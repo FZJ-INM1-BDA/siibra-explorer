@@ -1,0 +1,16 @@
+{
+  "extends": "./node_modules/neuroglancer/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*"],
+      "neuroglancer/*": ["third_party/neuroglancer/*"],
+      "nehuba/*": ["third_party/nehuba/*"],
+      "my-neuroglancer-project/*": ["src/my-neuroglancer-project/*"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

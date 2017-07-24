@@ -1,0 +1,20 @@
+{
+  "name": "nehubaUI",
+  "description": "desc",
+  "scripts": {
+    "build-min": "webpack --config ./config/webpack.min.js",
+    "build": "webpack --config ./config/webpack.config.js",
+    "dev-server": "webpack-dev-server --config ./config/webpack.config.js"
+  },
+  "dependencies": {
+    "neuroglancer": "^0.0.0-beta.0",
+    "nehuba": "^0.0.0-alpha.0",
+    "webpack": "^2.2.0",
+  },
+  "devDependencies": {
+    "html-webpack-plugin": "^2.29.0",
+    "tslint-eslint-rules": "^3.2.1",
+    "typescript": "2.3",
+    "webpack-dev-server": "^2.2.0"
+  }
+}
