@@ -1,11 +1,12 @@
 
 import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData,NehubaNavigator } from './nehubaUI.services'
+import { NehubaFetchData } from './nehubaUI.services'
 import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor } from './nehuba.model'
 import { NehubaModal } from './nehubaUI.modal.component'
-import { navigationControl,nehubaViewer } from '../main'
-import { changeTemplateHooks } from './nehubaUI.util.hooks'
+
+import { NehubaViewer } from 'nehuba/exports'
+// import { Viewer as NGViewer } from 'neuroglancer/viewer'
 
 @Component({
     selector : 'atlascontrol',
@@ -37,12 +38,15 @@ import { changeTemplateHooks } from './nehubaUI.util.hooks'
             transition('collapsed <=> expanded',animate('300ms'))
         ])
     ],
-    providers : [ NehubaFetchData,NehubaNavigator ],
+    providers : [ NehubaFetchData ],
 
 })
 
 export class NehubaUIControl implements OnInit,AfterViewInit{
 
+    @Input() nehubaViewer : NehubaViewer
+    // navigationControl : NGViewer
+    
     @ViewChild(NehubaModal) public modal:NehubaModal
     fetchedTemplatesData : FetchedTemplates;
 
@@ -66,7 +70,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     constructor( 
         private nehubaFetchData : NehubaFetchData,
         // private ngNavigator : NGNavigator,
-        private nehubaNavigator : NehubaNavigator,
+        // private nehubaNavigator : NehubaNavigator,
         private zone:NgZone
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
@@ -80,29 +84,11 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
     }
 
+    /** on view init 
+     * bind listeners for navigation changes
+     * fetch default templates
+     */
     ngOnInit():void{
-        
-        //listening for navigation state changes
-        //this is the angular2 way of implementing $scope.$apply() 
-        //if changed.add(listener) directly, the model does not get updated
-        
-        /* waiting for nehuba controller */
-
-        navigationControl.navigationState.changed.add(()=>{
-            this.zone.runOutsideAngular(()=>{
-                (this.nehubaNavigator.navigationStateChangeListener).bind(this.nehubaNavigator)(()=>{
-                    this.zone.run(()=>{})
-                })
-            })
-        })
-
-        navigationControl.mouseState.changed.add(()=>{
-            this.zone.runOutsideAngular(()=>{
-                (this.nehubaNavigator.mouseMoveChangeListener).bind(this.nehubaNavigator)(()=>{
-                    this.zone.run(()=>{})
-                })
-            })
-        })
 
         /* default dataset */
         this.nehubaFetchData.fetchJson('http://172.104.156.15/json/colin').then((json:any)=>{
@@ -121,24 +107,68 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     ngAfterViewInit():void{
         /* call template hook to do something? */
+        //listening for navigation state changes
+        //this is the angular2 way of implementing $scope.$apply() 
+        //if changed.add(listener) directly, the model does not get updated
+        
+        /* waiting for nehuba controller */
+        // this.navigationControl = this.nehubaViewer.ngviewer
+
+        // this.navigationControl.navigationState.changed.add(()=>{
+        //     this.zone.runOutsideAngular(()=>{
+        //         (this.nehubaNavigator.navigationStateChangeListener).bind(this.nehubaNavigator)(()=>{
+        //             this.zone.run(()=>{})
+        //         })
+        //     })
+        // })
+
+        // this.navigationControl.mouseState.changed.add(()=>{
+        //     this.zone.runOutsideAngular(()=>{
+        //         (this.nehubaNavigator.mouseMoveChangeListener).bind(this.nehubaNavigator)(()=>{
+        //             this.zone.run(()=>{})
+        //         })
+        //     })
+        // })
     }
 
     chooseTemplate(templateDescriptor:TemplateDescriptor):void{
         if ( this.selectedTemplate != templateDescriptor ){
-            /* deselect the current template */
-            this.selectedTemplate = templateDescriptor
-            this.selectedRegions = []
-            this.selectedParcellation = undefined
 
-            /* change the nehubaviewerconfig  */
-            nehubaViewer.config = this.selectedTemplate.nehubaConfig
-            nehubaViewer.applyInitialNgState()
-            nehubaViewer.relayout()
-            nehubaViewer.redraw()
+            let curtainMessage = {
+                title : 'Loading template',
+                message : 'Please wait while the template is being loaded ...',
+                dismissable : false
+            }
+            this.modal.curtainLower( curtainMessage ).then( modal =>{
 
-            /* apply change template hooks */
-            this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] > 0.5 ? false : true
-            changeTemplateHooks( this.darktheme )
+                /* required, as promise is async */
+                /* or ... is it? */
+                this.zone.run(()=>{
+
+                    /* deselect the current template */
+                    this.selectedTemplate = templateDescriptor
+                    this.selectedRegions = []
+                    this.selectedParcellation = undefined
+
+                    /* change the nehubaviewerconfig  */
+                    this.nehubaViewer.config = this.selectedTemplate.nehubaConfig
+
+                    /* temporary measure */
+                    this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] < 0.5
+
+                    this.nehubaViewer.applyInitialNgState()
+                    this.nehubaViewer.relayout()
+                    this.nehubaViewer.redraw()
+
+                })
+                
+                /* currently the modal automatically hides after 3 seconds. */
+                /* but in the future, we will be waiting for a signal from nehubaviewer */
+                /* signalling that it is ok to hide the modal */
+                setTimeout(()=>{
+                    modal.hide()
+                },3000)
+            })
         } 
     }
 
@@ -158,10 +188,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         return this.selectedRegions.some( itRegion => itRegion === region )
     }
 
+    /* TODO: this should go else where */
     toggleDefaultPanel(name:string,preventDefault:boolean):void{
         preventDefault ? {}:this.defaultPanelsState[name] == 'expanded' ? this.defaultPanelsState[name] = 'collapsed' : this.defaultPanelsState[name] = 'expanded'
     }
 
+    /* TODO: this should go elsewhere */
     toggleCollapse(id:String):void{
         //temporary solution, see above
         switch(id){
@@ -177,6 +209,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
     }
 
+    /* fetching a new template from an url address */
+    /* TODO: when error? */
+    /* TODO: on success, dismiss modal */
     modalAddTemplateFetch(url:string){
         this.nehubaFetchData.fetchJson(url)
             .then((json:any)=>{
@@ -200,55 +235,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     @Input() searchTerm : String = '';
-    @Output() darktheme : boolean = false;
+    @Output() public darktheme : boolean = false;
 }
 
 
-// import { createNehubaViewer,NehubaViewer } from 'nehuba/exports'
-// import { Viewer as NGViewer } from 'neuroglancer/viewer'
-// import { BigBrain,JuBrain } from '../dataset/datasetConfig'
-
-// @Component({
-//     selector : '#ATLASViewer',
-//     template : `
-//         <div id="container"></div>
-//     `
-// })
-
-// export class NehubaViewerContainer implements AfterViewInit{
-//     @Input() darkTheme : boolean
-//     nehubaViewer:NehubaViewer
-//     navigationControl:NGViewer
-
-//     ngAfterViewInit(){
-//         JuBrain
-//         let nehubaConfig = BigBrain
-//         this.nehubaViewer = createNehubaViewer(nehubaConfig)
-//         this.nehubaViewer.disableSegmentSelectionForLoadedLayers()
-//         this.navigationControl = nehubaViewer.ngviewer
-//         console.log("nehubaviewer init")
-//     }
-// }
-
-// @Component({
-//     selector : '#ATLASContainer',
-//     template : `
-    
-//       <atlasbanner>
-//       </atlasbanner>
-
-//       <atlascontrol>
-//         Loading Atlas Viewer ...
-//       </atlascontrol>
-//       <div id = "ATLASViewer">
-//         <div id="container"></div>
-//       </div>
-//     `,
-//     providers : [NehubaViewer,NehubaUIControl]
-// })
-
-// export class NehubaContainer implements OnInit{
-//     ngOnInit(){
-//         console.log("nehubacontainer init")
-//     }
-// }

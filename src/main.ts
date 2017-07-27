@@ -17,46 +17,8 @@
 import 'zone.js';
 import 'reflect-metadata';
 
-import { createNehubaViewer } from 'nehuba/exports'
-import { BigBrain,JuBrain } from './dataset/datasetConfig'
-
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import 'nehubaUI/templates/sass/theme.scss'
-
-window.addEventListener('DOMContentLoaded', () => {
-    JuBrain
-    // let button0 = document.getElementById('testButton0')
-    // button0!.addEventListener('click',()=>{
-    //   nehubaViewer.config = BigBrain
-    //   nehubaViewer.relayout()
-    //   nehubaViewer.applyInitialNgState()
-    //   nehubaViewer.disableSegmentSelectionForLoadedLayers()
-    // })
-    // let button1 = document.getElementById('testButton1')
-    // button1!.addEventListener('click',()=>{
-    //   nehubaViewer.config = JuBrain
-    //   nehubaViewer.relayout()
-      
-    //   nehubaViewer.applyInitialNgState()
-    // })
-
-    // let button2 = document.getElementById('testButton2')
-    // button2!.addEventListener('click',()=>{
-      
-    // })
-
-    // let button3 = document.getElementById('testButton3')
-    // button3!.addEventListener('click',()=>{
-    //    nehubaViewer
-    // })
-});
-
-let nehubaConfig = BigBrain
-export const nehubaViewer = createNehubaViewer(nehubaConfig)
-nehubaViewer.disableSegmentSelectionForLoadedLayers()
-
-/* waiting for nehuba native navigation control */
-export const navigationControl = nehubaViewer.ngviewer
 
 platformBrowserDynamic().bootstrapModule(NehubaUI);

@@ -9,9 +9,11 @@ import { ModalModule }  from 'ngx-bootstrap/modal'
 
 import { NehubaModal } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
-import { NehubaUIControl } from './nehubaUI.component';
+import { NehubaUIControl } from './nehubaUI.control.component';
+import { NehubaViewerContainer } from './nehubaUI.viewer.component';
+import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
-import { NehubaFetchData,NehubaNavigator } from './nehubaUI.services';
+import { NehubaFetchData } from './nehubaUI.services';
 import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight } from './nehubaUI.util.pipes'
 
 @NgModule({
@@ -24,8 +26,8 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight } from './nehu
         PopoverModule.forRoot(),
         ModalModule.forRoot()
     ],
-    declarations : [ NehubaUIControl,NehubaBanner,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight, MultilevelSelector, NehubaModal ],
-    bootstrap : [ NehubaUIControl,NehubaBanner ],
-    providers : [ NehubaFetchData,NehubaNavigator ]
+    declarations : [ NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight, MultilevelSelector, NehubaModal ],
+    bootstrap : [ NehubaContainer ],
+    providers : [ NehubaFetchData ]
 })
 export class NehubaUI{}

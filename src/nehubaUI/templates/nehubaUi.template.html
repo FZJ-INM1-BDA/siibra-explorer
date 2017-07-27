@@ -55,10 +55,10 @@
             <span class = "unicodeSymbols" (click) = "region.enabled = false">&times;</span>
         </div>
     </div>
-    <button class = "btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
+    <button class = "hidden btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
         Navigation
-    </button>
-    <div class = "menuItemContentList HBPWidget form-horizontal" [@panelExpansion]="defaultPanelsState.navigationPanelState">
+     </button>
+    <!-- <div class = "menuItemContentList HBPWidget form-horizontal" [@panelExpansion]="defaultPanelsState.navigationPanelState">
         <div class = "row">
             <div class = "col-md-12">
                 <h5>Position</h5>
@@ -132,5 +132,5 @@
             <button (click) = "nehubaNavigator.resetView()" class = "col-md-push-2 col-md-5 btn btn-default">Reset View</button>
             <button (click) = "nehubaNavigator.testbutton()" class = "col-md-push-2 col-md-5 btn btn-default">Debug Button</button>
         </div>
-    </div>
+    </div>  -->
 </div>

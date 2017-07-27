@@ -66,6 +66,21 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
         </div>
     </div>
 </div>
+<div bsModal #curtainModal="bs-modal" class = "modal fade" tabindex = -1 role = "dialog" (onShown) = "curtainHandler('onShown',$event)">
+    <div class = "modal-dialog modal-lg">
+        <div class = "modal-content">
+            <div class = "modal-header">
+                <h4 class = "modal-title pull-left">{{curtain.title}}</h4>
+                <button type="button" [ngClass] = "{hidden : !curtain.dismissable}" class="close pull-right" (click)="infoModal.hide()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class = "modal-body">
+                <span>{{curtain.message}}</span>
+            </div>
+        </div>
+    </div>
+</div>
     `
 })
 
@@ -73,6 +88,7 @@ export class NehubaModal{
     
     @ViewChild('inputModal') public inputModalObj:ModalDirective
     @ViewChild('infoModal') public infoModalObj:ModalDirective
+    @ViewChild('curtainModal') public curtainModal:ModalDirective
     @Output() fetchTemplate = new EventEmitter<string>()
 
     title:String = 'More Info'
@@ -117,5 +133,41 @@ export class NehubaModal{
     /* this function should be more generic. such as confirmModal(data:string) */
     callFetchTemplate(url:string){
         this.fetchTemplate.emit( url )
+    }
+
+    curtain = {
+        dismissable : false,
+        title : 'Curtain',
+        message : 'Curtain message'
+    }
+
+    public curtainHandler : any
+    curtainLower( curtainMessage:any ):Promise<ModalDirective>{
+        this.curtain.title = curtainMessage.title ? curtainMessage.title : 'Curtain'
+        this.curtain.message = curtainMessage.message ? curtainMessage.message : 'Curtain message'
+
+        let config = curtainMessage.dismissable ? 
+            {
+                animated : true,
+                keyboard : false,
+                backdrop : true,
+                ignoreBackdropClick : true
+            }
+            :
+            {
+                animated : true,
+                keyboard : true,
+                backdrop : true,
+                ignoreBackdropClick : false
+            }
+        return new Promise(resolve=>{
+            
+            this.curtainHandler = (type:string,$event:ModalDirective)=>{
+                console.log(type,$event)
+                resolve( this.curtainModal )
+            }
+            this.curtainModal.config = config
+            this.curtainModal.show()
+        })
     }
 }

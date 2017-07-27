@@ -30,13 +30,13 @@ $BORDERWIDTH : 2px;
         overflow-y:auto;
     }
     
-    #ATLASViewer{
+    ATLASViewer{
         grid-column-start:2;
         grid-column-end:span 1;
         grid-row-start:2;
         grid-row-end:span 1;
 
-        #container{
+        div#container{
             height:100%;
             width:100%;
 
@@ -48,20 +48,25 @@ $BORDERWIDTH : 2px;
                 border :$BORDERWIDTH solid gray(0.8)
             }
 
-            .gllayoutcell.darktheme{
-                border: $BORDERWIDTH solid gray(0.05)
-            }
-
-            .gllayoutcell.darktheme:hover{
-                border :$BORDERWIDTH solid gray(0.2)
-            }
-
             .scale-bar-container{
                 color : gray(0.05);
                 background-color : tgray(0.3,0.2)
             }
+        }
 
-            .scale-bar-container.darktheme{
+        div#container.darktheme{
+            height:100%;
+            width:100%;
+
+            .gllayoutcell{
+                border: $BORDERWIDTH solid gray(0.05)
+            }
+
+            .gllayoutcell:hover{
+                border :$BORDERWIDTH solid gray(0.2)
+            }
+
+            .scale-bar-container{
                 color : gray(0.95);
                 background-color : tgray(0.6,0.2)
             }
@@ -99,16 +104,68 @@ atlascontrol{
             .list-group-item{
                 @extend %darkthemetemplate;
                 margin : 0px;
+
+                .list-group-item-icon:hover{
+                    background-color:gray(0.25);
+                }
+
+                /* for multilevel */
+                div.menuItem{
+                    @extend %darkthemetemplate;
+
+                    div.menuItemContent{
+                        @extend %darkthemetemplate;
+
+                        .menuItemContentList{
+                            @extend %darkthemetemplate;
+
+                            span.multilevel-icon:hover{
+                                background-color:gray(0.25);
+                            }
+
+                        }
+                        .menuItemContentList:hover{
+                            @extend %darkthemetemplate;
+                            background-color:tgray(1.0,0.08);
+                        }
+                    }
+                }
             };
+
+            .list-group-item.nohover:hover{
+                @extend %darkthemetemplate;
+            }
+
             .list-group-item:hover{
                 @extend %darkthemetemplate;
                 background-color:tgray(1.0,0.08);
             };
             .list-group-item.active{
                 @extend %darkthemetemplate;
-
                 background-color:tgray(1.0,0.2);
             };
+
+            input.form-control{
+                @extend %darkthemetemplate;
+                background-color:gray(0.2);
+                color:gray(1);
+            };
+
+            input.form-control::-moz-placeholder{
+                @extend %darkthemetemplate;
+                color:tgray(1,0.4);
+            };
+
+            div.multiSelectPills{
+                background-color:rgb(150,150,50);
+                color:gray(0.8);
+            }
+            /* breaks FF somehow */
+            // input.form-control::-webkit-input-placeholder{
+            //     @extend %darkthemetemplate;
+            //     color:tgray(1,0.4);
+            // };
+        
         }
 
         %popovertemplate{
@@ -139,6 +196,63 @@ atlascontrol{
                 @extend %popovertemplate;
                 background-color:gray(0);
             };
+        }
+    }
+}
+
+atlasbanner{
+    div#bannerContainer{
+        height:100%;
+        background-color:gray(1);
+        display:flex;
+
+        %img{
+            height:100%;
+            flex: 0 0 auto;
+            background-size:contain;
+        }
+
+        img#hbplogo{
+            @extend %img;
+            margin:auto;
+            height:70%;
+        }
+        img#explorethebrain{
+            @extend %img;
+        }
+
+        img#cofundedbyEU{
+            @extend %img;
+            margin:auto;
+            height:70%;
+        }
+
+        div#bannerTitle{
+            flex: 1 1 auto;
+            h2{
+                text-align: center;
+                vertical-align: middle;
+                font-weight: 100;
+                font-size : 2.2vw;
+                color :gray(0);
+            }
+            small{
+                color: #c33;
+            }
+        }
+    }
+
+    div#bannerContainer.darktheme{
+        @extend div#bannerContainer;
+        background-color:gray(0);
+
+        div#bannerTitle{
+            h2{
+                color:gray(1);
+            }
+            small{
+                color:rgb(255,160,160);
+            }
         }
     }
 }

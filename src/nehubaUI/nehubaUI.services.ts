@@ -1,10 +1,10 @@
 
 import { Injectable } from '@angular/core';
 import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor } from './nehuba.model'
-import { vec4,vec3,quat } from 'neuroglancer/util/geom'
+import { vec4,vec3 } from 'neuroglancer/util/geom'
 import { Config as NehubaConfig } from 'nehuba/exports'
 
-import { navigationControl } from '../main'
+// import { Viewer as NGViewer } from 'neuroglancer/viewer'
 
 @Injectable()
 export class NehubaFetchData {
@@ -349,199 +349,204 @@ export class Navigation{
 }
 
 
-export class NehubaNavigator{
+// export class NehubaNavigator{
 
-    public navigation : Navigation
+//     public navigation : Navigation
+//     public navigationControl : NGViewer
     
-    constructor(){
-        this.navigation = new Navigation()
-        this.navigationRotQuaternionDiff = quat.create()
-        this.invertedQuat = quat.create()
-        this.normalizedVec3 = vec3.create()
+//     constructor(){
+//         this.navigation = new Navigation()
+//         this.navigationRotQuaternionDiff = quat.create()
+//         this.invertedQuat = quat.create()
+//         this.normalizedVec3 = vec3.create()
 
-        this.navigationRotRad = 0
-        this.navigationRotAxis = vec3.create()
+//         this.navigationRotRad = 0
+//         this.navigationRotAxis = vec3.create()
 
-        this.navigationAnimationRotRad = 0
-        this.navigationAnimationRotAxis = vec3.create()
+//         this.navigationAnimationRotRad = 0
+//         this.navigationAnimationRotAxis = vec3.create()
 
-        this.navigationStartrot = quat.create()
-        this.navigationEndrot = quat.create()
+//         this.navigationStartrot = quat.create()
+//         this.navigationEndrot = quat.create()
 
-        this.resetView()
-    }
+//         this.resetView()
+//     }
 
-    //listening to the NG navigationState change dispatch nullary signal
-    public navigationStateChangeListener(doneCallback: () => void){
+//     public registerViewer(viewer:NGViewer){
+//         this.navigationControl = viewer
+//     }
 
-        /* if navigationstate.position is resetted, I wonder if toJSON will return undefined? */
+//     //listening to the NG navigationState change dispatch nullary signal
+//     public navigationStateChangeListener(doneCallback: () => void){
+
+//         /* if navigationstate.position is resetted, I wonder if toJSON will return undefined? */
         
-        /* .toJSON() can return undefined */
-        /* need to catch */
+//         /* .toJSON() can return undefined */
+//         /* need to catch */
 
-        /* waiting on nehuba viewer navigation implementation */
+//         /* waiting on nehuba viewer navigation implementation */
         
-        this.navigation.setPosition(vec3.fromValues(
-            navigationControl.navigationState.position.toJSON().voxelCoordinates[0],
-            navigationControl.navigationState.position.toJSON().voxelCoordinates[1],
-            navigationControl.navigationState.position.toJSON().voxelCoordinates[2]))
+//         this.navigation.setPosition(vec3.fromValues(
+//             this.navigationControl.navigationState.position.toJSON().voxelCoordinates[0],
+//             this.navigationControl.navigationState.position.toJSON().voxelCoordinates[1],
+//             this.navigationControl.navigationState.position.toJSON().voxelCoordinates[2]))
         
 
-        /* viewer.navigationState.pose.orientation.toJSON() may return undefined if reset pose is called */
-        /* I wonder if viewer.navigationState.pose.orientation.orientation can ever be undefined */
-        /* somehow viewer.navigationState.pose.orientation.orientation can return [NaN, NaN, NaN, NaN] */
+//         /* viewer.navigationState.pose.orientation.toJSON() may return undefined if reset pose is called */
+//         /* I wonder if viewer.navigationState.pose.orientation.orientation can ever be undefined */
+//         /* somehow viewer.navigationState.pose.orientation.orientation can return [NaN, NaN, NaN, NaN] */
 
-        /* waiting on nehuba viewer navigation implemnetation */
+//         /* waiting on nehuba viewer navigation implemnetation */
         
-        if( isNaN(navigationControl.navigationState.pose.orientation.orientation[0]) ){
-            navigationControl.navigationState.pose.orientation.reset()
-        }else{
-            this.navigationRotRad = quat.getAxisAngle( this.navigationRotAxis,navigationControl.navigationState.pose.orientation.orientation)
-            this.navigation.setRotation( this.navigationRotRad, this.navigationRotAxis )
-        }
+//         if( isNaN(this.navigationControl.navigationState.pose.orientation.orientation[0]) ){
+//             this.navigationControl.navigationState.pose.orientation.reset()
+//         }else{
+//             this.navigationRotRad = quat.getAxisAngle( this.navigationRotAxis,this.navigationControl.navigationState.pose.orientation.orientation)
+//             this.navigation.setRotation( this.navigationRotRad, this.navigationRotAxis )
+//         }
         
-        doneCallback()
-    }
+//         doneCallback()
+//     }
 
-    //listening to the NG mousemove change dispatch signal
-    public mouseMoveChangeListener(doneCallback: () =>void){
-        /* update mouse position model here */
-        doneCallback()
-    }
+//     //listening to the NG mousemove change dispatch signal
+//     public mouseMoveChangeListener(doneCallback: () =>void){
+//         /* update mouse position model here */
+//         doneCallback()
+//     }
 
-    public resetView():void{
-        this.navigation.resetNavigation()
-        this.navigateView()
-    }
+//     public resetView():void{
+//         this.navigation.resetNavigation()
+//         this.navigateView()
+//     }
 
-    public navigateView():void{
+//     public navigateView():void{
         
-        /* I wonder if viewer.navigationState.pose.orientation.orientation can ever be undefined */
-        //waiting on nehuba viewer implementations
+//         /* I wonder if viewer.navigationState.pose.orientation.orientation can ever be undefined */
+//         //waiting on nehuba viewer implementations
         
-        this.navigationRotRad = quat.getAxisAngle( this.navigationRotAxis,navigationControl.navigationState.pose.orientation.orientation)
+//         this.navigationRotRad = quat.getAxisAngle( this.navigationRotAxis,this.navigationControl.navigationState.pose.orientation.orientation)
         
-        /* toJSON() can return undefined */
-        /* need to catch */
+//         /* toJSON() can return undefined */
+//         /* need to catch */
 
-        //waiting on nehuba viewer implementaiton
+//         //waiting on nehuba viewer implementaiton
         
-        this.gotoVoxelAnimation(500,
-            vec3.fromValues(
-                navigationControl.navigationState.position.toJSON().voxelCoordinates[0],
-                navigationControl.navigationState.position.toJSON().voxelCoordinates[1],
-                navigationControl.navigationState.position.toJSON().voxelCoordinates[2]),
-            this.navigation.getPosition(),
-            [ this.navigationRotRad , this.navigationRotAxis ],
-            this.navigation.getRotation())
+//         this.gotoVoxelAnimation(500,
+//             vec3.fromValues(
+//                 this.navigationControl.navigationState.position.toJSON().voxelCoordinates[0],
+//                 this.navigationControl.navigationState.position.toJSON().voxelCoordinates[1],
+//                 this.navigationControl.navigationState.position.toJSON().voxelCoordinates[2]),
+//             this.navigation.getPosition(),
+//             [ this.navigationRotRad , this.navigationRotAxis ],
+//             this.navigation.getRotation())
         
-    }
+//     }
 
-    //debug only
+//     //debug only
     
-    testbutton():void{
-        /*
-        console.log(viewer)
-        viewer.navigationState.pose.orientation.reset()
-        */
-    }
+//     testbutton():void{
+//         /*
+//         console.log(viewer)
+//         viewer.navigationState.pose.orientation.reset()
+//         */
+//     }
 
-    //navigation animation related variables.
-    navigationDuration : number = 0
-    navigationAnCountDown : number = 0
-    navigationAnTimeKeeper : number = 0
-    navigationReqAnFrame : any
+//     //navigation animation related variables.
+//     navigationDuration : number = 0
+//     navigationAnCountDown : number = 0
+//     navigationAnTimeKeeper : number = 0
+//     navigationReqAnFrame : any
 
-    navigationReqAnFrameTracker : any
+//     navigationReqAnFrameTracker : any
 
-    navigationStartpos : vec3
-    navigationEndpos : vec3
+//     navigationStartpos : vec3
+//     navigationEndpos : vec3
 
-    navigationStartrot : quat
-    navigationEndrot : quat
+//     navigationStartrot : quat
+//     navigationEndrot : quat
 
-    navigationRotQuaternionDiff : quat
-    navigationRotRad : number
-    navigationRotAxis : vec3
+//     navigationRotQuaternionDiff : quat
+//     navigationRotRad : number
+//     navigationRotAxis : vec3
 
-    navigationAnimationRotRad : number
-    navigationAnimationRotAxis : vec3
+//     navigationAnimationRotRad : number
+//     navigationAnimationRotAxis : vec3
 
-    /* dummy variables */
-    invertedQuat : quat
-    normalizedVec3 : vec3
+//     /* dummy variables */
+//     invertedQuat : quat
+//     normalizedVec3 : vec3
 
-    //animation move to the desired voxel
-    //needs: starting voxel position, end voxel position, duration
-    public gotoVoxelAnimation(duration:number,startpos:vec3,endpos:vec3,startrot:[number,vec3],endrot:[number,vec3]):void{
+//     //animation move to the desired voxel
+//     //needs: starting voxel position, end voxel position, duration
+//     public gotoVoxelAnimation(duration:number,startpos:vec3,endpos:vec3,startrot:[number,vec3],endrot:[number,vec3]):void{
 
-        /* in case a new request for navigation animation fires before the previous one finishes */
-        if( this.navigationReqAnFrameTracker ){
-            cancelAnimationFrame( this.navigationReqAnFrameTracker )
-        }
+//         /* in case a new request for navigation animation fires before the previous one finishes */
+//         if( this.navigationReqAnFrameTracker ){
+//             cancelAnimationFrame( this.navigationReqAnFrameTracker )
+//         }
 
-        this.navigationAnCountDown = duration
-        this.navigationDuration = duration
-        this.navigationAnTimeKeeper = Date.now()
+//         this.navigationAnCountDown = duration
+//         this.navigationDuration = duration
+//         this.navigationAnTimeKeeper = Date.now()
 
-        this.navigationStartpos = startpos
-        this.navigationEndpos = endpos
+//         this.navigationStartpos = startpos
+//         this.navigationEndpos = endpos
 
-        this.navigationStartrot = quat.setAxisAngle( this.navigationStartrot , startrot[1] , startrot[0] )
-        this.navigationEndrot = quat.setAxisAngle( this.navigationEndrot , endrot[1] , endrot[0] )
+//         this.navigationStartrot = quat.setAxisAngle( this.navigationStartrot , startrot[1] , startrot[0] )
+//         this.navigationEndrot = quat.setAxisAngle( this.navigationEndrot , endrot[1] , endrot[0] )
         
-        /* find the difference between two quarernions */
-        this.navigationRotQuaternionDiff = quat.mul(
-            this.navigationRotQuaternionDiff,
-            quat.invert( this.invertedQuat, this.navigationStartrot ),
-            this.navigationEndrot )
+//         /* find the difference between two quarernions */
+//         this.navigationRotQuaternionDiff = quat.mul(
+//             this.navigationRotQuaternionDiff,
+//             quat.invert( this.invertedQuat, this.navigationStartrot ),
+//             this.navigationEndrot )
 
-        if( this.navigationDuration > 0 ){
-            this.navigationAnimationRotRad = quat.getAxisAngle( this.navigationAnimationRotAxis , this.navigationRotQuaternionDiff ) / this.navigationDuration
-        }else{
-            this.navigationAnimationRotRad = quat.getAxisAngle( this.navigationAnimationRotAxis , this.navigationRotQuaternionDiff )
-        }
+//         if( this.navigationDuration > 0 ){
+//             this.navigationAnimationRotRad = quat.getAxisAngle( this.navigationAnimationRotAxis , this.navigationRotQuaternionDiff ) / this.navigationDuration
+//         }else{
+//             this.navigationAnimationRotRad = quat.getAxisAngle( this.navigationAnimationRotAxis , this.navigationRotQuaternionDiff )
+//         }
 
-        this.navigationReqAnFrameTracker = requestAnimationFrame(this.gotoVoxelAnimationLinear.bind(this))
-    }
+//         this.navigationReqAnFrameTracker = requestAnimationFrame(this.gotoVoxelAnimationLinear.bind(this))
+//     }
 
-    private gotoVoxelAnimationLinear():void{
+//     private gotoVoxelAnimationLinear():void{
 
-        if( this.navigationAnCountDown <= 0 ){
-            this.gotoVoxel(this.navigationEndpos)
-            this.rotate( this.navigationAnimationRotAxis , this.navigationAnimationRotRad )
-            this.navigationReqAnFrameTracker = null
-        }else{
-            this.navigationAnCountDown -= Date.now() - this.navigationAnTimeKeeper
+//         if( this.navigationAnCountDown <= 0 ){
+//             this.gotoVoxel(this.navigationEndpos)
+//             this.rotate( this.navigationAnimationRotAxis , this.navigationAnimationRotRad )
+//             this.navigationReqAnFrameTracker = null
+//         }else{
+//             this.navigationAnCountDown -= Date.now() - this.navigationAnTimeKeeper
             
-            /* do rotation here */
-            this.rotate( this.navigationAnimationRotAxis , this.navigationAnimationRotRad * ( Date.now() - this.navigationAnTimeKeeper ) )
+//             /* do rotation here */
+//             this.rotate( this.navigationAnimationRotAxis , this.navigationAnimationRotRad * ( Date.now() - this.navigationAnTimeKeeper ) )
 
-            this.navigationAnTimeKeeper = Date.now()
+//             this.navigationAnTimeKeeper = Date.now()
 
-            /* do movement here */
-            this.gotoVoxel(vec3.fromValues(
-                    this.navigationStartpos[0] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[0] * ( 1 - this.navigationAnCountDown / this.navigationDuration),
-                    this.navigationStartpos[1] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[1] * ( 1 - this.navigationAnCountDown / this.navigationDuration),
-                    this.navigationStartpos[2] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[2] * ( 1 - this.navigationAnCountDown / this.navigationDuration)
-                )
-            )
-            this.navigationReqAnFrameTracker = requestAnimationFrame(this.gotoVoxelAnimationLinear.bind(this))
-        }
-    }
+//             /* do movement here */
+//             this.gotoVoxel(vec3.fromValues(
+//                     this.navigationStartpos[0] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[0] * ( 1 - this.navigationAnCountDown / this.navigationDuration),
+//                     this.navigationStartpos[1] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[1] * ( 1 - this.navigationAnCountDown / this.navigationDuration),
+//                     this.navigationStartpos[2] * this.navigationAnCountDown / this.navigationDuration + this.navigationEndpos[2] * ( 1 - this.navigationAnCountDown / this.navigationDuration)
+//                 )
+//             )
+//             this.navigationReqAnFrameTracker = requestAnimationFrame(this.gotoVoxelAnimationLinear.bind(this))
+//         }
+//     }
 
-    //teleports to the described location
-    private gotoVoxel(pos:vec3):void{
-        pos
-        //waiting on nehuba viewer implementation
-        navigationControl.navigationState.pose.position.setVoxelCoordinates(pos)
-    }
+//     //teleports to the described location
+//     private gotoVoxel(pos:vec3):void{
+//         pos
+//         //waiting on nehuba viewer implementation
+//         this.navigationControl.navigationState.pose.position.setVoxelCoordinates(pos)
+//     }
 
-    //rotate relative to the current rotation configuration
-    private rotate(axis:vec3,rad:number){
-        axis
-        rad
-        //waiting on nehuba viwer implementation
-        navigationControl.navigationState.pose.rotateRelative(axis,rad)
-    }
-}
+//     //rotate relative to the current rotation configuration
+//     private rotate(axis:vec3,rad:number){
+//         axis
+//         rad
+//         //waiting on nehuba viwer implementation
+//         this.navigationControl.navigationState.pose.rotateRelative(axis,rad)
+//     }
+// }

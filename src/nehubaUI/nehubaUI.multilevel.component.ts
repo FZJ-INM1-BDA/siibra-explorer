@@ -1,7 +1,6 @@
 import { Input, Output, EventEmitter,Component,AfterViewInit } from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { Multilevel } from './nehuba.model'
-// import { SearchHighlight } from './nehubaUI.util.pipes'
 
 @Component({
     selector : 'multilevel',
