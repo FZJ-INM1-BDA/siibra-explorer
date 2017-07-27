@@ -1,0 +1,144 @@
+$WHITE : rgb(255,255,255);
+$BLACK : rgb(0,0,0);
+$BORDERWIDTH : 2px;
+@function gray($percent){
+    @return rgb($percent*255,$percent*255,$percent*255)
+};
+@function tgray($percent,$alpha){
+    @return rgba($percent*255,$percent*255,$percent*255,$alpha)
+};
+
+#ATLASContainer{
+    background-color:$WHITE;
+    color:$BLACK;
+    height:100%;
+    width:100%;
+    display:grid;
+    grid-template-columns:25% 75%;
+    grid-template-rows:10% 90%;
+    
+    atlasbanner{
+        grid-column-start:1;
+        grid-column-end:span 2;
+    }
+    
+    atlascontrol{
+        grid-column-start:1;
+        grid-column-end:span 1;
+        grid-row-start:2;
+        grid-row-end:span 1;
+        overflow-y:auto;
+    }
+    
+    #ATLASViewer{
+        grid-column-start:2;
+        grid-column-end:span 1;
+        grid-row-start:2;
+        grid-row-end:span 1;
+
+        #container{
+            height:100%;
+            width:100%;
+
+            .gllayoutcell{
+                border: $BORDERWIDTH solid gray(0.95)
+            }
+
+            .gllayoutcell:hover{
+                border :$BORDERWIDTH solid gray(0.8)
+            }
+
+            .gllayoutcell.darktheme{
+                border: $BORDERWIDTH solid gray(0.05)
+            }
+
+            .gllayoutcell.darktheme:hover{
+                border :$BORDERWIDTH solid gray(0.2)
+            }
+
+            .scale-bar-container{
+                color : gray(0.05);
+                background-color : tgray(0.3,0.2)
+            }
+
+            .scale-bar-container.darktheme{
+                color : gray(0.95);
+                background-color : tgray(0.6,0.2)
+            }
+        }
+    }
+}
+
+%darkthemetemplate{
+    background-color : gray(0);
+    color : gray(0.85);
+}
+
+atlascontrol{
+    .darktheme{
+        @extend %darkthemetemplate;
+        min-height:100%;
+
+        .btn.btn-lg.btn-default{
+            @extend %darkthemetemplate;
+            border : 1px solid gray(0.8);
+        };
+        .btn.btn-lg.btn-default:hover{
+            @extend %darkthemetemplate;
+            background-color:gray(0.08)
+        };
+        .btn.btn-lg.btn-default.inactive{
+            @extend %darkthemetemplate;
+            color : gray(0.3);
+            border : 1px solid gray(0.3);
+        };
+
+        .list-group{
+            @extend %darkthemetemplate;
+            
+            .list-group-item{
+                @extend %darkthemetemplate;
+                margin : 0px;
+            };
+            .list-group-item:hover{
+                @extend %darkthemetemplate;
+                background-color:tgray(1.0,0.08);
+            };
+            .list-group-item.active{
+                @extend %darkthemetemplate;
+
+                background-color:tgray(1.0,0.2);
+            };
+        }
+
+        %popovertemplate{
+            background-color : gray(0.2);
+            color : gray(0.8);
+        }
+
+        popover-container.popover{
+            border:1px solid tgray(255,0.2);
+            box-shadow: 0 5px 10px tgray(1,0.2 );
+            background-color : gray(0);
+
+            .popover-arrow{
+                border-color:transparent;
+                border-right-color : tgray(1,0.2);
+            };
+            .popover-arrow:after{
+                border-color:transparent;
+                border-right-color : gray(0);
+            }
+
+            .popover-title{
+                @extend %popovertemplate;
+                border-bottom: 1px solid gray(0.08);
+            };
+
+            .popover-content{
+                @extend %popovertemplate;
+                background-color:gray(0);
+            };
+        }
+    }
+}

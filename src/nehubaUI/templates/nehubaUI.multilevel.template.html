@@ -1,0 +1,40 @@
+<div *ngFor = "let singleData of data" [hidden]="!singleData.hasVisibleChildren()">
+    <div class = "menuItem">
+        <div class = "menuItemContent">
+            <div (click)="chooseLevel(singleData)" class = "menuItemContentList" [ngClass]="{selected : isMultilevelSelected(singleData)} ">
+                <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
+                    
+                    <span class = "multilevel-name">
+                        <span [@multilvlArrow]="singleData.isExpandedString" (click) = "expandMultilvl( singleData ,$event)" *ngIf="singleData.children.length>0" class = "unicodeSymbols">
+                            &#x25e2;
+                        </span>
+                        <span *ngIf="singleData.children.length==0" class = "unicodeSymbols">
+                            &#x2003;
+                        </span>
+
+                        <span *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <span class = "unicodeSymbols">&#x25A3;</span>
+                        </span>
+                        <span *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <span class = "unicodeSymbols">&#x2611;</span>
+                        </span>
+                        <span *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+                            <span class = "unicodeSymbols">&#x2610;</span>
+                        </span>
+
+                        <span [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData">
+
+                        </span>
+                    </span>
+                    <span class = "multilevel-icon unicodeSymbols" (click) = "callingModal(singleData);$event.stopPropagation()"  >
+                        &#x24d8;
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class = "multilvlContainer" [@multilvlExpansion]="singleData.isExpanded ? 'expanded' : 'collapsed'">
+        <multilevel (callModal)="callingModal($event)" *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
+        </multilevel>
+    </div>
+</div>

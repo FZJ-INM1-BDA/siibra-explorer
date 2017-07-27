@@ -7,14 +7,36 @@
     "dev-server": "webpack-dev-server --config ./config/webpack.config.js"
   },
   "dependencies": {
-    "neuroglancer": "^0.0.0-beta.0",
+    "@angular/animations": "^4.1.3",
+    "@angular/cli": "^1.0.3",
+    "@angular/common": "^4.1.3",
+    "@angular/compiler": "^4.1.3",
+    "@angular/core": "^4.1.3",
+    "@angular/forms": "^4.1.3",
+    "@angular/http": "^4.1.3",
+    "@angular/platform-browser": "^4.1.3",
+    "@angular/platform-browser-dynamic": "^4.1.3",
+    "@angular/router": "^4.1.3",
+    "angular2-materialize": "^15.0.3",
+    "core.js": "^0.4.2",
+    "materialize-css": "^0.98.2",
     "nehuba": "^0.0.0-alpha.0",
+    "neuroglancer": "^0.0.0-beta.0",
+    "ngx-bootstrap": "^1.8.0",
+    "reflect-metadata": "^0.1.10",
+    "rxjs": "^5.4.2",
+    "tslint": "^5.5.0",
     "webpack": "^2.2.0",
+    "zone.js": "^0.8.10"
   },
   "devDependencies": {
     "html-webpack-plugin": "^2.29.0",
+    "node-sass": "^4.5.3",
+    "reflect-metadata": "^0.1.10",
+    "sass-loader": "^6.0.6",
     "tslint-eslint-rules": "^3.2.1",
     "typescript": "2.3",
+    "webpack": "^2.7.0",
     "webpack-dev-server": "^2.2.0"
   }
 }

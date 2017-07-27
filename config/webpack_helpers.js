@@ -40,6 +40,15 @@ function modifyViewerOptions(options) {
   options.frontendModules = [resolveReal(__dirname, '../src/main.ts')];
 
   options.htmlPlugin = new HtmlWebpackPlugin({template : "src/index.html"})
+  
+  let testScss = {
+    test : /\.scss$/,
+    use : ['style-loader','css-loader','sass-loader']
+  }
+  
+  options.otherRules = [
+    testScss
+  ]
   return options;
 }
 
