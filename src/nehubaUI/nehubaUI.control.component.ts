@@ -215,10 +215,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     modalAddTemplateFetch(url:string){
         this.nehubaFetchData.fetchJson(url)
             .then((json:any)=>{
+                this.zone.runOutsideAngular(()=>{
+                    this.modal.inputResponse = 'Adding template successful.'
+                    this.zone.run(()=>{})
+                })
+                this.modal.inputInput = ''
                 this.fetchedTemplatesData.templates.push( this.nehubaFetchData.parseTemplateData( json ) )
             })
             .catch((err:any)=>{
-                console.log('error when adding a new template',err)
                 this.zone.runOutsideAngular(()=>{
                     this.modal.inputResponse = 'error when adding a new template' + err;
                     this.zone.run(()=>{})
