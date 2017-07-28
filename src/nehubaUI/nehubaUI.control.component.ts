@@ -136,7 +136,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
             let curtainMessage = {
                 title : 'Loading template',
-                message : 'Please wait while the template is being loaded ...',
+                message : 'Please wait while the template is being loaded ... TODO: this modal currently dismiss on a timer. In production, it will wait for the viewer\'s completion signal, and then gets dismissed. ',
                 dismissable : false
             }
             this.modal.curtainLower( curtainMessage ).then( modal =>{

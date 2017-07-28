@@ -163,7 +163,8 @@ export class NehubaModal{
         return new Promise(resolve=>{
             
             this.curtainHandler = (type:string,$event:ModalDirective)=>{
-                console.log(type,$event)
+                type
+                $event
                 resolve( this.curtainModal )
             }
             this.curtainModal.config = config

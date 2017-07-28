@@ -80,7 +80,14 @@ $BORDERWIDTH : 2px;
 }
 
 atlascontrol{
-    .darktheme{
+    div{
+        .list-group{
+            .list-group-item{
+                margin:0px
+            }
+        }
+    }
+    div.darktheme{
         @extend %darkthemetemplate;
         min-height:100%;
 

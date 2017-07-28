@@ -30,4 +30,6 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight } from './nehu
     bootstrap : [ NehubaContainer ],
     providers : [ NehubaFetchData ]
 })
-export class NehubaUI{}
+export class NehubaUI{
+    
+}
