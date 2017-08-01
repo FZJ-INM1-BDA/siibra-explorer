@@ -9,7 +9,7 @@
   "dependencies": {
     "neuroglancer": "^0.0.0-beta.0",
     "nehuba": "^0.0.0-alpha.0",
-    "webpack": "^2.2.0",
+    "webpack": "^2.2.0"
   },
   "devDependencies": {
     "html-webpack-plugin": "^2.29.0",
