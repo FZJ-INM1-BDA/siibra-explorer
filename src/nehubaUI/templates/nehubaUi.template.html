@@ -29,7 +29,12 @@
     </button>
     <div class = "list-group" *ngIf="selectedTemplate" [@panelExpansion]="defaultPanelsState.parcellationsPanelState" >
         <div (click)="chooseParcellation(parcellation)" class = "list-group-item" [ngClass]="{active : parcellation == selectedParcellation} " *ngFor = "let parcellation of selectedTemplate.parcellations">
-            <span class = "list-group-item-name">
+            
+            <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.isShown = !parcellation.isShown;$event.stopPropagation() "  >
+                <span *ngIf = "parcellation.isShown" class = "glyphicon glyphicon-eye-open"></span>
+                <span *ngIf = "!parcellation.isShown" class = "glyphicon glyphicon-eye-close"></span>
+            </span>
+            <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
                 {{ parcellation.name }}   
             </span>
             <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >

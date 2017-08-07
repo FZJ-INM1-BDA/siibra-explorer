@@ -86,10 +86,18 @@ atlascontrol{
                 margin:0px
             }
         }
+        .text-muted{
+            text-decoration: line-through
+        }
     }
     div.darktheme{
         @extend %darkthemetemplate;
         min-height:100%;
+
+        .text-muted{
+            text-decoration: line-through;
+            color : gray(0.5)
+        }
 
         .btn.btn-lg.btn-default{
             @extend %darkthemetemplate;
