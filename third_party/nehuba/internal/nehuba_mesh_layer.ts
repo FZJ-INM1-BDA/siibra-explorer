@@ -134,17 +134,18 @@ export function getValuesForClipping(extra: ExtraRenderContext) {
       }
       
       if (conf.flipRemovedOctant) {
-        octant = vec4.fromValues(0.0, 0.0, -1.0, 1.0);
-        let perspectivePose = extra.perspectivePose;
+        octant = vec4.fromValues(0.0, 0.0, -(extra.perspectiveNavigationState.zoomFactor.value), 1.0);
+		  let perspectivePose = extra.perspectiveNavigationState.pose;
+		  let pos = pose.position.spatialCoordinates;
         let perspectiveQuat = perspectivePose.orientation.orientation;
         let navQuat = quat.invert(quat.create(), pose.orientation.orientation);
         let resQuat = quat.multiply(quat.create(), navQuat, perspectiveQuat);
         let rot = mat4.fromQuat(mat4.create(), resQuat);
         vec4.transformMat4(octant, octant, rot);
-        octant[0] = octant[0] < 0.0 ? -1.0 : 1.0;
-        octant[1] = octant[1] < 0.0 ? -1.0 : 1.0;
-        octant[2] = octant[2] < 0.0 ? -1.0 : 1.0;
-        octant[3] = octant[3] < 0.0 ? -1.0 : 1.0;
+        octant[0] = octant[0] < (pos[0]/100) ? -1.0 : 1.0;
+        octant[1] = octant[1] < (pos[1]/100) ? -1.0 : 1.0;
+        octant[2] = octant[2] < (pos[2]/100) ? -1.0 : 1.0;
+      //   octant[3] = octant[3] < 0.0 ? -1.0 : 1.0;
       }
     }
     return {navState, octant, backFaceColor};

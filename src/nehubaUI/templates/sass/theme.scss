@@ -86,6 +86,9 @@ atlascontrol{
             .list-group-item{
                 margin:0px
             }
+            textarea.form-control{
+                resize:vertical;
+            }
         }
         .text-muted{
             text-decoration: line-through
@@ -168,6 +171,12 @@ atlascontrol{
             };
 
             input.form-control{
+                @extend %darkthemetemplate;
+                background-color:gray(0.2);
+                color:gray(1);
+            };
+
+            textarea.form-control{
                 @extend %darkthemetemplate;
                 background-color:gray(0.2);
                 color:gray(1);

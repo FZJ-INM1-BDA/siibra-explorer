@@ -45,15 +45,26 @@
                     &#x24d8;
                 </span>
             </div>
-            <div class = "well">
-                <div class = "col-md-2">
-                    Opacity: 
-                </div>
-                <div class = "col-md-4">
-                    <input class = "form-control" [(ngModel)]="parcellation.masterOpacity" type = "number" max = "1" min = "0" step = "0.01">
-                </div>
-                <div class = "col-md-4">
-                    <input [(ngModel)]="parcellation.masterOpacity" type = "range" max = "1" min = "0" step = "0.01">
+            <div *ngIf = "parcellation.subPanelShown"  class = "subPanel">
+                <div class = "well row">
+                    <div class = "form-horizontal">
+                        <div class = "form-group">
+                            <label class = "col-md-2 control-label" for="masterOpacity">Opacity: </label>
+                            <div class = "col-md-4">
+                                <input name = "masterOpacity" id = "masterOpacity" class = "form-control" [(ngModel)]="parcellation.masterOpacity" type = "number" max = "1" min = "0" step = "0.01">
+                            </div>
+                            <div class = "col-md-4 control-label" for = "masterOpacity">
+                                <input [(ngModel)]="parcellation.masterOpacity" type = "range" max = "1" min = "0" step = "0.01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "form-group">
+                        <label class = "control-label" for="masterOpacity">Custom GLSL Code: </label>
+                        <div class = "col-md-12">
+                            <textarea [(ngModel)]="parcellation.customGLSL" class = "form-control"  >
+                            </textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

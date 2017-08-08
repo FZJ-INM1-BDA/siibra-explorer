@@ -6,7 +6,7 @@ import {startRelativeMouseDrag} from 'neuroglancer/util/mouse_drag';
 
 import { PerspectivePanel, PerspectiveViewerState, perspectivePanelEmit, OffscreenTextures, perspectivePanelEmitOIT } from "neuroglancer/perspective_view/panel";
 import { quat } from 'neuroglancer/util/geom';
-import { Pose } from 'neuroglancer/navigation_state';
+import { NavigationState, Pose } from 'neuroglancer/navigation_state';
 
 import { NehubaSliceViewRenderHelper, TransparentPlaneRenderHelper } from "nehuba/internal/nehuba_renderers";
 import { Config } from "nehuba/config";
@@ -17,7 +17,7 @@ const tempMat4 = mat4.create();
 export interface ExtraRenderContext {
   config: Config
   slicesPose: Pose
-  perspectivePose: Pose
+  perspectiveNavigationState: NavigationState
   /** To be set by our custom renderLayers to indicate that mesh has been rendered. So it is a return value from draw method to avoid changing draw method signature */
   meshRendered?: boolean
 }
@@ -142,7 +142,7 @@ export class NehubaPerspectivePanel extends PerspectivePanel {
       extra: {
         config: this.config,
         slicesPose: (<any>this.viewer).slicesNavigationState.pose as Pose,
-        perspectivePose: this.viewer.navigationState.pose,
+        perspectiveNavigationState: this.viewer.navigationState,
         // meshRendered: false
       }
     };
