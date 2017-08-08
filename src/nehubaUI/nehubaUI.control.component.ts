@@ -6,7 +6,6 @@ import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescri
 import { NehubaModal } from './nehubaUI.modal.component'
 
 import { NehubaViewer } from 'nehuba/exports'
-// import { Viewer as NGViewer } from 'neuroglancer/viewer'
 
 @Component({
     selector : 'atlascontrol',
@@ -38,7 +37,7 @@ import { NehubaViewer } from 'nehuba/exports'
             transition('collapsed <=> expanded',animate('300ms'))
         ])
     ],
-    providers : [ NehubaFetchData ],
+    providers : [ NehubaFetchData,NehubaModal ],
 
 })
 
@@ -231,11 +230,11 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     showMoreInfo(item:any):void{
-        this.modal.showModal('More Info',item)
+        this.modal.showModal('More Info',[item])
     }
 
-    showInputModal():void{
-        this.modal.showInputModal('Add Template')
+    showInputModal(type:string):void{
+        this.modal.showInputModal('Add '+type)
     }
 
     @Input() searchTerm : String = '';

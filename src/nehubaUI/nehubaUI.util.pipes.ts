@@ -21,6 +21,20 @@ export class SearchPipe implements PipeTransform{
 }
 
 @Pipe({
+    name:'keyPipe'
+})
+
+export class KeyPipe implements PipeTransform{
+    public transform(obj:any):string[]{
+        let returnKey = []
+        for (let key in obj){
+            returnKey.push(key)
+        }
+        return returnKey
+    }
+}
+
+@Pipe({
     name:'searchTreePipe'
 })
 

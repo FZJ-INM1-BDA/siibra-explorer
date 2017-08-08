@@ -20,7 +20,7 @@
             </div>
         </div>
         
-        <div (click) = "showInputModal()" class = "list-group-item flex-center">
+        <div (click) = "showInputModal('Template')" class = "list-group-item flex-center">
             &#x2295; Add New Template
         </div>
     </div>
@@ -28,18 +28,29 @@
         Parcellations <small *ngIf = "selectedParcellation">({{selectedParcellation.name}})</small>
     </button>
     <div class = "list-group" *ngIf="selectedTemplate" [@panelExpansion]="defaultPanelsState.parcellationsPanelState" >
-        <div (click)="chooseParcellation(parcellation)" class = "list-group-item" [ngClass]="{active : parcellation == selectedParcellation} " *ngFor = "let parcellation of selectedTemplate.parcellations">
-            
-            <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.isShown = !parcellation.isShown;$event.stopPropagation() "  >
-                <span *ngIf = "parcellation.isShown" class = "glyphicon glyphicon-eye-open"></span>
-                <span *ngIf = "!parcellation.isShown" class = "glyphicon glyphicon-eye-close"></span>
-            </span>
-            <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
-                {{ parcellation.name }}   
-            </span>
-            <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
-                &#x24d8;
-            </span>
+        <div *ngFor = "let parcellation of selectedTemplate.parcellations">
+            <div (click)="chooseParcellation(parcellation)" class = "list-group-item" [ngClass]="{active : parcellation == selectedParcellation} " >
+                
+                <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.isShown = !parcellation.isShown;$event.stopPropagation() "  >
+                    <span *ngIf = "parcellation.isShown" class = "glyphicon glyphicon-eye-open"></span>
+                    <span *ngIf = "!parcellation.isShown" class = "glyphicon glyphicon-eye-close"></span>
+                </span>
+                <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
+                    {{ parcellation.name }}   
+                </span>
+                <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.subPanelShown = !parcellation.subPanelShown;$event.stopPropagation()"  >
+                    <i class = "glyphicon glyphicon-cog"></i>
+                </span>
+                <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
+                    &#x24d8;
+                </span>
+            </div>
+            <div class = "well">
+                control panel
+            </div>
+        </div>
+        <div (click) = "showInputModal('Parcellation')" class = "list-group-item flex-center">
+            &#x2295; Add New Parcellation
         </div>
     </div>
     <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('regionsPanelState',selectedParcellation == undefined)" [ngClass]="{inactive: selectedParcellation == undefined}">

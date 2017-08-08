@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input,Output,EventEmitter } from '@angular/core'
 
 @Component({
     selector : 'atlasbanner',
@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core'
 
 export class NehubaBanner {
     @Input() darktheme : boolean
+    @Output() showModal:EventEmitter<string> = new EventEmitter()
 
     hbpimg : string = 'src/assets/images/HBP_Horizontal_RGB_BlackText.png'
     hbpimgdark : string = 'src/assets/images/HBP_Horizontal_RGB_WhiteText.png'
@@ -16,4 +17,8 @@ export class NehubaBanner {
 
     euimg : string = 'src/assets/images/cofundedByEU.png'
     euimgdark : string = 'src/assets/images/cofundedByEU.png'
+
+    showhelp(){
+        this.showModal.emit('showHelpModal')
+    }
 }

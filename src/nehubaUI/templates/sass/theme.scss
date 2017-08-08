@@ -1,5 +1,6 @@
 $WHITE : rgb(255,255,255);
 $BLACK : rgb(0,0,0);
+$GOLDEN : rgb(244,212,48);
 $BORDERWIDTH : 2px;
 @function gray($percent){
     @return rgb($percent*255,$percent*255,$percent*255)
@@ -255,6 +256,15 @@ atlasbanner{
                 color: #c33;
             }
         }
+
+        span.unicodeSymbols{
+            color:gray(0);
+        }
+
+            span.unicodeSymbols:hover{
+                color:$GOLDEN;
+                cursor:pointer;
+            }
     }
 
     div#bannerContainer.darktheme{
@@ -269,5 +279,14 @@ atlasbanner{
                 color:rgb(255,160,160);
             }
         }
+
+        span.unicodeSymbols{
+            color:gray(1);
+        }
+
+            span.unicodeSymbols:hover{
+                color:$GOLDEN;
+                cursor:pointer;
+            }
     }
 }

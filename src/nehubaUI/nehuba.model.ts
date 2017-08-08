@@ -26,15 +26,15 @@ export class ParcellationDescriptor {
         this.name = name
         this.regions = []
         this.properties = {}
-        this.isShown = true
     }
     regions : RegionDescriptor[];
     name : string;
     getUrl : string;
     properties : any;
 
-    isShown : boolean;
+    isShown : boolean = true;
     masterOpacity : number;
+    subPanelShown : boolean = false;
 
     nehubaConfig : Nehubaconfig;
 }

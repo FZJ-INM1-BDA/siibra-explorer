@@ -55,11 +55,16 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
             </div>
             <div class = "modal-body">
                 <div class = "row" *ngFor="let singleData of data">
-                    <div class = "col-md-3">
-                        {{singleData.title}}
+                    <div class = "col-md-12">
+                    <h3>{{singleData.name}}</h3>
                     </div>
-                    <div class = "col-md-9">
-                        {{singleData.value}}
+                    <div *ngFor="let key of singleData.properties | keyPipe">
+                        <div class = "col-md-3">
+                            {{key}}
+                        </div>
+                        <div class = "col-md-9">
+                            {{singleData.properties[key]}}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -101,31 +106,18 @@ export class NehubaModal{
     inputInput:string = ''
     inputResponse:string = ''
 
-    public showModal( modalTitle:string = 'More Info', item : any ){
+    public showModal( modalTitle:string = 'More Info', items : any[] ){
 
         this.title = modalTitle
+        this.data = items
 
-        this.data = []
-        this.data.push({
-            title : 'name',
-            value : item.name
-        })
-
-        if( item.properties ){
-            for(let key in item.properties){
-                this.data.push({
-                    title:key,
-                    value:JSON.stringify( item.properties[key] )
-                })
-            }
-        }
         setTimeout(()=>{
             this.infoModalObj.show()
         },0)
     }
 
     public showInputModal(modalTitle:string){
-        this.inputTitle = 'Add New Template'
+        this.inputTitle = 'Add New '+modalTitle
         this.inputLabel = modalTitle
         this.inputModalObj.show()
     }

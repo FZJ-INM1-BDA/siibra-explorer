@@ -14,7 +14,7 @@ import { NehubaViewerContainer } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
 import { NehubaFetchData } from './nehubaUI.services';
-import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight } from './nehubaUI.util.pipes'
+import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
@@ -26,9 +26,12 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight } from './nehu
         PopoverModule.forRoot(),
         ModalModule.forRoot()
     ],
-    declarations : [ NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight, MultilevelSelector, NehubaModal ],
+    declarations : 
+        [ NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
+        MultilevelSelector, NehubaModal,
+        SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe ],
     bootstrap : [ NehubaContainer ],
-    providers : [ NehubaFetchData ]
+    providers : [ NehubaFetchData,NehubaModal ]
 })
 export class NehubaUI{
     
