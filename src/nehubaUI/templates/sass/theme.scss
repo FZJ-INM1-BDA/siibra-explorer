@@ -114,6 +114,12 @@ atlascontrol{
             border : 1px solid gray(0.3);
         };
 
+        .well{
+            background-color:gray(0.0);
+            color:gray(0.6);
+            border: solid 1px gray(0.3);
+        }
+
         .list-group{
             @extend %darkthemetemplate;
             

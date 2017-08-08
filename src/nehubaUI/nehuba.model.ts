@@ -33,7 +33,7 @@ export class ParcellationDescriptor {
     properties : any;
 
     isShown : boolean = true;
-    masterOpacity : number;
+    masterOpacity : number = 1.00;
     subPanelShown : boolean = false;
 
     nehubaConfig : Nehubaconfig;
