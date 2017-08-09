@@ -7,14 +7,13 @@ import { NehubaViewerContainer } from './nehubaUI.viewer.component'
     selector : '#ATLASContainer',
     template : `
     
-      <atlasbanner (showModal)="showModal($event)" [darktheme]="nehubaUIControl.darktheme" >
+      <atlasbanner [darktheme]="nehubaUIControl.darktheme" >
       </atlasbanner>
 
       <atlascontrol [nehubaViewer]="nehubaViewerContainer.nehubaViewer">
         Loading Atlas Viewer ...
       </atlascontrol>
-      <ATLASViewer [darktheme]="nehubaUIControl.darktheme" id = "ATLASViewer">
-        <div id="container"></div>
+      <ATLASViewer (showModal)="showModal($event)" [darktheme]="nehubaUIControl.darktheme" id = "ATLASViewer">
       </ATLASViewer>
     `,
 })

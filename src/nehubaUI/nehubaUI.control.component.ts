@@ -2,7 +2,7 @@
 import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { NehubaFetchData } from './nehubaUI.services'
-import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor } from './nehuba.model'
+import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 import { NehubaModal } from './nehubaUI.modal.component'
 
 import { NehubaViewer } from 'nehuba/exports'
@@ -49,6 +49,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     @ViewChild(NehubaModal) public modal:NehubaModal
     fetchedTemplatesData : FetchedTemplates;
 
+    listOfActiveLayers : LayerDescriptor[]
+
     selectedTemplate : TemplateDescriptor | undefined; 
     selectedParcellation : ParcellationDescriptor | undefined; 
     selectedRegions : RegionDescriptor[] = []; 
@@ -73,6 +75,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         private zone:NgZone
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
+        this.listOfActiveLayers = []
 
         /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
         this.defaultPanelsState = {
@@ -151,6 +154,13 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
                     /* change the nehubaviewerconfig  */
                     this.nehubaViewer.config = this.selectedTemplate.nehubaConfig
+
+                    /* currently, parses layer directly from nehubaConfig */
+                    /* probably expecting an official nehuba api in the future */
+                    let ngJson = this.nehubaViewer.config.dataset!.initialNgState
+                    for (let key in ngJson.layers){
+                        this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
+                    }
 
                     /* temporary measure */
                     this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] < 0.5

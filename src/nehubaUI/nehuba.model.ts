@@ -7,6 +7,18 @@ export class FetchedTemplates {
     templates : TemplateDescriptor[];
 }
 
+export class LayerDescriptor {
+    constructor(name:string,json:any){
+        this.name = name
+        this.propoerties = json
+    }
+    propoerties : any;
+    name : string;
+
+    isShown : boolean = true;
+    subPanelShown : boolean = false;
+}
+
 export class TemplateDescriptor {
     constructor(name:string){
         this.name = name
