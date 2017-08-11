@@ -10,13 +10,15 @@ import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
 import { TabsModule }  from 'ngx-bootstrap/tabs'
 
+import { FloatingWidgetDirective } from './nehubaUI.floatingWidget.directive'
+import { FloatingWidget,FloatingWidgetComponent } from './nehubaUI.floatingWidget.component';
 import { NehubaModal } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
-import { NehubaFetchData } from './nehubaUI.services';
+import { NehubaFetchData,EventCenter } from './nehubaUI.services';
 import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
@@ -32,11 +34,12 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonPa
         TabsModule.forRoot()
     ],
     declarations : 
-        [ NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
+        [ FloatingWidgetComponent, FloatingWidgetDirective,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,FloatingWidget,
         MultilevelSelector, NehubaModal,
         SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
     bootstrap : [ NehubaContainer ],
-    providers : [ NehubaFetchData,NehubaModal ]
+    providers : [ NehubaFetchData,NehubaModal,EventCenter ],
+    entryComponents : [ FloatingWidgetComponent ]
 })
 export class NehubaUI{
     

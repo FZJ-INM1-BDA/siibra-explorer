@@ -1,8 +1,8 @@
 
-import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild} from '@angular/core'
+import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild,EventEmitter} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData } from './nehubaUI.services'
-import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
+import { NehubaFetchData,EventCenter } from './nehubaUI.services'
+import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 import { NehubaModal } from './nehubaUI.modal.component'
 
 import { NehubaViewer } from 'nehuba/exports'
@@ -47,6 +47,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     // navigationControl : NGViewer
     @Input() searchTerm : String = '';
     @Output() public darktheme : boolean = false;
+    @Output() presetShader = new EventEmitter<LayerDescriptor>()
     
     @ViewChild(NehubaModal) public modal:NehubaModal
     fetchedTemplatesData : FetchedTemplates;
@@ -75,7 +76,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         private nehubaFetchData : NehubaFetchData,
         // private ngNavigator : NGNavigator,
         // private nehubaNavigator : NehubaNavigator,
-        private zone:NgZone
+        private zone:NgZone,
+        private eventCenter:EventCenter
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
 
@@ -97,8 +99,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     ngOnInit():void{
 
         /* load default dataset */
+        /* TODO: Migrate to service.ts */
         this.loadInitDatasets()
-
     }
 
     ngAfterViewInit():void{
@@ -263,6 +265,17 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     showInputModal(type:string):void{
         this.modal.showInputModal('Add '+type)
+    }
+
+    loadPresetShader(layer:LayerDescriptor):void{
+        layer
+        console.log('loadpresetshader')
+        this.eventCenter.eventRelay.emit(
+            new EventPacket('floatingWidget',Date.now().toString(),200,'open')
+        )
+        this.eventCenter.eventRelay.subscribe((resp:EventPacket)=>{
+            console.log(resp)
+        })
     }
 }
 

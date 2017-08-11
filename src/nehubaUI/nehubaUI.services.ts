@@ -1,6 +1,6 @@
 
-import { Injectable } from '@angular/core';
-import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor } from './nehuba.model'
+import { Injectable,EventEmitter } from '@angular/core';
+import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
 import { vec4,vec3 } from 'neuroglancer/util/geom'
 import { Config as NehubaConfig } from 'nehuba/exports'
 
@@ -501,7 +501,12 @@ export class Navigation{
     }
 }
 
-
+export class EventCenter{
+    eventRelay : EventEmitter<EventPacket>
+    constructor(){
+        this.eventRelay = new EventEmitter()
+    }
+}
 // export class NehubaNavigator{
 
 //     public navigation : Navigation

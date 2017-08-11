@@ -264,3 +264,16 @@ export abstract class DescriptorBase{
         return returnProperties
     }
 }
+
+export class EventPacket{
+    constructor(target:string,id:string,code:number,message:string){
+        this.target = target
+        this.id = id
+        this.code = code
+        this.message = message
+    }
+    target : string     /* possible values: modal | floatingWidget */
+    id : string         /* unique identifier for each transaction */
+    code : number       /* code to indicate status. use http code for convenience */
+    message : string    /* message */
+}

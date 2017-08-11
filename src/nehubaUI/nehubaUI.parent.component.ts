@@ -15,6 +15,8 @@ import { NehubaViewerContainer } from './nehubaUI.viewer.component'
       </atlascontrol>
       <ATLASViewer (showModal)="showModal($event)" [darktheme]="nehubaUIControl.darktheme" id = "ATLASViewer">
       </ATLASViewer>
+      <FloatingWidgetContainer>
+      </FloatingWidgetContainer>
     `,
 })
 
