@@ -36,21 +36,18 @@ export class NehubaContainer implements OnInit{
         }
       }
 
-      helpMenu:any = [
+      helpMenu:any = 
         {
-          name : 'Mouse Controls',
-          properties : {
+          'Mouse Controls' : {
             "Left-drag" : "within a slice view to move within that plane",
             "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
             "Mouse-Wheel" : "up or down to zoom in and out.",
             "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
             "Ctrl + Right-click" : "within a slice to teleport to that location"
-          }
-        },{
-          name : 'Keyboard Controls',
-          properties : {
+          },
+          'Keyboard Controls' : {
             "tobe":"completed"
           }
         }
-      ]
+      
 }

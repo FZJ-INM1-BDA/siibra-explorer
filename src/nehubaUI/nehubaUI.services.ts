@@ -95,87 +95,240 @@ export class NehubaFetchData {
         })
     }
 
-    parseTemplateData(json:any):TemplateDescriptor{
-        let newTemplateDescriptor = new TemplateDescriptor( json.name )
+    parseTemplateData(json:any):Promise<TemplateDescriptor>{
+
+        let promiseArray : Promise<any>[] = []
 
         /* nehubaviewer config */
-        this.parseNehubaConfig( json ).then( config =>{
-            newTemplateDescriptor.nehubaConfig = config
-        })
+        promiseArray.push( 
+            new Promise((resolve,reject)=>{
+                this.parseNehubaConfig( json )
+                    .then(config=>{
+                        resolve(config)
+                    }) 
+                    .catch( e =>{
+                        reject(e)
+                    })
+                })
+            )
 
-        /* deciding which fields go in the description modal */
-        for( let key in json ){
-            if( key !== 'name' ){
-                newTemplateDescriptor.properties[key] = json[key]
-            }
-        }
+        /* properties will define what gets displayed in the modal window */
+        /* goinng to be strict on what gets displayed and what does not */
+        promiseArray.push(
+            new Promise((resolve)=>{
+                if (json.properties){
+                    resolve(json.properties)
+                }else if(json.getPropertiesUrl){
+                    this.fetchJson( json.getPropertiesUrl )
+                        .then(obj=>{
+                            resolve(obj)
+                        })
+                        .catch(e=>{
+                            this.handleError('fetching template properties error')
+                            this.handleError(e)
+                            resolve({})
+                        })
+                }else{
+                    /* if there is no properties field */
+                    /* nor is there a getPropertiesUrl field */
+                    /* then return an empty object */
+                    resolve({})
+                }
+                }))
 
         /* parse the parcellation described by the template */
-        if ( json.parcellations ){
-            /* if the parcellations already exist */
-            json.parcellations.forEach( (parcellation:any) => newTemplateDescriptor.parcellations.push( this.parseParcellationData( parcellation ) ) )
-        } else if ( json.parcellationsURL ) {
-            /* if parcellations were not defined, but the method of fetching a list of parcellations exist */
-            this.fetchJson( json.parcellationsURL ).then( (obj:any)=>{
-                newTemplateDescriptor.parcellations.push(this.parseParcellationData(obj))
+        promiseArray.push(
+            new Promise(resolve=>{
+                if ( json.parcellations ){
+                    /* if the parcellations already exist */
+                    resolve(json.parcellations)
+                    // json.parcellations.forEach( (parcellation:any) => newTemplateDescriptor.parcellations.push( this.parseParcellationData( parcellation ) ) )
+                } else if ( json.parcellationsURL ) {
+                    /* if parcellations were not defined, but the method of fetching a list of parcellations exist */
+                    this.fetchJson( json.parcellationsURL ).then( (obj:any)=>{
+                        resolve(obj)
+                        // newTemplateDescriptor.parcellations.push(this.parseParcellationData(obj))
+                    })
+                } else {
+                    this.handleError('parse tempaltedata error. Neither json.parcellations nor json.parcellationsURL exist ')
+                    resolve([])
+                }
             })
-        } else {
-            /* getURL is deprecated */
-            this.handleError('parse tempaltedata error. Neither json.parcellations nor json.parcellationsURL exist ')
-        }
+        )
 
-        return newTemplateDescriptor
-    }
-
-    parseParcellationData(json:any):ParcellationDescriptor{
-        let newParcellation = new ParcellationDescriptor( json.name )
-
-        /* deciding which fields go in the description modal */
-        for( let key in json ){
-            if( key !== 'name' ){
-                newParcellation.properties[key] = json[key]
-            }
-        }
-
-        /* parse the region described by the parcellation */
-        if ( json.regions ){
-            /* if the regions property already exists */
-            json.regions.forEach( (region:any)=>{
-                newParcellation.regions.push( this.validateRegionData(region,0) )
-            })
-        } else if ( json.regionsURL ){
-            /* if regions were not defined, fetch regionsURL */
-            this.fetchJson( json.regionsURL ).then( (obj:any)=>{
-                obj.forEach((o:any)=>{
-                    newParcellation.regions.push( this.validateRegionData(o,0))
+        
+        return new Promise((resolve) =>{
+            let newTemplateDescriptor = new TemplateDescriptor( json.name )
+            Promise.all( promiseArray ).then( (values) =>{
+                    newTemplateDescriptor.nehubaConfig = values[0]
+                    newTemplateDescriptor.properties = values[1]
+                    if(values[2].constructor === Array || values[2].constructor === Object){
+                        for(let key in values[2]){
+                            this.parseParcellationData((<any>values[2])[key])
+                                .then(parcellation=>{
+                                    newTemplateDescriptor.parcellations.push( parcellation )
+                                })
+                        }
+                    }else{
+                        this.handleError('resolved promise from parcellation is not of array or object type')
+                    }
+                    resolve( newTemplateDescriptor )
                 })
-            })
-        } else if ( json.getUrl ){
-            this.fetchJson( json.getUrl ).then( (obj:any)=>{
-                let tempParcellation =  this.parseParcellationData( obj )
-                newParcellation.regions = tempParcellation.regions
-            })
-        } else {
-            /* getURL is deprecated */
-            this.handleError('parse parcellationdata error. neither json.regions, json.regionsurl nor json.getURL exist.')
-        }
-        return newParcellation
+        })
     }
 
-    validateRegionData(json:any,hierarchy:number):RegionDescriptor{
-        let newRegionDescriptor = new RegionDescriptor( json.name )
-        newRegionDescriptor.hierarchy = hierarchy
-        for( let key in json ){
-            if( key !== 'name' && key !== 'children' ){
-                newRegionDescriptor.properties[key] = json[key]
+    parseParcellationData(json:any):Promise<ParcellationDescriptor>{
+
+        let promiseArray : Promise<any>[] = []
+
+        /* properties will define what gets displayed in the modal window */
+        /* goinng to be strict on what gets displayed and what does not */
+        promiseArray.push(
+            new Promise((resolve)=>{
+                if (json.properties){
+                    resolve(json.properties)
+                }else if(json.getPropertiesUrl){
+                    this.fetchJson( json.getPropertiesUrl )
+                        .then(obj=>{
+                            resolve(obj)
+                        })
+                        .catch(e=>{
+                            this.handleError('fetching parcellation properties error')
+                            this.handleError(e)
+                            resolve({})
+                        })
+                }else{
+                    /* if there is no properties field */
+                    /* nor is there a getPropertiesUrl field */
+                    /* then return an empty object */
+                    resolve({})
+                }
+                }))
+        
+        promiseArray.push(new Promise(resolve=>{
+            if( json.regions ){
+                let regionsArray:Promise<RegionDescriptor>[] = []
+                json.regions.forEach((region:any) =>{
+                    regionsArray.push(this.validateRegionData(region,0))
+                })
+                Promise.all(regionsArray).then(values=>{
+                    let r:RegionDescriptor[] = []
+                    values.forEach(value=>{
+                        r.push(value)
+                    })
+                    resolve(r)
+                })
+            }else if( json.regionsURL ){
+                this.fetchJson( json.regionsURL )
+                    .then( obj =>{
+                        let regionsArray:Promise<RegionDescriptor>[] = []
+                        obj.forEach((region:any) =>{
+                            regionsArray.push(this.validateRegionData(region,0))
+                        })
+                        Promise.all(regionsArray).then(values=>{
+                            let r:RegionDescriptor[] = []
+                            values.forEach(value=>{
+                                r.push(value)
+                            })
+                            resolve(r)
+                        })
+                    })
+            }else if ( json.getUrl ){
+                this.fetchJson( json.getUrl )
+                    .then(obj=>{
+                        this.parseParcellationData(obj)
+                            .then(parcellation=>{
+                                resolve(parcellation.regions)
+                            })
+                            .catch(e=>{
+                                this.handleError('json.geturl, then parse parcellation data failed')
+                                this.handleError(e)
+                                resolve([])
+                            })
+                    })
+                    .catch(e=>{
+                        this.handleError('fetchjson json.geturl failed')
+                        this.handleError(e)
+                        resolve([])
+                    })
+            }else{
+                /* resolves with an empty array */
+                resolve([])
             }
-        }
-        if (json.children && json.children.length > 0){
-            let regions:RegionDescriptor[] = []
-            json.children.forEach((child:any) => regions.push( this.validateRegionData( child ,hierarchy+1) ))
-            newRegionDescriptor.children = regions
-        }
-        return newRegionDescriptor
+        }))
+
+        return new Promise(resolve=>{
+            Promise.all(promiseArray)
+                .then(values=>{
+                    let returnParcellation = new ParcellationDescriptor(json.name)
+                    returnParcellation.properties = values[0]
+                    returnParcellation.regions = values[1]
+                    resolve(returnParcellation)
+                })
+        })
+    }
+
+    validateRegionData(json:any,hierarchy:number):Promise<RegionDescriptor>{
+        let promiseArray : Promise<any>[] = []
+
+        /* properties will define what gets displayed in the modal window */
+        /* goinng to be strict on what gets displayed and what does not */
+        promiseArray.push(
+            new Promise((resolve)=>{
+                if (json.properties){
+                    resolve(json.properties)
+                }else if(json.getPropertiesUrl){
+                    this.fetchJson( json.getPropertiesUrl )
+                        .then(obj=>{
+                            resolve(obj)
+                        })
+                        .catch(e=>{
+                            this.handleError('fetching template properties error')
+                            this.handleError(e)
+                            resolve({})
+                        })
+                }else{
+                    /* if there is no properties field */
+                    /* nor is there a getPropertiesUrl field */
+                    /* then return an empty object */
+                    resolve({})
+                }
+                }))
+        
+        promiseArray.push(new Promise(resolve=>{
+            if (json.children && json.children.constructor === Array){
+                let regionsArray:Promise<RegionDescriptor>[] = []
+                json.children.forEach((child:any) =>{
+                    regionsArray.push(this.validateRegionData(child,hierarchy+1))
+                })
+                Promise.all(regionsArray).then(values=>{
+                    let r:RegionDescriptor[] = []
+                    values.forEach(value=>{
+                        r.push(value)
+                    })
+                    resolve(r)
+                })
+            } else {
+                resolve([])
+            }
+        }))
+
+        return new Promise((resolve,reject)=>{
+            Promise
+                .all(promiseArray)
+                .then(values=>{
+                    let newRegionDescriptor = new RegionDescriptor( json.name )
+                    newRegionDescriptor.hierarchy = hierarchy
+                    newRegionDescriptor.properties = values[0]
+                    newRegionDescriptor.children = values[1]
+                    resolve(newRegionDescriptor)
+                })
+                .catch(e=>{
+                    this.handleError('resolving all promises in validating regional data failed')
+                    this.handleError(e)
+                    reject(e)
+                })
+        })
     }
 
     private handleError(error:any):Promise<any>{

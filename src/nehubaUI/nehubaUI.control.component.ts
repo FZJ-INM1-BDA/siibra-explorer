@@ -24,7 +24,7 @@ import { NehubaViewer } from 'nehuba/exports'
             state('expanded',style({
 
             })),
-            transition('collapsed <=> expanded',animate('300ms'))
+            transition('collapsed <=> expanded',animate('0ms'))
         ]),
         trigger('panelExpansionExtra',[
             state('collapsed',style({
@@ -34,7 +34,7 @@ import { NehubaViewer } from 'nehuba/exports'
                 paddingTop : '0em',
                 paddingBottom : '0em',
             })),
-            transition('collapsed <=> expanded',animate('300ms'))
+            transition('collapsed <=> expanded',animate('1ms'))
         ])
     ],
     providers : [ NehubaFetchData,NehubaModal ],
@@ -45,11 +45,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     @Input() nehubaViewer : NehubaViewer
     // navigationControl : NGViewer
+    @Input() searchTerm : String = '';
+    @Output() public darktheme : boolean = false;
     
     @ViewChild(NehubaModal) public modal:NehubaModal
     fetchedTemplatesData : FetchedTemplates;
 
-    listOfActiveLayers : LayerDescriptor[]
+    listOfActiveLayers : LayerDescriptor[] = []
+    enableAdvancedMode : string
 
     selectedTemplate : TemplateDescriptor | undefined; 
     selectedParcellation : ParcellationDescriptor | undefined; 
@@ -75,7 +78,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         private zone:NgZone
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
-        this.listOfActiveLayers = []
 
         /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
         this.defaultPanelsState = {
@@ -84,6 +86,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             regionsPanelState : 'collapsed',
             navigationPanelState : 'collapsed'
         }
+
+        this.enableAdvancedMode = 'off'
     }
 
     /** on view init 
@@ -92,19 +96,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
      */
     ngOnInit():void{
 
-        /* default dataset */
-        this.nehubaFetchData.fetchJson('http://172.104.156.15/json/colin').then((json:any)=>{
-            this.fetchedTemplatesData.templates.push( this.nehubaFetchData.parseTemplateData(json) )
-        })
-        this.nehubaFetchData.fetchJson('http://172.104.156.15/json/bigbrain').then((json:any)=>{
-            this.fetchedTemplatesData.templates.push( this.nehubaFetchData.parseTemplateData(json) )
-        })
-        //fetch the metadata for the atlas viewer
-        // this.hbpFetchData.fetchTemplateData()
-        //     .then(fetchedTemplates => {
-        //         this.fetchedTemplatesData = fetchedTemplates
-        //     })
-        //     .catch(error => console.log('An error has occured',error));
+        /* load default dataset */
+        this.loadInitDatasets()
+
     }
 
     ngAfterViewInit():void{
@@ -133,6 +127,26 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         // })
     }
 
+    loadInitDatasets(){
+        let datasetArray = [
+            'http://172.104.156.15/json/bigbrain',
+            'http://172.104.156.15/json/colin'
+        ]
+
+        datasetArray.forEach(dataset=>{
+            this.nehubaFetchData.fetchJson(dataset)
+                .then((json:any)=>{
+                    this.nehubaFetchData.parseTemplateData(json)
+                        .then( template =>{
+                            this.fetchedTemplatesData.templates.push( template )
+                        })
+                        .catch(e=>{
+                            console.log(e)
+                        })
+                    })
+            })
+    }
+
     chooseTemplate(templateDescriptor:TemplateDescriptor):void{
         if ( this.selectedTemplate != templateDescriptor ){
 
@@ -157,6 +171,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
                     /* currently, parses layer directly from nehubaConfig */
                     /* probably expecting an official nehuba api in the future */
+                    this.listOfActiveLayers = []
                     let ngJson = this.nehubaViewer.config.dataset!.initialNgState
                     for (let key in ngJson.layers){
                         this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
@@ -229,7 +244,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                     this.zone.run(()=>{})
                 })
                 this.modal.inputInput = ''
-                this.fetchedTemplatesData.templates.push( this.nehubaFetchData.parseTemplateData( json ) )
+                this.nehubaFetchData.parseTemplateData( json )
+                    .then(template=>{
+                        this.fetchedTemplatesData.templates.push( template )
+                    })
             })
             .catch((err:any)=>{
                 this.zone.runOutsideAngular(()=>{
@@ -240,15 +258,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     showMoreInfo(item:any):void{
-        this.modal.showModal('More Info',[item])
+        this.modal.showModal('More Info',item)
     }
 
     showInputModal(type:string):void{
         this.modal.showInputModal('Add '+type)
     }
-
-    @Input() searchTerm : String = '';
-    @Output() public darktheme : boolean = false;
 }
 
 

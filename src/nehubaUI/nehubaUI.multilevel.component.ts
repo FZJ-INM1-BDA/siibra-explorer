@@ -21,7 +21,7 @@ import { Multilevel } from './nehuba.model'
             state('expanded',style({
 
             })),
-            transition('collapsed <=> expanded',animate('300ms'))
+            transition('collapsed <=> expanded',animate('0ms'))
         ]),
         trigger('multilvlArrow',[
             state('collapsed',style({
@@ -29,7 +29,7 @@ import { Multilevel } from './nehuba.model'
             })),
             state('expanded',style({
             })),
-            transition('collapsed <=> expanded',animate('100ms'))
+            transition('collapsed <=> expanded',animate('0ms'))
         ])
     ]
 })

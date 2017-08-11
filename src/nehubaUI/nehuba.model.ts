@@ -7,23 +7,104 @@ export class FetchedTemplates {
     templates : TemplateDescriptor[];
 }
 
+export class LayerProperties{
+    constructor(json:any){
+        for(let key in this){
+            if(json[key]){
+                this[key] = json[key]
+            }
+        }
+    }
+    type:string = '';
+    source:string = '';
+    transform:number[][] = [
+        [1,0,0,0],
+        [0,1,0,0],
+        [0,0,1,0],
+        [0,0,0,1]
+    ]
+    shader:string = ''
+}
+
 export class LayerDescriptor {
     constructor(name:string,json:any){
         this.name = name
-        this.propoerties = json
+        this.properties = new LayerProperties(json)
     }
-    propoerties : any;
+    properties : LayerProperties;
     name : string;
+    masterOpacity : number = 1.0;
 
     isShown : boolean = true;
     subPanelShown : boolean = false;
+}
+
+export class Property{
+    constructor(obj:any){
+        try{
+            this.name = obj.name
+            if( obj.fields ){
+                this.fields = obj.fields
+            }else if ( obj.getUrl ){
+                let self = this
+                fetch(obj.getUrl)
+                    .then(resp=> {
+                        return resp.json()
+                    })
+                    .then(json=>{
+                        self.fields = json
+                    })
+                    .catch(err=>{
+                        throw new Error(err)
+                    })
+            }else {
+                this.fields = {}
+            }
+        }catch (e) {
+            console.log('Error parsing property object',e)
+            console.log('Dumping text instead ...')
+            this.name = "Text Info"
+            this.fields = {
+                "raw":JSON.stringify(obj)
+            }
+        }
+    }
+
+    name:string     /* will be displayed as title */
+    fields:any      /* will be displayed as key JSON.stringify(value) pair */
+                    /* set as an empty set if no values are to be displayed */
+    getUrl:string   /* will be called if fields do not exist */
+
+    /* fallback: fields are populated with length zero array */
+    /* sample objs to be passed to Property constructor:
+
+    {
+        "name"      : "Academic Information",
+        "fields"    : {
+            "authors"       : "K.A. Person, B.A. Mass",
+            "affiliation"   : "FZ Juelich"
+        },
+        "getUrl"    : "http://www.examples.org/sample/academic"  //will be ignored
+    }
+
+    {
+        "name"      : "Histological Information",
+        "getUrl"    : "http://www.examples.org/sample/histological"
+    }
+    
+    {
+        "name"      : "NB: This information is licensed under MIT license."
+        "fields"    : []
+    }
+
+    */
 }
 
 export class TemplateDescriptor {
     constructor(name:string){
         this.name = name
         this.parcellations = []
-        this.properties = {}
+        this.properties = []
     }
     name : string;
     getUrl : string;
@@ -31,13 +112,14 @@ export class TemplateDescriptor {
     properties : any;
     
     nehubaConfig : Nehubaconfig;
+
 }
 
 export class ParcellationDescriptor {
     constructor(name:string){
         this.name = name
         this.regions = []
-        this.properties = {}
+        this.properties = []
     }
     regions : RegionDescriptor[];
     name : string;
@@ -127,11 +209,58 @@ export class RegionDescriptor extends Multilevel{
     constructor(name:string){
         super()
         this.name = name
-        this.properties = {}
+        this.properties = []
     }
 
     children : RegionDescriptor[] = []
     name : string;
     properties : any;
     getUrl: string;
+}
+
+export abstract class DescriptorBase{
+    private parseArrayObjectStringToArray = (obj:any):Promise<any[]> => {
+        return new Promise( resolve =>{
+            switch( obj.constructor ){
+                case Array: {
+                    resolve(obj)
+                }break;
+                case String: {
+                    resolve([obj])
+                }break;
+                case Object: {
+                    let newArray = []
+                    for (let key in obj){
+                        newArray.push({key:obj[key]})
+                    }
+                    resolve(newArray)
+                }default: {
+                    resolve([])
+                }
+            }
+        })
+    }
+
+    // private parseArrayObjecctStringToObject = (obj:any):Promise<Object> =>{
+    //     return new Promise( resolve =>{
+    //         switch (obj.constructor) {
+    //             case String :{
+    //                 resolve({"desc":obj})
+    //             }break;
+    //             case 
+    //         }
+    //     })
+    // }
+
+    parsePropertiesField = (obj:any):Property[] => {
+        let returnProperties : Property[] = []
+
+        this.parseArrayObjectStringToArray( obj ).then(array=>{
+            for (let idx in array){
+                array[idx]
+            }
+        })
+
+        return returnProperties
+    }
 }

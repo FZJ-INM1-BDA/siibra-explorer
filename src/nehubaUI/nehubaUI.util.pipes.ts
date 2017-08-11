@@ -3,6 +3,36 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { SecurityContext } from '@angular/core'
 import { Multilevel } from './nehuba.model'
 
+/* experimental */
+
+@Pipe({
+    name:'jsonStringifyPipe'
+})
+
+export class JsonStringifyPipe implements PipeTransform{
+    public transform(json:any){
+        return JSON.stringify(json)
+    }
+}
+
+@Pipe({
+    name:'jsonParsePipe'
+})
+
+export class JsonParsePipe implements PipeTransform{
+    public transform(string:string){
+        let json
+        try{
+            json = JSON.parse(string)
+            return json
+        } catch (e){
+            
+        }
+    }
+}
+
+/* experimental */
+
 @Pipe({
     name:'searchPipe'
 })

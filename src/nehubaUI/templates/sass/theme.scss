@@ -28,7 +28,26 @@ $BORDERWIDTH : 2px;
         grid-column-end:span 1;
         grid-row-start:2;
         grid-row-end:span 1;
-        overflow-y:auto;
+        
+        div#leftSide{
+            height:100%;
+            width:100%;
+            display:grid;
+            grid-template-rows:auto 40px;
+
+            div#leftSideTop{
+                grid-row-start:1;
+                grid-row-end:span 1;
+                overflow-y:auto;
+                overflow-x:hidden;
+            }
+
+            div#leftSideBottom{
+                grid-row-start:2;
+                grid-row-end:span 1;
+                text-align: center;
+            }
+        }
     }
     
     ATLASViewer{
@@ -96,7 +115,18 @@ atlascontrol{
     }
     div.darktheme{
         @extend %darkthemetemplate;
-        min-height:100%;
+
+        .subPanel{
+            @extend %darkthemetemplate;
+        }
+
+        .form-group{
+            input[type=text],textarea{
+                @extend %darkthemetemplate;
+                background-color:gray(0.2);
+                color:gray(1);
+            }
+        }
 
         .text-muted{
             text-decoration: line-through;

@@ -54,16 +54,34 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
                 </button>
             </div>
             <div class = "modal-body">
-                <div class = "row" *ngFor="let singleData of data">
-                    <div class = "col-md-12">
-                    <h3>{{singleData.name}}</h3>
-                    </div>
-                    <div *ngFor="let key of singleData.properties | keyPipe">
+                <div class = "row">
+                    <tabset class = "col-md-12">
+                        <tab *ngFor="let key of data | keyPipe" [heading] = "key">
+                            <div class = "well row">
+                                <div *ngIf="data[key].constructor.name == 'String'" class = "col-md-12">
+                                    {{data[key]}}
+                                </div>
+                                <div *ngIf="data[key].constructor.name == 'Object'" class = "col-md-12">
+                                    <div class = "row" *ngFor="let key2 of data[key] | keyPipe">
+                                        <div class = "col-md-3">
+                                            {{key2}}
+                                        </div>
+                                        <div class = "col-md-9">
+                                            {{ data[key][key2] | jsonStringifyPipe }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </tab>
+                    </tabset>
+                </div>
+                <div *ngIf = "false" class = "row">
+                    <div *ngFor="let key of data | keyPipe">
                         <div class = "col-md-3">
                             {{key}}
                         </div>
                         <div class = "col-md-9">
-                            {{singleData.properties[key]}}
+                            {{ data[key] | jsonStringifyPipe }}
                         </div>
                     </div>
                 </div>
@@ -106,10 +124,10 @@ export class NehubaModal{
     inputInput:string = ''
     inputResponse:string = ''
 
-    public showModal( modalTitle:string = 'More Info', items : any[] ){
+    public showModal( modalTitle:string = 'More Info', properties : any ){
 
         this.title = modalTitle
-        this.data = items
+        this.data = properties
 
         setTimeout(()=>{
             this.infoModalObj.show()
@@ -117,7 +135,7 @@ export class NehubaModal{
     }
 
     public showInputModal(modalTitle:string){
-        this.inputTitle = 'Add New '+modalTitle
+        this.inputTitle = 'Add New ' + modalTitle
         this.inputLabel = modalTitle
         this.inputModalObj.show()
     }
