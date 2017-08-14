@@ -503,13 +503,15 @@ export class Navigation{
 }
 
 export class EventCenter{
-    floatingWidgetRelay : Subject<EventPacket>
+    floatingWidgetRelay : Subject<Subject<EventPacket>>
     constructor(){
         this.floatingWidgetRelay = new Subject()
+    }
 
-        this.floatingWidgetRelay.subscribe({
-            next : (v) => console.log(v)
-        })
+    createNewRelay():Subject<EventPacket>{
+        let newSubject : Subject<EventPacket> = new Subject()
+        this.floatingWidgetRelay.next(newSubject)
+        return newSubject
     }
 
     // createNewRelay():Subject<EventPacket>{

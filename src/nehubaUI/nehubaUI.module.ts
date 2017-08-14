@@ -9,6 +9,7 @@ import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
 import { TabsModule }  from 'ngx-bootstrap/tabs'
+import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
 
 import { FloatingWidgetDirective } from './nehubaUI.floatingWidget.directive'
 import { FloatingWidget,FloatingWidgetComponent } from './nehubaUI.floatingWidget.component';
@@ -31,7 +32,8 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonPa
         ButtonsModule.forRoot(),
         PopoverModule.forRoot(),
         ModalModule.forRoot(),
-        TabsModule.forRoot()
+        TabsModule.forRoot(),
+        BsDropdownModule.forRoot()
     ],
     declarations : 
         [ FloatingWidgetComponent, FloatingWidgetDirective,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,FloatingWidget,

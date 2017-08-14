@@ -268,16 +268,27 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     loadPresetShader(layer:LayerDescriptor):void{
-        layer
-        console.log('loadpresetshader')
-        let eventPacket = new EventPacket('floatingWidget',Date.now().toString(),200,'open')
+        let packetId = Date.now().toString()
+        let packetBody = {
+            title : 'Load preset shader for layer ',
+            layername : layer.name,
+            currentshader : layer.properties.shader
+        }
+        let eventPacket = new EventPacket('loadPresetShader',packetId,100,packetBody)
         
-        this.eventCenter.floatingWidgetRelay.subscribe((resp:EventPacket)=>{
-            
-            console.log('control component response',resp)
-            this.eventCenter.floatingWidgetRelay.unsubscribe()
+        let loadPresetShaderSubject = this.eventCenter.createNewRelay()
+        loadPresetShaderSubject.subscribe((resp:EventPacket)=>{
+            switch(resp.code){
+                case 200:{
+                    layer.properties.shader = resp.body.code
+                    /* no break... both causes unsubscription */
+                }
+                case 404:{
+                    loadPresetShaderSubject.unsubscribe()
+                }break;
+            }
         })
-        this.eventCenter.floatingWidgetRelay.next(eventPacket)
+        loadPresetShaderSubject.next(eventPacket)
     }
 }
 

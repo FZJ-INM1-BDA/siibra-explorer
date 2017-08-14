@@ -33,7 +33,6 @@ export class NehubaContainer implements OnInit{
       debounceTimer:number = 0
       temporaryDebounce(ev:any){
         ev.stopPropagation()
-        console.log(ev)
         Date.now() - this.debounceTimer < 500 ? ev.stopPropagation() : ev;
         this.debounceTimer = Date.now()
       }
