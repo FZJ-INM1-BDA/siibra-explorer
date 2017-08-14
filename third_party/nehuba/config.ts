@@ -1,4 +1,4 @@
-import { vec4, quat } from 'neuroglancer/util/geom';
+import { vec4, quat } from 'nehuba/exports';
 //TODO Get rid of vec4 and other imports. Config as a public API should neither depend on any third-party libraries (gl-matrix), nor expose neuroglancer types without strong reason
 //TODO Need a clear way to represent colors and quats without using vec4 and quat
 //TODO At least change vec4 to vec3 for colors....

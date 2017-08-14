@@ -74,6 +74,8 @@ export function disableSegmentSelectionForLayer(layer: SegmentationUserLayer) {
 	layer.displayState.segmentSelectionState.set = function () {}
 }
 
+/** !!! func will be called for each layer every time the set of layers changes.
+ *  So it might be called many times for the same layer. TODO change function name to reflect that  */
 export function forAllSegmentationUserLayers(viewer: Viewer, func: (layer: SegmentationUserLayer) => void) {
 	let { layerManager } = viewer;
 	layerManager.registerDisposer(layerManager.layersChanged.add(() => {

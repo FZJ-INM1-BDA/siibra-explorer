@@ -6,8 +6,10 @@ import { EventPacket } from './nehuba.model'
 @Component({
       selector : 'FloatingWidgetContainer',
       template:`
-            <ng-template floating-widget-host>
-            </ng-template>
+            <div id = "floating-widget-screen">
+                  <ng-template floating-widget-host>
+                  </ng-template>
+            </div>
       `
 })
 
@@ -20,8 +22,9 @@ export class FloatingWidget implements OnInit{
             private componentFactoryResolver: ComponentFactoryResolver,
             private eventCenter : EventCenter
       ){
-            this.eventCenter.eventRelay.subscribe((msg:EventPacket)=>{
+            this.eventCenter.floatingWidgetRelay.subscribe((msg:EventPacket)=>{
                   if ( msg.target == 'floatingWidget' ) {
+                        console.log('floatingwidget',msg)
                         this.loadFloatingWidget()
                   }
             })
@@ -50,7 +53,7 @@ export class FloatingWidget implements OnInit{
       template : `
             <div [style.bottom] = "offset[1]+'px'" [style.right]="offset[0]+'px'" class = "floatingWidget">
                   <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
-                        <div (mousemove)="mousemove($event)" (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">Heading</div>
+                        <div (mouseleave)="mousemove($event)" (mousemove)="mousemove($event)" (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">Heading</div>
                         <div class = "panel-body">
                               {{data.name}} is {{data.age}} years old. {{reposition}}
                         </div>

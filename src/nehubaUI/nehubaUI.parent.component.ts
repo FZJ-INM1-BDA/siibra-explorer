@@ -13,7 +13,7 @@ import { NehubaViewerContainer } from './nehubaUI.viewer.component'
       <atlascontrol [nehubaViewer]="nehubaViewerContainer.nehubaViewer">
         Loading Atlas Viewer ...
       </atlascontrol>
-      <ATLASViewer (showModal)="showModal($event)" [darktheme]="nehubaUIControl.darktheme" id = "ATLASViewer">
+      <ATLASViewer (click)="temporaryDebounce($event)" (showModal)="showModal($event)" [darktheme]="nehubaUIControl.darktheme" id = "ATLASViewer">
       </ATLASViewer>
       <FloatingWidgetContainer>
       </FloatingWidgetContainer>
@@ -28,6 +28,14 @@ export class NehubaContainer implements OnInit{
 
       ngOnInit(){
             
+      }
+
+      debounceTimer:number = 0
+      temporaryDebounce(ev:any){
+        ev.stopPropagation()
+        console.log(ev)
+        Date.now() - this.debounceTimer < 500 ? ev.stopPropagation() : ev;
+        this.debounceTimer = Date.now()
       }
 
       showModal(ev:any){

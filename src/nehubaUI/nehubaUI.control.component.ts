@@ -270,12 +270,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     loadPresetShader(layer:LayerDescriptor):void{
         layer
         console.log('loadpresetshader')
-        this.eventCenter.eventRelay.emit(
-            new EventPacket('floatingWidget',Date.now().toString(),200,'open')
-        )
-        this.eventCenter.eventRelay.subscribe((resp:EventPacket)=>{
-            console.log(resp)
+        let eventPacket = new EventPacket('floatingWidget',Date.now().toString(),200,'open')
+        
+        this.eventCenter.floatingWidgetRelay.subscribe((resp:EventPacket)=>{
+            
+            console.log('control component response',resp)
+            this.eventCenter.floatingWidgetRelay.unsubscribe()
         })
+        this.eventCenter.floatingWidgetRelay.next(eventPacket)
     }
 }
 

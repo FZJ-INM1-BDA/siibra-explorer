@@ -1,8 +1,9 @@
 
-import { Injectable,EventEmitter } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
 import { vec4,vec3 } from 'neuroglancer/util/geom'
 import { Config as NehubaConfig } from 'nehuba/exports'
+import { Subject } from 'rxjs/Rx'
 
 // import { Viewer as NGViewer } from 'neuroglancer/viewer'
 
@@ -502,10 +503,19 @@ export class Navigation{
 }
 
 export class EventCenter{
-    eventRelay : EventEmitter<EventPacket>
+    floatingWidgetRelay : Subject<EventPacket>
     constructor(){
-        this.eventRelay = new EventEmitter()
+        this.floatingWidgetRelay = new Subject()
+
+        this.floatingWidgetRelay.subscribe({
+            next : (v) => console.log(v)
+        })
     }
+
+    // createNewRelay():Subject<EventPacket>{
+
+
+    // }
 }
 // export class NehubaNavigator{
 
