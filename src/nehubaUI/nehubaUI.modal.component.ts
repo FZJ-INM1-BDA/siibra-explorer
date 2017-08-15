@@ -57,20 +57,9 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
                 <div class = "row">
                     <tabset class = "col-md-12">
                         <tab *ngFor="let key of data | keyPipe" [heading] = "key">
-                            <div class = "well row">
-                                <div *ngIf="data[key].constructor.name == 'String'" class = "col-md-12">
-                                    {{data[key]}}
-                                </div>
-                                <div *ngIf="data[key].constructor.name == 'Object'" class = "col-md-12">
-                                    <div class = "row" *ngFor="let key2 of data[key] | keyPipe">
-                                        <div class = "col-md-3">
-                                            {{key2}}
-                                        </div>
-                                        <div class = "col-md-9">
-                                            {{ data[key][key2] | jsonStringifyPipe }}
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class = "row">
+                                <multiform [data] = "data[key] | filterUncertainObject">
+                                </multiform>
                             </div>
                         </tab>
                     </tabset>

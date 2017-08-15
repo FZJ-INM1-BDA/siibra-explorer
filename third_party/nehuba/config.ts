@@ -54,7 +54,11 @@ export interface Config {
 	/** From Neuroglancer docs: 
 	 *  "Shift-left-drag within a slice view to change the orientation of the slice views. The projection of the point where the drag started will remain fixed." 
 	 *  This flag disables 'fixed projection of the point' part. It is implemented by NehubaLayout, so will not work without it. Togglable. */
-	disableFixedPointObliqueRotation?: boolean //TODO Since it depends on NehubaLayout, would be reasonable to move to layout section.
+	rotateAtViewCentre?: boolean //TODO Since it depends on NehubaLayout, would be reasonable to move to layout section.
+	/** From Neuroglancer docs: 
+	 *  "mouse wheel zooms in or out. When used in the cross-sectional view, the projection of the point under the mouse pointer will remain fixed." 
+	 *  This flag disables 'fixed projection of the point' part. It is implemented by NehubaLayout, so will not work without it. Togglable. */
+	zoomAtViewCentre?: boolean //TODO Since it depends on NehubaLayout, would be reasonable to move to layout section.
 	/** Restricts user movements to the boundaries of displayed volumes, i.e
 	 *  prevents the user to navigate away from the data, which does not make sense anyway.
 	 *  Required for clipped mesh "3d view" in NehubaPerspective, otherwise it looks ugly and broken if the user does navigate far away from the slice field of view.

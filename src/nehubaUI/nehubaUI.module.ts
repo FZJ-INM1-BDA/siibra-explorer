@@ -19,8 +19,9 @@ import { NehubaUIControl } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
+import { Multiform } from './nehubaUI.displaymultiform.component';
 import { NehubaFetchData,EventCenter } from './nehubaUI.services';
-import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
+import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
@@ -36,9 +37,9 @@ import { SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonPa
         BsDropdownModule.forRoot()
     ],
     declarations : 
-        [ FloatingWidgetComponent, FloatingWidgetDirective,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,FloatingWidget,
+        [ Multiform, FloatingWidgetComponent, FloatingWidgetDirective,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,FloatingWidget,
         MultilevelSelector, NehubaModal,
-        SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
+        FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
     bootstrap : [ NehubaContainer ],
     providers : [ NehubaFetchData,NehubaModal,EventCenter ],
     entryComponents : [ FloatingWidgetComponent ]

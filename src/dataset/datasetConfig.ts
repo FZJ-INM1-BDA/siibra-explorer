@@ -20,7 +20,8 @@ export const BigBrain: Config = {
 	},
 	zoomWithoutCtrl: true,
 	rightClickWithCtrl: true,
-	disableFixedPointObliqueRotation: true,
+	rotateAtViewCentre : true,
+	zoomAtViewCentre : true,
 	restrictUserNavigation: true,
 	// disableSegmentSelection: true,
 	dataset: {
@@ -79,7 +80,8 @@ export const JuBrain: Config = {
     },
     zoomWithoutCtrl: true,
     rightClickWithCtrl: true,
-    disableFixedPointObliqueRotation: true,
+	rotateAtViewCentre : true,
+	zoomAtViewCentre : true,
     layout: {
         hideSliceViewsCheckbox: true,
         useNehubaPerspective: {

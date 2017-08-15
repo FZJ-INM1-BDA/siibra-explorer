@@ -74,7 +74,7 @@ export class NehubaLayout extends RefCounted {
       return slice;
     }
     const configureSliceViewPanel = (slice: SliceViewPanel) => {
-      disableFixedPointInRotation(changeBackground(slice), config);
+      disableFixedPointInZoom(disableFixedPointInRotation(changeBackground(slice), config), config);
       return slice;
     }
 
@@ -189,7 +189,7 @@ function disableFixedPointInRotation(slice: SliceViewPanel, config: Config) {
     let {mouseState} = this.viewer;
     if (mouseState.updateUnconditionally()) {
 		//⇊⇊⇊ Our change is only here ⇊⇊⇊
-      let initialPosition = config.disableFixedPointObliqueRotation ? undefined : vec3.clone(mouseState.position);
+      let initialPosition = config.rotateAtViewCentre ? undefined : vec3.clone(mouseState.position);
 		//⇈⇈⇈ Our change is only here ⇈⇈⇈
 
       startRelativeMouseDrag(e, (event, deltaX, deltaY) => {
@@ -214,6 +214,17 @@ function disableFixedPointInRotation(slice: SliceViewPanel, config: Config) {
 
   return slice;
 }
+
+function disableFixedPointInZoom(slice: SliceViewPanel, config: Config) {
+  const originalZoomByMouse = slice.zoomByMouse;
+  slice.zoomByMouse = function (this: SliceViewPanel, factor: number) {
+    if (config.zoomAtViewCentre) this.navigationState.zoomBy(factor);
+    else originalZoomByMouse.call(this, factor);
+  }
+
+  return slice;
+}  
+
 /*
 function patchSliceView(slice: SliceViewPanel) {
   let untyped = slice as any;

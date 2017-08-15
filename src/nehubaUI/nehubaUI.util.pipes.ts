@@ -3,7 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { SecurityContext } from '@angular/core'
 import { Multilevel } from './nehuba.model'
 
-/* experimental */
+/* pipes in object, pipes out stringified json  */
 
 @Pipe({
     name:'jsonStringifyPipe'
@@ -14,6 +14,8 @@ export class JsonStringifyPipe implements PipeTransform{
         return JSON.stringify(json)
     }
 }
+
+/* pipes in string, pipes out json objects */
 
 @Pipe({
     name:'jsonParsePipe'
@@ -26,13 +28,13 @@ export class JsonParsePipe implements PipeTransform{
             json = JSON.parse(string)
             return json
         } catch (e){
-            
+            return {}
         }
     }
 }
 
-/* experimental */
-
+/* pipes in array and search term, pipes out search term that matches the array */
+/* deprecated by searchTreePipe */
 @Pipe({
     name:'searchPipe'
 })
@@ -50,6 +52,7 @@ export class SearchPipe implements PipeTransform{
     }
 }
 
+/* pipes in object and pipes out list of keys */
 @Pipe({
     name:'keyPipe'
 })
@@ -63,6 +66,10 @@ export class KeyPipe implements PipeTransform{
         return returnKey
     }
 }
+
+/* searches tree array object (assuming children nodes are nested under children property) */
+/* ignores blank spaces */
+/* supercedes searchPipe */
 
 @Pipe({
     name:'searchTreePipe'
@@ -89,6 +96,8 @@ export class SearchTreePipe implements PipeTransform{
     }
 }
 
+/* search high lighting */
+
 @Pipe({
     name:'searchHighlight'
 })
@@ -110,6 +119,8 @@ export class SearchHighlight implements PipeTransform{
         }
     }
 }
+
+/* searches for tree selected status (selected/unselected/partially selected) */
 
 @Pipe({
     name:'selectTreePipe',
@@ -139,6 +150,9 @@ export class SelectTreePipe implements PipeTransform{
     }
 }
 
+/* round float to 3 dp */
+/* originally used for navigation panel */
+
 @Pipe({
     name:'numberfilteringPipe'
 })
@@ -146,5 +160,19 @@ export class SelectTreePipe implements PipeTransform{
 export class NumberFilteringPipe implements PipeTransform{
     public transform(number:number){
         return Math.round( number * 1000 ) / 1000
+    }
+}
+
+@Pipe({
+    name:'filterUncertainObject'
+})
+
+export class FilterUncertainObject implements PipeTransform{
+    public transform(obj:any|any[]){
+        if(!obj){
+            return 'n/a'
+        }else{
+            return obj
+        }
     }
 }

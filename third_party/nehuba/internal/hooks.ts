@@ -45,6 +45,7 @@ export function restrictUserNavigation(viewer: Viewer) { //Exported, because 3d 
 		};
 		if (boxFound/*isFiniteBox(box)*/) (<any>viewer.navigationState.position)[bbox] = box;
 		if (boxFound/*isFiniteBox(box)*/) (<any>viewer.navigationState.pose)[bbox] = box; //temp
+		if (boxFound/*isFiniteBox(box)*/) viewer.navigationState.position.changed.dispatch();
 	}));
 	//Neuroglancer sets position by directly settting coordinates of spatialCoordinates vector (we don't want to intercept that)
 	//and then calling dispatch() of respective signal, which we decorate here to set coordinates back into the bounding box.
