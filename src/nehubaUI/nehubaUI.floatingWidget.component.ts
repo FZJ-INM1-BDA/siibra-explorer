@@ -1,4 +1,4 @@
-import { Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { FloatingWidgetDirective } from './nehubaUI.floatingWidget.directive'
 import { EventCenter } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
@@ -7,10 +7,8 @@ import { Subject } from 'rxjs/Subject'
 @Component({
       selector : 'FloatingWidgetContainer',
       template:`
-            <div id = "floating-widget-screen">
-                  <ng-template floating-widget-host>
-                  </ng-template>
-            </div>
+<ng-template floating-widget-host>
+</ng-template>
       `
 })
 
@@ -69,37 +67,37 @@ export class FloatingWidget implements OnInit{
 
 @Component({
       template : `
-            <div [style.bottom] = "offset[1]+'px'" [style.right]="offset[0]+'px'" class = "floatingWidget">
-                  <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
-                        <div (mouseleave)="mousemove($event)" (mousemove)="mousemove($event)" (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">
-                              {{data.title}}
-                        </div>
-                        <div class = "panel-body">
-                              <span>Load a custom colour map for:<br>
-                              <strong> {{data.layername}}</strong></span>
-                              <hr>
-                              <div class = "btn-group" dropdown>
-                                    <button dropdownToggle type = "button" class = "btn btn-default dropdown-toggle">
-                                          <span *ngIf = "!selectedColorMap">Select a preset</span>
-                                          <span *ngIf = "selectedColorMap">{{selectedColorMap.name}}</span>
-                                          <span class = "caret"></span>
-                                    </button>
-                                    <ul *dropdownMenu class = "dropdown-menu" role = "menu">
-                                          <li *ngFor = "let colormap of COLORMAPS" role = "menuitems">
-                                                <a class = "dropdown-item" (click) = "selectedColorMap = colormap;$event.preventDefault()" href = "#">
-                                                      <img [src] = "colormap.previewurl">{{colormap.name}}
-                                                </a>
-                                          </li>
-                                    </ul>
-                              </div>
-                              
-                        </div>
-                        <div class = "panel-footer">
-                              <div (click)="loadColorMap()" [ngClass]="{disabled:!selectedColorMap}" class = "btn btn-primary">Load</div>
-                              <div (click)="cancel()" class = "btn btn-defaul">Cancel</div>
-                        </div>
-                  </div>
+<div [style.bottom] = "offset[1]+'px'" [style.right]="offset[0]+'px'" class = "floatingWidget">
+      <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
+            <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">
+                  {{data.title}}
             </div>
+            <div class = "panel-body">
+                  <span>Load a custom colour map for:<br>
+                  <strong> {{data.layername}}</strong></span>
+                  <hr>
+                  <div class = "btn-group" dropdown>
+                        <button dropdownToggle type = "button" class = "btn btn-default dropdown-toggle">
+                              <span *ngIf = "!selectedColorMap">Select a preset</span>
+                              <span *ngIf = "selectedColorMap">{{selectedColorMap.name}}</span>
+                              <span class = "caret"></span>
+                        </button>
+                        <ul *dropdownMenu class = "dropdown-menu" role = "menu">
+                              <li *ngFor = "let colormap of COLORMAPS" role = "menuitems">
+                                    <a class = "dropdown-item" (click) = "selectedColorMap = colormap;$event.preventDefault()" href = "#">
+                                          <img [src] = "colormap.previewurl">{{colormap.name}}
+                                    </a>
+                              </li>
+                        </ul>
+                  </div>
+                  
+            </div>
+            <div class = "panel-footer">
+                  <div (click)="loadColorMap()" [ngClass]="{disabled:!selectedColorMap}" class = "btn btn-primary">Load</div>
+                  <div (click)="cancel()" class = "btn btn-defaul">Cancel</div>
+            </div>
+      </div>
+</div>
       `
 })
 export class FloatingWidgetComponent implements FloatingWidgetInterface{
@@ -114,6 +112,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
 
       COLORMAPS : any[] = PRESET_COLOR_MAPS
 
+      @HostListener('document:mousemove',['$event'])
       mousemove(ev:any){
             if(!this.reposition){
                   return

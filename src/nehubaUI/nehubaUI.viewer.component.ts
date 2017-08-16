@@ -1,6 +1,8 @@
 import { Component,Input,Output,AfterViewInit,EventEmitter } from '@angular/core'
 import { createNehubaViewer,NehubaViewer } from 'nehuba/exports'
 import { BigBrain,JuBrain } from '../dataset/datasetConfig'
+import { EventCenter } from './nehubaUI.services'
+import { EventPacket } from './nehuba.model'
 
 @Component({
     selector : 'ATLASViewer',
@@ -15,11 +17,17 @@ export class NehubaViewerContainer implements AfterViewInit{
     @Output() public nehubaViewer:NehubaViewer
     @Output() showModal:EventEmitter<string> = new EventEmitter()
 
+    constructor(private eventCenter : EventCenter){}
+
     ngAfterViewInit(){
         JuBrain
         let nehubaConfig = BigBrain
         this.nehubaViewer = createNehubaViewer(nehubaConfig)
         this.nehubaViewer.disableSegmentSelectionForLoadedLayers()
+
+        this.nehubaViewer.setNavigationStateCallbackInVoxelCoordinates((pos,ori)=>{
+            this.eventCenter.navigationUpdateRelay.next(new EventPacket('updateNavigation',Date.now().toString(),100,{pos:pos,ori:ori}))
+        })
     }
 
     showhelp(){

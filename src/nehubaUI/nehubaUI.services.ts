@@ -273,7 +273,6 @@ export class NehubaFetchData {
         let promiseArray : Promise<any>[] = []
 
         /* properties will define what gets displayed in the modal window */
-        /* goinng to be strict on what gets displayed and what does not */
         promiseArray.push(
             new Promise((resolve)=>{
                 if (json.properties){
@@ -296,6 +295,7 @@ export class NehubaFetchData {
                 }
                 }))
         
+        /* fetches all of its children */
         promiseArray.push(new Promise(resolve=>{
             if (json.children && json.children.constructor === Array){
                 let regionsArray:Promise<RegionDescriptor>[] = []
@@ -319,6 +319,12 @@ export class NehubaFetchData {
                 .all(promiseArray)
                 .then(values=>{
                     let newRegionDescriptor = new RegionDescriptor( json.name )
+                    if (json.label_index){
+                        newRegionDescriptor.label_index = json.label_index
+                    }
+                    if (json.default_loc){
+                        newRegionDescriptor.default_loc = json.default_loc
+                    }
                     newRegionDescriptor.hierarchy = hierarchy
                     newRegionDescriptor.properties = values[0]
                     newRegionDescriptor.children = values[1]
@@ -502,10 +508,47 @@ export class Navigation{
     }
 }
 
+/* usage
+ * 1) construct a new animation object with duration and (in the future) method
+ * 2) use call generate() to return an iterator
+ * 3) use requestanimationframe to get an object in the form of {value:number,done:boolean}
+ * 4) number traverse from 0 - 1 corresponding to the fraction of animation completed
+ * 
+ * nb: do not inject. Start new instance each time. startTime is needed for each Animation.
+ *  */
+export class Animation{
+
+    duration:number
+    method:string
+    startTime : number
+
+    constructor(duration:number,method:string){
+        this.duration = duration
+        this.method = method
+        this.startTime = Date.now()
+    }
+
+    *generate():IterableIterator<number>{
+        while(( Date.now() - this.startTime ) / this.duration < 1 ){
+            yield ( Date.now() - this.startTime ) / this.duration
+        }
+        return 1
+    }
+}
+
 export class EventCenter{
     floatingWidgetRelay : Subject<Subject<EventPacket>>
+    navigationRelay : Subject<EventPacket>
+    segmentSelectionRelay : Subject<EventPacket>
+    navigationUpdateRelay : Subject<EventPacket>
+    modalEventRelay : Subject<EventPacket>
+
     constructor(){
         this.floatingWidgetRelay = new Subject()
+        this.navigationRelay = new Subject()
+        this.segmentSelectionRelay = new Subject()
+        this.navigationUpdateRelay = new Subject()
+        this.modalEventRelay = new Subject()
     }
 
     createNewRelay():Subject<EventPacket>{
@@ -513,11 +556,6 @@ export class EventCenter{
         this.floatingWidgetRelay.next(newSubject)
         return newSubject
     }
-
-    // createNewRelay():Subject<EventPacket>{
-
-
-    // }
 }
 // export class NehubaNavigator{
 

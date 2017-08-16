@@ -173,6 +173,7 @@ export class Multilevel{
         }
     }
 
+    /* used to determine the tick status (selected, unselected, partially selected) */
     public hasDisabledChildren():boolean{
         if ( this.children.length > 0 ){
             return this.children.some( child =>{
@@ -193,6 +194,7 @@ export class Multilevel{
         }
     }
 
+    /* used for searching and filtering tree */
     public hasVisibleChildren():boolean{
         if ( this.children.length > 0){
             return this.children.some( child =>{
@@ -216,6 +218,8 @@ export class RegionDescriptor extends Multilevel{
     name : string;
     properties : any;
     getUrl: string;
+    label_index : number;
+    default_loc : number[];
 }
 
 export abstract class DescriptorBase{

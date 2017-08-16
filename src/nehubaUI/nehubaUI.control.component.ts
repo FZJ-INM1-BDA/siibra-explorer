@@ -1,11 +1,11 @@
 
 import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild,EventEmitter} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData,EventCenter } from './nehubaUI.services'
+import { NehubaFetchData,EventCenter,Animation } from './nehubaUI.services'
 import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 import { NehubaModal } from './nehubaUI.modal.component'
 
-import { NehubaViewer } from 'nehuba/exports'
+import { NehubaViewer,vec3 } from 'nehuba/exports'
 
 @Component({
     selector : 'atlascontrol',
@@ -44,7 +44,6 @@ import { NehubaViewer } from 'nehuba/exports'
 export class NehubaUIControl implements OnInit,AfterViewInit{
 
     @Input() nehubaViewer : NehubaViewer
-    // navigationControl : NGViewer
     @Input() searchTerm : String = '';
     @Output() public darktheme : boolean = false;
     @Output() presetShader = new EventEmitter<LayerDescriptor>()
@@ -53,7 +52,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     fetchedTemplatesData : FetchedTemplates;
 
     listOfActiveLayers : LayerDescriptor[] = []
-    enableAdvancedMode : string
+    enableAdvancedMode : string = 'off'
 
     selectedTemplate : TemplateDescriptor | undefined; 
     selectedParcellation : ParcellationDescriptor | undefined; 
@@ -69,6 +68,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     showRegions : Boolean = true;
 
     showTemplatesState : string = 'expanded';
+    viewerVoxelCoord : number[] = [0,0,0]
 
     // displaySetting : HBPAtlasDisplaySetting;
 
@@ -89,7 +89,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             navigationPanelState : 'collapsed'
         }
 
-        this.enableAdvancedMode = 'off'
+        this.eventCenter.navigationUpdateRelay.subscribe((ev:EventPacket)=>{
+            this.viewerVoxelCoord = ev.body.pos
+        })
+        // this.enableAdvancedMode = 'off'
     }
 
     /** on view init 
@@ -127,6 +130,46 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         //         })
         //     })
         // })
+
+        /* Listening to navigation request calls */
+        this.eventCenter.navigationRelay.subscribe((msg:EventPacket)=>{
+            let deltaPos = [
+                msg.body.pos[0]-this.viewerVoxelCoord[0],
+                msg.body.pos[1]-this.viewerVoxelCoord[1],
+                msg.body.pos[2]-this.viewerVoxelCoord[2]
+            ]
+
+            let startPos = this.viewerVoxelCoord
+            
+            startPos
+            deltaPos
+
+            let iterator = (new Animation(300,'linear')).generate()
+            
+            let newAnimationFrame = () =>{
+                let iteratedValue = iterator.next()
+                this.nehubaViewer.setPosition(vec3.fromValues(
+                    startPos[0]+deltaPos[0]*iteratedValue.value,
+                    startPos[1]+deltaPos[1]*iteratedValue.value,
+                    startPos[2]+deltaPos[2]*iteratedValue.value
+                ),false)
+                if(!iteratedValue.done){
+                    requestAnimationFrame(newAnimationFrame)
+                }
+            }
+            requestAnimationFrame(newAnimationFrame)
+
+        })      
+        
+        /* listening to segment selection request calls */
+        this.eventCenter.segmentSelectionRelay.subscribe((msg:EventPacket)=>{
+            if (msg.body.mode == 'show'){
+                this.nehubaViewer.showSegment(msg.body.segID)
+            }else if(msg.body.mode == 'hide'){
+                this.nehubaViewer.hideSegment(msg.body.segID)
+            }
+        })
+
     }
 
     loadInitDatasets(){
@@ -141,6 +184,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                     this.nehubaFetchData.parseTemplateData(json)
                         .then( template =>{
                             this.fetchedTemplatesData.templates.push( template )
+     
+
                         })
                         .catch(e=>{
                             console.log(e)
@@ -185,7 +230,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                     this.nehubaViewer.applyInitialNgState()
                     this.nehubaViewer.relayout()
                     this.nehubaViewer.redraw()
-
                 })
                 
                 /* currently the modal automatically hides after 3 seconds. */
@@ -205,6 +249,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
     }
 
+    /* obsolete with multilevel */
     chooseRegion(region:RegionDescriptor):void{
         let idx = this.selectedRegions.findIndex( itRegion => itRegion === region )
         idx < 0 ? this.selectedRegions.push( region ) : this.selectedRegions.splice( idx , 1 )

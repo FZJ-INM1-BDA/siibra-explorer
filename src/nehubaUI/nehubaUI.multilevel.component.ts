@@ -1,6 +1,7 @@
 import { Input, Output, EventEmitter,Component,AfterViewInit } from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { Multilevel } from './nehuba.model'
+import { Multilevel,EventPacket,RegionDescriptor } from './nehuba.model'
+import { EventCenter } from './nehubaUI.services'
 
 @Component({
     selector : 'multilevel',
@@ -41,6 +42,8 @@ export class MultilevelSelector implements AfterViewInit{
     @Input() selectedData : Multilevel[]
     @Output() callModal = new EventEmitter<Multilevel>()
 
+    constructor(private eventCenter : EventCenter){}
+
     ngAfterViewInit():void{
         
     }
@@ -50,12 +53,27 @@ export class MultilevelSelector implements AfterViewInit{
         data
     }
 
-    chooseLevel(data:Multilevel):void{
+    chooseLevel(data:RegionDescriptor):void{
         
+        // if (data.default_loc){
+        //     this.eventCenter.navigationRelay.next(new EventPacket('navigateTo',Date.now().toString(),100,{pos:data.default_loc}))
+        // }
+        // if (data.label_index){
+        //     this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index}))
+        // }
         if( data.hasEnabledChildren() ){
             data.updateChildrenStatus('disable')
+            if (data.label_index){
+                this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index,mode:"hide"}))
+            }
         }else{
             data.updateChildrenStatus('enable')
+            if (data.default_loc){
+                this.eventCenter.navigationRelay.next(new EventPacket('navigateTo',Date.now().toString(),100,{pos:data.default_loc}))
+            }
+            if (data.label_index){
+                this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index,mode:"show"}))
+            }
         }
     }
 

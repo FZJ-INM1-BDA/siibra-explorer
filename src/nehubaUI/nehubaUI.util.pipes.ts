@@ -163,6 +163,7 @@ export class NumberFilteringPipe implements PipeTransform{
     }
 }
 
+/* if a field is undefined/null, set it to n/a instead */
 @Pipe({
     name:'filterUncertainObject'
 })
