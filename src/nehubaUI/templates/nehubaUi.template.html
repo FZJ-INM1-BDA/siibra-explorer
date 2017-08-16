@@ -1,4 +1,4 @@
-<nehubaModal (fetchTemplate)="modalAddTemplateFetch($event)"></nehubaModal>
+<nehubaModal (fetchedSomething)="fetchedSomething($event)"></nehubaModal>
 
 <div id = "leftSide">
     <div id = "leftSideTop" [ngClass]="{darktheme:darktheme}">
@@ -80,7 +80,7 @@
                         <span class = "list-group-item-name">
                             {{template.name}}
                         </span>
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(template.properties);$event.stopPropagation()"  >
+                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(template);$event.stopPropagation()"  >
                             &#x24d8;
                         </span>
                     </div>
@@ -110,7 +110,7 @@
                             <i class = "glyphicon glyphicon-cog"></i>
                         </span>
                         -->
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation.properties);$event.stopPropagation()"  >
+                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
                             &#x24d8;
                         </span>
                     </div>
@@ -148,7 +148,7 @@
                     <input class = "form-control" placeholder = "Search regions ... " [(ngModel)]="searchTerm" name = "searchRegionInput">
                 </div>
                 <div class = "list-group-item nohover">
-                    <multilevel (callModal)="showMoreInfo($event.properties)" class = "menuItemContentText" [data]="selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
+                    <multilevel class = "menuItemContentText" [data]="selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
                     </multilevel>
                 </div>
             </div>

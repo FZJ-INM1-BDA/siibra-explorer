@@ -10,6 +10,7 @@ import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
 import { TabsModule }  from 'ngx-bootstrap/tabs'
 import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
+// import { CollapseModule }  from 'ngx-bootstrap/collapse'
 
 import { FloatingWidgetDirective } from './nehubaUI.floatingWidget.directive'
 import { FloatingWidget,FloatingWidgetComponent } from './nehubaUI.floatingWidget.component';

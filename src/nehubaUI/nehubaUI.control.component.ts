@@ -57,9 +57,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     selectedTemplate : TemplateDescriptor | undefined; 
     selectedParcellation : ParcellationDescriptor | undefined; 
     selectedRegions : RegionDescriptor[] = []; 
-    
-    //might still need this to initialize other menu items
-    defaultMenu : String[] = ['Region Specific Search','Display Settings','Tools'];
 
     //this is a temporary solution for collapsing menus
     defaultPanelsState : any
@@ -173,6 +170,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     loadInitDatasets(){
+
+        /* this will need to come from elsewhere eventually */
         let datasetArray = [
             'http://172.104.156.15/json/bigbrain',
             'http://172.104.156.15/json/colin'
@@ -184,8 +183,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                     this.nehubaFetchData.parseTemplateData(json)
                         .then( template =>{
                             this.fetchedTemplatesData.templates.push( template )
-     
-
                         })
                         .catch(e=>{
                             console.log(e)
@@ -280,36 +277,13 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
     }
 
-    /* fetching a new template from an url address */
-    /* TODO: when error? */
-    /* TODO: on success, dismiss modal */
-    modalAddTemplateFetch(url:string){
-        this.nehubaFetchData.fetchJson(url)
-            .then((json:any)=>{
-                this.zone.runOutsideAngular(()=>{
-                    this.modal.inputResponse = 'Adding template successful.'
-                    this.zone.run(()=>{})
-                })
-                this.modal.inputInput = ''
-                this.nehubaFetchData.parseTemplateData( json )
-                    .then(template=>{
-                        this.fetchedTemplatesData.templates.push( template )
-                    })
-            })
-            .catch((err:any)=>{
-                this.zone.runOutsideAngular(()=>{
-                    this.modal.inputResponse = 'error when adding a new template' + err;
-                    this.zone.run(()=>{})
-                })
-            })
-    }
-
     showMoreInfo(item:any):void{
-        this.modal.showModal('More Info',item)
+        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:item.name,body:item.properties}))
     }
 
     showInputModal(type:string):void{
-        this.modal.showInputModal('Add '+type)
+        this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add',title_:type}))
+        // this.modal.showInputModal('Add '+type)
     }
 
     loadPresetShader(layer:LayerDescriptor):void{
@@ -326,7 +300,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             switch(resp.code){
                 case 200:{
                     layer.properties.shader = resp.body.code
-                    /* no break... both causes unsubscription */
+                    /* no break statement... both causes unsubscription */
                 }
                 case 404:{
                     loadPresetShaderSubject.unsubscribe()
@@ -334,6 +308,22 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             }
         })
         loadPresetShaderSubject.next(eventPacket)
+    }
+
+    fetchedSomething(sth:any){
+        switch( sth.constructor.name ){
+            case 'TemplateDescriptor':{
+                this.fetchedTemplatesData.templates.push(sth)
+            }break;
+            case 'ParcellationDescriptor':{
+                if (!this.selectedTemplate){
+                    //TODO add proper feedback
+                    console.log('throw error: maybe you should selected a template first')
+                }else {
+                    this.selectedTemplate.parcellations.push(sth)
+                }
+            }break;
+        }
     }
 }
 

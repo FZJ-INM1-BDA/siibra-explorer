@@ -342,131 +342,6 @@ export class NehubaFetchData {
         console.log('An error had occured',error);
         return Promise.reject(error.message||error);
     }
-    
-    /* legacy codes below. no longer necessary */
-
-    // /* this should become obsolete soon */
-    // fetchTemplateData():Promise<FetchedTemplates>{
-    //     return fetch( FETCH_DATA_URL )
-    //         .then( response => {
-    //             return response.json()
-    //         } )
-    //         .then( json => {
-    //             //this is where fetched data (in json format) is fitted into templates. 
-    //             //in the future, should real api becomes available, these codes will need to change reflecting the real api's
-    //             let returnTemplates = new FetchedTemplates();
-    //             for (let idx in json.data){
-    //                 if( /Colin/.test(json.data[idx].name) ){
-    //                     returnTemplates.templates.push( this.processColinTemplate(json.data[idx]) )
-    //                 }else if(/Waxholm/.test( json.data[idx].name )){
-    //                     returnTemplates.templates.push( this.processWaxholmTemplate(json.data[idx]) )
-    //                 }else{
-    //                     returnTemplates.templates.push( this.processMockTemplate(json.data[idx]) )
-    //                 }
-    //             }
-    //             return Promise.resolve( returnTemplates );
-    //         })
-    //         .catch( error => this.handleError(error));
-    // }
-
-
-    // //we might need one of these for every data source
-    // //to do: should these methods be returning a promise or templatedescriptor object?
-    // //ie if we expect any of these to be async?
-    // private processMockTemplate(rawTemplate:any):TemplateDescriptor{
-
-    //     //instantiate a new instance of template descriptor, to be returned by the promise
-    //     let returnTemplateDescriptor = new TemplateDescriptor(rawTemplate.name)
-        
-    //     //populate the parcellation descriptor array according to the returned json obj
-    //     for(let idxP in rawTemplate.parcellations){
-    //         returnTemplateDescriptor.parcellations.push(new ParcellationDescriptor(rawTemplate.parcellations[idxP]))
-    //     }
-
-    //     //populate the region descriptor array according to the return json obj
-    //     for(let idxR in rawTemplate.regions){
-    //         // returnTemplateDescriptor.regions.push(new RegionDescriptor(rawTemplate.regions[idxR]))
-    //     }
-
-    //     return returnTemplateDescriptor
-    // }
-
-    // /* this is to demonstrate that we can implement custom parser for datasets with non-standard metadata */
-    // private processColinTemplate(rawTemplate:any):TemplateDescriptor{
-    //     let returnTemplateDescriptor = new TemplateDescriptor(rawTemplate.name)
-        
-    //     for(let idxP in rawTemplate.parcellations){
-    //         returnTemplateDescriptor.parcellations.push(new ParcellationDescriptor(rawTemplate.parcellations[idxP]))
-    //     }
-
-    //     // returnTemplateDescriptor.regions = this.parseSpaceConjugatedHierarchical(rawTemplate.regions)
-
-    //     return returnTemplateDescriptor
-    // }
-
-    // private processWaxholmTemplate(template:any):TemplateDescriptor{
-    //     let returnTemplateDescriptor = new TemplateDescriptor(template.name)
-    //     for(let idxP in template.parcellations){
-    //         returnTemplateDescriptor.parcellations.push(new ParcellationDescriptor(template.parcellations[idxP]))
-    //     }
-    //     // returnTemplateDescriptor.regions = this.parseHierarchical( template.regions,0 )
-    //     return returnTemplateDescriptor
-    // }
-
-    // private parseHierarchical(data:any[],hierarchy:number):RegionDescriptor[]{
-    //     let returnRegionDescriptors = []
-    //     for( let idx in data ){
-    //         let newRegionDescriptor = new RegionDescriptor( data[idx].name )
-    //         if( data[idx].children && data[idx].children.length > 0){
-    //             newRegionDescriptor.children = this.parseHierarchical( data[idx].children,hierarchy+1 )
-    //         }
-    //         if( data[idx].properties ){
-    //             newRegionDescriptor.properties = data[idx].properties
-    //         }
-    //         newRegionDescriptor.hierarchy = hierarchy
-    //         returnRegionDescriptors.push( newRegionDescriptor )
-    //     }
-    //     return returnRegionDescriptors
-    // }
-
-    // private parseSpaceConjugatedHierarchical(data:string):RegionDescriptor[]{
-    //     let returnRegionDescriptors : RegionDescriptor[] = []
-    //     let space : number = 0
-    //     data.split('\n').forEach(( value )=>{
-    //         let [ returnedSpace , regionName ] = this.spaceConjugationLineParser( value )
-    //         if( returnedSpace == 0 ){
-    //             let newRegionDescriptor = new RegionDescriptor( regionName )
-    //             newRegionDescriptor.hierarchy = returnedSpace
-    //             returnRegionDescriptors.push(newRegionDescriptor)
-    //         }else{
-
-    //             let newregion = new RegionDescriptor( regionName )
-    //             newregion.hierarchy = returnedSpace
-
-    //             let tempMulti : RegionDescriptor[] = returnRegionDescriptors
-    //             while(returnedSpace > 0){
-    //                 tempMulti = tempMulti[ tempMulti.length - 1 ].children
-    //                 returnedSpace --
-    //             }
-
-    //             if( !tempMulti ){
-    //                 tempMulti = []
-    //             }
-    //             tempMulti.push( newregion )
-    //         }
-    //     })
-    //     return returnRegionDescriptors
-    // }
-
-    // private spaceConjugationLineParser(line:string):[number,string]{
-    //     let counter :number = 0
-    //     while( line.substring(0,1) === ' ' ){
-    //         counter ++
-    //         line = line.substring(1)
-    //     }
-
-    //     return [counter,line]
-    // }
 }
 
 export class Navigation{
@@ -508,14 +383,14 @@ export class Navigation{
     }
 }
 
-/* usage
+/** usage
  * 1) construct a new animation object with duration and (in the future) method
  * 2) use call generate() to return an iterator
  * 3) use requestanimationframe to get an object in the form of {value:number,done:boolean}
  * 4) number traverse from 0 - 1 corresponding to the fraction of animation completed
  * 
  * nb: do not inject. Start new instance each time. startTime is needed for each Animation.
- *  */
+ */
 export class Animation{
 
     duration:number
@@ -551,6 +426,10 @@ export class EventCenter{
         this.modalEventRelay = new Subject()
     }
 
+    /* returns a new Subject to the function's caller
+     * in the future, also sends the subject to the right service
+     * so the caller and the right service can have a single channel
+     */
     createNewRelay():Subject<EventPacket>{
         let newSubject : Subject<EventPacket> = new Subject()
         this.floatingWidgetRelay.next(newSubject)

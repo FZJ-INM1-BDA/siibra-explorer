@@ -1,4 +1,4 @@
-import { Component,Input,Output,AfterViewInit,EventEmitter } from '@angular/core'
+import { Component,Input,Output,AfterViewInit } from '@angular/core'
 import { createNehubaViewer,NehubaViewer } from 'nehuba/exports'
 import { BigBrain,JuBrain } from '../dataset/datasetConfig'
 import { EventCenter } from './nehubaUI.services'
@@ -15,7 +15,6 @@ import { EventPacket } from './nehuba.model'
 export class NehubaViewerContainer implements AfterViewInit{
     @Input() darktheme : boolean
     @Output() public nehubaViewer:NehubaViewer
-    @Output() showModal:EventEmitter<string> = new EventEmitter()
 
     constructor(private eventCenter : EventCenter){}
 
@@ -31,6 +30,21 @@ export class NehubaViewerContainer implements AfterViewInit{
     }
 
     showhelp(){
-        this.showModal.emit('showHelpModal')
+        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:"Basic Controls",body:this.helpMenu}))
+        // this.showModal.emit('showHelpModal')
+    }
+
+    helpMenu:any = 
+    {
+        'Mouse Controls' : {
+        "Left-drag" : "within a slice view to move within that plane",
+        "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
+        "Mouse-Wheel" : "up or down to zoom in and out.",
+        "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
+        "Ctrl + Right-click" : "within a slice to teleport to that location"
+        },
+        'Keyboard Controls' : {
+        "tobe":"completed"
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { Input, Output, EventEmitter,Component,AfterViewInit } from '@angular/core'
+import { Input, Component,AfterViewInit } from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { Multilevel,EventPacket,RegionDescriptor } from './nehuba.model'
 import { EventCenter } from './nehubaUI.services'
@@ -40,17 +40,11 @@ export class MultilevelSelector implements AfterViewInit{
     @Input() searchTerm : string
     @Input() data : Multilevel[]
     @Input() selectedData : Multilevel[]
-    @Output() callModal = new EventEmitter<Multilevel>()
 
     constructor(private eventCenter : EventCenter){}
 
     ngAfterViewInit():void{
         
-    }
-
-    isMultilevelSelected(data:Multilevel):void{
-        //console.log( data )
-        data
     }
 
     chooseLevel(data:RegionDescriptor):void{
@@ -87,7 +81,7 @@ export class MultilevelSelector implements AfterViewInit{
         return singleData.children.some( (child:any)=>child.isVisible || this.iterativeVisible( child ))
     }
 
-    callingModal(multilevel:Multilevel):void{
-        this.callModal.emit( multilevel )
+    callingModal(regionDescriptor:RegionDescriptor):void{
+        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:regionDescriptor.name,body:regionDescriptor.properties}))
     }
 }

@@ -7,7 +7,7 @@ import { Component,Input } from '@angular/core'
       {{data}}
 </div>
 <div *ngIf = "data.constructor.name == 'Array'" class = "col-md-12">
-      <table class = "table table-sm table-hover table-bordered">
+      <table class = "table table-sm table-bordered">
             <tbody>
                   <tr *ngFor = "let d of data">
                         <td>
@@ -19,7 +19,7 @@ import { Component,Input } from '@angular/core'
       </table>
 </div>
 <div *ngIf = "data.constructor.name == 'Object'" class = "col-md-12">
-      <table class = "table table-sm table-hover table-bordered">
+      <table class = "table table-sm table-bordered">
             <tbody>
                   <tr *ngFor = "let key of data | keyPipe">
                         <td class = "col-md-3">

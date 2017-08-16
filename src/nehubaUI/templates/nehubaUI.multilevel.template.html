@@ -1,7 +1,7 @@
 <div *ngFor = "let singleData of data" [hidden]="!singleData.hasVisibleChildren()">
     <div class = "menuItem">
         <div class = "menuItemContent">
-            <div (click)="chooseLevel(singleData)" class = "menuItemContentList" [ngClass]="{selected : isMultilevelSelected(singleData)} ">
+            <div (click)="chooseLevel(singleData)" class = "menuItemContentList">
                 <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
                     
                     <span class = "multilevel-name">
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class = "multilvlContainer" [@multilvlExpansion]="singleData.isExpanded ? 'expanded' : 'collapsed'">
-        <multilevel (callModal)="callingModal($event)" *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
+        <multilevel *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
         </multilevel>
     </div>
 </div>

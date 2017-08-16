@@ -1,6 +1,8 @@
 
 import { Component,ViewChild,Output,EventEmitter } from '@angular/core'
 import { ModalDirective } from 'ngx-bootstrap/modal'
+import { EventCenter,NehubaFetchData } from './nehubaUI.services'
+import { EventPacket } from './nehuba.model'
 
 @Component({
     selector: 'nehubaModal',
@@ -9,7 +11,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
     <div class = "modal-dialog modal-lg">
         <div class = "modal-content">
             <div class = "modal-header">
-                <h4 class = "modal-title pull-left">{{inputLabel}}</h4>
+                <h4 class = "modal-title pull-left">{{inputTitle}}</h4>
                 <button type="button" class="close pull-right" (click)="inputModal.hide()" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -26,7 +28,7 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
                             <input [(ngModel)] = "inputInput" class = "form-control">
                         </div>
                         <div class = "col-md-2">
-                            <div (click)="callFetchTemplate(inputInput)" class = "btn btn-block btn-primary">GET</div>
+                            <div (click)="fetchData(inputInput)" class = "btn btn-block btn-primary">GET</div>
                         </div>
                     </div>
                 </div>
@@ -101,7 +103,8 @@ export class NehubaModal{
     @ViewChild('inputModal') public inputModalObj:ModalDirective
     @ViewChild('infoModal') public infoModalObj:ModalDirective
     @ViewChild('curtainModal') public curtainModal:ModalDirective
-    @Output() fetchTemplate = new EventEmitter<string>()
+
+    @Output() public fetchedSomething : EventEmitter<any> = new EventEmitter()
 
     title:String = 'More Info'
     data:any[] = [
@@ -112,6 +115,27 @@ export class NehubaModal{
     inputLabel:string = 'URL'
     inputInput:string = ''
     inputResponse:string = ''
+
+    constructor(
+        private eventCenter:EventCenter,
+        private nehubaFetchData:NehubaFetchData
+    ){
+        this.eventCenter.modalEventRelay.subscribe((msg:EventPacket)=>{
+            switch (msg.target){
+                case 'showInfoModal':{
+                    this.title = msg.body.title
+                    this.data = msg.body.body
+                    setTimeout(()=>{
+                        this.infoModalObj.show()
+                    },0)
+                }break;
+                case 'showInputModal':{
+                    this.inputTitle = msg.body.title
+                    this.inputModalObj.show()
+                }break;
+            }
+        })
+    }
 
     public showModal( modalTitle:string = 'More Info', properties : any ){
 
@@ -130,9 +154,92 @@ export class NehubaModal{
     }
 
     /* this function should be more generic. such as confirmModal(data:string) */
-    callFetchTemplate(url:string){
-        this.fetchTemplate.emit( url )
+    fetchData(url:string){
+        this.inputResponse = ''
+        this.nehubaFetchData.fetchJson(url)
+            .then(json=>{
+                this.inputResponse += 'Fetch Json Successful. '
+                this.parseJson(json)
+            })
+            .catch(e=>{
+                console.log(e)
+                this.nehubaFetchData.fetchJson(url+'/info')
+                    .then(json=>{
+                        json
+                        /* add raw layer here */
+                        this.inputResponse += 'Adding raw layer successful. '
+                    })
+                    .catch(err=>{
+                        this.inputResponse += 'Fetch Json Failed. '
+                        this.inputResponse += e.toString()
+                        this.inputResponse += err.toString()
+                    })
+            })
     }
+
+    /* After fetching json, lazy parse the json to determine if it was a template, a parcellation, or a layer */
+    parseJson(json:any){
+        switch(json.type){
+            case 'template':{
+                this.inputResponse += 'Adding new Template. '
+                this.nehubaFetchData.parseTemplateData(json)
+                    .then( template =>{
+                        this.outputToController(template)
+                    })
+                    .catch( e=>{
+                        this.inputResponse += 'Error.'
+                        this.inputResponse += e.toString()
+                        console.log(e)
+                    })
+            }break;
+            case 'parcellation':{
+                this.inputResponse += 'Adding new Parcellation.'
+                this.nehubaFetchData.parseParcellationData(json)
+                    .then(parcellation =>{
+                        this.outputToController(parcellation)
+                    })
+                    .catch( e=>{
+                        this.inputResponse += 'Error.'
+                        this.inputResponse += e.toString()
+                        console.log(e)
+                    })
+            }break;
+            default:{
+                this.inputResponse += 'No type property found. Unable to process this JSON.'
+            }break;
+        }
+    }
+
+    outputToController(item:any){
+        console.log(item)
+        this.fetchedSomething.emit(item)
+    }
+
+    /* fetching a new template from an url address */
+    /* TODO: when error? */
+    /* TODO: on success, dismiss modal */
+    /*
+    modalAddTemplateFetch(url:string){
+        this.nehubaFetchData.fetchJson(url)
+            .then((json:any)=>{
+                this.zone.runOutsideAngular(()=>{
+                    this.modal.inputResponse = 'Adding template successful.'
+                    this.zone.run(()=>{})
+                })
+                this.modal.inputInput = ''
+                this.nehubaFetchData.parseTemplateData( json )
+                    .then(template=>{
+                        this.fetchedTemplatesData.templates.push( template )
+                    })
+            })
+            .catch((err:any)=>{
+                this.zone.runOutsideAngular(()=>{
+                    this.modal.inputResponse = 'error when adding a new template' + err;
+                    this.zone.run(()=>{})
+                })
+            })
+    }
+    */
 
     curtain = {
         dismissable : false,
