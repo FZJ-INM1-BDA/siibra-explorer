@@ -17,6 +17,7 @@ export const BigBrain: Config = {
 		embedded: true,
 		rightClickWithCtrlGlobal: false,
 		zoomWithoutCtrlGlobal: false,
+		useCustomSegmentColors:true
 	},
 	zoomWithoutCtrl: true,
 	rightClickWithCtrl: true,
@@ -77,6 +78,7 @@ export const JuBrain: Config = {
         useNehubaLayout: true,
         useNehubaSingleMeshLayer: true,
 		embedded:true,
+		useCustomSegmentColors:true
     },
     zoomWithoutCtrl: true,
     rightClickWithCtrl: true,
@@ -115,4 +117,46 @@ export const JuBrain: Config = {
         imageBackground: BLACK,
         initialNgState: JuBrainWithMesh
     },
+}
+
+export const DiscoWidget = [
+	"Disco Widget",
+	"Testing custom floating Widget. Description go here. Other fields are below",
+	{
+		"SegmentID" : {
+			"_functionFlag" : "discoball! This field does not really matter. the important thing is, this field is defined.",
+			"_selector" 	: "input",
+			"_id"			: "testBallId",
+			"_name"			: "testBallId",
+			"_class"		: "form-control"
+		}
+	}
+]
+
+export interface FunctionalField {
+	_functionFlag : string
+
+	/**
+	 * Determines the html element to be materialised
+	 * button | input | div | span | textarea (?)
+	 */
+	_selector : string
+
+	/**
+	 * _id and _name should be the same. IIRC, posted form fields can be browser specific.
+	 */
+	_id : string
+	_name : string
+
+	/**
+	 * bootstrap should be working strong
+	 */
+	_class : string
+
+	/**
+	 * May be empty (in which case, this will simply be an input/textfield)
+	 * Predetermined hooks.
+	 * segmentHoverListener | segmentClickListener | fileUpload | post (beta (????)) | postResponseListener (beta (????))
+	 */
+	_hook : string 
 }

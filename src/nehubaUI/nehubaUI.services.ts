@@ -409,6 +409,15 @@ export class Animation{
         }
         return 1
     }
+
+    /* takes a value and generates a value that is somewhat close to the original value every time */
+    *randomSteps(oldValue:number):IterableIterator<number>{
+        do{
+            yield (oldValue + Math.random()) / 5
+            /* too new age for my liking */
+            // yield Math.abs( (oldValue + ( Math.random() - 0.5 )/5 ) %1 )
+        }while(true)
+    }
 }
 
 export class EventCenter{

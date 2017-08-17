@@ -247,6 +247,7 @@ export class NehubaModal{
         message : 'Curtain message'
     }
 
+    /* TODO: fix curtain modal */
     public curtainHandler : any
     curtainLower( curtainMessage:any ):Promise<ModalDirective>{
         this.curtain.title = curtainMessage.title ? curtainMessage.title : 'Curtain'

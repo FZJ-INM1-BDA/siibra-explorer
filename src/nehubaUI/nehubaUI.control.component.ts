@@ -67,12 +67,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     showTemplatesState : string = 'expanded';
     viewerVoxelCoord : number[] = [0,0,0]
 
-    // displaySetting : HBPAtlasDisplaySetting;
-
     constructor( 
         private nehubaFetchData : NehubaFetchData,
-        // private ngNavigator : NGNavigator,
-        // private nehubaNavigator : NehubaNavigator,
         private zone:NgZone,
         private eventCenter:EventCenter
         ){
@@ -162,6 +158,26 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         this.eventCenter.segmentSelectionRelay.subscribe((msg:EventPacket)=>{
             if (msg.body.mode == 'show'){
                 this.nehubaViewer.showSegment(msg.body.segID)
+                /* TODO: remove this in production. let's have some FUN! */
+
+                let iterator = (new Animation(100,'linear')).randomSteps(0.1)
+                let R = 0.1, G = 0.5, B = 0.9
+                let newAnimationFrame = () =>{
+                    this.nehubaViewer.clearCustomSegmentColors()
+                    let RV = iterator.next(R)
+                    R += RV.value 
+                    let GV = iterator.next(G)
+                    G += GV.value 
+                    let BV = iterator.next(B)
+                    B += BV.value
+
+                    this.nehubaViewer.setSegmentColor(msg.body.segID,{
+                            red :       Math.round((Math.sin(R)/2+0.5)*255),
+                            green :     Math.round((Math.sin(G)/2+0.5)*255),
+                            blue:       Math.round((Math.sin(B)/2+0.5)*255)})
+                    requestAnimationFrame(newAnimationFrame)
+                }
+                requestAnimationFrame(newAnimationFrame)
             }else if(msg.body.mode == 'hide'){
                 this.nehubaViewer.hideSegment(msg.body.segID)
             }

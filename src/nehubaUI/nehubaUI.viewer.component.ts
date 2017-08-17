@@ -19,6 +19,7 @@ export class NehubaViewerContainer implements AfterViewInit{
     constructor(private eventCenter : EventCenter){}
 
     ngAfterViewInit(){
+        /* consider what to do with this... how to load default view ? */
         JuBrain
         let nehubaConfig = BigBrain
         this.nehubaViewer = createNehubaViewer(nehubaConfig)
