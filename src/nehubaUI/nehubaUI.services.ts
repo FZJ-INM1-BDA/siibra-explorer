@@ -159,7 +159,7 @@ export class NehubaFetchData {
 
         
         return new Promise((resolve) =>{
-            let newTemplateDescriptor = new TemplateDescriptor( json.name )
+            let newTemplateDescriptor = new TemplateDescriptor( json )
             Promise.all( promiseArray ).then( (values) =>{
                     newTemplateDescriptor.nehubaConfig = values[0]
                     newTemplateDescriptor.properties = values[1]
@@ -421,17 +421,20 @@ export class Animation{
 }
 
 export class EventCenter{
-    floatingWidgetRelay : Subject<Subject<EventPacket>>
-    navigationRelay : Subject<EventPacket>
-    segmentSelectionRelay : Subject<EventPacket>
-    navigationUpdateRelay : Subject<EventPacket>
     modalEventRelay : Subject<EventPacket>
+    floatingWidgetRelay : Subject<Subject<EventPacket>>
+
+    /* subject that conerns with viewer */
+    nehubaViewerRelay : Subject<EventPacket>
+
+    /* subject that concerns with layout */
+    globalLayoutRelay : Subject<EventPacket>
 
     constructor(){
+        this.nehubaViewerRelay = new Subject()
+        this.globalLayoutRelay = new Subject()
+
         this.floatingWidgetRelay = new Subject()
-        this.navigationRelay = new Subject()
-        this.segmentSelectionRelay = new Subject()
-        this.navigationUpdateRelay = new Subject()
         this.modalEventRelay = new Subject()
     }
 
@@ -443,6 +446,30 @@ export class EventCenter{
         let newSubject : Subject<EventPacket> = new Subject()
         this.floatingWidgetRelay.next(newSubject)
         return newSubject
+    }
+}
+
+export const EVENTCENTER_CONST = {
+    NEHUBAVIEWER : {
+        TARGET : {
+            LOAD_TEMPALTE : 'loadTemplate',
+            NAVIGATE : 'navigation',
+            MOUSE_ENTER_SEGMENT : 'mouseEnterSegment',
+            MOUSE_LEAVE_SEGMENT : 'mouseLeaveSegment',
+            SHOW_SEGMENT : 'showSegment',
+            HIDE_SEGMENT : 'hideSegment'
+        }
+    },
+    GLOBALLAYOUT : {
+        TARGET : {
+            THEME : 'theme'
+        },
+        BODY : {
+            THEME : {
+                LIGHT : 'light',
+                DARK : 'dark'
+            }
+        }
     }
 }
 // export class NehubaNavigator{

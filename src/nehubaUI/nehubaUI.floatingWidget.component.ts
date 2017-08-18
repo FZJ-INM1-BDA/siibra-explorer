@@ -1,8 +1,15 @@
-import { HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
-import { FloatingWidgetDirective } from './nehubaUI.floatingWidget.directive'
+import { Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { EventCenter } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
+
+
+@Directive({
+      selector : '[floating-widget-host]'
+})
+export class FloatingWidgetDirective{
+      constructor(public viewContainerRef:ViewContainerRef){}
+}
 
 @Component({
       selector : 'FloatingWidgetContainer',
