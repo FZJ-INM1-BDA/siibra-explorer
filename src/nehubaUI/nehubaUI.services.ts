@@ -426,12 +426,15 @@ export class EventCenter{
     segmentSelectionRelay : Subject<EventPacket>
     navigationUpdateRelay : Subject<EventPacket>
     modalEventRelay : Subject<EventPacket>
+    templateSelectionRelay : Subject<EventPacket>
 
     constructor(){
-        this.floatingWidgetRelay = new Subject()
+        this.templateSelectionRelay = new Subject()
+        this.navigationUpdateRelay = new Subject()
         this.navigationRelay = new Subject()
         this.segmentSelectionRelay = new Subject()
-        this.navigationUpdateRelay = new Subject()
+
+        this.floatingWidgetRelay = new Subject()
         this.modalEventRelay = new Subject()
     }
 

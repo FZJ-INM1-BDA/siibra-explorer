@@ -208,51 +208,56 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     chooseTemplate(templateDescriptor:TemplateDescriptor):void{
-        if ( this.selectedTemplate != templateDescriptor ){
+        this.eventCenter.templateSelectionRelay.next(new EventPacket('','',100,templateDescriptor))
+        this.zone.run(()=>{
 
-            let curtainMessage = {
-                title : 'Loading template',
-                message : 'Please wait while the template is being loaded ... TODO: this modal currently dismiss on a timer. In production, it will wait for the viewer\'s completion signal, and then gets dismissed. ',
-                dismissable : false
-            }
-            this.modal.curtainLower( curtainMessage ).then( modal =>{
+        })
 
-                /* required, as promise is async */
-                /* or ... is it? */
-                this.zone.run(()=>{
+        // if ( this.selectedTemplate != templateDescriptor ){
 
-                    /* deselect the current template */
-                    this.selectedTemplate = templateDescriptor
-                    this.selectedRegions = []
-                    this.selectedParcellation = undefined
+        //     let curtainMessage = {
+        //         title : 'Loading template',
+        //         message : 'Please wait while the template is being loaded ... TODO: this modal currently dismiss on a timer. In production, it will wait for the viewer\'s completion signal, and then gets dismissed. ',
+        //         dismissable : false
+        //     }
+        //     this.modal.curtainLower( curtainMessage ).then( modal =>{
 
-                    /* change the nehubaviewerconfig  */
-                    this.nehubaViewer.config = this.selectedTemplate.nehubaConfig
+        //         /* required, as promise is async */
+        //         /* or ... is it? */
+        //         this.zone.run(()=>{
 
-                    /* currently, parses layer directly from nehubaConfig */
-                    /* probably expecting an official nehuba api in the future */
-                    this.listOfActiveLayers = []
-                    let ngJson = this.nehubaViewer.config.dataset!.initialNgState
-                    for (let key in ngJson.layers){
-                        this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
-                    }
+        //             /* deselect the current template */
+        //             this.selectedTemplate = templateDescriptor
+        //             this.selectedRegions = []
+        //             this.selectedParcellation = undefined
 
-                    /* temporary measure */
-                    this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] < 0.5
+        //             /* currently, parses layer directly from nehubaConfig */
+        //             /* probably expecting an official nehuba api in the future */
+        //             this.listOfActiveLayers = []
+        //             let ngJson = this.nehubaViewer.config.dataset!.initialNgState
+        //             for (let key in ngJson.layers){
+        //                 this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
+        //             }
 
-                    this.nehubaViewer.applyInitialNgState()
-                    this.nehubaViewer.relayout()
-                    this.nehubaViewer.redraw()
-                })
+        //             // /* change the nehubaviewerconfig  */
+        //             // this.nehubaViewer.config = this.selectedTemplate.nehubaConfig
+
+        //             // /* temporary measure */
+        //             // this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] < 0.5
+
+        //             // this.nehubaViewer.applyInitialNgState()
+        //             // this.nehubaViewer.relayout()
+        //             // this.nehubaViewer.redraw()
+        //         })
                 
-                /* currently the modal automatically hides after 3 seconds. */
-                /* but in the future, we will be waiting for a signal from nehubaviewer */
-                /* signalling that it is ok to hide the modal */
-                setTimeout(()=>{
-                    modal.hide()
-                },3000)
-            })
-        } 
+        //         /* currently the modal automatically hides after 3 seconds. */
+        //         /* but in the future, we will be waiting for a signal from nehubaviewer */
+        //         /* signalling that it is ok to hide the modal */
+        //         setTimeout(()=>{
+        //             modal.hide()
+        //         },3000)
+        //     })
+        // } 
     }
 
     chooseParcellation(parcellation:ParcellationDescriptor):void{
