@@ -16,8 +16,8 @@ import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from '
 import { NehubaModal } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl } from './nehubaUI.control.component';
-import { NehubaViewerContainer } from './nehubaUI.viewer.component';
-import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent } from './nehubaUI.viewerUnit.component';
+import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
+import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';

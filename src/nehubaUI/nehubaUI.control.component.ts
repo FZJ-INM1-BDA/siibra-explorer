@@ -1,11 +1,10 @@
 
-import { Component,Input,Output,OnInit,AfterViewInit,NgZone,ViewChild,EventEmitter} from '@angular/core'
+import { Component,Input,Output,OnInit,AfterViewInit,NgZone,EventEmitter} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData,EventCenter,Animation } from './nehubaUI.services'
+import { NehubaFetchData,EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
-import { NehubaModal } from './nehubaUI.modal.component'
 
-import { NehubaViewer,vec3 } from 'nehuba/exports'
+import { NehubaViewer } from 'nehuba/exports'
 
 @Component({
     selector : 'atlascontrol',
@@ -37,7 +36,7 @@ import { NehubaViewer,vec3 } from 'nehuba/exports'
             transition('collapsed <=> expanded',animate('1ms'))
         ])
     ],
-    providers : [ NehubaFetchData,NehubaModal ],
+    providers : [ NehubaFetchData ],
 
 })
 
@@ -45,10 +44,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     @Input() nehubaViewer : NehubaViewer
     @Input() searchTerm : String = '';
-    @Output() public darktheme : boolean = false;
+    darktheme : boolean = false;
     @Output() presetShader = new EventEmitter<LayerDescriptor>()
     
-    @ViewChild(NehubaModal) public modal:NehubaModal
     fetchedTemplatesData : FetchedTemplates;
 
     listOfActiveLayers : LayerDescriptor[] = []
@@ -65,7 +63,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     showRegions : Boolean = true;
 
     showTemplatesState : string = 'expanded';
-    viewerVoxelCoord : number[] = [0,0,0]
 
     constructor( 
         private nehubaFetchData : NehubaFetchData,
@@ -82,10 +79,13 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             navigationPanelState : 'collapsed'
         }
 
-        this.eventCenter.navigationUpdateRelay.subscribe((ev:EventPacket)=>{
-            this.viewerVoxelCoord = ev.body.pos
+        this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
+            switch(msg.target){
+                case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
+                    this.darktheme = msg.body.theme == 'dark' 
+                }break;
+            }
         })
-        // this.enableAdvancedMode = 'off'
     }
 
     /** on view init 
@@ -123,66 +123,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         //         })
         //     })
         // })
-
-        /* Listening to navigation request calls */
-        this.eventCenter.navigationRelay.subscribe((msg:EventPacket)=>{
-            let deltaPos = [
-                msg.body.pos[0]-this.viewerVoxelCoord[0],
-                msg.body.pos[1]-this.viewerVoxelCoord[1],
-                msg.body.pos[2]-this.viewerVoxelCoord[2]
-            ]
-
-            let startPos = this.viewerVoxelCoord
-            
-            startPos
-            deltaPos
-
-            let iterator = (new Animation(300,'linear')).generate()
-            
-            let newAnimationFrame = () =>{
-                let iteratedValue = iterator.next()
-                this.nehubaViewer.setPosition(vec3.fromValues(
-                    startPos[0]+deltaPos[0]*iteratedValue.value,
-                    startPos[1]+deltaPos[1]*iteratedValue.value,
-                    startPos[2]+deltaPos[2]*iteratedValue.value
-                ),false)
-                if(!iteratedValue.done){
-                    requestAnimationFrame(newAnimationFrame)
-                }
-            }
-            requestAnimationFrame(newAnimationFrame)
-
-        })      
-        
-        /* listening to segment selection request calls */
-        this.eventCenter.segmentSelectionRelay.subscribe((msg:EventPacket)=>{
-            if (msg.body.mode == 'show'){
-                this.nehubaViewer.showSegment(msg.body.segID)
-                /* TODO: remove this in production. let's have some FUN! */
-
-                let iterator = (new Animation(100,'linear')).randomSteps(0.1)
-                let R = 0.1, G = 0.5, B = 0.9
-                let newAnimationFrame = () =>{
-                    this.nehubaViewer.clearCustomSegmentColors()
-                    let RV = iterator.next(R)
-                    R += RV.value 
-                    let GV = iterator.next(G)
-                    G += GV.value 
-                    let BV = iterator.next(B)
-                    B += BV.value
-
-                    this.nehubaViewer.setSegmentColor(msg.body.segID,{
-                            red :       Math.round((Math.sin(R)/2+0.5)*255),
-                            green :     Math.round((Math.sin(G)/2+0.5)*255),
-                            blue:       Math.round((Math.sin(B)/2+0.5)*255)})
-                    requestAnimationFrame(newAnimationFrame)
-                }
-                requestAnimationFrame(newAnimationFrame)
-            }else if(msg.body.mode == 'hide'){
-                this.nehubaViewer.hideSegment(msg.body.segID)
-            }
-        })
-
     }
 
     loadInitDatasets(){
@@ -208,7 +148,29 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     chooseTemplate(templateDescriptor:TemplateDescriptor):void{
-        this.eventCenter.templateSelectionRelay.next(new EventPacket('','',100,templateDescriptor))
+        if ( this.selectedTemplate != templateDescriptor ){
+            /* send signals to modal and viewer to update the view */
+            /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
+            let id = Date.now().toString()
+            this.eventCenter.modalEventRelay.next(new EventPacket('showCurtainModal',id,100,{}))
+            this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
+            this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
+                {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
+
+            /* update models in the controller */
+            this.selectedTemplate = templateDescriptor
+            this.selectedRegions = []
+            this.selectedParcellation = undefined
+
+            /* update layers in the advanced mode */
+            /* probably awaiting nehuba viewer to implement two way binding of things like shader code and transformation matrix */
+            this.listOfActiveLayers = []
+            let ngJson = templateDescriptor.nehubaConfig.dataset!.initialNgState
+            for (let key in ngJson.layers){
+                this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
+            }
+        }
+
         this.zone.run(()=>{
 
         })

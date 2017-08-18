@@ -101,13 +101,14 @@ export class Property{
 }
 
 export class TemplateDescriptor {
-    constructor(name:string){
-        this.name = name
+    constructor(json:any){
+        this.name = json.name ? json.name : 'Untitled Template'
+        this.useTheme = json.useTheme ? json.useTheme : 'light'
         this.parcellations = []
         this.properties = []
     }
     name : string;
-    getUrl : string;
+    useTheme : string;
     parcellations : ParcellationDescriptor[];
     properties : any;
     

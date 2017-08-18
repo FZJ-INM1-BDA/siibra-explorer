@@ -133,8 +133,15 @@ export class NehubaModal{
                     this.inputTitle = msg.body.title
                     this.inputModalObj.show()
                 }break;
+                case 'showCurtainModal':{
+                    this.showCurtain()
+                }break;
             }
         })
+    }
+
+    public showCurtain(){
+        console.log('curtain is shown')
     }
 
     public showModal( modalTitle:string = 'More Info', properties : any ){
@@ -210,36 +217,10 @@ export class NehubaModal{
         }
     }
 
+    /* not using observables, since all fetched objects should go to the main controller */
     outputToController(item:any){
-        console.log(item)
         this.fetchedSomething.emit(item)
     }
-
-    /* fetching a new template from an url address */
-    /* TODO: when error? */
-    /* TODO: on success, dismiss modal */
-    /*
-    modalAddTemplateFetch(url:string){
-        this.nehubaFetchData.fetchJson(url)
-            .then((json:any)=>{
-                this.zone.runOutsideAngular(()=>{
-                    this.modal.inputResponse = 'Adding template successful.'
-                    this.zone.run(()=>{})
-                })
-                this.modal.inputInput = ''
-                this.nehubaFetchData.parseTemplateData( json )
-                    .then(template=>{
-                        this.fetchedTemplatesData.templates.push( template )
-                    })
-            })
-            .catch((err:any)=>{
-                this.zone.runOutsideAngular(()=>{
-                    this.modal.inputResponse = 'error when adding a new template' + err;
-                    this.zone.run(()=>{})
-                })
-            })
-    }
-    */
 
     curtain = {
         dismissable : false,
