@@ -1,10 +1,11 @@
 
 import { Injectable } from '@angular/core';
-import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
 import { vec4,vec3 } from 'neuroglancer/util/geom'
 import { Config as NehubaConfig } from 'nehuba/exports'
 import { Subject } from 'rxjs/Rx'
 
+import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
+import { TIMEOUT } from './nehuba.config'
 // import { Viewer as NGViewer } from 'neuroglancer/viewer'
 
 @Injectable()
@@ -15,26 +16,31 @@ export class NehubaFetchData {
     /* or else an error will be thrown */
 
     fetchJson(url:string):Promise<any>{
-        return fetch( url )
-            .then( response =>{
-                return response.json()
+        return Promise.race([
+            fetch( url )
+                .then( response =>{
+                    return response.json()
+                })
+                .then(json => {
+                    return json
+                }),
+            new Promise((_,reject)=>{
+                setTimeout(()=>{
+                    reject('fetch request did not receive any response. Timeout after '+TIMEOUT+'ms')
+                },TIMEOUT)
             })
-            .then(json => {
-                return json
-            })
+        ])
     }
 
     /* parse a json object to an object with nehubaconfig interface */
     parseNehubaConfig(json:any):Promise<NehubaConfig>{
-
-        // const WHITE = vec4.fromValues(1.0, 1.0, 1.0, 1.0);
-        // const BLACK = vec4.fromValues(0.0, 0.0, 0.0, 1.0);
 
         let convertValues = function(nehubaConfig:any):NehubaConfig{
 
             let returnObj : NehubaConfig = {}
             returnObj = nehubaConfig
 
+            /* TODO: fix this, either check values exist first, or when number[] is implemented */
             /* temporary measure, since nehubaconfig needs some value as vec4's */
             returnObj.dataset!.imageBackground = nehubaConfig.dataset.imageBackground ?  convertColor( nehubaConfig.dataset.imageBackground ) : vec4.fromValues(1.,1.,1.,1.)
             returnObj.layout!.planarSlicesBackground = nehubaConfig.layout.planarSlicesBackground ? convertColor( nehubaConfig.layout.planarSlicesBackground ) : undefined

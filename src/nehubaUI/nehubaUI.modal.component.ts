@@ -7,7 +7,7 @@ import { EventPacket } from './nehuba.model'
 @Component({
     selector: 'nehubaModal',
     template : `
-<div bsModal #inputModal="bs-modal" class = "modal fade" tabindex = -1 role = "dialog">
+<div bsModal #inputModal="bs-modal" (onHide)="inputModalHideHandler($event)" class = "modal fade" tabindex = -1 role = "dialog">
     <div class = "modal-dialog modal-lg">
         <div class = "modal-content">
             <div class = "modal-header">
@@ -160,6 +160,10 @@ export class NehubaModal{
         this.inputModalObj.show()
     }
 
+    inputModalHideHandler(ev:any){
+        console.log(ev)
+    }
+
     /* this function should be more generic. such as confirmModal(data:string) */
     fetchData(url:string){
         this.inputResponse = ''
@@ -191,7 +195,7 @@ export class NehubaModal{
                 this.inputResponse += 'Adding new Template. '
                 this.nehubaFetchData.parseTemplateData(json)
                     .then( template =>{
-                        this.outputToController(template)
+                        this.fetchedOutputToController(template)
                     })
                     .catch( e=>{
                         this.inputResponse += 'Error.'
@@ -203,7 +207,7 @@ export class NehubaModal{
                 this.inputResponse += 'Adding new Parcellation.'
                 this.nehubaFetchData.parseParcellationData(json)
                     .then(parcellation =>{
-                        this.outputToController(parcellation)
+                        this.fetchedOutputToController(parcellation)
                     })
                     .catch( e=>{
                         this.inputResponse += 'Error.'
@@ -218,7 +222,7 @@ export class NehubaModal{
     }
 
     /* not using observables, since all fetched objects should go to the main controller */
-    outputToController(item:any){
+    fetchedOutputToController(item:any){
         this.fetchedSomething.emit(item)
     }
 
