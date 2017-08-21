@@ -427,31 +427,33 @@ export class Animation{
 }
 
 export class EventCenter{
-    modalEventRelay : Subject<EventPacket>
-    floatingWidgetRelay : Subject<Subject<EventPacket>>
+    modalSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
+    floatingWidgetSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
 
-    /* subject that conerns with viewer */
-    nehubaViewerRelay : Subject<EventPacket>
-
-    /* subject that concerns with layout */
-    globalLayoutRelay : Subject<EventPacket>
-
-    constructor(){
-        this.nehubaViewerRelay = new Subject()
-        this.globalLayoutRelay = new Subject()
-
-        this.floatingWidgetRelay = new Subject()
-        this.modalEventRelay = new Subject()
-    }
+    modalEventRelay : Subject<EventPacket> = new Subject()
+    nehubaViewerRelay : Subject<EventPacket> = new Subject()
+    globalLayoutRelay : Subject<EventPacket> = new Subject()
 
     /* returns a new Subject to the function's caller
      * in the future, also sends the subject to the right service
      * so the caller and the right service can have a single channel
      */
-    createNewRelay():Subject<EventPacket>{
-        let newSubject : Subject<EventPacket> = new Subject()
-        this.floatingWidgetRelay.next(newSubject)
-        return newSubject
+    createNewRelay(evPk:EventPacket):Subject<EventPacket>{
+        switch (evPk.target){
+            case 'floatingWidgetRelay':{
+                let newSubject : Subject<EventPacket> = new Subject()
+                this.floatingWidgetSubjectBroker.next(newSubject)
+                return newSubject
+            }
+            case 'curtainModal':{
+                let newSubject : Subject<EventPacket> = new Subject()
+                this.modalSubjectBroker.next(newSubject)
+                return newSubject
+            }
+            default:{
+                return new Subject()
+            }
+        }
     }
 }
 

@@ -29,7 +29,7 @@ export class FloatingWidget implements OnInit{
             private componentFactoryResolver: ComponentFactoryResolver,
             private eventCenter : EventCenter
       ){
-            this.eventCenter.floatingWidgetRelay.subscribe((subject:Subject<EventPacket>)=>{
+            this.eventCenter.floatingWidgetSubjectBroker.subscribe((subject:Subject<EventPacket>)=>{
                   subject.subscribe((eventPacket:EventPacket)=>{
                         switch (eventPacket.code)  {
                               case 100:{

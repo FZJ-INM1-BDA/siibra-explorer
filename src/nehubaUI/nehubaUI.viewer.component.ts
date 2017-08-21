@@ -38,7 +38,7 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.eventCenter.nehubaViewerRelay.subscribe((msg:EventPacket)=>{
                   switch(msg.target){
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE:{
-                              this.loadNewTemplate(msg.body.nehubaConfig,true)
+                              this.loadNewTemplate(msg.body.nehubaConfig)
                         }break;
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE:{
                               this.navigate(msg.body.pos,msg.body.rot)
@@ -52,11 +52,11 @@ export class NehubaViewerInnerContainer implements OnInit{
                   }
             })
             this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-                switch(msg.target){
-                    case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-                        this.darktheme = msg.body.theme == 'dark' 
-                    }break;
-                }
+                  switch(msg.target){
+                        case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
+                              this.darktheme = msg.body.theme == 'dark' 
+                        }break;
+                  }
             })
       }
 
@@ -64,7 +64,7 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.viewContainerRef = this.host.viewContainerRef
       }
 
-      loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig,darktheme:boolean){
+      loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
             if ( this.templateLoaded ){
                   /* I'm not too sure what does the dispose method do (?) */
                   /* TODO: use something other than a flag? */
@@ -72,12 +72,13 @@ export class NehubaViewerInnerContainer implements OnInit{
                   this.componentRef.destroy()
             } 
             
-            let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,darktheme)
+            let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,this.darktheme)
             let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
             this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
             
             this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
-            this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig,darktheme)
+            this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig)
+            this.nehubaViewerComponent.darktheme = this.darktheme
             
             this.templateLoaded = true
       }
@@ -116,8 +117,7 @@ export class NehubaViewerComponent{
       viewerPos : number[] = [0,0,0]
       viewerOri : number[] = [0,0,1,0]
 
-      public loadTemplate(config:NehubaViewerConfig,darktheme:boolean){
-            this.darktheme = darktheme
+      public loadTemplate(config:NehubaViewerConfig){
             this.nehubaViewer = createNehubaViewer(config,(err)=>{
                   /* TODO: error handling?*/
                   console.log('createnehubaviewer error handler',err)

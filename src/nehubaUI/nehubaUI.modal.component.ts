@@ -4,10 +4,12 @@ import { ModalDirective } from 'ngx-bootstrap/modal'
 import { EventCenter,NehubaFetchData } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 
+import { Subject } from 'rxjs/Rx'
+
 @Component({
     selector: 'nehubaModal',
     template : `
-<div bsModal #inputModal="bs-modal" (onHide)="inputModalHideHandler($event)" class = "modal fade" tabindex = -1 role = "dialog">
+<div bsModal #inputModal="bs-modal" class = "modal fade" tabindex = -1 role = "dialog">
     <div class = "modal-dialog modal-lg">
         <div class = "modal-content">
             <div class = "modal-header">
@@ -80,7 +82,12 @@ import { EventPacket } from './nehuba.model'
         </div>
     </div>
 </div>
-<div bsModal #curtainModal="bs-modal" class = "modal fade" tabindex = -1 role = "dialog" (onShown) = "curtainHandler('onShown',$event)">
+<div bsModal #curtainModal="bs-modal" class = "modal fade" tabindex = -1 role = "dialog" 
+    (onShow) = "curtainModalHandler('onShow',$event)"
+    (onShown) = "curtainModalHandler('onShown',$event)"
+    (onHide) = "curtainModalHandler('onHide',$event)"
+    (onHidden) = "curtainModalHandler('onHidden',$event)">
+
     <div class = "modal-dialog modal-lg">
         <div class = "modal-content">
             <div class = "modal-header">
@@ -116,6 +123,8 @@ export class NehubaModal{
     inputInput:string = ''
     inputResponse:string = ''
 
+    curtainModalHandler:any
+
     constructor(
         private eventCenter:EventCenter,
         private nehubaFetchData:NehubaFetchData
@@ -133,9 +142,40 @@ export class NehubaModal{
                     this.inputTitle = msg.body.title
                     this.inputModalObj.show()
                 }break;
-                case 'showCurtainModal':{
-                    this.showCurtain()
-                }break;
+            }
+        })
+        this.eventCenter.modalSubjectBroker.subscribe((subj:Subject<EventPacket>)=>{
+            subj.subscribe((evPk:EventPacket)=>{
+                switch(evPk.target){
+                    case 'curtainModal':{
+                        switch(evPk.code){
+                            case 100:{
+                                this.curtain.title = evPk.body.title
+                                this.curtain.message = evPk.body.body
+                                setTimeout(()=>{
+                                    this.curtainModal.show()
+                                })
+                            }
+                        }
+                    }break;
+                }
+
+                switch(evPk.code){
+                    case 200:
+                        this.curtainModal.hide()
+                    case 400:
+                    {
+                        subj.unsubscribe()
+                        this.curtainModalHandler = this.defaultCurtainHandler
+                    }break;
+                }
+            })
+            this.curtainModalHandler = (evString:string,_:any) => {
+                switch(evString){
+                    case 'onShown':{
+                        subj.next(new EventPacket('','',101,{status:'onShown'}))
+                    }
+                }
             }
         })
     }
@@ -160,10 +200,6 @@ export class NehubaModal{
         this.inputModalObj.show()
     }
 
-    inputModalHideHandler(ev:any){
-        console.log(ev)
-    }
-
     /* this function should be more generic. such as confirmModal(data:string) */
     fetchData(url:string){
         this.inputResponse = ''
@@ -181,7 +217,7 @@ export class NehubaModal{
                         this.inputResponse += 'Adding raw layer successful. '
                     })
                     .catch(err=>{
-                        this.inputResponse += 'Fetch Json Failed. '
+                        this.inputResponse += 'Fetch Info Json Failed. '
                         this.inputResponse += e.toString()
                         this.inputResponse += err.toString()
                     })
@@ -232,35 +268,7 @@ export class NehubaModal{
         message : 'Curtain message'
     }
 
-    /* TODO: fix curtain modal */
-    public curtainHandler : any
-    curtainLower( curtainMessage:any ):Promise<ModalDirective>{
-        this.curtain.title = curtainMessage.title ? curtainMessage.title : 'Curtain'
-        this.curtain.message = curtainMessage.message ? curtainMessage.message : 'Curtain message'
-
-        let config = curtainMessage.dismissable ? 
-            {
-                animated : true,
-                keyboard : false,
-                backdrop : true,
-                ignoreBackdropClick : true
-            }
-            :
-            {
-                animated : true,
-                keyboard : true,
-                backdrop : true,
-                ignoreBackdropClick : false
-            }
-        return new Promise(resolve=>{
-            
-            this.curtainHandler = (type:string,$event:ModalDirective)=>{
-                type
-                $event
-                resolve( this.curtainModal )
-            }
-            this.curtainModal.config = config
-            this.curtainModal.show()
-        })
+    defaultCurtainHandler = (_evString:string,_ev:any)=>{
+        
     }
 }

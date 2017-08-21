@@ -16,7 +16,10 @@ export class Lab {
 
       }
       discoParcel(){
-            let newSubject = this.eventCenter.createNewRelay()
-            newSubject.next(new EventPacket('','',100,{title:'testing disco',layername:'balllllll'}))
+            let requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
+            let newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
+            if( newSubject ){
+                  newSubject.next(new EventPacket('','',100,{title:'testing disco',layername:'balllllll'}))
+            }
       }
 }

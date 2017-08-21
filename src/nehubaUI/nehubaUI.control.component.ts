@@ -1,5 +1,5 @@
 
-import { Component,Input,Output,OnInit,AfterViewInit,NgZone,EventEmitter} from '@angular/core'
+import { Component,Input,OnInit,AfterViewInit} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { NehubaFetchData,EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
@@ -45,7 +45,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     @Input() nehubaViewer : NehubaViewer
     @Input() searchTerm : String = '';
     darktheme : boolean = false;
-    @Output() presetShader = new EventEmitter<LayerDescriptor>()
     
     fetchedTemplatesData : FetchedTemplates;
 
@@ -66,7 +65,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     constructor( 
         private nehubaFetchData : NehubaFetchData,
-        private zone:NgZone,
         private eventCenter:EventCenter
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
@@ -152,74 +150,44 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             /* send signals to modal and viewer to update the view */
             /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
             let id = Date.now().toString()
-            this.eventCenter.modalEventRelay.next(new EventPacket('showCurtainModal',id,100,{}))
-            this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
-            this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
-                {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
+            let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
+            let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
+            
+            let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... TODO: currently this modal closes after 3 seconds. In the future, this behaviour should changed so that when the template finishes loading, this modal closes automatically.'})
+            curtainModalSubject.next(eventPacket)
+            curtainModalSubject.subscribe((evPk:EventPacket)=>{
 
-            /* update models in the controller */
-            this.selectedTemplate = templateDescriptor
-            this.selectedRegions = []
-            this.selectedParcellation = undefined
-
-            /* update layers in the advanced mode */
-            /* probably awaiting nehuba viewer to implement two way binding of things like shader code and transformation matrix */
-            this.listOfActiveLayers = []
-            let ngJson = templateDescriptor.nehubaConfig.dataset!.initialNgState
-            for (let key in ngJson.layers){
-                this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
-            }
+                switch(evPk.code){
+                    case 101:{
+                        this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
+                            {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
+                        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
+            
+                        /* update models in the controller */
+                        this.selectedTemplate = templateDescriptor
+                        this.selectedRegions = []
+                        this.selectedParcellation = undefined
+            
+                        /* update layers in the advanced mode */
+                        /* probably awaiting nehuba viewer to implement two way binding of things like shader code and transformation matrix */
+                        this.listOfActiveLayers = []
+                        let ngJson = templateDescriptor.nehubaConfig.dataset!.initialNgState
+                        for (let key in ngJson.layers){
+                            this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
+                        }
+                        
+                        /* TODO: temporary measure */
+                        setTimeout(()=>{
+                            curtainModalSubject!.next(new EventPacket('','',200,{}))
+                        },3000)
+                    }break;
+                    case 200:
+                    case 400:{
+                        curtainModalSubject.unsubscribe()
+                    }break;
+                }
+            })
         }
-
-        this.zone.run(()=>{
-
-        })
-
-        // if ( this.selectedTemplate != templateDescriptor ){
-
-        //     let curtainMessage = {
-        //         title : 'Loading template',
-        //         message : 'Please wait while the template is being loaded ... TODO: this modal currently dismiss on a timer. In production, it will wait for the viewer\'s completion signal, and then gets dismissed. ',
-        //         dismissable : false
-        //     }
-        //     this.modal.curtainLower( curtainMessage ).then( modal =>{
-
-        //         /* required, as promise is async */
-        //         /* or ... is it? */
-        //         this.zone.run(()=>{
-
-        //             /* deselect the current template */
-        //             this.selectedTemplate = templateDescriptor
-        //             this.selectedRegions = []
-        //             this.selectedParcellation = undefined
-
-        //             /* currently, parses layer directly from nehubaConfig */
-        //             /* probably expecting an official nehuba api in the future */
-        //             this.listOfActiveLayers = []
-        //             let ngJson = this.nehubaViewer.config.dataset!.initialNgState
-        //             for (let key in ngJson.layers){
-        //                 this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
-        //             }
-
-        //             // /* change the nehubaviewerconfig  */
-        //             // this.nehubaViewer.config = this.selectedTemplate.nehubaConfig
-
-        //             // /* temporary measure */
-        //             // this.darktheme = this.selectedTemplate.nehubaConfig.dataset!.imageBackground[0] < 0.5
-
-        //             // this.nehubaViewer.applyInitialNgState()
-        //             // this.nehubaViewer.relayout()
-        //             // this.nehubaViewer.redraw()
-        //         })
-                
-        //         /* currently the modal automatically hides after 3 seconds. */
-        //         /* but in the future, we will be waiting for a signal from nehubaviewer */
-        //         /* signalling that it is ok to hide the modal */
-        //         setTimeout(()=>{
-        //             modal.hide()
-        //         },3000)
-        //     })
-        // } 
     }
 
     chooseParcellation(parcellation:ParcellationDescriptor):void{
@@ -278,19 +246,21 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
         let eventPacket = new EventPacket('loadPresetShader',packetId,100,packetBody)
         
-        let loadPresetShaderSubject = this.eventCenter.createNewRelay()
-        loadPresetShaderSubject.subscribe((resp:EventPacket)=>{
-            switch(resp.code){
-                case 200:{
-                    layer.properties.shader = resp.body.code
-                    /* no break statement... both causes unsubscription */
+        let requestForNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
+        let loadPresetShaderSubject = this.eventCenter.createNewRelay(requestForNewFloatingWidget)
+        if( loadPresetShaderSubject ){
+            loadPresetShaderSubject.subscribe((resp:EventPacket)=>{
+                switch(resp.code){
+                    case 200:{
+                        layer.properties.shader = resp.body.code
+                    }
+                    case 404:{
+                        loadPresetShaderSubject!.unsubscribe()
+                    }break;
                 }
-                case 404:{
-                    loadPresetShaderSubject.unsubscribe()
-                }break;
-            }
-        })
-        loadPresetShaderSubject.next(eventPacket)
+            })
+            loadPresetShaderSubject.next(eventPacket)
+        }
     }
 
     fetchedSomething(sth:any){
