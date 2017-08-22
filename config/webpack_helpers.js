@@ -46,9 +46,10 @@ function modifyViewerOptions(options) {
     use : ['style-loader','css-loader','sass-loader']
   }
   
-  options.otherRules = [
-    testScss
-  ]
+  /* TODO: maybe consider using text extract for scss? */
+  options.modifyBaseConfig = (baseConfig) => {
+    baseConfig.module.rules.push(testScss)
+  }
   return options;
 }
 

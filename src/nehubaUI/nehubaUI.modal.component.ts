@@ -155,14 +155,16 @@ export class NehubaModal{
                                 setTimeout(()=>{
                                     this.curtainModal.show()
                                 })
-                            }
+                            }break;
+                            case 102:{
+                                this.curtainModal.hide()
+                            }break;
                         }
                     }break;
                 }
 
                 switch(evPk.code){
                     case 200:
-                        this.curtainModal.hide()
                     case 400:
                     {
                         subj.unsubscribe()
@@ -174,7 +176,10 @@ export class NehubaModal{
                 switch(evString){
                     case 'onShown':{
                         subj.next(new EventPacket('','',101,{status:'onShown'}))
-                    }
+                    }break;
+                    case 'onHidden':{
+                        subj.next(new EventPacket('','',200,{}))
+                    }break;
                 }
             }
         })

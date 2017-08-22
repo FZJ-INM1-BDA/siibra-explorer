@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule } from '@angular/forms';
-import { FlexLayoutModule } from '@angular/flex-layout'
 
 import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { ModalModule }  from 'ngx-bootstrap/modal'
@@ -23,11 +22,10 @@ import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';
 import { Multiform } from './nehubaUI.displaymultiform.component';
 import { NehubaFetchData,EventCenter } from './nehubaUI.services';
-import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
+import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
-        FlexLayoutModule,
         BrowserAnimationsModule,
         RouterModule,
         FormsModule,
@@ -43,9 +41,9 @@ import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHi
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,
         Multiform, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
         MultilevelSelector, NehubaModal,
-        FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
+        FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe ],
     bootstrap : [ NehubaContainer ],
-    providers : [ NehubaFetchData,NehubaModal,EventCenter ],
+    providers : [ NehubaFetchData,EventCenter ],
     entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent ]
 })
 export class NehubaUI{

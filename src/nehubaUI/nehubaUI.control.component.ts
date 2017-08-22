@@ -74,7 +74,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             templatesPanelState : 'expanded',
             parcellationsPanelState : 'collapsed',
             regionsPanelState : 'collapsed',
-            navigationPanelState : 'collapsed'
+            navigationPanelState : 'collapsed',
+            labPanelState : 'collapsed'
         }
 
         this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
@@ -178,11 +179,11 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                         
                         /* TODO: temporary measure */
                         setTimeout(()=>{
-                            curtainModalSubject!.next(new EventPacket('','',200,{}))
+                            curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
                         },3000)
                     }break;
                     case 200:
-                    case 400:{
+                    case 404:{
                         curtainModalSubject.unsubscribe()
                     }break;
                 }

@@ -221,6 +221,7 @@ export class RegionDescriptor extends Multilevel{
     getUrl: string;
     label_index : number;
     default_loc : number[];
+    PMapUrl : string;
 }
 
 export abstract class DescriptorBase{

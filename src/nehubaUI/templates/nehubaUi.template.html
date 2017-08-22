@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 
-                <div (click) = "showInputModal('Template')" class = "list-group-item flex-center">
+                <div *ngIf = "false" (click) = "showInputModal('Template')" class = "list-group-item flex-center">
                     &#x2295; Add New Template
                 </div>
             </div>
@@ -96,48 +96,13 @@
             <div class = "list-group" *ngIf="selectedTemplate" [@panelExpansion]="defaultPanelsState.parcellationsPanelState" >
                 <div *ngFor = "let parcellation of selectedTemplate.parcellations">
                     <div (click)="chooseParcellation(parcellation)" class = "list-group-item" [ngClass]="{active : parcellation == selectedParcellation} " >
-                        <!--
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.isShown = !parcellation.isShown;$event.stopPropagation() "  >
-                            <span *ngIf = "parcellation.isShown" class = "glyphicon glyphicon-eye-open"></span>
-                            <span *ngIf = "!parcellation.isShown" class = "glyphicon glyphicon-eye-close"></span>
-                        </span>
-                        -->
                         <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
                             {{ parcellation.name }}   
                         </span>
-                        <!--
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "parcellation.subPanelShown = !parcellation.subPanelShown;$event.stopPropagation()"  >
-                            <i class = "glyphicon glyphicon-cog"></i>
-                        </span>
-                        -->
                         <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
                             &#x24d8;
                         </span>
                     </div>
-                    <!--
-                    <div *ngIf = "parcellation.subPanelShown"  class = "subPanel">
-                        <div class = "well row">
-                            <div class = "form-horizontal">
-                                <div class = "form-group">
-                                    <label class = "col-md-2 control-label" for="masterOpacity">Opacity: </label>
-                                    <div class = "col-md-4">
-                                        <input name = "masterOpacity" id = "masterOpacity" class = "form-control" [(ngModel)]="parcellation.masterOpacity" type = "number" max = "1" min = "0" step = "0.01">
-                                    </div>
-                                    <div class = "col-md-4 control-label" for = "masterOpacity">
-                                        <input [(ngModel)]="parcellation.masterOpacity" type = "range" max = "1" min = "0" step = "0.01">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class = "form-group">
-                                <label class = "control-label" for="masterOpacity">Custom GLSL Code: </label>
-                                <div class = "col-md-12">
-                                    <textarea [(ngModel)]="parcellation.customGLSL" class = "form-control"  >
-                                    </textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
             <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('regionsPanelState',selectedParcellation == undefined)" [ngClass]="{inactive: selectedParcellation == undefined}">
@@ -158,7 +123,16 @@
                     <span class = "unicodeSymbols" (click) = "region.enabled = false">&times;</span>
                 </div>
             </div>
-            <button class = "hidden btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
+            <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
+                Lab
+            </button>
+            <div *ngIf = "false" class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
+                <div class = "list-group-item">
+                    <lab>
+                    </lab>
+                </div>
+            </div>
+            <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
                 Navigation
             </button>
             <!-- <div class = "menuItemContentList HBPWidget form-horizontal" [@panelExpansion]="defaultPanelsState.navigationPanelState">

@@ -44,11 +44,22 @@ export class NehubaViewerInnerContainer implements OnInit{
                               this.navigate(msg.body.pos,msg.body.rot)
                         }break;
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT:{
-                              this.showSegment(msg.body.segID)
+                              if(msg.body.segID == 0){
+                                    this.hideAllSegments()
+                              }else{
+                                    this.showSegment(msg.body.segID)
+                              }
                         }break;
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.HIDE_SEGMENT:{
-                              this.hideSegment(msg.body.segID)
+                              if(msg.body.segID == 0){
+                                    this.showAllSegments()
+                              }else{
+                                    this.hideSegment(msg.body.segID)
+                              }
                         }break;
+                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER:{
+                              this.loadLayer(msg.body.url)
+                        }
                   }
             })
             this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
@@ -93,6 +104,34 @@ export class NehubaViewerInnerContainer implements OnInit{
 
       hideSegment(segID:any){
             this.nehubaViewerComponent.hideSeg(segID)
+      }
+
+      showAllSegments(){
+            this.nehubaViewerComponent.allSeg(true)
+      }
+
+      hideAllSegments(){
+            this.nehubaViewerComponent.allSeg(false)
+      }
+
+      loadLayer(url:string){
+            let id = Date.now().toString()
+            let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal',id,100,{}))
+            curtainModalSubject.next(new EventPacket('curtainModal',id,100,{title:'Loading PMap',body:'fetching '+url + ' This modal current is dismissed after 1.5 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
+            curtainModalSubject.subscribe((evPk:EventPacket)=>{
+                  switch (evPk.code){
+                        case 101:{
+                              this.nehubaViewerComponent.loadLayer(url)
+                              setTimeout(()=>{
+                                    curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
+                              },1500)
+                        }break;
+                        case 200:
+                        case 404:{
+                              curtainModalSubject.unsubscribe()
+                        }break;
+                  }
+            })
       }
 }
 
@@ -141,9 +180,9 @@ export class NehubaViewerComponent{
             })
       }
 
-      public navigate(pos:vec3,rot:quat){
+      public navigate(pos:vec3,_rot:quat){
             /* TODO: implement rotation somehow oO */
-            rot
+            
 
             /* slice is required to make clones of the values */
             /* or else the values (startPos/deltaPos) will change mid-animation */
@@ -175,6 +214,25 @@ export class NehubaViewerComponent{
 
       public hideSeg(id:number){
             this.nehubaViewer.hideSegment(id)
+      }
+
+      public allSeg(show:boolean){
+            this.nehubaViewer.getShownSegments().forEach(segID => {
+                  this.nehubaViewer.hideSegment(segID)
+            })
+            if( !show ) {
+                  this.nehubaViewer.showSegment(0)
+            }
+      }
+
+      public loadLayer(_url:string){
+            let json = this.nehubaViewer.ngviewer.state.toJSON()
+            json.layers.PMap = {
+                  type : "image",
+                  source : "nifti://http://172.104.156.15/hOc1.nii",
+                  shader : 'void main() {\n emitRGB(vec3(toNormalized(getDataValue()),0.,0.));\n}\n'
+            }
+            this.nehubaViewer.ngviewer.state.restoreState(json)
       }
 }
 

@@ -177,3 +177,34 @@ export class FilterUncertainObject implements PipeTransform{
         }
     }
 }
+
+@Pipe({
+    name:'htmlElementAssemblerPipe'
+})
+
+export class HTMLElementAssemblerPipe implements PipeTransform{
+    public transform(data:any){
+        let element : HTMLElement
+        if ( data._elementTagName ){
+            switch( data._elementTagName ){
+                case 'span':{
+                    element = document.createElement('span')
+                }break; 
+                case 'div':
+                default :{
+                    element = document.createElement('div')
+                }break;
+            }
+            if( data._class ){
+                element.className = data._class
+            }
+            if ( data._id ){
+                element.id = data._id
+            }
+            element.innerHTML = 'hello world'
+            return element.outerHTML
+        }else{
+            return ''
+        }
+    }
+}

@@ -19,7 +19,9 @@ import { Component,Input } from '@angular/core'
       </table>
 </div>
 <div *ngIf = "data.constructor.name == 'Object'" class = "col-md-12">
-      <table class = "table table-sm table-bordered">
+      <div *ngIf = "data._activeCell" [outerHTML]="data | htmlElementAssemblerPipe">
+      </div>
+      <table *ngIf ="!data._activeCell" class = "table table-sm table-bordered">
             <tbody>
                   <tr *ngFor = "let key of data | keyPipe">
                         <td class = "col-md-3">

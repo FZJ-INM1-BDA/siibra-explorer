@@ -331,6 +331,9 @@ export class NehubaFetchData {
                     if (json.default_loc){
                         newRegionDescriptor.default_loc = json.default_loc
                     }
+                    if(json.PMapUrl){
+                        newRegionDescriptor.PMapUrl = json.PMapUrl
+                    }
                     newRegionDescriptor.hierarchy = hierarchy
                     newRegionDescriptor.properties = values[0]
                     newRegionDescriptor.children = values[1]
@@ -465,7 +468,8 @@ export const EVENTCENTER_CONST = {
             MOUSE_ENTER_SEGMENT : 'mouseEnterSegment',
             MOUSE_LEAVE_SEGMENT : 'mouseLeaveSegment',
             SHOW_SEGMENT : 'showSegment',
-            HIDE_SEGMENT : 'hideSegment'
+            HIDE_SEGMENT : 'hideSegment',
+            LOAD_LAYER : 'loadLayer'
         }
     },
     GLOBALLAYOUT : {

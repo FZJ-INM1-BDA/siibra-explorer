@@ -26,6 +26,9 @@
 
                         </span>
                     </span>
+                    <span *ngIf = "singleData.PMapUrl" class = "multilevel-icon unicodeSymbols" (click) = "ShowPMap(singleData);$event.stopPropagation()">
+                        <i class = "glyphicon glyphicon-map-marker"></i>
+                    </span>
                     <span class = "multilevel-icon unicodeSymbols" (click) = "callingModal(singleData);$event.stopPropagation()"  >
                         &#x24d8;
                     </span>

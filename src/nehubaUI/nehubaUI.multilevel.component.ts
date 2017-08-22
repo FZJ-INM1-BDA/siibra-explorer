@@ -1,4 +1,4 @@
-import { Input, Component,AfterViewInit } from '@angular/core'
+import { Input, Component } from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { Multilevel,EventPacket,RegionDescriptor } from './nehuba.model'
 import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
@@ -35,17 +35,13 @@ import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
     ]
 })
 
-export class MultilevelSelector implements AfterViewInit{
+export class MultilevelSelector {
 
     @Input() searchTerm : string
     @Input() data : Multilevel[]
     @Input() selectedData : Multilevel[]
 
     constructor(private eventCenter : EventCenter){}
-
-    ngAfterViewInit():void{
-        
-    }
 
     chooseLevel(data:RegionDescriptor):void{
         
@@ -98,6 +94,20 @@ export class MultilevelSelector implements AfterViewInit{
 
     iterativeVisible(singleData:any):boolean{
         return singleData.children.some( (child:any)=>child.isVisible || this.iterativeVisible( child ))
+    }
+
+    ShowPMap(singleData:RegionDescriptor){
+        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT,'',100,{segID : 0}))
+        if (singleData.default_loc){
+            this.eventCenter.nehubaViewerRelay.next(
+                new EventPacket(
+                    EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE,
+                    Date.now().toString(),
+                    100,
+                    {pos:singleData.default_loc}
+                ))
+        }
+        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{url:singleData.PMapUrl}))    
     }
 
     callingModal(regionDescriptor:RegionDescriptor):void{

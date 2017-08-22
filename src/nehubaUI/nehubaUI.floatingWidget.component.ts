@@ -33,13 +33,20 @@ export class FloatingWidget implements OnInit{
                   subject.subscribe((eventPacket:EventPacket)=>{
                         switch (eventPacket.code)  {
                               case 100:{
-                                    this.loadPresetShaderFloatingWidget(eventPacket)
-                                          .then(newcode=>{
-                                                subject.next(new EventPacket('','',200,{code:newcode}))
-                                          })
-                                          .catch(e=>{
-                                                subject.next(new EventPacket('','',404,e))
-                                          })
+                                    switch(eventPacket.target){
+                                          case 'loadPresetShader':{
+                                                this.loadPresetShaderFloatingWidget(eventPacket)
+                                                      .then(newcode=>{
+                                                            subject.next(new EventPacket('','',200,{code:newcode}))
+                                                      })
+                                                      .catch(e=>{
+                                                            subject.next(new EventPacket('','',404,e))
+                                                      })
+                                          }break;
+                                          case 'loadCustomFloatingWidget':{
+                                                this.loadCustomWidget(eventPacket)
+                                          }break;
+                                    }
                               }break;
                               case 404:
                               case 200:{
@@ -60,6 +67,7 @@ export class FloatingWidget implements OnInit{
                   let floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
                   let componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
                   (<FloatingWidgetComponent>componentRef.instance).data = msg.body;
+                  (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = true;
                   (<FloatingWidgetComponent>componentRef.instance).loadSelection = (code:any)=>{
                         componentRef.destroy()
                         resolve(code)
@@ -70,6 +78,21 @@ export class FloatingWidget implements OnInit{
                   }
             })
       }
+
+      loadCustomWidget(msg:EventPacket){
+            let newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:msg.body})
+            let floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
+            let componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
+            (<FloatingWidgetComponent>componentRef.instance).customData = msg.body.body;
+            (<FloatingWidgetComponent>componentRef.instance).data = {title:msg.body.title};
+            (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
+            (<FloatingWidgetComponent>componentRef.instance).loadSelection = ()=>{
+                  componentRef.destroy()
+            }
+            (<FloatingWidgetComponent>componentRef.instance).cancelSelection = ()=>{
+                  componentRef.destroy()
+            }
+      }
 }
 
 @Component({
@@ -78,8 +101,9 @@ export class FloatingWidget implements OnInit{
       <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
             <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">
                   {{data.title}}
+                  <span (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></span>
             </div>
-            <div class = "panel-body">
+            <div *ngIf = "presetColorFlag" class = "panel-body">
                   <span>Load a custom colour map for:<br>
                   <strong> {{data.layername}}</strong></span>
                   <hr>
@@ -97,9 +121,12 @@ export class FloatingWidget implements OnInit{
                               </li>
                         </ul>
                   </div>
-                  
             </div>
-            <div class = "panel-footer">
+            <div *ngIf = "!presetColorFlag" class = "panel-body">
+                  <multiform [data]="customData">
+                  </multiform>
+            </div>
+            <div *ngIf = "presetColorFlag" class = "panel-footer">
                   <div (click)="loadColorMap()" [ngClass]="{disabled:!selectedColorMap}" class = "btn btn-primary">Load</div>
                   <div (click)="cancel()" class = "btn btn-defaul">Cancel</div>
             </div>
@@ -118,6 +145,9 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
       selectedColorMap : any 
 
       COLORMAPS : any[] = PRESET_COLOR_MAPS
+
+      presetColorFlag : boolean = true
+      customData : any = {}
 
       @HostListener('document:mousemove',['$event'])
       mousemove(ev:any){
