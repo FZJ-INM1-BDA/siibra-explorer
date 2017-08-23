@@ -1,8 +1,8 @@
 <nehubaModal (fetchedSomething)="fetchedSomething($event)"></nehubaModal>
 
 <div id = "leftSide">
-    <div id = "leftSideTop" [ngClass]="{darktheme:darktheme}">
-        <div *ngIf = "enableAdvancedMode == 'on'" [ngClass]="{darktheme:darktheme}" >
+    <div id = "leftSideTop" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
+        <div class = "modePanel" *ngIf = "enableAdvancedMode == 'on'" [ngClass]="{darktheme:darktheme}" >
             <div *ngFor="let layer of listOfActiveLayers" (click) = "layer.subPanelShown = !layer.subPanelShown" class = "list-group">
                 <div class = "list-group-item">
                     <span class = "list-group-item-icon unicodeSymbols" (click) = "layer.isShown = !layer.isShown;$event.stopPropagation() "  >
@@ -66,28 +66,20 @@
                 </div>
             </div>
         </div>
-        <div *ngIf = "enableAdvancedMode == 'off'" [ngClass]="{darktheme : darktheme}">
+        <div class = "modePanel" *ngIf = "enableAdvancedMode == 'off'" [ngClass]="{darktheme : darktheme}">
             <button (click)="toggleDefaultPanel('templatesPanelState',false)" class = "btn btn-default btn-block btn-lg">
                 Templates <small *ngIf = "selectedTemplate">({{selectedTemplate.name}})</small>
             </button>
             <div class = "list-group" *ngIf="fetchedTemplatesData" [@panelExpansion]="defaultPanelsState.templatesPanelState" >
-                <div *ngFor = "let template of fetchedTemplatesData.templates"
-                                popover = "Short description/Other info"
-                                popoverTitle = "{{template.name}}" 
-                                triggers = "mouseenter:mouseleave"
-                                placement = "right" >
+                <div *ngFor = "let template of fetchedTemplatesData.templates" >
                     <div (click)="chooseTemplate(template)" class = "list-group-item" [ngClass]="{active : template === selectedTemplate}" >
                         <span class = "list-group-item-name">
                             {{template.name}}
                         </span>
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(template);$event.stopPropagation()"  >
+                        <span *ngIf = "!(template.properties | isEmpty)" class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(template);$event.stopPropagation()"  >
                             &#x24d8;
                         </span>
                     </div>
-                </div>
-                
-                <div *ngIf = "false" (click) = "showInputModal('Template')" class = "list-group-item flex-center">
-                    &#x2295; Add New Template
                 </div>
             </div>
             <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('parcellationsPanelState',selectedTemplate == undefined)" [ngClass]="{inactive: selectedTemplate == undefined}">
@@ -99,7 +91,7 @@
                         <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
                             {{ parcellation.name }}   
                         </span>
-                        <span class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
+                        <span *ngIf = "!(parcellation.properties | isEmpty)" class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
                             &#x24d8;
                         </span>
                     </div>
@@ -110,7 +102,7 @@
             </button>
             <div class = "list-group" *ngIf="selectedParcellation" [@panelExpansion]="defaultPanelsState.regionsPanelState">
                 <div class = "list-group-item nohover">
-                    <input class = "form-control" placeholder = "Search regions ... " [(ngModel)]="searchTerm" name = "searchRegionInput">
+                    <input class = "form-control" placeholder = "Search regions ... " (ngModel)="searchTerm" name = "searchRegionInput">
                 </div>
                 <div class = "list-group-item nohover">
                     <multilevel class = "menuItemContentText" [data]="selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
@@ -135,84 +127,9 @@
             <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
                 Navigation
             </button>
-            <!-- <div class = "menuItemContentList HBPWidget form-horizontal" [@panelExpansion]="defaultPanelsState.navigationPanelState">
-                <div class = "row">
-                    <div class = "col-md-12">
-                        <h5>Position</h5>
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label" >
-                        x
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.position[0]">
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label">
-                        y
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.position[1]">
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label">
-                        z
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.position[2]">
-                    </div>
-                </div>
-                <div class = "row">
-                    <hr>
-                </div>
-                <div class = "row">
-                    <div class = "col-md-12">
-                        <h5>Rotation</h5>
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label" >
-                        Deg
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.rotation[0]">
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label" >
-                        Axis-x
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.rotation[1][0]">
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label">
-                        Axis-y
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.rotation[1][1]">
-                    </div>
-                </div>
-                <div class = "form-group">
-                    <label class = "col-md-2 control-label">
-                        Axis-z
-                    </label>
-                    <div class = "col-md-10">
-                        <input class = "form-control" (change)="nehubaNavigator.navigateView()" [(ngModel)] = "nehubaNavigator.navigation.rotation[1][2]">
-                    </div>
-                </div>
-                <div class = "row">
-                    <button (click) = "nehubaNavigator.resetView()" class = "col-md-push-2 col-md-5 btn btn-default">Reset View</button>
-                    <button (click) = "nehubaNavigator.testbutton()" class = "col-md-push-2 col-md-5 btn btn-default">Debug Button</button>
-                </div>
-            </div>  -->
         </div>
     </div>
-    <div id = "leftSideBottom" [ngClass]="{darktheme:darktheme}">
+    <div id = "leftSideBottom" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
         <div [ngClass]="{darktheme:darktheme}" class = "btn-group">
             <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "off">Default Panel</label>
             <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "on">Advanced Panel</label>

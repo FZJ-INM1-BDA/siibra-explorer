@@ -45,6 +45,9 @@ export class FloatingWidget implements OnInit{
                                           }break;
                                           case 'loadCustomFloatingWidget':{
                                                 this.loadCustomWidget(eventPacket)
+                                                      .then(_newCode => {
+                                                            subject.next(new EventPacket('','',200,{}))
+                                                      })
                                           }break;
                                     }
                               }break;
@@ -79,19 +82,20 @@ export class FloatingWidget implements OnInit{
             })
       }
 
-      loadCustomWidget(msg:EventPacket){
-            let newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:msg.body})
-            let floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
-            let componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
-            (<FloatingWidgetComponent>componentRef.instance).customData = msg.body.body;
-            (<FloatingWidgetComponent>componentRef.instance).data = {title:msg.body.title};
-            (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
-            (<FloatingWidgetComponent>componentRef.instance).loadSelection = ()=>{
-                  componentRef.destroy()
-            }
-            (<FloatingWidgetComponent>componentRef.instance).cancelSelection = ()=>{
-                  componentRef.destroy()
-            }
+      loadCustomWidget(msg:EventPacket):Promise<string>{
+            return new Promise((resolve,_reject)=>{
+                  let newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:msg.body})
+                  let floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
+                  let componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
+                  (<FloatingWidgetComponent>componentRef.instance).customData = msg.body.body;
+                  (<FloatingWidgetComponent>componentRef.instance).data = {title:msg.body.title};
+                  (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
+                  
+                  (<FloatingWidgetComponent>componentRef.instance).cancelSelection = ()=>{
+                        resolve('200')
+                        componentRef.destroy()
+                  }
+            })
       }
 }
 

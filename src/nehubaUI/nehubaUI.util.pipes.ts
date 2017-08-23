@@ -187,6 +187,12 @@ export class HTMLElementAssemblerPipe implements PipeTransform{
         let element : HTMLElement
         if ( data._elementTagName ){
             switch( data._elementTagName ){
+                case 'img':{
+                    element = document.createElement('img')
+                    if( data._src ){
+                        element.setAttribute('src',data._src)
+                    }
+                }break;
                 case 'span':{
                     element = document.createElement('span')
                 }break; 
@@ -201,10 +207,26 @@ export class HTMLElementAssemblerPipe implements PipeTransform{
             if ( data._id ){
                 element.id = data._id
             }
-            element.innerHTML = 'hello world'
+            if (data._value){
+                element.innerHTML = data._value
+            }
+
             return element.outerHTML
         }else{
             return ''
         }
+    }
+}
+
+@Pipe({
+    name:'isEmpty'
+})
+
+export class IsEmpty implements PipeTransform{
+    public transform(thing:any|any[]):boolean{
+        return thing.constructor.name == 'String' ? thing.length == 0 : 
+            thing.constructor.name == 'Array' ? thing.length == 0 :
+            thing.constructor.name == 'Object' ? Object.keys(thing).length == 0 :
+            true
     }
 }

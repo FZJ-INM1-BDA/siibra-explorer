@@ -1,6 +1,4 @@
-import { Component,OnInit,ViewChild} from '@angular/core'
-import { NehubaUIControl } from './nehubaUI.control.component'
-import { NehubaBanner } from './nehubaUI.banner.component'
+import { Component,AfterViewInit } from '@angular/core'
 
 @Component({
     selector : '#ATLASContainer',
@@ -10,7 +8,6 @@ import { NehubaBanner } from './nehubaUI.banner.component'
       </atlasbanner>
 
       <atlascontrol>
-        Loading Atlas Viewer ...
       </atlascontrol>
       <ATLASViewer id = "ATLASViewer">
       </ATLASViewer>
@@ -19,12 +16,8 @@ import { NehubaBanner } from './nehubaUI.banner.component'
     `,
 })
 
-export class NehubaContainer implements OnInit{
-
-      @ViewChild(NehubaBanner) nehubaBanner : NehubaBanner
-      @ViewChild(NehubaUIControl) nehubaUIControl : NehubaUIControl
-
-      ngOnInit(){
-            
-      }
+export class NehubaContainer implements AfterViewInit {
+  ngAfterViewInit(){
+    window.location.hash = ''
+  }
 }

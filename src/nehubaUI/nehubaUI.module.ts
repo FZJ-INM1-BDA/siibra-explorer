@@ -4,7 +4,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule } from '@angular/forms';
 
-import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
 import { TabsModule }  from 'ngx-bootstrap/tabs'
@@ -22,7 +21,7 @@ import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';
 import { Multiform } from './nehubaUI.displaymultiform.component';
 import { NehubaFetchData,EventCenter } from './nehubaUI.services';
-import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe } from './nehubaUI.util.pipes'
+import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
@@ -31,7 +30,6 @@ import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHi
         FormsModule,
         BrowserModule,
         ButtonsModule.forRoot(),
-        PopoverModule.forRoot(),
         ModalModule.forRoot(),
         TabsModule.forRoot(),
         BsDropdownModule.forRoot()
@@ -41,7 +39,7 @@ import { FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHi
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,
         Multiform, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
         MultilevelSelector, NehubaModal,
-        FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe ],
+        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe ],
     bootstrap : [ NehubaContainer ],
     providers : [ NehubaFetchData,EventCenter ],
     entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent ]

@@ -11,7 +11,10 @@ export const DISCO_WIDGET = {
                         "_id" : "UniqueID",
                         "_active" : "toggle",
                         "_hook" : "segmentOnHover",
-                        "_value" : "segment.id"
+                        "_value" : "{{segment.id}}",
+                        "_action" : {
+                              
+                        }
                   }
             }
       ]

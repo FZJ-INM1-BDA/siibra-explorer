@@ -20,6 +20,12 @@ const path = require('path');
 const original_webpack_helpers = require('neuroglancer/config/webpack_helpers');
 const resolveReal = require('neuroglancer/config/resolve_real');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+const extractSass = new ExtractTextPlugin({
+  filename : 'ui.css',
+  allChunks : true
+})
 
 function modifyViewerOptions(options) {
   options = options || {};
@@ -43,13 +49,20 @@ function modifyViewerOptions(options) {
   
   let testScss = {
     test : /\.scss$/,
-    use : ['style-loader','css-loader','sass-loader']
+    use : extractSass.extract({
+      use: [{
+        loader : 'css-loader'
+      },{
+        loader : 'sass-loader'
+      }]
+    })
   }
   
   /* TODO: maybe consider using text extract for scss? */
   options.modifyBaseConfig = (baseConfig) => {
     baseConfig.module.rules.push(testScss)
   }
+  options.frontendPlugins = [extractSass]
   return options;
 }
 

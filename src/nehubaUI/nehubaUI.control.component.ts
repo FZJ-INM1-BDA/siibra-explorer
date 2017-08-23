@@ -11,7 +11,6 @@ import { NehubaViewer } from 'nehuba/exports'
     templateUrl : 'src/nehubaUI/templates/nehubaUI.template.html',
     styleUrls : [ 
         'src/nehubaUI/templates/bootstrap.css',
-        'src/nehubaUI/templates/nehubaUI.template.css'
          ],
     animations : [
         trigger('panelExpansion',[

@@ -58,7 +58,7 @@ export class NehubaViewerInnerContainer implements OnInit{
                               }
                         }break;
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER:{
-                              this.loadLayer(msg.body.url)
+                              this.loadLayer(msg)
                         }
                   }
             })
@@ -114,17 +114,42 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.nehubaViewerComponent.allSeg(false)
       }
 
-      loadLayer(url:string){
-            let id = Date.now().toString()
-            let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal',id,100,{}))
-            curtainModalSubject.next(new EventPacket('curtainModal',id,100,{title:'Loading PMap',body:'fetching '+url + ' This modal current is dismissed after 1.5 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
+      loadLayer(msg:EventPacket){
+            let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
+            curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url + ' This modal current is dismissed after 3 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
             curtainModalSubject.subscribe((evPk:EventPacket)=>{
                   switch (evPk.code){
                         case 101:{
-                              this.nehubaViewerComponent.loadLayer(url)
+                              this.nehubaViewerComponent.loadLayer(msg.body.url)
                               setTimeout(()=>{
                                     curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-                              },1500)
+                                    
+                                    let floatingWidgetRelay = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
+                                    floatingWidgetRelay.next(new EventPacket('loadCustomFloatingWidget','',100,{
+                                          title : 'PMap for ' + msg.body.title,
+                                          body : [
+                                                {
+                                                      "_activeCell" : true,
+                                                      "_elementTagName" : "img",
+                                                      "_class" : "col-md-12",
+                                                      "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_autumn.png"
+                                                },
+                                                "To return to normal browsing, close this Dialogue."
+                                          ]
+                                    }))
+                                    floatingWidgetRelay.subscribe((evPk:EventPacket)=>{
+                                          switch (evPk.code){
+                                                case 200:
+                                                case 404:{
+                                                      let json = this.nehubaViewerComponent.nehubaViewer.ngviewer.state.toJSON()
+                                                      json.layers.PMap.visible = false
+                                                      json.layers.atlas.visible = true
+                                                      this.nehubaViewerComponent.nehubaViewer.ngviewer.state.restoreState(json)
+                                                      floatingWidgetRelay.unsubscribe()
+                                                }break;
+                                          }
+                                    })
+                              },3000)
                         }break;
                         case 200:
                         case 404:{
@@ -183,7 +208,6 @@ export class NehubaViewerComponent{
       public navigate(pos:vec3,_rot:quat){
             /* TODO: implement rotation somehow oO */
             
-
             /* slice is required to make clones of the values */
             /* or else the values (startPos/deltaPos) will change mid-animation */
             let deltaPos = ([
@@ -225,13 +249,15 @@ export class NehubaViewerComponent{
             }
       }
 
+      //TODO: do this properly with proper api's
       public loadLayer(_url:string){
             let json = this.nehubaViewer.ngviewer.state.toJSON()
             json.layers.PMap = {
                   type : "image",
-                  source : "nifti://http://172.104.156.15/hOc1.nii",
-                  shader : 'void main() {\n emitRGB(vec3(toNormalized(getDataValue()),0.,0.));\n}\n'
+                  source : "nifti://"+_url,
+                  shader : 'void main() { if( toNormalized(getDataValue()) > 0.05 ) { emitRGB(vec3(1.,toNormalized(getDataValue()),0.));}else{emitTransparent();}}'
             }
+            json.layers.atlas.visible = false
             this.nehubaViewer.ngviewer.state.restoreState(json)
       }
 }

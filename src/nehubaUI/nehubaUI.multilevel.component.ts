@@ -12,7 +12,7 @@ import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
         background-color:#ff3
         }
     `],
-    styleUrls : [   'src/nehubaUI/templates/nehubaUI.template.css',
+    styleUrls : [   
                     'src/nehubaUI/templates/nehubaUI.multilevel.template.css'],
     animations : [
         trigger('multilvlExpansion',[
@@ -97,7 +97,6 @@ export class MultilevelSelector {
     }
 
     ShowPMap(singleData:RegionDescriptor){
-        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT,'',100,{segID : 0}))
         if (singleData.default_loc){
             this.eventCenter.nehubaViewerRelay.next(
                 new EventPacket(
@@ -107,7 +106,10 @@ export class MultilevelSelector {
                     {pos:singleData.default_loc}
                 ))
         }
-        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{url:singleData.PMapUrl}))    
+        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{
+            url:singleData.PMapUrl,
+            title:singleData.name
+        }))    
     }
 
     callingModal(regionDescriptor:RegionDescriptor):void{
