@@ -8,7 +8,7 @@ import { NehubaViewer } from 'nehuba/exports'
 
 @Component({
     selector : 'atlascontrol',
-    templateUrl : 'src/nehubaUI/templates/nehubaUI.template.html',
+    templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html',
     styleUrls : [ 
         'src/nehubaUI/templates/bootstrap.css',
          ],

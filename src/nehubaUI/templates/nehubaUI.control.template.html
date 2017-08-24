@@ -115,10 +115,10 @@
                     <span class = "unicodeSymbols" (click) = "region.enabled = false">&times;</span>
                 </div>
             </div>
-            <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
+            <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
                 Lab
             </button>
-            <div class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
+            <div *ngIf = "false" class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
                 <div class = "list-group-item">
                     <lab>
                     </lab>
