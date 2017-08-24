@@ -457,8 +457,8 @@ atlascontrol
                 };
                 &.active
                 {
-                    color:gray(0.15);
-                    background-color:$GOLDEN;
+                    color:gray(1.0);
+                    background-color:tgray(1.0,0.2);
                 };
 
                 &.inactive
