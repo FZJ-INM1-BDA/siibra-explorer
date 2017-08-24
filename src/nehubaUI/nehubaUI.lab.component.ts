@@ -22,7 +22,7 @@ export class Lab {
             if( newSubject ){
                   // newSubject.next(new EventPacket('lab','',100,DISCO_WIDGET))
                   newSubject.next(new EventPacket('lab','',100,{
-                        url : 'http://localhost/nehubaPlugins/test.ts'
+                        url : 'http://localhost/nehubaPlugins/test.js'
                   }))
             }
       }

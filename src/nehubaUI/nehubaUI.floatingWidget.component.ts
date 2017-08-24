@@ -107,6 +107,15 @@ export class FloatingWidget implements OnInit{
             const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
             (<LabComponent>componentRef.instance).data = msg
 
+            let script = document.createElement('script')
+            script.onload = function(s){
+                  console.log('script loaded',s)
+            }
+            script.onerror = function(e){
+                  console.log('load script error',e)
+            }
+            script.src = msg.body.url
+            document.head.appendChild(script)
             // import(msg.body.url)
             //       .then((v:any)=>{
             //             console.log(v)
