@@ -49,6 +49,9 @@ export class FloatingWidget implements OnInit{
                                                             subject.next(new EventPacket('','',200,{}))
                                                       })
                                           }break;
+                                          case 'lab':{
+                                                this.lab(eventPacket)
+                                          }break;
                                     }
                               }break;
                               case 404:
@@ -97,7 +100,33 @@ export class FloatingWidget implements OnInit{
                   }
             })
       }
+
+      lab(msg:EventPacket){
+            const newLabUnit = new LabComponentUnit(LabComponent,msg)
+            const labUnitFactory = this.componentFactoryResolver.resolveComponentFactory(newLabUnit.component)
+            const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
+            (<LabComponent>componentRef.instance).data = msg
+
+            // import(msg.body.url)
+            //       .then((v:any)=>{
+            //             console.log(v)
+            //       })
+            // console.log(msg.body.url)
+            
+      }
 }
+
+export class LabComponentUnit{
+      constructor(public component : Type<any>,public data:EventPacket){}
+}
+
+@Component({
+      template:`<span>test</span>`
+})
+export class LabComponent{
+      public data : any
+}
+
 
 @Component({
       template : `

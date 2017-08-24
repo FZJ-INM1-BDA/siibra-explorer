@@ -10,7 +10,7 @@ import { TabsModule }  from 'ngx-bootstrap/tabs'
 import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
 // import { CollapseModule }  from 'ngx-bootstrap/collapse'
 
-import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from './nehubaUI.floatingWidget.component';
+import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective,LabComponent } from './nehubaUI.floatingWidget.component';
 import { NehubaModal } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl } from './nehubaUI.control.component';
@@ -35,14 +35,14 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
         BsDropdownModule.forRoot()
     ],
     declarations : 
-        [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective,
+        [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective,LabComponent,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,
         Multiform, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
         MultilevelSelector, NehubaModal,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe,HTMLElementAssemblerPipe ],
     bootstrap : [ NehubaContainer ],
     providers : [ NehubaFetchData,EventCenter ],
-    entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent ]
+    entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent,LabComponent ]
 })
 export class NehubaUI{
     
