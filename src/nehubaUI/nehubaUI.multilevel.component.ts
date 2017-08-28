@@ -101,10 +101,11 @@ export class MultilevelSelector {
                     {pos:singleData.default_loc}
                 ))
         }
-        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{
-            url:singleData.PMapUrl,
-            title:singleData.name
-        }))    
+        this.eventCenter.nehubaViewerRelay.next(
+            new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{
+                url:singleData.PMapUrl,
+                title:singleData.name
+            }))    
     }
 
     callingModal(regionDescriptor:RegionDescriptor):void{

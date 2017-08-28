@@ -1,5 +1,5 @@
 import { Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
-import { EventCenter } from './nehubaUI.services'
+import { EventCenter,HelperFunctions } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
 
@@ -26,7 +26,8 @@ export class FloatingWidget implements OnInit{
 
       constructor(
             private componentFactoryResolver: ComponentFactoryResolver,
-            private eventCenter : EventCenter
+            private eventCenter : EventCenter,
+            private helperFunctions : HelperFunctions,
       ){
             this.eventCenter.floatingWidgetSubjectBroker.subscribe((subject:Subject<EventPacket>)=>{
                   subject.subscribe((eventPacket:EventPacket)=>{
@@ -94,13 +95,29 @@ export class FloatingWidget implements OnInit{
                   (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
                   
                   if( msg.body.eventListeners && msg.body.eventListeners.length > 0 ){
-                        let userViewerSubscription = this.eventCenter.userViewerInteractRelay.subscribe((evPk:EventPacket)=>{
-                              msg.body.eventListeners.filter((evL:any)=>evL.event == evPk.target).forEach((_evL:any)=>{
-                                    console.log('ev listening')
-                              })
-                        })
+                        let userViewerSubscriptions:any[] = []
+                        msg.body.eventListeners.forEach((evL:any)=>{
+                              userViewerSubscriptions.push(this.eventCenter.userViewerInteractRelay
+                                    .filter((evPk:EventPacket)=>evPk.target==evL.event)
+                                    .filter((evPk:EventPacket)=>{
+                                          const filters = evL.filters as any[]
+                                          return filters.length == 0 ? true : filters.some((filter:any)=>this.helperFunctions.queryJsonSubset(filter,evPk.body))
+                                    })
+                                    .subscribe((evPk:EventPacket)=>{
+                                          evL.values.forEach((value:any)=>{
+                                                const targetValue = this.helperFunctions.queryNestedJsonValue(value,evPk.body)
+                                                this.helperFunctions.setValueById(
+                                                      targetValue.target,
+                                                      (<FloatingWidgetComponent>componentRef.instance).customData,
+                                                      targetValue.value)
+                                          })
+                                          evL.scripts.forEach((script:any)=>{
+                                                eval(script)
+                                          })
+                                    }))
+                  })
                         componentRef.onDestroy(()=>{
-                              userViewerSubscription.unsubscribe()
+                              userViewerSubscriptions.forEach(sub=>{sub.unsubscribe()})
                         });
                   }
                   (<FloatingWidgetComponent>componentRef.instance).cancelSelection = ()=>{

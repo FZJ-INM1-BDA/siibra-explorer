@@ -1,4 +1,4 @@
-import { ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3,quat } from 'nehuba/exports'
@@ -80,13 +80,15 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.viewContainerRef = this.host.viewContainerRef
       }
 
+      loadNewTemplateHook : any[] = []
+
       loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
             if ( this.templateLoaded ){
                   /* I'm not too sure what does the dispose method do (?) */
                   /* TODO: use something other than a flag? */
                   (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
                   this.componentRef.destroy()
-            } 
+            }
             
             let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,this.darktheme)
             let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
@@ -95,6 +97,15 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
             this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig)
             this.nehubaViewerComponent.darktheme = this.darktheme
+
+            this.nehubaViewerComponent.nehubaViewer.mouseOver.layer.subscribe((im:any)=>{
+                  this.eventCenter.userViewerInteractRelay.next(new EventPacket(
+                        'layerMouseOver',
+                        Date.now().toString(),
+                        100,
+                        {layer:im}
+                  ))
+            })
             
             this.templateLoaded = true
       }
@@ -130,6 +141,7 @@ export class NehubaViewerInnerContainer implements OnInit{
                               setTimeout(()=>{
                                     curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
                              
+                                    /* TODO: pMapFlatingWidget should either be with multilevel or floating widget, and not in viewer.component */
                                     this.pMapFloatingWidget = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
                                     this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget','',100,{
                                           title : 'PMap for ' + msg.body.title,
@@ -139,19 +151,35 @@ export class NehubaViewerInnerContainer implements OnInit{
                                                       "_elementTagName" : "img",
                                                       "_class" : "col-md-12",
                                                       "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
-                                                },
-                                                {
-                                                      "_activeCell" : true,
-                                                      "_elementTagName" : "div",
-                                                      "_class" : "col-md-12 hidden",
-                                                      "_active" : "always",
-                                                      "_value" : '{{segments.PMap.value}}'
+                                                },{
+                                                      "Encoded Value":
+                                                            {
+                                                                  "_activeCell" : true,
+                                                                  "_elementTagName" : "div",
+                                                                  "_class" : "col-md-12",
+                                                                  "_active" : "always",
+                                                                  "_id" : "pmap_value",
+                                                                  "_value" : '0'
+                                                            }
                                                 },
                                                 "To return to normal browsing, close this Dialogue."
                                           ],
                                           eventListeners : [
                                                 {
-                                                      "event" : "mousemove",
+                                                      "event" : "layerMouseOver",
+                                                      "filters": [{
+                                                                  "layer":{
+                                                                        "layer":{
+                                                                              "name" : "PMap"
+                                                                        }
+                                                                  }
+                                                            }],
+                                                      "values":[{
+                                                                  "layer":{
+                                                                        "value":"pmap_value | number:'1.4-4'"
+                                                                  }
+                                                            }],
+                                                      "scripts" : []
                                                 }
                                           ]
                                     }))
@@ -196,12 +224,20 @@ div#container{
             `
       ]
 })
-export class NehubaViewerComponent{
+export class NehubaViewerComponent implements OnDestroy{
       public nehubaViewer : NehubaViewer
       viewerConfig : NehubaViewerConfig
       darktheme : boolean
       viewerPos : number[] = [0,0,0]
       viewerOri : number[] = [0,0,1,0]
+
+      onDestroyUnsubscribe : any[] = []
+
+      public ngOnDestroy(){
+            this.onDestroyUnsubscribe.forEach((subscription:any)=>{
+                  subscription.unsubscribe()
+            })
+      }
 
       public loadTemplate(config:NehubaViewerConfig){
             this.nehubaViewer = createNehubaViewer(config,(err)=>{
@@ -214,18 +250,13 @@ export class NehubaViewerComponent{
             this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
 
             /* set navigation callback */
-            this.nehubaViewer.setNavigationStateCallbackInRealSpaceCoordinates((pos,ori)=>{
+            let navigationSubscription = this.nehubaViewer.addNavigationStateCallbackInRealSpaceCoordinates((pos)=>{
                   this.viewerPos[0] = pos[0]
                   this.viewerPos[1] = pos[1]
                   this.viewerPos[2] = pos[2]
-
-                  if( ori ){
-                        this.viewerOri[0] = ori[0]
-                        this.viewerOri[1] = ori[1]
-                        this.viewerOri[2] = ori[2]
-                        this.viewerOri[3] = ori[3]
-                  }
             })
+
+            this.onDestroyUnsubscribe.push( navigationSubscription )
       }
 
       public navigate(pos:vec3,_rot:quat){

@@ -19,8 +19,8 @@ import { Component,Input } from '@angular/core'
       </table>
 </div>
 <div *ngIf = "data.constructor.name == 'Object'" class = "col-md-12">
-      <div *ngIf = "data._activeCell" [outerHTML]="data | htmlElementAssemblerPipe">
-      </div>
+      <activecomponent *ngIf = "data._activeCell" [data]="data">
+      </activecomponent>
       <table *ngIf ="!data._activeCell" class = "table table-sm table-bordered">
             <tbody>
                   <tr *ngFor = "let key of data | keyPipe">
@@ -40,4 +40,19 @@ import { Component,Input } from '@angular/core'
 
 export class Multiform{
       @Input() data:any|any[]
+}
+
+@Component({
+      selector : 'activecomponent',
+      template : `
+<div *ngIf = "data._elementTagName == 'div'" [ngClass] = "data._class">{{data._value}}
+</div>
+<span *ngIf = "data._elementTagName == 'span'" [ngClass] = "data._class">{{data._value}}
+</span>
+<img *ngIf = "data._elementTagName == 'img'" [src] = "data._src" [ngClass] = "data._class">
+      `
+})
+
+export class ActiveComponent{
+      @Input() data:any
 }
