@@ -3,7 +3,6 @@ import { EventCenter } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
 
-
 @Directive({
       selector : '[floating-widget-host]'
 })
@@ -94,6 +93,16 @@ export class FloatingWidget implements OnInit{
                   (<FloatingWidgetComponent>componentRef.instance).data = {title:msg.body.title};
                   (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
                   
+                  if( msg.body.eventListeners && msg.body.eventListeners.length > 0 ){
+                        let userViewerSubscription = this.eventCenter.userViewerInteractRelay.subscribe((evPk:EventPacket)=>{
+                              msg.body.eventListeners.filter((evL:any)=>evL.event == evPk.target).forEach((_evL:any)=>{
+                                    console.log('ev listening')
+                              })
+                        })
+                        componentRef.onDestroy(()=>{
+                              userViewerSubscription.unsubscribe()
+                        });
+                  }
                   (<FloatingWidgetComponent>componentRef.instance).cancelSelection = ()=>{
                         resolve('200')
                         componentRef.destroy()
@@ -102,10 +111,11 @@ export class FloatingWidget implements OnInit{
       }
 
       lab(msg:EventPacket){
-            const newLabUnit = new LabComponentUnit(LabComponent,msg)
-            const labUnitFactory = this.componentFactoryResolver.resolveComponentFactory(newLabUnit.component)
-            const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
-            (<LabComponent>componentRef.instance).data = msg
+            console.log('labmsg')
+            // const newLabUnit = new LabComponentUnit(LabComponent,msg)
+            // const labUnitFactory = this.componentFactoryResolver.resolveComponentFactory(newLabUnit.component)
+            // const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
+            // (<LabComponent>componentRef.instance).data = msg
 
             let script = document.createElement('script')
             script.onload = function(s){
@@ -116,6 +126,8 @@ export class FloatingWidget implements OnInit{
             }
             script.src = msg.body.url
             document.head.appendChild(script)
+
+            
             // import(msg.body.url)
             //       .then((v:any)=>{
             //             console.log(v)

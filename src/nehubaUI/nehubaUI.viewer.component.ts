@@ -1,8 +1,11 @@
 import { ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
-import { EventCenter,Animation,EVENTCENTER_CONST } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
+import { Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3,quat } from 'nehuba/exports'
+
+import { EventCenter,Animation,EVENTCENTER_CONST } from './nehubaUI.services'
+import { EventPacket } from './nehuba.model'
+import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
 
 
 @Directive({
@@ -30,6 +33,8 @@ export class NehubaViewerInnerContainer implements OnInit{
       viewContainerRef : ViewContainerRef
       templateLoaded : boolean = false
       darktheme : boolean = false
+
+      colorMap : Map<number,{}>
 
       constructor(
             private componentFactoryResolver: ComponentFactoryResolver,
@@ -114,6 +119,7 @@ export class NehubaViewerInnerContainer implements OnInit{
             this.nehubaViewerComponent.allSeg(false)
       }
 
+      pMapFloatingWidget : Subject<EventPacket>
       loadLayer(msg:EventPacket){
             let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
             curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url + ' This modal current is dismissed after 3 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
@@ -123,21 +129,33 @@ export class NehubaViewerInnerContainer implements OnInit{
                               this.nehubaViewerComponent.loadLayer(msg.body.url)
                               setTimeout(()=>{
                                     curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-                                    
-                                    let floatingWidgetRelay = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
-                                    floatingWidgetRelay.next(new EventPacket('loadCustomFloatingWidget','',100,{
+                             
+                                    this.pMapFloatingWidget = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
+                                    this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget','',100,{
                                           title : 'PMap for ' + msg.body.title,
                                           body : [
                                                 {
                                                       "_activeCell" : true,
                                                       "_elementTagName" : "img",
                                                       "_class" : "col-md-12",
-                                                      "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_autumn.png"
+                                                      "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
+                                                },
+                                                {
+                                                      "_activeCell" : true,
+                                                      "_elementTagName" : "div",
+                                                      "_class" : "col-md-12 hidden",
+                                                      "_active" : "always",
+                                                      "_value" : '{{segments.PMap.value}}'
                                                 },
                                                 "To return to normal browsing, close this Dialogue."
+                                          ],
+                                          eventListeners : [
+                                                {
+                                                      "event" : "mousemove",
+                                                }
                                           ]
                                     }))
-                                    floatingWidgetRelay.subscribe((evPk:EventPacket)=>{
+                                    this.pMapFloatingWidget.subscribe((evPk:EventPacket)=>{
                                           switch (evPk.code){
                                                 case 200:
                                                 case 404:{
@@ -145,7 +163,11 @@ export class NehubaViewerInnerContainer implements OnInit{
                                                       json.layers.PMap.visible = false
                                                       json.layers.atlas.visible = true
                                                       this.nehubaViewerComponent.nehubaViewer.ngviewer.state.restoreState(json)
-                                                      floatingWidgetRelay.unsubscribe()
+                                                      this.pMapFloatingWidget.unsubscribe()
+                                                      
+                                                      /* TODO:temporary. need to load specific map for specific atlases */
+                                                      this.nehubaViewerComponent.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
+                                                      console.log(this.pMapFloatingWidget)
                                                 }break;
                                           }
                                     })
@@ -189,6 +211,7 @@ export class NehubaViewerComponent{
             this.nehubaViewer.applyInitialNgState()
             this.nehubaViewer.redraw()
             this.nehubaViewer.relayout()
+            this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
 
             /* set navigation callback */
             this.nehubaViewer.setNavigationStateCallbackInRealSpaceCoordinates((pos,ori)=>{
@@ -250,12 +273,12 @@ export class NehubaViewerComponent{
       }
 
       //TODO: do this properly with proper api's
-      public loadLayer(_url:string){
+      public loadLayer(url:string){
             let json = this.nehubaViewer.ngviewer.state.toJSON()
             json.layers.PMap = {
                   type : "image",
-                  source : "nifti://"+_url,
-                  shader : 'void main() { if( toNormalized(getDataValue()) > 0.05 ) { emitRGB(vec3(1.,toNormalized(getDataValue()),0.));}else{emitTransparent();}}'
+                  source : "nifti://"+url,
+                  shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
             }
             json.layers.atlas.visible = false
             this.nehubaViewer.ngviewer.state.restoreState(json)

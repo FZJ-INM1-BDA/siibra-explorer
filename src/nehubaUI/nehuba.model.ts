@@ -283,3 +283,34 @@ export class EventPacket{
     code : number       /* code to indicate status. use http code for convenience */
     body : any    /* message */
 }
+
+export class LabComponent{
+    script : HTMLElement
+    template : HTMLElement
+    name : string
+    author : string
+    desc : string
+
+    constructor(json:any){
+        this.name = json.name ? json.name : 'Untitled';
+        this.author = json.author ? json.author : 'No author provided.';
+        this.desc = json.desc ? json.desc : 'No description provided.';
+
+        if( json.scriptURL ){
+            this.script = document.createElement('script')
+            this.script.setAttribute('src',json.scriptURL)
+        }
+
+        if( json.templateURL ){
+            Promise.race([
+                fetch(json.templateURL)
+                .then(_template=>{
+
+                })
+                .catch(e=>{
+                    console.log('error fetching plugin template',e)
+                })
+            ])
+        }
+    }
+}

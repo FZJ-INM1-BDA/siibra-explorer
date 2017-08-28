@@ -45,12 +45,7 @@ export class MultilevelSelector {
 
     chooseLevel(data:RegionDescriptor):void{
         
-        // if (data.default_loc){
-        //     this.eventCenter.navigationRelay.next(new EventPacket('navigateTo',Date.now().toString(),100,{pos:data.default_loc}))
-        // }
-        // if (data.label_index){
-        //     this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index}))
-        // }
+        //TODO: fix trans location when more regions have their index and id
         if( data.hasEnabledChildren() ){
             data.updateChildrenStatus('disable')
             if (data.label_index){

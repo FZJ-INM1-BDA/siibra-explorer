@@ -185,10 +185,6 @@ export class NehubaModal{
         })
     }
 
-    public showCurtain(){
-        console.log('curtain is shown')
-    }
-
     public showModal( modalTitle:string = 'More Info', properties : any ){
 
         this.title = modalTitle
@@ -255,6 +251,9 @@ export class NehubaModal{
                         this.inputResponse += e.toString()
                         console.log(e)
                     })
+            }break;
+            case 'plugin':{
+                /* some sort of validation process? */
             }break;
             default:{
                 this.inputResponse += 'No type property found. Unable to process this JSON.'

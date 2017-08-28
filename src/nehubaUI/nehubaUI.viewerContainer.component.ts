@@ -5,7 +5,7 @@ import { EventPacket } from './nehuba.model'
 @Component({
     selector : 'ATLASViewer',
     template : `
-        <NehubaViewer></NehubaViewer>
+        <NehubaViewer (mousemove)="mousemove($event)"></NehubaViewer>
         <span id="helpbutton" (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign unicodeSymbols"></span>
     `
 })
@@ -23,9 +23,12 @@ export class NehubaViewerContainer {
         })
     }
 
+    mousemove(event:any){
+        this.eventCenter.userViewerInteractRelay.next(new EventPacket('mousemove',Date.now().toString(),100,{event:event}))
+    }
+
     showhelp(){
         this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:"Basic Controls",body:this.helpMenu}))
-        // this.showModal.emit('showHelpModal')
     }
 
     helpMenu:any = 
