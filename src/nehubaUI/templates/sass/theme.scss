@@ -399,6 +399,21 @@ atlascontrol
                                 cursor:default;
                             }
                         };
+                        lab
+                        {
+                            div#labContainer
+                            {
+                                div.btn.btn-default
+                                {
+                                    @extend %darkthemetemplate;
+
+                                    &:hover
+                                    {
+                                        background-color: tgray(1.0,0.2)
+                                    }
+                                }
+                            }
+                        }
                     };
                     .subPanel
                     {

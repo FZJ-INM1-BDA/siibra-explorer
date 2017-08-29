@@ -130,7 +130,6 @@ export class FloatingWidget implements OnInit{
       }
 
       lab(msg:EventPacket){
-            console.log('labmsg')
             // const newLabUnit = new LabComponentUnit(LabComponent,msg)
             // const labUnitFactory = this.componentFactoryResolver.resolveComponentFactory(newLabUnit.component)
             // const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
@@ -154,8 +153,8 @@ export class FloatingWidget implements OnInit{
                         }
 
                         let script = document.createElement('script')
-                        script.onload = (s) => {
-                              console.log('script loaded',s)
+                        script.onload = (_s) => {
+                              console.log('script loaded')
                         }
                         script.onerror = (e) => {
                               console.log('load script error',e)
