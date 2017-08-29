@@ -229,12 +229,10 @@ FloatingWidgetContainer{
 
     div.floatingWidget{
         position:absolute;
-        // right:350px;
-        // bottom:450px;
         width:300px;
         z-index:100;
         div.panel{
-            div.panel-heading{
+            div.panel-heading.moveable{
                 &:hover{
                     cursor:move;
                 }

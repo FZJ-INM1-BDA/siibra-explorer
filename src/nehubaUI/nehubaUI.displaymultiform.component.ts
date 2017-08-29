@@ -40,6 +40,7 @@ import { Component,Input } from '@angular/core'
 
 export class Multiform{
       @Input() data:any|any[]
+      @Input() template:any
 }
 
 @Component({

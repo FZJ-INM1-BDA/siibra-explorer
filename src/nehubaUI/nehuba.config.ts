@@ -114,6 +114,58 @@ export const COLORMAP_WIDGET = {
       ]
 }
 
+export const JUGEX_WIDGET = {
+    title : 'JuGeX',
+    body : [
+        {
+            "Area1" : {
+                "_activeCell" : true,
+                "_elementTagName" : "div",
+                "_class" : "col-md-12",
+                "_id" : "area1",
+                "_active":"toggle",
+                "_value" : "select a region"
+            },
+            "Area2" : {
+                "_activeCell" : true,
+                "_elementTagName" : "div",
+                "_class" : "col-md-12",
+                "_id" : "area2",
+                "_active":"toggle",
+                "_value" : "select a region"
+            },
+        },
+        "Select genes of interest:",
+        {
+            "_activeCell" : true,
+            "_elementTagName" : "input",
+            "_class" : "form-control",
+            "_id" : "genesOfInterest",
+            "_attributes" : {
+                "placeholder" : "Enter a list of genes of interest"
+            }
+        },
+        {
+            "_activeCell" : true,
+            "_elementTagName" : "div",
+            "_class" : "btn btn-default",
+            "_id" : "addRegionsOfInterest",
+            "_active":"click",
+            "_value" : "Add"
+        },{
+            "_activeCell" : true,
+            "_elementTagName" : "hr",
+            "_class" : "col-md-12",
+        },{
+            "_activeCell" : true,
+            "_elementTagName" : "div",
+            "_class" : "col-md-12 btn btn-default",
+            "_id" : "submit",
+            "_active":"click",
+            "_value" : "Submit"
+        }
+    ]
+}
 
 export const PRESET_COLOR_MAPS = [
       {

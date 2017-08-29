@@ -7,6 +7,12 @@ import { EventCenter,Animation,EVENTCENTER_CONST } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
 
+declare var window:{
+      [key:string] : any
+      prototype : Window;
+      new() : Window;
+}
+
 
 @Directive({
       selector : '[nehuba-viewer-host]'
@@ -212,7 +218,11 @@ export class NehubaViewerInnerContainer implements OnInit{
 
 @Component({
       template : `
-<div id = "container" [ngClass]="{darktheme : darktheme}">
+<div id = "container" [ngClass]="{darktheme : darktheme}"
+      (mousedown)="mousehandler('mousedown',$event)" 
+      (mouseup)="mousehandler('mouseup',$event)" 
+      (click)="mousehandler('click',$event)" 
+      (mousemove)="mousehandler('mousemove',$event)" >
 </div>
       `,
       styles : [
@@ -232,10 +242,25 @@ export class NehubaViewerComponent implements OnDestroy{
       viewerOri : number[] = [0,0,1,0]
 
       onDestroyUnsubscribe : any[] = []
+      mouseEventSubject : Subject<any>
+
+      constructor(){
+            this.mouseEventSubject = new Subject()
+            window['mouseEvent'] = this.mouseEventSubject
+      }
 
       public ngOnDestroy(){
             this.onDestroyUnsubscribe.forEach((subscription:any)=>{
                   subscription.unsubscribe()
+            })
+            window['nehubaViewer'] = null
+            window['mouseEvent'] = null
+      }
+
+      public mousehandler(mode:string,ev:any){
+            this.mouseEventSubject.next({
+                  mode : mode,
+                  ev : ev
             })
       }
 
@@ -257,6 +282,8 @@ export class NehubaViewerComponent implements OnDestroy{
             })
 
             this.onDestroyUnsubscribe.push( navigationSubscription )
+
+            window['nehubaViewer'] = this.nehubaViewer
       }
 
       public navigate(pos:vec3,_rot:quat){

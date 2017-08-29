@@ -1,4 +1,5 @@
 import { Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { DomSanitizer } from '@angular/platform-browser'
 import { EventCenter,HelperFunctions } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
@@ -28,6 +29,7 @@ export class FloatingWidget implements OnInit{
             private componentFactoryResolver: ComponentFactoryResolver,
             private eventCenter : EventCenter,
             private helperFunctions : HelperFunctions,
+            private sanitizer : DomSanitizer
       ){
             this.eventCenter.floatingWidgetSubjectBroker.subscribe((subject:Subject<EventPacket>)=>{
                   subject.subscribe((eventPacket:EventPacket)=>{
@@ -134,32 +136,53 @@ export class FloatingWidget implements OnInit{
             // const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
             // (<LabComponent>componentRef.instance).data = msg
 
-            let script = document.createElement('script')
-            script.onload = function(s){
-                  console.log('script loaded',s)
-            }
-            script.onerror = function(e){
-                  console.log('load script error',e)
-            }
-            script.src = msg.body.url
-            document.head.appendChild(script)
+            fetch(msg.body.templateURL)
+                  .then(template=>template.text())
+                  .then(text=>{
+                        const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:msg.body})
+                        const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
+                        const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
+                        (<FloatingWidgetComponent>componentRef.instance).template = this.sanitizer.bypassSecurityTrustHtml(text);
+                        const data = {
+                              title : "JuGeX"
+                        };
+                        (<FloatingWidgetComponent>componentRef.instance).data = data;
+                        (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
+                        (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
+                              /* end of life hook */
+                              componentRef.destroy()
+                        }
 
-            
-            // import(msg.body.url)
-            //       .then((v:any)=>{
-            //             console.log(v)
-            //       })
-            // console.log(msg.body.url)
-            
+                        let script = document.createElement('script')
+                        script.onload = (s) => {
+                              console.log('script loaded',s)
+                        }
+                        script.onerror = (e) => {
+                              console.log('load script error',e)
+                        }
+                        script.src = msg.body.scriptURL
+                        document.head.appendChild(script)
+                  })
+                  .catch(e=>console.log(e))
+
+            // let script = document.createElement('script')
+            // script.onload = function(s){
+            //       console.log('script loaded',s)
+            // }
+            // script.onerror = function(e){
+            //       console.log('load script error',e)
+            // }
+            // script.src = msg.body.url
+            // document.head.appendChild(script)
       }
 }
 
 export class LabComponentUnit{
-      constructor(public component : Type<any>,public data:EventPacket){}
+      constructor(public component : Type<any>){}
 }
 
 @Component({
-      template:`<span>test</span>`
+      template:`<span>LabComponent</span>`
 })
 export class LabComponent{
       public data : any
@@ -168,13 +191,15 @@ export class LabComponent{
 
 @Component({
       template : `
-<div [style.bottom] = "offset[1]+'px'" [style.right]="offset[0]+'px'" class = "floatingWidget">
+<div [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" class = "floatingWidget">
       <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
-            <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "panel-heading">
+            <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
                   {{data.title}}
                   <span (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></span>
             </div>
-            <div *ngIf = "presetColorFlag" class = "panel-body">
+            <div [innerHTML]="template" *ngIf = "template" class = "panel-body">
+            </div>
+            <div *ngIf = "presetColorFlag && !template" class = "panel-body">
                   <span>Load a custom colour map for:<br>
                   <strong> {{data.layername}}</strong></span>
                   <hr>
@@ -193,7 +218,7 @@ export class LabComponent{
                         </ul>
                   </div>
             </div>
-            <div *ngIf = "!presetColorFlag" class = "panel-body">
+            <div *ngIf = "!presetColorFlag && !template" class = "panel-body">
                   <multiform [data]="customData">
                   </multiform>
             </div>
@@ -211,7 +236,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
       @Output() loadSelection : any
       reposition : boolean = false
       startpos : number[] = [0,0]
-      offset : number[] = [450,350] /* from bottom right */
+      offset : number[] = [850,650] /* from bottom right */
       startOffset : number[] = [450,350]
       selectedColorMap : any 
 
@@ -219,6 +244,8 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
 
       presetColorFlag : boolean = true
       customData : any = {}
+
+      template : any
 
       @HostListener('document:mousemove',['$event'])
       mousemove(ev:any){
