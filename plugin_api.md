@@ -10,9 +10,9 @@ Metadata JSON
 
 ```
 {
-      "name:"NAME",
+      "name":"NAME",
       "icon":"ICON",
-      "type : "plugin",
+      "type":"plugin",
       "templateURL":"http://LINK-TO-YOUR-PLUGIN-TEMPLATE.html",
       "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT.js"
 }
