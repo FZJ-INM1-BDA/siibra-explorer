@@ -3,6 +3,13 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { EventCenter,HelperFunctions } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
+import { Observable } from 'rxjs/Observable'
+
+declare var window:{
+      [key:string] : any
+      prototype : Window;
+      new() : Window;
+}
 
 @Directive({
       selector : '[floating-widget-host]'
@@ -24,6 +31,8 @@ export class FloatingWidget implements OnInit{
       @ViewChild(FloatingWidgetDirective) host : FloatingWidgetDirective
       floatingWidgets : FloatingWidgetUnit[]
       viewContainerRef : ViewContainerRef
+      zStackCounter : number = 10
+      minimisedTrays : any[] = []
 
       constructor(
             private componentFactoryResolver: ComponentFactoryResolver,
@@ -84,6 +93,7 @@ export class FloatingWidget implements OnInit{
                         componentRef.destroy()
                         reject('cancelled by user')
                   }
+                  (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
             })
       }
 
@@ -126,15 +136,11 @@ export class FloatingWidget implements OnInit{
                         resolve('200')
                         componentRef.destroy()
                   }
+                  (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
             })
       }
 
       lab(msg:EventPacket){
-            // const newLabUnit = new LabComponentUnit(LabComponent,msg)
-            // const labUnitFactory = this.componentFactoryResolver.resolveComponentFactory(newLabUnit.component)
-            // const componentRef = this.viewContainerRef.createComponent(labUnitFactory);
-            // (<LabComponent>componentRef.instance).data = msg
-
             fetch(msg.body.templateURL)
                   .then(template=>template.text())
                   .then(text=>{
@@ -143,16 +149,14 @@ export class FloatingWidget implements OnInit{
                         const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
                         (<FloatingWidgetComponent>componentRef.instance).template = this.sanitizer.bypassSecurityTrustHtml(text);
                         const data = {
-                              title : "JuGeX"
+                              title : msg.body.name ? msg.body.name : 'untitled',
+                              icon : msg.body.icon ? msg.body.icon : undefined
                         };
                         (<FloatingWidgetComponent>componentRef.instance).data = data;
                         (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
-                        (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
-                              /* end of life hook */
-                              componentRef.destroy()
-                        }
+                        window[msg.body.name] = (<FloatingWidgetComponent>componentRef.instance).controllerSubject
 
-                        let script = document.createElement('script')
+                        const script = document.createElement('script')
                         script.onload = (_s) => {
                               console.log('script loaded')
                         }
@@ -160,19 +164,18 @@ export class FloatingWidget implements OnInit{
                               console.log('load script error',e)
                         }
                         script.src = msg.body.scriptURL
-                        document.head.appendChild(script)
+                        document.head.appendChild(script);
+
+                        (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
+                              /* end of life hook */
+                              window[msg.body.name] = null
+                              document.head.removeChild(script);
+                              (<FloatingWidgetComponent>componentRef.instance).controllerSubject.unsubscribe()
+                              componentRef.destroy()
+                        }
+                        (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
                   })
                   .catch(e=>console.log(e))
-
-            // let script = document.createElement('script')
-            // script.onload = function(s){
-            //       console.log('script loaded',s)
-            // }
-            // script.onerror = function(e){
-            //       console.log('load script error',e)
-            // }
-            // script.src = msg.body.url
-            // document.head.appendChild(script)
       }
 }
 
@@ -190,11 +193,23 @@ export class LabComponent{
 
 @Component({
       template : `
-<div [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" class = "floatingWidget">
-      <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition }" class = "panel panel-default">
+<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]="'-50px'" class = "floatingWidget">
+      <div class = "btn" [ngClass]="{'btn-success':successFlag,'btn-default':!successFlag}"
+            [popoverTitle] = "data.title"
+            [popover] = "popoverMessage ? popoverMessage : 'No messages.'"
+            placement = "left"
+            triggers = "mouseenter:mouseleave"
+            >
+            <span *ngIf = "data.icon" [ngClass]="'glyphicon-'+data.icon" class = "glyphicon"></span>
+            <span *ngIf = "!data.icon">{{data.title.substring(0,1)}}</span>
+      </div>
+</div>
+<div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget">
+      <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
             <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
-                  {{data.title}}
+                  <i *ngIf = "data.icon" class = "glyphicon" [ngClass] = "'glyphicon-' + data.icon"></i> {{data.title}}
                   <span (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></span>
+                  <span (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></span>
             </div>
             <div [innerHTML]="template" *ngIf = "template" class = "panel-body">
             </div>
@@ -231,8 +246,13 @@ export class LabComponent{
 })
 export class FloatingWidgetComponent implements FloatingWidgetInterface{
       @Input() data:any
+      @Input() minimisedTrays : any []
       @Output() cancelSelection : any
       @Output() loadSelection : any
+      
+      icon : string 
+      popoverMessage : string | null
+
       reposition : boolean = false
       startpos : number[] = [0,0]
       offset : number[] = [850,650] /* from bottom right */
@@ -245,6 +265,33 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
       customData : any = {}
 
       template : any
+      controllerSubject : Subject<EventPacket>
+      
+      blinkingTimer : any
+      blinkingFlag : boolean = false
+      successFlag : boolean = false
+
+      minimised : boolean = false
+
+      constructor(){
+            this.controllerSubject = new Subject()
+            this.controllerSubject.subscribe((evPk:EventPacket)=>{
+                  if(evPk.body.blink){
+                        this.blinkingFlag = true
+                        let blinkingTimer = Observable.timer(0,500)
+                        this.blinkingTimer = blinkingTimer.subscribe((t:any)=>{
+                              this.successFlag = !this.successFlag
+                              if(t>10){
+                                    this.blinkingTimer.unsubscribe()
+                                    this.successFlag = true
+                              }
+                        })
+                  }
+                  if(evPk.body.popoverMessage){
+                        this.popoverMessage = this.popoverMessage ? this.popoverMessage + evPk.body.popoverMessage : evPk.body.popoverMessage;
+                  }
+            })
+      }
 
       @HostListener('document:mousemove',['$event'])
       mousemove(ev:any){
@@ -270,8 +317,33 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
             }
       }
 
+      stopBlinking(){
+            this.successFlag = false;
+            this.blinkingFlag = false;
+            if(this.blinkingTimer){
+                  this.blinkingTimer.unsubscribe()
+            }
+      }
+
       cancel(){
             this.cancelSelection()
+      }
+
+      minimise(){
+            this.minimisedTrays.push(this)
+            this.minimised = true
+      }
+
+      calcMinimisedTrayPos():string{
+            return `-${(this.minimisedTrays.findIndex(item=>item===this)+1)*50}px`
+      }
+
+      unminimise(){
+            const idx = this.minimisedTrays.findIndex(item=>item===this)
+            if ( idx >= 0 ) this.minimisedTrays.splice(idx,1)
+            this.minimised = false
+            this.popoverMessage = null
+            this.stopBlinking()
       }
 }
 

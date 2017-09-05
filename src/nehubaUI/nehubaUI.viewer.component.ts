@@ -69,7 +69,7 @@ export class NehubaViewerInnerContainer implements OnInit{
                               }
                         }break;
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER:{
-                              this.loadLayer(msg)
+                              this.loadPMap(msg)
                         }
                   }
             })
@@ -137,7 +137,7 @@ export class NehubaViewerInnerContainer implements OnInit{
       }
 
       pMapFloatingWidget : Subject<EventPacket>
-      loadLayer(msg:EventPacket){
+      loadPMap(msg:EventPacket){
             let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
             curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url + ' This modal current is dismissed after 3 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
             curtainModalSubject.subscribe((evPk:EventPacket)=>{
@@ -146,65 +146,72 @@ export class NehubaViewerInnerContainer implements OnInit{
                               this.nehubaViewerComponent.loadLayer(msg.body.url)
                               setTimeout(()=>{
                                     curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-                             
-                                    /* TODO: pMapFlatingWidget should either be with multilevel or floating widget, and not in viewer.component */
-                                    this.pMapFloatingWidget = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
-                                    this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget','',100,{
-                                          title : 'PMap for ' + msg.body.title,
-                                          body : [
-                                                {
-                                                      "_activeCell" : true,
-                                                      "_elementTagName" : "img",
-                                                      "_class" : "col-md-12",
-                                                      "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
-                                                },{
-                                                      "Encoded Value":
-                                                            {
-                                                                  "_activeCell" : true,
-                                                                  "_elementTagName" : "div",
-                                                                  "_class" : "col-md-12",
-                                                                  "_active" : "always",
-                                                                  "_id" : "pmap_value",
-                                                                  "_value" : '0'
-                                                            }
-                                                },
-                                                "To return to normal browsing, close this Dialogue."
-                                          ],
-                                          eventListeners : [
-                                                {
-                                                      "event" : "layerMouseOver",
-                                                      "filters": [{
-                                                                  "layer":{
+                                    
+                                    if(!this.pMapFloatingWidget || this.pMapFloatingWidget.closed){
+
+                                          /* TODO: pMapFlatingWidget should either be with multilevel or floating widget, and not in viewer.component */
+                                          this.pMapFloatingWidget = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
+                                          this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget','',100,{
+                                                title : 'PMap for ' + msg.body.title,
+                                                body : [
+                                                      {
+                                                            "_activeCell" : true,
+                                                            "_elementTagName" : "img",
+                                                            "_class" : "col-md-12",
+                                                            "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
+                                                      },{
+                                                            "Encoded Value":
+                                                                  {
+                                                                        "_activeCell" : true,
+                                                                        "_elementTagName" : "div",
+                                                                        "_class" : "col-md-12",
+                                                                        "_active" : "always",
+                                                                        "_id" : "pmap_value",
+                                                                        "_value" : '0'
+                                                                  }
+                                                      },
+                                                      "To return to normal browsing, close this Dialogue."
+                                                ],
+                                                eventListeners : [
+                                                      {
+                                                            "event" : "layerMouseOver",
+                                                            "filters": [{
                                                                         "layer":{
-                                                                              "name" : "PMap"
+                                                                              "layer":{
+                                                                                    "name" : "PMap"
+                                                                              }
                                                                         }
-                                                                  }
-                                                            }],
-                                                      "values":[{
-                                                                  "layer":{
-                                                                        "value":"pmap_value | number:'1.4-4'"
-                                                                  }
-                                                            }],
-                                                      "scripts" : []
+                                                                  }],
+                                                            "values":[{
+                                                                        "layer":{
+                                                                              "value":"pmap_value | number:'1.4-4'"
+                                                                        }
+                                                                  }],
+                                                            "scripts" : []
+                                                      }
+                                                ]
+                                          }))
+                                          this.pMapFloatingWidget.subscribe((evPk:EventPacket)=>{
+                                                switch (evPk.code){
+                                                      case 200:
+                                                      case 404:{
+                                                            let json = this.nehubaViewerComponent.nehubaViewer.ngviewer.state.toJSON()
+                                                            json.layers.PMap.visible = false
+                                                            json.layers.atlas.visible = true
+                                                            this.nehubaViewerComponent.nehubaViewer.ngviewer.state.restoreState(json)
+                                                            this.pMapFloatingWidget.unsubscribe()
+                                                            
+                                                            /* TODO:temporary. need to load specific map for specific atlases */
+                                                            this.nehubaViewerComponent.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
+                                                      }break;
                                                 }
-                                          ]
-                                    }))
-                                    this.pMapFloatingWidget.subscribe((evPk:EventPacket)=>{
-                                          switch (evPk.code){
-                                                case 200:
-                                                case 404:{
-                                                      let json = this.nehubaViewerComponent.nehubaViewer.ngviewer.state.toJSON()
-                                                      json.layers.PMap.visible = false
-                                                      json.layers.atlas.visible = true
-                                                      this.nehubaViewerComponent.nehubaViewer.ngviewer.state.restoreState(json)
-                                                      this.pMapFloatingWidget.unsubscribe()
-                                                      
-                                                      /* TODO:temporary. need to load specific map for specific atlases */
-                                                      this.nehubaViewerComponent.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
-                                                      console.log(this.pMapFloatingWidget)
-                                                }break;
-                                          }
-                                    })
+                                          })
+                                    }else{
+                                          this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget',Date.now().toString(),110,{
+                                                title : 'PMap for ' + msg.body.title,
+                                          }))
+                                    }
+
                               },3000)
                         }break;
                         case 200:
@@ -275,10 +282,13 @@ export class NehubaViewerComponent implements OnDestroy{
             this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
 
             /* set navigation callback */
-            let navigationSubscription = this.nehubaViewer.addNavigationStateCallbackInRealSpaceCoordinates((pos)=>{
-                  this.viewerPos[0] = pos[0]
-                  this.viewerPos[1] = pos[1]
-                  this.viewerPos[2] = pos[2]
+            // let navigationSubscription = this.nehubaViewer.addNavigationStateCallbackInRealSpaceCoordinates((pos)=>{
+            //       this.viewerPos[0] = pos[0]
+            //       this.viewerPos[1] = pos[1]
+            //       this.viewerPos[2] = pos[2]
+            // })
+            const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
+                  this.viewerPos = pos
             })
 
             this.onDestroyUnsubscribe.push( navigationSubscription )
