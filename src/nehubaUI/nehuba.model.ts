@@ -135,6 +135,19 @@ export class ParcellationDescriptor {
     nehubaConfig : Nehubaconfig;
 }
 
+export class PluginDescriptor{
+    constructor(param:any){
+        this.name = param.name
+        this.templateURL = param.templateURL
+        this.scriptURL = param.scriptURL
+        this.icon = param.icon ? param.icon : null;
+    }
+    templateURL : string
+    scriptURL : string
+    name : string
+    icon : string | null
+}
+
 export class Multilevel{
 
     name : string; /* should be overwritten by subclasses */

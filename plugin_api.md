@@ -8,33 +8,34 @@ These files needs to have the same origin and port. Alternatively, these files n
 Metadata JSON
 ------
 
-```
+
+```json
 {
       "name":"NAME",
-      "icon":"ICON",
+      "icon":"ICON | null", 
       "type":"plugin",
       "templateURL":"http://LINK-TO-YOUR-PLUGIN-TEMPLATE.html",
       "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT.js"
 }
 ```
 
-TODO: more meta data
+TODO: more meta data, e.g., author, validation hash etc
 
 ---
-Template HTML
+Template
 ------
 
 bootstrap4.0 css is already included. 
 
-Keep in mind of the width limitation of the widget (400px). Uncaught overflows are especially jarring. 
+Keep in mind of the width limitation of the widget (400px). Uncaught overflows are not pleasant to look at. 
 
-Whilst there are no hard limitations on the vertical size of the widget, it may influence the usability of the widget. For tall elements, consider using max-height style, and set overflow-y to auto or scroll. 
+Whilst there are no hard limitations on the vertical size of the widget, it may influence the usability of the widget. For tall elements, consider using *max-height* style, and set *overflow-y* to auto or scroll. 
 
 Your template will interact with your script via **element id**. As a result, it is imperative that you use unique id's. 
 It is recommended that you use *domain.developer.packagename.uniqueid* e.g.: *fzj.xiaogui.remotecontrol.wsurl* to avoid id duplication.
 
 ---
-Writing js
+Script
 ------
 
 A good idea is to scope it so that the variables you declare stays local:
@@ -45,7 +46,7 @@ A good idea is to scope it so that the variables you declare stays local:
 })()
 ```
 
-Note: *window.nehubaViewer* and *window.viewer* can become destroyed / return null (e.g., before the user select any template). Any subscriptions/event listeners tied to them can be lost. As a result, if your plugin relies on interacting with these two APIs, use *try catch* block, and listen to the appropriate events when they are destroyed and reattach your listeners appropriately.
+Note: *window.nehubaViewer* and *window.viewer* can be destroyed / return null (e.g., before the user select any template). Any subscriptions/event listeners tied to them can be lost. As a result, if your plugin relies on interacting with these two APIs, use them in a *try catch* block, and listen to the appropriate events when they are destroyed and reattach your listeners appropriately.
 
 ---
 APIs
@@ -73,6 +74,20 @@ Providing low level access to the viewer.
 Gets destroyed and recreated when a new template is selected.
 May interfere with how nehuba and atlas viewer interact with neuroglancer
 For a full list of how to interact with window.viewer object, consult neuroglancer github page, or console.log(window.viewer)
+
+---
+In addition, you may interact with the container of your widget with **window[PLUGINNAME]**.
+
+```javascript
+window['JuGeX'].next({
+      body : {
+            blink : true, /* makes the widget blink */
+            popoverMessage : 'Analysis Complete!' /* append to the popover message */
+      }
+})
+```
+
+---
 
 Example plugins
 ======

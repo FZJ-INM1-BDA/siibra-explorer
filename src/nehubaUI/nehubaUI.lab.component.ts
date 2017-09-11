@@ -12,11 +12,11 @@ declare var window:{
       selector : 'lab',
       template : `
 <div id = "labContainer">
-      <div (click)="discoParcel(jugex)" class = "btn btn-default">
-            JuGeX
+      <div *ngFor = "let plugin of plugins" (click)="launchPlugin(plugin)" class = "btn btn-default">
+            <span *ngIf = "plugin.icon" [ngClass]="'glyphicon-'+plugin.icon" class = "glyphicon"></span> {{plugin.name}}
       </div>
-      <div (click)="discoParcel(masterslave)" class = "btn btn-default">
-            <i class = "glyphicon glyphicon-signal"></i> Remote Control
+      <div (click)="showInputModal()" class = "btn btn-default">
+            <span class = "glyphicon glyphicon-plus"></span>
       </div>
 </div>
       `
@@ -30,16 +30,17 @@ export class Lab {
             scriptURL : 'http://172.104.156.15/js/jugex.script'
       }
 
-      masterslave = {
-            name : 'Remote Control',
-            icon : 'signal',
-            templateURL:'http://172.104.156.15/html/masterslave',
-            scriptURL : 'http://172.104.156.15/js/masterslave'
-      }
       constructor(private eventCenter:EventCenter){
 
       }
-      discoParcel(param:any){
+
+      plugins = [this.jugex]
+
+      appendPlugin(param:any){
+            this.plugins.push(param)
+      }
+
+      launchPlugin(param:any){
             if(param.templateURL && param.scriptURL){
                   if(window[param.name]){
                         window[param.name].next(new EventPacket('lab',Date.now().toString(),110,{blink:true}))
@@ -49,5 +50,9 @@ export class Lab {
                         newSubject.next(new EventPacket('lab','',100,param))
                   }
             }
+      }
+
+      showInputModal(){
+            this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
       }
 }

@@ -1,7 +1,7 @@
-
-import { Component,Input,OnInit,AfterViewInit} from '@angular/core'
+import { Component,Input,OnInit,AfterViewInit,ViewChild} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { NehubaFetchData,EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
+import { Lab } from './nehubaUI.lab.component'
 import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 
 import { NehubaViewer } from 'nehuba/exports'
@@ -42,23 +42,24 @@ import { NehubaViewer } from 'nehuba/exports'
 export class NehubaUIControl implements OnInit,AfterViewInit{
 
     @Input() nehubaViewer : NehubaViewer
-    @Input() searchTerm : String = '';
-    darktheme : boolean = false;
+    @Input() searchTerm : String = ''
+    @ViewChild(Lab) labComponent : Lab
+    darktheme : boolean = false
     
-    fetchedTemplatesData : FetchedTemplates;
+    fetchedTemplatesData : FetchedTemplates
 
     listOfActiveLayers : LayerDescriptor[] = []
     enableAdvancedMode : string = 'off'
 
-    selectedTemplate : TemplateDescriptor | undefined; 
-    selectedParcellation : ParcellationDescriptor | undefined; 
-    selectedRegions : RegionDescriptor[] = []; 
+    selectedTemplate : TemplateDescriptor | undefined
+    selectedParcellation : ParcellationDescriptor | undefined
+    selectedRegions : RegionDescriptor[] = [];
 
     //this is a temporary solution for collapsing menus
     defaultPanelsState : any
-    showTemplates : Boolean = true;
-    showParcellations : Boolean = true;
-    showRegions : Boolean = true;
+    showTemplates : Boolean = true
+    showParcellations : Boolean = true
+    showRegions : Boolean = true
 
     showTemplatesState : string = 'expanded';
 
@@ -275,6 +276,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                 }else {
                     this.selectedTemplate.parcellations.push(sth)
                 }
+            }break;
+            case 'PluginDescriptor':{
+                this.enableAdvancedMode = 'off'
+                this.labComponent.appendPlugin(sth)
             }break;
         }
     }

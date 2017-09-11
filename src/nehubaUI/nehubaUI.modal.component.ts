@@ -2,7 +2,7 @@
 import { Component,ViewChild,Output,EventEmitter } from '@angular/core'
 import { ModalDirective } from 'ngx-bootstrap/modal'
 import { EventCenter,NehubaFetchData } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
+import { EventPacket,PluginDescriptor } from './nehuba.model'
 
 import { Subject } from 'rxjs/Rx'
 
@@ -112,6 +112,7 @@ export class NehubaModal{
     @ViewChild('curtainModal') public curtainModal:ModalDirective
 
     @Output() public fetchedSomething : EventEmitter<any> = new EventEmitter()
+    @Output() public fetchedPlugin : EventEmitter<any> = new EventEmitter()
 
     title:String = 'More Info'
     data:any[] = [
@@ -225,7 +226,7 @@ export class NehubaModal{
             })
     }
 
-    /* After fetching json, lazy parse the json to determine if it was a template, a parcellation, or a layer */
+    /* After fetching json, parse the json to determine if it was a template, a parcellation, or a layer */
     parseJson(json:any){
         switch(json.type){
             case 'template':{
@@ -254,9 +255,12 @@ export class NehubaModal{
             }break;
             case 'plugin':{
                 /* some sort of validation process? */
+                this.inputResponse += 'Adding new plugin.'
+                const newPlugin = new PluginDescriptor(json)
+                this.fetchedOutputToController(newPlugin)
             }break;
             default:{
-                this.inputResponse += 'No type property found. Unable to process this JSON.'
+                this.inputResponse += '\'type\' field not found.. Unable to process this JSON.'
             }break;
         }
     }

@@ -1,4 +1,4 @@
-import { Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { NgZone,Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import { EventCenter,HelperFunctions } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
@@ -149,7 +149,7 @@ export class FloatingWidget implements OnInit{
                         const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
                         (<FloatingWidgetComponent>componentRef.instance).template = this.sanitizer.bypassSecurityTrustHtml(text);
                         const data = {
-                              title : msg.body.name ? msg.body.name : 'untitled',
+                              title : msg.body.name, 
                               icon : msg.body.icon ? msg.body.icon : undefined
                         };
                         (<FloatingWidgetComponent>componentRef.instance).data = data;
@@ -165,6 +165,11 @@ export class FloatingWidget implements OnInit{
                         }
                         script.src = msg.body.scriptURL
                         document.head.appendChild(script);
+
+                        window[msg.body.name] = (<FloatingWidgetComponent>componentRef.instance).controllerSubject;
+                        componentRef.onDestroy(()=>{
+                              window[msg.body.name] = undefined
+                        });
 
                         (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
                               /* end of life hook */
@@ -265,7 +270,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
       customData : any = {}
 
       template : any
-      controllerSubject : Subject<EventPacket>
+      public controllerSubject : Subject<EventPacket>
       
       blinkingTimer : any
       blinkingFlag : boolean = false
@@ -273,22 +278,29 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
 
       minimised : boolean = false
 
-      constructor(){
+      constructor(public zone:NgZone){
             this.controllerSubject = new Subject()
             this.controllerSubject.subscribe((evPk:EventPacket)=>{
                   if(evPk.body.blink){
+                        if( this.blinkingFlag ){
+                              this.blinkingTimer.unsubscribe()
+                        }
                         this.blinkingFlag = true
                         let blinkingTimer = Observable.timer(0,500)
                         this.blinkingTimer = blinkingTimer.subscribe((t:any)=>{
-                              this.successFlag = !this.successFlag
-                              if(t>10){
-                                    this.blinkingTimer.unsubscribe()
-                                    this.successFlag = true
-                              }
+                              this.zone.run(()=>{
+                                    this.successFlag = t%2==0
+                                    if(t>10){
+                                          this.blinkingTimer.unsubscribe()
+                                          this.successFlag = true
+                                    }
+                              })
                         })
                   }
                   if(evPk.body.popoverMessage){
-                        this.popoverMessage = this.popoverMessage ? this.popoverMessage + evPk.body.popoverMessage : evPk.body.popoverMessage;
+                        this.zone.run(()=>{
+                              this.popoverMessage = this.popoverMessage ? this.popoverMessage + evPk.body.popoverMessage : evPk.body.popoverMessage;
+                        })
                   }
             })
       }
