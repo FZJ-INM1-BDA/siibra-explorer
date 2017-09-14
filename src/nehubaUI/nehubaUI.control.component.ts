@@ -54,7 +54,13 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     selectedRegions : RegionDescriptor[] = [];
 
     //this is a temporary solution for collapsing menus
-    defaultPanelsState : any
+    defaultPanelsState : any = {
+        templatesPanelState : 'expanded',
+        parcellationsPanelState : 'collapsed',
+        regionsPanelState : 'collapsed',
+        navigationPanelState : 'collapsed',
+        labPanelState : 'collapsed'
+    }
     showTemplates : Boolean = true
     showParcellations : Boolean = true
     showRegions : Boolean = true
@@ -66,15 +72,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         private eventCenter:EventCenter
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
-
-        /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
-        this.defaultPanelsState = {
-            templatesPanelState : 'expanded',
-            parcellationsPanelState : 'collapsed',
-            regionsPanelState : 'collapsed',
-            navigationPanelState : 'collapsed',
-            labPanelState : 'collapsed'
-        }
 
         this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
             switch(msg.target){

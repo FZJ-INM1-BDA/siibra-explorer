@@ -97,12 +97,14 @@ $BORDERWIDTH : 2px;
 }
 
 %darkthemetemplate{
-    background-color : gray(0.05);
-    color : gray(0.6);
+    background-color : gray(0.2);
+    color : gray(0.8);
 }
 
 #ATLASContainer{
     atlascontrol{
+        box-shadow: -0.3em 0.3em 1em gray(0.1);
+        margin-top:5px;
         div
         {
             .list-group
@@ -121,7 +123,12 @@ $BORDERWIDTH : 2px;
                 text-decoration: line-through
             }
         }
-    }    
+    } 
+    
+    &.darktheme
+    {
+        background-color:gray(0.2);
+    }
 }
 
 atlasbanner{
@@ -129,6 +136,7 @@ atlasbanner{
         height:100%;
         background-color:gray(0.98);
         display:flex;
+        font-weight:100;
 
         %img{
             height:100%;
@@ -225,7 +233,7 @@ atlasviewer{
 
         &:hover
         {
-            color:$GOLDEN;
+            color:gray(1);
             cursor:pointer;
         }
     }
@@ -275,25 +283,19 @@ atlascontrol
             {
                 .btn.btn-block.btn-default
                 {
-                    margin-top : 10px;
-                    margin-left : 3%;
-                    margin-right : 5%;
+                    margin-top : 0px;
                     margin-bottom : 0px;
-                    width : 92%;
+                    width : 100%;
+                    border-radius:0px;
                     z-index : 4;
 
-                    box-shadow : 0 0 1em -0.5em gray(0.5);
                     overflow:hidden;
-                    padding : 16px 5px 16px 5px;
-
-                    &:first-child
-                    {
-                        margin-top:10px;
-                    }
+                    padding : 20px 5px 20px 25px;
+                    text-align: left;
 
                     &.inactive
                     {
-                        color:#999;
+                        color:gray(0.8);
                         &:hover
                         {
                             cursor:not-allowed;
@@ -303,20 +305,24 @@ atlascontrol
                 
                 .list-group
                 {
-                    width : 84%;
-                    box-shadow : 0 0 1em -0.6em gray(0.5);
+                    width : 120%;
+                    margin-left : -10%;
+                    padding-left : 10%;
+                    padding-right : 10%;
                     overflow : hidden;
-                    margin-left : 6%;
                     margin-bottom : 0px;
                     z-index : 3;
+                    box-shadow : inset 0 0 1em -0.5em gray(0.5);
+                    background-color:gray(0.98);
 
                     .list-group-item
                     {
                         width:100%;
                         display:flex;
                         border-radius : 0px;
-                        background-color:gray(0.98);
                         color:gray(0.3);
+                        padding-left:40px;
+                        background-color:tgray(0,0);
 
                         .list-group-item-name
                         {
@@ -332,7 +338,10 @@ atlascontrol
                             &:hover
                             {
                                 color:goldenrod;
-                                background-color:gray(1.0);
+                                &.active
+                                {
+                                    background-color:gray(0.98);
+                                }
                             };
                         };
 
@@ -341,7 +350,7 @@ atlascontrol
                             cursor:pointer;
                             &:not(.active)
                             {
-                                background-color:gray(0.9);
+                                background-color:tgray(0.5,0.1);
                                 color:gray(0);
                             }
                         };
@@ -353,10 +362,10 @@ atlascontrol
                             color:gray(1);
                         }
 
-                        .nohover:hover
+                        &.nohover:hover
                         {
                             cursor:default;
-                            background-color:#fff;
+                            background-color:tgray(0,0);
                         };
                     };
 
@@ -369,16 +378,30 @@ atlascontrol
                         margin-left:0.2em;
                         margin-right:0.2em;
                         margin-bottom:0.1em;
-                        color:gray(0.8);
-                        background-color: gray(0.2);
-                    };
+                        color:gray(0.2);
+                        background-color: gray(0.98);
+                        box-shadow:0 0 1em -0.5em gray(0.5);
 
+                        &:first-child
+                        {
+                            margin-top:10px;
+                        }
+
+                        &:last-child
+                        {
+                            margin-bottom:10px;
+                        }
+
+                        &:hover
+                        {
+                            cursor:default;
+                        }
+                    };
                     
                     span.unicodeSymbols
                     {
-                        display:inline-block;
-                        font-size: large;
-                        vertical-align: middle;
+                        margin-right:5px;
+
                         &:hover
                         {
                             cursor:default;
@@ -397,16 +420,18 @@ atlascontrol
             {
                 @extend %darkthemetemplate;
                 background-color:gray(0.2);
+
                 .list-group
                 {
                     @extend %darkthemetemplate;
-                    box-shadow : 0 0 1em -0.2em gray(0.1);
-                    background-color:gray(0.1);
+                    background-color:gray(0.15);
+                    box-shadow : inset 0 0 1em -0.5em gray(0);
+
                     .list-group-item
                     {
-                        border : 1px solid gray(0.1);
+                        border : 1px solid tgray(0.15,0);
                         margin : 0 1em 0 0;
-                        background-color:gray(0.1);
+                        background-color:tgray(0,0);
                         color:gray(0.6);
 
                         .text-muted
@@ -414,18 +439,19 @@ atlascontrol
                             text-decoration: line-through;
                             color : gray(0.5);
                         }
-                        .list-group-item-icon
-                        {
-                            &:hover
-                            {
-                                background-color:gray(0.25);
-                            }
-                        };
                         &.active
                         {
                             @extend %darkthemetemplate;
                             background-color:$DARKGOLDEN;
                             color:gray(1);
+
+                            .list-group-item-icon
+                            {
+                                &:hover
+                                {
+                                    color:gray(0.10);
+                                }
+                            };
                         };
                         &:not(.nohover)
                         {
@@ -433,8 +459,8 @@ atlascontrol
                             {
                                 &:not(.active)
                                 {
-                                    @extend %darkthemetemplate;
-                                    background-color:tgray(1.0,0.08);
+                                    color:gray(0.55);
+                                    background-color:tgray(0,0.08);
                                 }
                             };
                         };
@@ -443,28 +469,25 @@ atlascontrol
                             input{
                                 @extend %darkthemetemplate;
                                 color:gray(1);
+                                border-color:gray(0.1);
+                                background-color:gray(0.10);
+                                box-shadow:inset 0 0 1em -0.3em gray(0);
                                 
                                 &::-moz-placeholder
                                 {
-                                    border-color:gray(0.3);
-                                    background-color:gray(0);
                                     color:tgray(1,0.4);
                                 };
                                 &::-webkit-input-placeholder{
-                                    border-color:gray(0.3);
-                                    background-color:gray(0);
                                     color:tgray(1,0.4);
                                 };
                             }
                             &:hover
                             {
-                                background-color:gray(0.1);
                                 cursor:default;
                             }
 
                             .menuItemContentList
                             {
-                                background-color:gray(0.1);
 
                                 &:hover
                                 {
@@ -478,12 +501,13 @@ atlascontrol
                             {
                                 div.btn.btn-default
                                 {
-                                    border:1px solid gray(0.1);
                                     @extend %darkthemetemplate;
+                                    border:none;
+                                    box-shadow: 0 0 1em -0.3em gray(0);
 
                                     &:hover
                                     {
-                                        background-color:gray(0.08)
+                                        background-color:gray(0.18)
                                     }
                                 }
                             }
@@ -512,22 +536,24 @@ atlascontrol
                     {
                         color:gray(0.6);
                         background-color: gray(0.2);
+                        box-shadow:0 0 1em -0.3em gray(0);
                     };
                 };
                 .btn.btn-lg.btn-default
                 {
                     @extend %darkthemetemplate;
-                    border : 1px solid gray(0);
-                    box-shadow : 0 0 1em -0.1em gray(0.1);
+                    border-top:1px solid gray(0.25);
+                    border-bottom:1px solid gray(0.25);
+                    border-left:none;
+                    border-right:none;
                     &:hover
                     {
-                        background-color:gray(0.08)
+                        background-color:gray(0.18)
                     };
 
                     &.inactive
                     {
-                        color : gray(0.3);
-                        border : 1px solid gray(0.05);
+                        color : gray(0.4);
                     };
                 };
             }
@@ -540,25 +566,26 @@ atlascontrol
 
         div.leftSideSubSection.darktheme#leftSideBottom
         {
-            @extend %darkthemetemplate;
-            background-color:gray(0.2);
             .btn.btn-default
             {
-                @extend %darkthemetemplate;
                 border : 1px solid gray(0.1);
-                &:hover
-                {
-                    background-color:gray(0.08);
-                    border : 1px solid gray(0.1);
-                };
+
                 &:not(.active)
                 {
+                    color:gray(0.8);
                     background-color:gray(0.3);
+                    box-shadow: 0 0 1em -0.5em gray(0.1);
+                    &:hover
+                    {
+                        background-color:gray(0.28);
+                    }
                 };
 
                 &.active
                 {
+                    background-color:gray(0.18);
                     color:gray(1.0);
+                    box-shadow: inset 0 0 1em 0em gray(0);
                 }
             };
         }
@@ -613,7 +640,6 @@ div.darktheme
             overflow:hidden;
             display:block;
             padding:0em;
-            font-family:'Montserrat', Helvetica, sans-serif;
             
             /* debug only */
             /*outline-style:dashed;
@@ -669,9 +695,6 @@ div.darktheme
 
                 div.menuItemContentList
                 {
-                    padding-left:5%;
-                    padding-right:1%;
-                    background-color:gray(0);
                     color : gray(0.85);
                     &:hover
                     {
@@ -705,7 +728,6 @@ div
             overflow:hidden;
             display:block;
             padding:0em;
-            font-family:'Montserrat', Helvetica, sans-serif;
             
             /* debug only */
             /*outline-style:dashed;
@@ -762,9 +784,9 @@ div
                 div.menuItemContentList
                 {
                     color:#636363;
-                    padding-left:2.6em;
-                    padding-right:2.6em;
-                    padding-top:0.8em;
+                    padding-left:5%;
+                    padding-right:1%;
+                    padding-top:0.4em;
                     padding-bottom:0.4em;
                     transition: 300ms;
                     &:hover
