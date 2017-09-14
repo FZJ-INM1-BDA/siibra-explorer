@@ -168,14 +168,14 @@ export class FloatingWidget implements OnInit{
 
                         window[msg.body.name] = (<FloatingWidgetComponent>componentRef.instance).controllerSubject;
                         componentRef.onDestroy(()=>{
+                              /* end of life hook */
+                              window[msg.body.name].next(new EventPacket('',Date.now().toString(),200,{}))
                               window[msg.body.name] = undefined
+                              document.head.removeChild(script);
+                              (<FloatingWidgetComponent>componentRef.instance).controllerSubject.unsubscribe()
                         });
 
                         (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
-                              /* end of life hook */
-                              window[msg.body.name] = null
-                              document.head.removeChild(script);
-                              (<FloatingWidgetComponent>componentRef.instance).controllerSubject.unsubscribe()
                               componentRef.destroy()
                         }
                         (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
@@ -183,18 +183,6 @@ export class FloatingWidget implements OnInit{
                   .catch(e=>console.log(e))
       }
 }
-
-export class LabComponentUnit{
-      constructor(public component : Type<any>){}
-}
-
-@Component({
-      template:`<span>LabComponent</span>`
-})
-export class LabComponent{
-      public data : any
-}
-
 
 @Component({
       template : `

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component,Input,EventEmitter,Output } from '@angular/core'
 import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 
@@ -7,11 +7,14 @@ import { EventPacket } from './nehuba.model'
     template : `
         <NehubaViewer (mousemove)="mousemove($event)"></NehubaViewer>
         <span id="helpbutton" (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign unicodeSymbols"></span>
+        <span id="hideUI" (click)="toggleHideUI()" [ngClass]="{darktheme : darktheme,'glyphicon-resize-full':!hideUI,'glyphicon-resize-small':hideUI}" class = "glyphicon unicodeSymbols"></span>
     `
 })
 
 export class NehubaViewerContainer {
     darktheme : boolean
+    @Input() hideUI : boolean = false
+    @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
 
     constructor(private eventCenter : EventCenter){
         this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
@@ -21,6 +24,10 @@ export class NehubaViewerContainer {
                 }break;
             }
         })
+    }
+
+    toggleHideUI(){
+        this.emitHideUI.emit({hideUI:!this.hideUI})
     }
 
     mousemove(event:any){

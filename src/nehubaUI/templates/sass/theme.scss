@@ -1,6 +1,7 @@
 $WHITE : rgb(255,255,255);
 $BLACK : rgb(0,0,0);
 $GOLDEN : rgb(244,212,48);
+$DARKGOLDEN : rgb(200,160,0);
 $BORDERWIDTH : 2px;
 @function gray($percent){
     @return rgb($percent*255,$percent*255,$percent*255)
@@ -15,8 +16,8 @@ $BORDERWIDTH : 2px;
     height:100%;
     width:100%;
     display:grid;
-    grid-template-columns:25% 75%;
-    grid-template-rows:10% 90%;
+    grid-template-columns:15% 85%;
+    grid-template-rows:8% 92%;
     
     atlasbanner{
         grid-column-start:1;
@@ -55,6 +56,7 @@ $BORDERWIDTH : 2px;
         grid-column-end:span 1;
         grid-row-start:2;
         grid-row-end:span 1;
+        z-index:5;
 
         div#container{
             height:100%;
@@ -95,8 +97,8 @@ $BORDERWIDTH : 2px;
 }
 
 %darkthemetemplate{
-    background-color : gray(0);
-    color : gray(0.85);
+    background-color : gray(0.05);
+    color : gray(0.6);
 }
 
 #ATLASContainer{
@@ -125,7 +127,7 @@ $BORDERWIDTH : 2px;
 atlasbanner{
     div#bannerContainer{
         height:100%;
-        background-color:gray(1);
+        background-color:gray(0.98);
         display:flex;
 
         %img{
@@ -156,7 +158,7 @@ atlasbanner{
                 vertical-align: middle;
                 font-weight: 100;
                 font-size : 2.2vw;
-                color :gray(0);
+                color :gray(0.3);
             }
             small{
                 color: #c33;
@@ -166,7 +168,7 @@ atlasbanner{
 
     div#bannerContainer.darktheme{
         @extend div#bannerContainer;
-        background-color:gray(0);
+        background-color:gray(0.2);
 
         div#bannerTitle{
             h2{
@@ -190,34 +192,56 @@ atlasbanner{
 
 atlasviewer{
     position:relative;
+    background-color:gray(0.97);
+    box-shadow: 0.3em 0.3em 1em gray(0.1);
 
     div#container{
         position:absolute;
-        left:0;
-        top:0;
+        left:0px;
+        top:0px;
         width:100%;
         height:100%;
         z-index:9;
     }
 
-    span#helpbutton{
-        color:$GOLDEN;
+    %glyphiconBtn
+    {
+        color:gray(0.0);
+        text-shadow:0 0 1em gray(0.3);
         position:absolute;
-        right:0.5em;
-        top:0.5em;
         z-index:10;
-        font-size:3em;
-    }
+        font-size:2em;
 
-        span.darktheme#helpbutton:hover{
+        &.darktheme
+        {
+            text-shadow:0 0 0.3em gray(1);
+        }
+
+        &.darktheme:hover
+        {
             color:gray(1);
             cursor:pointer;
         }
 
-        span#helpbutton:hover{
-            color:gray(0);
+        &:hover
+        {
+            color:$GOLDEN;
             cursor:pointer;
         }
+    }
+
+    span#helpbutton{
+        @extend %glyphiconBtn;
+        right:0.3em;
+        top:0.3em;
+    }
+
+    span#hideUI{
+        @extend %glyphiconBtn;
+        right:1.6em;
+        top:0.3em;
+    }
+
 }
 
 FloatingWidgetContainer{
@@ -251,9 +275,21 @@ atlascontrol
             {
                 .btn.btn-block.btn-default
                 {
-                    margin-top:0px;
+                    margin-top : 10px;
+                    margin-left : 3%;
+                    margin-right : 5%;
+                    margin-bottom : 0px;
+                    width : 92%;
+                    z-index : 4;
+
+                    box-shadow : 0 0 1em -0.5em gray(0.5);
                     overflow:hidden;
-                    padding : 20px 0 20px 0;
+                    padding : 16px 5px 16px 5px;
+
+                    &:first-child
+                    {
+                        margin-top:10px;
+                    }
 
                     &.inactive
                     {
@@ -267,12 +303,20 @@ atlascontrol
                 
                 .list-group
                 {
-                    overflow:hidden;
-                    margin-bottom:0px;
+                    width : 84%;
+                    box-shadow : 0 0 1em -0.6em gray(0.5);
+                    overflow : hidden;
+                    margin-left : 6%;
+                    margin-bottom : 0px;
+                    z-index : 3;
 
                     .list-group-item
                     {
+                        width:100%;
                         display:flex;
+                        border-radius : 0px;
+                        background-color:gray(0.98);
+                        color:gray(0.3);
 
                         .list-group-item-name
                         {
@@ -282,14 +326,13 @@ atlascontrol
 
                         .list-group-item-icon
                         {
-                            flex: 0 0 3em;
+                            flex: 0 0 1.6em;
                             align-self: center;
                             text-align:center;
                             &:hover
                             {
                                 color:goldenrod;
-                                cursor:pointer;
-                                background-color:#FFF;
+                                background-color:gray(1.0);
                             };
                         };
 
@@ -298,9 +341,17 @@ atlascontrol
                             cursor:pointer;
                             &:not(.active)
                             {
-                                background-color:#f5f5f5;
+                                background-color:gray(0.9);
+                                color:gray(0);
                             }
                         };
+
+                        &.active
+                        {
+                            border-color:gray(0.67);
+                            background-color:$GOLDEN;
+                            color:gray(1);
+                        }
 
                         .nohover:hover
                         {
@@ -313,12 +364,13 @@ atlascontrol
                     .multiSelectPills
                     {
                         display:inline-block;
-                        padding:0.4em 0.8em;
-                        border-radius: 1.2em;
+                        padding:0.2em 0.4em;
+                        border-radius: 0.4em;
+                        margin-left:0.2em;
                         margin-right:0.2em;
                         margin-bottom:0.1em;
-                        color:#696969;
-                        background-color: #ffa;
+                        color:gray(0.8);
+                        background-color: gray(0.2);
                     };
 
                     
@@ -340,16 +392,23 @@ atlascontrol
         div.leftSideSubSection.darktheme#leftSideTop
         {
             @extend %darkthemetemplate;
+            background-color:gray(0.2);
             div.modePanel
             {
                 @extend %darkthemetemplate;
+                background-color:gray(0.2);
                 .list-group
                 {
                     @extend %darkthemetemplate;
+                    box-shadow : 0 0 1em -0.2em gray(0.1);
+                    background-color:gray(0.1);
                     .list-group-item
                     {
+                        border : 1px solid gray(0.1);
                         margin : 0 1em 0 0;
-                        @extend %darkthemetemplate;
+                        background-color:gray(0.1);
+                        color:gray(0.6);
+
                         .text-muted
                         {
                             text-decoration: line-through;
@@ -365,7 +424,8 @@ atlascontrol
                         &.active
                         {
                             @extend %darkthemetemplate;
-                            background-color:tgray(1.0,0.2);
+                            background-color:$DARKGOLDEN;
+                            color:gray(1);
                         };
                         &:not(.nohover)
                         {
@@ -383,20 +443,33 @@ atlascontrol
                             input{
                                 @extend %darkthemetemplate;
                                 color:gray(1);
+                                
                                 &::-moz-placeholder
                                 {
+                                    border-color:gray(0.3);
                                     background-color:gray(0);
                                     color:tgray(1,0.4);
                                 };
                                 &::-webkit-input-placeholder{
+                                    border-color:gray(0.3);
                                     background-color:gray(0);
                                     color:tgray(1,0.4);
                                 };
                             }
                             &:hover
                             {
-                                @extend %darkthemetemplate;
+                                background-color:gray(0.1);
                                 cursor:default;
+                            }
+
+                            .menuItemContentList
+                            {
+                                background-color:gray(0.1);
+
+                                &:hover
+                                {
+                                    background-color:gray(0.2);
+                                }
                             }
                         };
                         lab
@@ -405,11 +478,12 @@ atlascontrol
                             {
                                 div.btn.btn-default
                                 {
+                                    border:1px solid gray(0.1);
                                     @extend %darkthemetemplate;
 
                                     &:hover
                                     {
-                                        background-color: tgray(1.0,0.2)
+                                        background-color:gray(0.08)
                                     }
                                 }
                             }
@@ -426,6 +500,7 @@ atlascontrol
                             .form-group{
                                 input[type=text],textarea{
                                     @extend %darkthemetemplate;
+                                    border:1px solid gray(0.1);
                                     background-color:gray(0.2);
                                     color:gray(1);
                                 }
@@ -435,14 +510,15 @@ atlascontrol
                     
                     div.multiSelectPills
                     {
-                        background-color:rgb(150,150,50);
-                        color:gray(0.8);
+                        color:gray(0.6);
+                        background-color: gray(0.2);
                     };
                 };
                 .btn.btn-lg.btn-default
                 {
                     @extend %darkthemetemplate;
-                    border : 1px solid gray(0.8);
+                    border : 1px solid gray(0);
+                    box-shadow : 0 0 1em -0.1em gray(0.1);
                     &:hover
                     {
                         background-color:gray(0.08)
@@ -451,34 +527,39 @@ atlascontrol
                     &.inactive
                     {
                         color : gray(0.3);
-                        border : 1px solid gray(0.3);
+                        border : 1px solid gray(0.05);
                     };
                 };
             }
         };
 
+        div.leftSideSubSection#leftSideBottom
+        {
+
+        }
+
         div.leftSideSubSection.darktheme#leftSideBottom
         {
             @extend %darkthemetemplate;
+            background-color:gray(0.2);
             .btn.btn-default
             {
                 @extend %darkthemetemplate;
-                border : 1px solid gray(0.8);
+                border : 1px solid gray(0.1);
                 &:hover
                 {
-                    background-color:gray(0.08)
+                    background-color:gray(0.08);
+                    border : 1px solid gray(0.1);
                 };
+                &:not(.active)
+                {
+                    background-color:gray(0.3);
+                };
+
                 &.active
                 {
                     color:gray(1.0);
-                    background-color:tgray(1.0,0.2);
-                };
-
-                &.inactive
-                {
-                    color : gray(0.25);
-                    border : 1px solid gray(0.3);
-                };
+                }
             };
         }
     };
@@ -588,6 +669,8 @@ div.darktheme
 
                 div.menuItemContentList
                 {
+                    padding-left:5%;
+                    padding-right:1%;
                     background-color:gray(0);
                     color : gray(0.85);
                     &:hover
@@ -694,4 +777,10 @@ div
             };
         };
     };
+}
+
+.glyphicon.glyphicon-none:before
+{
+    content: "\2122";
+    color: transparent !important;
 }

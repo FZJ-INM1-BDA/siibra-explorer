@@ -5,11 +5,7 @@
                 <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
                     
                     <span class = "multilevel-name">
-                        <span [@multilvlArrow]="singleData.isExpandedString" (click) = "expandMultilvl( singleData ,$event)" *ngIf="singleData.children.length>0" class = "unicodeSymbols">
-                            &#x25e2;
-                        </span>
-                        <span *ngIf="singleData.children.length==0" class = "unicodeSymbols">
-                            &#x2003;
+                        <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "expandMultilvl( singleData ,$event)" class = "unicodeSymbols glyphicon">                            
                         </span>
 
                         <span *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
@@ -30,7 +26,7 @@
                         <i class = "glyphicon glyphicon-map-marker"></i>
                     </span>
                     <span *ngIf = "! (singleData.properties | isEmpty)" class = "multilevel-icon unicodeSymbols" (click) = "callingModal(singleData);$event.stopPropagation()"  >
-                        &#x24d8;
+                        <i class = "glyphicon glyphicon-info-sign"></i>
                     </span>
                 </span>
             </div>

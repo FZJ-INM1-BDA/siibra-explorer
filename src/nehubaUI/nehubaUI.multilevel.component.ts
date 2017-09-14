@@ -9,7 +9,7 @@ import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
     styles : [` 
         :host >>> span.highlight
         {
-        background-color:#ff3
+        background-color:#770;
         }
     `],
     styleUrls : [   

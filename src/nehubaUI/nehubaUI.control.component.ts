@@ -1,17 +1,14 @@
-import { Component,Input,OnInit,AfterViewInit,ViewChild} from '@angular/core'
+import { Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData,EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
+import { NehubaFetchData,EventCenter,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
-import { EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
+import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 
 import { NehubaViewer } from 'nehuba/exports'
 
 @Component({
     selector : 'atlascontrol',
     templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html',
-    styleUrls : [ 
-        'src/nehubaUI/templates/bootstrap.css',
-         ],
     animations : [
         trigger('panelExpansion',[
             state('collapsed',style({
@@ -41,6 +38,7 @@ import { NehubaViewer } from 'nehuba/exports'
 
 export class NehubaUIControl implements OnInit,AfterViewInit{
 
+    @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
     @Input() nehubaViewer : NehubaViewer
     @Input() searchTerm : String = ''
     @ViewChild(Lab) labComponent : Lab
@@ -93,35 +91,65 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
      */
     ngOnInit():void{
 
-        /* load default dataset */
-        /* TODO: Migrate to service.ts */
-        this.loadInitDatasets()
     }
 
     ngAfterViewInit():void{
-        /* call template hook to do something? */
-        //listening for navigation state changes
-        //this is the angular2 way of implementing $scope.$apply() 
-        //if changed.add(listener) directly, the model does not get updated
-        
-        /* waiting for nehuba controller */
-        // this.navigationControl = this.nehubaViewer.ngviewer
+        const query = window.location.search.substring(1)
+        const toolModeURL = query.split('&').find(kv=>kv.split('=')[0]=='toolmode')
+        if ( toolModeURL ){
+            Promise.race([
+                new Promise((resolve,_)=>{
+                    const PRECONFIGURED_TOOLMODES : any =  NEHUBAUI_CONSTANTS.toolmode 
+                    if ( PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ] ){
+                        resolve(PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ])
+                    }
+                }),
+                new Promise((resolve,reject)=>{
+                    Promise.race([
+                        new Promise((resolve,reject)=>{
+                            fetch(toolModeURL.split('=')[1])
+                                .then(res=>resolve(res))
+                                .catch(e=>reject(e))
+                        }),
+                        new Promise((_,reject)=>{
+                            setTimeout(()=>{
+                                reject('Fetching toolmodeurl timeout, 10000ms')
+                            },10000)
+                        })
+                    ])
+                    .then((res:any)=>res.json())
+                    .then(((json:any)=>{resolve(json)}))
+                    .catch(e=>reject(e))
+                })
+            ])
+            .then((json:any)=>{
+                this.nehubaFetchData.fetchJson(json['UIConfigURL'])
+                    .then((json:any)=>{
+                        this.nehubaFetchData.parseTemplateData(json)
+                            .then( template =>{
+                                this.chooseTemplate( template )
+                            })
+                            .catch(e=>{
+                                throw new Error(e)
+                            })
+                        })
 
-        // this.navigationControl.navigationState.changed.add(()=>{
-        //     this.zone.runOutsideAngular(()=>{
-        //         (this.nehubaNavigator.navigationStateChangeListener).bind(this.nehubaNavigator)(()=>{
-        //             this.zone.run(()=>{})
-        //         })
-        //     })
-        // })
-
-        // this.navigationControl.mouseState.changed.add(()=>{
-        //     this.zone.runOutsideAngular(()=>{
-        //         (this.nehubaNavigator.mouseMoveChangeListener).bind(this.nehubaNavigator)(()=>{
-        //             this.zone.run(()=>{})
-        //         })
-        //     })
-        // })
+                /* TODO: find a more elegant solution in the future */
+                setTimeout(()=>{
+                    json.plugins.forEach((plugin:any)=>{
+                        const newPlugin = new PluginDescriptor(plugin)
+                        this.labComponent.launchPlugin(newPlugin)
+                    })
+                },3000)
+                this.emitHideUI.emit({hideUI:true})
+            })
+            .catch(e=>{
+                console.log(e)
+                this.loadInitDatasets()
+            })
+        }else{
+            this.loadInitDatasets()
+        }
     }
 
     loadInitDatasets(){

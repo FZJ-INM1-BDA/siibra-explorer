@@ -79,12 +79,25 @@ For a full list of how to interact with window.viewer object, consult neuroglanc
 In addition, you may interact with the container of your widget with **window[PLUGINNAME]**.
 
 ```javascript
+/* in jugex.js */
 window['JuGeX'].next({
       body : {
             blink : true, /* makes the widget blink */
             popoverMessage : 'Analysis Complete!' /* append to the popover message */
       }
 })
+```
+If you would like to hook up onDestroy lifecycle events, subscribe to *window[PLUGINNAME* and listen for code 200. e.g.
+```javascript
+/* in jugex.js */
+window['JuGeX'].subscribe(evPk=>{
+      if(evPk.code == 200){
+            window['JuGeX'].unsubscribe()
+            /* do this when user closes the widget */
+            /* this task is carried out synchronisely */
+      }
+})
+
 ```
 
 ---
