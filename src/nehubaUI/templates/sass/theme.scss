@@ -137,13 +137,10 @@ atlasbanner{
     div#bannerContainer{
         height:100%;
         background-color:gray(0.98);
-        display:flex;
-        flex-wrap: wrap;
         font-weight:100;
 
         %img{
             width:90%;
-            flex: 0 0 auto;
             background-size:contain;
         }
 
