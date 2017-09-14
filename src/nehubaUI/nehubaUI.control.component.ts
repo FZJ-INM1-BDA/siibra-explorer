@@ -90,7 +90,30 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
      * fetch default templates
      */
     ngOnInit():void{
-
+        (()=>{
+            const canvas = document.createElement('canvas')
+            const gl = canvas.getContext('webgl')
+            const message:any = {
+                General:['Your browser does not seem to meet the minimum requirements to run neuroglancer.']
+            }
+            if(!gl){
+                message['Detail'] = 'Your browser does not support WebGL.'
+                this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+                return
+            }
+            
+            const drawbuffer = gl.getExtension('WEBGL_draw_buffers')
+            const texturefloat = gl.getExtension('OES_texture_float')
+            const indexuint = gl.getExtension('OES_element_index_uint')
+            if( !(drawbuffer && texturefloat && indexuint) ){
+                const detail = `Your browser does not support 
+                ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
+                ${ !texturefloat ? 'OES_texture_float' : ''} 
+                ${ !indexuint ? 'OES_element_index_uint' : ''} `
+                message['Detail'] = [detail]
+                this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+            }
+        })()
     }
 
     ngAfterViewInit():void{
