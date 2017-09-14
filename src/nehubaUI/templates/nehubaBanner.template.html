@@ -1,8 +1,8 @@
 <div [ngClass]="{darktheme : darktheme}" id = "bannerContainer">
     <img id = "hbplogo" src = "{{ !darktheme ? hbpimg : hbpimgdark}}" />
-    <img id = "explorethebrain" src = "{{ !darktheme ? exploreimg : exploreimgdark}}" />
     <div id = "bannerTitle">
         <h2>Atlas Viewer</h2>
     </div>
-    <img id = "fundedbyeu" src = "{{ !darktheme ? euimg : euimgdark}}"  id = "cofundedbyEU">
+    <img *ngIf = "false" id = "explorethebrain" src = "{{ !darktheme ? exploreimg : exploreimgdark}}" />
+    <img *ngIf = "false" id = "fundedbyeu" src = "{{ !darktheme ? euimg : euimgdark}}"  id = "cofundedbyEU">
 </div>

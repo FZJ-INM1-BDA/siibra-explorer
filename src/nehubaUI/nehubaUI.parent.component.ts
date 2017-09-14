@@ -10,7 +10,7 @@ import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 
       <atlascontrol (emitHideUI)="controlUI($event)">
       </atlascontrol>
-      <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-row-start': hideUI ? '1' : '2','grid-row-end': hideUI ? 'span 2' : 'span 1','grid-column-start': hideUI ? '1' : '2','grid-column-end' : hideUI ? 'span 2' : 'span 1'}">
+      <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '2','grid-column-end' : hideUI ? 'span 2' : 'span 1'}">
       </ATLASViewer>
       <FloatingWidgetContainer>
       </FloatingWidgetContainer>

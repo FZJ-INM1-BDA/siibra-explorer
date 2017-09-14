@@ -17,11 +17,13 @@ $BORDERWIDTH : 2px;
     width:100%;
     display:grid;
     grid-template-columns:15% 85%;
-    grid-template-rows:8% 92%;
+    grid-template-rows:25% 75%;
     
     atlasbanner{
         grid-column-start:1;
-        grid-column-end:span 2;
+        grid-column-end:span 1;
+        grid-row-start:1;
+        grid-row-end:span 1;
     }
     
     atlascontrol{
@@ -54,8 +56,8 @@ $BORDERWIDTH : 2px;
     ATLASViewer{
         grid-column-start:2;
         grid-column-end:span 1;
-        grid-row-start:2;
-        grid-row-end:span 1;
+        grid-row-start:1;
+        grid-row-end:span 2;
         z-index:5;
 
         div#container{
@@ -136,27 +138,27 @@ atlasbanner{
         height:100%;
         background-color:gray(0.98);
         display:flex;
+        flex-wrap: wrap;
         font-weight:100;
 
         %img{
-            height:100%;
+            width:90%;
             flex: 0 0 auto;
             background-size:contain;
         }
 
         img#hbplogo{
             @extend %img;
-            margin:auto;
-            height:70%;
+            margin-left:5%;
+            margin-top:20px;
         }
         img#explorethebrain{
-            @extend %img;
+            
         }
 
         img#cofundedbyEU{
             @extend %img;
             margin:auto;
-            height:70%;
         }
 
         div#bannerTitle{
