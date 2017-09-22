@@ -60,13 +60,13 @@ export class MultilevelSelector {
             }
         }else{
             data.updateChildrenStatus('enable')
-            if (data.default_loc){
+            if (data.position){
                 this.eventCenter.nehubaViewerRelay.next(
                     new EventPacket(
                         EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE,
                         Date.now().toString(),
                         100,
-                        {pos:data.default_loc}
+                        {pos:data.position}
                     ))
             }
             if (data.label_index){
@@ -92,18 +92,18 @@ export class MultilevelSelector {
     }
 
     ShowPMap(singleData:RegionDescriptor){
-        if (singleData.default_loc){
+        if (singleData.position){
             this.eventCenter.nehubaViewerRelay.next(
                 new EventPacket(
                     EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE,
                     Date.now().toString(),
                     100,
-                    {pos:singleData.default_loc}
+                    {pos:singleData.position}
                 ))
         }
         this.eventCenter.nehubaViewerRelay.next(
             new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{
-                url:singleData.PMapUrl,
+                url:singleData.PMapURL,
                 title:singleData.name
             }))    
     }

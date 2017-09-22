@@ -3,7 +3,7 @@ import { Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3,quat } from 'nehuba/exports'
 
-import { EventCenter,Animation,EVENTCENTER_CONST } from './nehubaUI.services'
+import { EventCenter,Animation,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
 
@@ -46,6 +46,13 @@ export class NehubaViewerInnerContainer implements OnInit{
             private componentFactoryResolver: ComponentFactoryResolver,
             private eventCenter : EventCenter
       ){
+            gExternalControl.viewControl
+                  .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==101)
+                  .subscribe((_evPk:EventPacket)=>{
+                        this.nehubaViewer.clearCustomSegmentColors()
+                  })
+
+            /* this maybecome obsolete */
             this.eventCenter.nehubaViewerRelay.subscribe((msg:EventPacket)=>{
                   switch(msg.target){
                         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE:{
@@ -194,7 +201,7 @@ export class NehubaViewerInnerContainer implements OnInit{
                                           this.pMapFloatingWidget.subscribe((evPk:EventPacket)=>{
                                                 switch (evPk.code){
                                                       case 200:
-                                                      case 404:{
+                                                      case 500:{
                                                             let json = this.nehubaViewerComponent.nehubaViewer.ngviewer.state.toJSON()
                                                             json.layers.PMap.visible = false
                                                             json.layers.atlas.visible = true
@@ -253,7 +260,7 @@ export class NehubaViewerComponent implements OnDestroy{
 
       constructor(){
             this.mouseEventSubject = new Subject()
-            window['mouseEvent'] = this.mouseEventSubject
+            window['nehubaUI']['mouseEvent'] = this.mouseEventSubject
       }
 
       public ngOnDestroy(){
@@ -261,7 +268,7 @@ export class NehubaViewerComponent implements OnDestroy{
                   subscription.unsubscribe()
             })
             window['nehubaViewer'] = null
-            window['mouseEvent'] = null
+            window['nehubaUI']['mouseEvent'] = null
       }
 
       public mousehandler(mode:string,ev:any){
@@ -279,18 +286,16 @@ export class NehubaViewerComponent implements OnDestroy{
             this.nehubaViewer.applyInitialNgState()
             this.nehubaViewer.redraw()
             this.nehubaViewer.relayout()
-            this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
 
-            /* set navigation callback */
-            // let navigationSubscription = this.nehubaViewer.addNavigationStateCallbackInRealSpaceCoordinates((pos)=>{
-            //       this.viewerPos[0] = pos[0]
-            //       this.viewerPos[1] = pos[1]
-            //       this.viewerPos[2] = pos[2]
-            // })
+            /* TODO: only works for JuBrain. Workout a proper parser for rgb values */
+            let testForJubrain = new RegExp('jubrain','gi')
+            if(config.globals!.useCustomSegmentColors && testForJubrain.test(JSON.stringify(config.dataset!.initialNgState))){
+                  this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
+            }
+
             const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
                   this.viewerPos = pos
             })
-
             this.onDestroyUnsubscribe.push( navigationSubscription )
 
             window['nehubaViewer'] = this.nehubaViewer

@@ -22,7 +22,7 @@
 
                         </span>
                     </span>
-                    <span *ngIf = "singleData.PMapUrl" class = "multilevel-icon unicodeSymbols" (click) = "ShowPMap(singleData);$event.stopPropagation()">
+                    <span *ngIf = "singleData.PMapURL" class = "multilevel-icon unicodeSymbols" (click) = "ShowPMap(singleData);$event.stopPropagation()">
                         <i class = "glyphicon glyphicon-map-marker"></i>
                     </span>
                     <span *ngIf = "! (singleData.properties | isEmpty)" class = "multilevel-icon unicodeSymbols" (click) = "callingModal(singleData);$event.stopPropagation()"  >

@@ -20,7 +20,7 @@ export class FloatingWidgetDirective{
 
 @Component({
       selector : 'FloatingWidgetContainer',
-      template:`
+      template : `
 <ng-template floating-widget-host>
 </ng-template>
       `
@@ -33,6 +33,7 @@ export class FloatingWidget implements OnInit{
       viewContainerRef : ViewContainerRef
       zStackCounter : number = 10
       minimisedTrays : any[] = []
+      loadedWidgets : any[] = []
 
       constructor(
             private componentFactoryResolver: ComponentFactoryResolver,
@@ -40,6 +41,8 @@ export class FloatingWidget implements OnInit{
             private helperFunctions : HelperFunctions,
             private sanitizer : DomSanitizer
       ){
+
+            /* TODO: deprecate this method and eventCenter.floatingWidgetSubjectBroker */
             this.eventCenter.floatingWidgetSubjectBroker.subscribe((subject:Subject<EventPacket>)=>{
                   subject.subscribe((eventPacket:EventPacket)=>{
                         switch (eventPacket.code)  {
@@ -61,11 +64,17 @@ export class FloatingWidget implements OnInit{
                                                       })
                                           }break;
                                           case 'lab':{
-                                                this.lab(eventPacket)
+                                                /* temporary measure */
+                                                if (this.loadedWidgets.find(widget=>widget.name == eventPacket.body.name)){
+                                                      window['pluginControl'].next(new EventPacket(eventPacket.body.name,'',100,{blink:true}))
+                                                      subject.next(new EventPacket('','',500,{reason:'widget already loaded!'}))
+                                                }else{
+                                                      this.lab(eventPacket)
+                                                }
                                           }break;
                                     }
                               }break;
-                              case 404:
+                              case 500:
                               case 200:{
                                     subject.unsubscribe()
                               }break;
@@ -76,6 +85,39 @@ export class FloatingWidget implements OnInit{
 
       ngOnInit(){
             this.viewContainerRef = this.host.viewContainerRef
+            window['pluginControl'] = new Subject()
+
+            /* shutdown sequence */
+            window['pluginControl']
+                  .filter((evPk:EventPacket)=>evPk.body.shutdown)
+                  .subscribe((evPk:EventPacket)=>{
+                        switch(evPk.code){
+                              case 100:{
+                                    const nEvPk = evPk
+                                    nEvPk.code = 101
+                                    window['pluginControl'].next(nEvPk)
+                              }break;
+                              case 101:{
+                                    const nEvPk = evPk
+                                    nEvPk.code = 102
+                                    window['pluginControl'].next(nEvPk)
+                              }break;
+                              case 102:{
+                                    const nEvPk = evPk
+                                    nEvPk.code = 103
+                                    window['pluginControl'].next(nEvPk)
+                              }break;
+                              case 103:{
+                                    const nEvPk = evPk
+                                    nEvPk.code = 200
+                                    window['pluginControl'].next(nEvPk)
+                                    const idx = this.loadedWidgets.findIndex(widget=>widget.name==evPk.target)
+                                    if (idx>=0) this.loadedWidgets.splice(idx,1)
+                              }break;
+                        }
+                  })
+
+            
       }
 
       loadPresetShaderFloatingWidget(msg:EventPacket):Promise<string>{
@@ -144,6 +186,8 @@ export class FloatingWidget implements OnInit{
             fetch(msg.body.templateURL)
                   .then(template=>template.text())
                   .then(text=>{
+                        this.loadedWidgets.push(msg.body)
+
                         const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:msg.body})
                         const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
                         const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
@@ -154,7 +198,7 @@ export class FloatingWidget implements OnInit{
                         };
                         (<FloatingWidgetComponent>componentRef.instance).data = data;
                         (<FloatingWidgetComponent>componentRef.instance).presetColorFlag = false;
-                        window[msg.body.name] = (<FloatingWidgetComponent>componentRef.instance).controllerSubject
+                        (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
 
                         const script = document.createElement('script')
                         script.onload = (_s) => {
@@ -166,19 +210,21 @@ export class FloatingWidget implements OnInit{
                         script.src = msg.body.scriptURL
                         document.head.appendChild(script);
 
-                        window[msg.body.name] = (<FloatingWidgetComponent>componentRef.instance).controllerSubject;
-                        componentRef.onDestroy(()=>{
-                              /* end of life hook */
-                              window[msg.body.name].next(new EventPacket('',Date.now().toString(),200,{}))
-                              window[msg.body.name] = undefined
-                              document.head.removeChild(script);
-                              (<FloatingWidgetComponent>componentRef.instance).controllerSubject.unsubscribe()
-                        });
-
                         (<FloatingWidgetComponent>componentRef.instance).cancelSelection = () =>{
-                              componentRef.destroy()
+                              window['pluginControl'].next(new EventPacket(msg.body.name,'',100,{shutdown:true}))
                         }
-                        (<FloatingWidgetComponent>componentRef.instance).minimisedTrays = this.minimisedTrays
+
+                        /* floatingwidget lifecycle */
+                        const pluginControlHandler = window['pluginControl']
+                              .filter((evPk:EventPacket)=>evPk.target==msg.body.name)
+                              .subscribe((evPk:EventPacket)=>{
+                                    if( evPk.body.shutdown && evPk.code == 200 ) {
+                                          pluginControlHandler.unsubscribe()
+                                          componentRef.destroy()
+                                          document.head.removeChild(script)
+                                    };
+                                    (<FloatingWidgetComponent>componentRef.instance).controllerSubject.next(evPk)
+                              });
                   })
                   .catch(e=>console.log(e))
       }
@@ -200,7 +246,7 @@ export class FloatingWidget implements OnInit{
 <div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget">
       <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
             <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
-                  <i *ngIf = "data.icon" class = "glyphicon" [ngClass] = "'glyphicon-' + data.icon"></i> {{data.title}}
+                  <i *ngIf = "data.icon" class = "glyphicon" [ngClass] = "'glyphicon-' + data.icon"></i> {{data.title.split('.')[data.title.split('.').length-1]}}
                   <span (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></span>
                   <span (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></span>
             </div>
@@ -268,7 +314,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
 
       constructor(public zone:NgZone){
             this.controllerSubject = new Subject()
-            this.controllerSubject.subscribe((evPk:EventPacket)=>{
+            const subscriptionHandler = this.controllerSubject.subscribe((evPk:EventPacket)=>{
                   if(evPk.body.blink){
                         if( this.blinkingFlag ){
                               this.blinkingTimer.unsubscribe()
@@ -289,6 +335,9 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
                         this.zone.run(()=>{
                               this.popoverMessage = this.popoverMessage ? this.popoverMessage + evPk.body.popoverMessage : evPk.body.popoverMessage;
                         })
+                  }
+                  if( evPk.body.shutdown ){
+                        subscriptionHandler.unsubscribe()
                   }
             })
       }

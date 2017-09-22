@@ -19,6 +19,12 @@ Metadata JSON
 }
 ```
 
+NB: required fields: name, type='plugin', templateURL, scriptURL.
+
+Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
+
+You may choose to add more fields to the JSON object. Brain Atlas Viewer will not parse them.
+
 TODO: more meta data, e.g., author, validation hash etc
 
 ---
@@ -221,8 +227,7 @@ There are three levels of APIs available to developers. Try to use APIs from the
 window.nehubaUI
 ------
 provide a higher level of abstraction over nehubaViewer
-provide event streams that are concatenated with metadata
-provide controls over widget (minimise, unminimise, blink, etc)
+provide event streams that are concatenated with metadata. For a full list of APIs, see [window.nehubaUI.readme.md](window.nehubaUI.readme.md)
 
 window.nehubaViewer
 ------
@@ -237,31 +242,30 @@ The original neuroglancer viewer object.
 Providing low level access to the viewer.
 Gets destroyed and recreated when a new template is selected.
 May interfere with how nehuba and atlas viewer interact with neuroglancer
-For a full list of how to interact with window.viewer object, consult neuroglancer github page, or console.log(window.viewer)
+For a full list of how to interact with window.viewer object, consult neuroglancer github page, or *console.log(window.viewer)*
 
 ---
-In addition, you may interact with the container of your widget with **window[PLUGINNAME]**.
+In addition, you may interact with the container of your widget with **window.pluginControl**.
 
 ```javascript
 /* in jugex.js */
-window['fzj.xg.JuGeX'].next({
+window.pluginControl.next({
+      target : 'fzj.xg.JuGeX',
       body : {
             blink : true, /* makes the widget blink */
             popoverMessage : 'Analysis Complete!' /* append to the popover message */
       }
 })
-```
-If you would like to hook up onDestroy lifecycle events, subscribe to *window[PLUGINNAME* and listen for code 200. e.g.
-```javascript
-/* in jugex.js */
-window['fzj.xg.JuGeX'].subscribe(evPk=>{
-      if(evPk.code == 200){
-            window['fzj.xg.JuGeX'].unsubscribe()
-            /* do this when user closes the widget */
-            /* this task is carried out synchronisely */
-      }
-})
 
+const shutdownHandler = window.pluginControl
+      .filter(evPk=>evPk.target=='fzj.xg.JuGeX'&&evPk.body.shutdown)
+      .subscribe(_=>{
+            shutdownHandler.unsubscribe()
+            /* do thing when your user closes your app */
+            /* for example, unsubscribe all of the subscriptions */
+            /* close ws sockets */
+            /* remove custom DOM elements */
+      })
 ```
 
 ---

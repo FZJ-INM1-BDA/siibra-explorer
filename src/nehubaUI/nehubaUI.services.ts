@@ -6,7 +6,13 @@ import { Subject } from 'rxjs/Rx'
 
 import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
 import { TIMEOUT } from './nehuba.config'
-// import { Viewer as NGViewer } from 'neuroglancer/viewer'
+
+declare var window:{
+    [key:string] : any
+    prototype : Window;
+    new() : Window;
+}
+
 
 @Injectable()
 export class NehubaFetchData {
@@ -100,7 +106,6 @@ export class NehubaFetchData {
         }
         
         return new Promise((resolve,reject)=>{
-
             if ( json.nehubaConfig ){
                 const nehubaConfig = convertValues( json.nehubaConfig )
                 parseOrFetchInitialNgState( nehubaConfig.dataset )
@@ -109,7 +114,6 @@ export class NehubaFetchData {
                         resolve( nehubaConfig )
                     })
             } else if ( json.nehubaConfigURL ){
-                
                 this.fetchJson( json.nehubaConfigURL )
                     .then( nehubaConfigJson =>{
                         const nehubaConfig = convertValues( nehubaConfigJson )
@@ -150,8 +154,8 @@ export class NehubaFetchData {
             new Promise((resolve)=>{
                 if (json.properties){
                     resolve(json.properties)
-                }else if(json.getPropertiesUrl){
-                    this.fetchJson( json.getPropertiesUrl )
+                }else if(json.propertiesURL){
+                    this.fetchJson( json.propertiesURL )
                         .then(obj=>{
                             resolve(obj)
                         })
@@ -162,7 +166,7 @@ export class NehubaFetchData {
                         })
                 }else{
                     /* if there is no properties field */
-                    /* nor is there a getPropertiesUrl field */
+                    /* nor is there a propertiesURL field */
                     /* then return an empty object */
                     resolve({})
                 }
@@ -177,17 +181,22 @@ export class NehubaFetchData {
                     // json.parcellations.forEach( (parcellation:any) => newTemplateDescriptor.parcellations.push( this.parseParcellationData( parcellation ) ) )
                 } else if ( json.parcellationsURL ) {
                     /* if parcellations were not defined, but the method of fetching a list of parcellations exist */
-                    this.fetchJson( json.parcellationsURL ).then( (obj:any)=>{
-                        resolve(obj)
-                        // newTemplateDescriptor.parcellations.push(this.parseParcellationData(obj))
-                    })
+                    this.fetchJson( json.parcellationsURL )
+                        .then( (obj:any)=>{
+                            resolve(obj)
+                            // newTemplateDescriptor.parcellations.push(this.parseParcellationData(obj))
+                        })
+                        .catch( (e:any)=>{
+                            this.handleError('error when retrieving parcellationsURL, returning empty array')
+                            this.handleError(e)
+                            resolve([])
+                        })
                 } else {
                     this.handleError('parse tempaltedata error. Neither json.parcellations nor json.parcellationsURL exist ')
                     resolve([])
                 }
             })
         )
-
         
         return new Promise((resolve) =>{
             let newTemplateDescriptor = new TemplateDescriptor( json )
@@ -219,8 +228,8 @@ export class NehubaFetchData {
             new Promise((resolve)=>{
                 if (json.properties){
                     resolve(json.properties)
-                }else if(json.getPropertiesUrl){
-                    this.fetchJson( json.getPropertiesUrl )
+                }else if(json.propertiesURL){
+                    this.fetchJson( json.propertiesURL )
                         .then(obj=>{
                             resolve(obj)
                         })
@@ -231,7 +240,7 @@ export class NehubaFetchData {
                         })
                 }else{
                     /* if there is no properties field */
-                    /* nor is there a getPropertiesUrl field */
+                    /* nor is there a propertiesURL field */
                     /* then return an empty object */
                     resolve({})
                 }
@@ -292,7 +301,8 @@ export class NehubaFetchData {
         return new Promise(resolve=>{
             Promise.all(promiseArray)
                 .then(values=>{
-                    let returnParcellation = new ParcellationDescriptor(json.name)
+                    console.log('new parcellation',json,values)
+                    let returnParcellation = new ParcellationDescriptor(json)
                     returnParcellation.properties = values[0]
                     returnParcellation.regions = values[1]
                     resolve(returnParcellation)
@@ -308,8 +318,8 @@ export class NehubaFetchData {
             new Promise((resolve)=>{
                 if (json.properties){
                     resolve(json.properties)
-                }else if(json.getPropertiesUrl){
-                    this.fetchJson( json.getPropertiesUrl )
+                }else if(json.propertiesURL){
+                    this.fetchJson( json.propertiesURL )
                         .then(obj=>{
                             resolve(obj)
                         })
@@ -320,7 +330,7 @@ export class NehubaFetchData {
                         })
                 }else{
                     /* if there is no properties field */
-                    /* nor is there a getPropertiesUrl field */
+                    /* nor is there a propertiesURL field */
                     /* then return an empty object */
                     resolve({})
                 }
@@ -353,11 +363,11 @@ export class NehubaFetchData {
                     if (json.label_index){
                         newRegionDescriptor.label_index = json.label_index
                     }
-                    if (json.default_loc){
-                        newRegionDescriptor.default_loc = json.default_loc
+                    if (json.position){
+                        newRegionDescriptor.position = json.position
                     }
-                    if(json.PMapUrl){
-                        newRegionDescriptor.PMapUrl = json.PMapUrl
+                    if(json.PMapURL){
+                        newRegionDescriptor.PMapURL = json.PMapURL
                     }
                     newRegionDescriptor.hierarchy = hierarchy
                     newRegionDescriptor.properties = values[0]
@@ -500,6 +510,14 @@ export class HelperFunctions{
             }break;
         }
     }
+}
+
+let metadata : any = {}
+
+export const EXTERNAL_CONTROL = window['nehubaUI'] = {
+    viewControl : new Subject(),
+    metadata : metadata,
+    testFunc : ()=>{}
 }
 
 export const EVENTCENTER_CONST = {

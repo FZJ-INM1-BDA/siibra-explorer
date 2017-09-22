@@ -1,10 +1,16 @@
-import { Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
+import { NgZone,Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
 import { trigger, state, style, animate, transition } from '@angular/animations'
-import { NehubaFetchData,EventCenter,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
+import { NehubaFetchData,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
 import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 
 import { NehubaViewer } from 'nehuba/exports'
+
+declare var window:{
+    [key:string] : any
+    prototype : Window;
+    new() : Window;
+}
 
 @Component({
     selector : 'atlascontrol',
@@ -54,27 +60,29 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     selectedRegions : RegionDescriptor[] = [];
 
     //this is a temporary solution for collapsing menus
-    defaultPanelsState : any
+    
+        /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
+    defaultPanelsState : any = {
+        templatesPanelState : 'expanded',
+        parcellationsPanelState : 'collapsed',
+        regionsPanelState : 'collapsed',
+        navigationPanelState : 'collapsed',
+        labPanelState : 'collapsed'
+    }
     showTemplates : Boolean = true
     showParcellations : Boolean = true
     showRegions : Boolean = true
 
     showTemplatesState : string = 'expanded';
 
+    viewerObservables : any /* hanging onto nehubaViewer event streams. Or else, when the last plugin unsubscribes, the Observable gets garbage collected. */
+
     constructor( 
         private nehubaFetchData : NehubaFetchData,
-        private eventCenter:EventCenter
+        private eventCenter:EventCenter,
+        private zone:NgZone
         ){
         this.fetchedTemplatesData = new FetchedTemplates()
-
-        /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
-        this.defaultPanelsState = {
-            templatesPanelState : 'expanded',
-            parcellationsPanelState : 'collapsed',
-            regionsPanelState : 'collapsed',
-            navigationPanelState : 'collapsed',
-            labPanelState : 'collapsed'
-        }
 
         this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
             switch(msg.target){
@@ -83,18 +91,76 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                 }break;
             }
         })
+
+        gExternalControl.viewControl
+            .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&(evPk.code==100||evPk.code==101||evPk.code==103))
+            .subscribe((evPk:EventPacket)=>{
+                switch(evPk.code){
+                    case 100:{
+                        const nEvPk = evPk
+                        nEvPk.code = 101
+                        gExternalControl.viewControl.next(nEvPk)
+                    }break;
+                    case 101:{
+                        const nEvPk = evPk
+                        nEvPk.code = 102
+                        gExternalControl.viewControl.next(nEvPk)
+                        
+                        /* loadTemplate pre hook */
+                        if (this.viewerObservables) this.viewerObservables.unsubscribe()
+                    }break;
+                    case 103:{
+                        const nEvPk = evPk
+                        nEvPk.code = 200
+                        gExternalControl.viewControl.next(nEvPk)
+
+                        /* loadTemplate post hook */
+                        this.viewerObservables = window['nehubaViewer'].mouseOver.segment.subscribe(()=>{})
+                    }break;
+                }
+            })
+
+        gExternalControl.viewControl
+            .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==102)
+            .subscribe((evPk:EventPacket)=>{
+                if( evPk.body.templateDescriptor ){
+                    try{
+                        this.zone.run(()=>{
+                            this.loadTemplate( evPk.body.templateDescriptor,evPk )
+                        })
+                    }catch(e){
+                        evPk.code = 500
+                        evPk.body.reason = 'templateDescriptor ill defined.'
+                        gExternalControl.viewControl.next( evPk )
+                    }
+                }else if( evPk.body.name ){
+                    const openTemplate = this.fetchedTemplatesData.templates.find(template=>template.name==evPk.body.name)
+                    if( openTemplate ){
+                        this.zone.run(()=>{
+                            this.loadTemplate( openTemplate,evPk )
+                        })
+                    }else{
+                        evPk.code = 500
+                        evPk.body.reason = 'Could not find the template by name.'
+                        gExternalControl.viewControl.next( evPk )
+                    }
+                }else{
+                    evPk.code = 500
+                    evPk.body.reason = 'either body.templateDescriptor : TemplateDescriptor | Object or body.name : string needs to be defined.'
+                    gExternalControl.viewControl.next( evPk )
+                }
+            })
     }
 
     /** on view init 
-     * bind listeners for navigation changes
-     * fetch default templates
+     * checking browser compatibility
      */
     ngOnInit():void{
         (()=>{
             const canvas = document.createElement('canvas')
             const gl = canvas.getContext('webgl')
             const message:any = {
-                General:['Your browser does not seem to meet the minimum requirements to run neuroglancer.']
+                Error:['Your browser does not meet the minimum requirements to run neuroglancer.']
             }
             if(!gl){
                 message['Detail'] = 'Your browser does not support WebGL.'
@@ -118,7 +184,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     ngAfterViewInit():void{
         const query = window.location.search.substring(1)
-        const toolModeURL = query.split('&').find(kv=>kv.split('=')[0]=='toolmode')
+        const toolModeURL = query.split('&').find((kv:any)=>kv.split('=')[0]=='toolmode')
         if ( toolModeURL ){
             Promise.race([
                 new Promise((resolve,_)=>{
@@ -180,7 +246,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         /* this will need to come from elsewhere eventually */
         let datasetArray = [
             'http://172.104.156.15/json/bigbrain',
-            'http://172.104.156.15/json/colin'
+            'http://172.104.156.15/json/colin',
+            'http://172.104.156.15/json/waxholm'
         ]
 
         datasetArray.forEach(dataset=>{
@@ -197,55 +264,67 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             })
     }
 
+    loadTemplate(templateDescriptor:TemplateDescriptor,mEvPk:EventPacket):void{
+
+        /* send signals to modal and viewer to update the view */
+        /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
+        let id = Date.now().toString()
+        let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
+        let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
+        
+        let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... TODO: currently this modal closes after 3 seconds. In the future, this behaviour should changed so that when the template finishes loading, this modal closes automatically.'})
+        curtainModalSubject.next(eventPacket)
+        curtainModalSubject.subscribe((evPk:EventPacket)=>{
+            switch(evPk.code){
+                case 101:{
+                    this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
+                        {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
+                    this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
+        
+                    /* update models in the controller */
+                    this.selectedTemplate = templateDescriptor
+                    this.selectedRegions = []
+                    this.selectedParcellation = undefined
+        
+                    /* update layers in the advanced mode */
+                    /* probably awaiting nehuba viewer to implement two way binding of things like shader code and transformation matrix */
+                    this.listOfActiveLayers = []
+                    let ngJson = templateDescriptor.nehubaConfig.dataset!.initialNgState
+                    for (let key in ngJson.layers){
+                        this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
+                    }
+
+                    gExternalControl.metadata.template = this.selectedTemplate
+
+                    mEvPk.code = 103
+                    gExternalControl.viewControl.next(mEvPk)
+                    
+                    /* TODO: temporary measure */
+                    setTimeout(()=>{
+                        curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
+                    },3000)
+                }break;
+                case 200:
+                case 500:{
+                    curtainModalSubject.unsubscribe()
+                }break;
+            }
+        })
+    }
+
     chooseTemplate(templateDescriptor:TemplateDescriptor):void{
         if ( this.selectedTemplate != templateDescriptor ){
-            /* send signals to modal and viewer to update the view */
-            /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
-            let id = Date.now().toString()
-            let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
-            let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
-            
-            let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... TODO: currently this modal closes after 3 seconds. In the future, this behaviour should changed so that when the template finishes loading, this modal closes automatically.'})
-            curtainModalSubject.next(eventPacket)
-            curtainModalSubject.subscribe((evPk:EventPacket)=>{
-
-                switch(evPk.code){
-                    case 101:{
-                        this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
-                            {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
-                        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
-            
-                        /* update models in the controller */
-                        this.selectedTemplate = templateDescriptor
-                        this.selectedRegions = []
-                        this.selectedParcellation = undefined
-            
-                        /* update layers in the advanced mode */
-                        /* probably awaiting nehuba viewer to implement two way binding of things like shader code and transformation matrix */
-                        this.listOfActiveLayers = []
-                        let ngJson = templateDescriptor.nehubaConfig.dataset!.initialNgState
-                        for (let key in ngJson.layers){
-                            this.listOfActiveLayers.push(new LayerDescriptor(key,ngJson.layers[key]))
-                        }
-                        
-                        /* TODO: temporary measure */
-                        setTimeout(()=>{
-                            curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-                        },3000)
-                    }break;
-                    case 200:
-                    case 404:{
-                        curtainModalSubject.unsubscribe()
-                    }break;
-                }
-            })
+            gExternalControl.viewControl.next(new EventPacket('loadTemplate','',100,{templateDescriptor:templateDescriptor}))
         }
     }
 
     chooseParcellation(parcellation:ParcellationDescriptor):void{
         if( this.selectedParcellation != parcellation ){
+            console.log(parcellation)
             this.selectedParcellation = parcellation
             this.selectedRegions = []
+
+            gExternalControl.metadata.parcellation = this.selectedParcellation
         }
     }
 
@@ -253,6 +332,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     chooseRegion(region:RegionDescriptor):void{
         let idx = this.selectedRegions.findIndex( itRegion => itRegion === region )
         idx < 0 ? this.selectedRegions.push( region ) : this.selectedRegions.splice( idx , 1 )
+
+        gExternalControl.metadata.selectedRegions = this.selectedRegions
     }
 
     isRegionSelected(region:RegionDescriptor):boolean{

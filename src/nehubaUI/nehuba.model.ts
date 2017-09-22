@@ -106,19 +106,22 @@ export class TemplateDescriptor {
         this.useTheme = json.useTheme ? json.useTheme : 'light'
         this.parcellations = []
         this.properties = []
+        this.nehubaId = json.nehubaId ? json.nehubaId : ''
     }
     name : string;
     useTheme : string;
     parcellations : ParcellationDescriptor[];
     properties : any;
+    nehubaId : string;
     
     nehubaConfig : Nehubaconfig;
 
 }
 
 export class ParcellationDescriptor {
-    constructor(name:string){
-        this.name = name
+    constructor(json:any){
+        this.name = json.name
+        this.nehubaId = json.nehubaId ? json.nehubaId : ''
         this.regions = []
         this.properties = []
     }
@@ -126,6 +129,7 @@ export class ParcellationDescriptor {
     name : string;
     getUrl : string;
     properties : any;
+    nehubaId : string;
 
     isShown : boolean = true;
     masterOpacity : number = 1.00;
@@ -233,55 +237,8 @@ export class RegionDescriptor extends Multilevel{
     properties : any;
     getUrl: string;
     label_index : number;
-    default_loc : number[];
-    PMapUrl : string;
-}
-
-export abstract class DescriptorBase{
-    private parseArrayObjectStringToArray = (obj:any):Promise<any[]> => {
-        return new Promise( resolve =>{
-            switch( obj.constructor ){
-                case Array: {
-                    resolve(obj)
-                }break;
-                case String: {
-                    resolve([obj])
-                }break;
-                case Object: {
-                    let newArray = []
-                    for (let key in obj){
-                        newArray.push({key:obj[key]})
-                    }
-                    resolve(newArray)
-                }default: {
-                    resolve([])
-                }
-            }
-        })
-    }
-
-    // private parseArrayObjecctStringToObject = (obj:any):Promise<Object> =>{
-    //     return new Promise( resolve =>{
-    //         switch (obj.constructor) {
-    //             case String :{
-    //                 resolve({"desc":obj})
-    //             }break;
-    //             case 
-    //         }
-    //     })
-    // }
-
-    parsePropertiesField = (obj:any):Property[] => {
-        let returnProperties : Property[] = []
-
-        this.parseArrayObjectStringToArray( obj ).then(array=>{
-            for (let idx in array){
-                array[idx]
-            }
-        })
-
-        return returnProperties
-    }
+    position : number[];
+    PMapURL : string;
 }
 
 export class EventPacket{
