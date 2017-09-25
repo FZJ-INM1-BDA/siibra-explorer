@@ -236,7 +236,7 @@ export class RegionDescriptor extends Multilevel{
     name : string;
     properties : any;
     getUrl: string;
-    label_index : number;
+    labelIndex : number;
     position : number[];
     PMapURL : string;
 }

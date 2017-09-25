@@ -57,6 +57,7 @@ overflow:hidden;
 .multilevel-name
 {
 flex: 1 1 auto;
+overflow:hidden;
 }
 
 .multilevel-icon

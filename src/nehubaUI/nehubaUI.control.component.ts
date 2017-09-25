@@ -60,8 +60,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     selectedRegions : RegionDescriptor[] = [];
 
     //this is a temporary solution for collapsing menus
-    
-        /* this has to do with viewer state. I'd prefer if this was not in the component. Or segregate this into a separate component */
     defaultPanelsState : any = {
         templatesPanelState : 'expanded',
         parcellationsPanelState : 'collapsed',

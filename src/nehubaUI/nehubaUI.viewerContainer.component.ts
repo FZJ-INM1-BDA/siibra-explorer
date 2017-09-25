@@ -1,11 +1,15 @@
 import { Component,Input,EventEmitter,Output } from '@angular/core'
-import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
+import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 
 @Component({
     selector : 'ATLASViewer',
     template : `
-        <NehubaViewer (mousemove)="mousemove($event)"></NehubaViewer>
+        <NehubaViewer 
+            (mousemove)="mousemove($event);mouseEventHandler('mousemove',$event)"
+            (click) = "mouseEventHandler('click',$event)"
+            (mousedown) = "mouseEventHandler('mousedown',$event)"
+            (mouseup) = "mouseEventHandler('mouseup',$event)"></NehubaViewer>
         <span id="helpbutton" (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign unicodeSymbols"></span>
         <span id="hideUI" (click)="toggleHideUI()" [ngClass]="{darktheme : darktheme,'glyphicon-resize-full':!hideUI,'glyphicon-resize-small':hideUI}" class = "glyphicon unicodeSymbols"></span>
     `
@@ -24,6 +28,12 @@ export class NehubaViewerContainer {
                 }break;
             }
         })
+
+        gExternalControl
+    }
+
+    mouseEventHandler(mode:string,ev:any){
+        gExternalControl.mouseEvent.next(new EventPacket(mode,'',100,ev))
     }
 
     toggleHideUI(){

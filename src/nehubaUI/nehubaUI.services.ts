@@ -360,8 +360,8 @@ export class NehubaFetchData {
                 .all(promiseArray)
                 .then(values=>{
                     let newRegionDescriptor = new RegionDescriptor( json.name )
-                    if (json.label_index){
-                        newRegionDescriptor.label_index = json.label_index
+                    if (json.labelIndex){
+                        newRegionDescriptor.labelIndex = json.labelIndex
                     }
                     if (json.position){
                         newRegionDescriptor.position = json.position
@@ -517,7 +517,7 @@ let metadata : any = {}
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
     metadata : metadata,
-    testFunc : ()=>{}
+    mouseEvent : new Subject()
 }
 
 export const EVENTCENTER_CONST = {

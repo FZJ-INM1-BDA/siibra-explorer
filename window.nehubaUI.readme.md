@@ -52,7 +52,7 @@ const evPk = {
 Events in nehubaUI
 ------
 
-**Load a new template**
+**Initiating/Listening to the loading of a new template**
 
 Description: Request /listening to the loading of a (new) template. 
 
@@ -87,3 +87,11 @@ The code gives an indication of the lifecycle of the load template event. Plugin
 500 : error, check body for reason
 ```
 
+---
+**Listening to mouseEvents in viewer**
+---
+
+window.nehubaUI.mouseEvent
+
+target : mousedown | mouseup | click | mousemove
+body : event object

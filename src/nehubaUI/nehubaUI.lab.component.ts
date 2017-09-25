@@ -26,7 +26,7 @@ export class Lab {
 
       uix = {
             "name":"fzj.xg.uix",
-            "icon":"info-sign",
+            "icon":"screenshot",
             "type":"plugin",
             "templateURL":"http://172.104.156.15/html/nehuba_ui_extension",
             "scriptURL":"http://172.104.156.15/js/nehuba_ui_extension"
@@ -38,11 +38,25 @@ export class Lab {
             scriptURL : 'http://172.104.156.15/js/jugex.script'
       }
 
-      constructor(private eventCenter:EventCenter){
-
+      papayaX = {
+            "name":"fzj.xg.papayaX",
+            "icon":"info-sign",
+            "type":"plugin",
+            "templateURL":"http://172.104.156.15/html/papayaX",
+            "scriptURL":"http://172.104.156.15/js/papayaX"
       }
 
-      plugins = [this.uix,this.jugex]
+      screenSaver = {
+            "name":"fzj.xg.screenSaver",
+            "templateURL":"http://172.104.156.15/html/screenSaver",
+            "scriptURL":"http://172.104.156.15/js/screenSaver"
+      }
+
+      constructor(private eventCenter:EventCenter){
+            
+      }
+
+      plugins = [this.uix,this.screenSaver,this.jugex,this.papayaX]
 
       appendPlugin(param:any){
             this.plugins.push(param)

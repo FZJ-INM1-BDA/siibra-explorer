@@ -68,6 +68,7 @@
         </div>
         <div class = "modePanel" *ngIf = "enableAdvancedMode == 'off'" [ngClass]="{darktheme : darktheme}">
             <button (click)="toggleDefaultPanel('templatesPanelState',false)" class = "btn btn-default btn-block btn-lg">
+                <span class = "glyphicon" [ngClass]="defaultPanelsState.templatesPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Templates <small *ngIf = "selectedTemplate">({{selectedTemplate.name}})</small>
             </button>
             <div class = "list-group" *ngIf="fetchedTemplatesData" [@panelExpansion]="defaultPanelsState.templatesPanelState" >
@@ -81,6 +82,8 @@
                 </div>
             </div>
             <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('parcellationsPanelState',selectedTemplate == undefined)" [ngClass]="{inactive: selectedTemplate == undefined}">
+                <span *ngIf = "!selectedTemplate" class = "glyphicon glyphicon-chevron-right"></span>
+                <span *ngIf = "selectedTemplate" class = "glyphicon" [ngClass]="defaultPanelsState.parcellationsPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Parcellations <small *ngIf = "selectedParcellation">({{selectedParcellation.name}})</small>
             </button>
             <div class = "list-group" *ngIf="selectedTemplate" [@panelExpansion]="defaultPanelsState.parcellationsPanelState" >
@@ -96,6 +99,8 @@
                 </div>
             </div>
             <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('regionsPanelState',selectedParcellation == undefined)" [ngClass]="{inactive: selectedParcellation == undefined}">
+                <span *ngIf = "!selectedParcellation" class = "glyphicon glyphicon-chevron-right"></span>
+                <span *ngIf = "selectedParcellation" class = "glyphicon" [ngClass]="defaultPanelsState.regionsPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Regions <small *ngIf = "selectedParcellation && ( selectedParcellation.regions | selectTreePipe ).length>0">({{( selectedParcellation.regions | selectTreePipe ).length}})</small>
             </button>
             <div class = "list-group" *ngIf="selectedParcellation" [@panelExpansion]="defaultPanelsState.regionsPanelState">
@@ -107,14 +112,15 @@
                     </multilevel>
                 </div>
             </div>
-            <div class = "list-group" *ngIf="selectedParcellation && (selectedParcellation.regions | selectTreePipe).length > 0" [@panelExpansionExtra]="defaultPanelsState.regionsPanelState">
+            <div class = "list-group" *ngIf="selectedParcellation && (selectedParcellation.regions | selectTreePipe).length > 0" [@panelExpansion]="defaultPanelsState.regionsPanelState">
                 <div class = "multiSelectPills" *ngFor = "let region of (selectedParcellation.regions | selectTreePipe)">
                     {{region.name}}
                     <span class = "unicodeSymbols" (click) = "region.enabled = false">&times;</span>
                 </div>
             </div>
             <button *ngIf = "true" class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
-                Lab
+                    <span class = "glyphicon" [ngClass]="defaultPanelsState.labPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
+                    Plugins
             </button>
             <div *ngIf = "true" class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
                 <div class = "list-group-item nohover">
@@ -127,7 +133,7 @@
             </button>
         </div>
     </div>
-    <div id = "leftSideBottom" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
+    <div id = "leftSideBottom" class = " hidden leftSideSubSection" [ngClass]="{darktheme:darktheme}">
         <div [ngClass]="{darktheme:darktheme}" class = "btn-group">
             <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "off">Default Panel</label>
             <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "on">Advanced Panel</label>

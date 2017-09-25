@@ -273,8 +273,8 @@ export class NehubaViewerComponent implements OnDestroy{
 
       public mousehandler(mode:string,ev:any){
             this.mouseEventSubject.next({
-                  mode : mode,
-                  ev : ev
+                  target : mode,
+                  body : ev
             })
       }
 
