@@ -13,27 +13,44 @@ $GOLDEN : rgb(244,212,48);
 $DARKGOLDEN : rgb(200,160,0);
 $BORDERWIDTH : 2px;
 
-#ATLASContainer{
+#ATLASContainer
+{
     background-color:$WHITE;
     color:$BLACK;
     height:100%;
     width:100%;
     display:grid;
-    grid-template-columns:15% 85%;
+    grid-template-columns:250px 10px auto;
     grid-template-rows:25% 75%;
     
-    atlasbanner{
+    atlasbanner
+    {
         grid-column-start:1;
         grid-column-end:span 1;
         grid-row-start:1;
         grid-row-end:span 1;
     }
+
+    div#atlasResizeSliver
+    {
+        grid-column-start:2;
+        grid-column-end:span 1;
+        grid-row-start:1;
+        grid-row-end:span 2;
+        z-index:3;
+        &:hover
+        {
+            cursor:ew-resize;
+        }
+    }
     
-    atlascontrol{
+    atlascontrol
+    {
         grid-column-start:1;
         grid-column-end:span 1;
         grid-row-start:2;
         grid-row-end:span 1;
+        z-index:2;
         
         div#leftSide{
             height:100%;
@@ -58,7 +75,7 @@ $BORDERWIDTH : 2px;
     }
     
     ATLASViewer{
-        grid-column-start:2;
+        grid-column-start:3;
         grid-column-end:span 1;
         grid-row-start:1;
         grid-row-end:span 2;
@@ -109,6 +126,8 @@ $BORDERWIDTH : 2px;
 
 #ATLASContainer{
     atlascontrol{
+        width:110%;
+        padding-right:5%;
         box-shadow: -0.3em 0.3em 1em gray(0.1);
         margin-top:5px;
         div
@@ -147,8 +166,10 @@ atlasbanner{
             display:block;
             margin-left:auto;
             margin-right:auto;
-            margin-top:10%;
+            margin-top:auto;
+            margin-bottom:auto;
             width:90%;
+            height: 90%;
             background-size:contain;
         }
 
@@ -274,6 +295,131 @@ FloatingWidgetContainer{
                 }
             }
         }
+
+        &.darktheme
+        {
+            %widgetDarkTheme
+            {
+                border-color:gray(0.35);
+                color:gray(0.95);
+                background-color:gray(0.2)
+            }
+
+            .table
+            {
+                @extend %widgetDarkTheme;
+
+                tr
+                {
+                    @extend %widgetDarkTheme;
+                    td
+                    {
+                        @extend %widgetDarkTheme;
+                    }
+                }
+            }
+
+            div.panel.panel-default
+            {
+                div.panel-heading
+                {
+                    border-color:gray(0.35);
+                    color:gray(1.0);
+                    background-color:gray(0.25);
+                }
+            }
+            div.panel
+            {
+                @extend %widgetDarkTheme;
+                border:1px solid gray(0.35);
+                .panel-body
+                {
+                    border:none;
+                    @extend %widgetDarkTheme;
+                }
+                &.panel-success
+                {
+                    .btn.btn-block
+                    {
+                        border:1px solid rgba(214,233,198,0.5);
+                    }
+                }
+                &.panel-warning
+                {
+                    .btn.btn-block
+                    {
+                        border:1px solid rgba(250,235,204,0.5);
+                    }
+                }
+                &.panel-danger
+                {
+                    .btn.btn-block
+                    {
+                        border:1px solid rgba(235,204,209,0.5);
+                    }
+                }
+    
+            }
+
+            div.well
+            {
+                @extend %widgetDarkTheme;
+            }
+            .btn
+            {
+                @extend %widgetDarkTheme;
+                &.btn-primary
+                {
+                    background-color:gray(0.35);
+                }
+                &.btn-success
+                {
+                    border:1px solid rgba(214,233,198,0.5);
+                }
+                &.btn-warning
+                {
+                    border:1px solid rgba(250,235,204,0.5);
+                }
+                &.btn-danger
+                {
+                    border:1px solid rgba(235,204,209,0.5);
+                }
+                &:hover{
+                    background-color:gray(0.35);
+                }
+            }
+            input
+            {
+                @extend %widgetDarkTheme;
+            }
+            hr
+            {
+                border-top: 1px solid gray(0.3);
+            }
+            span
+            {
+                @extend %widgetDarkTheme;
+            }
+
+            .alert
+            {
+                border:none;
+                &.alert-danger
+                {
+                    background-color:rgba(242,222,222,0.2);
+                }
+            }
+            
+            .popover
+            {
+                @extend %widgetDarkTheme;
+                .popover-title
+                {
+                    @extend %widgetDarkTheme;
+                    background-color:gray(0.3);
+                }
+            }
+        }
     }
 }
 
@@ -281,6 +427,7 @@ atlascontrol
 {
     div#leftSide
     {
+        width:100%;
         div.leftSideSubSection#leftSideTop
         {
             background-color:$OFFWHITE;

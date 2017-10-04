@@ -2,6 +2,7 @@ import { NgZone,Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitt
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { NehubaFetchData,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
+import { SelectTreePipe } from './nehubaUI.util.pipes'
 import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 
 import { NehubaViewer } from 'nehuba/exports'
@@ -57,6 +58,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     selectedTemplate : TemplateDescriptor | undefined
     selectedParcellation : ParcellationDescriptor | undefined
+    regionsLabelIndexMap : Map<Number,RegionDescriptor> = new Map()
     selectedRegions : RegionDescriptor[] = [];
 
     //this is a temporary solution for collapsing menus
@@ -91,7 +93,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         })
 
         gExternalControl.viewControl
-            .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&(evPk.code==100||evPk.code==101||evPk.code==103))
+            .filter((evPk:EventPacket)=>(evPk.target=='loadTemplate'||'selectRegions')&&(evPk.code==100||evPk.code==101||evPk.code==103))
             .subscribe((evPk:EventPacket)=>{
                 switch(evPk.code){
                     case 100:{
@@ -112,8 +114,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                         nEvPk.code = 200
                         gExternalControl.viewControl.next(nEvPk)
 
-                        /* loadTemplate post hook */
-                        this.viewerObservables = window['nehubaViewer'].mouseOver.segment.subscribe(()=>{})
+                        /* loadTemplate post hook, in order to prevent subscribers shutting down after last user unsubscribed */
+                        this.viewerObservables = 
+                            window['nehubaViewer'].mouseOver.segment
+                                .merge(window['nehubaViewer'].navigationState.sliceZoom)
+                                .merge(window['nehubaViewer'].navigationState.perspectiveZoom)
+                                .subscribe(()=>{})
                     }break;
                 }
             })
@@ -147,6 +153,21 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                     evPk.body.reason = 'either body.templateDescriptor : TemplateDescriptor | Object or body.name : string needs to be defined.'
                     gExternalControl.viewControl.next( evPk )
                 }
+            })
+
+        gExternalControl.viewControl
+            .filter((evPk:EventPacket)=>evPk.target=='selectRegions'&&evPk.code==102)
+            .subscribe((evPk:EventPacket)=>{
+                /* first update the viewer */
+                window.nehubaViewer.getShownSegments().forEach((idx:Number)=>window.nehubaViewer.hideSegment(idx))
+                if(evPk.body.regions.length>0){
+                    evPk.body.regions.forEach((idx:number)=>window.nehubaViewer.showSegment(idx))
+                }else{
+                    window.nehubaViewer.showSegment(0)
+                }
+
+                /* then update the model */
+                this.updateRegionDescriptors(evPk.body.regions)
             })
     }
 
@@ -245,7 +266,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         let datasetArray = [
             'http://172.104.156.15/json/bigbrain',
             'http://172.104.156.15/json/colin',
-            'http://172.104.156.15/json/waxholm'
+            'http://172.104.156.15/json/waxholm',
+            'http://172.104.156.15/json/allanMouse'
         ]
 
         datasetArray.forEach(dataset=>{
@@ -294,6 +316,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
                     gExternalControl.metadata.template = this.selectedTemplate
 
+                    /* for the time being, parcellation is automatically chosen (?) TODO: there are current no usecase for single template with multiple parcellations.  */
+                    this.chooseParcellation(this.selectedTemplate.parcellations[0])
+
                     mEvPk.code = 103
                     gExternalControl.viewControl.next(mEvPk)
                     
@@ -316,11 +341,49 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
     }
 
+    refreshSelectedRegions(){
+        console.log('refresh regions')
+        const treePipe = new SelectTreePipe()
+        if(this.selectedParcellation){
+            gExternalControl.viewControl.next(new EventPacket('selectRegions','',100,
+            {regions:treePipe.transform(this.selectedParcellation.regions).map(region=>region.labelIndex)}))
+        }
+        
+    }
+
+    updateRegionDescriptors(labelIndices:Number[]){
+        labelIndices.forEach(idx=>{
+            const region = this.regionsLabelIndexMap.get(idx)
+            if(region) region.enabled = true
+        })
+    }
+
     chooseParcellation(parcellation:ParcellationDescriptor):void{
         if( this.selectedParcellation != parcellation ){
-            console.log(parcellation)
             this.selectedParcellation = parcellation
             this.selectedRegions = []
+
+            // this.selectedParcellation.regions.
+            const mapRegions = (regions:RegionDescriptor[])=>{
+                regions.forEach((region:RegionDescriptor)=>{
+                    if(region.labelIndex){
+                        this.regionsLabelIndexMap.set(region.labelIndex,region)
+                    }
+                    if(region.children){
+                        mapRegions(region.children)
+                    }
+                })
+            }
+            this.regionsLabelIndexMap.clear()
+            mapRegions(this.selectedParcellation.regions)
+
+            /* TODO: very hacky way to do this */
+            for (let key in window.nehubaViewer.config.dataset!.initialNgState.layers){
+                const layer = window.nehubaViewer.config.dataset!.initialNgState.layers[key]
+                if((<any>layer).type=='segmentation'&&(<any>layer).segments){
+                    this.updateRegionDescriptors((<any>layer).segments.map((str:string)=>Number(str)))
+                }
+            }
 
             gExternalControl.metadata.parcellation = this.selectedParcellation
         }

@@ -2,7 +2,7 @@ import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core';
 import { vec4 } from 'neuroglancer/util/geom'
 import { Config as NehubaConfig } from 'nehuba/exports'
-import { Subject } from 'rxjs/Rx'
+import { Subject,BehaviorSubject } from 'rxjs/Rx'
 
 import { TemplateDescriptor,RegionDescriptor,ParcellationDescriptor,EventPacket } from './nehuba.model'
 import { TIMEOUT } from './nehuba.config'
@@ -301,7 +301,7 @@ export class NehubaFetchData {
         return new Promise(resolve=>{
             Promise.all(promiseArray)
                 .then(values=>{
-                    console.log('new parcellation',json,values)
+                    // console.log('new parcellation',json,values)
                     let returnParcellation = new ParcellationDescriptor(json)
                     returnParcellation.properties = values[0]
                     returnParcellation.regions = values[1]
@@ -431,7 +431,7 @@ export class EventCenter{
 
     modalEventRelay : Subject<EventPacket> = new Subject()
     nehubaViewerRelay : Subject<EventPacket> = new Subject()
-    globalLayoutRelay : Subject<EventPacket> = new Subject()
+    globalLayoutRelay : BehaviorSubject<EventPacket> = new BehaviorSubject(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,{theme:'light'}))
 
     userViewerInteractRelay : Subject<EventPacket> = new Subject()
 

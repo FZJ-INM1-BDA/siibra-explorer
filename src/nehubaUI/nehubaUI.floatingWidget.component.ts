@@ -1,6 +1,6 @@
 import { NgZone,Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { EventCenter,HelperFunctions } from './nehubaUI.services'
+import { EventCenter,HelperFunctions,EVENTCENTER_CONST } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { Subject } from 'rxjs/Subject'
 import { Observable } from 'rxjs/Observable'
@@ -116,8 +116,6 @@ export class FloatingWidget implements OnInit{
                               }break;
                         }
                   })
-
-            
       }
 
       loadPresetShaderFloatingWidget(msg:EventPacket):Promise<string>{
@@ -232,23 +230,23 @@ export class FloatingWidget implements OnInit{
 
 @Component({
       template : `
-<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]="'-50px'" class = "floatingWidget">
+<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]="'-50px'" class = "floatingWidget" [ngClass]="{darktheme : darktheme}">
       <div class = "btn" [ngClass]="{'btn-success':successFlag,'btn-default':!successFlag}"
             [popoverTitle] = "data.title"
             [popover] = "popoverMessage ? popoverMessage : 'No messages.'"
             placement = "left"
             triggers = "mouseenter:mouseleave"
             >
-            <span *ngIf = "data.icon" [ngClass]="'glyphicon-'+data.icon" class = "glyphicon"></span>
-            <span *ngIf = "!data.icon">{{data.title.substring(0,1)}}</span>
+            <i *ngIf = "data.icon" [ngClass]="'glyphicon-'+data.icon" class = "glyphicon"></i>
+            <i *ngIf = "!data.icon">{{data.title.split('.')[data.title.split('.').length-1].substring(0,1)}}</i>
       </div>
 </div>
-<div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget">
-      <div [ngClass]="{'panel-default' : !reposition, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
+<div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget"  [ngClass]="{darktheme : darktheme}">
+      <div [ngClass]="{'panel-default' : !reposition && !successFlag, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
             <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
                   <i *ngIf = "data.icon" class = "glyphicon" [ngClass] = "'glyphicon-' + data.icon"></i> {{data.title.split('.')[data.title.split('.').length-1]}}
-                  <span (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></span>
-                  <span (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></span>
+                  <i (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></i>
+                  <i (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></i>
             </div>
             <div [innerHTML]="template" *ngIf = "template" class = "panel-body">
             </div>
@@ -311,8 +309,12 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
       successFlag : boolean = false
 
       minimised : boolean = false
+      darktheme : boolean  = false
 
-      constructor(public zone:NgZone){
+      constructor(
+            public zone:NgZone,
+            public eventCenter:EventCenter
+      ){
             this.controllerSubject = new Subject()
             const subscriptionHandler = this.controllerSubject.subscribe((evPk:EventPacket)=>{
                   if(evPk.body.blink){
@@ -338,6 +340,14 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface{
                   }
                   if( evPk.body.shutdown ){
                         subscriptionHandler.unsubscribe()
+                  }
+            })
+
+            this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
+                  switch(msg.target){
+                        case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME : {
+                              this.darktheme = msg.body.theme == 'dark'
+                        }break;
                   }
             })
       }

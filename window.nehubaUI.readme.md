@@ -86,10 +86,36 @@ The code gives an indication of the lifecycle of the load template event. Plugin
 200 : gracefully end of action
 500 : error, check body for reason
 ```
+---
+**initiating/listening to region selection**
+
+Description: Request /Listening to the (de)selection of regions.
+
+eventPacket gives an indication of the lifecycle of selecting regions
+
+```javascript
+const evPk = {
+      target : 'selectRegions',
+      id : '',
+      code: 100,
+      body : {
+            regions : [ /* regionindices as an array, or leave empty to hide every segments */ ]
+      }
+}
+window.nehubaUI.next(evPk)
+```
+The code gives an indication of the lifecycle of the load template event. Plugins can *both* listen to and initiate 100, but should only *listen* to 101, 102,103, 200 and 500. 
+```
+100 : request to load template initiated
+101 : pre action hook, unsubscribe observers etc
+102 : action hook
+103 : post action hook, resubscribe observers etc
+200 : gracefully end of action
+500 : error, check body for reason
+```
 
 ---
 **Listening to mouseEvents in viewer**
----
 
 window.nehubaUI.mouseEvent
 

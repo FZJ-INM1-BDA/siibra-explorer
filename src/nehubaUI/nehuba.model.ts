@@ -222,6 +222,7 @@ export class Multilevel{
             return this.isVisible
         }
     }
+    
 }
 
 export class RegionDescriptor extends Multilevel{

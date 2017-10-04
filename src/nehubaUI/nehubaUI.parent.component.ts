@@ -1,16 +1,20 @@
-import { Component,AfterViewInit } from '@angular/core'
+import { Component,HostListener,HostBinding,AfterViewInit } from '@angular/core'
 import { EventPacket } from './nehuba.model'
 import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 
 @Component({
     selector : '#ATLASContainer',
     template : `
+      <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="fetchedSomething($event)"></nehubaModal>
+  
       <atlasbanner>
       </atlasbanner>
 
       <atlascontrol (emitHideUI)="controlUI($event)">
       </atlascontrol>
-      <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '2','grid-column-end' : hideUI ? 'span 2' : 'span 1'}">
+      <div id = "atlasResizeSliver" (mousedown)="resize=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+      </div>
+      <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
       </ATLASViewer>
       <FloatingWidgetContainer>
       </FloatingWidgetContainer>
@@ -21,15 +25,36 @@ import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 export class NehubaContainer implements AfterViewInit {
   hideUI = false
   darktheme = false
+  resize = false
+  width = 250
+
+  @HostBinding('style.grid-template-columns')
+  gridTemplateColumns = `${this.width>150?this.width:150}px 10px auto`
 
   constructor(private eventCenter : EventCenter){
     this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
       switch(msg.target){
         case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-            this.darktheme = msg.body.theme == 'dark' 
+          this.darktheme = msg.body.theme == 'dark' 
         }break;
       }
     })
+  }
+
+  
+  @HostListener('document:mousemove',['$event'])
+  mousemove(ev:any){
+    if(!this.resize){
+          return
+    }
+    /* may break in chrome */
+    this.width = /*this.startwidth + this.startpos -*/ ev.clientX
+    this.gridTemplateColumns = `${this.width<150?150:this.width>450?450:this.width}px 10px auto`
+  }
+
+  @HostListener('document:mouseup',['$event'])
+  mouseup(){
+    this.resize = false
   }
 
   ngAfterViewInit(){

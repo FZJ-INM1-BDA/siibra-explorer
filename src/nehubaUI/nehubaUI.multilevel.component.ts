@@ -48,19 +48,18 @@ export class MultilevelSelector {
         //TODO: fix trans location when more regions have their index and id
         if( data.hasEnabledChildren() ){
             data.updateChildrenStatus('disable')
-            if (data.labelIndex){
-                this.eventCenter.nehubaViewerRelay.next(
-                    new EventPacket(
-                        EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.HIDE_SEGMENT,
-                        Date.now().toString(),
-                        100,
-                        {segID:data.labelIndex}
-                    ))
-                // this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index,mode:"hide"}))
-            }
+            // if (data.labelIndex){
+            //     this.eventCenter.nehubaViewerRelay.next(
+            //         new EventPacket(
+            //             EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.HIDE_SEGMENT,
+            //             Date.now().toString(),
+            //             100,
+            //             {segID:data.labelIndex}
+            //         ))
+            //     // this.eventCenter.segmentSelectionRelay.next(new EventPacket('segmentSelection',Date.now().toString(),100,{segID:data.label_index,mode:"hide"}))
+            // }
         }else{
             data.updateChildrenStatus('enable')
-            console.log(data)
             if (data.position){
                 this.eventCenter.nehubaViewerRelay.next(
                     new EventPacket(
@@ -70,15 +69,15 @@ export class MultilevelSelector {
                         {pos:data.position}
                     ))
             }
-            if (data.labelIndex){
-                this.eventCenter.nehubaViewerRelay.next(
-                    new EventPacket(
-                        EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT,
-                        Date.now().toString(),
-                        100,
-                        {segID:data.labelIndex}
-                    ))
-            }
+            // if (data.labelIndex){
+            //     this.eventCenter.nehubaViewerRelay.next(
+            //         new EventPacket(
+            //             EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT,
+            //             Date.now().toString(),
+            //             100,
+            //             {segID:data.labelIndex}
+            //         ))
+            // }
         }
     }
 

@@ -2,12 +2,6 @@ import { Component } from '@angular/core'
 import { EventCenter } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 
-declare var window:{
-      [key:string] : any
-      prototype : Window;
-      new() : Window;
-}
-
 @Component({
       selector : 'lab',
       template : `
@@ -23,6 +17,13 @@ declare var window:{
 })
 
 export class Lab {
+
+      advancedMode = {
+            name : "fzj.xg.advancedMode",
+            icon : "plus",
+            templateURL:"http://172.104.156.15/html/advancedMode",
+            scriptURL:"http://172.104.156.15/js/advancedMode"
+      }
 
       uix = {
             "name":"fzj.xg.uix",
@@ -68,7 +69,6 @@ export class Lab {
                   const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
                   newSubject.next(new EventPacket('lab','',100,param))
             }
-            window
       }
 
       showInputModal(){
