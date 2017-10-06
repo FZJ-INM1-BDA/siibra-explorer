@@ -163,20 +163,23 @@ atlasbanner{
         font-weight:100;
 
         %img{
-            display:block;
+            display:inline-block;
             margin-left:auto;
             margin-right:auto;
             margin-top:auto;
             margin-bottom:auto;
-            width:90%;
-            height: 90%;
-            background-size:contain;
+            max-width:90%;
+            max-height: 90%;
         }
 
-        img#hbplogo{
-            @extend %img;
-            margin-left:5%;
-            margin-top:20px;
+        #hbplogo{
+            margin-left:10%;
+            margin-right:10%;
+            width:80%;
+            height:100%;
+            background-size:contain;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         img#cofundedbyEU{

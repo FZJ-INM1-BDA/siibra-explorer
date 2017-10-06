@@ -1,70 +1,6 @@
 <div id = "leftSide">
     <div id = "leftSideTop" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
-        <div class = "modePanel" *ngIf = "enableAdvancedMode == 'on'" [ngClass]="{darktheme:darktheme}" >
-            <div *ngFor="let layer of listOfActiveLayers" (click) = "layer.subPanelShown = !layer.subPanelShown" class = "list-group">
-                <div class = "list-group-item">
-                    <span class = "list-group-item-icon unicodeSymbols" (click) = "layer.isShown = !layer.isShown;$event.stopPropagation() "  >
-                        <span *ngIf = "layer.isShown" class = "glyphicon glyphicon-eye-open"></span>
-                        <span *ngIf = "!layer.isShown" class = "glyphicon glyphicon-eye-close"></span>
-                    </span>
-                    <span [ngClass] = "{'text-muted' : !layer.isShown}" class = "list-group-item-name">
-                        {{layer.name}}
-                    </span>
-                    <span class = "list-group-item-icon unicodeSymbols" (click) = "layer.subPanelShown = !layer.subPanelShown;$event.stopPropagation()"  >
-                        <i *ngIf = "!layer.subPanelShown" class = "glyphicon glyphicon-chevron-left"></i>
-                        <i *ngIf = "layer.subPanelShown" class = "glyphicon glyphicon-chevron-down"></i>
-                    </span>
-                </div>
-                <div *ngIf = "layer.subPanelShown" (click)="$event.stopPropagation()"  class = "subPanel">
-                    <div class = "well row">
-                        <div class = "form-horizontal">
-                            <div class = "form-group">
-                                <label class = "col-md-4 control-label" >Opacity: {{layer.masterOpacity}}</label>
-                                <div class = "col-md-6 control-label" for = "masterOpacity">
-                                    <input [(ngModel)]="layer.masterOpacity" type = "range" max = "1" min = "0" step = "0.01">
-                                </div>
-                            </div>
-                        </div>
-                        <div class = "form-horizontal">
-                            <div class = "form-group">
-                                <label class = "col-md-4 control-label" >Type:</label>
-                                <div class = "col-md-6 control-label" for = "type">
-                                    <input class = "form-control" id = "type" name = "type" [(ngModel)]="layer.properties.type" type = "text">
-                                </div>
-                            </div>
-                        </div>
-                        <div class = "form-horizontal">
-                            <div class = "form-group">
-                                <label class = "col-md-4 control-label" >Source:</label>
-                                <div class = "col-md-6 control-label" for = "source">
-                                    <input class = "form-control" id = "source" name = "source" [(ngModel)]="layer.properties.source" type = "text">
-                                </div>
-                            </div>
-                        </div>
-                        <div class = "form-group">
-                            <label class = "control-label">Transformation: </label>
-                            <div class = "col-md-12">
-                                <textarea [ngModel]="layer.properties.transform | jsonStringifyPipe" class = "form-control"  >
-                                </textarea>
-                            </div>
-                        </div>
-                        <div class = "form-group">
-                            <label class = "control-label">Shader: <span (click)="loadPresetShader(layer)" class = "btn btn-link">presets</span></label>
-                            <div class = "col-md-12">
-                                <textarea [(ngModel)]="layer.properties.shader" class = "form-control"  >
-                                </textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class = "list-group">
-                <div (click) = "showInputModal('Layer')" class = "list-group-item flex-center">
-                    &#x2295; Add New Layer
-                </div>
-            </div>
-        </div>
-        <div class = "modePanel" *ngIf = "enableAdvancedMode == 'off'" [ngClass]="{darktheme : darktheme}">
+        <div class = "modePanel" [ngClass]="{darktheme : darktheme}">
             <button (click)="toggleDefaultPanel('templatesPanelState',false)" class = "btn btn-default btn-block btn-lg">
                 <span class = "glyphicon" [ngClass]="defaultPanelsState.templatesPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Templates <small *ngIf = "selectedTemplate">({{selectedTemplate.name}})</small>
@@ -129,12 +65,6 @@
             <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
                 Navigation
             </button>
-        </div>
-    </div>
-    <div id = "leftSideBottom" class = " hidden leftSideSubSection" [ngClass]="{darktheme:darktheme}">
-        <div [ngClass]="{darktheme:darktheme}" class = "btn-group">
-            <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "off">Default Panel</label>
-            <label class = "btn btn-default" [(ngModel)]="enableAdvancedMode" btnRadio = "on">Advanced Panel</label>
         </div>
     </div>
 </div>

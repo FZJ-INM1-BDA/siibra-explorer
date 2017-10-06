@@ -242,16 +242,17 @@ export class NehubaModal{
                     })
             }break;
             case 'parcellation':{
-                this.inputResponse += 'Adding new Parcellation.'
-                this.nehubaFetchData.parseParcellationData(json)
-                    .then(parcellation =>{
-                        this.fetchedOutputToController(parcellation)
-                    })
-                    .catch( e=>{
-                        this.inputResponse += 'Error.'
-                        this.inputResponse += e.toString()
-                        console.log(e)
-                    })
+                // TODO figure out how to parse parcellation
+                // this.inputResponse += 'Adding new Parcellation.'
+                // this.nehubaFetchData.parseParcellationData(json)
+                //     .then(parcellation =>{
+                //         this.fetchedOutputToController(parcellation)
+                //     })
+                //     .catch( e=>{
+                //         this.inputResponse += 'Error.'
+                //         this.inputResponse += e.toString()
+                //         console.log(e)
+                //     })
             }break;
             case 'plugin':{
                 /* some sort of validation process? */

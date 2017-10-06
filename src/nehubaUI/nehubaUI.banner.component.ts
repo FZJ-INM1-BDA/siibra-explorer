@@ -10,8 +10,8 @@ import { EventPacket } from './nehuba.model'
 export class NehubaBanner {
     darktheme : boolean
 
-    hbpimg : string = 'src/assets/images/HBP_AtlasViewer_light.svg'
-    hbpimgdark : string = 'src/assets/images/HBP_AtlasViewer_dark.svg'
+    hbpimg : string = 'src/assets/images/HBP_Primary_RGB_BlackText.png'
+    hbpimgdark : string = 'src/assets/images/HBP_Primary_RGB_WhiteText.png'
 
     exploreimg : string = 'src/assets/images/exploreTheBrain.png'
     exploreimgdark : string = 'src/assets/images/exploreTheBrain.png'
@@ -27,5 +27,9 @@ export class NehubaBanner {
                 }break;
             }
         })
+    }
+
+    parseSrcToBGUrl(str:string){
+        return `url('${str}')`
     }
 }

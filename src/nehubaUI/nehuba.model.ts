@@ -102,11 +102,30 @@ export class Property{
 
 export class TemplateDescriptor {
     constructor(json:any){
+
         this.name = json.name ? json.name : 'Untitled Template'
         this.useTheme = json.useTheme ? json.useTheme : 'light'
-        this.parcellations = []
-        this.properties = []
+        this.properties = json.properties ? json.properties : []
         this.nehubaId = json.nehubaId ? json.nehubaId : ''
+
+        this.parcellations = json.parcellations && json.parcellations.constructor.name == 'Array' ? json.parcellations.map((json:any)=>new ParcellationDescriptor(json)) : [];
+        
+        (new Promise((resolve,reject)=>{
+            json.nehubaConfig ? 
+                resolve(json.nehubaConfig) : 
+                json.nehubaConfigURL ? 
+                    fetch(json.nehubaConfigURL)
+                        .then(res=>res.json())
+                        .then(json=>resolve(json))
+                        .catch(e=>reject(e)) :
+                reject('no nehuba config URL')
+        }))
+            .then(nehubaConfig=>{
+                this.nehubaConfig = nehubaConfig
+            })
+            .catch(e=>{
+                console.log('constructing template error',e)
+            })
     }
     name : string;
     useTheme : string;
@@ -115,21 +134,20 @@ export class TemplateDescriptor {
     nehubaId : string;
     
     nehubaConfig : Nehubaconfig;
-
 }
 
 export class ParcellationDescriptor {
     constructor(json:any){
         this.name = json.name
-        this.nehubaId = json.nehubaId ? json.nehubaId : ''
-        this.regions = []
-        this.properties = []
+        this.ngId = json.ngId ? json.ngId : ''
+        this.regions = json.regions ? json.regions.map((region:any)=>new RegionDescriptor(region,0)) : []
+        this.properties = json.properties ? json.properties : []
     }
     regions : RegionDescriptor[];
     name : string;
     getUrl : string;
     properties : any;
-    nehubaId : string;
+    ngId : string;
 
     isShown : boolean = true;
     masterOpacity : number = 1.00;
@@ -227,10 +245,15 @@ export class Multilevel{
 
 export class RegionDescriptor extends Multilevel{
 
-    constructor(name:string){
+    constructor(json:any,hierachy:number){
         super()
-        this.name = name
-        this.properties = []
+        this.name = json.name
+        this.properties = json.properties ? json.properties : []
+        this.labelIndex = json.labelIndex ? json.labelIndex : null
+        this.hierarchy = hierachy
+        this.PMapURL = json.PMapURL ? json.PMapURL : null
+        this.position = json.position ? json.position : null
+        this.children = json.children && json.children.constructor.name == 'Array' ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
     }
 
     children : RegionDescriptor[] = []

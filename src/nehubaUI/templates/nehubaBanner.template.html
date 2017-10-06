@@ -1,5 +1,6 @@
-<div [ngClass]="{darktheme : darktheme}" id = "bannerContainer">
-    <img id = "hbplogo" src = "{{ !darktheme ? hbpimg : hbpimgdark}}" />
+<div [ngClass]="{darktheme : darktheme}" id = "bannerContainer" >
+    <div id = "hbplogo" [ngStyle]="{'background-image':parseSrcToBGUrl( darktheme ? hbpimgdark : hbpimg )}" >
+    </div>
     <img *ngIf = "false" id = "explorethebrain" src = "{{ !darktheme ? exploreimg : exploreimgdark}}" />
     <img *ngIf = "false" id = "fundedbyeu" src = "{{ !darktheme ? euimg : euimgdark}}"  id = "cofundedbyEU">
 </div>
