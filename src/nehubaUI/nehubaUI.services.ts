@@ -206,13 +206,13 @@ export const EVENTCENTER_CONST = {
 export const NEHUBAUI_CONSTANTS = {
     toolmode : {
         JuGeX : {
-            "UIConfigURL":"http://172.104.156.15/json/colin",
+            "UIConfigURL":"http://localhost:81/json/colinFull.json",
             "plugins":[
                   {
                         "name":"JuGeX",
                         "type":"plugin",
-                        "templateURL":"http://172.104.156.15/html/jugex.template",
-                        "scriptURL":"http://172.104.156.15/js/jugex.script"
+                        "templateURL":"http://localhost:81/plugins/jugex/jugex.template.html",
+                        "scriptURL":"http://localhost:81/plugins/jugex/jugex.script.html"
                   }
             ]
         }

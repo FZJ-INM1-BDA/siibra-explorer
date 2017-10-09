@@ -165,7 +165,7 @@ export class NehubaViewerInnerContainer implements OnInit{
                                                             "_activeCell" : true,
                                                             "_elementTagName" : "img",
                                                             "_class" : "col-md-12",
-                                                            "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
+                                                            "_src" : "http://localhost:81/colormaps/MATLAB_hot.png"
                                                       },{
                                                             "Encoded Value":
                                                                   {
