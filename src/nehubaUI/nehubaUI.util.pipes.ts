@@ -109,7 +109,10 @@ export class SearchHighlight implements PipeTransform{
     constructor(private sanitizer:DomSanitizer){}
 
     public transform(string : string,searchTerm:string,singleData:any){
-        if( searchTerm == '' ){
+        if( !string ){
+            return null
+        }
+        if( searchTerm || searchTerm == '' ){
             return string
         }else{
             let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')

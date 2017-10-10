@@ -294,7 +294,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
         let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
         
-        let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... TODO: currently this modal closes after 3 seconds. In the future, this behaviour should changed so that when the template finishes loading, this modal closes automatically.'})
+        let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... '})
         curtainModalSubject.next(eventPacket)
         curtainModalSubject.subscribe((evPk:EventPacket)=>{
             switch(evPk.code){

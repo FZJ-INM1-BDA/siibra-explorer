@@ -1,11 +1,12 @@
-import { Component,HostListener,HostBinding,AfterViewInit } from '@angular/core'
+import { Component,ViewChild ,HostListener,HostBinding,AfterViewInit } from '@angular/core'
 import { EventPacket } from './nehuba.model'
 import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
+import { NehubaUIControl } from './nehubaUI.control.component'
 
 @Component({
     selector : '#ATLASContainer',
     template : `
-      <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="fetchedSomething($event)"></nehubaModal>
+      <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="nehubaUI.fetchedSomething($event)"></nehubaModal>
   
       <atlasbanner>
       </atlasbanner>
@@ -27,6 +28,7 @@ export class NehubaContainer implements AfterViewInit {
   darktheme = false
   resize = false
   width = 250
+  @ViewChild(NehubaUIControl) nehubaUI:NehubaUIControl 
 
   @HostBinding('style.grid-template-columns')
   gridTemplateColumns = `${this.width>150?this.width:150}px 10px auto`

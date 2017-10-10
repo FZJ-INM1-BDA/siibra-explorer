@@ -146,7 +146,7 @@ export class NehubaViewerInnerContainer implements OnInit{
       pMapFloatingWidget : Subject<EventPacket>
       loadPMap(msg:EventPacket){
             let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
-            curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url + ' This modal current is dismissed after 3 seconds. In the future, it should dismiss automatically when the PMap is loaded.'}))
+            curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url }))
             curtainModalSubject.subscribe((evPk:EventPacket)=>{
                   switch (evPk.code){
                         case 101:{
@@ -267,6 +267,7 @@ export class NehubaViewerComponent implements OnDestroy{
             this.onDestroyUnsubscribe.forEach((subscription:any)=>{
                   subscription.unsubscribe()
             })
+            this.nehubaViewer.dispose()
             window['nehubaViewer'] = null
             window['nehubaUI']['mouseEvent'] = null
       }
