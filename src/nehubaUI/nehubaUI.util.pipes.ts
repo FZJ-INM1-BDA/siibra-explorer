@@ -141,10 +141,9 @@ export class SelectTreePipe implements PipeTransform{
 
     private iterate(array:any[]){
         array.forEach(item=>{
-            if(item.children.length>0){
+            if( item.enabled && item.labelIndex ) this.returnArray.push( item ) 
+            if( item.children && item.children.length>0){
                 this.iterate(item.children)
-            }else{
-                item.enabled ? this.returnArray.push( item ) : {}
             }
         })
     }
