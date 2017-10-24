@@ -263,10 +263,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
         /* this will need to come from elsewhere eventually */
         let datasetArray = [
-            'http://172.104.156.15/json/experimental/bigbrain',
-            'http://172.104.156.15/json/experimental/colin',
-            'http://172.104.156.15/json/experimental/waxholm',
-            'http://172.104.156.15/json/experimental/allanMouse'
+            'http://localhost:81/json/bigbrain.json',
+            'http://localhost:81/json/colin.json',
+            'http://localhost:81/json/waxholm.json',
+            'http://localhost:81/json/allanMouse.json'
         ]
 
         datasetArray.forEach(dataset=>{
@@ -294,7 +294,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
         let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
         
-        let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... TODO: currently this modal closes after 3 seconds. In the future, this behaviour should changed so that when the template finishes loading, this modal closes automatically.'})
+        let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... '})
         curtainModalSubject.next(eventPacket)
         curtainModalSubject.subscribe((evPk:EventPacket)=>{
             switch(evPk.code){

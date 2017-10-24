@@ -21,36 +21,36 @@ export class Lab {
       advancedMode = {
             name : "fzj.xg.advancedMode",
             icon : "plus",
-            templateURL:"http://172.104.156.15/html/advancedMode",
-            scriptURL:"http://172.104.156.15/js/advancedMode"
+            templateURL:"http://localhost:81/html/advancedMode.html",
+            scriptURL:"http://localhost:81/js/advancedMode.js"
       }
 
       uix = {
             "name":"fzj.xg.uix",
             "icon":"screenshot",
             "type":"plugin",
-            "templateURL":"http://172.104.156.15/html/nehuba_ui_extension",
-            "scriptURL":"http://172.104.156.15/js/nehuba_ui_extension"
+            "templateURL":"http://localhost:81/html/nehuba_ui_extension.html",
+            "scriptURL":"http://localhost:81/js/nehuba_ui_extension.js"
       }
 
       jugex = {
             name : 'fzj.xg.jugex',
-            templateURL:'http://172.104.156.15/html/jugex.template',
-            scriptURL : 'http://172.104.156.15/js/jugex.script'
+            templateURL:'http://localhost:81/html/jugex.template.html',
+            scriptURL : 'http://localhost:81/js/jugex.script.js'
       }
 
       papayaX = {
             "name":"fzj.xg.papayaX",
             "icon":"info-sign",
             "type":"plugin",
-            "templateURL":"http://172.104.156.15/html/papayaX",
-            "scriptURL":"http://172.104.156.15/js/papayaX"
+            "templateURL":"http://localhost:81/html/papayaX.html",
+            "scriptURL":"http://localhost:81/js/papayaX.js"
       }
 
       screenSaver = {
             "name":"fzj.xg.screenSaver",
-            "templateURL":"http://172.104.156.15/html/screenSaver",
-            "scriptURL":"http://172.104.156.15/js/screenSaver"
+            "templateURL":"http://localhost:81/html/screenSaver.html",
+            "scriptURL":"http://localhost:81/js/screenSaver.js"
       }
 
       constructor(private eventCenter:EventCenter){

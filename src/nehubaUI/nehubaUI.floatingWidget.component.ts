@@ -417,7 +417,7 @@ export interface FloatingWidgetInterface{
 const PRESET_COLOR_MAPS = [
       {
             name : 'MATLAB_autumn',
-            previewurl : "http://172.104.156.15:8080/colormaps/MATLAB_autumn.png",
+            previewurl : "http://localhost:81/colormaps/MATLAB_autumn.png",
             code : `
 vec4 colormap(float x) {
     float g = clamp(x, 0.0, 1.0);
@@ -427,7 +427,7 @@ vec4 colormap(float x) {
       },
        {
             name : 'MATLAB_bone',
-            previewurl : 'http://172.104.156.15:8080/colormaps/MATLAB_bone.png',
+            previewurl : 'http://localhost:81/colormaps/MATLAB_bone.png',
             code : `
 float colormap_red(float x) {
     if (x < 0.75) {
