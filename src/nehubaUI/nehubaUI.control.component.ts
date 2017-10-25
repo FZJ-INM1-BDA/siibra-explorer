@@ -5,8 +5,6 @@ import { Lab } from './nehubaUI.lab.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
 import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 
-import { NehubaViewer } from 'nehuba/exports'
-
 declare var window:{
     [key:string] : any
     prototype : Window;
@@ -46,7 +44,6 @@ declare var window:{
 export class NehubaUIControl implements OnInit,AfterViewInit{
 
     @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
-    @Input() nehubaViewer : NehubaViewer
     @Input() searchTerm : String = ''
     @ViewChild(Lab) labComponent : Lab
     darktheme : boolean = false

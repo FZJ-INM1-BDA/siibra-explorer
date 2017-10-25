@@ -33,7 +33,6 @@ export class NehubaViewerDirective{
 export class NehubaViewerInnerContainer implements OnInit{
 
       @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
-      nehubaViewer : NehubaViewer
       nehubaViewerComponent : NehubaViewerComponent
       componentRef : ComponentRef<any>
       viewContainerRef : ViewContainerRef
@@ -49,7 +48,7 @@ export class NehubaViewerInnerContainer implements OnInit{
             gExternalControl.viewControl
                   .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==101)
                   .subscribe((_evPk:EventPacket)=>{
-                        this.nehubaViewer.clearCustomSegmentColors()
+                        this.nehubaViewerComponent.nehubaViewer.clearCustomSegmentColors()
                   })
 
             /* this maybecome obsolete */

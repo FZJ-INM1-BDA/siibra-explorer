@@ -1,6 +1,7 @@
-import { Component,Input,EventEmitter,Output } from '@angular/core'
+import { Component,ViewChild,Input,EventEmitter,Output } from '@angular/core'
 import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
+import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 
 @Component({
     selector : 'ATLASViewer',
@@ -19,6 +20,7 @@ export class NehubaViewerContainer {
     darktheme : boolean
     @Input() hideUI : boolean = false
     @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
+    @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
     constructor(private eventCenter : EventCenter){
         this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
@@ -28,8 +30,6 @@ export class NehubaViewerContainer {
                 }break;
             }
         })
-
-        gExternalControl
     }
 
     mouseEventHandler(mode:string,ev:any){
@@ -38,6 +38,9 @@ export class NehubaViewerContainer {
 
     toggleHideUI(){
         this.emitHideUI.emit({hideUI:!this.hideUI})
+        if( this.nehubaViewerInnerContainer && this.nehubaViewerInnerContainer.nehubaViewerComponent ){
+            this.nehubaViewerInnerContainer.nehubaViewerComponent.nehubaViewer.redraw()
+        }
     }
 
     mousemove(event:any){
