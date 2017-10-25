@@ -14,54 +14,14 @@
  * limitations under the License.
  */
 
-// import {makeExtraKeyBindings} from 'my-neuroglancer-project/extra_key_bindings';
-// import {navigateToOrigin} from 'my-neuroglancer-project/navigate_to_origin';
-// import {setupDefaultViewer} from 'neuroglancer/ui/default_viewer_setup';
+import 'zone.js';
+import 'reflect-metadata';
 
-/* IGNOREERROR */
-import { createNehubaViewer } from 'nehuba/exports'
-import { NehubaViewer } from 'nehuba/NehubaViewer'
-// import { vec4 } from 'neuroglancer/util/geom'
-import { BigBrain,JuBrain } from './dataset/datasetConfig'
+import { NehubaUI } from 'nehubaUI/nehubaUI.module';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { enableProdMode } from '@angular/core'
+import 'nehubaUI/templates/sass/theme.scss'
 
-var nehubaViewer:NehubaViewer
+enableProdMode();
 
-window.addEventListener('DOMContentLoaded', () => {
-    let nehubaConfig = BigBrain
-    // let container = document.getElementById('c')
-    nehubaViewer = createNehubaViewer(nehubaConfig)
-    nehubaViewer.disableSegmentSelectionForLoadedLayers()
-    
-    let button0 = document.getElementById('testButton0')
-    button0!.addEventListener('click',()=>{
-      nehubaViewer.config = BigBrain
-      nehubaViewer.relayout()
-      nehubaViewer.applyInitialNgState()
-      nehubaViewer.disableSegmentSelectionForLoadedLayers()
-    })
-    let button1 = document.getElementById('testButton1')
-    button1!.addEventListener('click',()=>{
-      nehubaViewer.config = JuBrain
-      nehubaViewer.relayout()
-      
-      nehubaViewer.applyInitialNgState()
-    })
-
-    let button2 = document.getElementById('testButton2')
-    button2!.addEventListener('click',()=>{
-      
-      // nehubaViewer.dispose()
-
-      // let parent = container!.parentNode!
-      // parent.removeChild(container!)
-      // container = document.createElement('div')
-      // container.id = 'container'
-      // parent.appendChild(container)
-    })
-
-    let button3 = document.getElementById('testButton3')
-    button3!.addEventListener('click',()=>{
-       nehubaViewer
-    })
-});
-
+platformBrowserDynamic().bootstrapModule(NehubaUI);

@@ -1,0 +1,70 @@
+<div id = "leftSide">
+    <div id = "leftSideTop" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
+        <div class = "modePanel" [ngClass]="{darktheme : darktheme}">
+            <button (click)="toggleDefaultPanel('templatesPanelState',false)" class = "btn btn-default btn-block btn-lg">
+                <span class = "glyphicon" [ngClass]="defaultPanelsState.templatesPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
+                Templates <small *ngIf = "selectedTemplate">({{selectedTemplate.name}})</small>
+            </button>
+            <div class = "list-group" *ngIf="fetchedTemplatesData" [@panelExpansion]="defaultPanelsState.templatesPanelState" >
+                <div *ngFor = "let template of fetchedTemplatesData.templates" (click)="chooseTemplate(template)" class = "list-group-item" [ngClass]="{active : template === selectedTemplate}" >
+                    <span class = "list-group-item-name">
+                        {{template.name}}
+                    </span>
+                    <span *ngIf = "!(template.properties | isEmpty)" class = "list-group-item-icon" (click) = "showMoreInfo(template);$event.stopPropagation()"  >
+                        <i class = "glyphicon glyphicon-info-sign"></i>
+                    </span>
+                </div>
+            </div>
+            <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('parcellationsPanelState',selectedTemplate == undefined)" [ngClass]="{inactive: selectedTemplate == undefined}">
+                <span *ngIf = "!selectedTemplate" class = "glyphicon glyphicon-chevron-right"></span>
+                <span *ngIf = "selectedTemplate" class = "glyphicon" [ngClass]="defaultPanelsState.parcellationsPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
+                Parcellations <small *ngIf = "selectedParcellation">({{selectedParcellation.name}})</small>
+            </button>
+            <div class = "list-group" *ngIf="selectedTemplate" [@panelExpansion]="defaultPanelsState.parcellationsPanelState" >
+                <div *ngFor = "let parcellation of selectedTemplate.parcellations">
+                    <div (click)="chooseParcellation(parcellation)" class = "list-group-item" [ngClass]="{active : parcellation == selectedParcellation} " >
+                        <span [ngClass] = "{'text-muted' : !parcellation.isShown}" class = "list-group-item-name">
+                            {{ parcellation.name }}   
+                        </span>
+                        <span *ngIf = "!(parcellation.properties | isEmpty)" class = "list-group-item-icon unicodeSymbols" (click) = "showMoreInfo(parcellation);$event.stopPropagation()"  >
+                            <i class = "glyphicon glyphicon-info-sign"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <button class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('regionsPanelState',selectedParcellation == undefined)" [ngClass]="{inactive: selectedParcellation == undefined}">
+                <span *ngIf = "!selectedParcellation" class = "glyphicon glyphicon-chevron-right"></span>
+                <span *ngIf = "selectedParcellation" class = "glyphicon" [ngClass]="defaultPanelsState.regionsPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
+                Regions <small *ngIf = "selectedParcellation && ( selectedParcellation.regions | selectTreePipe ).length>0">({{( selectedParcellation.regions | selectTreePipe ).length}})</small>
+            </button>
+            <div class = "list-group" *ngIf="selectedParcellation" [@panelExpansion]="defaultPanelsState.regionsPanelState">
+                <div class = "list-group-item nohover">
+                    <input class = "form-control" placeholder = "Search regions ... " [(ngModel)]="searchTerm" name = "searchRegionInput" #ctrl="ngModel">
+                </div>
+                <div (click)="refreshSelectedRegions()" class = "list-group-item nohover">
+                    <multilevel class = "menuItemContentText" [data]="selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
+                    </multilevel>
+                </div>
+            </div>
+            <div (click)="refreshSelectedRegions()" class = "list-group" *ngIf="selectedParcellation && (selectedParcellation.regions | selectTreePipe).length > 0" [@panelExpansion]="defaultPanelsState.regionsPanelState">
+                <div class = "multiSelectPills" *ngFor = "let region of (selectedParcellation.regions | selectTreePipe)">
+                    {{region.name}}
+                    <span class = "unicodeSymbols" (click) = "region.enabled = false">&times;</span>
+                </div>
+            </div>
+            <button *ngIf = "true" class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
+                    <span class = "glyphicon" [ngClass]="defaultPanelsState.labPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
+                    Plugins
+            </button>
+            <div *ngIf = "true" class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
+                <div class = "list-group-item nohover">
+                    <lab>
+                    </lab>
+                </div>
+            </div>
+            <button *ngIf = "false" class = "btn btn-default btn-block btn-lg" (click) = "toggleDefaultPanel('navigationPanelState')">
+                Navigation
+            </button>
+        </div>
+    </div>
+</div>
