@@ -263,10 +263,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
         /* this will need to come from elsewhere eventually */
         let datasetArray = [
-            'http://localhost:81/json/bigbrain.json',
-            'http://localhost:81/json/colin.json',
-            'http://localhost:81/json/waxholm.json',
-            'http://localhost:81/json/allanMouse.json'
+            'http://172.104.156.15/json/bigbrain',
+            'http://172.104.156.15/json/colin',
+            'http://172.104.156.15/json/waxholm',
+            'http://172.104.156.15/json/allanMouse'
         ]
 
         datasetArray.forEach(dataset=>{
@@ -372,7 +372,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
                 window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
             })
-            window.viewer.layerManager.getLayerByName( this.selectedParcellation.ngId ).setVisible(true)
+            setTimeout(()=>{
+                window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
+            })
 
             this.updateRegionDescriptors( window.nehubaViewer.getShownSegments({name:this.selectedParcellation.ngId}) )
 
