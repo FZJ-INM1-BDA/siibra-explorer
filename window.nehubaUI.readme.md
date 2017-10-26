@@ -1,10 +1,67 @@
 Guidelines for using **window.nehubaUI** Object
 ======
-*window.nehubaUI.metadata* is an object that contains all the metadata currently loaded.
+Overview
 ---
-TODO: flesh out the metadata that is available
+* window
+  * nehubaUI
+    * metadata
+      * template : Object describing the selected template.
+      * parcellation : Object describing the selected parcellation
+      * regions : Array of Objects describing the selected regions
+    * viewControl : rxjs Subject. For a complete list of APIs of eventstreams, visit http://reactivex.io/rxjs/class/es6/Subject.js~Subject.html
+      * filter() : filter the event stream (to avoid if/switch blocks )
+      ```javascript
+      window.nehubaUI.viewControl.filter((data)=>{
+            return data.target === 'loadTemplate'
+      }) /* returns an eventStream */
+      ```
+      * subscribe() : listens to events caused by user (loading a template, selecting regions)
+
+      ```javascript
+      const subscriber = window.nehubaUI.viewControl
+            .subscribe((data)=>{
+                  data.target = 'loadTemplate' | 'selectRegions' 
+                  /* intention of the event packet */
+                  data.code : 100 | 101 | 102 | 103 | 200 | 500
+                  /* lifecycle 
+                  100 : initiation of the intention
+                  101 : pre-action hook
+                  102 : action
+                  103 : post-action hook
+                  200 : ends gracefully
+                  500 : error 
+                  */
+            })
+      ```
+
+      * next () : initiate action (such as load a different template, select different regions)
+      ```javascript
+      window.nehubaUI.viewControl
+            .next({
+                  target = 'loadTemplate' | 'selectRegions',
+                  /* intention of the event packet */
+                  code : 100 
+                  /* lifecycle 
+                  100 : initiation of the intention
+                  */
+            })
+      ```
+    * mouseEvent : rxjs Subject ( TODO change to Observable )
+      * subscribe () : listening to user interactions on the viewer canvas
+      
+      ```javascript
+      /* example  */
+      const subscriber = window.nehubaUI.mouseEvent
+            .filter(data=>data.target==='mousedown')
+            /* filters the eventStream such that only event with {target:'mousedown'} goes through */
+            .subscribe((data)=>{
+                  console.log(data.body)
+                  /* logs all events that gets to this stage */
+            })
+      ```
 
 ---
+
 *window.nehubaUI.viewControl* is a rxjs Subject.
 ---
 ```javascript

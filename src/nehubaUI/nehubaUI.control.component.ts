@@ -341,9 +341,13 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     updateRegionDescriptors(labelIndices:Number[]){
+        gExternalControl.metadata.regions = []
         labelIndices.forEach(idx=>{
             const region = this.regionsLabelIndexMap.get(idx)
-            if(region) region.enabled = true
+            if(region) {
+                region.enabled = true
+                gExternalControl.metadata.regions.push(region)
+            }
         })
     }
 

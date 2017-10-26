@@ -3,6 +3,7 @@ import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } fr
 import { EventPacket } from './nehuba.model'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 
+
 @Component({
     selector : 'ATLASViewer',
     template : `

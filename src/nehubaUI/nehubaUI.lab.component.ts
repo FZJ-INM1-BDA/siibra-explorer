@@ -53,11 +53,18 @@ export class Lab {
             "scriptURL":"http://172.104.156.15/js/screenSaver"
       }
 
+      builder = {
+            "name":"fzj.xg.pluginBuilder",
+            "icon":"console",
+            "templateURL":"http://172.104.156.15/html/pluginBuilder",
+            "scriptURL":"http://172.104.156.15/js/pluginBuilder"
+      }
+
       constructor(private eventCenter:EventCenter){
             
       }
 
-      plugins = [this.uix,this.screenSaver,this.jugex,this.papayaX]
+      plugins = [this.uix,this.screenSaver,this.jugex,this.papayaX,this.builder]
 
       appendPlugin(param:any){
             this.plugins.push(param)
