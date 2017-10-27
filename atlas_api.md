@@ -36,6 +36,7 @@ Overview
       ```
 
       * next () : initiate action (such as load a different template, select different regions)
+      
       ```javascript
       window.nehubaUI.viewControl
             .next({
