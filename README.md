@@ -1,3 +1,3 @@
 NehubaUI
 ======
-To develop plugins [see plugin_api.md](/plugin_api.md)
+To develop plugins [see develop_plugin.md](/develop_plugin.md)
