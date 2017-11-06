@@ -155,7 +155,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             .filter((evPk:EventPacket)=>evPk.target=='selectRegions'&&evPk.code==102)
             .subscribe((evPk:EventPacket)=>{
                 /* first update the viewer */
-                window.nehubaViewer.getShownSegments({name:this.selectedParcellation!.ngId}).forEach((idx:Number)=>window.nehubaViewer.hideSegment(idx,{name:this.selectedParcellation!.ngId}))
+                window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).forEach((idx:Number)=>window.nehubaViewer.hideSegment(idx,{name:this.selectedParcellation!.ngId}))
                 if(evPk.body.regions.length>0){
                     evPk.body.regions.forEach((idx:number)=>{if(idx)window.nehubaViewer.showSegment(idx,{name:this.selectedParcellation!.ngId})})
                 }else{
@@ -377,7 +377,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
                 window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
             })
 
-            this.updateRegionDescriptors( window.nehubaViewer.getShownSegments({name:this.selectedParcellation.ngId}) )
+            this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation.ngId}) )
 
             /* populate the metadata object */
             gExternalControl.metadata.parcellation = this.selectedParcellation

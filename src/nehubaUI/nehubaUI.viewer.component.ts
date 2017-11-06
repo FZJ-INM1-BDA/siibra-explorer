@@ -337,7 +337,7 @@ export class NehubaViewerComponent implements OnDestroy{
       }
 
       public allSeg(show:boolean){
-            this.nehubaViewer.getShownSegments().forEach(segID => {
+            this.nehubaViewer.getShownSegmentsNow().forEach(segID => {
                   this.nehubaViewer.hideSegment(segID)
             })
             if( !show ) {
