@@ -548,35 +548,6 @@ atlascontrol
                             }
                         }
                     };
-
-
-                    // .multiSelectPills
-                    // {
-                    //     display:inline-block;
-                    //     padding:0.2em 0.4em;
-                    //     border-radius: 0.4em;
-                    //     margin-left:0.2em;
-                    //     margin-right:0.2em;
-                    //     margin-bottom:0.1em;
-                    //     color:gray(0.2);
-                    //     background-color: gray(0.98);
-                    //     box-shadow:0 0 1em -0.5em gray(0.5);
-
-                    //     &:first-child
-                    //     {
-                    //         margin-top:10px;
-                    //     }
-
-                    //     &:last-child
-                    //     {
-                    //         margin-bottom:10px;
-                    //     }
-
-                    //     &:hover
-                    //     {
-                    //         cursor:default;
-                    //     }
-                    // };
                     
                     span.unicodeSymbols
                     {
@@ -664,15 +635,6 @@ atlascontrol
                             &:hover
                             {
                                 cursor:default;
-                            }
-
-                            .menuItemContentList
-                            {
-
-                                // &:hover
-                                // {
-                                //     background-color:gray(0.2);
-                                // }
                             }
                         };
                         lab
@@ -817,20 +779,6 @@ div.darktheme
             display:block;
             padding:0em;
             
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#fff;*/
-
-            &:hover
-            {
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#cacaca;*/
-            };
-
-            
             div.menuItemTitle
             {
                 width:100%;
@@ -872,12 +820,6 @@ div.darktheme
                 div.menuItemContentList
                 {
                     color : gray(0.85);
-                    // &:hover
-                    // {
-                    //     color:gray(0.85);
-                    //     background-color:tgray(1.0,0.08);
-                    //     cursor:pointer;
-                    // };
 
                     span.multilevel-name
                     {
@@ -909,20 +851,6 @@ div
             overflow:hidden;
             display:block;
             padding:0em;
-            
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#fff;*/
-
-            &:hover
-            {
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#cacaca;*/
-            };
-
             
             div.menuItemTitle
             {

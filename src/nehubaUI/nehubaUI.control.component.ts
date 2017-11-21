@@ -55,19 +55,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     regionsLabelIndexMap : Map<Number,RegionDescriptor> = new Map()
     selectedRegions : RegionDescriptor[] = [];
 
-    //this is a temporary solution for collapsing menus
-    defaultPanelsState : any = {
-        templatesPanelState : 'expanded',
-        parcellationsPanelState : 'collapsed',
-        regionsPanelState : 'collapsed',
-        navigationPanelState : 'collapsed',
-        labPanelState : 'collapsed'
-    }
-    showTemplates : Boolean = true
-    showParcellations : Boolean = true
-    showRegions : Boolean = true
-
-    showTemplatesState : string = 'expanded';
+    templatesPanelIsShown:boolean = true
+    parcellationsPanelIsShown:boolean = false
+    regionsPanelIsShown:boolean = false
+    pluginsPanelIsShown:boolean = false
 
     heartbeatObserver : any /* hanging onto nehubaViewer event streams. Or else, when the last plugin unsubscribes, the Observable gets garbage collected. */
 
@@ -198,6 +189,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }
 
     ngAfterViewInit():void{
+
+        /* TODO to be replaced by hash encoded string instead in the future */
         const query = window.location.search.substring(1)
         const toolModeURL = query.split('&').find((kv:any)=>kv.split('=')[0]=='toolmode')
         if ( toolModeURL ){
@@ -334,6 +327,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
     refreshSelectedRegions(){
         const treePipe = new SelectTreePipe()
+
+        /* TODO this may need to be reworked
+        refresh gets called too often */
         if(this.selectedParcellation){
             gExternalControl.viewControl.next(new EventPacket('selectRegions','',100,
             {regions:treePipe.transform(this.selectedParcellation.regions).map(region=>region.labelIndex ? region.labelIndex : null)}))
@@ -396,26 +392,26 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         return this.selectedRegions.some( itRegion => itRegion === region )
     }
 
-    /* TODO: this should go else where */
-    toggleDefaultPanel(name:string,preventDefault:boolean):void{
-        preventDefault ? {}:this.defaultPanelsState[name] == 'expanded' ? this.defaultPanelsState[name] = 'collapsed' : this.defaultPanelsState[name] = 'expanded'
-    }
+    // /* TODO: this should go else where */
+    // toggleDefaultPanel(name:string,preventDefault:boolean):void{
+    //     preventDefault ? {}:this.defaultPanelsState[name] == 'expanded' ? this.defaultPanelsState[name] = 'collapsed' : this.defaultPanelsState[name] = 'expanded'
+    // }
 
-    /* TODO: this should go elsewhere */
-    toggleCollapse(id:String):void{
-        //temporary solution, see above
-        switch(id){
-            case 'templates': {
-                this.showTemplates = !this.showTemplates
-                this.showTemplatesState === 'expanded' ? this.showTemplatesState = 'collapsed' : this.showTemplatesState = 'expanded'
-            };
-            break;
-            case 'parcellations': this.showParcellations = !this.showParcellations;
-            break;
-            case 'regions': this.showRegions = !this.showRegions;
-            break;
-        }
-    }
+    // /* TODO: this should go elsewhere */
+    // toggleCollapse(id:String):void{
+    //     //temporary solution, see above
+    //     switch(id){
+    //         case 'templates': {
+    //             this.showTemplates = !this.showTemplates
+    //             this.showTemplatesState === 'expanded' ? this.showTemplatesState = 'collapsed' : this.showTemplatesState = 'expanded'
+    //         };
+    //         break;
+    //         case 'parcellations': this.showParcellations = !this.showParcellations;
+    //         break;
+    //         case 'regions': this.showRegions = !this.showRegions;
+    //         break;
+    //     }
+    // }
 
     showMoreInfo(item:any):void{
         this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:item.name,body:item.properties}))
@@ -468,6 +464,21 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
             case 'PluginDescriptor':{
                 this.labComponent.appendPlugin(sth)
             }break;
+        }
+    }
+
+    multilvlExpansionTreeShake = (ev:any):void=>{
+        if( !this.selectedParcellation ){
+            return
+        }
+        this.searchTerm = ev
+        if( this.searchTerm != '' ){
+            const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
+                item.isExpanded = item.hasVisibleChildren()
+                propagate(item.children)
+            })
+            propagate(this.selectedParcellation.regions)
+            // this.selectedParcellation.regions.forEach(region=>region.isExpanded = region.hasVisibleChildren())
         }
     }
 }

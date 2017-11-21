@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule } from '@angular/forms';
 
 import { ModalModule }  from 'ngx-bootstrap/modal'
@@ -9,7 +8,6 @@ import { ButtonsModule }  from 'ngx-bootstrap/buttons'
 import { TabsModule }  from 'ngx-bootstrap/tabs'
 import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
 import { PopoverModule }  from 'ngx-bootstrap/popover'
-// import { CollapseModule }  from 'ngx-bootstrap/collapse'
 
 import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from './nehubaUI.floatingWidget.component';
 import { NehubaModal } from './nehubaUI.modal.component'
@@ -26,7 +24,6 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
 
 @NgModule({
     imports:[
-        BrowserAnimationsModule,
         RouterModule,
         FormsModule,
         BrowserModule,
