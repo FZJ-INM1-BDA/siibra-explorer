@@ -1,21 +1,21 @@
 <div *ngFor = "let singleData of data" [hidden]="!singleData.hasVisibleChildren()">
     <div class = "menuItem">
         <div class = "menuItemContent">
-            <div (click)="chooseLevel(singleData)" class = "menuItemContentList">
+            <div class = "menuItemContentList">
                 <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
                     
                     <span class = "multilevel-name">
                         <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "expandMultilvl( singleData ,$event)" class = "unicodeSymbols glyphicon">                            
                         </span>
 
-                        <span *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x25A3;</span>
+                        <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
                         </span>
-                        <span *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x2611;</span>
+                        <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
                         </span>
-                        <span *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x2610;</span>
+                        <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
                         </span>
 
                         <span [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData">

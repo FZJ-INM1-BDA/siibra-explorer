@@ -9,7 +9,7 @@ import { EventPacket } from './nehuba.model'
       <div *ngFor = "let plugin of plugins" (click)="launchPlugin(plugin)" class = "btn btn-default">
             <span *ngIf = "plugin.icon" [ngClass]="'glyphicon-'+plugin.icon" class = "glyphicon"></span> {{plugin.name.split('.')[plugin.name.split('.').length-1]}}
       </div>
-      <div (click)="showInputModal()" class = "btn btn-default">
+      <div *ngIf = "false" (click)="showInputModal()" class = "btn btn-default">
             <span class = "glyphicon glyphicon-plus"></span>
       </div>
 </div>
@@ -40,7 +40,7 @@ export class Lab {
       }
 
       papayaX = {
-            "name":"fzj.xg.papayaX",
+            "name":"fzj.xg.receptorBrowser",
             "icon":"info-sign",
             "type":"plugin",
             "templateURL":"http://172.104.156.15/html/papayaX",
@@ -48,7 +48,7 @@ export class Lab {
       }
 
       screenSaver = {
-            "name":"fzj.xg.screenSaver",
+            "name":"fzj.xg.meshAnimator",
             "templateURL":"http://172.104.156.15/html/screenSaver",
             "scriptURL":"http://172.104.156.15/js/screenSaver"
       }
@@ -64,7 +64,7 @@ export class Lab {
             
       }
 
-      plugins = [this.uix,this.screenSaver,this.jugex,this.papayaX,this.builder]
+      plugins = [this.uix,this.screenSaver,this.papayaX]
 
       appendPlugin(param:any){
             this.plugins.push(param)
