@@ -262,8 +262,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         let datasetArray = [
             'http://172.104.156.15/json/bigbrain',
             'http://172.104.156.15/json/colin',
-            'http://172.104.156.15/json/waxholm',
-            'http://172.104.156.15/json/allanMouse'
+            'http://172.104.156.15/json/waxholmRatV2_0',
+            'http://172.104.156.15/json/allenMouse'
         ]
 
         datasetArray.forEach(dataset=>{

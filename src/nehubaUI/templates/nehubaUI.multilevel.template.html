@@ -8,14 +8,14 @@
                         <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "expandMultilvl( singleData ,$event)" class = "unicodeSymbols glyphicon">                            
                         </span>
 
-                        <span *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x25A3;</span>
+                        <span class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
                         </span>
-                        <span *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x2611;</span>
+                        <span class = "glyphicon glyphicon-check" *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
                         </span>
-                        <span *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
-                            <span class = "unicodeSymbols">&#x2610;</span>
+                        <span class = "glyphicon glyphicon-unchecked" *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+                            <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
                         </span>
 
                         <span [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData">

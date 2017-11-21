@@ -54,7 +54,7 @@
             </div>
             <button *ngIf = "true" class = "btn btn-default btn-block btn-lg" (click)="toggleDefaultPanel('labPanelState')">
                     <span class = "glyphicon" [ngClass]="defaultPanelsState.labPanelState == 'expanded' ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
-                    Plugins
+                    Tools
             </button>
             <div *ngIf = "true" class = "list-group" [@panelExpansion]="defaultPanelsState.labPanelState">
                 <div class = "list-group-item nohover">
