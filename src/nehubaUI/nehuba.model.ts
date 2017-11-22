@@ -1,5 +1,11 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
 
+declare var window:{
+    [key:string] : any
+    prototype : Window;
+    new() : Window;
+  }
+  
 export class FetchedTemplates {
     constructor(){
         this.templates = []
@@ -216,7 +222,7 @@ export class Multilevel{
             this.isVisible       
 }
 
-export class RegionDescriptor extends Multilevel{
+export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
 
     constructor(json:any,hierachy:number){
         super()
@@ -227,6 +233,18 @@ export class RegionDescriptor extends Multilevel{
         this.PMapURL = json.PMapURL ? json.PMapURL : null
         this.position = json.position ? json.position : null
         this.children = json.children && json.children.constructor.name == 'Array' ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
+
+        /* populate moreInfo array */
+        if(this.position){
+            const goToPosition = new DescriptorMoreInfoItem('Go To Default Location','map-marker')
+            goToPosition.action = ()=>{
+                window['nehubaUI']['viewControlF'].moveToNavigationLoc(this.position,true)
+            }
+            this.moreInfo.push(goToPosition)
+        }
+        if(this.PMapURL){
+            this.moreInfo.push(new DescriptorMoreInfoItem('Show PMap','picture'))
+        }
     }
 
     children : RegionDescriptor[] = []
@@ -236,6 +254,23 @@ export class RegionDescriptor extends Multilevel{
     labelIndex : number;
     position : number[];
     PMapURL : string;
+
+    moreInfo : DescriptorMoreInfoItem[] = []
+}
+
+export interface DescriptorMoreInfo{
+    moreInfo : any[]
+}
+
+export class DescriptorMoreInfoItem{
+    name : string
+    icon : string
+    source : string
+    action : ()=>void = ()=>{}
+    constructor(name:string,icon:string){
+        this.name = name
+        this.icon = icon
+    }
 }
 
 export class EventPacket{

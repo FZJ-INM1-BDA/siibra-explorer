@@ -1,4 +1,4 @@
-import { Input, Component } from '@angular/core'
+import { Input, Component, ViewChildren } from '@angular/core'
 import { Multilevel,EventPacket,RegionDescriptor } from './nehuba.model'
 import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 
@@ -19,6 +19,7 @@ export class MultilevelSelector {
     @Input() searchTerm : string
     @Input() data : Multilevel[]
     @Input() selectedData : Multilevel[]
+    @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[]
 
     constructor(private eventCenter : EventCenter){}
 
@@ -48,5 +49,11 @@ export class MultilevelSelector {
 
     callingModal(regionDescriptor:RegionDescriptor):void{
         this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:regionDescriptor.name,body:regionDescriptor.properties}))
+    }
+
+    onScroll = (ev:any)=>{
+        this.childrenMultilevel.forEach(multilevel=>{
+            multilevel.onScroll(ev)
+        })
     }
 }

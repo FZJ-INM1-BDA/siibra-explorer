@@ -3,6 +3,7 @@ import { NehubaFetchData,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTC
 import { Lab } from './nehubaUI.lab.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
 import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
+import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
 
 declare var window:{
   [key:string] : any
@@ -21,6 +22,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
   @Input() searchTerm : String = ''
   @ViewChild(Lab) labComponent : Lab
+  @ViewChild(MultilevelSelector) multilevelSelector : MultilevelSelector
   darktheme : boolean = false
   
   fetchedTemplatesData : FetchedTemplates
@@ -46,6 +48,11 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       switch(msg.target){
         case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
           this.darktheme = msg.body.theme == 'dark' 
+          if ( this.darktheme ){
+            document.body.classList.add('darktheme')
+          } else {
+            document.body.classList.remove('darktheme')
+          }
         }break;
       }
     })
@@ -425,13 +432,21 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       return
     }
     this.searchTerm = ev
-    if( this.searchTerm != '' ){
-      const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
-        item.isExpanded = item.hasVisibleChildren()
-        propagate(item.children)
-      })
-      propagate(this.selectedParcellation.regions)
-    }
+
+    /* timeout is necessary as otherwise, treeshaking collapses based on the previous searchTerm */
+    setTimeout(()=>{
+      if( this.searchTerm != '' ){
+        const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
+          item.isExpanded = item.hasVisibleChildren()
+          propagate(item.children)
+        })
+        if(this.selectedParcellation)propagate(this.selectedParcellation.regions)
+      }
+    })
+  }
+
+  onScroll = (ev:any)=>{
+    this.multilevelSelector.onScroll(ev)
   }
 }
 
