@@ -3,9 +3,8 @@
         <div class = "menuItemContent">
             <div class = "menuItemContentList">
                 <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
-                    
                     <span class = "multilevel-name">
-                        <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "expandMultilvl( singleData ,$event)" class = "unicodeSymbols glyphicon">                            
+                        <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "toggleExpansion( singleData )" class = "unicodeSymbols glyphicon">                            
                         </span>
 
                         <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
@@ -32,7 +31,7 @@
             </div>
         </div>
     </div>
-    <div class = "multilvlContainer" [@multilvlExpansion]="singleData.isExpanded ? 'expanded' : 'collapsed'">
+    <div class = "multilvlContainer" [hidden]="!singleData.isExpanded">
         <multilevel *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
         </multilevel>
     </div>

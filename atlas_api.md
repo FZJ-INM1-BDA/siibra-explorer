@@ -23,7 +23,7 @@ Overview
             .subscribe((data)=>{
                   data.target = 'loadTemplate' | 'selectRegions' 
                   /* target signifies the action to be taken */
-                  data.code : 100 | 101 | 102 | 103 | 200 | 500
+                  data.code = 100 | 101 | 102 | 103 | 200 | 500
                   /* code signifies the lifecycle of an event
                   100 : initiation of the intention
                   101 : pre-action hook
@@ -32,8 +32,13 @@ Overview
                   200 : ends gracefully
                   500 : error 
                   */
+                  data.body.source = 'viewer' /* selectRegions only */ | 'ui' | 'plugin'
+                  data.body.regions = [{
+                    id : 0 /* label id */
+                    }, ... ]
             })
       ```
+      `note: as users can directly interact with region selection, selectRegions event can start at code 103 (post-action hook)`
 
       * next () : initiate action (such as load a different template, select different regions)
       

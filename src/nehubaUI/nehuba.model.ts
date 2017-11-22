@@ -188,59 +188,32 @@ export class Multilevel{
         this.children = []
     }
 
-    public updateChildrenStatus( status:string ):void{
-        switch( status ){
-            case 'enable':{
-                this.enabled = true
-                if( this.children ){
-                    this.children.forEach( child => {
-                        child.updateChildrenStatus('enable')
-                    })
-                }
-            }break;
-            case 'disable':{
-                this.enabled = false
-                if( this.children ){
-                    this.children.forEach( child => {
-                        child.updateChildrenStatus('disable')
-                    })
-                }
-            }break;
-        }
+    public disableSelfAndAllChildren = ():void => {
+        this.enabled = false
+        this.children.forEach( child => child.disableSelfAndAllChildren())
+    }
+
+    public enableSelfAndAllChildren = ():void => {
+        this.enabled = true
+        this.children.forEach( child => child.enableSelfAndAllChildren())
     }
 
     /* used to determine the tick status (selected, unselected, partially selected) */
-    public hasDisabledChildren():boolean{
-        if ( this.children.length > 0 ){
-            return this.children.some( child =>{
-                return child.hasDisabledChildren()
-            })
-        } else {
-            return !this.enabled
-        }
-    }
+    public hasDisabledChildren = ():boolean =>
+        this.children.length > 0 ?
+            this.children.some( child => child.hasDisabledChildren() ) :
+            !this.enabled
 
-    public hasEnabledChildren():boolean{
-        if ( this.children.length > 0 ){
-            return this.children.some( child =>{
-                return child.hasEnabledChildren()
-            })
-        } else {
-            return this.enabled
-        }
-    }
+    public hasEnabledChildren = ():boolean =>
+        this.children.length > 0 ?
+            this.children.some( child => child.hasEnabledChildren() ) :
+            this.enabled
 
     /* used for searching and filtering tree */
-    public hasVisibleChildren():boolean{
-        if ( this.children.length > 0){
-            return this.children.some( child =>{
-                return this.isVisible || child.hasVisibleChildren()
-            } )
-        } else{
-            return this.isVisible
-        }
-    }
-    
+    public hasVisibleChildren = ():boolean => 
+        this.children.length > 0 ? 
+            this.children.some( child=> this.isVisible || child.hasVisibleChildren()) :
+            this.isVisible       
 }
 
 export class RegionDescriptor extends Multilevel{
