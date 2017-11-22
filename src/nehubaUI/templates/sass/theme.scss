@@ -217,12 +217,13 @@ atlasbanner{
 
         span.unicodeSymbols{
             color:gray(1);
-        }
 
-            span.unicodeSymbols:hover{
+            &:hover
+            {
                 color:$GOLDEN;
                 cursor:pointer;
             }
+        }
     }
 }
 
@@ -914,4 +915,60 @@ div
 {
     content: "\2122";
     color: transparent !important;
+}
+
+body
+{
+    .popover.left
+    {
+        margin-left:1em;
+        margin-top:3.5em;
+        border-radius:0em;
+        border-width:0em;
+        .popover-arrow
+        {
+            display:none;
+        }
+        .popover-title
+        {
+            border-radius:0em;
+            border-width:0em;
+        }
+    }
+    
+    span.moreInfo-icon
+    {
+        width:1.4em;
+        &:hover
+        {
+            color:goldenrod;
+            cursor: default;
+        }
+    }
+
+    &.darktheme
+    {
+        .popover.left
+        {
+            border-color:gray(0.35);
+            color:gray(0.95);
+            background-color:gray(0.2);
+            .popover-title
+            {
+                background-color:gray(0.3);
+                border-color:gray(0.35);
+            }
+        }
+        
+        span.moreInfo-icon
+        {
+            color:gray(1);
+
+            &:hover
+            {
+                color:goldenrod;
+                background-color:gray(0.25);
+            }
+        }
+    }
 }

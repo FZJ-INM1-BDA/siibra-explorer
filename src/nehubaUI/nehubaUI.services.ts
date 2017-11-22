@@ -174,6 +174,7 @@ let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
+    viewControlF : {},
     metadata : metadata,
     mouseEvent : new Subject()
 }

@@ -21,12 +21,22 @@
 
                         </span>
                     </span>
-                    <span *ngIf = "singleData.PMapURL" class = "multilevel-icon unicodeSymbols" (click) = "ShowPMap(singleData);$event.stopPropagation()">
+                    <span 
+                        *ngIf = "singleData.moreInfo.length > 0" 
+                        class = "multilevel-icon unicodeSymbols" 
+                        [popoverTitle]="singleData.name"
+                        [popover]="moreInfo"
+                        [outsideClick]="true"
+                        container="body"
+                        placement="left">
+                            <i class = "glyphicon glyphicon-option-vertical"></i>
+                    </span>
+                    <!-- <span *ngIf = "singleData.PMapURL" class = "multilevel-icon unicodeSymbols" (click) = "ShowPMap(singleData);$event.stopPropagation()">
                         <i class = "glyphicon glyphicon-map-marker"></i>
                     </span>
                     <span *ngIf = "! (singleData.properties | isEmpty)" class = "multilevel-icon unicodeSymbols" (click) = "callingModal(singleData);$event.stopPropagation()"  >
                         <i class = "glyphicon glyphicon-info-sign"></i>
-                    </span>
+                    </span> -->
                 </span>
             </div>
         </div>
@@ -35,4 +45,13 @@
         <multilevel *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
         </multilevel>
     </div>
+    <ng-template #moreInfo>
+        <span 
+            *ngFor = "let moreInfo of singleData.moreInfo" 
+            class = "moreInfo-icon glyphicon" 
+            (click) = "moreInfo.action()"
+            [ngClass]="'glyphicon-'+moreInfo.icon"
+            [tooltip]="moreInfo.name">
+        </span>
+    </ng-template>
 </div>

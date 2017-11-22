@@ -1,7 +1,7 @@
 import { OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { Subject } from 'rxjs/Rx'
 
-import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3,quat } from 'nehuba/exports'
+import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
 import { EventCenter,Animation,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
@@ -58,8 +58,9 @@ export class NehubaViewerInnerContainer implements OnInit{
           this.loadNewTemplate(msg.body.nehubaConfig)
         }break;
         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE:{
-          this.navigate(msg.body.pos,msg.body.rot)
-        }break;
+          // this.navigate(msg.body.pos,msg.body.rot)
+          throw new Error('api retired, update api')
+        }
         case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT:{
           if(msg.body.segID == 0){
             this.hideAllSegments()
@@ -86,15 +87,51 @@ export class NehubaViewerInnerContainer implements OnInit{
         }break;
       }
     })
+
+    gExternalControl.viewControlF = this
+  }
+
+  /**
+   * attaches an onViewerDestory callback. If no viewer is initiated, callback will be fired immediately.
+   */
+  public onViewerDestroy = (cb:()=>{})=>{
+    if(!this.templateLoaded){
+      cb()
+    }else{
+      this.componentRef.onDestroy(()=>{
+        cb()
+      })
+    }
+  }
+
+  /**
+   * Teleport to new location
+   */
+  public setNavigationLoc = (loc:number[],realSpace?:boolean)=>{
+    this.nehubaViewerComponent.nehubaViewer.setPosition(vec3.fromValues(loc[0],loc[1],loc[2]),realSpace)
+  }
+
+  /**
+   * teleport to a new orientation
+   */
+  public setNavigationOrientation = (_ori:number[])=>{
+    /* waiting for proper api */
+  }
+
+  /**
+   * Animation moving to new location
+   */
+  public moveToNavigationLoc = (loc:number[],realSpace?:boolean)=>{
+    if(this.templateLoaded){
+      this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
+    }
   }
 
   ngOnInit(){
     this.viewContainerRef = this.host.viewContainerRef
   }
 
-  loadNewTemplateHook : any[] = []
-
-  loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
+  private loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
     if ( this.templateLoaded ){
       /* I'm not too sure what does the dispose method do (?) */
       /* TODO: use something other than a flag? */
@@ -118,12 +155,7 @@ export class NehubaViewerInnerContainer implements OnInit{
         {layer:im}
       ))
     })
-    
     this.templateLoaded = true
-  }
-
-  navigate(pos:vec3,rot:quat){
-    this.nehubaViewerComponent.navigate(pos,rot)
   }
 
   showSegment(segID:any){
@@ -143,7 +175,7 @@ export class NehubaViewerInnerContainer implements OnInit{
   }
 
   pMapFloatingWidget : Subject<EventPacket>
-  loadPMap(msg:EventPacket){
+  private loadPMap(msg:EventPacket){
     let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
     curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url }))
     curtainModalSubject.subscribe((evPk:EventPacket)=>{
@@ -319,31 +351,35 @@ export class NehubaViewerComponent implements OnDestroy{
     this.onDestroyUnsubscribe.push(this.heartbeatObserver)
   }
 
-  public navigate(pos:vec3,_rot:quat){
+  public navigate(pos:number[],duration:number,realSpace:boolean){
     /* TODO: implement rotation somehow oO */
     
-    /* slice is required to make clones of the values */
-    /* or else the values (startPos/deltaPos) will change mid-animation */
-    let deltaPos = ([
-      pos[0]-this.viewerPos[0],
-      pos[1]-this.viewerPos[1],
-      pos[2]-this.viewerPos[2]
-    ]).slice()
-    let startPos = (this.viewerPos).slice()
-
-    let iterator = (new Animation(300,'linear')).generate()
-    let newAnimationFrame = () =>{
-      let iteratedValue = iterator.next()
-      this.nehubaViewer.setPosition(vec3.fromValues(
-        startPos[0]+deltaPos[0]*iteratedValue.value,
-        startPos[1]+deltaPos[1]*iteratedValue.value,
-        startPos[2]+deltaPos[2]*iteratedValue.value
-      ),true)
-      if(!iteratedValue.done){
-        requestAnimationFrame(newAnimationFrame)
+    if( duration>0 ){
+      /* slice is required to make clones of the values */
+      /* or else the values (startPos/deltaPos) will change mid-animation */
+      let deltaPos = ([
+        pos[0]-this.viewerPos[0],
+        pos[1]-this.viewerPos[1],
+        pos[2]-this.viewerPos[2]
+      ]).slice()
+      let startPos = (this.viewerPos).slice()
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this.nehubaViewer.setPosition(vec3.fromValues(
+          startPos[0]+deltaPos[0]*iteratedValue.value,
+          startPos[1]+deltaPos[1]*iteratedValue.value,
+          startPos[2]+deltaPos[2]*iteratedValue.value
+        ),realSpace)
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
       }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this.nehubaViewer.setPosition(vec3.fromValues(pos[0],pos[1],pos[2]),realSpace)
     }
-    requestAnimationFrame(newAnimationFrame)
   }
 
   public showSeg(id:number){
