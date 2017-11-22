@@ -425,13 +425,15 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       return
     }
     this.searchTerm = ev
-    if( this.searchTerm != '' ){
-      const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
-        item.isExpanded = item.hasVisibleChildren()
-        propagate(item.children)
-      })
-      propagate(this.selectedParcellation.regions)
-    }
+    setTimeout(()=>{
+      if( this.searchTerm != '' ){
+        const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
+          item.isExpanded = item.hasVisibleChildren()
+          propagate(item.children)
+        })
+        if(this.selectedParcellation)propagate(this.selectedParcellation.regions)
+      }
+    },0)
   }
 }
 
