@@ -290,6 +290,16 @@ export class NehubaViewerInnerContainer implements OnInit{
   id = "container" 
   [ngClass]="{darktheme : darktheme}">
 </div>
+<div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+  <span 
+    class = "btn btn-link"
+    (click)="statusPanelRealSpace = !statusPanelRealSpace">
+    {{statusPanelRealSpace ? 'RealSpace(nm)' : 'VoxelSpace'}}
+  </span> 
+  Navigation: <small>({{statusPanelRealSpace ? viewerPosReal.join(',') : viewerPosVoxel.join(',')}})</small> 
+  Mouse: <small>({{statusPanelRealSpace ? mousePosReal.join(',') : mousePosVoxel.join(',')}})</small> 
+  {{!viewerSegment ? '' : viewerSegment.constructor.name == 'RegionDescriptor' ? 'Region: ' + viewerSegment.name : 'RegionID: ' + viewerSegment }}
+</div>
 <floatingPopover>
 </floatingPopover>
   `,
@@ -313,6 +323,8 @@ export class NehubaViewerComponent implements OnDestroy{
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
 
+  statusPanelRealSpace : boolean = true
+
   @HostListener('document:mousedown',['$event'])
   clearContextmenu(_ev:any){
     if(this.floatingPopover.contextmenuEvent)this.floatingPopover.contextmenuEvent=null
@@ -323,8 +335,7 @@ export class NehubaViewerComponent implements OnDestroy{
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
-  constructor(){
-  }
+  constructor(){}
 
   public ngOnDestroy(){
     this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
@@ -347,9 +358,9 @@ export class NehubaViewerComponent implements OnDestroy{
       this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
     }
 
-    const mouseRealSubscription = this.nehubaViewer.mousePosition.inRealSpace.subscribe((pos:any)=>this.mousePosReal = pos)
+    const mouseRealSubscription = this.nehubaViewer.mousePosition.inRealSpace.subscribe((pos:any)=>this.mousePosReal = pos ? pos : this.mousePosReal)
     this.onDestroyUnsubscribe.push(mouseRealSubscription)
-    const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos)
+    const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos ? pos :this.mousePosVoxel)
     this.onDestroyUnsubscribe.push(mouseVoxelSubscription)
     
     const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>this.viewerPosReal = pos)
@@ -382,6 +393,11 @@ export class NehubaViewerComponent implements OnDestroy{
     const loadParcellationSubscription = gExternalControl.viewControl
       .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==200)
       .subscribe((_evPk:EventPacket)=>{
+        /**
+         * TODO: applying default colour map. move this to choose parcellation later
+         */
+        this.nehubaViewer.batchAddAndUpdateSegmentColors(window['nehubaUI'].metadata.template.parcellations[0].colorMap)
+    
         const parcellationName = _evPk.body.parcellation.ngId
         const shownSegmentObs = this.nehubaViewer.getShownSegmentsObservable({name:parcellationName})
         const shownSegmentObsSubscription = shownSegmentObs.subscribe((ev:any)=>gExternalControl.viewControl.next(new EventPacket('selectRegions','',102,{source:'viewer',regions:ev.map((id:any)=>({labelIndex:id}))})))

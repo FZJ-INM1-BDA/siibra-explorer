@@ -8,7 +8,7 @@ import { RegionDescriptor } from './nehuba.model'
 <div 
     (mousedown)="$event.stopPropagation()"
     class = "popover down" 
-    style = "display:block;position:absolute"
+    style = "display:block;position:absolute;left:-10000px;top:-10000px"
     [style.left]="contextmenuEvent ? contextmenuEvent.target.offsetLeft + contextmenuEvent.layerX + 'px' : '-1000px'"
     [style.top]="contextmenuEvent ? contextmenuEvent.target.offsetTop + contextmenuEvent.layerY + 'px' : '-1000px'">
 

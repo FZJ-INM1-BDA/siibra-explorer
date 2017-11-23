@@ -116,6 +116,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         }
       })
     
+    /**
+     * when the parcellation has been loaded, map the regions
+     */
     gExternalControl.viewControl
       .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==102)
       .subscribe((evPk:EventPacket)=>{
@@ -313,7 +316,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
           /* update models in the controller */
           this.selectedTemplate = templateDescriptor
           this.selectedRegions = []
-          this.selectedParcellation = undefined
+
+          this.chooseParcellation(templateDescriptor.parcellations[0])
 
           gExternalControl.metadata.template = this.selectedTemplate
 
