@@ -148,6 +148,8 @@ export class ParcellationDescriptor {
         this.ngId = json.ngId ? json.ngId : ''
         this.regions = json.regions ? json.regions.map((region:any)=>new RegionDescriptor(region,0)) : []
         this.properties = json.properties ? json.properties : []
+
+        this.regions.forEach(region=>this.iterateColorMap(region))
     }
     regions : RegionDescriptor[];
     name : string;
@@ -157,10 +159,23 @@ export class ParcellationDescriptor {
 
     isShown : boolean = true;
     masterOpacity : number = 1.00;
-    subPanelShown : boolean = false;
-    customGLSL : string = ``;
 
-    nehubaConfig : Nehubaconfig;
+    colorMap : Map<number,{red:number,green:number,blue:number}> = new Map()
+    iterateColorMap = (region:RegionDescriptor)=>{
+        if( region.labelIndex ){
+            this.parseColor(region)
+        }
+        region.children.forEach(region=>this.iterateColorMap(region))
+    }
+    parseColor = (region:RegionDescriptor) => {
+        const rgb = (rgb:number[])=> ({red:rgb[0],green:rgb[1],blue:rgb[2]})
+        try{
+            this.colorMap.set(region.labelIndex,rgb(region.rgb))
+        }catch(e){
+            console.log('setting colour map failed',e)
+            this.colorMap.set(region.labelIndex,rgb([0,0,0]))
+        }
+    }
 }
 
 export class PluginDescriptor{
@@ -233,6 +248,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
         this.PMapURL = json.PMapURL ? json.PMapURL : null
         this.position = json.position ? json.position : null
         this.children = json.children && json.children.constructor.name == 'Array' ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
+        this.rgb = json.rgb ? json.rgb : null
 
         /* populate moreInfo array */
         if(this.position){
@@ -248,12 +264,13 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     }
 
     children : RegionDescriptor[] = []
-    name : string;
-    properties : any;
-    getUrl: string;
-    labelIndex : number;
-    position : number[];
-    PMapURL : string;
+    name : string
+    properties : any
+    getUrl: string
+    labelIndex : number
+    position : number[]
+    PMapURL : string
+    rgb : number[]
 
     moreInfo : DescriptorMoreInfoItem[] = []
 }

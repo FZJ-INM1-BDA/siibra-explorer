@@ -936,6 +936,23 @@ div
 
 body
 {
+    #viewerStatus
+    {
+        position:absolute;
+        left:2px;
+        top:0;
+        z-index:9;
+        width:100%;
+        box-sizing: border-box;
+        height:3rem;
+        line-height:3rem;
+        padding-left:1.5rem;
+        white-space: nowrap;
+
+        background-color:tgray(1,0.5);
+        color:gray(0.1);
+        border: 1px solid tgray(0,0);
+    }
     .popover.down
     {
         border-radius:0em;
@@ -980,6 +997,11 @@ body
 
     &.darktheme
     {
+        #viewerStatus
+        {
+            background-color:tgray(0,0.5);
+            color:gray(0.75);
+        }
         .popover.left,.popover.down
         {
             border-color:gray(0.35);
