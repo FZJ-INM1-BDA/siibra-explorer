@@ -919,6 +919,21 @@ div
 
 body
 {
+    .popover.down
+    {
+        border-radius:0em;
+        border-width:0em;
+        .popover-arrow
+        {
+            display:none;
+        }
+        .popover-title
+        {
+            border-radius:0em;
+            border-width:0em;
+        }
+    }
+
     .popover.left
     {
         margin-left:1em;
@@ -948,7 +963,7 @@ body
 
     &.darktheme
     {
-        .popover.left
+        .popover.left,.popover.down
         {
             border-color:gray(0.35);
             color:gray(0.95);
