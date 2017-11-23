@@ -19,6 +19,7 @@ import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent 
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';
+import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
 import { HelperFunctions,NehubaFetchData,EventCenter } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
@@ -37,7 +38,7 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
     ],
     declarations : 
         [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective,
-        NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,
+        NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
         Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
         MultilevelSelector, NehubaModal,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
@@ -48,3 +49,5 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
 export class NehubaUI{
     
 }
+
+/* TODO: culling uncessary components, such as ActiveComponent */

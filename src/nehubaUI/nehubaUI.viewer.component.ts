@@ -1,18 +1,18 @@
-import { OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
 import { EventCenter,Animation,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
+import { EventPacket, RegionDescriptor } from './nehuba.model'
 import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
+import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 
 declare var window:{
   [key:string] : any
   prototype : Window;
   new() : Window;
 }
-
 
 @Directive({
   selector : '[nehuba-viewer-host]'
@@ -40,6 +40,9 @@ export class NehubaViewerInnerContainer implements OnInit{
   darktheme : boolean = false
 
   colorMap : Map<number,{}>
+
+  private onViewerInitHook : (()=>void)[] = []
+  private afterviewerInitHook : (()=>void)[] = []
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -92,9 +95,23 @@ export class NehubaViewerInnerContainer implements OnInit{
   }
 
   /**
+   * attaches an onViewerInit callback.
+   */
+  public onViewerInit = (cb:()=>void)=>{
+    this.onViewerInitHook.push(cb)
+  }
+
+  /**
+   * attaches an afterViewerInit callback
+   */
+  public afterViewerInit = (cb:()=>void)=>{
+    this.afterviewerInitHook.push(cb)
+  }
+
+  /**
    * attaches an onViewerDestory callback. If no viewer is initiated, callback will be fired immediately.
    */
-  public onViewerDestroy = (cb:()=>{})=>{
+  public onViewerDestroy = (cb:()=>void)=>{
     if(!this.templateLoaded){
       cb()
     }else{
@@ -138,6 +155,9 @@ export class NehubaViewerInnerContainer implements OnInit{
       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
       this.componentRef.destroy()
     }
+
+    /* TODO implement a check that each el in the hooks are still defined and are fn's */
+    this.onViewerInitHook.forEach(fn=>fn())
     
     let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,this.darktheme)
     let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
@@ -156,6 +176,8 @@ export class NehubaViewerInnerContainer implements OnInit{
       ))
     })
     this.templateLoaded = true
+
+    this.afterviewerInitHook.forEach(fn=>fn())
   }
 
   showSegment(segID:any){
@@ -263,12 +285,13 @@ export class NehubaViewerInnerContainer implements OnInit{
 
 @Component({
   template : `
-<div id = "container" [ngClass]="{darktheme : darktheme}"
-  (mousedown)="mousehandler('mousedown',$event)" 
-  (mouseup)="mousehandler('mouseup',$event)" 
-  (click)="mousehandler('click',$event)" 
-  (mousemove)="mousehandler('mousemove',$event)" >
+<div 
+  (contextmenu)="showFloatingPopover($event)"
+  id = "container" 
+  [ngClass]="{darktheme : darktheme}">
 </div>
+<floatingPopover>
+</floatingPopover>
   `,
   styles : [
     `
@@ -283,30 +306,30 @@ export class NehubaViewerComponent implements OnDestroy{
   public nehubaViewer : NehubaViewer
   viewerConfig : NehubaViewerConfig
   darktheme : boolean
-  viewerPos : number[] = [0,0,0]
+  viewerPosReal : number[] = [0,0,0]
+  viewerPosVoxel : number[] = [0,0,0]
   viewerOri : number[] = [0,0,1,0]
+  viewerSegment : RegionDescriptor | number | null
+  mousePosReal :  number[] = [0,0,0]
+  mousePosVoxel :  number[] = [0,0,0]
+
+  @HostListener('document:mousedown',['$event'])
+  clearContextmenu(_ev:any){
+    if(this.floatingPopover.contextmenuEvent)this.floatingPopover.contextmenuEvent=null
+  }
+
+  @ViewChild(FloatingPopOver) floatingPopover : FloatingPopOver
 
   onDestroyUnsubscribe : any[] = []
-  mouseEventSubject : Subject<any>
   heartbeatObserver : any
 
   constructor(){
-    this.mouseEventSubject = new Subject()
-    window['nehubaUI']['mouseEvent'] = this.mouseEventSubject
   }
 
   public ngOnDestroy(){
     this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
     this.nehubaViewer.dispose()
     window['nehubaViewer'] = null
-    window['nehubaUI']['mouseEvent'] = null
-  }
-
-  public mousehandler(mode:string,ev:any){
-    this.mouseEventSubject.next({
-      target : mode,
-      body : ev
-    })
   }
 
   public loadTemplate(config:NehubaViewerConfig){
@@ -324,10 +347,37 @@ export class NehubaViewerComponent implements OnDestroy{
       this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
     }
 
-    const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
-      this.viewerPos = pos
-    })
+    const mouseRealSubscription = this.nehubaViewer.mousePosition.inRealSpace.subscribe((pos:any)=>this.mousePosReal = pos)
+    this.onDestroyUnsubscribe.push(mouseRealSubscription)
+    const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos)
+    this.onDestroyUnsubscribe.push(mouseVoxelSubscription)
+    
+    const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>this.viewerPosReal = pos)
     this.onDestroyUnsubscribe.push( navigationSubscription )
+
+    const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
+    this.onDestroyUnsubscribe.push( navigationSubscriptionVoxel )
+
+    const iterativeSearch = (regions:RegionDescriptor[],labelIndex:number):Promise<RegionDescriptor> => new Promise((resolve)=>{
+      const find = regions.find(region=>region.labelIndex==labelIndex)
+      if(find)resolve(find)
+      Promise.race(regions.map(region=>iterativeSearch(region.children,labelIndex)))
+        .then(region=>resolve(region))
+    })
+    const regionObserverSubscription = this.nehubaViewer.mouseOver.segment.subscribe((seg:any)=>{
+      /* seg.segment = number | 0 | null seg.layer */
+
+      /* TODO potentially generating some unresolvable promises here */
+      if(seg.segment&&seg.segment!=0){
+        this.viewerSegment=seg.segment
+        iterativeSearch(window['nehubaUI'].metadata.parcellation.regions,seg.segment)
+          .then(region=>this.viewerSegment=region)
+          .catch(e=>console.log(e))
+      }else{
+        this.viewerSegment=null
+      }
+    })
+    this.onDestroyUnsubscribe.push(regionObserverSubscription)
 
     const loadParcellationSubscription = gExternalControl.viewControl
       .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==200)
@@ -358,11 +408,11 @@ export class NehubaViewerComponent implements OnDestroy{
       /* slice is required to make clones of the values */
       /* or else the values (startPos/deltaPos) will change mid-animation */
       let deltaPos = ([
-        pos[0]-this.viewerPos[0],
-        pos[1]-this.viewerPos[1],
-        pos[2]-this.viewerPos[2]
+        pos[0]-this.viewerPosReal[0],
+        pos[1]-this.viewerPosReal[1],
+        pos[2]-this.viewerPosReal[2]
       ]).slice()
-      let startPos = (this.viewerPos).slice()
+      let startPos = (this.viewerPosReal).slice()
   
       let iterator = (new Animation(duration,'linear')).generate()
       let newAnimationFrame = () =>{
@@ -409,6 +459,13 @@ export class NehubaViewerComponent implements OnDestroy{
     }
     json.layers.atlas.visible = false
     this.nehubaViewer.ngviewer.state.restoreState(json)
+  }
+
+  public showFloatingPopover = (ev:any)=> {
+    this.floatingPopover.cursorSegment = this.viewerSegment
+    this.floatingPopover.cursorLocReal = this.mousePosReal
+    this.floatingPopover.cursorLocVoxel = this.mousePosVoxel
+    this.floatingPopover.contextmenuEvent = ev
   }
 }
 
