@@ -438,8 +438,15 @@ atlascontrol
 
             div.modePanel
             {
+                height:100%;
+                display:flex;
+                flex-direction: column;
+
                 .btn.btn-block.btn-default
                 {
+                    flex-grow:0;
+                    flex-shrink:0;
+
                     background-color:$OFFWHITE;
                     margin-top : 0px;
                     margin-bottom : 0px;
@@ -468,11 +475,21 @@ atlascontrol
                 
                 .list-group
                 {
+                    flex-shrink:1;
+                    flex-grow:0;
+                    flex-basis:auto;
+
+                    &#regionContainer
+                    {
+                        flex-shrink:10000;
+                    }
+
                     width : 120%;
                     margin-left : -10%;
                     padding-left : 10%;
                     padding-right : 10%;
-                    overflow : hidden;
+                    overflow-x : hidden;
+                    overflow-y : auto;
                     margin-bottom : 0px;
                     z-index : 3;
                     box-shadow : inset 0 0 1em -0.5em gray(0.38);

@@ -37,7 +37,7 @@
                 <span *ngIf = "selectedParcellation" class = "glyphicon" [ngClass]="regionsPanelIsShown ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Regions <small *ngIf = "selectedParcellation && ( selectedParcellation.regions | selectTreePipe ).length>0">({{( selectedParcellation.regions | selectTreePipe ).length}})</small>
             </button>
-            <div class = "list-group" *ngIf="selectedParcellation" [hidden]="!regionsPanelIsShown">
+            <div id = "regionContainer" class = "list-group" *ngIf="selectedParcellation" [hidden]="!regionsPanelIsShown">
                 <div class = "list-group-item nohover">
                     <input class = "form-control" placeholder = "Search regions ... "  [ngModel]="searchTerm" (ngModelChange)="multilvlExpansionTreeShake($event)" name = "searchRegionInput" #ctrl="ngModel">
                 </div>
