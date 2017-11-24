@@ -296,7 +296,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       })
   }
 
-  loadTemplate(templateDescriptor:TemplateDescriptor,mEvPk:EventPacket):void{
+  loadTemplate(templateDescriptor:TemplateDescriptor,mEvPk?:EventPacket):void{
 
     /* send signals to modal and viewer to update the view */
     /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
@@ -324,8 +324,10 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
           /* for the time being, parcellation is automatically chosen (?) TODO: there are current no usecase for single template with multiple parcellations.  */
           // this.chooseParcellation(this.selectedTemplate.parcellations[0])
 
-          mEvPk.code = 103
-          gExternalControl.viewControl.next(mEvPk)
+          if(mEvPk){
+            mEvPk.code = 103
+            gExternalControl.viewControl.next(mEvPk)
+          }
           
           /* TODO: temporary measure */
           setTimeout(()=>{
@@ -335,7 +337,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         case 200:
         case 500:{
           curtainModalSubject.unsubscribe()
-
         }break;
       }
     })
@@ -343,7 +344,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
   chooseTemplate(templateDescriptor:TemplateDescriptor):void{
     if ( this.selectedTemplate != templateDescriptor ){
-      gExternalControl.viewControl.next(new EventPacket('loadTemplate','',100,{templateDescriptor:templateDescriptor}))
+      this.selectedTemplate = templateDescriptor
+      this.loadTemplate(templateDescriptor)
     }
   }
 

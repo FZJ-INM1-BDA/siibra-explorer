@@ -1,10 +1,13 @@
 
 import { Component,ViewChild,Output,EventEmitter } from '@angular/core'
 import { ModalDirective } from 'ngx-bootstrap/modal'
-import { EventCenter,NehubaFetchData } from './nehubaUI.services'
+import { EventCenter,NehubaFetchData,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { EventPacket,PluginDescriptor } from './nehuba.model'
 
 import { Subject } from 'rxjs/Rx'
+import { Observable } from 'rxjs/Observable'
+import 'rxjs/Observable/of'
+import 'rxjs/operator/map'
 
 @Component({
     selector: 'nehubaModal',
@@ -184,6 +187,12 @@ export class NehubaModal{
                 }
             }
         })
+        
+        gExternalControl.util.modalControl = this
+    }
+
+    public showInfoModal = ()=>{
+        return Observable.of(1,2,3)
     }
 
     public showModal( modalTitle:string = 'More Info', properties : any ){

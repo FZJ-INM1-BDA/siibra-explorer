@@ -172,7 +172,6 @@ export class ParcellationDescriptor {
         try{
             this.colorMap.set(region.labelIndex,rgb(region.rgb))
         }catch(e){
-            console.log('setting colour map failed',e)
             this.colorMap.set(region.labelIndex,rgb([0,0,0]))
         }
     }

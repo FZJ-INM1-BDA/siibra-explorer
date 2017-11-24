@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Rx'
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
 import { EventCenter,Animation,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
-import { EventPacket, RegionDescriptor } from './nehuba.model'
+import { EventPacket, RegionDescriptor, ParcellationDescriptor } from './nehuba.model'
 import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 
@@ -43,6 +43,9 @@ export class NehubaViewerInnerContainer implements OnInit{
 
   private onViewerInitHook : (()=>void)[] = []
   private afterviewerInitHook : (()=>void)[] = []
+
+  private onParcellationSelectionHook : (()=>void)[] = []
+  private afterParcellationSelectionHook : (()=>void)[] = []
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -97,19 +100,27 @@ export class NehubaViewerInnerContainer implements OnInit{
   /**
    * attaches an onViewerInit callback.
    */
-  public onViewerInit = (cb:()=>void)=>{
-    this.onViewerInitHook.push(cb)
-  }
+  public onViewerInit = (cb:()=>void) => this.onViewerInitHook.push(cb)
 
   /**
    * attaches an afterViewerInit callback
    */
-  public afterViewerInit = (cb:()=>void)=>{
-    this.afterviewerInitHook.push(cb)
-  }
+  public afterViewerInit = (cb:()=>void)=> this.afterviewerInitHook.push(cb)
 
   /**
-   * attaches an onViewerDestory callback. If no viewer is initiated, callback will be fired immediately.
+   * attaches an on parcellation selection callback
+   */
+  public onParcellationSelection = (cb:()=>void)=> this.onParcellationSelectionHook.push(cb)
+
+  /**
+   * attaches an after parcellation selection callback
+   */
+  public afterParcellationSelection = (cb:()=>void)=> this.afterParcellationSelectionHook.push(cb)
+
+  /**
+   * attaches an onViewerDestory callback. 
+   * If no viewer is initiated, callback will be fired immediately.
+   * NB onViewerInit callback will be called before onViewerDestory callback
    */
   public onViewerDestroy = (cb:()=>void)=>{
     if(!this.templateLoaded){
@@ -149,15 +160,16 @@ export class NehubaViewerInnerContainer implements OnInit{
   }
 
   private loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
+
+    /* TODO implement a check that each el in the hooks are still defined and are fn's */
+    this.onViewerInitHook.forEach(fn=>fn())
+
     if ( this.templateLoaded ){
       /* I'm not too sure what does the dispose method do (?) */
       /* TODO: use something other than a flag? */
       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
       this.componentRef.destroy()
     }
-
-    /* TODO implement a check that each el in the hooks are still defined and are fn's */
-    this.onViewerInitHook.forEach(fn=>fn())
     
     let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,this.darktheme)
     let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
@@ -335,7 +347,64 @@ export class NehubaViewerComponent implements OnDestroy{
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
-  constructor(){}
+  constructor(){
+    const viewerControl = <NehubaViewerInnerContainer>gExternalControl.viewControlF
+    const metadata = gExternalControl.metadata
+
+
+    viewerControl.afterParcellationSelection(()=>{
+      /**
+       * applying default colour map.
+       */
+      this.nehubaViewer.batchAddAndUpdateSegmentColors(metadata.parcellation.colorMap)
+        
+      /**
+       * patching surface parcellation and whole mesh vs single mesh
+      */
+      const colorMap = (<ParcellationDescriptor>metadata.parcellation).colorMap
+      /* TODO patching in surface parcellation */
+      try{
+        if( this.viewerConfig.layout!.useNehubaPerspective!.mesh!.surfaceParcellation ){
+          colorMap.set(65535,{red:255,green:255,blue:255})
+          this.nehubaViewer.batchAddAndUpdateSegmentColors(colorMap)
+          this.nehubaViewer.setMeshesToLoad([65535,...Array.from(colorMap.keys())])
+        }else{
+          this.nehubaViewer.setMeshesToLoad(Array.from(colorMap.keys()))
+        }
+      }catch(e){
+        console.log('loading surface parcellation error ',e)
+      }
+
+      // const parcellationName = _evPk.body.parcellation.ngId
+      const shownSegmentObs = this.nehubaViewer.getShownSegmentsObservable()
+      const shownSegmentObsSubscription = shownSegmentObs.subscribe((ev:number[])=>{
+        /**
+         * attach regionSelection listener and update surface parcellation patch
+         */
+        try{
+          const newColorMap = new Map<number,{red:number,green:number,blue:number}>()
+          const selectedParcellation = <ParcellationDescriptor>metadata.parcellation
+          if( this.viewerConfig.layout!.useNehubaPerspective!.mesh!.surfaceParcellation ){
+
+            selectedParcellation.colorMap.forEach((activeColor,key)=>{
+              newColorMap.set(key,ev.find(segId=>segId==key)?activeColor:{red:255,green:255,blue:255})
+            })
+            this.nehubaViewer.clearCustomSegmentColors()
+            this.nehubaViewer.batchAddAndUpdateSegmentColors(ev.length == 0 ? selectedParcellation.colorMap : newColorMap)
+          }else{
+            // this.nehubaViewer.setMeshesToLoad( ev.length == 0 ? Array.from(selectedParcellation.colorMap.keys()) : ev )
+            // this.nehubaViewer.setMeshesToLoad(ev)
+          }
+        }catch(e){
+          console.log('toggling regions error surface parcellation ')
+          throw e
+        }
+
+        gExternalControl.viewControl.next(new EventPacket('selectRegions','',102,{source:'viewer',regions:ev.map((id:any)=>({labelIndex:id}))}))
+      })
+      this.onDestroyUnsubscribe.push(shownSegmentObsSubscription)
+    })
+  }
 
   public ngOnDestroy(){
     this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
@@ -344,6 +413,11 @@ export class NehubaViewerComponent implements OnDestroy{
   }
 
   public loadTemplate(config:NehubaViewerConfig){
+
+    this.viewerConfig = config
+    
+    const metadata = gExternalControl.metadata
+
     this.nehubaViewer = createNehubaViewer(config,(err)=>{
       /* TODO: error handling?*/
       console.log('createnehubaviewer error handler',err)
@@ -352,12 +426,9 @@ export class NehubaViewerComponent implements OnDestroy{
     this.nehubaViewer.redraw()
     this.nehubaViewer.relayout()
 
-    /* TODO: only works for JuBrain. Workout a proper parser for rgb values */
-    let testForJubrain = new RegExp('jubrain','gi')
-    if(config.globals!.useCustomSegmentColors && testForJubrain.test(JSON.stringify(config.dataset!.initialNgState))){
-      this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
-    }
-
+    /**
+     * attaching the mouse/navigation real/voxel listeners
+     */
     const mouseRealSubscription = this.nehubaViewer.mousePosition.inRealSpace.subscribe((pos:any)=>this.mousePosReal = pos ? pos : this.mousePosReal)
     this.onDestroyUnsubscribe.push(mouseRealSubscription)
     const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos ? pos :this.mousePosVoxel)
@@ -365,10 +436,12 @@ export class NehubaViewerComponent implements OnDestroy{
     
     const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>this.viewerPosReal = pos)
     this.onDestroyUnsubscribe.push( navigationSubscription )
-
     const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
     this.onDestroyUnsubscribe.push( navigationSubscriptionVoxel )
 
+    /**
+     * attaches viewerSegmentHover listener
+     */
     const iterativeSearch = (regions:RegionDescriptor[],labelIndex:number):Promise<RegionDescriptor> => new Promise((resolve)=>{
       const find = regions.find(region=>region.labelIndex==labelIndex)
       if(find)resolve(find)
@@ -381,7 +454,7 @@ export class NehubaViewerComponent implements OnDestroy{
       /* TODO potentially generating some unresolvable promises here */
       if(seg.segment&&seg.segment!=0){
         this.viewerSegment=seg.segment
-        iterativeSearch(window['nehubaUI'].metadata.parcellation.regions,seg.segment)
+        iterativeSearch(metadata.parcellation.regions,seg.segment)
           .then(region=>this.viewerSegment=region)
           .catch(e=>console.log(e))
       }else{
@@ -390,35 +463,24 @@ export class NehubaViewerComponent implements OnDestroy{
     })
     this.onDestroyUnsubscribe.push(regionObserverSubscription)
 
-    const loadParcellationSubscription = gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==200)
-      .subscribe((_evPk:EventPacket)=>{
-        /**
-         * TODO: applying default colour map. move this to choose parcellation later
-         */
-        this.nehubaViewer.batchAddAndUpdateSegmentColors(window['nehubaUI'].metadata.template.parcellations[0].colorMap)
-    
-        const parcellationName = _evPk.body.parcellation.ngId
-        const shownSegmentObs = this.nehubaViewer.getShownSegmentsObservable({name:parcellationName})
-        const shownSegmentObsSubscription = shownSegmentObs.subscribe((ev:any)=>gExternalControl.viewControl.next(new EventPacket('selectRegions','',102,{source:'viewer',regions:ev.map((id:any)=>({labelIndex:id}))})))
-        this.onDestroyUnsubscribe.push(shownSegmentObsSubscription)
-      })
-    this.onDestroyUnsubscribe.push(loadParcellationSubscription)
-
     window['nehubaViewer'] = this.nehubaViewer
 
     this.heartbeatObserver = 
       this.nehubaViewer.mouseOver.segment
-        .merge(window['nehubaViewer'].navigationState.sliceZoom)
-        .merge(window['nehubaViewer'].navigationState.perspectiveZoom)
+        .merge(this.nehubaViewer.navigationState.sliceZoom)
+        .merge(this.nehubaViewer.navigationState.perspectiveZoom)
         .subscribe((_ev:any)=>{
           //console.log('debug heartbeat',ev)
         })
     this.onDestroyUnsubscribe.push(this.heartbeatObserver)
   }
 
+  public loadParcellation(_parcellation:ParcellationDescriptor){
+
+  }
+
   public navigate(pos:number[],duration:number,realSpace:boolean){
-    /* TODO: implement rotation somehow oO */
+    /* TODO: waiting on nehubaViewer api to implement rotation */
     
     if( duration>0 ){
       /* slice is required to make clones of the values */
