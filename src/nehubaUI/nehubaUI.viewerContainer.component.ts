@@ -1,6 +1,5 @@
-import { Component,ViewChild,Input,EventEmitter,Output } from '@angular/core'
-import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl,HELP_MENU } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
+import { Component,ViewChild,Input,EventEmitter,Output,AfterViewInit } from '@angular/core'
+import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl,HELP_MENU } from './nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { ModalHandler } from './nehubaUI.modal.component'
 
@@ -14,7 +13,7 @@ declare var window:{
     selector : 'ATLASViewer',
     template : `
         <NehubaViewer 
-            (mousemove)="mousemove($event);mouseEventHandler('mousemove',$event)"
+            (mousemove)="mouseEventHandler('mousemove',$event)"
             (click) = "mouseEventHandler('click',$event)"
             (mousedown) = "mouseEventHandler('mousedown',$event)"
             (mouseup) = "mouseEventHandler('mouseup',$event)"></NehubaViewer>
@@ -23,24 +22,34 @@ declare var window:{
     `
 })
 
-export class NehubaViewerContainer {
+export class NehubaViewerContainer implements AfterViewInit {
     darktheme : boolean
     @Input() hideUI : boolean = false
     @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
     @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-    constructor(private eventCenter : EventCenter){
-        this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-            switch(msg.target){
-                case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-                    this.darktheme = msg.body.theme == 'dark' 
-                }break;
-            }
+    constructor(){
+        // this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
+        //     switch(msg.target){
+        //         case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
+        //             this.darktheme = msg.body.theme == 'dark' 
+        //         }break;
+        //     }
+        // })
+    }
+
+    ngAfterViewInit(){
+        UI_CONTROL.afterTemplateSelection(()=>{
+            this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
         })
     }
 
+    /* TODO figure out a new way to emit mouse event handler */
     mouseEventHandler(mode:string,ev:any){
-        gExternalControl.mouseEvent.next(new EventPacket(mode,'',100,ev))
+        gExternalControl.mouseEvent.next({
+            eventName : mode,
+            event : ev
+        })
     }
 
     toggleHideUI(){
@@ -50,9 +59,6 @@ export class NehubaViewerContainer {
         }
     }
 
-    mousemove(event:any){
-        this.eventCenter.userViewerInteractRelay.next(new EventPacket('mousemove',Date.now().toString(),100,{event:event}))
-    }
 
     showhelp(){
         const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()

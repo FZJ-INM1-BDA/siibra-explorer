@@ -1,10 +1,8 @@
 import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core';
-// import { vec4 } from 'neuroglancer/util/geom'
-// import { Config as NehubaConfig } from 'nehuba/exports'
-import { Subject,BehaviorSubject } from 'rxjs/Rx'
+import { Subject } from 'rxjs/Rx'
 
-import { TemplateDescriptor,EventPacket } from './nehuba.model'
+import { TemplateDescriptor, LabComponent } from './nehuba.model'
 import { TIMEOUT } from './nehuba.config'
 
 declare var window:{
@@ -112,38 +110,6 @@ export class Animation{
     }
 }
 
-export class EventCenter{
-    modalSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-    floatingWidgetSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-
-    nehubaViewerRelay : Subject<EventPacket> = new Subject()
-    globalLayoutRelay : BehaviorSubject<EventPacket> = new BehaviorSubject(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,{theme:'light'}))
-
-    userViewerInteractRelay : Subject<EventPacket> = new Subject()
-
-    /* returns a new Subject to the function's caller
-     * in the future, also sends the subject to the right service
-     * so the caller and the right service can have a single channel
-     */
-    createNewRelay(evPk:EventPacket):Subject<EventPacket>{
-        switch (evPk.target){
-            case 'floatingWidgetRelay':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.floatingWidgetSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            case 'curtainModal':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.modalSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            default:{
-                return new Subject()
-            }
-        }
-    }
-}
-
 export class HelperFunctions{
     
     queryJsonSubset(query:any,obj:any):boolean{
@@ -196,13 +162,14 @@ export class HelperFunctions{
             }break;
         }
     }
+
+    loadPlugin : (labComponent : LabComponent) =>void
 }
 
 let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
-    viewControlF : {},
     util : {
         modalControl : {}
     },
@@ -210,33 +177,38 @@ export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     mouseEvent : new Subject()
 }
 
-// export const MODAL_CONTROL = window['nehubaUI']['util']['modalControl']
-
-export const EVENTCENTER_CONST = {
-    NEHUBAVIEWER : {
-        TARGET : {
-            LOAD_TEMPALTE : 'loadTemplate',
-            NAVIGATE : 'navigation',
-            MOUSE_ENTER_SEGMENT : 'mouseEnterSegment',
-            MOUSE_LEAVE_SEGMENT : 'mouseLeaveSegment',
-            SHOW_SEGMENT : 'showSegment',
-            HIDE_SEGMENT : 'hideSegment',
-            LOAD_LAYER : 'loadLayer'
-        }
-    },
-    GLOBALLAYOUT : {
-        TARGET : {
-            THEME : 'theme'
-        },
-        BODY : {
-            THEME : {
-                LIGHT : 'light',
-                DARK : 'dark'
-            }
-        }
-    }
+class UIHandle{
+    onTemplateSelection : (cb:()=>void)=>void
+    afterTemplateSelection : (cb:()=>void)=>void
+    onParcellationSelection : (cb:()=>void)=>void
+    afterParcellationSelection : (cb:()=>void)=>void
 }
 
+export const UI_CONTROL = new UIHandle()
+
+class ViewerHandle {
+    loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
+
+    onViewerInit : (cb:()=>void)=>void
+    afterViewerInit : (cb:()=>void)=>void
+    onParcellationLoading : (cb:()=>void)=>void
+    afterParcellationLoading : (cb:()=>void)=>void
+    onViewerDestroy : (cb:()=>void)=>void
+
+    setNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+    setNavigationOrientation : (ori:number[])=>void
+
+    moveToNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+
+    showSegment : (segId:number)=>void
+    hideSegment : (segId:number)=>void
+    showAllSegments : ()=>void
+    hideAllSegments : ()=>void
+}
+
+export const VIEWER_CONTROL = new ViewerHandle()
+
+//TODO to be removed. init state to be encoded in hash
 export const NEHUBAUI_CONSTANTS = {
     toolmode : {
         JuGeX : {
