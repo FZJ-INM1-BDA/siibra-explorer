@@ -1,7 +1,6 @@
 import { Component,ViewChild ,HostListener,HostBinding,AfterViewInit } from '@angular/core'
-import { EventPacket } from './nehuba.model'
-import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
 import { NehubaUIControl } from './nehubaUI.control.component'
+import { UI_CONTROL, EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 
 @Component({
     selector : '#ATLASContainer',
@@ -33,14 +32,7 @@ export class NehubaContainer implements AfterViewInit {
   @HostBinding('style.grid-template-columns')
   gridTemplateColumns = `${this.width>150?this.width:150}px 10px auto`
 
-  constructor(private eventCenter : EventCenter){
-    this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-      switch(msg.target){
-        case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-          this.darktheme = msg.body.theme == 'dark' 
-        }break;
-      }
-    })
+  constructor(){
   }
 
   
@@ -61,6 +53,14 @@ export class NehubaContainer implements AfterViewInit {
 
   ngAfterViewInit(){
     window.location.hash = ''
+    UI_CONTROL.afterTemplateSelection(()=>{
+      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+      if( this.darktheme ){
+        document.body.classList.add('darktheme')
+      }else{
+        document.body.classList.remove('darktheme')
+      }
+    })
   }
 
   controlUI(ev:any){

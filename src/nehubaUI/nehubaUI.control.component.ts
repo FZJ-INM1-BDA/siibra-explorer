@@ -1,9 +1,11 @@
-import { NgZone,Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
-import { NehubaFetchData,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
+import { Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
+import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalControl,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
+import { ModalHandler } from './nehubaUI.modal.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
-import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
+import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor } from './nehuba.model'
 import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
+import { NehubaViewer } from 'nehuba/NehubaViewer';
 
 declare var window:{
   [key:string] : any
@@ -13,8 +15,7 @@ declare var window:{
 
 @Component({
   selector : 'atlascontrol',
-  templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html',
-  providers : [ NehubaFetchData ],
+  templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html'
 })
 
 export class NehubaUIControl implements OnInit,AfterViewInit{
@@ -27,6 +28,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   
   fetchedTemplatesData : FetchedTemplates
 
+  private shownSegmentsObserver : any
+
   selectedTemplate : TemplateDescriptor | undefined
   selectedParcellation : ParcellationDescriptor | undefined
   regionsLabelIndexMap : Map<Number,RegionDescriptor> = new Map()
@@ -37,145 +40,22 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   regionsPanelIsShown:boolean = false
   pluginsPanelIsShown:boolean = false
 
-  constructor( 
-    private nehubaFetchData : NehubaFetchData,
-    private eventCenter:EventCenter,
-    private zone:NgZone
-    ){
+  onTemplateSelectionHook : (()=>void)[] = []
+  afterTemplateSelectionHook : (()=>void)[] = []
+  onParcellationSelectionHook : (()=>void)[] = []
+  afterParcellationSelectionHook : (()=>void)[] = []
+
+  constructor( private dataService : DataService ){
     this.fetchedTemplatesData = new FetchedTemplates()
 
-    this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-      switch(msg.target){
-        case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-          this.darktheme = msg.body.theme == 'dark' 
-          if ( this.darktheme ){
-            document.body.classList.add('darktheme')
-          } else {
-            document.body.classList.remove('darktheme')
-          }
-        }break;
-      }
+    UI_CONTROL.onTemplateSelection = (cb:()=>void) => this.onTemplateSelectionHook.push(cb)
+    UI_CONTROL.afterTemplateSelection = (cb:()=>void) => this.afterTemplateSelectionHook.push(cb)
+    UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
+    UI_CONTROL.afterParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
+
+    this.afterTemplateSelectionHook.push(()=>{
+      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
     })
-
-    gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>(evPk.target=='loadTemplate'||'loadParcellation'||'selectRegions')&&(evPk.code==100||evPk.code==101||evPk.code==103))
-      .subscribe((evPk:EventPacket)=>{
-        switch(evPk.code){
-          case 100:{
-            const nEvPk = evPk
-            nEvPk.code = 101
-            setTimeout(()=>{
-              gExternalControl.viewControl.next(nEvPk)
-            })
-          }break;
-          case 101:{
-            const nEvPk = evPk
-            nEvPk.code = 102
-            setTimeout(()=>{
-              gExternalControl.viewControl.next(nEvPk)
-            })
-          }break;
-          case 103:{
-            const nEvPk = evPk
-            nEvPk.code = 200
-            setTimeout(()=>{
-              gExternalControl.viewControl.next(nEvPk)
-            })
-          }break;
-        }
-      })
-
-    gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==102)
-      .subscribe((evPk:EventPacket)=>{
-        if( evPk.body.templateDescriptor ){
-          try{
-            this.zone.run(()=>{
-              this.loadTemplate( evPk.body.templateDescriptor,evPk )
-            })
-          }catch(e){
-            evPk.code = 500
-            evPk.body.reason = 'templateDescriptor ill defined.'
-            gExternalControl.viewControl.next( evPk )
-          }
-        }else if( evPk.body.name ){
-          const openTemplate = this.fetchedTemplatesData.templates.find(template=>template.name==evPk.body.name)
-          if( openTemplate ){
-            this.zone.run(()=>{
-              this.loadTemplate( openTemplate,evPk )
-            })
-          }else{
-            evPk.code = 500
-            evPk.body.reason = 'Could not find the template by name.'
-            gExternalControl.viewControl.next( evPk )
-          }
-        }else{
-          evPk.code = 500
-          evPk.body.reason = 'either body.templateDescriptor : TemplateDescriptor | Object or body.name : string needs to be defined.'
-          gExternalControl.viewControl.next( evPk )
-        }
-      })
-    
-    /**
-     * when the parcellation has been loaded, map the regions
-     */
-    gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==102)
-      .subscribe((evPk:EventPacket)=>{
-        this.selectedParcellation = evPk.body.parcellation
-        this.selectedRegions = []
-  
-        const mapRegions = (regions:RegionDescriptor[])=>{
-          regions.forEach((region:RegionDescriptor)=>{
-            if(region.labelIndex){
-              this.regionsLabelIndexMap.set(region.labelIndex,region)
-            }
-            if(region.children){
-              mapRegions(region.children)
-            }
-          })
-        }
-        this.regionsLabelIndexMap.clear()
-        mapRegions(this.selectedParcellation!.regions)
-  
-        /* TODO temporary measure, until nehubaviewer has its own way of controlling layers */
-        this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
-          window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
-        })
-        setTimeout(()=>{
-          window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
-        })
-        this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).map((id:any)=>({labelIndex:id})) )
-  
-        /* populate the metadata object */
-        gExternalControl.metadata.parcellation = this.selectedParcellation
-
-        /* progress the evPk lifecycle */
-        const nEvPk = evPk
-        nEvPk.code=103
-        gExternalControl.viewControl.next(nEvPk)
-      })
-
-    /* user interact UI/plugin result in selectRegions */
-    gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>evPk.target=='selectRegions'&&evPk.code==102&&evPk.body.source!='viewer')
-      .subscribe((evPk:EventPacket)=>{
-        /* first update the viewer */
-        window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).forEach((idx:Number)=>window.nehubaViewer.hideSegment(idx,{name:this.selectedParcellation!.ngId}))
-        if(evPk.body.regions.length>0){
-          evPk.body.regions.forEach((region:any)=>{if(region.labelIndex)window.nehubaViewer.showSegment(region.labelIndex,{name:this.selectedParcellation!.ngId})})
-        }else{
-          window.nehubaViewer.showSegment(0,{name:this.selectedParcellation!.ngId})
-        }
-
-        /* then update the model */
-        this.updateRegionDescriptors(evPk.body.regions)
-      })
-
-    /* user interact with viewer result in selectRegions */
-    gExternalControl.viewControl
-      .filter((evPk:EventPacket)=>evPk.target=='selectRegions'&&evPk.code==102&&evPk.body.source=='viewer')
-      .subscribe((_evPk:EventPacket)=>this.updateRegionDescriptors(_evPk.body.regions))
   }
 
   /** on view init 
@@ -190,7 +70,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       }
       if(!gl){
         message['Detail'] = 'Your browser does not support WebGL.'
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+        
+        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
         return
       }
       
@@ -203,7 +88,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         ${ !texturefloat ? 'OES_texture_float' : ''} 
         ${ !indexuint ? 'OES_element_index_uint' : ''} `
         message['Detail'] = [detail]
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+        
+        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
       }
     })()
   }
@@ -240,9 +130,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         })
       ])
       .then((json:any)=>{
-        this.nehubaFetchData.fetchJson(json['UIConfigURL'])
+        this.dataService.fetchJson(json['UIConfigURL'])
           .then((json:any)=>{
-            this.nehubaFetchData.parseTemplateData(json)
+            this.dataService.parseTemplateData(json)
               .then( template =>{
                 this.chooseTemplate( template )
               })
@@ -253,9 +143,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
         /* TODO: find a more elegant solution in the future */
         setTimeout(()=>{
-          json.plugins.forEach((plugin:any)=>{
-            const newPlugin = new PluginDescriptor(plugin)
-            this.labComponent.launchPlugin(newPlugin)
+          json.plugins.forEach((_plugin:any)=>{
+            // const newPlugin = new PluginDescriptor(plugin)
+            // this.labComponent.launchPlugin(newPlugin)
           })
         },3000)
         this.emitHideUI.emit({hideUI:true})
@@ -267,6 +157,43 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     }else{
       this.loadInitDatasets()
     }
+    
+    this.afterParcellationSelectionHook.push(()=>{
+      const nehubaViewer = (<NehubaViewer>window.nehubaViewer)
+      
+      nehubaViewer.clearCustomSegmentColors()
+      if( this.selectedParcellation ){
+        nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
+        nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+      }
+
+      const shownSegmentsObservable = nehubaViewer.getShownSegmentsObservable()
+      this.shownSegmentsObserver = shownSegmentsObservable.subscribe(segs=>{
+        this.updateRegionDescriptors(segs)
+
+        if( this.selectedParcellation ){
+          if( this.selectedParcellation.surfaceParcellation ){
+            //TODO need to test init condition... if selectedRegions is a subset of total regions, what happens?
+            if( segs.length == 0 ){
+              nehubaViewer.clearCustomSegmentColors()
+              nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+            }else{
+              const newColormap = new Map()
+              const blankColor = {red:255,green:255,blue:255}
+              this.selectedParcellation.colorMap.forEach((activeValue,key)=>{
+                newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
+              })
+              nehubaViewer.clearCustomSegmentColors()
+              nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
+            }
+          }
+        }
+      })
+    })
+
+    this.onParcellationSelectionHook.push(()=>{
+      if (this.shownSegmentsObserver) this.shownSegmentsObserver.unsubscribe()
+    })
   }
 
   loadInitDatasets(){
@@ -280,9 +207,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     ]
 
     datasetArray.forEach(dataset=>{
-      this.nehubaFetchData.fetchJson(dataset)
+      this.dataService.fetchJson(dataset)
         .then((json:any)=>{
-          this.nehubaFetchData.parseTemplateData(json)
+          this.dataService.parseTemplateData(json)
             .then( template =>{
               this.fetchedTemplatesData.templates.push( template )
             })
@@ -296,119 +223,109 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       })
   }
 
-  loadTemplate(templateDescriptor:TemplateDescriptor,mEvPk:EventPacket):void{
+  loadTemplate(templateDescriptor:TemplateDescriptor):void{
 
-    /* send signals to modal and viewer to update the view */
-    /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
-    let id = Date.now().toString()
-    let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
-    let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
-    
-    let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... '})
-    curtainModalSubject.next(eventPacket)
-    curtainModalSubject.subscribe((evPk:EventPacket)=>{
-      switch(evPk.code){
-        case 101:{
-          this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
-            {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
-          this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
-    
-          /* update models in the controller */
-          this.selectedTemplate = templateDescriptor
-          this.selectedRegions = []
+    const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+    modalHandler.title = `<h4>Loading template ${templateDescriptor.name} </h4>`
+    modalHandler.body = `Please stand by ...`
+    modalHandler.footer = null
 
-          this.chooseParcellation(templateDescriptor.parcellations[0])
-
-          gExternalControl.metadata.template = this.selectedTemplate
-
-          /* for the time being, parcellation is automatically chosen (?) TODO: there are current no usecase for single template with multiple parcellations.  */
-          // this.chooseParcellation(this.selectedTemplate.parcellations[0])
-
-          mEvPk.code = 103
-          gExternalControl.viewControl.next(mEvPk)
-          
-          /* TODO: temporary measure */
-          setTimeout(()=>{
-            curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-          },3000)
-        }break;
-        case 200:
-        case 500:{
-          curtainModalSubject.unsubscribe()
-
-        }break;
-      }
+    modalHandler.onShown(()=>{
+      /* TODO onshown method does not fire at correct timing, investigate for issues */
+      setTimeout(()=>{
+        VIEWER_CONTROL.loadTemplate(templateDescriptor)
+        this.selectedTemplate = templateDescriptor
+        gExternalControl.metadata.selectedTemplate = this.selectedTemplate
+        this.afterTemplateSelectionHook.forEach(cb=>cb())
+        
+        this.chooseParcellation( templateDescriptor.parcellations[0] )
+        gExternalControl.metadata.selectedRegions = []
+      },200)
+      /* TODO waiting for nehuba API on when it's safe to dismiss the modal */
+      setTimeout(()=>{
+        modalHandler.hide()
+      },3000)
     })
+    modalHandler.show()
   }
 
   chooseTemplate(templateDescriptor:TemplateDescriptor):void{
     if ( this.selectedTemplate != templateDescriptor ){
-      gExternalControl.viewControl.next(new EventPacket('loadTemplate','',100,{templateDescriptor:templateDescriptor}))
+      this.onTemplateSelectionHook.forEach(cb=>cb())
+      this.loadTemplate(templateDescriptor)
     }
   }
 
   refreshSelectedRegions(){
     const treePipe = new SelectTreePipe()
-
-    /* TODO this may need to be reworked
-    refresh gets called too often */
+    treePipe
     if(this.selectedParcellation){
-      gExternalControl.viewControl.next(
-        new EventPacket('selectRegions','',100,{source:'ui',regions:treePipe.transform(this.selectedParcellation.regions)}))
+      (new Promise((resolve)=>{
+        resolve( treePipe.transform(this.selectedParcellation!.regions)
+          .map(region=>region.labelIndex) )
+      }))
+        .then((segments:number[])=>{
+          VIEWER_CONTROL.hideAllSegments()
+          segments.forEach(seg=>VIEWER_CONTROL.showSegment(seg))
+        })
     }
   }
 
-  updateRegionDescriptors(regions:any[]){
-      const labelIndices = regions.map(region=>region.labelIndex)
-      gExternalControl.metadata.regions = []
-      this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
-      labelIndices.forEach(idx=>{
-        const region = this.regionsLabelIndexMap.get(idx)
-        if(region) {
-          region.enabled = true
-          gExternalControl.metadata.regions.push(region)
-        }
-      })
+  updateRegionDescriptors(labelIndices:number[]){
+    gExternalControl.metadata.selectedRegions = []
+    this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
+    labelIndices.forEach(idx=>{
+      const region = this.regionsLabelIndexMap.get(idx)
+      if(region) {
+        region.enabled = true
+        gExternalControl.metadata.selectedRegions.push(region)
+      }
+    })
   }
 
   chooseParcellation(parcellation:ParcellationDescriptor):void{
     if( this.selectedParcellation != parcellation ){
-      gExternalControl.viewControl.next(new EventPacket('loadParcellation','',100,{source:'ui',oldParcellation:this.selectedParcellation,parcellation:parcellation}))
-    }
-  }
+      this.onParcellationSelectionHook.forEach(cb=>cb())
 
-  showMoreInfo(item:any):void{
-    this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:item.name,body:item.properties}))
-  }
+      this.selectedParcellation = parcellation
+      this.selectedRegions = []
 
-  showInputModal(type:string):void{
-    this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add',title_:type}))
-  }
-
-  loadPresetShader(layer:LayerDescriptor):void{
-    let packetId = Date.now().toString()
-    let packetBody = {
-      title : 'Load preset shader for layer ',
-      layername : layer.name,
-      currentshader : layer.properties.shader
-    }
-    let eventPacket = new EventPacket('loadPresetShader',packetId,100,packetBody)
-    
-    let requestForNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
-    let loadPresetShaderSubject = this.eventCenter.createNewRelay(requestForNewFloatingWidget)
-    if( loadPresetShaderSubject ){
-      loadPresetShaderSubject.subscribe((resp:EventPacket)=>{
-        switch(resp.code){
-          case 200:{
-            layer.properties.shader = resp.body.code
+      const mapRegions = (regions:RegionDescriptor[])=>{
+        regions.forEach((region:RegionDescriptor)=>{
+          if(region.labelIndex){
+            this.regionsLabelIndexMap.set(region.labelIndex,region)
           }
-          case 404:{
-            loadPresetShaderSubject!.unsubscribe()
-          }break;
-        }
+          if(region.children){
+            mapRegions(region.children)
+          }
+        })
+      }
+      this.regionsLabelIndexMap.clear()
+      mapRegions(this.selectedParcellation!.regions)
+
+      /* TODO temporary measure, until nehubaviewer has its own way of controlling layers */
+      this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
+        window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
       })
-      loadPresetShaderSubject.next(eventPacket)
+      setTimeout(()=>{
+        window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
+        window.nehubaViewer.redraw()
+      })
+      this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).map((id:any)=>({labelIndex:id})) )
+
+      /* populate the metadata object */
+      gExternalControl.metadata.selectedParcellation = this.selectedParcellation
+
+      this.afterParcellationSelectionHook.forEach(cb=>cb())
     }
+  }
+
+  showMoreInfo(_item:any):void{
+    
+  }
+
+  showInputModal(_type:string):void{
+    
   }
 
   fetchedSomething(sth:any){
@@ -449,6 +366,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     })
   }
 
+  /**
+   * the propagation event is needed to ensure the info panel stay with the element when scrolling
+   */
   onScroll = (ev:any)=>{
     this.multilevelSelector.onScroll(ev)
   }

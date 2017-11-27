@@ -1,10 +1,8 @@
 import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core';
-// import { vec4 } from 'neuroglancer/util/geom'
-// import { Config as NehubaConfig } from 'nehuba/exports'
-import { Subject,BehaviorSubject } from 'rxjs/Rx'
+import { Subject } from 'rxjs/Rx'
 
-import { TemplateDescriptor,EventPacket } from './nehuba.model'
+import { TemplateDescriptor, LabComponent } from './nehuba.model'
 import { TIMEOUT } from './nehuba.config'
 
 declare var window:{
@@ -15,7 +13,7 @@ declare var window:{
 
 
 @Injectable()
-export class NehubaFetchData {
+export class DataService {
 
     /* simiple fetch promise for json obj */
     /* nb: return header must contain Content-Type : application/json */
@@ -43,6 +41,35 @@ export class NehubaFetchData {
         return new Promise((resolve,_)=>{
             resolve(new TemplateDescriptor(json))
         })
+    }
+
+    parseJson(json:any){
+        switch(json.type){
+            // case 'template':{
+            //     this.inputResponse += 'Adding new Template. '
+            //     this.nehubaFetchData.parseTemplateData(json)
+            //         .then( template =>{
+            //             this.fetchedOutputToController(template)
+            //         })
+            //         .catch( e=>{
+            //             this.inputResponse += 'Error.'
+            //             this.inputResponse += e.toString()
+            //             console.log(e)
+            //         })
+            // }break;
+            // case 'parcellation':{
+                
+            // }break;
+            // case 'plugin':{
+            //     /* some sort of validation process? */
+            //     this.inputResponse += 'Adding new plugin.'
+            //     const newPlugin = new PluginDescriptor(json)
+            //     this.fetchedOutputToController(newPlugin)
+            // }break;
+            // default:{
+            //     this.inputResponse += '\'type\' field not found.. Unable to process this JSON.'
+            // }break;
+        }
     }
 }
 
@@ -80,39 +107,6 @@ export class Animation{
             /* too new age for my liking */
             // yield Math.abs( (oldValue + ( Math.random() - 0.5 )/5 ) %1 )
         }while(true)
-    }
-}
-
-export class EventCenter{
-    modalSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-    floatingWidgetSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-
-    modalEventRelay : Subject<EventPacket> = new Subject()
-    nehubaViewerRelay : Subject<EventPacket> = new Subject()
-    globalLayoutRelay : BehaviorSubject<EventPacket> = new BehaviorSubject(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,{theme:'light'}))
-
-    userViewerInteractRelay : Subject<EventPacket> = new Subject()
-
-    /* returns a new Subject to the function's caller
-     * in the future, also sends the subject to the right service
-     * so the caller and the right service can have a single channel
-     */
-    createNewRelay(evPk:EventPacket):Subject<EventPacket>{
-        switch (evPk.target){
-            case 'floatingWidgetRelay':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.floatingWidgetSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            case 'curtainModal':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.modalSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            default:{
-                return new Subject()
-            }
-        }
     }
 }
 
@@ -168,42 +162,53 @@ export class HelperFunctions{
             }break;
         }
     }
+
+    loadPlugin : (labComponent : LabComponent) =>void
 }
 
 let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
-    viewControlF : {},
+    util : {
+        modalControl : {}
+    },
     metadata : metadata,
     mouseEvent : new Subject()
 }
 
-export const EVENTCENTER_CONST = {
-    NEHUBAVIEWER : {
-        TARGET : {
-            LOAD_TEMPALTE : 'loadTemplate',
-            NAVIGATE : 'navigation',
-            MOUSE_ENTER_SEGMENT : 'mouseEnterSegment',
-            MOUSE_LEAVE_SEGMENT : 'mouseLeaveSegment',
-            SHOW_SEGMENT : 'showSegment',
-            HIDE_SEGMENT : 'hideSegment',
-            LOAD_LAYER : 'loadLayer'
-        }
-    },
-    GLOBALLAYOUT : {
-        TARGET : {
-            THEME : 'theme'
-        },
-        BODY : {
-            THEME : {
-                LIGHT : 'light',
-                DARK : 'dark'
-            }
-        }
-    }
+class UIHandle{
+    onTemplateSelection : (cb:()=>void)=>void
+    afterTemplateSelection : (cb:()=>void)=>void
+    onParcellationSelection : (cb:()=>void)=>void
+    afterParcellationSelection : (cb:()=>void)=>void
 }
 
+export const UI_CONTROL = new UIHandle()
+
+class ViewerHandle {
+    loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
+
+    onViewerInit : (cb:()=>void)=>void
+    afterViewerInit : (cb:()=>void)=>void
+    onParcellationLoading : (cb:()=>void)=>void
+    afterParcellationLoading : (cb:()=>void)=>void
+    onViewerDestroy : (cb:()=>void)=>void
+
+    setNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+    setNavigationOrientation : (ori:number[])=>void
+
+    moveToNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+
+    showSegment : (segId:number)=>void
+    hideSegment : (segId:number)=>void
+    showAllSegments : ()=>void
+    hideAllSegments : ()=>void
+}
+
+export const VIEWER_CONTROL = new ViewerHandle()
+
+//TODO to be removed. init state to be encoded in hash
 export const NEHUBAUI_CONSTANTS = {
     toolmode : {
         JuGeX : {
@@ -218,4 +223,17 @@ export const NEHUBAUI_CONSTANTS = {
             ]
         }
     }
+}
+
+export const HELP_MENU = {
+    'Mouse Controls' : {
+        "Left-drag" : "within a slice view to move within that plane",
+        "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
+        "Mouse-Wheel" : "up or down to zoom in and out.",
+        "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
+        "Ctrl + Right-click" : "within a slice to teleport to that location"
+        },
+        'Keyboard Controls' : {
+        "tobe":"completed"
+        }
 }

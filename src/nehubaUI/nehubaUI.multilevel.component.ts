@@ -1,6 +1,5 @@
 import { Input, Component, ViewChildren } from '@angular/core'
-import { Multilevel,EventPacket,RegionDescriptor } from './nehuba.model'
-import { EventCenter,EVENTCENTER_CONST } from './nehubaUI.services'
+import { Multilevel } from './nehuba.model'
 
 @Component({
     selector : 'multilevel',
@@ -21,7 +20,7 @@ export class MultilevelSelector {
     @Input() selectedData : Multilevel[]
     @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[]
 
-    constructor(private eventCenter : EventCenter){}
+    constructor(){}
 
     chooseLevel = (data:Multilevel):void => 
         data.hasEnabledChildren() ? 
@@ -29,27 +28,6 @@ export class MultilevelSelector {
             data.enableSelfAndAllChildren()
 
     toggleExpansion = (m:Multilevel):boolean => m.isExpanded = !m.isExpanded
-
-    ShowPMap(singleData:RegionDescriptor){
-        if (singleData.position){
-            this.eventCenter.nehubaViewerRelay.next(
-                new EventPacket(
-                    EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE,
-                    Date.now().toString(),
-                    100,
-                    {pos:singleData.position}
-                ))
-        }
-        this.eventCenter.nehubaViewerRelay.next(
-            new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER,'',100,{
-                url:singleData.PMapURL,
-                title:singleData.name
-            }))    
-    }
-
-    callingModal(regionDescriptor:RegionDescriptor):void{
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:regionDescriptor.name,body:regionDescriptor.properties}))
-    }
 
     onScroll = (ev:any)=>{
         this.childrenMultilevel.forEach(multilevel=>{

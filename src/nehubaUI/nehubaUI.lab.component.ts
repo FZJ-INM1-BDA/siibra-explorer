@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
-import { EventCenter } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
+import { HelperFunctions } from 'nehubaUI/nehubaUI.services';
+import { LabComponent } from 'nehubaUI/nehuba.model';
 
 @Component({
       selector : 'lab',
@@ -60,25 +60,27 @@ export class Lab {
             "scriptURL":"http://172.104.156.15/js/pluginBuilder"
       }
 
-      constructor(private eventCenter:EventCenter){
+      constructor(private helperFunctions:HelperFunctions){
             
       }
 
-      plugins = [this.uix,this.screenSaver,this.papayaX]
+      plugins = [this.uix,this.screenSaver,this.papayaX].map(item=>new LabComponent(item))
 
       appendPlugin(param:any){
             this.plugins.push(param)
       }
 
-      launchPlugin(param:any){
-            if(param.templateURL && param.scriptURL){
-                  const requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
-                  const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
-                  newSubject.next(new EventPacket('lab','',100,param))
-            }
+      /* TODO figure out a new way to launch plugin */
+      launchPlugin(labComponent:LabComponent){
+            this.helperFunctions.loadPlugin(labComponent)
+            // if(param.templateURL && param.scriptURL){
+            //       const requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
+            //       const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
+            //       newSubject.next(new EventPacket('lab','',100,param))
+            // }
       }
 
       showInputModal(){
-            this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
+            // this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
       }
 }

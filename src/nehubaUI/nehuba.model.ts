@@ -1,10 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-
-declare var window:{
-    [key:string] : any
-    prototype : Window;
-    new() : Window;
-  }
+import { VIEWER_CONTROL } from './nehubaUI.services'
   
 export class FetchedTemplates {
     constructor(){
@@ -150,12 +145,15 @@ export class ParcellationDescriptor {
         this.properties = json.properties ? json.properties : []
 
         this.regions.forEach(region=>this.iterateColorMap(region))
+        this.surfaceParcellation = json.surfaceParcellation
+        if( this.surfaceParcellation ) this.colorMap.set(65535,{red:255,green:255,blue:255})
     }
     regions : RegionDescriptor[];
     name : string;
     getUrl : string;
     properties : any;
     ngId : string;
+    surfaceParcellation : boolean = false;
 
     isShown : boolean = true;
     masterOpacity : number = 1.00;
@@ -172,7 +170,6 @@ export class ParcellationDescriptor {
         try{
             this.colorMap.set(region.labelIndex,rgb(region.rgb))
         }catch(e){
-            console.log('setting colour map failed',e)
             this.colorMap.set(region.labelIndex,rgb([0,0,0]))
         }
     }
@@ -254,7 +251,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
         if(this.position){
             const goToPosition = new DescriptorMoreInfoItem('Go To Default Location','map-marker')
             goToPosition.action = ()=>{
-                window['nehubaUI']['viewControlF'].moveToNavigationLoc(this.position,true)
+                VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
             }
             this.moreInfo.push(goToPosition)
         }
@@ -290,23 +287,12 @@ export class DescriptorMoreInfoItem{
     }
 }
 
-export class EventPacket{
-    constructor(target:string,id:string,code:number,body:any){
-        this.target = target
-        this.id = id
-        this.code = code
-        this.body = body
-    }
-    target : string     /* possible values: modal | floatingWidget */
-    id : string         /* unique identifier for each transaction */
-    code : number       /* code to indicate status. use http code for convenience */
-    body : any    /* message */
-}
-
 export class LabComponent{
     script : HTMLElement
     template : HTMLElement
+    icon : string | undefined
     name : string
+
     author : string
     desc : string
 
@@ -314,6 +300,7 @@ export class LabComponent{
         this.name = json.name ? json.name : 'Untitled';
         this.author = json.author ? json.author : 'No author provided.';
         this.desc = json.desc ? json.desc : 'No description provided.';
+        this.icon = json.icon ? json.icon : undefined
 
         if( json.scriptURL ){
             this.script = document.createElement('script')
@@ -323,13 +310,22 @@ export class LabComponent{
         if( json.templateURL ){
             Promise.race([
                 fetch(json.templateURL)
-                .then(_template=>{
-
-                })
-                .catch(e=>{
-                    console.log('error fetching plugin template',e)
-                })
+                    .then(resp=>resp.text())
+                    .then(template=>{
+                        this.template = document.createElement('div')
+                        this.template.innerHTML = template
+                    })
+                    .catch(e=>{
+                        console.log('error fetching plugin template',e)
+                    })
             ])
         }
     }
+}
+
+export class LabComponentHandler{
+    public blink : (sec?:number)=>void
+    public pushMessage : (string:string)=>void
+    public shutdown : ()=>void
+    public onShutdown : (cb:()=>void)=>void
 }
