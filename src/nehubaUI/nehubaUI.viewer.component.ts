@@ -356,12 +356,12 @@ export class NehubaViewerComponent implements OnDestroy{
       /**
        * applying default colour map.
        */
-      this.nehubaViewer.batchAddAndUpdateSegmentColors(metadata.parcellation.colorMap)
+      this.nehubaViewer.batchAddAndUpdateSegmentColors(metadata.selectedParcellation.colorMap)
         
       /**
        * patching surface parcellation and whole mesh vs single mesh
       */
-      const colorMap = (<ParcellationDescriptor>metadata.parcellation).colorMap
+      const colorMap = (<ParcellationDescriptor>metadata.selectedParcellation).colorMap
       /* TODO patching in surface parcellation */
       try{
         if( this.viewerConfig.layout!.useNehubaPerspective!.mesh!.surfaceParcellation ){
@@ -454,7 +454,7 @@ export class NehubaViewerComponent implements OnDestroy{
       /* TODO potentially generating some unresolvable promises here */
       if(seg.segment&&seg.segment!=0){
         this.viewerSegment=seg.segment
-        iterativeSearch(metadata.parcellation.regions,seg.segment)
+        iterativeSearch(metadata.selectedParcellation.regions,seg.segment)
           .then(region=>this.viewerSegment=region)
           .catch(e=>console.log(e))
       }else{

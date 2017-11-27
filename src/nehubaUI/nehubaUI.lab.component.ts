@@ -79,6 +79,6 @@ export class Lab {
       }
 
       showInputModal(){
-            this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
+            // this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
       }
 }

@@ -15,7 +15,7 @@ declare var window:{
 
 
 @Injectable()
-export class NehubaFetchData {
+export class DataService {
 
     /* simiple fetch promise for json obj */
     /* nb: return header must contain Content-Type : application/json */
@@ -43,6 +43,35 @@ export class NehubaFetchData {
         return new Promise((resolve,_)=>{
             resolve(new TemplateDescriptor(json))
         })
+    }
+
+    parseJson(json:any){
+        switch(json.type){
+            // case 'template':{
+            //     this.inputResponse += 'Adding new Template. '
+            //     this.nehubaFetchData.parseTemplateData(json)
+            //         .then( template =>{
+            //             this.fetchedOutputToController(template)
+            //         })
+            //         .catch( e=>{
+            //             this.inputResponse += 'Error.'
+            //             this.inputResponse += e.toString()
+            //             console.log(e)
+            //         })
+            // }break;
+            // case 'parcellation':{
+                
+            // }break;
+            // case 'plugin':{
+            //     /* some sort of validation process? */
+            //     this.inputResponse += 'Adding new plugin.'
+            //     const newPlugin = new PluginDescriptor(json)
+            //     this.fetchedOutputToController(newPlugin)
+            // }break;
+            // default:{
+            //     this.inputResponse += '\'type\' field not found.. Unable to process this JSON.'
+            // }break;
+        }
     }
 }
 
@@ -87,7 +116,6 @@ export class EventCenter{
     modalSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
     floatingWidgetSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
 
-    modalEventRelay : Subject<EventPacket> = new Subject()
     nehubaViewerRelay : Subject<EventPacket> = new Subject()
     globalLayoutRelay : BehaviorSubject<EventPacket> = new BehaviorSubject(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,{theme:'light'}))
 
@@ -182,6 +210,8 @@ export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     mouseEvent : new Subject()
 }
 
+// export const MODAL_CONTROL = window['nehubaUI']['util']['modalControl']
+
 export const EVENTCENTER_CONST = {
     NEHUBAVIEWER : {
         TARGET : {
@@ -221,4 +251,17 @@ export const NEHUBAUI_CONSTANTS = {
             ]
         }
     }
+}
+
+export const HELP_MENU = {
+    'Mouse Controls' : {
+        "Left-drag" : "within a slice view to move within that plane",
+        "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
+        "Mouse-Wheel" : "up or down to zoom in and out.",
+        "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
+        "Ctrl + Right-click" : "within a slice to teleport to that location"
+        },
+        'Keyboard Controls' : {
+        "tobe":"completed"
+        }
 }

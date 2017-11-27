@@ -47,10 +47,6 @@ export class MultilevelSelector {
             }))    
     }
 
-    callingModal(regionDescriptor:RegionDescriptor):void{
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:regionDescriptor.name,body:regionDescriptor.properties}))
-    }
-
     onScroll = (ev:any)=>{
         this.childrenMultilevel.forEach(multilevel=>{
             multilevel.onScroll(ev)

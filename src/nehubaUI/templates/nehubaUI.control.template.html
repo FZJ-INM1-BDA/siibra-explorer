@@ -1,5 +1,5 @@
 <div id = "leftSide">
-    <div (scroll)="onScroll($event)" id = "leftSideTop" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
+    <div id = "leftSideTop" class = "leftSideSubSection" [ngClass]="{darktheme:darktheme}">
         <div class = "modePanel" [ngClass]="{darktheme : darktheme}">
             <button (click)="templatesPanelIsShown = !templatesPanelIsShown" class = "btn btn-default btn-block btn-lg">
                 <span class = "glyphicon" [ngClass]="templatesPanelIsShown ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
@@ -37,7 +37,7 @@
                 <span *ngIf = "selectedParcellation" class = "glyphicon" [ngClass]="regionsPanelIsShown ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'"></span> 
                 Regions <small *ngIf = "selectedParcellation && ( selectedParcellation.regions | selectTreePipe ).length>0">({{( selectedParcellation.regions | selectTreePipe ).length}})</small>
             </button>
-            <div id = "regionContainer" class = "list-group" *ngIf="selectedParcellation" [hidden]="!regionsPanelIsShown">
+            <div (scroll)="onScroll($event)" id = "regionContainer" class = "list-group" *ngIf="selectedParcellation" [hidden]="!regionsPanelIsShown">
                 <div class = "list-group-item nohover">
                     <input class = "form-control" placeholder = "Search regions ... "  [ngModel]="searchTerm" (ngModelChange)="multilvlExpansionTreeShake($event)" name = "searchRegionInput" #ctrl="ngModel">
                 </div>

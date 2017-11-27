@@ -1,8 +1,14 @@
 import { Component,ViewChild,Input,EventEmitter,Output } from '@angular/core'
-import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { EventCenter,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl,HELP_MENU } from './nehubaUI.services'
 import { EventPacket } from './nehuba.model'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
+import { ModalHandler } from './nehubaUI.modal.component'
 
+declare var window:{
+    [key:string] : any
+    prototype : Window;
+    new() : Window;
+}
 
 @Component({
     selector : 'ATLASViewer',
@@ -49,20 +55,10 @@ export class NehubaViewerContainer {
     }
 
     showhelp(){
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:"Basic Controls",body:this.helpMenu}))
-    }
-
-    helpMenu:any = 
-    {
-        'Mouse Controls' : {
-        "Left-drag" : "within a slice view to move within that plane",
-        "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
-        "Mouse-Wheel" : "up or down to zoom in and out.",
-        "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
-        "Ctrl + Right-click" : "within a slice to teleport to that location"
-        },
-        'Keyboard Controls' : {
-        "tobe":"completed"
-        }
+        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Help</h4>`
+        modalHandler.body = HELP_MENU
+        modalHandler.footer
+        modalHandler.show()
     }
 }

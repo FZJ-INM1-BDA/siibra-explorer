@@ -11,7 +11,7 @@ import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 
 import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from './nehubaUI.floatingWidget.component';
-import { NehubaModal } from './nehubaUI.modal.component'
+import { NehubaModalService,NehubaModalUnit } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
@@ -21,7 +21,7 @@ import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
-import { HelperFunctions,NehubaFetchData,EventCenter } from './nehubaUI.services';
+import { HelperFunctions,DataService,EventCenter } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
@@ -39,12 +39,12 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
     declarations : 
         [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
-        Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,
-        MultilevelSelector, NehubaModal,
+        Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
+        MultilevelSelector, NehubaModalService,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
     bootstrap : [ NehubaContainer ],
-    providers : [ HelperFunctions,NehubaFetchData,EventCenter],
-    entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent ]
+    providers : [ HelperFunctions,DataService,EventCenter],
+    entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent,NehubaModalUnit ]
 })
 export class NehubaUI{
     

@@ -1,6 +1,7 @@
 import { NgZone,Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
-import { NehubaFetchData,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
+import { DataService,EventCenter,EXTERNAL_CONTROL as gExternalControl,EVENTCENTER_CONST,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
+import { ModalHandler } from './nehubaUI.modal.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
 import { PluginDescriptor,EventPacket, FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor,LayerDescriptor } from './nehuba.model'
 import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
@@ -13,8 +14,7 @@ declare var window:{
 
 @Component({
   selector : 'atlascontrol',
-  templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html',
-  providers : [ NehubaFetchData ],
+  templateUrl : 'src/nehubaUI/templates/nehubaUI.control.template.html'
 })
 
 export class NehubaUIControl implements OnInit,AfterViewInit{
@@ -38,7 +38,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   pluginsPanelIsShown:boolean = false
 
   constructor( 
-    private nehubaFetchData : NehubaFetchData,
+    private dataService : DataService,
     private eventCenter:EventCenter,
     private zone:NgZone
     ){
@@ -122,33 +122,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     gExternalControl.viewControl
       .filter((evPk:EventPacket)=>evPk.target=='loadParcellation'&&evPk.code==102)
       .subscribe((evPk:EventPacket)=>{
-        this.selectedParcellation = evPk.body.parcellation
-        this.selectedRegions = []
-  
-        const mapRegions = (regions:RegionDescriptor[])=>{
-          regions.forEach((region:RegionDescriptor)=>{
-            if(region.labelIndex){
-              this.regionsLabelIndexMap.set(region.labelIndex,region)
-            }
-            if(region.children){
-              mapRegions(region.children)
-            }
-          })
-        }
-        this.regionsLabelIndexMap.clear()
-        mapRegions(this.selectedParcellation!.regions)
-  
-        /* TODO temporary measure, until nehubaviewer has its own way of controlling layers */
-        this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
-          window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
-        })
-        setTimeout(()=>{
-          window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
-        })
-        this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).map((id:any)=>({labelIndex:id})) )
-  
-        /* populate the metadata object */
-        gExternalControl.metadata.parcellation = this.selectedParcellation
 
         /* progress the evPk lifecycle */
         const nEvPk = evPk
@@ -190,7 +163,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       }
       if(!gl){
         message['Detail'] = 'Your browser does not support WebGL.'
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+        
+        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
         return
       }
       
@@ -203,7 +181,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         ${ !texturefloat ? 'OES_texture_float' : ''} 
         ${ !indexuint ? 'OES_element_index_uint' : ''} `
         message['Detail'] = [detail]
-        this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal','',100,{title:'Warning',body:message}))
+        
+        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
       }
     })()
   }
@@ -240,9 +223,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         })
       ])
       .then((json:any)=>{
-        this.nehubaFetchData.fetchJson(json['UIConfigURL'])
+        this.dataService.fetchJson(json['UIConfigURL'])
           .then((json:any)=>{
-            this.nehubaFetchData.parseTemplateData(json)
+            this.dataService.parseTemplateData(json)
               .then( template =>{
                 this.chooseTemplate( template )
               })
@@ -280,9 +263,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     ]
 
     datasetArray.forEach(dataset=>{
-      this.nehubaFetchData.fetchJson(dataset)
+      this.dataService.fetchJson(dataset)
         .then((json:any)=>{
-          this.nehubaFetchData.parseTemplateData(json)
+          this.dataService.parseTemplateData(json)
             .then( template =>{
               this.fetchedTemplatesData.templates.push( template )
             })
@@ -296,55 +279,36 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       })
   }
 
-  loadTemplate(templateDescriptor:TemplateDescriptor,mEvPk?:EventPacket):void{
+  loadTemplate(templateDescriptor:TemplateDescriptor,_mEvPk?:EventPacket):void{
 
-    /* send signals to modal and viewer to update the view */
-    /* ID needed so that when loading template is complete, the dismiss signal with the correct ID can be sent */
-    let id = Date.now().toString()
-    let requestNewCurtainModal = new EventPacket('curtainModal',id,100,{})
-    let curtainModalSubject = this.eventCenter.createNewRelay(requestNewCurtainModal)
-    
-    let eventPacket = new EventPacket('curtainModal',id,100,{title:'Loading Template ...',body:templateDescriptor.name+' is being loaded... '})
-    curtainModalSubject.next(eventPacket)
-    curtainModalSubject.subscribe((evPk:EventPacket)=>{
-      switch(evPk.code){
-        case 101:{
-          this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,id,100,
-            {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
-          this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,id,100,templateDescriptor))
-    
-          /* update models in the controller */
-          this.selectedTemplate = templateDescriptor
-          this.selectedRegions = []
+    const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+    modalHandler.title = `<h4>Loading template ${templateDescriptor.name} </h4>`
+    modalHandler.body = `Please stand by ...`
+    modalHandler.footer = null
 
-          this.chooseParcellation(templateDescriptor.parcellations[0])
-
-          gExternalControl.metadata.template = this.selectedTemplate
-
-          /* for the time being, parcellation is automatically chosen (?) TODO: there are current no usecase for single template with multiple parcellations.  */
-          // this.chooseParcellation(this.selectedTemplate.parcellations[0])
-
-          if(mEvPk){
-            mEvPk.code = 103
-            gExternalControl.viewControl.next(mEvPk)
-          }
+    modalHandler.onShown(()=>{
+      /* TODO onshown method does not fire at correct timing, investigate for issues */
+      setTimeout(()=>{
+        this.eventCenter.nehubaViewerRelay.next(new EventPacket(EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE,'',100,templateDescriptor))
+        this.eventCenter.globalLayoutRelay.next(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,
+          {theme:templateDescriptor.useTheme == 'dark' ? EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.DARK : EVENTCENTER_CONST.GLOBALLAYOUT.BODY.THEME.LIGHT}))
           
-          /* TODO: temporary measure */
-          setTimeout(()=>{
-            curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-          },3000)
-        }break;
-        case 200:
-        case 500:{
-          curtainModalSubject.unsubscribe()
-        }break;
-      }
+        this.selectedTemplate = templateDescriptor
+        this.chooseParcellation( templateDescriptor.parcellations[0] )
+
+        gExternalControl.metadata.selectedTemplate = this.selectedTemplate
+        gExternalControl.metadata.selectedRegions = []
+      },200)
+      /* TODO waiting for nehuba API on when it's safe to dismiss the modal */
+      setTimeout(()=>{
+        modalHandler.hide()
+      },3000)
     })
+    modalHandler.show()
   }
 
   chooseTemplate(templateDescriptor:TemplateDescriptor):void{
     if ( this.selectedTemplate != templateDescriptor ){
-      this.selectedTemplate = templateDescriptor
       this.loadTemplate(templateDescriptor)
     }
   }
@@ -361,30 +325,56 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   }
 
   updateRegionDescriptors(regions:any[]){
-      const labelIndices = regions.map(region=>region.labelIndex)
-      gExternalControl.metadata.regions = []
-      this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
-      labelIndices.forEach(idx=>{
-        const region = this.regionsLabelIndexMap.get(idx)
-        if(region) {
-          region.enabled = true
-          gExternalControl.metadata.regions.push(region)
-        }
-      })
+    const labelIndices = regions.map(region=>region.labelIndex)
+    gExternalControl.metadata.selectedRegions = []
+    this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
+    labelIndices.forEach(idx=>{
+      const region = this.regionsLabelIndexMap.get(idx)
+      if(region) {
+        region.enabled = true
+        gExternalControl.metadata.selectedRegions.push(region)
+      }
+    })
   }
 
   chooseParcellation(parcellation:ParcellationDescriptor):void{
     if( this.selectedParcellation != parcellation ){
-      gExternalControl.viewControl.next(new EventPacket('loadParcellation','',100,{source:'ui',oldParcellation:this.selectedParcellation,parcellation:parcellation}))
+      this.selectedParcellation = parcellation
+      this.selectedRegions = []
+
+      const mapRegions = (regions:RegionDescriptor[])=>{
+        regions.forEach((region:RegionDescriptor)=>{
+          if(region.labelIndex){
+            this.regionsLabelIndexMap.set(region.labelIndex,region)
+          }
+          if(region.children){
+            mapRegions(region.children)
+          }
+        })
+      }
+      this.regionsLabelIndexMap.clear()
+      mapRegions(this.selectedParcellation!.regions)
+
+      /* TODO temporary measure, until nehubaviewer has its own way of controlling layers */
+      this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
+        window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
+      })
+      setTimeout(()=>{
+        window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
+      })
+      this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).map((id:any)=>({labelIndex:id})) )
+
+      /* populate the metadata object */
+      gExternalControl.metadata.selectedParcellation = this.selectedParcellation
     }
   }
 
-  showMoreInfo(item:any):void{
-    this.eventCenter.modalEventRelay.next(new EventPacket('showInfoModal',Date.now().toString(),100,{title:item.name,body:item.properties}))
+  showMoreInfo(_item:any):void{
+    
   }
 
-  showInputModal(type:string):void{
-    this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add',title_:type}))
+  showInputModal(_type:string):void{
+    
   }
 
   loadPresetShader(layer:LayerDescriptor):void{
@@ -451,6 +441,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     })
   }
 
+  /**
+   * the propagation event is needed to ensure the info panel stay with the element when scrolling
+   */
   onScroll = (ev:any)=>{
     this.multilevelSelector.onScroll(ev)
   }
