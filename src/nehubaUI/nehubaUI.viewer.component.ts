@@ -4,7 +4,7 @@ import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } fro
 
 import { Animation,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
-import { CM_THRESHOLD,CM_MATLAB_HOT } from './nehuba.config'
+import { CM_THRESHOLD,CM_MATLAB_HOT } from './nehubaUI.services'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 
@@ -61,6 +61,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     VIEWER_CONTROL.afterParcellationLoading = (cb:()=>void) => this.afterParcellationSelection(cb)
     VIEWER_CONTROL.showSegment = (seg) => this.showSegment(seg)
     VIEWER_CONTROL.hideAllSegments = () => this.hideAllSegments()
+    VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
     VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
 
   }
