@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
 
 import { TemplateDescriptor, LabComponent } from './nehuba.model'
-import { TIMEOUT } from './nehuba.config'
 
 declare var window:{
     [key:string] : any
@@ -98,15 +97,6 @@ export class Animation{
             yield ( Date.now() - this.startTime ) / this.duration
         }
         return 1
-    }
-
-    /* takes a value and generates a value that is somewhat close to the original value every time */
-    *randomSteps(oldValue:number):IterableIterator<number>{
-        do{
-            yield (oldValue + Math.random()) / 5
-            /* too new age for my liking */
-            // yield Math.abs( (oldValue + ( Math.random() - 0.5 )/5 ) %1 )
-        }while(true)
     }
 }
 
@@ -208,22 +198,6 @@ class ViewerHandle {
 
 export const VIEWER_CONTROL = new ViewerHandle()
 
-//TODO to be removed. init state to be encoded in hash
-export const NEHUBAUI_CONSTANTS = {
-    toolmode : {
-        JuGeX : {
-            "UIConfigURL":"http://172.104.156.15/json/colin",
-            "plugins":[
-                  {
-                        "name":"JuGeX",
-                        "type":"plugin",
-                        "templateURL":"http://172.104.156.15/html/jugex.template",
-                        "scriptURL":"http://172.104.156.15/js/jugex.script"
-                  }
-            ]
-        }
-    }
-}
 
 export const HELP_MENU = {
     'Mouse Controls' : {
@@ -237,3 +211,58 @@ export const HELP_MENU = {
         "tobe":"completed"
         }
 }
+
+export const PRESET_COLOR_MAPS = [
+    {
+          name : 'MATLAB_autumn',
+          previewurl : "http://http://172.104.156.15:8080/colormaps/MATLAB_autumn.png",
+          code : `
+vec4 colormap(float x) {
+  float g = clamp(x,0.0,1.0);
+  return vec4(1.0,g,0.0,1.0);
+}
+          `
+    },
+     {
+          name : 'MATLAB_bone',
+          previewurl : 'http://http://172.104.156.15:8080/colormaps/MATLAB_bone.png',
+          code : `
+float colormap_red(float x) {
+  if (x < 0.75) {
+      return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;
+  } else {
+      return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;
+  }
+}
+
+float colormap_green(float x) {
+  if (x <= 0.375) {
+      return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;
+  } else if (x <= 0.75) {
+      return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;
+  } else {
+      return 8.0 / 9.0 * x + 1.0 / 9.0;
+  }
+}
+
+float colormap_blue(float x) {
+  if (x <= 0.375) {
+      return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;
+  } else {
+      return 8.0 / 9.0 * x + 1.0 / 9.0;
+  }
+}
+
+vec4 colormap(float x) {
+  float r = clamp(colormap_red(x),0.0,1.0);
+  float g = clamp(colormap_green(x), 0.0, 1.0);
+  float b = clamp(colormap_blue(x), 0.0, 1.0);
+  return vec4(r, g, b, 1.0);
+}
+          `
+    }
+]
+
+export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
+export const TIMEOUT = 5000;
+export const CM_THRESHOLD = 0.01;

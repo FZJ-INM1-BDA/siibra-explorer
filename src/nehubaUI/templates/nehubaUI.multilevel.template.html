@@ -24,10 +24,8 @@
                     <span 
                         *ngIf = "singleData.moreInfo.length > 0" 
                         class = "multilevel-icon unicodeSymbols" 
-                        [popoverTitle]="singleData.name"
                         [popover]="moreInfo"
                         [outsideClick]="true"
-                        container="body"
                         placement="left">
                             <i class = "glyphicon glyphicon-option-vertical"></i>
                     </span>

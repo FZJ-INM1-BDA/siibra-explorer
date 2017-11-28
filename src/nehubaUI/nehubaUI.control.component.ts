@@ -1,5 +1,5 @@
 import { Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
-import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalControl,NEHUBAUI_CONSTANTS } from './nehubaUI.services'
+import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
 import { ModalHandler } from './nehubaUI.modal.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
@@ -101,63 +101,64 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   ngAfterViewInit():void{
 
     /* TODO to be replaced by hash encoded string instead in the future */
-    const query = window.location.search.substring(1)
-    const toolModeURL = query.split('&').find((kv:any)=>kv.split('=')[0]=='toolmode')
-    if ( toolModeURL ){
-      Promise.race([
-        new Promise((resolve,_)=>{
-          const PRECONFIGURED_TOOLMODES : any =  NEHUBAUI_CONSTANTS.toolmode 
-          if ( PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ] ){
-            resolve(PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ])
-          }
-        }),
-        new Promise((resolve,reject)=>{
-          Promise.race([
-            new Promise((resolve,reject)=>{
-              fetch(toolModeURL.split('=')[1])
-                .then(res=>resolve(res))
-                .catch(e=>reject(e))
-            }),
-            new Promise((_,reject)=>{
-              setTimeout(()=>{
-                reject('Fetching toolmodeurl timeout, 10000ms')
-              },10000)
-            })
-          ])
-          .then((res:any)=>res.json())
-          .then(((json:any)=>{resolve(json)}))
-          .catch(e=>reject(e))
-        })
-      ])
-      .then((json:any)=>{
-        this.dataService.fetchJson(json['UIConfigURL'])
-          .then((json:any)=>{
-            this.dataService.parseTemplateData(json)
-              .then( template =>{
-                this.chooseTemplate( template )
-              })
-              .catch(e=>{
-                throw new Error(e)
-              })
-            })
+    // const query = window.location.search.substring(1)
+    // const toolModeURL = query.split('&').find((kv:any)=>kv.split('=')[0]=='toolmode')
+    // if ( toolModeURL ){
+    //   Promise.race([
+    //     new Promise((resolve,_)=>{
+    //       const PRECONFIGURED_TOOLMODES : any =  NEHUBAUI_CONSTANTS.toolmode 
+    //       if ( PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ] ){
+    //         resolve(PRECONFIGURED_TOOLMODES[ toolModeURL.split('=')[1] ])
+    //       }
+    //     }),
+    //     new Promise((resolve,reject)=>{
+    //       Promise.race([
+    //         new Promise((resolve,reject)=>{
+    //           fetch(toolModeURL.split('=')[1])
+    //             .then(res=>resolve(res))
+    //             .catch(e=>reject(e))
+    //         }),
+    //         new Promise((_,reject)=>{
+    //           setTimeout(()=>{
+    //             reject('Fetching toolmodeurl timeout, 10000ms')
+    //           },10000)
+    //         })
+    //       ])
+    //       .then((res:any)=>res.json())
+    //       .then(((json:any)=>{resolve(json)}))
+    //       .catch(e=>reject(e))
+    //     })
+    //   ])
+    //   .then((json:any)=>{
+    //     this.dataService.fetchJson(json['UIConfigURL'])
+    //       .then((json:any)=>{
+    //         this.dataService.parseTemplateData(json)
+    //           .then( template =>{
+    //             this.chooseTemplate( template )
+    //           })
+    //           .catch(e=>{
+    //             throw new Error(e)
+    //           })
+    //         })
 
-        /* TODO: find a more elegant solution in the future */
-        setTimeout(()=>{
-          json.plugins.forEach((_plugin:any)=>{
-            // const newPlugin = new PluginDescriptor(plugin)
-            // this.labComponent.launchPlugin(newPlugin)
-          })
-        },3000)
-        this.emitHideUI.emit({hideUI:true})
-      })
-      .catch(e=>{
-        console.log(e)
-        this.loadInitDatasets()
-      })
-    }else{
-      this.loadInitDatasets()
-    }
+    //     /* TODO: find a more elegant solution in the future */
+    //     setTimeout(()=>{
+    //       json.plugins.forEach((_plugin:any)=>{
+    //         // const newPlugin = new PluginDescriptor(plugin)
+    //         // this.labComponent.launchPlugin(newPlugin)
+    //       })
+    //     },3000)
+    //     this.emitHideUI.emit({hideUI:true})
+    //   })
+    //   .catch(e=>{
+    //     console.log(e)
+    //     this.loadInitDatasets()
+    //   })
+    // }else{
+    // }
     
+    this.loadInitDatasets()
+
     this.afterParcellationSelectionHook.push(()=>{
       const nehubaViewer = (<NehubaViewer>window.nehubaViewer)
       
@@ -265,8 +266,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
           .map(region=>region.labelIndex) )
       }))
         .then((segments:number[])=>{
-          VIEWER_CONTROL.hideAllSegments()
-          segments.forEach(seg=>VIEWER_CONTROL.showSegment(seg))
+          if(segments.length==0){
+            VIEWER_CONTROL.showAllSegments()
+          }else{
+            VIEWER_CONTROL.hideAllSegments()
+            segments.forEach(seg=>VIEWER_CONTROL.showSegment(seg))
+          }
         })
     }
   }
