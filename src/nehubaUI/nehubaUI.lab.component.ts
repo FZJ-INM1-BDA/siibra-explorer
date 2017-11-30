@@ -60,7 +60,7 @@ export class Lab {
             "scriptURL":"http://172.104.156.15/js/pluginBuilder"
       }
 
-      constructor(private helperFunctions:HelperFunctions){
+      constructor(){
             
       }
 
@@ -72,7 +72,7 @@ export class Lab {
 
       /* TODO figure out a new way to launch plugin */
       launchPlugin(labComponent:LabComponent){
-            this.helperFunctions.loadPlugin(labComponent)
+            HelperFunctions.sLoadPlugin(labComponent)
             // if(param.templateURL && param.scriptURL){
             //       const requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
             //       const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)

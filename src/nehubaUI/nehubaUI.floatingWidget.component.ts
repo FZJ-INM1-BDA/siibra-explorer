@@ -35,9 +35,11 @@ export class FloatingWidget implements OnInit,AfterViewInit{
   loadedWidgets : LabComponent[] = []
   darktheme : boolean = false
 
-  constructor( private helperFunctions:HelperFunctions, private componentFactoryResolver: ComponentFactoryResolver, private sanitizer : DomSanitizer){
+  constructor( private componentFactoryResolver: ComponentFactoryResolver, private sanitizer : DomSanitizer){
     /* TODO figure out a new way to launch plugin */
-    this.helperFunctions.loadPlugin = (labComponent:LabComponent) => this.lab(labComponent)
+    HelperFunctions.sLoadPlugin = (labComponent:LabComponent)=>{
+      this.lab(labComponent)
+    }
   }
 
   ngOnInit(){
