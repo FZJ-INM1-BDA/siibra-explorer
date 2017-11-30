@@ -1,8 +1,8 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions, EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
-import { OnDestroy, AfterViewInit } from '@angular/core/src/metadata/lifecycle_hooks';
+import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions, EXTERNAL_CONTROL as gExternalControl,CM_MATLAB_HOT,CM_THRESHOLD } from './nehubaUI.services'
+import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
-  
+
 export class FetchedTemplates {
   constructor(){
     this.templates = []
@@ -236,7 +236,7 @@ export class Multilevel{
       this.isVisible     
 }
 
-export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo,AfterViewInit{
+export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
 
   constructor(json:any,hierachy:number){
     super()
@@ -264,8 +264,21 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo,A
         modalHandler.title = `Loading PMap of ${this.name} ...`
         modalHandler.body = `Please stand by ...`
         modalHandler.show()
+
+        /* move viewer to the relevant location */
+        VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
+
         setTimeout(()=>{
-            VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
+            const pMapObj = {
+                PMap : {
+                    type : 'image',
+                    source : 'nifti://'+this.PMapURL,
+                    shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
+                }
+            }
+            VIEWER_CONTROL.loadLayer(pMapObj)
+            VIEWER_CONTROL.reapplyNehubaMeshFix()
+            VIEWER_CONTROL.hideAllSegments()
             const newWidget = new LabComponent(PMAP_WIDGET)
             HelperFunctions.sLoadPlugin(newWidget)
         },200)
@@ -287,9 +300,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo,A
   rgb : number[]
 
   moreInfo : DescriptorMoreInfoItem[] = []
-
-  ngAfterViewInit(){
-  }
 }
 
 export interface DescriptorMoreInfo{

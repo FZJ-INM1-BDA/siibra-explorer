@@ -37,9 +37,7 @@ export class FloatingWidget implements OnInit,AfterViewInit{
 
   constructor( private componentFactoryResolver: ComponentFactoryResolver, private sanitizer : DomSanitizer){
     /* TODO figure out a new way to launch plugin */
-    HelperFunctions.sLoadPlugin = (labComponent:LabComponent)=>{
-      this.lab(labComponent)
-    }
+    HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.lab(labComponent)
   }
 
   ngOnInit(){
@@ -76,8 +74,8 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     labComponent.script.onerror = (_e)=>{
       console.log('script loading error')
     }
-    document.head.appendChild(labComponent.script)
 
+    floatingWidgetComponent.afterViewInitHook.push(()=>document.head.appendChild(labComponent.script))
     floatingWidgetComponent.shutdownPlugin = () => componentRef.destroy()
   }
 }
@@ -115,20 +113,16 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
   
   icon : string 
   popoverMessage : string | null
+  afterViewInitHook : (()=>void)[] = []
 
   reposition : boolean = false
   startpos : number[] = [0,0]
   offset : number[] = [850,650] /* from bottom right */
   startOffset : number[] = [450,350]
-  selectedColorMap : any 
 
   COLORMAPS : any[] = PRESET_COLOR_MAPS
 
-  presetColorFlag : boolean = true
-  customData : any = {}
-
   template : any
-//   public controllerSubject : Subject<EventPacket>
   
   blinkingTimer : any
   blinkingFlag : boolean = false
@@ -146,6 +140,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false      
     })
     this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+    this.afterViewInitHook.forEach(fn=>fn())
   }
 
   @HostListener('document:mousemove',['$event'])
@@ -187,12 +182,6 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
 
     this.startOffset[0] = this.offset[0]
     this.startOffset[1] = this.offset[1]
-  }
-
-  loadColorMap(){
-    if (this.selectedColorMap) { 
-      this.loadSelection(this.selectedColorMap.code) 
-    }
   }
 
   stopBlinking(){

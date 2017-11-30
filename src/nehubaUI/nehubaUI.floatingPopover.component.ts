@@ -26,7 +26,7 @@ import { RegionDescriptor } from './nehuba.model'
             <span 
                 *ngFor = "let moreInfo of cursorSegment.moreInfo"
                 class = "moreInfo-icon glyphicon"
-                (click) = "moreInfo.action()"
+                (click) = "contextmenuEvent=null;moreInfo.action()"
                 [ngClass] = "'glyphicon-' + moreInfo.icon"
                 [tooltip] = "moreInfo.name">
             </span>
@@ -34,7 +34,7 @@ import { RegionDescriptor } from './nehuba.model'
         <span 
             *ngFor = "let moreInfo of otherTools"
             class = "moreInfo-icon glyphicon"
-            (click) = "moreInfo.action()"
+            (click) = "contextmenuEvent=null;moreInfo.action();"
             [ngClass] = "'glyphicon-' + moreInfo.icon"
             [tooltip] = "moreInfo.name">
         </span>

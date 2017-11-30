@@ -4,7 +4,6 @@ import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } fro
 
 import { Animation,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
-import { CM_THRESHOLD,CM_MATLAB_HOT } from './nehubaUI.services'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 
@@ -60,10 +59,11 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     VIEWER_CONTROL.onParcellationLoading = (cb:()=>void) => this.onParcellationSelection(cb)
     VIEWER_CONTROL.afterParcellationLoading = (cb:()=>void) => this.afterParcellationSelection(cb)
     VIEWER_CONTROL.showSegment = (seg) => this.showSegment(seg)
+    VIEWER_CONTROL.hideSegment = (seg) => this.hideSegment(seg)
     VIEWER_CONTROL.hideAllSegments = () => this.hideAllSegments()
     VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
     VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
-
+    VIEWER_CONTROL.loadLayer = (layerObj:Object) => this.loadLayer(layerObj)
   }
 
   public loadTemplate = (templateDescriptor:TemplateDescriptor)=>{
@@ -177,6 +177,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   public hideAllSegments(){
     this.nehubaViewerComponent.allSeg(false)
   }
+
+  public loadLayer(layerObj:Object){
+    this.nehubaViewerComponent.loadLayer(layerObj)
+  }
 }
 
 @Component({
@@ -208,7 +212,7 @@ div#container{
     `
   ]
 })
-export class NehubaViewerComponent implements OnDestroy{
+export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
   viewerConfig : NehubaViewerConfig
   darktheme : boolean
@@ -292,6 +296,9 @@ export class NehubaViewerComponent implements OnDestroy{
     this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
     this.nehubaViewer.dispose()
     window['nehubaViewer'] = null
+  }
+
+  public ngAfterViewInit(){
   }
 
   public loadTemplate(config:NehubaViewerConfig){
@@ -408,15 +415,11 @@ export class NehubaViewerComponent implements OnDestroy{
   }
 
   //TODO: do this properly with proper api's
-  public loadLayer(url:string){
-    let json = this.nehubaViewer.ngviewer.state.toJSON()
-    json.layers.PMap = {
-      type : "image",
-      source : "nifti://"+url,
-      shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-    }
-    json.layers.atlas.visible = false
-    this.nehubaViewer.ngviewer.state.restoreState(json)
+  public loadLayer(layerObj:Object){
+    /* TODO wait for proper api in nehuba viewer */
+    const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
+    Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
+    this.nehubaViewer.ngviewer.state.restoreState(state)
   }
 
   public showFloatingPopover = (ev:any)=> {

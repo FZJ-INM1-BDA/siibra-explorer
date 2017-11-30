@@ -173,7 +173,7 @@ class UIHandle{
     afterParcellationSelection : (cb:()=>void)=>void
 }
 
-export const UI_CONTROL = new UIHandle()
+export const UI_CONTROL = window['uiControl'] = new UIHandle()
 
 class ViewerHandle {
     loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
@@ -193,9 +193,12 @@ class ViewerHandle {
     hideSegment : (segId:number)=>void
     showAllSegments : ()=>void
     hideAllSegments : ()=>void
+
+    loadLayer : (layerObj:Object)=>void
+    reapplyNehubaMeshFix : ()=>void
 }
 
-export const VIEWER_CONTROL = new ViewerHandle()
+export const VIEWER_CONTROL = window['viewerControl'] = new ViewerHandle()
 
 
 export const HELP_MENU = {
@@ -227,10 +230,17 @@ export const TIMEOUT = 5000;
 export const CM_THRESHOLD = 0.01;
 export const PMAP_WIDGET = {
     name : `PMap`,
-    icon : 'map',
+    icon : 'picture',
     script : `
-    const encodedValue = document.getElementById('default.default.pmap.encodedValue')
-    window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.text = ev.value || ev.value == 0 ? '' : ev.value)
+    (()=>{
+        window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
+        const encodedValue = document.getElementById('default.default.pmap.encodedValue')
+        window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
+        window.pluginControl['PMap'].onShutdown(()=>{
+            window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
+            window.viewerControl.hideSegment(0)
+        })
+    })()
     `,
     template : `
     <table class = "table table-sm table-bordered">
