@@ -53,6 +53,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
     UI_CONTROL.afterParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
 
+    VIEWER_CONTROL.reapplyNehubaMeshFix = this.applyNehubaMeshFix
     this.afterTemplateSelectionHook.push(()=>{
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
     })
@@ -159,38 +160,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     
     this.loadInitDatasets()
 
-    this.afterParcellationSelectionHook.push(()=>{
-      const nehubaViewer = (<NehubaViewer>window.nehubaViewer)
-      
-      nehubaViewer.clearCustomSegmentColors()
-      if( this.selectedParcellation ){
-        nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
-        nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
-      }
-
-      const shownSegmentsObservable = nehubaViewer.getShownSegmentsObservable()
-      this.shownSegmentsObserver = shownSegmentsObservable.subscribe(segs=>{
-        this.updateRegionDescriptors(segs)
-
-        if( this.selectedParcellation ){
-          if( this.selectedParcellation.surfaceParcellation ){
-            //TODO need to test init condition... if selectedRegions is a subset of total regions, what happens?
-            if( segs.length == 0 ){
-              nehubaViewer.clearCustomSegmentColors()
-              nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
-            }else{
-              const newColormap = new Map()
-              const blankColor = {red:255,green:255,blue:255}
-              this.selectedParcellation.colorMap.forEach((activeValue,key)=>{
-                newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
-              })
-              nehubaViewer.clearCustomSegmentColors()
-              nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
-            }
-          }
-        }
-      })
-    })
+    this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
 
     this.onParcellationSelectionHook.push(()=>{
       if (this.shownSegmentsObserver) this.shownSegmentsObserver.unsubscribe()
@@ -222,6 +192,39 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
           console.log('fetch init dataset error',e)
         })
       })
+  }
+
+  applyNehubaMeshFix = () =>{
+    const nehubaViewer = (<NehubaViewer>window.nehubaViewer)
+    
+    nehubaViewer.clearCustomSegmentColors()
+    if( this.selectedParcellation ){
+      nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
+      nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+    }
+
+    const shownSegmentsObservable = nehubaViewer.getShownSegmentsObservable()
+    this.shownSegmentsObserver = shownSegmentsObservable.subscribe(segs=>{
+      this.updateRegionDescriptors(segs)
+
+      if( this.selectedParcellation ){
+        if( this.selectedParcellation.surfaceParcellation ){
+          //TODO need to test init condition... if selectedRegions is a subset of total regions, what happens?
+          if( segs.length == 0 ){
+            nehubaViewer.clearCustomSegmentColors()
+            nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+          }else{
+            const newColormap = new Map()
+            const blankColor = {red:255,green:255,blue:255}
+            this.selectedParcellation.colorMap.forEach((activeValue,key)=>{
+              newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
+            })
+            nehubaViewer.clearCustomSegmentColors()
+            nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
+          }
+        }
+      }
+    })
   }
 
   loadTemplate(templateDescriptor:TemplateDescriptor):void{

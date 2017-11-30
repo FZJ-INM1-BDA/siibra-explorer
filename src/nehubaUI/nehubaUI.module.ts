@@ -21,7 +21,7 @@ import { NehubaBanner } from './nehubaUI.banner.component';
 import { Lab } from './nehubaUI.lab.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
-import { HelperFunctions,DataService } from './nehubaUI.services';
+import { DataService } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
 
 @NgModule({
@@ -43,7 +43,7 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
         MultilevelSelector, NehubaModalService,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
     bootstrap : [ NehubaContainer ],
-    providers : [ HelperFunctions,DataService],
+    providers : [ DataService],
     entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent,NehubaModalUnit ]
 })
 export class NehubaUI{
