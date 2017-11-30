@@ -1,369 +1,440 @@
-import { OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
-import { Subject } from 'rxjs/Rx'
+import { AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 
-import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3,quat } from 'nehuba/exports'
+import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
-import { EventCenter,Animation,EVENTCENTER_CONST,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
-import { EventPacket } from './nehuba.model'
-import { CM_THRESHOLD,CM_MATLAB_HOT,CM_DEFAULT_MAP } from './nehuba.config'
+import { Animation,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
+import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
+import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 
 declare var window:{
-      [key:string] : any
-      prototype : Window;
-      new() : Window;
+  [key:string] : any
+  prototype : Window;
+  new() : Window;
 }
 
-
 @Directive({
-      selector : '[nehuba-viewer-host]'
+  selector : '[nehuba-viewer-host]'
 })
 
 export class NehubaViewerDirective{
-      constructor(public viewContainerRef:ViewContainerRef){}
+  constructor(public viewContainerRef:ViewContainerRef){}
 }
 
 @Component({
-      selector : 'NehubaViewer',
-      template:`
+  selector : 'NehubaViewer',
+  template:`
 <ng-template nehuba-viewer-host>
 </ng-template>
-      `
+  `
 })
 
-export class NehubaViewerInnerContainer implements OnInit{
+export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
 
-      @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
-      nehubaViewerComponent : NehubaViewerComponent
-      componentRef : ComponentRef<any>
-      viewContainerRef : ViewContainerRef
-      templateLoaded : boolean = false
-      darktheme : boolean = false
+  @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
+  nehubaViewerComponent : NehubaViewerComponent
+  componentRef : ComponentRef<any>
+  viewContainerRef : ViewContainerRef
+  private templateLoaded : boolean = false
+  darktheme : boolean = false
 
-      colorMap : Map<number,{}>
+  colorMap : Map<number,{}>
 
-      constructor(
-            private componentFactoryResolver: ComponentFactoryResolver,
-            private eventCenter : EventCenter
-      ){
-            gExternalControl.viewControl
-                  .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==101)
-                  .subscribe((_evPk:EventPacket)=>{
-                        this.nehubaViewerComponent.nehubaViewer.clearCustomSegmentColors()
-                  })
+  private onViewerInitHook : (()=>void)[] = []
+  private afterviewerInitHook : (()=>void)[] = []
 
-            /* this maybecome obsolete */
-            this.eventCenter.nehubaViewerRelay.subscribe((msg:EventPacket)=>{
-                  switch(msg.target){
-                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_TEMPALTE:{
-                              this.loadNewTemplate(msg.body.nehubaConfig)
-                        }break;
-                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.NAVIGATE:{
-                              this.navigate(msg.body.pos,msg.body.rot)
-                        }break;
-                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.SHOW_SEGMENT:{
-                              if(msg.body.segID == 0){
-                                    this.hideAllSegments()
-                              }else{
-                                    this.showSegment(msg.body.segID)
-                              }
-                        }break;
-                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.HIDE_SEGMENT:{
-                              if(msg.body.segID == 0){
-                                    this.showAllSegments()
-                              }else{
-                                    this.hideSegment(msg.body.segID)
-                              }
-                        }break;
-                        case EVENTCENTER_CONST.NEHUBAVIEWER.TARGET.LOAD_LAYER:{
-                              this.loadPMap(msg)
-                        }
-                  }
-            })
-            this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-                  switch(msg.target){
-                        case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-                              this.darktheme = msg.body.theme == 'dark' 
-                        }break;
-                  }
-            })
-      }
+  private onParcellationSelectionHook : (()=>void)[] = []
+  private afterParcellationSelectionHook : (()=>void)[] = []
 
-      ngOnInit(){
-            this.viewContainerRef = this.host.viewContainerRef
-      }
+  constructor( private componentFactoryResolver: ComponentFactoryResolver ){
+    // gExternalControl.viewControl
+    //   .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==101)
+    //   .subscribe((_evPk:EventPacket)=>{
+    //     if (this.nehubaViewerComponent) this.nehubaViewerComponent.nehubaViewer.clearCustomSegmentColors()
+    //   })
+    
+    VIEWER_CONTROL.loadTemplate = (templateDescriptor) => this.loadTemplate(templateDescriptor)
+    VIEWER_CONTROL.onViewerInit = (cb:()=>void) => this.onViewerInit(cb)
+    VIEWER_CONTROL.afterViewerInit = (cb:()=>void) => this.afterViewerInit(cb)
+    VIEWER_CONTROL.onParcellationLoading = (cb:()=>void) => this.onParcellationSelection(cb)
+    VIEWER_CONTROL.afterParcellationLoading = (cb:()=>void) => this.afterParcellationSelection(cb)
+    VIEWER_CONTROL.showSegment = (seg) => this.showSegment(seg)
+    VIEWER_CONTROL.hideSegment = (seg) => this.hideSegment(seg)
+    VIEWER_CONTROL.hideAllSegments = () => this.hideAllSegments()
+    VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
+    VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
+    VIEWER_CONTROL.loadLayer = (layerObj:Object) => this.loadLayer(layerObj)
+  }
 
-      loadNewTemplateHook : any[] = []
+  public loadTemplate = (templateDescriptor:TemplateDescriptor)=>{
+    /* TODO implement a check that each el in the hooks are still defined and are fn's */
+    this.onViewerInitHook.forEach(fn=>fn())
+    this.loadNewTemplate(templateDescriptor.nehubaConfig)
+    this.afterviewerInitHook.forEach(fn=>fn())
+  }
 
-      loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
-            if ( this.templateLoaded ){
-                  /* I'm not too sure what does the dispose method do (?) */
-                  /* TODO: use something other than a flag? */
-                  (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
-                  this.componentRef.destroy()
-            }
-            
-            let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig,this.darktheme)
-            let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
-            this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
-            
-            this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
-            this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig)
-            this.nehubaViewerComponent.darktheme = this.darktheme
+  /**
+   * attaches an onViewerInit callback.
+   */
+  public onViewerInit = (cb:()=>void) => this.onViewerInitHook.push(cb)
 
-            this.nehubaViewerComponent.nehubaViewer.mouseOver.layer.subscribe((im:any)=>{
-                  this.eventCenter.userViewerInteractRelay.next(new EventPacket(
-                        'layerMouseOver',
-                        Date.now().toString(),
-                        100,
-                        {layer:im}
-                  ))
-            })
-            
-            this.templateLoaded = true
-      }
+  /**
+   * attaches an afterViewerInit callback
+   */
+  public afterViewerInit = (cb:()=>void)=> this.afterviewerInitHook.push(cb)
 
-      navigate(pos:vec3,rot:quat){
-            this.nehubaViewerComponent.navigate(pos,rot)
-      }
+  /**
+   * attaches an on parcellation selection callback
+   */
+  public onParcellationSelection = (cb:()=>void)=> this.onParcellationSelectionHook.push(cb)
 
-      showSegment(segID:any){
-            this.nehubaViewerComponent.showSeg(segID)
-      }
+  /**
+   * attaches an after parcellation selection callback
+   */
+  public afterParcellationSelection = (cb:()=>void)=> this.afterParcellationSelectionHook.push(cb)
 
-      hideSegment(segID:any){
-            this.nehubaViewerComponent.hideSeg(segID)
-      }
+  /**
+   * attaches an onViewerDestory callback. 
+   * If no viewer is initiated, callback will be fired immediately.
+   * NB onViewerInit callback will be called before onViewerDestory callback
+   */
+  public onViewerDestroy = (cb:()=>void)=>{
+    if(!this.templateLoaded){
+      cb()
+    }else{
+      this.componentRef.onDestroy(()=>{
+        cb()
+      })
+    }
+  }
 
-      showAllSegments(){
-            this.nehubaViewerComponent.allSeg(true)
-      }
+  /**
+   * Teleport to new location
+   */
+  public setNavigationLoc = (loc:number[],realSpace?:boolean)=>{
+    this.nehubaViewerComponent.nehubaViewer.setPosition(vec3.fromValues(loc[0],loc[1],loc[2]),realSpace)
+  }
 
-      hideAllSegments(){
-            this.nehubaViewerComponent.allSeg(false)
-      }
+  /**
+   * teleport to a new orientation
+   */
+  public setNavigationOrientation = (_ori:number[])=>{
+    /* waiting for proper api */
+  }
 
-      pMapFloatingWidget : Subject<EventPacket>
-      loadPMap(msg:EventPacket){
-            let curtainModalSubject = this.eventCenter.createNewRelay(new EventPacket('curtainModal','',100,{}))
-            curtainModalSubject.next(new EventPacket('curtainModal','',100,{title:'Loading PMap',body:'fetching '+msg.body.url }))
-            curtainModalSubject.subscribe((evPk:EventPacket)=>{
-                  switch (evPk.code){
-                        case 101:{
-                              this.nehubaViewerComponent.loadLayer(msg.body.url)
-                              setTimeout(()=>{
-                                    curtainModalSubject.next(new EventPacket('curtainModal','',102,{}))
-                                    
-                                    if(!this.pMapFloatingWidget || this.pMapFloatingWidget.closed){
+  /**
+   * Animation moving to new location
+   */
+  public moveToNavigationLoc = (loc:number[],realSpace?:boolean)=>{
+    if(this.templateLoaded){
+      this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
+    }
+  }
 
-                                          /* TODO: pMapFlatingWidget should either be with multilevel or floating widget, and not in viewer.component */
-                                          this.pMapFloatingWidget = this.eventCenter.createNewRelay(new EventPacket('floatingWidgetRelay','',100,{}))
-                                          this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget','',100,{
-                                                title : 'PMap for ' + msg.body.title,
-                                                body : [
-                                                      {
-                                                            "_activeCell" : true,
-                                                            "_elementTagName" : "img",
-                                                            "_class" : "col-md-12",
-                                                            "_src" : "http://172.104.156.15:8080/colormaps/MATLAB_hot.png"
-                                                      },{
-                                                            "Encoded Value":
-                                                                  {
-                                                                        "_activeCell" : true,
-                                                                        "_elementTagName" : "div",
-                                                                        "_class" : "col-md-12",
-                                                                        "_active" : "always",
-                                                                        "_id" : "pmap_value",
-                                                                        "_value" : '0'
-                                                                  }
-                                                      },
-                                                      "To return to normal browsing, close this Dialogue."
-                                                ],
-                                                eventListeners : [
-                                                      {
-                                                            "event" : "layerMouseOver",
-                                                            "filters": [{
-                                                                        "layer":{
-                                                                              "layer":{
-                                                                                    "name" : "PMap"
-                                                                              }
-                                                                        }
-                                                                  }],
-                                                            "values":[{
-                                                                        "layer":{
-                                                                              "value":"pmap_value | number:'1.4-4'"
-                                                                        }
-                                                                  }],
-                                                            "scripts" : []
-                                                      }
-                                                ]
-                                          }))
-                                          this.pMapFloatingWidget.subscribe((evPk:EventPacket)=>{
-                                                switch (evPk.code){
-                                                      case 200:
-                                                      case 500:{
-                                                            let json = this.nehubaViewerComponent.nehubaViewer.ngviewer.state.toJSON()
-                                                            json.layers.PMap.visible = false
-                                                            json.layers.atlas.visible = true
-                                                            this.nehubaViewerComponent.nehubaViewer.ngviewer.state.restoreState(json)
-                                                            this.pMapFloatingWidget.unsubscribe()
-                                                            
-                                                            /* TODO:temporary. need to load specific map for specific atlases */
-                                                            this.nehubaViewerComponent.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
-                                                      }break;
-                                                }
-                                          })
-                                    }else{
-                                          this.pMapFloatingWidget.next(new EventPacket('loadCustomFloatingWidget',Date.now().toString(),110,{
-                                                title : 'PMap for ' + msg.body.title,
-                                          }))
-                                    }
+  ngOnInit(){
+    this.viewContainerRef = this.host.viewContainerRef
+  }
 
-                              },3000)
-                        }break;
-                        case 200:
-                        case 404:{
-                              curtainModalSubject.unsubscribe()
-                        }break;
-                  }
-            })
-      }
+  ngAfterViewInit(){
+    UI_CONTROL.afterTemplateSelection(()=>{
+      this.darktheme = this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false;
+      (<NehubaViewerComponent>this.componentRef.instance).darktheme = this.darktheme
+    })
+  }
+
+  private loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
+
+    if ( this.templateLoaded ){
+      /* I'm not too sure what does the dispose method do (?) */
+      /* TODO: use something other than a flag? */
+      (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
+      this.componentRef.destroy()
+    }
+    
+    let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig)
+    let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
+    this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
+    
+    this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
+    this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig)
+    this.nehubaViewerComponent.darktheme = this.darktheme
+
+    this.templateLoaded = true
+  }
+
+  public showSegment(segID:any){
+    this.nehubaViewerComponent.showSeg(segID)
+  }
+
+  public hideSegment(segID:any){
+    this.nehubaViewerComponent.hideSeg(segID)
+  }
+
+  public showAllSegments(){
+    this.nehubaViewerComponent.allSeg(true)
+  }
+
+  public hideAllSegments(){
+    this.nehubaViewerComponent.allSeg(false)
+  }
+
+  public loadLayer(layerObj:Object){
+    this.nehubaViewerComponent.loadLayer(layerObj)
+  }
 }
 
 @Component({
-      template : `
-<div id = "container" [ngClass]="{darktheme : darktheme}"
-      (mousedown)="mousehandler('mousedown',$event)" 
-      (mouseup)="mousehandler('mouseup',$event)" 
-      (click)="mousehandler('click',$event)" 
-      (mousemove)="mousehandler('mousemove',$event)" >
+  template : `
+<div 
+  (contextmenu)="showFloatingPopover($event)"
+  id = "container" 
+  [ngClass]="{darktheme : darktheme}">
 </div>
-      `,
-      styles : [
-            `
+<div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+  <span 
+    class = "btn btn-link"
+    (click)="statusPanelRealSpace = !statusPanelRealSpace">
+    {{statusPanelRealSpace ? 'RealSpace(nm)' : 'VoxelSpace'}}
+  </span> 
+  Navigation: <small>({{statusPanelRealSpace ? viewerPosReal.join(',') : viewerPosVoxel.join(',')}})</small> 
+  Mouse: <small>({{statusPanelRealSpace ? mousePosReal.join(',') : mousePosVoxel.join(',')}})</small> 
+  {{!viewerSegment ? '' : viewerSegment.constructor.name == 'RegionDescriptor' ? 'Region: ' + viewerSegment.name : 'RegionID: ' + viewerSegment }}
+</div>
+<floatingPopover>
+</floatingPopover>
+  `,
+  styles : [
+    `
 div#container{
-      width:100%;
-      height:100%;
+  width:100%;
+  height:100%;
 }
-            `
-      ]
+    `
+  ]
 })
-export class NehubaViewerComponent implements OnDestroy{
-      public nehubaViewer : NehubaViewer
-      viewerConfig : NehubaViewerConfig
-      darktheme : boolean
-      viewerPos : number[] = [0,0,0]
-      viewerOri : number[] = [0,0,1,0]
+export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
+  public nehubaViewer : NehubaViewer
+  viewerConfig : NehubaViewerConfig
+  darktheme : boolean
+  viewerPosReal : number[] = [0,0,0]
+  viewerPosVoxel : number[] = [0,0,0]
+  viewerOri : number[] = [0,0,1,0]
+  viewerSegment : RegionDescriptor | number | null
+  mousePosReal :  number[] = [0,0,0]
+  mousePosVoxel :  number[] = [0,0,0]
 
-      onDestroyUnsubscribe : any[] = []
-      mouseEventSubject : Subject<any>
+  statusPanelRealSpace : boolean = true
 
-      constructor(){
-            this.mouseEventSubject = new Subject()
-            window['nehubaUI']['mouseEvent'] = this.mouseEventSubject
+  @HostListener('document:mousedown',['$event'])
+  clearContextmenu(_ev:any){
+    if(this.floatingPopover.contextmenuEvent)this.floatingPopover.contextmenuEvent=null
+  }
+
+  @ViewChild(FloatingPopOver) floatingPopover : FloatingPopOver
+
+  onDestroyUnsubscribe : any[] = []
+  heartbeatObserver : any
+
+  constructor(){
+    // const metadata = gExternalControl.metadata
+
+    // UI_CONTROL.afterParcellationSelection(()=>{
+    //   /**
+    //    * applying default colour map.
+    //    */
+    //   this.nehubaViewer.batchAddAndUpdateSegmentColors(metadata.selectedParcellation!.colorMap)
+        
+    //   /**
+    //    * patching surface parcellation and whole mesh vs single mesh
+    //   */
+    //   const colorMap = (<ParcellationDescriptor>metadata.selectedParcellation).colorMap
+    //   /* TODO patching in surface parcellation */
+    //   try{
+    //     if( this.viewerConfig.layout!.useNehubaPerspective!.mesh!.surfaceParcellation ){
+    //       colorMap.set(65535,{red:255,green:255,blue:255})
+    //       this.nehubaViewer.batchAddAndUpdateSegmentColors(colorMap)
+    //       this.nehubaViewer.setMeshesToLoad([65535,...Array.from(colorMap.keys())])
+    //     }else{
+    //       this.nehubaViewer.setMeshesToLoad(Array.from(colorMap.keys()))
+    //     }
+    //   }catch(e){
+    //     console.log('loading surface parcellation error ',e)
+    //   }
+
+    //   // const parcellationName = _evPk.body.parcellation.ngId
+    //   const shownSegmentObs = this.nehubaViewer.getShownSegmentsObservable()
+    //   const shownSegmentObsSubscription = shownSegmentObs.subscribe((ev:number[])=>{
+    //     /**
+    //      * attach regionSelection listener and update surface parcellation patch
+    //      */
+    //     try{
+    //       const newColorMap = new Map<number,{red:number,green:number,blue:number}>()
+    //       const selectedParcellation = <ParcellationDescriptor>metadata.selectedParcellation
+    //       if( this.viewerConfig.layout!.useNehubaPerspective!.mesh!.surfaceParcellation ){
+
+    //         selectedParcellation.colorMap.forEach((activeColor,key)=>{
+    //           newColorMap.set(key,ev.find(segId=>segId==key)?activeColor:{red:255,green:255,blue:255})
+    //         })
+    //         this.nehubaViewer.clearCustomSegmentColors()
+    //         this.nehubaViewer.batchAddAndUpdateSegmentColors(ev.length == 0 ? selectedParcellation.colorMap : newColorMap)
+    //       }else{
+    //         // this.nehubaViewer.setMeshesToLoad( ev.length == 0 ? Array.from(selectedParcellation.colorMap.keys()) : ev )
+    //         // this.nehubaViewer.setMeshesToLoad(ev)
+    //       }
+    //     }catch(e){
+    //       console.log('toggling regions error surface parcellation ')
+    //       throw e
+    //     }
+
+    //     gExternalControl.viewControl.next(new EventPacket('selectRegions','',102,{source:'viewer',regions:ev.map((id:any)=>({labelIndex:id}))}))
+    //   })
+    //   this.onDestroyUnsubscribe.push(shownSegmentObsSubscription)
+    // })
+  }
+
+  public ngOnDestroy(){
+    this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
+    this.nehubaViewer.dispose()
+    window['nehubaViewer'] = null
+  }
+
+  public ngAfterViewInit(){
+  }
+
+  public loadTemplate(config:NehubaViewerConfig){
+
+    this.viewerConfig = config
+    const metadata = gExternalControl.metadata
+    this.nehubaViewer = createNehubaViewer(config,(err)=>{
+      /* TODO: error handling?*/
+      console.log('createnehubaviewer error handler',err)
+    })
+    this.nehubaViewer.applyInitialNgState()
+    this.nehubaViewer.redraw()
+    this.nehubaViewer.relayout()
+
+    /**
+     * attaching the mouse/navigation real/voxel listeners
+     */
+    const mouseRealSubscription = this.nehubaViewer.mousePosition.inRealSpace.subscribe((pos:any)=>this.mousePosReal = pos ? pos : this.mousePosReal)
+    this.onDestroyUnsubscribe.push(mouseRealSubscription)
+    const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos ? pos :this.mousePosVoxel)
+    this.onDestroyUnsubscribe.push(mouseVoxelSubscription)
+    
+    const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>this.viewerPosReal = pos)
+    this.onDestroyUnsubscribe.push( navigationSubscription )
+    const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
+    this.onDestroyUnsubscribe.push( navigationSubscriptionVoxel )
+
+    /**
+     * attaches viewerSegmentHover listener
+     */
+    const iterativeSearch = (regions:RegionDescriptor[],labelIndex:number):Promise<RegionDescriptor> => new Promise((resolve)=>{
+      const find = regions.find(region=>region.labelIndex==labelIndex)
+      if(find)resolve(find)
+      Promise.race(regions.map(region=>iterativeSearch(region.children,labelIndex)))
+        .then(region=>resolve(region))
+    })
+    const regionObserverSubscription = this.nehubaViewer.mouseOver.segment.subscribe((seg:any)=>{
+      /* seg.segment = number | 0 | null seg.layer */
+
+      /* TODO potentially generating some unresolvable promises here */
+      if(seg.segment&&seg.segment!=0){
+        this.viewerSegment=seg.segment
+        iterativeSearch(metadata.selectedParcellation!.regions,seg.segment)
+          .then(region=>this.viewerSegment=region)
+          .catch(e=>console.log(e))
+      }else{
+        this.viewerSegment=null
       }
+    })
+    this.onDestroyUnsubscribe.push(regionObserverSubscription)
 
-      public ngOnDestroy(){
-            this.onDestroyUnsubscribe.forEach((subscription:any)=>{
-                  subscription.unsubscribe()
-            })
-            this.nehubaViewer.dispose()
-            window['nehubaViewer'] = null
-            window['nehubaUI']['mouseEvent'] = null
+    window['nehubaViewer'] = this.nehubaViewer
+
+    this.heartbeatObserver = 
+      this.nehubaViewer.mouseOver.segment
+        .merge(this.nehubaViewer.navigationState.sliceZoom)
+        .merge(this.nehubaViewer.navigationState.perspectiveZoom)
+        .subscribe((_ev:any)=>{
+          //console.log('debug heartbeat',ev)
+        })
+    this.onDestroyUnsubscribe.push(this.heartbeatObserver)
+  }
+
+  public loadParcellation(_parcellation:ParcellationDescriptor){
+
+  }
+
+  public navigate(pos:number[],duration:number,realSpace:boolean){
+    /* TODO: waiting on nehubaViewer api to implement rotation */
+    
+    if( duration>0 ){
+      /* slice is required to make clones of the values */
+      /* or else the values (startPos/deltaPos) will change mid-animation */
+      let deltaPos = ([
+        pos[0]-this.viewerPosReal[0],
+        pos[1]-this.viewerPosReal[1],
+        pos[2]-this.viewerPosReal[2]
+      ]).slice()
+      let startPos = (this.viewerPosReal).slice()
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this.nehubaViewer.setPosition(vec3.fromValues(
+          startPos[0]+deltaPos[0]*iteratedValue.value,
+          startPos[1]+deltaPos[1]*iteratedValue.value,
+          startPos[2]+deltaPos[2]*iteratedValue.value
+        ),realSpace)
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
       }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this.nehubaViewer.setPosition(vec3.fromValues(pos[0],pos[1],pos[2]),realSpace)
+    }
+  }
 
-      public mousehandler(mode:string,ev:any){
-            this.mouseEventSubject.next({
-                  target : mode,
-                  body : ev
-            })
-      }
+  public showSeg(id:number){
+    this.nehubaViewer.showSegment(id)
+  }
 
-      public loadTemplate(config:NehubaViewerConfig){
-            this.nehubaViewer = createNehubaViewer(config,(err)=>{
-                  /* TODO: error handling?*/
-                  console.log('createnehubaviewer error handler',err)
-            })
-            this.nehubaViewer.applyInitialNgState()
-            this.nehubaViewer.redraw()
-            this.nehubaViewer.relayout()
+  public hideSeg(id:number){
+    this.nehubaViewer.hideSegment(id)
+  }
 
-            /* TODO: only works for JuBrain. Workout a proper parser for rgb values */
-            let testForJubrain = new RegExp('jubrain','gi')
-            if(config.globals!.useCustomSegmentColors && testForJubrain.test(JSON.stringify(config.dataset!.initialNgState))){
-                  this.nehubaViewer.batchAddAndUpdateSegmentColors(CM_DEFAULT_MAP)
-            }
+  public allSeg(show:boolean){
+    this.nehubaViewer.getShownSegmentsNow().forEach(segID => {
+      this.nehubaViewer.hideSegment(segID)
+    })
+    if( !show ) {
+      this.nehubaViewer.showSegment(0)
+    }
+  }
 
-            const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
-                  this.viewerPos = pos
-            })
-            this.onDestroyUnsubscribe.push( navigationSubscription )
+  //TODO: do this properly with proper api's
+  public loadLayer(layerObj:Object){
+    /* TODO wait for proper api in nehuba viewer */
+    const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
+    Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
+    this.nehubaViewer.ngviewer.state.restoreState(state)
+  }
 
-            window['nehubaViewer'] = this.nehubaViewer
-      }
-
-      public navigate(pos:vec3,_rot:quat){
-            /* TODO: implement rotation somehow oO */
-            
-            /* slice is required to make clones of the values */
-            /* or else the values (startPos/deltaPos) will change mid-animation */
-            let deltaPos = ([
-                  pos[0]-this.viewerPos[0],
-                  pos[1]-this.viewerPos[1],
-                  pos[2]-this.viewerPos[2]
-            ]).slice()
-            let startPos = (this.viewerPos).slice()
-
-            let iterator = (new Animation(300,'linear')).generate()
-            let newAnimationFrame = () =>{
-                  let iteratedValue = iterator.next()
-                  this.nehubaViewer.setPosition(vec3.fromValues(
-                        startPos[0]+deltaPos[0]*iteratedValue.value,
-                        startPos[1]+deltaPos[1]*iteratedValue.value,
-                        startPos[2]+deltaPos[2]*iteratedValue.value
-                  ),true)
-                  if(!iteratedValue.done){
-                        requestAnimationFrame(newAnimationFrame)
-                  }
-            }
-            requestAnimationFrame(newAnimationFrame)
-      }
-
-      public showSeg(id:number){
-            this.nehubaViewer.showSegment(id)
-      }
-
-      public hideSeg(id:number){
-            this.nehubaViewer.hideSegment(id)
-      }
-
-      public allSeg(show:boolean){
-            this.nehubaViewer.getShownSegments().forEach(segID => {
-                  this.nehubaViewer.hideSegment(segID)
-            })
-            if( !show ) {
-                  this.nehubaViewer.showSegment(0)
-            }
-      }
-
-      //TODO: do this properly with proper api's
-      public loadLayer(url:string){
-            let json = this.nehubaViewer.ngviewer.state.toJSON()
-            json.layers.PMap = {
-                  type : "image",
-                  source : "nifti://"+url,
-                  shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-            }
-            json.layers.atlas.visible = false
-            this.nehubaViewer.ngviewer.state.restoreState(json)
-      }
+  public showFloatingPopover = (ev:any)=> {
+    this.floatingPopover.cursorSegment = this.viewerSegment
+    this.floatingPopover.cursorLocReal = this.mousePosReal
+    this.floatingPopover.cursorLocVoxel = this.mousePosVoxel
+    this.floatingPopover.contextmenuEvent = ev
+  }
 }
 
 export class NehubaViewerUnit{
-      viewerConfig : NehubaViewerConfig
-      darktheme : boolean
+  viewerConfig : NehubaViewerConfig
+  darktheme : boolean
 
-      constructor(public component:Type<any>,viewerConfig:NehubaViewerConfig,darktheme:boolean){  
-            this.darktheme = darktheme
-            this.viewerConfig = viewerConfig
-      }
+  constructor(public component:Type<any>,viewerConfig:NehubaViewerConfig){  
+    this.viewerConfig = viewerConfig
+  }
 }

@@ -9,8 +9,8 @@
 $WHITE : rgb(255,255,255);
 $OFFWHITE : gray(0.96);
 $BLACK : rgb(0,0,0);
-$GOLDEN : rgb(244,212,48);
-$DARKGOLDEN : rgb(200,160,0);
+$GOLDEN : tgray(0.8,0.5);
+$DARKGOLDEN : rgb(70,70,70);
 $BORDERWIDTH : 2px;
 
 #ATLASContainer
@@ -119,7 +119,14 @@ $BORDERWIDTH : 2px;
     }
 }
 
-%darkthemetemplate{
+%samefontsize
+{
+    font-size:1.5rem;
+    font-weight:100;
+}
+
+%darkthemetemplate
+{
     background-color : gray(0.2);
     color : gray(0.8);
 }
@@ -217,12 +224,13 @@ atlasbanner{
 
         span.unicodeSymbols{
             color:gray(1);
-        }
 
-            span.unicodeSymbols:hover{
+            &:hover
+            {
                 color:$GOLDEN;
                 cursor:pointer;
             }
+        }
     }
 }
 
@@ -437,8 +445,17 @@ atlascontrol
 
             div.modePanel
             {
+                height:100%;
+                display:flex;
+                flex-direction: column;
+
                 .btn.btn-block.btn-default
                 {
+                    @extend %samefontsize;
+
+                    flex-grow:0;
+                    flex-shrink:0;
+
                     background-color:$OFFWHITE;
                     margin-top : 0px;
                     margin-bottom : 0px;
@@ -452,7 +469,7 @@ atlascontrol
 
                     &:hover
                     {
-                        background-color:gray(0.90);
+                        background-color:tgray(0.5,0.05);
                     }
 
                     &.inactive
@@ -467,18 +484,30 @@ atlascontrol
                 
                 .list-group
                 {
+                    flex-shrink:1;
+                    flex-grow:0;
+                    flex-basis:auto;
+
+                    &#regionContainer
+                    {
+                        flex-shrink:10000;
+                    }
+
                     width : 120%;
                     margin-left : -10%;
                     padding-left : 10%;
                     padding-right : 10%;
-                    overflow : hidden;
+                    overflow-x : hidden;
+                    overflow-y : auto;
                     margin-bottom : 0px;
                     z-index : 3;
-                    box-shadow : inset 0 0 1em -0.5em gray(0.38);
+                    box-shadow : inset 0 0 1em -0.5em tgray(0,0.5);
                     background-color:gray(0.95);
 
                     .list-group-item
                     {
+                        @extend %samefontsize;
+
                         width:100%;
                         display:flex;
                         border:none;
@@ -514,7 +543,7 @@ atlascontrol
                             cursor:pointer;
                             &:not(.active)
                             {
-                                background-color:tgray(0.5,0.1);
+                                background-color:tgray(0.5,0.05);
                                 color:gray(0);
                             }
                         };
@@ -523,7 +552,7 @@ atlascontrol
                         {
                             border-color:gray(0.67);
                             background-color:$GOLDEN;
-                            color:gray(1);
+                            color:gray(0);
                         }
 
                         &.nohover
@@ -542,39 +571,12 @@ atlascontrol
                             {
                                 div.btn.btn-default
                                 {
+                                    @extend %samefontsize;
+
                                     border:none;
                                     margin-right:5px;
                                 }
                             }
-                        }
-                    };
-
-
-                    .multiSelectPills
-                    {
-                        display:inline-block;
-                        padding:0.2em 0.4em;
-                        border-radius: 0.4em;
-                        margin-left:0.2em;
-                        margin-right:0.2em;
-                        margin-bottom:0.1em;
-                        color:gray(0.2);
-                        background-color: gray(0.98);
-                        box-shadow:0 0 1em -0.5em gray(0.5);
-
-                        &:first-child
-                        {
-                            margin-top:10px;
-                        }
-
-                        &:last-child
-                        {
-                            margin-bottom:10px;
-                        }
-
-                        &:hover
-                        {
-                            cursor:default;
                         }
                     };
                     
@@ -665,15 +667,6 @@ atlascontrol
                             {
                                 cursor:default;
                             }
-
-                            .menuItemContentList
-                            {
-
-                                &:hover
-                                {
-                                    background-color:gray(0.2);
-                                }
-                            }
                         };
                         lab
                         {
@@ -711,12 +704,12 @@ atlascontrol
                         };
                     };
                     
-                    div.multiSelectPills
-                    {
-                        color:gray(0.6);
-                        background-color: gray(0.2);
-                        box-shadow:0 0 1em -0.3em gray(0);
-                    };
+                    // div.multiSelectPills
+                    // {
+                    //     color:gray(0.6);
+                    //     background-color: gray(0.2);
+                    //     box-shadow:0 0 1em -0.3em gray(0);
+                    // };
                 };
                 .btn.btn-lg.btn-default
                 {
@@ -776,32 +769,23 @@ div.darktheme.leftSideSubSection
         background-color : gray(0.2);
         color : gray(0.8);
     };
-
-    popover-container.popover
+    popover-container.popover.left
     {
-        border:1px solid tgray(255,0.2);
-        box-shadow: 0 5px 10px tgray(1,0.2 );
-        background-color : gray(0);
+        margin-left:0em;
+        margin-top:0em;
 
-        .popover-arrow{
-            border-color:transparent;
-            border-right-color : tgray(1,0.2);
-        };
-        .popover-arrow:after{
-            border-color:transparent;
-            border-right-color : gray(0);
+        border-radius:0em;
+        border-width:0em;
+        .popover-arrow
+        {
+            display:none;
         }
-
-        .popover-title{
-            @extend %popovertemplate;
-            border-bottom: 1px solid gray(0.08);
-        };
-
-        .popover-content{
-            @extend %popovertemplate;
-            background-color:gray(0);
-        };
-    };
+        .popover-title
+        {
+            border-radius:0em;
+            border-width:0em;
+        }
+    }
 };
 
 div.darktheme
@@ -816,20 +800,6 @@ div.darktheme
             overflow:hidden;
             display:block;
             padding:0em;
-            
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#fff;*/
-
-            &:hover
-            {
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#cacaca;*/
-            };
-
             
             div.menuItemTitle
             {
@@ -872,12 +842,6 @@ div.darktheme
                 div.menuItemContentList
                 {
                     color : gray(0.85);
-                    &:hover
-                    {
-                        color:gray(0.85);
-                        background-color:tgray(1.0,0.08);
-                        cursor:pointer;
-                    };
 
                     span.multilevel-name
                     {
@@ -909,20 +873,6 @@ div
             overflow:hidden;
             display:block;
             padding:0em;
-            
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#fff;*/
-
-            &:hover
-            {
-            /* debug only */
-            /*outline-style:dashed;
-            outline-width:1px;
-            outline-color:#cacaca;*/
-            };
-
             
             div.menuItemTitle
             {
@@ -970,12 +920,12 @@ div
                     padding-top:0.4em;
                     padding-bottom:0.4em;
                     transition: 300ms;
-                    &:hover
-                    {
-                        color:#000;
-                        background-color:#f5f5f5;
-                        cursor:pointer;
-                    };
+                    // &:hover
+                    // {
+                    //     color:#000;
+                    //     background-color:#f5f5f5;
+                    //     cursor:pointer;
+                    // };
                 };
             };
         };
@@ -986,4 +936,99 @@ div
 {
     content: "\2122";
     color: transparent !important;
+}
+
+body
+{
+    modal-container
+    {
+        color:black
+    }
+    #viewerStatus
+    {
+        position:absolute;
+        left:2px;
+        top:0;
+        z-index:9;
+        width:100%;
+        box-sizing: border-box;
+        height:3rem;
+        line-height:3rem;
+        padding-left:1.5rem;
+        white-space: nowrap;
+
+        background-color:tgray(1,0.5);
+        color:gray(0.1);
+        border: 1px solid tgray(0,0);
+    }
+    .popover.down
+    {
+        border-radius:0em;
+        border-width:0em;
+        .popover-arrow
+        {
+            display:none;
+        }
+        .popover-title
+        {
+            border-radius:0em;
+            border-width:0em;
+        }
+    }
+
+    .popover.left
+    {
+        border-radius:0em;
+        border-width:0em;
+        .popover-arrow
+        {
+            display:none;
+        }
+        .popover-title
+        {
+            border-radius:0em;
+            border-width:0em;
+        }
+    }
+    
+    span.moreInfo-icon
+    {
+        width:1.4em;
+        &:hover
+        {
+            color:goldenrod;
+            cursor: default;
+        }
+    }
+
+    &.darktheme
+    {
+        #viewerStatus
+        {
+            background-color:tgray(0,0.5);
+            color:gray(0.75);
+        }
+        .popover.left,.popover.down
+        {
+            border-color:gray(0.35);
+            color:gray(0.95);
+            background-color:gray(0.2);
+            .popover-title
+            {
+                background-color:gray(0.3);
+                border-color:gray(0.35);
+            }
+        }
+        
+        span.moreInfo-icon
+        {
+            color:gray(1);
+
+            &:hover
+            {
+                color:goldenrod;
+                background-color:gray(0.25);
+            }
+        }
+    }
 }

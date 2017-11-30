@@ -1,11 +1,7 @@
-import { DecimalPipe } from '@angular/common'
 import { Injectable } from '@angular/core';
-// import { vec4 } from 'neuroglancer/util/geom'
-// import { Config as NehubaConfig } from 'nehuba/exports'
-import { Subject,BehaviorSubject } from 'rxjs/Rx'
+import { Subject } from 'rxjs/Rx'
 
-import { TemplateDescriptor,EventPacket } from './nehuba.model'
-import { TIMEOUT } from './nehuba.config'
+import { TemplateDescriptor, LabComponent } from './nehuba.model'
 
 declare var window:{
     [key:string] : any
@@ -15,7 +11,7 @@ declare var window:{
 
 
 @Injectable()
-export class NehubaFetchData {
+export class DataService {
 
     /* simiple fetch promise for json obj */
     /* nb: return header must contain Content-Type : application/json */
@@ -43,6 +39,35 @@ export class NehubaFetchData {
         return new Promise((resolve,_)=>{
             resolve(new TemplateDescriptor(json))
         })
+    }
+
+    parseJson(json:any){
+        switch(json.type){
+            // case 'template':{
+            //     this.inputResponse += 'Adding new Template. '
+            //     this.nehubaFetchData.parseTemplateData(json)
+            //         .then( template =>{
+            //             this.fetchedOutputToController(template)
+            //         })
+            //         .catch( e=>{
+            //             this.inputResponse += 'Error.'
+            //             this.inputResponse += e.toString()
+            //             console.log(e)
+            //         })
+            // }break;
+            // case 'parcellation':{
+                
+            // }break;
+            // case 'plugin':{
+            //     /* some sort of validation process? */
+            //     this.inputResponse += 'Adding new plugin.'
+            //     const newPlugin = new PluginDescriptor(json)
+            //     this.fetchedOutputToController(newPlugin)
+            // }break;
+            // default:{
+            //     this.inputResponse += '\'type\' field not found.. Unable to process this JSON.'
+            // }break;
+        }
     }
 }
 
@@ -72,149 +97,176 @@ export class Animation{
         }
         return 1
     }
-
-    /* takes a value and generates a value that is somewhat close to the original value every time */
-    *randomSteps(oldValue:number):IterableIterator<number>{
-        do{
-            yield (oldValue + Math.random()) / 5
-            /* too new age for my liking */
-            // yield Math.abs( (oldValue + ( Math.random() - 0.5 )/5 ) %1 )
-        }while(true)
-    }
-}
-
-export class EventCenter{
-    modalSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-    floatingWidgetSubjectBroker : Subject<Subject<EventPacket>> = new Subject()
-
-    modalEventRelay : Subject<EventPacket> = new Subject()
-    nehubaViewerRelay : Subject<EventPacket> = new Subject()
-    globalLayoutRelay : BehaviorSubject<EventPacket> = new BehaviorSubject(new EventPacket(EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME,'',100,{theme:'light'}))
-
-    userViewerInteractRelay : Subject<EventPacket> = new Subject()
-
-    /* returns a new Subject to the function's caller
-     * in the future, also sends the subject to the right service
-     * so the caller and the right service can have a single channel
-     */
-    createNewRelay(evPk:EventPacket):Subject<EventPacket>{
-        switch (evPk.target){
-            case 'floatingWidgetRelay':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.floatingWidgetSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            case 'curtainModal':{
-                let newSubject : Subject<EventPacket> = new Subject()
-                this.modalSubjectBroker.next(newSubject)
-                return newSubject
-            }
-            default:{
-                return new Subject()
-            }
-        }
-    }
 }
 
 export class HelperFunctions{
     
-    queryJsonSubset(query:any,obj:any):boolean{
-        if(query==={}){
-            return true
-        }
-        if(query.constructor.name !== 'Object') {
-            return query == obj
-        }
-        return Object.keys(query).every(key=>
-            obj[key] ? this.queryJsonSubset(query[key],obj[key]) : false)
-    }
+    // queryJsonSubset(query:any,obj:any):boolean{
+    //     if(query==={}){
+    //         return true
+    //     }
+    //     if(query.constructor.name !== 'Object') {
+    //         return query == obj
+    //     }
+    //     return Object.keys(query).every(key=>
+    //         obj[key] ? this.queryJsonSubset(query[key],obj[key]) : false)
+    // }
 
-    queryNestedJsonValue(query:any,obj:any):any{
-        const key = Object.keys(query)[0]
-        return query[key].constructor.name === 'Object' ? 
-            this.queryNestedJsonValue(query[key],obj[key]?obj[key]:({})) :
-            ({target: query[key],value:obj[key]?obj[key]:({})});
-    }
+    // queryNestedJsonValue(query:any,obj:any):any{
+    //     const key = Object.keys(query)[0]
+    //     return query[key].constructor.name === 'Object' ? 
+    //         this.queryNestedJsonValue(query[key],obj[key]?obj[key]:({})) :
+    //         ({target: query[key],value:obj[key]?obj[key]:({})});
+    // }
 
-    setValueById(id:string,obj:any,value:string){
-        switch( obj.constructor.name ){
-            case 'Object':
-            case 'Array':{
-                for (let idx in obj){
-                    if( obj[idx]._activeCell ){
-                        if( obj[idx]._id && obj[idx]._id == id.replace(/\s/g,'').split('|')[0] ) {
-                            let transformed_value = value
-                            id.replace(/\s/g,'').split('|').forEach((pipe,idx)=>{
-                                if( idx == 0 ){
-                                    /* target id */
-                                }else{
-                                    /* more pipes to be introduced */
-                                    if( /number/.test(pipe) ){
-                                        if( value.constructor.name === 'Object' ){
-                                            transformed_value = "0.0000"
-                                        }else{
-                                            let transform = new DecimalPipe('en-US').transform(value,pipe.replace(/number|\'|\"|\:/gi,''))
-                                            transformed_value = transform ? transform! : "0.0000"
-                                        }
-                                    }
-                                }
-                            })
-                            obj[idx]._value = transformed_value
-                        }
-                    } else {
-                        this.setValueById(id,obj[idx],value)
-                    }
-                }
-            }break;
-        }
-    }
+    // setValueById(id:string,obj:any,value:string){
+    //     switch( obj.constructor.name ){
+    //         case 'Object':
+    //         case 'Array':{
+    //             for (let idx in obj){
+    //                 if( obj[idx]._activeCell ){
+    //                     if( obj[idx]._id && obj[idx]._id == id.replace(/\s/g,'').split('|')[0] ) {
+    //                         let transformed_value = value
+    //                         id.replace(/\s/g,'').split('|').forEach((pipe,idx)=>{
+    //                             if( idx == 0 ){
+    //                                 /* target id */
+    //                             }else{
+    //                                 /* more pipes to be introduced */
+    //                                 if( /number/.test(pipe) ){
+    //                                     if( value.constructor.name === 'Object' ){
+    //                                         transformed_value = "0.0000"
+    //                                     }else{
+    //                                         let transform = new DecimalPipe('en-US').transform(value,pipe.replace(/number|\'|\"|\:/gi,''))
+    //                                         transformed_value = transform ? transform! : "0.0000"
+    //                                     }
+    //                                 }
+    //                             }
+    //                         })
+    //                         obj[idx]._value = transformed_value
+    //                     }
+    //                 } else {
+    //                     this.setValueById(id,obj[idx],value)
+    //                 }
+    //             }
+    //         }break;
+    //     }
+    // }
+
+    static sLoadPlugin : (labComponent : LabComponent)=>void
 }
 
 let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
+    util : {
+        modalControl : {}
+    },
     metadata : metadata,
     mouseEvent : new Subject()
 }
 
-export const EVENTCENTER_CONST = {
-    NEHUBAVIEWER : {
-        TARGET : {
-            LOAD_TEMPALTE : 'loadTemplate',
-            NAVIGATE : 'navigation',
-            MOUSE_ENTER_SEGMENT : 'mouseEnterSegment',
-            MOUSE_LEAVE_SEGMENT : 'mouseLeaveSegment',
-            SHOW_SEGMENT : 'showSegment',
-            HIDE_SEGMENT : 'hideSegment',
-            LOAD_LAYER : 'loadLayer'
-        }
-    },
-    GLOBALLAYOUT : {
-        TARGET : {
-            THEME : 'theme'
-        },
-        BODY : {
-            THEME : {
-                LIGHT : 'light',
-                DARK : 'dark'
-            }
-        }
-    }
+class UIHandle{
+    onTemplateSelection : (cb:()=>void)=>void
+    afterTemplateSelection : (cb:()=>void)=>void
+    onParcellationSelection : (cb:()=>void)=>void
+    afterParcellationSelection : (cb:()=>void)=>void
 }
 
-export const NEHUBAUI_CONSTANTS = {
-    toolmode : {
-        JuGeX : {
-            "UIConfigURL":"http://172.104.156.15/json/colin",
-            "plugins":[
-                  {
-                        "name":"JuGeX",
-                        "type":"plugin",
-                        "templateURL":"http://172.104.156.15/html/jugex.template",
-                        "scriptURL":"http://172.104.156.15/js/jugex.script"
-                  }
-            ]
+export const UI_CONTROL = window['uiControl'] = new UIHandle()
+
+class ViewerHandle {
+    loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
+
+    onViewerInit : (cb:()=>void)=>void
+    afterViewerInit : (cb:()=>void)=>void
+    onParcellationLoading : (cb:()=>void)=>void
+    afterParcellationLoading : (cb:()=>void)=>void
+    onViewerDestroy : (cb:()=>void)=>void
+
+    setNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+    setNavigationOrientation : (ori:number[])=>void
+
+    moveToNavigationLoc : (loc:number[],realSpace?:boolean)=>void
+
+    showSegment : (segId:number)=>void
+    hideSegment : (segId:number)=>void
+    showAllSegments : ()=>void
+    hideAllSegments : ()=>void
+
+    loadLayer : (layerObj:Object)=>void
+    reapplyNehubaMeshFix : ()=>void
+}
+
+export const VIEWER_CONTROL = window['viewerControl'] = new ViewerHandle()
+
+
+export const HELP_MENU = {
+    'Mouse Controls' : {
+        "Left-drag" : "within a slice view to move within that plane",
+        "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
+        "Mouse-Wheel" : "up or down to zoom in and out.",
+        "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
+        "Ctrl + Right-click" : "within a slice to teleport to that location"
+        },
+        'Keyboard Controls' : {
+        "tobe":"completed"
         }
-    }
+}
+
+export const PRESET_COLOR_MAPS = 
+    [{
+          name : 'MATLAB_autumn',
+          previewurl : "http://http://172.104.156.15:8080/colormaps/MATLAB_autumn.png",
+          code : `vec4 colormap(float x) {float g = clamp(x,0.0,1.0);return vec4(1.0,g,0.0,1.0);}`
+    },{
+          name : 'MATLAB_bone',
+          previewurl : 'http://http://172.104.156.15:8080/colormaps/MATLAB_bone.png',
+          code : `float colormap_red(float x) {  if (x < 0.75) {      return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {      return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;  }}float colormap_green(float x) {  if (x <= 0.375) {      return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else if (x <= 0.75) {      return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;  } else {      return 8.0 / 9.0 * x + 1.0 / 9.0;  }}float colormap_blue(float x) {  if (x <= 0.375) {      return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {      return 8.0 / 9.0 * x + 1.0 / 9.0;  }}vec4 colormap(float x) {  float r = clamp(colormap_red(x),0.0,1.0);  float g = clamp(colormap_green(x), 0.0, 1.0);  float b = clamp(colormap_blue(x), 0.0, 1.0);  return vec4(r, g, b, 1.0);}          `
+    }]
+
+export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
+export const TIMEOUT = 5000;
+export const CM_THRESHOLD = 0.01;
+export const PMAP_WIDGET = {
+    name : `PMap`,
+    icon : 'picture',
+    script : `
+    (()=>{
+        window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
+        const encodedValue = document.getElementById('default.default.pmap.encodedValue')
+        window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
+        window.pluginControl['PMap'].onShutdown(()=>{
+            window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
+            window.viewerControl.hideSegment(0)
+        })
+    })()
+    `,
+    template : `
+    <table class = "table table-sm table-bordered">
+        <tbody>
+            <tr>
+                <td>Heat Map</td>
+            </tr>
+            <tr>
+                <td><img class="col-md-12" src="http://172.104.156.15:8080/colormaps/MATLAB_hot.png"></td>
+            </tr>
+            <tr>
+                <td>
+                    <table class = "table table-sm table-bordered">
+                        <tbody>
+                            <tr>
+                                <td class = "col-sm-6">Encoded Value</td>
+                                <td class = "col-sm-6" id = "default.default.pmap.encodedValue"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>Close this dialogue to resume normal browsing.</td>
+            </tr>
+        </tbody>
+    </table>
+    `
 }
