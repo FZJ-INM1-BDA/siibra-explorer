@@ -1,8 +1,11 @@
-General
+Plugin README
 ======
-Plugins needs to contain three files. Metadata JSON, template HTML, and script JS. 
+Plugins needs to contain three files. 
+- Metadata JSON
+- template HTML
+- script JS. 
 
-These files needs to have the same origin and port. Alternatively, these files needs to be served with appropriate CORS header.
+These files needs to have the same origin and port and. Alternatively, these files needs to be served with appropriate CORS header.
 
 ---
 Metadata JSON
