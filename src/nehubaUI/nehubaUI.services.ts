@@ -100,58 +100,6 @@ export class Animation{
 }
 
 export class HelperFunctions{
-    
-    // queryJsonSubset(query:any,obj:any):boolean{
-    //     if(query==={}){
-    //         return true
-    //     }
-    //     if(query.constructor.name !== 'Object') {
-    //         return query == obj
-    //     }
-    //     return Object.keys(query).every(key=>
-    //         obj[key] ? this.queryJsonSubset(query[key],obj[key]) : false)
-    // }
-
-    // queryNestedJsonValue(query:any,obj:any):any{
-    //     const key = Object.keys(query)[0]
-    //     return query[key].constructor.name === 'Object' ? 
-    //         this.queryNestedJsonValue(query[key],obj[key]?obj[key]:({})) :
-    //         ({target: query[key],value:obj[key]?obj[key]:({})});
-    // }
-
-    // setValueById(id:string,obj:any,value:string){
-    //     switch( obj.constructor.name ){
-    //         case 'Object':
-    //         case 'Array':{
-    //             for (let idx in obj){
-    //                 if( obj[idx]._activeCell ){
-    //                     if( obj[idx]._id && obj[idx]._id == id.replace(/\s/g,'').split('|')[0] ) {
-    //                         let transformed_value = value
-    //                         id.replace(/\s/g,'').split('|').forEach((pipe,idx)=>{
-    //                             if( idx == 0 ){
-    //                                 /* target id */
-    //                             }else{
-    //                                 /* more pipes to be introduced */
-    //                                 if( /number/.test(pipe) ){
-    //                                     if( value.constructor.name === 'Object' ){
-    //                                         transformed_value = "0.0000"
-    //                                     }else{
-    //                                         let transform = new DecimalPipe('en-US').transform(value,pipe.replace(/number|\'|\"|\:/gi,''))
-    //                                         transformed_value = transform ? transform! : "0.0000"
-    //                                     }
-    //                                 }
-    //                             }
-    //                         })
-    //                         obj[idx]._value = transformed_value
-    //                     }
-    //                 } else {
-    //                     this.setValueById(id,obj[idx],value)
-    //                 }
-    //             }
-    //         }break;
-    //     }
-    // }
-
     static sLoadPlugin : (labComponent : LabComponent)=>void
 }
 

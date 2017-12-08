@@ -1,49 +1,36 @@
 Plugin README
 ======
 Plugins needs to contain three files. 
-- Metadata JSON
+- Manifest JSON
 - template HTML
 - script JS. 
 
-These files needs to have the same origin and port and. Alternatively, these files needs to be served with appropriate CORS header.
+Alternatively, these files needs to served with appropriate CORS header.
 
 ---
-Metadata JSON
+Manifest JSON
 ------
-
+The manifest JSON file describes the metadata associated with the plugin. 
 
 ```json
 {
-      "name":"fzj.xg.JuGeX",
+      "name":"fzj.xg.webJuGEx",
       "icon":"lamp", 
       "type":"plugin",
       "templateURL":"http://LINK-TO-YOUR-PLUGIN-TEMPLATE/jugex.template.html",
       "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT/jugex.script.js"
 }
 ```
+*NB* 
+- the "icon" field is optional. All other fields are required.
+- Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
 
-NB: required fields: name, type='plugin', templateURL, scriptURL.
-
-Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
-
-You may choose to add more fields to the JSON object. Brain Atlas Viewer will not parse them.
-
-TODO: more meta data, e.g., author, validation hash etc
 
 ---
-Template
+Template HTML
 ------
+The template HTML file describes the HTML elements that will be rendered in the floating widget.
 
-bootstrap 3.6 css is already included. 
-
-Keep in mind of the width limitation of the widget (400px). Uncaught overflows are not pleasant to look at. 
-
-Whilst there are no hard limitations on the vertical size of the widget, it may influence the usability of the widget. For tall elements, consider using *max-height* style, and set *overflow-y* to auto or scroll. 
-
-Your template will interact with your script via **element id**. As a result, it is imperative that you use unique id's. 
-It is recommended that you use *domain.developer.packagename.uniqueid* e.g.: *fzj.xiaogui.remotecontrol.wsurl* to avoid id duplication.
-
-Here is an example template:
 
 ```html
 <form>
@@ -80,29 +67,32 @@ Here is an example template:
       </div>
 </form>
 ```
-
+*NB*
+- bootstrap 3.6 css is already included.
+- keep in mind of the widget width restriction (400px) when crafting the template
+- whilst there are no vertical limits on the widget, contents can be rendered below the viewport. Consider setting the *max-height* attribute.
+- your template and script will interact with each other likely via *element id*. As a result, it is highly recommended that unique id's are used. Please adhere to the convention: **AFFILIATION.AUTHOR.PACKAGE.ID** 
 ---
-Script
+Script JS
 ------
-
-A good idea is to scope it so that the variables you declare stays local:
+The script JS file describes the interaction between users, Interactive Atlas Viewer and the plugin.
 
 ```javascript
 (()=>{
       /* your code here */
 })()
 ```
+*NB*
+- ensure the script is scoped locally, instead of poisoning the global scope
+- ensure the right hook is applied at the right lifecycle of user initiated events [INSERT LINK TO USER EVENTS LIFECYCLE]
+- for a list of APIs, see [plugin_api.md](plugin_api.md)
 
----
-APIs
-======
-see [atlas_api.md](atlas_api.md)
 
 ---
 
 Example plugins
-======
-JuGeX
+---
+webJuGEx
 
 Remote Control
 
