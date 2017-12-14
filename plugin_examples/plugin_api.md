@@ -4,7 +4,7 @@ Plugin APIs
   - *metadata* 
     - *selectedTemplate* : nullable Object 
     - *selectedParcellation* : nullable Object
-    - *selectedRegions* : Array of Object
+    - *selectedRegions* : Array of Object (empty array if no regions are selected)
   - *mouseEvent* : EventStream
   - *util*
     - *modalControl*

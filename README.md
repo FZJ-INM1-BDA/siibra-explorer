@@ -15,4 +15,5 @@ to be completed
 Developing plugins
 ---
 [general information](/plugin_examples/plugin_README.md)
+
 [plugin api](/plugin_examples/plugin_api.md)
