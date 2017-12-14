@@ -198,7 +198,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   </span> 
   Navigation: <small>({{statusPanelRealSpace ? viewerPosReal.join(',') : viewerPosVoxel.join(',')}})</small> 
   Mouse: <small>({{statusPanelRealSpace ? mousePosReal.join(',') : mousePosVoxel.join(',')}})</small> 
-  {{!viewerSegment ? '' : viewerSegment.constructor.name == 'RegionDescriptor' ? 'Region: ' + viewerSegment.name : 'RegionID: ' + viewerSegment }}
+  {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? 'RegionID: ' + viewerSegment : 'Region: ' + viewerSegment.name   }}
 </div>
 <floatingPopover>
 </floatingPopover>
