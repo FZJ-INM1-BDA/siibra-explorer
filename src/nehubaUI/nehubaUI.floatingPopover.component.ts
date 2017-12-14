@@ -13,7 +13,7 @@ import { RegionDescriptor } from './nehuba.model'
     [style.top]="contextmenuEvent ? contextmenuEvent.target.offsetTop + contextmenuEvent.layerY + 'px' : '-1000px'">
 
     <h3 class = "popover-title popover-header">
-        <span *ngIf = "cursorSegment && cursorSegment.constructor.name == 'RegionDescriptor'">{{cursorSegment.name}}</span>
+        <span *ngIf = "cursorSegment && cursorSegment.constructor.name != 'Number'">{{cursorSegment.name}}</span>
         <span *ngIf = "!cursorSegment">No segment selected</span>
     </h3>
     <div class = "popover-content popover-body">

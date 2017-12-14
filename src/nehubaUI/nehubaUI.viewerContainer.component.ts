@@ -28,15 +28,7 @@ export class NehubaViewerContainer implements AfterViewInit {
     @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
     @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-    constructor(){
-        // this.eventCenter.globalLayoutRelay.subscribe((msg:EventPacket)=>{
-        //     switch(msg.target){
-        //         case EVENTCENTER_CONST.GLOBALLAYOUT.TARGET.THEME:{
-        //             this.darktheme = msg.body.theme == 'dark' 
-        //         }break;
-        //     }
-        // })
-    }
+    constructor(){ }
 
     ngAfterViewInit(){
         UI_CONTROL.afterTemplateSelection(()=>{
@@ -46,7 +38,7 @@ export class NehubaViewerContainer implements AfterViewInit {
 
     /* TODO figure out a new way to emit mouse event handler */
     mouseEventHandler(mode:string,ev:any){
-        gExternalControl.mouseEvent.next({
+        UI_CONTROL.mouseEvent.next({
             eventName : mode,
             event : ev
         })
@@ -61,7 +53,7 @@ export class NehubaViewerContainer implements AfterViewInit {
 
 
     showhelp(){
-        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
         modalHandler.title = `<h4>Help</h4>`
         modalHandler.body = HELP_MENU
         modalHandler.footer
