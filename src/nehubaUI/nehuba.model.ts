@@ -1,5 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions, EXTERNAL_CONTROL as gExternalControl,CM_MATLAB_HOT,CM_THRESHOLD } from './nehubaUI.services'
+import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions, EXTERNAL_CONTROL as gExternalControl,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL } from './nehubaUI.services'
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
 
@@ -260,7 +260,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     if(this.PMapURL){
       const pmap = new DescriptorMoreInfoItem('Show PMap','picture')
       pmap.action = () => {
-        const modalHandler = (<NehubaModalService>gExternalControl.util.modalControl).getModalHandler()
+        const modalHandler = (<NehubaModalService>UI_CONTROL.modalControl).getModalHandler()
         modalHandler.title = `Loading PMap of ${this.name} ...`
         modalHandler.body = `Please stand by ...`
         modalHandler.show()

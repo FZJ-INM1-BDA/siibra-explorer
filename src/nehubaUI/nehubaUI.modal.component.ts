@@ -2,7 +2,7 @@
 import { Component,ChangeDetectorRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
 // import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class'
-import { EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { UI_CONTROL } from './nehubaUI.services'
 
 // import { Observable } from 'rxjs/Observable'
 import { Subscription } from 'rxjs/subscription'
@@ -24,7 +24,7 @@ export class NehubaModalService{
          * curtain
          */
         
-        gExternalControl.util.modalControl = this
+        UI_CONTROL.modalControl = this
     }
 
     public getModalHandler = ()=> new ModalHandler(this.bsModalService)

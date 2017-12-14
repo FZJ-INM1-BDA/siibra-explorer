@@ -72,7 +72,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       if(!gl){
         message['Detail'] = 'Your browser does not support WebGL.'
         
-        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
         modalHandler.title = `<h4>Error</h4>`
         modalHandler.body = message
         modalHandler.footer = null
@@ -90,7 +90,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         ${ !indexuint ? 'OES_element_index_uint' : ''} `
         message['Detail'] = [detail]
         
-        const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+        const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
         modalHandler.title = `<h4>Error</h4>`
         modalHandler.body = message
         modalHandler.footer = null
@@ -229,7 +229,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
   loadTemplate(templateDescriptor:TemplateDescriptor):void{
 
-    const modalHandler = <ModalHandler>window['nehubaUI'].util.modalControl.getModalHandler()
+    const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
     modalHandler.title = `<h4>Loading template ${templateDescriptor.name} </h4>`
     modalHandler.body = `Please stand by ...`
     modalHandler.footer = null

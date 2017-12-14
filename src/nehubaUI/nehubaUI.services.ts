@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
 
 import { TemplateDescriptor, LabComponent } from './nehuba.model'
+import { NehubaModalService } from './nehubaUI.modal.component'
 
 declare var window:{
     [key:string] : any
@@ -107,11 +108,7 @@ let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
     viewControl : new Subject(),
-    util : {
-        modalControl : {}
-    },
-    metadata : metadata,
-    mouseEvent : new Subject()
+    metadata : metadata
 }
 
 class UIHandle{
@@ -119,9 +116,11 @@ class UIHandle{
     afterTemplateSelection : (cb:()=>void)=>void
     onParcellationSelection : (cb:()=>void)=>void
     afterParcellationSelection : (cb:()=>void)=>void
+    mouseEvent : Subject<any> = new Subject()
+    modalControl : NehubaModalService
 }
 
-export const UI_CONTROL = window['uiControl'] = new UIHandle()
+export const UI_CONTROL = window['uiHandle'] = new UIHandle()
 
 class ViewerHandle {
     loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
@@ -146,7 +145,7 @@ class ViewerHandle {
     reapplyNehubaMeshFix : ()=>void
 }
 
-export const VIEWER_CONTROL = window['viewerControl'] = new ViewerHandle()
+export const VIEWER_CONTROL = window['viewerHandle'] = new ViewerHandle()
 
 
 export const HELP_MENU = {
@@ -186,7 +185,7 @@ export const PMAP_WIDGET = {
         window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
         window.pluginControl['PMap'].onShutdown(()=>{
             window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
-            window.viewerControl.hideSegment(0)
+            window.viewerHandle.hideSegment(0)
         })
     })()
     `,
