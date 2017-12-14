@@ -9,6 +9,18 @@ Plugin APIs
   - *util*
     - *modalControl*
       - *getModalHandler()* : Function returning a handler to change/show/hide/listen to a Modal. 
+      - *modalHander* methods:
+        - *hide()* : Dynamically hides the modal
+        - *show()* : Shows the modal
+        - *onHide(callback(reason)=>void)* : Attaches an onHide callback. 
+        - *onHidden(callback(reason)=>void)* : Attaches an onHidden callback. 
+        - *onShow(callback(reason)=>void)* : Attaches an onShow callback. 
+        - *onShown(callback(reason)=>void)* : Attaches an onShown callback.
+      - *modalHandler* properties:
+        - title : title of the modal (String)
+        - body : body of the modal shown (JSON, Array, String)
+        - footer : footer of the modal (String)
+        - config : config of the modal
 
 - *window.viewerControl*
   - *loadTemplate(TemplateDescriptor)* : Function that loads a new template
@@ -30,3 +42,5 @@ Plugin APIs
 - *window.uiControl*
   - *onTemplateSelection(callback)* : Function that allows a callback function to be called just after user clicks to navigate to a new template, before *selectedTemplate* is updated
   - *afterTemplateSelection(callback)* : Function that allows a callback function to be called after the template selection process is complete, and *selectedTemplate* is updated
+  - *onParcellationSelection(callback)* : Function that attach a callback function to user selecting a different parcellation
+  - *afterParcellationSelection(callback)* : Function that attach a callback function to be called after the parcellation selection process is complete and *selectedParcellation* is updated.
