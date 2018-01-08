@@ -1,5 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions, EXTERNAL_CONTROL as gExternalControl,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL } from './nehubaUI.services'
+import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL } from './nehubaUI.services'
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
 

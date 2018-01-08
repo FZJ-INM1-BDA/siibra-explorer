@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
 
-import { TemplateDescriptor, LabComponent } from './nehuba.model'
+import { TemplateDescriptor, LabComponent, RegionDescriptor } from './nehuba.model'
 import { NehubaModalService } from './nehubaUI.modal.component'
 
 declare var window:{
@@ -102,6 +102,7 @@ export class Animation{
 
 export class HelperFunctions{
     static sLoadPlugin : (labComponent : LabComponent)=>void
+    static sFindRegion : (id : Number|null) => RegionDescriptor | null
 }
 
 let metadata : any = {}
@@ -116,7 +117,6 @@ class UIHandle{
     afterTemplateSelection : (cb:()=>void)=>void
     onParcellationSelection : (cb:()=>void)=>void
     afterParcellationSelection : (cb:()=>void)=>void
-    mouseEvent : Subject<any> = new Subject()
     modalControl : NehubaModalService
 }
 
@@ -127,8 +127,6 @@ class ViewerHandle {
 
     onViewerInit : (cb:()=>void)=>void
     afterViewerInit : (cb:()=>void)=>void
-    onParcellationLoading : (cb:()=>void)=>void
-    afterParcellationLoading : (cb:()=>void)=>void
     onViewerDestroy : (cb:()=>void)=>void
 
     setNavigationLoc : (loc:number[],realSpace?:boolean)=>void
@@ -143,6 +141,9 @@ class ViewerHandle {
 
     loadLayer : (layerObj:Object)=>void
     reapplyNehubaMeshFix : ()=>void
+
+    mouseEvent : Subject<{eventName:string,event:any}>
+    mouseOverNehuba : Subject<{nehubaOutput : any, foundRegion : RegionDescriptor | null}>
 }
 
 export const VIEWER_CONTROL = window['viewerHandle'] = new ViewerHandle()

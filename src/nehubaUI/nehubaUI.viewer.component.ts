@@ -56,8 +56,8 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     VIEWER_CONTROL.loadTemplate = (templateDescriptor) => this.loadTemplate(templateDescriptor)
     VIEWER_CONTROL.onViewerInit = (cb:()=>void) => this.onViewerInit(cb)
     VIEWER_CONTROL.afterViewerInit = (cb:()=>void) => this.afterViewerInit(cb)
-    VIEWER_CONTROL.onParcellationLoading = (cb:()=>void) => this.onParcellationSelection(cb)
-    VIEWER_CONTROL.afterParcellationLoading = (cb:()=>void) => this.afterParcellationSelection(cb)
+    UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelection(cb)
+    UI_CONTROL.afterParcellationSelection = (cb:()=>void) => this.afterParcellationSelection(cb)
     VIEWER_CONTROL.showSegment = (seg) => this.showSegment(seg)
     VIEWER_CONTROL.hideSegment = (seg) => this.hideSegment(seg)
     VIEWER_CONTROL.hideAllSegments = () => this.hideAllSegments()
@@ -137,7 +137,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
 
   ngAfterViewInit(){
     UI_CONTROL.afterTemplateSelection(()=>{
-      this.darktheme = this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false;
+      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false;
       (<NehubaViewerComponent>this.componentRef.instance).darktheme = this.darktheme
     })
   }
@@ -304,6 +304,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public loadTemplate(config:NehubaViewerConfig){
 
     this.viewerConfig = config
+
+    /* TODO potentially setting metadata before it was defined (?) */
     const metadata = gExternalControl.metadata
     this.nehubaViewer = createNehubaViewer(config,(err)=>{
       /* TODO: error handling?*/

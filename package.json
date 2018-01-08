@@ -22,20 +22,19 @@
     "nehuba": "^0.0.0-alpha.0",
     "neuroglancer": "^0.0.0-beta.0",
     "ngx-bootstrap": "^1.8.1",
-    "reflect-metadata": "^0.1.10",
     "systemjs": "^0.20.18",
     "tslint": "^5.5.0",
-    "webpack": "^3.4.1",
     "zone.js": "^0.8.10"
   },
   "devDependencies": {
     "html-webpack-plugin": "^2.29.0",
-    "node-sass": "^4.5.3",
+    "jasmine": "^2.8.0",
+    "node-sass": "^4.7.2",
     "reflect-metadata": "^0.1.10",
     "sass-loader": "^6.0.6",
     "tslint-eslint-rules": "^4.1.1",
     "typescript": "2.3",
-    "webpack": "^2.7.0",
+    "webpack": "^3.10.0",
     "webpack-dev-server": "^2.2.0"
   }
 }

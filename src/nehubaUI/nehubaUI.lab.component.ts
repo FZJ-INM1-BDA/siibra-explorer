@@ -21,50 +21,50 @@ export class Lab {
       advancedMode = {
             name : "fzj.xg.advancedMode",
             icon : "plus",
-            templateURL:"http://172.104.156.15/html/advancedMode",
-            scriptURL:"http://172.104.156.15/js/advancedMode"
+            templateURL:"http://172.104.156.15/cors/html/advancedMode",
+            scriptURL:"http://172.104.156.15/cors/js/advancedMode"
       }
 
       uix = {
             "name":"fzj.xg.uix",
             "icon":"screenshot",
             "type":"plugin",
-            "templateURL":"http://172.104.156.15/html/nehuba_ui_extension",
-            "scriptURL":"http://172.104.156.15/js/nehuba_ui_extension"
+            "templateURL":"http://172.104.156.15/cors/html/nehuba_ui_extension",
+            "scriptURL":"http://172.104.156.15/cors/js/nehuba_ui_extension"
       }
 
       jugex = {
             name : 'fzj.xg.jugex',
-            templateURL:'http://172.104.156.15/html/jugex.template',
-            scriptURL : 'http://172.104.156.15/js/jugex.script'
+            templateURL:'http://172.104.156.15/cors/html/jugex.template',
+            scriptURL : 'http://172.104.156.15/cors/js/jugex.script'
       }
 
       papayaX = {
             "name":"fzj.xg.receptorBrowser",
             "icon":"info-sign",
             "type":"plugin",
-            "templateURL":"http://172.104.156.15/html/papayaX",
-            "scriptURL":"http://172.104.156.15/js/papayaX"
+            "templateURL":"http://172.104.156.15/cors/html/papayaX",
+            "scriptURL":"http://172.104.156.15/cors/js/papayaX"
       }
 
       screenSaver = {
             "name":"fzj.xg.meshAnimator",
-            "templateURL":"http://172.104.156.15/html/screenSaver",
-            "scriptURL":"http://172.104.156.15/js/screenSaver"
+            "templateURL":"http://172.104.156.15/cors/html/screenSaver",
+            "scriptURL":"http://172.104.156.15/cors/js/screenSaver"
       }
 
       builder = {
             "name":"fzj.xg.pluginBuilder",
             "icon":"console",
-            "templateURL":"http://172.104.156.15/html/pluginBuilder",
-            "scriptURL":"http://172.104.156.15/js/pluginBuilder"
+            "templateURL":"http://172.104.156.15/cors/html/pluginBuilder",
+            "scriptURL":"http://172.104.156.15/cors/js/pluginBuilder"
       }
 
       constructor(){
             
       }
 
-      plugins = [this.uix,this.screenSaver,this.papayaX].map(item=>new LabComponent(item))
+      plugins = [this.uix,this.screenSaver,this.papayaX,this.builder].map(item=>new LabComponent(item))
 
       appendPlugin(param:any){
             this.plugins.push(param)

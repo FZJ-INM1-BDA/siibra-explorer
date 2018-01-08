@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="297mm"
+   height="210mm"
+   viewBox="0 0 297 210"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.2 (unknown)"
+   sodipodi:docname="loadParcellationTimeline.svg"
+   inkscape:export-filename="/home/xgui3783/dev/projects/nehubaUI/nehubaUI/plugin_examples/loadParcellationTimeline.svg.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.98994949"
+     inkscape:cx="521.35888"
+     inkscape:cy="385.49616"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1855"
+     inkscape:window-height="1056"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-87)">
+    <rect
+       style="fill:#ffffff;stroke-width:0.26458332"
+       id="rect134"
+       width="297.2037"
+       height="210.07385"
+       x="0"
+       y="87.460693" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot10"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="matrix(0.26458333,0,0,0.26458333,5.7937806,97.819857)"><flowRegion
+         id="flowRegion12"><rect
+           id="rect14"
+           width="338.57144"
+           height="61.428585"
+           x="28.571428"
+           y="55.376827" /></flowRegion><flowPara
+         id="flowPara16">user interaction</flowPara></flowRoot>    <rect
+       id="rect18"
+       width="3.7797618"
+       height="23.434523"
+       x="116.72979"
+       y="106.59958"
+       style="stroke-width:0.26458332" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot20"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="matrix(0,0.26458333,-0.26458333,0,163.79782,17.951113)"><flowRegion
+         id="flowRegion22"><rect
+           id="rect24"
+           width="367.14288"
+           height="65.714302"
+           x="437.14285"
+           y="139.41507" /></flowRegion><flowPara
+         id="flowPara26"
+         style="font-size:16px">clicks a parcellation</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot10-3"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none"
+       transform="matrix(0.26458333,0,0,0.26458333,8.0785109,127.10264)"><flowRegion
+         id="flowRegion12-6"
+         style="fill:#ff0000"><rect
+           id="rect14-7"
+           width="338.57144"
+           height="61.428585"
+           x="28.571428"
+           y="55.376827"
+           style="fill:#ff0000" /></flowRegion><flowPara
+         id="flowPara16-5">hook firing</flowPara></flowRoot>    <rect
+       id="rect18-3"
+       width="3.7797618"
+       height="23.434523"
+       x="126.1792"
+       y="137.02666"
+       style="fill:#ff0000;stroke-width:0.26458332" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot20-5"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none"
+       transform="matrix(0,0.26458333,-0.26458333,0,173.15212,47.165852)"><flowRegion
+         id="flowRegion22-6"
+         style="fill:#ff0000"><rect
+           id="rect24-2"
+           width="434.28577"
+           height="64.285721"
+           x="437.14285"
+           y="139.41507"
+           style="fill:#ff0000" /></flowRegion><flowPara
+         id="flowPara26-9"
+         style="font-size:16px;fill:#ff0000">uiHandle.onParcellationSelection(callback)</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot10-3-1"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0000ff;fill-opacity:1;stroke:none"
+       transform="matrix(0.26458333,0,0,0.26458333,6.9157005,156.43466)"><flowRegion
+         id="flowRegion12-6-2"
+         style="fill:#0000ff"><rect
+           id="rect14-7-7"
+           width="338.57144"
+           height="61.428585"
+           x="28.571428"
+           y="55.376827"
+           style="fill:#0000ff" /></flowRegion><flowPara
+         id="flowPara16-5-0">model change</flowPara></flowRoot>    <rect
+       id="rect18-3-9"
+       width="3.7797618"
+       height="23.434523"
+       x="136.823"
+       y="165.81326"
+       style="fill:#0000ff;stroke-width:0.26458332" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot20-5-3"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0000ff;fill-opacity:1;stroke:none"
+       transform="matrix(0,0.26458333,-0.26458333,0,183.79592,75.945064)"><flowRegion
+         id="flowRegion22-6-6"
+         style="fill:#0000ff"><rect
+           id="rect24-2-0"
+           width="434.28577"
+           height="64.285721"
+           x="437.14285"
+           y="139.41507"
+           style="fill:#0000ff" /></flowRegion><flowPara
+         id="flowPara26-9-6"
+         style="font-size:16px;fill:#0000ff">Set parcellation visibilities</flowPara></flowRoot>    <rect
+       id="rect18-3-92"
+       width="3.7797618"
+       height="23.434523"
+       x="156.33369"
+       y="136.4136"
+       style="fill:#ff0000;stroke-width:0.26458332" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot20-5-0"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none"
+       transform="matrix(0,0.26458333,-0.26458333,0,203.3066,46.545416)"><flowRegion
+         id="flowRegion22-6-2"
+         style="fill:#ff0000"><rect
+           id="rect24-2-3"
+           width="434.28577"
+           height="64.285721"
+           x="437.14285"
+           y="139.41507"
+           style="fill:#ff0000" /></flowRegion><flowPara
+         id="flowPara26-9-7"
+         style="font-size:16px;fill:#ff0000">uiHandle.afterParcellationSelection(callback)</flowPara></flowRoot>    <rect
+       id="rect18-3-9-5"
+       width="3.7797618"
+       height="23.434523"
+       x="146.17743"
+       y="165.32109"
+       style="fill:#0000ff;stroke-width:0.26458332" />
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot20-5-3-6"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#0000ff;fill-opacity:1;stroke:none"
+       transform="matrix(0,0.26458333,-0.26458333,0,193.15036,75.452881)"><flowRegion
+         id="flowRegion22-6-6-9"
+         style="fill:#0000ff"><rect
+           id="rect24-2-0-3"
+           width="434.28577"
+           height="64.285721"
+           x="437.14285"
+           y="139.41507"
+           style="fill:#0000ff" /></flowRegion><flowPara
+         id="flowPara26-9-6-7"
+         style="font-size:16px;fill:#0000ff">nehubaUI.metadata.selectedParcellation defined</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot10-4"
+       style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+       transform="matrix(0.26458333,0,0,0.26458333,5.357095,75.141414)"><flowRegion
+         id="flowRegion12-5"><rect
+           id="rect14-2"
+           width="843.64771"
+           height="71.530113"
+           x="28.571428"
+           y="55.376827" /></flowRegion><flowPara
+         id="flowPara16-54"
+         style="font-size:42.66666794px">Parcellation Selection Timeline</flowPara></flowRoot>    <path
+       style="fill:none;stroke:#000000;stroke-width:0.27234674px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 201.93037,101.62597 H 16.161568 Z"
+       id="path392-7"
+       inkscape:connector-curvature="0" />
+  </g>
+</svg>

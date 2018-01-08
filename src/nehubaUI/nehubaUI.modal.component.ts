@@ -5,7 +5,7 @@ import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
 import { UI_CONTROL } from './nehubaUI.services'
 
 // import { Observable } from 'rxjs/Observable'
-import { Subscription } from 'rxjs/subscription'
+import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
 import 'rxjs/operator/map'
 

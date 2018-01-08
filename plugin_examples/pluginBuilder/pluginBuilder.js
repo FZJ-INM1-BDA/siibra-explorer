@@ -27,24 +27,58 @@
         }
     })
 
+    let localStorageURI = {}
+    let allFiles = []
+    let onConnectionTimeout
+
+    const parseNewFile = (obj) =>{
+        if(/html$|js$/.test(obj.filename)){
+            return ({
+                filename : obj.filename,
+                data : obj.data
+            })
+        }else{
+            return({
+                filename : obj.filename,
+                data : obj.data
+            })
+        }
+    }
+
     const handleWsMsg = (msg)=>{
         try{
-            const json = JSON.parse(msg.data)
+            const json = JSON.parse(msg)
             if(json.event == 'on connection'){
-                handleOnConnection = handleOnConnection(json)
-                return
+                allFiles.push(parseNewFile(json))
+                onConnectionTimeout = setTimeout(()=>{
+                    console.log('handleChange')
+                    handleChange()
+                },200)
+            }else{
+                const idx = allFiles.findIndex(file=>file.filename===json.filename)
+                if(idx>=0){
+                    allFiles[idx] = parseNewFile(json)
+                }
+                handleChange()
             }
-            switch(json.filename){
-                case 'template.html':{
-                    templateData = json.data
-                }break;
-                case 'script.js':{
-                    scriptData = json.data
-                }break;
-                default:
-                    throw 'Unknown filename ... This plugin currently only parses template.html and script.js.' 
-            }
-            handleChange()
+
+            // if(json.event == 'on connection'){
+            //     handleOnConnection = handleOnConnection(json)
+            //     return
+            // }
+            // switch(json.filename){
+            //     case 'template.html':{
+            //         templateData = json.data
+            //     }break;
+            //     case 'script.js':{
+            //         scriptData = json.data
+            //     }break;
+            //     default:{
+            //         /* other files, store in localStorage */
+            //         console.log(json.data)
+            //     }
+            // }
+            // handleChange()
         }catch(e){
             addWarning('WS message parsing failed ... Check console for more details.')
             console.log('WS message: ',msg)
@@ -52,16 +86,29 @@
         }
     }
 
-    let handleOnConnection = (obj1) => (obj2) =>{
-        const arr = [obj1,obj2]
+    const handleOnConnection = () => {
         try{
-            templateData = arr.find(obj=>obj.filename=='template.html').data
-            scriptData = arr.find(obj=>obj.filename=='script.js').data
-            handleChange() 
+
+            templateData = allFiles.find(file=>file.filename=='template.html').data
+            scriptData = allFiles.find(file=>file.filename=='script.js').data
+            handleChange()
         }catch(e){
+            
             console.log('either template.html or script.js not found',e)
         }
     }
+
+    // let handleOnConnection = (obj1) => (obj2) =>{
+    //     const arr = [obj1,obj2]
+    //     console.log(arr)
+    //     try{
+    //         templateData = arr.find(obj=>obj.filename=='template.html').data
+    //         scriptData = arr.find(obj=>obj.filename=='script.js').data
+    //         handleChange() 
+    //     }catch(e){
+    //         console.log('either template.html or script.js not found',e)
+    //     }
+    // }
 
     let templateData
     let scriptData
@@ -87,11 +134,7 @@
 
     }
 
-    const shutdownHandler = window.pluginControl
-          .filter(evPk=>evPk.target=='fzj.xg.pluginBuilder'&&evPk.body.shutdown)
-          .subscribe(evPk=>{
-                /* shutdown sequence */
-                if(ws)ws.close()
-                shutdownHandler.unsubscribe()
-          })
+    window.pluginControl['fzj.xg.pluginBuilder'].onShutdown(()=>{
+        if(ws)ws.close()
+    })
 })()

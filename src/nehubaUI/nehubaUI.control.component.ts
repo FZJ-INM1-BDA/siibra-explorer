@@ -1,11 +1,12 @@
 import { Component,Input,OnInit,AfterViewInit,Output,ViewChild,EventEmitter} from '@angular/core'
-import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalControl, HelperFunctions } from './nehubaUI.services'
 import { Lab } from './nehubaUI.lab.component'
 import { ModalHandler } from './nehubaUI.modal.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
 import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor } from './nehuba.model'
 import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
 import { NehubaViewer } from 'nehuba/NehubaViewer';
+import { Subject } from 'rxjs/Subject'
 
 declare var window:{
   [key:string] : any
@@ -45,7 +46,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   onParcellationSelectionHook : (()=>void)[] = []
   afterParcellationSelectionHook : (()=>void)[] = []
 
-  constructor( private dataService : DataService ){
+  nehubaViewer : NehubaViewer
+  nehubaViewerSegmentMouseover : any
+  mouseOverNehuba : (nehubaOutput : any)=>void = (nehubaOuput:any) => 
+    VIEWER_CONTROL.mouseOverNehuba.next({nehubaOutput:nehubaOuput,foundRegion:HelperFunctions.sFindRegion(nehubaOuput.segment)})
+
+  constructor( private dataService : DataService){
     this.fetchedTemplatesData = new FetchedTemplates()
 
     UI_CONTROL.onTemplateSelection = (cb:()=>void) => this.onTemplateSelectionHook.push(cb)
@@ -56,7 +62,16 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     VIEWER_CONTROL.reapplyNehubaMeshFix = this.applyNehubaMeshFix
     this.afterTemplateSelectionHook.push(()=>{
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+      this.nehubaViewer = window.nehubaViewer
+      this.nehubaViewerSegmentMouseover = this.nehubaViewer.mouseOver.segment
+        .filter(()=> (typeof this.mouseOverNehuba !== 'undefined'))
+        .subscribe(ev=>this.mouseOverNehuba(ev))
     })
+    this.onTemplateSelectionHook.push(()=>{
+      if(this.nehubaViewerSegmentMouseover)this.nehubaViewerSegmentMouseover.unsubscribe()
+    })
+    
+    VIEWER_CONTROL.mouseOverNehuba = new Subject()
   }
 
   /** on view init 
@@ -97,6 +112,8 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         modalHandler.show()
       }
     })()
+    
+    this.loadInitDatasets()
   }
 
   ngAfterViewInit():void{
@@ -158,23 +175,35 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     // }else{
     // }
     
-    this.loadInitDatasets()
-
     this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
 
     this.onParcellationSelectionHook.push(()=>{
       if (this.shownSegmentsObserver) this.shownSegmentsObserver.unsubscribe()
     })
+
+    HelperFunctions.sFindRegion = this.findRegionWithId
+  }
+
+  findRegionWithId : (id:number|null)=>RegionDescriptor|null = (id) => {
+    if( id == null || id == 0 || !this.selectedParcellation ) return null
+    const searchThroughChildren : (regions:RegionDescriptor[])=>RegionDescriptor|null = (regions:RegionDescriptor[]) => {
+      const matchedRegion = regions.find(region=> region.labelIndex !== undefined && region.labelIndex == id)
+      if(matchedRegion) return matchedRegion
+      const searchedChildren = regions.map(region=>searchThroughChildren(region.children)).find(child=>child!==null)
+      return searchedChildren ? searchedChildren : null
+    }
+    const searchResult = searchThroughChildren(this.selectedParcellation.regions)
+    return searchResult ? searchResult : null
   }
 
   loadInitDatasets(){
 
     /* this will need to come from elsewhere eventually */
     let datasetArray = [
-      'http://172.104.156.15/json/bigbrain',
-      'http://172.104.156.15/json/colin',
-      'http://172.104.156.15/json/waxholmRatV2_0',
-      'http://172.104.156.15/json/allenMouse'
+      'http://172.104.156.15/cors/json/bigbrain',
+      'http://172.104.156.15/cors/json/colin',
+      'http://172.104.156.15/cors/json/waxholmRatV2_0',
+      'http://172.104.156.15/cors/json/allenMouse'
     ]
 
     datasetArray.forEach(dataset=>{
@@ -195,15 +224,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   }
 
   applyNehubaMeshFix = () =>{
-    const nehubaViewer = (<NehubaViewer>window.nehubaViewer)
     
-    nehubaViewer.clearCustomSegmentColors()
+    this.nehubaViewer.clearCustomSegmentColors()
     if( this.selectedParcellation ){
-      nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
-      nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+      this.nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
+      this.nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
     }
 
-    const shownSegmentsObservable = nehubaViewer.getShownSegmentsObservable()
+    const shownSegmentsObservable = this.nehubaViewer.getShownSegmentsObservable()
     this.shownSegmentsObserver = shownSegmentsObservable.subscribe(segs=>{
       this.updateRegionDescriptors(segs)
 
@@ -211,16 +239,16 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         if( this.selectedParcellation.surfaceParcellation ){
           //TODO need to test init condition... if selectedRegions is a subset of total regions, what happens?
           if( segs.length == 0 ){
-            nehubaViewer.clearCustomSegmentColors()
-            nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+            this.nehubaViewer.clearCustomSegmentColors()
+            this.nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
           }else{
             const newColormap = new Map()
             const blankColor = {red:255,green:255,blue:255}
             this.selectedParcellation.colorMap.forEach((activeValue,key)=>{
               newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
             })
-            nehubaViewer.clearCustomSegmentColors()
-            nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
+            this.nehubaViewer.clearCustomSegmentColors()
+            this.nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
           }
         }
       }
@@ -233,16 +261,20 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
     modalHandler.title = `<h4>Loading template ${templateDescriptor.name} </h4>`
     modalHandler.body = `Please stand by ...`
     modalHandler.footer = null
-
+    
     modalHandler.onShown(()=>{
       /* TODO onshown method does not fire at correct timing, investigate for issues */
       setTimeout(()=>{
+        
         VIEWER_CONTROL.loadTemplate(templateDescriptor)
         this.selectedTemplate = templateDescriptor
         gExternalControl.metadata.selectedTemplate = this.selectedTemplate
-        this.afterTemplateSelectionHook.forEach(cb=>cb())
         
+        this.afterTemplateSelectionHook.forEach(cb=>cb())
+
         this.chooseParcellation( templateDescriptor.parcellations[0] )
+
+        /* TODO potentially breaks. selectedRegions should be cleared after each chooseParcellation */
         gExternalControl.metadata.selectedRegions = []
       },200)
       /* TODO waiting for nehuba API on when it's safe to dismiss the modal */
@@ -262,7 +294,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
   refreshSelectedRegions(){
     const treePipe = new SelectTreePipe()
-    treePipe
     if(this.selectedParcellation){
       (new Promise((resolve)=>{
         resolve( treePipe.transform(this.selectedParcellation!.regions)
@@ -311,15 +342,15 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       this.regionsLabelIndexMap.clear()
       mapRegions(this.selectedParcellation!.regions)
 
-      /* TODO temporary measure, until nehubaviewer has its own way of controlling layers */
+      /* TODO temporary measure, until nehubaViewer has its own way of controlling layers */
       this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
         window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
       })
       setTimeout(()=>{
         window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
-        window.nehubaViewer.redraw()
+        this.nehubaViewer.redraw()
       })
-      this.updateRegionDescriptors( window.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}).map((id:any)=>({labelIndex:id})) )
+      this.updateRegionDescriptors( this.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}) )
 
       /* populate the metadata object */
       gExternalControl.metadata.selectedParcellation = this.selectedParcellation
@@ -376,6 +407,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
 
   /**
    * the propagation event is needed to ensure the info panel stay with the element when scrolling
+   * TODO deprecate onScroll meethod. since the popover is tethered to the multilevel container
    */
   onScroll = (ev:any)=>{
     this.multilevelSelector.onScroll(ev)

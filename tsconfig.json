@@ -1,6 +1,7 @@
 {
   "extends": "./node_modules/neuroglancer/tsconfig.json",
   "compilerOptions": {
+    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "baseUrl": ".",
