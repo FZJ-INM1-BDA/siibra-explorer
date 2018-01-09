@@ -1,6 +1,5 @@
-import { Pipe,PipeTransform } from '@angular/core'
+import { Pipe,PipeTransform,SecurityContext } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { SecurityContext } from '@angular/core'
 import { Multilevel } from './nehuba.model'
 
 /* pipes in object, pipes out stringified json  */
@@ -162,7 +161,7 @@ export class SelectTreePipe implements PipeTransform{
 
 export class NumberFilteringPipe implements PipeTransform{
     public transform(number:number){
-        return Math.round( number * 1000 ) / 1000
+        return number.toFixed(2)
     }
 }
 
@@ -178,6 +177,29 @@ export class FilterUncertainObject implements PipeTransform{
         }else{
             return obj
         }
+    }
+}
+
+@Pipe({
+    name : 'nmToMm'
+})
+
+export class NmToMmPipe implements PipeTransform{
+
+    public transform(number:any):number{
+        return isNaN(number) ? 
+            0 :
+            number / 1000000
+    }
+}
+
+@Pipe({
+    name : 'arrayJoinComma'
+})
+
+export class ArrayJoinComma implements PipeTransform{
+    public transform(array:any[]){
+        return array.join(',')
     }
 }
 

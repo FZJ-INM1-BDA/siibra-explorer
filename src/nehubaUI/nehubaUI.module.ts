@@ -22,7 +22,7 @@ import { Lab } from './nehubaUI.lab.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
 import { DataService } from './nehubaUI.services';
-import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe } from './nehubaUI.util.pipes'
+import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
@@ -41,7 +41,7 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
         Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService,
-        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe ],
+        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma ],
     bootstrap : [ NehubaContainer ],
     providers : [ DataService],
     entryComponents : [ FloatingWidgetComponent,NehubaViewerComponent,NehubaModalUnit ]

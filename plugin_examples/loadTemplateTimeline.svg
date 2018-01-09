@@ -29,7 +29,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="375.99144"
+     inkscape:cx="350.73762"
      inkscape:cy="452.3262"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -62,7 +62,9 @@
        width="297.2037"
        height="210.07385"
        x="0.26727489"
-       y="87.460686" />
+       y="87.460686"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <flowRoot
        xml:space="preserve"
        id="flowRoot10"

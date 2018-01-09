@@ -131,6 +131,37 @@ $BORDERWIDTH : 2px;
     color : gray(0.8);
 }
 
+.glyphicon-overlay
+{
+    position:absolute;
+    right:0px;
+    bottom:0px;
+    height:1em;
+    z-index:99;
+
+    margin-top:auto;
+    margin-bottom:auto;
+    margin-right:1.5em;
+
+    color:gray(0.5);
+
+    &:hover
+    {
+        color:gray(0.3);
+    }
+}
+
+.darktheme
+{
+    .glyphicon-overlay
+    {
+        &:hover
+        {
+            color:gray(0.7);
+        }
+    }
+}
+
 #ATLASContainer{
     atlascontrol{
         width:110%;

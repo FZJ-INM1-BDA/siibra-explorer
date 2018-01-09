@@ -194,10 +194,42 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   <span 
     class = "btn btn-link"
     (click)="statusPanelRealSpace = !statusPanelRealSpace">
-    {{statusPanelRealSpace ? 'RealSpace(nm)' : 'VoxelSpace'}}
+    {{statusPanelRealSpace ? 'RealSpace(mm)' : 'VoxelSpace'}}
   </span> 
-  Navigation: <small>({{statusPanelRealSpace ? viewerPosReal.join(',') : viewerPosVoxel.join(',')}})</small> 
-  Mouse: <small>({{statusPanelRealSpace ? mousePosReal.join(',') : mousePosVoxel.join(',')}})</small> 
+  Navigation: <small>(
+    {{
+      statusPanelRealSpace ? 
+        (viewerPosReal[0] | nmToMm | number) : 
+        viewerPosVoxel[0]
+    }},
+    {{
+      statusPanelRealSpace ? 
+        (viewerPosReal[1] | nmToMm | number) : 
+        viewerPosVoxel[1]
+    }},
+    {{
+      statusPanelRealSpace ? 
+        (viewerPosReal[2] | nmToMm | number) : 
+        viewerPosVoxel[2]
+    }}
+  )</small> 
+  Mouse: <small>(
+    {{
+      statusPanelRealSpace ? 
+        (mousePosReal[0] | nmToMm | number) : 
+        mousePosVoxel[0]
+    }},
+    {{
+      statusPanelRealSpace ? 
+        (mousePosReal[1] | nmToMm | number) : 
+        mousePosVoxel[1]
+    }},
+    {{
+      statusPanelRealSpace ? 
+        (mousePosReal[2] | nmToMm | number) : 
+        mousePosVoxel[2]
+    }}
+  )</small> 
   {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? 'RegionID: ' + viewerSegment : 'Region: ' + viewerSegment.name   }}
 </div>
 <floatingPopover>

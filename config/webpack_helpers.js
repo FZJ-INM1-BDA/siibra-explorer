@@ -21,6 +21,7 @@ const original_webpack_helpers = require('neuroglancer/config/webpack_helpers');
 const resolveReal = require('neuroglancer/config/resolve_real');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const webpack = require('webpack')
 
 const extractSass = new ExtractTextPlugin({
   filename : 'ui.css',
@@ -46,6 +47,9 @@ function modifyViewerOptions(options) {
   options.frontendModules = [resolveReal(__dirname, '../src/main.ts')];
 
   options.htmlPlugin = new HtmlWebpackPlugin({template : "src/index.html"})
+  options.commonPlugins = [
+    new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)@angular/,path.join(__dirname,'../src'))
+  ]
   
   let testScss = {
     test : /\.scss$/,

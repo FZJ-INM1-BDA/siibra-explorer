@@ -40,6 +40,8 @@
       <div (scroll)="onScroll($event)" id = "regionContainer" class = "list-group" *ngIf="selectedParcellation" [hidden]="!regionsPanelIsShown">
         <div class = "list-group-item nohover">
           <input class = "form-control" placeholder = "Search regions ... "  [ngModel]="searchTerm" (ngModelChange)="multilvlExpansionTreeShake($event)" name = "searchRegionInput" #ctrl="ngModel">
+          <span (click)="searchTerm=''" [hidden]="searchTerm==''" class = "glyphicon-overlay glyphicon glyphicon-remove-sign">
+          </span>
         </div>
         <div (click)="refreshSelectedRegions()" class = "list-group-item nohover">
           <multilevel class = "menuItemContentText" [data]="selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
