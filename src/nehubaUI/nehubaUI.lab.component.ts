@@ -1,16 +1,19 @@
 import { Component } from '@angular/core'
 import { HelperFunctions } from 'nehubaUI/nehubaUI.services';
-import { LabComponent } from 'nehubaUI/nehuba.model';
+import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
+
+declare var window:{
+      [key:string] : any
+      prototype : Window;
+      new() : Window;
+    }
 
 @Component({
       selector : 'lab',
       template : `
 <div id = "labContainer">
       <div *ngFor = "let plugin of plugins" (click)="launchPlugin(plugin)" class = "btn btn-default">
-            <span *ngIf = "plugin.icon" [ngClass]="'glyphicon-'+plugin.icon" class = "glyphicon"></span> {{plugin.name.split('.')[plugin.name.split('.').length-1]}}
-      </div>
-      <div *ngIf = "false" (click)="showInputModal()" class = "btn btn-default">
-            <span class = "glyphicon glyphicon-plus"></span>
+            {{plugin.name.split('.')[plugin.name.split('.').length-1]}}
       </div>
 </div>
       `
@@ -20,14 +23,12 @@ export class Lab {
 
       advancedMode = {
             name : "fzj.xg.advancedMode",
-            icon : "plus",
             templateURL:"http://172.104.156.15/cors/html/advancedMode",
             scriptURL:"http://172.104.156.15/cors/js/advancedMode"
       }
 
       uix = {
             "name":"fzj.xg.uix",
-            "icon":"screenshot",
             "type":"plugin",
             "templateURL":"http://172.104.156.15/cors/html/nehuba_ui_extension",
             "scriptURL":"http://172.104.156.15/cors/js/nehuba_ui_extension"
@@ -41,7 +42,6 @@ export class Lab {
 
       papayaX = {
             "name":"fzj.xg.receptorBrowser",
-            "icon":"info-sign",
             "type":"plugin",
             "templateURL":"http://172.104.156.15/cors/html/papayaX",
             "scriptURL":"http://172.104.156.15/cors/js/papayaX"
@@ -72,15 +72,15 @@ export class Lab {
 
       /* TODO figure out a new way to launch plugin */
       launchPlugin(labComponent:LabComponent){
-            HelperFunctions.sLoadPlugin(labComponent)
+            if(window.pluginControl[labComponent.name]){
+                  (<LabComponentHandler>window.pluginControl[labComponent.name]).blink(10)
+            }else{
+                  HelperFunctions.sLoadPlugin(labComponent)
+            }
             // if(param.templateURL && param.scriptURL){
             //       const requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
             //       const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
             //       newSubject.next(new EventPacket('lab','',100,param))
             // }
-      }
-
-      showInputModal(){
-            // this.eventCenter.modalEventRelay.next(new EventPacket('showInputModal',Date.now().toString(),100,{title:'Add'}))
       }
 }

@@ -15,14 +15,12 @@ The manifest JSON file describes the metadata associated with the plugin.
 ```json
 {
   "name":"fzj.xg.webJuGEx",
-  "icon":"lamp", 
   "type":"plugin",
   "templateURL":"http://LINK-TO-YOUR-PLUGIN-TEMPLATE/jugex.template.html",
   "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT/jugex.script.js"
 }
 ```
 *NB* 
-- the "icon" field is optional. All other fields are required.
 - Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
 
 

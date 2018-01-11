@@ -62,11 +62,15 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     floatingWidgetComponent.darktheme = this.darktheme
     floatingWidgetComponent.minimisedTrays = this.minimisedTrays
 
+    /* labComponentHandler : how plugin script interact with floatingWidget */
     const labComponentHandler = window['pluginControl'][labComponent.name] = new LabComponentHandler()
     labComponentHandler.blink = (sec?:number) => floatingWidgetComponent.blink(sec)
     labComponentHandler.pushMessage = (message:string) => floatingWidgetComponent.pushMessage(message)
     labComponentHandler.shutdown = ()=> floatingWidgetComponent.shutdownPlugin()
     labComponentHandler.onShutdown = (cb:()=>void)=>componentRef.onDestroy(cb)
+    componentRef.onDestroy(()=>{
+      delete window.pluginControl[labComponent.name]
+    })
 
     labComponent.script.onload = (_s) =>{
       console.log('script loaded')
@@ -88,14 +92,13 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     [popover] = "popoverMessage ? popoverMessage : 'No messages.'"
     placement = "left"
     triggers = "mouseenter:mouseleave">
-    <i *ngIf = "data.icon" [ngClass]="'glyphicon-'+data.icon" class = "glyphicon"></i>
-    <i *ngIf = "!data.icon">{{data.name.split('.')[data.name.split('.').length-1].substring(0,1)}}</i>
+    <i>{{data.name.split('.')[data.name.split('.').length-1].substring(0,1)}}</i>
   </div>
 </div>
 <div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget"  [ngClass]="{darktheme : darktheme}">
   <div [ngClass]="{'panel-default' : !reposition && !successFlag, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
     <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
-      <i *ngIf = "data.icon" class = "glyphicon" [ngClass] = "'glyphicon-' + data.icon"></i> {{data.name.split('.')[data.name.split('.').length-1]}}
+      {{data.name.split('.')[data.name.split('.').length-1]}}
       <i (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></i>
       <i (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></i>
     </div>
