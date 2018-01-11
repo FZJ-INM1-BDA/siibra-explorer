@@ -47,13 +47,13 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   private afterParcellationSelectionHook : (()=>void)[] = []
 
   constructor( private componentFactoryResolver: ComponentFactoryResolver ){
-    // gExternalControl.viewControl
-    //   .filter((evPk:EventPacket)=>evPk.target=='loadTemplate'&&evPk.code==101)
-    //   .subscribe((_evPk:EventPacket)=>{
-    //     if (this.nehubaViewerComponent) this.nehubaViewerComponent.nehubaViewer.clearCustomSegmentColors()
-    //   })
     
-    VIEWER_CONTROL.loadTemplate = (templateDescriptor) => this.loadTemplate(templateDescriptor)
+    VIEWER_CONTROL.loadTemplate = (templateDescriptor:TemplateDescriptor) => {
+      /* TODO implement a check that each el in the hooks are still defined and are fn's */
+      this.onViewerInitHook.forEach(fn=>fn())
+      this.loadTemplate(templateDescriptor.nehubaConfig)
+      this.afterviewerInitHook.forEach(fn=>fn())
+    }
     VIEWER_CONTROL.onViewerInit = (cb:()=>void) => this.onViewerInit(cb)
     VIEWER_CONTROL.afterViewerInit = (cb:()=>void) => this.afterViewerInit(cb)
     UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelection(cb)
@@ -64,13 +64,6 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
     VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
     VIEWER_CONTROL.loadLayer = (layerObj:Object) => this.loadLayer(layerObj)
-  }
-
-  public loadTemplate = (templateDescriptor:TemplateDescriptor)=>{
-    /* TODO implement a check that each el in the hooks are still defined and are fn's */
-    this.onViewerInitHook.forEach(fn=>fn())
-    this.loadNewTemplate(templateDescriptor.nehubaConfig)
-    this.afterviewerInitHook.forEach(fn=>fn())
   }
 
   /**
@@ -142,7 +135,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     })
   }
 
-  private loadNewTemplate(nehubaViewerConfig:NehubaViewerConfig){
+  private loadTemplate(nehubaViewerConfig:NehubaViewerConfig){
 
     if ( this.templateLoaded ){
       /* I'm not too sure what does the dispose method do (?) */
@@ -156,7 +149,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
     
     this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
-    this.nehubaViewerComponent.loadTemplate(nehubaViewerConfig)
+    this.nehubaViewerComponent.createNewNehubaViewerWithConfig(nehubaViewerConfig)
     this.nehubaViewerComponent.darktheme = this.darktheme
 
     this.templateLoaded = true
@@ -333,7 +326,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public ngAfterViewInit(){
   }
 
-  public loadTemplate(config:NehubaViewerConfig){
+  public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
 
     this.viewerConfig = config
 
@@ -343,6 +336,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       /* TODO: error handling?*/
       console.log('createnehubaviewer error handler',err)
     })
+
+    /* 
+    TODO what happens if initialngstate is undefined?
+    */
     this.nehubaViewer.applyInitialNgState()
     this.nehubaViewer.redraw()
     this.nehubaViewer.relayout()
@@ -450,7 +447,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   //TODO: do this properly with proper api's
   public loadLayer(layerObj:Object){
-    /* TODO wait for proper api in nehuba viewer */
     const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
     Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
     this.nehubaViewer.ngviewer.state.restoreState(state)

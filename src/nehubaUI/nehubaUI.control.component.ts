@@ -344,7 +344,9 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
       this.regionsLabelIndexMap.clear()
       mapRegions(this.selectedParcellation!.regions)
 
-      /* TODO temporary measure, until nehubaViewer has its own way of controlling layers */
+      /* TODO temporary measure, until nehubaViewer has its own way of controlling layers 
+      also untested for multiple parcellations
+      */
       this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
         window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
       })
@@ -410,14 +412,6 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
         if(this.selectedParcellation)propagate(this.selectedParcellation.regions)
       }
     })
-  }
-
-  /**
-   * the propagation event is needed to ensure the info panel stay with the element when scrolling
-   * TODO deprecate onScroll meethod. since the popover is tethered to the multilevel container
-   */
-  onScroll = (ev:any)=>{
-    this.multilevelSelector.onScroll(ev)
   }
 }
 

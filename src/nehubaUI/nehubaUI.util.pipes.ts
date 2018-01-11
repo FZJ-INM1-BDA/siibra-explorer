@@ -5,65 +5,65 @@ import { Multilevel } from './nehuba.model'
 /* pipes in object, pipes out stringified json  */
 
 @Pipe({
-    name:'jsonStringifyPipe'
+  name:'jsonStringifyPipe'
 })
 
 export class JsonStringifyPipe implements PipeTransform{
-    public transform(json:any){
-        return JSON.stringify(json)
-    }
+  public transform(json:any){
+    return JSON.stringify(json)
+  }
 }
 
 /* pipes in string, pipes out json objects */
 
 @Pipe({
-    name:'jsonParsePipe'
+  name:'jsonParsePipe'
 })
 
 export class JsonParsePipe implements PipeTransform{
-    public transform(string:string){
-        let json
-        try{
-            json = JSON.parse(string)
-            return json
-        } catch (e){
-            return {}
-        }
+  public transform(string:string){
+    let json
+    try{
+      json = JSON.parse(string)
+      return json
+    } catch (e){
+      return {}
     }
+  }
 }
 
 /* pipes in array and search term, pipes out search term that matches the array */
 /* deprecated by searchTreePipe */
 @Pipe({
-    name:'searchPipe'
+  name:'searchPipe'
 })
 
 export class SearchPipe implements PipeTransform{
-    public transform(array:any[],searchTerm:string){
-        return array.filter( (item) => {
-            if(searchTerm === ''){
-                return true
-            }else{
-                let regExp = new RegExp('\\b'+searchTerm,'gi')
-                return regExp.test(item.name)
-            }
-        })
-    }
+  public transform(array:any[],searchTerm:string){
+    return array.filter( (item) => {
+      if(searchTerm === ''){
+        return true
+      }else{
+        let regExp = new RegExp('\\b'+searchTerm,'gi')
+        return regExp.test(item.name)
+      }
+    })
+  }
 }
 
 /* pipes in object and pipes out list of keys */
 @Pipe({
-    name:'keyPipe'
+  name:'keyPipe'
 })
 
 export class KeyPipe implements PipeTransform{
-    public transform(obj:any):string[]{
-        let returnKey = []
-        for (let key in obj){
-            returnKey.push(key)
-        }
-        return returnKey
+  public transform(obj:any):string[]{
+    let returnKey = []
+    for (let key in obj){
+      returnKey.push(key)
     }
+    return returnKey
+  }
 }
 
 /* searches tree array object (assuming children nodes are nested under children property) */
@@ -71,187 +71,187 @@ export class KeyPipe implements PipeTransform{
 /* supercedes searchPipe */
 
 @Pipe({
-    name:'searchTreePipe'
+  name:'searchTreePipe'
 })
 
 export class SearchTreePipe implements PipeTransform{
 
-    searchTerm : string
+  searchTerm : string
 
-    public transform(array:Multilevel[],searchTerm:string):Multilevel[]{
-        this.searchTerm = searchTerm
-        this.iteratingArray( array )
-        return array
-    }
+  public transform(array:Multilevel[],searchTerm:string):Multilevel[]{
+    this.searchTerm = searchTerm
+    this.iteratingArray( array )
+    return array
+  }
 
-    private iteratingArray(array:Multilevel[]){
-        let sanitaized = this.searchTerm.replace(/[^\w\s]/gi, '')
-        array.forEach( item => {
-            /* if regexp is not here, it gives funny results */
-            let regExp = new RegExp(sanitaized,'gi')
-            item.isVisible = regExp.test( item.name )
-            this.iteratingArray( item.children )
-        })
-    }
+  private iteratingArray(array:Multilevel[]){
+    let sanitaized = this.searchTerm.replace(/[^\w\s]/gi, '')
+    array.forEach( item => {
+      /* if regexp is not here, it gives funny results */
+      let regExp = new RegExp(sanitaized,'gi')
+      item.isVisible = regExp.test( item.name )
+      this.iteratingArray( item.children )
+    })
+  }
 }
 
 /* search high lighting */
 
 @Pipe({
-    name:'searchHighlight'
+  name:'searchHighlight'
 })
 
 export class SearchHighlight implements PipeTransform{
-    
-    regExp : RegExp
+  
+  regExp : RegExp
 
-    constructor(private sanitizer:DomSanitizer){}
+  constructor(private sanitizer:DomSanitizer){}
 
-    public transform(string : string,searchTerm:string,singleData:any){
-        /* necessary as some region has no name defined */
-        if( !string ){
-            return null
-        }
-        if( !searchTerm || searchTerm == '' ){
-            return string
-        }else{
-            let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
-            this.regExp = new RegExp(sanitaized,'gi')
-            singleData
-            return this.sanitizer.bypassSecurityTrustHtml( string.replace(this.regExp,match=>`<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`) )
-        }
+  public transform(string : string,searchTerm:string,singleData:any){
+    /* necessary as some region has no name defined */
+    if( !string ){
+      return null
     }
+    if( !searchTerm || searchTerm == '' ){
+      return string
+    }else{
+      let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
+      this.regExp = new RegExp(sanitaized,'gi')
+      singleData
+      return this.sanitizer.bypassSecurityTrustHtml( string.replace(this.regExp,match=>`<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`) )
+    }
+  }
 }
 
 /* searches for tree selected status (selected/unselected/partially selected) */
 
 @Pipe({
-    name:'selectTreePipe',
-    pure : false
+  name:'selectTreePipe',
+  pure : false
 })
 
 export class SelectTreePipe implements PipeTransform{
 
-    returnArray:any[]
+  returnArray:any[]
 
-    public transform(array:any[]):any[]{
-        
-        this.returnArray = []
-        this.iterate(array)
+  public transform(array:any[]):any[]{
+    
+    this.returnArray = []
+    this.iterate(array)
 
-        return this.returnArray
-    }
+    return this.returnArray
+  }
 
-    private iterate(array:any[]){
-        array.forEach(item=>{
-            if( item.enabled && item.labelIndex ) this.returnArray.push( item ) 
-            if( item.children && item.children.length>0){
-                this.iterate(item.children)
-            }
-        })
-    }
+  private iterate(array:any[]){
+    array.forEach(item=>{
+      if( item.enabled && item.labelIndex ) this.returnArray.push( item ) 
+      if( item.children && item.children.length>0){
+        this.iterate(item.children)
+      }
+    })
+  }
 }
 
 /* round float to 3 dp */
 /* originally used for navigation panel */
 
 @Pipe({
-    name:'numberfilteringPipe'
+  name:'numberfilteringPipe'
 })
 
 export class NumberFilteringPipe implements PipeTransform{
-    public transform(number:number){
-        return number.toFixed(2)
-    }
+  public transform(number:number){
+    return number.toFixed(2)
+  }
 }
 
 /* if a field is undefined/null, set it to n/a instead */
 @Pipe({
-    name:'filterUncertainObject'
+  name:'filterUncertainObject'
 })
 
 export class FilterUncertainObject implements PipeTransform{
-    public transform(obj:any|any[]){
-        if(!obj){
-            return 'n/a'
-        }else{
-            return obj
-        }
+  public transform(obj:any|any[]){
+    if(!obj){
+      return 'n/a'
+    }else{
+      return obj
     }
+  }
 }
 
 @Pipe({
-    name : 'nmToMm'
+  name : 'nmToMm'
 })
 
 export class NmToMmPipe implements PipeTransform{
 
-    public transform(number:any):number{
-        return isNaN(number) ? 
-            0 :
-            number / 1000000
-    }
+  public transform(number:any):number{
+    return isNaN(number) ? 
+      0 :
+      number / 1000000
+  }
 }
 
 @Pipe({
-    name : 'arrayJoinComma'
+  name : 'arrayJoinComma'
 })
 
 export class ArrayJoinComma implements PipeTransform{
-    public transform(array:any[]){
-        return array.join(',')
-    }
+  public transform(array:any[]){
+    return array.join(',')
+  }
 }
 
 // @Pipe({
-//     name:'htmlElementAssemblerPipe'
+//   name:'htmlElementAssemblerPipe'
 // })
 
 // export class HTMLElementAssemblerPipe implements PipeTransform{
-//     public transform(data:any){
-//         let element : HTMLElement
-//         if ( data._elementTagName ){
-//             switch( data._elementTagName ){
-//                 case 'img':{
-//                     element = document.createElement('img')
-//                     if( data._src ){
-//                         element.setAttribute('src',data._src)
-//                     }
-//                 }break;
-//                 case 'span':{
-//                     element = document.createElement('span')
-//                 }break; 
-//                 case 'div':
-//                 default :{
-//                     element = document.createElement('div')
-//                 }break;
-//             }
-//             if( data._class ){
-//                 element.className = data._class
-//             }
-//             if ( data._id ){
-//                 element.id = data._id
-//             }
-//             if (data._value){
-//                 element.innerHTML = data._value
-//             }
+//   public transform(data:any){
+//     let element : HTMLElement
+//     if ( data._elementTagName ){
+//       switch( data._elementTagName ){
+//         case 'img':{
+//           element = document.createElement('img')
+//           if( data._src ){
+//             element.setAttribute('src',data._src)
+//           }
+//         }break;
+//         case 'span':{
+//           element = document.createElement('span')
+//         }break; 
+//         case 'div':
+//         default :{
+//           element = document.createElement('div')
+//         }break;
+//       }
+//       if( data._class ){
+//         element.className = data._class
+//       }
+//       if ( data._id ){
+//         element.id = data._id
+//       }
+//       if (data._value){
+//         element.innerHTML = data._value
+//       }
 
-//             return element.outerHTML
-//         }else{
-//             return ''
-//         }
+//       return element.outerHTML
+//     }else{
+//       return ''
 //     }
+//   }
 // }
 
 @Pipe({
-    name:'isEmpty'
+  name:'isEmpty'
 })
 
 export class IsEmpty implements PipeTransform{
-    public transform(thing:any|any[]):boolean{
-        return thing.constructor.name == 'String' ? thing.length == 0 : 
-            thing.constructor.name == 'Array' ? thing.length == 0 :
-            thing.constructor.name == 'Object' ? Object.keys(thing).length == 0 :
-            true
-    }
+  public transform(thing:any|any[]):boolean{
+    return thing.constructor.name == 'String' ? thing.length == 0 : 
+      thing.constructor.name == 'Array' ? thing.length == 0 :
+      thing.constructor.name == 'Object' ? Object.keys(thing).length == 0 :
+      true
+  }
 }
