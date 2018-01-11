@@ -86,7 +86,28 @@ $BORDERWIDTH : 2px;
             width:100%;
 
             .gllayoutcell{
-                border: $BORDERWIDTH solid gray(0.95)
+                border: $BORDERWIDTH solid gray(0.95);
+
+                label.perspective-panel-show-slice-views
+                {
+                    /* override neuroglancer pointer-events property */
+                    pointer-events: all;
+
+                    color:gray(0.2);
+                    margin-left:1em;
+                    visibility: hidden;
+
+                    &:hover
+                    {
+                        color:gray(0.1);
+                    }
+
+                    &:before
+                    {
+                        content : "toggle front octant";
+                        visibility: visible;
+                    }
+                }
             }
 
             .gllayoutcell:hover{
@@ -95,7 +116,7 @@ $BORDERWIDTH : 2px;
 
             .scale-bar-container{
                 color : gray(0.05);
-                background-color : tgray(0.3,0.2)
+                background-color : tgray(0.3,0.2);
             }
         }
 
@@ -104,7 +125,16 @@ $BORDERWIDTH : 2px;
             width:100%;
 
             .gllayoutcell{
-                border: $BORDERWIDTH solid gray(0.05)
+                border: $BORDERWIDTH solid gray(0.05);
+
+                label.perspective-panel-show-slice-views
+                {
+                    color : gray(0.8);
+                    &:hover
+                    {
+                        color:gray(0.9);
+                    }
+                }
             }
 
             .gllayoutcell:hover{

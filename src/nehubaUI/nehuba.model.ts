@@ -182,12 +182,10 @@ export class PluginDescriptor{
     this.name = param.name
     this.templateURL = param.templateURL
     this.scriptURL = param.scriptURL
-    this.icon = param.icon ? param.icon : null;
   }
   templateURL : string
   scriptURL : string
   name : string
-  icon : string | null
 }
 
 export class Multilevel{
@@ -246,7 +244,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     this.hierarchy = hierachy
     this.PMapURL = json.PMapURL ? json.PMapURL : null
     this.position = json.position ? json.position : null
-    this.children = json.children && json.children.constructor.name == 'Array' ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
+    this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
     this.rgb = json.rgb ? json.rgb : null
 
     /* populate moreInfo array */
@@ -269,18 +267,18 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
         VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
 
         setTimeout(()=>{
-            const pMapObj = {
-                PMap : {
-                    type : 'image',
-                    source : 'nifti://'+this.PMapURL,
-                    shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-                }
+          const pMapObj = {
+            PMap : {
+              type : 'image',
+              source : 'nifti://'+this.PMapURL,
+              shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
             }
-            VIEWER_CONTROL.loadLayer(pMapObj)
-            VIEWER_CONTROL.reapplyNehubaMeshFix()
-            VIEWER_CONTROL.hideAllSegments()
-            const newWidget = new LabComponent(PMAP_WIDGET)
-            HelperFunctions.sLoadPlugin(newWidget)
+          }
+          VIEWER_CONTROL.loadLayer(pMapObj)
+          VIEWER_CONTROL.reapplyNehubaMeshFix()
+          VIEWER_CONTROL.hideAllSegments()
+          const newWidget = new LabComponent(PMAP_WIDGET)
+          HelperFunctions.sLoadPlugin(newWidget)
         },200)
         setTimeout(()=>{
             modalHandler.hide()
@@ -320,7 +318,6 @@ export class DescriptorMoreInfoItem{
 export class LabComponent implements OnDestroy{
   script : HTMLElement
   template : HTMLElement
-  icon : string | undefined
   name : string
 
   author : string
@@ -330,7 +327,6 @@ export class LabComponent implements OnDestroy{
     this.name = json.name ? json.name : 'Untitled';
     this.author = json.author ? json.author : 'No author provided.';
     this.desc = json.desc ? json.desc : 'No description provided.';
-    this.icon = json.icon ? json.icon : undefined
 
     this.script = document.createElement('script')
     if( json.script ){

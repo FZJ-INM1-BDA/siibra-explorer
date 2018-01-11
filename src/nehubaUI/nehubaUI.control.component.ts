@@ -3,7 +3,7 @@ import { UI_CONTROL,VIEWER_CONTROL,DataService,EXTERNAL_CONTROL as gExternalCont
 import { Lab } from './nehubaUI.lab.component'
 import { ModalHandler } from './nehubaUI.modal.component'
 import { SelectTreePipe } from './nehubaUI.util.pipes'
-import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor } from './nehuba.model'
+import { FetchedTemplates,TemplateDescriptor,ParcellationDescriptor,RegionDescriptor, PluginDescriptor } from './nehuba.model'
 import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
 import { NehubaViewer } from 'nehuba/NehubaViewer';
 import { Subject } from 'rxjs/Subject'
@@ -199,12 +199,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   loadInitDatasets(){
 
     /* this will need to come from elsewhere eventually */
-    let datasetArray = [
-      'http://172.104.156.15/cors/json/bigbrain',
-      'http://172.104.156.15/cors/json/colin',
-      'http://172.104.156.15/cors/json/waxholmRatV2_0',
-      'http://172.104.156.15/cors/json/allenMouse'
-    ]
+    // let datasetArray = [
+    //   'http://172.104.156.15/cors/json/bigbrain',
+    //   'http://172.104.156.15/cors/json/colin',
+    //   'http://172.104.156.15/cors/json/waxholmRatV2_0',
+    //   'http://172.104.156.15/cors/json/allenMouse'
+    // ]
+
+    let datasetArray = ['http://localhost:5080/res/json/colin.json']
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -360,7 +362,12 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   }
 
   showMoreInfo(_item:any):void{
-    
+    // console.log(_item)
+    const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
+    modalHandler.title = `<h4>More information on ${_item.name}</h4>`
+    modalHandler.body = _item.properties
+    modalHandler.footer = null
+    modalHandler.show()
   }
 
   showInputModal(_type:string):void{
@@ -368,11 +375,11 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   }
 
   fetchedSomething(sth:any){
-    switch( sth.constructor.name ){
-      case 'TemplateDescriptor':{
+    switch( sth.constructor ){
+      case TemplateDescriptor:{
         this.fetchedTemplatesData.templates.push(sth)
       }break;
-      case 'ParcellationDescriptor':{
+      case ParcellationDescriptor:{
         if (!this.selectedTemplate){
           //TODO add proper feedback
           console.log('throw error: maybe you should selected a template first')
@@ -380,7 +387,7 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
           this.selectedTemplate.parcellations.push(sth)
         }
       }break;
-      case 'PluginDescriptor':{
+      case PluginDescriptor:{
         this.labComponent.appendPlugin(sth)
       }break;
     }

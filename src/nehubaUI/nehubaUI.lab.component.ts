@@ -49,8 +49,8 @@ export class Lab {
 
       screenSaver = {
             "name":"fzj.xg.meshAnimator",
-            "templateURL":"http://172.104.156.15/cors/html/screenSaver",
-            "scriptURL":"http://172.104.156.15/cors/js/screenSaver"
+            "templateURL":"http://localhost:5080/meshAnimator/meshAnimator.html",
+            "scriptURL":"http://localhost:5080/meshAnimator/meshAnimator.js"
       }
 
       builder = {
