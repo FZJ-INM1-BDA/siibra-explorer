@@ -1,6 +1,7 @@
 import { Component,ViewChild ,HostListener,HostBinding,AfterViewInit } from '@angular/core'
 import { NehubaUIControl } from './nehubaUI.control.component'
 import { UI_CONTROL, EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { FloatingWidgetComponent, FloatingWidget } from 'nehubaUI/nehubaUI.floatingWidget.component';
 
 @Component({
     selector : '#ATLASContainer',
@@ -16,6 +17,8 @@ import { UI_CONTROL, EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.ser
       </div>
       <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
       </ATLASViewer>
+      <DockedWidgetContainer [dockedWidgets]="dockedWidgets">
+      </DockedWidgetContainer>
       <FloatingWidgetContainer>
       </FloatingWidgetContainer>
     `,
@@ -26,24 +29,26 @@ export class NehubaContainer implements AfterViewInit {
   hideUI = false
   darktheme = false
   resize = false
-  width = 250
-  @ViewChild(NehubaUIControl) nehubaUI:NehubaUIControl 
+  controlMenuWidget = 250
+  dockedWidgets : FloatingWidgetComponent[] = []
+
+  @ViewChild(NehubaUIControl) nehubaUI : NehubaUIControl 
+  @ViewChild(FloatingWidget) floatingWidget : FloatingWidget
 
   @HostBinding('style.grid-template-columns')
-  gridTemplateColumns = `${this.width>150?this.width:150}px 10px auto`
+  gridTemplateColumns = `${this.controlMenuWidget > 150 ? this.controlMenuWidget : 150 }px 10px auto 10px 300px`
 
   constructor(){
   }
-
   
   @HostListener('document:mousemove',['$event'])
   mousemove(ev:any){
     if(!this.resize){
-          return
+      return
     }
     /* may break in chrome */
-    this.width = /*this.startwidth + this.startpos -*/ ev.clientX
-    this.gridTemplateColumns = `${this.width<150?150:this.width>450?450:this.width}px 10px auto`
+    this.controlMenuWidget = /*this.startcontrolMenuWidget + this.startpos -*/ ev.clientX
+    this.gridTemplateColumns = `${this.controlMenuWidget<150?150:this.controlMenuWidget>450?450:this.controlMenuWidget}px 10px auto`
   }
 
   @HostListener('document:mouseup',['$event'])

@@ -11,6 +11,7 @@ import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 
 import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from './nehubaUI.floatingWidget.component';
+import { DockedWidgetContainer } from './nehubaUI.dockedWidget.component'
 import { NehubaModalService,NehubaModalUnit } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl } from './nehubaUI.control.component';
@@ -37,7 +38,7 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
         TooltipModule.forRoot()
     ],
     declarations : 
-        [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective,
+        [ FloatingWidget, FloatingWidgetComponent, FloatingWidgetDirective, DockedWidgetContainer,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
         Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService,
