@@ -14,11 +14,11 @@ import { FloatingWidget } from 'nehubaUI/nehubaUI.floatingWidget.component';
 
         <atlascontrol (emitHideUI)="controlUI($event)">
         </atlascontrol>
-        <div id = "atlasResizeSliver" (mousedown)="resizeControlPanel=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+        <div id = "atlasResizeSliver" (mousedown)="resizeControlPanel=true;enableUIInteraction(false)" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
         </div>
         <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
         </ATLASViewer>
-        <div id = "dockResizeSliver" [hidden]="!hasDockedComponents()" (mousedown)="resizeDockedWidgetPanel=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+        <div id = "dockResizeSliver" [hidden]="!hasDockedComponents()" (mousedown)="resizeDockedWidgetPanel=true;enableUIInteraction(false)" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
         </div>
         <DockedWidgetContainer [hidden]="!hasDockedComponents()" [allFloatingWidgets]="floatingWidget.loadedFloatingComponents">
         </DockedWidgetContainer>
@@ -66,6 +66,7 @@ export class NehubaContainer implements AfterViewInit {
   mouseup(){
     this.resizeControlPanel = false
     this.resizeDockedWidgetPanel = false
+    this.enableUIInteraction(true )
   }
 
   ngAfterViewInit(){
@@ -92,5 +93,9 @@ export class NehubaContainer implements AfterViewInit {
 
   controlUI(ev:any){
     this.hideUI = ev.hideUI
+  }
+
+  enableUIInteraction(bool:boolean){
+    document.body.style.pointerEvents = bool ? 'all':'none'
   }
 }

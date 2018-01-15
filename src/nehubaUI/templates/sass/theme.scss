@@ -514,15 +514,34 @@ DockedWidgetContainer,floatingwidgetcontainer
 
 DockedWidgetContainer
 {
+  overflow-y:auto;
+  overflow-x:hidden;
+  width:calc(100%+10px);
+  margin-left:-10px;
   div.panel
   {
+    width:100%;
+    border-radius: 0px;
+    margin-bottom: 0px;
     div.panel-heading
     {
+      display:flex;
       opacity: 0.9;
+      border:none;
       &:hover
       {
         opacity:1.0;
         cursor:pointer;
+      }
+
+      .nehuba-pull-left
+      {
+        flex: 1 1 0px;
+      }
+
+      .nehuba-pull-right
+      {
+        flex: 0 0 1em;
       }
     }
   }

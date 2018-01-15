@@ -1,4 +1,4 @@
-import { AfterViewInit,NgZone,Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { AfterViewInit,Injectable,NgZone,Directive,HostListener,Output,Type,OnInit,Input,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, HelperFunctions } from './nehubaUI.services'
 import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
@@ -9,6 +9,27 @@ declare var window:{
   [key:string] : any
   prototype : Window;
   new() : Window;
+}
+
+export interface WidgetsStatus{
+  totalMinimisedWidgets : number
+  hasDockedWidgets : boolean
+  dockedWidgetPanelWidth : number
+}
+
+@Injectable()
+export class FloatingWidgetService{
+  dockedWidgetStatus : WidgetsStatus = {
+    totalMinimisedWidgets : 0,
+    hasDockedWidgets : false,
+    dockedWidgetPanelWidth : 300
+  }
+
+  relayout : ()=>void
+
+  getDockedWidgetStatus(){
+    return this.dockedWidgetStatus
+  }
 }
 
 @Directive({
@@ -23,12 +44,13 @@ export class FloatingWidgetDirective{
   template : `
 <ng-template floating-widget-host>
 </ng-template>
-{{loadedFloatingComponents.length}}
-  `
+{{dockedWidgetPanelWidth}}
+  `,
+  providers : [FloatingWidgetService]
 })
 
 export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
-  @Input() dockedWidgetPanelWidth : number = 0
+  @Input() dockedWidgetPanelWidth : number = 300
   
   loadedFloatingComponents : FloatingWidgetComponent[] = []
 
@@ -39,22 +61,29 @@ export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
   loadedWidgets : LabComponent[] = []
   darktheme : boolean = false
 
-  hasDockedWidget : boolean = this.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0
+  dockedWidgetStatus : WidgetsStatus = {
+    totalMinimisedWidgets : 0,
+    hasDockedWidgets : this.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0,
+    dockedWidgetPanelWidth : this.dockedWidgetPanelWidth
+  }
 
   constructor( 
     private componentFactoryResolver: ComponentFactoryResolver, 
-    private sanitizer : DomSanitizer){
+    private sanitizer : DomSanitizer,
+    private floatingWidgetService: FloatingWidgetService
+  ){
     /* TODO figure out a new way to launch plugin */
-    HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.lab(labComponent)
+    HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.createFloatingComponent(labComponent)
   }
 
   ngOnChanges(){
     //at least this works
-    this.loadedFloatingComponents.forEach(c=>{
-      c.rightClearance = this.loadedFloatingComponents.findIndex(c_=>!c_.floating) < 0 ? 
-        0 :
-        this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300
-    })
+    // this.loadedFloatingComponents.forEach(c=>{
+    //   c.rightClearance = this.loadedFloatingComponents.findIndex(c_=>!c_.floating) < 0 ? 
+    //     0 :
+    //     this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300
+    // })
+    this.floatingWidgetService.dockedWidgetStatus.dockedWidgetPanelWidth = this.dockedWidgetPanelWidth
   }
 
   ngOnInit(){
@@ -66,16 +95,21 @@ export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false      
     })
     this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+    
+    this.floatingWidgetService.dockedWidgetStatus = this.dockedWidgetStatus
+    this.floatingWidgetService.relayout = () =>
+      this.floatingWidgetService.dockedWidgetStatus.hasDockedWidgets = (this.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0)
   }
 
-  lab(labComponent:LabComponent){
+  createFloatingComponent(labComponent:LabComponent){
     this.loadedWidgets.push(labComponent)
-    const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:labComponent,rightClearance:this.dockedWidgetPanelWidth,hasDockedSibling:this.hasDockedWidget})
-    const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetComponent )
+    const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{labComponent:labComponent})
+    const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
     const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
+    
     const floatingWidgetComponent = (<FloatingWidgetComponent>componentRef.instance)
+    floatingWidgetComponent.data = labComponent
     floatingWidgetComponent.template = this.sanitizer.bypassSecurityTrustHtml(labComponent.template ? labComponent.template.innerHTML : 'Error parsing template content!');
-    floatingWidgetComponent.data = newFloatingWidgetUnit.data.content
     floatingWidgetComponent.darktheme = this.darktheme
     floatingWidgetComponent.minimisedTrays = this.minimisedTrays
     floatingWidgetComponent.rightClearance = this.dockedWidgetPanelWidth
@@ -89,8 +123,6 @@ export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
      * so that it can be easily filtered to be rendered in docked view
      */
     this.loadedFloatingComponents.push( floatingWidgetComponent )
-
-    floatingWidgetComponent.loadedWidget = this.loadedFloatingComponents
 
     /* labComponentHandler : how plugin script interact with floatingWidget */
     const labComponentHandler = window['pluginControl'][labComponent.name] = new LabComponentHandler()
@@ -121,7 +153,7 @@ export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
 @Component({
   selector : 'floatingwidgetcomponent',
   template : `
-<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]=" - 50 - rightClearance + 'px'" class = "floatingWidget" [ngClass]="{darktheme : darktheme}">
+<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]=" - 50 - (!widgetsStatus.hasDockedWidgets ? 0 : (widgetsStatus.dockedWidgetPanelWidth>300 ? 300 : widgetsStatus.dockedWidgetPanelWidth)) + 'px'" class = "floatingWidget" [ngClass]="{darktheme : darktheme}">
   <div class = "btn" [ngClass]="{'btn-success':successFlag,'btn-default':!successFlag}"
     [popoverTitle] = "data.name"
     [popover] = "popoverMessage ? popoverMessage : 'No messages.'"
@@ -139,9 +171,6 @@ export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
       <i (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></i>
     </div>
     <div [innerHTML]="template" class = "panel-body">
-    </div>
-    <div class = "panel-footer">
-      {{rightClearance}}
     </div>
   </div>
 </div>
@@ -177,10 +206,11 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
   darktheme : boolean  = false
   showbody : boolean = true
 
-  loadedWidget : FloatingWidgetComponent[]= []
+  widgetsStatus : WidgetsStatus
 
-  constructor( public zone:NgZone ){
-
+  constructor( 
+    public zone:NgZone,
+    public FloatingWidgetService:FloatingWidgetService ){
   }
 
   ngAfterViewInit(){
@@ -189,6 +219,7 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
     })
     this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
     this.afterViewInitHook.forEach(fn=>fn())
+    this.widgetsStatus = this.FloatingWidgetService.getDockedWidgetStatus()
   }
 
   @HostListener('document:mousemove',['$event'])
@@ -242,16 +273,24 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
 
   cancel(){
     this.shutdownPlugin()
+    this.FloatingWidgetService.relayout()
   }
 
   toTray(){
     this.floating = false
+    this.FloatingWidgetService.relayout()
+  }
+
+  offTray(){
+    this.floating = true
+    this.FloatingWidgetService.relayout()
   }
 
   minimise(){
     this.minimisedTrays.push(this)
     this.floating = true
     this.minimised = true
+    this.FloatingWidgetService.relayout()
   }
 
   calcMinimisedTrayPos():string{
@@ -268,13 +307,15 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
 }
 
 export class FloatingWidgetUnit{
-  constructor(public component:Type<any>,public data:any){ 
-    
+  constructor(
+    public component:Type<FloatingWidgetComponent>,
+    public data:FloatingWidgetInterface
+  ){ 
   }
 }
 
 export interface FloatingWidgetInterface{
-  data:any
+  
 }
 
 /* nehubaUI.floatingWidget.component.ts */
