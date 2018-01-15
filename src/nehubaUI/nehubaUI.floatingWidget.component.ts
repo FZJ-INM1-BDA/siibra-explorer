@@ -3,6 +3,7 @@ import { DomSanitizer } from '@angular/platform-browser'
 import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, HelperFunctions } from './nehubaUI.services'
 import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
 import { Observable } from 'rxjs/Observable';
+import { OnChanges } from '@angular/core/src/metadata/lifecycle_hooks';
 
 declare var window:{
   [key:string] : any
@@ -22,22 +23,38 @@ export class FloatingWidgetDirective{
   template : `
 <ng-template floating-widget-host>
 </ng-template>
+{{loadedFloatingComponents.length}}
   `
 })
 
-export class FloatingWidget implements OnInit,AfterViewInit{
+export class FloatingWidget implements OnInit,AfterViewInit,OnChanges{
+  @Input() dockedWidgetPanelWidth : number = 0
+  
+  loadedFloatingComponents : FloatingWidgetComponent[] = []
 
   @ViewChild(FloatingWidgetDirective) host : FloatingWidgetDirective
-  floatingWidgets : FloatingWidgetUnit[]
   viewContainerRef : ViewContainerRef
   zStackCounter : number = 10
   minimisedTrays : any[] = []
   loadedWidgets : LabComponent[] = []
   darktheme : boolean = false
 
-  constructor( private componentFactoryResolver: ComponentFactoryResolver, private sanitizer : DomSanitizer){
+  hasDockedWidget : boolean = this.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0
+
+  constructor( 
+    private componentFactoryResolver: ComponentFactoryResolver, 
+    private sanitizer : DomSanitizer){
     /* TODO figure out a new way to launch plugin */
     HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.lab(labComponent)
+  }
+
+  ngOnChanges(){
+    //at least this works
+    this.loadedFloatingComponents.forEach(c=>{
+      c.rightClearance = this.loadedFloatingComponents.findIndex(c_=>!c_.floating) < 0 ? 
+        0 :
+        this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300
+    })
   }
 
   ngOnInit(){
@@ -53,14 +70,27 @@ export class FloatingWidget implements OnInit,AfterViewInit{
 
   lab(labComponent:LabComponent){
     this.loadedWidgets.push(labComponent)
-    const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:labComponent})
-    const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( newFloatingWidgetUnit.component )
+    const newFloatingWidgetUnit = new FloatingWidgetUnit(FloatingWidgetComponent,{content:labComponent,rightClearance:this.dockedWidgetPanelWidth,hasDockedSibling:this.hasDockedWidget})
+    const floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetComponent )
     const componentRef = this.viewContainerRef.createComponent(floatingWidgetFactory);
     const floatingWidgetComponent = (<FloatingWidgetComponent>componentRef.instance)
     floatingWidgetComponent.template = this.sanitizer.bypassSecurityTrustHtml(labComponent.template ? labComponent.template.innerHTML : 'Error parsing template content!');
-    floatingWidgetComponent.data = labComponent
+    floatingWidgetComponent.data = newFloatingWidgetUnit.data.content
     floatingWidgetComponent.darktheme = this.darktheme
     floatingWidgetComponent.minimisedTrays = this.minimisedTrays
+    floatingWidgetComponent.rightClearance = this.dockedWidgetPanelWidth
+
+    // setTimeout(()=>{
+    //   labComponent.name += 'just testing'
+    // },1000)
+    
+    /** 
+     * keeping a list of all floating widget components loaded
+     * so that it can be easily filtered to be rendered in docked view
+     */
+    this.loadedFloatingComponents.push( floatingWidgetComponent )
+
+    floatingWidgetComponent.loadedWidget = this.loadedFloatingComponents
 
     /* labComponentHandler : how plugin script interact with floatingWidget */
     const labComponentHandler = window['pluginControl'][labComponent.name] = new LabComponentHandler()
@@ -70,6 +100,8 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     labComponentHandler.onShutdown = (cb:()=>void)=>componentRef.onDestroy(cb)
     componentRef.onDestroy(()=>{
       delete window.pluginControl[labComponent.name]
+      const idx = this.loadedFloatingComponents.findIndex(c=>c.data.name===floatingWidgetComponent.data.name)
+      this.loadedFloatingComponents.splice(idx,1)
     })
 
     labComponent.script.onload = (_s) =>{
@@ -80,13 +112,16 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     }
 
     floatingWidgetComponent.afterViewInitHook.push(()=>document.head.appendChild(labComponent.script))
-    floatingWidgetComponent.shutdownPlugin = () => componentRef.destroy()
+    floatingWidgetComponent.shutdownPlugin = () => {
+      componentRef.destroy()
+    }
   }
 }
 
 @Component({
+  selector : 'floatingwidgetcomponent',
   template : `
-<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]="'-50px'" class = "floatingWidget" [ngClass]="{darktheme : darktheme}">
+<div (click)="unminimise()" *ngIf = "minimised" [style.top]="calcMinimisedTrayPos()" [style.left]=" - 50 - rightClearance + 'px'" class = "floatingWidget" [ngClass]="{darktheme : darktheme}">
   <div class = "btn" [ngClass]="{'btn-success':successFlag,'btn-default':!successFlag}"
     [popoverTitle] = "data.name"
     [popover] = "popoverMessage ? popoverMessage : 'No messages.'"
@@ -95,14 +130,18 @@ export class FloatingWidget implements OnInit,AfterViewInit{
     <i>{{data.name.split('.')[data.name.split('.').length-1].substring(0,1)}}</i>
   </div>
 </div>
-<div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised ? 'hidden' : 'visible'" class = "floatingWidget"  [ngClass]="{darktheme : darktheme}">
+<div (mousedown)="stopBlinking()" [style.top] = "'-'+offset[1]+'px'" [style.left]="'-'+offset[0]+'px'" [style.visibility]= " minimised || !floating ? 'hidden' : 'visible'" class = "floatingWidget"  [ngClass]="{darktheme : darktheme}">
   <div [ngClass]="{'panel-default' : !reposition && !successFlag, 'panel-info' : reposition ,'panel-success':successFlag}" class = "panel">
     <div (mousedown) = "reposition = true;mousedown($event)" (mouseup) = "reposition = false" class = "moveable panel-heading">
       {{data.name.split('.')[data.name.split('.').length-1]}}
       <i (click)="cancel()" class = "pull-right close"><i class = "glyphicon glyphicon-remove"></i></i>
+      <i (click)="toTray()" class = "pull-right close"><i class = "glyphicon glyphicon-log-in"></i></i>
       <i (click)="minimise()" class = "pull-right close"><i class = "glyphicon glyphicon-minus"></i></i>
     </div>
     <div [innerHTML]="template" class = "panel-body">
+    </div>
+    <div class = "panel-footer">
+      {{rightClearance}}
     </div>
   </div>
 </div>
@@ -111,8 +150,13 @@ export class FloatingWidget implements OnInit,AfterViewInit{
 export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterViewInit{
   @Input() data:any
   @Input() minimisedTrays : any []
+  @Input() rightClearance : number = 0
+
   @Output() shutdownPlugin : any
   @Output() loadSelection : any
+
+  floating : boolean = true
+  hasDockedSiblings : boolean = false
   
   icon : string 
   popoverMessage : string | null
@@ -123,8 +167,6 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
   offset : number[] = [850,650] /* from bottom right */
   startOffset : number[] = [450,350]
 
-  COLORMAPS : any[] = PRESET_COLOR_MAPS
-
   template : any
   
   blinkingTimer : any
@@ -133,6 +175,9 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
 
   minimised : boolean = false
   darktheme : boolean  = false
+  showbody : boolean = true
+
+  loadedWidget : FloatingWidgetComponent[]= []
 
   constructor( public zone:NgZone ){
 
@@ -199,8 +244,13 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
     this.shutdownPlugin()
   }
 
+  toTray(){
+    this.floating = false
+  }
+
   minimise(){
     this.minimisedTrays.push(this)
+    this.floating = true
     this.minimised = true
   }
 
@@ -218,62 +268,13 @@ export class FloatingWidgetComponent implements FloatingWidgetInterface,AfterVie
 }
 
 export class FloatingWidgetUnit{
-  constructor(public component:Type<any>,public data:any){  }
+  constructor(public component:Type<any>,public data:any){ 
+    
+  }
 }
 
 export interface FloatingWidgetInterface{
   data:any
 }
-
-const PRESET_COLOR_MAPS = [
-  {
-    name : 'MATLAB_autumn',
-    previewurl : "http://172.104.156.15:8080/colormaps/MATLAB_autumn.png",
-    code : `
-vec4 colormap(float x) {
-    float g = clamp(x, 0.0, 1.0);
-    return vec4(1.0, g, 0.0, 1.0);
-}
-    `
-  },
-   {
-    name : 'MATLAB_bone',
-    previewurl : 'http://172.104.156.15:8080/colormaps/MATLAB_bone.png',
-    code : `
-float colormap_red(float x) {
-    if (x < 0.75) {
-    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;
-    } else {
-    return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;
-    }
-}
-
-float colormap_green(float x) {
-    if (x <= 0.375) {
-    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;
-    } else if (x <= 0.75) {
-    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;
-    } else {
-    return 8.0 / 9.0 * x + 1.0 / 9.0;
-    }
-}
-
-float colormap_blue(float x) {
-    if (x <= 0.375) {
-    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;
-    } else {
-    return 8.0 / 9.0 * x + 1.0 / 9.0;
-    }
-}
-
-vec4 colormap(float x) {
-    float r = clamp(colormap_red(x), 0.0, 1.0);
-    float g = clamp(colormap_green(x), 0.0, 1.0);
-    float b = clamp(colormap_blue(x), 0.0, 1.0);
-    return vec4(r, g, b, 1.0);
-}
-    `
-  }
-]
 
 /* nehubaUI.floatingWidget.component.ts */

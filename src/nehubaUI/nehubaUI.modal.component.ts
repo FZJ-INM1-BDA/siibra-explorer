@@ -1,10 +1,8 @@
 
 import { Component,ChangeDetectorRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-// import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class'
 import { UI_CONTROL } from './nehubaUI.services'
 
-// import { Observable } from 'rxjs/Observable'
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
 import 'rxjs/operator/map'

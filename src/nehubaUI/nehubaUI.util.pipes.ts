@@ -1,6 +1,7 @@
 import { Pipe,PipeTransform,SecurityContext } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import { Multilevel } from './nehuba.model'
+import { FloatingWidgetComponent } from 'nehubaUI/nehubaUI.floatingWidget.component';
 
 /* pipes in object, pipes out stringified json  */
 
@@ -11,6 +12,17 @@ import { Multilevel } from './nehuba.model'
 export class JsonStringifyPipe implements PipeTransform{
   public transform(json:any){
     return JSON.stringify(json)
+  }
+}
+
+
+@Pipe({
+  name : 'filterFloatingComponentsViaFloatingProperty'
+})
+
+export class FilterFloatingComponentsViaFloatingProperty implements PipeTransform{
+  public transform(floatingComponents:FloatingWidgetComponent[]):FloatingWidgetComponent[]{
+    return floatingComponents.filter(c=>!c.floating)
   }
 }
 

@@ -1,59 +1,71 @@
-import { Component,ViewChild ,HostListener,HostBinding,AfterViewInit } from '@angular/core'
+import { Component,ViewChild ,HostListener,AfterViewInit } from '@angular/core'
 import { NehubaUIControl } from './nehubaUI.control.component'
 import { UI_CONTROL, EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
-import { FloatingWidgetComponent, FloatingWidget } from 'nehubaUI/nehubaUI.floatingWidget.component';
+import { FloatingWidget } from 'nehubaUI/nehubaUI.floatingWidget.component';
 
 @Component({
-    selector : '#ATLASContainer',
+    selector : 'div#ATLASContainer',
     template : `
-      <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="nehubaUI.fetchedSomething($event)"></nehubaModal>
-  
-      <atlasbanner>
-      </atlasbanner>
+      <div [style.grid-template-columns]="calcGridTemplateColumn()">
+        <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="nehubaUI.fetchedSomething($event)"></nehubaModal>
+    
+        <atlasbanner>
+        </atlasbanner>
 
-      <atlascontrol (emitHideUI)="controlUI($event)">
-      </atlascontrol>
-      <div id = "atlasResizeSliver" (mousedown)="resize=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+        <atlascontrol (emitHideUI)="controlUI($event)">
+        </atlascontrol>
+        <div id = "atlasResizeSliver" (mousedown)="resizeControlPanel=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+        </div>
+        <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
+        </ATLASViewer>
+        <div id = "dockResizeSliver" [hidden]="!hasDockedComponents()" (mousedown)="resizeDockedWidgetPanel=true" (mousemove)="mousemove($event)" (mouseup)="mouseup()">
+        </div>
+        <DockedWidgetContainer [hidden]="!hasDockedComponents()" [allFloatingWidgets]="floatingWidget.loadedFloatingComponents">
+        </DockedWidgetContainer>
+        <FloatingWidgetContainer [dockedWidgetPanelWidth]="dockedWidgetPanelWidth" >
+        </FloatingWidgetContainer>
       </div>
-      <ATLASViewer (emitHideUI)="controlUI($event)" [hideUI]="hideUI" id = "ATLASViewer" [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
-      </ATLASViewer>
-      <DockedWidgetContainer [dockedWidgets]="dockedWidgets">
-      </DockedWidgetContainer>
-      <FloatingWidgetContainer>
-      </FloatingWidgetContainer>
     `,
-    host : {'[class.darktheme]':'darktheme'}
+    host : {
+      '[class.darktheme]':'darktheme'
+    }
 })
 
 export class NehubaContainer implements AfterViewInit {
   hideUI = false
   darktheme = false
-  resize = false
-  controlMenuWidget = 250
-  dockedWidgets : FloatingWidgetComponent[] = []
+  resizeControlPanel = false
+  resizeDockedWidgetPanel = false
+  controlPanelWidth = 250
+  dockedWidgetPanelWidth = 300
 
   @ViewChild(NehubaUIControl) nehubaUI : NehubaUIControl 
   @ViewChild(FloatingWidget) floatingWidget : FloatingWidget
+  
+  // calcGridTemplateColumn = `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto ${!this.floatingWidget ? false : this.floatingWidget.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0 ? `10px ${this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300 }px` : ''}`
 
-  @HostBinding('style.grid-template-columns')
-  gridTemplateColumns = `${this.controlMenuWidget > 150 ? this.controlMenuWidget : 150 }px 10px auto 10px 300px`
+  // @HostBinding('style.grid-template-columns')
+  // gridTemplateColumns = this.calcGridTemplateColumn
 
   constructor(){
+    
   }
   
   @HostListener('document:mousemove',['$event'])
   mousemove(ev:any){
-    if(!this.resize){
-      return
+    if(this.resizeControlPanel){
+      this.controlPanelWidth = /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
+
     }
-    /* may break in chrome */
-    this.controlMenuWidget = /*this.startcontrolMenuWidget + this.startpos -*/ ev.clientX
-    this.gridTemplateColumns = `${this.controlMenuWidget<150?150:this.controlMenuWidget>450?450:this.controlMenuWidget}px 10px auto`
+    if(this.resizeDockedWidgetPanel){
+      this.dockedWidgetPanelWidth = window.innerWidth - /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
+    }
   }
 
   @HostListener('document:mouseup',['$event'])
   mouseup(){
-    this.resize = false
+    this.resizeControlPanel = false
+    this.resizeDockedWidgetPanel = false
   }
 
   ngAfterViewInit(){
@@ -66,6 +78,16 @@ export class NehubaContainer implements AfterViewInit {
         document.body.classList.remove('darktheme')
       }
     })
+  }
+
+  hasDockedComponents(){
+    return !this.floatingWidget ? false : this.floatingWidget.loadedFloatingComponents.findIndex(c=>!c.floating) >= 0
+  }
+
+  calcGridTemplateColumn(){
+    return this.hasDockedComponents() ? 
+      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto 10px ${this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300 }px` :
+      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto`
   }
 
   controlUI(ev:any){

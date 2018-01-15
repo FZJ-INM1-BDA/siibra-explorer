@@ -13,16 +13,22 @@ $GOLDEN : tgray(0.8,0.5);
 $DARKGOLDEN : rgb(70,70,70);
 $BORDERWIDTH : 2px;
 
-#ATLASContainer
+div#ATLASContainer
 {
   background-color:$WHITE;
   color:$BLACK;
   height:100%;
   width:100%;
-  display:grid;
-  grid-template-columns:250px 10px auto 10px 300px;
-  grid-template-rows:25% 75%;
   
+  > div
+  {
+    height:100%;
+    width:100%;
+    display:grid;
+    grid-template-columns:250px 10px auto;
+    grid-template-rows:25% 75%;
+  }
+
   atlasbanner
   {
     grid-column-start:1;
@@ -71,6 +77,19 @@ $BORDERWIDTH : 2px;
         text-align: center;
         z-index:-10;
       }
+    }
+  }
+
+  div#dockResizeSliver
+  {
+    grid-column-start:4;
+    grid-column-end:span 1;
+    grid-row-start:1;
+    grid-row-end:span 2;
+    z-index:3;
+    &:hover
+    {
+      cursor:ew-resize;
     }
   }
 
@@ -233,7 +252,8 @@ $BORDERWIDTH : 2px;
   }
 }
 
-atlasbanner{
+atlasbanner
+{
   div#bannerContainer{
     height:100%;
     background-color:gray(0.98);
@@ -304,10 +324,12 @@ atlasbanner{
   }
 }
 
-atlasviewer{
+atlasviewer
+{
   position:relative;
+  overflow:hidden;
   background-color:$WHITE;
-  box-shadow: 0.3em 0.3em 1em gray(0.1);
+  box-shadow: 0em 0em 1.5em -0.5em gray(0);
 
   div#container{
     position:absolute;
@@ -358,25 +380,11 @@ atlasviewer{
 
 }
 
-FloatingWidgetContainer{
-  position:absolute;
-  right:0;
-  bottom:0;
-  width:0;
-  height:0;
-
-  div.floatingWidget{
-    position:absolute;
-    width:400px;
-    z-index:100;
-    div.panel{
-      div.panel-heading.moveable{
-        &:hover{
-          cursor:move;
-        }
-      }
-    }
-
+/* generic style for darkthemes and light themes */
+DockedWidgetContainer,floatingwidgetcontainer
+{
+  div
+  {
     &.darktheme
     {
       %widgetDarkTheme
@@ -469,7 +477,7 @@ FloatingWidgetContainer{
           background-color:gray(0.35);
         }
       }
-      input
+      input, input[readonly]
       {
         @extend %widgetDarkTheme;
       }
@@ -498,6 +506,47 @@ FloatingWidgetContainer{
         {
           @extend %widgetDarkTheme;
           background-color:gray(0.3);
+        }
+      }
+    } 
+  }
+}
+
+DockedWidgetContainer
+{
+  div.panel
+  {
+    div.panel-heading
+    {
+      opacity: 0.9;
+      &:hover
+      {
+        opacity:1.0;
+        cursor:pointer;
+      }
+    }
+  }
+}
+
+FloatingWidgetContainer
+{
+  position:absolute;
+  right:0;
+  bottom:0;
+  width:0;
+  height:0;
+
+  div.floatingWidget{
+    position:absolute;
+    width:400px;
+    z-index:100;
+    div.panel
+    {
+      div.panel-heading.moveable
+      {
+        &:hover
+        {
+          cursor:move;
         }
       }
     }
