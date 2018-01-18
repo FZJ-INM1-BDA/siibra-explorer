@@ -10,7 +10,6 @@ declare var window:{
   new() : Window;
 }
 
-
 @Injectable()
 export class DataService {
 
@@ -108,7 +107,6 @@ export class HelperFunctions{
 let metadata : any = {}
 
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
-  viewControl : new Subject(),
   metadata : metadata
 }
 
@@ -180,47 +178,52 @@ export const CM_THRESHOLD = 0.01;
 export const PMAP_WIDGET = {
   name : `PMap`,
   icon : 'picture',
-  script : `
-(()=>{
-  window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
-  let encodedValue = document.getElementById('default.default.pmap.encodedValue')
-  
-  const attach = ()=>{
-    const sub = window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
-    window.pluginControl['PMap'].onShutdown(()=>{
-      sub.unsubscribe()
-      window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
-      window.viewerHandle.hideSegment(0)
-    })
-  }
-  attach()
-})()
+  script : 
+  `
+  (()=>{
+    window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
+    let encodedValue = document.getElementById('default.default.pmap.encodedValue')
+    
+    const attach = ()=>{
+      const sub = window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
+      window.pluginControl['PMap'].onShutdown(()=>{
+        sub.unsubscribe()
+        window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
+        window.viewerHandle.hideSegment(0)
+      })
+    }
+    attach()
+  })()
   `,
   template : `
-<table class = "table table-sm table-bordered">
-  <tbody>
-    <tr>
-      <td>Heat Map</td>
-    </tr>
-    <tr>
-      <td><img class="col-md-12" src="http://172.104.156.15:8080/colormaps/MATLAB_hot.png"></td>
-    </tr>
-    <tr>
-      <td>
-        <table class = "table table-sm table-bordered">
-          <tbody>
-            <tr>
-              <td class = "col-sm-6">Encoded Value</td>
-              <td class = "col-sm-6" id = "default.default.pmap.encodedValue"></td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td>Close this dialogue to resume normal browsing.</td>
-    </tr>
-  </tbody>
-</table>
+  <table class = "table table-sm table-bordered">
+    <tbody>
+      <tr>
+        <td>Heat Map</td>
+      </tr>
+      <tr>
+        <td><img class="col-md-12" src="http://172.104.156.15:8080/colormaps/MATLAB_hot.png"></td>
+      </tr>
+      <tr>
+        <td>
+          <table class = "table table-sm table-bordered">
+            <tbody>
+              <tr>
+                <td class = "col-sm-6">Encoded Value</td>
+                <td class = "col-sm-6" id = "default.default.pmap.encodedValue"></td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>Close this dialogue to resume normal browsing.</td>
+      </tr>
+    </tbody>
+  </table>
   `
 }
+
+/* temporary workaround for fetching plugin data */
+export const TEMP_PLUGIN_DOMAIN = `https://neuroglancer-dev.humanbrainproject.org/res/`
+// export const TEMP_PLUGIN_DOMAIN = `http://localhost:5080/res/`

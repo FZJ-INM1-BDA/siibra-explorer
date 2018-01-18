@@ -199,14 +199,14 @@ export class NehubaUIControl implements OnInit,AfterViewInit{
   loadInitDatasets(){
 
     /* this will need to come from elsewhere eventually */
-    // let datasetArray = [
-    //   'http://172.104.156.15/cors/json/bigbrain',
-    //   'http://172.104.156.15/cors/json/colin',
-    //   'http://172.104.156.15/cors/json/waxholmRatV2_0',
-    //   'http://172.104.156.15/cors/json/allenMouse'
-    // ]
+    let datasetArray = [
+      'https://neuroglancer-dev.humanbrainproject.org/res/json/bigbrain.json',
+      'https://neuroglancer-dev.humanbrainproject.org/res/json/colin.json',
+      'https://neuroglancer-dev.humanbrainproject.org/res/json/waxholmRatV2_0.json',
+      'https://neuroglancer-dev.humanbrainproject.org/res/json/allenMouse.json'
+    ]
 
-    let datasetArray = ['http://localhost:5080/res/json/colin.json']
+    // let datasetArray = ['http://localhost:5080/res/json/colin.json']
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
