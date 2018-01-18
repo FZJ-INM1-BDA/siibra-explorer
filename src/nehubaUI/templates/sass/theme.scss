@@ -20,43 +20,8 @@ div#ATLASContainer
   height:100%;
   width:100%;
   
-  > div
-  {
-    height:100%;
-    width:100%;
-    display:grid;
-    grid-template-columns:250px 10px auto;
-    grid-template-rows:25% 75%;
-  }
-
-  atlasbanner
-  {
-    grid-column-start:1;
-    grid-column-end:span 1;
-    grid-row-start:1;
-    grid-row-end:span 1;
-  }
-
-  div#atlasResizeSliver
-  {
-    grid-column-start:2;
-    grid-column-end:span 1;
-    grid-row-start:1;
-    grid-row-end:span 2;
-    z-index:3;
-    &:hover
-    {
-      cursor:ew-resize;
-    }
-  }
-  
   atlascontrol
   {
-    grid-column-start:1;
-    grid-column-end:span 1;
-    grid-row-start:2;
-    grid-row-end:span 1;
-    z-index:2;
     
     div#leftSide{
       height:100%;
@@ -79,35 +44,9 @@ div#ATLASContainer
       }
     }
   }
-
-  div#dockResizeSliver
-  {
-    grid-column-start:4;
-    grid-column-end:span 1;
-    grid-row-start:1;
-    grid-row-end:span 2;
-    z-index:3;
-    &:hover
-    {
-      cursor:ew-resize;
-    }
-  }
-
-  DockedWidgetContainer
-  {
-    grid-column-start : 5;
-    grid-column-end : span 1;
-    grid-row-start : 1;
-    grid-row-end : span 2;
-  }
   
   ATLASViewer
   {
-    grid-column-start:3;
-    grid-column-end:span 1;
-    grid-row-start:1;
-    grid-row-end:span 2;
-    z-index:5;
 
     div#container{
       height:100%;
@@ -381,19 +320,72 @@ atlasviewer
 }
 
 /* generic style for darkthemes and light themes */
-DockedWidgetContainer,floatingwidgetcontainer
+WidgetsContainer
 {
-  div
+  &.darktheme
   {
-    &.darktheme
+    %widgetDarkTheme
     {
-      %widgetDarkTheme
+      border-color:gray(0.35);
+      color:gray(0.95);
+      background-color:gray(0.2);
+    }
+    MinimisedContainer
+    {
+      div.btn
       {
-        border-color:gray(0.35);
-        color:gray(0.95);
-        background-color:gray(0.2)
+        @extend %widgetDarkTheme;
       }
+    }
+    DockedWidgetContainer,FloatingWidgetContainer
+    {
+      @extend %widgetDarkTheme;
+      div.panel
+      {
+        border:1px solid gray(0.35);
 
+        div.panel-heading
+        {
+          border-color:gray(0.35);
+          color:gray(1.0);
+          background-color:gray(0.25);
+
+          span
+          {
+            background-color:rgba(0,0,0,0);
+          }
+        }
+
+        .panel-body
+        {
+          border:none;
+          @extend %widgetDarkTheme;
+        }
+
+        &.panel-success
+        {
+          .btn.btn-block
+          {
+            border:1px solid rgba(214,233,198,0.5);
+          }
+        }
+
+        &.panel-warning
+        {
+          .btn.btn-block
+          {
+            border:1px solid rgba(250,235,204,0.5);
+          }
+        }
+
+        &.panel-danger
+        {
+          .btn.btn-block
+          {
+            border:1px solid rgba(235,204,209,0.5);
+          }
+        }
+        
       .table
       {
         @extend %widgetDarkTheme;
@@ -407,49 +399,8 @@ DockedWidgetContainer,floatingwidgetcontainer
           }
         }
       }
-
-      div.panel.panel-default
-      {
-        div.panel-heading
-        {
-          border-color:gray(0.35);
-          color:gray(1.0);
-          background-color:gray(0.25);
-        }
       }
-      div.panel
-      {
-        @extend %widgetDarkTheme;
-        border:1px solid gray(0.35);
-        .panel-body
-        {
-          border:none;
-          @extend %widgetDarkTheme;
-        }
-        &.panel-success
-        {
-          .btn.btn-block
-          {
-            border:1px solid rgba(214,233,198,0.5);
-          }
-        }
-        &.panel-warning
-        {
-          .btn.btn-block
-          {
-            border:1px solid rgba(250,235,204,0.5);
-          }
-        }
-        &.panel-danger
-        {
-          .btn.btn-block
-          {
-            border:1px solid rgba(235,204,209,0.5);
-          }
-        }
-  
-      }
-
+      
       div.well
       {
         @extend %widgetDarkTheme;
@@ -506,66 +457,6 @@ DockedWidgetContainer,floatingwidgetcontainer
         {
           @extend %widgetDarkTheme;
           background-color:gray(0.3);
-        }
-      }
-    } 
-  }
-}
-
-DockedWidgetContainer
-{
-  overflow-y:auto;
-  overflow-x:hidden;
-  width:calc(100%+10px);
-  margin-left:-10px;
-  div.panel
-  {
-    width:100%;
-    border-radius: 0px;
-    margin-bottom: 0px;
-    div.panel-heading
-    {
-      display:flex;
-      opacity: 0.9;
-      border:none;
-      &:hover
-      {
-        opacity:1.0;
-        cursor:pointer;
-      }
-
-      .nehuba-pull-left
-      {
-        flex: 1 1 0px;
-      }
-
-      .nehuba-pull-right
-      {
-        flex: 0 0 1em;
-      }
-    }
-  }
-}
-
-FloatingWidgetContainer
-{
-  position:absolute;
-  right:0;
-  bottom:0;
-  width:0;
-  height:0;
-
-  div.floatingWidget{
-    position:absolute;
-    width:400px;
-    z-index:100;
-    div.panel
-    {
-      div.panel-heading.moveable
-      {
-        &:hover
-        {
-          cursor:move;
         }
       }
     }

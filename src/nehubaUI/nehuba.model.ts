@@ -1,5 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL } from './nehubaUI.services'
+import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL,PLUGIN_CONTROL as gPluginControl } from './nehubaUI.services'
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
 
@@ -277,8 +277,13 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
           VIEWER_CONTROL.loadLayer(pMapObj)
           VIEWER_CONTROL.reapplyNehubaMeshFix()
           VIEWER_CONTROL.hideAllSegments()
-          const newWidget = new LabComponent(PMAP_WIDGET)
-          HelperFunctions.sLoadPlugin(newWidget)
+
+          if(gPluginControl['PMap']){
+            gPluginControl['PMap'].blink(10)
+          }else{
+            const newWidget = new LabComponent(PMAP_WIDGET)
+            HelperFunctions.sLoadPlugin(newWidget)
+          }
         },200)
         setTimeout(()=>{
             modalHandler.hide()
