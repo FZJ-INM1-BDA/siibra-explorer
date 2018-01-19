@@ -1,7 +1,7 @@
 import { Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
 import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, HelperFunctions } from 'nehubaUI/nehubaUI.services'
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Rx';
 
 /**
  * basic widget class
@@ -265,6 +265,14 @@ export class WidgetView implements AfterViewInit{
 }
 
 /**
+ * the chassis holding instances of widgetview
+ */
+interface WidgetViewChassis{
+  widgetComponent : WidgetComponent
+  panelBody : ViewContainerRef
+}
+
+/**
  * additional views based on the mode (docked, floating, minimised)
  */
 
@@ -337,7 +345,7 @@ export class WidgetView implements AfterViewInit{
   `
   ]
 })
-export class FloatingWidgetView implements AfterViewInit{
+export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   widgetComponent : WidgetComponent
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
 
@@ -421,8 +429,8 @@ export class FloatingWidgetView implements AfterViewInit{
   }
 
   ngAfterViewInit(){
-    this.widgetComponent.handler.blink = () =>{
-      this.blink()
+    this.widgetComponent.handler.blink = (sec?:number) =>{
+      this.blink(sec)
     }
   }
 }
@@ -499,7 +507,7 @@ export class FloatingWidgetView implements AfterViewInit{
     `
   ]
 })
-export class DockedWidgetView {
+export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   widgetComponent : WidgetComponent
 
@@ -512,6 +520,12 @@ export class DockedWidgetView {
   successClassState : boolean = false
 
   constructor(private zone:NgZone){}
+
+  ngAfterViewInit(){
+    this.widgetComponent.handler.blink = (sec?:number) =>{
+      this.blink(sec)
+    }
+  }
 
   minimise(ev:any){
     this.widgetComponent.changeState('minimised')
@@ -554,12 +568,13 @@ export class DockedWidgetView {
 @Component({
   template : 
   `
-  <div 
+  <div
+    (mousedown) = "stopBlink()" 
     (click) = "unminimise()"
     [popover] = "getPopoverTitle()" 
     placement = "left"
     triggers = "mouseenter:mouseleave"
-    [ngClass] = "{'panel-success':successClassState,'panel-default':!successClassState}"
+    [ngClass] = "{'btn-success':successClassState,'btn-default':!successClassState}"
     class = "btn" minimisedWidget>
       {{ getIcon() }}
     <div class = "hidden">
@@ -577,10 +592,14 @@ export class DockedWidgetView {
   `
   ]
 })
-export class MinimisedView implements AfterViewInit {
+export class MinimisedView implements AfterViewInit,WidgetViewChassis {
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   successClassState : boolean = false
   widgetComponent : WidgetComponent
+  blinkFlag : boolean = false
+  blinkTimer : any
+
+  constructor(private zone:NgZone){}
 
   unminimise(){
     this.widgetComponent.changeState('floating')
@@ -600,8 +619,33 @@ export class MinimisedView implements AfterViewInit {
     return extractedName.substring(0,1)
   }
 
-  ngAfterViewInit(){
+  blink(sec?:number){
+    if( this.blinkFlag ){
+      this.blinkTimer.unsubscribe()
+    }
+    this.blinkFlag = true
+    const timer = Observable.timer(0,500)
+    this.blinkTimer = timer.subscribe((t:any)=>{
+      this.zone.run(()=>{
+        this.successClassState = t%2 == 0
+        if(t > (sec ? sec : 10)){
+          this.blinkTimer.unsubscribe()
+          this.successClassState = true
+        }
+      })
+    })
+  }
 
+  stopBlink(){
+    this.successClassState = false
+    this.blinkFlag = false
+    if(this.blinkTimer) this.blinkTimer.unsubscribe()
+  }
+
+  ngAfterViewInit(){
+    this.widgetComponent.handler.blink = (sec?:number) =>{
+      this.blink(sec)
+    }
   }
 }
 

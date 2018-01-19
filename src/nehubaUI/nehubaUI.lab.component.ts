@@ -50,17 +50,24 @@ export class Lab {
 //   }
   
   localNifti = {
-        "name":"fzj.xg.localNifti",
-        "type":"plugin",
-        "templateURL":gTempPluginDomain + "/html/localNifti.html",
-        "scriptURL":gTempPluginDomain + "/js/localNifti.js"
-      }
+    "name":"fzj.xg.localNifti",
+    "type":"plugin",
+    "templateURL":gTempPluginDomain + "html/localNifti.html",
+    "scriptURL":gTempPluginDomain + "js/localNifti.js"
+  }
+
+  webjugex = {
+    "name":"fzj.xg.webjugex",
+    "type":"plugin",
+    "templateURL":gTempPluginDomain + "html/webjugex.html",
+    "scriptURL":gTempPluginDomain + "js/webjugex.js"
+  }
 
   constructor(){
     
   }
 
-  plugins = [this.screenSaver,this.localNifti].map(item=>new LabComponent(item))
+  plugins = [this.screenSaver,this.localNifti,this.webjugex].map(item=>new LabComponent(item))
 
   appendPlugin(param:any){
     this.plugins.push(param)
