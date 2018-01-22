@@ -468,7 +468,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         <i class = "glyphicon glyphicon-remove"></i>
       </i>
     </div>
-    <div [hidden] = "showBody">
+    <div [hidden] = "!showBody">
       <ng-template #panelBody>
       </ng-template>
     </div>

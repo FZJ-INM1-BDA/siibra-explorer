@@ -96,6 +96,7 @@ class MyCustomElement extends HTMLElement{
 customElements.define('fzj-xg-pluginname-my-custom-element',MyCustomElement)
 })()
 ```
+- when/if using webcomponents, please be aware that the `connectedCallback()` and `disconnectedCallback` will be called everytime user toggle between *floating*, *docked* or *minimised* modes. 
 - for a list of APIs, see [plugin_api.md](plugin_api.md)
 
 ---

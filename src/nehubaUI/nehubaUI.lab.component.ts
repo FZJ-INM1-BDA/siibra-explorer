@@ -16,11 +16,11 @@ import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
 
 export class Lab {
 
-//   advancedMode = {
-//     name : "fzj.xg.advancedMode",
-//     templateURL:"http://172.104.156.15/cors/html/advancedMode",
-//     scriptURL:"http://172.104.156.15/cors/js/advancedMode"
-//   }
+  advancedMode = {
+    name : "fzj.xg.advancedMode",
+    templateURL:gTempPluginDomain + "/res/advancedMode/advancedMode.html",
+    scriptURL:gTempPluginDomain + "/res/advancedMode/advancedMode.js"
+  }
 
 //   jugex = {
 //     name : 'fzj.xg.jugex',
