@@ -7,8 +7,8 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
 @Component({
   selector : 'div#ATLASContainer',
   template : `
-    <div [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
-      <nehubaModal (fetchedPlugin)="fetchedPlugin($event)" (fetchedSomething)="nehubaUI.fetchedSomething($event)"></nehubaModal>
+    <div [ngClass]="{'darktheme':mainController.darktheme}" [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
+      <nehubaModal></nehubaModal>
   
       <div [autoClose]="true" [isOpen]="showMenu" dropdownContainer dropdown container="body">
         <atlasbanner dropdownToggle [ngClass]="{'darktheme':mainController.darktheme}">
@@ -28,7 +28,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
           <li class="divider dropdown-divider"></li>
 
           <li class = "dropdown-header">Tools</li>
-          <li *ngFor="let widget of mainController.loadedWidgets" role="menuitem"><a (click)="mainController.loadWidget(widget)" class="dropdown-item" href="#">{{widget.name}}</a></li>
+          <li [ngClass]="{'selected':mainController.widgetLaunched(widget.name)}" *ngFor="let widget of mainController.loadedWidgets" role="menuitem"><a (click)="mainController.loadWidget(widget)" class="dropdown-item" href="#">{{widget.name}}</a></li>
         </ul>
       </div>
 
@@ -43,8 +43,8 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       <ATLASViewer 
         (emitHideUI)="controlUI($event)" 
         [hideUI]="hideUI" 
-        id = "ATLASViewer" 
-        [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}">
+        id = "ATLASViewer"
+        [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}" >
       </ATLASViewer>
       <div 
         id = "dockResizeSliver" 
@@ -55,7 +55,6 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       </div>
       <WidgetsContainer 
         [ngClass]="{'darktheme':darktheme}"
-        [style.grid-column-start]="hasDockedComponents() ? '5' : '3'" 
         [hasDockedComponents]="hasDockedComponents()" 
         [dockedWidgetPanelWidth] = "dockedWidgetPanelWidth">
       </WidgetsContainer>
@@ -68,7 +67,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       height:100%;
       width:100%;
       display:grid;
-      grid-template-columns:250px 10px auto;
+      grid-template-columns:250px 10px auto 0px 0px;
       grid-template-rows:10% 90%;
     }
 
@@ -105,7 +104,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:1;
       grid-row-end:span 2;
-      z-index:3;
+      z-index:7;
     }
       div#atlasResizeSliver:hover
       {
@@ -118,6 +117,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:2;
       grid-row-end:span 1;
+
       z-index:2;
     }
 
@@ -127,7 +127,8 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:1;
       grid-row-end:span 2;
-      z-index:3;
+
+      z-index:7;
     }
       div#dockResizeSliver:hover
       {
@@ -140,6 +141,8 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end : span 1;
       grid-row-start : 1;
       grid-row-end : span 2;
+
+      z-index:6;
     }
 
     ATLASViewer
@@ -148,7 +151,9 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:1;
       grid-row-end:span 2;
+
       z-index:5;
+      position:relative;
     }
     `
   ],
@@ -214,7 +219,7 @@ export class NehubaContainer implements AfterViewInit {
   calcGridTemplateColumn(){
     return this.hasDockedComponents() ? 
       `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto 10px ${this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300 }px` :
-      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto`
+      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto 0px 0px`
   }
 
   controlUI(ev:any){

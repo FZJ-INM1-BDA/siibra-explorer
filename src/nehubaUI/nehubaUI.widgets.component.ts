@@ -1,6 +1,6 @@
 import { Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
 import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
-import { PLUGIN_CONTROL as gPluginControl, HelperFunctions } from 'nehubaUI/nehubaUI.services'
+import { PLUGIN_CONTROL as gPluginControl, HelperFunctions, MainController } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 
 /**
@@ -140,6 +140,8 @@ export class MinimisedWidgetContainer implements AfterViewInit{
     width:0em;
     height:0em;
     position:absolute;
+
+    z-index:9;
   }
   MinimisedContainer
   {
@@ -155,7 +157,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
     width:calc(100% + 12px);
     margin-left:-11px;
     height:100%;
-    overflow-y:scroll;
+    overflow-y:auto;
     overflow-x:hidden;
   }
   `
@@ -180,7 +182,8 @@ export class WidgetsContainer{
 
   constructor( 
     private componentFactoryResolver:ComponentFactoryResolver, 
-    private rd2:Renderer2 ){
+    private rd2:Renderer2,
+    private mainController:MainController ){
       this.floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetView )
       this.dockedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( DockedWidgetView )
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
@@ -192,6 +195,7 @@ export class WidgetsContainer{
 
   createNewWidget(labComponent:LabComponent){
     const newWidget = new WidgetComponent( labComponent )
+    this.mainController.launchedWidgets.push(labComponent.name)
 
     const widgetViewRef = this.widgetContentViewRef.createComponent( this.widgetFactory )
     const widgetView = (<WidgetView>widgetViewRef.instance)
@@ -199,7 +203,6 @@ export class WidgetsContainer{
 
     /* overwriting change state method */
     newWidget.changeState = ( state : 'docked' | 'minimised' | 'floating' )=>{
-
       newWidget.parentViewRef.instance.panelBody.detach( 0 )
       newWidget.parentViewRef.destroy()
 
@@ -214,6 +217,8 @@ export class WidgetsContainer{
       newWidget.parentViewRef = newParentViewRef
 
       newWidget.state = state
+
+      if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
     }
 
     /* initial stage */
@@ -221,13 +226,18 @@ export class WidgetsContainer{
     firstParentViewRef.instance.panelBody.insert( widgetViewRef.hostView )
     firstParentViewRef.instance.widgetComponent = newWidget
     newWidget.parentViewRef = firstParentViewRef
-    newWidget.state = 'floating'
+    newWidget.state = 'docked'
+
+    if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
 
     /* overwriting shutdown cleanup */
     newWidget.onShutdownCleanup = ()=>{
       newWidget.parentViewRef.destroy()
       widgetViewRef.destroy()
       this.rd2.removeChild(document.head,newWidget.labComponent.script)
+      
+      const indx = this.mainController.launchedWidgets.findIndex(widgetName=>widgetName==labComponent.name)
+      this.mainController.launchedWidgets.splice(indx,1)
     }
     
     setTimeout(()=>{
@@ -284,7 +294,7 @@ interface WidgetViewChassis{
     [style.left] = " '-' + position[0] + 'px' "
     [style.top] = " '-' + position[1] + 'px' "
     [ngClass]="{'panel-default':!repositionFlag&&!successClassState,'panel-info':repositionFlag&&!successClassState,'panel-success':successClassState&&!repositionFlag}"
-    (mousedown)="stopBlink()" floatingWidgetContainer>
+    (mousedown)="stopBlink()" floatingWidgetUnit>
 
     <div 
       class = "panel-heading"
@@ -318,13 +328,13 @@ interface WidgetViewChassis{
   `,
   styles : [
   `
-  div[floatingWidgetContainer]
+  div[floatingWidgetUnit]
   {
     position:absolute;
     width:25em;
     z-index:9;
   }
-  div[floatingWidgetContainer] > div.panel-heading:hover
+  div[floatingWidgetUnit] > div.panel-heading:hover
   {
     cursor:move;
   }
@@ -441,7 +451,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   <div
     class = "panel"
     [ngClass] = "{'panel-default':!successClassState, 'panel-success':successClassState}"
-    (mousedown) = "stopBlink()" dockedWidgetContainer>
+    (mousedown) = "stopBlink()" dockedWidgetUnit>
 
     <div
       class = "panel-heading"
@@ -476,7 +486,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   `,
   styles : [
     `
-    div[dockedWidgetContainer]
+    div[dockedWidgetUnit]
     {
       border-radius: 0px;
       margin-bottom: 0px;

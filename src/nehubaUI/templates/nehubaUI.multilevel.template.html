@@ -3,31 +3,46 @@
     <div class = "menuItemContent">
       <div class = "menuItemContentList">
         <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
-          <span class = "multilevel-name">
-            <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "toggleExpansion( singleData )" class = "unicodeSymbols glyphicon">
-            </span>
-
-            <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-              <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
-            </span>
-            <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-              <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
-            </span>
-            <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
-              <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
-            </span>
-
-            <span [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData">
-
-            </span>
+          <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "toggleExpansion( singleData )" class = "unicodeSymbols glyphicon">
           </span>
+
+          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
+          </span>
+          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+                <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
+          </span>
+          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+                <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
+          </span>
+
           <span 
-            *ngIf = "singleData.moreInfo.length > 0" 
-            class = "multilevel-icon unicodeSymbols" 
+            *ngIf="singleData.moreInfo.length == 0" 
+            class = "multilevel-name">
+
+            <span 
+              [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData"
+              spanName>
+            </span>
+
+          </span>
+
+          <span class = "multilevel-name"
             [popover]="moreInfo"
             [outsideClick]="true"
-            placement="left">
-              <i class = "glyphicon glyphicon-option-vertical"></i>
+            placement="bottom"
+            *ngIf = "singleData.moreInfo.length > 0" >
+
+            <span 
+              class="regionHasMoreInfo"
+              [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData"
+              spanName>
+            </span>
+
+            <span 
+              class = "multilevel-icon unicodeSymbols" >
+                <i class = "glyphicon glyphicon-option-vertical"></i>
+            </span>
           </span>
         </span>
       </div>
@@ -38,12 +53,17 @@
     </multilevel>
   </div>
   <ng-template #moreInfo>
-    <span 
+    <div 
       *ngFor = "let moreInfo of singleData.moreInfo" 
-      class = "moreInfo-icon glyphicon" 
-      (click) = "moreInfo.action()"
-      [ngClass]="'glyphicon-'+moreInfo.icon"
-      [tooltip]="moreInfo.name">
-    </span>
+      class = "moreInfo-icon" 
+      (click) = "moreInfo.action()">
+      <span 
+        class = "glyphicon"
+        [ngClass]="'glyphicon-' + moreInfo.icon">
+      </span>
+      <span>
+        {{ moreInfo.name }}
+      </span>
+    </div>
   </ng-template>
 </div>

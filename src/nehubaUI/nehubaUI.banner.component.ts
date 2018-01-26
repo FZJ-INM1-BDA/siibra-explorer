@@ -9,8 +9,9 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
     div[bannerContainer]
     {
       position:relative;
-      height:100%;
-      width:2000em;
+      height:calc(100% + 1px);
+      padding-bottom:1px;
+      width:50em;
     }
     div[bannerContainer]:hover
     {
@@ -52,7 +53,8 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
     }
     small[selectedInformation]
     {
-      line-height:1em;
+      line-height:1.1em;
+      margin-left:0.3em;
     }
     `
   ]

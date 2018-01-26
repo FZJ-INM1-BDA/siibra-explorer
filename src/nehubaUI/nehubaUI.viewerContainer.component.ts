@@ -12,9 +12,39 @@ import { Subject } from 'rxjs/Subject';
       (click) = "mouseEventHandler('click',$event)"
       (mousedown) = "mouseEventHandler('mousedown',$event)"
       (mouseup) = "mouseEventHandler('mouseup',$event)"></NehubaViewer>
-    <span id="helpbutton" (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign unicodeSymbols"></span>
-    <span id="hideUI" (click)="toggleHideUI()" [ngClass]="{darktheme : darktheme,'glyphicon-resize-full':!hideUI,'glyphicon-resize-small':hideUI}" class = "glyphicon unicodeSymbols"></span>
-  `
+    <span glyphiconShowHelp (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign"></span>
+    <span glyphiconToggleUI (click)="toggleHideUI()" [ngClass]="{darktheme : darktheme,'glyphicon-resize-full':!hideUI,'glyphicon-resize-small':hideUI}" class = "glyphicon"></span>
+  `,
+  styles : [
+    `
+    div#container
+    {
+      position:absolute;
+      
+      z-index:9;
+    }
+
+    span[glyphiconShowHelp],
+    span[glyphiconToggleUI]
+    {
+      position:absolute;
+      z-index:10;
+      font-size:1.5em;
+    }
+    
+    span[glyphiconShowHelp]
+    {
+      right:0.3em;
+      top:0.3em;
+    }
+
+    span[glyphiconToggleUI]
+    {
+      right:1.6em;
+      top:0.3em;
+    }
+    `
+  ]
 })
 
 export class NehubaViewerContainer implements AfterViewInit {

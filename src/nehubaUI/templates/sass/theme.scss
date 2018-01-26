@@ -19,6 +19,11 @@ div#ATLASContainer
   color:$BLACK;
   height:100%;
   width:100%;
+
+  nehubaModal
+  {
+    color:gray(0);
+  }
   
   ATLASViewer
   {
@@ -26,26 +31,18 @@ div#ATLASContainer
     div#container{
 
       .gllayoutcell{
-        border: $BORDERWIDTH solid gray(0.95);
 
         label.perspective-panel-show-slice-views
         {
           /* override neuroglancer pointer-events property */
-          pointer-events: all;
 
-          color:gray(0.2);
-          margin-left:1em;
-          visibility: hidden;
 
           &:hover
           {
-            color:gray(0.1);
           }
 
           &:before
           {
-            content : "toggle front octant";
-            visibility: visible;
           }
         }
       }
@@ -63,27 +60,21 @@ div#ATLASContainer
       {
         .gllayoutcell
         {
-          border: $BORDERWIDTH solid gray(0.05);
   
           label.perspective-panel-show-slice-views
           {
-            color : gray(0.8);
             &:hover
             {
-              color:gray(0.9);
             }
           }
         }
   
         .gllayoutcell:hover
         {
-          border :$BORDERWIDTH solid gray(0.2)
         }
   
         .scale-bar-container
         {
-          color : gray(0.95);
-          background-color : tgray(0.6,0.2)
         }
       }
     }
@@ -104,21 +95,10 @@ div#ATLASContainer
 
 .glyphicon-overlay
 {
-  position:absolute;
-  right:0px;
-  bottom:0px;
-  height:1em;
-  z-index:99;
 
-  margin-top:auto;
-  margin-bottom:auto;
-  margin-right:1.5em;
-
-  color:gray(0.5);
 
   &:hover
   {
-    color:gray(0.3);
   }
 }
 
@@ -128,7 +108,6 @@ div#ATLASContainer
   {
     &:hover
     {
-      color:gray(0.7);
     }
   }
 }
@@ -139,10 +118,6 @@ div#ATLASContainer
 
   atlascontrol{
 
-    width:calc(100% + 20px);
-    padding-right:20px;
-    box-shadow: 0em 0em 1em tgray(0,0.25);
-    margin-top:5px;
 
     div
     {
@@ -166,24 +141,12 @@ div#ATLASContainer
   
   &.darktheme
   {
-    background-color:gray(0.2);
 
     atlascontrol
     {
       input
       { 
-        color:gray(1);
-        border-color:gray(0.1);
-        background-color:gray(0.10);
-        box-shadow:inset 0 0 1em -0.3em gray(0);
         
-        &::-moz-placeholder
-        {
-          color:tgray(1,0.4);
-        }
-        &::-webkit-input-placeholder{
-          color:tgray(1,0.4);
-        }
       }
     }
   }
@@ -227,7 +190,6 @@ atlasbanner
   }
 
   div#bannerContainer{
-    background-color:gray(0.98);
     font-weight:100;
 
     %img{
@@ -257,7 +219,6 @@ atlasbanner
 
   div#bannerContainer.darktheme{
     @extend div#bannerContainer;
-    background-color:gray(0.2);
 
     div#bannerTitle{
       h2{
@@ -284,8 +245,6 @@ atlasviewer
 {
   position:relative;
   overflow:hidden;
-  background-color:$WHITE;
-  box-shadow: 0em 0em 1.5em -0.5em gray(0);
 
   div#container{
     position:absolute;
@@ -293,20 +252,13 @@ atlasviewer
     top:0px;
     width:100%;
     height:100%;
-    z-index:9;
   }
 
   %glyphiconBtn
   {
-    color:gray(0.0);
-    text-shadow:0 0 1em gray(0.3);
-    position:absolute;
-    z-index:10;
-    font-size:2em;
 
     &.darktheme
     {
-      text-shadow:0 0 0.3em gray(1);
     }
 
     &.darktheme:hover
@@ -317,21 +269,15 @@ atlasviewer
 
     &:hover
     {
-      color:gray(1);
-      cursor:pointer;
     }
   }
 
   span#helpbutton{
     @extend %glyphiconBtn;
-    right:0.3em;
-    top:0.3em;
   }
 
   span#hideUI{
     @extend %glyphiconBtn;
-    right:1.6em;
-    top:0.3em;
   }
 
 }
@@ -357,6 +303,18 @@ WidgetsContainer
     DockedWidgetContainer,FloatingWidgetContainer
     {
       @extend %widgetDarkTheme;
+
+      /**
+       * required for blinking widget header. will not bleed into child panels
+       */
+      div.panel.panel-success[floatingWidgetUnit],div.panel.panel-success[dockedWidgetUnit]
+      {
+        > div.panel-heading
+        {
+          background-color:rgba(0,20,0,0.5);
+        }
+      }
+
       div.panel
       {
         border:1px solid gray(0.35);
@@ -381,10 +339,10 @@ WidgetsContainer
 
         &.panel-success
         {
-          .btn.btn-block
-          {
-            border:1px solid rgba(214,233,198,0.5);
-          }
+          // .btn.btn-block
+          // {
+          //   border:1px solid rgba(214,233,198,0.5);
+          // }
         }
 
         &.panel-warning
@@ -815,7 +773,7 @@ div.darktheme.leftSideSubSection
     background-color : gray(0.2);
     color : gray(0.8);
   };
-  popover-container.popover.left
+  popover-container.popover-right
   {
     margin-left:0em;
     margin-top:0em;
@@ -891,7 +849,7 @@ div.darktheme.leftSideSubSection
 
           span.multilevel-name
           {
-            box-shadow: inset 
+            
           };
 
           span.multilevel-icon
@@ -961,8 +919,8 @@ div
         div.menuItemContentList
         {
           color:#636363;
-          padding-left:5%;
-          padding-right:1%;
+          padding-left:1em;
+          padding-right:0.2em;
           padding-top:0.4em;
           padding-bottom:0.4em;
           transition: 300ms;
@@ -978,61 +936,44 @@ div
   color: transparent !important;
 }
 
-div#ATLASContainer{
+div#ATLASContainer
+{
   modal-container
   {
     color:black
   }
   #viewerStatus
   {
-    position:absolute;
-    left:2px;
-    top:0;
-    z-index:9;
-    width:100%;
-    box-sizing: border-box;
-    height:3rem;
-    line-height:3rem;
-    padding-left:1.5rem;
-    white-space: nowrap;
   
-    background-color:tgray(1,0.5);
-    color:gray(0.1);
-    border: 1px solid tgray(0,0);
   }
-  .popover.down
+  .popover-right,
+  .popover-bottom
   {
     border-radius:0em;
     border-width:0em;
+
     .popover-arrow
     {
       display:none;
     }
+
     .popover-title
     {
       border-radius:0em;
       border-width:0em;
     }
   }
-  
-  .popover.left
+
+  .popover-right
   {
-    border-radius:0em;
-    border-width:0em;
-    .popover-arrow
+    > div
     {
-      display:none;
-    }
-    .popover-title
-    {
-      border-radius:0em;
-      border-width:0em;
+      margin-left:100%;
     }
   }
   
-  span.moreInfo-icon
+  .moreInfo-icon
   {
-    width:1.4em;
     &:hover
     {
       color:goldenrod;
@@ -1044,18 +985,11 @@ div#ATLASContainer{
   {
     #viewerStatus
     {
-      background-color:tgray(0,0.5);
-      color:gray(0.75);
     }
-    .popover.left,.popover.down
+    .popover-bottom,.popover-right
     {
-      border-color:gray(0.35);
-      color:gray(0.95);
-      background-color:gray(0.2);
       .popover-title
       {
-        background-color:gray(0.3);
-        border-color:gray(0.35);
       }
     }
     

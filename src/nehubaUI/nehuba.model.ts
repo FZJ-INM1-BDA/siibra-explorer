@@ -1,7 +1,6 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD, UI_CONTROL,PLUGIN_CONTROL as gPluginControl } from './nehubaUI.services'
+import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD,PLUGIN_CONTROL as gPluginControl } from './nehubaUI.services'
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
-import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
 
 export class LayerProperties{
   constructor(json:any){
@@ -249,38 +248,40 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
       this.moreInfo.push(goToPosition)
     }
     if(this.PMapURL){
-      const pmap = new DescriptorMoreInfoItem('Show PMap','picture')
+      const pmap = new DescriptorMoreInfoItem('Show Probability Map','picture')
       pmap.action = () => {
-        const modalHandler = (<NehubaModalService>UI_CONTROL.modalControl).getModalHandler()
-        modalHandler.title = `Loading PMap of ${this.name} ...`
-        modalHandler.body = `Please stand by ...`
-        modalHandler.show()
+        // const modalHandler = (<NehubaModalService>UI_CONTROL.modalControl).getModalHandler()
+        // modalHandler.title = `Loading PMap of ${this.name} ...`
+        // modalHandler.body = `Please stand by ...`
+        // modalHandler.show()
+
+        // setTimeout(()=>{
+        // },200)
+        // setTimeout(()=>{
+            // modalHandler.hide()
+        // },3000)
+        
 
         /* move viewer to the relevant location */
         VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
 
-        setTimeout(()=>{
-          const pMapObj = {
-            PMap : {
-              type : 'image',
-              source : 'nifti://'+this.PMapURL,
-              shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-            }
+        const pMapObj = {
+          PMap : {
+            type : 'image',
+            source : 'nifti://'+this.PMapURL,
+            shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
           }
-          VIEWER_CONTROL.loadLayer(pMapObj)
-          VIEWER_CONTROL.reapplyNehubaMeshFix()
-          VIEWER_CONTROL.hideAllSegments()
+        }
+        VIEWER_CONTROL.loadLayer(pMapObj)
+        VIEWER_CONTROL.reapplyNehubaMeshFix()
+        VIEWER_CONTROL.hideAllSegments()
 
-          if(gPluginControl['PMap']){
-            gPluginControl['PMap'].blink(10)
-          }else{
-            const newWidget = new LabComponent(PMAP_WIDGET)
-            HelperFunctions.sLoadPlugin(newWidget)
-          }
-        },200)
-        setTimeout(()=>{
-            modalHandler.hide()
-        },3000)
+        if(gPluginControl['PMap']){
+          gPluginControl['PMap'].blink(10)
+        }else{
+          const newWidget = new LabComponent(PMAP_WIDGET)
+          HelperFunctions.sLoadPlugin(newWidget)
+        }
       }
       this.moreInfo.push(pmap)
     }
@@ -304,6 +305,7 @@ export interface DescriptorMoreInfo{
 
 export class DescriptorMoreInfoItem{
   name : string
+  desc : string
   icon : string
   source : string
   action : ()=>void = ()=>{}

@@ -12,7 +12,37 @@ import { Multilevel } from './nehuba.model'
     }
     `,
     `
-    
+    span.regionHasMoreInfo:hover
+    {
+      cursor:default;
+    }
+
+    .multilvlContainer
+    {
+      overflow:hidden;
+      padding-top:0.1em;
+      padding-bottom:0.1em;
+    }    
+
+    .multilevel-name,.multilevel-name > span[spanName]
+    {
+      flex: 1 1 auto;
+      overflow:hidden;
+      display:flex;
+      white-space:nowrap;
+    }
+
+    .multilevel-name > span[spanName]
+    {
+      margin-left:0.5em;
+    }
+
+    .glyphicon
+    {
+      flex: 0 0 1.2em;
+      align-self: center;
+      text-align:center;
+    }
     `
   ],
   styleUrls : ['src/nehubaUI/templates/nehubaUI.multilevel.template.css']

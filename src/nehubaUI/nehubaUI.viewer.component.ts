@@ -24,9 +24,13 @@ export class NehubaViewerDirective{
 @Component({
   selector : 'NehubaViewer',
   template:`
-<ng-template nehuba-viewer-host>
-</ng-template>
-  `
+    <ng-template nehuba-viewer-host>
+    </ng-template>
+  `,
+  styles : [
+    `
+    `
+  ]
 })
 
 export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
@@ -234,12 +238,22 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     {
       width:100%;
       height:100%;
+      position:relative;
     }
-
-    div#container .gllayoutcell label.perspective-panel-show-slice-views
+    div#viewerStatus
     {
-
+      position:absolute;
+      left:2px;
+      top:0;
+      z-index:9;
+      width:100%;
+      box-sizing: border-box;
+      height:3rem;
+      line-height:3rem;
+      padding-left:1.5rem;
+      white-space: nowrap;
     }
+
     `
   ]
 })
@@ -344,15 +358,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       console.log('createnehubaviewer error handler',err)
     })
 
-
     this.mainController.nehubaViewer = this.nehubaViewer
 
-    /* 
-    TODO what happens if initialngstate is undefined?
-    without settimeout, fails on second load of template
-    */
+    this.nehubaViewer.applyInitialNgState()
+
+    /**
+     * preventing errors such as visibleLayer of null/undefined
+     */
     setTimeout(()=>{
-      this.nehubaViewer.applyInitialNgState()
       this.nehubaViewer.redraw()
       this.nehubaViewer.relayout()
     })

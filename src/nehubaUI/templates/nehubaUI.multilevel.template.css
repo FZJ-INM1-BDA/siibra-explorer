@@ -4,6 +4,53 @@
 width:100%;
 display:flex;
 }
+
+.hierarchy-0
+{
+padding-left:0em;
+}
+.hierarchy-1
+{
+padding-left:1em
+}
+.hierarchy-2
+{
+padding-left:2em
+}
+.hierarchy-3
+{
+padding-left:3em
+}
+.hierarchy-4
+{
+padding-left:4em
+}
+.hierarchy-5
+{
+padding-left:5em
+}
+.hierarchy-6
+{
+padding-left:6em
+}
+.hierarchy-7
+{
+padding-left:7em
+}
+.hierarchy-8
+{
+padding-left:8em
+}
+.hierarchy-9
+{
+padding-left:9em
+}
+.hierarchy-10
+{
+padding-left:10em
+}
+
+/* 
 .hierarchy-0
 {
 padding-left:0%;
@@ -47,29 +94,4 @@ padding-left:45%
 .hierarchy-10
 {
 padding-left:50%
-}
-
-.multilvlContainer
-{
-overflow:hidden;
-}    
-
-.multilevel-name
-{
-flex: 1 1 auto;
-overflow:hidden;
-}
-
-.multilevel-icon
-{
-flex: 0 0 1.4em;
-align-self: center;
-text-align:center;
-}
-
-    .multilevel-icon:hover
-    {
-    color:goldenrod;
-    cursor:pointer;
-    background-color:#FFF;
-    }
+} */
