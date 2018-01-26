@@ -2,7 +2,7 @@ import { AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnIni
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
-import { Animation,EXTERNAL_CONTROL as gExternalControl } from './nehubaUI.services'
+import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
@@ -143,7 +143,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
       this.componentRef.destroy()
     }
-    
+
     let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig)
     let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
     this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
@@ -178,62 +178,68 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
 
 @Component({
   template : `
-<div 
-  (contextmenu)="showFloatingPopover($event)"
-  id = "container" 
-  [ngClass]="{darktheme : darktheme}">
-</div>
-<div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
-  <span 
-    class = "btn btn-link"
-    (click)="statusPanelRealSpace = !statusPanelRealSpace">
-    {{statusPanelRealSpace ? 'RealSpace(mm)' : 'VoxelSpace'}}
-  </span> 
-  Navigation: <small>(
-    {{
-      statusPanelRealSpace ? 
-        (viewerPosReal[0] | nmToMm | number) : 
-        viewerPosVoxel[0]
-    }},
-    {{
-      statusPanelRealSpace ? 
-        (viewerPosReal[1] | nmToMm | number) : 
-        viewerPosVoxel[1]
-    }},
-    {{
-      statusPanelRealSpace ? 
-        (viewerPosReal[2] | nmToMm | number) : 
-        viewerPosVoxel[2]
-    }}
-  )</small> 
-  Mouse: <small>(
-    {{
-      statusPanelRealSpace ? 
-        (mousePosReal[0] | nmToMm | number) : 
-        mousePosVoxel[0]
-    }},
-    {{
-      statusPanelRealSpace ? 
-        (mousePosReal[1] | nmToMm | number) : 
-        mousePosVoxel[1]
-    }},
-    {{
-      statusPanelRealSpace ? 
-        (mousePosReal[2] | nmToMm | number) : 
-        mousePosVoxel[2]
-    }}
-  )</small> 
-  {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? 'RegionID: ' + viewerSegment : 'Region: ' + viewerSegment.name   }}
-</div>
-<floatingPopover>
-</floatingPopover>
+    <div 
+      (contextmenu)="showFloatingPopover($event)"
+      id = "container" 
+      [ngClass]="{darktheme : darktheme}">
+    </div>
+    <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+      <span 
+        class = "btn btn-link"
+        (click)="statusPanelRealSpace = !statusPanelRealSpace">
+        {{statusPanelRealSpace ? 'RealSpace(mm)' : 'VoxelSpace'}}
+      </span> 
+      Navigation: <small>(
+        {{
+          statusPanelRealSpace ? 
+            (viewerPosReal[0] | nmToMm | number) : 
+            viewerPosVoxel[0]
+        }},
+        {{
+          statusPanelRealSpace ? 
+            (viewerPosReal[1] | nmToMm | number) : 
+            viewerPosVoxel[1]
+        }},
+        {{
+          statusPanelRealSpace ? 
+            (viewerPosReal[2] | nmToMm | number) : 
+            viewerPosVoxel[2]
+        }}
+      )</small> 
+      Mouse: <small>(
+        {{
+          statusPanelRealSpace ? 
+            (mousePosReal[0] | nmToMm | number) : 
+            mousePosVoxel[0]
+        }},
+        {{
+          statusPanelRealSpace ? 
+            (mousePosReal[1] | nmToMm | number) : 
+            mousePosVoxel[1]
+        }},
+        {{
+          statusPanelRealSpace ? 
+            (mousePosReal[2] | nmToMm | number) : 
+            mousePosVoxel[2]
+        }}
+      )</small> 
+      {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? 'RegionID: ' + viewerSegment : 'Region: ' + viewerSegment.name   }}
+    </div>
+    <floatingPopover>
+    </floatingPopover>
   `,
   styles : [
     `
-div#container{
-  width:100%;
-  height:100%;
-}
+    div#container
+    {
+      width:100%;
+      height:100%;
+    }
+
+    div#container .gllayoutcell label.perspective-panel-show-slice-views
+    {
+
+    }
     `
   ]
 })
@@ -260,7 +266,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
-  constructor(){
+  constructor(private mainController:MainController){
+
     // const metadata = gExternalControl.metadata
 
     // UI_CONTROL.afterParcellationSelection(()=>{
@@ -337,12 +344,18 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       console.log('createnehubaviewer error handler',err)
     })
 
+
+    this.mainController.nehubaViewer = this.nehubaViewer
+
     /* 
     TODO what happens if initialngstate is undefined?
+    without settimeout, fails on second load of template
     */
-    this.nehubaViewer.applyInitialNgState()
-    this.nehubaViewer.redraw()
-    this.nehubaViewer.relayout()
+    setTimeout(()=>{
+      this.nehubaViewer.applyInitialNgState()
+      this.nehubaViewer.redraw()
+      this.nehubaViewer.relayout()
+    })
 
     /**
      * attaching the mouse/navigation real/voxel listeners

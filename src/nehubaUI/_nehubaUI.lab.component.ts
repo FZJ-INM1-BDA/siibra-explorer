@@ -18,8 +18,8 @@ export class Lab {
 
   advancedMode = {
     name : "fzj.xg.advancedMode",
-    templateURL:gTempPluginDomain + "/res/advancedMode/advancedMode.html",
-    scriptURL:gTempPluginDomain + "/res/advancedMode/advancedMode.js"
+    templateURL:gTempPluginDomain + "advancedMode/advancedMode.html",
+    scriptURL:gTempPluginDomain + "advancedMode/advancedMode.js"
   }
 
 //   jugex = {
@@ -56,18 +56,18 @@ export class Lab {
     "scriptURL":gTempPluginDomain + "js/localNifti.js"
   }
 
-  webjugex = {
-    "name":"fzj.xg.webjugex",
-    "type":"plugin",
-    "templateURL":gTempPluginDomain + "html/webjugex.html",
-    "scriptURL":gTempPluginDomain + "js/webjugex.js"
-  }
+  // webjugex = {
+  //   "name":"fzj.xg.webjugex",
+  //   "type":"plugin",
+  //   "templateURL":gTempPluginDomain + "html/webjugex.html",
+  //   "scriptURL":gTempPluginDomain + "js/webjugex.js"
+  // }
 
   constructor(){
     
   }
 
-  plugins = [this.screenSaver,this.localNifti,this.webjugex].map(item=>new LabComponent(item))
+  plugins = [this.advancedMode,this.screenSaver,this.localNifti].map(item=>new LabComponent(item))
 
   appendPlugin(param:any){
     this.plugins.push(param)
@@ -80,10 +80,5 @@ export class Lab {
     }else{
       HelperFunctions.sLoadPlugin(labComponent)
     }
-    // if(param.templateURL && param.scriptURL){
-    //   const requestNewFloatingWidget = new EventPacket('floatingWidgetRelay',Date.now().toString(),100,{})
-    //   const newSubject = this.eventCenter.createNewRelay(requestNewFloatingWidget)
-    //   newSubject.next(new EventPacket('lab','',100,param))
-    // }
   }
 }

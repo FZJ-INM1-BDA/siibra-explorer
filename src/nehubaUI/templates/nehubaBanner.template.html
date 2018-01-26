@@ -1,6 +1,12 @@
-<div [ngClass]="{darktheme : darktheme}" id = "bannerContainer" >
-    <div id = "hbplogo" [ngStyle]="{'background-image':parseSrcToBGUrl( darktheme ? hbpimgdark : hbpimg )}" >
-    </div>
-    <img *ngIf = "false" id = "explorethebrain" src = "{{ !darktheme ? exploreimg : exploreimgdark}}" />
-    <img *ngIf = "false" id = "fundedbyeu" src = "{{ !darktheme ? euimg : euimgdark}}"  id = "cofundedbyEU">
+<div [ngClass]="{darktheme : darktheme}" bannerContainer >
+  <img [src] = "darktheme ? 'src/assets/images/HBP_Primary_RGB_WhiteText.png' : 'src/assets/images/HBP_Primary_RGB_BlackText.png'" />
+  <div  textContainer>
+    <h4>Atlas Viewer </h4>
+    <span class = "glyphicon glyphicon-chevron-down"></span>
+    <br />
+    <small class = "text-muted" selectedInformation>
+      {{ mainController.selectedTemplate ? mainController.selectedTemplate.name : ' ' }} <br />
+      {{ mainController.selectedParcellation ? mainController.selectedParcellation.name : ' ' }} <br />
+    </small>
+  </div>
 </div>

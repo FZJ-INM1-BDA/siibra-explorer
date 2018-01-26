@@ -3,13 +3,6 @@ import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD, 
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 import { NehubaModalService } from 'nehubaUI/nehubaUI.modal.component';
 
-export class FetchedTemplates {
-  constructor(){
-    this.templates = []
-  }
-  templates : TemplateDescriptor[];
-}
-
 export class LayerProperties{
   constructor(json:any){
     for(let key in this){
@@ -142,7 +135,7 @@ export class TemplateDescriptor {
 export class ParcellationDescriptor {
   constructor(json:any){
     this.name = json.name
-    this.ngId = json.ngId ? json.ngId : ''
+    this.ngId = json.ngId 
     this.regions = json.regions ? json.regions.map((region:any)=>new RegionDescriptor(region,0)) : []
     this.properties = json.properties ? json.properties : []
 
@@ -197,7 +190,7 @@ export class Multilevel{
   hierarchy : number;
   parent : Multilevel | undefined;
   children : Multilevel[];
-  isExpanded : boolean = false;
+  isExpanded : boolean = true;
   isExpandedString : 'expanded' | 'collapsed' = 'collapsed'
   isVisible : boolean = true
 

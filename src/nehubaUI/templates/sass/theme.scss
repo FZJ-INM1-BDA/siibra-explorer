@@ -20,37 +20,10 @@ div#ATLASContainer
   height:100%;
   width:100%;
   
-  atlascontrol
-  {
-    
-    div#leftSide{
-      height:100%;
-      width:100%;
-      display:grid;
-      grid-template-rows:auto 40px;
-
-      div#leftSideTop{
-        grid-row-start:1;
-        grid-row-end:span 2;
-        overflow-y:auto;
-        overflow-x:hidden;
-      }
-
-      div#leftSideBottom{
-        grid-row-start:2;
-        grid-row-end:span 1;
-        text-align: center;
-        z-index:-10;
-      }
-    }
-  }
-  
   ATLASViewer
   {
 
     div#container{
-      height:100%;
-      width:100%;
 
       .gllayoutcell{
         border: $BORDERWIDTH solid gray(0.95);
@@ -85,32 +58,33 @@ div#ATLASContainer
         color : gray(0.05);
         background-color : tgray(0.3,0.2);
       }
-    }
 
-    div#container.darktheme{
-      height:100%;
-      width:100%;
-
-      .gllayoutcell{
-        border: $BORDERWIDTH solid gray(0.05);
-
-        label.perspective-panel-show-slice-views
+      &.darktheme
+      {
+        .gllayoutcell
         {
-          color : gray(0.8);
-          &:hover
+          border: $BORDERWIDTH solid gray(0.05);
+  
+          label.perspective-panel-show-slice-views
           {
-            color:gray(0.9);
+            color : gray(0.8);
+            &:hover
+            {
+              color:gray(0.9);
+            }
           }
         }
-      }
-
-      .gllayoutcell:hover{
-        border :$BORDERWIDTH solid gray(0.2)
-      }
-
-      .scale-bar-container{
-        color : gray(0.95);
-        background-color : tgray(0.6,0.2)
+  
+        .gllayoutcell:hover
+        {
+          border :$BORDERWIDTH solid gray(0.2)
+        }
+  
+        .scale-bar-container
+        {
+          color : gray(0.95);
+          background-color : tgray(0.6,0.2)
+        }
       }
     }
   }
@@ -159,12 +133,17 @@ div#ATLASContainer
   }
 }
 
-#ATLASContainer{
+
+#ATLASContainer
+{
+
   atlascontrol{
-    width:110%;
-    padding-right:5%;
-    box-shadow: -0.3em 0.3em 1em gray(0.1);
+
+    width:calc(100% + 20px);
+    padding-right:20px;
+    box-shadow: 0em 0em 1em tgray(0,0.25);
     margin-top:5px;
+
     div
     {
       .list-group
@@ -188,13 +167,66 @@ div#ATLASContainer
   &.darktheme
   {
     background-color:gray(0.2);
+
+    atlascontrol
+    {
+      input
+      { 
+        color:gray(1);
+        border-color:gray(0.1);
+        background-color:gray(0.10);
+        box-shadow:inset 0 0 1em -0.3em gray(0);
+        
+        &::-moz-placeholder
+        {
+          color:tgray(1,0.4);
+        }
+        &::-webkit-input-placeholder{
+          color:tgray(1,0.4);
+        }
+      }
+    }
+  }
+}
+
+ul.darktheme.dropdown-menu
+{
+  background-color:gray(0.22);
+
+  li
+  {
+    &.dropdown-header
+    {
+      color:gray(0.7);
+    }
+
+    &.divider.dropdown-divider
+    {
+      background-color:gray(0.15);
+    }
+
+    .dropdown-item
+    {
+      color:gray(0.8);
+      position:relative;
+
+      &:hover
+      {
+        color:gray(0.9);
+        background-color:gray(0.25);
+      }
+    }
   }
 }
 
 atlasbanner
 {
+  &.darktheme
+  {
+    color:$WHITE
+  }
+
   div#bannerContainer{
-    height:100%;
     background-color:gray(0.98);
     font-weight:100;
 
@@ -206,21 +238,6 @@ atlasbanner
       margin-bottom:auto;
       max-width:90%;
       max-height: 90%;
-    }
-
-    #hbplogo{
-      margin-left:10%;
-      margin-right:10%;
-      width:80%;
-      height:100%;
-      background-size:contain;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    img#cofundedbyEU{
-      @extend %img;
-      margin:auto;
     }
 
     div#bannerTitle{
@@ -817,7 +834,7 @@ div.darktheme.leftSideSubSection
   }
 };
 
-div.darktheme
+.darktheme
 {
   multilevel.menuItemContentText
   {
@@ -949,12 +966,6 @@ div
           padding-top:0.4em;
           padding-bottom:0.4em;
           transition: 300ms;
-          // &:hover
-          // {
-          //   color:#000;
-          //   background-color:#f5f5f5;
-          //   cursor:pointer;
-          // };
         };
       };
     };
@@ -967,8 +978,7 @@ div
   color: transparent !important;
 }
 
-body
-{
+div#ATLASContainer{
   modal-container
   {
     color:black
@@ -985,7 +995,7 @@ body
     line-height:3rem;
     padding-left:1.5rem;
     white-space: nowrap;
-
+  
     background-color:tgray(1,0.5);
     color:gray(0.1);
     border: 1px solid tgray(0,0);
@@ -1004,7 +1014,7 @@ body
       border-width:0em;
     }
   }
-
+  
   .popover.left
   {
     border-radius:0em;
@@ -1029,7 +1039,7 @@ body
       cursor: default;
     }
   }
-
+  
   &.darktheme
   {
     #viewerStatus
@@ -1052,7 +1062,7 @@ body
     span.moreInfo-icon
     {
       color:gray(1);
-
+  
       &:hover
       {
         color:goldenrod;
