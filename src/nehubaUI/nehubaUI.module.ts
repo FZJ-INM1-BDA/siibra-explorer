@@ -20,10 +20,9 @@ import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
 import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
-import { Lab } from './nehubaUI.lab.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
-import { DataService } from './nehubaUI.services';
+import { MainController } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma  } from './nehubaUI.util.pipes'
 
 @NgModule({
@@ -41,11 +40,11 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
     declarations : 
         [ MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
-        Multiform,ActiveComponent, Lab,NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
+        Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma],
     bootstrap : [ NehubaContainer ],
-    providers : [ DataService ],
+    providers : [ MainController ],
     entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
 })
 export class NehubaUI{

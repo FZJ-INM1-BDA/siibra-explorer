@@ -4,12 +4,17 @@ import { Multilevel } from './nehuba.model'
 @Component({
   selector : 'multilevel',
   templateUrl : 'src/nehubaUI/templates/nehubaUI.multilevel.template.html',
-  styles : [` 
+  styles : [
+    ` 
     :host >>> span.highlight
     {
     background-color:#770;
     }
-  `],
+    `,
+    `
+    
+    `
+  ],
   styleUrls : ['src/nehubaUI/templates/nehubaUI.multilevel.template.css']
 })
 
