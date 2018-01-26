@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
 
-import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor } from './nehuba.model'
+import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
 import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
 import { NehubaViewer } from 'nehuba/NehubaViewer';
 import { SelectTreePipe } from 'nehubaUI/nehubaUI.util.pipes';
+import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
 
 declare var window:{
   [key:string] : any
@@ -30,6 +31,7 @@ export class MainController{
    * plugins
    */
   loadedWidgets : LabComponent[] = DEFAULT_WIDGETS.map(json=>new LabComponent(json))
+  launchedWidgets : string[] = []
 
   /**
    * hooks
@@ -59,6 +61,7 @@ export class MainController{
       this.init()
       this.attachInternalHooks()
       this.hookAPI()
+      this.patchNG()
     }
 
     /* TODO reconsider if this is a good idea */
@@ -134,6 +137,17 @@ export class MainController{
       })
   }
 
+  patchNG(){
+    
+    UrlHashBinding.prototype.setUrlHash = ()=>{
+      // console.log('seturl hash')
+    }
+
+    UrlHashBinding.prototype.updateFromUrlHash = ()=>{
+      // console.log('update hash binding')
+    }
+  }
+
   attachInternalHooks(){
 
 
@@ -187,9 +201,10 @@ export class MainController{
     /**
      * temporary workaround. 
      */
+
+    this.loadParcellation( templateDescriptor.parcellations[0] )
+    this.sendUISelectedRegionToViewer()
     setTimeout(()=>{
-      this.loadParcellation( templateDescriptor.parcellations[0] )
-      this.sendUISelectedRegionToViewer()
     })
 
     /* TODO potentially breaks. selectedRegions should be cleared after each loadParcellation */
@@ -280,8 +295,18 @@ export class MainController{
       })
   }
 
-  loadWidget(labComponent:LabComponent){
-    HelperFunctions.sLoadPlugin(labComponent)
+  loadWidget(labComponent:LabComponent)
+  {
+    if(PLUGIN_CONTROL[labComponent.name])
+    {
+      (<LabComponentHandler>PLUGIN_CONTROL[labComponent.name]).blink(10)
+    } else {
+      HelperFunctions.sLoadPlugin(labComponent)
+    }
+  }
+
+  widgetLaunched(name:string):boolean{
+    return this.launchedWidgets.findIndex(n=>n==name) >= 0
   }
 
   /**
@@ -594,12 +619,12 @@ export const DEFAULT_WIDGETS = [
     scriptURL:TEMP_PLUGIN_DOMAIN + "advancedMode/advancedMode.js"
   },{
     "name":"fzj.xg.meshAnimator",
-    "templateURL":TEMP_PLUGIN_DOMAIN + "html/meshAnimator.html",
-    "scriptURL":TEMP_PLUGIN_DOMAIN + "js/meshAnimator.js"
+    "templateURL":TEMP_PLUGIN_DOMAIN + "meshAnimator/meshAnimator.html",
+    "scriptURL":TEMP_PLUGIN_DOMAIN + "meshAnimator/meshAnimator.js"
   },{
     "name":"fzj.xg.localNifti",
     "type":"plugin",
-    "templateURL":TEMP_PLUGIN_DOMAIN + "html/localNifti.html",
-    "scriptURL":TEMP_PLUGIN_DOMAIN + "js/localNifti.js"
+    "templateURL":TEMP_PLUGIN_DOMAIN + "localNifti/localNifti.html",
+    "scriptURL":TEMP_PLUGIN_DOMAIN + "localNifti/localNifti.js"
   }
 ]

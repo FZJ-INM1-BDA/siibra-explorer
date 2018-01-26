@@ -8,91 +8,91 @@ import 'rxjs/observable/of'
 import 'rxjs/operator/map'
 
 @Component({
-    selector: 'nehubaModal',
-    template : ``
+  selector: 'nehubaModal',
+  template : ``
 })
 
 export class NehubaModalService{
-    bsModalRef:BsModalRef
+  bsModalRef:BsModalRef
 
-    constructor(private bsModalService:BsModalService){
-        /**
-         * input
-         * info
-         * curtain
-         */
-        
-        UI_CONTROL.modalControl = this
-    }
+  constructor(private bsModalService:BsModalService){
+    /**
+     * input
+     * info
+     * curtain
+     */
+    
+    UI_CONTROL.modalControl = this
+  }
 
-    public getModalHandler = ()=> new ModalHandler(this.bsModalService)
+  public getModalHandler = ()=> new ModalHandler(this.bsModalService)
 }
 
 export class ModalHandler{
-    public title : String | null = ''
-    public body : Object | Array<any> | String | null = ''
-    public footer : String | null = ''
-    public config : any | null 
+  public title : String | null = ''
+  public body : Object | Array<any> | String | null = ''
+  public footer : String | null = ''
+  public config : any | null 
 
-    bsModalRef : BsModalRef
-    private subscriptions : Subscription[] = []
+  bsModalRef : BsModalRef
+  private subscriptions : Subscription[] = []
 
-    /* TODO check if listeners can be heard globally */
+  /* TODO check if listeners can be heard globally */
 
-    /**
-     * Dynamically hide the modal.
-     */
-    public hide = ()=>{
-        this.bsModalRef.hide()
-    }
+  /**
+   * Dynamically hide the modal.
+   */
+  public hide = ()=>{
+    this.bsModalRef.hide()
+  }
 
-    /**
-     * Show the modal with the assigned config.
-     */
-    public show = ()=>{
-        this.bsModalRef = this.bsModalService.show( NehubaModalUnit,this.config )
-        this.bsModalRef.content.title = this.title
-        this.bsModalRef.content.body = this.body
-        this.bsModalRef.content.footer = this.footer
-        
-        this.subscriptions.push( this.bsModalService.onHidden.subscribe(()=>
-            this.subscriptions.forEach(subscription=>subscription.unsubscribe())
-        ))
-    }
-    public onHide = (cb:(reason:any)=>void) =>
-        this.subscriptions.push( this.bsModalService.onHide.subscribe((reason:String)=>cb(reason)) )
-    public onHidden = (cb:(reason:any)=>void) =>
-        this.subscriptions.push( this.bsModalService.onHidden.subscribe((reason:String)=>cb(reason)) )
+  /**
+   * Show the modal with the assigned config.
+   */
+  public show = ()=>{
+    this.bsModalRef = this.bsModalService.show( NehubaModalUnit,this.config )
+    this.bsModalRef.content.title = this.title
+    this.bsModalRef.content.body = this.body
+    this.bsModalRef.content.footer = this.footer
     
-    public onShow = (cb:(reason:any)=>void) =>
-        this.subscriptions.push( this.bsModalService.onShow.subscribe((reason:String)=>cb(reason)) )
-    public onShown = (cb:(reason:any)=>void) =>
-        this.subscriptions.push( this.bsModalService.onShown.subscribe((reason:String)=>cb(reason)) )
+    this.subscriptions.push( this.bsModalService.onHidden.subscribe(()=>
+      this.subscriptions.forEach(subscription=>subscription.unsubscribe())
+    ))
+  }
+  public onHide = (cb:(reason:any)=>void) =>
+    this.subscriptions.push( this.bsModalService.onHide.subscribe((reason:String)=>cb(reason)) )
+  public onHidden = (cb:(reason:any)=>void) =>
+    this.subscriptions.push( this.bsModalService.onHidden.subscribe((reason:String)=>cb(reason)) )
+  
+  public onShow = (cb:(reason:any)=>void) =>
+    this.subscriptions.push( this.bsModalService.onShow.subscribe((reason:String)=>cb(reason)) )
+  public onShown = (cb:(reason:any)=>void) =>
+    this.subscriptions.push( this.bsModalService.onShown.subscribe((reason:String)=>cb(reason)) )
+  
+  constructor(private bsModalService:BsModalService){
     
-    constructor(private bsModalService:BsModalService){
-        
-    }
+  }
 }
 
 @Component({
-    selector : 'modal-unit',
-    template:
+  selector : 'modal-unit',
+  template:
 `
 <div *ngIf = "title" class = "modal-header" [innerHTML] = "title">
 </div>
 <div  class = "modal-body">
-    <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
-    </div>
-    <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
-        <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
-            <div class = "row">
-                <multiform [data] = "body[key] | filterUncertainObject">
-                </multiform>
-            </div>
-        </tab>
-    </tabset>
-    <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
-    </multiform>
+  <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
+  </div>
+  <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
+    <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
+      <div class = "row">
+        <multiform [data] = "body[key] | filterUncertainObject">
+        </multiform>
+      </div>
+    </tab>
+  </tabset>
+  <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
+  </multiform>
 </div>
 <div *ngIf = "footer" class = "modal-footer" [innerHTML] = "footer">
 </div>
@@ -100,13 +100,13 @@ export class ModalHandler{
 })
 
 export class NehubaModalUnit{
-    public title : String | null  = 'Default Title'
-    public body : Object | Array<any> |String | null = 'Default body'
-    public footer : String | null = 'default footer'
+  public title : String | null  = 'Default Title'
+  public body : Object | Array<any> |String | null = 'Default body'
+  public footer : String | null = 'default footer'
 
-    constructor(private cd:ChangeDetectorRef){
-        /* filterUncertainObject jsonStringifyPipe */
-    }
+  constructor(private cd:ChangeDetectorRef){
+    /* filterUncertainObject jsonStringifyPipe */
+  }
 
-    public updateModel = () => this.cd.detectChanges()
+  public updateModel = () => this.cd.detectChanges()
 }

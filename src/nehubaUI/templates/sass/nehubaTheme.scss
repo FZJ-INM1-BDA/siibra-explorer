@@ -1,0 +1,288 @@
+@function gray($percent){
+  @return rgb($percent*255,$percent*255,$percent*255)
+};
+@function tgray($percent,$alpha){
+  @return rgba($percent*255,$percent*255,$percent*255,$alpha)
+};
+
+/** 
+ * styles only, no layouts
+ */
+
+div#ATLASContainer
+{
+  background-color:gray(1);
+  color:gray(0);
+  width:100%;
+  height:100%;
+
+  atlascontrol
+  {
+    width:calc(100% + 20px);
+    padding-right:20px;
+    box-shadow: 0em 0em 1em tgray(0,0.25);
+    padding-top:5px;
+
+    .glyphicon-overlay
+    {
+      color:gray(0.5);
+
+      &:hover
+      {
+        color:gray(0.3);
+      }
+    }
+
+    multilevel
+    {
+      span.regionHasMoreInfo:hover
+      {
+        color:goldenrod;
+      }
+
+      .multilevel-icon:hover
+      {
+        color:goldenrod;
+        background-color:tgray(0.5,0.2);
+      }
+    }
+  }
+
+  atlasviewer
+  {
+    background-color:gray(1);
+    box-shadow: 0em 0em 1.5em -0.5em gray(0);
+  }
+
+  nehubaModal
+  {
+    color:gray(0);
+  }
+
+  ATLASViewer
+  {
+    div#viewerStatus
+    {
+      background-color:tgray(1,0.5);
+      color:gray(0.1);
+      border: 1px solid tgray(0,0);
+    }
+
+    div#container
+    {
+      label.perspective-panel-show-slice-views
+      {
+        color:gray(0.3);
+
+        /* special case, since the checkbox + container is dynamically generated, has to be applied as global css */
+        
+        pointer-events : all;
+        margin-left:1em;
+        visibility: hidden;
+
+        &:before
+        {
+          content : "toggle view";
+          visibility : visible;  
+        }
+
+        &:hover
+        {
+          color:gray(0.1);
+        }
+      }
+
+      .gllayoutcell
+      {
+        border : 2px solid gray(0.95);
+
+        &:hover
+        {
+          border : 2px solid gray(0.8);
+        }
+      }
+    }
+
+    > span.glyphicon
+    {
+      color:gray(0.0);
+      text-shadow:0 0 0.5em rgb(128,128,128);
+
+      &:hover
+      {
+        color:gray(1);
+      }
+    }
+  }
+}
+
+div#ATLASContainer.darktheme
+{
+  atlasbanner
+  {
+    background-color:gray(0.2);
+    color:gray(1);
+
+    div
+    {
+      background-color:gray(0.2);
+      color:gray(1);
+    }
+  }
+
+  atlascontrol
+  {
+    background-color : gray(0.2);
+
+    input
+    {
+      color:gray(1);
+      border-color:gray(0.1);
+      background-color:gray(0.10);
+      box-shadow:inset 0 0 1em -0.3em gray(0);
+      
+      &::-moz-placeholder
+      {
+        color:tgray(1,0.4);
+      }
+      &::-webkit-input-placeholder{
+        color:tgray(1,0.4);
+      }
+    }
+
+    .glyphicon-overlay
+    {
+
+      &:hover
+      {
+        color:gray(0.7);
+      }
+    }
+
+    multilevel
+    {
+      color:gray(0.85);
+
+      span.regionHasMoreInfo:hover
+      {
+        color:goldenrod;
+      }
+
+      .popover.popover-bottom
+      {
+        border-color:gray(0.35);
+        color:gray(0.95);
+        background-color:gray(0.25);
+
+        .popover-arrow
+        {
+          &:after
+          {
+            border-bottom-color: gray(0.35);
+          }
+        }
+
+        .popover-title
+        {
+          background-color:gray(0.3);
+          border-color:gray(0.35);
+        }
+
+        .popover-content
+        {
+          .moreInfo-icon
+          {
+            &:hover
+            {
+              color:goldenrod;
+              cursor:default;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ATLASViewer
+  {
+    floatingPopover
+    {
+
+      .popover.down
+      {
+        border-color:gray(0.35);
+        color:gray(0.95);
+        background-color:gray(0.25);
+
+        .popover-title
+        {
+          background-color:gray(0.3);
+          border-color:gray(0.35);
+        }
+
+        .popover-content
+        {
+          .moreInfo-icon
+          {
+            &:hover
+            {
+              color:goldenrod;
+              cursor:default;
+            }
+          }
+        }
+      }
+    }
+
+    div#viewerStatus
+    {
+      background-color:tgray(0,0.5);
+      color:gray(0.75);
+    }
+
+    div#container
+    {
+      .gllayoutcell
+      {
+        border : 2px solid gray(0.05);
+
+        &:hover
+        {
+          border : 2px solid gray(0.2);
+        }
+
+        label.perspective-panel-show-slice-views
+        {
+          color:gray(0.8);
+          &:hover
+          {
+            color:gray(0.9);
+          }
+        }
+
+        .scale-bar-container
+        {
+          color:gray(0.95);
+          background-color:tgray(0.6,0.2);
+        }
+      }
+    }
+
+    > span.glyphicon
+    {
+      text-shadow:0 0 0.3em gray(1);
+    }
+  }
+}
+
+/* styles, only if necessary */
+
+div#ATLASContainer
+{
+  atlascontrol
+  {
+    multilevel
+    {
+    }
+  }
+}

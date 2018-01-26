@@ -23,6 +23,20 @@ import { ModalHandler } from './nehubaUI.modal.component'
       margin-right:1em;
     }
 
+    .glyphicon-overlay
+    {
+      
+      position:absolute;
+      right:0px;
+      bottom:0px;
+      height:1em;
+      z-index:1;
+    
+      margin-top:auto;
+      margin-bottom:auto;
+      margin-right:1em;
+    }
+
     div[inputContainer]
     {
       flex: 0 0 auto;
@@ -31,7 +45,7 @@ import { ModalHandler } from './nehubaUI.modal.component'
     div[multilevelContainer]
     {
       width:calc(100% + 50px);
-      padding-left:20px;
+      padding-left:25px;
       padding-right:30px;
       margin-left:-15px;
       padding-top:1em;

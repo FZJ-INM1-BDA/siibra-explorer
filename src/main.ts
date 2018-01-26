@@ -20,7 +20,7 @@ import 'reflect-metadata';
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core'
-import 'nehubaUI/templates/sass/theme.scss'
+import 'nehubaUI/templates/sass/nehubaTheme.scss'
 
 enableProdMode();
 
