@@ -122,7 +122,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   selector : `WidgetsContainer`,
   template : 
   `
-  <DockedWidgetContainer [hidden]="!hasDockedComponents">
+  <DockedWidgetContainer [style.display]="hasDockedComponents?'block':'none'">
   </DockedWidgetContainer>
   <FloatingWidgetContainer>
   </FloatingWidgetContainer>
@@ -303,21 +303,15 @@ interface WidgetViewChassis{
         <span>
           {{ widgetComponent.labComponent.name.split('.')[widgetComponent.labComponent.name.split('.').length-1] }}
         </span>
-        <i 
-          (mousedown)="minimise($event)" 
-          class = "close">
+        <i (mousedown)="minimise($event)" class = "close">
 
           <i class = "glyphicon glyphicon-minus"></i>
         </i>
-        <i 
-          (mousedown)="dock($event)" 
-          class = "close">
+        <i (mousedown)="dock($event)" class = "close">
 
           <i class = "glyphicon glyphicon-log-in"></i>
         </i>
-        <i 
-          (mousedown)="close($event)" 
-          class = "close">
+        <i (mousedown)="close($event)" class = "close">
 
           <i class = "glyphicon glyphicon-remove"></i>
         </i>

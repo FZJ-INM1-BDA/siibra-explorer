@@ -488,8 +488,33 @@ export class HelperFunctions{
 
 let metadata : any = {}
 
+export enum SUPPORTED_LIB {
+  jquery2,
+  jquery3,
+  webcomponentsLite,
+  reactRedux
+}
+
+const parseURLToElement = (urls:string[]):HTMLElement[]=>
+  urls.map(url=>{
+    const el = document.createElement('script')
+    el.src = url
+    return el
+  })
+
+export const SUPPORT_LIBRARY_MAP : Map<SUPPORTED_LIB,HTMLElement[]> = new Map([
+  [(SUPPORTED_LIB.jquery3),parseURLToElement(['http://code.jquery.com/jquery-3.3.1.min.js'])],
+  [(SUPPORTED_LIB.jquery2),parseURLToElement(['http://code.jquery.com/jquery-2.2.4.min.js'])],
+  [(SUPPORTED_LIB.webcomponentsLite),parseURLToElement(['https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js'])],
+  [(SUPPORTED_LIB.reactRedux),parseURLToElement(['https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.6/react-redux.min.js'])],
+])
+
 export const EXTERNAL_CONTROL = window['nehubaUI'] = {
-  metadata : metadata
+  metadata : metadata,
+  /* to be overwritten by parent */
+  loadExternalLibrary : (_libraryNames:SUPPORTED_LIB[],_callback:(e:any)=>void)=>{
+    
+  }
 }
 
 class UIHandle{

@@ -1,6 +1,6 @@
-import { Component,ViewChild ,HostListener,AfterViewInit } from '@angular/core'
+import { Component,ViewChild ,HostListener,AfterViewInit,Renderer2 } from '@angular/core'
 import { NehubaUIControl } from './nehubaUI.control.component'
-import { UI_CONTROL,MainController } from './nehubaUI.services'
+import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from './nehubaUI.services'
 import { WidgetsContainer } from './nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
 
@@ -10,7 +10,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
     <div [ngClass]="{'darktheme':mainController.darktheme}" [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
       <nehubaModal></nehubaModal>
   
-      <div [autoClose]="true" [isOpen]="showMenu" dropdownContainer dropdown container="body">
+      <div [autoClose]="true" [isOpen]="showMenu" dropdownContainer dropdown container="body" containerClass="dropdownMenu">
         <atlasbanner dropdownToggle [ngClass]="{'darktheme':mainController.darktheme}">
         </atlasbanner>
         <ul [ngClass]="{'darktheme':mainController.darktheme}" class="dropdown-menu" role="menu" *dropdownMenu>
@@ -104,7 +104,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:1;
       grid-row-end:span 2;
-      z-index:7;
+      z-index:5;
     }
       div#atlasResizeSliver:hover
       {
@@ -117,8 +117,6 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end:span 1;
       grid-row-start:2;
       grid-row-end:span 1;
-
-      z-index:2;
     }
 
     div#dockResizeSliver
@@ -128,7 +126,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-row-start:1;
       grid-row-end:span 2;
 
-      z-index:7;
+      z-index:6;
     }
       div#dockResizeSliver:hover
       {
@@ -141,8 +139,6 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       grid-column-end : span 1;
       grid-row-start : 1;
       grid-row-end : span 2;
-
-      z-index:6;
     }
 
     ATLASViewer
@@ -172,12 +168,36 @@ export class NehubaContainer implements AfterViewInit {
   controlPanelWidth = 250
   dockedWidgetPanelWidth = 300
 
+
+
+  libraryLoaded : Map<SUPPORTED_LIB,boolean> = new Map()
+
   @ViewChild(NehubaUIControl) nehubaUI : NehubaUIControl 
   @ViewChild(WidgetsContainer) widgetContainer : WidgetsContainer
   @ViewChild(NehubaBanner) nehubaBanner : NehubaBanner
 
-  constructor(public mainController:MainController){
+  constructor(public mainController:MainController, private rd2:Renderer2){
     this.darktheme = this.mainController.darktheme
+    gExternalControl.loadExternalLibrary = (libraryNames,callback) =>{
+      Promise.all(
+        libraryNames.map(libraryName=>
+          new Promise((resolve,reject)=>{
+            if(this.libraryLoaded.get(libraryName)) return resolve()
+
+            const elScripts = SUPPORT_LIBRARY_MAP.get(libraryName)
+            if(!elScripts) return reject(`library name ${libraryName} not defined`)
+
+            Promise.all(elScripts.map(script=>new Promise((rs,rj)=>{
+              script.onload = () => rs()
+              script.onerror =(e) => rj(e)
+              this.rd2.appendChild(document.head,script)
+            })))
+              .then(()=>resolve())
+              .catch(e=>reject(e))
+          })))
+        .then(()=>callback(null))
+        .catch(e=>callback(e))
+    }
   }
   
   @HostListener('document:mousemove',['$event'])
