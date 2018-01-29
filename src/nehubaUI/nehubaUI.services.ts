@@ -116,8 +116,10 @@ export class MainController{
     // ]
 
     let datasetArray = [
-      'http://localhost:5080/res/json/colin.json',
-      'http://localhost:5080/res/json/bigbrain.json'
+      '/res/json/colin.json',
+      '/res/json/bigbrain.json',
+      '/res/json/waxholmRatV2_0.json',
+      '/res/json/allenMouse.json'
     ]
 
     datasetArray.forEach(dataset=>{
@@ -135,6 +137,12 @@ export class MainController{
           console.log('fetch init dataset error',e)
         })
       })
+
+    /* dev option, use a special endpoint to fetch all plugins */
+    fetch('/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
   }
 
   patchNG(){
@@ -157,7 +165,18 @@ export class MainController{
     this.onParcellationSelectionHook.push(()=>{
       if (this.shownSegmentsObserver) this.shownSegmentsObserver.unsubscribe()
     })
+    this.onTemplateSelectionHook.push(()=>{
+      if (this.nehubaViewerSegmentMouseOver) this.nehubaViewerSegmentMouseOver.unsubscribe()
+    })
     this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
+    this.afterParcellationSelectionHook.push(()=>{
+      this.nehubaViewerSegmentMouseOver = this.nehubaViewer.mouseOver.segment.subscribe(ev=>{
+        VIEWER_CONTROL.mouseOverNehuba.next({
+          nehubaOutput : ev,
+          foundRegion : this.findRegionWithId(ev.segment)
+        })
+      })
+    })
   }
 
   hookAPI(){
