@@ -153,6 +153,8 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   }
   DockedWidgetContainer
   {
+    position:relative;
+    z-index:5;
     display:block;
     width:calc(100% + 12px);
     margin-left:-11px;
