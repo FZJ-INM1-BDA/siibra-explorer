@@ -11,7 +11,7 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
       position:relative;
       height:calc(100% + 1px);
       padding-bottom:1px;
-      width:50em;
+      width:calc(100% + 10em);
     }
     div[bannerContainer]:hover
     {
