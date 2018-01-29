@@ -12,6 +12,12 @@ import { Multilevel } from './nehuba.model'
     }
     `,
     `
+    div[multilevelContainer]
+    {
+      position:relative;
+      overflow:visible;
+    }
+
     span.regionHasMoreInfo:hover
     {
       cursor:default;
@@ -19,7 +25,6 @@ import { Multilevel } from './nehuba.model'
 
     .multilvlContainer
     {
-      overflow:hidden;
       padding-top:0.1em;
       padding-bottom:0.1em;
     }    

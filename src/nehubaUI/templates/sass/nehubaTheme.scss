@@ -114,6 +114,12 @@ div#ATLASContainer
       }
     }
   }
+
+  div#dockResizeSliver,
+  div#atlasResizeSliver
+  {
+    background-color:grey(1);
+  }
 }
 
 div#ATLASContainer.darktheme
@@ -273,6 +279,197 @@ div#ATLASContainer.darktheme
       text-shadow:0 0 0.3em gray(1);
     }
   }
+
+  WidgetsContainer
+  {
+    %widgetDarkTheme
+    {
+      border-color:gray(0.35);
+      color:gray(0.95);
+      background-color:gray(0.2);
+    }
+
+    DockedWidgetContainer,
+    FloatingWidgetContainer
+    {
+      @extend %widgetDarkTheme;
+
+      div.panel.panel-success[floatingWidgetUnit],
+      div.panel.panel-success[dockedWidgetUnit]
+      {
+        > div.panel-heading
+        {
+          background-color:rgba(0,20,0,0.5);
+        }
+      }
+      
+
+      div.panel
+      {
+        border:1px solid gray(0.35);
+
+        div.panel-heading
+        {
+          @extend %widgetDarkTheme;
+
+          span
+          {
+            background-color:rgba(0,0,0,0);
+          }
+        }
+        
+        .panel-body
+        {
+          border:none;
+          @extend %widgetDarkTheme;
+        }
+      }
+      
+      span
+      {
+        @extend %widgetDarkTheme;
+      }
+
+      .alert
+      {
+        border:none;
+        &.alert-danger
+        {
+          background-color:rgba(242,222,222,0.2);
+        }
+      }
+      
+      .popover
+      {
+        @extend %widgetDarkTheme;
+        .popover-title
+        {
+          @extend %widgetDarkTheme;
+          background-color:gray(0.3);
+        }
+      }
+
+      .btn
+      {
+        @extend %widgetDarkTheme;
+        &.btn-primary
+        {
+          background-color:gray(0.35);
+        }
+        &.btn-success
+        {
+          border:1px solid rgba(214,233,198,0.5);
+        }
+        &.btn-warning
+        {
+          border:1px solid rgba(250,235,204,0.5);
+        }
+        &.btn-danger
+        {
+          border:1px solid rgba(235,204,209,0.5);
+        }
+        &:hover{
+          background-color:gray(0.35);
+        }
+      }
+      input, input[readonly]
+      {
+        @extend %widgetDarkTheme;
+      }
+
+      hr
+      {
+        border-top: 1px solid gray(0.3);
+      }
+
+      div.well
+      {
+        @extend %widgetDarkTheme;
+      }
+
+      .table
+      {
+        @extend %widgetDarkTheme;
+
+        tr
+        {
+          @extend %widgetDarkTheme;
+          td
+          {
+            @extend %widgetDarkTheme;
+          }
+        }
+      }
+    }
+
+    DockedWidgetContainer
+    {
+      background-color:gray(0.2);
+    }
+
+    MinimisedContainer
+    {
+
+      .btn
+      {
+        @extend %widgetDarkTheme;
+        &.btn-default
+        {
+          @extend %widgetDarkTheme;
+        }
+        &.btn-success
+        {
+          background-color:rgba(0,20,0,0.5);
+        }
+      }
+
+      .popover
+      {
+        @extend %widgetDarkTheme;
+        .popover-arrow
+        {
+          &:after
+          {
+            border-left-color:gray(0.35);
+          }
+        }
+      }
+    }
+  }
+
+  div#dockResizeSliver,
+  div#atlasResizeSliver
+  {
+    background-color:gray(0.2);
+  }
+}
+
+ul.darktheme.dropdown-menu
+{
+  background-color:gray(0.22);
+  li
+  {
+    &.dropdown-header
+    {
+      color:gray(0.7);
+    }
+
+    &.divider.dropdown-divider
+    {
+      background-color:gray(0.15);
+    }
+
+    .dropdown-item
+    {
+      color:gray(0.8);
+
+      &:hover
+      {
+        color:gray(0.9);
+        background-color:gray(0.25);
+      }
+    }
+  }
 }
 
 /* styles, only if necessary */
@@ -283,6 +480,11 @@ div#ATLASContainer
   {
     multilevel
     {
+      .popover
+      {
+        width:100%;
+        margin-left:-2em;
+      }
     }
   }
 }
