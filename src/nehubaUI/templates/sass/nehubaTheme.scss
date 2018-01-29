@@ -118,12 +118,13 @@ div#ATLASContainer
   div#dockResizeSliver,
   div#atlasResizeSliver
   {
-    background-color:grey(1);
+    background-color:tgrey(0,0);
   }
 }
 
 div#ATLASContainer.darktheme
 {
+
   atlasbanner
   {
     background-color:gray(0.2);
@@ -440,7 +441,7 @@ div#ATLASContainer.darktheme
   div#dockResizeSliver,
   div#atlasResizeSliver
   {
-    background-color:gray(0.2);
+    background-color:tgrey(0,0);
   }
 }
 
@@ -468,6 +469,28 @@ ul.darktheme.dropdown-menu
         color:gray(0.9);
         background-color:gray(0.25);
       }
+    }
+  }
+}
+
+
+modal-container
+{
+  color:gray(0);
+  *
+  {
+    color:gray(0);
+  }
+
+  /* not yet active */
+  &.darktheme
+  {
+    background-color:gray(0.2);
+    color:gray(1);
+    *
+    {
+      background-color:gray(0.2);
+      color:gray(1);
     }
   }
 }
