@@ -158,7 +158,6 @@ export class MainController{
 
   attachInternalHooks(){
 
-
     /**
      * to be moved to viewer or viewerContainer
      */
