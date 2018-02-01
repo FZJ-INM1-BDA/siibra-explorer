@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
+import { Multilevel } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
 import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
@@ -116,10 +117,7 @@ export class MainController{
     // ]
 
     let datasetArray = [
-      '/res/json/colin.json',
-      '/res/json/bigbrain.json',
-      '/res/json/waxholmRatV2_0.json',
-      '/res/json/allenMouse.json'
+      'http://localhost:5080/res/json/colin.json'
     ]
 
     datasetArray.forEach(dataset=>{
@@ -139,7 +137,7 @@ export class MainController{
       })
 
     /* dev option, use a special endpoint to fetch all plugins */
-    fetch('/collectPlugins')
+    fetch('http://localhost:5080/collectPlugins')
       .then(res=>res.json())
       .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
       .catch(console.warn)
@@ -411,6 +409,12 @@ export class MainController{
   }
 }
 
+@Injectable()
+export class MultilevelProvider{
+  searchTerm : string = ``
+  selectedMultilevel : Multilevel[]
+}
+
 class DataService {
 
   /* simiple fetch promise for json obj */
@@ -610,7 +614,7 @@ export const PMAP_WIDGET = {
   (()=>{
     window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
     let encodedValue = document.getElementById('default.default.pmap.encodedValue')
-    
+
     const attach = ()=>{
       const sub = window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
       window.pluginControl['PMap'].onShutdown(()=>{

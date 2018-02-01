@@ -1,5 +1,6 @@
 import { Input, Component, ViewChildren } from '@angular/core'
 import { Multilevel } from './nehuba.model'
+import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
 
 @Component({
   selector : 'multilevel',
@@ -31,7 +32,7 @@ import { Multilevel } from './nehuba.model'
 
     .multilevel-name,.multilevel-name > span[spanName]
     {
-      flex: 1 1 auto;
+      flex: 0 1 auto;
       overflow:hidden;
       display:flex;
       white-space:nowrap;
@@ -55,12 +56,11 @@ import { Multilevel } from './nehuba.model'
 
 export class MultilevelSelector {
 
-  @Input() searchTerm : string
   @Input() data : Multilevel[]
   @Input() selectedData : Multilevel[]
   @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[]
 
-  constructor(){}
+  constructor(public mainController:MainController,public multilevelProvider:MultilevelProvider){}
 
   chooseLevel = (data:Multilevel):void => 
     data.hasEnabledChildren() ? 

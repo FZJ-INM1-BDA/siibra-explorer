@@ -6,60 +6,7 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
 
 @Component({
   selector : 'div#ATLASContainer',
-  template : `
-    <div [ngClass]="{'darktheme':mainController.darktheme}" [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
-      <nehubaModal></nehubaModal>
-  
-      <div [autoClose]="true" [isOpen]="showMenu" dropdownContainer dropdown container="body" containerClass="dropdownMenu">
-        <atlasbanner dropdownToggle [ngClass]="{'darktheme':mainController.darktheme}">
-        </atlasbanner>
-        <ul [ngClass]="{'darktheme':mainController.darktheme}" class="dropdown-menu" role="menu" *dropdownMenu>
-
-          <li class = "dropdown-header">Templates</li>
-          <li *ngIf="mainController.loadedTemplates.length == 0" class = "disabled">Still loading templates ... </li>
-          <li [ngClass]="{'selected':template == mainController.selectedTemplate}" *ngFor="let template of mainController.loadedTemplates" role="menuitem"><a class="dropdown-item" (click)="mainController.loadTemplate(template)" href="#">{{template.name}}</a></li>
-          
-          <li class="divider dropdown-divider"></li>
-
-          <li class = "dropdown-header">Parcellations</li>
-          <li [ngClass]="{'selected':parcellation == mainController.selectedParcellation}" *ngFor="let parcellation of mainController.selectedTemplate ? mainController.selectedTemplate.parcellations : []" role="menuitem"><a class="dropdown-item" (click)="mainController.loadParcellation(parcellation)" href="#">{{parcellation.name}}</a></li>
-          <li role="menuitem" *ngIf="!mainController.selectedTemplate"><i class="text-muted">no template selected</i></li>
-          
-          <li class="divider dropdown-divider"></li>
-
-          <li class = "dropdown-header">Tools</li>
-          <li [ngClass]="{'selected':mainController.widgetLaunched(widget.name)}" *ngFor="let widget of mainController.loadedWidgets" role="menuitem"><a (click)="mainController.loadWidget(widget)" class="dropdown-item" href="#">{{widget.name}}</a></li>
-        </ul>
-      </div>
-
-      <atlascontrol (emitHideUI)="controlUI($event)">
-      </atlascontrol>
-      <div 
-        id = "atlasResizeSliver" 
-        (mousedown)="resizeControlPanel=true;enableUIInteraction(false)" 
-        (mousemove)="mousemove($event)" 
-        (mouseup)="mouseup()">
-      </div>
-      <ATLASViewer 
-        (emitHideUI)="controlUI($event)" 
-        [hideUI]="hideUI" 
-        id = "ATLASViewer"
-        [ngStyle]="{'grid-column-start': hideUI ? '1' : '3','grid-column-end' : hideUI ? 'span 3' : 'span 1'}" >
-      </ATLASViewer>
-      <div 
-        id = "dockResizeSliver" 
-        [hidden]="!hasDockedComponents()" 
-        (mousedown)="resizeDockedWidgetPanel=true;enableUIInteraction(false)" 
-        (mousemove)="mousemove($event)" 
-        (mouseup)="mouseup()">
-      </div>
-      <WidgetsContainer 
-        [ngClass]="{'darktheme':darktheme}"
-        [hasDockedComponents]="hasDockedComponents()" 
-        [dockedWidgetPanelWidth] = "dockedWidgetPanelWidth">
-      </WidgetsContainer>
-    </div>
-  `,
+  templateUrl : 'src/nehubaUI/templates/nehubaUI.parent.template.html',
   styles : [
     `
     div[containerDiv]

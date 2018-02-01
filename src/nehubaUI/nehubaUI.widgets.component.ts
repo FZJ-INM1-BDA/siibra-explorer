@@ -232,18 +232,21 @@ export class WidgetsContainer{
 
     if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
 
+    /* script needs to be cloned or the script will only be executed the first time */
+    /* deep needs to be true to support inline script */
+    const scriptclone = labComponent.script.cloneNode(true)
+
     /* overwriting shutdown cleanup */
     newWidget.onShutdownCleanup = ()=>{
       newWidget.parentViewRef.destroy()
       widgetViewRef.destroy()
-      this.rd2.removeChild(document.head,newWidget.labComponent.script)
+      this.rd2.removeChild(document.head,scriptclone)
       
       const indx = this.mainController.launchedWidgets.findIndex(widgetName=>widgetName==labComponent.name)
       this.mainController.launchedWidgets.splice(indx,1)
     }
-    
     setTimeout(()=>{
-      this.rd2.appendChild(document.head,newWidget.labComponent.script)
+      this.rd2.appendChild(document.head,scriptclone)
     })
   }
 
@@ -272,7 +275,10 @@ export class WidgetView implements AfterViewInit{
   @ViewChild('panelBody')panelBody : ElementRef
 
   ngAfterViewInit(){
-    this.panelBody.nativeElement.appendChild(this.widgetComponent.labComponent.template)
+    /* use clone node to reset the template each time after user closes and reopens the widget */
+    // const template = this.widgetComponent.labComponent.template
+    const template = this.widgetComponent.labComponent.template.cloneNode(true)
+    this.panelBody.nativeElement.appendChild(template)
   }
 }
 

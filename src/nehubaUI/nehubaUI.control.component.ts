@@ -1,5 +1,5 @@
 import { Component} from '@angular/core'
-import { UI_CONTROL, MainController } from './nehubaUI.services'
+import { UI_CONTROL, MainController, MultilevelProvider } from './nehubaUI.services'
 import { ModalHandler } from './nehubaUI.modal.component'
 
 @Component({
@@ -56,13 +56,14 @@ import { ModalHandler } from './nehubaUI.modal.component'
       box-shadow:inset 0px 0px 3.5em -0.8em rgba(0,0,0,0.5);
     }
     `
-  ]
+  ],
+  providers : [ MultilevelProvider ]
 })
 
 export class NehubaUIControl{
   searchTerm : string = ''
 
-  constructor(public mainController:MainController){
+  constructor(public mainController:MainController,public multilevelProvider:MultilevelProvider){
 
   }
 

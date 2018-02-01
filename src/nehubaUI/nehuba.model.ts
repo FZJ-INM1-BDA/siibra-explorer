@@ -250,17 +250,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     if(this.PMapURL){
       const pmap = new DescriptorMoreInfoItem('Show Probability Map','picture')
       pmap.action = () => {
-        // const modalHandler = (<NehubaModalService>UI_CONTROL.modalControl).getModalHandler()
-        // modalHandler.title = `Loading PMap of ${this.name} ...`
-        // modalHandler.body = `Please stand by ...`
-        // modalHandler.show()
-
-        // setTimeout(()=>{
-        // },200)
-        // setTimeout(()=>{
-            // modalHandler.hide()
-        // },3000)
-        
 
         /* move viewer to the relevant location */
         VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
@@ -272,9 +261,13 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
             shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
           }
         }
-        VIEWER_CONTROL.loadLayer(pMapObj)
-        VIEWER_CONTROL.reapplyNehubaMeshFix()
-        VIEWER_CONTROL.hideAllSegments()
+
+        /* setting timeout is required... or else the pMap, or parcellation looks wonky */
+        setTimeout(()=>{
+          VIEWER_CONTROL.loadLayer(pMapObj)
+          VIEWER_CONTROL.hideAllSegments()
+          VIEWER_CONTROL.reapplyNehubaMeshFix()
+        })
 
         if(gPluginControl['PMap']){
           gPluginControl['PMap'].blink(10)
@@ -339,16 +332,19 @@ export class LabComponent implements OnDestroy{
     if( json.template ){
       this.template.innerHTML = json.template
     }else if( json.templateURL ){
-      Promise.race([
-        fetch(json.templateURL)
-          .then(resp=>resp.text())
-          .then(template=>{
-            this.template.innerHTML = template
-          })
-          .catch(e=>{
-            console.log('error fetching plugin template',e)
-          })
-      ])
+
+      /* unless we want to introduce timeout mechanism, no need for Promise.race */
+      // Promise.race([
+      // ])
+      
+      fetch(json.templateURL)
+        .then(resp=>resp.text())
+        .then(template=>{
+          this.template.innerHTML = template
+        })
+        .catch(e=>{
+          console.log('error fetching plugin template',e)
+        })
     }
   }
 

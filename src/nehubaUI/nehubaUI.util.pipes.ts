@@ -13,6 +13,18 @@ export class JsonStringifyPipe implements PipeTransform{
   }
 }
 
+@Pipe({
+  name : 'multilevelHasVisibleChildren'
+})
+
+export class MultilevelHasVisibleChildren implements PipeTransform{
+  public transform(multilevels:Multilevel[],searchTerm:string):Multilevel[]{
+    /* needs searchTerm to update *ngFor loop */
+    searchTerm
+    return multilevels.filter(multilevel=>multilevel.hasVisibleChildren())
+  }
+}
+
 /* pipes in string, pipes out json objects */
 
 @Pipe({
@@ -106,7 +118,7 @@ export class SearchHighlight implements PipeTransform{
 
   constructor(private sanitizer:DomSanitizer){}
 
-  public transform(string : string,searchTerm:string,singleData:any){
+  public transform(string : string,searchTerm:string){
     /* necessary as some region has no name defined */
     if( !string ){
       return null
@@ -115,9 +127,9 @@ export class SearchHighlight implements PipeTransform{
       return string
     }else{
       let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
+      const nbsp = string.replace(/\s/gi,'&nbsp;')
       this.regExp = new RegExp(sanitaized,'gi')
-      singleData
-      return this.sanitizer.bypassSecurityTrustHtml( string.replace(this.regExp,match=>`<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`) )
+      return this.sanitizer.bypassSecurityTrustHtml( nbsp.replace(this.regExp,match=> `<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`))
     }
   }
 }
