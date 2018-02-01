@@ -11,7 +11,7 @@
 
 <div *ngIf="mainController.selectedParcellation" regionContainer>
   <div inputContainer>
-    <input placeholder = "Search regions ... " type = "text" [(ngModel)]="searchTerm" class = "form-control" />
+    <input placeholder = "Search regions ... " type = "text" [(ngModel)]="multilevelProvider.searchTerm" class = "form-control" />
     <span (click)="searchTerm=''" [hidden]="searchTerm==''" class = "glyphicon-overlay glyphicon glyphicon-remove-sign">
     </span>
     <!-- <div (click)="refreshSelectedRegions()" class = "list-group-item nohover">
@@ -19,7 +19,7 @@
   </div>
 
   <div (click)="mainController.sendUISelectedRegionToViewer()" multilevelContainer>
-    <multilevel class = "menuItemContentText"  [data]="mainController.selectedParcellation.regions | searchTreePipe : searchTerm" [searchTerm]="searchTerm">
+    <multilevel class = "menuItemContentText"  [data]="mainController.selectedParcellation.regions | searchTreePipe : multilevelProvider.searchTerm" >
     </multilevel>
   </div>
 </div>

@@ -1,53 +1,77 @@
 
 .hierarchy
 {
-width:100%;
 display:flex;
+position:relative;
+z-index:1;
 }
 
 .hierarchy-0
 {
-padding-left:0em;
+margin-left:0em;
+width:100%;
 }
-.hierarchy-1
+
+.hierarchyContainer
 {
-padding-left:1em
+  margin-left:1em;
+  width:calc(100% - 1em);
 }
-.hierarchy-2
+
+multilevel div[multilevelContainer]:not(:last-child):before
 {
-padding-left:2em
+  pointer-events: none;
+  left:-0.5em;
+  height:100%;
+  border-left: rgba(128,128,128,0.6) 1px dashed;
+  box-sizing: border-box;
 }
-.hierarchy-3
+multilevel div[multilevelContainer]:not(:last-child) > span 
 {
-padding-left:3em
+  position:relative;
 }
-.hierarchy-4
+
+multilevel div[multilevelContainer]:not(:last-child) > span:before
 {
-padding-left:4em
+  pointer-events: none;
+  content : '';
+  position:absolute;
+  width:1.5em;
+  height:100%;
+  top:-50%;
+  left:-0.5em;
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+  z-index: 0;
 }
-.hierarchy-5
+multilevel div[multilevelContainer]:last-child > span
 {
-padding-left:5em
+  position:relative;
 }
-.hierarchy-6
+
+
+multilevel div[multilevelContainer]:last-child > span:before
 {
-padding-left:6em
+  pointer-events: none;
+  content : '';
+  position:absolute;
+  width:1.5em;
+  height:100%;
+  top:-50%;
+  left:-0.5em;
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+  border-left : rgba(128,128,128,0.6) 1px dashed;
+  z-index: 0;
 }
-.hierarchy-7
+
+div[multilevelContainer]
 {
-padding-left:7em
+  position:relative;
 }
-.hierarchy-8
+div[multilevelContainer]:before
 {
-padding-left:8em
-}
-.hierarchy-9
-{
-padding-left:9em
-}
-.hierarchy-10
-{
-padding-left:10em
+  content:' ';
+  position:absolute;
+  z-index: 0;
 }
 
 /* 

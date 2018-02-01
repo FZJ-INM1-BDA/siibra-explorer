@@ -174,39 +174,6 @@ div#ATLASContainer.darktheme
       {
         color:goldenrod;
       }
-
-      .popover.popover-bottom
-      {
-        border-color:gray(0.35);
-        color:gray(0.95);
-        background-color:gray(0.25);
-
-        .popover-arrow
-        {
-          &:after
-          {
-            border-bottom-color: gray(0.35);
-          }
-        }
-
-        .popover-title
-        {
-          background-color:gray(0.3);
-          border-color:gray(0.35);
-        }
-
-        .popover-content
-        {
-          .moreInfo-icon
-          {
-            &:hover
-            {
-              color:goldenrod;
-              cursor:default;
-            }
-          }
-        }
-      }
     }
   }
 
@@ -445,6 +412,42 @@ div#ATLASContainer.darktheme
   }
 }
 
+.darktheme
+{
+  &.popover.popover-bottom
+  {
+    border-color:gray(0.35);
+    color:gray(0.95);
+    background-color:gray(0.25);
+
+    .popover-arrow
+    {
+      &:after
+      {
+        border-bottom-color: gray(0.35);
+      }
+    }
+
+    .popover-title
+    {
+      background-color:gray(0.3);
+      border-color:gray(0.35);
+    }
+
+    .popover-content
+    {
+      .moreInfo-icon
+      {
+        &:hover
+        {
+          color:goldenrod;
+          cursor:default;
+        }
+      }
+    }
+  }
+}
+
 ul.darktheme.dropdown-menu
 {
   background-color:gray(0.22);
@@ -507,6 +510,7 @@ div#ATLASContainer
       {
         width:100%;
         margin-left:-2em;
+        z-index:99;
       }
     }
   }

@@ -1,57 +1,68 @@
-<div *ngFor = "let singleData of data" [hidden]="!singleData.hasVisibleChildren()" multilevelContainer>
-  <div class = "menuItem">
-    <div class = "menuItemContent">
-      <div class = "menuItemContentList">
-        <span class="hierarchy hierarchy-{{singleData.hierarchy}}">
-          <span [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" (click) = "toggleExpansion( singleData )" class = "unicodeSymbols glyphicon">
-          </span>
+<div
+  class = " hierarchyContainer" 
+  *ngFor = "let singleData of data | multilevelHasVisibleChildren : multilevelProvider.searchTerm"
+  multilevelContainer>
 
-          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
-          </span>
-          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "!singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
-                <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
-          </span>
-          <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
-                <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
-          </span>
+  <span class="hierarchy">
+    <span 
+      [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" 
+      (click) = "toggleExpansion( singleData )" 
+      class = "unicodeSymbols glyphicon" 
+      glyphiconChevron>
+    </span>
 
-          <span 
-            *ngIf="singleData.moreInfo.length == 0" 
-            class = "multilevel-name">
+    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "false && singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+          <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
+    </span>
+    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "false && !singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+          <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
+    </span>
+    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "false && singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+          <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
+    </span>
 
-            <span 
-              [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData"
-              spanName>
-            </span>
+    <span 
+      *ngIf="singleData.moreInfo.length == 0" 
+      class = "multilevel-name">
 
-          </span>
+      <span 
+        class = "regionHasMoreInfo"
+        (click) = "toggleExpansion( singleData )"
+        [innerHtml]="singleData.name | searchHighlight : multilevelProvider.searchTerm : singleData"
+        spanName>
+      </span>
+    </span>
 
-          <span class = "multilevel-name"
-            [popover]="moreInfo"
-            [outsideClick]="true"
-            placement="bottom"
-            *ngIf = "singleData.moreInfo.length > 0" >
+    <span class = "multilevel-name"
+    
+      [popover]="moreInfo"
+      container="body"
+      [containerClass]="mainController.darktheme ? 'darktheme' : 'nodarktheme'"
+      [outsideClick]="true"
+      placement="bottom"
+      *ngIf = "singleData.moreInfo.length > 0" >
 
-            <span 
-              class="regionHasMoreInfo"
-              [innerHtml]="singleData.name | searchHighlight : searchTerm : singleData"
-              spanName>
-            </span>
+      <span 
+        class="regionHasMoreInfo"
+        [innerHtml]="singleData.name | searchHighlight : multilevelProvider.searchTerm"
+        spanName>
+      </span>
 
-            <span 
-              class = "multilevel-icon unicodeSymbols" >
-                <i class = "glyphicon glyphicon-option-vertical"></i>
-            </span>
-          </span>
-        </span>
-      </div>
-    </div>
-  </div>
-  <div class = "multilvlContainer" [hidden]="!singleData.isExpanded">
-    <multilevel *ngIf = "singleData.children.length>0" class = "menuItemContentText" [data]="singleData.children" [selectedData]="selectedRegions" [searchTerm]="searchTerm">
-    </multilevel>
-  </div>
+      <span 
+        *ngIf = "false"
+        class = "multilevel-icon unicodeSymbols" >
+          <i class = "glyphicon glyphicon-option-vertical"></i>
+      </span>
+    </span>
+  </span>
+  <multilevel 
+    [hidden]="!singleData.isExpanded" 
+    *ngIf = "singleData.children.length>0" 
+    class = "menuItemContentText" 
+    [data]="singleData.children" 
+    [selectedData]="selectedRegions" >
+  </multilevel>
+
   <ng-template #moreInfo>
     <div 
       *ngFor = "let moreInfo of singleData.moreInfo" 
