@@ -43,25 +43,6 @@ export class JsonParsePipe implements PipeTransform{
   }
 }
 
-/* pipes in array and search term, pipes out search term that matches the array */
-/* deprecated by searchTreePipe */
-@Pipe({
-  name:'searchPipe'
-})
-
-export class SearchPipe implements PipeTransform{
-  public transform(array:any[],searchTerm:string){
-    return array.filter( (item) => {
-      if(searchTerm === ''){
-        return true
-      }else{
-        let regExp = new RegExp('\\b'+searchTerm,'gi')
-        return regExp.test(item.name)
-      }
-    })
-  }
-}
-
 /* pipes in object and pipes out list of keys */
 @Pipe({
   name:'keyPipe'

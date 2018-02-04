@@ -1,5 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,PMAP_WIDGET,HelperFunctions,CM_MATLAB_HOT,CM_THRESHOLD,PLUGIN_CONTROL as gPluginControl } from './nehubaUI.services'
+import { VIEWER_CONTROL,CM_MATLAB_HOT,CM_THRESHOLD } from './nehubaUI.services'
 import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
 
 export class LayerProperties{
@@ -241,18 +241,18 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
 
     /* populate moreInfo array */
     if(this.position){
-      const goToPosition = new DescriptorMoreInfoItem('Go To Default Location','map-marker')
+      const goToPosition = new DescriptorMoreInfoItem('Go To There','map-marker')
       goToPosition.action = ()=>{
         VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
       }
       this.moreInfo.push(goToPosition)
     }
     if(this.PMapURL){
-      const pmap = new DescriptorMoreInfoItem('Show Probability Map','picture')
+      const pmap = new DescriptorMoreInfoItem('Probability Map','picture')
       pmap.action = () => {
 
         /* move viewer to the relevant location */
-        VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
+        if(this.position)VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
 
         const pMapObj = {
           PMap : {
@@ -269,14 +269,27 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
           VIEWER_CONTROL.reapplyNehubaMeshFix()
         })
 
-        if(gPluginControl['PMap']){
-          gPluginControl['PMap'].blink(10)
-        }else{
-          const newWidget = new LabComponent(PMAP_WIDGET)
-          HelperFunctions.sLoadPlugin(newWidget)
-        }
+        // if(gPluginControl['PMap']){
+        //   gPluginControl['PMap'].blink(10)
+        // }else{
+        //   const newWidget = new LabComponent(PMAP_WIDGET)
+        //   HelperFunctions.sLoadPlugin(newWidget)
+        // }
       }
+      pmap.source = 'nifti://'+this.PMapURL
       this.moreInfo.push(pmap)
+    }
+
+    if(json.receptorData){
+      const receptorData = new DescriptorMoreInfoItem('Receptor Data','tag')
+      receptorData.action = ()=>{
+        if(this.position)VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
+        VIEWER_CONTROL.hideAllSegments()
+        VIEWER_CONTROL.showSegment(this.labelIndex)
+        /* TODO find a more permanent way to pass the selected rectpro data to mainController */
+      }
+      receptorData.source = json.receptorData
+      this.moreInfo.push(receptorData)
     }
   }
 

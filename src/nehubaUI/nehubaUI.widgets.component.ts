@@ -1,7 +1,8 @@
-import { Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
+import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
 import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, HelperFunctions, MainController } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
+import { NehubaUIControl } from 'nehubaUI/nehubaUI.control.component';
 
 /**
  * basic widget class
@@ -33,7 +34,10 @@ export class WidgetComponent{
   shutdown()
   {
     this.onShutdownCallbacks.forEach((cb)=>cb())
-    delete gPluginControl[this.labComponent.name]
+
+    if(this.labComponent){
+      delete gPluginControl[this.labComponent.name]
+    }
 
     /* execute shutdown sequence */
     this.onShutdownCleanup()
@@ -186,6 +190,9 @@ export class WidgetsContainer{
     private componentFactoryResolver:ComponentFactoryResolver, 
     private rd2:Renderer2,
     private mainController:MainController ){
+
+      this.overridingMainController()
+
       this.floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetView )
       this.dockedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( DockedWidgetView )
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
@@ -193,6 +200,43 @@ export class WidgetsContainer{
       this.widgetFactory = this.componentFactoryResolver.resolveComponentFactory( WidgetView )
 
       HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.createNewWidget(labComponent)
+  }
+
+  overridingMainController(){
+    this.mainController.widgitiseSearchRegion = (templateref:TemplateRef<NehubaUIControl>)=>{
+      const newLabcomponent = new LabComponent({
+        name : 'Search Region'
+      })
+      const newWidget = new WidgetComponent(newLabcomponent)
+      newWidget.onShutdownCallbacks.push(()=>{
+        this.mainController.unwidgitiseSearchRegion(templateref)
+      })
+      this.initialCreateEmbedView(templateref,newWidget)
+    }
+  }
+
+  private initialCreateEmbedView(templateRef:TemplateRef<NehubaUIControl>,newWidget:WidgetComponent){
+
+    const firstParentViewRef = this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
+    const embbedViewRef = firstParentViewRef.instance.panelBody.createEmbeddedView(templateRef)
+    
+    embbedViewRef.context.mainController = this.mainController
+    // firstParentViewRef.injector.get(this.mainController)
+    // embbedViewRef.context.searchTerm = this.mainController.
+
+    firstParentViewRef.instance.widgetComponent = newWidget
+    newWidget.parentViewRef = firstParentViewRef
+    newWidget.state = 'floating'
+  }
+
+  private initialInsertWidgetIntoContainer(viewRef:ViewRef,newWidget:WidgetComponent){
+
+    /* initial stage */
+    const firstParentViewRef = this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
+    firstParentViewRef.instance.panelBody.insert( viewRef )
+    firstParentViewRef.instance.widgetComponent = newWidget
+    newWidget.parentViewRef = firstParentViewRef
+    newWidget.state = 'floating'
   }
 
   createNewWidget(labComponent:LabComponent){
@@ -224,11 +268,7 @@ export class WidgetsContainer{
     }
 
     /* initial stage */
-    const firstParentViewRef = this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
-    firstParentViewRef.instance.panelBody.insert( widgetViewRef.hostView )
-    firstParentViewRef.instance.widgetComponent = newWidget
-    newWidget.parentViewRef = firstParentViewRef
-    newWidget.state = 'docked'
+    this.initialInsertWidgetIntoContainer(widgetViewRef.hostView,newWidget)
 
     if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
 

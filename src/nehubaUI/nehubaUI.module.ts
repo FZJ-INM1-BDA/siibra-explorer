@@ -15,15 +15,15 @@ import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetC
 // import { DockedWidgetContainer } from './nehubaUI.dockedWidget.component'
 import { NehubaModalService,NehubaModalUnit } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
-import { NehubaUIControl } from './nehubaUI.control.component';
+import { NehubaUIControl,SearchPipe,PrependNavigate,HighlighPipe } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
 import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
-import { MainController } from './nehubaUI.services';
-import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma, MultilevelHasVisibleChildren  } from './nehubaUI.util.pipes'
+import { MainController, TempReceptorData } from './nehubaUI.services';
+import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma, MultilevelHasVisibleChildren  } from './nehubaUI.util.pipes'
 
 @NgModule({
     imports:[
@@ -41,8 +41,8 @@ import { IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,
         [ MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
         Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
-        MultilevelSelector, NehubaModalService,
-        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren],
+        MultilevelSelector, NehubaModalService, TempReceptorData,
+        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren,SearchPipe,PrependNavigate,HighlighPipe],
     bootstrap : [ NehubaContainer ],
     providers : [ MainController ],
     entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]

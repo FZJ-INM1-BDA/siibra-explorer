@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
 import { Multilevel } from './nehuba.model'
 
@@ -7,6 +7,7 @@ import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
 import { NehubaViewer } from 'nehuba/NehubaViewer';
 import { SelectTreePipe } from 'nehubaUI/nehubaUI.util.pipes';
 import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
+import { LayerManager } from 'neuroglancer/layer'
 
 declare var window:{
   [key:string] : any
@@ -27,6 +28,11 @@ export class MainController{
   selectedRegions : RegionDescriptor[] = []
 
   regionsLabelIndexMap: Map<Number,RegionDescriptor> = new Map() // map NG segID to region descriptor
+
+  /**
+   * viewing 
+   */
+  viewingMode : string = `navigation (default mode)`
 
   /**
    * plugins
@@ -51,11 +57,15 @@ export class MainController{
 
   nehubaViewer : NehubaViewer
   nehubaViewerSegmentMouseOver : any
+  nehubaCurrentSegment : RegionDescriptor | null
 
   /* to be moved to viewer or viewercontainer */
   shownSegmentsObserver : any
+  viewerControl : ViewerHandle
 
   constructor(){
+
+    this.viewerControl = new ViewerHandle()
     this.dataService = new DataService()
 
     if( this.testRequirement() ){
@@ -68,6 +78,82 @@ export class MainController{
     /* TODO reconsider if this is a good idea */
     HelperFunctions.sFindRegion = this.findRegionWithId
   }
+
+  receptorString : string | null
+
+  private passCheckSetMode(mode:String){
+
+    /* reset view state */
+    this.viewerControl.hideAllSegments()
+    if(this.nehubaViewer){
+      this.selectedRegions.forEach(re=>{
+        const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.selectedParcellation!.ngId+re.name)
+        if(pmap){
+          pmap.setVisible(false)
+        }else{
+          console.warn('could not turn off visibility of pmap layer')
+        }
+      })
+    }
+
+    /* reset pmap */
+    if(this.nehubaViewer){
+      this.nehubaViewer.ngviewer.layerManager.managedLayers.filter(l=>/nifti/.test((<any>l).toJSON().source))
+        .forEach(l=>l.setVisible(false))
+    }
+
+    this.receptorString = null
+
+    // this.selectedRegions.forEach(re=>{
+    //   const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.selectedParcellation!.ngId + re.name)
+    //   if(pmap){
+    //     pmap.setVisible(false)
+    //   }else{
+    //     console.warn('cannot find pmap')
+    //   }
+    // })
+
+    /* set state */
+    switch(mode){
+      case 'navigation (default mode)':
+        if(this.selectedRegions.length==0){
+          this.viewerControl.showAllSegments()
+        }else{
+          this.selectedRegions.forEach(r=>this.viewerControl.showSegment(r.labelIndex))
+        }
+      break;
+      case 'Probability Map':
+      {
+        this.viewerControl.loadLayer( this.selectedRegions
+          .filter(r=>r.moreInfo.findIndex(info=>info.name==mode))
+          .reduce((prev:any,r:RegionDescriptor)=>{
+            const obj : any = {}
+            obj[this.selectedParcellation!.ngId+r.name] = {
+              type : 'image',
+              source : r.moreInfo.find(info=>info.name==mode)!.source,
+              shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
+            }
+            return Object.assign({},prev,obj)
+          },{}) )
+
+          this.applyNehubaMeshFix()
+      }
+      break;
+      case 'Receptor Data':
+
+      break;
+    }
+  }
+
+  setMode(mode:string){
+    if(this.viewingMode != mode){
+      this.viewingMode = mode
+      this.passCheckSetMode(mode)
+    }
+  }
+
+  widgitiseSearchRegion : (templateRef:TemplateRef<any>)=>void
+  unwidgitiseSearchRegion : (templateref:TemplateRef<any>)=>void
 
   testRequirement():boolean{
     
@@ -109,16 +195,16 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    // let datasetArray = [
-    //   'https://neuroglancer-dev.humanbrainproject.org/res/json/bigbrain.json',
-    //   'https://neuroglancer-dev.humanbrainproject.org/res/json/colin.json',
-    //   'https://neuroglancer-dev.humanbrainproject.org/res/json/waxholmRatV2_0.json',
-    //   'https://neuroglancer-dev.humanbrainproject.org/res/json/allenMouse.json'
-    // ]
-
     let datasetArray = [
-      'http://localhost:5080/res/json/colin.json'
+      '/res/json/bigbrain.json',
+      '/res/json/colin.json',
+      '/res/json/waxholmRatV2_0.json',
+      '/res/json/allenMouse.json'
     ]
+
+    // let datasetArray = [
+    //   'http://localhost:5080/res/json/colin.json'
+    // ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -127,9 +213,7 @@ export class MainController{
             .then( template =>{
               this.loadedTemplates.push( template )
             })
-            .catch(e=>{
-              console.log(e)
-            })
+            .catch(console.warn)
           })
         .catch((e:any)=>{
           console.log('fetch init dataset error',e)
@@ -137,20 +221,35 @@ export class MainController{
       })
 
     /* dev option, use a special endpoint to fetch all plugins */
-    fetch('http://localhost:5080/collectPlugins')
+    fetch('/collectPlugins')
       .then(res=>res.json())
       .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
       .catch(console.warn)
   }
 
   patchNG(){
-    
     UrlHashBinding.prototype.setUrlHash = ()=>{
       // console.log('seturl hash')
     }
 
     UrlHashBinding.prototype.updateFromUrlHash = ()=>{
       // console.log('update hash binding')
+    }
+
+    /* TODO find a more permanent fix to disable double click */
+    LayerManager.prototype.invokeAction = (arg) => {
+      
+      if(arg=='select'&&this.nehubaCurrentSegment){
+        const idx = this.selectedRegions.findIndex(r=>r==this.nehubaCurrentSegment)
+        if(idx>=0){
+          this.selectedRegions.splice(idx,1)
+          this.nehubaCurrentSegment.enabled = false
+        }else{
+          this.selectedRegions.push(this.nehubaCurrentSegment)
+          this.nehubaCurrentSegment.enabled = true
+        }
+        this.regionSelectionChanged()
+      }
     }
   }
 
@@ -168,6 +267,7 @@ export class MainController{
     this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
     this.afterParcellationSelectionHook.push(()=>{
       this.nehubaViewerSegmentMouseOver = this.nehubaViewer.mouseOver.segment.subscribe(ev=>{
+        this.nehubaCurrentSegment = this.findRegionWithId(ev.segment)
         VIEWER_CONTROL.mouseOverNehuba.next({
           nehubaOutput : ev,
           foundRegion : this.findRegionWithId(ev.segment)
@@ -185,6 +285,7 @@ export class MainController{
 
     VIEWER_CONTROL.reapplyNehubaMeshFix = this.applyNehubaMeshFix
     VIEWER_CONTROL.mouseOverNehuba = new Subject()
+    
   }
 
   /**
@@ -235,7 +336,7 @@ export class MainController{
     this.onParcellationSelectionHook.forEach(cb=>cb())
 
     this.selectedParcellation = parcellation
-    this.selectedRegions = []
+    this.selectedRegions.splice(0,this.selectedRegions.length-1)
 
     const mapRegions = (regions:RegionDescriptor[])=>{
       regions.forEach((region:RegionDescriptor)=>{
@@ -266,6 +367,11 @@ export class MainController{
     EXTERNAL_CONTROL.metadata.selectedParcellation = this.selectedParcellation
 
     this.afterParcellationSelectionHook.forEach(cb=>cb())
+  }
+
+  /* TODO figure out a more elegant way to watch array for changes */
+  regionSelectionChanged(){
+    this.passCheckSetMode(this.viewingMode)
   }
 
   updateRegionDescriptors(labelIndices:number[]){
@@ -321,7 +427,8 @@ export class MainController{
     }
   }
 
-  widgetLaunched(name:string):boolean{
+  widgetLaunched(name:string):boolean
+  {
     return this.launchedWidgets.findIndex(n=>n==name) >= 0
   }
 
@@ -413,6 +520,75 @@ export class MainController{
 export class MultilevelProvider{
   searchTerm : string = ``
   selectedMultilevel : Multilevel[]
+
+  constructor(private mainController:MainController){
+    
+  }
+
+  spliceRegionSelect(m:Multilevel){
+    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    if (idx>=0){
+      this.mainController.selectedRegions.splice(idx,1)
+      this.mainController.regionSelectionChanged()
+    }else{
+      console.warn('splice region select: cannot find region')
+    }
+  }
+
+  pushRegionSelect(m:Multilevel){
+    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    if (idx<0){
+      this.mainController.selectedRegions.push(<RegionDescriptor>m)
+      this.mainController.regionSelectionChanged()
+    }else{
+      console.warn('push region select: region already in region select. Not pushed!')
+    }
+  }
+
+  toggleRegionSelect(m:Multilevel){
+    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    if(idx>=0){
+      this.spliceRegionSelect(m)
+      m.enabled = false
+    }else{
+      this.pushRegionSelect(m)
+      m.enabled = true
+    }
+  }
+
+  enableSelfAndAllChildren(m:Multilevel):void{
+    m.enabled = true
+    m.children.forEach(c=>this.enableSelfAndAllChildren(c))
+    if( m.children.length == 0){
+      this.pushRegionSelect(m)
+    }
+  }
+
+  disableSelfAndAllChildren(m:Multilevel):void{
+    m.enabled = false
+    m.children.forEach(c=>this.disableSelfAndAllChildren(c))
+    if( m.children.length ==0 ){
+      this.spliceRegionSelect(m)
+    }
+  }
+
+  hasDisabledChildren(m:Multilevel):boolean{
+    return m.children.length > 0?
+      m.children.some(c=>this.hasDisabledChildren(c)) :
+      !m.enabled
+  }
+
+  hasEnabledChildren(m:Multilevel):boolean{
+    return m.children.length > 0?
+      m.children.some(c=>this.hasDisabledChildren(c)) :
+      m.enabled
+  }
+
+  hasVisibleChildren(m:Multilevel):boolean{
+    return m.children.length > 0 ?
+      m.children.some( c=> c.isVisible || this.hasDisabledChildren(c)):
+      m.isVisible
+  }
 }
 
 class DataService {
@@ -675,3 +851,91 @@ export const DEFAULT_WIDGETS = [
     "scriptURL":TEMP_PLUGIN_DOMAIN + "localNifti/localNifti.js"
   }
 ]
+
+export const TEMP_RECEPTORDATA_BASE_URL = `http://imedv02.ime.kfa-juelich.de:5081/plugins/receptorBrowser/data/`
+export const TEMP_RECEPTORDATA_DRIVER_DATA = 
+{
+  "Fingerprint":"__fingerprint.jpg",
+  "Profiles":
+  {
+    "Glutamate":
+    {
+      "AMPA":"_pr_AMPA.jpg",
+      "NMDA":"_pr_NMDA.jpg",
+      "kainate":"_pr_kainate.jpg",
+      "mGluR2/3":"_pr_mGluR2_3.jpg"
+    },
+    "GABA":
+    {
+      "GABAA":"_pr_GABAA.jpg",
+      "GABAB":"_pr_GABAB.jpg"
+    }
+  },
+  "Autoradiographs":
+  {
+    "Glutamate":{
+      "AMPA":"_bm_AMPA.jpg",
+      "NMDA":"_bm_NMDA.jpg",
+      "kainate":"_bm_kainate.jpg",
+      "mGluR2/3":"_bm_mGluR2_3.jpg"
+    },
+    "GABA":
+    {
+      "GABAA":"_bm_GABAA.jpg",
+      "GABAB":"_bm_GABAB.jpg"
+    }
+  }
+}
+
+@Component({
+  selector : 'receptorDataDriver',
+  template : `
+    <div
+      class = "btn btn-block btn-sm"
+      (click)="popStack()" 
+      *ngIf="historyStack.length != 0">
+      <span class = "glyphicon glyphicon-chevron-left"></span> Back
+    </div>
+    <div 
+      (click) = "enterStack(key)" 
+      class = "btn btn-block btn-sm" 
+      *ngFor="let key of focusStack | keyPipe">
+
+      {{key}} <span *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></span> <span *ngIf="focusStack[key].constructor.name == 'Object' " class = "glyphicon glyphicon-chevron-right"></span> 
+    </div>
+  `,
+  styles : [
+    `
+    .btn
+    {
+      padding:0em;
+      margin:0em;
+    }
+    `
+  ]
+})
+
+export class TempReceptorData{
+  @Output() receptorString : EventEmitter<string|null> = new EventEmitter()
+
+  historyStack : any[] = []
+  choiceStack : string[] = []
+  focusStack : any = TEMP_RECEPTORDATA_DRIVER_DATA
+
+  popStack(){
+    this.focusStack = this.historyStack.pop()
+    this.choiceStack.pop()
+    this.receptorString.emit(null)
+  }
+
+  enterStack(key:string){
+    this.historyStack.push(this.focusStack)
+    this.choiceStack.push(key)
+    if(typeof this.focusStack[key] == 'string'){
+      this.receptorString.emit(this.focusStack[key])
+      this.focusStack = []
+    }else{
+      this.focusStack = this.focusStack[key]
+    }
+  }
+}
