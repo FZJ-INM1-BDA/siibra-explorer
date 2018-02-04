@@ -2,7 +2,7 @@ import { AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnIni
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
 
-import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController } from './nehubaUI.services'
+import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
@@ -50,8 +50,9 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   private onParcellationSelectionHook : (()=>void)[] = []
   private afterParcellationSelectionHook : (()=>void)[] = []
 
-  constructor( private componentFactoryResolver: ComponentFactoryResolver ){
+  constructor(public mainController:MainController, private componentFactoryResolver: ComponentFactoryResolver ){
     
+    /* TODO reduce complexity, as to not having multiple VIEW_CONTROL objects floating around */
     VIEWER_CONTROL.loadTemplate = (templateDescriptor:TemplateDescriptor) => {
       /* TODO implement a check that each el in the hooks are still defined and are fn's */
       this.onViewerInitHook.forEach(fn=>fn())
@@ -68,6 +69,11 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
     VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
     VIEWER_CONTROL.loadLayer = (layerObj:Object) => this.loadLayer(layerObj)
+
+    this.mainController.viewerControl.hideAllSegments = () => this.hideAllSegments()
+    this.mainController.viewerControl.showSegment = (segId) => this.showSegment(segId)
+    this.mainController.viewerControl.showAllSegments = () => this.showAllSegments()
+    this.mainController.viewerControl.loadLayer = (layerObj) => this.loadLayer(layerObj)
   }
 
   /**
@@ -188,11 +194,45 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       [ngClass]="{darktheme : darktheme}">
     </div>
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+
+      <span nametagSelectedRegions>
+        Selected Regions : 
+      </span>
+      <div class = "row" *ngIf="mainController.selectedRegions.length == 0">
+        <i class = "col-sm-12 col-md-12 col-lg-12 text-muted" >No Region Selected </i>
+      </div>
+      <div
+        class = "row"
+        *ngFor = "let selectedRegion of mainController.selectedRegions">
+        
+        <div class = "col-sm-12 col-md-12 col-lg-12">
+          {{selectedRegion.name}} 
+        </div>
+        <div class = "col-md-12 col-sm-12 col-lg-12" [innerHTML]="dynamicData(selectedRegion)">
+          dynamic content here
+        </div>
+      </div>
+
+      <br *ngIf="mainController.viewingMode == 'Receptor Data'" />
+      <div class = "row" *ngIf="mainController.viewingMode == 'Receptor Data'" >
+        <receptorDataDriver (receptorString)="setReceptorString($event)">
+        </receptorDataDriver>
+      </div>
+
+      <br />
+      <span>
+        Hovering : {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? '' : viewerSegment.name   }}
+      </span>
+      <br /><br />
+      Mode : {{ mainController.viewingMode }}
+      <br />
       <span 
         class = "btn btn-link"
         (click)="statusPanelRealSpace = !statusPanelRealSpace">
         {{statusPanelRealSpace ? 'RealSpace(mm)' : 'VoxelSpace'}}
-      </span> 
+      </span>
+
+      <br />
       Navigation: <small>(
         {{
           statusPanelRealSpace ? 
@@ -210,6 +250,8 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
             viewerPosVoxel[2]
         }}
       )</small> 
+
+      <br />
       Mouse: <small>(
         {{
           statusPanelRealSpace ? 
@@ -227,7 +269,6 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
             mousePosVoxel[2]
         }}
       )</small> 
-      {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? 'RegionID: ' + viewerSegment : 'Region: ' + viewerSegment.name   }}
     </div>
     <floatingPopover>
     </floatingPopover>
@@ -240,19 +281,28 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       height:100%;
       position:relative;
     }
+    span[nametagSelectedRegions]
+    {
+      margin-bottom:0.5em;
+    }
     div#viewerStatus
     {
       position:absolute;
-      left:2px;
-      top:0;
+      left:1em;
+      bottom:1em;
       z-index:9;
-      width:100%;
+      width:13em;
+      overflow:hidden;
       box-sizing: border-box;
-      height:3rem;
-      line-height:3rem;
-      padding-left:1.5rem;
+      padding:0.5em;
       white-space: nowrap;
+      font-size-adjust:0.5;
     }
+
+      div#viewerStatus .btn-link
+      {
+        padding: 0px;
+      }
 
     `
   ]
@@ -269,6 +319,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   mousePosVoxel :  number[] = [0,0,0]
 
   statusPanelRealSpace : boolean = true
+
+  segmentListener : any = {}
 
   @HostListener('document:mousedown',['$event'])
   clearContextmenu(_ev:any){
@@ -347,6 +399,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public ngAfterViewInit(){
   }
 
+  public setReceptorString(ev:string|null){
+    this.mainController.receptorString = ev
+  }
+
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
 
     this.viewerConfig = config
@@ -383,6 +439,11 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
     this.onDestroyUnsubscribe.push( navigationSubscriptionVoxel )
 
+    const segmentListener = this.nehubaViewer.mouseOver.image
+      .subscribe(ev=>{
+        this.segmentListener[ev.layer.name] = ev.value
+      })
+    this.onDestroyUnsubscribe.push(segmentListener)
     /**
      * attaches viewerSegmentHover listener
      */
@@ -418,6 +479,39 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         })
     this.onDestroyUnsubscribe.push(this.heartbeatObserver)
   }
+
+  public dynamicData(selectedData:RegionDescriptor):string{
+    switch(this.mainController.viewingMode){
+      case 'navigation (default mode)':
+        return ``
+      case 'Probability Map':{
+        const value = this.segmentListener[this.mainController.selectedParcellation!.ngId + selectedData.name]
+        return `&nbsp;&nbsp;Encoded value: ${ value ? Math.round(value * 1000)/1000 : ''}`
+      }
+      case 'Receptor Data' : 
+        return this.mainController.nehubaViewer.getShownSegmentsNow().length == 0 ? `` : this.checkIdxForReceptorData(selectedData)
+      default :
+        return ``
+    }
+  }
+
+  private checkIdxForReceptorData(m:RegionDescriptor):string{
+    if(m.moreInfo.findIndex(info=>info.name=='Receptor Data')>= 0){
+      if(this.mainController.receptorString){
+        const imgSrc = TEMP_RECEPTORDATA_BASE_URL + m.moreInfo.find(i=>i.name=='Receptor Data')!.source + this.mainController.receptorString
+        return `<img src = "${imgSrc}" style = "width:100%" />`
+      }else{
+        return `&nbsp;&nbsp;receptor data found ...`
+      }
+    }else{
+      return `&nbsp;&nbsp;<i class = "text-muted">receptor data found</i>`
+    }
+  }
+
+  // private returnReceptorData(regionInfo:DescriptorMoreInfoItem):string{
+  //   regionInfo
+  //   return ``
+  // }
 
   public loadParcellation(_parcellation:ParcellationDescriptor){
 

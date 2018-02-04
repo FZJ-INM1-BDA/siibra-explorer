@@ -1,4 +1,4 @@
-import { Component,ViewChild,Input,EventEmitter,Output,AfterViewInit } from '@angular/core'
+import { Component,ViewChild,Input,AfterViewInit } from '@angular/core'
 import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl,HELP_MENU, VIEWER_CONTROL } from './nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { ModalHandler } from './nehubaUI.modal.component'
@@ -13,7 +13,6 @@ import { Subject } from 'rxjs/Subject';
       (mousedown) = "mouseEventHandler('mousedown',$event)"
       (mouseup) = "mouseEventHandler('mouseup',$event)"></NehubaViewer>
     <span glyphiconShowHelp (click)="showhelp()" [ngClass]="{darktheme : darktheme}" class = "glyphicon glyphicon-question-sign"></span>
-    <span glyphiconToggleUI (click)="toggleHideUI()" [ngClass]="{darktheme : darktheme,'glyphicon-resize-full':!hideUI,'glyphicon-resize-small':hideUI}" class = "glyphicon"></span>
   `,
   styles : [
     `
@@ -24,8 +23,7 @@ import { Subject } from 'rxjs/Subject';
       z-index:9;
     }
 
-    span[glyphiconShowHelp],
-    span[glyphiconToggleUI]
+    span[glyphiconShowHelp]
     {
       position:absolute;
       z-index:10;
@@ -37,12 +35,6 @@ import { Subject } from 'rxjs/Subject';
       right:0.3em;
       top:0.3em;
     }
-
-    span[glyphiconToggleUI]
-    {
-      right:1.6em;
-      top:0.3em;
-    }
     `
   ]
 })
@@ -50,7 +42,6 @@ import { Subject } from 'rxjs/Subject';
 export class NehubaViewerContainer implements AfterViewInit {
   darktheme : boolean
   @Input() hideUI : boolean = false
-  @Output() emitHideUI : EventEmitter<any> = new EventEmitter()
   @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
   constructor(){ }
@@ -63,14 +54,6 @@ export class NehubaViewerContainer implements AfterViewInit {
     UI_CONTROL.afterTemplateSelection(()=>
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false)
     VIEWER_CONTROL.mouseEvent = new Subject()
-  }
-
-
-  toggleHideUI(){
-    this.emitHideUI.emit({hideUI:!this.hideUI})
-    if( this.nehubaViewerInnerContainer && this.nehubaViewerInnerContainer.nehubaViewerComponent ){
-      this.nehubaViewerInnerContainer.nehubaViewerComponent.nehubaViewer.redraw()
-    }
   }
 
   showhelp(){

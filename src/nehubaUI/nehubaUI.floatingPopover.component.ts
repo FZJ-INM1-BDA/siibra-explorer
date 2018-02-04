@@ -1,5 +1,6 @@
 import { Component } from '@angular/core'
 import { RegionDescriptor } from './nehuba.model'
+import { MainController } from 'nehubaUI/nehubaUI.services';
 
 @Component({
   selector : 'floatingPopover',
@@ -29,7 +30,7 @@ import { RegionDescriptor } from './nehuba.model'
     <div *ngIf="cursorSegment">
       <div
         class="moreInfo-icon"
-        (click) = "contextmenuEvent=null;moreInfo.action()"
+        (click) = "contextmenuEvent=null;moreInfo.action();mainController.setMode(moreInfo.name=='Go To There' ? 'navigation (default mode)' : moreInfo.name)"
         *ngFor = "let moreInfo of cursorSegment.moreInfo">
           <span 
             class = "glyphicon"
@@ -71,4 +72,5 @@ export class FloatingPopOver {
   contextmenuEvent : any
 
   otherTools : any[] = []
+  constructor(public mainController:MainController){}
 }

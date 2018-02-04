@@ -21,11 +21,12 @@ width:100%;
 multilevel div[multilevelContainer]:not(:last-child):before
 {
   pointer-events: none;
+  top:-0.8em;
   left:-0.5em;
   height:100%;
-  border-left: rgba(128,128,128,0.6) 1px dashed;
   box-sizing: border-box;
 }
+
 multilevel div[multilevelContainer]:not(:last-child) > span 
 {
   position:relative;
@@ -40,7 +41,6 @@ multilevel div[multilevelContainer]:not(:last-child) > span:before
   height:100%;
   top:-50%;
   left:-0.5em;
-  border-bottom: rgba(128,128,128,0.6) 1px dashed;
   z-index: 0;
 }
 multilevel div[multilevelContainer]:last-child > span
@@ -58,10 +58,35 @@ multilevel div[multilevelContainer]:last-child > span:before
   height:100%;
   top:-50%;
   left:-0.5em;
-  border-bottom: rgba(128,128,128,0.6) 1px dashed;
-  border-left : rgba(128,128,128,0.6) 1px dashed;
   z-index: 0;
 }
+
+multilevel div[multilevelContainer]:not(:last-child):before
+{
+  border-left: rgba(128,128,128,0.6) 1px dashed;
+}
+
+multilevel div[multilevelContainer]:not(:last-child) > span:before
+{
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+}
+
+multilevel div[multilevelContainer]:last-child > span:before
+{
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+  border-left : rgba(128,128,128,0.6) 1px dashed;
+}
+
+/* TODO use golden dashed line to indicate selected region(s), siblin selectors??? */
+
+/* multilevel div[multilevelContainer].has-text-active:before,
+multilevel div[multilevelContainer].has-text-active:not(:last-child):before,
+multilevel div[multilevelContainer].has-text-active:not(:last-child) > span:before,
+multilevel div[multilevelContainer].has-text-active:last-child:before,
+multilevel div[multilevelContainer].has-text-active:last-child >span :before
+{
+  border-color:rgb(219,181,86);
+} */
 
 div[multilevelContainer]
 {

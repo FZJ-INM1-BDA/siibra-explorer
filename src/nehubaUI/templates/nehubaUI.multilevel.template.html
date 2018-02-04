@@ -1,4 +1,5 @@
 <div
+  [ngClass]="{'has-text-active':isSelectedByMainController(singleData)}"
   class = " hierarchyContainer" 
   *ngFor = "let singleData of data | multilevelHasVisibleChildren : multilevelProvider.searchTerm"
   multilevelContainer>
@@ -22,36 +23,14 @@
     </span>
 
     <span 
-      *ngIf="singleData.moreInfo.length == 0" 
-      class = "multilevel-name">
-
-      <span 
-        class = "regionHasMoreInfo"
-        (click) = "toggleExpansion( singleData )"
-        [innerHtml]="singleData.name | searchHighlight : multilevelProvider.searchTerm : singleData"
-        spanName>
-      </span>
-    </span>
-
-    <span class = "multilevel-name"
-    
-      [popover]="moreInfo"
-      container="body"
-      [containerClass]="mainController.darktheme ? 'darktheme' : 'nodarktheme'"
-      [outsideClick]="true"
-      placement="bottom"
-      *ngIf = "singleData.moreInfo.length > 0" >
+      class = "multilevel-name"
+      [ngClass]="{'text-muted': hasTextMutedClass(singleData),'text-active':isSelectedByMainController(singleData)}"
+      (click)="singleClick( singleData )" >
 
       <span 
         class="regionHasMoreInfo"
         [innerHtml]="singleData.name | searchHighlight : multilevelProvider.searchTerm"
         spanName>
-      </span>
-
-      <span 
-        *ngIf = "false"
-        class = "multilevel-icon unicodeSymbols" >
-          <i class = "glyphicon glyphicon-option-vertical"></i>
       </span>
     </span>
   </span>
@@ -62,19 +41,4 @@
     [data]="singleData.children" 
     [selectedData]="selectedRegions" >
   </multilevel>
-
-  <ng-template #moreInfo>
-    <div 
-      *ngFor = "let moreInfo of singleData.moreInfo" 
-      class = "moreInfo-icon" 
-      (click) = "moreInfo.action()">
-      <span 
-        class = "glyphicon"
-        [ngClass]="'glyphicon-' + moreInfo.icon">
-      </span>
-      <span>
-        {{ moreInfo.name }}
-      </span>
-    </div>
-  </ng-template>
 </div>

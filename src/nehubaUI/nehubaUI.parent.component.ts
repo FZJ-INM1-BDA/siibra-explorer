@@ -1,5 +1,4 @@
-import { Component,ViewChild ,HostListener,AfterViewInit,Renderer2 } from '@angular/core'
-import { NehubaUIControl } from './nehubaUI.control.component'
+import { Component,ViewChild ,AfterViewInit,Renderer2 } from '@angular/core'
 import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from './nehubaUI.services'
 import { WidgetsContainer } from './nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
@@ -14,64 +13,33 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       height:100%;
       width:100%;
       display:grid;
-      grid-template-columns:250px 10px auto 0px 0px;
-      grid-template-rows:10% 90%;
+      grid-template-columns:auto 0px 0px;
     }
 
-    div[dropdownContainer]
+    atlasbanner[overlayBanner]
     {
-      grid-column-start:1;
-      grid-column-end:span 1;
-      grid-row-start:1;
-      grid-row-end:span 1;
-    }
-
-    ul li.selected a:before
-    {
-      content: '\u2022';
-      width : 1em;
-      margin-left: -1em;
-      display:inline-block;
-    }
-
-    ul li
-    {
-      padding-left:0.5em;
-    }
-
-    atlasbanner
-    {
+      position:absolute;
+      top:0px;
+      left:0px;
+      height:2em;
+      z-index:6;
       width:100%;
-      height:100%;
     }
-
-    div#atlasResizeSliver
-    {
-      grid-column-start:2;
-      grid-column-end:span 1;
-      grid-row-start:1;
-      grid-row-end:span 2;
-      z-index:5;
-    }
-      div#atlasResizeSliver:hover
-      {
-        cursor:ew-resize;
-      }
 
     atlascontrol
     {
-      grid-column-start:1;
-      grid-column-end:span 1;
-      grid-row-start:2;
-      grid-row-end:span 1;
+      position:absolute;
+      top : 7em;
+      left : 2em;
+      width : 20em;
+      height : calc(100% - 10em);
+      z-index:6;
+      overflow:hidden;
     }
-
     div#dockResizeSliver
     {
-      grid-column-start:4;
+      grid-column-start:2;
       grid-column-end:span 1;
-      grid-row-start:1;
-      grid-row-end:span 2;
 
       z-index:6;
     }
@@ -82,18 +50,14 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
 
     WidgetsContainer
     {
-      grid-column-start : 5;
+      grid-column-start : 3;
       grid-column-end : span 1;
-      grid-row-start : 1;
-      grid-row-end : span 2;
     }
 
     ATLASViewer
     {
-      grid-column-start:3;
+      grid-column-start:1;
       grid-column-end:span 1;
-      grid-row-start:1;
-      grid-row-end:span 2;
 
       z-index:5;
       position:relative;
@@ -108,18 +72,15 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
 export class NehubaContainer implements AfterViewInit {
   showMenu : boolean = false
 
-  hideUI = false
+  showRegion : boolean = false
+
   darktheme = false
-  resizeControlPanel = false
   resizeDockedWidgetPanel = false
   controlPanelWidth = 250
   dockedWidgetPanelWidth = 300
 
-
-
   libraryLoaded : Map<SUPPORTED_LIB,boolean> = new Map()
 
-  @ViewChild(NehubaUIControl) nehubaUI : NehubaUIControl 
   @ViewChild(WidgetsContainer) widgetContainer : WidgetsContainer
   @ViewChild(NehubaBanner) nehubaBanner : NehubaBanner
 
@@ -146,28 +107,6 @@ export class NehubaContainer implements AfterViewInit {
         .catch(e=>callback(e))
     }
   }
-  
-  @HostListener('document:mousemove',['$event'])
-  mousemove(ev:any){
-    if(this.resizeControlPanel){
-      this.controlPanelWidth = /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
-    }
-    if(this.resizeDockedWidgetPanel){
-      this.dockedWidgetPanelWidth = window.innerWidth - /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
-    }
-  }
-
-  @HostListener('document:mouseup',['$event'])
-  mouseup(){
-    this.resizeControlPanel = false
-    this.resizeDockedWidgetPanel = false
-    if(this.mainController.nehubaViewer)this.mainController.nehubaViewer.redraw()
-    this.enableUIInteraction(true )
-  }
-
-  toggleMenu(){
-    this.showMenu = !this.showMenu
-  }
 
   ngAfterViewInit(){
     window.location.hash = ''
@@ -180,21 +119,20 @@ export class NehubaContainer implements AfterViewInit {
     return this.widgetContainer.dockedWidgetContainer.viewContainerRef ? 
       this.widgetContainer.dockedWidgetContainer.viewContainerRef.length > 0 :
       false
-    // return true
   }
 
   calcGridTemplateColumn(){
     return this.hasDockedComponents() ? 
-      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto 10px ${this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300 }px` :
-      `${this.controlPanelWidth<150?150:this.controlPanelWidth>450?450:this.controlPanelWidth}px 10px auto 0px 0px`
-  }
-
-  controlUI(ev:any){
-    this.hideUI = ev.hideUI
+      `auto 10px ${this.dockedWidgetPanelWidth < 300 ? this.dockedWidgetPanelWidth : 300 }px` :
+      `auto 0px 0px`
   }
 
   enableUIInteraction(bool:boolean){
     document.body.style.pointerEvents = bool ? 'all':'none'
     document.body.style.userSelect = bool ? 'initial' : 'none'
+  }
+
+  showRegionDialog(){
+    this.showRegion = !this.showRegion
   }
 }

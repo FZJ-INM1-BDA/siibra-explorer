@@ -16,12 +16,24 @@ div#ATLASContainer
   width:100%;
   height:100%;
 
+  .btn.btn-default
+  {
+    border-color:tgray(0.9,0.5);
+
+    &:hover
+    {
+      background-color:tgray(0.9,0.5);
+    }
+  }
+
+  atlasbanner
+  {
+    background-color:rgba(0,0,0,0);
+  }
+
   atlascontrol
   {
-    width:calc(100% + 20px);
-    padding-right:20px;
     box-shadow: 0em 0em 1em tgray(0,0.25);
-    padding-top:5px;
 
     .glyphicon-overlay
     {
@@ -124,28 +136,66 @@ div#ATLASContainer
 
 div#ATLASContainer.darktheme
 {
-
   atlasbanner
   {
-    background-color:gray(0.2);
-    color:gray(1);
-
-    div
+    .tooltip.popover.bottom
     {
-      background-color:gray(0.2);
-      color:gray(1);
+      background-color:tgray(0.5,0.3);
     }
-  }
 
-  atlascontrol
-  {
-    background-color : gray(0.2);
+    .popover.bottom
+    {
+      border-color:tgray(0.1,0.5);
+      color:gray(0.95);
+      background-color:tgray(0.06,0.8);
+
+      .popover-title
+      {
+        display:none;
+      }
+
+      .popover-arrow
+      {
+        display:none;
+      }
+
+      .popover-content
+      {
+        .moreInfo-icon
+        {
+          &:hover
+          {
+            color:goldenrod;
+            cursor:default;
+          }
+        }
+      }
+    }
+
+    span.btn-default
+    {
+      color:gray(0.8);
+      background-color:tgray(0.06,0.8);
+      border-color:tgray(0.20,0.5);
+
+      &:hover
+      {
+        background-color:tgray(0.1,0.8);
+      }
+    }
+
+    span.input-group-addon
+    {
+      background-color:tgray(0.1,0.8);
+      color:gray(1);
+      border-color:tgray(0.35,0.5);
+    }
 
     input
     {
       color:gray(1);
       border-color:gray(0.1);
-      background-color:gray(0.10);
+      background-color:tgray(0.06,0.8);
       box-shadow:inset 0 0 1em -0.3em gray(0);
       
       &::-moz-placeholder
@@ -156,6 +206,11 @@ div#ATLASContainer.darktheme
         color:tgray(1,0.4);
       }
     }
+  }
+
+  atlascontrol
+  {
+    background-color : gray(0.2);
 
     .glyphicon-overlay
     {
@@ -173,6 +228,16 @@ div#ATLASContainer.darktheme
       span.regionHasMoreInfo:hover
       {
         color:goldenrod;
+      }
+
+      span.multilevel-name.text-active
+      {
+        color:rgb(219, 181, 86)
+      }
+
+      span.multilevel-name.text-active.text-muted
+      {
+        color:rgba(219, 181, 86,0.5)
       }
     }
   }
@@ -210,7 +275,7 @@ div#ATLASContainer.darktheme
 
     div#viewerStatus
     {
-      background-color:tgray(0,0.5);
+      background-color:tgray(0.2,0.5);
       color:gray(0.75);
     }
 
@@ -261,6 +326,12 @@ div#ATLASContainer.darktheme
     FloatingWidgetContainer
     {
       @extend %widgetDarkTheme;
+
+      div[regionContainer]
+      {
+        background-color:gray(0.2);
+        overflow-x:hidden;
+      }
 
       div.panel.panel-success[floatingWidgetUnit],
       div.panel.panel-success[dockedWidgetUnit]
@@ -416,15 +487,15 @@ div#ATLASContainer.darktheme
 {
   &.popover.popover-bottom
   {
-    border-color:gray(0.35);
+    border-color:tgray(0.35,0.5);
     color:gray(0.95);
-    background-color:gray(0.25);
+    background-color:tgray(0.12,0.8);
 
     .popover-arrow
     {
       &:after
       {
-        border-bottom-color: gray(0.35);
+        border-bottom-color: tgray(0.12,0.8);
       }
     }
 
@@ -450,7 +521,8 @@ div#ATLASContainer.darktheme
 
 ul.darktheme.dropdown-menu
 {
-  background-color:gray(0.22);
+  background-color:tgray(0.06,0.8);
+
   li
   {
     &.dropdown-header
@@ -461,6 +533,11 @@ ul.darktheme.dropdown-menu
     &.divider.dropdown-divider
     {
       background-color:gray(0.15);
+    }
+
+    .dropdown-menu
+    {
+      padding:0px;
     }
 
     .dropdown-item
@@ -502,16 +579,81 @@ modal-container
 
 div#ATLASContainer
 {
+  atlasbanner
+  {
+    
+    .popover.popover-bottom.bottom
+    {
+      margin-top : 0px;
+      max-height:40em;
+      overflow:hidden;
+      
+      .popover-content
+      {
+        padding : 0px;
+        height:100%;
+        max-height:40em;
+        width:20em;
+      }
+    }
+  }
   atlascontrol
   {
     multilevel
     {
       .popover
       {
-        width:100%;
-        margin-left:-2em;
-        z-index:99;
       }
     }
   }
+
+  NehubaViewer
+  {
+    img
+    {
+      width:100%;
+    }
+  }
+
+  WidgetsContainer
+  {
+
+    FloatingWidgetContainer,
+    DockedWidgetContainer
+    {
+      // input.form-control
+      // {
+      //   padding-top:0px;
+      //   padding-bottom:0px;
+      // }
+      // .input-group-addon
+      // {
+      //   padding-top:0px;
+      //   padding-bottom:0px;
+      // }
+      // .btn
+      // {
+      //   padding-top:0px;
+      //   padding-bottom:0px;
+      // }
+
+      .panel
+      {
+        .panel-heading
+        {
+          padding-top:0.5em;
+          padding-bottom:0.5em;
+
+          .glyphicon
+          {
+            font-size:0.8em;
+          }
+        }
+      }
+    }
+  }
+}
+.popover
+{
+  border-radius:0px;
 }

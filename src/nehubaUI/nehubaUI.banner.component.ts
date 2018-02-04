@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core'
+import { ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit } from '@angular/core'
 import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from './nehubaUI.services'
 
 @Component({
@@ -9,37 +9,24 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
     div[bannerContainer]
     {
       position:relative;
-      height:calc(100% + 1px);
+      height:0px;
       padding-bottom:1px;
-      width:calc(100% + 10em);
+
+      display:flex;
     }
-    div[bannerContainer]:hover
+    img[hbplogo]
     {
-      cursor:pointer;
-    }
-    div[bannerContainer]:before
-    {
-      content: ' ';
-      position:absolute;
-      width:100%;
-      height:100%;
-    }
-    div[bannerContainer]:hover:before
-    {
-      background-color:rgba(128,128,128,0.1);
-    }
-    img
-    {
-      height:100%;
+      height:6em;
+      pointer-events:none;
       display:inline-block;
-      padding-top: 1em;
-      padding-bottom: 1em;
-      padding-left:1em;
+      padding:0px;
+      margin:1em;
       box-sizing:border-box;
+
+      flex:0 0 auto;
     }
     div
     {
-      height:100%;
       display:inline-block;
     }
     div > *
@@ -48,26 +35,70 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
     }
     div[textContainer]
     {
-      vertical-align:middle;
+      vertical-align:top;
       padding:1em;
+
+      flex: 1 1 auto;
     }
-    small[selectedInformation]
+    div[textContainer] > div
     {
-      line-height:1.1em;
-      margin-left:0.3em;
+      display:inline-block
     }
+    span[editBtn]{
+      margin-left:-1em;
+      color:white;
+      z-index:9;
+    }
+    [btnCustom]
+    {
+      border-radius : 0px;
+    }
+    
+    ul li.selected a:before
+    {
+      content: '\u2022';
+      width : 1em;
+      margin-left: -1em;
+      display:inline-block;
+    }
+
+    ul li
+    {
+      padding-left:0.5em;
+    }
+
+    div[inputSearchRegion]
+    {
+      vertical-align : top;
+      width:20em;
+    }
+
     `
   ]
 })
 
 export class NehubaBanner implements AfterViewInit {
   darktheme : boolean
-
+  @Output() showRegionDialog : EventEmitter<any> = new EventEmitter()
+  @ViewChild('searchRegion',{read:TemplateRef}) searchRegion : TemplateRef<any>
   hbpimg : string = 'src/assets/images/HBP_Primary_RGB_BlackText.png'
   hbpimgdark : string = 'src/assets/images/HBP_Primary_RGB_WhiteText.png'
 
-  constructor(public mainController:MainController){
+  showTemplateSelection : boolean = false
+  widgetiseSearchRegion : boolean = false
 
+  searchTerm : string = ``
+
+  constructor(public mainController:MainController){
+    this.mainController.unwidgitiseSearchRegion = (templateRef:TemplateRef<any>)=>{
+      templateRef
+      this.widgetiseSearchRegion = false
+    }
+  }
+
+  test(){
+    console.log(this.searchRegion)
+    this.mainController.widgitiseSearchRegion(this.searchRegion)
   }
 
   parseSrcToBGUrl(str:string){
@@ -78,5 +109,16 @@ export class NehubaBanner implements AfterViewInit {
     UI_CONTROL.afterTemplateSelection(()=>{
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
     })
+  }
+
+  showRegion(){
+    if(this.mainController.selectedTemplate && this.mainController.selectedParcellation){
+      this.showRegionDialog.emit()
+    }
+  }
+
+  focusSearchInput(){
+    console.log('focus search input')
+    // console.log('atlascontrol click',ev)
   }
 }

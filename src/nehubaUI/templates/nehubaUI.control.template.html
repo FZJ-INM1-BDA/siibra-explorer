@@ -1,25 +1,41 @@
+<div regionContainer>
 
-<div class = "col-sm-12 col-md-12 col-lg-12" *ngIf="!mainController.selectedTemplate">
-  <h3>Start by selecting a template:</h3>
-  <a *ngFor="let template of mainController.loadedTemplates" href = "#" (click)="mainController.loadTemplate(template)" class = "btn btn-link">{{template.name}}</a>
-  <p>A default parcellation will be loaded with the template selected.</p>
-</div>
+  <div 
+    class = "input-group"
+    modeSelection>
 
-<div *ngIf="mainController.selectedParcellation && !mainController.selectedParcellation">
-  Loading Parcellation... 
-</div>
-
-<div *ngIf="mainController.selectedParcellation" regionContainer>
-  <div inputContainer>
-    <input placeholder = "Search regions ... " type = "text" [(ngModel)]="multilevelProvider.searchTerm" class = "form-control" />
-    <span (click)="searchTerm=''" [hidden]="searchTerm==''" class = "glyphicon-overlay glyphicon glyphicon-remove-sign">
+    <span class = "input-group-addon">
+      Mode
     </span>
-    <!-- <div (click)="refreshSelectedRegions()" class = "list-group-item nohover">
-    </div> -->
+
+    <input 
+      [(ngModel)]="searchActivityTerm"
+      class = "form-control" 
+      (keydown.esc) = "clearSearchActivityTerm();$event.target.blur()"
+      (keydown.enter) = "selectViewingMode();$event.target.blur()"
+      (focus) = "showListOfActivities = true;$event.target.select()"
+      (focusout) = "showListOfActivities = false"
+      [placeholder] = "mainController.viewingMode"
+      searchMode/>
   </div>
 
-  <div (click)="mainController.sendUISelectedRegionToViewer()" multilevelContainer>
-    <multilevel class = "menuItemContentText"  [data]="mainController.selectedParcellation.regions | searchTreePipe : multilevelProvider.searchTerm" >
+  <div
+    *ngIf = "showListOfActivities"
+    class = "btn-group-vertical"
+    listOfActivities>
+    <span 
+      (mousedown) = "selectViewingMode(activity)"
+      class = "btn btn-default btn-block text-left" 
+      *ngFor = "let activity of listOfActivities | prependNavigatePipe  | searchPipe : searchActivityTerm"
+      [innerHTML] = "activity | highlightPipe : searchActivityTerm ">
+    </span>
+  </div>
+
+  <div 
+    multilevelContainer>
+    <multilevel 
+      class = "menuItemContentText"  
+      [data]="mainController.selectedParcellation.regions | searchTreePipe : multilevelProvider.searchTerm" >
     </multilevel>
   </div>
 </div>
