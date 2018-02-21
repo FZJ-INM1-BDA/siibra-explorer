@@ -1,9 +1,10 @@
-import { AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef }from '@angular/core'
+import { Input,AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef }from '@angular/core'
+import { Observable } from 'rxjs/Rx'
 
-import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3 } from 'nehuba/exports'
+import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports'
 
 import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL } from './nehubaUI.services'
-import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from './nehuba.model'
+import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 
@@ -190,8 +191,31 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   template : `
     <div 
       (contextmenu)="showFloatingPopover($event)"
-      id = "container" 
-      [ngClass]="{darktheme : darktheme}">
+      id = "neuroglancer-container" 
+      [ngClass]="{darktheme : darktheme}"
+      #container>
+    </div>
+    
+    <div id = "nehubaui-overlay" #nehubaUiOverlay>
+      <nehubaui-overlay 
+        [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[0]"
+        class = "nehubaui-overlay-c" 
+        id = "nehubaui-overlay-c1">
+      </nehubaui-overlay>
+      <nehubaui-overlay 
+        [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[1]"
+        class = "nehubaui-overlay-c" 
+        id = "nehubaui-overlay-c2">
+      </nehubaui-overlay>
+      <nehubaui-overlay 
+        [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[2]"
+        class = "nehubaui-overlay-c" 
+        id = "nehubaui-overlay-c3">
+      </nehubaui-overlay>
+      <nehubaui-overlay 
+        class = "nehubaui-overlay-c" 
+        id = "nehubaui-overlay-c4">
+      </nehubaui-overlay>
     </div>
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
 
@@ -275,12 +299,59 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   `,
   styles : [
     `
-    div#container
+    div#neuroglancer-container
     {
       width:100%;
       height:100%;
+      position:absolute;
+      top:0px;
+      left:0px;
+      z-index:1;
+    }
+    div#nehubaui-overlay
+    {
+      width:100%;
+      height:100%;
+      position:absolute;
+      top:0px;
+      left:0px;
+      z-index:2;
+      display:grid;
+      grid-template-columns : 50% 50%;
+      grid-template-rows : 50% 50%;
+      pointer-events:none;
+    }
+
+    .nehubaui-overlay-c
+    {
+      grid-column-end : span 1;
+      grid-row-end : span 1;
+
+      overflow:hidden;
       position:relative;
     }
+
+    #nehubaui-overlay-c1
+    {
+      grid-column-start : 1;
+      grid-row-start : 1;
+    }
+    #nehubaui-overlay-c2
+    {
+      grid-column-start : 2;
+      grid-row-start : 1;
+    }
+    #nehubaui-overlay-c3
+    {
+      grid-column-start : 1;
+      grid-row-start : 2;
+    }
+    #nehubaui-overlay-c4
+    {
+      grid-column-start : 2;
+      grid-row-start : 2;
+    }
+
     span[nametagSelectedRegions]
     {
       margin-bottom:0.5em;
@@ -311,6 +382,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
   viewerConfig : NehubaViewerConfig
   darktheme : boolean
+  sliceViewZoom : number
   viewerPosReal : number[] = [0,0,0]
   viewerPosVoxel : number[] = [0,0,0]
   viewerOri : number[] = [0,0,1,0]
@@ -322,12 +394,15 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   segmentListener : any = {}
 
+  nanometersToOffsetPixelsFn : Function[] = [()=>{},()=>{}, ()=>{}]
+
   @HostListener('document:mousedown',['$event'])
   clearContextmenu(_ev:any){
     if(this.floatingPopover.contextmenuEvent)this.floatingPopover.contextmenuEvent=null
   }
 
   @ViewChild(FloatingPopOver) floatingPopover : FloatingPopOver
+  @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
 
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
@@ -422,8 +497,33 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
      * preventing errors such as visibleLayer of null/undefined
      */
     setTimeout(()=>{
+
       this.nehubaViewer.redraw()
       this.nehubaViewer.relayout()
+      
+      /* redraw/relayout is async */
+      setTimeout(()=>{
+
+        /* listens to custom events from neuroglancer-panel
+          whenever it fires, updates the position of existing landmarks
+        */
+        (<HTMLElement>this.viewerContainer.nativeElement).querySelectorAll('.neuroglancer-panel').forEach(panel=>{
+          
+          Observable.fromEvent(panel,sliceRenderEventType).map(it=>it as CustomEvent)
+            .subscribe(ev=>{
+              const el = ev.target as HTMLElement
+              const detail = ev.detail as SliceRenderEventDetail
+              /* TODO this is a terrible way of identifying panels */
+              el.offsetLeft < 5 ? 
+                el.offsetTop < 5 ?
+                  this.nanometersToOffsetPixelsFn[0] = detail.nanometersToOffsetPixels :
+                  this.nanometersToOffsetPixelsFn[2] = detail.nanometersToOffsetPixels :
+                el.offsetTop < 5 ?
+                  this.nanometersToOffsetPixelsFn[1] = detail.nanometersToOffsetPixels :
+                  (console.log('observable fired from perspective panel'))
+            })
+        })
+      })
     })
 
     /**
@@ -434,10 +534,29 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     const mouseVoxelSubscription = this.nehubaViewer.mousePosition.inVoxels.subscribe((pos:any)=>this.mousePosVoxel = pos ? pos :this.mousePosVoxel)
     this.onDestroyUnsubscribe.push(mouseVoxelSubscription)
     
-    const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>this.viewerPosReal = pos)
+    const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
+      this.viewerPosReal = pos
+      
+      /* spatial query */
+      const container = (<HTMLElement>this.viewerContainer.nativeElement)
+      const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
+      /* width in mm */
+      this.mainController.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+    })
     this.onDestroyUnsubscribe.push( navigationSubscription )
     const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
     this.onDestroyUnsubscribe.push( navigationSubscriptionVoxel )
+    
+    const zoomSub = this.nehubaViewer.navigationState.sliceZoom.subscribe((zoom:any)=>{
+      this.sliceViewZoom = zoom
+    
+      /* spatial query */
+      const container = (<HTMLElement>this.viewerContainer.nativeElement)
+      const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
+      /* width in mm */
+      this.mainController.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+    })
+    this.onDestroyUnsubscribe.push( zoomSub )
 
     const segmentListener = this.nehubaViewer.mouseOver.image
       .subscribe(ev=>{
@@ -586,5 +705,79 @@ export class NehubaViewerUnit{
 
   constructor(public component:Type<any>,viewerConfig:NehubaViewerConfig){  
     this.viewerConfig = viewerConfig
+  }
+}
+
+@Component({
+  selector : `nehubaui-overlay`,
+  template : 
+  `
+  <span 
+    [ngStyle] = "styleLandmark(landmark)"
+    *ngFor="let landmark of mainController.landmarks"
+    class="glyphicon glyphicon-map-marker"
+    [tooltip]=" landmark.properties | jsonStringifyPipe"
+    >
+  </span>
+  `,
+  styles : [
+    `
+    .glyphicon
+    {
+      position:absolute;
+      width:1em;
+      height:1em;
+      margin-top:-0.5em;
+      margin-left:-0.5em;
+      top:10px;
+      left:10px;
+      pointer-events:auto;
+    }
+    `
+  ]
+})
+
+export class NehubaViewerOverlayUnit{
+  @Input() nanometersToOffsetPixelsFn : Function 
+
+  constructor(public mainController:MainController){
+  }
+
+  styleLandmark(landmark:Landmark){
+    if(this.nanometersToOffsetPixelsFn){
+
+      /* calculate the offset thanks to nehuba magic */
+      const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
+      const scale = Math.atan( 100.0 / ( 100.0 + vec[2])) / (Math.PI / 2) * 100.0
+      
+      if(scale>100.0){
+        return({
+          display:`none`
+        })
+      }
+
+      /* check if the marker is inside the panel */
+      // const dist = ( 1.0 - Math.abs( scale / 50.0  - 1.0 ) ) * 255.0
+      const dist = scale / 100.0 * 255.0
+      const a = dist / 255.0
+
+      /* apply color */
+      const r = Math.round(Math.min(255,dist*8/3))
+      const g = Math.round(Math.min(255,Math.max(0,dist*8/3-255)))
+      const b = Math.round(Math.min(255,Math.max(4/3*dist-255,0)))
+      // marker.style.color = `rgba(${ r },${ g },${ b },${ a })`
+
+      return ({
+        'top' : `${vec[1]}px`,
+        'left' : `${vec[0]}px`,
+        'font-size' : `${ scale * 1.5 }%`,
+        'color' : `rgba(${r},${g},${b},${a})`
+      })
+
+    } else {
+      return({
+        display:'none'
+      })
+    }
   }
 }

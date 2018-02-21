@@ -1,6 +1,6 @@
 import { Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
-import { Multilevel } from './nehuba.model'
+import { Multilevel, Landmark } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
 import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
@@ -17,7 +17,7 @@ declare var window:{
 
 @Injectable()
 export class MainController{
-  private dataService : DataService
+  private dataService : DataService = new DataService()
   /**
    * data
    */
@@ -37,7 +37,8 @@ export class MainController{
   /**
    * plugins
    */
-  loadedWidgets : LabComponent[] = DEFAULT_WIDGETS.map(json=>new LabComponent(json))
+  loadedWidgets : LabComponent[] = []
+    // DEFAULT_WIDGETS.map(json=>new LabComponent(json))
   launchedWidgets : string[] = []
 
   /**
@@ -59,14 +60,57 @@ export class MainController{
   nehubaViewerSegmentMouseOver : any
   nehubaCurrentSegment : RegionDescriptor | null
 
+  /**
+   * spatial search
+  */
+
+  boundingBox : [[number,number,number],[number,number,number]] 
+  spatialSearchResultSubject : Subject<any> = new Subject()
+
   /* to be moved to viewer or viewercontainer */
   shownSegmentsObserver : any
   viewerControl : ViewerHandle
 
+  /* should always use larger for width when doing spatial querying */
+  /* otherwise, some parts of the viewer will be out of bounds */
+  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
+    this.spatialSearchResultSubject.next({center,width,templateSpace})
+
+
+  landmarks : Landmark[] = []
+
+  addLandmark = (pos:[number,number,number],id:string,properties:any)=>
+    this.landmarks.push({ pos , id , properties })
+
+  /* probably no need to clear the landmarks */
+  // clearAllLandmarks = () => 
+  //   this.landmarks.splice( 0 , this.landmarks.length )
+
+  parseSpatialQuery = (data:any)=>{
+    // this.clearAllLandmarks()
+    const docs = data.response.docs as any[]
+    docs
+      // .filter((_,idx)=>idx<20)
+      .filter(doc=> this.landmarks.findIndex(d=>d.id==doc.id) < 0)
+      .forEach(doc=>{
+        const pos = [0,1,2].map(idx=>`geometry.coordinates_${idx}___pdouble`).map(key=>doc[key]) as [number,number,number]
+        this.addLandmark(pos,doc.id,{
+          datapath : doc.datapath,
+          coordinates : doc['geometry.coordinates']
+        })
+      })
+  }
+
   constructor(){
 
     this.viewerControl = new ViewerHandle()
-    this.dataService = new DataService()
+
+    this.spatialSearchResultSubject
+      .throttleTime(300)
+      .subscribe(({center,width,templateSpace})=>
+        this.dataService.spatialSearch(center,width,templateSpace)
+          .then((data:any)=>this.parseSpatialQuery(data))
+          .catch((error:any)=>console.warn(error)))
 
     if( this.testRequirement() ){
       this.init()
@@ -195,16 +239,16 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    let datasetArray = [
-      '/res/json/bigbrain.json',
-      '/res/json/colin.json',
-      '/res/json/waxholmRatV2_0.json',
-      '/res/json/allenMouse.json'
-    ]
-
     // let datasetArray = [
-    //   'http://localhost:5080/res/json/colin.json'
+    //   '/res/json/bigbrain.json',
+    //   '/res/json/colin.json',
+    //   '/res/json/waxholmRatV2_0.json',
+    //   '/res/json/allenMouse.json'
     // ]
+
+    let datasetArray = [
+      'http://localhost:5080/res/json/colin.json'
+    ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -221,10 +265,10 @@ export class MainController{
       })
 
     /* dev option, use a special endpoint to fetch all plugins */
-    fetch('/collectPlugins')
-      .then(res=>res.json())
-      .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
-      .catch(console.warn)
+    // fetch('/collectPlugins')
+    //   .then(res=>res.json())
+    //   .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
+    //   .catch(console.warn)
   }
 
   patchNG(){
@@ -321,8 +365,6 @@ export class MainController{
 
     this.loadParcellation( templateDescriptor.parcellations[0] )
     this.sendUISelectedRegionToViewer()
-    setTimeout(()=>{
-    })
 
     /* TODO potentially breaks. selectedRegions should be cleared after each loadParcellation */
     EXTERNAL_CONTROL.metadata.selectedRegions = []
@@ -648,6 +690,42 @@ class DataService {
       //   this.inputResponse += '\'type\' field not found.. Unable to process this JSON.'
       // }break;
     }
+  }
+
+  /* promise race timeout (?) */
+  spatialSearch(center:[number,number,number],width:number,templateSpace:string){
+
+    if(isNaN(width)){
+      return Promise.reject('width is not a number')
+    }
+
+    const SPATIAL_SEARCH_URL = `https://kg-int.humanbrainproject.org/solr/`
+    const SOLR_C = `metadata/`
+    const SEARCH_PATH = `select`
+    const url = new URL(SPATIAL_SEARCH_URL+SOLR_C+SEARCH_PATH)
+    
+    /* do not set fl to get all params */
+    // url.searchParams.append('fl','geometry.coordinates_0___pdouble,geometry.coordinates_1___pdouble,geometry.coordinates_2___pdouble')
+
+    url.searchParams.append('q','*:*')
+    url.searchParams.append('wt','json')
+    url.searchParams.append('indent','on')
+    url.searchParams.append('start',"0")
+    url.searchParams.append('rows',"256")
+    
+    /* TODO future for template space? */
+    const filterTemplateSpace = templateSpace == 'Colin 27' ? 
+      'datapath:metadata/sEEG-sample.json' :
+        templateSpace == 'Waxholm Rat' ?
+        'datapath:metadata/OSLO_sp_data_rev.json' :
+          null
+
+    if(filterTemplateSpace){
+      url.searchParams.append('fq',filterTemplateSpace)
+    }
+    url.searchParams.append('fq',`geometry.coordinates:[${center.map(n=>n-width).join(',')}+TO+${center.map(n=>n+width).join(',')}]`)
+    const fetchUrl = url.toString().replace(/\%2B/gi,'+')
+    return fetch(fetchUrl).then(r=>r.json())
   }
 }
 

@@ -16,12 +16,6 @@ import { Subject } from 'rxjs/Subject';
   `,
   styles : [
     `
-    div#container
-    {
-      position:absolute;
-      
-      z-index:9;
-    }
 
     span[glyphiconShowHelp]
     {
