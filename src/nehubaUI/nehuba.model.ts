@@ -372,3 +372,9 @@ export class LabComponentHandler{
   public shutdown : ()=>void
   public onShutdown : (cb:()=>void)=>void
 }
+
+export class Landmark{
+  pos : [number,number,number]
+  id : string
+  properties : any
+}

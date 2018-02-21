@@ -10,14 +10,12 @@ import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
 import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 
-// import { FloatingWidget,FloatingWidgetComponent,FloatingWidgetDirective } from './nehubaUI.floatingWidget.component';
 import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer, FloatingWidgetView, WidgetView, MinimisedView, MinimisedWidgetContainer } from './nehubaUI.widgets.component'
-// import { DockedWidgetContainer } from './nehubaUI.dockedWidget.component'
 import { NehubaModalService,NehubaModalUnit } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
 import { NehubaUIControl,SearchPipe,PrependNavigate,HighlighPipe } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
-import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent } from './nehubaUI.viewer.component';
+import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner } from './nehubaUI.banner.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
@@ -39,7 +37,7 @@ import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighl
     ],
     declarations : 
         [ MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,
-        NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,FloatingPopOver,
+        NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingPopOver,
         Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService, TempReceptorData,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren,SearchPipe,PrependNavigate,HighlighPipe],

@@ -80,7 +80,7 @@ div#ATLASContainer
       border: 1px solid tgray(0,0);
     }
 
-    div#container
+    div#neuroglancer-container
     {
       label.perspective-panel-show-slice-views
       {
@@ -104,7 +104,7 @@ div#ATLASContainer
         }
       }
 
-      .gllayoutcell
+      .neuroglancer-panel
       {
         border : 2px solid gray(0.95);
 
@@ -279,9 +279,9 @@ div#ATLASContainer.darktheme
       color:gray(0.75);
     }
 
-    div#container
+    div#neuroglancer-container
     {
-      .gllayoutcell
+      .neuroglancer-panel
       {
         border : 2px solid gray(0.05);
 
@@ -609,6 +609,15 @@ div#ATLASContainer
 
   NehubaViewer
   {
+    div#neuroglancer-container
+    {
+      height:100%;
+      span.neuroglancer-marker
+      {
+        width:0px;
+        height:0px;
+      }
+    }
     img
     {
       width:100%;
@@ -656,4 +665,8 @@ div#ATLASContainer
 .popover
 {
   border-radius:0px;
+}
+ul#statusContainer
+{
+  display:none;
 }
