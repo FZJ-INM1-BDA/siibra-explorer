@@ -713,25 +713,29 @@ export class NehubaViewerUnit{
   template : 
   `
   <span 
-    [ngStyle] = "styleLandmark(landmark)"
     *ngFor="let landmark of mainController.landmarks"
-    class="glyphicon glyphicon-map-marker"
     [tooltip]=" landmark.properties | jsonStringifyPipe"
-    >
+    [ngStyle] = "styleLandmark(landmark)"
+    class = "glyphicon-container">
+    <span 
+      class="glyphicon glyphicon-map-marker">
+    </span>
   </span>
   `,
   styles : [
     `
+    .glyphicon-container
+    {
+      display:flex;
+      pointer-events:auto;
+    }
     .glyphicon
     {
-      position:absolute;
-      width:1em;
-      height:1em;
-      margin-top:-0.5em;
+      margin-top:-1em;
+      margin-bottom:1em;
+      width:0px;
+      height:0px;
       margin-left:-0.5em;
-      top:10px;
-      left:10px;
-      pointer-events:auto;
     }
     `
   ]
@@ -748,9 +752,9 @@ export class NehubaViewerOverlayUnit{
 
       /* calculate the offset thanks to nehuba magic */
       const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
-      const scale = Math.atan( 100.0 / ( 100.0 + vec[2])) / (Math.PI / 2) * 100.0
+      const scale = Math.atan( 100.0 / ( 100.0 - vec[2]))  / ( Math.PI / 2 ) * 100.0 
       
-      if(scale>100.0){
+      if( scale > 75.0 || scale < 25.0 ){
         return({
           display:`none`
         })
@@ -758,21 +762,37 @@ export class NehubaViewerOverlayUnit{
 
       /* check if the marker is inside the panel */
       // const dist = ( 1.0 - Math.abs( scale / 50.0  - 1.0 ) ) * 255.0
-      const dist = scale / 100.0 * 255.0
-      const a = dist / 255.0
+      // const dist = scale / 100.0 * 255.0
+      // const a = dist / 255.0
 
-      /* apply color */
-      const r = Math.round(Math.min(255,dist*8/3))
-      const g = Math.round(Math.min(255,Math.max(0,dist*8/3-255)))
-      const b = Math.round(Math.min(255,Math.max(4/3*dist-255,0)))
-      // marker.style.color = `rgba(${ r },${ g },${ b },${ a })`
-
-      return ({
-        'top' : `${vec[1]}px`,
-        'left' : `${vec[0]}px`,
-        'font-size' : `${ scale * 1.5 }%`,
-        'color' : `rgba(${r},${g},${b},${a})`
-      })
+      // /* apply color */
+      // const r = Math.round(Math.min(255,dist*8/3))
+      // const g = Math.round(Math.min(255,Math.max(0,dist*8/3-255)))
+      // const b = Math.round(Math.min(255,Math.max(4/3*dist-255,0)))
+      // // marker.style.color = `rgba(${ r },${ g },${ b },${ a })`
+      
+      // const a = 1.0 - ( Math.abs(scale - 50.0) / 50.0 )
+      
+      return vec[2] > 0 ? 
+        ({
+          'top' : `${vec[1]-vec[2]}px`,
+          'left' : `${vec[0]}px`,
+          'height': `${vec[2]}px`,
+          'width' :  `1px`,
+          'font-size':`${scale + 50.0}%`,
+          'color' : `rgba(150,50,0,${scale/100+0.25})`,
+          'background-color' : `rgba(150,50,0,${scale/100+0.25})`,
+          'flex-direction':`column`
+        }) : ({
+          'top' : `${vec[1]}px`,
+          'left' : `${vec[0]}px`,
+          'height': `${-1*vec[2]}px`,
+          'width' : `1px`,
+          'font-size':`${scale + 50.0}%`,
+          'color' : `rgba(150,50,0,${scale/100-0.25})`,
+          'background-color' : `rgba(150,50,0,${scale/100-0.25})`,
+          'flex-direction':`column-reverse`
+        })
 
     } else {
       return({

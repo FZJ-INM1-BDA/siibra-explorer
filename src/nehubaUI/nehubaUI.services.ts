@@ -239,16 +239,16 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    // let datasetArray = [
-    //   '/res/json/bigbrain.json',
-    //   '/res/json/colin.json',
-    //   '/res/json/waxholmRatV2_0.json',
-    //   '/res/json/allenMouse.json'
-    // ]
-
     let datasetArray = [
-      'http://localhost:5080/res/json/colin.json'
+      '/res/json/bigbrain.json',
+      '/res/json/colin.json',
+      '/res/json/waxholmRatV2_0.json',
+      '/res/json/allenMouse.json'
     ]
+
+    // let datasetArray = [
+    //   'http://localhost:5080/res/json/colin.json'
+    // ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
