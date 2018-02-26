@@ -609,13 +609,22 @@ div#ATLASContainer
 
   NehubaViewer
   {
-    div#neuroglancer-container
+    div#nehubaui-overlay
     {
-      height:100%;
-      span.neuroglancer-marker
+      nehubaui-overlay.nehubaui-overlay-c
       {
-        width:0px;
-        height:0px;
+        .glyphicon-container
+        {
+          position:absolute;
+
+          &:before
+          {
+            position:absolute;
+            content : ' ';
+            width:1px;
+            height:100%;
+          }
+        }
       }
     }
     img
