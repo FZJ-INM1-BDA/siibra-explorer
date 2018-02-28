@@ -1,5 +1,5 @@
 import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
-import { LabComponent, LabComponentHandler } from 'nehubaUI/nehuba.model';
+import { LabComponent, LabComponentHandler, widgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, HelperFunctions, MainController } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 import { NehubaUIControl } from 'nehubaUI/nehubaUI.control.component';
@@ -158,7 +158,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   DockedWidgetContainer
   {
     position:relative;
-    z-index:5;
+    z-index:4;
     display:block;
     width:calc(100% + 12px);
     margin-left:-11px;
@@ -203,30 +203,41 @@ export class WidgetsContainer{
   }
 
   overridingMainController(){
-    this.mainController.widgitiseSearchRegion = (templateref:TemplateRef<NehubaUIControl>)=>{
+    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:widgitiseTempRefMetaData)=>{
       const newLabcomponent = new LabComponent({
-        name : 'Search Region'
+        name : metadata.name
       })
       const newWidget = new WidgetComponent(newLabcomponent)
       newWidget.onShutdownCallbacks.push(()=>{
         this.mainController.unwidgitiseSearchRegion(templateref)
       })
-      this.initialCreateEmbedView(templateref,newWidget)
+      
+      this.embedView(templateref,newWidget,'docked')
+
+      newWidget.changeState = (state : 'docked' | 'minimised' | 'floating') =>{
+        this.embedView(templateref,newWidget,state)
+      }
+
+      /* if metadata.onShutdownCleanup is not provided, should the widgit be able to be exited? */
+      if(metadata.onShutdownCleanup){
+        newWidget.onShutdownCleanup = metadata.onShutdownCleanup as ()=>void
+      }
     }
   }
 
-  private initialCreateEmbedView(templateRef:TemplateRef<NehubaUIControl>,newWidget:WidgetComponent){
-
-    const firstParentViewRef = this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
-    const embbedViewRef = firstParentViewRef.instance.panelBody.createEmbeddedView(templateRef)
-    
-    embbedViewRef.context.mainController = this.mainController
-    // firstParentViewRef.injector.get(this.mainController)
-    // embbedViewRef.context.searchTerm = this.mainController.
-
-    firstParentViewRef.instance.widgetComponent = newWidget
-    newWidget.parentViewRef = firstParentViewRef
-    newWidget.state = 'floating'
+  private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
+    const parentViewRef = state == 'floating' ? this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory ) :
+      state == 'docked' ?
+        this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) :
+        this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
+    const embedView = parentViewRef.instance.panelBody.createEmbeddedView( templateRef )
+    embedView.context.mainController = this.mainController
+    parentViewRef.instance.widgetComponent = newWidget
+    if(newWidget.parentViewRef){
+      newWidget.parentViewRef.destroy()
+    }
+    newWidget.parentViewRef = parentViewRef
+    newWidget.state = state
   }
 
   private initialInsertWidgetIntoContainer(viewRef:ViewRef,newWidget:WidgetComponent){
@@ -359,7 +370,7 @@ interface WidgetViewChassis{
 
           <i class = "glyphicon glyphicon-log-in"></i>
         </i>
-        <i (mousedown)="close($event)" class = "close">
+        <i *ngIf="widgetComponent.onShutdownCleanup" (mousedown)="close($event)" class = "close">
 
           <i class = "glyphicon glyphicon-remove"></i>
         </i>
@@ -514,6 +525,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         <i class = "glyphicon glyphicon-new-window"></i>
       </i>
       <i 
+        *ngIf="widgetComponent.onShutdownCleanup"
         (mousedown)="close($event)" 
         class = "pull-right close">
 

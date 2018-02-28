@@ -377,4 +377,10 @@ export class Landmark{
   pos : [number,number,number]
   id : string
   properties : any
+  hover : boolean 
+}
+
+export interface widgitiseTempRefMetaData{
+  name : string
+  onShutdownCleanup? : Function
 }
