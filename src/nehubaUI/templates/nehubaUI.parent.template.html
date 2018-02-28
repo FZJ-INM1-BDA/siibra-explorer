@@ -1,11 +1,14 @@
 <nehubaModal></nehubaModal>
-<atlasbanner (showRegionDialog)="showRegionDialog()" overlayBanner>
-</atlasbanner>
+
 
 <atlascontrol *ngIf="showRegion">
 </atlascontrol>
 
 <div [ngClass]="{'darktheme':mainController.darktheme}" [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
+
+  <atlasbanner (showRegionDialog)="showRegionDialog()" overlayBanner>
+  </atlasbanner>
+
   <ATLASViewer 
     id = "ATLASViewer" >
   </ATLASViewer>
@@ -14,7 +17,7 @@
     [hidden]="!hasDockedComponents()" 
     (mousedown)="resizeDockedWidgetPanel=true;enableUIInteraction(false)" 
     (mousemove)="mousemove($event)" 
-    (mouseup)="mouseup()">
+    (mouseup)="mouseup($event)">
   </div>
   <WidgetsContainer 
     [ngClass]="{'darktheme':mainController.darktheme}"

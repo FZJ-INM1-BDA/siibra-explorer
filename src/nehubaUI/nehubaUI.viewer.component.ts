@@ -1,9 +1,9 @@
-import { Input,AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef }from '@angular/core'
+import { Input,AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
 import { Observable } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports'
 
-import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL } from './nehubaUI.services'
+import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
@@ -217,6 +217,9 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
         id = "nehubaui-overlay-c4">
       </nehubaui-overlay>
     </div>
+    <nehubaui-landmark-list>
+    </nehubaui-landmark-list>
+
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
 
       <span nametagSelectedRegions>
@@ -299,6 +302,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   `,
   styles : [
     `
+    nehubaui-landmark-list
+    {
+      display:none;
+    }
     div#neuroglancer-container
     {
       width:100%;
@@ -376,7 +383,8 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       }
 
     `
-  ]
+  ],
+  providers : [ SpatialSearch ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
@@ -394,7 +402,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   segmentListener : any = {}
 
-  nanometersToOffsetPixelsFn : Function[] = [()=>{},()=>{}, ()=>{}]
+  nanometersToOffsetPixelsFn : Function[] | null[] = [null,null,null]
 
   @HostListener('document:mousedown',['$event'])
   clearContextmenu(_ev:any){
@@ -407,7 +415,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
-  constructor(private mainController:MainController){
+  constructor(private mainController:MainController,public spatialSearch:SpatialSearch){
 
     // const metadata = gExternalControl.metadata
 
@@ -541,7 +549,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       const container = (<HTMLElement>this.viewerContainer.nativeElement)
       const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
       /* width in mm */
-      this.mainController.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
     })
     this.onDestroyUnsubscribe.push( navigationSubscription )
     const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
@@ -554,7 +562,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       const container = (<HTMLElement>this.viewerContainer.nativeElement)
       const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
       /* width in mm */
-      this.mainController.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
     })
     this.onDestroyUnsubscribe.push( zoomSub )
 
@@ -626,11 +634,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       return `&nbsp;&nbsp;<i class = "text-muted">receptor data found</i>`
     }
   }
-
-  // private returnReceptorData(regionInfo:DescriptorMoreInfoItem):string{
-  //   regionInfo
-  //   return ``
-  // }
 
   public loadParcellation(_parcellation:ParcellationDescriptor){
 
@@ -713,21 +716,46 @@ export class NehubaViewerUnit{
   template : 
   `
   <span 
-    *ngFor="let landmark of mainController.landmarks"
+    *ngFor="let landmark of spatialSearch.landmarks"
     [tooltip]=" landmark.properties | jsonStringifyPipe"
     [ngStyle] = "styleLandmark(landmark)"
+    (mouseenter)="landmark.hover = true"
+    (mouseleave)="landmark.hover = false"
     class = "glyphicon-container">
     <span 
       class="glyphicon glyphicon-map-marker">
     </span>
+    <div 
+      [ngStyle]="styleBeam(landmark)"
+      class = "pos-beam">
+    </div>
+    <div class = "pos-shadow">
+      <div
+        [ngStyle]="styleShadow(landmark)">
+      </div>
+    </div>
   </span>
   `,
   styles : [
     `
+    .pos-shadow
+    {
+      flex: 0 0 0px;
+      order: 2;
+    }
+    .pos-beam
+    {
+      box-sizing:border-box;
+      background-color:transparent;
+      flex: 1 1 0px;
+      order : 1;
+    }
     .glyphicon-container
     {
+      width: 0px;
       display:flex;
       pointer-events:auto;
+      flex-wrap:nowrap;
     }
     .glyphicon
     {
@@ -736,15 +764,76 @@ export class NehubaViewerUnit{
       width:0px;
       height:0px;
       margin-left:-0.5em;
+      flex: 0 0 0px;
+      order : 1;
     }
     `
   ]
 })
 
-export class NehubaViewerOverlayUnit{
+export class NehubaViewerOverlayUnit {
   @Input() nanometersToOffsetPixelsFn : Function 
+  constructor(public mainController:MainController,public spatialSearch:SpatialSearch){
+  }
 
-  constructor(public mainController:MainController){
+  NORMAL_COLOR : string = '150,50,20'
+  HOVER_COLOR : string = '250,100,40'
+
+  styleShadow(landmark:Landmark){
+    if(this.nanometersToOffsetPixelsFn){
+      const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
+      const size = 0.4/(0.4*Math.pow(vec[2]/30,2) + 1) + 0.1
+      const returnStyle = {
+        display : 'block',
+        background:'radial-gradient(rgba(120,60,30,0.8), rgba(120,60,30,0.3))',
+      }
+      return vec[2] >= 0 ?
+        Object.assign({},returnStyle,{
+          'width' : `${size}em`,
+          'height' : `${size}em`,
+          'border-radius' : `${size/2}em`,
+          'margin-top' : `${-1*size/2}em`,
+          'margin-left' : `${-1*size/2}em`,
+          'background':`radial-gradient(rgba(${landmark.hover ? this.HOVER_COLOR + ',0.8' : this.NORMAL_COLOR + ',0.8'}), rgba(${landmark.hover ? this.HOVER_COLOR + ',0.3' : this.NORMAL_COLOR + ',0.3'}))`,
+        }) : 
+        Object.assign({},returnStyle,{
+          'width' : `${size}em`,
+          'height' : `${size}em`,
+          'border-radius' : `${size/2}em`,
+          'margin-top' : `${-1*size/2}em`,
+          'margin-left' : `${-1*size/2}em`,
+          'background':`radial-gradient(rgba(${landmark.hover ? this.HOVER_COLOR + ',0.4' : this.NORMAL_COLOR + ',0.4'}), rgba(${landmark.hover ? this.HOVER_COLOR + ',0.15' : this.NORMAL_COLOR + ',0.15'}))`,
+        })
+    }else{
+      return({
+        display:'none'
+      })
+    }
+  }
+
+  styleBeam(landmark:Landmark){
+    
+    if(this.nanometersToOffsetPixelsFn){
+      const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
+      const borderWidth = 1
+      return vec[2] >= 0 ? 
+        ({
+          'border-top' : `${vec[2]}px solid rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},0.75)`,
+          'border-left' : `${borderWidth}px solid transparent`,
+          'border-right' : `${borderWidth}px solid transparent`,
+          'width' : `0px`,
+          'margin-left':`${-1*borderWidth}px`
+        }) : 
+        ({
+          'border-left' : `1px dashed rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},0.25)`,
+          'border-right' : `1px solid transparent`,
+          'width' : `0px`,
+        })
+    }else{
+      return({
+        display:'none'
+      })
+    }
   }
 
   styleLandmark(landmark:Landmark){
@@ -752,13 +841,13 @@ export class NehubaViewerOverlayUnit{
 
       /* calculate the offset thanks to nehuba magic */
       const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
-      const scale = Math.atan( 100.0 / ( 100.0 - vec[2]))  / ( Math.PI / 2 ) * 100.0 
+      const scale = Math.atan( 500.0 / ( 500.0 - vec[2]))  / ( Math.PI / 2 ) * 100.0 
       
-      if( scale > 75.0 || scale < 25.0 ){
-        return({
-          display:`none`
-        })
-      }
+      // if( scale > 75.0 || scale < 25.0 ){
+      //   return({
+      //     display:`none`
+      //   })
+      // }
 
       /* check if the marker is inside the panel */
       // const dist = ( 1.0 - Math.abs( scale / 50.0  - 1.0 ) ) * 255.0
@@ -773,24 +862,22 @@ export class NehubaViewerOverlayUnit{
       
       // const a = 1.0 - ( Math.abs(scale - 50.0) / 50.0 )
       
-      return vec[2] > 0 ? 
+      return vec[2] >= 0 ? 
         ({
           'top' : `${vec[1]-vec[2]}px`,
           'left' : `${vec[0]}px`,
           'height': `${vec[2]}px`,
-          'width' :  `1px`,
-          'font-size':`${scale + 50.0}%`,
-          'color' : `rgba(150,50,0,${scale/100+0.25})`,
-          'background-color' : `rgba(150,50,0,${scale/100+0.25})`,
+          'font-size':`${scale * 2.0}%`,
+          'color' : `rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},${scale/100+0.25})`,
+          'background-color' : `rgba(${landmark.hover ?  this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100+0.25})`,
           'flex-direction':`column`
         }) : ({
           'top' : `${vec[1]}px`,
           'left' : `${vec[0]}px`,
           'height': `${-1*vec[2]}px`,
-          'width' : `1px`,
-          'font-size':`${scale + 50.0}%`,
-          'color' : `rgba(150,50,0,${scale/100-0.25})`,
-          'background-color' : `rgba(150,50,0,${scale/100-0.25})`,
+          'font-size':`${scale * 2.0}%`,
+          'color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100-0.25})`,
+          'background-color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100-0.25})`,
           'flex-direction':`column-reverse`
         })
 
@@ -799,5 +886,107 @@ export class NehubaViewerOverlayUnit{
         display:'none'
       })
     }
+  }
+}
+
+@Component({
+  selector : 'nehubaui-landmark-list',
+  template : 
+  `
+  <ng-template #landmarkList>
+    <div class = "panel-body">
+      <ul class = "list-group" id = "landmarkList">
+        <li
+          (mouseenter)="landmark.hover = true"
+          (mouseleave)="landmark.hover = false"
+          class = "list-group-item"
+          *ngFor="let landmark of spatialSearch.landmarks">
+
+          <small>
+            <span class = "text-muted">OID :</span> {{ landmark.properties['OID']  }}<br />
+            <span class = "text-muted">coordinates :</span> [{{ landmark.properties['geometry.coordinates'] }}]
+          </small>
+        </li>
+      </ul>
+      
+      <div *ngIf="spatialSearch.landmarks.length>0" class = "btn-group">
+
+        <div class = "default-control btn btn-default btn-sm" (click)="spatialSearch.goTo(0)">
+          <i class = "glyphicon glyphicon-fast-backward"></i>
+        </div>
+        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination-1)">
+          <i class = "glyphicon glyphicon-step-backward"></i>
+        </div>
+
+        <div 
+          (click)="spatialSearch.goTo(pageNum)"
+          [ngClass]="{'btn-primary':spatialSearch.pagination == pageNum}"
+          *ngFor = "let pageNum of Array.from(Array(Math.ceil(spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE)).keys()).filter(hidePagination)"
+          class = "pagination-control btn btn-default btn-sm">
+          {{ pageNum + 1 }}
+        </div>
+
+        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination+1)">
+          <i class = "glyphicon glyphicon-step-forward"></i>
+        </div>
+        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo( spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE + 1 )">
+          <i class = "glyphicon glyphicon-fast-forward"></i>
+        </div>
+
+      </div>
+      
+      <div style="text-align:center">
+        {{ spatialSearch.numHits ? spatialSearch.numHits : 0 }} landmarks found.
+      </div>
+
+    </div>
+  </ng-template>
+  `,
+  styles : [
+    `
+    .btn-group
+    {
+      display:flex
+    }
+
+    .btn-group > .default-control
+    {
+      flex : 0 0 auto;
+    }
+
+    .btn-group > .pagination-control
+    {
+      flex : 1 1 auto;
+    }
+    ul.list-group#landmarkList > li.list-group-item:hover
+    {
+      cursor:default;
+      background-color:rgba(128,128,128,0.2);
+    }
+    `
+  ]
+})
+
+export class NehubaLandmarkList implements AfterViewInit{
+  @ViewChild('landmarkList',{read:TemplateRef}) landmarkList : TemplateRef<any>
+
+  constructor(public mainController:MainController,public spatialSearch:SpatialSearch){
+
+  }
+
+  Array = Array
+  Math = Math
+
+  hidePagination = (idx:number) => {
+    const correctedPagination = this.spatialSearch.pagination < 2 ?
+      2 :
+      this.spatialSearch.pagination > (Math.ceil(this.spatialSearch.numHits / this.spatialSearch.RESULTS_PER_PAGE) - 3) ?
+        Math.ceil(this.spatialSearch.numHits / this.spatialSearch.RESULTS_PER_PAGE) - 3 :
+        this.spatialSearch.pagination
+    return (Math.abs(idx-correctedPagination) < 3)
+  }
+
+  ngAfterViewInit(){
+    this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
   }
 }

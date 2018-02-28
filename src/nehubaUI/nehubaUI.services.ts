@@ -1,6 +1,6 @@
 import { Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Rx'
-import { Multilevel, Landmark } from './nehuba.model'
+import { Multilevel, Landmark, widgitiseTempRefMetaData } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
 import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
@@ -60,57 +60,13 @@ export class MainController{
   nehubaViewerSegmentMouseOver : any
   nehubaCurrentSegment : RegionDescriptor | null
 
-  /**
-   * spatial search
-  */
-
-  boundingBox : [[number,number,number],[number,number,number]] 
-  spatialSearchResultSubject : Subject<any> = new Subject()
-
   /* to be moved to viewer or viewercontainer */
   shownSegmentsObserver : any
   viewerControl : ViewerHandle
 
-  /* should always use larger for width when doing spatial querying */
-  /* otherwise, some parts of the viewer will be out of bounds */
-  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
-    this.spatialSearchResultSubject.next({center,width,templateSpace})
-
-
-  landmarks : Landmark[] = []
-
-  addLandmark = (pos:[number,number,number],id:string,properties:any)=>
-    this.landmarks.push({ pos , id , properties })
-
-  /* probably no need to clear the landmarks */
-  // clearAllLandmarks = () => 
-  //   this.landmarks.splice( 0 , this.landmarks.length )
-
-  parseSpatialQuery = (data:any)=>{
-    // this.clearAllLandmarks()
-    const docs = data.response.docs as any[]
-    docs
-      // .filter((_,idx)=>idx<20)
-      .filter(doc=> this.landmarks.findIndex(d=>d.id==doc.id) < 0)
-      .forEach(doc=>{
-        const pos = [0,1,2].map(idx=>`geometry.coordinates_${idx}___pdouble`).map(key=>doc[key]) as [number,number,number]
-        this.addLandmark(pos,doc.id,{
-          datapath : doc.datapath,
-          coordinates : doc['geometry.coordinates']
-        })
-      })
-  }
-
   constructor(){
 
     this.viewerControl = new ViewerHandle()
-
-    this.spatialSearchResultSubject
-      .throttleTime(300)
-      .subscribe(({center,width,templateSpace})=>
-        this.dataService.spatialSearch(center,width,templateSpace)
-          .then((data:any)=>this.parseSpatialQuery(data))
-          .catch((error:any)=>console.warn(error)))
 
     if( this.testRequirement() ){
       this.init()
@@ -196,7 +152,7 @@ export class MainController{
     }
   }
 
-  widgitiseSearchRegion : (templateRef:TemplateRef<any>)=>void
+  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:widgitiseTempRefMetaData)=>void
   unwidgitiseSearchRegion : (templateref:TemplateRef<any>)=>void
 
   testRequirement():boolean{
@@ -239,16 +195,16 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    let datasetArray = [
-      '/res/json/bigbrain.json',
-      '/res/json/colin.json',
-      '/res/json/waxholmRatV2_0.json',
-      '/res/json/allenMouse.json'
-    ]
-
     // let datasetArray = [
-    //   'http://localhost:5080/res/json/colin.json'
+    //   '/res/json/bigbrain.json',
+    //   '/res/json/colin.json',
+    //   '/res/json/waxholmRatV2_0.json',
+    //   '/res/json/allenMouse.json'
     // ]
+
+    let datasetArray = [
+      'http://localhost:5080/res/json/colin.json'
+    ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -265,10 +221,10 @@ export class MainController{
       })
 
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
   }
 
   patchNG(){
@@ -633,6 +589,117 @@ export class MultilevelProvider{
   }
 }
 
+@Injectable()
+export class SpatialSearch{
+
+  pagination : number = 0
+  numHits : number = 0
+  RESULTS_PER_PAGE : number = 10
+
+  /**
+   * spatial search
+  */
+
+  center : [number,number,number]
+  width : number
+  templateSpace : string
+  spatialSearchResultSubject : Subject<any> = new Subject()
+
+  landmarks : Landmark[] = []
+
+  constructor(){
+
+    this.spatialSearchResultSubject
+      .throttleTime(300)
+      .subscribe(({center,width,templateSpace})=>
+        this.spatialSearch(center,width,templateSpace)
+          .then((data:any)=>(this.landmarks = [],this.parseSpatialQuery(data)))
+          .catch((error:any)=>console.warn(error)))
+
+  }
+  /* should always use larger for width when doing spatial querying */
+  /* otherwise, some parts of the viewer will be out of bounds */
+  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
+    this.spatialSearchResultSubject.next({center,width,templateSpace})
+
+  /* promise race timeout (?) */
+  spatialSearch(center:[number,number,number],width:number,templateSpace:string){
+
+    if(isNaN(width)){
+      return Promise.reject('width is not a number')
+    }
+
+    this.center = center
+    this.width = width
+    this.templateSpace = templateSpace
+
+    const SPATIAL_SEARCH_URL = `https://kg-int.humanbrainproject.org/solr/`
+    const SOLR_C = `metadata/`
+    const SEARCH_PATH = `select`
+    const url = new URL(SPATIAL_SEARCH_URL+SOLR_C+SEARCH_PATH)
+    
+    /* do not set fl to get all params */
+    // url.searchParams.append('fl','geometry.coordinates_0___pdouble,geometry.coordinates_1___pdouble,geometry.coordinates_2___pdouble')
+
+    url.searchParams.append('q','*:*')
+    url.searchParams.append('wt','json')
+    url.searchParams.append('indent','on')
+    url.searchParams.append('start',(this.pagination*this.RESULTS_PER_PAGE).toString())
+    url.searchParams.append('rows',this.RESULTS_PER_PAGE.toString())
+    
+    /* TODO future for template space? */
+    const filterTemplateSpace = templateSpace == 'Colin 27' ? 
+      'datapath:metadata/sEEG-sample.json' :
+        templateSpace == 'Waxholm Rat' ?
+        'datapath:metadata/OSLO_sp_data_rev.json' :
+          null
+
+    if(filterTemplateSpace){
+      url.searchParams.append('fq',filterTemplateSpace)
+    }
+    url.searchParams.append('fq',`geometry.coordinates:[${center.map(n=>n-width).join(',')}+TO+${center.map(n=>n+width).join(',')}]`)
+    const fetchUrl = url.toString().replace(/\%2B/gi,'+')
+    return fetch(fetchUrl).then(r=>r.json())
+  }
+  
+  addLandmark = (pos:[number,number,number],id:string,properties:any)=>
+    this.landmarks.push({ pos , id , properties,hover:false })
+    
+  /* probably no need to clear the landmarks */
+  // clearAllLandmarks = () => 
+  //   this.landmarks.splice( 0 , this.landmarks.length )
+
+  parseSpatialQuery = (data:any)=>{
+    this.numHits = data.response.numFound
+    this.pagination = data.response.start / this.RESULTS_PER_PAGE
+    // this.clearAllLandmarks()
+    const docs = data.response.docs as any[]
+    docs
+      // .filter((_,idx)=>idx<20)
+      // .filter(doc=> this.landmarks.findIndex(d=>d.id==doc.id) < 0)
+      .forEach(doc=>{
+        const pos = [0,1,2].map(idx=>`geometry.coordinates_${idx}___pdouble`).map(key=>doc[key]) as [number,number,number]
+        const { OID , ReferenceSpace, datapath, id } = doc
+        this.addLandmark(pos,doc.id,{
+          OID, ReferenceSpace, datapath, id,
+          'geometry.coordinates' : doc['geometry.coordinates']
+        })
+      })
+  }
+
+  goTo = (pageIdx:number)=>{
+    const gotoPage = pageIdx < 0 ? 
+      0 : 
+      pageIdx > this.numHits / this.RESULTS_PER_PAGE  ?
+        Math.floor(this.numHits / this.RESULTS_PER_PAGE)  :
+        pageIdx
+    if(gotoPage != this.pagination){
+      this.pagination = gotoPage
+      this.spatialSearchResultSubject.next({center : this.center, width :this.width, templateSpace : this.templateSpace})
+    }
+  }
+}
+
 class DataService {
 
   /* simiple fetch promise for json obj */
@@ -692,41 +759,8 @@ class DataService {
     }
   }
 
-  /* promise race timeout (?) */
-  spatialSearch(center:[number,number,number],width:number,templateSpace:string){
+  sptialPagination : number = 0
 
-    if(isNaN(width)){
-      return Promise.reject('width is not a number')
-    }
-
-    const SPATIAL_SEARCH_URL = `https://kg-int.humanbrainproject.org/solr/`
-    const SOLR_C = `metadata/`
-    const SEARCH_PATH = `select`
-    const url = new URL(SPATIAL_SEARCH_URL+SOLR_C+SEARCH_PATH)
-    
-    /* do not set fl to get all params */
-    // url.searchParams.append('fl','geometry.coordinates_0___pdouble,geometry.coordinates_1___pdouble,geometry.coordinates_2___pdouble')
-
-    url.searchParams.append('q','*:*')
-    url.searchParams.append('wt','json')
-    url.searchParams.append('indent','on')
-    url.searchParams.append('start',"0")
-    url.searchParams.append('rows',"256")
-    
-    /* TODO future for template space? */
-    const filterTemplateSpace = templateSpace == 'Colin 27' ? 
-      'datapath:metadata/sEEG-sample.json' :
-        templateSpace == 'Waxholm Rat' ?
-        'datapath:metadata/OSLO_sp_data_rev.json' :
-          null
-
-    if(filterTemplateSpace){
-      url.searchParams.append('fq',filterTemplateSpace)
-    }
-    url.searchParams.append('fq',`geometry.coordinates:[${center.map(n=>n-width).join(',')}+TO+${center.map(n=>n+width).join(',')}]`)
-    const fetchUrl = url.toString().replace(/\%2B/gi,'+')
-    return fetch(fetchUrl).then(r=>r.json())
-  }
 }
 
 /** usage

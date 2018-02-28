@@ -1,4 +1,4 @@
-import { Component,ViewChild ,AfterViewInit,Renderer2 } from '@angular/core'
+import { HostListener,Component,ViewChild ,AfterViewInit,Renderer2 } from '@angular/core'
 import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from './nehubaUI.services'
 import { WidgetsContainer } from './nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
@@ -14,16 +14,18 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
       width:100%;
       display:grid;
       grid-template-columns:auto 0px 0px;
+      grid-template-rows:100%;
     }
 
     atlasbanner[overlayBanner]
     {
-      position:absolute;
-      top:0px;
-      left:0px;
+      grid-column-start:1;
+      grid-column-end:span 1;
+      grid-row-start:1;
+      grid-row-end:span 1;
+
       height:2em;
       z-index:6;
-      width:100%;
     }
 
     atlascontrol
@@ -58,6 +60,8 @@ import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
     {
       grid-column-start:1;
       grid-column-end:span 1;
+      grid-row-start:1;
+      grid-row-end:span 1;
 
       z-index:5;
       position:relative;
@@ -134,5 +138,20 @@ export class NehubaContainer implements AfterViewInit {
 
   showRegionDialog(){
     this.showRegion = !this.showRegion
+  }
+
+  @HostListener('document:mousemove',['$event'])
+  mousemove(ev:any){
+    if(this.resizeDockedWidgetPanel){
+      this.dockedWidgetPanelWidth = window.innerWidth - /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
+    }
+  }
+
+  @HostListener('document:mouseup',['$event'])
+  mouseup(_ev:any){
+    if(this.resizeDockedWidgetPanel){
+      this.resizeDockedWidgetPanel=false;
+      this.enableUIInteraction(true)
+    }
   }
 }

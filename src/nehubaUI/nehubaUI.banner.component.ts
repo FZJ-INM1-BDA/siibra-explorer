@@ -98,7 +98,7 @@ export class NehubaBanner implements AfterViewInit {
 
   test(){
     console.log(this.searchRegion)
-    this.mainController.widgitiseSearchRegion(this.searchRegion)
+    this.mainController.widgitiseTemplateRef(this.searchRegion,{name:'Search Region',onShutdownCleanup : ()=>{/* on widget shutdown */}})
   }
 
   parseSrcToBGUrl(str:string){
