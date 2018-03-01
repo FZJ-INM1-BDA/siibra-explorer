@@ -58,14 +58,9 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController } from
     {
       content: '\u2022';
       width : 1em;
-      margin-left: -1em;
       display:inline-block;
     }
 
-    ul li
-    {
-      padding-left:0.5em;
-    }
 
     div[inputSearchRegion]
     {

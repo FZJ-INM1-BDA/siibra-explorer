@@ -935,7 +935,7 @@ export class NehubaViewerOverlayUnit {
 
       </div>
       
-      <div style="text-align:center">
+      <div style="text-align:center; margin-top:10px;">
         {{ spatialSearch.numHits ? spatialSearch.numHits : 0 }} landmarks found.
       </div>
 
