@@ -7,6 +7,7 @@ import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RE
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
+import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 
 declare var window:{
   [key:string] : any
@@ -717,7 +718,9 @@ export class NehubaViewerUnit{
   `
   <span 
     *ngFor="let landmark of spatialSearch.landmarks"
-    [tooltip]=" landmark.properties | jsonStringifyPipe"
+    [tooltip] =" landmark.properties | jsonStringifyPipe"
+    container = "body"
+    containerClass = "landmarkTooltip"
     [ngStyle] = "styleLandmark(landmark)"
     (mouseenter)="landmark.hover = true"
     (mouseleave)="landmark.hover = false"
@@ -725,9 +728,15 @@ export class NehubaViewerUnit{
     <span 
       class="glyphicon glyphicon-map-marker">
     </span>
-    <div 
-      [ngStyle]="styleBeam(landmark)"
-      class = "pos-beam">
+    <div class = "pos-beam">
+      <div 
+        [ngStyle] = "styleBeam(landmark,false)" 
+        class = "pos-beam-outer">
+      </div>
+      <div 
+        [ngStyle] = "styleBeam(landmark,true)"
+        class = "pos-beam-inner">
+      </div>
     </div>
     <div class = "pos-shadow">
       <div
@@ -741,14 +750,24 @@ export class NehubaViewerUnit{
     .pos-shadow
     {
       flex: 0 0 0px;
-      order: 2;
     }
     .pos-beam
     {
       box-sizing:border-box;
-      background-color:transparent;
+      background-color:black;
       flex: 1 1 0px;
-      order : 1;
+      position:relative;
+    }
+    .pos-beam > .pos-beam-outer
+    {
+      position:absolute;
+      top:-1px;
+      left:-3px;
+    }
+    .pos-beam > .pos-beam-inner
+    {
+      position : absolute;
+      top:0px;
     }
     .glyphicon-container
     {
@@ -765,7 +784,6 @@ export class NehubaViewerUnit{
       height:0px;
       margin-left:-0.5em;
       flex: 0 0 0px;
-      order : 1;
     }
     `
   ]
@@ -776,8 +794,8 @@ export class NehubaViewerOverlayUnit {
   constructor(public mainController:MainController,public spatialSearch:SpatialSearch){
   }
 
-  NORMAL_COLOR : string = '150,50,20'
-  HOVER_COLOR : string = '250,100,40'
+  NORMAL_COLOR : string = '201,54,38'
+  HOVER_COLOR : string = '250,150,80'
 
   styleShadow(landmark:Landmark){
     if(this.nanometersToOffsetPixelsFn){
@@ -794,6 +812,7 @@ export class NehubaViewerOverlayUnit {
           'border-radius' : `${size/2}em`,
           'margin-top' : `${-1*size/2}em`,
           'margin-left' : `${-1*size/2}em`,
+          'border': `1px solid rgba(0,0,0,1.0)`,
           'background':`radial-gradient(rgba(${landmark.hover ? this.HOVER_COLOR + ',0.8' : this.NORMAL_COLOR + ',0.8'}), rgba(${landmark.hover ? this.HOVER_COLOR + ',0.3' : this.NORMAL_COLOR + ',0.3'}))`,
         }) : 
         Object.assign({},returnStyle,{
@@ -802,6 +821,7 @@ export class NehubaViewerOverlayUnit {
           'border-radius' : `${size/2}em`,
           'margin-top' : `${-1*size/2}em`,
           'margin-left' : `${-1*size/2}em`,
+          'border': `1px solid rgba(0,0,0,1.0)`,
           'background':`radial-gradient(rgba(${landmark.hover ? this.HOVER_COLOR + ',0.4' : this.NORMAL_COLOR + ',0.4'}), rgba(${landmark.hover ? this.HOVER_COLOR + ',0.15' : this.NORMAL_COLOR + ',0.15'}))`,
         })
     }else{
@@ -811,24 +831,29 @@ export class NehubaViewerOverlayUnit {
     }
   }
 
-  styleBeam(landmark:Landmark){
+  styleBeam(landmark:Landmark,inner:boolean){
     
     if(this.nanometersToOffsetPixelsFn){
       const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
       const borderWidth = 1
       return vec[2] >= 0 ? 
         ({
-          'border-top' : `${vec[2]}px solid rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},0.75)`,
-          'border-left' : `${borderWidth}px solid transparent`,
-          'border-right' : `${borderWidth}px solid transparent`,
+          'border-top' : `${vec[2]+(inner?0:2)}px solid rgba(${inner ? landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR : '0,0,0'},0.75)`,
+          'border-left' : `${borderWidth+(inner?0:1)}px solid transparent`,
+          'border-right' : `${borderWidth+(inner?0:1)}px solid transparent`,
           'width' : `0px`,
-          'margin-left':`${-1*borderWidth}px`
+          'left':`${-1*(borderWidth+(inner?0:1))}px`
         }) : 
-        ({
-          'border-left' : `1px dashed rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},0.25)`,
-          'border-right' : `1px solid transparent`,
-          'width' : `0px`,
-        })
+        inner ? 
+          ({
+            'height':`${-1*vec[2]}px`,
+            'border-left' : `1px dashed rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},1.0)`,
+            'border-right' : `1px solid transparent`,
+            'width' : `0px`,
+          }) : 
+          ({
+
+          })
     }else{
       return({
         display:'none'
@@ -864,21 +889,34 @@ export class NehubaViewerOverlayUnit {
       
       return vec[2] >= 0 ? 
         ({
+          'z-index':`${Math.round(vec[2])}`,
           'top' : `${vec[1]-vec[2]}px`,
           'left' : `${vec[0]}px`,
           'height': `${vec[2]}px`,
-          'font-size':`${scale * 2.0}%`,
+          'font-size':`${scale * 3.0}%`,
           'color' : `rgba(${landmark.hover ? this.HOVER_COLOR :this.NORMAL_COLOR},${scale/100+0.25})`,
           'background-color' : `rgba(${landmark.hover ?  this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100+0.25})`,
-          'flex-direction':`column`
+          'flex-direction':`column`,
+          'text-shadow' : `
+            -1px 0 rgba(0,0,0,1.0),
+            0 1px rgba(0,0,0,1.0),
+            1px 0 rgba(0,0,0,1.0),
+            0 -1px rgba(0,0,0,1.0)`
         }) : ({
+          'z-index':`${Math.round(vec[2])}`,
           'top' : `${vec[1]}px`,
           'left' : `${vec[0]}px`,
           'height': `${-1*vec[2]}px`,
-          'font-size':`${scale * 2.0}%`,
-          'color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100-0.25})`,
-          'background-color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100-0.25})`,
-          'flex-direction':`column-reverse`
+          'opacity' : '0.5',
+          'font-size':`${scale * 3.0}%`,
+          'color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100+0.25})`,
+          'background-color' : `rgba(${landmark.hover ? this.HOVER_COLOR : this.NORMAL_COLOR},${scale/100+0.25})`,
+          'flex-direction':`column-reverse`,
+          'text-shadow' : `
+            -1px 0 rgba(0,0,0,1.0),
+            0 1px rgba(0,0,0,1.0),
+            1px 0 rgba(0,0,0,1.0),
+            0 -1px rgba(0,0,0,1.0)`
         })
 
     } else {
@@ -988,5 +1026,7 @@ export class NehubaLandmarkList implements AfterViewInit{
 
   ngAfterViewInit(){
     this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
+    const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
+    segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
   }
 }
