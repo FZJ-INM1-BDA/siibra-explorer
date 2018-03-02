@@ -889,7 +889,7 @@ export class NehubaViewerOverlayUnit {
       
       return vec[2] >= 0 ? 
         ({
-          'z-index':`${Math.round(vec[2])}`,
+          'z-index':`${Math.round(vec[1]*10)}`,
           'top' : `${vec[1]-vec[2]}px`,
           'left' : `${vec[0]}px`,
           'height': `${vec[2]}px`,
@@ -1026,7 +1026,10 @@ export class NehubaLandmarkList implements AfterViewInit{
 
   ngAfterViewInit(){
     this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
+
     const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
     segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
+
   }
 }
+

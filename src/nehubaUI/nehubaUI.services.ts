@@ -607,8 +607,7 @@ export class SpatialSearch{
 
   landmarks : Landmark[] = []
 
-  constructor(){
-
+  constructor(private mainController:MainController){
     this.spatialSearchResultSubject
       .throttleTime(300)
       .subscribe(({center,width,templateSpace})=>
@@ -616,6 +615,9 @@ export class SpatialSearch{
           .then((data:any)=>(this.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
 
+    const encoder = new TextEncoder()
+    const blob = new Blob([encoder.encode(TEMP_ICOSAHEDRON_VTK)],{type:'application/octet-stream'})
+    this.TEMP_vtkUrl = URL.createObjectURL(blob)
   }
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
@@ -665,9 +667,26 @@ export class SpatialSearch{
   addLandmark = (pos:[number,number,number],id:string,properties:any)=>
     this.landmarks.push({ pos , id , properties,hover:false })
     
-  /* probably no need to clear the landmarks */
-  // clearAllLandmarks = () => 
-  //   this.landmarks.splice( 0 , this.landmarks.length )
+  TEMP_vtkUrl : string
+  TEMP_parseLandmarkToVtk = (landmark:Landmark,idx:number) =>{
+    const viewer = this.mainController.nehubaViewer.ngviewer
+
+    const oldLayer = viewer.layerManager.getLayerByName(`vtk-landmark-meshes-${idx}`)
+    if(oldLayer){
+      viewer.layerManager.removeManagedLayer(oldLayer)
+    }
+
+    viewer.layerManager.addManagedLayer(viewer.layerSpecification.getLayer(`vtk-landmark-meshes-${idx}`,{
+      type : 'mesh',
+      source : `vtk://${this.TEMP_vtkUrl}`,
+      transform : [
+        [2 , 0 , 0, landmark.pos[0]*1000000],
+        [0 , 2 , 0, landmark.pos[1]*1000000],
+        [0 , 0 , 2, landmark.pos[2]*1000000],
+        [0 , 0 , 0, 1 ]
+      ]
+    }))
+  }
 
   parseSpatialQuery = (data:any)=>{
     this.numHits = data.response.numFound
@@ -685,6 +704,8 @@ export class SpatialSearch{
           'geometry.coordinates' : doc['geometry.coordinates']
         })
       })
+
+    this.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
   }
 
   goTo = (pageIdx:number)=>{
@@ -1051,3 +1072,44 @@ export class TempReceptorData{
     }
   }
 }
+
+
+const TEMP_ICOSAHEDRON_VTK = 
+`# vtk DataFile Version 2.0
+Converted using https://github.com/HumanBrainProject/neuroglancer-scripts
+ASCII
+DATASET POLYDATA
+POINTS 12 float
+-525731.0 0.0 850651.0
+525731.0 0.0 850651.0
+-525731.0 0.0 -850651.0
+525731.0 0.0 -850651.0
+0.0 850651.0 525731.0
+0.0 850651.0 -525731.0
+0.0 -850651.0 525731.0
+0.0 -850651.0 -525731.0
+850651.0 525731.0 0.0
+-850651.0 525731.0 0.0
+850651.0 -525731.0 0.0
+-850651.0 -525731.0 0.0
+POLYGONS 20 80
+3 1 4 0
+3 4 9 0
+3 4 5 9
+3 8 5 4
+3 1 8 4
+3 1 10 8
+3 10 3 8
+3 8 3 5
+3 3 2 5
+3 3 7 2
+3 3 10 7
+3 10 6 7
+3 6 11 7
+3 6 0 11
+3 6 1 0
+3 10 1 6
+3 11 0 9
+3 2 11 9
+3 5 2 9
+3 11 2 7`
