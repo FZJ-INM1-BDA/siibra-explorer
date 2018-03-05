@@ -203,14 +203,17 @@ export class WidgetsContainer{
   }
 
   overridingMainController(){
-    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:widgitiseTempRefMetaData)=>{
+    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:widgitiseTempRefMetaData):WidgetComponent=>{
       const newLabcomponent = new LabComponent({
         name : metadata.name
       })
       const newWidget = new WidgetComponent(newLabcomponent)
-      newWidget.onShutdownCallbacks.push(()=>{
-        this.mainController.unwidgitiseSearchRegion(templateref)
-      })
+      // newWidget.onShutdownCallbacks.push(()=>{
+      //   this.mainController.unwidgitiseTemplateRef(templateref)
+      // })
+      // this.mainController.unwidgitiseTemplateRef = () =>{
+      //   newWidget.parentViewRef.destroy()
+      // }
       
       this.embedView(templateref,newWidget,'docked')
 
@@ -222,6 +225,8 @@ export class WidgetsContainer{
       if(metadata.onShutdownCleanup){
         newWidget.onShutdownCleanup = metadata.onShutdownCleanup as ()=>void
       }
+
+      return newWidget
     }
   }
 

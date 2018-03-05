@@ -1,5 +1,5 @@
 import { Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
-import { Subject } from 'rxjs/Rx'
+import { Subject,BehaviorSubject } from 'rxjs/Rx'
 import { Multilevel, Landmark, widgitiseTempRefMetaData } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
@@ -8,6 +8,8 @@ import { NehubaViewer } from 'nehuba/NehubaViewer';
 import { SelectTreePipe } from 'nehubaUI/nehubaUI.util.pipes';
 import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
 import { LayerManager } from 'neuroglancer/layer'
+import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
+import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 
 declare var window:{
   [key:string] : any
@@ -33,6 +35,7 @@ export class MainController{
    * viewing 
    */
   viewingMode : string = `navigation (default mode)`
+  viewingModeBSubject : BehaviorSubject<string> = new BehaviorSubject( this.viewingMode )
 
   /**
    * plugins
@@ -86,41 +89,46 @@ export class MainController{
     /* reset view state */
     this.viewerControl.hideAllSegments()
     if(this.nehubaViewer){
+
+      /* turn off all pmap layers */
       this.selectedRegions.forEach(re=>{
         const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.selectedParcellation!.ngId+re.name)
         if(pmap){
           pmap.setVisible(false)
         }else{
-          console.warn('could not turn off visibility of pmap layer')
+          //pmap layer does not yet exist
         }
       })
+      
+      /* turn on selected segments in parcellation */
+      if(this.selectedRegions.length==0){
+        this.viewerControl.showAllSegments()
+      }else{
+        this.selectedRegions.forEach(r=>this.viewerControl.showSegment(r.labelIndex))
+      }
+      
+      /* restore alpha */
+      this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
+        .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.5))
+
     }
 
     /* reset pmap */
-    if(this.nehubaViewer){
-      this.nehubaViewer.ngviewer.layerManager.managedLayers.filter(l=>/nifti/.test((<any>l).toJSON().source))
-        .forEach(l=>l.setVisible(false))
-    }
+    // if(this.nehubaViewer){
+    //   this.nehubaViewer.ngviewer.layerManager.managedLayers.filter(l=>/nifti/.test((<any>l).toJSON().source))
+    //     .forEach(l=>l.setVisible(false))
+    // }
+    /* this is already happening */
 
     this.receptorString = null
 
-    // this.selectedRegions.forEach(re=>{
-    //   const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.selectedParcellation!.ngId + re.name)
-    //   if(pmap){
-    //     pmap.setVisible(false)
-    //   }else{
-    //     console.warn('cannot find pmap')
-    //   }
-    // })
-
     /* set state */
     switch(mode){
-      case 'navigation (default mode)':
-        if(this.selectedRegions.length==0){
-          this.viewerControl.showAllSegments()
-        }else{
-          this.selectedRegions.forEach(r=>this.viewerControl.showSegment(r.labelIndex))
-        }
+      case 'Querying Landmarks':
+      {
+        this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
+          .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.2))
+      }
       break;
       case 'Probability Map':
       {
@@ -139,8 +147,10 @@ export class MainController{
           this.applyNehubaMeshFix()
       }
       break;
-      case 'Receptor Data':
-
+      default:
+      {
+        /* navigation and receptor data mode */
+      }
       break;
     }
   }
@@ -149,11 +159,11 @@ export class MainController{
     if(this.viewingMode != mode){
       this.viewingMode = mode
       this.passCheckSetMode(mode)
+      this.viewingModeBSubject.next(mode)
     }
   }
 
-  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:widgitiseTempRefMetaData)=>void
-  unwidgitiseSearchRegion : (templateref:TemplateRef<any>)=>void
+  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:widgitiseTempRefMetaData)=>WidgetComponent
 
   testRequirement():boolean{
     
@@ -618,11 +628,24 @@ export class SpatialSearch{
     const encoder = new TextEncoder()
     const blob = new Blob([encoder.encode(TEMP_ICOSAHEDRON_VTK)],{type:'application/octet-stream'})
     this.TEMP_vtkUrl = URL.createObjectURL(blob)
+
+    this.mainController.viewingModeBSubject.subscribe(mode=>{
+      if(mode=='Querying Landmarks'){
+        
+      }else{
+        if(this.mainController.nehubaViewer){
+          this.TEMP_clearVtkLayers()
+        }
+      }
+    })
   }
+
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
   querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
-    this.spatialSearchResultSubject.next({center,width,templateSpace})
+    this.mainController.viewingMode == 'Querying Landmarks' ? 
+      this.spatialSearchResultSubject.next({center,width,templateSpace}) :
+      this.landmarks = []
 
   /* promise race timeout (?) */
   spatialSearch(center:[number,number,number],width:number,templateSpace:string){
@@ -688,11 +711,22 @@ export class SpatialSearch{
     }))
   }
 
+  TEMP_clearVtkLayers(){
+    const layerManager = this.mainController.nehubaViewer.ngviewer.layerManager
+    Array.from(Array(10).keys())
+      .map(i=>`vtk-landmark-meshes-${i}`)
+      .forEach(layerName=>{
+        const layer = layerManager.getLayerByName(layerName)
+        if( layer ) layer.setVisible(false)
+      })
+  }
+
   parseSpatialQuery = (data:any)=>{
     this.numHits = data.response.numFound
     this.pagination = data.response.start / this.RESULTS_PER_PAGE
     // this.clearAllLandmarks()
     const docs = data.response.docs as any[]
+
     docs
       // .filter((_,idx)=>idx<20)
       // .filter(doc=> this.landmarks.findIndex(d=>d.id==doc.id) < 0)
@@ -705,7 +739,8 @@ export class SpatialSearch{
         })
       })
 
-    this.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
+      this.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
+
   }
 
   goTo = (pageIdx:number)=>{

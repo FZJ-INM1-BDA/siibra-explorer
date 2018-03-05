@@ -108,7 +108,7 @@ export class SearchHighlight implements PipeTransform{
       return string
     }else{
       let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
-      const nbsp = string.replace(/\s/gi,'&nbsp;')
+      const nbsp = string.replace(/\s/gi,' ')
       this.regExp = new RegExp(sanitaized,'gi')
       return this.sanitizer.bypassSecurityTrustHtml( nbsp.replace(this.regExp,match=> `<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`))
     }

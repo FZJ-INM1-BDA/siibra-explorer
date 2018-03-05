@@ -78,6 +78,28 @@
     </div>
 
     <div 
+      *ngIf = "mainController.selectedTemplate"
+      class = "input-group"
+      [popover] = "searchMode"
+      placement = "bottom"
+      [outsideClick] = "true"
+      triggers = ""
+      #popover = "bs-popover"
+      modeSelection>
+
+      <input 
+        [(ngModel)]="searchActivityTerm"
+        class = "form-control" 
+        (click)="popover.show()"
+        (keydown.esc) = "clearSearchActivityTerm();$event.target.blur()"
+        (keydown.enter) = "selectViewingMode();$event.target.blur()"
+        (focus) = "showListOfActivities = true;$event.target.select()"
+        (focusout) = "showListOfActivities = false"
+        [placeholder] = "mainController.viewingMode"
+        searchMode />
+    </div>
+
+    <div 
       *ngIf = "mainController.selectedTemplate && !widgetiseSearchRegion"
       class = "input-group" 
       [popover] = "searchRegion"
@@ -106,8 +128,28 @@
       {{widget.name.split('.')[2][0]}}
     </span>
 
+    <span 
+      glyphiconShowHelp 
+      (click)="showhelp()" 
+      [ngClass]="{darktheme : darktheme}" 
+      class = "helpbtn glyphicon glyphicon-question-sign">
+    </span>
   </div>
 </div>
+
+<ng-template #selectMode>
+  <div
+    *ngIf = "showListOfActivities"
+    class = "btn-group-vertical"
+    listOfActivities>
+    <span 
+      (mousedown) = "selectViewingMode(activity)"
+      class = "btn btn-default btn-block text-left" 
+      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm"
+      [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
+    </span>
+  </div>
+</ng-template>
 
 <ng-template #searchRegion>
   <atlascontrol [searchTerm]="searchTerm" #atlascontrol>
