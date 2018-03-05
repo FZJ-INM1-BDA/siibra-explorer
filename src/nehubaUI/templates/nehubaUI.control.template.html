@@ -1,36 +1,4 @@
 <div regionContainer>
-
-  <div 
-    class = "input-group"
-    modeSelection>
-
-    <span class = "input-group-addon">
-      Mode
-    </span>
-
-    <input 
-      [(ngModel)]="searchActivityTerm"
-      class = "form-control" 
-      (keydown.esc) = "clearSearchActivityTerm();$event.target.blur()"
-      (keydown.enter) = "selectViewingMode();$event.target.blur()"
-      (focus) = "showListOfActivities = true;$event.target.select()"
-      (focusout) = "showListOfActivities = false"
-      [placeholder] = "mainController.viewingMode"
-      searchMode/>
-  </div>
-
-  <div
-    *ngIf = "showListOfActivities"
-    class = "btn-group-vertical"
-    listOfActivities>
-    <span 
-      (mousedown) = "selectViewingMode(activity)"
-      class = "btn btn-default btn-block text-left" 
-      *ngFor = "let activity of listOfActivities | prependNavigatePipe  | searchPipe : searchActivityTerm"
-      [innerHTML] = "activity | highlightPipe : searchActivityTerm ">
-    </span>
-  </div>
-
   <div 
     multilevelContainer>
     <multilevel 

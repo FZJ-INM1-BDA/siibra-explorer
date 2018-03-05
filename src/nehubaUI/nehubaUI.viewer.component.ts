@@ -8,6 +8,7 @@ import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark 
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
+import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 
 declare var window:{
   [key:string] : any
@@ -214,67 +215,74 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
         id = "nehubaui-overlay-c3">
       </nehubaui-overlay>
       <nehubaui-overlay 
+        [rotate3D] = "rotate3D"
         class = "nehubaui-overlay-c" 
         id = "nehubaui-overlay-c4">
       </nehubaui-overlay>
     </div>
-    <nehubaui-landmark-list>
+    <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'Querying Landmarks'">
     </nehubaui-landmark-list>
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
-
-      <span nametagSelectedRegions>
-        Selected Regions : 
-      </span>
-      <div class = "row" *ngIf="mainController.selectedRegions.length == 0">
-        <i class = "col-sm-12 col-md-12 col-lg-12 text-muted" >No Region Selected </i>
-      </div>
-      <div
-        class = "row"
-        *ngFor = "let selectedRegion of mainController.selectedRegions">
-        
-        <div class = "col-sm-12 col-md-12 col-lg-12">
-          {{selectedRegion.name}} 
+      
+      <div *ngIf="false">
+        <span nametagSelectedRegions>
+          Selected Regions : 
+        </span>
+        <div class = "row" *ngIf="mainController.selectedRegions.length == 0">
+          <i class = "col-sm-12 col-md-12 col-lg-12 text-muted" >No Region Selected </i>
         </div>
-        <div class = "col-md-12 col-sm-12 col-lg-12" [innerHTML]="dynamicData(selectedRegion)">
-          dynamic content here
+        <div
+          class = "row"
+          *ngFor = "let selectedRegion of mainController.selectedRegions">
+          
+          <div class = "col-sm-12 col-md-12 col-lg-12">
+            {{selectedRegion.name}} 
+          </div>
+          <div class = "col-md-12 col-sm-12 col-lg-12" [innerHTML]="dynamicData(selectedRegion)">
+            dynamic content here
+          </div>
         </div>
+
+        <br *ngIf="mainController.viewingMode == 'Receptor Data'" />
+        <div class = "row" *ngIf="mainController.viewingMode == 'Receptor Data'" >
+          <receptorDataDriver (receptorString)="setReceptorString($event)">
+          </receptorDataDriver>
+        </div>
+
+        <br />
+        <span>
+          Hovering : {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? '' : viewerSegment.name   }}
+        </span>
+        <br /><br />
+        <span *ngIf="false">
+          Mode : {{ mainController.viewingMode }}
+        </span>
+        <br />
+
       </div>
 
-      <br *ngIf="mainController.viewingMode == 'Receptor Data'" />
-      <div class = "row" *ngIf="mainController.viewingMode == 'Receptor Data'" >
-        <receptorDataDriver (receptorString)="setReceptorString($event)">
-        </receptorDataDriver>
-      </div>
-
-      <br />
-      <span>
-        Hovering : {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? '' : viewerSegment.name   }}
-      </span>
-      <br /><br />
-      Mode : {{ mainController.viewingMode }}
-      <br />
       <span 
         class = "btn btn-link"
         (click)="statusPanelRealSpace = !statusPanelRealSpace">
-        {{statusPanelRealSpace ? 'RealSpace(mm)' : 'VoxelSpace'}}
+        {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
       </span>
 
       <br />
       Navigation: <small>(
         {{
           statusPanelRealSpace ? 
-            (viewerPosReal[0] | nmToMm | number) : 
+            (viewerPosReal[0] | nmToMm | number) + 'mm': 
             viewerPosVoxel[0]
         }},
         {{
           statusPanelRealSpace ? 
-            (viewerPosReal[1] | nmToMm | number) : 
+            (viewerPosReal[1] | nmToMm | number) + 'mm' : 
             viewerPosVoxel[1]
         }},
         {{
           statusPanelRealSpace ? 
-            (viewerPosReal[2] | nmToMm | number) : 
+            (viewerPosReal[2] | nmToMm | number) + 'mm' : 
             viewerPosVoxel[2]
         }}
       )</small> 
@@ -283,17 +291,17 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       Mouse: <small>(
         {{
           statusPanelRealSpace ? 
-            (mousePosReal[0] | nmToMm | number) : 
+            (mousePosReal[0] | nmToMm | number) + 'mm' : 
             mousePosVoxel[0]
         }},
         {{
           statusPanelRealSpace ? 
-            (mousePosReal[1] | nmToMm | number) : 
+            (mousePosReal[1] | nmToMm | number) + 'mm' : 
             mousePosVoxel[1]
         }},
         {{
           statusPanelRealSpace ? 
-            (mousePosReal[2] | nmToMm | number) : 
+            (mousePosReal[2] | nmToMm | number) + 'mm' : 
             mousePosVoxel[2]
         }}
       )</small> 
@@ -370,7 +378,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       left:1em;
       bottom:1em;
       z-index:9;
-      width:13em;
+      width:16em;
       overflow:hidden;
       box-sizing: border-box;
       padding:0.5em;
@@ -403,7 +411,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   segmentListener : any = {}
 
+  spatialSearchWidth : number
   nanometersToOffsetPixelsFn : Function[] | null[] = [null,null,null]
+  rotate3D : number[] | null = null
 
   @HostListener('document:mousedown',['$event'])
   clearContextmenu(_ev:any){
@@ -472,6 +482,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     //   })
     //   this.onDestroyUnsubscribe.push(shownSegmentObsSubscription)
     // })
+
+    this.mainController.viewingModeBSubject.subscribe(()=>{
+      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+    })
   }
 
   public ngOnDestroy(){
@@ -520,6 +534,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
           
           Observable.fromEvent(panel,sliceRenderEventType).map(it=>it as CustomEvent)
             .subscribe(ev=>{
+
               const el = ev.target as HTMLElement
               const detail = ev.detail as SliceRenderEventDetail
               /* TODO this is a terrible way of identifying panels */
@@ -530,7 +545,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
                 el.offsetTop < 5 ?
                   this.nanometersToOffsetPixelsFn[1] = detail.nanometersToOffsetPixels :
                   (console.log('observable fired from perspective panel'))
+
             })
+          
         })
       })
     })
@@ -545,12 +562,12 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     
     const navigationSubscription = this.nehubaViewer.navigationState.position.inRealSpace.subscribe((pos:any)=>{
       this.viewerPosReal = pos
-      
+
       /* spatial query */
       const container = (<HTMLElement>this.viewerContainer.nativeElement)
-      const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
+      this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
       /* width in mm */
-      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
     })
     this.onDestroyUnsubscribe.push( navigationSubscription )
     const navigationSubscriptionVoxel = this.nehubaViewer.navigationState.position.inVoxels.subscribe((pos:any)=>this.viewerPosVoxel=pos)
@@ -561,9 +578,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     
       /* spatial query */
       const container = (<HTMLElement>this.viewerContainer.nativeElement)
-      const width = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
+      this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
       /* width in mm */
-      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],width,`Colin 27`)
+      this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
     })
     this.onDestroyUnsubscribe.push( zoomSub )
 
@@ -689,10 +706,15 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   }
 
   //TODO: do this properly with proper api's
-  public loadLayer(layerObj:Object){
-    const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
-    Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
-    this.nehubaViewer.ngviewer.state.restoreState(state)
+  public loadLayer(layerObj:any){
+    const viewer = this.nehubaViewer.ngviewer
+    Object.keys(layerObj).forEach(key=>{
+      viewer.layerManager.addManagedLayer(
+        viewer.layerSpecification.getLayer(`PMap ${key}`,layerObj[key]))
+    })
+    // const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
+    // Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
+    // this.nehubaViewer.ngviewer.state.restoreState(state)
   }
 
   public showFloatingPopover = (ev:any)=> {
@@ -744,9 +766,20 @@ export class NehubaViewerUnit{
       </div>
     </div>
   </span>
+  <div [ngStyle] = "{'transform':'rotate3D(' + rotate3D.join(',') + 'rad)' }" *ngIf="rotate3D" perspectiveAd>
+    Perspective Overlay
+  </div>
   `,
   styles : [
     `
+    div[perspectiveAd]
+    {
+      width:80%;
+      height:80%;
+      background-color:rgba(128,128,128,0.2);
+      margin-left:10%;
+      margin-top:10%;
+    }
     .pos-shadow
     {
       flex: 0 0 0px;
@@ -791,11 +824,18 @@ export class NehubaViewerUnit{
 
 export class NehubaViewerOverlayUnit {
   @Input() nanometersToOffsetPixelsFn : Function 
+  @Input() rotate3D : number[] | undefined
   constructor(public mainController:MainController,public spatialSearch:SpatialSearch){
   }
 
   NORMAL_COLOR : string = '201,54,38'
   HOVER_COLOR : string = '250,150,80'
+
+  stylePerspectiveAd(){
+    return({
+      'transform':`rotate3d(${this.rotate3D![1]},${this.rotate3D![2]},${this.rotate3D![3]},${this.rotate3D![0]}rad)`
+    })
+  }
 
   styleShadow(landmark:Landmark){
     if(this.nanometersToOffsetPixelsFn){
@@ -1005,7 +1045,7 @@ export class NehubaViewerOverlayUnit {
   ]
 })
 
-export class NehubaLandmarkList implements AfterViewInit{
+export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
   @ViewChild('landmarkList',{read:TemplateRef}) landmarkList : TemplateRef<any>
 
   constructor(public mainController:MainController,public spatialSearch:SpatialSearch){
@@ -1024,12 +1064,17 @@ export class NehubaLandmarkList implements AfterViewInit{
     return (Math.abs(idx-correctedPagination) < 3)
   }
 
+  widgetComponent : WidgetComponent
+
   ngAfterViewInit(){
-    this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
+    this.widgetComponent = this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
 
     const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
     segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
+  }
 
+  ngOnDestroy(){
+    this.widgetComponent.parentViewRef.destroy()
   }
 }
 

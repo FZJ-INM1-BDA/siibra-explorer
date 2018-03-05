@@ -13,11 +13,11 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer, FloatingWidgetView, WidgetView, MinimisedView, MinimisedWidgetContainer } from './nehubaUI.widgets.component'
 import { NehubaModalService,NehubaModalUnit } from './nehubaUI.modal.component'
 import { MultilevelSelector } from './nehubaUI.multilevel.component'
-import { NehubaUIControl,SearchPipe,PrependNavigate,HighlighPipe } from './nehubaUI.control.component';
+import { NehubaUIControl } from './nehubaUI.control.component';
 import { NehubaViewerContainer } from './nehubaUI.viewerContainer.component';
 import { NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit,NehubaLandmarkList } from './nehubaUI.viewer.component';
 import { NehubaContainer } from './nehubaUI.parent.component';
-import { NehubaBanner } from './nehubaUI.banner.component';
+import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from './nehubaUI.banner.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
 import { MainController, TempReceptorData } from './nehubaUI.services';
@@ -40,7 +40,7 @@ import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighl
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingPopOver,
         Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService, TempReceptorData,
-        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren,SearchPipe,PrependNavigate,HighlighPipe],
+        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
     bootstrap : [ NehubaContainer ],
     providers : [ MainController ],
     entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
