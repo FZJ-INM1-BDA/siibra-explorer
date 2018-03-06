@@ -23,6 +23,8 @@ import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component
 import { MainController, TempReceptorData } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma, MultilevelHasVisibleChildren  } from './nehubaUI.util.pipes'
 
+import { SearchResultCardRegion,ListSearchResultCardRegion } from './nehubaUI.searchResultCard.region'
+
 @NgModule({
     imports:[
         RouterModule,
@@ -36,7 +38,8 @@ import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighl
         TooltipModule.forRoot()
     ],
     declarations : 
-        [ MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
+        [ ListSearchResultCardRegion, SearchResultCardRegion ,
+        MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingPopOver,
         Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,
         MultilevelSelector, NehubaModalService, TempReceptorData,

@@ -87,12 +87,11 @@ export class MainController{
   private passCheckSetMode(mode:String){
 
     /* reset view state */
-    this.viewerControl.hideAllSegments()
     if(this.nehubaViewer){
 
       /* turn off all pmap layers */
       this.selectedRegions.forEach(re=>{
-        const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.selectedParcellation!.ngId+re.name)
+        const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${re.name}`)
         if(pmap){
           pmap.setVisible(false)
         }else{
@@ -132,11 +131,21 @@ export class MainController{
       break;
       case 'Probability Map':
       {
+        /* can't do this. or else the mesh becomes invisible */
+        // this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
+        //   .forEach(l=>(<ManagedUserLayer>l).setVisible(false))
+
+        this.viewerControl.hideAllSegments()
+        this.viewerControl.setLayerVisibility({name:/^PMap/},false)
+        this.selectedRegions.forEach(r=>{
+          this.viewerControl.setLayerVisibility({name:`PMap ${r.name}`},true)
+        })
+
         this.viewerControl.loadLayer( this.selectedRegions
           .filter(r=>r.moreInfo.findIndex(info=>info.name==mode))
           .reduce((prev:any,r:RegionDescriptor)=>{
             const obj : any = {}
-            obj[this.selectedParcellation!.ngId+r.name] = {
+            obj[`PMap ${r.name}`] = {
               type : 'image',
               source : r.moreInfo.find(info=>info.name==mode)!.source,
               shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
@@ -910,7 +919,9 @@ class ViewerHandle {
   showAllSegments : ()=>void
   hideAllSegments : ()=>void
 
-  loadLayer : (layerObj:Object)=>void
+  loadLayer : (layerObj:any)=>any[]
+  removeLayer : (layerObj:any)=>string[]
+  setLayerVisibility : (layerObj:any, visibility:boolean)=>string[]
   reapplyNehubaMeshFix : ()=>void
 
   mouseEvent : Subject<{eventName:string,event:any}>

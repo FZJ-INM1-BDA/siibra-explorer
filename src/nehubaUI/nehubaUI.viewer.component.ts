@@ -1,7 +1,7 @@
 import { Input,AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
 import { Observable } from 'rxjs/Rx'
 
-import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports'
+import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail, perspectiveRenderEventType } from 'nehuba/exports'
 
 import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
@@ -9,6 +9,7 @@ import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
+import { ManagedUserLayer } from 'neuroglancer/layer';
 
 declare var window:{
   [key:string] : any
@@ -77,6 +78,8 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     this.mainController.viewerControl.showSegment = (segId) => this.showSegment(segId)
     this.mainController.viewerControl.showAllSegments = () => this.showAllSegments()
     this.mainController.viewerControl.loadLayer = (layerObj) => this.loadLayer(layerObj)
+    this.mainController.viewerControl.removeLayer = (layerObj) => this.removeLayer(layerObj)
+    this.mainController.viewerControl.setLayerVisibility = (layerObj,visible) => this.setLayerVisibility(layerObj,visible)
   }
 
   /**
@@ -184,8 +187,16 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     this.nehubaViewerComponent.allSeg(false)
   }
 
-  public loadLayer(layerObj:Object){
-    this.nehubaViewerComponent.loadLayer(layerObj)
+  public setLayerVisibility(layerObj:any,visible:boolean){
+    return this.nehubaViewerComponent.setLayerVisibility(layerObj,visible)
+  }
+
+  public loadLayer(layerObj:any){
+    return this.nehubaViewerComponent.loadLayer(layerObj)
+  }
+
+  public removeLayer(layerObj:any){
+    return this.nehubaViewerComponent.removeLayer(layerObj)
   }
 }
 
@@ -220,8 +231,15 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
         id = "nehubaui-overlay-c4">
       </nehubaui-overlay>
     </div>
+    
     <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'Querying Landmarks'">
     </nehubaui-landmark-list>
+
+    <nehubaui-searchresult-region-list 
+      [title] = "'Receptor Data Browser'"
+      [regions] = " Array.from( mainController.regionsLabelIndexMap.values() ).filter(filterForReceptorData) "
+      *ngIf = "mainController.viewingMode == 'Receptor Data'">
+    </nehubaui-searchresult-region-list>
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
       
@@ -426,6 +444,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
+  /* Variables needed for listify receptor browser */
+  Array = Array
+  filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
+
   constructor(private mainController:MainController,public spatialSearch:SpatialSearch){
 
     // const metadata = gExternalControl.metadata
@@ -549,6 +571,12 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
             })
           
         })
+
+        Observable.fromEvent(this.viewerContainer.nativeElement,perspectiveRenderEventType)
+          .subscribe(()=>{
+            /* attach pointer to 3d viewer here */
+            
+          })
       })
     })
 
@@ -705,13 +733,72 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     }
   }
 
+  /* filter function
+  tests array l for all conditions in layerObj. for eg
+  const array = [
+    {
+      name : 'apples'
+    },
+    {
+      name : 'oranges'
+    }
+  ]
+  const test1 = {
+    name : /^app/
+  }
+
+  filterLayers(array,test1) 
+  returns [{
+    {
+      name : 'apples'
+    }
+  }]
+  */
+  private filterLayers(l:any,layerObj:any):boolean{
+    return Object.keys(layerObj).length == 0 && layerObj.constructor == Object ?
+      true :
+      Object.keys(layerObj).every(key=>
+        !(<Object>l).hasOwnProperty(key) ? 
+          false :
+          layerObj[key] instanceof RegExp ?
+            layerObj[key].test(l[key]) :
+            layerObj[key] == l[key])
+  }
+
+  public removeLayer(layerObj:any){
+
+    const viewer = this.nehubaViewer.ngviewer
+    const removeLayer = (i:ManagedUserLayer) => (viewer.layerManager.removeManagedLayer(i),i.name)
+
+    return viewer.layerManager.managedLayers
+      .filter(l=>this.filterLayers(l,layerObj))
+      .map(removeLayer)
+  }
+
+  public setLayerVisibility(layerObj:any,visible:boolean){
+
+    const viewer = this.nehubaViewer.ngviewer
+    const setVisibility = (i:ManagedUserLayer) => (i.setVisible(visible),i.name)
+
+    return viewer.layerManager.managedLayers
+      .filter(l=>this.filterLayers(l,layerObj))
+      .map(setVisibility)
+  }
+
   //TODO: do this properly with proper api's
   public loadLayer(layerObj:any){
     const viewer = this.nehubaViewer.ngviewer
-    Object.keys(layerObj).forEach(key=>{
-      viewer.layerManager.addManagedLayer(
-        viewer.layerSpecification.getLayer(`PMap ${key}`,layerObj[key]))
-    })
+    return Object.keys(layerObj)
+      .filter(key=>
+        /* if the layer exists, it will not be loaded */
+        !viewer.layerManager.getLayerByName(key))
+      .map(key=>{
+
+        viewer.layerManager.addManagedLayer(
+          viewer.layerSpecification.getLayer(key,layerObj[key]))
+
+        return layerObj[key]
+      })
     // const state = (<NehubaViewer>window['nehubaViewer']).ngviewer.state.toJSON()
     // Object.keys(layerObj).forEach(key=>state.layers[key]=(<any>layerObj)[key])
     // this.nehubaViewer.ngviewer.state.restoreState(state)
