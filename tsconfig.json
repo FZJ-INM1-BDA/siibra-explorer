@@ -5,6 +5,7 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "baseUrl": ".",
+    "target": "ES2015",
     "paths": {
       "*": ["*"],
       "neuroglancer/*": ["third_party/neuroglancer/*"],
