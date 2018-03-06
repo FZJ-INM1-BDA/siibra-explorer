@@ -312,7 +312,7 @@ export interface DescriptorMoreInfo{
 export class DescriptorMoreInfoItem{
   name : string
   desc : string
-  icon : string
+  icon : any
   source : string
   action : ()=>void = ()=>{}
   constructor(name:string,icon:string){
@@ -380,7 +380,7 @@ export class Landmark{
   hover : boolean 
 }
 
-export interface widgitiseTempRefMetaData{
+export interface WidgitiseTempRefMetaData{
   name : string
   onShutdownCleanup? : Function
 }

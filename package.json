@@ -4,7 +4,8 @@
   "scripts": {
     "build-min": "webpack --config ./config/webpack.min.js",
     "build": "webpack --config ./config/webpack.config.js",
-    "dev-server": "webpack-dev-server --config ./config/webpack.config.js"
+    "dev-server": "webpack-dev-server --config ./config/webpack.config.js",
+    "dev-server-all-interfaces" : "webpack-dev-server --config ./config/webpack.config.js --hot --host 0.0.0.0"
   },
   "dependencies": {
     "@angular/animations": "^4.1.3",

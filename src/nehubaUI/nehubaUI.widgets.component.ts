@@ -1,5 +1,5 @@
 import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
-import { LabComponent, LabComponentHandler, widgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
+import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, HelperFunctions, MainController } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 import { NehubaUIControl } from 'nehubaUI/nehubaUI.control.component';
@@ -203,7 +203,7 @@ export class WidgetsContainer{
   }
 
   overridingMainController(){
-    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:widgitiseTempRefMetaData):WidgetComponent=>{
+    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:WidgitiseTempRefMetaData):WidgetComponent=>{
       const newLabcomponent = new LabComponent({
         name : metadata.name
       })
@@ -228,6 +228,8 @@ export class WidgetsContainer{
 
       return newWidget
     }
+
+    this.mainController.createDisposableWidgets = (widgetComponent:WidgetComponent)=>this.createWidgetView(widgetComponent)
   }
 
   private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
@@ -243,6 +245,10 @@ export class WidgetsContainer{
     }
     newWidget.parentViewRef = parentViewRef
     newWidget.state = state
+
+    if(this.mainController.nehubaViewer){
+      this.mainController.nehubaViewer.redraw()
+    }
   }
 
   private initialInsertWidgetIntoContainer(viewRef:ViewRef,newWidget:WidgetComponent){
@@ -255,18 +261,15 @@ export class WidgetsContainer{
     newWidget.state = 'floating'
   }
 
-  createNewWidget(labComponent:LabComponent){
-    const newWidget = new WidgetComponent( labComponent )
-    this.mainController.launchedWidgets.push(labComponent.name)
-
+  createWidgetView(widgetComponent:WidgetComponent){
     const widgetViewRef = this.widgetContentViewRef.createComponent( this.widgetFactory )
     const widgetView = (<WidgetView>widgetViewRef.instance)
-    widgetView.widgetComponent = newWidget
+    widgetView.widgetComponent = widgetComponent
 
     /* overwriting change state method */
-    newWidget.changeState = ( state : 'docked' | 'minimised' | 'floating' )=>{
-      newWidget.parentViewRef.instance.panelBody.detach( 0 )
-      newWidget.parentViewRef.destroy()
+    widgetComponent.changeState = ( state : 'docked' | 'minimised' | 'floating' )=>{
+      widgetComponent.parentViewRef.instance.panelBody.detach( 0 )
+      widgetComponent.parentViewRef.destroy()
 
       const newParentViewRef = state == 'docked' ?
         this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) : 
@@ -275,18 +278,28 @@ export class WidgetsContainer{
           this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
 
       newParentViewRef.instance.panelBody.insert( widgetViewRef.hostView )
-      newParentViewRef.instance.widgetComponent = newWidget
-      newWidget.parentViewRef = newParentViewRef
+      newParentViewRef.instance.widgetComponent = widgetComponent
+      widgetComponent.parentViewRef = newParentViewRef
 
-      newWidget.state = state
+      widgetComponent.state = state
 
       if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
     }
 
     /* initial stage */
-    this.initialInsertWidgetIntoContainer(widgetViewRef.hostView,newWidget)
+    this.initialInsertWidgetIntoContainer(widgetViewRef.hostView,widgetComponent)
 
     if( this.mainController.nehubaViewer ) this.mainController.nehubaViewer.redraw()
+
+    return widgetViewRef
+  }
+
+  /* create new widget from labcomponent for plugins */
+  createNewWidget(labComponent:LabComponent){
+    const newWidget = new WidgetComponent( labComponent )
+    this.mainController.launchedWidgets.push(labComponent.name)
+
+    const widgetViewRef = this.createWidgetView( newWidget )
 
     /* script needs to be cloned or the script will only be executed the first time */
     /* deep needs to be true to support inline script */
@@ -296,8 +309,8 @@ export class WidgetsContainer{
     newWidget.onShutdownCleanup = ()=>{
       newWidget.parentViewRef.destroy()
       widgetViewRef.destroy()
+
       this.rd2.removeChild(document.head,scriptclone)
-      
       const indx = this.mainController.launchedWidgets.findIndex(widgetName=>widgetName==labComponent.name)
       this.mainController.launchedWidgets.splice(indx,1)
     }

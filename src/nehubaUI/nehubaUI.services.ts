@@ -1,6 +1,6 @@
-import { Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
+import { Input, Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
 import { Subject,BehaviorSubject } from 'rxjs/Rx'
-import { Multilevel, Landmark, widgitiseTempRefMetaData } from './nehuba.model'
+import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
 import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
@@ -172,7 +172,8 @@ export class MainController{
     }
   }
 
-  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:widgitiseTempRefMetaData)=>WidgetComponent
+  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent
+  createDisposableWidgets : (widgetComponent:WidgetComponent)=>any
 
   testRequirement():boolean{
     
@@ -609,6 +610,20 @@ export class MultilevelProvider{
 }
 
 @Injectable()
+export class LandmarkServices{
+  landmarks : Landmark[] = []
+
+  changeLandmarkNodeView(landmark:Landmark,view:any){
+    this.onChangeLandmarkNodeViewCbs.forEach(cb=>cb(landmark,view))
+  }
+
+  private onChangeLandmarkNodeViewCbs : ((landmark:Landmark,view:any)=>void)[] = []
+  onChangeLandmarkNodeView(callback:(landmark:Landmark,view:any)=>void){
+    this.onChangeLandmarkNodeViewCbs.push(callback)
+  }
+}
+
+@Injectable()
 export class SpatialSearch{
 
   pagination : number = 0
@@ -624,14 +639,13 @@ export class SpatialSearch{
   templateSpace : string
   spatialSearchResultSubject : Subject<any> = new Subject()
 
-  landmarks : Landmark[] = []
 
-  constructor(private mainController:MainController){
+  constructor(private mainController:MainController,private landmarkServices:LandmarkServices){
     this.spatialSearchResultSubject
       .throttleTime(300)
       .subscribe(({center,width,templateSpace})=>
         this.spatialSearch(center,width,templateSpace)
-          .then((data:any)=>(this.landmarks = [],this.parseSpatialQuery(data)))
+          .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
 
     const encoder = new TextEncoder()
@@ -652,9 +666,10 @@ export class SpatialSearch{
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
   querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
-    this.mainController.viewingMode == 'Querying Landmarks' ? 
-      this.spatialSearchResultSubject.next({center,width,templateSpace}) :
-      this.landmarks = []
+  {
+    if(this.mainController.viewingMode == 'Querying Landmarks')
+      this.spatialSearchResultSubject.next({center,width,templateSpace})
+  }
 
   /* promise race timeout (?) */
   spatialSearch(center:[number,number,number],width:number,templateSpace:string){
@@ -697,7 +712,7 @@ export class SpatialSearch{
   }
   
   addLandmark = (pos:[number,number,number],id:string,properties:any)=>
-    this.landmarks.push({ pos , id , properties,hover:false })
+    this.landmarkServices.landmarks.push({ pos , id , properties,hover:false})
     
   TEMP_vtkUrl : string
   TEMP_parseLandmarkToVtk = (landmark:Landmark,idx:number) =>{
@@ -748,7 +763,7 @@ export class SpatialSearch{
         })
       })
 
-      this.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
+      this.landmarkServices.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
 
   }
 
@@ -1069,37 +1084,82 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
 @Component({
   selector : 'receptorDataDriver',
   template : `
+    <div class = "well" receptorPath>
+      <small>
+        <span (click)="popall()" clickables>{{ receptorName }}</span>
+        <i class = "glyphicon glyphicon-chevron-right">
+        </i>
+        <span *ngFor = "let choice of choiceStack">
+          <span (click)="popUntil(choice)" clickables>{{ choice }} </span>
+          <i class = "glyphicon glyphicon-chevron-right">
+          </i>
+        </span>
+      </small>
+    </div>
     <div
-      class = "btn btn-block btn-sm"
+      class = "btn btn-block"
       (click)="popStack()" 
-      *ngIf="historyStack.length != 0">
-      <span class = "glyphicon glyphicon-chevron-left"></span> Back
+      *ngIf="historyStack.length != 0"
+      backBtn>
+
+      <i class = "glyphicon glyphicon-chevron-left"></i> 
+      Back
+
     </div>
     <div 
       (click) = "enterStack(key)" 
-      class = "btn btn-block btn-sm" 
+      class = "btn btn-block" 
       *ngFor="let key of focusStack | keyPipe">
 
-      {{key}} <span *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></span> <span *ngIf="focusStack[key].constructor.name == 'Object' " class = "glyphicon glyphicon-chevron-right"></span> 
+      {{key}} 
+      <i *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></i> 
+      <i *ngIf="focusStack[key].constructor.name == 'Object'" class = "glyphicon glyphicon-chevron-right"></i> 
     </div>
   `,
   styles : [
     `
+    [clickables]:hover
+    {
+      cursor:pointer;
+    }
+    .well[receptorPath]
+    {
+      white-space:nowrap;
+      overflow:hidden;
+      background-color:rgba(0,0,0,0.2);
+    }
     .btn
     {
       padding:0em;
       margin:0em;
+    }
+    .btn[backBtn]
+    {
+      margin-bottom:0.4em;
     }
     `
   ]
 })
 
 export class TempReceptorData{
+  @Input() receptorName : string = ``
   @Output() receptorString : EventEmitter<string|null> = new EventEmitter()
 
   historyStack : any[] = []
   choiceStack : string[] = []
   focusStack : any = TEMP_RECEPTORDATA_DRIVER_DATA
+
+  popall(){
+    while(this.choiceStack.length>0){
+      this.popStack()
+    }
+  }
+
+  popUntil(choice:string){
+    while(this.choiceStack[this.choiceStack.length-1]!=choice){
+      this.popStack()
+    }
+  }
 
   popStack(){
     this.focusStack = this.historyStack.pop()
@@ -1114,6 +1174,7 @@ export class TempReceptorData{
       this.receptorString.emit(this.focusStack[key])
       this.focusStack = []
     }else{
+      this.receptorString.emit(null)
       this.focusStack = this.focusStack[key]
     }
   }
