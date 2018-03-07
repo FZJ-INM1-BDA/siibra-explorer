@@ -393,8 +393,10 @@ interface WidgetViewChassis{
           <i class = "glyphicon glyphicon-remove"></i>
         </i>
     </div>
-    <ng-template #panelBody>
-    </ng-template>
+    <div class = "panel-body">
+      <ng-template #panelBody>
+      </ng-template>
+    </div>
   </div>
   `,
   styles : [
@@ -550,7 +552,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         <i class = "glyphicon glyphicon-remove"></i>
       </i>
     </div>
-    <div [hidden] = "!showBody">
+    <div [hidden] = "!showBody" class = "panel-body">
       <ng-template #panelBody>
       </ng-template>
     </div>

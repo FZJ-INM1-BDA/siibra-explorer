@@ -45,10 +45,22 @@ import { ModalHandler } from './nehubaUI.modal.component'
     {
       display:inline-block
     }
-    span[editBtn]{
-      margin-left:-1em;
-      color:white;
+    div[editBtn]
+    {
+      height:34px;
+      box-sizing:border-box;
+      padding:2px;
+      position:relative;
+      margin-left:-2.5em;
       z-index:9;
+    }
+    div[editBtn]:before
+    {
+      content:'';
+      height:100%;
+      width:0px;
+      vertical-align:middle;
+      display:inline-block;
     }
     [btnCustom]
     {
@@ -115,9 +127,14 @@ export class NehubaBanner implements AfterViewInit {
     })
   }
 
-  test(){
-    console.log(this.searchRegion)
-    this.mainController.widgitiseTemplateRef(this.searchRegion,{name:'Search Region',onShutdownCleanup : ()=>{/* on widget shutdown */}})
+  widgetiseSearchRegionComponent(){
+    this.widgetiseSearchRegion = true
+    const widgitComponent = this.mainController.widgitiseTemplateRef(this.searchRegion,{name:'Search Region',onShutdownCleanup : ()=>{
+      this.widgetiseSearchRegion = false
+      widgitComponent.parentViewRef.destroy()
+      if(this.mainController.nehubaViewer)this.mainController.nehubaViewer.redraw()
+    }})
+    widgitComponent.changeState("floating")
   }
 
   parseSrcToBGUrl(str:string){

@@ -1,5 +1,5 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
-import { RegionDescriptor, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
+import { RegionDescriptor, LabComponent } from 'nehubaUI/nehuba.model';
 import { MainController, LandmarkServices } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 
@@ -34,12 +34,17 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
       this.mainController.nehubaViewer.redraw()
     }
 
+    this.selectedRegionsWithReceptorData()
+
     this.landmarkServices.landmarks = this.regions.map(r=>({
       pos : r.position.map(number=>number / 1000000) as [number,number,number],
       id : r.name,
       hover : false,
       properties : r
     }))
+
+    this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx,7,'d20'))
+    this.landmarkServices.TEMP_clearVtkHighlight()
   }
 
   ngOnDestroy(){
@@ -49,20 +54,30 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     }
   }
 
+  private selectedRegionsWithReceptorData(){
+    this.mainController.selectedRegions = this.regions
+    this.mainController.regionSelectionChanged()
+  }
+
   showReceptorData(region:RegionDescriptor,templateRef:TemplateRef<any>){
     const l = this.landmarkServices.landmarks.find(l=>l.id==region.name)
-    console.log(l,templateRef)
     if(l) this.landmarkServices.changeLandmarkNodeView(l,templateRef)
   }
 
   hover(region:RegionDescriptor){
-    const l = this.landmarkServices.landmarks.find(l=>l.id==region.name)
-    if(l) l.hover = true
+    const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
+    if(idx >= 0) {
+      this.landmarkServices.landmarks[idx].hover = true
+      this.landmarkServices.TEMP_vtkHighlight(idx)
+    }
   }
 
   unhover(region:RegionDescriptor){
-    const l = this.landmarkServices.landmarks.find(l=>l.id==region.name)
-    if(l) l.hover = false
+    const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
+    if(idx >= 0) {
+      this.landmarkServices.landmarks[idx].hover = false
+      this.landmarkServices.TEMP_clearVtkHighlight(idx)
+    }
   }
 
   /* hover status inside the searchresult-region card */
@@ -86,7 +101,11 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     <div *ngIf = "showBody" #receptorPanelBody>
       <div class = "panel">
         <div class = "panel-body">
-          <receptorDataDriver [receptorName]="region.name" (receptorString)="receptorString($event)">
+          <receptorDataDriver 
+            [regionName]="region.name" 
+            (neurotransmitterName)="neurotransmitterName($event)" 
+            (modeName) = "modeName($event)"
+            (receptorString)="receptorString($event)">
           </receptorDataDriver>
           <div #showImgContainer>
           </div>
@@ -95,15 +114,28 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     </div>
   </div>
   <ng-template #imgContainer>
+    <span (click)="showOnBiggie()" id = "showOnBiggie" class = "close" showOnBiggie>
+      <i class = "glyphicon glyphicon-new-window"></i>
+    </span> 
     <img [src] = "imgSrc" />
-    <span (click)="showOnBiggie()">Show On Bigscreen</span>
   </ng-template>
   `,
   styles : [
     `
+    span.close#showOnBiggie[showOnBiggie]
+    {
+      position:relative;
+      right:0.5em;
+      top:0.5em;
+      margin-bottom:-1em;
+      color:black !important;
+      z-index:11;
+    }
     img
     {
       width:100%;
+      position:relative;
+      z-index:10;
     }
     .panel-heading
     {
@@ -128,7 +160,8 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     }
     receptorDataDriver
     {
-      margin-top:1em;
+      padding-top:1em;
+      padding-bottom:1em;
       display:block;
     }
     `
@@ -148,9 +181,30 @@ export class SearchResultCardRegion{
 
   showBody = false
   imgSrc : string | null
-  title : string
+  ntName : string
+  mName : string
+  
+  neurotransmitterName(string:any){
+    this.ntName = string ? string : null
+  }
+  modeName(string:any){
+    this.mName = string ? string : null
+  }
+  
   receptorString(string:any){
-    this.title = string ? string : null
+    this.mName = /^__fingerprint/.test(string) ? 
+      'fingerprint' :
+      /^_pr/.test(string) ? 
+        'profile' :
+        /^_bm/.test(string) ?
+          'autoradiograph' :
+          '? mode'
+
+    this.ntName = !string ? null : 
+      this.mName == 'fingerprint' ? 
+        '' : 
+        string.split('_')[2] 
+
     const info = this.region.moreInfo.find(info=>info.name=='Receptor Data')
     this.imgSrc = string && info && info.source ? RECEPTOR_ROOT + info.source + string : null
     if(this.imgSrc){
@@ -161,15 +215,13 @@ export class SearchResultCardRegion{
   }
 
   showOnBiggie(){
-    console.log(this.region.name)
-    const metadata : WidgitiseTempRefMetaData = {
-      name : this.region.name + this.title,
-      onShutdownCleanup : ()=>{
-        console.log('onshutdown cleanup')
-      }
+    const metadata = {
+      name : `default.default.${this.region.name} ${this.ntName} ${this.mName}`,
+      script : ``,
+      template : `<img src = "${this.imgSrc}" style = "width:100%; position:relative; z-index:10;" />`
     }
-    console.log(metadata)
 
+    this.mainController.loadWidget(new LabComponent(metadata))
     // this.mainController.createDisposableWidgets(metadata)
   }
 

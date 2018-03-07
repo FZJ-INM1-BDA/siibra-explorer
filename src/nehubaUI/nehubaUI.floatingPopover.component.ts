@@ -7,6 +7,7 @@ import { MainController } from 'nehubaUI/nehubaUI.services';
   template : 
 `
 <div 
+  *ngIf="false"
   (mousedown)="$event.stopPropagation()"
   class = "popover down" 
   style = "display:block;position:absolute;left:-10000px;top:-10000px"

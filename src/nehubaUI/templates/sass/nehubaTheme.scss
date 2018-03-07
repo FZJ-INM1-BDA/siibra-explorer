@@ -34,10 +34,6 @@ div#ATLASContainer
       border-radius:0px;
       padding:10px 15px;
 
-      &:first-child
-      {
-        margin-top:10px;
-      }
     }
   }
 
@@ -54,15 +50,39 @@ div#ATLASContainer
     border:none;
     border-radius:0px;
     margin:0px;
+    overflow:hidden;
+
+    background-color:gray(1);
+
     .panel-heading
     {
       border:none;
       border-radius:0px;
+
+      background:none;
     }
     .panel-body
     {
       padding:0px;
-      padding-bottom:15px;
+      padding-bottom:0px;
+
+      background:none;
+
+      position:relative;
+      &:before
+      {
+        display : block;
+        z-index : 9;
+        content : ' ';
+        position:absolute;
+        width:100%;
+        height:100%;
+        top:0px;
+        left:0px;
+        pointer-events: none;
+
+        background-color:tgray(0,0.2);
+      }
     }
   }
 
@@ -70,6 +90,7 @@ div#ATLASContainer
   {
     border:none;
     border-color:tgray(0.9,0.5);
+    border-radius:0px;
 
     &:not(.btn-link):hover
     {
@@ -205,6 +226,30 @@ div#ATLASContainer.darktheme
     background-color:gray(0.2);
   }
 
+
+  div.panel
+  {
+    background-color:gray(0.2);
+
+    div.panel-heading
+    {
+      @extend %darktheme;
+      background:none;
+
+      span
+      {
+        background-color:tgray(0,0);
+      }
+    }
+    
+    .panel-body
+    {
+      border:none;
+      @extend %darktheme;
+      background:none
+    }
+  }
+
   .text-muted
   {
     color:rgba(255,255,255,0.5);
@@ -304,6 +349,47 @@ div#ATLASContainer.darktheme
     }
   }
 
+  multilevel
+  {
+    color:gray(0.85);
+
+    span.regionHasMoreInfo:hover
+    {
+      color:goldenrod;
+    }
+
+    span.multilevel-name.text-active
+    {
+      color:rgb(219, 181, 86);
+
+      > span
+      {
+        color:rgb(219, 181, 86);
+      }
+    }
+
+    span.multilevel-name.text-muted
+    {
+      color:tgray(1,0.5);
+
+      > span
+      {
+        color:tgray(1,0.5);
+      }
+
+      &.text-active
+      {
+
+        color:rgba(219, 181, 86,0.5);
+
+        > span
+        {
+          color:rgba(219, 181, 86,0.5);
+        }
+      }
+    }
+  }
+
   atlascontrol
   {
     background-color : gray(0.2);
@@ -317,25 +403,6 @@ div#ATLASContainer.darktheme
       }
     }
 
-    multilevel
-    {
-      color:gray(0.85);
-
-      span.regionHasMoreInfo:hover
-      {
-        color:goldenrod;
-      }
-
-      span.multilevel-name.text-active
-      {
-        color:rgb(219, 181, 86)
-      }
-
-      span.multilevel-name.text-active.text-muted
-      {
-        color:rgba(219, 181, 86,0.5)
-      }
-    }
   }
 
   ATLASViewer
@@ -436,28 +503,6 @@ div#ATLASContainer.darktheme
         > div.panel-heading
         {
           background-color:rgba(0,20,0,0.5);
-        }
-      }
-      
-
-      div.panel
-      {
-
-        div.panel-heading
-        {
-          @extend %widgetDarkTheme;
-          background-color:rgba(0,0,0,0.75);
-
-          span
-          {
-            background-color:rgba(0,0,0,0);
-          }
-        }
-        
-        .panel-body
-        {
-          border:none;
-          @extend %widgetDarkTheme;
         }
       }
       

@@ -152,6 +152,7 @@ export class NehubaContainer implements AfterViewInit {
     if(this.resizeDockedWidgetPanel){
       this.resizeDockedWidgetPanel=false;
       this.enableUIInteraction(true)
+      if(this.mainController.nehubaViewer) this.mainController.nehubaViewer.redraw()
     }
   }
 }

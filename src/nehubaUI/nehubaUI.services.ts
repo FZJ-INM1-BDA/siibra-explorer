@@ -10,6 +10,8 @@ import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
 import { LayerManager } from 'neuroglancer/layer'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
+import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification';
+import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer';
 
 declare var window:{
   [key:string] : any
@@ -99,6 +101,9 @@ export class MainController{
         }
       })
       
+      /* hide all segments first, then selectively turn on each selected region */
+      this.viewerControl.hideAllSegments()
+
       /* turn on selected segments in parcellation */
       if(this.selectedRegions.length==0){
         this.viewerControl.showAllSegments()
@@ -215,16 +220,16 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    // let datasetArray = [
-    //   '/res/json/bigbrain.json',
-    //   '/res/json/colin.json',
-    //   '/res/json/waxholmRatV2_0.json',
-    //   '/res/json/allenMouse.json'
-    // ]
-
     let datasetArray = [
-      'http://localhost:5080/res/json/colin.json'
+      '/res/json/bigbrain.json',
+      '/res/json/colin.json',
+      '/res/json/waxholmRatV2_0.json',
+      '/res/json/allenMouse.json'
     ]
+
+    // let datasetArray = [
+    //   'http://localhost:5080/res/json/colin.json'
+    // ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -258,7 +263,6 @@ export class MainController{
 
     /* TODO find a more permanent fix to disable double click */
     LayerManager.prototype.invokeAction = (arg) => {
-      
       if(arg=='select'&&this.nehubaCurrentSegment){
         const idx = this.selectedRegions.findIndex(r=>r==this.nehubaCurrentSegment)
         if(idx>=0){
@@ -613,6 +617,21 @@ export class MultilevelProvider{
 export class LandmarkServices{
   landmarks : Landmark[] = []
 
+  TEMP_icosahedronVtkUrl : string
+  TEMP_crossVtkUrl : string
+
+  constructor(public mainController:MainController){
+
+    const encoder = new TextEncoder()
+    const blob = new Blob([encoder.encode(TEMP_ICOSAHEDRON_VTK)],{type:'application/octet-stream'})
+    this.TEMP_icosahedronVtkUrl = URL.createObjectURL(blob)
+    
+    const encoder2 = new TextEncoder()
+    const blob2 = new Blob([encoder2.encode(TEMP_CROSS_VTK)],{type:'application/octet-stream'})
+    this.TEMP_crossVtkUrl = URL.createObjectURL(blob2)
+
+  }
+
   changeLandmarkNodeView(landmark:Landmark,view:any){
     this.onChangeLandmarkNodeViewCbs.forEach(cb=>cb(landmark,view))
   }
@@ -620,6 +639,71 @@ export class LandmarkServices{
   private onChangeLandmarkNodeViewCbs : ((landmark:Landmark,view:any)=>void)[] = []
   onChangeLandmarkNodeView(callback:(landmark:Landmark,view:any)=>void){
     this.onChangeLandmarkNodeViewCbs.push(callback)
+  }    
+  TEMP_parseLandmarkToVtk = (landmark:Landmark,idx:number,scale?:number,mesh?:string,shader?:string) =>{
+    const viewer = this.mainController.nehubaViewer.ngviewer
+
+    const oldLayer = viewer.layerManager.getLayerByName(`vtk-landmark-meshes-${idx}`)
+    if(oldLayer){
+      viewer.layerManager.removeManagedLayer(oldLayer)
+    }
+
+    const _scale = !scale ? [2,2,2] : [scale,scale,scale]
+    const _meshUrl = !mesh ? this.TEMP_icosahedronVtkUrl :
+      mesh == 'cross' ? 
+        this.TEMP_crossVtkUrl :
+        mesh == 'd20' || mesh == 'icosahedron' ?
+          this.TEMP_icosahedronVtkUrl :
+            this.TEMP_icosahedronVtkUrl
+
+    viewer.layerManager.addManagedLayer(viewer.layerSpecification.getLayer(`vtk-landmark-meshes-${idx}`,{
+      type : 'mesh',
+      source : `vtk://${_meshUrl}`,
+      transform : [
+        [_scale[0] , 0 , 0, landmark.pos[0]*1000000],
+        [0 , _scale[1] , 0, landmark.pos[1]*1000000],
+        [0 , 0 , _scale[2], landmark.pos[2]*1000000],
+        [0 , 0 , 0, 1 ],
+      ],
+      shader
+    }))
+  }
+
+  TEMP_clearVtkLayers(){
+    const layerManager = this.mainController.nehubaViewer.ngviewer.layerManager
+    Array.from(Array(10).keys())
+      .map(i=>`vtk-landmark-meshes-${i}`)
+      .forEach(layerName=>{
+        const layer = layerManager.getLayerByName(layerName)
+        if( layer ) layer.setVisible(false)
+      })
+  }
+
+  fragmentMainHighlight = `void main(){emitRGBA(vec4(1.0,0.0,0.0,0.6));}`
+  fragmentMainWhite = `void main(){emitRGBA(vec4(1.0,0.8,0.8,0.6));}`
+  TEMP_vtkHighlight(idx:number){
+    const layer = this.mainController.nehubaViewer.ngviewer.layerManager.getLayerByName(`vtk-landmark-meshes-${idx}`) as ManagedUserLayerWithSpecification
+    this.setSingleMeshUserLayerColor(layer,this.fragmentMainHighlight)
+  }
+
+  TEMP_clearVtkHighlight(idx?:number){
+    const manager = this.mainController.nehubaViewer.ngviewer.layerManager
+    if(idx){
+      let _layer = manager.getLayerByName(`vtk-landmark-meshes-${idx}`) as ManagedUserLayerWithSpecification
+      this.setSingleMeshUserLayerColor(_layer,this.fragmentMainWhite)
+    }else{
+      let _idx = 0
+      let _layer = manager.getLayerByName(`vtk-landmark-meshes-${_idx}`) as ManagedUserLayerWithSpecification
+      while(_layer){
+        this.setSingleMeshUserLayerColor(_layer,this.fragmentMainWhite)
+        _idx++
+        _layer = manager.getLayerByName(`vtk-landmark-meshes-${_idx}`) as ManagedUserLayerWithSpecification
+      }
+    }
+  }
+
+  private setSingleMeshUserLayerColor(layer:ManagedUserLayerWithSpecification,fragment:string){
+    (<SingleMeshUserLayer>layer.layer).displayState.fragmentMain.restoreState(fragment)
   }
 }
 
@@ -639,6 +723,7 @@ export class SpatialSearch{
   templateSpace : string
   spatialSearchResultSubject : Subject<any> = new Subject()
 
+  
 
   constructor(private mainController:MainController,private landmarkServices:LandmarkServices){
     this.spatialSearchResultSubject
@@ -648,16 +733,12 @@ export class SpatialSearch{
           .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
 
-    const encoder = new TextEncoder()
-    const blob = new Blob([encoder.encode(TEMP_ICOSAHEDRON_VTK)],{type:'application/octet-stream'})
-    this.TEMP_vtkUrl = URL.createObjectURL(blob)
-
     this.mainController.viewingModeBSubject.subscribe(mode=>{
       if(mode=='Querying Landmarks'){
         
       }else{
         if(this.mainController.nehubaViewer){
-          this.TEMP_clearVtkLayers()
+          this.landmarkServices.TEMP_clearVtkLayers()
         }
       }
     })
@@ -713,37 +794,7 @@ export class SpatialSearch{
   
   addLandmark = (pos:[number,number,number],id:string,properties:any)=>
     this.landmarkServices.landmarks.push({ pos , id , properties,hover:false})
-    
-  TEMP_vtkUrl : string
-  TEMP_parseLandmarkToVtk = (landmark:Landmark,idx:number) =>{
-    const viewer = this.mainController.nehubaViewer.ngviewer
 
-    const oldLayer = viewer.layerManager.getLayerByName(`vtk-landmark-meshes-${idx}`)
-    if(oldLayer){
-      viewer.layerManager.removeManagedLayer(oldLayer)
-    }
-
-    viewer.layerManager.addManagedLayer(viewer.layerSpecification.getLayer(`vtk-landmark-meshes-${idx}`,{
-      type : 'mesh',
-      source : `vtk://${this.TEMP_vtkUrl}`,
-      transform : [
-        [2 , 0 , 0, landmark.pos[0]*1000000],
-        [0 , 2 , 0, landmark.pos[1]*1000000],
-        [0 , 0 , 2, landmark.pos[2]*1000000],
-        [0 , 0 , 0, 1 ]
-      ]
-    }))
-  }
-
-  TEMP_clearVtkLayers(){
-    const layerManager = this.mainController.nehubaViewer.ngviewer.layerManager
-    Array.from(Array(10).keys())
-      .map(i=>`vtk-landmark-meshes-${i}`)
-      .forEach(layerName=>{
-        const layer = layerManager.getLayerByName(layerName)
-        if( layer ) layer.setVisible(false)
-      })
-  }
 
   parseSpatialQuery = (data:any)=>{
     this.numHits = data.response.numFound
@@ -763,8 +814,7 @@ export class SpatialSearch{
         })
       })
 
-      this.landmarkServices.landmarks.forEach(this.TEMP_parseLandmarkToVtk)
-
+      this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx))
   }
 
   goTo = (pageIdx:number)=>{
@@ -1086,7 +1136,7 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
   template : `
     <div class = "well" receptorPath>
       <small>
-        <span (click)="popall()" clickables>{{ receptorName }}</span>
+        <span (click)="popall()" clickables>{{ regionName }}</span>
         <i class = "glyphicon glyphicon-chevron-right">
         </i>
         <span *ngFor = "let choice of choiceStack">
@@ -1097,7 +1147,7 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
       </small>
     </div>
     <div
-      class = "btn btn-block"
+      class = "btn btn-block btn-default"
       (click)="popStack()" 
       *ngIf="historyStack.length != 0"
       backBtn>
@@ -1108,7 +1158,7 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
     </div>
     <div 
       (click) = "enterStack(key)" 
-      class = "btn btn-block" 
+      class = "btn btn-block btn-default" 
       *ngFor="let key of focusStack | keyPipe">
 
       {{key}} 
@@ -1130,20 +1180,22 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
     }
     .btn
     {
-      padding:0em;
+      padding:0.2em;
       margin:0em;
     }
     .btn[backBtn]
     {
-      margin-bottom:0.4em;
+      margin-bottom:0.6em;
     }
     `
   ]
 })
 
 export class TempReceptorData{
-  @Input() receptorName : string = ``
+  @Input() regionName : string = ``
   @Output() receptorString : EventEmitter<string|null> = new EventEmitter()
+  @Output() neurotransmitterName : EventEmitter<string|null> = new EventEmitter()
+  @Output() modeName : EventEmitter<string|null> = new EventEmitter()
 
   historyStack : any[] = []
   choiceStack : string[] = []
@@ -1165,6 +1217,7 @@ export class TempReceptorData{
     this.focusStack = this.historyStack.pop()
     this.choiceStack.pop()
     this.receptorString.emit(null)
+    this.neurotransmitterName.emit(null)
   }
 
   enterStack(key:string){
@@ -1172,14 +1225,119 @@ export class TempReceptorData{
     this.choiceStack.push(key)
     if(typeof this.focusStack[key] == 'string'){
       this.receptorString.emit(this.focusStack[key])
+      this.neurotransmitterName.emit(key)
       this.focusStack = []
     }else{
       this.receptorString.emit(null)
+      this.neurotransmitterName.emit(null)
       this.focusStack = this.focusStack[key]
     }
   }
 }
 
+const TEMP_CROSS_VTK = 
+`# vtk DataFile Version 2.0
+Converted using https://github.com/HumanBrainProject/neuroglancer-scripts
+ASCII
+DATASET POLYDATA
+POINTS 48 float
+-1e+08 -500000.0 0.0
+-1e+06 -500000.0 0.0
+-1e+08 0.0218557 -500000.0
+-1e+06 0.0218557 -500000.0
+-1e+08 500000.0 0.0437114
+-1e+06 500000.0 0.0437114
+-1e+08 -0.00596244 500000.0
+-1e+06 -0.00596244 500000.0
+1e+06 -500000.0 0.0
+1e+08 -500000.0 0.0
+1e+06 0.0218557 -500000.0
+1e+08 0.0218557 -500000.0
+1e+06 500000.0 0.0437114
+1e+08 500000.0 0.0437114
+1e+06 -0.00596244 500000.0
+1e+08 -0.00596244 500000.0
+500000.0 -1e+08 0.0
+500000.0 -1e+06 0.0
+-0.0218557 -1e+08 -500000.0
+-0.0218557 -1e+06 -500000.0
+-500000.0 -1e+08 0.0437114
+-500000.0 -1e+06 0.0437114
+0.00596244 -1e+08 500000.0
+0.00596244 -1e+06 500000.0
+500000.0 1e+06 0.0
+500000.0 1e+08 0.0
+-0.0218557 1e+06 -500000.0
+-0.0218557 1e+08 -500000.0
+-500000.0 1e+06 0.0437114
+-500000.0 1e+08 0.0437114
+0.00596244 1e+06 500000.0
+0.00596244 1e+08 500000.0
+-500000.0 0.0 -1e+08
+-500000.0 0.0 -1e+06
+0.0218557 -500000.0 -1e+08
+0.0218557 -500000.0 -1e+06
+500000.0 0.0437114 -1e+08
+500000.0 0.0437114 -1e+06
+-0.00596244 500000.0 -1e+08
+-0.00596244 500000.0 -1e+06
+-500000.0 0.0 1e+06
+-500000.0 0.0 1e+08
+0.0218557 -500000.0 1e+06
+0.0218557 -500000.0 1e+08
+500000.0 0.0437114 1e+06
+500000.0 0.0437114 1e+08
+-0.00596244 500000.0 1e+06
+-0.00596244 500000.0 1e+08
+POLYGONS 48 192
+3 0 2 1
+3 1 2 3
+3 2 4 3
+3 3 4 5
+3 4 6 5
+3 5 6 7
+3 6 0 7
+3 7 0 1
+3 8 10 9
+3 9 10 11
+3 10 12 11
+3 11 12 13
+3 12 14 13
+3 13 14 15
+3 14 8 15
+3 15 8 9
+3 16 18 17
+3 17 18 19
+3 18 20 19
+3 19 20 21
+3 20 22 21
+3 21 22 23
+3 22 16 23
+3 23 16 17
+3 24 26 25
+3 25 26 27
+3 26 28 27
+3 27 28 29
+3 28 30 29
+3 29 30 31
+3 30 24 31
+3 31 24 25
+3 32 34 33
+3 33 34 35
+3 34 36 35
+3 35 36 37
+3 36 38 37
+3 37 38 39
+3 38 32 39
+3 39 32 33
+3 40 42 41
+3 41 42 43
+3 42 44 43
+3 43 44 45
+3 44 46 45
+3 45 46 47
+3 46 40 47
+3 47 40 41`
 
 const TEMP_ICOSAHEDRON_VTK = 
 `# vtk DataFile Version 2.0
