@@ -54,6 +54,12 @@ import { ModalHandler } from './nehubaUI.modal.component'
       overflow-y:auto;
       box-shadow:inset 0px 0px 3.5em -0.8em rgba(0,0,0,0.5);
     }
+    [selectionSummary]
+    {
+      margin-left:1.0em;
+      margin-bottom:0.5em;
+      height:35px;
+    }
     `
   ],
   providers : [ MultilevelProvider ]
@@ -77,5 +83,10 @@ export class NehubaUIControl implements OnChanges{
     modalHandler.body = _item.properties
     modalHandler.footer = null
     modalHandler.show()
+  }
+
+  clearAllSelections(){
+    this.mainController.selectedRegions = []
+    this.mainController.regionSelectionChanged()
   }
 }

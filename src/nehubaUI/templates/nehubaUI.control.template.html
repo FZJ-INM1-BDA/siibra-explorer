@@ -1,6 +1,11 @@
-<div regionContainer>
+<div regionContainer>  
   <div 
     multilevelContainer>
+    <div selectionSummary>
+      <div style = "display:inline-block;padding-top:6px;padding-bottom:6px;">{{ mainController.selectedRegions.length }} regions selected 
+      </div>
+      <a *ngIf = "mainController.selectedRegions.length > 0" (click)="clearAllSelections()" class = "btn btn-link">clear all</a>
+    </div>
     <multilevel 
       class = "menuItemContentText"  
       [data]="mainController.selectedParcellation.regions | searchTreePipe : multilevelProvider.searchTerm" >

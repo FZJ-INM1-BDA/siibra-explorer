@@ -323,6 +323,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
             mousePosVoxel[2]
         }}
       )</small> 
+      <br />
+      <small>
+        &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
+      </small>
     </div>
     <floatingPopover>
     </floatingPopover>
@@ -900,6 +904,8 @@ export class NehubaViewerOverlayUnit {
 
 }
 
+
+/* migrate to a separate file, probably related to landmarks */
 @Component({
   selector : `nehuba-viewer-2d-landmark-unit`,
   template : 
