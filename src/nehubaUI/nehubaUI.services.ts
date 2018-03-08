@@ -27,6 +27,7 @@ export class MainController{
    */
   loadedTemplates : TemplateDescriptor[] = []
 
+  selectTemplateBSubject : BehaviorSubject<TemplateDescriptor|null> = new BehaviorSubject(null)
   selectedTemplate : TemplateDescriptor | undefined
   selectedParcellation : ParcellationDescriptor | undefined
   selectedRegions : RegionDescriptor[] = []
@@ -40,13 +41,6 @@ export class MainController{
   viewingModeBSubject : BehaviorSubject<string> = new BehaviorSubject( this.viewingMode )
 
   /**
-   * plugins
-   */
-  loadedWidgets : LabComponent[] = []
-    // DEFAULT_WIDGETS.map(json=>new LabComponent(json))
-  launchedWidgets : string[] = []
-
-  /**
    * hooks
    */
 
@@ -54,6 +48,11 @@ export class MainController{
   afterTemplateSelectionHook : (()=>void)[] = []
   onParcellationSelectionHook : (()=>void)[] = []
   afterParcellationSelectionHook : (()=>void)[] = []
+
+  /**
+   * plugins
+  */
+  loadedPlugins : LabComponent[] = []
 
   /**
    * style
@@ -177,7 +176,6 @@ export class MainController{
     }
   }
 
-  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent
   createDisposableWidgets : (widgetComponent:WidgetComponent)=>any
 
   testRequirement():boolean{
@@ -299,6 +297,11 @@ export class MainController{
         })
       })
     })
+
+    /* clear widgets and viewing mode */
+    this.selectTemplateBSubject.subscribe((_template)=>{
+      if(this.viewingMode!='navigation (default mode)') this.setMode('navigation (default mode)')
+    })
   }
 
   hookAPI(){
@@ -317,11 +320,13 @@ export class MainController{
    * control functions
    */
 
-  unloadTemplate():void{
+  unloadTemplate():void
+  {
 
   }
 
-  loadTemplate(templateDescriptor:TemplateDescriptor):void{
+  loadTemplate(templateDescriptor:TemplateDescriptor):void
+  {
     
     if ( this.selectedTemplate == templateDescriptor ){
       return
@@ -329,6 +334,8 @@ export class MainController{
     // else if( this.selectedTemplate ) {
     //   this.unloadTemplate()
     // }
+
+    this.selectTemplateBSubject.next(templateDescriptor)
 
     this.onTemplateSelectionHook.forEach(cb=>cb())
 
@@ -351,7 +358,8 @@ export class MainController{
     EXTERNAL_CONTROL.metadata.selectedRegions = []
   }
 
-  loadParcellation(parcellation:ParcellationDescriptor):void{
+  loadParcellation(parcellation:ParcellationDescriptor):void
+  {
     if( this.selectedParcellation == parcellation ){
       return
     }
@@ -393,11 +401,13 @@ export class MainController{
   }
 
   /* TODO figure out a more elegant way to watch array for changes */
-  regionSelectionChanged(){
+  regionSelectionChanged()
+  {
     this.passCheckSetMode(this.viewingMode)
   }
 
-  updateRegionDescriptors(labelIndices:number[]){
+  updateRegionDescriptors(labelIndices:number[])
+  {
     EXTERNAL_CONTROL.metadata.selectedRegions = []
     this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
     labelIndices.forEach(idx=>{
@@ -409,7 +419,8 @@ export class MainController{
     })
   }
   
-  findRegionWithId(id : number|null):RegionDescriptor|null{
+  findRegionWithId(id : number|null):RegionDescriptor|null
+  {
     if( id == null || id == 0 || !this.selectedParcellation ) return null
     const searchThroughChildren : (regions:RegionDescriptor[])=>RegionDescriptor|null = (regions:RegionDescriptor[]) => {
       const matchedRegion = regions.find(region=> region.labelIndex !== undefined && region.labelIndex == id)
@@ -421,7 +432,8 @@ export class MainController{
     return searchResult ? searchResult : null
   }
   
-  sendUISelectedRegionToViewer(){
+  sendUISelectedRegionToViewer()
+  {
     if(!this.selectedParcellation){
       return
     }
@@ -440,38 +452,32 @@ export class MainController{
       })
   }
 
-  loadWidget(labComponent:LabComponent)
-  {
-    if(PLUGIN_CONTROL[labComponent.name])
-    {
-      (<LabComponentHandler>PLUGIN_CONTROL[labComponent.name]).blink(10)
-    } else {
-      HelperFunctions.sLoadPlugin(labComponent)
-    }
-  }
-
-  widgetLaunched(name:string):boolean
-  {
-    return this.launchedWidgets.findIndex(n=>n==name) >= 0
-  }
 
   /**
    * hibernating functions
    */
   
-  fetchedSomething(sth:any){
-    switch( sth.constructor ){
-      case TemplateDescriptor:{
+  fetchedSomething(sth:any)
+  {
+    switch( sth.constructor )
+    {
+      case TemplateDescriptor:
+      {
 
-      }break;
-      case ParcellationDescriptor:{
-        if (!this.selectedTemplate){
+      }
+      break;
+      case ParcellationDescriptor:
+      {
+        if (!this.selectedTemplate)
+        {
           //TODO add proper feedback
           console.log('throw error: maybe you should selected a template first')
-        }else {
+        } else 
+        {
           this.selectedTemplate.parcellations.push(sth)
         }
-      }break;
+      }
+      break;
       case PluginDescriptor:{
         
       }break;
@@ -540,11 +546,13 @@ export class MainController{
 }
 
 @Injectable()
-export class MultilevelProvider{
+export class MultilevelProvider
+{
   searchTerm : string = ``
   selectedMultilevel : Multilevel[]
 
-  constructor(private mainController:MainController){
+  constructor(private mainController:MainController)
+  {
     
   }
 
@@ -612,6 +620,75 @@ export class MultilevelProvider{
       m.children.some( c=> c.isVisible || this.hasDisabledChildren(c)):
       m.isVisible
   }
+}
+
+@Injectable()
+export class WidgitServices
+{
+  constructor(private mainController:MainController)
+  {
+    this.mainController.selectTemplateBSubject.subscribe((_template)=>{
+      if(this._unloadAll) this._unloadAll()
+      this.loadedWidgets = []
+      this.loadedLabComponents = []
+    })
+  }
+
+  loadedWidgets : WidgetComponent[] = []
+  loadedLabComponents : LabComponent[] = []
+
+  /* tobe overwritten by view */
+  _loadWidgetFromLabComponent : (labComponent:LabComponent)=>WidgetComponent
+
+  loadWidgetFromLabComponent(labComponent:LabComponent)
+  {
+    if(PLUGIN_CONTROL[labComponent.name])
+    {
+      (<LabComponentHandler>PLUGIN_CONTROL[labComponent.name]).blink(10)
+      return null
+    } else {
+      const newWidget = this._loadWidgetFromLabComponent(labComponent)
+      this.loadedWidgets.push(newWidget)
+      return newWidget
+    }
+  }
+
+  /* tobe overwritten by view */
+  _widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent 
+  
+  widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent = (templateRef,metadata)=>
+  {
+    const widgetComponent = this._widgitiseTemplateRef(templateRef,metadata)
+    this.loadedWidgets.push(widgetComponent)
+    return widgetComponent
+  }
+
+  unloadWidget(widgetComponent:WidgetComponent)
+  {
+    widgetComponent.parentViewRef.destroy()
+    const idx = this.loadedWidgets.findIndex(w=>w==widgetComponent)
+    if( idx >= 0 ){
+      this.loadedWidgets.splice(idx,1)
+    } else {
+      console.log('WidgetService unloadWidget could not find the widget')
+    }
+    if(this.mainController.nehubaViewer) this.mainController.nehubaViewer.redraw()
+  }
+
+  unloadLabcomponent(labComponent:LabComponent)
+  {
+    console.log('unloading labcomponent')
+    delete PLUGIN_CONTROL[labComponent.name]
+    const idx = this.loadedLabComponents.findIndex(w=>w==labComponent)
+    if( idx >= 0 ){
+      this.loadedLabComponents.splice(idx,1)
+    } else {
+      console.log('WidgetService unloadWidget could not find the labcomponent')
+    }
+  }
+
+  /* tobe overwritten by view */
+  _unloadAll : ()=>void
 }
 
 @Injectable()
@@ -995,16 +1072,18 @@ class ViewerHandle {
 export const VIEWER_CONTROL = window['viewerHandle'] = new ViewerHandle()
 export const PLUGIN_CONTROL : any = window['pluginControl'] = {}
 export const HELP_MENU = {
-  'Mouse Controls' : {
+  'Mouse Controls' : 
+  {
     "Left-drag" : "within a slice view to move within that plane",
     "Shift + Left-drag" : "within a slice view to change the rotation of the slice views",
     "Mouse-Wheel" : "up or down to zoom in and out.",
     "Ctrl + Mouse-Wheel" : "moves the navigation forward and backward",
     "Ctrl + Right-click" : "within a slice to teleport to that location"
-    },
-    'Keyboard Controls' : {
-    "tobe":"completed"
-    }
+  },
+  'Keyboard Controls' : 
+  {
+    "s":"toggle front octant"
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
-import { PLUGIN_CONTROL as gPluginControl, HelperFunctions, MainController } from 'nehubaUI/nehubaUI.services'
+import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 import { NehubaUIControl } from 'nehubaUI/nehubaUI.control.component';
 
@@ -33,14 +33,11 @@ export class WidgetComponent{
 
   shutdown()
   {
+    console.log('widget shutdown sequence')
     this.onShutdownCallbacks.forEach((cb)=>cb())
 
-    if(this.labComponent){
-      delete gPluginControl[this.labComponent.name]
-    }
-
     /* execute shutdown sequence */
-    this.onShutdownCleanup()
+    if(this.onShutdownCleanup) this.onShutdownCleanup()
   }
 
   changeState : ( state : 'docked' | 'minimised' | 'floating' )=>void
@@ -51,7 +48,8 @@ export class WidgetComponent{
   selector : `[host]`
 })
 export class DynamicViewDirective{
-  constructor(public viewContainerRef:ViewContainerRef){}
+  constructor(public viewContainerRef:ViewContainerRef){
+  }
 }
 
 /** 
@@ -189,7 +187,8 @@ export class WidgetsContainer{
   constructor( 
     private componentFactoryResolver:ComponentFactoryResolver, 
     private rd2:Renderer2,
-    private mainController:MainController ){
+    private mainController:MainController,
+    private widgitServices : WidgitServices ){
 
       this.overridingMainController()
 
@@ -198,12 +197,10 @@ export class WidgetsContainer{
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
 
       this.widgetFactory = this.componentFactoryResolver.resolveComponentFactory( WidgetView )
-
-      HelperFunctions.sLoadPlugin = (labComponent:LabComponent) => this.createNewWidget(labComponent)
   }
 
   overridingMainController(){
-    this.mainController.widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:WidgitiseTempRefMetaData):WidgetComponent=>{
+    this.widgitServices._widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:WidgitiseTempRefMetaData):WidgetComponent=>{
       const newLabcomponent = new LabComponent({
         name : metadata.name
       })
@@ -229,7 +226,17 @@ export class WidgetsContainer{
       return newWidget
     }
 
+    this.widgitServices._loadWidgetFromLabComponent = (labComponent:LabComponent)=>{
+      return this.createNewWidget(labComponent)
+    }
+
     this.mainController.createDisposableWidgets = (widgetComponent:WidgetComponent)=>this.createWidgetView(widgetComponent)
+
+    this.widgitServices._unloadAll = ()=>{
+      this.floatingWidgetContainer.viewContainerRef.clear()
+      this.dockedWidgetContainer.viewContainerRef.clear()
+      this.minimisedWidgetContainer.viewContainerRef.clear()
+    }
   }
 
   private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
@@ -297,8 +304,7 @@ export class WidgetsContainer{
   /* create new widget from labcomponent for plugins */
   createNewWidget(labComponent:LabComponent){
     const newWidget = new WidgetComponent( labComponent )
-    this.mainController.launchedWidgets.push(labComponent.name)
-
+    this.widgitServices.loadedLabComponents.push(labComponent)
     const widgetViewRef = this.createWidgetView( newWidget )
 
     /* script needs to be cloned or the script will only be executed the first time */
@@ -311,12 +317,14 @@ export class WidgetsContainer{
       widgetViewRef.destroy()
 
       this.rd2.removeChild(document.head,scriptclone)
-      const indx = this.mainController.launchedWidgets.findIndex(widgetName=>widgetName==labComponent.name)
-      this.mainController.launchedWidgets.splice(indx,1)
+      this.widgitServices.unloadLabcomponent(labComponent)
+      this.widgitServices.unloadWidget(newWidget)
     }
     setTimeout(()=>{
       this.rd2.appendChild(document.head,scriptclone)
     })
+
+    return newWidget
   }
 
   getClearRight(){

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail, perspectiveRenderEventType } from 'nehuba/exports'
 
-import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch, LandmarkServices } from './nehubaUI.services'
+import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch, LandmarkServices, WidgitServices } from './nehubaUI.services'
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
 import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
 import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
@@ -1182,7 +1182,11 @@ const HOVER_COLOR : string = '250,150,80'
 export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
   @ViewChild('landmarkList',{read:TemplateRef}) landmarkList : TemplateRef<any>
 
-  constructor(public mainController:MainController,public spatialSearch:SpatialSearch,public landmarkServices:LandmarkServices){
+  constructor(
+    public mainController:MainController,
+    public spatialSearch:SpatialSearch,
+    public landmarkServices:LandmarkServices,
+    public widgitServices:WidgitServices){
 
   }
 
@@ -1201,14 +1205,15 @@ export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
   widgetComponent : WidgetComponent
 
   ngAfterViewInit(){
-    this.widgetComponent = this.mainController.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
+    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
 
     const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
     segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
   }
 
   ngOnDestroy(){
-    this.widgetComponent.parentViewRef.destroy()
+    this.widgitServices.unloadWidget(this.widgetComponent)
+    // this.widgetComponent.parentViewRef.destroy()
   }
 }
 

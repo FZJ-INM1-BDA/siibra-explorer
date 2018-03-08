@@ -52,12 +52,16 @@ div#ATLASContainer
     margin:0px;
     overflow:hidden;
 
-    background-color:gray(1);
+    background-color:gray(0.95);
+    box-shadow: 0 4px 6px 0 tgray(0,0.12);
 
     .panel-heading
     {
       border:none;
       border-radius:0px;
+      position:relative;
+      z-index:1;
+      box-shadow: 0 4px 6px 0 tgray(0,0.08);
 
       background:none;
     }
@@ -81,7 +85,7 @@ div#ATLASContainer
         left:0px;
         pointer-events: none;
 
-        background-color:tgray(0,0.2);
+        background-color:tgray(0,0.01);
       }
     }
   }

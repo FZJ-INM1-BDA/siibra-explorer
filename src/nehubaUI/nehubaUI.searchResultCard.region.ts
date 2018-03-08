@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, TempReceptorData } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, TempReceptorData, WidgitServices } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 
 @Component({
@@ -23,13 +23,16 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   @Input() regions : RegionDescriptor[] = []
   @Input() title : string = `Untitled`
   @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
-  constructor(public mainController:MainController,public landmarkServices:LandmarkServices){
+  constructor(
+    public mainController:MainController,
+    public landmarkServices:LandmarkServices,
+    public widgitServices:WidgitServices){
     
   }
 
   widgetComponent : WidgetComponent
   ngAfterViewInit(){
-    this.widgetComponent = this.mainController.widgitiseTemplateRef(this.regionList,{name:this.title})
+    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.regionList,{name:this.title})
     if(this.mainController.nehubaViewer){
       this.mainController.nehubaViewer.redraw()
     }
@@ -48,10 +51,11 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 
   ngOnDestroy(){
-    this.widgetComponent.parentViewRef.destroy()    
-    if(this.mainController.nehubaViewer){
-      this.mainController.nehubaViewer.redraw()
-    }
+    this.widgitServices.unloadWidget(this.widgetComponent)
+    // this.widgetComponent.parentViewRef.destroy()    
+    // if(this.mainController.nehubaViewer){
+    //   this.mainController.nehubaViewer.redraw()
+    // }
   }
 
   private selectedRegionsWithReceptorData(){
@@ -177,7 +181,7 @@ export class SearchResultCardRegion{
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
 
   @ViewChild('receptorDataDriver') receptorDataComponent : TempReceptorData
-  constructor(public landmarkServices:LandmarkServices,public mainController:MainController){
+  constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
 
   }
 
@@ -226,9 +230,7 @@ export class SearchResultCardRegion{
       template : `<img src = "${this.imgSrc}" style = "width:100%; position:relative; z-index:10;" />`
     }
 
-    console.log(metadata)
-
-    this.mainController.loadWidget(new LabComponent(metadata))
+    this.widgitServices.loadWidgetFromLabComponent(new LabComponent(metadata))
     // this.mainController.createDisposableWidgets(metadata)
   }
 
