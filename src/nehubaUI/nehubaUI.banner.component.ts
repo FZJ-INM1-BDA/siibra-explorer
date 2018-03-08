@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit } from '@angular/core'
-import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU } from './nehubaUI.services'
+import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices } from './nehubaUI.services'
 import { RegionDescriptor }from './nehuba.model'
 import { ModalHandler } from './nehubaUI.modal.component'
 
@@ -121,7 +121,7 @@ export class NehubaBanner implements AfterViewInit {
   searchActivityTerm : string = ``
   Array = Array
 
-  constructor(public mainController:MainController){
+  constructor(public mainController:MainController,public widgitServices:WidgitServices){
     // this.mainController.unwidgitiseSearchRegion = (templateRef:TemplateRef<any>)=>{
     //   templateRef
     //   this.widgetiseSearchRegion = false
@@ -137,7 +137,7 @@ export class NehubaBanner implements AfterViewInit {
 
   widgetiseSearchRegionComponent(){
     this.widgetiseSearchRegion = true
-    const widgitComponent = this.mainController.widgitiseTemplateRef(this.searchRegion,{name:'Search Region',onShutdownCleanup : ()=>{
+    const widgitComponent = this.widgitServices.widgitiseTemplateRef(this.searchRegion,{name:'Search Region',onShutdownCleanup : ()=>{
       this.widgetiseSearchRegion = false
       widgitComponent.parentViewRef.destroy()
       if(this.mainController.nehubaViewer)this.mainController.nehubaViewer.redraw()

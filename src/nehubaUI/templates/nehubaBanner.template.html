@@ -140,9 +140,9 @@
       class = "btn btn-default"
       btnCustom
       placement = "bottom"
-      [tooltip]="widget.name.split('.')[2]"
-      (click) = "mainController.loadWidget(widget)"
-      *ngFor = "let widget of mainController.loadedWidgets">
+      [tooltip]="labcomponent.name.split('.')[2]"
+      (click) = "widgitServices.loadWidgetFromLabComponent(labcomponent)"
+      *ngFor = "let labcomponent of mainController.loadedPlugins">
       {{widget.name.split('.')[2][0]}}
     </span>
 

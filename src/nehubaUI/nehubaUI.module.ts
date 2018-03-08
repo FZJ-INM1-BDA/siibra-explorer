@@ -20,7 +20,7 @@ import { NehubaContainer } from './nehubaUI.parent.component';
 import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from './nehubaUI.banner.component';
 import { FloatingPopOver } from './nehubaUI.floatingPopover.component'
 import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component';
-import { MainController, TempReceptorData,LandmarkServices } from './nehubaUI.services';
+import { MainController, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma, MultilevelHasVisibleChildren  } from './nehubaUI.util.pipes'
 
 import { SearchResultCardRegion,ListSearchResultCardRegion } from './nehubaUI.searchResultCard.region'
@@ -45,7 +45,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion } from './nehubaUI.se
         MultilevelSelector, NehubaModalService, TempReceptorData,
         IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,MultilevelHasVisibleChildren,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
     bootstrap : [ NehubaContainer ],
-    providers : [ MainController,LandmarkServices ],
+    providers : [ MainController,LandmarkServices,WidgitServices ],
     entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
 })
 export class NehubaUI{
