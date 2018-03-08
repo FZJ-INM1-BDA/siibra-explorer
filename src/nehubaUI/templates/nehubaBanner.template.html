@@ -47,10 +47,10 @@
       containerClass="dropdownMenu">
 
       <span 
-      [ngClass]="{'disabled' : !mainController.selectedTemplate}" 
-      class = "btn btn-default" 
-      btnCustom 
-      dropdownToggle>
+        [ngClass]="{'disabled' : !mainController.selectedTemplate}" 
+        class = "btn btn-default" 
+        btnCustom 
+        dropdownToggle>
         <span>
           <small>Parcellation</small>
           <small class="text-muted">({{ !mainController.selectedTemplate ? 'select a template' : mainController.selectedParcellation ?  mainController.selectedParcellation.name : 'select a parcellation'}})</small>
@@ -80,23 +80,37 @@
     <div 
       *ngIf = "mainController.selectedTemplate"
       class = "input-group"
-      [popover] = "searchMode"
-      placement = "bottom"
-      [outsideClick] = "true"
-      triggers = ""
-      #popover = "bs-popover"
-      modeSelection>
+      container = "body"
+      dropdown
+      containerClass = "dropdownMenu">
 
       <input 
+        type = "text"
         [(ngModel)]="searchActivityTerm"
         class = "form-control" 
-        (click)="popover.show()"
         (keydown.esc) = "clearSearchActivityTerm();$event.target.blur()"
         (keydown.enter) = "selectViewingMode();$event.target.blur()"
-        (focus) = "showListOfActivities = true;$event.target.select()"
-        (focusout) = "showListOfActivities = false"
         [placeholder] = "mainController.viewingMode"
-        searchMode />
+        dropdownToggle />
+        
+      <ul
+        class = "dropdown-menu"
+        [ngClass] = "{'darktheme':mainController.darktheme}"
+        listOfActivities
+        *dropdownMenu>
+        <li 
+          [ngClass] = "{'selected':mainController.viewingMode == activity}"
+          role = "menuitem"
+          *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm">
+          
+          <a class = "dropdown-item"
+            href = "#"
+            (click) = "selectViewingMode(activity)"
+            [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
+          
+          </a>
+        </li>
+      </ul>
     </div>
 
     <div 
@@ -140,20 +154,6 @@
     </span>
   </div>
 </div>
-
-<ng-template #selectMode>
-  <div
-    *ngIf = "showListOfActivities"
-    class = "btn-group-vertical"
-    listOfActivities>
-    <span 
-      (mousedown) = "selectViewingMode(activity)"
-      class = "btn btn-default btn-block text-left" 
-      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm"
-      [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
-    </span>
-  </div>
-</ng-template>
 
 <ng-template #searchRegion>
   <atlascontrol [searchTerm]="searchTerm" #atlascontrol>

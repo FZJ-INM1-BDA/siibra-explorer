@@ -86,15 +86,17 @@ div#ATLASContainer
     }
   }
 
-  .btn
+  .btn:not(.btn-link)
   {
     border:none;
     border-color:tgray(0.9,0.5);
+    box-shadow: 0 4px 6px 0 tgray(0.9,0.8);
+    background-color:tgray(1.0,0.8);
     border-radius:0px;
 
-    &:not(.btn-link):hover
+    &:hover
     {
-      background-color:tgray(0.9,0.5);
+      background-color:tgray(0.97,0.99);
     }
   }
 
@@ -103,10 +105,24 @@ div#ATLASContainer
     background-color:rgba(0,0,0,0);
     height:0px;
 
+    div.input-group
+    {
+      vertical-align: middle;
+    }
+
+    input[type="text"]
+    {
+      background-color:tgray(0.95,0.8);
+      box-shadow: inset 0 4px 6px 0 tgray(0.9,0.8);
+      border:none;
+    }
     .glyphicon.helpbtn
     {
       font-size:1.5em;
       vertical-align: middle;
+
+      text-shadow: 0 4px 6px 0 tgray(0.9,0.8);
+      
       &:hover
       {
         color:rgba(0,0,0,0.5);
@@ -158,9 +174,10 @@ div#ATLASContainer
   {
     div#viewerStatus
     {
-      background-color:tgray(1,0.5);
+      background-color:tgray(0.99,0.5);
       color:gray(0.1);
       border: 1px solid tgray(0,0);
+      box-shadow: 0 4px 6px 0 tgray(0.9,0.8);
     }
 
     div#neuroglancer-container
@@ -178,12 +195,16 @@ div#ATLASContainer
         &:before
         {
           content : "toggle view";
-          visibility : visible;  
+          visibility : visible; 
+          font-weight:500; 
+          color:#337ab7;
         }
 
         &:hover
         {
-          color:gray(0.1);
+          cursor: pointer;
+          text-decoration: underline;
+          text-decoration-color: #337ab7;
         }
       }
 
@@ -194,6 +215,13 @@ div#ATLASContainer
         &:hover
         {
           border : 2px solid gray(0.8);
+        }
+
+        .scale-bar-container
+        {
+          font-weight:500;
+          color:gray(0.1);
+          background-color:tgray(0.8,0.5);
         }
       }
     }
@@ -226,6 +254,10 @@ div#ATLASContainer.darktheme
     background-color:gray(0.2);
   }
 
+  .btn:not(.btn-link)
+  {
+    box-shadow:none;
+  }
 
   div.panel
   {
@@ -438,6 +470,7 @@ div#ATLASContainer.darktheme
 
     div#viewerStatus
     {
+      box-shadow:none;
       background-color:tgray(0.2,0.5);
       color:gray(0.75);
     }
@@ -742,6 +775,7 @@ div#ATLASContainer
     
     .popover.popover-bottom.bottom
     {
+      border:none;
       margin-top : 0px;
       max-height:40em;
       overflow:hidden;

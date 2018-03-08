@@ -220,16 +220,17 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    let datasetArray = [
-      '/res/json/bigbrain.json',
-      '/res/json/colin.json',
-      '/res/json/waxholmRatV2_0.json',
-      '/res/json/allenMouse.json'
-    ]
-
     // let datasetArray = [
-    //   'http://localhost:5080/res/json/colin.json'
+    //   '/res/json/bigbrain.json',
+    //   '/res/json/colin.json',
+    //   '/res/json/waxholmRatV2_0.json',
+    //   '/res/json/allenMouse.json'
     // ]
+
+    let datasetArray = [
+      'http://localhost:5080/res/json/bigbrain.json',
+      'http://localhost:5080/res/json/colin.json'
+    ]
 
     datasetArray.forEach(dataset=>{
       this.dataService.fetchJson(dataset)
@@ -630,6 +631,12 @@ export class LandmarkServices{
     const blob2 = new Blob([encoder2.encode(TEMP_CROSS_VTK)],{type:'application/octet-stream'})
     this.TEMP_crossVtkUrl = URL.createObjectURL(blob2)
 
+    this.mainController.viewingModeBSubject.subscribe(_mode=>{
+      this.landmarks = []
+      if(this.mainController.nehubaViewer){
+        this.TEMP_clearVtkLayers()
+      }
+    })
   }
 
   changeLandmarkNodeView(landmark:Landmark,view:any){
@@ -670,13 +677,14 @@ export class LandmarkServices{
   }
 
   TEMP_clearVtkLayers(){
-    const layerManager = this.mainController.nehubaViewer.ngviewer.layerManager
-    Array.from(Array(10).keys())
-      .map(i=>`vtk-landmark-meshes-${i}`)
-      .forEach(layerName=>{
-        const layer = layerManager.getLayerByName(layerName)
-        if( layer ) layer.setVisible(false)
-      })
+    const manager = this.mainController.nehubaViewer.ngviewer.layerManager
+    let _idx = 0
+    let _layer = manager.getLayerByName(`vtk-landmark-meshes-${_idx}`) as ManagedUserLayerWithSpecification
+    while(_layer){
+      _layer.setVisible(false)
+      _idx++
+      _layer = manager.getLayerByName(`vtk-landmark-meshes-${_idx}`) as ManagedUserLayerWithSpecification
+    }
   }
 
   fragmentMainHighlight = `void main(){emitRGBA(vec4(1.0,0.0,0.0,0.6));}`
@@ -733,15 +741,6 @@ export class SpatialSearch{
           .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
 
-    this.mainController.viewingModeBSubject.subscribe(mode=>{
-      if(mode=='Querying Landmarks'){
-        
-      }else{
-        if(this.mainController.nehubaViewer){
-          this.landmarkServices.TEMP_clearVtkLayers()
-        }
-      }
-    })
   }
 
   /* should always use larger for width when doing spatial querying */
@@ -1224,13 +1223,14 @@ export class TempReceptorData{
     this.historyStack.push(this.focusStack)
     this.choiceStack.push(key)
     if(typeof this.focusStack[key] == 'string'){
-      this.receptorString.emit(this.focusStack[key])
-      this.neurotransmitterName.emit(key)
+      const emitItem = this.focusStack[key]
       this.focusStack = []
+      this.receptorString.emit(emitItem)
+      this.neurotransmitterName.emit(key)
     }else{
+      this.focusStack = this.focusStack[key]
       this.receptorString.emit(null)
       this.neurotransmitterName.emit(null)
-      this.focusStack = this.focusStack[key]
     }
   }
 }

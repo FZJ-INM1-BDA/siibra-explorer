@@ -73,6 +73,12 @@ import { ModalHandler } from './nehubaUI.modal.component'
       width : 1em;
       display:inline-block;
     }
+    ul li:not(.selected) a:before
+    {
+      content: ' ';
+      width : 1em;
+      display:inline-block;
+    }
 
     div[modeSelection]
     {
@@ -89,7 +95,10 @@ import { ModalHandler } from './nehubaUI.modal.component'
     {
       
     }
-
+    [listOfActivities] > span
+    {
+      text-align:left;
+    }
     `
   ]
 })
@@ -98,7 +107,6 @@ export class NehubaBanner implements AfterViewInit {
   darktheme : boolean
   @Output() showRegionDialog : EventEmitter<any> = new EventEmitter()
   @ViewChild('searchRegion',{read:TemplateRef}) searchRegion : TemplateRef<any>
-  @ViewChild('selectMode',{read:TemplateRef}) searchMode : TemplateRef<any>
   hbpimg : string = 'src/assets/images/HBP_Primary_RGB_BlackText.png'
   hbpimgdark : string = 'src/assets/images/HBP_Primary_RGB_WhiteText.png'
 

@@ -52,7 +52,6 @@ import { ModalHandler } from './nehubaUI.modal.component'
       flex: 1 1 auto;
       overflow-x:hidden;
       overflow-y:auto;
-      box-shadow:inset 0px 0px 3.5em -0.8em rgba(0,0,0,0.5);
     }
     [selectionSummary]
     {
