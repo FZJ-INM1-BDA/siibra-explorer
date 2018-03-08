@@ -400,12 +400,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       left:1em;
       bottom:1em;
       z-index:9;
-      width:16em;
       overflow:hidden;
       box-sizing: border-box;
       padding:0.5em;
       white-space: nowrap;
-      font-size-adjust:0.5;
     }
 
       div#viewerStatus .btn-link

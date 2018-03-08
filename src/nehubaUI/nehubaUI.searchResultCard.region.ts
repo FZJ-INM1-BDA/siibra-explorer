@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, TempReceptorData } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 
 @Component({
@@ -105,7 +105,8 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
             [regionName]="region.name" 
             (neurotransmitterName)="neurotransmitterName($event)" 
             (modeName) = "modeName($event)"
-            (receptorString)="receptorString($event)">
+            (receptorString)="receptorString($event)"
+            #receptorDataDriver>
           </receptorDataDriver>
           <div #showImgContainer>
           </div>
@@ -175,6 +176,7 @@ export class SearchResultCardRegion{
   @ViewChild('showImgContainer',{read:ViewContainerRef}) showImageContainer : ViewContainerRef
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
 
+  @ViewChild('receptorDataDriver') receptorDataComponent : TempReceptorData
   constructor(public landmarkServices:LandmarkServices,public mainController:MainController){
 
   }
@@ -203,14 +205,17 @@ export class SearchResultCardRegion{
     this.ntName = !string ? null : 
       this.mName == 'fingerprint' ? 
         '' : 
-        string.split('_')[2] 
+        string.split(/\_|\./gi)[2] 
 
     const info = this.region.moreInfo.find(info=>info.name=='Receptor Data')
     this.imgSrc = string && info && info.source ? RECEPTOR_ROOT + info.source + string : null
+
     if(this.imgSrc){
-      this.showImageContainer.createEmbeddedView( this.imageContainer )
+      this.showOnBiggie()
+      this.receptorDataComponent.popStack()
+      // this.showImageContainer.createEmbeddedView( this.imageContainer )
     }else{
-      this.showImageContainer.remove()
+      // this.showImageContainer.remove()
     }
   }
 
@@ -220,6 +225,8 @@ export class SearchResultCardRegion{
       script : ``,
       template : `<img src = "${this.imgSrc}" style = "width:100%; position:relative; z-index:10;" />`
     }
+
+    console.log(metadata)
 
     this.mainController.loadWidget(new LabComponent(metadata))
     // this.mainController.createDisposableWidgets(metadata)
