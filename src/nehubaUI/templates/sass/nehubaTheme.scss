@@ -9,6 +9,12 @@
  * styles only, no layouts
  */
 
+img
+{
+  max-width:100%;
+  pointer-events: all;
+}
+
 span.highlight
 {
   background-color:#770 !important;
@@ -128,7 +134,7 @@ div#ATLASContainer
         left:0px;
         pointer-events: none;
 
-        background-color:tgray(0,0.01);
+        background-color:tgray(0,0.1);
       }
     }
   }

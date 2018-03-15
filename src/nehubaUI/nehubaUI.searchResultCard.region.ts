@@ -82,7 +82,6 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 }
 
-/* Component exclusively used for displaying landmarks... used by iEEG dataset for now */
 @Component({
   selector : `nehubaui-searchresult-region`,
   template : 
@@ -100,9 +99,9 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
         <div class = "panel-body">
         
           <multilevel
+            [muteFilter] = "muteFilter"
             (singleClick) = "singleClick($event)"
             [data] = "receptorBrowserMultilevel">
-
           </multilevel>
 
           <receptorDataDriver 
@@ -187,12 +186,14 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
   @ViewChild('receptorDataDriver') receptorDataComponent : TempReceptorData
 
-  receptorBrowserMultilevel:Multilevel[]
+  receptorBrowserMultilevel:Multilevel
   constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
     // this.receptorBrowserMultilevel = receptorBrowserMultilevel
     const newMultilvl = initMultilvl(RECEPTOR_DATASTRUCTURE_JSON)
-    this.receptorBrowserMultilevel = [newMultilvl]
+    this.receptorBrowserMultilevel = newMultilvl
   }
+
+  muteFilter = (m:Multilevel):boolean=>m.children.length > 0
 
   showBody = false
   imgSrc : string | null
@@ -228,7 +229,94 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   }
 
   singleClick(m:Multilevel){
-    console.log(m)
+
+    if(m.children.length>0){
+      return
+    }
+
+    const info = this.region.moreInfo.find(info=>info.name=='Receptor Data')
+
+    const metadata = {
+      name : `default.default.${this.region.name} ${m.name}`,
+      script : 
+      `
+      (()=>{
+
+        const modalHandler = uiHandle.modalControl.getModalHandler()
+      
+        const regionName = '${this.region.name}'
+        let ntName
+        let mName
+  
+        const imageWrappers = document.getElementsByClassName('default.default.imageWrapper')
+        const array = Array.from(imageWrappers)
+  
+        array.forEach(div=>{
+          Array.from(div.getElementsByTagName('img')).forEach(img=>{
+            img.addEventListener('click',()=>{
+              mName = img.getAttribute('rbMode')
+              ntName = '${/fingerprint/i.test(m.name) ? ' ' : m.name}'
+              const imgSrc = img.getAttribute('src')
+              modalHandler.title = regionName + ' ' + ntName + ' ' + mName
+              modalHandler.body = '<img style = "width:100%" src = "' + imgSrc + '" />'
+              modalHandler.show()
+            })
+          })
+        })
+      })()
+      `,
+      template : 
+      `
+      <style>
+        div[imageWrapper]
+        {
+          position:relative;
+        }
+        div[imageWrapper]:before
+        {
+          content: ' ';
+          width:100%;
+          height:100%;
+          position:absolute;
+          top:0px;
+          left:0px;
+          z-index:999;
+          pointer-events:none;
+          text-align:center;
+        }
+        div[imageWrapper]:hover:before
+        {
+          color : white;
+          content: 'click to enlarge';
+          background-color:rgba(0,0,0,0.8);
+        }
+        div[imageWrapper]:hover
+        {
+          cursor:pointer
+        }
+      </style>
+      ` +
+      (!info ? 
+        `cannot find information on receptor data for ${this.region.name}` :
+        /fingerprint/i.test(m.name) ? 
+          `
+          <div imageWrapper class = "default.default.imageWrapper">
+            <img rbMode = "fingerprint" src = "${RECEPTOR_ROOT + info.source}__fingerprint.jpg" style = "width:100%; position:relative; z-index:10;" />
+          </div>
+          ` :
+            `
+            <div style = "display:flex; width:100%;">
+              <div imageWrapper class = "default.default.imageWrapper" style = "flex: 0 0 35%;">
+                <img rbMode = "autoradiograph" src = "${RECEPTOR_ROOT + info.source}_bm_${m.name}.jpg" style = "width:100%;position:relative; z-index:10;" />
+              </div>
+              <div imageWrapper class = "default.default.imageWrapper" style = "flex : 1 1 50%;">
+                <img rbMode = "profile" src = "${RECEPTOR_ROOT + info.source}_pr_${m.name}.jpg" style = "width:100%;position:relative; z-index:10;" />
+              </div>
+            </div>
+            `)
+    }
+       
+    this.widgitServices.loadWidgetFromLabComponent(new LabComponent(metadata))
   }
   
   receptorString(string:any){

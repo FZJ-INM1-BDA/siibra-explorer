@@ -1,48 +1,49 @@
 <div
-  [ngClass]="{'has-text-active':highlightFilter(singleData)}"
+  [hidden] = "!(data | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm)"
+  [ngClass]="{'has-text-active':highlightFilter(data)}"
   class = " hierarchyContainer" 
-  *ngFor = "let singleData of data | multilevelHasVisibleChildren : multilevelProvider.searchTerm"
   multilevelContainer>
 
   <span class="hierarchy">
     <span 
-      [ngClass]="{'glyphicon-none':singleData.children.length == 0,'glyphicon-chevron-right':singleData.children.length > 0 && !singleData.isExpanded,'glyphicon-chevron-down':singleData.children.length > 0 && singleData.isExpanded }" 
-      (click) = "toggleExpansion( singleData )" 
+      [ngClass]="{'glyphicon-none':data.children.length == 0,'glyphicon-chevron-right':data.children.length > 0 && !data.isExpanded,'glyphicon-chevron-down':data.children.length > 0 && data.isExpanded }" 
+      (click) = "toggleExpansion( data )" 
       class = "unicodeSymbols glyphicon" 
       glyphiconChevron>
     </span>
 
-    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-stop" *ngIf = "false && singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-stop" *ngIf = "false && data.hasDisabledChildren() && data.hasEnabledChildren()">
           <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
     </span>
-    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-check" *ngIf = "false && !singleData.hasDisabledChildren() && singleData.hasEnabledChildren()">
+    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-check" *ngIf = "false && !data.hasDisabledChildren() && data.hasEnabledChildren()">
           <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
     </span>
-    <span (click)="chooseLevel(singleData)" class = "glyphicon glyphicon-unchecked" *ngIf = "false && singleData.hasDisabledChildren() && !singleData.hasEnabledChildren()">
+    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-unchecked" *ngIf = "false && data.hasDisabledChildren() && !data.hasEnabledChildren()">
           <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
     </span>
 
     <span 
       class = "multilevel-name"
-      [ngClass]="{'text-muted': muteFilter(singleData),'text-active':highlightFilter(singleData)}"
-      (click)="multilvlClick( singleData )" >
+      [ngClass]="{'text-muted': muteFilter(data),'text-active':highlightFilter(data)}"
+      (click)="multilvlClick( data )" >
 
       <span 
         class="regionHasMoreInfo"
-        [innerHtml]="singleData.name | searchHighlight : multilevelProvider.searchTerm"
+        [innerHtml]="data.name | searchHighlight : multilevelProvider.searchTerm"
         spanName>
       </span>
     </span>
   </span>
   <multilevel 
+    [isVisible] = "singleData | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm"
     (doubleClick) = "doubleClick.emit($event)"
     (singleClick) = "singleClick.emit($event)"
     [muteFilter] = "muteFilter"
     [highlightFilter] = "highlightFilter"
-    [hidden]="!singleData.isExpanded" 
-    *ngIf = "singleData.children.length>0" 
+    [hidden]="!data.isExpanded" 
     class = "menuItemContentText" 
-    [data]="singleData.children" 
+    [data]="singleData" 
+    *ngFor = "let singleData of data.children"
     [selectedData]="selectedRegions" >
   </multilevel>
 </div>

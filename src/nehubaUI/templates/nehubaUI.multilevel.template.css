@@ -18,7 +18,7 @@ width:100%;
   width:calc(100% - 1em);
 }
 
-multilevel div[multilevelContainer]:not(:last-child):before
+multilevel:not(:last-child) div[multilevelContainer]:before
 {
   pointer-events: none;
   top:-0.8em;
@@ -27,12 +27,12 @@ multilevel div[multilevelContainer]:not(:last-child):before
   box-sizing: border-box;
 }
 
-multilevel div[multilevelContainer]:not(:last-child) > span 
+multilevel:not(:last-child) div[multilevelContainer] > span 
 {
   position:relative;
 }
 
-multilevel div[multilevelContainer]:not(:last-child) > span:before
+multilevel:not(:last-child) div[multilevelContainer] > span:before
 {
   pointer-events: none;
   content : '';
@@ -43,13 +43,13 @@ multilevel div[multilevelContainer]:not(:last-child) > span:before
   left:-0.5em;
   z-index: 0;
 }
-multilevel div[multilevelContainer]:last-child > span
+multilevel:last-child div[multilevelContainer] > span
 {
   position:relative;
 }
 
 
-multilevel div[multilevelContainer]:last-child > span:before
+multilevel:last-child div[multilevelContainer] > span:before
 {
   pointer-events: none;
   content : '';
@@ -61,12 +61,12 @@ multilevel div[multilevelContainer]:last-child > span:before
   z-index: 0;
 }
 
-multilevel div[multilevelContainer]:not(:last-child):before
+multilevel:not(:last-child) div[multilevelContainer]:before
 {
   border-left: rgba(128,128,128,0.6) 1px dashed;
 }
 
-multilevel div[multilevelContainer]:not(:last-child) > span:before
+multilevel:not(:last-child) div[multilevelContainer] > span:before
 {
   border-bottom: rgba(128,128,128,0.6) 1px dashed;
 }
