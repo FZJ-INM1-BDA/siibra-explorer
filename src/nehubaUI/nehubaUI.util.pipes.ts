@@ -13,18 +13,6 @@ export class JsonStringifyPipe implements PipeTransform{
   }
 }
 
-@Pipe({
-  name : 'multilevelHasVisibleChildren'
-})
-
-export class MultilevelHasVisibleChildren implements PipeTransform{
-  public transform(multilevels:Multilevel[],searchTerm:string):Multilevel[]{
-    /* needs searchTerm to update *ngFor loop */
-    searchTerm
-    return multilevels.filter(multilevel=>multilevel.hasVisibleChildren())
-  }
-}
-
 /* pipes in string, pipes out json objects */
 
 @Pipe({
@@ -58,34 +46,52 @@ export class KeyPipe implements PipeTransform{
   }
 }
 
+@Pipe({
+  name : 'multilevelSelectorVisiblePipe'
+})
+
+export class MultilevelSelectorVisiblePipe implements PipeTransform{
+  public transform(m:Multilevel,searchTerm:string):boolean{
+    return this.iterate(m,searchTerm)
+  }
+
+  private iterate(m:Multilevel,searchTerm:string):boolean{
+    const regex = new RegExp(searchTerm,'gi')
+    
+    return m.children.length > 0 ? 
+      regex.test(m.name) || m.children.some(mc=>this.iterate(mc,searchTerm)) :
+      regex.test(m.name)
+  }
+}
+
 /* searches tree array object (assuming children nodes are nested under children property) */
 /* ignores blank spaces */
 /* supercedes searchPipe */
 
-@Pipe({
-  name:'searchTreePipe'
-})
+// @Pipe({
+//   name:'searchTreePipe'
+// })
 
-export class SearchTreePipe implements PipeTransform{
+// export class SearchTreePipe implements PipeTransform{
 
-  searchTerm : string
+//   searchTerm : string
 
-  public transform(array:Multilevel[],searchTerm:string):Multilevel[]{
-    this.searchTerm = searchTerm
-    this.iteratingArray( array )
-    return array
-  }
+//   public transform(array:Multilevel[],searchTerm:string):Multilevel[]{
+//     this.searchTerm = searchTerm
+//     this.iteratingArray( array )
+//     return array
+//   }
 
-  private iteratingArray(array:Multilevel[]){
-    let sanitaized = this.searchTerm.replace(/[^\w\s]/gi, '')
-    array.forEach( item => {
-      /* if regexp is not here, it gives funny results */
-      let regExp = new RegExp(sanitaized,'gi')
-      item.isVisible = regExp.test( item.name )
-      this.iteratingArray( item.children )
-    })
-  }
-}
+//   private iteratingArray(array:Multilevel[]){
+//     let sanitaized = this.searchTerm.replace(/[^\w\s]/gi, '')
+//     array.forEach( item => {
+//       /* if regexp is not here, it gives funny results */
+//       let regExp = new RegExp(sanitaized,'gi')
+//       item.isVisible = regExp.test( item.name )
+//       this.iteratingArray( item.children )
+//     })
+//   }
+// }
 
 /* search high lighting */
 

@@ -12,6 +12,7 @@ import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification';
 import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer';
+import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
 
 declare var window:{
   [key:string] : any
@@ -260,17 +261,17 @@ export class MainController{
 
   init(){
     /* this will need to come from elsewhere eventually */
-    // let datasetArray = [
-    //   '/res/json/bigbrain.json',
-    //   '/res/json/colin.json',
-    //   '/res/json/waxholmRatV2_0.json',
-    //   '/res/json/allenMouse.json'
-    // ]
-
     let datasetArray = [
-      'http://localhost:5080/res/json/bigbrain.json',
-      'http://localhost:5080/res/json/colin.json'
+      '/res/json/bigbrain.json',
+      '/res/json/colin.json',
+      '/res/json/waxholmRatV2_0.json',
+      '/res/json/allenMouse.json'
     ]
+
+    // let datasetArray = [
+    //   'http://localhost:5080/res/json/bigbrain.json',
+    //   'http://localhost:5080/res/json/colin.json'
+    // ]
     
     Promise.all(datasetArray.map(dataset=>
       this.dataService.fetchJson(dataset)
@@ -601,26 +602,26 @@ export class MainController{
    * to be migrated to region view
    */
   
-  multilvlExpansionTreeShake = (ev:any):void=>{
-    /* this event should in theory not happen, but catching just in case */
-    if( !this.selectedParcellation ){
-      return
-    }
+  // multilvlExpansionTreeShake = (ev:any):void=>{
+  //   /* this event should in theory not happen, but catching just in case */
+  //   if( !this.selectedParcellation ){
+  //     return
+  //   }
 
-    /* bind search term to searchTerm */
-    const searchTerm = ev
+  //   /* bind search term to searchTerm */
+  //   const searchTerm = ev
 
-    /* timeout is necessary as otherwise, treeshaking collapses based on the previous searchTerm */
-    setTimeout(()=>{
-      if( searchTerm != '' ){
-        const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
-          item.isExpanded = item.hasVisibleChildren()
-          propagate(item.children)
-        })
-        if(this.selectedParcellation)propagate(this.selectedParcellation.regions)
-      }
-    })
-  }
+  //   /* timeout is necessary as otherwise, treeshaking collapses based on the previous searchTerm */
+  //   setTimeout(()=>{
+  //     if( searchTerm != '' ){
+  //       const propagate = (arr:RegionDescriptor[])=>arr.forEach(item=>{
+  //         item.isExpanded = item.hasVisibleChildren()
+  //         propagate(item.children)
+  //       })
+  //       if(this.selectedParcellation)propagate(this.selectedParcellation.regions)
+  //     }
+  //   })
+  // }
 }
 
 @Injectable()
@@ -632,6 +633,10 @@ export class MultilevelProvider
   constructor(private mainController:MainController)
   {
     
+  }
+
+  checkMultilevelVisibility(){
+
   }
 
   spliceRegionSelect(m:Multilevel){
@@ -693,9 +698,9 @@ export class MultilevelProvider
       m.enabled
   }
 
-  hasVisibleChildren(m:Multilevel):boolean{
-    return m.children.length > 0 ?
-      m.children.some( c=> c.isVisible || this.hasDisabledChildren(c)):
+  hasVisibleChildren(m:MultilevelSelector):boolean{
+    return m.childrenMultilevel && m.childrenMultilevel.length > 0 ?
+      m.childrenMultilevel.some( c=> c.isVisible || this.hasVisibleChildren(c)):
       m.isVisible
   }
 }

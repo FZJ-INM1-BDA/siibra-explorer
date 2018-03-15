@@ -194,7 +194,6 @@ export class Multilevel{
   children : Multilevel[];
   isExpanded : boolean = true;
   isExpandedString : 'expanded' | 'collapsed' = 'collapsed'
-  isVisible : boolean = true
 
   constructor(){
     this.enabled = false
@@ -220,13 +219,7 @@ export class Multilevel{
   public hasEnabledChildren = ():boolean =>
     this.children.length > 0 ?
       this.children.some( child => child.hasEnabledChildren() ) :
-      this.enabled
-
-  /* used for searching and filtering tree */
-  public hasVisibleChildren = ():boolean => 
-    this.children.length > 0 ? 
-      this.children.some( child=> this.isVisible || child.hasVisibleChildren()) :
-      this.isVisible     
+      this.enabled  
 }
 
 export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{

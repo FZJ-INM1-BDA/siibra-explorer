@@ -7,11 +7,13 @@
       <a *ngIf = "mainController.selectedRegions.length > 0" (click)="clearAllSelections()" class = "btn btn-link">clear all</a>
     </div>
     <multilevel 
+      [isVisible] = "region | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm"
       [muteFilter] = "muteFilter"
       [highlightFilter] = "highlightFilter"
       (singleClick) = "multilevelSingleClick($event)"
       class = "menuItemContentText"  
-      [data]="mainController.selectedParcellation.regions | searchTreePipe : multilevelProvider.searchTerm" >
+      *ngFor = "let region of mainController.selectedParcellation.regions"
+      [data]= "region" >
     </multilevel>
   </div>
 </div>

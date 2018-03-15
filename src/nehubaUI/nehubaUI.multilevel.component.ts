@@ -51,19 +51,21 @@ import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
       text-align:center;
     }
     `
-  ],
+],
   styleUrls : ['src/nehubaUI/templates/nehubaUI.multilevel.template.css']
 })
 
 export class MultilevelSelector {
 
+  @Input() isVisible : boolean = true
+
   @Input() muteFilter : (m:Multilevel)=>boolean = ()=>false
   @Input() highlightFilter : (m:Multilevel)=>boolean = ()=>false
 
-  @Input() data : Multilevel[]
+  @Input() data : Multilevel
   @Input() selectedData : Multilevel[]
-  @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[]
-
+  @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[] = []
+  
   @Output() singleClick : EventEmitter<Multilevel> = new EventEmitter()
   @Output() doubleClick : EventEmitter<Multilevel> = new EventEmitter()
 
