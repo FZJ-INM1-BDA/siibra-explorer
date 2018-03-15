@@ -105,7 +105,7 @@ export class TemplateDescriptor {
 
     this.parcellations = json.parcellations && json.parcellations.constructor.name == 'Array' ? json.parcellations.map((json:any)=>new ParcellationDescriptor(json)) : [];
     
-    (new Promise((resolve,reject)=>{
+    this.asyncPromises = [(new Promise((resolve,reject)=>{
       json.nehubaConfig ? 
         resolve(json.nehubaConfig) : 
         json.nehubaConfigURL ? 
@@ -117,10 +117,12 @@ export class TemplateDescriptor {
     }))
       .then(nehubaConfig=>{
         this.nehubaConfig = nehubaConfig
+        return Promise.resolve()
       })
       .catch(e=>{
         console.log('constructing template error',e)
-      })
+        return Promise.reject(e)
+      })]
   }
   name : string;
   useTheme : string;
@@ -129,6 +131,7 @@ export class TemplateDescriptor {
   nehubaId : string;
   
   nehubaConfig : Nehubaconfig;
+  asyncPromises : Promise<any>[]
 }
 
 export class ParcellationDescriptor {

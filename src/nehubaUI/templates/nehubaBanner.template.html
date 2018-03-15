@@ -79,57 +79,55 @@
 
     <div 
       *ngIf = "mainController.selectedTemplate"
-      class = "input-group"
-      container = "body"
-      dropdown
-      containerClass = "dropdownMenu">
+      [outsideClick] = "true"
+      containerClass = "inputModeSearchContainer"
+      placement = "bottom"
+      triggers = ""
+      #inputSearchActivitiesPopover = "bs-popover"
+      [popover] = "searchMode"
+      inputSearchRegion>
 
-      <input 
-        type = "text"
-        [(ngModel)]="searchActivityTerm"
-        class = "form-control" 
-        (keydown.esc) = "clearSearchActivityTerm();$event.target.blur()"
-        (keydown.enter) = "selectViewingMode();$event.target.blur()"
-        [placeholder] = "mainController.viewingMode"
-        dropdownToggle />
+      <div 
+        class = "app-input-group" 
+        modeSelector>
+
+        <span 
+          *ngIf = "searchActivityTerm==''" 
+          class = "app-input-placeholder" 
+          [ngStyle]="{'z-index':focusModeSelector ? 0 : 2}">
+          <small>Mode</small>
+          <small class = "text-muted">{{mainController.viewingMode}}</small>
+        </span>
+        <input 
+          type = "text"
+          (click) = "inputSearchActivitiesPopover.show()"
+          (focus) = "inputSearchActivitiesPopover.show()"
+          [(ngModel)]="searchActivityTerm"
+          class = "form-control" 
+          (keydown.esc) = "inputSearchActivitiesPopover.hide();clearSearchActivityTerm();$event.target.blur()"
+          (keydown.enter) = "inputSearchActivitiesPopover.hide();selectViewingMode();$event.target.blur()" />
+      </div>
         
-      <ul
-        class = "dropdown-menu"
-        [ngClass] = "{'darktheme':mainController.darktheme}"
-        listOfActivities
-        *dropdownMenu>
-        <li 
-          [ngClass] = "{'selected':mainController.viewingMode == activity}"
-          role = "menuitem"
-          *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm">
-          
-          <a class = "dropdown-item"
-            href = "#"
-            (click) = "selectViewingMode(activity)"
-            [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
-          
-          </a>
-        </li>
-      </ul>
     </div>
 
     <div 
       *ngIf = "mainController.selectedTemplate && !widgetiseSearchRegion"
       class = "input-group" 
-      [popover] = "searchRegion"
       placement = "bottom"
       [outsideClick] = "true"
+      containerClass = "inputSearchContainer"
       triggers = ""
-      #popover = "bs-popover"
+      #inputSearchRegionPopover = "bs-popover"
+      [popover] = "searchRegion"
       inputSearchRegion>
 
       <input 
-        (keydown.esc)="popover.hide();$event.target.blur();searchTerm=''"
+        (keydown.esc)="inputSearchRegionPopover.hide();$event.target.blur();searchTerm=''"
         [(ngModel)]="searchTerm"
         class = "form-control" 
-        (click)="popover.show()"
+        (click)="inputSearchRegionPopover.show()"
         type="text" 
-        placeholder="Search region hierachy ..."/>
+        placeholder="Regions"/>
 
         <div *ngIf = "false" (click)="widgetiseSearchRegionComponent()" editBtn>
           <i class = "helpbtn glyphicon glyphicon-new-window"></i>
@@ -143,7 +141,7 @@
       [tooltip]="labcomponent.name.split('.')[2]"
       (click) = "widgitServices.loadWidgetFromLabComponent(labcomponent)"
       *ngFor = "let labcomponent of mainController.loadedPlugins">
-      {{widget.name.split('.')[2][0]}}
+      {{ labcomponent.name.split('.')[2][0] }}
     </span>
 
     <span 
@@ -159,4 +157,23 @@
   <atlascontrol [searchTerm]="searchTerm" #atlascontrol>
 
   </atlascontrol>
+</ng-template>
+
+<ng-template #searchMode>
+  <ul
+    id = "modeSelector"
+    [ngClass] = "{'darktheme':mainController.darktheme}"
+    listOfActivities>
+    <li 
+      [ngClass] = "{'selected':mainController.viewingMode == activity}"
+      role = "menuitem"
+      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm">
+      
+      <a class = "dropdown-item"
+        (mousedown) = "selectViewingMode(activity)"
+        [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
+      
+      </a>
+    </li>
+  </ul>
 </ng-template>

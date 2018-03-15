@@ -1,7 +1,8 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
-import { RegionDescriptor, LabComponent } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, TempReceptorData, WidgitServices } from 'nehubaUI/nehubaUI.services';
+import { RegionDescriptor, LabComponent, Landmark, Multilevel } from 'nehubaUI/nehuba.model';
+import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
+import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.component';
 
 @Component({
   selector : `nehubaui-searchresult-region-list`,
@@ -11,10 +12,11 @@ import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
     <nehubaui-searchresult-region 
       (hover)="subHover($event)"
       (showReceptorData)="showReceptorData(region,$event)"
-      (mouseenter)="hover(region)" 
-      (mouseleave)="unhover(region)"
+      (mouseenter)="mouseEnterRegion.emit(region)" 
+      (mouseleave)="mouseLeaveRegion.emit(region)"
       [region] = "region" 
-      *ngFor = "let region of regions">
+      [idx] = "idx"
+      *ngFor = "let region of regions; let idx = index">
     </nehubaui-searchresult-region>
   </ng-template>
   `
@@ -22,32 +24,38 @@ import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   @Input() regions : RegionDescriptor[] = []
   @Input() title : string = `Untitled`
+  @Input() startingMode : 'docked' | 'floating' | 'minimised' = 'docked'
+  
+  @Output() mouseEnterRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
+  @Output() mouseLeaveRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
+  
   @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
   constructor(
     public mainController:MainController,
     public landmarkServices:LandmarkServices,
     public widgitServices:WidgitServices){
-    
   }
 
   widgetComponent : WidgetComponent
   ngAfterViewInit(){
     this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.regionList,{name:this.title})
+    this.widgetComponent.changeState(this.startingMode)
+    
     if(this.mainController.nehubaViewer){
       this.mainController.nehubaViewer.redraw()
     }
 
     this.selectedRegionsWithReceptorData()
 
-    this.landmarkServices.landmarks = this.regions.map(r=>({
-      pos : r.position.map(number=>number / 1000000) as [number,number,number],
-      id : r.name,
-      hover : false,
-      properties : r
-    }))
+    // this.landmarkServices.landmarks = this.regions.map(r=>({
+    //   pos : r.position.map(number=>number / 1000000) as [number,number,number],
+    //   id : r.name,
+    //   hover : false,
+    //   properties : r
+    // }))
 
-    this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx,7,'d20'))
-    this.landmarkServices.TEMP_clearVtkHighlight()
+    // this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx,7,'d20'))
+    // this.landmarkServices.TEMP_clearVtkHighlight()
   }
 
   ngOnDestroy(){
@@ -68,28 +76,13 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     if(l) this.landmarkServices.changeLandmarkNodeView(l,templateRef)
   }
 
-  hover(region:RegionDescriptor){
-    const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
-    if(idx >= 0) {
-      this.landmarkServices.landmarks[idx].hover = true
-      this.landmarkServices.TEMP_vtkHighlight(idx)
-    }
-  }
-
-  unhover(region:RegionDescriptor){
-    const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
-    if(idx >= 0) {
-      this.landmarkServices.landmarks[idx].hover = false
-      this.landmarkServices.TEMP_clearVtkHighlight(idx)
-    }
-  }
-
   /* hover status inside the searchresult-region card */
   subHover(item:any){
     console.log(item)
   }
 }
 
+/* Component exclusively used for displaying landmarks... used by iEEG dataset for now */
 @Component({
   selector : `nehubaui-searchresult-region`,
   template : 
@@ -105,13 +98,22 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     <div *ngIf = "showBody" #receptorPanelBody>
       <div class = "panel">
         <div class = "panel-body">
+        
+          <multilevel
+            (singleClick) = "singleClick($event)"
+            [data] = "receptorBrowserMultilevel">
+
+          </multilevel>
+
           <receptorDataDriver 
+            *ngIf = "false"
             [regionName]="region.name" 
             (neurotransmitterName)="neurotransmitterName($event)" 
             (modeName) = "modeName($event)"
             (receptorString)="receptorString($event)"
             #receptorDataDriver>
           </receptorDataDriver>
+
           <div #showImgContainer>
           </div>
         </div>
@@ -165,36 +167,68 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     }
     receptorDataDriver
     {
-      padding-top:1em;
-      padding-bottom:1em;
+      background-color:rgba(0,0,0,0.2);
+      padding:0.4em;
       display:block;
     }
     `
-  ]
+  ],
+  providers : [ MultilevelProvider ]
 })
-export class SearchResultCardRegion{
+export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   @Input() region : RegionDescriptor
+  @Input() idx : number
+
   @Output() hover : EventEmitter<any> = new EventEmitter()
   @Output() showReceptorData : EventEmitter<TemplateRef<any>> = new EventEmitter()
+
   @ViewChild('imgContainer',{read:TemplateRef}) imageContainer : TemplateRef<any>
   @ViewChild('showImgContainer',{read:ViewContainerRef}) showImageContainer : ViewContainerRef
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
-
   @ViewChild('receptorDataDriver') receptorDataComponent : TempReceptorData
-  constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
 
+  receptorBrowserMultilevel:Multilevel[]
+  constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
+    // this.receptorBrowserMultilevel = receptorBrowserMultilevel
+    const newMultilvl = initMultilvl(RECEPTOR_DATASTRUCTURE_JSON)
+    this.receptorBrowserMultilevel = [newMultilvl]
   }
 
   showBody = false
   imgSrc : string | null
   ntName : string
   mName : string
+  landmark : Landmark
+
+  ngOnDestroy(){
+    this.landmarkServices.removeLandmark(this.landmark)
+  }
+
+  ngAfterViewInit(){
+    try{
+      this.landmark = ({
+        pos : this.region.position.map(n=>n/1e6) as [number,number,number],
+        id : this.region.name,
+        hover: false,
+        properties:this.region
+      }) as Landmark
+
+      this.landmarkServices.addLandmark(this.landmark)
+      this.landmarkServices.TEMP_parseLandmarkToVtk(this.landmark,this.idx,7,'d20')
+    }catch(e){
+      console.error('could not add landmark',e)
+    }
+  }
   
   neurotransmitterName(string:any){
     this.ntName = string ? string : null
   }
   modeName(string:any){
     this.mName = string ? string : null
+  }
+
+  singleClick(m:Multilevel){
+    console.log(m)
   }
   
   receptorString(string:any){
@@ -240,4 +274,106 @@ export class SearchResultCardRegion{
   }
 }
 
+@Component({
+  selector : `nehubaui-searchresult-region-pill-list`,
+  template :
+  `
+  <ng-template #regionList>
+    <nehubaui-searchresult-region-pill
+      [region] = "region"
+      *ngFor = "let region of regions">
+      <a 
+        *ngIf = "additionalContent=='nifti'" 
+        href = "{{region.PMapURL}}">
+        download nifti
+      </a>
+    </nehubaui-searchresult-region-pill>
+  </ng-template>
+  `
+})
+
+export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
+  @Input() regions : RegionDescriptor[]
+  @Input() title : string = `Untitled`
+  @Input() startingMode : 'docked' | 'floating' | 'minimised' = 'docked'
+  @Input() additionalContent : string = ``
+
+  @Output() mouseEnterRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
+  @Output() mouseLeaveRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
+  
+
+  constructor(public mainController:MainController,public landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
+
+  }
+
+  @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
+  widgetComponent:WidgetComponent
+  ngAfterViewInit(){
+    this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.regionList,{name:this.title})
+    this.widgetComponent.changeState(this.startingMode)
+    if(this.mainController){
+      this.mainController.nehubaViewer.redraw()
+    }
+  }
+
+  ngOnDestroy(){
+    this.widgetServices.unloadWidget(this.widgetComponent)
+  }
+}
+
+@Component({
+  selector : `nehubaui-searchresult-region-pill`,
+  template : 
+  `
+  <div>
+    <span class = "badge">
+      {{region.name}} 
+      <i 
+        (click) = "close()"
+        class = "glyphicon glyphicon-remove-sign">
+      </i> <br />
+      <ng-content>
+      </ng-content>
+    </span>
+  <div>
+  `,
+  styles : [
+    `
+    span.badge
+    {
+      text-align:left;
+    }
+    `
+  ]
+})
+export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
+
+  @Input() region :RegionDescriptor
+  @Input() idx : number
+  @Input() mode : string = `default`
+
+  @Input() regionTemplate : TemplateRef<RegionTemplateRefInterface>
+
+  constructor(public mainController : MainController){}
+
+  ngAfterViewInit(){
+  }
+
+  ngOnDestroy(){
+    this.mainController.regionSelectionChanged()
+  }
+
+  close(){
+    const idx = this.mainController.selectedRegions.findIndex(r=>r.name == this.region.name)
+    if(idx >= 0){
+      this.mainController.selectedRegions.splice(idx,1)
+    }else{
+      console.warn('cannot find the region',this.region, this.mainController.selectedRegions)
+    }
+  }
+}
+
+
+
 const RECEPTOR_ROOT = `http://medpc055.ime.kfa-juelich.de:5082/plugins/receptorBrowser/data/`
+// const RECEPTOR_ROOT = `http://localhost:5080/pluginDev/receptorBrowser/data/`

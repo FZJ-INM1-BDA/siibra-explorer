@@ -1,6 +1,5 @@
 <nehubaModal></nehubaModal>
 
-
 <atlascontrol *ngIf="showRegion">
 </atlascontrol>
 
@@ -20,6 +19,7 @@
     (mouseup)="mouseup($event)">
   </div>
   <WidgetsContainer 
+    (contextmenu)="$event.stopPropagation()"
     [ngClass]="{'darktheme':mainController.darktheme}"
     [hasDockedComponents]="hasDockedComponents()" 
     [dockedWidgetPanelWidth] = "dockedWidgetPanelWidth">

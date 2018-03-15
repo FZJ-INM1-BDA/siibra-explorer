@@ -23,7 +23,7 @@ import { Multiform,ActiveComponent } from './nehubaUI.displaymultiform.component
 import { MainController, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,SearchTreePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma, MultilevelHasVisibleChildren  } from './nehubaUI.util.pipes'
 
-import { SearchResultCardRegion,ListSearchResultCardRegion } from './nehubaUI.searchResultCard.region'
+import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
 @NgModule({
     imports:[
@@ -38,7 +38,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion } from './nehubaUI.se
         TooltipModule.forRoot()
     ],
     declarations : 
-        [ ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,
+        [ ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
         MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
         NehubaViewerInnerContainer,NehubaViewerDirective,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingPopOver,
         Multiform,ActiveComponent, NehubaContainer,NehubaViewerContainer,NehubaUIControl,NehubaBanner,NehubaModalUnit,

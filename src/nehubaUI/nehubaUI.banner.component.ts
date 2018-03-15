@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit } from '@angular/core'
+import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
 import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices } from './nehubaUI.services'
 import { RegionDescriptor }from './nehuba.model'
 import { ModalHandler } from './nehubaUI.modal.component'
@@ -41,9 +41,10 @@ import { ModalHandler } from './nehubaUI.modal.component'
       margin-top:1em;
       flex: 1 1 auto;
     }
-    div[textContainer] > div
+    div[textContainer] > *
     {
-      display:inline-block
+      display:inline-block;
+      margin-top:0.3em;
     }
     div[editBtn]
     {
@@ -91,13 +92,15 @@ import { ModalHandler } from './nehubaUI.modal.component'
       vertical-align : top;
       width:20em;
     }
-    span[glyphiconShowHelp]
-    {
-      
-    }
+
     [listOfActivities] > span
     {
       text-align:left;
+    }
+    [modeSelector]
+    {
+      width:278px;
+      height:1.43em;
     }
     `
   ]
@@ -117,8 +120,9 @@ export class NehubaBanner implements AfterViewInit {
 
   /* viewing mode variables */
   listOfActivities : string[] = []
-  showListOfActivities : boolean = false
   searchActivityTerm : string = ``
+  focusModeSelector : boolean = false
+
   Array = Array
 
   constructor(public mainController:MainController,public widgitServices:WidgitServices){
@@ -127,10 +131,17 @@ export class NehubaBanner implements AfterViewInit {
     //   this.widgetiseSearchRegion = false
     // }
 
-    this.mainController.onParcellationSelectionHook.push(()=>{
-      this.listOfActivities = Array.from(this.mainController.regionsLabelIndexMap.values())
-        .reduce((prev:string[],curr:RegionDescriptor)=>
-            prev.concat(curr.moreInfo.filter(info=> info.name != 'Go To There' && prev.findIndex(i=>i==info.name) < 0).map(i=>i.name))
+    this.mainController.afterParcellationSelectionHook.push(()=>{
+      
+      this.listOfActivities = 
+        Array
+          .from(this.mainController.regionsLabelIndexMap.values())
+          .reduce((prev:string[],curr:RegionDescriptor)=>
+            prev
+              .concat(
+                curr.moreInfo
+                  .filter(info=> info.name != 'Go To There' && prev.findIndex(i=>i==info.name) < 0)
+                  .map(i=>i.name))
           ,[])
     })
   }
@@ -169,7 +180,12 @@ export class NehubaBanner implements AfterViewInit {
   /* viewing mode functions */
   clearSearchActivityTerm(){
     this.searchActivityTerm = ''
-    this.showListOfActivities = false
+    this.focusModeSelector = false
+  }
+
+  @HostListener('body:mousedown')
+  documentMouseUp(){
+    this.focusModeSelector = false
   }
   
   selectViewingMode(activity?:string){
@@ -180,6 +196,7 @@ export class NehubaBanner implements AfterViewInit {
       const newPipe = new PrependNavigate()
       const newP2 = new SearchPipe()
       const filter = newP2.transform(newPipe.transform(this.listOfActivities),this.searchActivityTerm)
+      
       if(filter.length > 0) { 
         newActivity = filter[0] 
       }else{
@@ -188,6 +205,7 @@ export class NehubaBanner implements AfterViewInit {
     }
     
     this.clearSearchActivityTerm()
+    this.focusModeSelector = false
     this.mainController.setMode(newActivity)
   }
 
@@ -207,7 +225,7 @@ export class NehubaBanner implements AfterViewInit {
 
 export class PrependNavigate implements PipeTransform{
   public transform(array:string[]):string[]{
-    return ['navigation (default mode)', ... array,'Querying Landmarks']
+    return ['navigation (default mode)', ... array,'iEEG Recordings']
   }
 }
 

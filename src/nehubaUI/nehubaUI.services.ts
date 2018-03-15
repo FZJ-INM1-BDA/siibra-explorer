@@ -28,6 +28,7 @@ export class MainController{
   loadedTemplates : TemplateDescriptor[] = []
 
   selectTemplateBSubject : BehaviorSubject<TemplateDescriptor|null> = new BehaviorSubject(null)
+
   selectedTemplate : TemplateDescriptor | undefined
   selectedParcellation : ParcellationDescriptor | undefined
   selectedRegions : RegionDescriptor[] = []
@@ -38,11 +39,13 @@ export class MainController{
    * viewing 
    */
   viewingMode : string = `navigation (default mode)`
-  viewingModeBSubject : BehaviorSubject<string> = new BehaviorSubject( this.viewingMode )
+  viewingModeBSubject : Subject<string> = new Subject() // cannot be a behaviourSubject, or else it will overwrite query param every time
 
   /**
    * hooks
    */
+  /* queryChangeSubject should emit only key value of strings to be set as query */
+  queryChangeSubject : Subject<any> = new Subject()
 
   onTemplateSelectionHook : (()=>void)[] = []
   afterTemplateSelectionHook : (()=>void)[] = []
@@ -81,6 +84,45 @@ export class MainController{
 
     /* TODO reconsider if this is a good idea */
     HelperFunctions.sFindRegion = this.findRegionWithId
+
+    /* required to handle back events */
+    window.addEventListener('hashchange',(ev:HashChangeEvent)=>{
+      
+      if((<string>ev.newURL).indexOf('#') < 0){
+        if(this.nehubaViewer)
+        {
+          this.selectTemplateBSubject.next(null)
+          // this.nehubaViewer.dispose()
+          // this.darktheme = false
+        }
+
+        this.selectedTemplate = undefined
+      }
+      history.replaceState(null,'')
+    })
+  }
+
+  private parseQueryString(locationSearch:string){
+    const query = new URLSearchParams(locationSearch)
+    Array.from(query.entries()).forEach(keyval=>{
+      switch(keyval[0]){
+        case 'selectedTemplate':{
+          const template = this.loadedTemplates.find(template=>template.name==keyval[1])
+          if(template) this.loadTemplate(template)
+        }break;
+        case 'viewingMode':{
+          setTimeout(()=>{
+            if(this.nehubaViewer) this.setMode(keyval[1])
+          })
+        }break;
+        case 'selectedRegions':{
+          this.selectedRegions = keyval[1].split('_')
+            .map(idx=>Number(idx))
+            .filter(idx=>this.regionsLabelIndexMap.get(idx))
+            .map(idx=>this.regionsLabelIndexMap.get(idx)!)
+        }break;
+      }
+    })
   }
 
   receptorString : string | null
@@ -127,7 +169,7 @@ export class MainController{
 
     /* set state */
     switch(mode){
-      case 'Querying Landmarks':
+      case 'iEEG Recordings':
       {
         this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
           .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.2))
@@ -229,25 +271,26 @@ export class MainController{
       'http://localhost:5080/res/json/bigbrain.json',
       'http://localhost:5080/res/json/colin.json'
     ]
-
-    datasetArray.forEach(dataset=>{
+    
+    Promise.all(datasetArray.map(dataset=>
       this.dataService.fetchJson(dataset)
         .then((json:any)=>{
-          this.dataService.parseTemplateData(json)
+          return this.dataService.parseTemplateData(json)
             .then( template =>{
               this.loadedTemplates.push( template )
             })
             .catch(console.warn)
-          })
-        .catch((e:any)=>{
-          console.log('fetch init dataset error',e)
-        })
+          })))
+      .then(()=>
+        this.parseQueryString( window.location.search ))
+      .catch((e:any)=>{
+        console.error('fetching initial dataset error',e)
       })
 
     /* dev option, use a special endpoint to fetch all plugins */
     // fetch('http://localhost:5080/collectPlugins')
     //   .then(res=>res.json())
-    //   .then(arr=>this.loadedWidgets = (<Array<any>>arr).map(json=>new LabComponent(json)))
+    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
     //   .catch(console.warn)
   }
 
@@ -274,7 +317,12 @@ export class MainController{
         this.regionSelectionChanged()
       }
     }
+
+    /* temp */
+    window['unloadNG'] = (this.unloadTemplate).bind(this)
   }
+
+  urlToPush:URL = new URL(window.location)
 
   attachInternalHooks(){
 
@@ -299,8 +347,31 @@ export class MainController{
     })
 
     /* clear widgets and viewing mode */
-    this.selectTemplateBSubject.subscribe((_template)=>{
+    this.selectTemplateBSubject.subscribe((template)=>{
+      this.queryChangeSubject.next({
+        'selectedTemplate': template ? template.name : null
+      })
       if(this.viewingMode!='navigation (default mode)') this.setMode('navigation (default mode)')
+    })
+
+    this.queryChangeSubject.subscribe((keyval:any)=>{
+      const search = new URLSearchParams( this.urlToPush.search )
+      Object.keys(keyval).forEach(key=>{
+        keyval[key] ? search.set(key,keyval[key]) : search.delete(key)
+      })
+      this.urlToPush.search = search.toString()
+    })
+
+    this.queryChangeSubject
+      .debounceTime(200)
+      .subscribe(()=>{
+        if(this.urlToPush) history.replaceState(null,'',this.urlToPush.toString())
+      })
+
+    this.viewingModeBSubject.subscribe((mode:string)=>{
+      this.queryChangeSubject.next({
+        viewingMode : mode
+      })
     })
   }
 
@@ -322,7 +393,7 @@ export class MainController{
 
   unloadTemplate():void
   {
-
+    this.selectTemplateBSubject.next(null)
   }
 
   loadTemplate(templateDescriptor:TemplateDescriptor):void
@@ -335,8 +406,9 @@ export class MainController{
     //   this.unloadTemplate()
     // }
 
+    // hash needs to be reset, or else neuroglancer will take the old hash and put in new viewer
+    window.location.hash = ``
     this.selectTemplateBSubject.next(templateDescriptor)
-
     this.onTemplateSelectionHook.forEach(cb=>cb())
 
     VIEWER_CONTROL.loadTemplate(templateDescriptor)
@@ -350,12 +422,14 @@ export class MainController{
     /**
      * temporary workaround. 
      */
-
-    this.loadParcellation( templateDescriptor.parcellations[0] )
-    this.sendUISelectedRegionToViewer()
+    // setTimeout(()=>{
+      this.loadParcellation( templateDescriptor.parcellations[0] )
+      this.sendUISelectedRegionToViewer()
+    // },5000)
 
     /* TODO potentially breaks. selectedRegions should be cleared after each loadParcellation */
     EXTERNAL_CONTROL.metadata.selectedRegions = []
+
   }
 
   loadParcellation(parcellation:ParcellationDescriptor):void
@@ -416,6 +490,10 @@ export class MainController{
         region.enabled = true
         EXTERNAL_CONTROL.metadata.selectedRegions.push(region)
       }
+    })
+    
+    this.queryChangeSubject.next({
+      selectedRegions : this.selectedRegions.map(r=>r.labelIndex).join('_').toString()
     })
   }
   
@@ -716,6 +794,23 @@ export class LandmarkServices{
     })
   }
 
+  clearAllLandmarks(){
+    this.landmarks = []
+  }
+
+  addLandmark(landmark:Landmark){
+    this.landmarks.push(landmark)
+  }
+  removeLandmark(landmark:Landmark){
+    const idx = this.landmarks.findIndex(l=>l.id==landmark.id)
+    
+    if(idx>=0){
+      this.landmarks.splice(idx,1)
+    }else{
+      console.error('could not remove landmark')
+    }
+  }
+
   changeLandmarkNodeView(landmark:Landmark,view:any){
     this.onChangeLandmarkNodeViewCbs.forEach(cb=>cb(landmark,view))
   }
@@ -724,6 +819,7 @@ export class LandmarkServices{
   onChangeLandmarkNodeView(callback:(landmark:Landmark,view:any)=>void){
     this.onChangeLandmarkNodeViewCbs.push(callback)
   }    
+
   TEMP_parseLandmarkToVtk = (landmark:Landmark,idx:number,scale?:number,mesh?:string,shader?:string) =>{
     const viewer = this.mainController.nehubaViewer.ngviewer
 
@@ -824,7 +920,7 @@ export class SpatialSearch{
   /* otherwise, some parts of the viewer will be out of bounds */
   querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
   {
-    if(this.mainController.viewingMode == 'Querying Landmarks')
+    if(this.mainController.viewingMode == 'iEEG Recordings')
       this.spatialSearchResultSubject.next({center,width,templateSpace})
   }
 
@@ -931,8 +1027,11 @@ class DataService {
   }
 
   parseTemplateData(json:any):Promise<TemplateDescriptor>{
-    return new Promise((resolve,_)=>{
-      resolve(new TemplateDescriptor(json))
+    return new Promise((resolve,reject)=>{
+      const template = new TemplateDescriptor(json)
+      Promise.all(template.asyncPromises)
+        .then(()=>resolve(template))
+        .catch((e:any)=>reject(e))
     })
   }
 
@@ -1101,7 +1200,7 @@ export const PRESET_COLOR_MAPS =
       code : `float colormap_red(float x) {  if (x < 0.75) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;  }}float colormap_green(float x) {  if (x <= 0.375) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else if (x <= 0.75) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}float colormap_blue(float x) {  if (x <= 0.375) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}vec4 colormap(float x) {  float r = clamp(colormap_red(x),0.0,1.0);  float g = clamp(colormap_green(x), 0.0, 1.0);  float b = clamp(colormap_blue(x), 0.0, 1.0);  return vec4(r, g, b, 1.0);}      `
   }]
 
-export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
+export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float a = clamp(x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
 export const TIMEOUT = 5000;
 export const CM_THRESHOLD = 0.01;
 export const PMAP_WIDGET = {
@@ -1174,7 +1273,8 @@ export const DEFAULT_WIDGETS = [
   }
 ]
 
-export const TEMP_RECEPTORDATA_BASE_URL = `http://imedv02.ime.kfa-juelich.de:5081/plugins/receptorBrowser/data/`
+// export const TEMP_RECEPTORDATA_BASE_URL = `http://imedv02.ime.kfa-juelich.de:5081/plugins/receptorBrowser/data/`
+export const TEMP_RECEPTORDATA_BASE_URL = `http://localhost:5080/pluginDev/receptorBrowser/data/`
 export const TEMP_RECEPTORDATA_DRIVER_DATA = 
 {
   "Fingerprint":"__fingerprint.jpg",
@@ -1214,7 +1314,7 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
   template : `
     <div class = "well" receptorPath>
       <small>
-        <span (click)="popall()" clickables>{{ regionName }}</span>
+        <span (click)="popall()" clickables> root </span>
         <i class = "glyphicon glyphicon-chevron-right">
         </i>
         <span *ngFor = "let choice of choiceStack">
@@ -1231,17 +1331,20 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
       backBtn>
 
       <i class = "glyphicon glyphicon-chevron-left"></i> 
-      Back
-
+      <small>
+        Back
+      </small>
     </div>
     <div 
       (click) = "enterStack(key)" 
       class = "btn btn-block btn-default" 
       *ngFor="let key of focusStack | keyPipe">
 
-      {{key}} 
-      <i *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></i> 
-      <i *ngIf="focusStack[key].constructor.name == 'Object'" class = "glyphicon glyphicon-chevron-right"></i> 
+      <small>
+        {{key}} 
+        <i *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></i> 
+        <i *ngIf="focusStack[key].constructor.name == 'Object'" class = "glyphicon glyphicon-chevron-right"></i> 
+      </small>
     </div>
   `,
   styles : [
@@ -1254,16 +1357,19 @@ export const TEMP_RECEPTORDATA_DRIVER_DATA =
     {
       white-space:nowrap;
       overflow:hidden;
+      margin:0em 0em;
+      padding:0.2em 0.5em;
       background-color:rgba(0,0,0,0.2);
     }
     .btn
     {
-      padding:0.2em;
+      padding:0.2em 0.5em;
       margin:0em;
+      text-align:left;
     }
     .btn[backBtn]
     {
-      margin-bottom:0.6em;
+      margin-bottom:1px;
     }
     `
   ]
@@ -1313,6 +1419,60 @@ export class TempReceptorData{
     }
   }
 }
+
+export const initMultilvl = (json:any):Multilevel=>{
+  const m = new Multilevel()
+  m.name = json.name ? json.name : 'Untitled'
+  m.children = json.children.constructor == Array ? 
+    (<any[]>json.children).map(it=>
+      initMultilvl(it)) : 
+    []
+  return m
+}
+
+export const RECEPTOR_DATASTRUCTURE_JSON = {
+  name : 'Receptor Browser',
+  children : [
+    {
+      name : 'Fingerprint',
+      children : []
+    },{
+      name : 'Glutamate',
+      children : [
+        {
+          name : `AMPA`,
+          children : []
+        },
+        {
+          name : `NMDA`,
+          children : []
+        },
+        {
+          name : `kainate`,
+          children : []
+        },
+        {
+          name : `mGluR2_3`,
+          children : []
+        }
+      ]
+    },{
+      name : 'GABA',
+      children : [
+        {
+          name : `GABAA`,
+          children : []
+        },
+        {
+          name : `GABAB`,
+          children : []
+        }
+      ]
+    }
+  ]
+}
+
+// export const receptorBrowserMultilevel = new Multilevel();
 
 const TEMP_CROSS_VTK = 
 `# vtk DataFile Version 2.0

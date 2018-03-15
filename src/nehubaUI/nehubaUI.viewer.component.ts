@@ -57,6 +57,23 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   constructor(public mainController:MainController, private componentFactoryResolver: ComponentFactoryResolver ){
     
     /* TODO reduce complexity, as to not having multiple VIEW_CONTROL objects floating around */
+    // this.mainController.selectTemplateBSubject.subscribe((template:TemplateDescriptor|null)=>{
+    //   if(template){
+
+    //     this.loadTemplate(template.nehubaConfig)
+    //     this.templateLoaded = true
+
+    //   }else{
+    //     /* I'm not too sure what does the dispose method do (?) */
+    //     /* TODO: use something other than a flag? */
+        
+    //     if(this.templateLoaded){
+    //       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
+    //       this.componentRef.destroy()
+    //     }
+    //     this.templateLoaded = false
+    //   }
+    // })
     VIEWER_CONTROL.loadTemplate = (templateDescriptor:TemplateDescriptor) => {
       /* TODO implement a check that each el in the hooks are still defined and are fn's */
       this.onViewerInitHook.forEach(fn=>fn())
@@ -152,22 +169,18 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   }
 
   private loadTemplate(nehubaViewerConfig:NehubaViewerConfig){
-
-    if ( this.templateLoaded ){
-      /* I'm not too sure what does the dispose method do (?) */
-      /* TODO: use something other than a flag? */
+    if(this.templateLoaded){
       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
       this.componentRef.destroy()
     }
-
     let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig)
     let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
-    this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory );
+    this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory )
     
     this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
     this.nehubaViewerComponent.createNewNehubaViewerWithConfig(nehubaViewerConfig)
     this.nehubaViewerComponent.darktheme = this.darktheme
-
+    
     this.templateLoaded = true
   }
 
@@ -232,14 +245,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       </nehubaui-overlay>
     </div>
     
-    <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'Querying Landmarks'">
+    <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'iEEG Recordings'">
     </nehubaui-landmark-list>
 
-    <nehubaui-searchresult-region-list 
-      [title] = "'Receptor Data Browser'"
-      [regions] = " Array.from( mainController.regionsLabelIndexMap.values() ).filter(filterForReceptorData) "
-      *ngIf = "mainController.viewingMode == 'Receptor Data'">
-    </nehubaui-searchresult-region-list>
+    
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
       
@@ -287,7 +296,16 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       </span>
 
       <br />
-      Navigation: <small>(
+      Navigation: 
+        <input 
+          (keydown.enter) = "textNavigateTo(navigateInput.value)"
+          (keydown.tab) = "textNavigateTo(navigateInput.value)"
+          [ngModel] = "navToModel()" 
+          spellcheck = "false"
+          #navigateInput
+          navigateInput/>
+      
+      <small *ngIf="false">(
         {{
           statusPanelRealSpace ? 
             (viewerPosReal[0] | nmToMm | number) + 'mm': 
@@ -333,6 +351,14 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   `,
   styles : [
     `
+    input[navigateInput]
+    {
+      background:none;
+      border:rgba(255,255,255,0.2) solid 1px;
+      width : 16em;
+      padding-left: 0.5em;
+      font-size:85%;
+    }
     nehubaui-landmark-list
     {
       display:none;
@@ -427,6 +453,26 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
 
+  editingNavState : boolean = false
+  textNavigateTo(string:string){
+    if(string.split(/[\s|,]+/).length>=3 && string.split(/[\s|,]+/).slice(0,3).every(entry=>!isNaN(Number(entry.replace(/mm/,''))))){
+      this.navigate(
+        string.split(/[\s|,]+/).slice(0,3).map(entry=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)),
+        0,
+        this.statusPanelRealSpace
+      )
+    }else{
+      console.log('input did not parse to coordinates ',string)
+    }
+  }
+
+  navToModel(){
+    return this.statusPanelRealSpace ? 
+      Array.from(this.viewerPosReal.map(n=> isNaN(n) ? 0 : n/1e6))
+        .map(n=>n.toFixed(3)+'mm').join(' , ') :
+      Array.from(this.viewerPosVoxel.map(n=> isNaN(n) ? 0 : n)).join(' , ')
+  }
+
   statusPanelRealSpace : boolean = true
 
   segmentListener : any = {}
@@ -445,10 +491,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
-
-  /* Variables needed for listify receptor browser */
-  Array = Array
-  filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
 
   constructor(private mainController:MainController,public spatialSearch:SpatialSearch,public landmarkServices:LandmarkServices){
 
@@ -527,7 +569,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
-
     this.viewerConfig = config
 
     /* TODO potentially setting metadata before it was defined (?) */
@@ -1107,7 +1148,15 @@ const HOVER_COLOR : string = '250,150,80'
   `
   <ng-template #landmarkList>
     <div class = "panel-body">
-      <ul class = "list-group" id = "landmarkList">
+      <div 
+        landmarkEntry
+        (mouseenter)="landmark.hover = true"
+        (mouseleave)="landmark.hover = false"
+        *ngFor = "let landmark of landmarkServices.landmarks">
+
+        position : {{ landmark.properties['geometry.coordinates'] }}
+      </div>
+      <ul *ngIf = "false" class = "list-group" id = "landmarkList">
         <li
           (mouseenter)="landmark.hover = true"
           (mouseleave)="landmark.hover = false"
@@ -1156,6 +1205,15 @@ const HOVER_COLOR : string = '250,150,80'
   `,
   styles : [
     `
+    div[landmarkEntry]
+    {
+      padding : 0.2em 1.0em;
+    }
+    div[landmarkEntry]:hover
+    {
+      cursor:default;
+      background-color:rgba(128,128,128,0.2);
+    }
     .btn-group
     {
       display:flex

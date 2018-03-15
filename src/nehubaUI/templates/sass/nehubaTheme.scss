@@ -9,12 +9,57 @@
  * styles only, no layouts
  */
 
+span.highlight
+{
+  background-color:#770 !important;
+}
+
 div#ATLASContainer
 {
   background-color:gray(1);
   color:gray(0);
   width:100%;
   height:100%;
+
+  .app-input-group
+  {
+    position:relative;
+    height:1.43em;
+
+    .app-input-placeholder
+    {
+      position:absolute;
+      z-index:2;
+      pointer-events: none;
+
+      padding-left:12px;
+      padding-top:6px;
+      padding-bottom:6px;
+      padding-right:12px;
+    }
+
+    input[type="text"]
+    {
+      position:absolute;
+      z-index:1;
+    }
+  }
+
+  .inputSearchContainer
+  {
+    margin-top:2px;
+    border:none;
+    max-height:40em;
+    overflow:hidden;
+    
+    .popover-content
+    {
+      padding : 0px;
+      height:100%;
+      max-height:40em;
+      width:20em;
+    }
+  }
 
   .glyphicon
   {
@@ -40,8 +85,6 @@ div#ATLASContainer
   .well
   {
     border-radius:0px;
-    margin:0.5em;
-    padding:0.5em;
     border:none;
   }
 
@@ -119,6 +162,7 @@ div#ATLASContainer
       background-color:tgray(0.95,0.8);
       box-shadow: inset 0 4px 6px 0 tgray(0.9,0.8);
       border:none;
+      border-radius:0px;
     }
     .glyphicon.helpbtn
     {
@@ -198,7 +242,7 @@ div#ATLASContainer
 
         &:before
         {
-          content : "toggle view";
+          content : "Remove front block in 3D view";
           visibility : visible; 
           font-weight:500; 
           color:#337ab7;
@@ -233,6 +277,26 @@ div#ATLASContainer
 
   WidgetsContainer
   {
+
+    FloatingWidgetContainer,
+    DockedWidgetContainer
+    {
+
+      .panel
+      {
+        .panel-heading
+        {
+          padding-top:0.5em;
+          padding-bottom:0.5em;
+
+          .glyphicon
+          {
+            font-size:0.8em;
+          }
+        }
+      }
+    }
+
     MinimisedContainer
     {
       .popover
@@ -251,11 +315,31 @@ div#ATLASContainer
 
 div#ATLASContainer.darktheme
 {
+  a
+  {
+    color:#94b6d3;
+
+    &:hover
+    {
+      cursor:pointer;
+      color:#337ab7;
+      text-decoration:none;
+    }
+  }
   %darktheme
   {
     border-color:gray(0.35);
     color:gray(0.95);
     background-color:gray(0.2);
+  }
+
+  span.badge
+  {
+    background-color:rgba(128,128,128,0.4);
+    box-shadow: 0 4px 6px 0 tgray(0,0.12);
+    margin:0em 0.4em 0.5em 0.2em;
+    padding:0.5em;
+    border-radius:0em;
   }
 
   .btn:not(.btn-link)
@@ -742,7 +826,7 @@ ul.darktheme.dropdown-menu
       &:hover
       {
         color:gray(0.9);
-        background-color:gray(0.25);
+        background-color:tgray(0.5,0.1);
       }
     }
   }
@@ -774,34 +858,6 @@ modal-container
 
 div#ATLASContainer
 {
-  atlasbanner
-  {
-    
-    .popover.popover-bottom.bottom
-    {
-      border:none;
-      margin-top : 0px;
-      max-height:40em;
-      overflow:hidden;
-      
-      .popover-content
-      {
-        padding : 0px;
-        height:100%;
-        max-height:40em;
-        width:20em;
-      }
-    }
-  }
-  atlascontrol
-  {
-    multilevel
-    {
-      .popover
-      {
-      }
-    }
-  }
 
   NehubaViewer
   {
@@ -821,44 +877,6 @@ div#ATLASContainer
       width:100%;
     }
   }
-
-  WidgetsContainer
-  {
-
-    FloatingWidgetContainer,
-    DockedWidgetContainer
-    {
-      // input.form-control
-      // {
-      //   padding-top:0px;
-      //   padding-bottom:0px;
-      // }
-      // .input-group-addon
-      // {
-      //   padding-top:0px;
-      //   padding-bottom:0px;
-      // }
-      // .btn
-      // {
-      //   padding-top:0px;
-      //   padding-bottom:0px;
-      // }
-
-      .panel
-      {
-        .panel-heading
-        {
-          padding-top:1em;
-          padding-bottom:1em;
-
-          .glyphicon
-          {
-            font-size:0.8em;
-          }
-        }
-      }
-    }
-  }
 }
 .popover
 {
@@ -873,4 +891,59 @@ body > .tooltip.top.landmarkTooltip
 {
   margin-bottom : 1.5em;
   margin-right : 0.5em;
+}
+
+.inputModeSearchContainer
+{
+  margin-top:1em;
+  width:100%;
+
+  .popover-body.popover-content
+  {
+    padding:0px;
+
+    ul#modeSelector
+    {
+      width:100%;
+
+      list-style-type:none;
+      padding-left:0px;
+      margin-bottom:0px;
+
+      li
+      {
+        width:100%;
+
+        a
+        {
+          width:100%;
+          padding:10px;
+          display:inline-block;
+        }
+      }
+
+      &.darktheme
+      {
+
+        li
+        {
+          &:hover
+          {
+            color:gray(0.9);
+            background-color:tgray(0.5,0.1);
+          }
+
+          a
+          {
+            color:gray(0.85);
+
+            &:hover
+            {
+              color:gray(0.9);
+            }
+          }
+        }
+      }
+    }
+  }
 }
