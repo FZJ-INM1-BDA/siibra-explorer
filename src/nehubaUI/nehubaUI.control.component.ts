@@ -1,6 +1,7 @@
 import { OnChanges, Input, Component } from '@angular/core'
 import { UI_CONTROL, MainController, MultilevelProvider } from './nehubaUI.services'
 import { ModalHandler } from './nehubaUI.modal.component'
+import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 
 @Component({
   selector : 'atlascontrol',
@@ -71,8 +72,21 @@ export class NehubaUIControl implements OnChanges{
 
   }
 
+  muteFilter = (m:RegionDescriptor):boolean=>{
+    return this.mainController.viewingMode != 'navigation (default mode)' && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+  }
+
+  highlightFilter = (m:RegionDescriptor):boolean=>{
+    return this.mainController.selectedRegions.findIndex(r=>r==m) >= 0
+  }
+
   ngOnChanges(){
     this.multilevelProvider.searchTerm = this.searchTerm
+  }
+
+  multilevelSingleClick(m:RegionDescriptor){
+    const gothere = m.moreInfo.find(info=>info.name=='Go To There')
+    if(gothere) gothere.action()
   }
 
   showMoreInfo(_item:any):void{

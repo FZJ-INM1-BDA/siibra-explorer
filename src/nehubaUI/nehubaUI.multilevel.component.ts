@@ -1,4 +1,4 @@
-import { Input, Component, ViewChildren } from '@angular/core'
+import { Output, Input, Component, ViewChildren, EventEmitter } from '@angular/core'
 import { Multilevel, RegionDescriptor } from './nehuba.model'
 import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
 
@@ -57,9 +57,15 @@ import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
 
 export class MultilevelSelector {
 
+  @Input() muteFilter : (m:Multilevel)=>boolean = ()=>false
+  @Input() highlightFilter : (m:Multilevel)=>boolean = ()=>false
+
   @Input() data : Multilevel[]
   @Input() selectedData : Multilevel[]
   @ViewChildren(MultilevelSelector) childrenMultilevel : MultilevelSelector[]
+
+  @Output() singleClick : EventEmitter<Multilevel> = new EventEmitter()
+  @Output() doubleClick : EventEmitter<Multilevel> = new EventEmitter()
 
   debounceFlag : boolean = true
   debounceTimer : any
@@ -73,35 +79,26 @@ export class MultilevelSelector {
 
   toggleExpansion = (m:Multilevel):boolean => m.isExpanded = !m.isExpanded
 
-  hasTextMutedClass(singleData:RegionDescriptor):boolean{
-    return this.mainController.viewingMode != 'navigation (default mode)' && singleData.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
-  }
-
-  isSelectedByMainController(thisRegion:RegionDescriptor){
-    return this.mainController.selectedRegions.findIndex(r=>r==thisRegion) >= 0
-  }
-
-  singleClick(m:RegionDescriptor){
+  multilvlClick(m:RegionDescriptor){
     if(this.debounceFlag){
       this.debounceFlag = false
       this.debounceTimer = setTimeout(()=>{
         this.realSingleClick(m)
         this.debounceFlag = true
-      },200)
+      },300)
     }else{
       clearTimeout(this.debounceTimer)
       this.debounceFlag = true
-      this.doubleClick(m)
+      this.realDoubleClick(m)
     }
   }
 
-  realSingleClick(m:RegionDescriptor){
-    const gothere = m.moreInfo.find(info=>info.name=='Go To There')
-    if(gothere) gothere.action()
+  realSingleClick(m:Multilevel){
     m.isExpanded = !m.isExpanded
+    this.singleClick.emit(m)
   }
 
-  doubleClick(m:RegionDescriptor){
+  realDoubleClick(m:Multilevel){
     if( m.children.length > 0 ){
       if( m.hasEnabledChildren()){
         this.multilevelProvider.disableSelfAndAllChildren(m)
@@ -111,5 +108,6 @@ export class MultilevelSelector {
     }else{
       this.multilevelProvider.toggleRegionSelect(m)
     }
+    this.doubleClick.emit(m)
   }
 }

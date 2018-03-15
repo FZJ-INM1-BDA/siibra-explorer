@@ -113,12 +113,14 @@ export class NehubaContainer implements AfterViewInit {
   }
 
   ngAfterViewInit(){
-    window.location.hash = ''
     UI_CONTROL.afterTemplateSelection(()=>{
       this.darktheme = this.mainController.darktheme
     })
   }
 
+  /* TODO if enableProd is disabled, this throws an error
+  investigate https://angular.io/api/core/ChangeDetectorRef
+  */
   hasDockedComponents(){
     return this.widgetContainer.dockedWidgetContainer.viewContainerRef ? 
       this.widgetContainer.dockedWidgetContainer.viewContainerRef.length > 0 :

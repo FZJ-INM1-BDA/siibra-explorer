@@ -1,5 +1,5 @@
 <div
-  [ngClass]="{'has-text-active':isSelectedByMainController(singleData)}"
+  [ngClass]="{'has-text-active':highlightFilter(singleData)}"
   class = " hierarchyContainer" 
   *ngFor = "let singleData of data | multilevelHasVisibleChildren : multilevelProvider.searchTerm"
   multilevelContainer>
@@ -24,8 +24,8 @@
 
     <span 
       class = "multilevel-name"
-      [ngClass]="{'text-muted': hasTextMutedClass(singleData),'text-active':isSelectedByMainController(singleData)}"
-      (click)="singleClick( singleData )" >
+      [ngClass]="{'text-muted': muteFilter(singleData),'text-active':highlightFilter(singleData)}"
+      (click)="multilvlClick( singleData )" >
 
       <span 
         class="regionHasMoreInfo"
@@ -35,6 +35,10 @@
     </span>
   </span>
   <multilevel 
+    (doubleClick) = "doubleClick.emit($event)"
+    (singleClick) = "singleClick.emit($event)"
+    [muteFilter] = "muteFilter"
+    [highlightFilter] = "highlightFilter"
     [hidden]="!singleData.isExpanded" 
     *ngIf = "singleData.children.length>0" 
     class = "menuItemContentText" 
