@@ -699,7 +699,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   public dynamicData(selectedData:RegionDescriptor):string{
     switch(this.mainController.viewingMode){
-      case 'navigation (default mode)':
+      case 'Select atlas regions':
         return ``
       case 'Probability Map':{
         const value = this.segmentListener[this.mainController.selectedParcellation!.ngId + selectedData.name]
@@ -1263,7 +1263,7 @@ export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
   widgetComponent : WidgetComponent
 
   ngAfterViewInit(){
-    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'Query Landmarks'})
+    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'iEEG Recordings'})
 
     const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
     segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)

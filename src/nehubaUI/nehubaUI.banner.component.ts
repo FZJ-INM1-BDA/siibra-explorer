@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
 import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices } from './nehubaUI.services'
-import { RegionDescriptor }from './nehuba.model'
+import { RegionDescriptor, TemplateDescriptor }from './nehuba.model'
 import { ModalHandler } from './nehubaUI.modal.component'
 
 @Component({
@@ -195,7 +195,7 @@ export class NehubaBanner implements AfterViewInit {
     }else{
       const newPipe = new PrependNavigate()
       const newP2 = new SearchPipe()
-      const filter = newP2.transform(newPipe.transform(this.listOfActivities),this.searchActivityTerm)
+      const filter = newP2.transform(newPipe.transform(this.listOfActivities,this.mainController.selectedTemplate),this.searchActivityTerm)
       
       if(filter.length > 0) { 
         newActivity = filter[0] 
@@ -223,9 +223,13 @@ export class NehubaBanner implements AfterViewInit {
   name:'prependNavigatePipe'
 })
 
+//TODO fetch the available dataset from KG
 export class PrependNavigate implements PipeTransform{
-  public transform(array:string[]):string[]{
-    return ['navigation (default mode)', ... array,'iEEG Recordings']
+  public transform(array:string[],template : TemplateDescriptor | undefined):string[]{
+    return template ? template.name == 'MNI Colin 27' ? 
+      ['Select atlas regions', ... array,'iEEG Recordings'] :
+      ['Select atlas regions', ... array] :
+        []
   }
 }
 

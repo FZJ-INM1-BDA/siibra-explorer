@@ -235,6 +235,9 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
     this.rgb = json.rgb ? json.rgb : null
 
+    //TODO pmapurl, properties url and receptorData
+    this.propertiesURL = json.PMapURL ? json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata/${s.split(/\/|\./)[1]}.json`) : null
+
     /* populate moreInfo array */
     if(this.position){
       const goToPosition = new DescriptorMoreInfoItem('Go To There','map-marker')
@@ -296,6 +299,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
   labelIndex : number
   position : number[]
   PMapURL : string
+  propertiesURL : string
   rgb : number[]
 
   moreInfo : DescriptorMoreInfoItem[] = []

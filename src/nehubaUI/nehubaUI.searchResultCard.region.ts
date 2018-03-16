@@ -36,6 +36,10 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     public widgitServices:WidgitServices){
   }
 
+  /* Variables needed for listify receptor browser */
+  Array = Array
+  filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
+
   widgetComponent : WidgetComponent
   ngAfterViewInit(){
     this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.regionList,{name:this.title})
@@ -67,7 +71,7 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 
   private selectedRegionsWithReceptorData(){
-    this.mainController.selectedRegions = this.regions
+    this.mainController.selectedRegions = Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data'))
     this.mainController.regionSelectionChanged()
   }
 
@@ -90,9 +94,22 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     <div
       (click) = "showBodyFn()" 
       class = "panel-heading">
-      <span>
+
+      <span *ngIf = "hasReceptorData()">
+        <i class = "glyphicon" [ngClass] = "showBody ? 'glyphicon-chevron-down' : 'glyphicon-chevron-right'" ></i>
         {{ region.name }}
       </span>
+      <del *ngIf = "!hasReceptorData()">
+        {{ region.name }}
+      </del>
+
+      <i 
+        class = "close"
+        *ngIf = "findMoreInfo('Go To There')"
+        (click) = "$event.stopPropagation(); findMoreInfo('Go To There').action()">
+
+        <i class = "glyphicon glyphicon-screenshot"></i>
+      </i>
     </div>
     <div *ngIf = "showBody" #receptorPanelBody>
       <div class = "panel">
@@ -100,6 +117,7 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
         
           <multilevel
             [muteFilter] = "muteFilter"
+            (doubleClick) = "doubleClick($event)"
             (singleClick) = "singleClick($event)"
             [data] = "receptorBrowserMultilevel">
           </multilevel>
@@ -193,6 +211,8 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
     this.receptorBrowserMultilevel = newMultilvl
   }
 
+  hasReceptorData = ()=>this.region.moreInfo.some(info=>info.name == 'Receptor Data')
+
   muteFilter = (m:Multilevel):boolean=>m.children.length > 0
 
   showBody = false
@@ -219,6 +239,10 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
     }catch(e){
       console.error('could not add landmark',e)
     }
+  }
+
+  findMoreInfo(name:string){
+    return this.region.moreInfo.find(info=>info.name==name)
   }
   
   neurotransmitterName(string:any){
@@ -259,6 +283,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
               const imgSrc = img.getAttribute('src')
               modalHandler.title = regionName + ' ' + ntName + ' ' + mName
               modalHandler.body = '<img style = "width:100%" src = "' + imgSrc + '" />'
+              modalHandler.footer = '<a href = "' + imgSrc + '" target = "_blank">download jpg</a>'
               modalHandler.show()
             })
           })
@@ -357,6 +382,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   }
 
   showBodyFn(){
+    if(!this.hasReceptorData()) return 
     this.showBody = !this.showBody
     // this.showReceptorData.emit(this.receptorPanelBody)
   }
@@ -413,17 +439,31 @@ export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
   selector : `nehubaui-searchresult-region-pill`,
   template : 
   `
-  <div>
-    <span class = "badge">
+  <span class = "badge">
+    <span>
       {{region.name}} 
-      <i 
-        (click) = "close()"
-        class = "glyphicon glyphicon-remove-sign">
-      </i> <br />
-      <ng-content>
-      </ng-content>
     </span>
-  <div>
+    <i 
+      class = "close"
+      (click) = "close()">
+      <i class = "glyphicon glyphicon-remove-sign"></i>
+    </i>
+    <i
+      *ngIf = "findMoreInfo('Go To There')"
+      (click) = "findMoreInfo('Go To There').action()" 
+      class = "close">
+      <i class = "glyphicon glyphicon-screenshot"></i>
+    </i>
+    <i
+      *ngIf = "region.propertiesURL"
+      (click) = "showProperties()" 
+      class = "close">
+      <i class = "glyphicon glyphicon-info-sign"></i>
+    </i>
+    <br />
+    <ng-content>
+    </ng-content>
+  </span>
   `,
   styles : [
     `
@@ -449,6 +489,41 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
 
   ngOnDestroy(){
     this.mainController.regionSelectionChanged()
+  }
+
+  findMoreInfo(name:string){
+    return this.region.moreInfo.find(info=>info.name==name)
+  }
+
+  showProperties(){
+    const handler = this.mainController.modalService.getModalHandler()
+    handler.title = `Information on ${this.region.name}`
+    handler.body = `fetching ... `
+    handler.show()
+
+    fetch(this.region.propertiesURL)
+      .then(d=>d.json())
+      .then(json=>{
+        let finalObj : any = {}
+
+        const source = json._source
+
+        const singleAttr = ['owners','publications','license','ethics']
+        const arrayAttr = ['contributors']
+
+        singleAttr.forEach(attr=>{
+          
+          finalObj[attr] = source[attr].url ? source[attr].url : source[attr].value
+        })
+        arrayAttr.forEach(attr=>{
+          finalObj[attr] = source[attr].map((it:any)=>it.value)
+        })
+        handler.bsModalRef.content.body = finalObj
+      })
+      .catch((e:any)=>{
+        console.log(e)
+        handler.bsModalRef.content.body = `Error fetching the information.`
+      })
   }
 
   close(){

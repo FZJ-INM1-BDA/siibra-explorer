@@ -167,7 +167,7 @@
     <li 
       [ngClass] = "{'selected':mainController.viewingMode == activity}"
       role = "menuitem"
-      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe  | searchPipe : searchActivityTerm">
+      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe : mainController.selectedTemplate  | searchPipe : searchActivityTerm">
       
       <a class = "dropdown-item"
         (mousedown) = "selectViewingMode(activity)"

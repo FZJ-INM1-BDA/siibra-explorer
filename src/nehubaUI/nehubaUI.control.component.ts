@@ -73,7 +73,7 @@ export class NehubaUIControl implements OnChanges{
   }
 
   muteFilter = (m:RegionDescriptor):boolean=>{
-    return this.mainController.viewingMode != 'navigation (default mode)' && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+    return this.mainController.viewingMode != 'Select atlas regions' && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
   }
 
   highlightFilter = (m:RegionDescriptor):boolean=>{
@@ -85,6 +85,20 @@ export class NehubaUIControl implements OnChanges{
   }
 
   multilevelSingleClick(m:RegionDescriptor){
+    if( m.children.length > 0 ){
+      if( m.hasEnabledChildren()){
+        this.multilevelProvider.disableSelfAndAllChildren(m)
+      } else {
+        this.multilevelProvider.enableSelfAndAllChildren(m)
+      }
+    }else{
+      this.multilevelProvider.toggleRegionSelect(m)
+    }
+  }
+
+  multilevelDoubleClick(m:RegionDescriptor){
+    
+    m.isExpanded = !m.isExpanded
     const gothere = m.moreInfo.find(info=>info.name=='Go To There')
     if(gothere) gothere.action()
   }

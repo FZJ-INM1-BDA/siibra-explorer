@@ -1,5 +1,5 @@
 import { Output, Input, Component, ViewChildren, EventEmitter } from '@angular/core'
-import { Multilevel, RegionDescriptor } from './nehuba.model'
+import { Multilevel } from './nehuba.model'
 import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
 
 @Component({
@@ -81,7 +81,7 @@ export class MultilevelSelector {
 
   toggleExpansion = (m:Multilevel):boolean => m.isExpanded = !m.isExpanded
 
-  multilvlClick(m:RegionDescriptor){
+  multilvlClick(m:Multilevel){
     if(this.debounceFlag){
       this.debounceFlag = false
       this.debounceTimer = setTimeout(()=>{
@@ -96,20 +96,10 @@ export class MultilevelSelector {
   }
 
   realSingleClick(m:Multilevel){
-    m.isExpanded = !m.isExpanded
     this.singleClick.emit(m)
   }
 
   realDoubleClick(m:Multilevel){
-    if( m.children.length > 0 ){
-      if( m.hasEnabledChildren()){
-        this.multilevelProvider.disableSelfAndAllChildren(m)
-      } else {
-        this.multilevelProvider.enableSelfAndAllChildren(m)
-      }
-    }else{
-      this.multilevelProvider.toggleRegionSelect(m)
-    }
     this.doubleClick.emit(m)
   }
 }

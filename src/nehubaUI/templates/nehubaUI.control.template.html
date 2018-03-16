@@ -11,6 +11,7 @@
       [muteFilter] = "muteFilter"
       [highlightFilter] = "highlightFilter"
       (singleClick) = "multilevelSingleClick($event)"
+      (doubleClick) = "multilevelDoubleClick($event)"
       class = "menuItemContentText"  
       *ngFor = "let region of mainController.selectedParcellation.regions"
       [data]= "region" >
