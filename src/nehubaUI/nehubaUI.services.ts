@@ -23,6 +23,13 @@ declare var window:{
 @Injectable()
 export class MainController{
   private dataService : DataService = new DataService()
+
+  /**
+   * modalService, to be overwritten
+   */
+
+  modalService : NehubaModalService
+
   /**
    * data
    */
@@ -39,7 +46,7 @@ export class MainController{
   /**
    * viewing 
    */
-  viewingMode : string = `navigation (default mode)`
+  viewingMode : string = `Select atlas regions`
   viewingModeBSubject : Subject<string> = new Subject() // cannot be a behaviourSubject, or else it will overwrite query param every time
 
   /**
@@ -260,10 +267,10 @@ export class MainController{
   }
 
   init(){
-    /* this will need to come from elsewhere eventually */
+    /* TODO fetch available template space from KG  */
     let datasetArray = [
       '/res/json/bigbrain.json',
-      '/res/json/colin.json',
+      '/res/json/colin_.json',
       '/res/json/waxholmRatV2_0.json',
       '/res/json/allenMouse.json'
     ]
@@ -352,7 +359,8 @@ export class MainController{
       this.queryChangeSubject.next({
         'selectedTemplate': template ? template.name : null
       })
-      if(this.viewingMode!='navigation (default mode)') this.setMode('navigation (default mode)')
+      if(this.viewingMode!='Select atlas regions') this.setMode('Select atlas regions')
+      this.selectedRegions = []
     })
 
     this.queryChangeSubject.subscribe((keyval:any)=>{
@@ -534,6 +542,7 @@ export class MainController{
 
   /**
    * hibernating functions
+   * TODO remove
    */
   
   fetchedSomething(sth:any)

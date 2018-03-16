@@ -18,7 +18,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         [title] = "'Receptor Data Browser'"
         (mouseEnterRegion)="receptorMouseEnter($event)"
         (mouseLeaveRegion)="receptorMouseLeave($event)"
-        [regions] = " Array.from( mainController.regionsLabelIndexMap.values() ).filter(filterForReceptorData) "
+        [regions] = " mainController.selectedRegions "
         *ngIf = "mainController.viewingMode == 'Receptor Data'">
       </nehubaui-searchresult-region-list>
       
@@ -26,7 +26,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         [startingMode] = "'docked'"
         [title] = "'Selected Regions'"
         [regions] = " mainController.selectedRegions "
-        *ngIf = "mainController.viewingMode == 'navigation (default mode)' && mainController.selectedRegions.length > 0">
+        *ngIf = "mainController.viewingMode == 'Select atlas regions' && mainController.selectedRegions.length > 0">
       </nehubaui-searchresult-region-pill-list>
 
       <nehubaui-searchresult-region-pill-list 
@@ -56,10 +56,6 @@ export class NehubaViewerContainer implements AfterViewInit {
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false)
     VIEWER_CONTROL.mouseEvent = new Subject()
   }
-
-  /* Variables needed for listify receptor browser */
-  Array = Array
-  filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
 
   receptorMouseEnter(region:RegionDescriptor){
 

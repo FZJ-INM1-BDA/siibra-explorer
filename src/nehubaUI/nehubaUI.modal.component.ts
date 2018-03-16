@@ -1,7 +1,7 @@
 
 import { Component,ChangeDetectorRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-import { UI_CONTROL } from './nehubaUI.services'
+import { UI_CONTROL, MainController } from './nehubaUI.services'
 
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
@@ -15,13 +15,13 @@ import 'rxjs/operator/map'
 export class NehubaModalService{
   bsModalRef:BsModalRef
 
-  constructor(private bsModalService:BsModalService){
+  constructor(private bsModalService:BsModalService,private mainController:MainController){
     /**
      * input
      * info
      * curtain
      */
-    
+    this.mainController.modalService = this
     UI_CONTROL.modalControl = this
   }
 
@@ -78,23 +78,26 @@ export class ModalHandler{
   selector : 'modal-unit',
   template:
 `
-<div *ngIf = "title" class = "modal-header" [innerHTML] = "title">
-</div>
-<div  class = "modal-body">
-  <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
+<div (contextmenu) = "$event.stopPropagation()">
+  <div *ngIf = "title" class = "modal-header" [innerHTML] = "title">
   </div>
-  <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
-    <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
-      <div class = "row">
-        <multiform [data] = "body[key] | filterUncertainObject">
-        </multiform>
-      </div>
-    </tab>
-  </tabset>
-  <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
-  </multiform>
-</div>
-<div *ngIf = "footer" class = "modal-footer" [innerHTML] = "footer">
+  <div class = "modal-body">
+    
+    <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
+    </div>
+    <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
+      <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
+        <div class = "row">
+          <multiform [data] = "body[key] | filterUncertainObject">
+          </multiform>
+        </div>
+      </tab>
+    </tabset>
+    <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
+    </multiform>
+  </div>
+  <div *ngIf = "footer" class = "modal-footer" [innerHTML] = "footer">
+  </div>
 </div>
 `
 })
