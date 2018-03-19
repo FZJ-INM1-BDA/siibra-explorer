@@ -13,6 +13,7 @@ import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification';
 import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer';
 import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
+import { ImageUserLayer } from 'neuroglancer/image_user_layer';
 
 declare var window:{
   [key:string] : any
@@ -202,7 +203,7 @@ export class MainController{
             obj[`PMap ${r.name}`] = {
               type : 'image',
               source : r.moreInfo.find(info=>info.name==mode)!.source,
-              shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
+              shader : `void main(){float x=toNormalized(getDataValue());${true ? parseRegionRgbToGlsl(r) : CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,${true ? 'x' : '1.0'}));}else{emitTransparent();}}`
             }
             return Object.assign({},prev,obj)
           },{}) )
@@ -346,7 +347,19 @@ export class MainController{
     this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
     this.afterParcellationSelectionHook.push(()=>{
       this.nehubaViewerSegmentMouseOver = this.nehubaViewer.mouseOver.segment.subscribe(ev=>{
+        /* reset pmap shader (if exists) */
+        if(this.nehubaCurrentSegment && this.nehubaViewer && this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`)){
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`) as ManagedUserLayerWithSpecification
+          (<ImageUserLayer>layer.layer).fragmentMain.restoreState(parseRegionRgbToFragmentMain(this.nehubaCurrentSegment))
+        }
+
         this.nehubaCurrentSegment = this.findRegionWithId(ev.segment)
+
+        /* highlight new highlighted segment */
+        if(this.nehubaCurrentSegment && this.nehubaViewer && this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`)){
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`) as ManagedUserLayerWithSpecification
+          (<ImageUserLayer>layer.layer).fragmentMain.restoreState(getActiveColorMapFragmentMain())
+        }
         VIEWER_CONTROL.mouseOverNehuba.next({
           nehubaOutput : ev,
           foundRegion : this.findRegionWithId(ev.segment)
@@ -1214,9 +1227,40 @@ export const PRESET_COLOR_MAPS =
       code : `float colormap_red(float x) {  if (x < 0.75) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;  }}float colormap_green(float x) {  if (x <= 0.375) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else if (x <= 0.75) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}float colormap_blue(float x) {  if (x <= 0.375) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}vec4 colormap(float x) {  float r = clamp(colormap_red(x),0.0,1.0);  float g = clamp(colormap_green(x), 0.0, 1.0);  float b = clamp(colormap_blue(x), 0.0, 1.0);  return vec4(r, g, b, 1.0);}      `
   }]
 
+export const parseRegionRgbToFragmentMain = (r:RegionDescriptor):string=>`void main(){float x = toNormalized(getDataValue()); ${parseRegionRgbToGlsl(r)}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,x));}else{emitTransparent();}}`
+export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,a));}else{emitTransparent();}}`
+
+export const parseRegionRgbToGlsl = (r:RegionDescriptor):string => {
+  return (r.rgb.map((color,idx)=>`${idx == 0 ? 'float r' : idx == 1 ? 'float g' : idx == 2 ? 'float b' : 'float a'} = ${(color/255).toFixed(3)};`).join('') + `float a = 1.0;`)
+}
 export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float a = clamp(x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
+// export const CM_MATLAB_JET = `if (x < 0.7) {  float r = clamp(4.0 * x - 1.5, 0.0, 1.0);} else {  float r = clamp(-4.0 * x + 4.5, 0.0, 1.0);}if (x < 0.5) {  float g = clamp(4.0 * x - 0.5, 0.0, 1.0);} else {  float g = clamp(-4.0 * x + 3.5, 0.0, 1.0);}if (x < 0.3) {  float b = clamp(4.0 * x + 0.5, 0.0, 1.0);} else {  float b = clamp(-4.0 * x + 2.5, 0.0, 1.0);}`
+export const CM_MATLAB_JET = 
+`
+float r;
+if( x < 0.7 ){
+  r = 4.0 * x - 1.5;
+} else {
+  r = -4.0 * x + 4.5;
+}
+
+float g;
+if (x < 0.5) {
+    g = 4.0 * x - 0.5;
+} else {
+    g = -4.0 * x + 3.5;
+}
+
+float b;
+if (x < 0.3) {
+    b = 4.0 * x + 0.5;
+} else {
+    b = -4.0 * x + 2.5;
+}
+float a = 1.0;
+`
 export const TIMEOUT = 5000;
-export const CM_THRESHOLD = 0.01;
+export const CM_THRESHOLD = 0.05;
 export const PMAP_WIDGET = {
   name : `PMap`,
   icon : 'picture',
