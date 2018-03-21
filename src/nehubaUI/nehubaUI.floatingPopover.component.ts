@@ -1,5 +1,4 @@
-import { Component } from '@angular/core'
-import { RegionDescriptor } from './nehuba.model'
+import { ViewChild,Input,Component, TemplateRef, ViewContainerRef, AfterViewInit } from '@angular/core'
 import { MainController } from 'nehubaUI/nehubaUI.services';
 
 @Component({
@@ -7,71 +6,55 @@ import { MainController } from 'nehubaUI/nehubaUI.services';
   template : 
 `
 <div 
-  *ngIf="false"
   (mousedown)="$event.stopPropagation()"
   class = "popover down" 
-  style = "display:block;position:absolute;left:-10000px;top:-10000px"
-  [style.left]="contextmenuEvent ? contextmenuEvent.target.offsetLeft + contextmenuEvent.layerX + 'px' : '-1000px'"
-  [style.top]="contextmenuEvent ? contextmenuEvent.target.offsetTop + contextmenuEvent.layerY + 'px' : '-1000px'">
+  style = "display:block;position:absolute;"
+  [ngStyle] = "overwriteStyle"
+  [style.left] = "offset[0] + 'px'"
+  [style.top] = "offset[1] + 'px'"
+  popoverContainer>
 
-  <h3 class = "popover-title popover-header">
-    <span *ngIf = "cursorSegment && cursorSegment.constructor.name != 'Number'">{{cursorSegment.name}}</span>
-    <span *ngIf = "!cursorSegment">No segment selected</span>
+  <h3 
+    *ngIf = "title" 
+    [innerHTML] = "title"
+    class = "popover-title popover-header">
   </h3>
-  <div class = "popover-content popover-body">
-  
-    <ng-template>
-    <small>
-      Position: <br />
-      realspace(nm): ({{cursorLocReal.join(',')}})<br />
-      voxelspace : ({{cursorLocVoxel.join(',')}})
-    </small><br />
-    </ng-template>
-
-    <div *ngIf="cursorSegment">
-      <div
-        class="moreInfo-icon"
-        (click) = "contextmenuEvent=null;moreInfo.action();mainController.setMode(moreInfo.name=='Go To There' ? 'navigation (default mode)' : moreInfo.name)"
-        *ngFor = "let moreInfo of cursorSegment.moreInfo">
-          <span 
-            class = "glyphicon"
-            [ngClass] = "'glyphicon-' + moreInfo.icon"
-            [tooltip] = "moreInfo.name">
-          </span>
-          <span>{{moreInfo.name}}</span>
-      </div>
-    </div>
-
-    <div
-      class="moreInfo-icon"
-      (click) = "contextmenuEvent=null;moreInfo.action()"
-      *ngFor = "let moreInfo of otherTools">
-        <span 
-          class = "glyphicon"
-          [ngClass] = "'glyphicon-' + moreInfo.icon">
-        </span>
-        <span>{{moreInfo.name}}</span>
-    </div>
+  <div 
+    class = "popover-content popover-body"
+    #panelBody>
   </div>
 </div>
 `,
   styles : [
     `
-    .clickableText
+    [popoverContainer]
     {
-      color:goldenrod;
-      cursor:default;
+      border:none;
+    }
+    .popover-content.popover-body
+    {
+      padding: 0px;
+      border:none;
     }
     `
   ]
 })
 
-export class FloatingPopOver {
-  cursorLocReal : number[] = [0,0,0]
-  cursorLocVoxel : number[] = [0,0,0]
-  cursorSegment : RegionDescriptor | number | null
-  contextmenuEvent : any
+export class FloatingPopOver implements AfterViewInit{
+  @Input() offset :[number,number] = [-1000,-1000]
+  @Input() templateTobeRendered : TemplateRef<any>
+  @Input() overwriteStyle : any = {}
+  @Input() title : string
 
-  otherTools : any[] = []
-  constructor(public mainController:MainController){}
+  @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
+
+  constructor(public mainController:MainController){
+
+  }
+
+  ngAfterViewInit(){
+    if(this.templateTobeRendered){
+      this.panelBody.createEmbeddedView( this.templateTobeRendered )
+    }
+  }
 }

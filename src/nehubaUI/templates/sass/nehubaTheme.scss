@@ -22,6 +22,19 @@ span.highlight
 
 div#ATLASContainer
 {
+  a
+  {
+    &:hover
+    {
+      cursor:pointer;
+      text-decoration:none;
+    }
+  }
+  .close
+  {
+    margin-left:0.2em;
+  }
+
   background-color:gray(1);
   color:gray(0);
   width:100%;
@@ -30,7 +43,7 @@ div#ATLASContainer
   .app-input-group
   {
     position:relative;
-    height:1.43em;
+    height:2em;
 
     .app-input-placeholder
     {
@@ -51,7 +64,8 @@ div#ATLASContainer
     }
   }
 
-  .inputSearchContainer
+  .inputSearchContainer,
+  .inputModeSearchContainer
   {
     margin-top:2px;
     border:none;
@@ -143,7 +157,7 @@ div#ATLASContainer
   {
     border:none;
     border-color:tgray(0.9,0.5);
-    box-shadow: 0 4px 6px 0 tgray(0.9,0.8);
+    box-shadow: 0 4px 6px 0 tgray(0.9,0.5);
     background-color:tgray(1.0,0.8);
     border-radius:0px;
 
@@ -175,12 +189,16 @@ div#ATLASContainer
       font-size:1.5em;
       vertical-align: middle;
 
-      text-shadow: 0 4px 6px 0 tgray(0.9,0.8);
+      text-shadow: 0 4px 6px tgray(0.9,0.8);
       
       &:hover
       {
         color:rgba(0,0,0,0.5);
       }
+    }
+    .popover.bottom
+    {
+      background-color:tgray(1.0,0.8);
     }
   }
 
@@ -236,30 +254,62 @@ div#ATLASContainer
 
     div#neuroglancer-container
     {
+
       label.perspective-panel-show-slice-views
       {
         color:gray(0.3);
 
         /* special case, since the checkbox + container is dynamically generated, has to be applied as global css */
         
-        pointer-events : all;
-        margin-left:1em;
         visibility: hidden;
-
-        &:before
-        {
-          content : "Remove front block in 3D view";
-          visibility : visible; 
-          font-weight:500; 
-          color:#337ab7;
-        }
 
         &:hover
         {
-          cursor: pointer;
+          cursor:pointer;
           text-decoration: underline;
           text-decoration-color: #337ab7;
         }
+        &:before
+        {
+          margin-left:0.2em;
+          content : 'show / hide frontal octant';
+          visibility: visible;
+          pointer-events: all;
+          color:#337ab7;
+        }
+
+        /* :before and :after pseudo classes for input does not conform for w3c see https://stackoverflow.com/a/4660434/6059235 */
+        /* strange behaviour, works fine in chrome, but not in FF */
+        // input[type="checkbox"]
+        // {
+        //   visibility: hidden;
+        //   width:10em;
+
+        //   &:hover
+        //   {
+        //     cursor: pointer;
+        //     &:before
+        //     {
+        //       text-decoration: underline;
+        //       text-decoration-color: #337ab7;
+        //     }
+        //   }
+
+        //   &:before
+        //   {
+        //     content : 'Hide frontal block';
+        //     visibility: visible;
+        //     color:#337ab7;
+
+        //   }
+        //   &:checked
+        //   {
+        //     &:before
+        //     {
+        //       content : 'Show frontal block';
+        //     }
+        //   }
+        // }
       }
 
       .neuroglancer-panel
@@ -321,15 +371,24 @@ div#ATLASContainer
 
 div#ATLASContainer.darktheme
 {
+  .close
+  {
+    color:gray(1);
+    opacity:0.35;
+    text-shadow:0 1px 0 gray(0.2);
+    &:hover
+    {
+      color:gray(0.8);
+      opacity:0.35;
+    }
+  }
   a
   {
     color:#94b6d3;
 
     &:hover
     {
-      cursor:pointer;
       color:#337ab7;
-      text-decoration:none;
     }
   }
   %darktheme
@@ -791,7 +850,9 @@ div#ATLASContainer.darktheme
 ul.dropdown-menu
 {
   border:none;
+  border-radius:0px;
   padding:0px;
+  background-color:tgray(1.0,0.8);
 
   li
   {
@@ -799,7 +860,13 @@ ul.dropdown-menu
 
     a.dropdown-item
     {
+      color:gray(0.2);
       padding:10px 10px;
+      &:hover
+      {
+        color:gray(0.1);
+        background-color:tgray(0.5,0.1);
+      }
     }
   }
 }
@@ -842,10 +909,10 @@ ul.darktheme.dropdown-menu
 modal-container
 {
   color:gray(0);
-  *
-  {
-    color:gray(0);
-  }
+  // *
+  // {
+  //   color:gray(0);
+  // }
 
   /* not yet active */
   &.darktheme
@@ -903,10 +970,13 @@ body > .tooltip.top.landmarkTooltip
 {
   margin-top:1em;
   width:100%;
+  background-color:tgray(1,0.8);
+  padding:0px;
 
   .popover-body.popover-content
   {
     padding:0px;
+    background:transparent;
 
     ul#modeSelector
     {
@@ -915,13 +985,21 @@ body > .tooltip.top.landmarkTooltip
       list-style-type:none;
       padding-left:0px;
       margin-bottom:0px;
+      background: transparent;
 
       li
       {
+        background:transparent;
         width:100%;
+
+        &:hover
+        {
+          background-color:tgray(0.5,0.2);
+        }
 
         a
         {
+          color:gray(0.1);
           width:100%;
           padding:10px;
           display:inline-block;

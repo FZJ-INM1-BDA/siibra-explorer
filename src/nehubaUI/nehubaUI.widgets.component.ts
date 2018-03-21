@@ -1,4 +1,6 @@
-import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild } from '@angular/core'
+import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
+import { trigger,transition,style,animate } from '@angular/animations'
+
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
@@ -193,6 +195,7 @@ export class WidgetsContainer{
       this.overridingMainController()
 
       this.floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetView )
+
       this.dockedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( DockedWidgetView )
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
 
@@ -240,11 +243,14 @@ export class WidgetsContainer{
   }
 
   private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
-    const parentViewRef = state == 'floating' ? this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory ) :
-      state == 'docked' ?
-        this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) :
-        this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
+    const parentViewRef = state == 'floating' ? 
+      this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory ) :
+        state == 'docked' ?
+          this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) :
+          this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
+
     const embedView = parentViewRef.instance.panelBody.createEmbeddedView( templateRef )
+    
     embedView.context.mainController = this.mainController
     parentViewRef.instance.widgetComponent = newWidget
     if(newWidget.parentViewRef){
@@ -408,38 +414,51 @@ interface WidgetViewChassis{
   </div>
   `,
   styles : [
-  `
-  div[floatingWidgetUnit]
-  {
-    position:absolute;
-    width:25em;
-    z-index:9;
-  }
-  div[floatingWidgetUnit] > div.panel-heading:hover
-  {
-    cursor:move;
-  }
-  div.panel-heading
-  {
-    display:flex;
-  }
+    `
+    div[floatingWidgetUnit]
+    {
+      position:absolute;
+      width:25em;
+      z-index:9;
+    }
+    div[floatingWidgetUnit] > div.panel-heading:hover
+    {
+      cursor:move;
+    }
+    div.panel-heading
+    {
+      display:flex;
+    }
 
-  div.panel-heading > span
-  {
-    flex : 1 1 auto;
-  }
-  div.panel-heading > i
-  {
-    flex : 0 0 1em;
-  }
-  
-  `
+    div.panel-heading > span
+    {
+      flex : 1 1 auto;
+    }
+    div.panel-heading > i
+    {
+      flex : 0 0 1em;
+    }
+    
+    `
+  ],
+  animations : [
+    trigger('triggerShowFloatingWidget',[
+      transition('void => *',[
+        style({'opacity':'0.0'}),
+        animate('200ms',style({'opacity':'1.0'}))
+      ]),
+      transition('* => void',[
+        animate('400ms',style({'opacity':'0.0'}))
+      ])
+    ])
   ]
 })
 export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   widgetComponent : WidgetComponent
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
+  @HostBinding('@triggerShowFloatingWidget') routeanimation : any
 
+  testBool : boolean = false
   /* widget associated with blinking */
   blinkFlag : boolean = false
   successClassState : boolean = false

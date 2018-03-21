@@ -236,7 +236,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     this.rgb = json.rgb ? json.rgb : null
 
     //TODO pmapurl, properties url and receptorData
-    this.propertiesURL = json.PMapURL ? json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata/${s.split(/\/|\./)[1]}.json`) : null
+    this.propertiesURL = json.PMapURL ? json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata2/${s.split(/\/|\./)[1]}.json`) : null
 
     /* populate moreInfo array */
     if(this.position){
@@ -247,7 +247,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
       this.moreInfo.push(goToPosition)
     }
     if(this.PMapURL){
-      const pmap = new DescriptorMoreInfoItem('Probability Map','picture')
+      const pmap = new DescriptorMoreInfoItem('Cytoarchitectonic Probabilistic Map','picture')
       pmap.action = () => {
 
         /* move viewer to the relevant location */
@@ -383,4 +383,15 @@ export class Landmark{
 export interface WidgitiseTempRefMetaData{
   name : string
   onShutdownCleanup? : Function
+}
+
+export interface DatasetInterface{
+  name : string
+  description : string
+  publications : Publication[]
+}
+
+export interface Publication{
+  doi : string
+  citation : string
 }
