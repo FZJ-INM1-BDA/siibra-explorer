@@ -1,5 +1,5 @@
-import { Input,AfterViewInit, HostListener,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
-import { Observable } from 'rxjs/Rx'
+import { Input,AfterViewInit,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
+import { Observable, Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail, perspectiveRenderEventType } from 'nehuba/exports'
 
@@ -216,7 +216,7 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
 @Component({
   template : `
     <div 
-      (contextmenu)="showFloatingPopover($event)"
+      (mousemove)="showFloatingPopover($event)"
       id = "neuroglancer-container" 
       [ngClass]="{darktheme : darktheme}"
       #container>
@@ -246,6 +246,13 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     </div>
     
     <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'iEEG Recordings'">
+      <readmoreComponent
+        *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+        [style.background-color]="'rgba(0,0,0,0.2)'">
+        <datasetBlurb
+          [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+        </datasetBlurb>
+      </readmoreComponent>
     </nehubaui-landmark-list>
 
     
@@ -346,8 +353,15 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
         &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
       </small>
     </div>
-    <floatingPopover>
+    <floatingPopover
+      [templateTobeRendered] = "floatingPopoverBody"
+      [overwriteStyle]="{'opacity':'0.0'}">
     </floatingPopover>
+    <ng-template #floatingPopoverBody>
+      <small floatingPopoverContent>
+        {{ mainController.nehubaCurrentSegment ? mainController.nehubaCurrentSegment.name : 'no segment selected' }}
+      </small>
+    </ng-template>
   `,
   styles : [
     `
@@ -437,6 +451,15 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
         padding: 0px;
       }
 
+    floatingPopover
+    {
+      white-space:nowrap;
+      pointer-events:none;
+    }
+    [floatingPopoverContent]
+    {
+      padding: 0.5em 1em;
+    }
     `
   ],
   providers : [ SpatialSearch ]
@@ -452,6 +475,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   viewerSegment : RegionDescriptor | number | null
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
+
+  requestAnimationFrameFloatingPopoverFade : any
+  handlerFrameFloatingPopoverFade : any
+  mousemoveOverViewer : Subject<MouseEvent> = new Subject()
 
   editingNavState : boolean = false
   textNavigateTo(string:string){
@@ -481,14 +508,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   nanometersToOffsetPixelsFn : Function[] | null[] = [null,null,null]
   rotate3D : number[] | null = null
 
-  @HostListener('document:mousedown',['$event'])
-  clearContextmenu(_ev:any){
-    if(this.floatingPopover.contextmenuEvent)this.floatingPopover.contextmenuEvent=null
-  }
-
   @ViewChild(FloatingPopOver) floatingPopover : FloatingPopOver
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
-
+  @ViewChild('floatingPopoverBody',{read:TemplateRef}) floatingPopoverBody : TemplateRef<any>
+  
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
@@ -553,6 +576,48 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .subscribe(()=>{
         this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
       })
+
+    this.requestAnimationFrameFloatingPopoverFade = ()=>{
+      const animation = new Animation(500,'linear')
+      const iterator = animation.generate()
+      let animationFrameHandler
+      const animationFrame = ()=>{
+        const returnedValue = iterator.next()
+        if(!returnedValue.done){
+          animationFrameHandler = requestAnimationFrame(animationFrame)
+        }
+        this.floatingPopover.overwriteStyle = {opacity : 1 - returnedValue.value}
+      }
+      animationFrameHandler = requestAnimationFrame(animationFrame)
+      return animationFrameHandler
+    }
+
+    this.mousemoveOverViewer
+      .filter(()=>(this.mainController.nehubaCurrentSegment != null))
+      .subscribe(()=>{
+        cancelAnimationFrame(this.handlerFrameFloatingPopoverFade)
+        this.floatingPopover.overwriteStyle = {opacity : 1 }
+      })
+
+    this.mousemoveOverViewer
+      .subscribe((ev:MouseEvent)=>{
+        this.floatingPopover.offset = [ev.clientX+10,ev.clientY+10]
+        // this.floatingPopover.title = this.mainController.nehubaCurrentSegment ? this.mainController.nehubaCurrentSegment.name : 'no segment selected'
+        
+      })
+
+    this.mousemoveOverViewer
+      .filter(()=>(this.mainController.nehubaCurrentSegment != null))
+      .debounceTime(1500)
+      .subscribe(()=>{
+        
+        this.handlerFrameFloatingPopoverFade = this.requestAnimationFrameFloatingPopoverFade()
+      })
+    VIEWER_CONTROL.mouseOverNehuba.subscribe((ev:any)=>{
+      if(ev.foundRegion){
+
+      }
+    })
   }
 
   public ngOnDestroy(){
@@ -587,6 +652,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
      */
     setTimeout(()=>{
 
+      /* TODO are redraw and relayout necessary here? */
       this.nehubaViewer.redraw()
       this.nehubaViewer.relayout()
       
@@ -613,7 +679,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
                   (console.log('observable fired from perspective panel'))
 
             })
-          
         })
 
         Observable.fromEvent(this.viewerContainer.nativeElement,perspectiveRenderEventType)
@@ -697,11 +762,12 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     this.onDestroyUnsubscribe.push(this.heartbeatObserver)
   }
 
+  /* hibernating function TODO cull */
   public dynamicData(selectedData:RegionDescriptor):string{
     switch(this.mainController.viewingMode){
       case 'Select atlas regions':
         return ``
-      case 'Probability Map':{
+      case 'Cytoarchitectonic Probabilistic Map':{
         const value = this.segmentListener[this.mainController.selectedParcellation!.ngId + selectedData.name]
         return `&nbsp;&nbsp;Encoded value: ${ value ? Math.round(value * 1000)/1000 : ''}`
       }
@@ -848,11 +914,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     // this.nehubaViewer.ngviewer.state.restoreState(state)
   }
 
-  public showFloatingPopover = (ev:any)=> {
-    this.floatingPopover.cursorSegment = this.viewerSegment
-    this.floatingPopover.cursorLocReal = this.mousePosReal
-    this.floatingPopover.cursorLocVoxel = this.mousePosVoxel
-    this.floatingPopover.contextmenuEvent = ev
+  showFloatingPopover = (ev:MouseEvent)=> {
+    this.mousemoveOverViewer.next(ev)
   }
 }
 
@@ -1148,6 +1211,8 @@ const HOVER_COLOR : string = '250,150,80'
   `
   <ng-template #landmarkList>
     <div class = "panel-body">
+      <ng-content>
+      </ng-content>
       <div 
         landmarkEntry
         (mouseenter)="landmark.hover = true"

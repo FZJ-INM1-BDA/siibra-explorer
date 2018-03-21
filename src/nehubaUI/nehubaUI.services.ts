@@ -26,12 +26,6 @@ export class MainController{
   private dataService : DataService = new DataService()
 
   /**
-   * modalService, to be overwritten
-   */
-
-  modalService : NehubaModalService
-
-  /**
    * data
    */
   loadedTemplates : TemplateDescriptor[] = []
@@ -74,7 +68,7 @@ export class MainController{
 
   nehubaViewer : NehubaViewer
   nehubaViewerSegmentMouseOver : any
-  nehubaCurrentSegment : RegionDescriptor | null
+  nehubaCurrentSegment : RegionDescriptor | null = null
 
   /* to be moved to viewer or viewercontainer */
   shownSegmentsObserver : any
@@ -184,7 +178,7 @@ export class MainController{
           .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.2))
       }
       break;
-      case 'Probability Map':
+      case 'Cytoarchitectonic Probabilistic Map':
       {
         /* can't do this. or else the mesh becomes invisible */
         // this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
@@ -203,7 +197,7 @@ export class MainController{
             obj[`PMap ${r.name}`] = {
               type : 'image',
               source : r.moreInfo.find(info=>info.name==mode)!.source,
-              shader : `void main(){float x=toNormalized(getDataValue());${true ? parseRegionRgbToGlsl(r) : CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,${true ? 'x' : '1.0'}));}else{emitTransparent();}}`
+              shader : this.nehubaCurrentSegment && this.nehubaCurrentSegment.name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
             }
             return Object.assign({},prev,obj)
           },{}) )
@@ -268,39 +262,21 @@ export class MainController{
   }
 
   init(){
-    /* TODO fetch available template space from KG  */
-    let datasetArray = [
-      '/res/json/bigbrain.json',
-      '/res/json/colin_.json',
-      '/res/json/waxholmRatV2_0.json',
-      '/res/json/allenMouse.json'
-    ]
-
-    // let datasetArray = [
-    //   'http://localhost:5080/res/json/bigbrain.json',
-    //   'http://localhost:5080/res/json/colin.json'
-    // ]
-    
-    Promise.all(datasetArray.map(dataset=>
-      this.dataService.fetchJson(dataset)
-        .then((json:any)=>{
-          return this.dataService.parseTemplateData(json)
-            .then( template =>{
-              this.loadedTemplates.push( template )
-            })
-            .catch(console.warn)
-          })))
+    this.dataService.fetchTemplates
+      .then((this.dataService.fetchDatasets).bind(this.dataService))
+      .then(templates=>(this.loadedTemplates = templates,Promise.resolve()))
       .then(()=>
         this.parseQueryString( window.location.search ))
       .catch((e:any)=>{
         console.error('fetching initial dataset error',e)
       })
-
+    
+    
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('http://localhost:5080/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
   }
 
   patchNG(){
@@ -1029,12 +1005,74 @@ export class SpatialSearch{
   }
 }
 
+@Injectable()
+export class ModalServices{
+  constructor(public mainController:MainController){
+
+  }
+  getModalHandler:()=>ModalHandler
+}
+
 class DataService {
 
   /* simiple fetch promise for json obj */
   /* nb: return header must contain Content-Type : application/json */
   /* nb: return header must container CORS header */
-  /* or else an error will be thrown */
+
+  /* TODO temporary solution fetch available template space from KG  */
+  datasetArray = [
+    '/res/json/bigbrain.json',
+    '/res/json/colin_.json',
+    '/res/json/waxholmRatV2_0.json',
+    '/res/json/allenMouse.json'
+  ]
+  COLIN_JUBRAIN_PMAP_INFO = `/res/json/colinJubrainPMap.json`
+  COLIN_IEEG_INFO = `/res/json/colinIEEG.json`
+  COLIN_JUBRAIN_RECEPTOR_INFO = `/res/json/colinJubrainReceptor.json`
+
+
+  // letdatasetArray = [
+  //   'http://localhost:5080/res/json/bigbrain.json',
+  //   'http://localhost:5080/res/json/colin.json'
+  // ]
+
+  // COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
+  // COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
+  // COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
+  
+  fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
+    Promise.all(this.datasetArray.map(dataset=>
+      this.fetchJson(dataset)
+        .then((json:any)=>
+          this.parseTemplateData(json))))
+      .then(templates=>resolve(templates))
+      .catch(e=>reject(e))
+  })
+
+  fetchDatasets(templates:TemplateDescriptor[]):Promise<TemplateDescriptor[]>{
+    const arrPrm: Promise<TemplateDescriptor>[] = templates.map(template=>{
+      if(template.name!=`MNI Colin 27`){
+        return Promise.resolve(template)
+      }
+      return new Promise((resolve,reject)=>{
+        Promise.all([this.COLIN_JUBRAIN_PMAP_INFO,this.COLIN_IEEG_INFO,this.COLIN_JUBRAIN_RECEPTOR_INFO].map(url=>
+          this.fetchJson(url)))
+          .then(datas=>{
+            resolve(Object.assign({},template,{
+              'Cytoarchitectonic Probabilistic Map' : datas[0],
+              'iEEG Recordings' : datas[1],
+              'Receptor Data' : datas[2]
+            }) as TemplateDescriptor)
+          })
+          .catch(e=>reject(e))
+      })
+    })
+    return new Promise((resolve,reject)=>{
+      Promise.all(arrPrm)
+        .then(templates=>resolve(templates))
+        .catch(e=>reject(e))
+    })
+  }
 
   fetchJson(url:string):Promise<any>{
     return Promise.race([
@@ -1208,7 +1246,9 @@ export const HELP_MENU = {
   },
   'Keyboard Controls' : 
   {
-    "s":"toggle front octant"
+    "s":"toggle front octant",
+    "1 - 9" : "toggle layers visibility",
+    "r" : "rotate 3D view"
   }
 }
 
@@ -1228,7 +1268,7 @@ export const PRESET_COLOR_MAPS =
   }]
 
 export const parseRegionRgbToFragmentMain = (r:RegionDescriptor):string=>`void main(){float x = toNormalized(getDataValue()); ${parseRegionRgbToGlsl(r)}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,x));}else{emitTransparent();}}`
-export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,a));}else{emitTransparent();}}`
+export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
 export const parseRegionRgbToGlsl = (r:RegionDescriptor):string => {
   return (r.rgb.map((color,idx)=>`${idx == 0 ? 'float r' : idx == 1 ? 'float g' : idx == 2 ? 'float b' : 'float a'} = ${(color/255).toFixed(3)};`).join('') + `float a = 1.0;`)

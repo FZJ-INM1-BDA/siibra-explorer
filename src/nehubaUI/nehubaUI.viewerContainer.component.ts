@@ -20,6 +20,15 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         (mouseLeaveRegion)="receptorMouseLeave($event)"
         [regions] = " mainController.selectedRegions "
         *ngIf = "mainController.viewingMode == 'Receptor Data'">
+
+        <readmoreComponent
+          *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+          [style.background-color]="'rgba(0,0,0,0.2)'">
+          <datasetBlurb
+            [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+          </datasetBlurb>
+        </readmoreComponent>
+
       </nehubaui-searchresult-region-list>
       
       <nehubaui-searchresult-region-pill-list 
@@ -27,14 +36,33 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         [title] = "'Selected Regions'"
         [regions] = " mainController.selectedRegions "
         *ngIf = "mainController.viewingMode == 'Select atlas regions' && mainController.selectedRegions.length > 0">
+        
+        <readmoreComponent
+          *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+          [style.background-color]="'rgba(0,0,0,0.2)'">
+          <datasetBlurb
+            [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+          </datasetBlurb>
+        </readmoreComponent>
+
       </nehubaui-searchresult-region-pill-list>
 
       <nehubaui-searchresult-region-pill-list 
         [additionalContent] = "'nifti'"
         [startingMode] = "'docked'"
-        [title] = "'Probabilistic Cytoarchitectonic Maps'"
+        [title] = "'Cytoarchitectonic Probabilistic Map'"
         [regions] = " mainController.selectedRegions "
-        *ngIf = "mainController.viewingMode == 'Probability Map' && mainController.selectedRegions.length > 0">
+        *ngIf = "mainController.viewingMode == 'Cytoarchitectonic Probabilistic Map' && mainController.selectedRegions.length > 0">
+        
+        
+        <readmoreComponent
+          *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+          [style.background-color]="'rgba(0,0,0,0.2)'">
+          <datasetBlurb
+            [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+          </datasetBlurb>
+        </readmoreComponent>
+        
       </nehubaui-searchresult-region-pill-list>
     </div>
   `

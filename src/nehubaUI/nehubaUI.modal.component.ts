@@ -1,7 +1,7 @@
 
-import { Component,ChangeDetectorRef } from '@angular/core'
+import { Component,ChangeDetectorRef, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-import { UI_CONTROL, MainController } from './nehubaUI.services'
+import { UI_CONTROL, ModalServices } from './nehubaUI.services'
 
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
@@ -15,17 +15,18 @@ import 'rxjs/operator/map'
 export class NehubaModalService{
   bsModalRef:BsModalRef
 
-  constructor(private bsModalService:BsModalService,private mainController:MainController){
+  constructor(private bsModalService:BsModalService,private modalServices:ModalServices){
     /**
      * input
      * info
      * curtain
      */
-    this.mainController.modalService = this
+    this.modalServices.getModalHandler = this.getModalHandler
     UI_CONTROL.modalControl = this
   }
 
   public getModalHandler = ()=> new ModalHandler(this.bsModalService)
+  
 }
 
 export class ModalHandler{
@@ -46,6 +47,11 @@ export class ModalHandler{
     this.bsModalRef.hide()
   }
 
+  public showTemplateRef = (template:TemplateRef<any>) => {
+    this.show()
+    this.bsModalRef.content.modalBody.createEmbeddedView(template)
+  }
+  
   /**
    * Show the modal with the assigned config.
    */
@@ -77,35 +83,44 @@ export class ModalHandler{
 @Component({
   selector : 'modal-unit',
   template:
-`
-<div (contextmenu) = "$event.stopPropagation()">
-  <div *ngIf = "title" class = "modal-header" [innerHTML] = "title">
-  </div>
-  <div class = "modal-body">
-    
-    <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
-    </div>
-    <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
-      <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
-        <div class = "row">
-          <multiform [data] = "body[key] | filterUncertainObject">
-          </multiform>
+    `
+    <div (contextmenu) = "$event.stopPropagation()">
+      <div *ngIf = "title" class = "modal-header" [innerHTML] = "title">
+      </div>
+      <div class = "modal-body" #modalBody>
+        
+        <div *ngIf = "body && body.constructor.name == 'String'" [innerHTML] = "body">
         </div>
-      </tab>
-    </tabset>
-    <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
-    </multiform>
-  </div>
-  <div *ngIf = "footer" class = "modal-footer" [innerHTML] = "footer">
-  </div>
-</div>
-`
+        <tabset *ngIf = "body && body.constructor.name == 'Object'" class = "row">
+          <tab *ngFor = "let key of body | keyPipe" [heading] = "key">
+            <div class = "row">
+              <multiform [data] = "body[key] | filterUncertainObject">
+              </multiform>
+            </div>
+          </tab>
+        </tabset>
+        <multiform *ngIf = "body && body.constructor.name == 'Array'" class = "row" [data] = "body | filterUncertainObject">
+        </multiform>
+      </div>
+      <div *ngIf = "footer" class = "modal-footer" [innerHTML] = "footer">
+      </div>
+    </div>
+    `,
+  styles : [
+    `
+    div.modal-body
+    {
+      padding:0px;
+    }
+    `
+  ]
 })
 
 export class NehubaModalUnit{
   public title : String | null  = 'Default Title'
   public body : Object | Array<any> |String | null = 'Default body'
   public footer : String | null = 'default footer'
+  @ViewChild('modalBody',{read:ViewContainerRef}) modalBody : ViewContainerRef
 
   constructor(private cd:ChangeDetectorRef){
     /* filterUncertainObject jsonStringifyPipe */

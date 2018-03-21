@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
-import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices } from './nehubaUI.services'
-import { RegionDescriptor, TemplateDescriptor }from './nehuba.model'
+import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, ModalServices } from './nehubaUI.services'
+import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from './nehuba.model'
 import { ModalHandler } from './nehubaUI.modal.component'
+import { DatasetBlurb } from 'nehubaUI/nehubaUI.datasetBlurb.component';
 
 @Component({
   selector : 'atlasbanner',
@@ -97,6 +98,26 @@ import { ModalHandler } from './nehubaUI.modal.component'
     {
       text-align:left;
     }
+
+    #modeSelector[listOfActivities] > li
+    {
+      white-space:nowrap
+    }
+
+    #modeSelector[listOfActivities] > li > i.info
+    {
+      font-size:120%;
+      margin-left:-2em;
+      padding:10px 0px;
+      color:rgba(128,128,128,0.8);
+    }
+    
+    #modeSelector[listOfActivities] > li > i.info:hover
+    {
+      cursor:pointer;
+      color:rgba(128,128,128,1.0);
+    }
+
     [modeSelector]
     {
       width:278px;
@@ -118,6 +139,9 @@ export class NehubaBanner implements AfterViewInit {
 
   searchTerm : string = ``
 
+  @ViewChild('modeInfoUnit') modeInfoUnit: DatasetBlurb
+  @ViewChild('modeInfo') modeInfo: TemplateRef<any>
+
   /* viewing mode variables */
   listOfActivities : string[] = []
   searchActivityTerm : string = ``
@@ -125,7 +149,9 @@ export class NehubaBanner implements AfterViewInit {
 
   Array = Array
 
-  constructor(public mainController:MainController,public widgitServices:WidgitServices){
+  modalDataset : DatasetInterface
+
+  constructor(public mainController:MainController,public widgitServices:WidgitServices,public modalServices:ModalServices){
     // this.mainController.unwidgitiseSearchRegion = (templateRef:TemplateRef<any>)=>{
     //   templateRef
     //   this.widgetiseSearchRegion = false
@@ -170,6 +196,12 @@ export class NehubaBanner implements AfterViewInit {
     if(this.mainController.selectedTemplate && this.mainController.selectedParcellation){
       this.showRegionDialog.emit()
     }
+  }
+
+  showModeInfo(activity:string){
+    const handler = this.modalServices.getModalHandler()
+    handler.title = `${this.mainController.selectedTemplate ? this.mainController.selectedTemplate.name : 'No Template Selected'} <i class = "glyphicon glyphicon-chevron-right"></i> ${activity} `
+    handler.showTemplateRef(this.modeInfo)
   }
 
   focusSearchInput(){

@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
-import { RegionDescriptor, LabComponent, Landmark, Multilevel } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON } from 'nehubaUI/nehubaUI.services';
+import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
+import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, ModalServices } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.component';
 
@@ -9,6 +9,8 @@ import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.co
   template : 
   `
   <ng-template #regionList>
+    <ng-content>
+    </ng-content>
     <nehubaui-searchresult-region 
       (hover)="subHover($event)"
       (showReceptorData)="showReceptorData(region,$event)"
@@ -276,6 +278,9 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
         const array = Array.from(imageWrappers)
   
         array.forEach(div=>{
+          if(div.classList.contains('installed')){
+            return
+          }
           Array.from(div.getElementsByTagName('img')).forEach(img=>{
             img.addEventListener('click',()=>{
               mName = img.getAttribute('rbMode')
@@ -287,6 +292,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
               modalHandler.show()
             })
           })
+          div.classList.add('installed')
         })
       })()
       `,
@@ -308,12 +314,15 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
           z-index:999;
           pointer-events:none;
           text-align:center;
+
+          background-color:rgba(0,0,0,0);
+          transition: background-color 0.5s ease;
         }
         div[imageWrapper]:hover:before
         {
           color : white;
           content: 'click to enlarge';
-          background-color:rgba(0,0,0,0.8);
+          background-color:rgba(0,0,0,0.3);
         }
         div[imageWrapper]:hover
         {
@@ -393,6 +402,8 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   template :
   `
   <ng-template #regionList>
+    <ng-content>
+    </ng-content>
     <nehubaui-searchresult-region-pill
       [region] = "region"
       *ngFor = "let region of regions">
@@ -464,6 +475,16 @@ export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
     <ng-content>
     </ng-content>
   </span>
+  <ng-template #datasetTemplate>
+    <div
+      *ngIf = "!fetchedDatasetInfo">
+      Fetching more information right now ...
+    </div>
+    <datasetBlurb
+      [dataset] = "fetchedDatasetInfo"
+      *ngIf = "fetchedDatasetInfo">
+    </datasetBlurb>
+  </ng-template>
   `,
   styles : [
     `
@@ -481,8 +502,10 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   @Input() mode : string = `default`
 
   @Input() regionTemplate : TemplateRef<RegionTemplateRefInterface>
+  @ViewChild('datasetTemplate',{read:TemplateRef}) datasetTemplate : TemplateRef<any>
+  fetchedDatasetInfo : DatasetInterface
 
-  constructor(public mainController : MainController){}
+  constructor(public mainController : MainController,public modalServices:ModalServices){}
 
   ngAfterViewInit(){
   }
@@ -496,29 +519,14 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   }
 
   showProperties(){
-    const handler = this.mainController.modalService.getModalHandler()
-    handler.title = `Information on ${this.region.name}`
-    handler.body = `fetching ... `
-    handler.show()
+    const handler = this.modalServices.getModalHandler()
+    handler.title = `${this.region.name}`
+    handler.showTemplateRef(this.datasetTemplate)
 
     fetch(this.region.propertiesURL)
       .then(d=>d.json())
       .then(json=>{
-        let finalObj : any = {}
-
-        const source = json._source
-
-        const singleAttr = ['owners','publications','license','ethics']
-        const arrayAttr = ['contributors']
-
-        singleAttr.forEach(attr=>{
-          
-          finalObj[attr] = source[attr].url ? source[attr].url : source[attr].value
-        })
-        arrayAttr.forEach(attr=>{
-          finalObj[attr] = source[attr].map((it:any)=>it.value)
-        })
-        handler.bsModalRef.content.body = finalObj
+        this.fetchedDatasetInfo = json
       })
       .catch((e:any)=>{
         console.log(e)
