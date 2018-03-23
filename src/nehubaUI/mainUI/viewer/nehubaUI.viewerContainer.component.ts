@@ -1,5 +1,5 @@
 import { Component,ViewChild,Input,AfterViewInit } from '@angular/core'
-import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, VIEWER_CONTROL, MainController, LandmarkServices, SpatialSearch } from './nehubaUI.services'
+import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, VIEWER_CONTROL, MainController, LandmarkServices, SpatialSearch } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
@@ -115,9 +115,4 @@ export class NehubaViewerContainer implements AfterViewInit {
       this.landmarkServices.TEMP_clearVtkHighlight(idx)
     }
   }
-}
-
-/* interface required for region template refs to display */
-export interface RegionTemplateRefInterface{
-  region : RegionDescriptor
 }

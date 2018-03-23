@@ -1,0 +1,10 @@
+
+[popoverContainer]
+{
+  border:none;
+}
+.popover-content.popover-body
+{
+  padding: 0px;
+  border:none;
+}

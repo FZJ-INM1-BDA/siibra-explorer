@@ -1,9 +1,8 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
 import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, ModalServices } from 'nehubaUI/nehubaUI.services';
-import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
-import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.component';
-import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/nehubaUI.util.animations'
+import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
+import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 
 @Component({
   selector : `nehubaui-searchresult-region-list`,
@@ -48,7 +47,7 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   Array = Array
   filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
 
-  widgetComponent : WidgetComponent
+  widgetComponent : any
   ngAfterViewInit(){
     this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.regionList,{name:this.title})
     this.widgetComponent.changeState(this.startingMode)
@@ -452,7 +451,7 @@ export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
   }
 
   @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
-  widgetComponent:WidgetComponent
+  widgetComponent:any
   ngAfterViewInit(){
     this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.regionList,{name:this.title})
     this.widgetComponent.changeState(this.startingMode)

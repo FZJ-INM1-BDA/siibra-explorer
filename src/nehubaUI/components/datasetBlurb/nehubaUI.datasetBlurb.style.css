@@ -1,0 +1,18 @@
+div[container]
+{
+  width:100%;
+}
+div[linkContainer]
+{
+  width:100%;
+  padding:0.2em 1em;
+}
+div[descContainer]
+{
+  width:100%;
+  padding:0.2em 1em;
+}
+a
+{
+  display:inline-block;
+}

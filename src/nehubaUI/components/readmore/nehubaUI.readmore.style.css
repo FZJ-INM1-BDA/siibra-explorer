@@ -1,0 +1,21 @@
+
+div[container]
+{
+  width:100%;
+  overflow:hidden;
+}
+div[content]
+{
+  width:100%;
+  overflow:hidden;
+}
+div[readmoreSliver]
+{
+  width:100%;
+  height:15px;
+  text-align:center;
+}
+div[readmoreSliver]:hover
+{
+  cursor:pointer;
+}

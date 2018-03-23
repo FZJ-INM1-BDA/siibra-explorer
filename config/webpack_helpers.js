@@ -28,6 +28,13 @@ const extractSass = new ExtractTextPlugin({
   allChunks : true
 })
 
+// const extractHtml = new ExtractTextPlugin({
+//   filename : (getPath)=>{
+//     console.log(getPath('[name].[ext]'))
+//     return getPath('[name].[ext]').replace('src/nehubaUI/mainUI/parent','')
+//   }
+// })
+
 function modifyViewerOptions(options) {
   options = options || {};
   options.resolveLoaderRoots = [
@@ -61,12 +68,44 @@ function modifyViewerOptions(options) {
       }]
     })
   }
+
+  let ruleHtml = {
+    test : /src\/nehubaUI.*?\.html$/,
+    loader : 'raw-loader'
+  }
+
+  const compareRegex = (r1,r2)=>(r1 instanceof RegExp) && (r2 instanceof RegExp)
+    && r1.source == r2.source  
+
+  let ruleCss = {
+    test : /src\/nehubaUI.*?\.css$/,
+    loader : 'raw-loader'
+  }
+
+  // let rawLoading = {
+  //   test : /\.html$/,
+  //   exclude : /node_modules|index\.html/,
+  //   loader : 'raw-loader'
+  // }
+
+  // let tsLoading = {
+  //   test : /nehubaUI\.parent\.component\.ts/,
+  //   loaders : [ 'awesome-typescript-loader', 'angular2-template-loader' ]
+  // }
   
   /* TODO: maybe consider using text extract for scss? */
   options.modifyBaseConfig = (baseConfig) => {
     baseConfig.module.rules.push(ruleScss)
+    baseConfig.module.rules.push(ruleHtml)
+    
+    const idx = baseConfig.module.rules.findIndex(r=>compareRegex(r.test,/\.css$/))
+    if(idx>=0) baseConfig.module.rules[idx].exclude = /nehubaUI/
+
+    baseConfig.module.rules.push(ruleCss)
+    // baseConfig.module.rules.push(rawLoading)
+    // baseConfig.module.rules.push(tsLoading)
   }
-  options.frontendPlugins = [extractSass]
+  options.frontendPlugins = [extractSass /*,extractHtml*/ ]
   return options;
 }
 

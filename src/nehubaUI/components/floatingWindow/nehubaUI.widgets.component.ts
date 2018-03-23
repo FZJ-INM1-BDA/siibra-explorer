@@ -1,10 +1,10 @@
 import { TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
-import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/nehubaUI.util.animations'
+import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
-import { NehubaUIControl } from 'nehubaUI/nehubaUI.control.component';
+import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
 
 /**
  * basic widget class
@@ -206,7 +206,7 @@ export class WidgetsContainer{
   }
 
   overridingMainController(){
-    this.widgitServices._widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIControl>,metadata:WidgitiseTempRefMetaData):WidgetComponent=>{
+    this.widgitServices._widgitiseTemplateRef = (templateref:TemplateRef<NehubaUIRegionMultilevel>,metadata:WidgitiseTempRefMetaData):WidgetComponent=>{
       const newLabcomponent = new LabComponent({
         name : metadata.name
       })

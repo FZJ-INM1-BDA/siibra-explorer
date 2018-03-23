@@ -1,6 +1,6 @@
 import { Pipe,PipeTransform,SecurityContext } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
-import { Multilevel } from './nehuba.model'
+import { Multilevel } from 'nehubaUI/nehuba.model'
 /* pipes in object, pipes out stringified json  */
 
 @Pipe({

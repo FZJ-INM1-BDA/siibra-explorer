@@ -1,67 +1,16 @@
 import { Component,ViewChild ,AfterViewInit,Renderer2 } from '@angular/core'
-import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from './nehubaUI.services'
-import { WidgetsContainer } from './nehubaUI.widgets.component'
-import { NehubaBanner } from 'nehubaUI/nehubaUI.banner.component';
-import { showSideBar } from 'nehubaUI/nehubaUI.util.animations'
+import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from 'nehubaUI//nehubaUI.services'
+import { WidgetsContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
+import { NehubaBanner } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
+import { showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
+
+import template from './nehubaUI.parent.template.html'
+import css from './nehubaUI.parent.style.css'
 
 @Component({
   selector : 'div#ATLASContainer',
-  templateUrl : 'src/nehubaUI/templates/nehubaUI.parent.template.html',
-  styles : [
-    `
-    div[containerDiv]
-    {
-      height:100%;
-      width:100%;
-      display:flex;
-      flex-direction:row;
-    }
-
-
-    div#dockResizeSliver
-    {
-      flex: 0 0 20px;
-      background-color:rgba(128,128,128,0.08);
-      z-index:6;
-      display: flex;
-      justify-content:center;
-      flex-direction:column;
-    }
-      div#dockResizeSliver:hover
-      {
-        cursor:pointer;
-        background-color:rgba(128,128,128,0.2);
-      }
-
-      div#dockResizeSliver > i:after
-      {
-        content : ' '
-      }
-
-    WidgetsContainer
-    {
-      flex: 0 0 0px;
-    }
-
-    ATLASViewer
-    {
-      flex: 1 1 auto;
-      z-index:5;
-      position:relative;
-    }
-    div[atlasBannerContainer]
-    {
-      display:flex;
-      flex-direction:row;
-      position:absolute;
-      z-index:6;
-    }
-    atlasbanner[overlayBanner]
-    {
-      flex: 1 1 0px;
-    }
-    `
-  ],
+  template : template,
+  styles : [ css ],
   host : {
     '[class.darktheme]':'darktheme'
   },

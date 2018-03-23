@@ -1,0 +1,13 @@
+<div container>
+  <div 
+    *ngFor = "let publication of dataset.publications" 
+    linkContainer>
+
+    <a [href] = "publication.doi">{{publication.citation}}</a>
+  </div>
+  <div descContainer>
+    <small>
+      {{ dataset.description }}
+    </small>
+  </div>
+</div>

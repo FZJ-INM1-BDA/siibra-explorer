@@ -1,11 +1,15 @@
 import { Output, Input, Component, ViewChildren, EventEmitter } from '@angular/core'
-import { Multilevel } from './nehuba.model'
+import { Multilevel } from 'nehubaUI/nehuba.model'
 import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
+
+import template from './nehubaUI.multilevel.template.html'
+import css from './nehubaUI.multilevel.style.css'
 
 @Component({
   selector : 'multilevel',
-  templateUrl : 'src/nehubaUI/templates/nehubaUI.multilevel.template.html',
+  template : template,
   styles : [
+    css,
     ` 
     :host >>> span.highlight
     {
@@ -51,8 +55,7 @@ import { MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services';
       text-align:center;
     }
     `
-],
-  styleUrls : ['src/nehubaUI/templates/nehubaUI.multilevel.template.css']
+]
 })
 
 export class MultilevelSelector {

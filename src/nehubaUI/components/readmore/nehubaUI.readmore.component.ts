@@ -1,48 +1,13 @@
 import { Component, Input, ViewChild, ElementRef } from '@angular/core'
 import { state,trigger,transition,style,animate } from '@angular/animations'
 
+import template from './nehubaUI.readmore.template.html'
+import css from './nehubaUI.readmore.style.css'
+
 @Component({
   selector : `readmoreComponent`,
-  template : 
-  `
-  <div container>
-    <div 
-      [@showReadmore]="{value:showAllState,params:{readMoreMaxheight:readMoreMaxHeight,containerHeight:containerHeight}}" content>
-      <div #ngContentWrapper>
-        <ng-content>
-        </ng-content>
-      </div>
-    </div>
-    <div (click) = "showAll = !showAll" readmoreSliver>
-      <i *ngIf = "!showAll" class = "glyphicon glyphicon-chevron-down"></i>
-      <i *ngIf = "showAll" class = "glyphicon glyphicon-chevron-up"></i>
-    </div>
-  </div>
-  `,
-  styles : [
-    `
-    div[container]
-    {
-      width:100%;
-      overflow:hidden;
-    }
-    div[content]
-    {
-      width:100%;
-      overflow:hidden;
-    }
-    div[readmoreSliver]
-    {
-      width:100%;
-      height:15px;
-      text-align:center;
-    }
-    div[readmoreSliver]:hover
-    {
-      cursor:pointer;
-    }
-    `
-  ],
+  template : template ,
+  styles : [ css ],
   animations : [
     trigger('showReadmore',[
       state('collapse',
@@ -72,6 +37,7 @@ import { state,trigger,transition,style,animate } from '@angular/animations'
 })
 
 export class ReadMoreComponent{
+  /* wrap content to see effect */
   @Input() readMoreMaxHeight : string = '4em'
   @Input() showAll : boolean = false
   @ViewChild('ngContentWrapper')ngContentWrapper : ElementRef

@@ -1,131 +1,31 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
-import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, ModalServices } from './nehubaUI.services'
-import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from './nehuba.model'
-import { ModalHandler } from './nehubaUI.modal.component'
-import { DatasetBlurb } from 'nehubaUI/nehubaUI.datasetBlurb.component';
-import { animationFadeInOut } from 'nehubaUI/nehubaUI.util.animations'
+import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, ModalServices } from 'nehubaUI/nehubaUI.services'
+import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from 'nehubaUI/nehuba.model'
+
+import { DatasetBlurb } from 'nehubaUI/components/datasetBlurb/nehubaUI.datasetBlurb.component';
+import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations'
+
+import template from './nehubaUI.banner.template.html'
+import css from './nehubaUI.banner.style.css'
 
 @Component({
   selector : 'atlasbanner',
-  templateUrl : 'src/nehubaUI/templates/nehubaBanner.template.html',
-  styles : [
-    `
-    div[bannerContainer]
-    {
-      position:relative;
-      height:0px;
-      padding-bottom:1px;
-
-      display:flex;
-    }
-    img[hbplogo]
-    {
-      height:6em;
-      pointer-events:none;
-      display:inline-block;
-      padding:0px;
-      margin:1em;
-      box-sizing:border-box;
-
-      flex:0 0 auto;
-    }
-    div
-    {
-      display:inline-block;
-    }
-    div > *
-    {
-      display:inline-block;
-    }
-    div[textContainer]
-    {
-      vertical-align:top;
-      margin-top:1em;
-      flex: 1 1 auto;
-    }
-    div[textContainer] > *
-    {
-      display:inline-block;
-      margin-top:0.3em;
-    }
-    div[editBtn]
-    {
-      height:34px;
-      box-sizing:border-box;
-      padding:2px;
-      position:relative;
-      margin-left:-2.5em;
-      z-index:9;
-    }
-    div[editBtn]:before
-    {
-      content:'';
-      height:100%;
-      width:0px;
-      vertical-align:middle;
-      display:inline-block;
-    }
-    [btnCustom]
-    {
-      border-radius : 0px;
-    }
-    
-    ul li.selected a:before
-    {
-      content: '\u2022';
-      width : 1em;
-      display:inline-block;
-    }
-    ul li:not(.selected) a:before
-    {
-      content: ' ';
-      width : 1em;
-      display:inline-block;
-    }
-
-    div[modeSelection]
-    {
-      vertical-align : top;
-      width:20em;
-    }
-
-    div[inputSearchRegion]
-    {
-      vertical-align : top;
-      width:20em;
-    }
-
-    [listOfActivities] > span
-    {
-      text-align:left;
-    }
-
-    #modeSelector[listOfActivities] > li
-    {
-      white-space:nowrap
-    }
-
-    #modeSelector[listOfActivities] > li > i.info
-    {
-      font-size:120%;
-      margin-left:-2em;
-      padding:10px 0px;
-      color:rgba(128,128,128,0.8);
-    }
-    
-    #modeSelector[listOfActivities] > li > i.info:hover
-    {
-      cursor:pointer;
-      color:rgba(128,128,128,1.0);
-    }
-
-    [modeSelector]
-    {
-      width:278px;
-      height:1.43em;
-    }
-    `
-  ],
+  template : template,
+  styles : [ css ,
+  `
+  ul li.selected a:before
+  {
+    content: '\u2022';
+    width : 1em;
+    display:inline-block;
+  }
+  ul li:not(.selected) a:before
+  {
+    content: ' ';
+    width : 1em;
+    display:inline-block;
+  }
+  `], /* TODO with both raw-loader and sass, the utf-8 encoding are lost... investigate, merge these back to the rest of css */
   animations : [ animationFadeInOut ]
 })
 
@@ -244,7 +144,7 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   showhelp(){
-    const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
+    const modalHandler = UI_CONTROL.modalControl.getModalHandler()
     modalHandler.title = `<h4>Help</h4>`
     modalHandler.body = HELP_MENU
     modalHandler.footer

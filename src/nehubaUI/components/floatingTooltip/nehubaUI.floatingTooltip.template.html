@@ -1,0 +1,20 @@
+
+<div 
+  (mousedown)="$event.stopPropagation()"
+  class = "popover down" 
+  style = "display:block;position:absolute;"
+  [ngStyle] = "overwriteStyle"
+  [style.left] = "offset[0] + 'px'"
+  [style.top] = "offset[1] + 'px'"
+  popoverContainer>
+
+  <h3 
+    *ngIf = "title" 
+    [innerHTML] = "title"
+    class = "popover-title popover-header">
+  </h3>
+  <div 
+    class = "popover-content popover-body"
+    #panelBody>
+  </div>
+</div>
