@@ -1,5 +1,5 @@
-import { TemplateRef,ViewRef,Input, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
-import { trigger,transition,style,animate } from '@angular/animations'
+import { TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
+import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
@@ -103,9 +103,10 @@ export class DockedWidgetContainer implements AfterViewInit{
   `,
   styles : [
   `
-  div.btn
+  :host
   {
-    float:bottom
+    display:flex;
+    flex-direction:column-reverse;
   }
   `
   ]
@@ -126,11 +127,11 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   selector : `WidgetsContainer`,
   template : 
   `
-  <DockedWidgetContainer [style.display]="hasDockedComponents?'block':'none'">
+  <DockedWidgetContainer>
   </DockedWidgetContainer>
   <FloatingWidgetContainer>
   </FloatingWidgetContainer>
-  <MinimisedContainer [style.right] = "getClearRight() + 'px'">
+  <MinimisedContainer>
   </MinimisedContainer>
   <ng-template #widgetContentFactory>
   </ng-template>
@@ -150,18 +151,23 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   MinimisedContainer
   {
     z-index:9;
-    position:absolute;
-    right:0em;
-    width: 4em;
-    bottom:0em;
+    position:relative;
+    
+    width: 2em;
+    height:100%;
+
+    top:-100%;
+    right:4em;
+
+    pointer-events:none;
   }
   DockedWidgetContainer
   {
     position:relative;
     z-index:4;
     display:block;
-    width:calc(100% + 12px);
-    margin-left:-11px;
+    width:362px;
+    margin-left:-21px;
     height:100%;
     overflow-y:auto;
     overflow-x:hidden;
@@ -170,8 +176,6 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   ]
 })
 export class WidgetsContainer{
-  @Input() dockedWidgetPanelWidth : number
-  @Input() hasDockedComponents : boolean = false
 
   @ViewChild(FloatingWidgetContainer) floatingWidgetContainer : FloatingWidgetContainer
   @ViewChild(DockedWidgetContainer) dockedWidgetContainer : DockedWidgetContainer
@@ -195,7 +199,6 @@ export class WidgetsContainer{
       this.overridingMainController()
 
       this.floatingWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( FloatingWidgetView )
-
       this.dockedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( DockedWidgetView )
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
 
@@ -332,14 +335,6 @@ export class WidgetsContainer{
 
     return newWidget
   }
-
-  getClearRight(){
-    return !this.hasDockedComponents ? 
-      0 :
-      this.dockedWidgetPanelWidth < 300 ? 
-        this.dockedWidgetPanelWidth : 
-        300
-  }
 }
 
 /**
@@ -382,8 +377,7 @@ interface WidgetViewChassis{
   `
   <div 
     class = "panel" 
-    [style.left] = " '-' + position[0] + 'px' "
-    [style.top] = " '-' + position[1] + 'px' "
+    [style.transform] = "transform"
     [ngClass]="{'panel-default':!repositionFlag&&!successClassState,'panel-info':repositionFlag&&!successClassState,'panel-success':successClassState&&!repositionFlag}"
     (mousedown)="stopBlink()" floatingWidgetUnit>
 
@@ -394,7 +388,7 @@ interface WidgetViewChassis{
         <span>
           {{ widgetComponent.labComponent.name.split('.')[widgetComponent.labComponent.name.split('.').length-1] }}
         </span>
-        <i (mousedown)="minimise($event)" class = "close">
+        <i *ngIf = "false" (mousedown)="minimise($event)" class = "close">
 
           <i class = "glyphicon glyphicon-minus"></i>
         </i>
@@ -441,24 +435,13 @@ interface WidgetViewChassis{
     
     `
   ],
-  animations : [
-    trigger('triggerShowFloatingWidget',[
-      transition('void => *',[
-        style({'opacity':'0.0'}),
-        animate('200ms',style({'opacity':'1.0'}))
-      ]),
-      transition('* => void',[
-        animate('400ms',style({'opacity':'0.0'}))
-      ])
-    ])
-  ]
+  animations : [ animationFadeInOut ]
 })
 export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   widgetComponent : WidgetComponent
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
-  @HostBinding('@triggerShowFloatingWidget') routeanimation : any
+  @HostBinding('@animationFadeInOut') animationFadeInOut : any
 
-  testBool : boolean = false
   /* widget associated with blinking */
   blinkFlag : boolean = false
   successClassState : boolean = false
@@ -510,6 +493,10 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
     ev.stopPropagation()
   }
 
+  get transform(){
+    return `translate(${-1 * this.position[0]}px, ${-1 * this.position[1]}px)`
+  }
+
   close(ev:any){
     this.widgetComponent.shutdown()
     ev.stopPropagation()
@@ -549,6 +536,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   template :
   `
   <div
+    [@animationFadeInOut]
     class = "panel"
     [ngClass] = "{'panel-default':!successClassState, 'panel-success':successClassState}"
     (mousedown) = "stopBlink()" dockedWidgetUnit>
@@ -560,6 +548,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         {{ widgetComponent.labComponent.name.split('.')[widgetComponent.labComponent.name.split('.').length-1] }}
       </span>
       <i 
+        *ngIf = "false"
         (mousedown)="minimise($event)" 
         class = "pull-right close">
 
@@ -579,9 +568,11 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         <i class = "glyphicon glyphicon-remove"></i>
       </i>
     </div>
-    <div [hidden] = "!showBody" class = "panel-body">
-      <ng-template #panelBody>
-      </ng-template>
+    <div style="overflow:hidden">
+      <div [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" class = "panel-body">
+        <ng-template #panelBody>
+        </ng-template>
+      </div>
     </div>
   </div>
   `,
@@ -616,9 +607,11 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
         flex : 0 0 1em;
       }
     `
-  ]
+  ],
+  animations : [ animationFadeInOut,animateCollapseShow ]
 })
 export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
+  @HostBinding('@animationFadeInOut') animationFadeInOut : any
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   widgetComponent : WidgetComponent
 
@@ -630,6 +623,7 @@ export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
   blinkTimer : any
   successClassState : boolean = false
 
+
   constructor(private zone:NgZone){}
 
   ngAfterViewInit(){
@@ -637,6 +631,7 @@ export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
       this.blink(sec)
     }
   }
+  
 
   minimise(ev:any){
     this.widgetComponent.changeState('minimised')
@@ -683,15 +678,17 @@ export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
     (mousedown) = "stopBlink()" 
     (click) = "unminimise()"
     [popover] = "getPopoverTitle()" 
+    container = "body"
+    [containerClass] = "mainController.darktheme ? 'darktheme' : 'lighttheme'"
     placement = "left"
     triggers = "mouseenter:mouseleave"
     [ngClass] = "{'btn-success':successClassState,'btn-default':!successClassState}"
     class = "btn" minimisedWidget>
       {{ getIcon() }}
-    <div class = "hidden">
-      <ng-template #panelBody>
-      </ng-template>
-    </div>
+  </div>
+  <div class = "hidden">
+    <ng-template #panelBody>
+    </ng-template>
   </div>
   `,
   styles :[
@@ -699,9 +696,11 @@ export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
   div[minimisedWidget]
   {
     margin-bottom:0.5em;
+    pointer-events:all;
   }
   `
-  ]
+  ],
+  animations : [ animationFadeInOut ]
 })
 export class MinimisedView implements AfterViewInit,WidgetViewChassis {
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
@@ -710,8 +709,9 @@ export class MinimisedView implements AfterViewInit,WidgetViewChassis {
   blinkFlag : boolean = false
   blinkTimer : any
 
-  constructor(private zone:NgZone){}
+  @HostBinding('@animationFadeInOut') animationFadeInOut : any
 
+  constructor(private zone:NgZone,public mainController:MainController){}
   unminimise(){
     this.widgetComponent.changeState('floating')
   }

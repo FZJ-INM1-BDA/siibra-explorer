@@ -51,7 +51,7 @@ function modifyViewerOptions(options) {
     new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)@angular/,path.join(__dirname,'../src'))
   ]
   
-  let testScss = {
+  let ruleScss = {
     test : /\.scss$/,
     use : extractSass.extract({
       use: [{
@@ -64,7 +64,7 @@ function modifyViewerOptions(options) {
   
   /* TODO: maybe consider using text extract for scss? */
   options.modifyBaseConfig = (baseConfig) => {
-    baseConfig.module.rules.push(testScss)
+    baseConfig.module.rules.push(ruleScss)
   }
   options.frontendPlugins = [extractSass]
   return options;

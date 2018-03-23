@@ -35,6 +35,10 @@ import { DatasetInterface } from 'nehubaUI/nehuba.model';
       width:100%;
       padding:0.2em 1em;
     }
+    a
+    {
+      display:inline-block;
+    }
     `
   ]
 })

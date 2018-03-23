@@ -3,6 +3,7 @@ import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface 
 import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, ModalServices } from 'nehubaUI/nehubaUI.services';
 import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.component';
+import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/nehubaUI.util.animations'
 
 @Component({
   selector : `nehubaui-searchresult-region-list`,
@@ -11,17 +12,22 @@ import { RegionTemplateRefInterface } from 'nehubaUI/nehubaUI.viewerContainer.co
   <ng-template #regionList>
     <ng-content>
     </ng-content>
-    <nehubaui-searchresult-region 
-      (hover)="subHover($event)"
-      (showReceptorData)="showReceptorData(region,$event)"
-      (mouseenter)="mouseEnterRegion.emit(region)" 
-      (mouseleave)="mouseLeaveRegion.emit(region)"
-      [region] = "region" 
-      [idx] = "idx"
-      *ngFor = "let region of regions; let idx = index">
-    </nehubaui-searchresult-region>
+    <div
+      *ngFor = "let region of regions; let idx = index"
+      [@animationFadeInOut]>
+
+      <nehubaui-searchresult-region 
+        (hover)="subHover($event)"
+        (showReceptorData)="showReceptorData(region,$event)"
+        (mouseenter)="mouseEnterRegion.emit(region)" 
+        (mouseleave)="mouseLeaveRegion.emit(region)"
+        [region] = "region" 
+        [idx] = "idx">
+      </nehubaui-searchresult-region>
+    </div>
   </ng-template>
-  `
+  `,
+  animations : [ animationFadeInOut ]
 })
 export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   @Input() regions : RegionDescriptor[] = []
@@ -107,33 +113,32 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
 
       <i 
         class = "close"
+        (click) = "$event.stopPropagation(); close()">
+
+        <i class = "glyphicon glyphicon-remove-sign"></i>
+      </i>
+      <i 
+        class = "close"
         *ngIf = "findMoreInfo('Go To There')"
         (click) = "$event.stopPropagation(); findMoreInfo('Go To There').action()">
 
         <i class = "glyphicon glyphicon-screenshot"></i>
       </i>
     </div>
-    <div *ngIf = "showBody" #receptorPanelBody>
-      <div class = "panel">
-        <div class = "panel-body">
-        
-          <multilevel
-            [muteFilter] = "muteFilter"
-            (doubleClick) = "doubleClick($event)"
-            (singleClick) = "singleClick($event)"
-            [data] = "receptorBrowserMultilevel">
-          </multilevel>
+    <div style="overflow:hidden">
+      <div [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" #receptorPanelBody>
+        <div class = "panel">
+          <div class = "panel-body">
+          
+            <multilevel
+              [muteFilter] = "muteFilter"
+              (doubleClick) = "doubleClick($event)"
+              (singleClick) = "singleClick($event)"
+              [data] = "receptorBrowserMultilevel">
+            </multilevel>
 
-          <receptorDataDriver 
-            *ngIf = "false"
-            [regionName]="region.name" 
-            (neurotransmitterName)="neurotransmitterName($event)" 
-            (modeName) = "modeName($event)"
-            (receptorString)="receptorString($event)"
-            #receptorDataDriver>
-          </receptorDataDriver>
-
-          <div #showImgContainer>
+            <div #showImgContainer>
+            </div>
           </div>
         </div>
       </div>
@@ -192,7 +197,8 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
     }
     `
   ],
-  providers : [ MultilevelProvider ]
+  providers : [ MultilevelProvider ],
+  animations : [ animateCollapseShow ]
 })
 export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   @Input() region : RegionDescriptor
@@ -252,6 +258,15 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   }
   modeName(string:any){
     this.mName = string ? string : null
+  }
+
+  close(){
+    const idx = this.mainController.selectedRegions.findIndex(r=>r.name == this.region.name)
+    if(idx >= 0){
+      this.mainController.selectedRegions.splice(idx,1)
+    }else{
+      console.warn('cannot find the region',this.region, this.mainController.selectedRegions)
+    }
   }
 
   singleClick(m:Multilevel){
@@ -404,17 +419,22 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   <ng-template #regionList>
     <ng-content>
     </ng-content>
-    <nehubaui-searchresult-region-pill
-      [region] = "region"
-      *ngFor = "let region of regions">
-      <a 
-        *ngIf = "additionalContent=='nifti'" 
-        href = "{{region.PMapURL}}">
-        download nifti
-      </a>
-    </nehubaui-searchresult-region-pill>
+    <div
+      *ngFor = "let region of regions"
+      [@animationFadeInOut]>
+
+      <nehubaui-searchresult-region-pill
+        [region] = "region">
+        <a 
+          *ngIf = "additionalContent=='nifti'" 
+          href = "{{region.PMapURL}}">
+          download nifti
+        </a>
+      </nehubaui-searchresult-region-pill>
+    </div>
   </ng-template>
-  `
+  `,
+  animations : [ animationFadeInOut ]
 })
 
 export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{

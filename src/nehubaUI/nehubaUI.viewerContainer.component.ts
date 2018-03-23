@@ -1,5 +1,5 @@
 import { Component,ViewChild,Input,AfterViewInit } from '@angular/core'
-import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, VIEWER_CONTROL, MainController, LandmarkServices } from './nehubaUI.services'
+import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, VIEWER_CONTROL, MainController, LandmarkServices, SpatialSearch } from './nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
@@ -35,7 +35,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         [startingMode] = "'docked'"
         [title] = "'Selected Regions'"
         [regions] = " mainController.selectedRegions "
-        *ngIf = "mainController.viewingMode == 'Select atlas regions' && mainController.selectedRegions.length > 0">
+        *ngIf = "mainController.viewingMode == 'Select atlas regions'">
         
         <readmoreComponent
           *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
@@ -52,7 +52,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         [startingMode] = "'docked'"
         [title] = "'Cytoarchitectonic Probabilistic Map'"
         [regions] = " mainController.selectedRegions "
-        *ngIf = "mainController.viewingMode == 'Cytoarchitectonic Probabilistic Map' && mainController.selectedRegions.length > 0">
+        *ngIf = "mainController.viewingMode == 'Cytoarchitectonic Probabilistic Map'">
         
         
         <readmoreComponent
@@ -64,8 +64,22 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
         </readmoreComponent>
         
       </nehubaui-searchresult-region-pill-list>
+
+      <nehubaui-landmark-list 
+        *ngIf = "mainController.viewingMode == 'iEEG Recordings'">
+
+        <readmoreComponent
+          *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+          [style.background-color]="'rgba(0,0,0,0.2)'">
+          <datasetBlurb
+            [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+          </datasetBlurb>
+        </readmoreComponent>
+      </nehubaui-landmark-list>
+      
     </div>
-  `
+  `,
+  providers : [ SpatialSearch ]
 })
 
 export class NehubaViewerContainer implements AfterViewInit {

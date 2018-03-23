@@ -245,17 +245,6 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
       </nehubaui-overlay>
     </div>
     
-    <nehubaui-landmark-list *ngIf = "mainController.viewingMode == 'iEEG Recordings'">
-      <readmoreComponent
-        *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
-        [style.background-color]="'rgba(0,0,0,0.2)'">
-        <datasetBlurb
-          [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
-        </datasetBlurb>
-      </readmoreComponent>
-    </nehubaui-landmark-list>
-
-    
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
       
@@ -311,24 +300,6 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
           spellcheck = "false"
           #navigateInput
           navigateInput/>
-      
-      <small *ngIf="false">(
-        {{
-          statusPanelRealSpace ? 
-            (viewerPosReal[0] | nmToMm | number) + 'mm': 
-            viewerPosVoxel[0]
-        }},
-        {{
-          statusPanelRealSpace ? 
-            (viewerPosReal[1] | nmToMm | number) + 'mm' : 
-            viewerPosVoxel[1]
-        }},
-        {{
-          statusPanelRealSpace ? 
-            (viewerPosReal[2] | nmToMm | number) + 'mm' : 
-            viewerPosVoxel[2]
-        }}
-      )</small> 
 
       <br />
       Mouse: <small>(
@@ -459,10 +430,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     [floatingPopoverContent]
     {
       padding: 0.5em 1em;
+      white-space:nowrap;
     }
     `
-  ],
-  providers : [ SpatialSearch ]
+  ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
@@ -949,7 +920,15 @@ export class NehubaViewerUnit{
   <div [ngStyle] = "{'transform':'rotate3D(' + rotate3D.join(',') + 'rad)' }" *ngIf="rotate3D" perspectiveAd>
     Perspective Overlay
   </div>
-  `
+  `,
+  styles :[
+    `
+    nehuba-viewer-2d-landmark-unit
+    {
+      position : absolute;
+    }
+    `
+  ]
 })
 
 export class NehubaViewerOverlayUnit {
@@ -970,8 +949,7 @@ export class NehubaViewerOverlayUnit {
       return vec[2] >= 0 ? 
       ({
         'z-index':`${Math.round(vec[1]*10)}`,
-        'top' : `${vec[1]-vec[2]}px`,
-        'left' : `${vec[0]}px`,
+        'transform':`translate(${vec[0]}px, ${vec[1]-vec[2]}px)`,
         'height': `${vec[2]}px`,
         'text-shadow' : `
           -1px 0 rgba(0,0,0,1.0),
@@ -980,8 +958,7 @@ export class NehubaViewerOverlayUnit {
           0 -1px rgba(0,0,0,1.0)`
       }) : ({
         'z-index':`${Math.round(vec[2])}`,
-        'top' : `${vec[1]}px`,
-        'left' : `${vec[0]}px`,
+        'transform' : `translate(${vec[0]}px, ${vec[1]}px)`,
         'height': `${-1*vec[2]}px`,
         'opacity' : '0.5',
         'text-shadow' : `
