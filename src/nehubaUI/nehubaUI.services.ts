@@ -3,16 +3,16 @@ import { Subject,BehaviorSubject } from 'rxjs/Rx'
 import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
-import { NehubaModalService, ModalHandler } from './nehubaUI.modal.component'
+import { NehubaModalService, ModalHandler } from 'nehubaUI/components/modal/nehubaUI.modal.component'
 import { NehubaViewer } from 'nehuba/NehubaViewer';
-import { SelectTreePipe } from 'nehubaUI/nehubaUI.util.pipes';
+import { SelectTreePipe } from 'nehubaUI/util/nehubaUI.util.pipes';
 import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
 import { LayerManager } from 'neuroglancer/layer'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
-import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
+import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
 import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification';
 import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer';
-import { MultilevelSelector } from 'nehubaUI/nehubaUI.multilevel.component';
+import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component';
 import { ImageUserLayer } from 'neuroglancer/image_user_layer';
 
 declare var window:{
@@ -288,10 +288,10 @@ export class MainController{
     
     
     /* dev option, use a special endpoint to fetch all plugins */
-    fetch('http://localhost:5080/collectPlugins')
-      .then(res=>res.json())
-      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-      .catch(console.warn)
+    // fetch('http://localhost:5080/collectPlugins')
+    //   .then(res=>res.json())
+    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+    //   .catch(console.warn)
   }
 
   patchNG(){

@@ -1,0 +1,14 @@
+
+<div container>
+  <div 
+    [@showReadmore]="{value:showAllState,params:{readMoreMaxheight:readMoreMaxHeight,containerHeight:containerHeight}}" content>
+    <div #ngContentWrapper>
+      <ng-content>
+      </ng-content>
+    </div>
+  </div>
+  <div (click) = "showAll = !showAll" readmoreSliver>
+    <i *ngIf = "!showAll" class = "glyphicon glyphicon-chevron-down"></i>
+    <i *ngIf = "showAll" class = "glyphicon glyphicon-chevron-up"></i>
+  </div>
+</div>

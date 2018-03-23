@@ -395,3 +395,8 @@ export interface Publication{
   doi : string
   citation : string
 }
+
+/* interface required for region template refs to display */
+export interface RegionTemplateRefInterface{
+  region : RegionDescriptor
+}

@@ -1,28 +1,19 @@
-import { Input,AfterViewInit,OnDestroy,ComponentRef,Directive,Type,OnInit,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
+import { Input,AfterViewInit,OnDestroy,ComponentRef,Type,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef, ElementRef,TemplateRef }from '@angular/core'
 import { Observable, Subject } from 'rxjs/Rx'
 
 import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, sliceRenderEventType, SliceRenderEventDetail, perspectiveRenderEventType } from 'nehuba/exports'
 
-import { Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch, LandmarkServices, WidgitServices } from './nehubaUI.services'
-import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from './nehuba.model'
-import { FloatingPopOver } from 'nehubaUI/nehubaUI.floatingPopover.component';
-import { UI_CONTROL,VIEWER_CONTROL } from './nehubaUI.services'
+import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from 'nehubaUI/nehuba.model'
+import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
+import { UI_CONTROL,VIEWER_CONTROL,Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch, LandmarkServices, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
-import { WidgetComponent } from 'nehubaUI/nehubaUI.widgets.component';
+
 import { ManagedUserLayer } from 'neuroglancer/layer';
 
 declare var window:{
   [key:string] : any
   prototype : Window;
   new() : Window;
-}
-
-@Directive({
-  selector : '[nehuba-viewer-host]'
-})
-
-export class NehubaViewerDirective{
-  constructor(public viewContainerRef:ViewContainerRef){}
 }
 
 @Component({
@@ -37,12 +28,11 @@ export class NehubaViewerDirective{
   ]
 })
 
-export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
+export class NehubaViewerInnerContainer implements AfterViewInit{
 
-  @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
+  // @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
   nehubaViewerComponent : NehubaViewerComponent
   componentRef : ComponentRef<any>
-  viewContainerRef : ViewContainerRef
   private templateLoaded : boolean = false
   darktheme : boolean = false
 
@@ -54,7 +44,10 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
   private onParcellationSelectionHook : (()=>void)[] = []
   private afterParcellationSelectionHook : (()=>void)[] = []
 
-  constructor(public mainController:MainController, private componentFactoryResolver: ComponentFactoryResolver ){
+  constructor(
+    public viewContainerRef:ViewContainerRef,
+    public mainController:MainController, 
+    private componentFactoryResolver: ComponentFactoryResolver ){
     
     /* TODO reduce complexity, as to not having multiple VIEW_CONTROL objects floating around */
     // this.mainController.selectTemplateBSubject.subscribe((template:TemplateDescriptor|null)=>{
@@ -155,10 +148,6 @@ export class NehubaViewerInnerContainer implements OnInit,AfterViewInit{
     if(this.templateLoaded){
       this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
     }
-  }
-
-  ngOnInit(){
-    this.viewContainerRef = this.host.viewContainerRef
   }
 
   ngAfterViewInit(){
@@ -479,7 +468,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   nanometersToOffsetPixelsFn : Function[] | null[] = [null,null,null]
   rotate3D : number[] | null = null
 
-  @ViewChild(FloatingPopOver) floatingPopover : FloatingPopOver
+  @ViewChild(FloatingTooltip) floatingPopover : FloatingTooltip
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
   @ViewChild('floatingPopoverBody',{read:TemplateRef}) floatingPopoverBody : TemplateRef<any>
   
@@ -1302,7 +1291,7 @@ export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
     return (Math.abs(idx-correctedPagination) < 3)
   }
 
-  widgetComponent : WidgetComponent
+  widgetComponent : any
 
   ngAfterViewInit(){
     this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'iEEG Recordings'})

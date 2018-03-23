@@ -1,12 +1,13 @@
 
 import { Component,ChangeDetectorRef, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-import { UI_CONTROL, ModalServices } from './nehubaUI.services'
+import { UI_CONTROL, ModalServices } from 'nehubaUI/nehubaUI.services'
 
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
 import 'rxjs/operator/map'
 
+/* TODO clean up modal */
 @Component({
   selector: 'nehubaModal',
   template : ``
