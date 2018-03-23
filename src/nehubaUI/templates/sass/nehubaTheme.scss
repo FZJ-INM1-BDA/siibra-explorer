@@ -362,15 +362,26 @@ div#ATLASContainer
     }
   }
 
-  div#dockResizeSliver,
-  div#atlasResizeSliver
-  {
-    background-color:tgrey(0,0);
-  }
+  // div#dockResizeSliver,
+  // div#atlasResizeSliver
+  // {
+  //   background-color:tgrey(0,0);
+  // }
 }
 
 div#ATLASContainer.darktheme
 {
+  .glyphicon.helpbtn
+  {
+    color:gray(0.0);
+    text-shadow:0 0 0.5em rgb(128,128,128);
+
+    &:hover
+    {
+      color:gray(1);
+    }
+  }
+  
   .close
   {
     color:gray(1);
@@ -452,17 +463,6 @@ div#ATLASContainer.darktheme
   atlasbanner
   {
     @extend %darktheme;
-
-    .glyphicon.helpbtn
-    {
-      color:gray(0.0);
-      text-shadow:0 0 0.5em rgb(128,128,128);
-
-      &:hover
-      {
-        color:gray(1);
-      }
-    }
 
     .tooltip.popover.bottom
     {
@@ -577,7 +577,7 @@ div#ATLASContainer.darktheme
 
   atlascontrol
   {
-    background-color : gray(0.2);
+    // background-color : gray(0.2);
 
     .glyphicon-overlay
     {
@@ -779,7 +779,7 @@ div#ATLASContainer.darktheme
         @extend %widgetDarkTheme;
         &.btn-default
         {
-          background-color:tgray(0,0.6);
+          background-color:tgray(0.5,0.2);
           color:gray(0.8);
         }
         &.btn-success
@@ -804,21 +804,27 @@ div#ATLASContainer.darktheme
     }
   }
 
-  div#dockResizeSliver,
-  div#atlasResizeSliver
-  {
-    background-color:tgrey(0,0);
-  }
+  // div#dockResizeSliver,
+  // div#atlasResizeSliver
+  // {
+  //   background-color:tgray(0,0);
+  // }
 }
 
 .darktheme
 {
+  &.popover.popover-left
+  {
+    .popover-arrow
+    {
+      &:after
+      {
+        border-left-color:tgray(0.12,0.8);
+      }
+    }
+  }
   &.popover.popover-bottom
   {
-    border-color:tgray(0.35,0.5);
-    color:gray(0.95);
-    background-color:tgray(0.12,0.8);
-
     .popover-arrow
     {
       &:after
@@ -826,6 +832,13 @@ div#ATLASContainer.darktheme
         border-bottom-color: tgray(0.12,0.8);
       }
     }
+  }
+  &.popover
+  {
+    // border-color:tgray(0.35,0.5);
+    border:none;
+    color:gray(0.95);
+    background-color:tgray(0.12,0.8);
 
     .popover-title
     {

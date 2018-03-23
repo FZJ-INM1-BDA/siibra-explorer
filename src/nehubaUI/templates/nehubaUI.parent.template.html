@@ -1,27 +1,34 @@
 <nehubaModal></nehubaModal>
 
-<atlascontrol *ngIf="showRegion">
-</atlascontrol>
-
-<div [ngClass]="{'darktheme':mainController.darktheme}" [style.grid-template-columns]="calcGridTemplateColumn()" containerDiv>
+<div atlasBannerContainer>
 
   <atlasbanner (showRegionDialog)="showRegionDialog()" overlayBanner>
   </atlasbanner>
+
+  <div [@showSideBar] = "showMenu" atlasBannerPadder>
+  </div>
+</div>
+
+<div 
+  [ngClass]="{'darktheme':mainController.darktheme}" 
+  containerDiv>
 
   <ATLASViewer 
     id = "ATLASViewer" >
   </ATLASViewer>
   <div 
     id = "dockResizeSliver" 
-    [hidden]="!hasDockedComponents()" 
-    (mousedown)="resizeDockedWidgetPanel=true;enableUIInteraction(false)" 
-    (mousemove)="mousemove($event)" 
-    (mouseup)="mouseup($event)">
+    (click)="showMenu = !showMenu">
+    <i
+      [ngClass] = "showMenu ? 'glyphicon-chevron-right' : 'glyphicon-chevron-left'" 
+      class = "glyphicon">
+    </i>
   </div>
   <WidgetsContainer 
+    [@showSideBar] = "showMenu"
+    (@showSideBar.done) = "showMenuDone()"
+    (@showSideBar.start) = "startShowMenu()"
     (contextmenu)="$event.stopPropagation()"
-    [ngClass]="{'darktheme':mainController.darktheme}"
-    [hasDockedComponents]="hasDockedComponents()" 
-    [dockedWidgetPanelWidth] = "dockedWidgetPanelWidth">
+    [ngClass]="{'darktheme':mainController.darktheme}">
   </WidgetsContainer>
 </div>

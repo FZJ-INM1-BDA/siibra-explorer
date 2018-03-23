@@ -34,7 +34,15 @@ export class MainController{
 
   selectedTemplate : TemplateDescriptor | undefined
   selectedParcellation : ParcellationDescriptor | undefined
-  selectedRegions : RegionDescriptor[] = []
+  _selectedRegions : RegionDescriptor[] = []
+
+  get selectedRegions(){
+    return this._selectedRegions
+  }
+
+  set selectedRegions(regions:RegionDescriptor[]){
+    this._selectedRegions = regions
+  }
 
   regionsLabelIndexMap: Map<Number,RegionDescriptor> = new Map() // map NG segID to region descriptor
 
@@ -123,6 +131,13 @@ export class MainController{
             .map(idx=>Number(idx))
             .filter(idx=>this.regionsLabelIndexMap.get(idx))
             .map(idx=>this.regionsLabelIndexMap.get(idx)!)
+
+          /* this is needed for now as fresh start seem to wipe selected regions */
+          /* TODO properly do parse query string so this workaround is not needed */
+          /* TODO get rid of the settimeout */
+          setTimeout(()=>{
+            this.regionSelectionChanged()
+          })
         }break;
       }
     })
@@ -907,8 +922,6 @@ export class SpatialSearch{
   templateSpace : string
   spatialSearchResultSubject : Subject<any> = new Subject()
 
-  
-
   constructor(private mainController:MainController,private landmarkServices:LandmarkServices){
     this.spatialSearchResultSubject
       .throttleTime(300)
@@ -1020,25 +1033,25 @@ class DataService {
   /* nb: return header must container CORS header */
 
   /* TODO temporary solution fetch available template space from KG  */
-  datasetArray = [
-    '/res/json/bigbrain.json',
-    '/res/json/colin_.json',
-    '/res/json/waxholmRatV2_0.json',
-    '/res/json/allenMouse.json'
-  ]
-  COLIN_JUBRAIN_PMAP_INFO = `/res/json/colinJubrainPMap.json`
-  COLIN_IEEG_INFO = `/res/json/colinIEEG.json`
-  COLIN_JUBRAIN_RECEPTOR_INFO = `/res/json/colinJubrainReceptor.json`
-
-
-  // letdatasetArray = [
-  //   'http://localhost:5080/res/json/bigbrain.json',
-  //   'http://localhost:5080/res/json/colin.json'
+  // datasetArray = [
+  //   '/res/json/bigbrain.json',
+  //   '/res/json/colin_.json',
+  //   '/res/json/waxholmRatV2_0.json',
+  //   '/res/json/allenMouse.json'
   // ]
+  // COLIN_JUBRAIN_PMAP_INFO = `/res/json/colinJubrainPMap.json`
+  // COLIN_IEEG_INFO = `/res/json/colinIEEG.json`
+  // COLIN_JUBRAIN_RECEPTOR_INFO = `/res/json/colinJubrainReceptor.json`
 
-  // COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
-  // COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
-  // COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
+
+  datasetArray = [
+    'http://localhost:5080/res/json/bigbrain.json',
+    'http://localhost:5080/res/json/colin.json'
+  ]
+
+  COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
+  COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
+  COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
   
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
     Promise.all(this.datasetArray.map(dataset=>

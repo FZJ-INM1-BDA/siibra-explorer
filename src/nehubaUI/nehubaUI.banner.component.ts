@@ -3,6 +3,7 @@ import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_M
 import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from './nehuba.model'
 import { ModalHandler } from './nehubaUI.modal.component'
 import { DatasetBlurb } from 'nehubaUI/nehubaUI.datasetBlurb.component';
+import { animationFadeInOut } from 'nehubaUI/nehubaUI.util.animations'
 
 @Component({
   selector : 'atlasbanner',
@@ -124,7 +125,8 @@ import { DatasetBlurb } from 'nehubaUI/nehubaUI.datasetBlurb.component';
       height:1.43em;
     }
     `
-  ]
+  ],
+  animations : [ animationFadeInOut ]
 })
 
 export class NehubaBanner implements AfterViewInit {

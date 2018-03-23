@@ -22,6 +22,7 @@
 
       <ul 
         [ngClass]="{'darktheme':mainController.darktheme}"
+        [@animationFadeInOut]
         class="dropdown-menu"
         role="menu"
         *dropdownMenu>
@@ -60,6 +61,7 @@
 
       <ul 
         [ngClass]="{'darktheme':mainController.darktheme}"
+        [@animationFadeInOut]
         class="dropdown-menu"
         role="menu"
         *dropdownMenu>
@@ -154,13 +156,19 @@
 </div>
 
 <ng-template #searchRegion>
-  <atlascontrol [searchTerm]="searchTerm" #atlascontrol>
-
-  </atlascontrol>
+    <div [@animationFadeInOut]>
+      <atlascontrol 
+        
+        [searchTerm]="searchTerm" 
+        #atlascontrol>
+  
+      </atlascontrol>
+    </div>
 </ng-template>
 
 <ng-template #searchMode>
   <ul
+    [@animationFadeInOut]
     id = "modeSelector"
     [ngClass] = "{'darktheme':mainController.darktheme}"
     listOfActivities>
