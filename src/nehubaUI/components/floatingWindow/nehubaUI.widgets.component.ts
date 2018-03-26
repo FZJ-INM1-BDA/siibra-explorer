@@ -1,5 +1,5 @@
-import { TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
-import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
+import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
+import { animationFadeInOut,animateCollapseShow, showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
 import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
@@ -127,11 +127,14 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   selector : `WidgetsContainer`,
   template : 
   `
-  <DockedWidgetContainer>
+  <DockedWidgetContainer
+    (@showSideBar.done) = "showMenuDone()"
+    (@showSideBar.start) = "startShowMenu()"
+    [@showSideBar] = "showMenu">
   </DockedWidgetContainer>
   <FloatingWidgetContainer>
   </FloatingWidgetContainer>
-  <MinimisedContainer>
+  <MinimisedContainer *ngIf = "false">
   </MinimisedContainer>
   <ng-template #widgetContentFactory>
   </ng-template>
@@ -173,13 +176,41 @@ export class MinimisedWidgetContainer implements AfterViewInit{
     overflow-x:hidden;
   }
   `
-  ]
+  ],
+  
+  animations : [ showSideBar ]
 })
 export class WidgetsContainer{
 
+  @Input() showMenu : boolean
+  
+  animationDone : boolean = true
+
+  redrawViewer = () => {
+    if(this.mainController.nehubaViewer){
+      this.mainController.nehubaViewer.redraw()
+    }
+  }
+
+  onAnimationFrameCallback = ()=>{
+    this.redrawViewer()
+    if(!this.animationDone){
+      requestAnimationFrame(this.onAnimationFrameCallback)
+    }
+  }
+  
+  showMenuDone(){
+    this.animationDone = true
+  }
+
+  startShowMenu(){
+    this.animationDone = false
+    this.onAnimationFrameCallback()
+  }
+
   @ViewChild(FloatingWidgetContainer) floatingWidgetContainer : FloatingWidgetContainer
   @ViewChild(DockedWidgetContainer) dockedWidgetContainer : DockedWidgetContainer
-  @ViewChild(MinimisedWidgetContainer) minimisedWidgetContainer : MinimisedWidgetContainer
+  // @ViewChild(MinimisedWidgetContainer) minimisedWidgetContainer : MinimisedWidgetContainer
   @ViewChild('widgetContentFactory',{read:ViewContainerRef}) widgetContentViewRef : ViewContainerRef
 
   loadedWidget : WidgetComponent[] = []
@@ -241,16 +272,16 @@ export class WidgetsContainer{
     this.widgitServices._unloadAll = ()=>{
       this.floatingWidgetContainer.viewContainerRef.clear()
       this.dockedWidgetContainer.viewContainerRef.clear()
-      this.minimisedWidgetContainer.viewContainerRef.clear()
+      // this.minimisedWidgetContainer.viewContainerRef.clear()
     }
   }
 
   private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
     const parentViewRef = state == 'floating' ? 
       this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory ) :
-        state == 'docked' ?
-          this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) :
-          this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
+        // state == 'docked' ?
+          this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) 
+          //: this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
 
     const embedView = parentViewRef.instance.panelBody.createEmbeddedView( templateRef )
     
@@ -289,8 +320,8 @@ export class WidgetsContainer{
 
       const newParentViewRef = state == 'docked' ?
         this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) : 
-        state == 'minimised' ?
-          this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory ) :
+        // state == 'minimised' ?
+          // this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory ) :
           this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
 
       newParentViewRef.instance.panelBody.insert( widgetViewRef.hostView )

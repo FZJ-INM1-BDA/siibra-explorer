@@ -53,4 +53,9 @@ export class ReadMoreComponent{
   get showAllState(){
     return this.showAll ? 'show' : 'collapse'
   }
+
+  toggleShow(ev:Event){
+    this.showAll = !this.showAll
+    ev.stopPropagation()
+  }
 }

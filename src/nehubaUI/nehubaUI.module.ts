@@ -17,6 +17,7 @@ import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,Con
 import { NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,NehubaLandmarkList,NehubaViewer2DLandmarkUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component';
 import { NehubaViewerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerContainer.component';
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
+import { SplashScreen } from 'nehubaUI/mainUI/splashScreen/splashScreen.component'
 
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -30,14 +31,10 @@ import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetC
 /* util */
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
-
-
-
-
-
-
-
+/* service */
 import { MainController,ModalServices, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
+
+
 
 import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
@@ -57,6 +54,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardP
     ],
     declarations : 
         [ 
+        SplashScreen,
         DatasetBlurb, ReadMoreComponent, 
         ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
         MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,

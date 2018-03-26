@@ -16,6 +16,7 @@
   <ATLASViewer 
     id = "ATLASViewer" >
   </ATLASViewer>
+
   <div 
     id = "dockResizeSliver" 
     (click)="showMenu = !showMenu">
@@ -24,10 +25,9 @@
       class = "glyphicon">
     </i>
   </div>
+
   <WidgetsContainer 
-    [@showSideBar] = "showMenu"
-    (@showSideBar.done) = "showMenuDone()"
-    (@showSideBar.start) = "startShowMenu()"
+    [showMenu] = "showMenu"
     (contextmenu)="$event.stopPropagation()"
     [ngClass]="{'darktheme':mainController.darktheme}">
   </WidgetsContainer>

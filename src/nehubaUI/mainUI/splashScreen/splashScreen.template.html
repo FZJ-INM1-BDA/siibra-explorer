@@ -1,0 +1,9 @@
+<div
+  *ngFor = "let template of mainController.loadedTemplates"
+  (click)="mainController.loadTemplate( template )">
+
+  <h2>{{ template.properties.name }}</h2>
+  <readmoreComponent>
+    <small>{{ template.properties.description }}</small>
+  </readmoreComponent>
+</div>

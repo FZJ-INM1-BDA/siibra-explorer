@@ -5,7 +5,7 @@ import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, slic
 
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from 'nehubaUI/nehuba.model'
 import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
-import { UI_CONTROL,VIEWER_CONTROL,Animation,EXTERNAL_CONTROL as gExternalControl, MainController, TEMP_RECEPTORDATA_BASE_URL, SpatialSearch, LandmarkServices, WidgitServices } from 'nehubaUI/nehubaUI.services'
+import { UI_CONTROL,VIEWER_CONTROL,Animation,EXTERNAL_CONTROL as gExternalControl, MainController, SpatialSearch, LandmarkServices, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 
 import { ManagedUserLayer } from 'neuroglancer/layer';
@@ -19,13 +19,10 @@ declare var window:{
 @Component({
   selector : 'NehubaViewer',
   template:`
-    <ng-template nehuba-viewer-host>
+    <ng-template>
     </ng-template>
   `,
-  styles : [
-    `
-    `
-  ]
+  styles : [  ]
 })
 
 export class NehubaViewerInnerContainer implements AfterViewInit{
@@ -237,42 +234,6 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
       
-      <div *ngIf="false">
-        <span nametagSelectedRegions>
-          Selected Regions : 
-        </span>
-        <div class = "row" *ngIf="mainController.selectedRegions.length == 0">
-          <i class = "col-sm-12 col-md-12 col-lg-12 text-muted" >No Region Selected </i>
-        </div>
-        <div
-          class = "row"
-          *ngFor = "let selectedRegion of mainController.selectedRegions">
-          
-          <div class = "col-sm-12 col-md-12 col-lg-12">
-            {{selectedRegion.name}} 
-          </div>
-          <div class = "col-md-12 col-sm-12 col-lg-12" [innerHTML]="dynamicData(selectedRegion)">
-            dynamic content here
-          </div>
-        </div>
-
-        <br *ngIf="mainController.viewingMode == 'Receptor Data'" />
-        <div class = "row" *ngIf="mainController.viewingMode == 'Receptor Data'" >
-          <receptorDataDriver (receptorString)="setReceptorString($event)">
-          </receptorDataDriver>
-        </div>
-
-        <br />
-        <span>
-          Hovering : {{!viewerSegment ? '' : viewerSegment.constructor.name == 'Number' ? '' : viewerSegment.name   }}
-        </span>
-        <br /><br />
-        <span *ngIf="false">
-          Mode : {{ mainController.viewingMode }}
-        </span>
-        <br />
-
-      </div>
 
       <span 
         class = "btn btn-link"
@@ -589,10 +550,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public ngAfterViewInit(){
   }
 
-  public setReceptorString(ev:string|null){
-    this.mainController.receptorString = ev
-  }
-
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
     this.viewerConfig = config
 
@@ -624,9 +581,11 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         */
         (<HTMLElement>this.viewerContainer.nativeElement).querySelectorAll('.neuroglancer-panel').forEach(panel=>{
           
-          Observable.fromEvent(panel,sliceRenderEventType).map(it=>it as CustomEvent)
+          Observable
+            .fromEvent(panel,sliceRenderEventType)
+            .map(it=>it as CustomEvent)
+            .throttleTime(1500) /* is this even necessary (?) */
             .subscribe(ev=>{
-
               const el = ev.target as HTMLElement
               const detail = ev.detail as SliceRenderEventDetail
               /* TODO this is a terrible way of identifying panels */
@@ -720,35 +679,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
           //console.log('debug heartbeat',ev)
         })
     this.onDestroyUnsubscribe.push(this.heartbeatObserver)
-  }
-
-  /* hibernating function TODO cull */
-  public dynamicData(selectedData:RegionDescriptor):string{
-    switch(this.mainController.viewingMode){
-      case 'Select atlas regions':
-        return ``
-      case 'Cytoarchitectonic Probabilistic Map':{
-        const value = this.segmentListener[this.mainController.selectedParcellation!.ngId + selectedData.name]
-        return `&nbsp;&nbsp;Encoded value: ${ value ? Math.round(value * 1000)/1000 : ''}`
-      }
-      case 'Receptor Data' : 
-        return this.mainController.nehubaViewer.getShownSegmentsNow().length == 0 ? `` : this.checkIdxForReceptorData(selectedData)
-      default :
-        return ``
-    }
-  }
-
-  private checkIdxForReceptorData(m:RegionDescriptor):string{
-    if(m.moreInfo.findIndex(info=>info.name=='Receptor Data')>= 0){
-      if(this.mainController.receptorString){
-        const imgSrc = TEMP_RECEPTORDATA_BASE_URL + m.moreInfo.find(i=>i.name=='Receptor Data')!.source + this.mainController.receptorString
-        return `<img src = "${imgSrc}" style = "width:100%" />`
-      }else{
-        return `&nbsp;&nbsp;receptor data found ...`
-      }
-    }else{
-      return `&nbsp;&nbsp;<i class = "text-muted">receptor data found</i>`
-    }
   }
 
   public loadParcellation(_parcellation:ParcellationDescriptor){
@@ -924,10 +854,18 @@ export class NehubaViewerOverlayUnit {
   @Input() nanometersToOffsetPixelsFn : Function 
   @Input() rotate3D : number[] | undefined
 
-  zOffset : number
-
   constructor(public mainController:MainController,public spatialSearch:SpatialSearch,public landmarkServices:LandmarkServices){
 
+  }
+
+  private _zOffset : number = 0
+
+  set zOffset(n:number){
+    this._zOffset = n
+  }
+
+  get zOffset(){
+    return this._zOffset
   }
 
   pos(landmark:Landmark){
@@ -938,8 +876,8 @@ export class NehubaViewerOverlayUnit {
       return vec[2] >= 0 ? 
       ({
         'z-index':`${Math.round(vec[1]*10)}`,
-        'transform':`translate(${vec[0]}px, ${vec[1]-vec[2]}px)`,
-        'height': `${vec[2]}px`,
+        'transform':`translate(${vec[0]}px, ${vec[1]}px)`,
+        // 'height': `${vec[2]}px`,
         'text-shadow' : `
           -1px 0 rgba(0,0,0,1.0),
           0 1px rgba(0,0,0,1.0),
@@ -948,7 +886,7 @@ export class NehubaViewerOverlayUnit {
       }) : ({
         'z-index':`${Math.round(vec[2])}`,
         'transform' : `translate(${vec[0]}px, ${vec[1]}px)`,
-        'height': `${-1*vec[2]}px`,
+        // 'height': `${-1*vec[2]}px`,
         'opacity' : '0.5',
         'text-shadow' : `
           -1px 0 rgba(0,0,0,1.0),
@@ -968,8 +906,6 @@ export class NehubaViewerOverlayUnit {
       'transform':`rotate3d(${this.rotate3D![1]},${this.rotate3D![2]},${this.rotate3D![3]},${this.rotate3D![0]}rad)`
     })
   }
-
-
 }
 
 
@@ -1010,7 +946,7 @@ export class NehubaViewerOverlayUnit {
     div[landmarkContainer]
     {
       height:100%;
-      width: 0px;
+      width: 2px;
       display:flex;
       pointer-events:auto;
       flex-wrap:nowrap;
@@ -1018,6 +954,7 @@ export class NehubaViewerOverlayUnit {
     .pos-shadow
     {
       flex: 0 0 0px;
+      order : 2;
     }
     .pos-beam
     {
@@ -1025,6 +962,7 @@ export class NehubaViewerOverlayUnit {
       background-color:black;
       flex: 1 1 0px;
       position:relative;
+      order : 1;
     }
     .pos-beam > .pos-beam-outer
     {
@@ -1045,6 +983,7 @@ export class NehubaViewerOverlayUnit {
       height:0px;
       margin-left:-0.02px;
       flex: 0 0 0px;
+      order : 0;
     }
 
     [nodeView] > *
@@ -1053,6 +992,7 @@ export class NehubaViewerOverlayUnit {
 
     [nodeView] > .glyphicon
     {
+      position:absolute;
       margin-top:-1em;
       margin-bottom:1em;
       margin-left:-0.55em;
@@ -1062,6 +1002,7 @@ export class NehubaViewerOverlayUnit {
 })
 
 export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
+
   @Input() height : number
   @Input() scale : number = 50
   @Input() landmark:Landmark
@@ -1079,97 +1020,111 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
     })
   }
 
+  calculateZ(){
+
+  }
+
   styleLandmark(){
-    if(this.height){
+    return this.height >= 0 ? 
+      {
+        
+      } : 
+      {
+
+      }
+    // if(this.height){
       
-      return this.height >= 0 ? 
-        ({
-          'flex-direction':`column`,
-          'font-size':`${this.scale * 3.0}%`,
-          'color' : `rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},${this.scale/100+0.25})`,
-          'background-color' : `rgba(${this.landmark.hover ?  HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
+    //   return this.height >= 0 ? 
+    //     ({
+    //       'flex-direction':`column`,
+    //       'font-size':`${this.scale * 3.0}%`,
+    //       'color' : `rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},${this.scale/100+0.25})`,
+    //       'background-color' : `rgba(${this.landmark.hover ?  HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
 
-        }) : ({
-          'flex-direction':`column-reverse`,
-          'font-size':`${this.scale * 3.0}%`,
-          'color' : `rgba(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
-          'background-color' : `rgba(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
-        })
+    //     }) : ({
+    //       'flex-direction':`column-reverse`,
+    //       'font-size':`${this.scale * 3.0}%`,
+    //       'color' : `rgba(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
+    //       'background-color' : `rgba(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR},${this.scale/100+0.25})`,
+    //     })
 
-    } else {
-      return({
-        display:'none'
-      })
-    }
+    // } else {
+    //   return({
+    //     display:'none'
+    //   })
+    // }
   }
 
   styleShadow(){
-    if(this.height){
+    return({})
+    // if(this.height){
       
-      const size = 0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1
-      const returnStyle = {
-        display : 'block',
-        background:'radial-gradient(rgba(120,60,30,0.8), rgba(120,60,30,0.3))',
-      }
-      return this.height >= 0 ?
-        Object.assign({},returnStyle,{
-          'width' : `${size}em`,
-          'height' : `${size}em`,
-          'border-radius' : `${size/2}em`,
-          'margin-top' : `${-1*size/2}em`,
-          'margin-left' : `${-1*size/2}em`,
-          'border': `1px solid rgba(0,0,0,1.0)`,
-          'background':`radial-gradient(rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'}), rgba(${this.landmark.hover ? HOVER_COLOR + ',0.3' : NORMAL_COLOR + ',0.3'}))`,
-        }) : 
-        Object.assign({},returnStyle,{
-          'width' : `${size}em`,
-          'height' : `${size}em`,
-          'border-radius' : `${size/2}em`,
-          'margin-top' : `${-1*size/2}em`,
-          'margin-left' : `${-1*size/2}em`,
-          'border': `1px solid rgba(0,0,0,1.0)`,
-          'background':`radial-gradient(rgba(${this.landmark.hover ? HOVER_COLOR + ',0.4' : NORMAL_COLOR + ',0.4'}), rgba(${this.landmark.hover ? HOVER_COLOR + ',0.15' : NORMAL_COLOR + ',0.15'}))`,
-        })
-    }else{
-      return({
-        display:'none'
-      })
-    }
+    //   const size = 0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1
+    //   const returnStyle = {
+    //     display : 'block',
+    //     background:'radial-gradient(rgba(120,60,30,0.8), rgba(120,60,30,0.3))',
+    //   }
+    //   return this.height >= 0 ?
+    //     Object.assign({},returnStyle,{
+    //       'width' : `${size}em`,
+    //       'height' : `${size}em`,
+    //       'border-radius' : `${size/2}em`,
+    //       'margin-top' : `${-1*size/2}em`,
+    //       'margin-left' : `${-1*size/2}em`,
+    //       'border': `1px solid rgba(0,0,0,1.0)`,
+    //       'background':`radial-gradient(rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'}), rgba(${this.landmark.hover ? HOVER_COLOR + ',0.3' : NORMAL_COLOR + ',0.3'}))`,
+    //     }) : 
+    //     Object.assign({},returnStyle,{
+    //       'width' : `${size}em`,
+    //       'height' : `${size}em`,
+    //       'border-radius' : `${size/2}em`,
+    //       'margin-top' : `${-1*size/2}em`,
+    //       'margin-left' : `${-1*size/2}em`,
+    //       'border': `1px solid rgba(0,0,0,1.0)`,
+    //       'background':`radial-gradient(rgba(${this.landmark.hover ? HOVER_COLOR + ',0.4' : NORMAL_COLOR + ',0.4'}), rgba(${this.landmark.hover ? HOVER_COLOR + ',0.15' : NORMAL_COLOR + ',0.15'}))`,
+    //     })
+    // }else{
+    //   return({
+    //     display:'none'
+    //   })
+    // }
   }
 
   styleBeam(inner:boolean){
+    inner
+    return({})
     
-    if(this.height){
+    // if(this.height){
       
-      const borderWidth = 1
-      return this.height >= 0 ? 
-        ({
-          'border-top' : `${this.height+(inner?0:2)}px solid rgba(${inner ? this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR : '0,0,0'},0.75)`,
-          'border-left' : `${borderWidth+(inner?0:1)}px solid transparent`,
-          'border-right' : `${borderWidth+(inner?0:1)}px solid transparent`,
-          'width' : `0px`,
-          'left':`${-1*(borderWidth+(inner?0:1))}px`
-        }) : 
-        inner ? 
-          ({
-            'height':`${-1*this.height}px`,
-            'border-left' : `1px dashed rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},1.0)`,
-            'border-right' : `1px solid transparent`,
-            'width' : `0px`,
-          }) : 
-          ({
+    //   const borderWidth = 1
+    //   return this.height >= 0 ? 
+    //     ({
+    //       'border-top' : `${this.height+(inner?0:2)}px solid rgba(${inner ? this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR : '0,0,0'},0.75)`,
+    //       'border-left' : `${borderWidth+(inner?0:1)}px solid transparent`,
+    //       'border-right' : `${borderWidth+(inner?0:1)}px solid transparent`,
+    //       'width' : `0px`,
+    //       'left':`${-1*(borderWidth+(inner?0:1))}px`
+    //     }) : 
+    //     inner ? 
+    //       ({
+    //         'height':`${-1*this.height}px`,
+    //         'border-left' : `1px dashed rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},1.0)`,
+    //         'border-right' : `1px solid transparent`,
+    //         'width' : `0px`,
+    //       }) : 
+    //       ({
 
-          })
-    }else{
-      return({
-        display:'none'
-      })
-    }
+    //       })
+    // }else{
+    //   return({
+    //     display:'none'
+    //   })
+    // }
   }
 }
 
-const NORMAL_COLOR : string = '201,54,38'
-const HOVER_COLOR : string = '250,150,80'
+// const NORMAL_COLOR : string = '201,54,38'
+// const HOVER_COLOR : string = '250,150,80'
 
 @Component({
   selector : 'nehubaui-landmark-list',
