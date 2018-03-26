@@ -20,7 +20,6 @@ import css from './nehubaUI.parent.style.css'
 export class NehubaContainer implements AfterViewInit {
   showMenu : boolean = false
 
-
   darktheme = false
   resizeDockedWidgetPanel = false
   dockedWidgetPanelWidth = 350
@@ -65,30 +64,7 @@ export class NehubaContainer implements AfterViewInit {
     })
   }
 
-  showMenuDone(){
-    if(this.mainController.nehubaViewer) this.mainController.nehubaViewer.redraw()
-    this.animationDone = true
-  }
-
-  redrawViewer = () => {
-    if(this.mainController.nehubaViewer){
-      this.mainController.nehubaViewer.redraw()
-    }
-  }
   
-  animationDone : boolean = true
-
-  onAnimationFrameCallback = ()=>{
-    this.redrawViewer()
-    if(!this.animationDone){
-      requestAnimationFrame(this.onAnimationFrameCallback)
-    }
-  }
-  
-  startShowMenu(){
-    this.animationDone = false
-    this.onAnimationFrameCallback()
-  }
   /* TODO if enableProd is disabled, this throws an error
   investigate https://angular.io/api/core/ChangeDetectorRef
   */

@@ -7,7 +7,7 @@
       </ng-content>
     </div>
   </div>
-  <div (click) = "showAll = !showAll" readmoreSliver>
+  <div (click) = "toggleShow($event)" readmoreSliver>
     <i *ngIf = "!showAll" class = "glyphicon glyphicon-chevron-down"></i>
     <i *ngIf = "showAll" class = "glyphicon glyphicon-chevron-up"></i>
   </div>

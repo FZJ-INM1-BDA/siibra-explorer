@@ -143,8 +143,6 @@ export class MainController{
     })
   }
 
-  receptorString : string | null
-
   private passCheckSetMode(mode:String){
 
     /* reset view state */
@@ -183,7 +181,6 @@ export class MainController{
     // }
     /* this is already happening */
 
-    this.receptorString = null
 
     /* set state */
     switch(mode){
@@ -363,7 +360,11 @@ export class MainController{
       this.queryChangeSubject.next({
         'selectedTemplate': template ? template.name : null
       })
-      if(this.viewingMode!='Select atlas regions') this.setMode('Select atlas regions')
+      /* TODO temporary measure */
+        
+      /* loading a new template destroys all widgets. which also destroys select region widgit. */
+      /* temporary bandaid, set viewing mode to something else, so that when template is selected new instances of widgets will be instantiated */
+      if(this.viewingMode!='Select atlas regions') setTimeout(()=>this.setMode('Select atlas regions'))
       this.selectedRegions = []
     })
 
@@ -411,6 +412,10 @@ export class MainController{
 
   loadTemplate(templateDescriptor:TemplateDescriptor):void
   {
+    /* TODO temporary measure, find permanent solution */
+    /* loading a new template destroys all widgets. which also destroys select region widgit. */
+    /* temporary bandaid, set viewing mode to something else, so that when template is selected new instances of widgets will be instantiated */
+    this.viewingMode = ``
     
     if ( this.selectedTemplate == templateDescriptor ){
       return
@@ -1046,7 +1051,9 @@ class DataService {
 
   datasetArray = [
     'http://localhost:5080/res/json/bigbrain.json',
-    'http://localhost:5080/res/json/colin.json'
+    'http://localhost:5080/res/json/colin.json',
+    'http://localhost:5080/res/json/waxholmRatV2_0.json',
+    'http://localhost:5080/res/json/allenMouse.json'
   ]
 
   COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
