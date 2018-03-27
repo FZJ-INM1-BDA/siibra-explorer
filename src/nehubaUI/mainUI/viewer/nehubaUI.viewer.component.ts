@@ -825,7 +825,6 @@ export class NehubaViewerUnit{
   <nehuba-viewer-2d-landmark-unit
     [ngStyle]="pos(landmark)"
     *ngFor="let landmark of landmarkServices.landmarks"
-    [tooltip] =" landmark.properties | jsonStringifyPipe"
     container = "body"
     containerClass = "landmarkTooltip"
     
@@ -915,29 +914,42 @@ export class NehubaViewerOverlayUnit {
   template : 
   `
   <div 
-    [ngStyle] = "styleLandmark()"
     landmarkContainer>
     
-    <div nodeView #nodeView>
+    <div 
+      [ngStyle] = "styleNode()"
+      nodeView 
+      #nodeView>
       <span 
         class="glyphicon glyphicon-map-marker">
       </span>
     </div>
 
-    <div class = "pos-beam">
+    <div 
+      class = "pos-beam"
+      [ngStyle]="styleBeam()">
+
       <div 
-        [ngStyle] = "styleBeam(false)" 
+        *ngIf = "height >= 0"
+        [ngStyle] = "styleBeamColor(false)"
         class = "pos-beam-outer">
       </div>
       <div 
-        [ngStyle] = "styleBeam(true)"
+        *ngIf = "height >= 0"
+        [ngStyle] = "styleBeamColor(true)"
         class = "pos-beam-inner">
       </div>
-    </div>
-    <div class = "pos-shadow">
-      <div
-        [ngStyle]="styleShadow()">
+
+      <div 
+        *ngIf = "height < 0"
+        [ngStyle] = "styleBeamDashedColor()"
+        class = "pos-beam-dashed">
       </div>
+    </div>
+    <div 
+      [ngStyle]="styleShadow()"
+      class = "pos-shadow">
+      
     </div>
   </div>
   `,
@@ -945,45 +957,77 @@ export class NehubaViewerOverlayUnit {
     `
     div[landmarkContainer]
     {
-      height:100%;
-      width: 2px;
-      display:flex;
+      position:relative;
       pointer-events:auto;
-      flex-wrap:nowrap;
     }
     .pos-shadow
     {
-      flex: 0 0 0px;
-      order : 2;
+      position:absolute;
+      left:0px;
+      top:0px;
+      z-index:-1;
+
+      width:2px;
+      height:2px;
+      border-radius:1px
     }
     .pos-beam
     {
+      position:absolute;
+      left:0px;
+      top:0px;
+
+      width:1px;
+      height:1px;
+
       box-sizing:border-box;
-      background-color:black;
-      flex: 1 1 0px;
-      position:relative;
-      order : 1;
     }
     .pos-beam > .pos-beam-outer
     {
       position:absolute;
-      top:-1px;
-      left:-3px;
+      top:0px;
+      left:-1px;
+
+      width:2px;
+      height:1px;
+
+      border-top:1px solid;
+      border-bottom:0px;
+      border-left:1px solid transparent;
+      border-right:1px solid transparent;
     }
     .pos-beam > .pos-beam-inner
     {
       position : absolute;
       top:0px;
+
+      left:-1px;
+      width:2px;
+      height:1px;
+
+      border-top:1px solid;
+      border-bottom:0px;
+      border-left:1px solid transparent;
+      border-right:1px solid transparent;
     }
+
+    .pos-beam > .pos-beam-dashed
+    {
+      position : absolute;
+      top:0px;
+
+      width:1px;
+      height:1px;
+
+      border:none;
+      border-left:1px dashed;
+    }
+
     [nodeView]
     {
-      margin-top:-1em;
-      margin-bottom:1em;
-      width:0px;
-      height:0px;
-      margin-left:-0.02px;
-      flex: 0 0 0px;
-      order : 0;
+      position:absolute;
+      left:0px;
+      top:0px;
     }
 
     [nodeView] > *
@@ -992,10 +1036,9 @@ export class NehubaViewerOverlayUnit {
 
     [nodeView] > .glyphicon
     {
-      position:absolute;
+      margin-left:-0.5em;
       margin-top:-1em;
-      margin-bottom:1em;
-      margin-left:-0.55em;
+      display:block;
     }
     `
   ]
@@ -1020,18 +1063,21 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
     })
   }
 
-  calculateZ(){
-
+  styleNode(){
+    if(this.height){
+      return({
+        'transform' : `translate(0,${-this.height}px)`,
+        'color' : `rgb(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR})`,
+        'z-index' : this.height >= 0 ? 0 : -2
+      })
+    }else{
+      return({
+        display:'none'
+      })
+    }
   }
 
   styleLandmark(){
-    return this.height >= 0 ? 
-      {
-        
-      } : 
-      {
-
-      }
     // if(this.height){
       
     //   return this.height >= 0 ? 
@@ -1056,10 +1102,21 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
   }
 
   styleShadow(){
-    return({})
+    if(this.height){
+      const size = (0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1)*10
+      return ({
+        'background':`radial-gradient(
+          circle at center,
+          rgba(${this.landmark.hover ? HOVER_COLOR + ',0.3' : NORMAL_COLOR + ',0.3'}) 10%, 
+          rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'}) 30%,
+          rgba(0,0,0,0.8))`,
+        'transform' : `scale(${size},${size})`
+      })
+    }else{
+      return ({display:`none`})
+    }
     // if(this.height){
       
-    //   const size = 0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1
     //   const returnStyle = {
     //     display : 'block',
     //     background:'radial-gradient(rgba(120,60,30,0.8), rgba(120,60,30,0.3))',
@@ -1071,8 +1128,6 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
     //       'border-radius' : `${size/2}em`,
     //       'margin-top' : `${-1*size/2}em`,
     //       'margin-left' : `${-1*size/2}em`,
-    //       'border': `1px solid rgba(0,0,0,1.0)`,
-    //       'background':`radial-gradient(rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'}), rgba(${this.landmark.hover ? HOVER_COLOR + ',0.3' : NORMAL_COLOR + ',0.3'}))`,
     //     }) : 
     //     Object.assign({},returnStyle,{
     //       'width' : `${size}em`,
@@ -1090,41 +1145,75 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
     // }
   }
 
-  styleBeam(inner:boolean){
-    inner
-    return({})
+  styleBeam(){
+    return this.height ? 
+      ({
+        transform : `translate(0px,${-this.height/2}px) scale(1,${this.height})`
+      }) : 
+        ({
+          display:`none`
+        })
+  }
+
+  styleBeamDashedColor(){
+    return({
+      'border-left-color' :`rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'})` 
+    })
+  }
+
+  styleBeamColor(inner:boolean){
+    return inner ? ({
+      transform : `scale(1.0,1.0)`,
+      'border-top-color' : `rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'})`
+    }) : ({
+      transform : `scale(1.5,1.0)`,
+      'bordder-top-color' : 'rgb(0,0,0)'
+    })
+  }
+
+  // styleBeam(inner:boolean){
+  //   if(this.height){
+  //     // const borderWidth = 1
+
+  //     return this.height >= 0 ? 
+  //       ({
+  //         // 'border-top' : `${this.height+(inner?0:2)}px solid rgba(${inner ? this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR : '0,0,0'},0.75)`,
+  //         // 'border-left' : `${borderWidth+(inner?0:1)}px solid transparent`,
+  //         // 'border-right' : `${borderWidth+(inner?0:1)}px solid transparent`,
+  //         'width' : `4px`,
+  //         // 'left':`${-1*(borderWidth+(inner?0:1))}px`,
+  //         'transform':`scale(1,${this.height})`,
+  //       }) : 
+  //       inner ? 
+  //         ({
+  //           // 'border-left' : `1px dashed rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},1.0)`,
+  //           // 'border-right' : `1px solid transparent`,
+  //           'width' : `2px`,
+  //           'transform':`scale(1,${this.height})`
+  //         }) : 
+  //         ({
+
+  //         })
+
+  //   }else{
+  //     return({
+  //       display:'none'
+  //     })
+  //   }
     
     // if(this.height){
       
-    //   const borderWidth = 1
     //   return this.height >= 0 ? 
-    //     ({
-    //       'border-top' : `${this.height+(inner?0:2)}px solid rgba(${inner ? this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR : '0,0,0'},0.75)`,
-    //       'border-left' : `${borderWidth+(inner?0:1)}px solid transparent`,
-    //       'border-right' : `${borderWidth+(inner?0:1)}px solid transparent`,
-    //       'width' : `0px`,
-    //       'left':`${-1*(borderWidth+(inner?0:1))}px`
-    //     }) : 
-    //     inner ? 
-    //       ({
-    //         'height':`${-1*this.height}px`,
-    //         'border-left' : `1px dashed rgba(${this.landmark.hover ? HOVER_COLOR :NORMAL_COLOR},1.0)`,
-    //         'border-right' : `1px solid transparent`,
-    //         'width' : `0px`,
-    //       }) : 
-    //       ({
-
-    //       })
     // }else{
     //   return({
     //     display:'none'
     //   })
     // }
-  }
+    // }
 }
 
-// const NORMAL_COLOR : string = '201,54,38'
-// const HOVER_COLOR : string = '250,150,80'
+const NORMAL_COLOR : string = '201,54,38'
+const HOVER_COLOR : string = '250,150,80'
 
 @Component({
   selector : 'nehubaui-landmark-list',
