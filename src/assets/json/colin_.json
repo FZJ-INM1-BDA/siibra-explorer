@@ -4,7 +4,7 @@
 	"species":"Human",
 	"useTheme":"dark",
 	"ngId" : "colin",
-	"nehubaConfigURL":"/res/json/colinNehubaConfig.json",
+	"nehubaConfigURL":"res/json/colinNehubaConfig.json",
 	"parcellations":[
 		{
 			"ngId":"atlas",

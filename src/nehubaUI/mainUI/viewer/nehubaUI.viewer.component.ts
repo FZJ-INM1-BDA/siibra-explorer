@@ -274,10 +274,6 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
         &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
       </small>
     </div>
-    <floatingPopover
-      [templateTobeRendered] = "floatingPopoverBody"
-      [overwriteStyle]="{'opacity':'0.0'}">
-    </floatingPopover>
     <ng-template #floatingPopoverBody>
       <small floatingPopoverContent>
         {{ mainController.nehubaCurrentSegment ? mainController.nehubaCurrentSegment.name : 'no segment selected' }}

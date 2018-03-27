@@ -3,7 +3,7 @@
 	"type":"template",
 	"species":"Rat",
 	"useTheme":"dark",
-	"nehubaConfigURL":"http://localhost:5080/res/json/waxholmRatV2_0NehubaConfig.json",
+	"nehubaConfigURL":"res/json/waxholmRatV2_0NehubaConfig.json",
 	"parcellations":[
 		{
 			"ngId":"whole",

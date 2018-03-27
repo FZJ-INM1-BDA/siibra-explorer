@@ -17,4 +17,12 @@
     class = "popover-content popover-body"
     #panelBody>
   </div>
+  <div class = "popover-content popover-body">
+    <ng-template 
+      [templateRef] = "template"
+      *ngFor = "let template of templatesTobeRendered" 
+      renderTemplateDirective>
+
+    </ng-template>
+  </div>
 </div>

@@ -4,7 +4,7 @@
 	"species":"Mouse",
 	"ngId":"",
 	"useTheme":"dark",
-	"nehubaConfigURL":"http://localhost:5080/res/json/allenMouseNehubaConfig.json",
+	"nehubaConfigURL":"res/json/allenMouseNehubaConfig.json",
 	"parcellations":[
         {
 			"ngId":"atlas",

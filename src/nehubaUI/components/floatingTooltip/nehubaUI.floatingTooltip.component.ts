@@ -13,6 +13,8 @@ import css from './nehubaUI.floatingTooltip.style.css'
 export class FloatingTooltip implements AfterViewInit{
   @Input() offset :[number,number] = [-1000,-1000]
   @Input() templateTobeRendered : TemplateRef<any>
+  @Input() templatesTobeRendered : TemplateRef<any>[]
+  
   @Input() overwriteStyle : any = {}
   @Input() title : string
 

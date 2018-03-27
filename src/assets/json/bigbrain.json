@@ -4,7 +4,7 @@
 	"species":"Human",
 	"useTheme" : "light",
 	"nehubaId" : " grey value: ",
-	"nehubaConfigURL" : "http://localhost:5080/res/json/bigbrainNehubaConfig.json",
+	"nehubaConfigURL" : "res/json/bigbrainNehubaConfig.json",
 	"parcellations":[
 		{
 			"name":"Grey/White matter",
