@@ -28,6 +28,9 @@ import { ReadMoreComponent } from 'nehubaUI/components/readmore/nehubaUI.readmor
 import { NehubaModalService,NehubaModalUnit } from 'nehubaUI/components/modal/nehubaUI.modal.component'
 import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer, FloatingWidgetView, WidgetView, MinimisedView, MinimisedWidgetContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 
+/* directive */
+import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
+
 /* util */
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
@@ -54,7 +57,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardP
     ],
     declarations : 
         [ 
-        SplashScreen,
+        SplashScreen,RenderTemplateDirective,
         DatasetBlurb, ReadMoreComponent, 
         ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
         MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,

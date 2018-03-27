@@ -44,10 +44,10 @@ export const showSideBar =
     state('1',style({'width':'350px'})),
     transition('0 => 1',[
       style({'width':'0px'}),
-      animate('150ms ease-in',style({'width':'350px'}))
+      animate('500ms ease',style({'width':'350px'}))
     ]),
     transition('1 => 0',[
       style({'width':'350px'}),
-      animate('150ms ease-out',style({'width':'0px'}))
+      animate('500ms ease',style({'width':'0px'}))
     ])
   ])
