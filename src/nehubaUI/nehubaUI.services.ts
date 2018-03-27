@@ -285,10 +285,10 @@ export class MainController{
     
     
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('http://localhost:5080/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
   }
 
   patchNG(){
@@ -1038,27 +1038,27 @@ class DataService {
   /* nb: return header must container CORS header */
 
   /* TODO temporary solution fetch available template space from KG  */
-  // datasetArray = [
-  //   '/res/json/bigbrain.json',
-  //   '/res/json/colin_.json',
-  //   '/res/json/waxholmRatV2_0.json',
-  //   '/res/json/allenMouse.json'
-  // ]
-  // COLIN_JUBRAIN_PMAP_INFO = `/res/json/colinJubrainPMap.json`
-  // COLIN_IEEG_INFO = `/res/json/colinIEEG.json`
-  // COLIN_JUBRAIN_RECEPTOR_INFO = `/res/json/colinJubrainReceptor.json`
-
-
   datasetArray = [
-    'http://localhost:5080/res/json/bigbrain.json',
-    'http://localhost:5080/res/json/colin.json',
-    'http://localhost:5080/res/json/waxholmRatV2_0.json',
-    'http://localhost:5080/res/json/allenMouse.json'
+    'res/json/bigbrain.json',
+    'res/json/colin.json',
+    'res/json/waxholmRatV2_0.json',
+    'res/json/allenMouse.json'
   ]
+  COLIN_JUBRAIN_PMAP_INFO = `res/json/colinJubrainPMap.json`
+  COLIN_IEEG_INFO = `res/json/colinIEEG.json`
+  COLIN_JUBRAIN_RECEPTOR_INFO = `res/json/colinJubrainReceptor.json`
 
-  COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
-  COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
-  COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
+
+  // datasetArray = [
+  //   'http://localhost:5080/res/json/bigbrain.json',
+  //   'http://localhost:5080/res/json/colin.json',
+  //   'http://localhost:5080/res/json/waxholmRatV2_0.json',
+  //   'http://localhost:5080/res/json/allenMouse.json'
+  // ]
+
+  // COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
+  // COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
+  // COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
   
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
     Promise.all(this.datasetArray.map(dataset=>

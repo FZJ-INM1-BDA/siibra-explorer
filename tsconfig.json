@@ -9,7 +9,8 @@
       "*": ["*"],
       "neuroglancer/*": ["third_party/neuroglancer/*"],
       "nehuba/*": ["third_party/nehuba/*"],
-      "nehubaUI/*": ["src/nehubaUI/*"]
+      "nehubaUI/*": ["src/nehubaUI/*"],
+      "assets/*" : ["src/assets/*"]
     }
   },
   "exclude": [

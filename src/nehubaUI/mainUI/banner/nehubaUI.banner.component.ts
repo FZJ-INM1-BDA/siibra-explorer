@@ -8,6 +8,9 @@ import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations'
 import template from './nehubaUI.banner.template.html'
 import css from './nehubaUI.banner.style.css'
 
+import img from 'assets/images/HBP_Primary_RGB_BlackText.png'
+import imgdark from 'assets/images/HBP_Primary_RGB_WhiteText.png'
+
 @Component({
   selector : 'atlasbanner',
   template : template,
@@ -33,8 +36,8 @@ export class NehubaBanner implements AfterViewInit {
   darktheme : boolean
   @Output() showRegionDialog : EventEmitter<any> = new EventEmitter()
   @ViewChild('searchRegion',{read:TemplateRef}) searchRegion : TemplateRef<any>
-  hbpimg : string = 'src/assets/images/HBP_Primary_RGB_BlackText.png'
-  hbpimgdark : string = 'src/assets/images/HBP_Primary_RGB_WhiteText.png'
+  hbpimg : string = img
+  hbpimgdark : string = imgdark
 
   showTemplateSelection : boolean = false
   widgetiseSearchRegion : boolean = false
