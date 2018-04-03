@@ -12,8 +12,7 @@ import css from './nehubaUI.floatingTooltip.style.css'
 
 export class FloatingTooltip implements AfterViewInit{
   @Input() offset :[number,number] = [-1000,-1000]
-  @Input() templateTobeRendered : TemplateRef<any>
-  @Input() templatesTobeRendered : TemplateRef<any>[]
+  @Input() templatesTobeRendered : TemplateRef<any>[] = []
   
   @Input() overwriteStyle : any = {}
   @Input() title : string
@@ -24,9 +23,14 @@ export class FloatingTooltip implements AfterViewInit{
 
   }
 
+  get getTranslation(){
+    return `translate(${this.offset.map(n=>n+'px').join(',')})`
+  }
+
   ngAfterViewInit(){
-    if(this.templateTobeRendered){
-      this.panelBody.createEmbeddedView( this.templateTobeRendered )
-    }
+  }
+
+  get filteredTemplatesTobeRendered(){
+    return this.templatesTobeRendered.filter(t=>t)
   }
 }

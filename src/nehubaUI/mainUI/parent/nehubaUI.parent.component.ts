@@ -1,5 +1,5 @@
-import { Component,ViewChild ,AfterViewInit,Renderer2 } from '@angular/core'
-import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP } from 'nehubaUI//nehubaUI.services'
+import { Component,ViewChild ,AfterViewInit,Renderer2, HostListener } from '@angular/core'
+import { UI_CONTROL,MainController,EXTERNAL_CONTROL as gExternalControl, SUPPORTED_LIB, SUPPORT_LIBRARY_MAP, InfoToUIService } from 'nehubaUI//nehubaUI.services'
 import { WidgetsContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
 import { showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
@@ -21,10 +21,6 @@ export class NehubaContainer implements AfterViewInit {
   showMenu : boolean = false
 
   darktheme = false
-  resizeDockedWidgetPanel = false
-  dockedWidgetPanelWidth = 350
-
-  showDockedPanel : boolean = false
 
   /* TODO move this to one of the services */
   libraryLoaded : Map<SUPPORTED_LIB,boolean> = new Map()
@@ -32,7 +28,12 @@ export class NehubaContainer implements AfterViewInit {
   @ViewChild(WidgetsContainer) widgetContainer : WidgetsContainer
   @ViewChild(NehubaBanner) nehubaBanner : NehubaBanner
 
-  constructor(public mainController:MainController, private rd2:Renderer2){
+  Array = Array
+
+  constructor(
+    public infoToUI:InfoToUIService,
+    public mainController:MainController, 
+    private rd2:Renderer2){
     this.darktheme = this.mainController.darktheme
 
     /* TODO why is load external library here? */
@@ -62,6 +63,13 @@ export class NehubaContainer implements AfterViewInit {
     UI_CONTROL.afterTemplateSelection(()=>{
       this.darktheme = this.mainController.darktheme
     })
+  }
+
+  
+  curosrPos : [number,number] = [0,0]
+  @HostListener('document:mousemove',['$event'])
+  mousemove(ev:MouseEvent){
+    this.curosrPos = [ev.clientX,ev.clientY]
   }
 
   

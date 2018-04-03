@@ -19,6 +19,7 @@ import { NehubaViewerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerCon
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
 import { SplashScreen } from 'nehubaUI/mainUI/splashScreen/splashScreen.component'
 
+
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
 import { DatasetBlurb } from 'nehubaUI/components/datasetBlurb/nehubaUI.datasetBlurb.component'
@@ -35,7 +36,7 @@ import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemp
 import { IsEmpty,FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
-import { MainController,ModalServices, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
+import { MainController,InfoToUIService, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
 
 
 
@@ -43,34 +44,34 @@ import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardP
 
 
 @NgModule({
-    imports:[
-        RouterModule,
-        FormsModule,
-        BrowserModule,
-        BrowserAnimationsModule,
-        ButtonsModule.forRoot(),
-        ModalModule.forRoot(),
-        TabsModule.forRoot(),
-        BsDropdownModule.forRoot(),
-        PopoverModule.forRoot(),
-        TooltipModule.forRoot()
-    ],
-    declarations : 
-        [ 
-        SplashScreen,RenderTemplateDirective,
-        DatasetBlurb, ReadMoreComponent, 
-        ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
-        MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
-        NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingTooltip,
-        Multiform, NehubaContainer,NehubaViewerContainer,NehubaUIRegionMultilevel,NehubaBanner,NehubaModalUnit,
-        MultilevelSelector, NehubaModalService, TempReceptorData,
-        IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
-    bootstrap : [ NehubaContainer ],
-    providers : [ MainController,LandmarkServices,WidgitServices,ModalServices ],
-    entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
+  imports:[
+    RouterModule,
+    FormsModule,
+    BrowserModule,
+    BrowserAnimationsModule,
+    ButtonsModule.forRoot(),
+    ModalModule.forRoot(),
+    TabsModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    PopoverModule.forRoot(),
+    TooltipModule.forRoot()
+  ],
+  declarations : 
+    [ 
+    SplashScreen,RenderTemplateDirective,
+    DatasetBlurb, ReadMoreComponent, 
+    ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
+    MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
+    NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingTooltip,
+    Multiform, NehubaContainer,NehubaViewerContainer,NehubaUIRegionMultilevel,NehubaBanner,NehubaModalUnit,
+    MultilevelSelector, NehubaModalService, TempReceptorData,
+    IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
+  bootstrap : [ NehubaContainer ],
+  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
+  entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
 })
 export class NehubaUI{
-    
+  
 }
 
 /* TODO: culling uncessary components, such as ActiveComponent */

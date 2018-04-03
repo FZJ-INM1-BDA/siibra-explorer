@@ -101,3 +101,9 @@
     width:278px;
     height:1.43em;
   }
+
+#atlascontrolContainer,
+#atlascontrolElement
+{
+  width:100%;
+}

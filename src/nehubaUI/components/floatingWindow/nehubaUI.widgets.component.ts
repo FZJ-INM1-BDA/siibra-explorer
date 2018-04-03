@@ -1,4 +1,4 @@
-import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding } from '@angular/core'
+import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding, OnDestroy, EventEmitter, Output } from '@angular/core'
 import { animationFadeInOut,animateCollapseShow, showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
@@ -51,6 +51,7 @@ export class WidgetComponent{
 })
 export class DynamicViewDirective{
   constructor(public viewContainerRef:ViewContainerRef){
+    
   }
 }
 
@@ -94,6 +95,8 @@ export class DockedWidgetContainer implements AfterViewInit{
   }
 }
 
+
+/* TODO hibernating class ... minimised container is becoming deprecated */
 @Component({
   selector : `MinimisedContainer`,
   template :
@@ -140,42 +143,42 @@ export class MinimisedWidgetContainer implements AfterViewInit{
   </ng-template>
   `,
   styles : [
-  `
-  FloatingWidgetContainer
-  {
-    right:0em;
-    bottom:0em;
-    width:0em;
-    height:0em;
-    position:absolute;
+    `
+    FloatingWidgetContainer
+    {
+      right:0em;
+      bottom:0em;
+      width:0em;
+      height:0em;
+      position:absolute;
 
-    z-index:9;
-  }
-  MinimisedContainer
-  {
-    z-index:9;
-    position:relative;
-    
-    width: 2em;
-    height:100%;
+      z-index:9;
+    }
+    MinimisedContainer
+    {
+      z-index:9;
+      position:relative;
+      
+      width: 2em;
+      height:100%;
 
-    top:-100%;
-    right:4em;
+      top:-100%;
+      right:4em;
 
-    pointer-events:none;
-  }
-  DockedWidgetContainer
-  {
-    position:relative;
-    z-index:4;
-    display:block;
-    width:362px;
-    margin-left:-21px;
-    height:100%;
-    overflow-y:auto;
-    overflow-x:hidden;
-  }
-  `
+      pointer-events:none;
+    }
+    DockedWidgetContainer
+    {
+      position:relative;
+      z-index:4;
+      display:block;
+      width:362px;
+      margin-left:-21px;
+      height:100%;
+      overflow-y:auto;
+      overflow-x:hidden;
+    }
+    `
   ],
   
   animations : [ showSideBar ]
@@ -183,6 +186,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
 export class WidgetsContainer{
 
   @Input() showMenu : boolean
+  @Output() setShowMenu : EventEmitter<boolean> = new EventEmitter()
   
   animationDone : boolean = true
 
@@ -234,6 +238,12 @@ export class WidgetsContainer{
       this.minimisedWidgetFactory = this.componentFactoryResolver.resolveComponentFactory( MinimisedView )
 
       this.widgetFactory = this.componentFactoryResolver.resolveComponentFactory( WidgetView )
+
+      this.widgitServices.layoutChangeSubject
+        .debounceTime(200)
+        .subscribe(()=>{
+          this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
+        })
   }
 
   overridingMainController(){
@@ -641,7 +651,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
   ],
   animations : [ animationFadeInOut,animateCollapseShow ]
 })
-export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
+export class DockedWidgetView implements AfterViewInit,WidgetViewChassis,OnDestroy {
   @HostBinding('@animationFadeInOut') animationFadeInOut : any
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   widgetComponent : WidgetComponent
@@ -655,12 +665,20 @@ export class DockedWidgetView implements AfterViewInit,WidgetViewChassis {
   successClassState : boolean = false
 
 
-  constructor(private zone:NgZone){}
+  constructor(private zone:NgZone,public widgetService:WidgitServices){}
 
   ngAfterViewInit(){
+    
     this.widgetComponent.handler.blink = (sec?:number) =>{
       this.blink(sec)
     }
+    /* expand side bar */
+    this.widgetService.layoutChangeSubject.next()
+  }
+
+  ngOnDestroy(){
+    /* check if you are the last one. if yes, collapse the side bar */
+    this.widgetService.layoutChangeSubject.next()
   }
   
 

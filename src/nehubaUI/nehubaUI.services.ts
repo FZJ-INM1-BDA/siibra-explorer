@@ -1,5 +1,5 @@
 import { Input, Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
-import { Subject,BehaviorSubject } from 'rxjs/Rx'
+import { Subject,BehaviorSubject,Observable } from 'rxjs/Rx'
 import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
@@ -285,10 +285,10 @@ export class MainController{
     
     
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('http://localhost:5080/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
   }
 
   patchNG(){
@@ -738,6 +738,8 @@ export class WidgitServices
   loadedWidgets : WidgetComponent[] = []
   loadedLabComponents : LabComponent[] = []
 
+  layoutChangeSubject:Subject<any> = new Subject()
+
   /* tobe overwritten by view */
   _loadWidgetFromLabComponent : (labComponent:LabComponent)=>WidgetComponent
 
@@ -798,6 +800,7 @@ export class LandmarkServices{
 
   TEMP_icosahedronVtkUrl : string
   TEMP_crossVtkUrl : string
+  flatProjection : boolean = true
 
   constructor(public mainController:MainController){
 
@@ -1024,10 +1027,28 @@ export class SpatialSearch{
 }
 
 @Injectable()
-export class ModalServices{
+export class InfoToUIService{
   constructor(public mainController:MainController){
-
   }
+
+  contextInfoPopoverTemplateRef : Map<number,TemplateRef<any>|null> = new Map()
+  contextInfoPopoverObservables : Map<number,Observable<TemplateRef<any>|null>> = new Map()
+  getContentInfoPopoverObservable:(templateRefToBeRendered:Observable<TemplateRef<any>|null>)=>void = (observable)=>{
+    const key = Date.now()
+    this.contextInfoPopoverObservables.set(key,observable)
+    this.contextInfoPopoverTemplateRef.set(key,null)
+    observable
+      .subscribe(templateRef=>{
+        /* on event */
+        this.contextInfoPopoverTemplateRef.set(key,templateRef)
+      },console.error,()=>{
+        /* on complete */
+        this.contextInfoPopoverObservables.delete(key)
+        this.contextInfoPopoverTemplateRef.delete(key)
+      })
+    
+  }
+
   getModalHandler:()=>ModalHandler
 }
 

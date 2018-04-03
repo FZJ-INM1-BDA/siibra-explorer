@@ -1,12 +1,16 @@
-import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core'
+import { Directive, Input, TemplateRef, ViewContainerRef, AfterViewInit } from '@angular/core'
 
 @Directive({
   selector : `[renderTemplateDirective]`
 })
 
-export class RenderTemplateDirective{
+export class RenderTemplateDirective implements AfterViewInit{
   @Input() templateRef:TemplateRef<any>
   constructor(private viewContainerRef:ViewContainerRef){
+    
+  }
+
+  ngAfterViewInit(){
     this.viewContainerRef.createEmbeddedView(this.templateRef)
   }
 }

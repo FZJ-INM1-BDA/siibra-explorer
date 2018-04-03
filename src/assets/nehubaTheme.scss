@@ -592,35 +592,6 @@ div#ATLASContainer.darktheme
 
   ATLASViewer
   {
-    floatingPopover
-    {
-
-      .popover.down
-      {
-        border-color:gray(0.35);
-        color:gray(0.95);
-        background-color:gray(0.25);
-
-        .popover-title
-        {
-          background-color:gray(0.3);
-          border-color:gray(0.35);
-        }
-
-        .popover-content
-        {
-          .moreInfo-icon
-          {
-            &:hover
-            {
-              color:goldenrod;
-              cursor:default;
-            }
-          }
-        }
-      }
-    }
-
     div#viewerStatus
     {
       box-shadow:none;
@@ -813,6 +784,36 @@ div#ATLASContainer.darktheme
 
 .darktheme
 {
+
+  floatingPopover
+  {
+
+    .popover.down
+    {
+      border-color:gray(0.35);
+      color:gray(0.95);
+      background-color:gray(0.25);
+
+      .popover-title
+      {
+        background-color:gray(0.3);
+        border-color:gray(0.35);
+      }
+
+      .popover-content
+      {
+        .moreInfo-icon
+        {
+          &:hover
+          {
+            color:goldenrod;
+            cursor:default;
+          }
+        }
+      }
+    }
+  }
+
   &.popover.popover-left
   {
     .popover-arrow
