@@ -1,35 +1,9 @@
 import { Pipe,PipeTransform,SecurityContext } from '@angular/core'
 import { DomSanitizer } from '@angular/platform-browser'
 import { Multilevel } from 'nehubaUI/nehuba.model'
-/* pipes in object, pipes out stringified json  */
-
-@Pipe({
-  name:'jsonStringifyPipe'
-})
-
-export class JsonStringifyPipe implements PipeTransform{
-  public transform(json:any){
-    return JSON.stringify(json)
-  }
-}
 
 /* pipes in string, pipes out json objects */
 
-@Pipe({
-  name:'jsonParsePipe'
-})
-
-export class JsonParsePipe implements PipeTransform{
-  public transform(string:string){
-    let json
-    try{
-      json = JSON.parse(string)
-      return json
-    } catch (e){
-      return {}
-    }
-  }
-}
 
 /* pipes in object and pipes out list of keys */
 @Pipe({
@@ -63,37 +37,6 @@ export class MultilevelSelectorVisiblePipe implements PipeTransform{
       regex.test(m.name)
   }
 }
-
-/* searches tree array object (assuming children nodes are nested under children property) */
-/* ignores blank spaces */
-/* supercedes searchPipe */
-
-// @Pipe({
-//   name:'searchTreePipe'
-// })
-
-// export class SearchTreePipe implements PipeTransform{
-
-//   searchTerm : string
-
-//   public transform(array:Multilevel[],searchTerm:string):Multilevel[]{
-//     this.searchTerm = searchTerm
-//     this.iteratingArray( array )
-//     return array
-//   }
-
-//   private iteratingArray(array:Multilevel[]){
-//     let sanitaized = this.searchTerm.replace(/[^\w\s]/gi, '')
-//     array.forEach( item => {
-//       /* if regexp is not here, it gives funny results */
-//       let regExp = new RegExp(sanitaized,'gi')
-//       item.isVisible = regExp.test( item.name )
-//       this.iteratingArray( item.children )
-//     })
-//   }
-// }
-
-/* search high lighting */
 
 @Pipe({
   name:'searchHighlight'
@@ -150,19 +93,6 @@ export class SelectTreePipe implements PipeTransform{
   }
 }
 
-/* round float to 3 dp */
-/* originally used for navigation panel */
-
-@Pipe({
-  name:'numberfilteringPipe'
-})
-
-export class NumberFilteringPipe implements PipeTransform{
-  public transform(number:number){
-    return number.toFixed(2)
-  }
-}
-
 /* if a field is undefined/null, set it to n/a instead */
 @Pipe({
   name:'filterUncertainObject'
@@ -175,81 +105,5 @@ export class FilterUncertainObject implements PipeTransform{
     }else{
       return obj
     }
-  }
-}
-
-@Pipe({
-  name : 'nmToMm'
-})
-
-export class NmToMmPipe implements PipeTransform{
-
-  public transform(number:any):number{
-    return isNaN(number) ? 
-      0 :
-      number / 1000000
-  }
-}
-
-@Pipe({
-  name : 'arrayJoinComma'
-})
-
-export class ArrayJoinComma implements PipeTransform{
-  public transform(array:any[]){
-    return array.join(',')
-  }
-}
-
-// @Pipe({
-//   name:'htmlElementAssemblerPipe'
-// })
-
-// export class HTMLElementAssemblerPipe implements PipeTransform{
-//   public transform(data:any){
-//     let element : HTMLElement
-//     if ( data._elementTagName ){
-//       switch( data._elementTagName ){
-//         case 'img':{
-//           element = document.createElement('img')
-//           if( data._src ){
-//             element.setAttribute('src',data._src)
-//           }
-//         }break;
-//         case 'span':{
-//           element = document.createElement('span')
-//         }break; 
-//         case 'div':
-//         default :{
-//           element = document.createElement('div')
-//         }break;
-//       }
-//       if( data._class ){
-//         element.className = data._class
-//       }
-//       if ( data._id ){
-//         element.id = data._id
-//       }
-//       if (data._value){
-//         element.innerHTML = data._value
-//       }
-
-//       return element.outerHTML
-//     }else{
-//       return ''
-//     }
-//   }
-// }
-
-@Pipe({
-  name:'isEmpty'
-})
-
-export class IsEmpty implements PipeTransform{
-  public transform(thing:any|any[]):boolean{
-    return thing.constructor.name == 'String' ? thing.length == 0 : 
-      thing.constructor.name == 'Array' ? thing.length == 0 :
-      thing.constructor.name == 'Object' ? Object.keys(thing).length == 0 :
-      true
   }
 }

@@ -566,6 +566,5 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
 }
 
 
-
 const RECEPTOR_ROOT = `http://medpc055.ime.kfa-juelich.de:5082/plugins/receptorBrowser/data/`
 // const RECEPTOR_ROOT = `http://localhost:5080/pluginDev/receptorBrowser/data/`

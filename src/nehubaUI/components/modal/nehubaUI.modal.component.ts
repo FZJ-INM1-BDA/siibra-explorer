@@ -124,7 +124,7 @@ export class NehubaModalUnit{
   @ViewChild('modalBody',{read:ViewContainerRef}) modalBody : ViewContainerRef
 
   constructor(private cd:ChangeDetectorRef){
-    /* filterUncertainObject jsonStringifyPipe */
+    
   }
 
   public updateModel = () => this.cd.detectChanges()
