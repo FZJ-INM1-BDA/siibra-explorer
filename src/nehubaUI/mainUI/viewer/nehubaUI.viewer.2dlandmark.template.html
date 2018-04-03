@@ -1,0 +1,41 @@
+<div 
+  [ngStyle] = "{opacity:calcOpacity()}"
+  landmarkContainer>
+  
+  <div 
+    [ngStyle] = "styleNode()"
+    [@translateLandmarkHeight] = "{value:landmarkServices.flatProjection ? landmark.hover : true,params:{landmarkHeight:-height}}"
+    nodeView 
+    #nodeView>
+    <span 
+      class="glyphicon glyphicon-map-marker">
+    </span>
+  </div>
+
+  <div 
+    class = "pos-beam"
+    [@showLandmarkHeight]="{value:landmarkServices.flatProjection ? landmark.hover : true,params:{landmarkHeight:-height/2,landmarkScale:height}}">
+
+    <div 
+      *ngIf = "height >= 0"
+      [ngStyle] = "styleBeamColor(false)"
+      class = "pos-beam-outer">
+    </div>
+    <div 
+      *ngIf = "height >= 0"
+      [ngStyle] = "styleBeamColor(true)"
+      class = "pos-beam-inner">
+    </div>
+
+    <div 
+      *ngIf = "height < 0"
+      [ngStyle] = "styleBeamDashedColor()"
+      class = "pos-beam-dashed">
+    </div>
+  </div>
+  <div 
+    [ngStyle]="styleShadow()"
+    class = "pos-shadow">
+    
+  </div>
+</div>

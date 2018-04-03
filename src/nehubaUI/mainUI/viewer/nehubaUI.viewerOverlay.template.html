@@ -1,0 +1,23 @@
+
+<nehuba-viewer-2d-landmark-unit
+  (mouseover) = "mouseoverLandmark(landmark)"
+  (mouseout) = "mouseoverLandmark()"
+  [ngStyle]="pos(landmark)"
+  *ngFor="let landmark of landmarkServices.landmarks"
+  container = "body"
+  containerClass = "landmarkTooltip"
+  
+  [height] = "zOffset"
+  [landmark]="landmark"
+  (mouseenter)="landmark.hover = true"
+  (mouseleave)="landmark.hover = false"
+  class = "glyphicon-container">
+
+</nehuba-viewer-2d-landmark-unit>
+<div [ngStyle] = "{'transform':'rotate3D(' + rotate3D.join(',') + 'rad)' }" *ngIf="rotate3D" perspectiveAd>
+  Perspective Overlay
+</div>
+
+<ng-template #landmarkTemplateRef>
+  Landmark Hovered: {{ hoverLandmark ? hoverLandmark.pos : '' }}
+</ng-template>

@@ -14,11 +14,14 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip'
 /* mainUI */
 import { NehubaContainer } from 'nehubaUI/mainUI/parent/nehubaUI.parent.component';
 import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
-import { NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,NehubaLandmarkList,NehubaViewer2DLandmarkUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component';
+import { NehubaViewerInnerContainer,NehubaLandmarkList } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component'
+import { NehubaViewer2DLandmarkUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.2dlandmark.component'
+import { NehubaViewerOverlayUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerOverlay.component'
+import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component'
 import { NehubaViewerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerContainer.component';
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
 import { SplashScreen } from 'nehubaUI/mainUI/splashScreen/splashScreen.component'
-
+import { DisplayFilteredResult } from 'nehubaUI/mainUI/displayFilteredResult/nehubaUI.displayFilteredResult.component'
 
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -33,7 +36,7 @@ import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetC
 import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
 
 /* util */
-import { IsEmpty,FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma  } from 'nehubaUI/util/nehubaUI.util.pipes'
+import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
 import { MainController,InfoToUIService, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
@@ -57,7 +60,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardP
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ 
+    [ DisplayFilteredResult,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
@@ -65,7 +68,7 @@ import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardP
     NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingTooltip,
     Multiform, NehubaContainer,NehubaViewerContainer,NehubaUIRegionMultilevel,NehubaBanner,NehubaModalUnit,
     MultilevelSelector, NehubaModalService, TempReceptorData,
-    IsEmpty,FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,JsonParsePipe,JsonStringifyPipe, NmToMmPipe, ArrayJoinComma,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
+    FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
   providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
   entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
