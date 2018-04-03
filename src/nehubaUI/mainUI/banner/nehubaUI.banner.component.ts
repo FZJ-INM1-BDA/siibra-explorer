@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
-import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, ModalServices } from 'nehubaUI/nehubaUI.services'
+import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from 'nehubaUI/nehuba.model'
 
 import { DatasetBlurb } from 'nehubaUI/components/datasetBlurb/nehubaUI.datasetBlurb.component';
@@ -56,7 +56,7 @@ export class NehubaBanner implements AfterViewInit {
 
   modalDataset : DatasetInterface
 
-  constructor(public mainController:MainController,public widgitServices:WidgitServices,public modalServices:ModalServices){
+  constructor(public mainController:MainController,public widgitServices:WidgitServices,public infoToUI:InfoToUIService){
     // this.mainController.unwidgitiseSearchRegion = (templateRef:TemplateRef<any>)=>{
     //   templateRef
     //   this.widgetiseSearchRegion = false
@@ -87,10 +87,6 @@ export class NehubaBanner implements AfterViewInit {
     widgitComponent.changeState("floating")
   }
 
-  parseSrcToBGUrl(str:string){
-    return `url('${str}')`
-  }
-
   ngAfterViewInit(){
     UI_CONTROL.afterTemplateSelection(()=>{
       this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
@@ -104,14 +100,9 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   showModeInfo(activity:string){
-    const handler = this.modalServices.getModalHandler()
+    const handler = this.infoToUI.getModalHandler()
     handler.title = `${this.mainController.selectedTemplate ? this.mainController.selectedTemplate.name : 'No Template Selected'} <i class = "glyphicon glyphicon-chevron-right"></i> ${activity} `
     handler.showTemplateRef(this.modeInfo)
-  }
-
-  focusSearchInput(){
-    console.log('focus search input')
-    // console.log('atlascontrol click',ev)
   }
 
   /* viewing mode functions */

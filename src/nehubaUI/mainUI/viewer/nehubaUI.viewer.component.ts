@@ -5,10 +5,11 @@ import { Config as NehubaViewerConfig,NehubaViewer,createNehubaViewer,vec3, slic
 
 import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor, Landmark } from 'nehubaUI/nehuba.model'
 import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
-import { UI_CONTROL,VIEWER_CONTROL,Animation,EXTERNAL_CONTROL as gExternalControl, MainController, SpatialSearch, LandmarkServices, WidgitServices } from 'nehubaUI/nehubaUI.services'
-import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
+import { UI_CONTROL,VIEWER_CONTROL,Animation,EXTERNAL_CONTROL as gExternalControl, MainController, SpatialSearch, LandmarkServices, WidgitServices, InfoToUIService } from 'nehubaUI/nehubaUI.services'
+import { showLandmarkHeight,translateLandmarkHeight } from 'nehubaUI/util/nehubaUI.util.animations'
 
-import { ManagedUserLayer } from 'neuroglancer/layer';
+import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer'
+import { ManagedUserLayer } from 'neuroglancer/layer'
 
 declare var window:{
   [key:string] : any
@@ -159,6 +160,8 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
       this.componentRef.destroy()
     }
+
+    
     let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig)
     let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
     this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory )
@@ -202,7 +205,6 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
 @Component({
   template : `
     <div 
-      (mousemove)="showFloatingPopover($event)"
       id = "neuroglancer-container" 
       [ngClass]="{darktheme : darktheme}"
       #container>
@@ -233,7 +235,13 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
     
 
     <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
-      
+      <span 
+        class = "btn btn-link"
+        (click) = "landmarkServices.flatProjection = !landmarkServices.flatProjection">
+        toggle landmark flat projection
+      </span>  
+
+      <br />
 
       <span 
         class = "btn btn-link"
@@ -274,9 +282,9 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
         &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
       </small>
     </div>
-    <ng-template #floatingPopoverBody>
+    <ng-template #hoverRegionTemplate>
       <small floatingPopoverContent>
-        {{ mainController.nehubaCurrentSegment ? mainController.nehubaCurrentSegment.name : 'no segment selected' }}
+        Hovering on: {{ mainController.nehubaCurrentSegment ? mainController.nehubaCurrentSegment.name : 'no segment selected' }}
       </small>
     </ng-template>
   `,
@@ -393,9 +401,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
 
-  requestAnimationFrameFloatingPopoverFade : any
-  handlerFrameFloatingPopoverFade : any
-  mousemoveOverViewer : Subject<MouseEvent> = new Subject()
+  // requestAnimationFrameFloatingPopoverFade : any
+  // handlerFrameFloatingPopoverFade : any
+  // mousemoveOverViewer : Subject<MouseEvent> = new Subject()
 
   editingNavState : boolean = false
   textNavigateTo(string:string){
@@ -427,12 +435,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   @ViewChild(FloatingTooltip) floatingPopover : FloatingTooltip
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
-  @ViewChild('floatingPopoverBody',{read:TemplateRef}) floatingPopoverBody : TemplateRef<any>
-  
+  @ViewChild('hoverRegionTemplate',{read:TemplateRef}) hoverRegionTemplate : TemplateRef<any>
+
   onDestroyUnsubscribe : any[] = []
   heartbeatObserver : any
 
-  constructor(private mainController:MainController,public spatialSearch:SpatialSearch,public landmarkServices:LandmarkServices){
+  constructor(
+    private mainController:MainController,
+    public spatialSearch:SpatialSearch,
+    public landmarkServices:LandmarkServices,
+    public infoToUIService:InfoToUIService){
 
     // const metadata = gExternalControl.metadata
 
@@ -489,61 +501,79 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     //   this.onDestroyUnsubscribe.push(shownSegmentObsSubscription)
     // })
 
+    /* TODO really? everytime viewing mode changes spatial query? */
     this.mainController.viewingModeBSubject
       .subscribe(()=>{
         this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
       })
 
-    this.requestAnimationFrameFloatingPopoverFade = ()=>{
-      const animation = new Animation(500,'linear')
-      const iterator = animation.generate()
-      let animationFrameHandler
-      const animationFrame = ()=>{
-        const returnedValue = iterator.next()
-        if(!returnedValue.done){
-          animationFrameHandler = requestAnimationFrame(animationFrame)
-        }
-        this.floatingPopover.overwriteStyle = {opacity : 1 - returnedValue.value}
-      }
-      animationFrameHandler = requestAnimationFrame(animationFrame)
-      return animationFrameHandler
-    }
+    // this.requestAnimationFrameFloatingPopoverFade = ()=>{
+    //   const animation = new Animation(500,'linear')
+    //   const iterator = animation.generate()
+    //   let animationFrameHandler
+    //   const animationFrame = ()=>{
+    //     const returnedValue = iterator.next()
+    //     if(!returnedValue.done){
+    //       animationFrameHandler = requestAnimationFrame(animationFrame)
+    //     }
+    //     this.floatingPopover.overwriteStyle = {opacity : 1 - returnedValue.value}
+    //   }
+    //   animationFrameHandler = requestAnimationFrame(animationFrame)
+    //   return animationFrameHandler
+    // }
 
-    this.mousemoveOverViewer
-      .filter(()=>(this.mainController.nehubaCurrentSegment != null))
-      .subscribe(()=>{
-        cancelAnimationFrame(this.handlerFrameFloatingPopoverFade)
-        this.floatingPopover.overwriteStyle = {opacity : 1 }
-      })
+    // this.mousemoveOverViewer
+    //   .filter(()=>(this.mainController.nehubaCurrentSegment != null))
+    //   .subscribe(()=>{
+    //     cancelAnimationFrame(this.handlerFrameFloatingPopoverFade)
+    //     this.floatingPopover.overwriteStyle = {opacity : 1 }
+    //   })
 
-    this.mousemoveOverViewer
-      .subscribe((ev:MouseEvent)=>{
-        this.floatingPopover.offset = [ev.clientX+10,ev.clientY+10]
-        // this.floatingPopover.title = this.mainController.nehubaCurrentSegment ? this.mainController.nehubaCurrentSegment.name : 'no segment selected'
+    // this.mousemoveOverViewer
+    //   .subscribe((ev:MouseEvent)=>{
+    //     this.floatingPopover.offset = [ev.clientX+10,ev.clientY+10]
+    //     // this.floatingPopover.title = this.mainController.nehubaCurrentSegment ? this.mainController.nehubaCurrentSegment.name : 'no segment selected'
         
-      })
+    //   })
 
-    this.mousemoveOverViewer
-      .filter(()=>(this.mainController.nehubaCurrentSegment != null))
-      .debounceTime(1500)
-      .subscribe(()=>{
+    // this.mousemoveOverViewer
+    //   .filter(()=>(this.mainController.nehubaCurrentSegment != null))
+    //   .debounceTime(1500)
+    //   .subscribe(()=>{
         
-        this.handlerFrameFloatingPopoverFade = this.requestAnimationFrameFloatingPopoverFade()
-      })
-    VIEWER_CONTROL.mouseOverNehuba.subscribe((ev:any)=>{
-      if(ev.foundRegion){
+    //     this.handlerFrameFloatingPopoverFade = this.requestAnimationFrameFloatingPopoverFade()
+    //   })
 
-      }
-    })
+    const observable = VIEWER_CONTROL.mouseOverNehuba
+      .map(ev=>ev.foundRegion ? this.hoverRegionTemplate : null)
+      .takeUntil(this.destroySubject)
+
+    // this.infoToUIService.removeAllInfoPopoverObservables.subscribe((ev:any)=>{
+    //   console.log(ev)
+    // })
+
+    this.infoToUIService.getContentInfoPopoverObservable(observable)
+    
+      // .subscribe((ev:any)=>{
+      //   this.infoToUIService.getContentInfoPopoverObservable
+      //   console.log(ev)
+      // })
   }
+
+  /* TODO not very elegant way of ending getContentInfoPOpoverObservable */
+  destroySubject : Subject<any> = new Subject()
 
   public ngOnDestroy(){
     this.onDestroyUnsubscribe.forEach((subscription:any)=>subscription.unsubscribe())
     this.nehubaViewer.dispose()
     window['nehubaViewer'] = null
+    
+    this.destroySubject.next()
+    this.destroySubject.complete()
   }
 
   public ngAfterViewInit(){
+    
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
@@ -729,27 +759,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     }
   }
 
-  /* filter function
-  tests array l for all conditions in layerObj. for eg
-  const array = [
-    {
-      name : 'apples'
-    },
-    {
-      name : 'oranges'
-    }
-  ]
-  const test1 = {
-    name : /^app/
-  }
-
-  filterLayers(array,test1) 
-  returns [{
-    {
-      name : 'apples'
-    }
-  }]
-  */
   private filterLayers(l:any,layerObj:any):boolean{
     return Object.keys(layerObj).length == 0 && layerObj.constructor == Object ?
       true :
@@ -800,9 +809,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     // this.nehubaViewer.ngviewer.state.restoreState(state)
   }
 
-  showFloatingPopover = (ev:MouseEvent)=> {
-    this.mousemoveOverViewer.next(ev)
-  }
 }
 
 export class NehubaViewerUnit{
@@ -819,6 +825,8 @@ export class NehubaViewerUnit{
   template : 
   `
   <nehuba-viewer-2d-landmark-unit
+    (mouseover) = "mouseoverLandmark(landmark)"
+    (mouseout) = "mouseoverLandmark()"
     [ngStyle]="pos(landmark)"
     *ngFor="let landmark of landmarkServices.landmarks"
     container = "body"
@@ -834,6 +842,10 @@ export class NehubaViewerUnit{
   <div [ngStyle] = "{'transform':'rotate3D(' + rotate3D.join(',') + 'rad)' }" *ngIf="rotate3D" perspectiveAd>
     Perspective Overlay
   </div>
+
+  <ng-template #landmarkTemplateRef>
+    Landmark Hovered: 
+  </ng-template>
   `,
   styles :[
     `
@@ -845,12 +857,29 @@ export class NehubaViewerUnit{
   ]
 })
 
-export class NehubaViewerOverlayUnit {
+export class NehubaViewerOverlayUnit implements OnDestroy{
   @Input() nanometersToOffsetPixelsFn : Function 
   @Input() rotate3D : number[] | undefined
+  @ViewChild('landmarkTemplateRef',{read:TemplateRef}) landmarkTemplateRef : TemplateRef<any>
+  hoverLandmark : Landmark | null
+  constructor(
+    public infoToUI:InfoToUIService,
+    public mainController:MainController,
+    public spatialSearch:SpatialSearch,
+    public landmarkServices:LandmarkServices){
+    
+    this.infoToUI.getContentInfoPopoverObservable(
+      this.mouseoverLandmarkObservable
+        .map(ev=> ev ? this.landmarkTemplateRef : null)
+        .takeUntil(this.onDestroySubject)
+    )
+  }
 
-  constructor(public mainController:MainController,public spatialSearch:SpatialSearch,public landmarkServices:LandmarkServices){
+  onDestroySubject : Subject<any> = new Subject()
 
+  ngOnDestroy(){
+    this.onDestroySubject.next()
+    this.onDestroySubject.complete()
   }
 
   private _zOffset : number = 0
@@ -863,32 +892,45 @@ export class NehubaViewerOverlayUnit {
     return this._zOffset
   }
 
+  mouseoverLandmarkObservable : Subject<Landmark|null> = new Subject()
+
+  mouseoverLandmark(landmark:Landmark|null){
+    this.mouseoverLandmarkObservable.next(landmark ? landmark : null)
+  }
+
   pos(landmark:Landmark){
     if(this.nanometersToOffsetPixelsFn){
       const vec = this.nanometersToOffsetPixelsFn(landmark.pos.map((pt:number)=>pt*1000000) as any)
       this.zOffset = vec[2]
       
-      return vec[2] >= 0 ? 
-      ({
-        'z-index':`${Math.round(vec[1]*10)}`,
+      return ({
         'transform':`translate(${vec[0]}px, ${vec[1]}px)`,
-        // 'height': `${vec[2]}px`,
-        'text-shadow' : `
-          -1px 0 rgba(0,0,0,1.0),
-          0 1px rgba(0,0,0,1.0),
-          1px 0 rgba(0,0,0,1.0),
-          0 -1px rgba(0,0,0,1.0)`
-      }) : ({
-        'z-index':`${Math.round(vec[2])}`,
-        'transform' : `translate(${vec[0]}px, ${vec[1]}px)`,
-        // 'height': `${-1*vec[2]}px`,
-        'opacity' : '0.5',
         'text-shadow' : `
           -1px 0 rgba(0,0,0,1.0),
           0 1px rgba(0,0,0,1.0),
           1px 0 rgba(0,0,0,1.0),
           0 -1px rgba(0,0,0,1.0)`
       })
+
+      // return vec[2] >= 0 ? 
+      // ({
+      //   'z-index':`${Math.round(vec[1]*10)}`,
+      //   'transform':`translate(${vec[0]}px, ${vec[1]}px)`,
+      //   // 'height': `${vec[2]}px`,
+      //   'text-shadow' : `
+      //     -1px 0 rgba(0,0,0,1.0),
+      //     0 1px rgba(0,0,0,1.0),
+      //     1px 0 rgba(0,0,0,1.0),
+      //     0 -1px rgba(0,0,0,1.0)`
+      // }) : ({
+      //   'z-index':`${Math.round(vec[2])}`,
+      //   'transform' : `translate(${vec[0]}px, ${vec[1]}px)`,
+      //   'text-shadow' : `
+      //     -1px 0 rgba(0,0,0,1.0),
+      //     0 1px rgba(0,0,0,1.0),
+      //     1px 0 rgba(0,0,0,1.0),
+      //     0 -1px rgba(0,0,0,1.0)`
+      // })
     }else{
       return({
         display:`none`
@@ -910,10 +952,12 @@ export class NehubaViewerOverlayUnit {
   template : 
   `
   <div 
+    [ngStyle] = "{opacity:calcOpacity()}"
     landmarkContainer>
     
     <div 
       [ngStyle] = "styleNode()"
+      [@translateLandmarkHeight] = "{value:landmarkServices.flatProjection ? landmark.hover : true,params:{landmarkHeight:-height}}"
       nodeView 
       #nodeView>
       <span 
@@ -923,7 +967,7 @@ export class NehubaViewerOverlayUnit {
 
     <div 
       class = "pos-beam"
-      [ngStyle]="styleBeam()">
+      [@showLandmarkHeight]="{value:landmarkServices.flatProjection ? landmark.hover : true,params:{landmarkHeight:-height/2,landmarkScale:height}}">
 
       <div 
         *ngIf = "height >= 0"
@@ -1037,7 +1081,8 @@ export class NehubaViewerOverlayUnit {
       display:block;
     }
     `
-  ]
+  ],
+  animations : [ showLandmarkHeight,translateLandmarkHeight ]
 })
 
 export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
@@ -1062,7 +1107,6 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
   styleNode(){
     if(this.height){
       return({
-        'transform' : `translate(0,${-this.height}px)`,
         'color' : `rgb(${this.landmark.hover ? HOVER_COLOR : NORMAL_COLOR})`,
         'z-index' : this.height >= 0 ? 0 : -2
       })
@@ -1097,16 +1141,28 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
     // }
   }
 
+  calcOpacityFlatMode():number{
+    return this.landmark.hover ? 1.0 : 10 / (Math.abs(this.height) + 10)
+  }
+
+  calcOpacity():number{
+    return this.landmarkServices.flatProjection ? 
+      this.calcOpacityFlatMode() :
+        this.height >= 0 ? 
+          1 :
+          0.4 
+  }
+
   styleShadow(){
     if(this.height){
-      const size = (0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1)*10
+      // const size = (0.4/(0.4*Math.pow(this.height/30,2) + 1) + 0.1)*10
       return ({
         'background':`radial-gradient(
           circle at center,
           rgba(${this.landmark.hover ? HOVER_COLOR + ',0.3' : NORMAL_COLOR + ',0.3'}) 10%, 
           rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'}) 30%,
           rgba(0,0,0,0.8))`,
-        'transform' : `scale(${size},${size})`
+        'transform' : `scale(5,5)`
       })
     }else{
       return ({display:`none`})

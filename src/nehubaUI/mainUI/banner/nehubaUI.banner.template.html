@@ -156,14 +156,17 @@
 </div>
 
 <ng-template #searchRegion>
-    <div [@animationFadeInOut]>
-      <atlascontrol 
-        
-        [searchTerm]="searchTerm" 
-        #atlascontrol>
-  
-      </atlascontrol>
-    </div>
+  <div 
+    id = "atlascontrolContainer" 
+    [@animationFadeInOut]>
+
+    <atlascontrol 
+      id = "atlascontrolElement"
+      [searchTerm]="searchTerm" 
+      #atlascontrol>
+
+    </atlascontrol>
+  </div>
 </ng-template>
 
 <ng-template #searchMode>

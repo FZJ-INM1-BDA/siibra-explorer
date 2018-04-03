@@ -1,7 +1,9 @@
 <nehubaModal></nehubaModal>
 
-<floatingPopover>
-  
+<floatingPopover
+  [templatesTobeRendered] = "Array.from(infoToUI.contextInfoPopoverTemplateRef.values())"
+  [offset] = "curosrPos">
+
 </floatingPopover>
 
 <div atlasBannerContainer>
@@ -31,6 +33,7 @@
   </div>
 
   <WidgetsContainer 
+    (setShowMenu) = "showMenu = $event"
     [showMenu] = "showMenu"
     (contextmenu)="$event.stopPropagation()"
     [ngClass]="{'darktheme':mainController.darktheme}">

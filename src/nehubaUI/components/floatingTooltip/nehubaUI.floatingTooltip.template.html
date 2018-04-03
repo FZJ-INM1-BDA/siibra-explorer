@@ -4,8 +4,7 @@
   class = "popover down" 
   style = "display:block;position:absolute;"
   [ngStyle] = "overwriteStyle"
-  [style.left] = "offset[0] + 'px'"
-  [style.top] = "offset[1] + 'px'"
+  [style.transform] = "getTranslation"
   popoverContainer>
 
   <h3 
@@ -20,7 +19,7 @@
   <div class = "popover-content popover-body">
     <ng-template 
       [templateRef] = "template"
-      *ngFor = "let template of templatesTobeRendered" 
+      *ngFor = "let template of filteredTemplatesTobeRendered" 
       renderTemplateDirective>
 
     </ng-template>

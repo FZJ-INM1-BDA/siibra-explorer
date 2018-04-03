@@ -1,7 +1,7 @@
 
 import { Component,ChangeDetectorRef, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-import { UI_CONTROL, ModalServices } from 'nehubaUI/nehubaUI.services'
+import { UI_CONTROL, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
@@ -16,13 +16,13 @@ import 'rxjs/operator/map'
 export class NehubaModalService{
   bsModalRef:BsModalRef
 
-  constructor(private bsModalService:BsModalService,private modalServices:ModalServices){
+  constructor(private bsModalService:BsModalService,private infoToUiService:InfoToUIService){
     /**
      * input
      * info
      * curtain
      */
-    this.modalServices.getModalHandler = this.getModalHandler
+    this.infoToUiService.getModalHandler = this.getModalHandler
     UI_CONTROL.modalControl = this
   }
 

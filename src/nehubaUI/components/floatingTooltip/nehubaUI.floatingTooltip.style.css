@@ -1,7 +1,9 @@
-
 [popoverContainer]
 {
   border:none;
+  margin-left:10px;
+  margin-top:10px;
+  padding:0px;
 }
 .popover-content.popover-body
 {

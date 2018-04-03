@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, ModalServices } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService } from 'nehubaUI/nehubaUI.services';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
 import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 
@@ -83,8 +83,10 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 
   showReceptorData(region:RegionDescriptor,templateRef:TemplateRef<any>){
-    const l = this.landmarkServices.landmarks.find(l=>l.id==region.name)
-    if(l) this.landmarkServices.changeLandmarkNodeView(l,templateRef)
+    // const l = this.landmarkServices.landmarks.find(l=>l.id==region.name)
+    // if(l) this.landmarkServices.changeLandmarkNodeView(l,templateRef)
+    region
+    templateRef
   }
 
   /* hover status inside the searchresult-region card */
@@ -524,7 +526,7 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   @ViewChild('datasetTemplate',{read:TemplateRef}) datasetTemplate : TemplateRef<any>
   fetchedDatasetInfo : DatasetInterface
 
-  constructor(public mainController : MainController,public modalServices:ModalServices){}
+  constructor(public mainController : MainController,public infoToUI:InfoToUIService){}
 
   ngAfterViewInit(){
   }
@@ -538,7 +540,7 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   }
 
   showProperties(){
-    const handler = this.modalServices.getModalHandler()
+    const handler = this.infoToUI.getModalHandler()
     handler.title = `${this.region.name}`
     handler.showTemplateRef(this.datasetTemplate)
 

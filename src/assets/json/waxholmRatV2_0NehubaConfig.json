@@ -3,7 +3,6 @@
         "hideNullImageValues": true,
         "useNehubaLayout": true,
 	      "useNehubaMeshLayer":true,
-        "useNehubaSingleMeshLayer": true,
         "embedded":true,
 	"useCustomSegmentColors":true
     },
