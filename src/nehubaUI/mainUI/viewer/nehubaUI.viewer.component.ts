@@ -1,11 +1,10 @@
-import { AfterViewInit,OnDestroy,ComponentRef,Component,ComponentFactoryResolver,ViewChild,ViewContainerRef,TemplateRef, ComponentFactory }from '@angular/core'
+import { AfterViewInit,ComponentRef,Component,ComponentFactoryResolver,ViewContainerRef, ComponentFactory }from '@angular/core'
 
 import { Config as NehubaViewerConfig,vec3} from 'nehuba/exports'
 
 import { TemplateDescriptor } from 'nehubaUI/nehuba.model'
-import { UI_CONTROL,VIEWER_CONTROL,EXTERNAL_CONTROL as gExternalControl, MainController, SpatialSearch, LandmarkServices, WidgitServices } from 'nehubaUI/nehubaUI.services'
+import { UI_CONTROL,VIEWER_CONTROL,EXTERNAL_CONTROL as gExternalControl, MainController} from 'nehubaUI/nehubaUI.services'
 
-import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer'
 import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component';
 
 
@@ -196,142 +195,6 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
 
   public removeLayer(layerObj:any){
     return this.nehubaViewerComponent.removeLayer(layerObj)
-  }
-}
-
-
-@Component({
-  selector : 'nehubaui-landmark-list',
-  template : 
-  `
-  <ng-template #landmarkList>
-    <div class = "panel-body">
-      <ng-content>
-      </ng-content>
-      <div 
-        landmarkEntry
-        (mouseenter)="landmark.hover = true"
-        (mouseleave)="landmark.hover = false"
-        *ngFor = "let landmark of landmarkServices.landmarks">
-
-        position : {{ landmark.properties['geometry.coordinates'] }}
-      </div>
-      <ul *ngIf = "false" class = "list-group" id = "landmarkList">
-        <li
-          (mouseenter)="landmark.hover = true"
-          (mouseleave)="landmark.hover = false"
-          class = "list-group-item"
-          *ngFor="let landmark of landmarkServices.landmarks">
-
-          <small>
-            <span class = "text-muted">OID :</span> {{ landmark.properties['OID']  }}<br />
-            <span class = "text-muted">coordinates :</span> [{{ landmark.properties['geometry.coordinates'] }}]
-          </small>
-        </li>
-      </ul>
-      
-      <div *ngIf="landmarkServices.landmarks.length>0" class = "btn-group">
-
-        <div class = "default-control btn btn-default btn-sm" (click)="spatialSearch.goTo(0)">
-          <i class = "glyphicon glyphicon-fast-backward"></i>
-        </div>
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination-1)">
-          <i class = "glyphicon glyphicon-step-backward"></i>
-        </div>
-
-        <div 
-          (click)="spatialSearch.goTo(pageNum)"
-          [ngClass]="{'btn-primary':spatialSearch.pagination == pageNum}"
-          *ngFor = "let pageNum of Array.from(Array(Math.ceil(spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE)).keys()).filter(hidePagination)"
-          class = "pagination-control btn btn-default btn-sm">
-          {{ pageNum + 1 }}
-        </div>
-
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination+1)">
-          <i class = "glyphicon glyphicon-step-forward"></i>
-        </div>
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo( spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE + 1 )">
-          <i class = "glyphicon glyphicon-fast-forward"></i>
-        </div>
-
-      </div>
-      
-      <div style="text-align:center; margin-top:10px;">
-        {{ spatialSearch.numHits ? spatialSearch.numHits : 0 }} landmarks found.
-      </div>
-
-    </div>
-  </ng-template>
-  `,
-  styles : [
-    `
-    div[landmarkEntry]
-    {
-      padding : 0.2em 1.0em;
-    }
-    div[landmarkEntry]:hover
-    {
-      cursor:default;
-      background-color:rgba(128,128,128,0.2);
-    }
-    .btn-group
-    {
-      display:flex
-    }
-
-    .btn-group > .default-control
-    {
-      flex : 0 0 auto;
-    }
-
-    .btn-group > .pagination-control
-    {
-      flex : 1 1 auto;
-    }
-    ul.list-group#landmarkList > li.list-group-item:hover
-    {
-      cursor:default;
-      background-color:rgba(128,128,128,0.2);
-    }
-    `
-  ]
-})
-
-export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
-  @ViewChild('landmarkList',{read:TemplateRef}) landmarkList : TemplateRef<any>
-
-  constructor(
-    public mainController:MainController,
-    public spatialSearch:SpatialSearch,
-    public landmarkServices:LandmarkServices,
-    public widgitServices:WidgitServices){
-
-  }
-
-  Array = Array
-  Math = Math
-
-  hidePagination = (idx:number) => {
-    const correctedPagination = this.spatialSearch.pagination < 2 ?
-      2 :
-      this.spatialSearch.pagination > (Math.ceil(this.spatialSearch.numHits / this.spatialSearch.RESULTS_PER_PAGE) - 3) ?
-        Math.ceil(this.spatialSearch.numHits / this.spatialSearch.RESULTS_PER_PAGE) - 3 :
-        this.spatialSearch.pagination
-    return (Math.abs(idx-correctedPagination) < 3)
-  }
-
-  widgetComponent : any
-
-  ngAfterViewInit(){
-    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'iEEG Recordings'})
-
-    const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
-    segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
-  }
-
-  ngOnDestroy(){
-    this.widgitServices.unloadWidget(this.widgetComponent)
-    // this.widgetComponent.parentViewRef.destroy()
   }
 }
 
