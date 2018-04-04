@@ -73,10 +73,6 @@ div[landmarkContainer]
   top:0px;
 }
 
-[nodeView] > *
-{
-}
-
 [nodeView] > .glyphicon
 {
   margin-left:-0.5em;

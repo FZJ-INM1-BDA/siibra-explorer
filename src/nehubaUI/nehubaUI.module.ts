@@ -14,7 +14,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip'
 /* mainUI */
 import { NehubaContainer } from 'nehubaUI/mainUI/parent/nehubaUI.parent.component';
 import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
-import { NehubaViewerInnerContainer,NehubaLandmarkList } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component'
+import { NehubaViewerInnerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component'
 import { NehubaViewer2DLandmarkUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.2dlandmark.component'
 import { NehubaViewerOverlayUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerOverlay.component'
 import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component'
@@ -43,7 +43,7 @@ import { MainController,InfoToUIService, TempReceptorData,LandmarkServices, Widg
 
 
 
-import { SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
+import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
 
 @NgModule({
