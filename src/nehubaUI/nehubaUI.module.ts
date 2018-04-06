@@ -39,9 +39,7 @@ import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemp
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
-import { MainController,InfoToUIService, TempReceptorData,LandmarkServices, WidgitServices } from './nehubaUI.services';
-
-
+import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from './nehubaUI.services';
 
 import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
@@ -60,14 +58,14 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult,
+    [ DisplayFilteredResult, 
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
     MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
     NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingTooltip,
     Multiform, NehubaContainer,NehubaViewerContainer,NehubaUIRegionMultilevel,NehubaBanner,NehubaModalUnit,
-    MultilevelSelector, NehubaModalService, TempReceptorData,
+    MultilevelSelector, NehubaModalService,
     FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
   providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],

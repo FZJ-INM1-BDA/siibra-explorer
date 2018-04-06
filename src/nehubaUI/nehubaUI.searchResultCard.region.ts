@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, TempReceptorData, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
 import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
@@ -217,8 +217,7 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 
   private selectedRegionsWithReceptorData(){
-    this.mainController.selectedRegions = Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data'))
-    this.mainController.regionSelectionChanged()
+    this.mainController.selectedRegionsBSubject.next( Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data')) )
   }
 
   showReceptorData(region:RegionDescriptor,templateRef:TemplateRef<any>){
@@ -350,7 +349,6 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   @ViewChild('imgContainer',{read:TemplateRef}) imageContainer : TemplateRef<any>
   @ViewChild('showImgContainer',{read:ViewContainerRef}) showImageContainer : ViewContainerRef
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
-  @ViewChild('receptorDataDriver') receptorDataComponent : TempReceptorData
 
   receptorBrowserMultilevel:Multilevel
   constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
@@ -403,7 +401,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   close(){
     const idx = this.mainController.selectedRegions.findIndex(r=>r.name == this.region.name)
     if(idx >= 0){
-      this.mainController.selectedRegions.splice(idx,1)
+      this.mainController.selectedRegionsBSubject.next(this.mainController.selectedRegions.filter((_,i)=>i!=idx))
     }else{
       console.warn('cannot find the region',this.region, this.mainController.selectedRegions)
     }
@@ -423,7 +421,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
       `
       (()=>{
 
-        const modalHandler = uiHandle.modalControl.getModalHandler()
+        const modalHandler = interactiveViewer.uiHandle.modalControl.getModalHandler()
       
         const regionName = '${this.region.name}'
         let ntName
@@ -506,32 +504,6 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
     }
        
     this.widgitServices.loadWidgetFromLabComponent(new LabComponent(metadata))
-  }
-  
-  receptorString(string:any){
-    this.mName = /^__fingerprint/.test(string) ? 
-      'fingerprint' :
-      /^_pr/.test(string) ? 
-        'profile' :
-        /^_bm/.test(string) ?
-          'autoradiograph' :
-          '? mode'
-
-    this.ntName = !string ? null : 
-      this.mName == 'fingerprint' ? 
-        '' : 
-        string.split(/\_|\./gi)[2] 
-
-    const info = this.region.moreInfo.find(info=>info.name=='Receptor Data')
-    this.imgSrc = string && info && info.source ? RECEPTOR_ROOT + info.source + string : null
-
-    if(this.imgSrc){
-      this.showOnBiggie()
-      this.receptorDataComponent.popStack()
-      // this.showImageContainer.createEmbeddedView( this.imageContainer )
-    }else{
-      // this.showImageContainer.remove()
-    }
   }
 
   showOnBiggie(){
@@ -671,7 +643,7 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   }
 
   ngOnDestroy(){
-    this.mainController.regionSelectionChanged()
+    
   }
 
   findMoreInfo(name:string){
@@ -697,7 +669,7 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   close(){
     const idx = this.mainController.selectedRegions.findIndex(r=>r.name == this.region.name)
     if(idx >= 0){
-      this.mainController.selectedRegions.splice(idx,1)
+      this.mainController.selectedRegionsBSubject.next(this.mainController.selectedRegions.filter((_,i)=>i!=idx))
     }else{
       console.warn('cannot find the region',this.region, this.mainController.selectedRegions)
     }

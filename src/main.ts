@@ -22,6 +22,8 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { enableProdMode } from '@angular/core'
 import './assets/nehubaTheme.scss'
 
+import { } from 'src/nehubaUI/exports'
+
 enableProdMode();
 
 platformBrowserDynamic().bootstrapModule(NehubaUI);
@@ -38,3 +40,4 @@ import './assets/json/waxholmRatV2_0.json'
 import './assets/json/waxholmRatV2_0NehubaConfig.json'
 import './assets/json/allenMouse.json'
 import './assets/json/allenMouseNehubaConfig.json'
+

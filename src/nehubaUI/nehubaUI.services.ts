@@ -1,19 +1,17 @@
-import { Input, Output,EventEmitter, Component,TemplateRef, Injectable } from '@angular/core';
+import { TemplateRef, Injectable } from '@angular/core';
 import { Subject,BehaviorSubject,Observable } from 'rxjs/Rx'
 import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
-import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, PluginDescriptor, LabComponentHandler } from './nehuba.model'
-import { NehubaModalService, ModalHandler } from 'nehubaUI/components/modal/nehubaUI.modal.component'
-import { NehubaViewer } from 'nehuba/NehubaViewer';
-import { SelectTreePipe } from 'nehubaUI/util/nehubaUI.util.pipes';
-import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding';
+import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, LabComponentHandler } from './nehuba.model'
+import { ModalHandler } from 'nehubaUI/components/modal/nehubaUI.modal.component'
+import { NehubaViewer } from 'nehuba/NehubaViewer'
+import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding'
 import { LayerManager } from 'neuroglancer/layer'
-import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
-import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
-import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification';
-import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer';
-import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component';
-import { ImageUserLayer } from 'neuroglancer/image_user_layer';
+import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
+import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification'
+import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer'
+import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 declare var window:{
   [key:string] : any
@@ -30,38 +28,22 @@ export class MainController{
    */
   loadedTemplates : TemplateDescriptor[] = []
 
-  selectTemplateBSubject : BehaviorSubject<TemplateDescriptor|null> = new BehaviorSubject(null)
-
   selectedTemplate : TemplateDescriptor | undefined
   selectedParcellation : ParcellationDescriptor | undefined
-  _selectedRegions : RegionDescriptor[] = []
 
-  get selectedRegions(){
-    return this._selectedRegions
-  }
+  selectedRegions : RegionDescriptor[] = []
 
-  set selectedRegions(regions:RegionDescriptor[]){
-    this._selectedRegions = regions
-  }
+  selectedTemplateBSubject : BehaviorSubject<TemplateDescriptor|null> = new BehaviorSubject(null)
+  selectedParcellationBSubject : BehaviorSubject<ParcellationDescriptor|null> = new BehaviorSubject(null)
+  selectedRegionsBSubject : BehaviorSubject<RegionDescriptor[]> = new BehaviorSubject([])
 
-  regionsLabelIndexMap: Map<Number,RegionDescriptor> = new Map() // map NG segID to region descriptor
+  regionsLabelIndexMap: Map<number,RegionDescriptor> = new Map() // map NG segID to region descriptor
 
   /**
    * viewing 
    */
-  viewingMode : string = `Select atlas regions`
-  viewingModeBSubject : Subject<string> = new Subject() // cannot be a behaviourSubject, or else it will overwrite query param every time
-
-  /**
-   * hooks
-   */
-  /* queryChangeSubject should emit only key value of strings to be set as query */
-  queryChangeSubject : Subject<any> = new Subject()
-
-  onTemplateSelectionHook : (()=>void)[] = []
-  afterTemplateSelectionHook : (()=>void)[] = []
-  onParcellationSelectionHook : (()=>void)[] = []
-  afterParcellationSelectionHook : (()=>void)[] = []
+  viewingMode : string|null = ``
+  viewingModeBSubject : BehaviorSubject<string|null> = new BehaviorSubject(null) 
 
   /**
    * plugins
@@ -73,18 +55,9 @@ export class MainController{
    */
 
   darktheme : boolean
-
   nehubaViewer : NehubaViewer
-  nehubaViewerSegmentMouseOver : any
-  nehubaCurrentSegment : RegionDescriptor | null = null
-
-  /* to be moved to viewer or viewercontainer */
-  shownSegmentsObserver : any
-  viewerControl : ViewerHandle
 
   constructor(){
-
-    this.viewerControl = new ViewerHandle()
 
     if( this.testRequirement() ){
       this.init()
@@ -92,42 +65,22 @@ export class MainController{
       this.hookAPI()
       this.patchNG()
     }
-
-    /* TODO reconsider if this is a good idea */
-    HelperFunctions.sFindRegion = this.findRegionWithId
-
-    /* required to handle back events */
-    window.addEventListener('hashchange',(ev:HashChangeEvent)=>{
-      
-      if((<string>ev.newURL).indexOf('#') < 0){
-        if(this.nehubaViewer)
-        {
-          this.selectTemplateBSubject.next(null)
-          // this.nehubaViewer.dispose()
-          // this.darktheme = false
-        }
-
-        this.selectedTemplate = undefined
-      }
-      history.replaceState(null,'')
-    })
   }
 
   private parseQueryString(locationSearch:string){
     const query = new URLSearchParams(locationSearch)
+    
     Array.from(query.entries()).forEach(keyval=>{
       switch(keyval[0]){
         case 'selectedTemplate':{
           const template = this.loadedTemplates.find(template=>template.name==keyval[1])
-          if(template) this.loadTemplate(template)
+          if(template) this.selectedTemplateBSubject.next(template)
         }break;
         case 'viewingMode':{
-          setTimeout(()=>{
-            if(this.nehubaViewer) this.setMode(keyval[1])
-          })
+          if(this.nehubaViewer) this.viewingModeBSubject.next(keyval[1])
         }break;
         case 'selectedRegions':{
-          this.selectedRegions = keyval[1].split('_')
+          const selectedRegions = keyval[1].split('_')
             .map(idx=>Number(idx))
             .filter(idx=>this.regionsLabelIndexMap.get(idx))
             .map(idx=>this.regionsLabelIndexMap.get(idx)!)
@@ -135,106 +88,15 @@ export class MainController{
           /* this is needed for now as fresh start seem to wipe selected regions */
           /* TODO properly do parse query string so this workaround is not needed */
           /* TODO get rid of the settimeout */
-          setTimeout(()=>{
-            this.regionSelectionChanged()
-          })
+          this.selectedRegionsBSubject.next(selectedRegions)
         }break;
       }
     })
   }
 
-  private passCheckSetMode(mode:String){
-
-    /* reset view state */
-    if(this.nehubaViewer){
-
-      /* turn off all pmap layers */
-      this.selectedRegions.forEach(re=>{
-        const pmap = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${re.name}`)
-        if(pmap){
-          pmap.setVisible(false)
-        }else{
-          //pmap layer does not yet exist
-        }
-      })
-      
-      /* hide all segments first, then selectively turn on each selected region */
-      this.viewerControl.hideAllSegments()
-
-      /* turn on selected segments in parcellation */
-      if(this.selectedRegions.length==0){
-        this.viewerControl.showAllSegments()
-      }else{
-        this.selectedRegions.forEach(r=>this.viewerControl.showSegment(r.labelIndex))
-      }
-      
-      /* restore alpha */
-      this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
-        .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.5))
-
-    }
-
-    /* reset pmap */
-    // if(this.nehubaViewer){
-    //   this.nehubaViewer.ngviewer.layerManager.managedLayers.filter(l=>/nifti/.test((<any>l).toJSON().source))
-    //     .forEach(l=>l.setVisible(false))
-    // }
-    /* this is already happening */
-
-
-    /* set state */
-    switch(mode){
-      case 'iEEG Recordings':
-      {
-        this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
-          .forEach(l=>(<SegmentationUserLayer>l.layer).displayState.selectedAlpha.restoreState(0.2))
-      }
-      break;
-      case 'Cytoarchitectonic Probabilistic Map':
-      {
-        /* can't do this. or else the mesh becomes invisible */
-        // this.nehubaViewer.ngviewer.layerManager.managedLayers.filter((l:any)=>l.initialSpecification ? l.initialSpecification.type == 'segmentation' : false)
-        //   .forEach(l=>(<ManagedUserLayer>l).setVisible(false))
-
-        this.viewerControl.hideAllSegments()
-        this.viewerControl.setLayerVisibility({name:/^PMap/},false)
-        this.selectedRegions.forEach(r=>{
-          this.viewerControl.setLayerVisibility({name:`PMap ${r.name}`},true)
-        })
-
-        this.viewerControl.loadLayer( this.selectedRegions
-          .filter(r=>r.moreInfo.findIndex(info=>info.name==mode))
-          .reduce((prev:any,r:RegionDescriptor)=>{
-            const obj : any = {}
-            obj[`PMap ${r.name}`] = {
-              type : 'image',
-              source : r.moreInfo.find(info=>info.name==mode)!.source,
-              shader : this.nehubaCurrentSegment && this.nehubaCurrentSegment.name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
-            }
-            return Object.assign({},prev,obj)
-          },{}) )
-
-          this.applyNehubaMeshFix()
-      }
-      break;
-      default:
-      {
-        /* navigation and receptor data mode */
-      }
-      break;
-    }
-  }
-
-  setMode(mode:string){
-    if(this.viewingMode != mode){
-      this.viewingMode = mode
-      this.passCheckSetMode(mode)
-      this.viewingModeBSubject.next(mode)
-    }
-  }
-
   createDisposableWidgets : (widgetComponent:WidgetComponent)=>any
 
+  /* TODO reimplement modal warning */
   testRequirement():boolean{
     
     const canvas = document.createElement('canvas')
@@ -245,7 +107,7 @@ export class MainController{
     if(!gl){
       message['Detail'] = 'Your browser does not support WebGL.'
       
-      const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
+      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
       modalHandler.title = `<h4>Error</h4>`
       modalHandler.body = message
       modalHandler.footer = null
@@ -263,7 +125,7 @@ export class MainController{
       ${ !indexuint ? 'OES_element_index_uint' : ''} `
       message['Detail'] = [detail]
       
-      const modalHandler = <ModalHandler>UI_CONTROL.modalControl.getModalHandler()
+      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
       modalHandler.title = `<h4>Error</h4>`
       modalHandler.body = message
       modalHandler.footer = null
@@ -274,21 +136,20 @@ export class MainController{
   }
 
   init(){
-    this.dataService.fetchTemplates
-      .then((this.dataService.fetchDatasets).bind(this.dataService))
-      .then(templates=>(this.loadedTemplates = templates,Promise.resolve()))
-      .then(()=>
-        this.parseQueryString( window.location.search ))
-      .catch((e:any)=>{
-        console.error('fetching initial dataset error',e)
-      })
-    
-    
+
     /* dev option, use a special endpoint to fetch all plugins */
     fetch('http://localhost:5080/collectPlugins')
       .then(res=>res.json())
       .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
       .catch(console.warn)
+
+    this.dataService.fetchTemplates
+      .then((this.dataService.fetchDatasets).bind(this.dataService))
+      .then(templates=>(this.loadedTemplates = templates,INTERACTIVE_VIEWER.metadata.loadedTemplates = templates,Promise.resolve()))
+      .then(()=>this.parseQueryString( window.location.search ))
+    .catch((e:any)=>{
+      console.error('fetching initial dataset error',e)
+    })
   }
 
   patchNG(){
@@ -302,16 +163,14 @@ export class MainController{
 
     /* TODO find a more permanent fix to disable double click */
     LayerManager.prototype.invokeAction = (arg) => {
-      if(arg=='select'&&this.nehubaCurrentSegment){
-        const idx = this.selectedRegions.findIndex(r=>r==this.nehubaCurrentSegment)
+      const foundRegion = INTERACTIVE_VIEWER.viewerHandle.mouseOverNehuba.getValue().foundRegion
+      if(arg=='select'&&foundRegion){
+        const idx = this.selectedRegions.findIndex(r=>r.name==foundRegion.name)
         if(idx>=0){
-          this.selectedRegions.splice(idx,1)
-          this.nehubaCurrentSegment.enabled = false
+          this.selectedRegionsBSubject.next(this.selectedRegions.filter((_,i)=>i!=idx))
         }else{
-          this.selectedRegions.push(this.nehubaCurrentSegment)
-          this.nehubaCurrentSegment.enabled = true
+          this.selectedRegionsBSubject.next(this.selectedRegions.concat(foundRegion))
         }
-        this.regionSelectionChanged()
       }
     }
 
@@ -319,86 +178,73 @@ export class MainController{
     window['unloadNG'] = (this.unloadTemplate).bind(this)
   }
 
-  urlToPush:URL = new URL(window.location)
-
   attachInternalHooks(){
 
-    /**
-     * to be moved to viewer or viewerContainer
-     */
-    this.onParcellationSelectionHook.push(()=>{
-      if (this.shownSegmentsObserver) this.shownSegmentsObserver.unsubscribe()
-    })
-    this.onTemplateSelectionHook.push(()=>{
-      if (this.nehubaViewerSegmentMouseOver) this.nehubaViewerSegmentMouseOver.unsubscribe()
-    })
-    this.afterParcellationSelectionHook.push(this.applyNehubaMeshFix)
-    this.afterParcellationSelectionHook.push(()=>{
-      this.nehubaViewerSegmentMouseOver = this.nehubaViewer.mouseOver.segment.subscribe(ev=>{
-        /* reset pmap shader (if exists) */
-        if(this.nehubaCurrentSegment && this.nehubaViewer && this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`)){
-          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`) as ManagedUserLayerWithSpecification
-          (<ImageUserLayer>layer.layer).fragmentMain.restoreState(parseRegionRgbToFragmentMain(this.nehubaCurrentSegment))
-        }
-
-        this.nehubaCurrentSegment = this.findRegionWithId(ev.segment)
-
-        /* highlight new highlighted segment */
-        if(this.nehubaCurrentSegment && this.nehubaViewer && this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`)){
-          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(`PMap ${this.nehubaCurrentSegment.name}`) as ManagedUserLayerWithSpecification
-          (<ImageUserLayer>layer.layer).fragmentMain.restoreState(getActiveColorMapFragmentMain())
-        }
-        VIEWER_CONTROL.mouseOverNehuba.next({
-          nehubaOutput : ev,
-          foundRegion : this.findRegionWithId(ev.segment)
-        })
-      })
+    this.selectedParcellationBSubject.subscribe(parcellation=>{
+      if(parcellation)this.loadParcellation(parcellation)
     })
 
-    /* clear widgets and viewing mode */
-    this.selectTemplateBSubject.subscribe((template)=>{
-      this.queryChangeSubject.next({
-        'selectedTemplate': template ? template.name : null
-      })
-      /* TODO temporary measure */
-        
-      /* loading a new template destroys all widgets. which also destroys select region widgit. */
-      /* temporary bandaid, set viewing mode to something else, so that when template is selected new instances of widgets will be instantiated */
-      if(this.viewingMode!='Select atlas regions') setTimeout(()=>this.setMode('Select atlas regions'))
-      this.selectedRegions = []
+    this.viewingModeBSubject.subscribe(mode=>{
+      
+      this.viewingMode = mode
+      // if(mode) this.passCheckSetMode(mode)
+    })
+    
+    this.selectedTemplateBSubject.subscribe((templateDescriptor)=>{
+      if(templateDescriptor){
+        this.loadTemplate(templateDescriptor)
+        this.selectedParcellationBSubject.next(templateDescriptor.parcellations[0])
+      }
     })
 
-    this.queryChangeSubject.subscribe((keyval:any)=>{
-      const search = new URLSearchParams( this.urlToPush.search )
-      Object.keys(keyval).forEach(key=>{
-        keyval[key] ? search.set(key,keyval[key]) : search.delete(key)
-      })
-      this.urlToPush.search = search.toString()
-    })
-
-    this.queryChangeSubject
-      .debounceTime(200)
+    /* ramification of needing to destroy then recreate  */
+    this.selectedTemplateBSubject
       .subscribe(()=>{
-        if(this.urlToPush) history.replaceState(null,'',this.urlToPush.toString())
+        this.viewingModeBSubject.next(null)
       })
 
-    this.viewingModeBSubject.subscribe((mode:string)=>{
-      this.queryChangeSubject.next({
-        viewingMode : mode
-      })
+    this.selectedRegionsBSubject.debounceTime(10).subscribe(regions=>{
+      this.selectedRegions = regions
     })
+
+    const merged = Observable.merge(
+      Observable.from(this.selectedTemplateBSubject
+        .skip(1)
+        .map(template=>({ 'selectedTemplate' : template ? template.name: null }))),
+      Observable.from(this.selectedParcellationBSubject
+        .skip(1)
+        .map(parcellation=>({'selectedParcellation' : parcellation ? parcellation.name : null}))),
+      Observable.from(this.viewingModeBSubject
+        .skip(1)
+        .map(m=>({ 'viewingMode' : m }))),
+      Observable.from(this.selectedRegionsBSubject
+        .skip(1) /* need to skip the first one, as the behaviour subject will always emit an empty array on init */
+        .debounceTime(100)
+        .map(regions=>({
+          'selectedRegions':regions.map(region=>region.labelIndex).join('_')
+        }))
+      )
+    )
+    
+    merged
+      .subscribe((keyval:any)=>{
+        const url = new URL( window.location )
+        const search = new URLSearchParams( window.location.search )
+        Object.keys(keyval).forEach(key=>{
+          keyval[key] ? search.set(key,keyval[key]) : search.delete(key)
+        })
+
+        url.search = search.toString()
+        history.replaceState(null,'',url.toString())
+      })
   }
 
   hookAPI(){
-    
-    UI_CONTROL.onTemplateSelection = (cb:()=>void) => this.onTemplateSelectionHook.push(cb)
-    UI_CONTROL.afterTemplateSelection = (cb:()=>void) => this.afterTemplateSelectionHook.push(cb)
-    UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
-    UI_CONTROL.afterParcellationSelection = (cb:()=>void) => this.onParcellationSelectionHook.push(cb)
 
-    VIEWER_CONTROL.reapplyNehubaMeshFix = this.applyNehubaMeshFix
-    VIEWER_CONTROL.mouseOverNehuba = new Subject()
-    
+    INTERACTIVE_VIEWER.metadata.selectedParcellationBSubject = this.selectedParcellationBSubject
+    INTERACTIVE_VIEWER.metadata.selectedRegionsBSubject = this.selectedRegionsBSubject
+    INTERACTIVE_VIEWER.metadata.selectedTemplateBSubject = this.selectedTemplateBSubject
+    INTERACTIVE_VIEWER.uiHandle.viewingModeBSubject = this.viewingModeBSubject
   }
 
   /**
@@ -407,59 +253,30 @@ export class MainController{
 
   unloadTemplate():void
   {
-    this.selectTemplateBSubject.next(null)
+    this.selectedTemplateBSubject.next(null)
   }
 
   loadTemplate(templateDescriptor:TemplateDescriptor):void
   {
-    /* TODO temporary measure, find permanent solution */
-    /* loading a new template destroys all widgets. which also destroys select region widgit. */
-    /* temporary bandaid, set viewing mode to something else, so that when template is selected new instances of widgets will be instantiated */
-    this.viewingMode = ``
     
     if ( this.selectedTemplate == templateDescriptor ){
       return
     } 
-    // else if( this.selectedTemplate ) {
-    //   this.unloadTemplate()
-    // }
-
-    // hash needs to be reset, or else neuroglancer will take the old hash and put in new viewer
-    window.location.hash = ``
-    this.selectTemplateBSubject.next(templateDescriptor)
-    this.onTemplateSelectionHook.forEach(cb=>cb())
-
-    VIEWER_CONTROL.loadTemplate(templateDescriptor)
-    this.selectedTemplate = templateDescriptor
-
-    this.darktheme = this.selectedTemplate.useTheme == 'dark'
-    EXTERNAL_CONTROL.metadata.selectedTemplate = this.selectedTemplate
     
-    this.afterTemplateSelectionHook.forEach(cb=>cb())
+    /* TODO probably no longer needed, since the refactor of viewing mode mechanism */
+    this.viewingMode = ``
 
-    /**
-     * temporary workaround. 
-     */
-    // setTimeout(()=>{
-      this.loadParcellation( templateDescriptor.parcellations[0] )
-      this.sendUISelectedRegionToViewer()
-    // },5000)
-
-    /* TODO potentially breaks. selectedRegions should be cleared after each loadParcellation */
-    EXTERNAL_CONTROL.metadata.selectedRegions = []
-
+    this.selectedTemplate = templateDescriptor
+    this.darktheme = templateDescriptor.useTheme == 'dark'
   }
 
   loadParcellation(parcellation:ParcellationDescriptor):void
   {
-    if( this.selectedParcellation == parcellation ){
-      return
-    }
-    
-    this.onParcellationSelectionHook.forEach(cb=>cb())
 
     this.selectedParcellation = parcellation
-    this.selectedRegions.splice(0,this.selectedRegions.length-1)
+
+    /* TODO is this the best placce to clear all selected regions? */
+    this.selectedRegionsBSubject.next([])
 
     const mapRegions = (regions:RegionDescriptor[])=>{
       regions.forEach((region:RegionDescriptor)=>{
@@ -474,147 +291,64 @@ export class MainController{
     this.regionsLabelIndexMap.clear()
     mapRegions(this.selectedParcellation!.regions)
 
-    /* TODO temporary measure, until nehubaViewer has its own way of controlling layers 
-    also untested for multiple parcellations
-    */
-    this.selectedTemplate!.parcellations.forEach((parcellation:ParcellationDescriptor)=>{
-      window.viewer.layerManager.getLayerByName( parcellation.ngId ).setVisible(false)
-    })
-
-    window.viewer.layerManager.getLayerByName( this.selectedParcellation!.ngId ).setVisible(true)
-    this.nehubaViewer.redraw()
-
-    this.updateRegionDescriptors( this.nehubaViewer.getShownSegmentsNow({name:this.selectedParcellation!.ngId}) )
-
-    /* populate the metadata object */
-    EXTERNAL_CONTROL.metadata.selectedParcellation = this.selectedParcellation
-
-    this.afterParcellationSelectionHook.forEach(cb=>cb())
+    INTERACTIVE_VIEWER.metadata.regionsLabelIndexMap = this.regionsLabelIndexMap
   }
 
   /* TODO figure out a more elegant way to watch array for changes */
-  regionSelectionChanged()
-  {
-    this.passCheckSetMode(this.viewingMode)
-  }
-
-  updateRegionDescriptors(labelIndices:number[])
-  {
-    EXTERNAL_CONTROL.metadata.selectedRegions = []
-    this.regionsLabelIndexMap.forEach(region=>region.enabled=false)
-    labelIndices.forEach(idx=>{
-      const region = this.regionsLabelIndexMap.get(idx)
-      if(region) {
-        region.enabled = true
-        EXTERNAL_CONTROL.metadata.selectedRegions.push(region)
-      }
-    })
-    
-    this.queryChangeSubject.next({
-      selectedRegions : this.selectedRegions.map(r=>r.labelIndex).join('_').toString()
-    })
-  }
+  // regionSelectionChanged()
+  // {
+  //   this.passCheckSetMode(this.viewingMode)
+  // }
   
-  findRegionWithId(id : number|null):RegionDescriptor|null
-  {
-    if( id == null || id == 0 || !this.selectedParcellation ) return null
-    const searchThroughChildren : (regions:RegionDescriptor[])=>RegionDescriptor|null = (regions:RegionDescriptor[]) => {
-      const matchedRegion = regions.find(region=> region.labelIndex !== undefined && region.labelIndex == id)
-      if(matchedRegion) return matchedRegion
-      const searchedChildren = regions.map(region=>searchThroughChildren(region.children)).find(child=>child!==null)
-      return searchedChildren ? searchedChildren : null
-    }
-    const searchResult = searchThroughChildren(this.selectedParcellation.regions)
-    return searchResult ? searchResult : null
-  }
+  /* should really use this.regionsLabelIndexMap */
+  // findRegionWithId(id : number|null):RegionDescriptor|null
+  // {
+  //   if( id == null || id == 0 || !this.selectedParcellation ) return null
+  //   const searchThroughChildren : (regions:RegionDescriptor[])=>RegionDescriptor|null = (regions:RegionDescriptor[]) => {
+  //     const matchedRegion = regions.find(region=> region.labelIndex !== undefined && region.labelIndex == id)
+  //     if(matchedRegion) return matchedRegion
+  //     const searchedChildren = regions.map(region=>searchThroughChildren(region.children)).find(child=>child!==null)
+  //     return searchedChildren ? searchedChildren : null
+  //   }
+  //   const searchResult = searchThroughChildren(this.selectedParcellation.regions)
+  //   return searchResult ? searchResult : null
+  // }
   
-  sendUISelectedRegionToViewer()
-  {
-    if(!this.selectedParcellation){
-      return
-    }
-    const treePipe = new SelectTreePipe(); //oh how I hate to use semi colon
-    (new Promise((resolve)=>{
-      resolve( treePipe.transform(this.selectedParcellation!.regions)
-        .map(region=>region.labelIndex) )
-    }))
-      .then((segments:number[])=>{
-        if(segments.length==0){
-          VIEWER_CONTROL.showAllSegments()
-        }else{
-          VIEWER_CONTROL.hideAllSegments()
-          segments.forEach(seg=>VIEWER_CONTROL.showSegment(seg))
-        }
-      })
-  }
+  // sendUISelectedRegionToViewer()
+  // {
+  //   if(!this.selectedParcellation){
+  //     return
+  //   }
 
-
-  /**
-   * hibernating functions
-   * TODO remove
-   */
-  
-  fetchedSomething(sth:any)
-  {
-    switch( sth.constructor )
-    {
-      case TemplateDescriptor:
-      {
-
-      }
-      break;
-      case ParcellationDescriptor:
-      {
-        if (!this.selectedTemplate)
-        {
-          //TODO add proper feedback
-          console.log('throw error: maybe you should selected a template first')
-        } else 
-        {
-          this.selectedTemplate.parcellations.push(sth)
-        }
-      }
-      break;
-      case PluginDescriptor:{
-        
-      }break;
-    }
-  }
+  //   /* find better way to implement this */
+  //   const treePipe = new SelectTreePipe(); //oh how I hate to use semi colon
+  //   (new Promise((resolve)=>{
+  //     resolve( treePipe.transform(this.selectedParcellation!.regions)
+  //       .map(region=>region.labelIndex) )
+  //   }))
+  //     .then((segments:number[])=>{
+  //       segments
+  //       // if(segments.length==0){
+  //       //   VIEWER_CONTROL.showAllSegments()
+  //       // }else{
+  //       //   VIEWER_CONTROL.hideAllSegments()
+  //       //   segments.forEach(seg=>VIEWER_CONTROL.showSegment(seg))
+  //       // }
+  //     })
+  // }
 
   /**
    * to be migrated to viewerContainer or viewer
    */
-  applyNehubaMeshFix = () =>{
+  // applyNehubaMeshFix = () =>{
     
-    this.nehubaViewer.clearCustomSegmentColors()
-    if( this.selectedParcellation ){
-      this.nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
-      this.nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
-    }
+  //   this.nehubaViewer.clearCustomSegmentColors()
+  //   if( this.selectedParcellation ){
+  //     this.nehubaViewer.setMeshesToLoad( Array.from(this.selectedParcellation.colorMap.keys()) )
+  //     this.nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
+  //   }
 
-    const shownSegmentsObservable = this.nehubaViewer.getShownSegmentsObservable()
-    this.shownSegmentsObserver = shownSegmentsObservable.subscribe(segs=>{
-      this.updateRegionDescriptors(segs)
-
-      if( this.selectedParcellation ){
-        if( this.selectedParcellation.surfaceParcellation ){
-          //TODO need to test init condition... if selectedRegions is a subset of total regions, what happens?
-          if( segs.length == 0 ){
-            this.nehubaViewer.clearCustomSegmentColors()
-            this.nehubaViewer.batchAddAndUpdateSegmentColors( this.selectedParcellation.colorMap )
-          }else{
-            const newColormap = new Map()
-            const blankColor = {red:255,green:255,blue:255}
-            this.selectedParcellation.colorMap.forEach((activeValue,key)=>{
-              newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
-            })
-            this.nehubaViewer.clearCustomSegmentColors()
-            this.nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
-          }
-        }
-      }
-    })
-  }
+  // }
 
   /**
    * to be migrated to region view
@@ -646,9 +380,9 @@ export class MainController{
 export class MultilevelProvider
 {
   searchTerm : string = ``
-  selectedMultilevel : Multilevel[]
+  selectedMultilevel : Multilevel[] = []
 
-  constructor(private mainController:MainController)
+  constructor()
   {
     
   }
@@ -658,68 +392,72 @@ export class MultilevelProvider
   }
 
   spliceRegionSelect(m:Multilevel){
-    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    const idx = this.selectedMultilevel.findIndex(r=>r==m)
     if (idx>=0){
-      this.mainController.selectedRegions.splice(idx,1)
-      this.mainController.regionSelectionChanged()
+      this.selectedMultilevel.splice(idx,1)
     }else{
       console.warn('splice region select: cannot find region')
     }
   }
 
   pushRegionSelect(m:Multilevel){
-    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    const idx = this.selectedMultilevel.findIndex(r=>r==m)
     if (idx<0){
-      this.mainController.selectedRegions.push(<RegionDescriptor>m)
-      this.mainController.regionSelectionChanged()
+      this.selectedMultilevel.push(<RegionDescriptor>m)
     }else{
       console.warn('push region select: region already in region select. Not pushed!')
     }
   }
 
   toggleRegionSelect(m:Multilevel){
-    const idx = this.mainController.selectedRegions.findIndex(r=>r==m)
+    const idx = this.selectedMultilevel.findIndex(r=>r==m)
     if(idx>=0){
       this.spliceRegionSelect(m)
-      m.enabled = false
     }else{
       this.pushRegionSelect(m)
-      m.enabled = true
     }
   }
 
   enableSelfAndAllChildren(m:Multilevel):void{
-    m.enabled = true
     m.children.forEach(c=>this.enableSelfAndAllChildren(c))
-    if( m.children.length == 0){
+    if( m.children.length == 0 )
+    {
       this.pushRegionSelect(m)
     }
   }
 
   disableSelfAndAllChildren(m:Multilevel):void{
-    m.enabled = false
     m.children.forEach(c=>this.disableSelfAndAllChildren(c))
-    if( m.children.length ==0 ){
+    if( m.children.length == 0 )
+    {
       this.spliceRegionSelect(m)
     }
   }
 
   hasDisabledChildren(m:Multilevel):boolean{
-    return m.children.length > 0?
-      m.children.some(c=>this.hasDisabledChildren(c)) :
-      !m.enabled
+    return !this.isSelected(m) ?
+      true :
+      m.children.length > 0 ?
+        m.children.some(c=>this.hasDisabledChildren(c)) :
+        false
   }
 
   hasEnabledChildren(m:Multilevel):boolean{
-    return m.children.length > 0?
-      m.children.some(c=>this.hasDisabledChildren(c)) :
-      m.enabled
+    return this.isSelected(m) ? 
+      true :
+      m.children.length > 0 ?
+        m.children.some(c=>this.hasEnabledChildren(c)) :
+        false
   }
 
   hasVisibleChildren(m:MultilevelSelector):boolean{
     return m.childrenMultilevel && m.childrenMultilevel.length > 0 ?
       m.childrenMultilevel.some( c=> c.isVisible || this.hasVisibleChildren(c)):
       m.isVisible
+  }
+
+  isSelected(m:Multilevel){
+    return this.selectedMultilevel.findIndex(sm=>sm===m) >= 0
   }
 }
 
@@ -728,7 +466,7 @@ export class WidgitServices
 {
   constructor(private mainController:MainController)
   {
-    this.mainController.selectTemplateBSubject.subscribe((_template)=>{
+    this.mainController.selectedTemplateBSubject.subscribe((_template)=>{
       if(this._unloadAll) this._unloadAll()
       this.loadedWidgets = []
       this.loadedLabComponents = []
@@ -745,9 +483,9 @@ export class WidgitServices
 
   loadWidgetFromLabComponent(labComponent:LabComponent)
   {
-    if(PLUGIN_CONTROL[labComponent.name])
+    if(INTERACTIVE_VIEWER.pluginControl[labComponent.name])
     {
-      (<LabComponentHandler>PLUGIN_CONTROL[labComponent.name]).blink(10)
+      (<LabComponentHandler>INTERACTIVE_VIEWER.pluginControl[labComponent.name]).blink(10)
       return null
     } else {
       const newWidget = this._loadWidgetFromLabComponent(labComponent)
@@ -780,8 +518,7 @@ export class WidgitServices
 
   unloadLabcomponent(labComponent:LabComponent)
   {
-    console.log('unloading labcomponent')
-    delete PLUGIN_CONTROL[labComponent.name]
+    delete INTERACTIVE_VIEWER.pluginControl[labComponent.name]
     const idx = this.loadedLabComponents.findIndex(w=>w==labComponent)
     if( idx >= 0 ){
       this.loadedLabComponents.splice(idx,1)
@@ -1202,80 +939,34 @@ export class Animation{
   }
 }
 
-export class HelperFunctions{
-  static sLoadPlugin : (labComponent : LabComponent)=>void
-  static sFindRegion : (id : Number|null) => RegionDescriptor | null
-}
-
-let metadata : any = {}
-
 export enum SUPPORTED_LIB {
-  jquery2,
-  jquery3,
-  webcomponentsLite,
-  reactRedux
+  jquery2 = 'jquery2',
+  jquery3 = 'jquery3',
+  webcomponentsLite = 'webcomponentsLite',
+  react16 = 'react16',
+  reactdom16 = 'reactdom16'
 }
 
-const parseURLToElement = (urls:string[]):HTMLElement[]=>
-  urls.map(url=>{
-    const el = document.createElement('script')
-    el.src = url
-    return el
-  })
+const parseURLToElement = (url:string):HTMLElement=>{
+  const el = document.createElement('script')
+  el.setAttribute('crossorigin','true')
+  el.src = url
+  return el
+}
 
-export const SUPPORT_LIBRARY_MAP : Map<SUPPORTED_LIB,HTMLElement[]> = new Map([
-  [(SUPPORTED_LIB.jquery3),parseURLToElement(['http://code.jquery.com/jquery-3.3.1.min.js'])],
-  [(SUPPORTED_LIB.jquery2),parseURLToElement(['http://code.jquery.com/jquery-2.2.4.min.js'])],
-  [(SUPPORTED_LIB.webcomponentsLite),parseURLToElement(['https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js'])],
-  [(SUPPORTED_LIB.reactRedux),parseURLToElement(['https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.6/react-redux.min.js'])],
+export const SUPPORT_LIBRARY_MAP : Map<SUPPORTED_LIB,HTMLElement> = new Map([
+  [(SUPPORTED_LIB.jquery3),parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
+  [(SUPPORTED_LIB.jquery2),parseURLToElement('http://code.jquery.com/jquery-2.2.4.min.js')],
+  [(SUPPORTED_LIB.webcomponentsLite),parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
+  [(SUPPORTED_LIB.react16),parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
+  [(SUPPORTED_LIB.reactdom16),parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
 ])
 
-export const EXTERNAL_CONTROL = window['nehubaUI'] = {
-  metadata : metadata,
-  /* to be overwritten by parent */
-  loadExternalLibrary : (_libraryNames:SUPPORTED_LIB[],_callback:(e:any)=>void)=>{
-    
-  }
+export const checkStringAsSupportLibrary = (string:string):SUPPORTED_LIB|null=>{
+  return Object.keys(SUPPORTED_LIB).find(libkey=>libkey==string) ?
+    SUPPORTED_LIB[string as keyof typeof SUPPORTED_LIB] :
+    null
 }
-
-class UIHandle{
-  onTemplateSelection : (cb:()=>void)=>void
-  afterTemplateSelection : (cb:()=>void)=>void
-  onParcellationSelection : (cb:()=>void)=>void
-  afterParcellationSelection : (cb:()=>void)=>void
-  modalControl : NehubaModalService
-}
-
-export const UI_CONTROL = window['uiHandle'] = new UIHandle()
-
-class ViewerHandle {
-  loadTemplate : (TemplateDescriptor:TemplateDescriptor)=>void
-
-  onViewerInit : (cb:()=>void)=>void
-  afterViewerInit : (cb:()=>void)=>void
-  onViewerDestroy : (cb:()=>void)=>void
-
-  setNavigationLoc : (loc:number[],realSpace?:boolean)=>void
-  setNavigationOrientation : (ori:number[])=>void
-
-  moveToNavigationLoc : (loc:number[],realSpace?:boolean)=>void
-
-  showSegment : (segId:number)=>void
-  hideSegment : (segId:number)=>void
-  showAllSegments : ()=>void
-  hideAllSegments : ()=>void
-
-  loadLayer : (layerObj:any)=>any[]
-  removeLayer : (layerObj:any)=>string[]
-  setLayerVisibility : (layerObj:any, visibility:boolean)=>string[]
-  reapplyNehubaMeshFix : ()=>void
-
-  mouseEvent : Subject<{eventName:string,event:any}>
-  mouseOverNehuba : Subject<{nehubaOutput : any, foundRegion : RegionDescriptor | null}>
-}
-
-export const VIEWER_CONTROL = window['viewerHandle'] = new ViewerHandle()
-export const PLUGIN_CONTROL : any = window['pluginControl'] = {}
 export const HELP_MENU = {
   'Mouse Controls' : 
   {
@@ -1293,29 +984,12 @@ export const HELP_MENU = {
   }
 }
 
-/**
- * 
- */
-
-export const PRESET_COLOR_MAPS = 
-  [{
-      name : 'MATLAB_autumn',
-      previewurl : "http://172.104.156.15:8080/colormaps/MATLAB_autumn.png",
-      code : `vec4 colormap(float x) {float g = clamp(x,0.0,1.0);return vec4(1.0,g,0.0,1.0);}`
-  },{
-      name : 'MATLAB_bone',
-      previewurl : 'http://172.104.156.15:8080/colormaps/MATLAB_bone.png',
-      code : `float colormap_red(float x) {  if (x < 0.75) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return (13.0 + 8.0 / 9.0) / 10.0 * x - (3.0 + 8.0 / 9.0) / 10.0;  }}float colormap_green(float x) {  if (x <= 0.375) {    return 8.0 / 9.0 * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else if (x <= 0.75) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 100.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}float colormap_blue(float x) {  if (x <= 0.375) {    return (1.0 + 2.0 / 9.0) * x - (13.0 + 8.0 / 9.0) / 1000.0;  } else {    return 8.0 / 9.0 * x + 1.0 / 9.0;  }}vec4 colormap(float x) {  float r = clamp(colormap_red(x),0.0,1.0);  float g = clamp(colormap_green(x), 0.0, 1.0);  float b = clamp(colormap_blue(x), 0.0, 1.0);  return vec4(r, g, b, 1.0);}      `
-  }]
-
 export const parseRegionRgbToFragmentMain = (r:RegionDescriptor):string=>`void main(){float x = toNormalized(getDataValue()); ${parseRegionRgbToGlsl(r)}if(x>${CM_THRESHOLD}){emitRGBA(vec4(r,g,b,x));}else{emitTransparent();}}`
 export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-
 export const parseRegionRgbToGlsl = (r:RegionDescriptor):string => {
   return (r.rgb.map((color,idx)=>`${idx == 0 ? 'float r' : idx == 1 ? 'float g' : idx == 2 ? 'float b' : 'float a'} = ${(color/255).toFixed(3)};`).join('') + `float a = 1.0;`)
 }
 export const CM_MATLAB_HOT = `float r=clamp(8.0/3.0*x,0.0,1.0);float a = clamp(x,0.0,1.0);float g=clamp(8.0/3.0*x-1.0,0.0,1.0);float b=clamp(4.0*x-3.0,0.0,1.0);`
-// export const CM_MATLAB_JET = `if (x < 0.7) {  float r = clamp(4.0 * x - 1.5, 0.0, 1.0);} else {  float r = clamp(-4.0 * x + 4.5, 0.0, 1.0);}if (x < 0.5) {  float g = clamp(4.0 * x - 0.5, 0.0, 1.0);} else {  float g = clamp(-4.0 * x + 3.5, 0.0, 1.0);}if (x < 0.3) {  float b = clamp(4.0 * x + 0.5, 0.0, 1.0);} else {  float b = clamp(-4.0 * x + 2.5, 0.0, 1.0);}`
 export const CM_MATLAB_JET = 
 `
 float r;
@@ -1342,222 +1016,6 @@ float a = 1.0;
 `
 export const TIMEOUT = 5000;
 export const CM_THRESHOLD = 0.05;
-export const PMAP_WIDGET = {
-  name : `PMap`,
-  icon : 'picture',
-  script : 
-  `
-  (()=>{
-    window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(true)
-    let encodedValue = document.getElementById('default.default.pmap.encodedValue')
-
-    const attach = ()=>{
-      const sub = window.nehubaViewer.mouseOver.image.filter(ev=>ev.layer.name=='PMap').subscribe(ev=>encodedValue.innerHTML = (!ev.value || ev.value == 0) ? '' : Math.round(ev.value * 1000)/1000)
-      window.pluginControl['PMap'].onShutdown(()=>{
-        sub.unsubscribe()
-        window.nehubaViewer.ngviewer.layerManager.getLayerByName('PMap').setVisible(false)
-        window.viewerHandle.hideSegment(0)
-      })
-    }
-    attach()
-  })()
-  `,
-  template : `
-  <table class = "table table-sm table-bordered">
-    <tbody>
-      <tr>
-        <td>Heat Map</td>
-      </tr>
-      <tr>
-        <td><img class="col-md-12" src="http://172.104.156.15:8080/colormaps/MATLAB_hot.png"></td>
-      </tr>
-      <tr>
-        <td>
-          <table class = "table table-sm table-bordered">
-            <tbody>
-              <tr>
-                <td class = "col-sm-6">Encoded Value</td>
-                <td class = "col-sm-6" id = "default.default.pmap.encodedValue"></td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td>Close this dialogue to resume normal browsing.</td>
-      </tr>
-    </tbody>
-  </table>
-  `
-}
-
-/* temporary workaround for fetching plugin data */
-// export const TEMP_PLUGIN_DOMAIN = `https://neuroglancer-dev.humanbrainproject.org/res/`
-export const TEMP_PLUGIN_DOMAIN = `http://localhost:5080/res/`
-
-export const DEFAULT_WIDGETS = [
-  {
-    name : "fzj.xg.advancedMode",
-    templateURL:TEMP_PLUGIN_DOMAIN + "advancedMode/advancedMode.html",
-    scriptURL:TEMP_PLUGIN_DOMAIN + "advancedMode/advancedMode.js"
-  },{
-    "name":"fzj.xg.meshAnimator",
-    "templateURL":TEMP_PLUGIN_DOMAIN + "meshAnimator/meshAnimator.html",
-    "scriptURL":TEMP_PLUGIN_DOMAIN + "meshAnimator/meshAnimator.js"
-  },{
-    "name":"fzj.xg.localNifti",
-    "type":"plugin",
-    "templateURL":TEMP_PLUGIN_DOMAIN + "localNifti/localNifti.html",
-    "scriptURL":TEMP_PLUGIN_DOMAIN + "localNifti/localNifti.js"
-  }
-]
-
-// export const TEMP_RECEPTORDATA_BASE_URL = `http://imedv02.ime.kfa-juelich.de:5081/plugins/receptorBrowser/data/`
-export const TEMP_RECEPTORDATA_BASE_URL = `http://localhost:5080/pluginDev/receptorBrowser/data/`
-export const TEMP_RECEPTORDATA_DRIVER_DATA = 
-{
-  "Fingerprint":"__fingerprint.jpg",
-  "Profiles":
-  {
-    "Glutamate":
-    {
-      "AMPA":"_pr_AMPA.jpg",
-      "NMDA":"_pr_NMDA.jpg",
-      "kainate":"_pr_kainate.jpg",
-      "mGluR2/3":"_pr_mGluR2_3.jpg"
-    },
-    "GABA":
-    {
-      "GABAA":"_pr_GABAA.jpg",
-      "GABAB":"_pr_GABAB.jpg"
-    }
-  },
-  "Autoradiographs":
-  {
-    "Glutamate":{
-      "AMPA":"_bm_AMPA.jpg",
-      "NMDA":"_bm_NMDA.jpg",
-      "kainate":"_bm_kainate.jpg",
-      "mGluR2/3":"_bm_mGluR2_3.jpg"
-    },
-    "GABA":
-    {
-      "GABAA":"_bm_GABAA.jpg",
-      "GABAB":"_bm_GABAB.jpg"
-    }
-  }
-}
-
-@Component({
-  selector : 'receptorDataDriver',
-  template : `
-    <div class = "well" receptorPath>
-      <small>
-        <span (click)="popall()" clickables> root </span>
-        <i class = "glyphicon glyphicon-chevron-right">
-        </i>
-        <span *ngFor = "let choice of choiceStack">
-          <span (click)="popUntil(choice)" clickables>{{ choice }} </span>
-          <i class = "glyphicon glyphicon-chevron-right">
-          </i>
-        </span>
-      </small>
-    </div>
-    <div
-      class = "btn btn-block btn-default"
-      (click)="popStack()" 
-      *ngIf="historyStack.length != 0"
-      backBtn>
-
-      <i class = "glyphicon glyphicon-chevron-left"></i> 
-      <small>
-        Back
-      </small>
-    </div>
-    <div 
-      (click) = "enterStack(key)" 
-      class = "btn btn-block btn-default" 
-      *ngFor="let key of focusStack | keyPipe">
-
-      <small>
-        {{key}} 
-        <i *ngIf="focusStack[key].constructor.name == 'String'" class = "glyphicon glyphicon-picture"></i> 
-        <i *ngIf="focusStack[key].constructor.name == 'Object'" class = "glyphicon glyphicon-chevron-right"></i> 
-      </small>
-    </div>
-  `,
-  styles : [
-    `
-    [clickables]:hover
-    {
-      cursor:pointer;
-    }
-    .well[receptorPath]
-    {
-      white-space:nowrap;
-      overflow:hidden;
-      margin:0em 0em;
-      padding:0.2em 0.5em;
-      background-color:rgba(0,0,0,0.2);
-    }
-    .btn
-    {
-      padding:0.2em 0.5em;
-      margin:0em;
-      text-align:left;
-    }
-    .btn[backBtn]
-    {
-      margin-bottom:1px;
-    }
-    `
-  ]
-})
-
-export class TempReceptorData{
-  @Input() regionName : string = ``
-  @Output() receptorString : EventEmitter<string|null> = new EventEmitter()
-  @Output() neurotransmitterName : EventEmitter<string|null> = new EventEmitter()
-  @Output() modeName : EventEmitter<string|null> = new EventEmitter()
-
-  historyStack : any[] = []
-  choiceStack : string[] = []
-  focusStack : any = TEMP_RECEPTORDATA_DRIVER_DATA
-
-  popall(){
-    while(this.choiceStack.length>0){
-      this.popStack()
-    }
-  }
-
-  popUntil(choice:string){
-    while(this.choiceStack[this.choiceStack.length-1]!=choice){
-      this.popStack()
-    }
-  }
-
-  popStack(){
-    this.focusStack = this.historyStack.pop()
-    this.choiceStack.pop()
-    this.receptorString.emit(null)
-    this.neurotransmitterName.emit(null)
-  }
-
-  enterStack(key:string){
-    this.historyStack.push(this.focusStack)
-    this.choiceStack.push(key)
-    if(typeof this.focusStack[key] == 'string'){
-      const emitItem = this.focusStack[key]
-      this.focusStack = []
-      this.receptorString.emit(emitItem)
-      this.neurotransmitterName.emit(key)
-    }else{
-      this.focusStack = this.focusStack[key]
-      this.receptorString.emit(null)
-      this.neurotransmitterName.emit(null)
-    }
-  }
-}
 
 export const initMultilvl = (json:any):Multilevel=>{
   const m = new Multilevel()
@@ -1610,8 +1068,6 @@ export const RECEPTOR_DATASTRUCTURE_JSON = {
     }
   ]
 }
-
-// export const receptorBrowserMultilevel = new Multilevel();
 
 const TEMP_CROSS_VTK = 
 `# vtk DataFile Version 2.0

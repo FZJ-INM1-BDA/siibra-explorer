@@ -1,6 +1,6 @@
 <div
   *ngFor = "let template of mainController.loadedTemplates"
-  (click)="mainController.loadTemplate( template )">
+  (click)="loadTemplate( template )">
 
   <h2>{{ template.properties.name }}</h2>
   <readmoreComponent>
