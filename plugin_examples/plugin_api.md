@@ -1,60 +1,169 @@
 Plugin APIs
 ======
-![Loading Template Timing](loadTemplateTimeline.svg.png)
-![Loading Template Timing](loadParcellationTimeline.svg.png)
-- *window.nehubaUI*
-  - *metadata* 
-    - *selectedTemplate* : nullable Object 
-    - *availableTemplates* : Array of TemplateDescriptors (empty array if no templates are available)
-    - *selectedParcellation* : nullable Object
-    - *selectedRegions* : Array of Object (empty array if no regions are selected)
 
-- window.pluginControl['YOURPLUGINNAME'] *nb: may be undefined if yourpluginname is incorrect*
-  - blink(sec?:number) : Function that causes the floating widget to blink, attempt to grab user attention
-  - pushMessage(message:string) : Function that pushes a message that are displayed as a popover if the widget is minimised. No effect if the widget is not miniminised.
-  - shutdown() : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback)
-  - onShutdown(callback) : Attaches a callback function, which is called when the plugin is shutdown.
+window.interactiveViewer
+---
+- metadata
+
+  - *selectedTemplateBSubject* : BehaviourSubject that emits a TemplateDescriptor object whenever a template is selected. Emits null onInit.
+
+  - *selectedParcellationBSubject* : BehaviourSubject that emits a ParcellationDescriptor object whenever a parcellation is selected. n.b. selecting a new template automatically select the first available parcellation. Emits null onInit.
+
+  - *selectedRegionsBSubject* BehaviourSubject that emits an Array of RegionDescriptor objects whenever the list of selected regions changes. Emits empty array onInit.
+
+  - *loadedTemplates* : Array of TemplateDescriptor objects. Loaded asynchronously onInit.
+
+  - *regionsLabelIndexMap* Map of labelIndex (used by neuroglancer and nehuba) to the corresponding RegionDescriptor object.
+
+- viewerHandle
+
+  - *setNavigationLoc(coordinates,realspace?:boolean)* Function that teleports the navigation state to coordinates : [x:number,y:number,z:number]. Optional arg determine if the set of coordinates is in realspace (default) or voxelspace.
+
+  - *moveToNavigationLoc(coordinates,realspace?:boolean)*
+  same as *setNavigationLoc(coordinates,realspace?)*, except the action is carried out over 500ms.
+
+  - *setNavigationOri(ori)* (not yet live) Function that sets the orientation state of the viewer.
+
+  - *moveToNavigationOri(ori)* (not yet live) same as *setNavigationOri*, except the action is carried out over 500ms.
+
+  - *showSegment(labelIndex)* Function that shows a specific segment. Will trigger *selectedRegionsBSubject*.
+
+  - *hideSegment(labelIndex)* Function that hides a specific segment. Will trigger *selectRegionsBSubject*
   
-- *window.viewerHandle*
-  - *loadTemplate(TemplateDescriptor)* : Function that loads a new template
-  - *onViewerInit(callback)* : Functional that allows a callback function to be called just before a nehuba viewer is initialised
-  - *afterViewerInit(callback)* : Function that allows a callback function to be called just after a nehuba viewer is initialised
-  - *onViewerDestroy(callback)* : Function that allows a callback function be called just before a nehuba viewer is destroyed
-  - *onParcellationLoading(callback)* : Function that allows a callback function to be called just before a parcellation is selected
-  - *afterParcellationLoading(callback)* : Function that allows a callback function to be called just after a parcellation is selected
-  - *setNavigationLoc(loc,realSpace?)* : Function that teleports to loc : number[3]. Optional argument to determine if the loc is in realspace (default) or voxelspace.
-  - *setNavigationOrientation(ori)* : Function that teleports to ori : number[4]. (Does not work currently)
-  - *moveToNavigationLoc(loc,realSpace?)* : same as *setNavigationLoc(loc,realSpace?)*, except moves to target location over 500ms.
-  - *showSegment(id)* : Function that selectes a segment in the viewer and UI. 
-  - *hideSegment(id)* : Function that deselects a segment in the viewer and UI.
-  - *showAllSegments()* : Function that selects all segments.
-  - *hideAllSegments()* : Function that deselects all segments.
-  - *loadLayer(layerObject)* : Function that loads a custom neuroglancer compatible layer into the viewer (e.g. precomputed, NIFTI, etc). Does not influence UI. 
-  - *reapplyNehubaMeshFix()* Function that reapplies the cosmetic change to NehubaViewer (such as custom colour map, if defined)
-  - *mouseEvent* RxJs Observable. Read more at [rxjs doc](http://reactivex.io/rxjs/)
-    - *mouseEvent.filter(filterFn:({eventName : String, event: Event})=>boolean)* returns an Observable. Filters the event stream according to the filter function.
-    - *mouseEvent.map(mapFn:({eventName : String, event: Event})=>any)* returns an Observable. Map the event stream according to the map function.
-    - *mouseEvent.subscribe(callback:({eventName : String , event : Event})=>void)* returns an Subscriber instance. Call *Subscriber.unsubscribe()* when done to avoid memory leak. 
-  - *mouseOverNehuba* RxJs Observable. Read more at [rxjs doc](http://reactivex.io/rxjs)
-    - *mouseOverNehuba.filter* && *mouseOvernehuba.map* see above
-    - *mouseOverNehuba.subscribe(callback:({nehubaOutput : any, foundRegion : any})=>void)*
+  - *showAllSegments()* Function that shows all segments. Will trigger *selectRegionsBSubject*
 
-- *window.uiHandle*
-  - *onTemplateSelection(callback)* : Function that allows a callback function to be called just after user clicks to navigate to a new template, before *selectedTemplate* is updated
-  - *afterTemplateSelection(callback)* : Function that allows a callback function to be called after the template selection process is complete, and *selectedTemplate* is updated
-  - *onParcellationSelection(callback)* : Function that attach a callback function to user selecting a different parcellation
-  - *afterParcellationSelection(callback)* : Function that attach a callback function to be called after the parcellation selection process is complete and *selectedParcellation* is updated.
-  - *modalControl*
-    - *getModalHandler()* : Function returning a handler to change/show/hide/listen to a Modal. 
-    - *modalHander* methods:
+  - *hideAllSegments()* Function that hides all segments. Will trigger *selectRegionBSubject*
+
+  - *segmentColourMap* : Map of *labelIndex* to an object with the shape of `{red: number, green: number, blue: number}`.
+
+  - *applyColourMap(colourMap)* Function that applies a custom colour map (Map of number to and object with the shape of `{red: number , green: number , blue: number}`)
+
+  - *loadLayer(layerObject)* Function that loads *ManagedLayersWithSpecification* directly to neuroglancer. Returns the values of the object successfully added. **n.b.** advanced feature, will likely break other functionalities. **n.b.** if the layer name is already taken, the layer will not be added.
+  
+  ```javascript
+  const obj = {
+    'advanced layer' : {
+      type : 'image',
+      source : 'nifti://http://example.com/data/nifti.nii',
+    },
+    'advanced layer 2' : {
+      type : 'mesh',
+      source : 'vtk://http://example.com/data/vtk.vtk'
+    }
+  }
+  const returnValue = window.interactiveViewer.viewerHandle.loadLayer(obj)
+  /* loads two layers, an image nifti layer and a mesh vtk layer */
+
+  console.log(returnValue)
+  /* prints
+  
+  [{ 
+    type : 'image', 
+    source : 'nifti...' 
+  },
+  {
+    type : 'mesh',
+    source : 'vtk...'
+  }] 
+  */
+  ```
+
+  - *removeLayer(layerObject)* Function that removes *ManagedLayersWithSpecification*, returns an array of the names of the layers removed. **n.b.** advanced feature. may break other functionalities.
+  ```js
+  const obj = {
+    'name' : /^PMap/
+  }
+  const returnValue = window.interactiveViewer.viewerHandle.removeLayer(obj)
+  
+  console.log(returnValue)
+  /* prints
+  ['PMap 001','PMap 002']
+  */
+  ```
+  - *setLayerVisibility(layerObject,visible)* Function that sets the visibility of a layer. Returns the names of all the layers that are affected as an Array of string.
+
+  ```js
+  const obj = {
+    'type' : 'segmentation'
+  }
+
+  window.interactiveViewer.viewerHandle.setLayerVisibility(obj,false)
+
+  /* turns off all the segmentation layers */
+  ```
+
+  - *mouseEvent* Subject that emits an object shaped `{ eventName : string, event: event }` when a user triggers a mouse event on the viewer. 
+
+  - *mouseOverNehuba* BehaviourSubject that emits an object shaped `{ nehubaOutput : number | null, foundRegion : RegionDescriptor | null }`
+
+- uiHandle
+
+  - modalControl
+
+    - *getModalHandler()* returns a modalHandlerObject
+
+    - *modalHandler*
+
       - *hide()* : Dynamically hides the modal
       - *show()* : Shows the modal
       - *onHide(callback(reason)=>void)* : Attaches an onHide callback. 
       - *onHidden(callback(reason)=>void)* : Attaches an onHidden callback. 
       - *onShow(callback(reason)=>void)* : Attaches an onShow callback. 
       - *onShown(callback(reason)=>void)* : Attaches an onShown callback.
-    - *modalHandler* properties:
       - title : title of the modal (String)
       - body : body of the modal shown (JSON, Array, String)
       - footer : footer of the modal (String)
       - config : config of the modal
+
+  - *viewingModeBSubject* BehaviourSubject emitting strings when viewing mode has changed. 
+
+- pluginControl
+
+  - *loadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* Function that loads external libraries. Pass the name of the libraries as an Array of string, and returns a Promise. When promise resolves, the libraries are loaded. **n.b.** while unlikely, there is a possibility that multiple requests to load external libraries in quick succession can cause the promise to resolve before the library is actually loaded. 
+
+  ```js
+  const currentlySupportedLibraries = ['jquery2','jquery3','webcomponentsLite','react16','reactdom16']
+
+  window.interactivewViewer.loadExternalLibraries(currentlySupportedLibraries)
+    .then(()=>{
+      /* loaded */
+    })
+    .catch(e=>console.warn(e))
+
+  ```
+
+  - *unloadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* unloading the libraries (should be called on shutdown).
+
+  - **[PLUGINNAME]** returns a plugin handler. This would be how to interface with the plugins.
+
+    
+    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention
+    - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback)
+    - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
+
+    ```js
+    const pluginHandler = window.interactiveViewer.pluginControl[PLUGINNAME]
+
+    const subscription = window.interactiveViewer.metadata.selectedTemplateBSubject.subscribe(template=>console.log(template))
+
+    fetch(`http://YOUR_BACKEND.com/API_ENDPOINT`)
+      .then(data=>pluginHandler.blink(20))
+
+    pluginHandler.onShutdown(()=>{
+      subscription.unsubscribe()
+    })
+    ```
+
+------
+
+window.nehubaViewer
+---
+
+nehuba object, exposed if user would like to use it
+
+-------
+
+window.viewer
+---
+
+neuroglancer object, exposed if user would like to use it
