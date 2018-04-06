@@ -2,9 +2,10 @@ import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterVi
 import { animationFadeInOut,animateCollapseShow, showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
-import { PLUGIN_CONTROL as gPluginControl, MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
+import { MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 /**
  * basic widget class
@@ -27,7 +28,7 @@ export class WidgetComponent{
 
   constructor( labcomponent:LabComponent ){
     this.labComponent = labcomponent
-    this.handler = gPluginControl[this.labComponent.name] = new LabComponentHandler()
+    this.handler = INTERACTIVE_VIEWER.pluginControl[this.labComponent.name] = new LabComponentHandler()
 
     this.handler.shutdown = this.shutdown
     this.handler.onShutdown = (cb) => this.onShutdownCallbacks.push(cb)
@@ -370,6 +371,8 @@ export class WidgetsContainer{
       this.widgitServices.unloadLabcomponent(labComponent)
       this.widgitServices.unloadWidget(newWidget)
     }
+
+    /* TODO this timeout may not be necessary, since loading of src is already async */
     setTimeout(()=>{
       this.rd2.appendChild(document.head,scriptclone)
     })

@@ -1,38 +1,5 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { VIEWER_CONTROL,CM_MATLAB_HOT,CM_THRESHOLD } from './nehubaUI.services'
-import { OnDestroy } from '@angular/core/src/metadata/lifecycle_hooks';
-
-export class LayerProperties{
-  constructor(json:any){
-    for(let key in this){
-      if(json[key]){
-        this[key] = json[key]
-      }
-    }
-  }
-  type:string = '';
-  source:string = '';
-  transform:number[][] = [
-    [1,0,0,0],
-    [0,1,0,0],
-    [0,0,1,0],
-    [0,0,0,1]
-  ]
-  shader:string = ''
-}
-
-export class LayerDescriptor {
-  constructor(name:string,json:any){
-    this.name = name
-    this.properties = new LayerProperties(json)
-  }
-  properties : LayerProperties;
-  name : string;
-  masterOpacity : number = 1.0;
-
-  isShown : boolean = true;
-  subPanelShown : boolean = false;
-}
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 export class Property{
   constructor(obj:any){
@@ -187,39 +154,11 @@ export class Multilevel{
 
   name : string; /* should be overwritten by subclasses */
 
-  enabled : boolean = false;
+  hierarchy : number
+  parent : Multilevel | undefined
+  children : Multilevel[] = []
+  isExpanded : boolean = true
 
-  hierarchy : number;
-  parent : Multilevel | undefined;
-  children : Multilevel[];
-  isExpanded : boolean = true;
-  isExpandedString : 'expanded' | 'collapsed' = 'collapsed'
-
-  constructor(){
-    this.enabled = false
-    this.children = []
-  }
-
-  public disableSelfAndAllChildren = ():void => {
-    this.enabled = false
-    this.children.forEach( child => child.disableSelfAndAllChildren())
-  }
-
-  public enableSelfAndAllChildren = ():void => {
-    this.enabled = true
-    this.children.forEach( child => child.enableSelfAndAllChildren())
-  }
-
-  /* used to determine the tick status (selected, unselected, partially selected) */
-  public hasDisabledChildren = ():boolean =>
-    this.children.length > 0 ?
-      this.children.some( child => child.hasDisabledChildren() ) :
-      !this.enabled
-
-  public hasEnabledChildren = ():boolean =>
-    this.children.length > 0 ?
-      this.children.some( child => child.hasEnabledChildren() ) :
-      this.enabled  
 }
 
 export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
@@ -242,38 +181,14 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     if(this.position){
       const goToPosition = new DescriptorMoreInfoItem('Go To There','map-marker')
       goToPosition.action = ()=>{
-        VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
+        INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(this.position as [number,number,number],true)
       }
       this.moreInfo.push(goToPosition)
     }
     if(this.PMapURL){
       const pmap = new DescriptorMoreInfoItem('Cytoarchitectonic Probabilistic Map','picture')
       pmap.action = () => {
-
-        /* move viewer to the relevant location */
-        if(this.position)VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
-
-        const pMapObj = {
-          PMap : {
-            type : 'image',
-            source : 'nifti://'+this.PMapURL,
-            shader : `void main(){float x=toNormalized(getDataValue());${CM_MATLAB_HOT}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
-          }
-        }
-
-        /* setting timeout is required... or else the pMap, or parcellation looks wonky */
-        setTimeout(()=>{
-          VIEWER_CONTROL.loadLayer(pMapObj)
-          VIEWER_CONTROL.hideAllSegments()
-          VIEWER_CONTROL.reapplyNehubaMeshFix()
-        })
-
-        // if(gPluginControl['PMap']){
-        //   gPluginControl['PMap'].blink(10)
-        // }else{
-        //   const newWidget = new LabComponent(PMAP_WIDGET)
-        //   HelperFunctions.sLoadPlugin(newWidget)
-        // }
+        console.log('using action to access pmap has been deprecated')
       }
       pmap.source = 'nifti://'+this.PMapURL
       this.moreInfo.push(pmap)
@@ -282,10 +197,7 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     if(json.receptorData){
       const receptorData = new DescriptorMoreInfoItem('Receptor Data','tag')
       receptorData.action = ()=>{
-        if(this.position)VIEWER_CONTROL.moveToNavigationLoc(this.position,true)
-        VIEWER_CONTROL.hideAllSegments()
-        VIEWER_CONTROL.showSegment(this.labelIndex)
-        /* TODO find a more permanent way to pass the selected rectpro data to mainController */
+        console.log('using action to access receptor data has been depreciated')
       }
       receptorData.source = json.receptorData
       this.moreInfo.push(receptorData)
@@ -321,7 +233,7 @@ export class DescriptorMoreInfoItem{
   }
 }
 
-export class LabComponent implements OnDestroy{
+export class LabComponent{
   script : HTMLElement
   template : HTMLElement
   name : string
@@ -359,10 +271,6 @@ export class LabComponent implements OnDestroy{
           console.log('error fetching plugin template',e)
         })
     }
-  }
-
-  ngOnDestroy = ()=>{
-    console.log('destorying labcomponent')
   }
 }
 

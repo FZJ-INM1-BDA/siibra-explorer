@@ -72,15 +72,11 @@ export class MultilevelSelector {
   @Output() singleClick : EventEmitter<Multilevel> = new EventEmitter()
   @Output() doubleClick : EventEmitter<Multilevel> = new EventEmitter()
 
+
   debounceFlag : boolean = true
   debounceTimer : any
 
   constructor(public mainController:MainController,public multilevelProvider:MultilevelProvider){}
-
-  chooseLevel = (data:Multilevel):void => 
-    data.hasEnabledChildren() ? 
-      data.disableSelfAndAllChildren() : 
-      data.enableSelfAndAllChildren()
 
   toggleExpansion = (m:Multilevel):boolean => m.isExpanded = !m.isExpanded
 
@@ -90,7 +86,7 @@ export class MultilevelSelector {
       this.debounceTimer = setTimeout(()=>{
         this.realSingleClick(m)
         this.debounceFlag = true
-      },300)
+      },250)
     }else{
       clearTimeout(this.debounceTimer)
       this.debounceFlag = true

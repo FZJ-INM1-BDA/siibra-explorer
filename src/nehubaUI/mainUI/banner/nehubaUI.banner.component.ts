@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
-import { EXTERNAL_CONTROL as gExternalControl, UI_CONTROL, MainController,HELP_MENU,WidgitServices, InfoToUIService } from 'nehubaUI/nehubaUI.services'
-import { RegionDescriptor, TemplateDescriptor, DatasetInterface }from 'nehubaUI/nehuba.model'
+import { MainController,HELP_MENU,WidgitServices, InfoToUIService } from 'nehubaUI/nehubaUI.services'
+import { RegionDescriptor, TemplateDescriptor, DatasetInterface, ParcellationDescriptor }from 'nehubaUI/nehuba.model'
 
 import { DatasetBlurb } from 'nehubaUI/components/datasetBlurb/nehubaUI.datasetBlurb.component';
 import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations'
@@ -43,6 +43,7 @@ export class NehubaBanner implements AfterViewInit {
   widgetiseSearchRegion : boolean = false
 
   searchTerm : string = ``
+  regions : RegionDescriptor[] = []
 
   @ViewChild('modeInfoUnit') modeInfoUnit: DatasetBlurb
   @ViewChild('modeInfo') modeInfo: TemplateRef<any>
@@ -62,8 +63,8 @@ export class NehubaBanner implements AfterViewInit {
     //   this.widgetiseSearchRegion = false
     // }
 
-    this.mainController.afterParcellationSelectionHook.push(()=>{
-      
+    this.mainController.selectedTemplateBSubject.subscribe(()=>{
+
       this.listOfActivities = 
         Array
           .from(this.mainController.regionsLabelIndexMap.values())
@@ -75,6 +76,18 @@ export class NehubaBanner implements AfterViewInit {
                   .map(i=>i.name))
           ,[])
     })
+
+    this.mainController.selectedParcellationBSubject.subscribe((parcellation)=>{
+      this.regions = parcellation ? parcellation.regions : []
+    })
+  }
+
+  loadTemplate(template:TemplateDescriptor){
+    if(this.mainController.selectedTemplate !== template) this.mainController.selectedTemplateBSubject.next(template)
+  }
+
+  loadParcellation(parcellation:ParcellationDescriptor){
+    if(this.mainController.selectedParcellation !== parcellation) this.mainController.selectedParcellationBSubject.next(parcellation)
   }
 
   widgetiseSearchRegionComponent(){
@@ -88,16 +101,19 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   ngAfterViewInit(){
-    UI_CONTROL.afterTemplateSelection(()=>{
-      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+    // UI_CONTROL.afterTemplateSelection(()=>{
+    //   this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
+    // })
+    this.mainController.selectedTemplateBSubject.subscribe((template)=>{
+      if(template)this.darktheme = template.useTheme == 'dark'
     })
   }
 
-  showRegion(){
-    if(this.mainController.selectedTemplate && this.mainController.selectedParcellation){
-      this.showRegionDialog.emit()
-    }
-  }
+  // showRegion(){
+  //   if(this.mainController.selectedTemplate && this.mainController.selectedParcellation){
+  //     this.showRegionDialog.emit()
+  //   }
+  // }
 
   showModeInfo(activity:string){
     const handler = this.infoToUI.getModalHandler()
@@ -134,11 +150,12 @@ export class NehubaBanner implements AfterViewInit {
     
     this.clearSearchActivityTerm()
     this.focusModeSelector = false
-    this.mainController.setMode(newActivity)
+    this.mainController.viewingModeBSubject.next(newActivity == 'Select atlas regions' ? null : newActivity)
   }
 
   showhelp(){
-    const modalHandler = UI_CONTROL.modalControl.getModalHandler()
+    
+    const modalHandler = this.infoToUI.getModalHandler()
     modalHandler.title = `<h4>Help</h4>`
     modalHandler.body = HELP_MENU
     modalHandler.footer

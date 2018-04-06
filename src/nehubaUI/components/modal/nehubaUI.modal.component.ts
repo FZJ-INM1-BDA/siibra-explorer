@@ -1,11 +1,12 @@
 
 import { Component,ChangeDetectorRef, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core'
 import { BsModalService,BsModalRef } from 'ngx-bootstrap/modal'
-import { UI_CONTROL, InfoToUIService } from 'nehubaUI/nehubaUI.services'
+import { InfoToUIService } from 'nehubaUI/nehubaUI.services'
 
 import { Subscription } from 'rxjs/Rx'
 import 'rxjs/observable/of'
 import 'rxjs/operator/map'
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 /* TODO clean up modal */
 @Component({
@@ -23,11 +24,10 @@ export class NehubaModalService{
      * curtain
      */
     this.infoToUiService.getModalHandler = this.getModalHandler
-    UI_CONTROL.modalControl = this
+    INTERACTIVE_VIEWER.uiHandle.modalControl = this
   }
 
   public getModalHandler = ()=> new ModalHandler(this.bsModalService)
-  
 }
 
 export class ModalHandler{

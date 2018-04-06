@@ -12,6 +12,7 @@ import { Multilevel } from 'nehubaUI/nehuba.model'
 
 export class KeyPipe implements PipeTransform{
   public transform(obj:any):string[]{
+    if((typeof obj) != 'object') throw new Error('KeyPipe input is not an Object.')
     let returnKey = []
     for (let key in obj){
       returnKey.push(key)

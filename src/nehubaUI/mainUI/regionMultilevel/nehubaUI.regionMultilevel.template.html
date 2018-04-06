@@ -13,7 +13,7 @@
       (singleClick) = "multilevelSingleClick($event)"
       (doubleClick) = "multilevelDoubleClick($event)"
       class = "menuItemContentText"  
-      *ngFor = "let region of mainController.selectedParcellation.regions"
+      *ngFor = "let region of regions"
       [data]= "region" >
     </multilevel>
   </div>

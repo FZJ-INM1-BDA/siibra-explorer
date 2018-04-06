@@ -32,7 +32,7 @@
           role="menuitem">
           
           <a class="dropdown-item" 
-            (click)="mainController.loadTemplate(template)" 
+            (click)="loadTemplate(template)" 
             href="#">
             
             {{template.name}}</a>
@@ -84,7 +84,7 @@
       [outsideClick] = "true"
       containerClass = "inputModeSearchContainer"
       placement = "bottom"
-      triggers = ""
+      triggers = "focus"
       #inputSearchActivitiesPopover = "bs-popover"
       [popover] = "searchMode"
       inputSearchRegion>
@@ -98,7 +98,7 @@
           class = "app-input-placeholder" 
           [ngStyle]="{'z-index':focusModeSelector ? 0 : 2}">
           <small>Mode</small>
-          <small class = "text-muted">{{mainController.viewingMode}}</small>
+          <small class = "text-muted">{{mainController.viewingMode ? mainController.viewingMode : 'Select atlas regions' }}</small>
         </span>
         <input 
           type = "text"
@@ -162,7 +162,8 @@
 
     <atlascontrol 
       id = "atlascontrolElement"
-      [searchTerm]="searchTerm" 
+      [searchTerm] = "searchTerm" 
+      [regions]= "regions"
       #atlascontrol>
 
     </atlascontrol>
@@ -176,7 +177,7 @@
     [ngClass] = "{'darktheme':mainController.darktheme}"
     listOfActivities>
     <li 
-      [ngClass] = "{'selected':mainController.viewingMode == activity}"
+      [ngClass] = "{'selected':mainController.viewingMode == activity || (!mainController.viewingMode && activity == 'Select atlas regions')}"
       role = "menuitem"
       *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe : mainController.selectedTemplate  | searchPipe : searchActivityTerm">
       

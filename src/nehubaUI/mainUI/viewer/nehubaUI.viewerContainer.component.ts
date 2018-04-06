@@ -1,10 +1,11 @@
-import { Component,ViewChild,Input,AfterViewInit } from '@angular/core'
-import { UI_CONTROL,EXTERNAL_CONTROL as gExternalControl, VIEWER_CONTROL, MainController, LandmarkServices, SpatialSearch } from 'nehubaUI/nehubaUI.services'
+import { Component,ViewChild,Input } from '@angular/core'
+import { MainController, LandmarkServices, SpatialSearch } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.viewerContainer.template.html'
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 @Component({
   selector : 'ATLASViewer',
@@ -12,21 +13,39 @@ import template from './nehubaUI.viewerContainer.template.html'
   providers : [ SpatialSearch ]
 })
 
-export class NehubaViewerContainer implements AfterViewInit {
+export class NehubaViewerContainer {
   darktheme : boolean
   @Input() hideUI : boolean = false
   @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-  constructor(public mainController:MainController,private landmarkServices:LandmarkServices){ }
+  /* TODO to be exported as viewerHandle.mouseEvent */
+  mouseEventOnViewer : Subject<any> = new Subject()
 
-  mouseEventHandler : (mode:string,ev:any)=>void = (mode:string,ev:any) => {
-    if(VIEWER_CONTROL.mouseEvent)VIEWER_CONTROL.mouseEvent.next({eventName:mode,event:ev})
+  constructor(public mainController:MainController,private landmarkServices:LandmarkServices){
+    INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc = (loc,real)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationLoc(loc,real))
+    INTERACTIVE_VIEWER.viewerHandle.moveToNavigationOri = (ori) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationOri(ori))
+    
+    INTERACTIVE_VIEWER.viewerHandle.setNavigationLoc = (loc,real) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setNavigationLoc(loc,real))
+    INTERACTIVE_VIEWER.viewerHandle.setNavigationOri = (ori) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setNavigationOrientation(ori))
+    
+    INTERACTIVE_VIEWER.viewerHandle.hideSegment = (labelIndex) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.hideSegment(labelIndex))
+    INTERACTIVE_VIEWER.viewerHandle.hideAllSegments = () => (this.checkViewerExist(),this.nehubaViewerInnerContainer.hideAllSegments())
+    INTERACTIVE_VIEWER.viewerHandle.showSegment = (labelIndex) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.showSegment(labelIndex))
+    INTERACTIVE_VIEWER.viewerHandle.showAllSegments = () => (this.checkViewerExist(),this.nehubaViewerInnerContainer.showAllSegments())
+    INTERACTIVE_VIEWER.viewerHandle.loadLayer = (layerObj) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.loadLayer(layerObj))
+    INTERACTIVE_VIEWER.viewerHandle.removeLayer = (layerObj) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.removeLayer(layerObj))
+    INTERACTIVE_VIEWER.viewerHandle.setLayerVisibility = (layerObj,visible) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setLayerVisibility(layerObj,visible))
+
+    INTERACTIVE_VIEWER.viewerHandle.mouseEvent = this.mouseEventOnViewer
   }
 
-  ngAfterViewInit(){
-    UI_CONTROL.afterTemplateSelection(()=>
-      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false)
-    VIEWER_CONTROL.mouseEvent = new Subject()
+  checkViewerExist = () => {
+    if(this.nehubaViewerInnerContainer.nehubaViewerComponent !== null && (typeof this.nehubaViewerInnerContainer.nehubaViewerComponent != 'undefined'))return
+    else throw new Error('nehuba viewer has not yet been initialised, probably because a template has not yet been loaded.')
+  }
+
+  mouseEventHandler : (mode:string,ev:any)=>void = (mode:string,ev:any) => {
+    this.mouseEventOnViewer.next({eventName:mode,event:ev})
   }
 
   receptorMouseEnter(region:RegionDescriptor){
@@ -46,3 +65,5 @@ export class NehubaViewerContainer implements AfterViewInit {
     }
   }
 }
+
+// export let MOVE_TO_LOC : (loc:[number,number,number],realSpace?:boolean) => void

@@ -12,16 +12,6 @@
       glyphiconChevron>
     </span>
 
-    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-stop" *ngIf = "false && data.hasDisabledChildren() && data.hasEnabledChildren()">
-          <!-- <span class = "unicodeSymbols">&#x25A3;</span> -->
-    </span>
-    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-check" *ngIf = "false && !data.hasDisabledChildren() && data.hasEnabledChildren()">
-          <!-- <span class = "unicodeSymbols">&#x2611;</span> -->
-    </span>
-    <span (click)="chooseLevel(data)" class = "glyphicon glyphicon-unchecked" *ngIf = "false && data.hasDisabledChildren() && !data.hasEnabledChildren()">
-          <!-- <span class = "unicodeSymbols">&#x2610;</span> -->
-    </span>
-
     <span 
       class = "multilevel-name"
       [ngClass]="{'text-muted': muteFilter(data),'text-active':highlightFilter(data)}"

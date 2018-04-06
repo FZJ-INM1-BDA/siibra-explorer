@@ -1,5 +1,5 @@
 import { OnChanges, Input, Component } from '@angular/core'
-import { UI_CONTROL, MainController, MultilevelProvider } from 'nehubaUI/nehubaUI.services'
+import { MainController, MultilevelProvider, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.regionMultilevel.template.html'
@@ -14,13 +14,21 @@ import css from './nehubaUI.regionMultilevel.style.css'
 
 export class NehubaUIRegionMultilevel implements OnChanges{
   @Input() searchTerm : string = ''
+  @Input() regions : RegionDescriptor[] = []
 
-  constructor(public mainController:MainController,public multilevelProvider:MultilevelProvider){
+  constructor(
+    private infoToUI:InfoToUIService,
+    public mainController:MainController,
+    public multilevelProvider:MultilevelProvider){
 
+    this.mainController.selectedRegionsBSubject.subscribe(regions=>{
+      
+      this.multilevelProvider.selectedMultilevel = regions
+    })
   }
 
   muteFilter = (m:RegionDescriptor):boolean=>{
-    return this.mainController.viewingMode != 'Select atlas regions' && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+    return this.mainController.viewingMode !== null && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
   }
 
   highlightFilter = (m:RegionDescriptor):boolean=>{
@@ -33,7 +41,7 @@ export class NehubaUIRegionMultilevel implements OnChanges{
 
   multilevelSingleClick(m:RegionDescriptor){
     if( m.children.length > 0 ){
-      if( m.hasEnabledChildren()){
+      if( this.multilevelProvider.hasEnabledChildren(m) ){
         this.multilevelProvider.disableSelfAndAllChildren(m)
       } else {
         this.multilevelProvider.enableSelfAndAllChildren(m)
@@ -41,6 +49,7 @@ export class NehubaUIRegionMultilevel implements OnChanges{
     }else{
       this.multilevelProvider.toggleRegionSelect(m)
     }
+    this.updateRegionSelection()
   }
 
   multilevelDoubleClick(m:RegionDescriptor){
@@ -52,7 +61,7 @@ export class NehubaUIRegionMultilevel implements OnChanges{
 
   showMoreInfo(_item:any):void{
     // console.log(_item)
-    const modalHandler = UI_CONTROL.modalControl.getModalHandler()
+    const modalHandler = this.infoToUI.getModalHandler()
     modalHandler.title = `<h4>More information on ${_item.name}</h4>`
     modalHandler.body = _item.properties
     modalHandler.footer = null
@@ -60,7 +69,10 @@ export class NehubaUIRegionMultilevel implements OnChanges{
   }
 
   clearAllSelections(){
-    this.mainController.selectedRegions = []
-    this.mainController.regionSelectionChanged()
+    this.mainController.selectedRegionsBSubject.next([])
+  }
+
+  updateRegionSelection(){
+    this.mainController.selectedRegionsBSubject.next(this.multilevelProvider.selectedMultilevel as RegionDescriptor[])
   }
 }

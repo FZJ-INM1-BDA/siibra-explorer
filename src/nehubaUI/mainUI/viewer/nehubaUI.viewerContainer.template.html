@@ -29,7 +29,7 @@
     [startingMode] = "'docked'"
     [title] = "'Selected Regions'"
     [regions] = " mainController.selectedRegions "
-    *ngIf = "mainController.viewingMode == 'Select atlas regions'">
+    *ngIf = "!mainController.viewingMode">
     
     <readmoreComponent
       *ngIf="mainController.selectedTemplate[mainController.viewingMode]"

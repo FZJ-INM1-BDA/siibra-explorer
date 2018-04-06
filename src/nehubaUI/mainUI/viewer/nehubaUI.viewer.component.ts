@@ -1,25 +1,22 @@
-import { AfterViewInit,ComponentRef,Component,ComponentFactoryResolver,ViewContainerRef, ComponentFactory }from '@angular/core'
+import { ComponentRef,Component,ComponentFactoryResolver,ViewContainerRef, ComponentFactory, ViewChild }from '@angular/core'
 
-import { Config as NehubaViewerConfig,vec3} from 'nehuba/exports'
+import { Config as NehubaViewerConfig,vec3 } from 'nehuba/exports'
 
-import { TemplateDescriptor } from 'nehubaUI/nehuba.model'
-import { UI_CONTROL,VIEWER_CONTROL,EXTERNAL_CONTROL as gExternalControl, MainController} from 'nehubaUI/nehubaUI.services'
-
+import { MainController, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component';
 
 
 @Component({
   selector : 'NehubaViewer',
   template:`
-    <ng-template>
+    <ng-template #viewerHost>
     </ng-template>
   `,
   styles : [  ]
 })
 
-export class NehubaViewerInnerContainer implements AfterViewInit{
+export class NehubaViewerInnerContainer {
 
-  // @ViewChild(NehubaViewerDirective) host : NehubaViewerDirective
   nehubaViewerComponent : NehubaViewerComponent
   componentRef : ComponentRef<any>
   private templateLoaded : boolean = false
@@ -28,96 +25,23 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
   colorMap : Map<number,{}>
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerComponent>
-
-  private onViewerInitHook : (()=>void)[] = []
-  private afterviewerInitHook : (()=>void)[] = []
-
-  private onParcellationSelectionHook : (()=>void)[] = []
-  private afterParcellationSelectionHook : (()=>void)[] = []
+  @ViewChild('viewerHost',{read:ViewContainerRef}) viewContainerRef : ViewContainerRef
 
   constructor(
-    public viewContainerRef:ViewContainerRef,
     public mainController:MainController, 
-    private componentFactoryResolver: ComponentFactoryResolver ){
+    private componentFactoryResolver: ComponentFactoryResolver ,
+    public infoToUI:InfoToUIService){
 
     this.nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( NehubaViewerComponent )
-    
-    /* TODO reduce complexity, as to not having multiple VIEW_CONTROL objects floating around */
-    // this.mainController.selectTemplateBSubject.subscribe((template:TemplateDescriptor|null)=>{
-    //   if(template){
 
-    //     this.loadTemplate(template.nehubaConfig)
-    //     this.templateLoaded = true
-
-    //   }else{
-    //     /* I'm not too sure what does the dispose method do (?) */
-    //     /* TODO: use something other than a flag? */
-        
-    //     if(this.templateLoaded){
-    //       (<NehubaViewerComponent>this.componentRef.instance).nehubaViewer.dispose()
-    //       this.componentRef.destroy()
-    //     }
-    //     this.templateLoaded = false
-    //   }
-    // })
-    VIEWER_CONTROL.loadTemplate = (templateDescriptor:TemplateDescriptor) => {
-      /* TODO implement a check that each el in the hooks are still defined and are fn's */
-      this.onViewerInitHook.forEach(fn=>fn())
+    this.mainController.selectedTemplateBSubject.subscribe((templateDescriptor)=>{
+      if(!templateDescriptor) return
       this.loadTemplate(templateDescriptor.nehubaConfig)
-      this.afterviewerInitHook.forEach(fn=>fn())
-    }
-    VIEWER_CONTROL.onViewerInit = (cb:()=>void) => this.onViewerInit(cb)
-    VIEWER_CONTROL.afterViewerInit = (cb:()=>void) => this.afterViewerInit(cb)
-    UI_CONTROL.onParcellationSelection = (cb:()=>void) => this.onParcellationSelection(cb)
-    UI_CONTROL.afterParcellationSelection = (cb:()=>void) => this.afterParcellationSelection(cb)
-    VIEWER_CONTROL.showSegment = (seg) => this.showSegment(seg)
-    VIEWER_CONTROL.hideSegment = (seg) => this.hideSegment(seg)
-    VIEWER_CONTROL.hideAllSegments = () => this.hideAllSegments()
-    VIEWER_CONTROL.showAllSegments = () => this.showAllSegments()
-    VIEWER_CONTROL.moveToNavigationLoc = (loc:number[],realSpace?:boolean) => this.moveToNavigationLoc(loc,realSpace)
-    VIEWER_CONTROL.loadLayer = (layerObj:Object) => this.loadLayer(layerObj)
+    })
 
-    this.mainController.viewerControl.hideAllSegments = () => this.hideAllSegments()
-    this.mainController.viewerControl.showSegment = (segId) => this.showSegment(segId)
-    this.mainController.viewerControl.showAllSegments = () => this.showAllSegments()
-    this.mainController.viewerControl.loadLayer = (layerObj) => this.loadLayer(layerObj)
-    this.mainController.viewerControl.removeLayer = (layerObj) => this.removeLayer(layerObj)
-    this.mainController.viewerControl.setLayerVisibility = (layerObj,visible) => this.setLayerVisibility(layerObj,visible)
-  }
-
-  /**
-   * attaches an onViewerInit callback.
-   */
-  public onViewerInit = (cb:()=>void) => this.onViewerInitHook.push(cb)
-
-  /**
-   * attaches an afterViewerInit callback
-   */
-  public afterViewerInit = (cb:()=>void)=> this.afterviewerInitHook.push(cb)
-
-  /**
-   * attaches an on parcellation selection callback
-   */
-  public onParcellationSelection = (cb:()=>void)=> this.onParcellationSelectionHook.push(cb)
-
-  /**
-   * attaches an after parcellation selection callback
-   */
-  public afterParcellationSelection = (cb:()=>void)=> this.afterParcellationSelectionHook.push(cb)
-
-  /**
-   * attaches an onViewerDestory callback. 
-   * If no viewer is initiated, callback will be fired immediately.
-   * NB onViewerInit callback will be called before onViewerDestory callback
-   */
-  public onViewerDestroy = (cb:()=>void)=>{
-    if(!this.templateLoaded){
-      cb()
-    }else{
-      this.componentRef.onDestroy(()=>{
-        cb()
-      })
-    }
+    /* todo fix hover */
+    // infoToUI.getContentInfoPopoverObservable(this.nehubaViewerComponent.hoverRegionTemplate)
+    // this.nehubaViewerComponent.viewerSegment
   }
 
   /**
@@ -132,22 +56,18 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
    */
   public setNavigationOrientation = (_ori:number[])=>{
     /* waiting for proper api */
+    console.log('setNavitation ori has not yet been implemented')
   }
 
+  public moveToNavigationOri = (_ori:number[])=>{
+    /* waiting for proper api */
+    console.log('movetoNavigation ori has not yet been implemented')
+  }
   /**
    * Animation moving to new location
    */
   public moveToNavigationLoc = (loc:number[],realSpace?:boolean)=>{
-    if(this.templateLoaded){
-      this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
-    }
-  }
-
-  ngAfterViewInit(){
-    UI_CONTROL.afterTemplateSelection(()=>{
-      this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false;
-      (<NehubaViewerComponent>this.componentRef.instance).darktheme = this.darktheme
-    })
+    this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
   }
 
   private loadTemplate(nehubaViewerConfig:NehubaViewerConfig){
@@ -158,13 +78,8 @@ export class NehubaViewerInnerContainer implements AfterViewInit{
 
     this.componentRef = this.viewContainerRef.createComponent( this.nehubaViewerFactory )
     
-    // let newNehubaViewerUnit = new NehubaViewerUnit(NehubaViewerComponent,nehubaViewerConfig)
-    // let nehubaViewerFactory = this.componentFactoryResolver.resolveComponentFactory( newNehubaViewerUnit.component )
-    // this.componentRef = this.viewContainerRef.createComponent( nehubaViewerFactory )
-    
     this.nehubaViewerComponent = <NehubaViewerComponent>this.componentRef.instance
     this.nehubaViewerComponent.createNewNehubaViewerWithConfig(nehubaViewerConfig)
-    this.nehubaViewerComponent.darktheme = this.darktheme
     
     this.templateLoaded = true
   }
