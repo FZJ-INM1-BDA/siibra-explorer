@@ -196,8 +196,7 @@ export class MainController{
         this.selectedParcellationBSubject.next(templateDescriptor.parcellations[0])
       }
     })
-
-    /* ramification of needing to destroy then recreate  */
+    
     this.selectedTemplateBSubject
       .subscribe(()=>{
         this.viewingModeBSubject.next(null)

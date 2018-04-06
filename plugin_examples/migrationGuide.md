@@ -1,3 +1,11 @@
+Plugin Migration Guide (v0.1.0 => v0.2.0)
+======
+Plugin APIs have changed drastically from v0.1.0 to v0.2.0. Here is a list of plugin API from v0.1.0, and how it has changed moving to v0.2.0.
+
+**n.b.** `webcomponents-lite.js` is no longer included by default. You will need to request it explicitly with `window.interactiveViewer.pluginControl.loadExternalLibraries()` and unload it once you are done.
+
+---
+
 - ~~*window.nehubaUI*~~ removed
   - ~~*metadata*~~ => **window.interactiveViewer.metadata**
     - ~~*selectedTemplate* : nullable Object~~ removed. use **window.interactiveViewer.metadata.selectedTemplateBSubject** instead

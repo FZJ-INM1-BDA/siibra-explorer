@@ -6,14 +6,12 @@
 
 </NehubaViewer>
 
-<div *ngIf = "mainController.selectedTemplate">
-
+<ng-template #receptorDataWidget>
   <nehubaui-searchresult-region-list 
     [title] = "'Receptor Data Browser'"
     (mouseEnterRegion)="receptorMouseEnter($event)"
     (mouseLeaveRegion)="receptorMouseLeave($event)"
-    [regions] = " mainController.selectedRegions "
-    *ngIf = "mainController.viewingMode == 'Receptor Data'">
+    [regions] = " selectedRegions ">
 
     <readmoreComponent
       *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
@@ -24,55 +22,60 @@
     </readmoreComponent>
 
   </nehubaui-searchresult-region-list>
+</ng-template>
   
+<ng-template #testing>
+  test test haha
+</ng-template>
+
+<ng-template #defaultWidget>
   <nehubaui-searchresult-region-pill-list 
     [startingMode] = "'docked'"
     [title] = "'Selected Regions'"
-    [regions] = " mainController.selectedRegions "
-    *ngIf = "!mainController.viewingMode">
+    [regions] = " selectedRegions ">
     
     <readmoreComponent
-      *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
       [style.background-color]="'rgba(0,0,0,0.2)'">
       <datasetBlurb
-        [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+        [dataset]="selectedTemplate[viewingMode]">
       </datasetBlurb>
     </readmoreComponent>
 
   </nehubaui-searchresult-region-pill-list>
+</ng-template>
 
+<ng-template #cytopmapWidget>
   <nehubaui-searchresult-region-pill-list 
     [additionalContent] = "'nifti'"
     [startingMode] = "'docked'"
     [title] = "'Cytoarchitectonic Probabilistic Map'"
-    [regions] = " mainController.selectedRegions "
-    *ngIf = "mainController.viewingMode == 'Cytoarchitectonic Probabilistic Map'">
+    [regions] = " selectedRegions ">
     
     
     <readmoreComponent
-      *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
       [style.background-color]="'rgba(0,0,0,0.2)'">
       <datasetBlurb
-        [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+        [dataset]="selectedTemplate[viewingMode]">
       </datasetBlurb>
     </readmoreComponent>
     
   </nehubaui-searchresult-region-pill-list>
+</ng-template>
 
-  <nehubaui-landmark-list 
-    *ngIf = "mainController.viewingMode == 'iEEG Recordings'">
+<ng-template #landmarkWidget>
+  <nehubaui-landmark-list >
 
     <readmoreComponent
-      *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
+      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
       [style.background-color]="'rgba(0,0,0,0.2)'">
       <datasetBlurb
-        [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
+        [dataset]="selectedTemplate[viewingMode]">
       </datasetBlurb>
     </readmoreComponent>
   </nehubaui-landmark-list>
-  
-</div>
+</ng-template>
 
 <nehuba-ui-splash-screen>
-  
 </nehuba-ui-splash-screen>
