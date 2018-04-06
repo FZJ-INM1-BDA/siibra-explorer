@@ -1,11 +1,13 @@
-import { Component,ViewChild,Input } from '@angular/core'
-import { MainController, LandmarkServices, SpatialSearch } from 'nehubaUI/nehubaUI.services'
+import { Component,ViewChild,Input, TemplateRef, AfterViewInit } from '@angular/core'
+import { MainController, LandmarkServices, SpatialSearch, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
-import { RegionDescriptor } from 'nehubaUI/nehuba.model';
+import { RegionDescriptor, TemplateDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
+
 
 @Component({
   selector : 'ATLASViewer',
@@ -13,15 +15,23 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
   providers : [ SpatialSearch ]
 })
 
-export class NehubaViewerContainer {
+export class NehubaViewerContainer implements AfterViewInit{
   darktheme : boolean
   @Input() hideUI : boolean = false
   @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-  /* TODO to be exported as viewerHandle.mouseEvent */
+  @ViewChild('receptorDataWidget',{read:TemplateRef}) receptorDataWidget : TemplateRef<any>
+  @ViewChild('defaultWidget',{read:TemplateRef}) defaultWidget : TemplateRef<any>
+  @ViewChild('cytopmapWidget',{read:TemplateRef}) cytopmapWidget : TemplateRef<any>
+  @ViewChild('landmarkWidget',{read:TemplateRef}) landmarkWidget : TemplateRef<any>
+
+  @ViewChild('testing',{read:TemplateRef}) testing : TemplateRef<any>
+
+  widgetComponent : WidgetComponent
+
   mouseEventOnViewer : Subject<any> = new Subject()
 
-  constructor(public mainController:MainController,private landmarkServices:LandmarkServices){
+  constructor(public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc = (loc,real)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationLoc(loc,real))
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationOri = (ori) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationOri(ori))
     
@@ -37,6 +47,31 @@ export class NehubaViewerContainer {
     INTERACTIVE_VIEWER.viewerHandle.setLayerVisibility = (layerObj,visible) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setLayerVisibility(layerObj,visible))
 
     INTERACTIVE_VIEWER.viewerHandle.mouseEvent = this.mouseEventOnViewer
+
+    this.mainController.selectedTemplateBSubject.subscribe(t=>this.selectedTemplate=t)
+    this.mainController.selectedRegionsBSubject.subscribe(rs=>this.selectedRegions = rs)
+    this.mainController.viewingModeBSubject.subscribe(m=>this.viewingMode=m)
+  }
+
+  selectedRegions : RegionDescriptor[]
+  selectedTemplate : TemplateDescriptor | null
+  viewingMode : string | null
+
+  ngAfterViewInit(){
+    this.mainController.viewingModeBSubject.delay(1).subscribe(mode=>{
+      if(this.widgetComponent) this.widgetServices.unloadWidget( this.widgetComponent )
+
+      const templateRef = mode == 'Cytoarchitectonic Probabilistic Map' ?
+        this.cytopmapWidget :
+          mode == 'iEEG Recordings' ?
+            this.landmarkWidget :
+              mode == 'Receptor Data' ?
+                this.receptorDataWidget : 
+                  this.defaultWidget 
+
+      this.widgetComponent = this.widgetServices.widgitiseTemplateRef(templateRef,{name : mode ? mode : 'Select atlas regions'})
+      this.widgetComponent.changeState('docked')
+    })
   }
 
   checkViewerExist = () => {
@@ -65,5 +100,3 @@ export class NehubaViewerContainer {
     }
   }
 }
-
-// export let MOVE_TO_LOC : (loc:[number,number,number],realSpace?:boolean) => void

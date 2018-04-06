@@ -1,6 +1,8 @@
 Plugin APIs
 ======
 
+[plugin migration guide](migrationGuide.md)
+
 window.interactiveViewer
 ---
 - metadata

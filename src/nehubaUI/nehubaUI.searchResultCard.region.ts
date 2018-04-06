@@ -3,71 +3,68 @@ import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface 
 import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
 import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
-import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 
 
 @Component({
   selector : 'nehubaui-landmark-list',
   template : 
   `
-  <ng-template #landmarkList>
-    <div class = "panel-body">
-      <ng-content>
-      </ng-content>
-      <div 
-        landmarkEntry
+  <div class = "panel-body">
+    <ng-content>
+    </ng-content>
+    <div 
+      landmarkEntry
+      (mouseenter)="landmark.hover = true"
+      (mouseleave)="landmark.hover = false"
+      *ngFor = "let landmark of landmarkServices.landmarks">
+
+      position : {{ landmark.properties['geometry.coordinates'] }}
+    </div>
+    <ul *ngIf = "false" class = "list-group" id = "landmarkList">
+      <li
         (mouseenter)="landmark.hover = true"
         (mouseleave)="landmark.hover = false"
-        *ngFor = "let landmark of landmarkServices.landmarks">
+        class = "list-group-item"
+        *ngFor="let landmark of landmarkServices.landmarks">
 
-        position : {{ landmark.properties['geometry.coordinates'] }}
+        <small>
+          <span class = "text-muted">OID :</span> {{ landmark.properties['OID']  }}<br />
+          <span class = "text-muted">coordinates :</span> [{{ landmark.properties['geometry.coordinates'] }}]
+        </small>
+      </li>
+    </ul>
+    
+    <div *ngIf="landmarkServices.landmarks.length>0" class = "btn-group">
+
+      <div class = "default-control btn btn-default btn-sm" (click)="spatialSearch.goTo(0)">
+        <i class = "glyphicon glyphicon-fast-backward"></i>
       </div>
-      <ul *ngIf = "false" class = "list-group" id = "landmarkList">
-        <li
-          (mouseenter)="landmark.hover = true"
-          (mouseleave)="landmark.hover = false"
-          class = "list-group-item"
-          *ngFor="let landmark of landmarkServices.landmarks">
-
-          <small>
-            <span class = "text-muted">OID :</span> {{ landmark.properties['OID']  }}<br />
-            <span class = "text-muted">coordinates :</span> [{{ landmark.properties['geometry.coordinates'] }}]
-          </small>
-        </li>
-      </ul>
-      
-      <div *ngIf="landmarkServices.landmarks.length>0" class = "btn-group">
-
-        <div class = "default-control btn btn-default btn-sm" (click)="spatialSearch.goTo(0)">
-          <i class = "glyphicon glyphicon-fast-backward"></i>
-        </div>
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination-1)">
-          <i class = "glyphicon glyphicon-step-backward"></i>
-        </div>
-
-        <div 
-          (click)="spatialSearch.goTo(pageNum)"
-          [ngClass]="{'btn-primary':spatialSearch.pagination == pageNum}"
-          *ngFor = "let pageNum of Array.from(Array(Math.ceil(spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE)).keys()).filter(hidePagination)"
-          class = "pagination-control btn btn-default btn-sm">
-          {{ pageNum + 1 }}
-        </div>
-
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination+1)">
-          <i class = "glyphicon glyphicon-step-forward"></i>
-        </div>
-        <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo( spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE + 1 )">
-          <i class = "glyphicon glyphicon-fast-forward"></i>
-        </div>
-
+      <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination-1)">
+        <i class = "glyphicon glyphicon-step-backward"></i>
       </div>
-      
-      <div style="text-align:center; margin-top:10px;">
-        {{ spatialSearch.numHits ? spatialSearch.numHits : 0 }} landmarks found.
+
+      <div 
+        (click)="spatialSearch.goTo(pageNum)"
+        [ngClass]="{'btn-primary':spatialSearch.pagination == pageNum}"
+        *ngFor = "let pageNum of Array.from(Array(Math.ceil(spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE)).keys()).filter(hidePagination)"
+        class = "pagination-control btn btn-default btn-sm">
+        {{ pageNum + 1 }}
+      </div>
+
+      <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo(spatialSearch.pagination+1)">
+        <i class = "glyphicon glyphicon-step-forward"></i>
+      </div>
+      <div class = "btn btn-default btn-sm" (click)="spatialSearch.goTo( spatialSearch.numHits / spatialSearch.RESULTS_PER_PAGE + 1 )">
+        <i class = "glyphicon glyphicon-fast-forward"></i>
       </div>
 
     </div>
-  </ng-template>
+    
+    <div style="text-align:center; margin-top:10px;">
+      {{ spatialSearch.numHits ? spatialSearch.numHits : 0 }} landmarks found.
+    </div>
+
+  </div>
   `,
   styles : [
     `
@@ -103,14 +100,13 @@ import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
   ]
 })
 
-export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
+export class NehubaLandmarkList{
   @ViewChild('landmarkList',{read:TemplateRef}) landmarkList : TemplateRef<any>
 
   constructor(
     public mainController:MainController,
     public spatialSearch:SpatialSearch,
-    public landmarkServices:LandmarkServices,
-    public widgitServices:WidgitServices){
+    public landmarkServices:LandmarkServices){
 
   }
 
@@ -125,49 +121,31 @@ export class NehubaLandmarkList implements AfterViewInit,OnDestroy{
         this.spatialSearch.pagination
     return (Math.abs(idx-correctedPagination) < 3)
   }
-
-  widgetComponent : any
-
-  ngAfterViewInit(){
-    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.landmarkList,{name:'iEEG Recordings'})
-
-    const segmentationUserLayer = this.mainController.nehubaViewer.ngviewer.layerManager.managedLayers[1].layer! as SegmentationUserLayer
-    segmentationUserLayer.displayState.selectedAlpha.restoreState(0.2)
-  }
-
-  ngOnDestroy(){
-    this.widgitServices.unloadWidget(this.widgetComponent)
-    // this.widgetComponent.parentViewRef.destroy()
-  }
 }
-
-
 
 @Component({
   selector : `nehubaui-searchresult-region-list`,
   template : 
   `
-  <ng-template #regionList>
-    <ng-content>
-    </ng-content>
-    <div
-      *ngFor = "let region of regions; let idx = index"
-      [@animationFadeInOut]>
+  <ng-content>
+  </ng-content>
+  <div
+    *ngFor = "let region of regions; let idx = index"
+    [@animationFadeInOut]>
 
-      <nehubaui-searchresult-region 
-        (hover)="subHover($event)"
-        (showReceptorData)="showReceptorData(region,$event)"
-        (mouseenter)="mouseEnterRegion.emit(region)" 
-        (mouseleave)="mouseLeaveRegion.emit(region)"
-        [region] = "region" 
-        [idx] = "idx">
-      </nehubaui-searchresult-region>
-    </div>
-  </ng-template>
+    <nehubaui-searchresult-region 
+      (hover)="subHover($event)"
+      (showReceptorData)="showReceptorData(region,$event)"
+      (mouseenter)="mouseEnterRegion.emit(region)" 
+      (mouseleave)="mouseLeaveRegion.emit(region)"
+      [region] = "region" 
+      [idx] = "idx">
+    </nehubaui-searchresult-region>
+  </div>
   `,
   animations : [ animationFadeInOut ]
 })
-export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
+export class ListSearchResultCardRegion implements AfterViewInit{
   @Input() regions : RegionDescriptor[] = []
   @Input() title : string = `Untitled`
   @Input() startingMode : 'docked' | 'floating' | 'minimised' = 'docked'
@@ -175,27 +153,18 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   @Output() mouseEnterRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
   @Output() mouseLeaveRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
   
-  @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
   constructor(
     public mainController:MainController,
-    public landmarkServices:LandmarkServices,
-    public widgitServices:WidgitServices){
+    public landmarkServices:LandmarkServices){
   }
 
   /* Variables needed for listify receptor browser */
   Array = Array
   filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
 
-  widgetComponent : any
   ngAfterViewInit(){
-    this.widgetComponent = this.widgitServices.widgitiseTemplateRef(this.regionList,{name:this.title})
-    this.widgetComponent.changeState(this.startingMode)
-    
-    if(this.mainController.nehubaViewer){
-      this.mainController.nehubaViewer.redraw()
-    }
 
-    this.selectedRegionsWithReceptorData()
+    this.addRegionsWithReceptorData()
 
     // this.landmarkServices.landmarks = this.regions.map(r=>({
     //   pos : r.position.map(number=>number / 1000000) as [number,number,number],
@@ -209,15 +178,13 @@ export class ListSearchResultCardRegion implements AfterViewInit,OnDestroy{
   }
 
   ngOnDestroy(){
-    this.widgitServices.unloadWidget(this.widgetComponent)
-    // this.widgetComponent.parentViewRef.destroy()    
-    // if(this.mainController.nehubaViewer){
-    //   this.mainController.nehubaViewer.redraw()
-    // }
   }
 
-  private selectedRegionsWithReceptorData(){
-    this.mainController.selectedRegionsBSubject.next( Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data')) )
+  private addRegionsWithReceptorData(){
+    const newRegions = this.mainController.selectedRegionsBSubject.getValue().concat(
+      Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data'))
+    )
+    this.mainController.selectedRegionsBSubject.next( newRegions )
   }
 
   showReceptorData(region:RegionDescriptor,templateRef:TemplateRef<any>){
@@ -528,28 +495,26 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   selector : `nehubaui-searchresult-region-pill-list`,
   template :
   `
-  <ng-template #regionList>
-    <ng-content>
-    </ng-content>
-    <div
-      *ngFor = "let region of regions"
-      [@animationFadeInOut]>
+  <ng-content>
+  </ng-content>
+  <div
+    *ngFor = "let region of regions"
+    [@animationFadeInOut]>
 
-      <nehubaui-searchresult-region-pill
-        [region] = "region">
-        <a 
-          *ngIf = "additionalContent=='nifti'" 
-          href = "{{region.PMapURL}}">
-          download nifti
-        </a>
-      </nehubaui-searchresult-region-pill>
-    </div>
-  </ng-template>
+    <nehubaui-searchresult-region-pill
+      [region] = "region">
+      <a 
+        *ngIf = "additionalContent=='nifti'" 
+        href = "{{region.PMapURL}}">
+        download nifti
+      </a>
+    </nehubaui-searchresult-region-pill>
+  </div>
   `,
   animations : [ animationFadeInOut ]
 })
 
-export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
+export class ListSearchResultCardPill{
   @Input() regions : RegionDescriptor[]
   @Input() title : string = `Untitled`
   @Input() startingMode : 'docked' | 'floating' | 'minimised' = 'docked'
@@ -558,24 +523,6 @@ export class ListSearchResultCardPill implements AfterViewInit,OnDestroy{
   @Output() mouseEnterRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
   @Output() mouseLeaveRegion : EventEmitter<RegionDescriptor> = new EventEmitter()
   
-
-  constructor(public mainController:MainController,public landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
-
-  }
-
-  @ViewChild('regionList',{read:TemplateRef}) regionList : TemplateRef<any>
-  widgetComponent:any
-  ngAfterViewInit(){
-    this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.regionList,{name:this.title})
-    this.widgetComponent.changeState(this.startingMode)
-    if(this.mainController){
-      this.mainController.nehubaViewer.redraw()
-    }
-  }
-
-  ngOnDestroy(){
-    this.widgetServices.unloadWidget(this.widgetComponent)
-  }
 }
 
 @Component({
