@@ -8,6 +8,7 @@ import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
 
+
 @Component({
   selector : 'ATLASViewer',
   template : template,
