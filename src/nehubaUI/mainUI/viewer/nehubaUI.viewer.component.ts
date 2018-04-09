@@ -1,9 +1,11 @@
-import { ComponentRef,Component,ComponentFactoryResolver,ViewContainerRef, ComponentFactory, ViewChild }from '@angular/core'
+import { ComponentRef,Component,ComponentFactoryResolver,ViewContainerRef, ComponentFactory, ViewChild, TemplateRef }from '@angular/core'
 
 import { Config as NehubaViewerConfig,vec3 } from 'nehuba/exports'
 
 import { MainController, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component';
+import { RegionDescriptor } from 'nehubaUI/nehuba.model';
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 
 @Component({
@@ -11,8 +13,20 @@ import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUni
   template:`
     <ng-template #viewerHost>
     </ng-template>
+
+    <ng-template #hoverRegionTemplate>
+      <small floatingPopoverContent>
+        Hovering on: {{ hoveredRegion ? hoveredRegion.name : 'no segment selected' }}
+      </small>
+    </ng-template>
   `,
-  styles : [  ]
+  styles : [ `
+    [floatingPopoverContent]
+    {
+      padding: 0.5em 1em;
+      white-space:nowrap;
+    }
+  ` ]
 })
 
 export class NehubaViewerInnerContainer {
@@ -22,10 +36,13 @@ export class NehubaViewerInnerContainer {
   private templateLoaded : boolean = false
   darktheme : boolean = false
 
+  hoveredRegion : RegionDescriptor | null
+
   colorMap : Map<number,{}>
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerComponent>
   @ViewChild('viewerHost',{read:ViewContainerRef}) viewContainerRef : ViewContainerRef
+  @ViewChild('hoverRegionTemplate',{read:TemplateRef}) hoverRegionTemplate : TemplateRef<any>
 
   constructor(
     public mainController:MainController, 
@@ -39,9 +56,10 @@ export class NehubaViewerInnerContainer {
       this.loadTemplate(templateDescriptor.nehubaConfig)
     })
 
-    /* todo fix hover */
-    // infoToUI.getContentInfoPopoverObservable(this.nehubaViewerComponent.hoverRegionTemplate)
-    // this.nehubaViewerComponent.viewerSegment
+    INTERACTIVE_VIEWER.viewerHandle.mouseOverNehuba.subscribe((ev)=>this.hoveredRegion=ev.foundRegion)
+    this.infoToUI.getContentInfoPopoverObservable(
+      INTERACTIVE_VIEWER.viewerHandle.mouseOverNehuba.map(ev=>ev.foundRegion ? this.hoverRegionTemplate : null)
+    )
   }
 
   /**

@@ -14,6 +14,12 @@ import template from './nehubaUI.viewerOverlay.template.html'
     {
       position : absolute;
     }
+    
+    [floatingPopoverContent]
+    {
+      padding: 0.5em 1em;
+      white-space:nowrap;
+    }
     `
   ]
 })

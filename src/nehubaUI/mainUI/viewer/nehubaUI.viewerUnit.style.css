@@ -89,8 +89,3 @@ floatingPopover
   white-space:nowrap;
   pointer-events:none;
 }
-[floatingPopoverContent]
-{
-  padding: 0.5em 1em;
-  white-space:nowrap;
-}
