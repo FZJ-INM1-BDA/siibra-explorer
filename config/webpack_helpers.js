@@ -28,13 +28,6 @@ const extractSass = new ExtractTextPlugin({
   allChunks : true
 })
 
-// const extractHtml = new ExtractTextPlugin({
-//   filename : (getPath)=>{
-//     console.log(getPath('[name].[ext]'))
-//     return getPath('[name].[ext]').replace('src/nehubaUI/mainUI/parent','')
-//   }
-// })
-
 function modifyViewerOptions(options) {
   options = options || {};
   options.resolveLoaderRoots = [
@@ -104,18 +97,6 @@ function modifyViewerOptions(options) {
     loader : 'raw-loader'
   }
 
-  // let rawLoading = {
-  //   test : /\.html$/,
-  //   exclude : /node_modules|index\.html/,
-  //   loader : 'raw-loader'
-  // }
-
-  // let tsLoading = {
-  //   test : /nehubaUI\.parent\.component\.ts/,
-  //   loaders : [ 'awesome-typescript-loader', 'angular2-template-loader' ]
-  // }
-  
-  /* TODO: maybe consider using text extract for scss? */
   options.modifyBaseConfig = (baseConfig) => {
     baseConfig.module.rules.push(ruleScss)
     baseConfig.module.rules.push(ruleHtml)

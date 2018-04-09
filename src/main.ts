@@ -28,16 +28,6 @@ enableProdMode();
 
 platformBrowserDynamic().bootstrapModule(NehubaUI);
 
-import './assets/json/colin.json'
-import './assets/json/colinNehubaConfig.json'
-import './assets/json/colinJubrainPMap.json'
-import './assets/json/colinJubrainReceptor.json'
-import './assets/json/colinIEEG.json'
-
-import './assets/json/bigbrain.json'
-import './assets/json/bigbrainNehubaConfig.json'
-import './assets/json/waxholmRatV2_0.json'
-import './assets/json/waxholmRatV2_0NehubaConfig.json'
-import './assets/json/allenMouse.json'
-import './assets/json/allenMouseNehubaConfig.json'
-
+/* needed to bootstrap json files since KG isn't yet ready */
+const requireAll = (r:any) => {r.keys().forEach(r)}
+requireAll(require.context('./assets/json/',false, /.json$/))

@@ -1,6 +1,6 @@
 import { TemplateRef, Injectable } from '@angular/core';
 import { Subject,BehaviorSubject,Observable } from 'rxjs/Rx'
-import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
+import { Multilevel, Landmark, WidgitiseTempRefMetaData, Dataset } from './nehuba.model'
 
 import { TemplateDescriptor, LabComponent, RegionDescriptor, ParcellationDescriptor, LabComponentHandler } from './nehuba.model'
 import { ModalHandler } from 'nehubaUI/components/modal/nehubaUI.modal.component'
@@ -144,7 +144,7 @@ export class MainController{
       .catch(console.warn)
 
     this.dataService.fetchTemplates
-      .then((this.dataService.fetchDatasets).bind(this.dataService))
+      .then((this.dataService.fetchTemplatesData).bind(this.dataService))
       .then(templates=>(this.loadedTemplates = templates,INTERACTIVE_VIEWER.metadata.loadedTemplates = templates,Promise.resolve()))
       .then(()=>this.parseQueryString( window.location.search ))
     .catch((e:any)=>{
@@ -789,12 +789,18 @@ export class InfoToUIService{
 
 class DataService {
 
+  // private datasetArray = [
+  //   'res/json/MNIColin27_dataset.json'
+  // ]
+
   /* simiple fetch promise for json obj */
   /* nb: return header must contain Content-Type : application/json */
   /* nb: return header must container CORS header */
 
+  fetchDatasets:()=>Promise<Dataset[]> 
+
   /* TODO temporary solution fetch available template space from KG  */
-  datasetArray = [
+  private templateArray = [
     'res/json/bigbrain.json',
     'res/json/colin.json',
     'res/json/waxholmRatV2_0.json',
@@ -805,7 +811,7 @@ class DataService {
   COLIN_JUBRAIN_RECEPTOR_INFO = `res/json/colinJubrainReceptor.json`
 
 
-  // datasetArray = [
+  // templateArray = [
   //   'http://localhost:5080/res/json/bigbrain.json',
   //   'http://localhost:5080/res/json/colin.json',
   //   'http://localhost:5080/res/json/waxholmRatV2_0.json',
@@ -817,7 +823,7 @@ class DataService {
   // COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
   
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
-    Promise.all(this.datasetArray.map(dataset=>
+    Promise.all(this.templateArray.map(dataset=>
       this.fetchJson(dataset)
         .then((json:any)=>
           this.parseTemplateData(json))))
@@ -825,7 +831,7 @@ class DataService {
       .catch(e=>reject(e))
   })
 
-  fetchDatasets(templates:TemplateDescriptor[]):Promise<TemplateDescriptor[]>{
+  fetchTemplatesData(templates:TemplateDescriptor[]):Promise<TemplateDescriptor[]>{
     const arrPrm: Promise<TemplateDescriptor>[] = templates.map(template=>{
       if(template.name!=`MNI Colin 27`){
         return Promise.resolve(template)

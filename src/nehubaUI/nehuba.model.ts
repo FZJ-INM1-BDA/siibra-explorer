@@ -70,7 +70,7 @@ export class TemplateDescriptor {
     this.properties = json.properties ? json.properties : []
     this.nehubaId = json.nehubaId ? json.nehubaId : ''
 
-    this.parcellations = json.parcellations && json.parcellations.constructor.name == 'Array' ? json.parcellations.map((json:any)=>new ParcellationDescriptor(json)) : [];
+    this.parcellations = json.parcellations && json.parcellations.constructor.name == 'Array' ? json.parcellations.map((json:any)=>new ParcellationDescriptor(json,this)) : [];
     
     this.asyncPromises = [(new Promise((resolve,reject)=>{
       json.nehubaConfig ? 
@@ -102,10 +102,13 @@ export class TemplateDescriptor {
 }
 
 export class ParcellationDescriptor {
-  constructor(json:any){
+  constructor(json:any,parent:TemplateDescriptor){
+
+    this.templateParent = parent
+
     this.name = json.name
     this.ngId = json.ngId 
-    this.regions = json.regions ? json.regions.map((region:any)=>new RegionDescriptor(region,0)) : []
+    this.regions = json.regions ? json.regions.map((region:any)=>new RegionDescriptor(region,0,this)) : []
     this.properties = json.properties ? json.properties : []
 
     this.regions.forEach(region=>this.iterateColorMap(region))
@@ -118,6 +121,7 @@ export class ParcellationDescriptor {
   properties : any;
   ngId : string;
   surfaceParcellation : boolean = false;
+  templateParent:TemplateDescriptor;
 
   isShown : boolean = true;
   masterOpacity : number = 1.00;
@@ -155,36 +159,71 @@ export class Multilevel{
   name : string; /* should be overwritten by subclasses */
 
   hierarchy : number
-  parent : Multilevel | undefined
   children : Multilevel[] = []
+  parent : Multilevel
   isExpanded : boolean = true
 
 }
 
+/* metadata such as general info about PMap, or Receptor data */
+export class DatasetMetaClass implements DatasetInterface{
+  name : string
+  description:string
+  publications:Publication[]
+}
+
+/* such as FP1 PMap, or PFm receptor data */
+export class Dataset implements DatasetInterface {
+  metaInfo : DatasetMetaClass
+
+  name : string
+  description:string
+  publications:Publication[]
+}
+
+
+// /* {datasetMetaId : string filenames : string[] } */
+// const parseDatasetArrayRawToJson = (json:any,rd:RegionDescriptor,td:TemplateDescriptor)=>{
+//   if( rd.parcellationParent.templateParent.name == 'MNI Colin 27' ){
+
+//   } 
+// }
+
 export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
 
-  constructor(json:any,hierachy:number){
+  constructor(json:any,hierachy:number,parent:ParcellationDescriptor){
     super()
+
+    this.parcellationParent = parent
     this.name = json.name
     this.properties = json.properties ? json.properties : []
     this.labelIndex = json.labelIndex ? json.labelIndex : null
     this.hierarchy = hierachy
     this.PMapURL = json.PMapURL ? json.PMapURL : null
     this.position = json.position ? json.position : null
-    this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1)) : []
+    this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1,parent)) : []
     this.rgb = json.rgb ? json.rgb : null
 
     //TODO pmapurl, properties url and receptorData
-    this.propertiesURL = json.PMapURL ? json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata2/${s.split(/\/|\./)[1]}.json`) : null
+    this.propertiesURL = json.PMapURL ? 
+      json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata2/${s.split(/\/|\./)[1]}.json`) : 
+      null
 
     /* populate moreInfo array */
     if(this.position){
       const goToPosition = new DescriptorMoreInfoItem('Go To There','map-marker')
-      goToPosition.action = ()=>{
+      goToPosition.action = ()=>
         INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(this.position as [number,number,number],true)
-      }
+      
       this.moreInfo.push(goToPosition)
     }
+
+    // if( json.datasets ){
+    //   json.datasets.map((dataset:any)=>{
+    //     parseDatasetArrayRawToJson(dataset,this,this.parcellationParent.templateParent)
+    //   })
+    // }
+
     if(this.PMapURL){
       const pmap = new DescriptorMoreInfoItem('Cytoarchitectonic Probabilistic Map','picture')
       pmap.action = () => {
@@ -204,7 +243,9 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     }
   }
 
+
   children : RegionDescriptor[] = []
+  parcellationParent : ParcellationDescriptor
   name : string
   properties : any
   getUrl: string
