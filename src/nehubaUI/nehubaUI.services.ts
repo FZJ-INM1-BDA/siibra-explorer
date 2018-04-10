@@ -187,7 +187,6 @@ export class MainController{
     this.viewingModeBSubject.subscribe(mode=>{
       
       this.viewingMode = mode
-      // if(mode) this.passCheckSetMode(mode)
     })
     
     this.selectedTemplateBSubject.subscribe((templateDescriptor)=>{
