@@ -16,6 +16,8 @@
 
 import 'zone.js';
 import 'reflect-metadata';
+import '@webcomponents/custom-elements/src/native-shim'
+import '@webcomponents/custom-elements/custom-elements.min'
 
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';

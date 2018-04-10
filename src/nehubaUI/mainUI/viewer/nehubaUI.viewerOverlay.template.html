@@ -19,5 +19,7 @@
 </div>
 
 <ng-template #landmarkTemplateRef>
-  Landmark Hovered: {{ hoverLandmark ? hoverLandmark.pos : '' }}
+  <small floatingPopoverContent>
+    Landmark Hovered: {{ hoverLandmark ? hoverLandmark.pos : '' }}
+  </small>
 </ng-template>

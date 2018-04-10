@@ -1,4 +1,4 @@
-import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef, TemplateRef } from '@angular/core'
+import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
 import { vec3,NehubaViewer,Config as NehubaViewerConfig, createNehubaViewer, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports';
 
 import { Observable,Subject } from 'rxjs/Rx'
@@ -74,7 +74,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   @ViewChild(FloatingTooltip) floatingPopover : FloatingTooltip
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
-  @ViewChild('hoverRegionTemplate',{read:TemplateRef}) hoverRegionTemplate : TemplateRef<any>
 
   constructor(
     private mainController:MainController,

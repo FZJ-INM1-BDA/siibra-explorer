@@ -1,4 +1,4 @@
-import { Component,ViewChild ,AfterViewInit, HostListener, Renderer2 } from '@angular/core'
+import { Component,ViewChild , HostListener, Renderer2 } from '@angular/core'
 import { MainController, SUPPORTED_LIB, InfoToUIService, SUPPORT_LIBRARY_MAP, checkStringAsSupportLibrary } from 'nehubaUI//nehubaUI.services'
 import { WidgetsContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
@@ -18,7 +18,7 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
   animations : [ showSideBar ]
 })
 
-export class NehubaContainer implements AfterViewInit {
+export class NehubaContainer {
   showMenu : boolean = false
 
   darktheme = false
@@ -86,59 +86,14 @@ export class NehubaContainer implements AfterViewInit {
             console.warn('unload external libraries error. cannot find ledger entry...',libname,this.loadedLibraries)
           }
         })
-  }
-
-  ngAfterViewInit(){
-    // UI_CONTROL.afterTemplateSelection(()=>{
-    //   this.darktheme = this.mainController.darktheme
-    // })
     this.mainController.selectedTemplateBSubject.subscribe(template=>{
       if(template)this.darktheme = template.useTheme == 'dark'
     })
   }
-
   
   curosrPos : [number,number] = [0,0]
   @HostListener('document:mousemove',['$event'])
   mousemove(ev:MouseEvent){
     this.curosrPos = [ev.clientX,ev.clientY]
   }
-
-  
-  /* TODO if enableProd is disabled, this throws an error
-  investigate https://angular.io/api/core/ChangeDetectorRef
-  */
-  // hasDockedComponents(){
-  //   // return true
-  //   return this.widgetContainer.dockedWidgetContainer.viewContainerRef ? 
-  //     this.widgetContainer.dockedWidgetContainer.viewContainerRef.length > 0 :
-  //     false
-  // }
-
-  // calcGridTemplateColumn(){
-  //   return this.hasDockedComponents() ? 
-  //     `auto 10px ${this.dockedWidgetPanelWidth < 350 ? this.dockedWidgetPanelWidth : 350 }px` :
-  //     `auto 0px 0px`
-  // }
-
-  // enableUIInteraction(bool:boolean){
-  //   document.body.style.pointerEvents = bool ? 'all':'none'
-  //   document.body.style.userSelect = bool ? 'initial' : 'none'
-  // }
-
-  // @HostListener('document:mousemove',['$event'])
-  // mousemove(ev:any){
-  //   if(this.resizeDockedWidgetPanel){
-  //     this.dockedWidgetPanelWidth = window.innerWidth - /*this.startcontrolPanelWidth + this.startpos -*/ ev.clientX
-  //   }
-  // }
-
-  // @HostListener('document:mouseup',['$event'])
-  // mouseup(_ev:any){
-  //   if(this.resizeDockedWidgetPanel){
-  //     this.resizeDockedWidgetPanel=false;
-  //     this.enableUIInteraction(true)
-  //     if(this.mainController.nehubaViewer) this.mainController.nehubaViewer.redraw()
-  //   }
-  // }
 }

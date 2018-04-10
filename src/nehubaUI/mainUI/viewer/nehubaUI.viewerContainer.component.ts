@@ -8,7 +8,6 @@ import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
 
-
 @Component({
   selector : 'ATLASViewer',
   template : template,
@@ -67,10 +66,14 @@ export class NehubaViewerContainer implements AfterViewInit{
             this.landmarkWidget :
               mode == 'Receptor Data' ?
                 this.receptorDataWidget : 
-                  this.defaultWidget 
+                  this.selectedTemplate ? 
+                    this.defaultWidget :
+                    null
 
-      this.widgetComponent = this.widgetServices.widgitiseTemplateRef(templateRef,{name : mode ? mode : 'Select atlas regions'})
-      this.widgetComponent.changeState('docked')
+      if ( templateRef ){
+        this.widgetComponent = this.widgetServices.widgitiseTemplateRef(templateRef,{name : mode ? mode : 'Select atlas regions'})
+        this.widgetComponent.changeState('docked')
+      }
     })
   }
 
@@ -83,6 +86,7 @@ export class NehubaViewerContainer implements AfterViewInit{
     this.mouseEventOnViewer.next({eventName:mode,event:ev})
   }
 
+  /* TODO remove, or move elsewhere */
   receptorMouseEnter(region:RegionDescriptor){
 
     const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
@@ -92,6 +96,7 @@ export class NehubaViewerContainer implements AfterViewInit{
     }
   }
 
+  /* TODO remove, or move elsewhere */
   receptorMouseLeave(region:RegionDescriptor){
     const idx = this.landmarkServices.landmarks.findIndex(l=>l.id==region.name)
     if(idx >= 0) {
