@@ -28,13 +28,6 @@ const extractSass = new ExtractTextPlugin({
   allChunks : true
 })
 
-// const extractHtml = new ExtractTextPlugin({
-//   filename : (getPath)=>{
-//     console.log(getPath('[name].[ext]'))
-//     return getPath('[name].[ext]').replace('src/nehubaUI/mainUI/parent','')
-//   }
-// })
-
 function modifyViewerOptions(options) {
   options = options || {};
   options.resolveLoaderRoots = [
@@ -55,7 +48,7 @@ function modifyViewerOptions(options) {
 
   options.htmlPlugin = new HtmlWebpackPlugin({template : "src/index.html"})
   options.commonPlugins = [
-    new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)@angular/,path.join(__dirname,'../src'))
+    new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)/,path.join(__dirname,'../src'))
   ]
   
   let ruleScss = {
@@ -103,37 +96,22 @@ function modifyViewerOptions(options) {
     test : /src\/nehubaUI.*?\.css$/,
     loader : 'raw-loader'
   }
-
-  // let rawLoading = {
-  //   test : /\.html$/,
-  //   exclude : /node_modules|index\.html/,
-  //   loader : 'raw-loader'
-  // }
-
-  // let tsLoading = {
-  //   test : /nehubaUI\.parent\.component\.ts/,
-  //   loaders : [ 'awesome-typescript-loader', 'angular2-template-loader' ]
-  // }
   
-  /* TODO: maybe consider using text extract for scss? */
   options.modifyBaseConfig = (baseConfig) => {
     baseConfig.module.rules.push(ruleScss)
     baseConfig.module.rules.push(ruleHtml)
     
     const idx = baseConfig.module.rules.findIndex(r=>compareRegex(r.test,/\.css$/))
-    if(idx>=0) baseConfig.module.rules[idx].exclude = /nehubaUI/
+    if (idx >= 0) baseConfig.module.rules[idx].exclude = /nehubaUI/
     baseConfig.module.rules.push(ruleCss)
 
     const idx2 = baseConfig.module.rules.findIndex(r=>compareRegex(r.test,/\.json$/))
-    if(idx2>=0) baseConfig.module.rules[idx2].exclude = /assets\/json/
+    if (idx2 >= 0) baseConfig.module.rules[idx2].exclude = /assets\/json/
     baseConfig.module.rules.push(ruleJson)
 
     baseConfig.module.rules.push(ruleImage)
-
-    // baseConfig.module.rules.push(rawLoading)
-    // baseConfig.module.rules.push(tsLoading)
   }
-  options.frontendPlugins = [extractSass /*,extractHtml*/ ]
+  options.frontendPlugins = [ extractSass ]
   return options;
 }
 
