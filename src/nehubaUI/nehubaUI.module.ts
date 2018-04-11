@@ -1,8 +1,9 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injector } from '@angular/core';
 import { RouterModule } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { createCustomElement } from '@angular/elements'
 
 import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
@@ -69,10 +70,21 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
   providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
-  entryComponents : [ MinimisedView, WidgetView, DockedWidgetView,FloatingWidgetView, NehubaViewerComponent,NehubaModalUnit ]
+  entryComponents : [ 
+      MinimisedView, 
+      WidgetView, 
+      DockedWidgetView,
+      FloatingWidgetView, 
+      NehubaViewerComponent,
+      NehubaModalUnit,
+    
+      /* exported to be used by plugins etc */
+      ReadMoreComponent ]
 })
 export class NehubaUI{
-  
+  constructor(public injector:Injector){
+    const readmoreElement = createCustomElement( ReadMoreComponent, {injector:this.injector} )
+    
+    customElements.define('readmore-component',readmoreElement)
+  }
 }
-
-/* TODO: culling uncessary components, such as ActiveComponent */

@@ -130,10 +130,10 @@ export class NehubaLandmarkList{
   <ng-content>
   </ng-content>
   <div
-    *ngFor = "let region of regions; let idx = index"
-    [@animationFadeInOut]>
+    *ngFor = "let region of regions; let idx = index">
 
     <nehubaui-searchresult-region 
+      [@animationFadeInOut]
       (hover)="subHover($event)"
       (showReceptorData)="showReceptorData(region,$event)"
       (mouseenter)="mouseEnterRegion.emit(region)" 
@@ -163,27 +163,26 @@ export class ListSearchResultCardRegion implements AfterViewInit{
   filterForReceptorData = (region:RegionDescriptor) => region.moreInfo.some(info=>info.name=='Receptor Data')
 
   ngAfterViewInit(){
-
     this.addRegionsWithReceptorData()
-
-    // this.landmarkServices.landmarks = this.regions.map(r=>({
-    //   pos : r.position.map(number=>number / 1000000) as [number,number,number],
-    //   id : r.name,
-    //   hover : false,
-    //   properties : r
-    // }))
-
-    // this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx,7,'d20'))
-    // this.landmarkServices.TEMP_clearVtkHighlight()
   }
 
-  ngOnDestroy(){
+  private unionRegionDescriptorArrays(rds1:RegionDescriptor[],rds2:RegionDescriptor[]){
+    return rds2.reduce((acc,val)=>
+      rds1.findIndex(rd=>rd === val)>=0 ? 
+        acc : 
+        acc.concat(val)
+    ,rds1)
   }
 
+  private findRegionsHaveReceptorData(rds:RegionDescriptor[]){
+    return rds.filter(rd=>rd.moreInfo.some(info=>info.name==='Receptor Data'))
+  }
+
+  /* NB one of the few times regions are automatically added if they  */
   private addRegionsWithReceptorData(){
-    const newRegions = this.mainController.selectedRegionsBSubject.getValue().concat(
-      Array.from(this.mainController.regionsLabelIndexMap.values()).filter(r=>r.moreInfo.some(info=>info.name=='Receptor Data'))
-    )
+    const currRegions = this.mainController.selectedRegionsBSubject.getValue()
+    const allRegionsWithRecpeotrData = this.findRegionsHaveReceptorData(Array.from(this.mainController.regionsLabelIndexMap.values()))
+    const newRegions = this.unionRegionDescriptorArrays( currRegions , allRegionsWithRecpeotrData )
     this.mainController.selectedRegionsBSubject.next( newRegions )
   }
 
@@ -306,7 +305,7 @@ export class ListSearchResultCardRegion implements AfterViewInit{
   providers : [ MultilevelProvider ],
   animations : [ animateCollapseShow ]
 })
-export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
+export class SearchResultCardRegion{
   @Input() region : RegionDescriptor
   @Input() idx : number
 
@@ -318,7 +317,7 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   @ViewChild('receptorPanelBody',{read:TemplateRef}) receptorPanelBody : TemplateRef<any>
 
   receptorBrowserMultilevel:Multilevel
-  constructor(public landmarkServices:LandmarkServices,public mainController:MainController,public widgitServices:WidgitServices){
+  constructor(public mainController:MainController,public widgitServices:WidgitServices){
     // this.receptorBrowserMultilevel = receptorBrowserMultilevel
     const newMultilvl = initMultilvl(RECEPTOR_DATASTRUCTURE_JSON)
     this.receptorBrowserMultilevel = newMultilvl
@@ -333,26 +332,6 @@ export class SearchResultCardRegion implements OnDestroy, AfterViewInit{
   ntName : string
   mName : string
   landmark : Landmark
-
-  ngOnDestroy(){
-    this.landmarkServices.removeLandmark(this.landmark)
-  }
-
-  ngAfterViewInit(){
-    try{
-      this.landmark = ({
-        pos : this.region.position.map(n=>n/1e6) as [number,number,number],
-        id : this.region.name,
-        hover: false,
-        properties:this.region
-      }) as Landmark
-
-      this.landmarkServices.addLandmark(this.landmark)
-      this.landmarkServices.TEMP_parseLandmarkToVtk(this.landmark,this.idx,7,'d20')
-    }catch(e){
-      console.error('could not add landmark',e)
-    }
-  }
 
   findMoreInfo(name:string){
     return this.region.moreInfo.find(info=>info.name==name)

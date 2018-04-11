@@ -119,7 +119,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .delay(10) /* seems necessary, otherwise, on start up segments won't show properly */
       .takeUntil(this.destroySubject) /* TIL, order matters. if delay was after take until, last event will fire after destroy subject fires */
       .subscribe(([mode,regions])=>{
-
         if(mode == 'Cytoarchitectonic Probabilistic Map'){
           /* turn off the visibility of all pmaps first */
           this.setLayerVisibility({name:/^PMap/},false)

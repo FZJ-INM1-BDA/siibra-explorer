@@ -306,7 +306,10 @@ export class LabComponent{
       fetch(json.templateURL)
         .then(resp=>resp.text())
         .then(template=>{
-          this.template.innerHTML = template
+          /* changed from innerHTML to insertadjacenthtml to accomodate angular elements ... not too sure about the actual ramification */
+
+          // this.template.innerHTML = template
+          this.template.insertAdjacentHTML('afterbegin',template)
         })
         .catch(e=>{
           console.log('error fetching plugin template',e)
