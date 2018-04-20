@@ -18,6 +18,7 @@ import 'zone.js';
 import 'reflect-metadata';
 import '@webcomponents/custom-elements/src/native-shim'
 import '@webcomponents/custom-elements/custom-elements.min'
+import 'chart.js/src/chart.js'
 
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -33,3 +34,4 @@ platformBrowserDynamic().bootstrapModule(NehubaUI);
 /* needed to bootstrap json files since KG isn't yet ready */
 const requireAll = (r:any) => {r.keys().forEach(r)}
 requireAll(require.context('./assets/json/',false, /.json$/))
+requireAll(require.context('./assets/receptorData/',false, /.json$/))

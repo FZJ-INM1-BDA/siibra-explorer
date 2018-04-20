@@ -138,10 +138,10 @@ export class MainController{
   init(){
 
     /* dev option, use a special endpoint to fetch all plugins */
-    fetch('http://localhost:5080/collectPlugins')
-      .then(res=>res.json())
-      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-      .catch(console.warn)
+    // fetch('http://localhost:5080/collectPlugins')
+    //   .then(res=>res.json())
+    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+    //   .catch(console.warn)
 
     this.dataService.fetchTemplates
       .then((this.dataService.fetchTemplatesData).bind(this.dataService))
@@ -803,6 +803,7 @@ class DataService {
   private templateArray = [
     'res/json/bigbrain.json',
     'res/json/colin.json',
+    'res/json/MNI152.json',
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json'
   ]
@@ -1216,3 +1217,6 @@ POLYGONS 20 80
 3 2 11 9
 3 5 2 9
 3 11 2 7`
+
+/* temporary neurorecptors array */
+export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA","BZ","D1","GABAA","GABAB","kainate","M1","M2","M3","mGluR2_3","NMDA"]

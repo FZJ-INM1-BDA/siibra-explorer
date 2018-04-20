@@ -364,8 +364,61 @@ export class SearchResultCardRegion{
     const metadata = {
       name : `default.default.${this.region.name} ${m.name}`,
       script : 
+      /fingerprint/i.test(m.name) ? 
       `
       (()=>{
+        const radarFingerprint = document.getElementById('default.default.receptorData.fingerprint.chart.${info!.source}')
+        radarFingerprint.colors = [
+          {
+            backgroundColor : 'rgba(0,0,0,0.0)',
+            borderColor : 'rgba(255,0,0,1)',
+            pointBackgroundColor : 'rgba(255,0,0,0.5)',
+            pointBorderColor : 'rgba(255,0,0,1)'
+          },
+          {
+            backgroundColor : 'rgba(255,0,0,0.5)',
+            borderColor : 'rgba(255,0,0,1)',
+            pointBackgroundColor : 'rgba(255,0,0,0.5)',
+            pointBorderColor : 'rgba(255,0,0,1)'
+          },
+        ]
+        fetch('${JSON_RECEPTOR_ROOT}${info!.source}__fingerprint.json')
+          .then(res=>res.json())
+          .then(json=>{
+            radarFingerprint.labels = json.map(arr=>arr[0])
+            radarFingerprint.radarDatasets = ['4p','4p_sd'].map((label,idx)=>({
+              label : label,
+              data : json.map(el=>el[idx+1]),
+              borderWidth : 1,
+              borderDash : idx !== 0 ? [0] : [10,15],
+              fill : idx !==0 ? 'origin' : false
+            }))
+          })
+          .catch(console.warn)
+      })()
+      ` :
+      `
+      (()=>{
+
+        const lineProfile = document.getElementById('default.default.receptorData.profile.chart.${info!.source}.${m.name}')
+        lineProfile.colors = [
+          {
+            backgroundColor : 'rgba(0,0,0,0.0)',
+            borderColor : 'rgba(255,0,0,1)'
+          }
+        ]
+        const ntRName = lineProfile.getAttribute('nt_r_name')
+        fetch('${JSON_RECEPTOR_ROOT}${info!.source}_pr_'+ntRName+'.json')
+          .then(res=>res.json())
+          .then(json=>{
+            lineProfile.labels = Array.from(Array(json.length).keys())
+            lineProfile.lineDatasets = [{
+              label : ntRName + ' Profile',
+              data : json,
+              pointRadius : 0
+            }]
+          })
+          .catch(console.warn)
 
         const modalHandler = interactiveViewer.uiHandle.modalControl.getModalHandler()
       
@@ -375,7 +428,7 @@ export class SearchResultCardRegion{
   
         const imageWrappers = document.getElementsByClassName('default.default.imageWrapper')
         const array = Array.from(imageWrappers)
-  
+
         array.forEach(div=>{
           if(div.classList.contains('installed')){
             return
@@ -393,6 +446,7 @@ export class SearchResultCardRegion{
           })
           div.classList.add('installed')
         })
+          
       })()
       `,
       template : 
@@ -427,28 +481,38 @@ export class SearchResultCardRegion{
         {
           cursor:pointer
         }
+        #default.default.receptorData.fingerprint.chart
+        {
+          height:400px;
+          position:relative;
+        }
       </style>
       ` +
       (!info ? 
         `cannot find information on receptor data for ${this.region.name}` :
         /fingerprint/i.test(m.name) ? 
           `
-          <div imageWrapper class = "default.default.imageWrapper">
-            <img rbMode = "fingerprint" src = "${RECEPTOR_ROOT + info.source}__fingerprint.jpg" style = "width:100%; position:relative; z-index:10;" />
-          </div>
+          <radar-chart-component id = "default.default.receptorData.fingerprint.chart.${info!.source}">
+          </radar-chart-component>
           ` :
             `
             <div style = "display:flex; width:100%;">
               <div imageWrapper class = "default.default.imageWrapper" style = "flex: 0 0 35%;">
                 <img rbMode = "autoradiograph" src = "${RECEPTOR_ROOT + info.source}_bm_${m.name}.jpg" style = "width:100%;position:relative; z-index:10;" />
               </div>
-              <div imageWrapper class = "default.default.imageWrapper" style = "flex : 1 1 50%;">
-                <img rbMode = "profile" src = "${RECEPTOR_ROOT + info.source}_pr_${m.name}.jpg" style = "width:100%;position:relative; z-index:10;" />
-              </div>
+
+              <line-chart-component nt_r_name = "${m.name}" style = "flex: 1 1 50%;" id = "default.default.receptorData.profile.chart.${info!.source}.${m.name}">
+              </line-chart-component>
             </div>
             `)
     }
        
+    const placeholder = `
+    <div imageWrapper class = "default.default.imageWrapper">
+      <img rbMode = "fingerprint" src = "${RECEPTOR_ROOT + info!.source}__fingerprint.jpg" style = "width:100%; position:relative; z-index:10;" />
+    </div>
+    `
+    placeholder
     this.widgitServices.loadWidgetFromLabComponent(new LabComponent(metadata))
   }
 
@@ -604,4 +668,5 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
 
 
 const RECEPTOR_ROOT = `http://medpc055.ime.kfa-juelich.de:5082/plugins/receptorBrowser/data/`
+const JSON_RECEPTOR_ROOT = `res/json/`
 // const RECEPTOR_ROOT = `http://localhost:5080/pluginDev/receptorBrowser/data/`

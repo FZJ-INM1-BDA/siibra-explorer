@@ -12,6 +12,8 @@ import { BsDropdownModule }  from 'ngx-bootstrap/dropdown'
 import { PopoverModule }  from 'ngx-bootstrap/popover'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 
+import { ChartsModule } from 'ng2-charts'
+
 /* mainUI */
 import { NehubaContainer } from 'nehubaUI/mainUI/parent/nehubaUI.parent.component';
 import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
@@ -32,6 +34,8 @@ import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.fl
 import { ReadMoreComponent } from 'nehubaUI/components/readmore/nehubaUI.readmore.component'
 import { NehubaModalService,NehubaModalUnit } from 'nehubaUI/components/modal/nehubaUI.modal.component'
 import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer, FloatingWidgetView, WidgetView, MinimisedView, MinimisedWidgetContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
+import { NehubaRadarChart } from 'nehubaUI/components/chart/radarChart/nehubaUI.radar.chart.component'
+import { NehubaLineChart } from 'nehubaUI/components/chart/lineChart/nehubaUI.line.chart.component'
 
 /* directive */
 import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
@@ -47,6 +51,7 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
 
 @NgModule({
   imports:[
+    ChartsModule,
     RouterModule,
     FormsModule,
     BrowserModule,
@@ -59,7 +64,7 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, 
+    [ DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
@@ -79,12 +84,18 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
       NehubaModalUnit,
     
       /* exported to be used by plugins etc */
-      ReadMoreComponent ]
+      ReadMoreComponent,
+      NehubaRadarChart,
+      NehubaLineChart ]
 })
 export class NehubaUI{
   constructor(public injector:Injector){
-    const readmoreElement = createCustomElement( ReadMoreComponent, {injector:this.injector} )
+    const readmoreElement = createCustomElement( ReadMoreComponent, {injector : this.injector })
+    const radarChart = createCustomElement( NehubaRadarChart, {injector : this.injector })
+    const lineChart = createCustomElement( NehubaLineChart , {injector : this.injector })
     
     customElements.define('readmore-component',readmoreElement)
+    customElements.define('radar-chart-component',radarChart)
+    customElements.define('line-chart-component',lineChart)
   }
 }

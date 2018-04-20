@@ -101,6 +101,8 @@ export class TemplateDescriptor {
   asyncPromises : Promise<any>[]
 }
 
+const primeNumber = 171
+
 export class ParcellationDescriptor {
   constructor(json:any,parent:TemplateDescriptor){
 
@@ -138,7 +140,7 @@ export class ParcellationDescriptor {
     try{
       this.colorMap.set(region.labelIndex,rgb(region.rgb))
     }catch(e){
-      this.colorMap.set(region.labelIndex,rgb([0,0,0]))
+      this.colorMap.set(region.labelIndex,rgb([(region.labelIndex*primeNumber)%255,((region.labelIndex+1)*primeNumber)%255,((region.labelIndex+2)*primeNumber)%255]))
     }
   }
 }
@@ -197,12 +199,20 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     this.parcellationParent = parent
     this.name = json.name
     this.properties = json.properties ? json.properties : []
-    this.labelIndex = json.labelIndex ? json.labelIndex : null
+    try{
+      this.labelIndex = Number(json.labelIndex) 
+    }catch(e){
+      this.labelIndex = json.labelIndex
+    }
     this.hierarchy = hierachy
     this.PMapURL = json.PMapURL ? json.PMapURL : null
     this.position = json.position ? json.position : null
     this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1,parent)) : []
-    this.rgb = json.rgb ? json.rgb : null
+    this.rgb = json.rgb ? 
+      json.rgb : 
+      this.labelIndex ? 
+        [(this.labelIndex*primeNumber)%255,((this.labelIndex+1)*primeNumber)%255,((this.labelIndex+2)*primeNumber)%255] : 
+        null
 
     //TODO pmapurl, properties url and receptorData
     this.propertiesURL = json.PMapURL ? 

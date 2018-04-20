@@ -109,16 +109,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       /* TODO: error handling?*/
       console.log('createnehubaviewer error handler',err)
     })
-    
+     
     this.mainController.nehubaViewer = this.nehubaViewer
     this.nehubaViewer.applyInitialNgState()
 
     /* handles both selectedregion change and viewing mode change */
     Observable
-      .combineLatest(this.mainController.viewingModeBSubject,this.mainController.selectedRegionsBSubject)
+      .combineLatest(this.mainController.selectedTemplateBSubject,this.mainController.viewingModeBSubject,this.mainController.selectedRegionsBSubject)
       .delay(10) /* seems necessary, otherwise, on start up segments won't show properly */
       .takeUntil(this.destroySubject) /* TIL, order matters. if delay was after take until, last event will fire after destroy subject fires */
-      .subscribe(([mode,regions])=>{
+      .subscribe(([template,mode,regions])=>{
         if(mode == 'Cytoarchitectonic Probabilistic Map'){
           /* turn off the visibility of all pmaps first */
           this.setLayerVisibility({name:/^PMap/},false)
@@ -152,7 +152,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
           this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
           this.setSegmentationLayersOpacity(0.2)
         }else{
-          this.setSegmentationLayersOpacity(0.5)
+          this.setSegmentationLayersOpacity(template? template.name == 'Big Brain (Histology)' ? 0.0 : 0.5 : 0.5)
         }
 
         if(mode === null || mode == 'Receptor Data'){
