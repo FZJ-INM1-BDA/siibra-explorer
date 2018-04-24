@@ -28,6 +28,9 @@ import { DisplayFilteredResult } from 'nehubaUI/mainUI/displayFilteredResult/neh
 import { SearchResultUI } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component'
 import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component'
 import { PropertyWidget } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component'
+import { RegionAnchoredResults } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.regionAnchoredResults.component'
+import { SearchResultUIList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
+import { SelectedRegionList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
 
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -50,7 +53,7 @@ import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,Sear
 /* service */
 import { MainController,InfoToUIService,LandmarkServices, WidgitServices, TEMP_SearchDatasetService } from './nehubaUI.services';
 
-import { SearchResultUIList, NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
+import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
 
 @NgModule({
@@ -69,7 +72,7 @@ import { SearchResultUIList, NehubaLandmarkList,SearchResultCardRegion,ListSearc
   ],
   declarations : 
     [ 
-    CollapsablePanel, PropertyWidget,
+    CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,
     DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
@@ -88,6 +91,7 @@ import { SearchResultUIList, NehubaLandmarkList,SearchResultCardRegion,ListSearc
       FloatingWidgetView, 
       NehubaViewerComponent,
       NehubaModalUnit,
+      SearchResultUI,
     
       /* exported to be used by plugins etc */
       CollapsablePanel,

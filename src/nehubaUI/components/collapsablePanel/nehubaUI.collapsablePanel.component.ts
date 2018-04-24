@@ -1,8 +1,9 @@
-import { Component, Input, EventEmitter, Output } from '@angular/core'
+import { Component, Input, OnChanges, AfterViewInit } from '@angular/core'
 
 import template from './nehubaUI.collapsablePanel.template.html'
 import css from './nehubaUI.collapsablePanel.style.css'
 import { animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations';
+import { HasPropertyInterface } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component';
 
 @Component({
   selector : 'collapsable-panel',
@@ -11,14 +12,27 @@ import { animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations';
   animations : [animateCollapseShow]
 })
 
-export class CollapsablePanel{
+export class CollapsablePanel implements OnChanges,AfterViewInit{
   @Input() panelShow : boolean = false
   @Input() title : string = 'Untitled Panel'
-  @Input() glyphiconButtons : GlyphiconButtonInterface[] = []
-  @Output() glyphiconEvent : EventEmitter<[string,number]> = new EventEmitter()
-}
+  @Input() propertyWidget : HasPropertyInterface
+  
+  renderContent : boolean = false
 
-export interface GlyphiconButtonInterface{
-  bootstrapClass :string
-  tooltip? : string
+  ngOnChanges(){
+    this.renderContent = this.panelShow
+  }
+
+  ngAfterViewInit(){
+    this.renderContent = this.panelShow
+  }
+
+  toggleShow(){
+    if(!this.panelShow) this.renderContent = true
+    this.panelShow = !this.panelShow
+  }
+
+  animationEnd(){
+    if(!this.panelShow) this.renderContent = false
+  }
 }

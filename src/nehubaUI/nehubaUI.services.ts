@@ -1232,15 +1232,17 @@ export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA",
  */
 @Injectable()
 export class TEMP_SearchDatasetService{
-  returnedSearchResults : SearchResultInterface[] = []
+  // returnedSearchResults : SearchResultInterface[] = []
+
+  returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
   
   constructor(public mainController:MainController){
 
     fetch('res/json/receptorAggregatedData.json')
       .then(res=>res.json())
       .then(json=>{
-        this.returnedSearchResults = json
-        console.log(this.returnedSearchResults.map(r=>r.regionName))
+        // this.returnedSearchResults = json
+        this.returnedSearchResultsBSubject.next(json)
       })
       .catch(console.warn)
 
@@ -1293,6 +1295,26 @@ export class TEMP_SearchDatasetService{
         }
       }
     })
+
+    Observable
+      .combineLatest(this.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
+      .subscribe(([searchResults,parcellation])=>{
+        if(parcellation){
+          parcellation.regions.forEach(region=>this.editAvailableDatasetOnRegion(searchResults,region))
+        }
+      })
+  }
+
+  private editAvailableDatasetOnRegion(newDataSets:SearchResultInterface[],region:RegionDescriptor){
+    region.datasets = newDataSets
+      .filter(ds=>this.checkDatasetLinkRegion(ds,region))
+    region.children.forEach(c=>this.editAvailableDatasetOnRegion(newDataSets,c))
+  }
+
+  private checkDatasetLinkRegion(dataset:SearchResultInterface,region:RegionDescriptor):boolean{
+    return dataset.regionName ? 
+      dataset.regionName.findIndex(re=>re.regionName == region.name) >= 0 : 
+      false
   }
 }
 

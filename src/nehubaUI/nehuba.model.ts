@@ -1,5 +1,6 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 
 export class Property{
   constructor(obj:any){
@@ -263,6 +264,8 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
   PMapURL : string
   propertiesURL : string
   rgb : number[]
+
+  datasets : SearchResultInterface[] = []
 
   moreInfo : DescriptorMoreInfoItem[] = []
 }

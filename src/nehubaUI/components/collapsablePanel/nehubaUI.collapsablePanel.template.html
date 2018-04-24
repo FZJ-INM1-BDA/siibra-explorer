@@ -1,13 +1,22 @@
 <div id = "collapsable-panel" class = "panel panel-default">
   <div 
-    [innerHTML]="title"
-    (click)="panelShow = !panelShow" 
+    (click)="toggleShow()" 
     class = "panel-heading">
+    <span [innerHTML]="title">
+    </span>
+    <property-widget 
+      *ngIf = "propertyWidget" 
+      [inputComponent]="propertyWidget">
+
+    </property-widget>
   </div>
 
   <div id = "panelBodyContainer">
-    <div [@animateCollapseShow] = "panelShow ? 'show' : 'collapse'" class = "panel-body">
-      <ng-content>
+    <div 
+      (@animateCollapseShow.done) = "animationEnd()"
+      [@animateCollapseShow] = "panelShow ? 'show' : 'collapse'" 
+      class = "panel-body">
+      <ng-content *ngIf = "renderContent">
 
       </ng-content>
     </div>

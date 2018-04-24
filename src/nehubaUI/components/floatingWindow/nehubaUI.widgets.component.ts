@@ -305,6 +305,7 @@ export class WidgetsContainer{
     newWidget.parentViewRef = parentViewRef
     newWidget.state = state
 
+    /* TODO may no longer be necessary, with animation */
     if(this.mainController.nehubaViewer){
       this.mainController.nehubaViewer.redraw()
     }

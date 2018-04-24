@@ -1,4 +1,6 @@
 <div
+  (mouseover) = "mouseoverMultilevel.emit(data)"
+  (mouseout) = "mouseoutMultilevel.emit(data)"
   [hidden] = "!(data | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm)"
   [ngClass]="{'has-text-active':highlightFilter(data)}"
   class = " hierarchyContainer" 
@@ -19,21 +21,26 @@
 
       <span 
         class="regionHasMoreInfo"
-        [innerHtml]="data.name | searchHighlight : multilevelProvider.searchTerm"
+        [innerHtml]="getValueToShow(data) | searchHighlight : multilevelProvider.searchTerm"
         spanName>
       </span>
     </span>
   </span>
   <multilevel 
+    *ngFor = "let singleData of data.children"
     [isVisible] = "singleData | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm"
-    (doubleClick) = "doubleClick.emit($event)"
-    (singleClick) = "singleClick.emit($event)"
+    
     [muteFilter] = "muteFilter"
     [highlightFilter] = "highlightFilter"
     [hidden]="!data.isExpanded" 
-    class = "menuItemContentText" 
     [data]="singleData" 
-    *ngFor = "let singleData of data.children"
-    [selectedData]="selectedRegions" >
+    [selectedData]="selectedRegions"
+    [getValueToShow] = "getValueToShow"
+
+    (doubleClick) = "doubleClick.emit($event)"
+    (singleClick) = "singleClick.emit($event)"
+    (mouseoverMultilevel) = "mouseoverMultilevel.emit($event)"
+    (mouseoutMultilevel) = "mouseoutMultilevel.emit($event)"
+    class = "menuItemContentText"  >
   </multilevel>
 </div>

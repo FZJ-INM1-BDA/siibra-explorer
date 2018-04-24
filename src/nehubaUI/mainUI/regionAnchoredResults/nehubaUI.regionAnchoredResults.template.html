@@ -1,0 +1,16 @@
+<div (click)="toggle()" class = "btn btn-block">
+  {{ viewList ? 'show list' : 'categorise by region' }}
+</div>
+<nehubaui-searchresult-ui-list
+  (@animationFadeInOut.done) = "animationDone()"
+  [@animationFadeInOut]
+  *ngIf = "renderFullList">
+
+</nehubaui-searchresult-ui-list>
+
+<selected-region-list 
+  (@animationFadeInOut.done) = "animationDone()"
+  [@animationFadeInOut]
+  *ngIf = "renderRegionFilter">
+
+</selected-region-list>

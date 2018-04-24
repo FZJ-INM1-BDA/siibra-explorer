@@ -1,4 +1,4 @@
-import { Component, Input, TemplateRef, OnChanges } from '@angular/core'
+import { Component, Input, TemplateRef, OnChanges, EventEmitter, Output } from '@angular/core'
 
 import template from './nehubaUI.propertyWidget.template.html'
 import css from './nehubaUI.propertyWidget.style.css'
@@ -18,6 +18,7 @@ export class PropertyWidget implements OnChanges{
   
   @Input() title : string = `Property`
   @Input() inputComponent : HasPropertyInterface
+  @Output() dismiss : EventEmitter<boolean> = new EventEmitter()
 
   constructor(public infoToUI:InfoToUIService,public mainController:MainController){
     
@@ -43,10 +44,16 @@ export class PropertyWidget implements OnChanges{
   moveToRoi(pos:[number,number,number]){
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(pos,true)
   }
+
+  preventDefault(ev:Event){
+    ev.preventDefault()
+    ev.stopPropagation()
+  }
 }
 
-interface HasPropertyInterface{
+export interface HasPropertyInterface{
   position? : [number,number,number]
   properties? : DatasetInterface
   propertiesURL? : string
+  dismiss? : ()=>void
 }

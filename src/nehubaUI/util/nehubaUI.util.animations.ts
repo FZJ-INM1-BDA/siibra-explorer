@@ -18,32 +18,24 @@ export const animationFadeInOut =
 export const animateCollapseShow = 
   trigger('animateCollapseShow',[
     state('collapse',style({
-      'display' : 'none',
       'transform':'translateY(-100%)',
       'height':'0px'
     })),
     state('show',style({
-      'display' : 'block',
       'transform':'translateY(0px)',
       'height':'*'
     })),
     transition('collapse => show',[
-      style({
-        'display' : 'show'
-      }),
-      animate('100ms',style({
+      animate('200ms 100ms ease-out',style({
         'transform':'translateY(0px)',
         'height':'*'
       }))
     ]),
     transition('show => collapse',[
-      animate('100ms',style({
+      animate('200ms 100ms ease-in',style({
         'transform':'translateY(-100%)',
         'height':'0px'
-      })),
-      style({
-        'display':'none'
-      })
+      }))
     ])
   ])
 

@@ -67,7 +67,7 @@ export class NehubaViewerContainer implements AfterViewInit{
                   this.selectedTemplate ? 
                     this.defaultWidget :
                     null
-
+      
       if ( templateRef ){
         this.widgetComponent = this.widgetServices.widgitiseTemplateRef(templateRef,{name : mode ? mode : 'Select atlas regions'})
         this.widgetComponent.changeState('docked')

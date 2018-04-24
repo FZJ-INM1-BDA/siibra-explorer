@@ -6,11 +6,17 @@
 
 </NehubaViewer>
 
+<nehubaui-searchresult-ui-list
+  *ngIf = "false">
+</nehubaui-searchresult-ui-list>
+
 <ng-template #receptorDataWidget>
   
-  <nehubaui-searchresult-ui-list>
-  </nehubaui-searchresult-ui-list>
+  <region-anchored-results>
 
+  </region-anchored-results>
+
+  <!-- add jubrain hierachy here -->
   <nehubaui-searchresult-region-list 
     *ngIf = "false"
     [title] = "'Receptor Data Browser'"

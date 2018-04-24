@@ -27,8 +27,15 @@ export class NehubaUIRegionMultilevel implements OnChanges{
     })
   }
 
+  getDisplayName = (m:RegionDescriptor):string =>{
+    return m.name
+  }
+
+  /* TODO configure the mutefilter properly. decide  */
   muteFilter = (m:RegionDescriptor):boolean=>{
-    return this.mainController.viewingMode !== null && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+    return this.mainController.viewingMode == 'Receptor Data' ? 
+      !(m.datasets.length > 0) :
+      this.mainController.viewingMode !== null && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
   }
 
   highlightFilter = (m:RegionDescriptor):boolean=>{
@@ -50,6 +57,14 @@ export class NehubaUIRegionMultilevel implements OnChanges{
       this.multilevelProvider.toggleRegionSelect(m)
     }
     this.updateRegionSelection()
+  }
+
+  mouseoverMultilevel(m:RegionDescriptor){
+    m.datasets.forEach(ds=>ds.highlight = true)
+  }
+
+  mouseoutMultilevel(m:RegionDescriptor){
+    m.datasets.forEach(ds=>ds.highlight = false)
   }
 
   multilevelDoubleClick(m:RegionDescriptor){
@@ -74,5 +89,9 @@ export class NehubaUIRegionMultilevel implements OnChanges{
 
   updateRegionSelection(){
     this.mainController.selectedRegionsBSubject.next(this.multilevelProvider.selectedMultilevel as RegionDescriptor[])
+  }
+
+  getValueToShow(m:RegionDescriptor){
+    return m.name
   }
 }

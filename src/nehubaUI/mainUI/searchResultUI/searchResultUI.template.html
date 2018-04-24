@@ -1,5 +1,5 @@
 <collapsable-panel
-  [title]="searchResult.name">
+  [title]="searchResult.highlight ? ('<span class = \'highlight\'>' + searchResult.name + '</span>') : searchResult.name">
 
   <div *ngIf = "searchResult.thumbnail" id = "thumbnailContainer">
     <file-viewer
@@ -18,15 +18,13 @@
 
   
   <collapsable-panel
-    [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length + ') '">
+    [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length  + ') '">
     <div *ngFor = "let regionLink of regionLinks">
       
       <span fileUnit>
         {{ regionLink.moreInfo ? '(' + regionLink.moreInfo + ')' : '' }} {{ regionLink.relationship ? regionLink.relationship : '' }}  
         {{ regionLink.region ? regionLink.region.name  : 'Specified Region not found in the label index map' }} 
       </span> 
-      <!-- <i hoverable (click)="" class = "glyphicon glyphicon-info-sign"></i>
-      <i hoverable (click)="" class = "glyphicon glyphicon-screenshot"></i> -->
       <property-widget
         [title]="'More information on ' + regionLink.region.name"
         [inputComponent]="regionLink.region">
@@ -52,3 +50,6 @@
   </collapsable-panel>
 
 </collapsable-panel>
+<span *ngIf = "!searchResult">
+  searchResultUI.template.html > searchResult is undefined.
+</span>

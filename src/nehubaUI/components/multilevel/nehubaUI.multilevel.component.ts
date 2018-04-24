@@ -62,6 +62,7 @@ export class MultilevelSelector {
 
   @Input() isVisible : boolean = true
 
+  @Input() getValueToShow : (m:Multilevel)=>string = (m)=>m.name
   @Input() muteFilter : (m:Multilevel)=>boolean = ()=>false
   @Input() highlightFilter : (m:Multilevel)=>boolean = ()=>false
 
@@ -71,7 +72,8 @@ export class MultilevelSelector {
   
   @Output() singleClick : EventEmitter<Multilevel> = new EventEmitter()
   @Output() doubleClick : EventEmitter<Multilevel> = new EventEmitter()
-
+  @Output() mouseoverMultilevel : EventEmitter<Multilevel> = new EventEmitter()
+  @Output() mouseoutMultilevel : EventEmitter<Multilevel> = new EventEmitter()
 
   debounceFlag : boolean = true
   debounceTimer : any
@@ -100,5 +102,9 @@ export class MultilevelSelector {
 
   realDoubleClick(m:Multilevel){
     this.doubleClick.emit(m)
+  }
+
+  test(){
+    console.log('test')
   }
 }

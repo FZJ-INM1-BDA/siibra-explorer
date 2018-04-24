@@ -92,6 +92,8 @@ export interface SearchResultInterface{
 
   properties : Partial<DatasetInterface>
   files : SearchResultFileInterface[]
+
+  highlight :  boolean
 }
 
 export interface SearchResultFileInterface{
