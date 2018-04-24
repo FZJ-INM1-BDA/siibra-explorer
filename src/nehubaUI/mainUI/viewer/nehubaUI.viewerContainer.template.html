@@ -7,7 +7,12 @@
 </NehubaViewer>
 
 <ng-template #receptorDataWidget>
+  
+  <nehubaui-searchresult-ui-list>
+  </nehubaui-searchresult-ui-list>
+
   <nehubaui-searchresult-region-list 
+    *ngIf = "false"
     [title] = "'Receptor Data Browser'"
     (mouseEnterRegion)="receptorMouseEnter($event)"
     (mouseLeaveRegion)="receptorMouseLeave($event)"
@@ -22,10 +27,6 @@
     </readmoreComponent>
 
   </nehubaui-searchresult-region-list>
-</ng-template>
-  
-<ng-template #testing>
-  test test haha
 </ng-template>
 
 <ng-template #defaultWidget>

@@ -25,6 +25,9 @@ import { NehubaViewerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerCon
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
 import { SplashScreen } from 'nehubaUI/mainUI/splashScreen/splashScreen.component'
 import { DisplayFilteredResult } from 'nehubaUI/mainUI/displayFilteredResult/nehubaUI.displayFilteredResult.component'
+import { SearchResultUI } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component'
+import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component'
+import { PropertyWidget } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component'
 
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -36,6 +39,7 @@ import { NehubaModalService,NehubaModalUnit } from 'nehubaUI/components/modal/ne
 import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer, FloatingWidgetView, WidgetView, MinimisedView, MinimisedWidgetContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 import { NehubaRadarChart } from 'nehubaUI/components/chart/radarChart/nehubaUI.radar.chart.component'
 import { NehubaLineChart } from 'nehubaUI/components/chart/lineChart/nehubaUI.line.chart.component'
+import { CollapsablePanel } from 'nehubaUI/components/collapsablePanel/nehubaUI.collapsablePanel.component'
 
 /* directive */
 import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
@@ -44,9 +48,9 @@ import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemp
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
-import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from './nehubaUI.services';
+import { MainController,InfoToUIService,LandmarkServices, WidgitServices, TEMP_SearchDatasetService } from './nehubaUI.services';
 
-import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
+import { SearchResultUIList, NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
 
 
 @NgModule({
@@ -64,7 +68,9 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,
+    [ 
+    CollapsablePanel, PropertyWidget,
+    DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
@@ -74,7 +80,7 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     MultilevelSelector, NehubaModalService,
     FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
-  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
+  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService,TEMP_SearchDatasetService ],
   entryComponents : [ 
       MinimisedView, 
       WidgetView, 
@@ -84,6 +90,7 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
       NehubaModalUnit,
     
       /* exported to be used by plugins etc */
+      CollapsablePanel,
       ReadMoreComponent,
       NehubaRadarChart,
       NehubaLineChart ]

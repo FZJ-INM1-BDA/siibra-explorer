@@ -41,6 +41,7 @@ export interface Dataset{
   label? : string
   borderWidth? : number
   borderDash? : number[]
+  fill? :string|number|boolean
 }
 
 export interface LegendInterface{

@@ -172,7 +172,7 @@ export class NehubaBanner implements AfterViewInit {
 export class PrependNavigate implements PipeTransform{
   public transform(array:string[],template : TemplateDescriptor | undefined):string[]{
     return template ? template.name == 'MNI Colin 27' ? 
-      ['Select atlas regions', ... array,'iEEG Recordings'] :
+      ['Select atlas regions', ... array /*,'iEEG Recordings'*/] :
       ['Select atlas regions', ... array] :
         []
   }

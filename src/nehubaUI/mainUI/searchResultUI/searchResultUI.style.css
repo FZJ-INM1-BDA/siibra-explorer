@@ -1,0 +1,21 @@
+
+
+#thumbnailContainer
+{
+  width:300px; /*  TODO check if this stops the jerking when scroll bar is present */
+  margin-left:1em;
+  margin-right:1em;
+  margin-top:-11px; /* TODO the ng2-chartjs object introduces a strange 11px offset */
+}
+
+[fileUnit]
+{
+  margin-left:2em;
+}
+
+[hoverable]:hover
+{
+
+  cursor: pointer;
+  color : rgba(255,255,255,0.8);
+}

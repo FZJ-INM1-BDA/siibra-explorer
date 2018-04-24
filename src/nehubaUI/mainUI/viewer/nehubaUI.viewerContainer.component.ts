@@ -24,8 +24,6 @@ export class NehubaViewerContainer implements AfterViewInit{
   @ViewChild('cytopmapWidget',{read:TemplateRef}) cytopmapWidget : TemplateRef<any>
   @ViewChild('landmarkWidget',{read:TemplateRef}) landmarkWidget : TemplateRef<any>
 
-  @ViewChild('testing',{read:TemplateRef}) testing : TemplateRef<any>
-
   widgetComponent : WidgetComponent
 
   mouseEventOnViewer : Subject<any> = new Subject()

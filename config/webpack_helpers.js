@@ -68,7 +68,7 @@ function modifyViewerOptions(options) {
   }
 
   let ruleJson = {
-    test : /assets\/(json|receptorData)\/.*?\.json$/,
+    test : /assets.*?\.json$/,
     use : [{
       loader : 'file-loader',
       options : {

@@ -1,0 +1,7 @@
+<i *ngIf = "inputComponent.position" (click)="moveToRoi(inputComponent.position)" class = "glyphicon glyphicon-screenshot"></i>
+<i *ngIf = "inputComponent.properties" (click)="showPropertyModal(datasetBlurb)" class = "glyphicon glyphicon-info-sign"></i>
+<ng-template #datasetBlurb>
+  <datasetBlurb 
+    [dataset]="inputComponent.properties">
+  </datasetBlurb>
+</ng-template>

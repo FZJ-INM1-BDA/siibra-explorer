@@ -1,0 +1,15 @@
+<div id = "collapsable-panel" class = "panel panel-default">
+  <div 
+    [innerHTML]="title"
+    (click)="panelShow = !panelShow" 
+    class = "panel-heading">
+  </div>
+
+  <div id = "panelBodyContainer">
+    <div [@animateCollapseShow] = "panelShow ? 'show' : 'collapse'" class = "panel-body">
+      <ng-content>
+
+      </ng-content>
+    </div>
+  </div>
+</div>

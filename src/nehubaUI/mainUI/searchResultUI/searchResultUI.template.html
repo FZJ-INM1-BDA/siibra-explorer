@@ -1,0 +1,54 @@
+<collapsable-panel
+  [title]="searchResult.name">
+
+  <div *ngIf = "searchResult.thumbnail" id = "thumbnailContainer">
+    <file-viewer
+      thumbnail
+      [searchResult] = "searchResult.thumbnail"
+      *ngIf = "searchResult.thumbnail">
+    </file-viewer>
+    <span style = "font-size:smaller">
+      Thumbnail info:
+      <property-widget
+        [title]="'More information on ' + searchResult.thumbnail.name"
+        [inputComponent]="searchResult.thumbnail">
+      </property-widget>
+    </span>
+  </div>
+
+  
+  <collapsable-panel
+    [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length + ') '">
+    <div *ngFor = "let regionLink of regionLinks">
+      
+      <span fileUnit>
+        {{ regionLink.moreInfo ? '(' + regionLink.moreInfo + ')' : '' }} {{ regionLink.relationship ? regionLink.relationship : '' }}  
+        {{ regionLink.region ? regionLink.region.name  : 'Specified Region not found in the label index map' }} 
+      </span> 
+      <!-- <i hoverable (click)="" class = "glyphicon glyphicon-info-sign"></i>
+      <i hoverable (click)="" class = "glyphicon glyphicon-screenshot"></i> -->
+      <property-widget
+        [title]="'More information on ' + regionLink.region.name"
+        [inputComponent]="regionLink.region">
+      </property-widget>
+    </div>
+  </collapsable-panel>
+
+  <collapsable-panel
+    [title]="'<i class = \'glyphicon glyphicon-file\'></i> <span> Files (' + files.length  + ')</span>'">
+
+    <div *ngFor = "let file of files">
+      <ng-template #fileTemplate>
+        <file-viewer [searchResult] = "file">
+  
+        </file-viewer>
+      </ng-template>
+      <span fileUnit hoverable (click)="popupFileViewer(file,fileTemplate)">{{ file.name }}</span> 
+      <property-widget
+        [title]="'More information on ' + file.name"
+        [inputComponent]="file">
+      </property-widget>
+    </div>
+  </collapsable-panel>
+
+</collapsable-panel>

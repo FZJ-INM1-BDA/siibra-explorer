@@ -12,6 +12,8 @@ import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specificat
 import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer'
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
+import { Chart } from 'chart.js'
 
 declare var window:{
   [key:string] : any
@@ -58,7 +60,7 @@ export class MainController{
   nehubaViewer : NehubaViewer
 
   constructor(){
-
+    
     if( this.testRequirement() ){
       this.init()
       this.attachInternalHooks()
@@ -495,6 +497,10 @@ export class WidgitServices
   /* tobe overwritten by view */
   _widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent 
   
+  /**
+   * Internal call to widgetise a templateRef
+   * If the widget can be dismissed, pass a function as the value of metadata.onShutdown, and inside the said function, call widgetComponent.parentRef.destroy() 
+   */
   widgitiseTemplateRef : (templateRef:TemplateRef<any>,metadata:WidgitiseTempRefMetaData)=>WidgetComponent = (templateRef,metadata)=>
   {
     const widgetComponent = this._widgitiseTemplateRef(templateRef,metadata)
@@ -843,7 +849,7 @@ class DataService {
           .then(datas=>{
             resolve(Object.assign({},template,{
               'Cytoarchitectonic Probabilistic Map' : datas[0],
-              'iEEG Recordings' : datas[1],
+              // 'iEEG Recordings' : datas[1],
               'Receptor Data' : datas[2]
             }) as TemplateDescriptor)
           })
@@ -1220,3 +1226,99 @@ POLYGONS 20 80
 
 /* temporary neurorecptors array */
 export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA","BZ","D1","GABAA","GABAB","kainate","M1","M2","M3","mGluR2_3","NMDA"]
+
+/**
+ * currently only search for receptor data
+ */
+@Injectable()
+export class TEMP_SearchDatasetService{
+  returnedSearchResults : SearchResultInterface[] = []
+  
+  constructor(public mainController:MainController){
+
+    fetch('res/json/receptorAggregatedData.json')
+      .then(res=>res.json())
+      .then(json=>{
+        this.returnedSearchResults = json
+        console.log(this.returnedSearchResults.map(r=>r.regionName))
+      })
+      .catch(console.warn)
+
+    /**
+     * Because there is no easy way to display standard deviation natively, use a plugin 
+     * */
+    Chart.pluginService.register({
+      afterInit : function(chart){
+        if(chart.config.options && chart.config.options.tooltips){
+          
+          chart.config.options.tooltips.callbacks = {
+            label : function(tooltipItem,data){
+              let sdValue
+              if( data.datasets && typeof tooltipItem.datasetIndex != 'undefined' && data.datasets[tooltipItem.datasetIndex].label ){
+                const sdLabel = data.datasets[tooltipItem.datasetIndex].label+'_sd'
+                const sd = data.datasets.find(dataset=> typeof dataset.label != 'undefined' && dataset.label == sdLabel)
+                if(sd && sd.data && typeof tooltipItem.index != 'undefined' && typeof tooltipItem.yLabel != 'undefined') sdValue = Number(sd.data[tooltipItem.index]) - Number(tooltipItem.yLabel)
+              }
+              return `${tooltipItem.yLabel} ${sdValue ? '('+ sdValue +')' : ''}`
+            }
+          }
+        }
+        if(chart.data.datasets){
+          
+          chart.data.datasets = chart.data.datasets
+            .map(dataset=>{
+              if(dataset.label && /\_sd$/.test(dataset.label)){
+                const originalDS = chart.data.datasets!.find(baseDS=>typeof baseDS.label!== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/,'')))
+                if(originalDS){
+                  return Object.assign({},dataset,{
+                    data : (originalDS.data as number[]).map((datapoint,idx)=>(Number(datapoint) + Number((dataset.data as number[])[idx]))),
+                    ... CHART_SD_STYLE
+                  })
+                }else{
+                  return dataset
+                }
+              }else if (dataset.label){
+                const sdDS = chart.data.datasets!.find(sdDS=>typeof sdDS.label !=='undefined' && (sdDS.label == dataset.label + '_sd'))
+                if(sdDS){
+                  return Object.assign({},dataset,{
+                    ...CHART_BASE_STYLE
+                  })
+                }else{
+                  return dataset
+                }
+              }else{
+                return dataset
+              }
+            })
+        }
+      }
+    })
+  }
+}
+
+/* */
+const CHART_BASE_STYLE = {
+  fill : 'origin',
+  backgroundColor : 'rgba(255,0,255,0.3)'
+}
+
+/**/
+const CHART_SD_STYLE = {
+  fill : false,
+  borderDash : [10,3],
+  borderColor : 'rgba(255,0,0,1)',
+  pointRadius : 0,
+  pointHitRadius : 0,
+  backgroundColor : 'rgba(0,0,0,0)'
+}
+
+// const CHART_BASE_OPTION : ChartOptions = {
+//     tooltips : {
+//       callbacks : {
+//         label : function(tooltipItem,data){
+//           console.log('tooltip callback',tooltipItem,data)
+//           return 'test'
+//         }
+//       }
+//     }
+// }

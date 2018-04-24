@@ -28,6 +28,12 @@ export class NehubaRadarChart implements OnChanges{
     // this.chartOption.scale!.ticks!.stepSize = 
     // this.chartOption.scale!.ticks!.max = ( , this.maxY)
 
+    /**
+     * TODO the sroll up event sometimes does not get prevented for some reasons...
+     */
+    ev.stopPropagation()
+    ev.preventDefault()
+
     this.maxY *= ev.deltaY > 0 ? 1.2 : 0.8
     const newTicksObj = {
       stepSize : Math.ceil( this.maxY / 500 ) * 100,
@@ -52,6 +58,7 @@ export class NehubaRadarChart implements OnChanges{
     //     }
     //   }
     // }
+
   }
 
   maxY : number
@@ -113,7 +120,7 @@ export interface RadarDatasetInputInterface{
   data : number[]
 }
 
-interface RadarChartOptionInterface{
+export interface RadarChartOptionInterface{
   scale? : ScaleOptionInterface&RadarScaleOptionAdditionalInterface
   animation? : any
   legend? : LegendInterface

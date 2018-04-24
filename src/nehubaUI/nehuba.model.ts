@@ -198,7 +198,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
 
     this.parcellationParent = parent
     this.name = json.name
-    this.properties = json.properties ? json.properties : []
     try{
       this.labelIndex = Number(json.labelIndex) 
     }catch(e){

@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch, TEMP_SearchDatasetService } from 'nehubaUI/nehubaUI.services';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
 import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 
@@ -666,6 +666,27 @@ export class SearchResultPillRegion implements OnDestroy,AfterViewInit{
   }
 }
 
+@Component({
+  selector : 'nehubaui-searchresult-ui-list',
+  template : 
+  `
+  <ng-content>
+  </ng-content>
+  <div
+    [@animationFadeInOut]
+    *ngFor = "let searchResults of searchDatasetService.returnedSearchResults">
+    <nehubaui-searchresult-ui
+      [searchResult]="searchResults">
+
+    </nehubaui-searchresult-ui>
+  </div>
+  `,
+  animations : [ animationFadeInOut ]
+})
+export class SearchResultUIList{
+  constructor(public searchDatasetService:TEMP_SearchDatasetService){
+  }
+}
 
 const RECEPTOR_ROOT = `http://medpc055.ime.kfa-juelich.de:5082/plugins/receptorBrowser/data/`
 const JSON_RECEPTOR_ROOT = `res/json/`

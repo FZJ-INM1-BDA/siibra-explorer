@@ -1,0 +1,25 @@
+<div 
+  *ngIf = "searchResult"
+  [ngSwitch]="searchResult.mimetype">
+  <img *ngSwitchCase="'image/jpeg'" [src] = "searchResult.url" />
+  <div [ngSwitch]="searchResult.data.chartType" *ngSwitchCase="'application/json'">
+    <radar-chart
+      [labels]="searchResult.data.labels"
+      [radarDatasets]="searchResult.data.datasets"
+      *ngSwitchCase="'radar'">
+
+    </radar-chart>
+    <line-chart
+      [options] = "searchResult.data.chartOptions"
+      [lineDatasets] = "searchResult.data.datasets"
+      *ngSwitchCase = "'line'">
+
+    </line-chart>
+    <div *ngSwitchDefault>
+      The json file is not a chart. I mean, we could dump the json, but would it really help?
+    </div>
+  </div>
+  <div *ngSwitchDefault>
+    The selected file with the mimetype {{ searchResult.mimetype }} could not be displayed.
+  </div>
+</div>

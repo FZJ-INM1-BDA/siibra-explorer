@@ -32,17 +32,6 @@ export class NehubaLineChart implements OnChanges{
      * temporarily disabled
     */
 
-    // this.chartOption = {
-    //   animation : false,
-    //   scale : {
-    //     ticks : {
-    //       min : 0,
-    //       stepSize : Math.ceil( this.maxY / 500 ) * 100,
-    //       max : (this.maxY *= ev.deltaY > 0 ? 1.2 : 0.8 , this.maxY),
-    //       showLabelBackdrop : false
-    //     }
-    //   }
-    // }
   }
 
   maxY : number
@@ -98,7 +87,7 @@ export class NehubaLineChart implements OnChanges{
   
   ngOnChanges(){
     this.chartDataset = {
-      labels : this.labels,
+      labels : this.labels ? this.labels : Array.from(Array(this.lineDatasets[0].data.length).keys()).map(n=>n.toString()),
       datasets : this.lineDatasets
     }
 
@@ -110,15 +99,17 @@ export class NehubaLineChart implements OnChanges{
         },0))
     },0)
 
+
+
   }
 }
 
 export interface LineDatasetInputInterface{
-  label : string
+  label? : string
   data : number[]
 }
 
-interface LinearChartOptionInterface{
+export interface LinearChartOptionInterface{
   scales? : {
     xAxes? : ScaleOptionInterface[]
     yAxes? : ScaleOptionInterface[]

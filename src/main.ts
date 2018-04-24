@@ -32,6 +32,8 @@ enableProdMode();
 platformBrowserDynamic().bootstrapModule(NehubaUI);
 
 /* needed to bootstrap json files since KG isn't yet ready */
+import './assets/receptor/receptorAggregatedData.json'
+
 const requireAll = (r:any) => {r.keys().forEach(r)}
 requireAll(require.context('./assets/json/',false, /.json$/))
-requireAll(require.context('./assets/receptorData/',false, /.json$/))
+requireAll(require.context('./assets/receptor/',true, /.jpg$/))

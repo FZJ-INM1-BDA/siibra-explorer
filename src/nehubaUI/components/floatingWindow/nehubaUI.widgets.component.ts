@@ -175,6 +175,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
       display:block;
       width:362px;
       margin-left:-21px;
+      padding-left:21px;
       height:100%;
       overflow-y:auto;
       overflow-x:hidden;
@@ -476,6 +477,12 @@ interface WidgetViewChassis{
     {
       flex : 0 0 1em;
     }
+
+    div.panel-body
+    {
+      max-height : 80vh;
+      overflow-y : auto;
+    }
     
     `
   ],
@@ -613,7 +620,11 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
       </i>
     </div>
     <div style="overflow:hidden">
-      <div [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" class = "panel-body">
+      <div 
+        id = "dockedWidgetPanelBody"
+        [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" 
+        class = "panel-body">
+
         <ng-template #panelBody>
         </ng-template>
       </div>
