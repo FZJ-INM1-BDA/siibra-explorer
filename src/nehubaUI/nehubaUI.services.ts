@@ -1,4 +1,4 @@
-import { TemplateRef, Injectable } from '@angular/core';
+import { TemplateRef, Injectable, ComponentRef } from '@angular/core';
 import { Subject,BehaviorSubject,Observable } from 'rxjs/Rx'
 import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
@@ -7,7 +7,7 @@ import { ModalHandler } from 'nehubaUI/components/modal/nehubaUI.modal.component
 import { NehubaViewer } from 'nehuba/NehubaViewer'
 import { UrlHashBinding } from 'neuroglancer/ui/url_hash_binding'
 import { LayerManager } from 'neuroglancer/layer'
-import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
+import { WidgetComponent, FloatingWidgetView } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specification'
 import { SingleMeshUserLayer } from 'neuroglancer/single_mesh_user_layer'
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -457,6 +457,12 @@ export class MultilevelProvider
   isSelected(m:Multilevel){
     return this.selectedMultilevel.findIndex(sm=>sm===m) >= 0
   }
+}
+
+@Injectable()
+export class FloatingWidgetService{
+  floatingComponents : ComponentRef<FloatingWidgetView>[] = []
+  floatingViews :FloatingWidgetView[] = []
 }
 
 @Injectable()

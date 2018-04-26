@@ -1,8 +1,8 @@
-import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding, OnDestroy, EventEmitter, Output } from '@angular/core'
+import { Input, TemplateRef,ViewRef, ComponentRef, Renderer2, ElementRef,AfterViewInit, Directive,NgZone,HostListener,ViewContainerRef,Component,ComponentFactoryResolver,ComponentFactory,ViewChild,HostBinding, OnDestroy, EventEmitter, Output, OnInit } from '@angular/core'
 import { animationFadeInOut,animateCollapseShow, showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
 
 import { LabComponent, LabComponentHandler, WidgitiseTempRefMetaData } from 'nehubaUI/nehuba.model';
-import { MainController, WidgitServices } from 'nehubaUI/nehubaUI.services'
+import { MainController, WidgitServices, FloatingWidgetService } from 'nehubaUI/nehubaUI.services'
 import { Observable } from 'rxjs/Rx';
 import { NehubaUIRegionMultilevel } from 'nehubaUI/mainUI/regionMultilevel/nehubaUI.regionMultilevel.component';
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
@@ -60,6 +60,7 @@ export class DynamicViewDirective{
  * Containers for different views. Has to be declared before main container
  */
 
+
 @Component({
   selector : `FloatingWidgetContainer`,
   template : 
@@ -68,15 +69,41 @@ export class DynamicViewDirective{
   </ng-template>
   `,
   styles : [
-  ]
+  ],
+  providers : [ FloatingWidgetService ]
 })
 export class FloatingWidgetContainer implements AfterViewInit{
   @ViewChild(DynamicViewDirective) host : DynamicViewDirective
   viewContainerRef : ViewContainerRef
-  
-  ngAfterViewInit(){
-    this.viewContainerRef = this.host.viewContainerRef
+
+  constructor(public floatingWidgetSerivce:FloatingWidgetService){
+
   }
+
+  ngAfterViewInit(){
+
+    this.viewContainerRef = this.host.viewContainerRef
+    // const proxyViewContainerRef = new Proxy(this.host.viewContainerRef,{
+    //   get(target,prop){
+    //     if(prop == 'createComponent'){
+    //       console.log('createComponent called')
+    //       Reflect.get(target,prop)
+    //     }else{
+    //       console.log('other prop called')
+    //       Reflect.get(target,prop)
+    //     }
+    //   }
+    // })
+    // console.log(proxyViewContainerRef.clear,this.host.viewContainerRef.clear)
+    // console.log(proxyViewContainerRef,this.host.viewContainerRef)
+
+  }
+
+  // registerFloatingWidget(componentRef:ComponentRef<any>){
+  //   this.floatingWidgetsRef.push(componentRef)
+
+  //   this.viewContainerRef.
+  // }
 }
 
 @Component({
@@ -295,7 +322,7 @@ export class WidgetsContainer{
           //: this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
 
     const embedView = parentViewRef.instance.panelBody.createEmbeddedView( templateRef )
-    
+
     embedView.context.mainController = this.mainController
     parentViewRef.instance.widgetComponent = newWidget
     if(newWidget.parentViewRef){
@@ -481,7 +508,7 @@ interface WidgetViewChassis{
   ],
   animations : [ animationFadeInOut ]
 })
-export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
+export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,WidgetViewChassis{
   widgetComponent : WidgetComponent
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   @HostBinding('@animationFadeInOut') animationFadeInOut : any
@@ -493,11 +520,30 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
 
   /* properties associated with reposition the floating view */
   repositionFlag : boolean = false
-  position : number[] = [850,650]
+  position : number[]  = [850,650]
+
   reposStartMousePos : number[] = [0,0]
   reposStartViewPos : number[] = [0,0]
 
-  constructor(private zone:NgZone){
+  constructor(private zone:NgZone, public floatingWidgetService:FloatingWidgetService){
+  }
+
+  ngOnInit(){
+    while(this.floatingWidgetService.floatingViews.findIndex(fv=>fv.position[0]==this.position[0]&&fv.position[1]==this.position[1])>=0){
+      this.position = this.position.map(v=>v-10)
+      if(this.position[0]<=10 || this.position[1]<=10)this.position = [850,650]
+    }
+    this.floatingWidgetService.floatingViews.push(this)
+  }
+
+  ngOnDestroy(){
+    const idx = this.floatingWidgetService.floatingViews.findIndex(fv=>fv===this)
+    if(idx>=0) this.floatingWidgetService.floatingViews.splice(idx,0)
+  }
+
+  @HostListener('mousedown',['$event'])
+  floatingwidgetclick(ev:Event){
+    console.log('floating widget container clicked',ev,this)
   }
 
   @HostListener('document:mousemove',['$event'])
