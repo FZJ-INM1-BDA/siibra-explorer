@@ -2,15 +2,15 @@ import { trigger, transition, state, style, animate } from '@angular/animations'
 
 export const animationFadeInOut = 
   trigger('animationFadeInOut',[
-    state('void',style({'opacity' : '0.0'})),
+    state('void',style({'opacity' : '0.33'})),
     state('*',style({'opacity' : '1.0'})),
     transition('void => *',[
-      style({'opacity':'0.0'}),
-      animate('150ms',style({'opacity':'1.0'}))
+      style({'opacity':'0.32'}),
+      animate('550ms',style({'opacity':'1.0'}))
     ]),
     transition('* => void',[
       style({'opacity':'1.0'}),
-      animate('150ms',style({'opacity':'0.0'}))
+      animate('550ms',style({'opacity':'0.31'}))
     ])
   ])
 

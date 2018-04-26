@@ -69,28 +69,29 @@ export class DynamicViewDirective{
   </ng-template>
   `,
   styles : [
-  ],
-  providers : [ FloatingWidgetService ]
+  ]
 })
 export class FloatingWidgetContainer implements AfterViewInit{
   @ViewChild(DynamicViewDirective) host : DynamicViewDirective
   viewContainerRef : ViewContainerRef
 
-  constructor(public floatingWidgetSerivce:FloatingWidgetService){
+  constructor(){
 
   }
 
   ngAfterViewInit(){
 
     this.viewContainerRef = this.host.viewContainerRef
-    // const proxyViewContainerRef = new Proxy(this.host.viewContainerRef,{
-    //   get(target,prop){
+    
+    
+    // const proxyViewContainerRef = new Proxy(ViewContainerRef.prototype,{
+    //   get : (_target,prop)=>{
     //     if(prop == 'createComponent'){
     //       console.log('createComponent called')
-    //       Reflect.get(target,prop)
+    //       Reflect.get(this.host.viewContainerRef,prop)
     //     }else{
     //       console.log('other prop called')
-    //       Reflect.get(target,prop)
+    //       Reflect.get(this.host.viewContainerRef,prop)
     //     }
     //   }
     // })
@@ -209,7 +210,10 @@ export class MinimisedWidgetContainer implements AfterViewInit{
     `
   ],
   
-  animations : [ showSideBar ]
+  animations : [ showSideBar ],
+  providers : [
+    FloatingWidgetService
+  ]
 })
 export class WidgetsContainer{
 
@@ -254,6 +258,7 @@ export class WidgetsContainer{
   widgetFactory : ComponentFactory<WidgetView>
 
   constructor( 
+    public floatingWidgetSerivce:FloatingWidgetService,
     private componentFactoryResolver:ComponentFactoryResolver, 
     private rd2:Renderer2,
     private mainController:MainController,
@@ -271,6 +276,28 @@ export class WidgetsContainer{
         .debounceTime(200)
         .subscribe(()=>{
           this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
+        })
+
+
+      // this.floatingWidgetSerivce.focusFloatingViewSubject.subscribe(console.log)
+      Observable
+        .from(this.floatingWidgetSerivce.focusFloatingViewSubject)
+        .subscribe(fw=>{
+          const foundFVC = this.floatingViewComponentRefs.find(fvc=>fvc.instance==fw)
+          if(foundFVC){
+            const idx = this.floatingWidgetContainer.viewContainerRef.indexOf(foundFVC.hostView)
+            if(idx<0){
+              console.warn('error in foregrounding floating widget view. cannot find the host view in floating widget container')
+              return
+            }
+            
+            if(idx<this.floatingWidgetContainer.viewContainerRef.length -1 ){
+              const viewRef = this.floatingWidgetContainer.viewContainerRef.detach(idx)
+              if(viewRef)this.floatingWidgetContainer.viewContainerRef.insert(viewRef)
+              else console.warn('error in foregrounding floating widget view. could not detach viewref')
+            }
+
+          }
         })
   }
 
@@ -314,19 +341,40 @@ export class WidgetsContainer{
     }
   }
 
+  private floatingViewComponentRefs : ComponentRef<FloatingWidgetView>[] = []
+
+  /* proxy for createViewContainer, and retain a reference to all of the floatingView created */
+  private createViewContainer(state:'floating'|'docked'|'minimised'):ComponentRef<FloatingWidgetView|DockedWidgetView>{
+    const compref =  state == 'floating' ? 
+      this.floatingWidgetContainer.viewContainerRef.createComponent(this.floatingWidgetFactory) :
+      state == 'docked' ? 
+        this.dockedWidgetContainer.viewContainerRef.createComponent(this.dockedWidgetFactory) :
+        this.dockedWidgetContainer.viewContainerRef.createComponent(this.dockedWidgetFactory) /* should really throw an error (?) */
+
+
+    if(state == 'floating'){
+      this.floatingViewComponentRefs.push(compref as ComponentRef<FloatingWidgetView>)
+    }
+    return compref
+  }
+
+  /* removing the reference to the created floating view */
+  private destroyContainer(compref:ComponentRef<FloatingWidgetView|DockedWidgetView|MinimisedView| WidgetView>){
+    const idx = this.floatingViewComponentRefs.findIndex(fvc=>fvc==compref)
+    if(idx>=0)this.floatingViewComponentRefs.splice(idx,1)
+
+    compref.destroy()
+  }
+
   private embedView(templateRef:TemplateRef<any>,newWidget:WidgetComponent,state:'docked'|'minimised'|'floating'){
-    const parentViewRef = state == 'floating' ? 
-      this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory ) :
-        // state == 'docked' ?
-          this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) 
-          //: this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory )
+    const parentViewRef = this.createViewContainer(state)
 
     const embedView = parentViewRef.instance.panelBody.createEmbeddedView( templateRef )
 
     embedView.context.mainController = this.mainController
     parentViewRef.instance.widgetComponent = newWidget
     if(newWidget.parentViewRef){
-      newWidget.parentViewRef.destroy()
+      this.destroyContainer(newWidget.parentViewRef)
     }
     newWidget.parentViewRef = parentViewRef
     newWidget.state = state
@@ -339,7 +387,7 @@ export class WidgetsContainer{
   private initialInsertWidgetIntoContainer(viewRef:ViewRef,newWidget:WidgetComponent){
 
     /* initial stage */
-    const firstParentViewRef = this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
+    const firstParentViewRef = this.createViewContainer( 'floating' )
     firstParentViewRef.instance.panelBody.insert( viewRef )
     firstParentViewRef.instance.widgetComponent = newWidget
     newWidget.parentViewRef = firstParentViewRef
@@ -354,13 +402,9 @@ export class WidgetsContainer{
     /* overwriting change state method */
     widgetComponent.changeState = ( state : 'docked' | 'minimised' | 'floating' )=>{
       widgetComponent.parentViewRef.instance.panelBody.detach( 0 )
-      widgetComponent.parentViewRef.destroy()
+      this.destroyContainer(widgetComponent.parentViewRef)
 
-      const newParentViewRef = state == 'docked' ?
-        this.dockedWidgetContainer.viewContainerRef.createComponent( this.dockedWidgetFactory ) : 
-        // state == 'minimised' ?
-          // this.minimisedWidgetContainer.viewContainerRef.createComponent( this.minimisedWidgetFactory ) :
-          this.floatingWidgetContainer.viewContainerRef.createComponent( this.floatingWidgetFactory )
+      const newParentViewRef = this.createViewContainer(state)
 
       newParentViewRef.instance.panelBody.insert( widgetViewRef.hostView )
       newParentViewRef.instance.widgetComponent = widgetComponent
@@ -391,8 +435,8 @@ export class WidgetsContainer{
 
     /* overwriting shutdown cleanup */
     newWidget.onShutdownCleanup = ()=>{
-      newWidget.parentViewRef.destroy()
-      widgetViewRef.destroy()
+      this.destroyContainer(newWidget.parentViewRef)
+      this.destroyContainer(widgetViewRef)
 
       this.rd2.removeChild(document.head,scriptclone)
       this.widgitServices.unloadLabcomponent(labComponent)
@@ -449,6 +493,7 @@ interface WidgetViewChassis{
   <div 
     class = "panel" 
     [style.transform] = "transform"
+    [style.zIndex] = "zIndex"
     [ngClass]="{'panel-default':!repositionFlag&&!successClassState,'panel-info':repositionFlag&&!successClassState,'panel-success':successClassState&&!repositionFlag}"
     (mousedown)="stopBlink()" floatingWidgetUnit>
 
@@ -484,7 +529,6 @@ interface WidgetViewChassis{
     {
       position:absolute;
       width:25em;
-      z-index:9;
     }
     div[floatingWidgetUnit] > div.panel-heading:hover
     {
@@ -506,12 +550,12 @@ interface WidgetViewChassis{
     
     `
   ],
-  animations : [ animationFadeInOut ]
+  // animations : [ animationFadeInOut ]
 })
 export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,WidgetViewChassis{
   widgetComponent : WidgetComponent
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
-  @HostBinding('@animationFadeInOut') animationFadeInOut : any
+  // @HostBinding('@animationFadeInOut') animationFadeInOut : any
 
   /* widget associated with blinking */
   blinkFlag : boolean = false
@@ -521,18 +565,22 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   /* properties associated with reposition the floating view */
   repositionFlag : boolean = false
   position : number[]  = [850,650]
+  zIndex : number = 9
 
   reposStartMousePos : number[] = [0,0]
   reposStartViewPos : number[] = [0,0]
 
-  constructor(private zone:NgZone, public floatingWidgetService:FloatingWidgetService){
+  constructor(
+    private zone:NgZone, 
+    public floatingWidgetService:FloatingWidgetService){
+
   }
 
   ngOnInit(){
     while(this.floatingWidgetService.floatingViews.findIndex(fv=>fv.position[0]==this.position[0]&&fv.position[1]==this.position[1])>=0){
       this.position = this.position.map(v=>v-10)
-      if(this.position[0]<=10 || this.position[1]<=10)this.position = [850,650]
     }
+    if(this.position[0]<=10 || this.position[1]<=10)this.position = [850,650]
     this.floatingWidgetService.floatingViews.push(this)
   }
 
@@ -541,9 +589,10 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
     if(idx>=0) this.floatingWidgetService.floatingViews.splice(idx,0)
   }
 
-  @HostListener('mousedown',['$event'])
-  floatingwidgetclick(ev:Event){
-    console.log('floating widget container clicked',ev,this)
+  @HostListener('mousedown')
+  floatingwidgetclick(){
+    console.log('click')
+    this.floatingWidgetService.focusFloatingViewSubject.next(this)
   }
 
   @HostListener('document:mousemove',['$event'])
@@ -626,7 +675,6 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   template :
   `
   <div
-    [@animationFadeInOut]
     class = "panel"
     [ngClass] = "{'panel-default':!successClassState, 'panel-success':successClassState}"
     (mousedown) = "stopBlink()" dockedWidgetUnit>
@@ -698,10 +746,10 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
       }
     `
   ],
-  animations : [ animationFadeInOut,animateCollapseShow ]
+  animations : [ /* animationFadeInOut, */animateCollapseShow ]
 })
 export class DockedWidgetView implements AfterViewInit,WidgetViewChassis,OnDestroy {
-  @HostBinding('@animationFadeInOut') animationFadeInOut : any
+  // @HostBinding('@animationFadeInOut') animationFadeInOut : any
   @ViewChild('panelBody',{read:ViewContainerRef})panelBody : ViewContainerRef
   widgetComponent : WidgetComponent
 

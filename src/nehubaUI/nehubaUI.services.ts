@@ -1,4 +1,4 @@
-import { TemplateRef, Injectable, ComponentRef } from '@angular/core';
+import { TemplateRef, Injectable, ComponentRef, ViewContainerRef } from '@angular/core';
 import { Subject,BehaviorSubject,Observable } from 'rxjs/Rx'
 import { Multilevel, Landmark, WidgitiseTempRefMetaData } from './nehuba.model'
 
@@ -440,7 +440,8 @@ export class MultilevelProvider
         false
   }
 
-  hasEnabledChildren(m:Multilevel):boolean{
+  hasEnabledChildren(m:Multilevel):boolean
+  {
     return this.isSelected(m) ? 
       true :
       m.children.length > 0 ?
@@ -448,21 +449,26 @@ export class MultilevelProvider
         false
   }
 
-  hasVisibleChildren(m:MultilevelSelector):boolean{
+  hasVisibleChildren(m:MultilevelSelector):boolean
+  {
     return m.childrenMultilevel && m.childrenMultilevel.length > 0 ?
       m.childrenMultilevel.some( c=> c.isVisible || this.hasVisibleChildren(c)):
       m.isVisible
   }
 
-  isSelected(m:Multilevel){
+  isSelected(m:Multilevel)
+  {
     return this.selectedMultilevel.findIndex(sm=>sm===m) >= 0
   }
 }
 
 @Injectable()
-export class FloatingWidgetService{
-  floatingComponents : ComponentRef<FloatingWidgetView>[] = []
+export class FloatingWidgetService
+{
+  focusFloatingViewSubject : Subject<FloatingWidgetView> = new Subject()
+  floatingViewContainerRef:ViewContainerRef
   floatingViews :FloatingWidgetView[] = []
+  floatingViewComponent : ComponentRef<FloatingWidgetView>[] = []
 }
 
 @Injectable()
