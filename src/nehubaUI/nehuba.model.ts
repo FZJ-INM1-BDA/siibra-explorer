@@ -253,7 +253,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     }
   }
 
-
   children : RegionDescriptor[] = []
   parcellationParent : ParcellationDescriptor
   name : string

@@ -25,6 +25,11 @@ export class SelectedRegionList implements OnDestroy{
     this.destroySubject.next(true)
   }
   onDismiss(region:any){
-    console.log('dismiss',region)
+    this.mainController.selectedRegionsBSubject.next(
+      this.mainController.selectedRegions.filter(re=>re!==region)
+    )
+  }
+  renderRegionDatasetCount(region:RegionDescriptor){
+    return ` <small class = "text-muted">(${region.datasets ?  region.datasets.length : '0'})</small>`
   }
 }

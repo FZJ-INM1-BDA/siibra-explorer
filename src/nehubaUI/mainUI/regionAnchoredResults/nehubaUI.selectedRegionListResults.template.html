@@ -1,10 +1,14 @@
+<ng-content>
+</ng-content>
 <collapsable-panel
-  [title] = "region.datasets.length > 0 ? region.name : ('<del>' + region.name + '</del>')"
-  [propertyWidget] = "region"
+  (dismiss)="onDismiss(region)"
+  [title] = "region.name + renderRegionDatasetCount(region)"
+  [propertyWidget] = "Object.assign(region,{dismiss:true})"
   *ngFor = "let region of selectedRegions">
+
   <nehubaui-searchresult-ui
     *ngFor = "let searchResults of region.datasets"
     [searchResult]="searchResults">
-
   </nehubaui-searchresult-ui>
+
 </collapsable-panel>

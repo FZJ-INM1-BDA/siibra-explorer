@@ -5,6 +5,7 @@
     <span [innerHTML]="title">
     </span>
     <property-widget 
+      (dismiss) = "dismiss.emit(true)"
       *ngIf = "propertyWidget" 
       [inputComponent]="propertyWidget">
 

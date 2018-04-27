@@ -707,6 +707,18 @@ div#ATLASContainer.darktheme
         {
           border:1px solid rgba(235,204,209,0.5);
         }
+        &.btn-link
+        {
+          border:none;
+          background:none;
+          color : #94b6d3;
+
+          &:hover
+          {
+            background:none;
+            color : #337ab7;
+          }
+        }
         &:hover{
           background-color:gray(0.35);
         }

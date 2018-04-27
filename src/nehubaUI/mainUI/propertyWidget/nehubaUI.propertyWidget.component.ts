@@ -22,6 +22,7 @@ export class PropertyWidget implements OnChanges{
 
   constructor(public infoToUI:InfoToUIService,public mainController:MainController){
     
+    // if((this.inputComponent as any).name == 'Area Fp1 (Fpole)')console.log(this.inputComponent)
   }
 
   ngOnChanges(){
@@ -55,5 +56,5 @@ export interface HasPropertyInterface{
   position? : [number,number,number]
   properties? : DatasetInterface
   propertiesURL? : string
-  dismiss? : ()=>void
+  dismiss? : ()=>void | boolean
 }

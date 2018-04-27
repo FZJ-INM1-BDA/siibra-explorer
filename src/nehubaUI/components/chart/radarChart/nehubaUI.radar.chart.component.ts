@@ -3,6 +3,7 @@ import { Component, Input, OnChanges } from '@angular/core'
 import template from './nehubaUI.radar.chart.template.html'
 import css from './nehubaUI.radar.chart.style.css'
 import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface } from 'nehubaUI/components/chart/chartInterfaces';
+import { Color } from 'ng2-charts';
 @Component({
   selector : `radar-chart`,
   template : template,
@@ -24,41 +25,27 @@ export class NehubaRadarChart implements OnChanges{
   */
   @Input() colors : ChartColor[] = []
 
-  mousescroll(ev:MouseWheelEvent){
-    // this.chartOption.scale!.ticks!.stepSize = 
-    // this.chartOption.scale!.ticks!.max = ( , this.maxY)
+  mousescroll(_ev:MouseWheelEvent){
 
+    /**
+     * mouse wheel zooming disabled for now
+     */
     /**
      * TODO the sroll up event sometimes does not get prevented for some reasons...
      */
-    ev.stopPropagation()
-    ev.preventDefault()
 
-    this.maxY *= ev.deltaY > 0 ? 1.2 : 0.8
-    const newTicksObj = {
-      stepSize : Math.ceil( this.maxY / 500 ) * 100,
-      max : this.maxY
-    }
+    // ev.stopPropagation()
+    // ev.preventDefault()
 
-    const combineTicksObj = Object.assign({},this.chartOption.scale!.ticks,newTicksObj)
-    const combineScale = Object.assign({},this.chartOption.scale,{ticks:combineTicksObj})
-    this.chartOption = Object.assign({},this.chartOption,{scale : combineScale,animation : false})
-    // this.chartOption = Object.assign({},this.chartOption,{
-
-    // })
-
-    // this.chartOption = {
-    //   animation : false,
-    //   scale : {
-    //     ticks : {
-    //       min : 0,
-    //       stepSize : Math.ceil( this.maxY / 500 ) * 100,
-    //       max : (this.maxY *= ev.deltaY > 0 ? 1.2 : 0.8 , this.maxY),
-    //       showLabelBackdrop : false
-    //     }
-    //   }
+    // this.maxY *= ev.deltaY > 0 ? 1.2 : 0.8
+    // const newTicksObj = {
+    //   stepSize : Math.ceil( this.maxY / 500 ) * 100,
+    //   max : this.maxY
     // }
 
+    // const combineTicksObj = Object.assign({},this.chartOption.scale!.ticks,newTicksObj)
+    // const combineScale = Object.assign({},this.chartOption.scale,{ticks:combineTicksObj})
+    // this.chartOption = Object.assign({},this.chartOption,{scale : combineScale,animation : false})
   }
 
   maxY : number
@@ -86,23 +73,27 @@ export class NehubaRadarChart implements OnChanges{
       }
     },
     title :{
-      text : 'Fingerprint',
+      text : 'Radar graph',
       display : true,
       fontColor : 'rgba(255,255,255,1.0)'
-    }
+    },
+    color : [{
+      backgroundColor : `rgba(255,255,255,0.2)`
+    }]
   }
 
   chartDataset : DatasetInterface = {
     labels : [],
     datasets : []
   }
+
   
   ngOnChanges(){
     this.chartDataset = {
       labels : this.labels,
-      datasets : this.radarDatasets
+      datasets : this.radarDatasets.map(ds=>Object.assign({},ds,{backgroundColor : 'rgba(255,255,255,0.2)'}))
     }
-
+    // this.chartDataset.datasets[0]
 
     this.maxY = this.chartDataset.datasets.reduce((max,dataset)=>{
       return Math.max(
@@ -112,6 +103,16 @@ export class NehubaRadarChart implements OnChanges{
         },0))
     },0)
 
+    // this.colors = [
+    //   {
+    //     borderColor : 'rgba(255,255,255,1)'
+    //   },
+    //   {
+    //     borderColor : ' rgba(255,255,255,1)',
+    //   }
+    // ]
+
+    // console.log(this.chartDataset)
   }
 }
 
@@ -125,6 +126,7 @@ export interface RadarChartOptionInterface{
   animation? : any
   legend? : LegendInterface
   title? : TitleInterfacce
+  color? :Color[]
 }
 
 interface RadarScaleOptionAdditionalInterface{

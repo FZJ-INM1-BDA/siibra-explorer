@@ -1,16 +1,27 @@
-<div (click)="toggle()" class = "btn btn-block">
-  {{ viewList ? 'show list' : 'categorise by region' }}
-</div>
 <nehubaui-searchresult-ui-list
-  (@animationFadeInOut.done) = "animationDone()"
-  [@animationFadeInOut]
   *ngIf = "renderFullList">
 
+  <div class = "dataBrowserHeader">
+    No region selected. Listing all datasets.
+    <br />
+    <small>
+      <i class = "text-muted">
+        select region(s) from the viewer or region heirarchy to filter by region
+      </i>
+    </small>
+  </div>
 </nehubaui-searchresult-ui-list>
 
 <selected-region-list 
-  (@animationFadeInOut.done) = "animationDone()"
-  [@animationFadeInOut]
   *ngIf = "renderRegionFilter">
 
+  <div class = "dataBrowserHeader">
+    {{ mainController.selectedRegions.length == 0 ? 'No ' : mainController.selectedRegions.length }} region{{ mainController.selectedRegions.length == 1 ? '' : 's' }} selected
+    <a class = "btn btn-link" (click)="mainController.selectedRegionsBSubject.next([])">clear all</a>
+    <br />
+
+    <small>
+      <i class = "text-muted">click to expand and see the datasets available</i>
+    </small>
+  </div>
 </selected-region-list>

@@ -282,9 +282,10 @@ export class WidgetsContainer{
     this.mainController.createDisposableWidgets = (widgetComponent:WidgetComponent)=>this.createWidgetView(widgetComponent)
 
     this.widgitServices._unloadAll = ()=>{
+
+      /* TODO also clear the floatingWidgetContainer array */
       this.floatingWidgetContainer.viewContainerRef.clear()
       this.dockedWidgetContainer.viewContainerRef.clear()
-      // this.minimisedWidgetContainer.viewContainerRef.clear()
     }
   }
 

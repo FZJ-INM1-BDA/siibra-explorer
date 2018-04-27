@@ -1,6 +1,6 @@
 <i *ngIf = "inputComponent.position" (click)="moveToRoi(inputComponent.position);preventDefault($event)" class = "glyphicon glyphicon-screenshot"></i>
 <i *ngIf = "inputComponent.properties" (click)="showPropertyModal(datasetBlurb);preventDefault($event)" class = "glyphicon glyphicon-info-sign"></i>
-<i *ngIf = "inputComponent.dismiss" (click)="dismiss.emit(true);preventDefault($event)" class = "glyphicon glyphicon-close"></i>
+<i *ngIf = "inputComponent.dismiss" (click)="dismiss.emit(true);preventDefault($event)" class = "glyphicon glyphicon-remove-sign"></i>
 <ng-template #datasetBlurb>
   <datasetBlurb 
     [dataset]="inputComponent.properties">

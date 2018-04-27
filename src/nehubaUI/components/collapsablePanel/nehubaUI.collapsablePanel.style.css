@@ -40,3 +40,8 @@
   top:0;
   background-color: rgba(0,0,0,0.1);
 }
+
+:host > div#collapsable-panel > div.panel-heading > property-widget
+{
+  float:right
+}

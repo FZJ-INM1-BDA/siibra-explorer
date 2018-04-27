@@ -1,8 +1,10 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import {  DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce } from '../chartInterfaces'
+import {  DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption } from '../chartInterfaces'
 
 import template from './nehubaUI.line.chart.template.html'
 import css from './nehubaUI.line.chart.style.css'
+import { ChartOptions, LinearTickOptions,ChartDataSets } from 'chart.js';
+import { Color } from 'ng2-charts';
 @Component({
   selector : `line-chart`,
   template : template,
@@ -36,21 +38,21 @@ export class NehubaLineChart implements OnChanges{
 
   maxY : number
 
-  chartOption : LinearChartOptionInterface = {
+  xAxesTicks : LinearTickOptions = {
+    stepSize : 20,
+    fontColor : 'white'
+  }
+  chartOption : ChartOptions = {
     scales : {
       xAxes : [{
+        type : 'linear',
         gridLines : {
           color : 'rgba(128,128,128,0.5)'
         },
-        ticks : {
-          min : 0,
-          max : 100,
-          stepSize : 20,
-          fontColor : 'white',
-        },
+        ticks : this.xAxesTicks,
         scaleLabel : {
           display : true,
-          labelString : 'Receptor Density (fmol/mg protein)',
+          labelString : 'X Axes label',
           fontColor : 'rgba(200,200,200,1.0)'
         }
       }],
@@ -60,37 +62,49 @@ export class NehubaLineChart implements OnChanges{
         },
         ticks : {
           fontColor : 'white',
-          beginAtZero : true,
-          min : 0
         },
         scaleLabel : {
           display : true,
-          labelString : 'Corticol Depth %',
+          labelString : 'Y Axes label',
           fontColor : 'rgba(200,200,200,1.0)'
         }
       }],
     },
     legend : {
-      display : false
+      display : true
     },
     title : {
       display : true,
-      text : 'Profile',
+      text : 'Title',
       fontColor : 'rgba(255,255,255,1.0)'
+    },
+    elements : 
+    {
+      point : {
+        radius : 0,
+        hoverRadius : 8,
+        hitRadius : 4
+      }
     }
+    
   }
 
   chartDataset : DatasetInterface = {
     labels : [],
     datasets : []
   }
+
+  shapedLineChartDatasets : ChartDataSets[]
   
   ngOnChanges(){
-    this.chartDataset = {
-      labels : this.labels ? this.labels : Array.from(Array(this.lineDatasets[0].data.length).keys()).map(n=>n.toString()),
-      datasets : this.lineDatasets
-    }
-
+    this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
+      data : lineDataset.data.map((v,idx)=>({
+        x : idx,
+        y : v
+      })),
+      fill : 'origin'
+    }))
+    
     this.maxY = this.chartDataset.datasets.reduce((max,dataset)=>{
       return Math.max(
         max,
@@ -99,10 +113,15 @@ export class NehubaLineChart implements OnChanges{
         },0))
     },0)
 
+    applyOption(this.chartOption,this.options)
 
-
+    // this.colors = 
+    // this.colors = [{
+    //     backgroundColor : 'rgba(0,255,0,0.2)'
+    //   }]
   }
 }
+
 
 export interface LineDatasetInputInterface{
   label? : string
@@ -116,4 +135,5 @@ export interface LinearChartOptionInterface{
   }
   legend? : LegendInterface
   title? : TitleInterfacce
+  color? : Color[]
 }

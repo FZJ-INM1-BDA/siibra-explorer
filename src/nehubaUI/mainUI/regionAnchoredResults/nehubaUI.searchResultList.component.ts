@@ -1,10 +1,11 @@
 import {Component, AfterViewInit, OnDestroy} from '@angular/core'
 import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations';
-import { TEMP_SearchDatasetService } from 'nehubaUI/nehubaUI.services';
+import { TEMP_SearchDatasetService, MainController } from 'nehubaUI/nehubaUI.services';
 import { Subject,Observable } from 'rxjs/Rx';
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 
 import template from './nehubaUI.searchResultList.template.html'
+import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
 
 @Component({
   selector : 'nehubaui-searchresult-ui-list',
@@ -12,7 +13,7 @@ import template from './nehubaUI.searchResultList.template.html'
   animations : [ animationFadeInOut ]
 })
 export class SearchResultUIList implements AfterViewInit, OnDestroy{
-  constructor( public searchDatasetService:TEMP_SearchDatasetService ){
+  constructor( private mainController : MainController,private searchDatasetService:TEMP_SearchDatasetService ){
     this.onDestroySubject = new Subject()
   }
 
@@ -23,10 +24,12 @@ export class SearchResultUIList implements AfterViewInit, OnDestroy{
   ngAfterViewInit(){
     /* need to check if this logic works */
     Observable
-      .from(this.searchDatasetService.returnedSearchResultsBSubject)
+      .combineLatest(this.searchDatasetService.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
       .takeUntil(this.onDestroySubject)
-      .subscribe(searchResultArray=>{
-        this.searchResultObjects = searchResultArray
+      .subscribe((val)=>{
+        this.searchResultObjects = (val[1] && (val[1] as ParcellationDescriptor).name == 'JuBrain Cytoarchitectonic Atlas') ?
+          val[0] : 
+          []
       })
     
   }

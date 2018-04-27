@@ -132,26 +132,27 @@ export class NehubaBanner implements AfterViewInit {
     this.focusModeSelector = false
   }
   
-  selectViewingMode(activity?:string){
-    let newActivity
-    if(activity){
-      newActivity = activity
-    }else{
-      const newPipe = new PrependNavigate()
-      const newP2 = new SearchPipe()
-      const filter = newP2.transform(newPipe.transform(this.listOfActivities,this.mainController.selectedTemplate),this.searchActivityTerm)
+  /* banner should no longer need to control selecting viewing mode */
+  // selectViewingMode(activity?:string){
+  //   let newActivity
+  //   if(activity){
+  //     newActivity = activity
+  //   }else{
+  //     const newPipe = new PrependNavigate()
+  //     const newP2 = new SearchPipe()
+  //     const filter = newP2.transform(newPipe.transform(this.listOfActivities,this.mainController.selectedTemplate),this.searchActivityTerm)
       
-      if(filter.length > 0) { 
-        newActivity = filter[0] 
-      }else{
-        newActivity = this.mainController.viewingMode
-      }
-    }
+  //     if(filter.length > 0) { 
+  //       newActivity = filter[0] 
+  //     }else{
+  //       newActivity = this.mainController.viewingMode
+  //     }
+  //   }
     
-    this.clearSearchActivityTerm()
-    this.focusModeSelector = false
-    this.mainController.viewingModeBSubject.next(newActivity == 'Select atlas regions' ? null : newActivity)
-  }
+  //   this.clearSearchActivityTerm()
+  //   this.focusModeSelector = false
+  //   this.mainController.viewingModeBSubject.next(newActivity == 'Select atlas regions' ? null : newActivity)
+  // }
 
   showhelp(){
     

@@ -4,12 +4,14 @@
   <img *ngSwitchCase="'image/jpeg'" [src] = "searchResult.url" />
   <div [ngSwitch]="searchResult.data.chartType" *ngSwitchCase="'application/json'">
     <radar-chart
+      [colors] = "searchResult.data.colors"
       [labels]="searchResult.data.labels"
       [radarDatasets]="searchResult.data.datasets"
       *ngSwitchCase="'radar'">
 
     </radar-chart>
     <line-chart
+      [colors] = "searchResult.data.colors"
       [options] = "searchResult.data.chartOptions"
       [lineDatasets] = "searchResult.data.datasets"
       *ngSwitchCase = "'line'">

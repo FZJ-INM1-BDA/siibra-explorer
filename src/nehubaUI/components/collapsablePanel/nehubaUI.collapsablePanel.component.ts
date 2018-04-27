@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, AfterViewInit } from '@angular/core'
+import { Component, Input, OnChanges, AfterViewInit, EventEmitter, Output } from '@angular/core'
 
 import template from './nehubaUI.collapsablePanel.template.html'
 import css from './nehubaUI.collapsablePanel.style.css'
@@ -16,6 +16,7 @@ export class CollapsablePanel implements OnChanges,AfterViewInit{
   @Input() panelShow : boolean = false
   @Input() title : string = 'Untitled Panel'
   @Input() propertyWidget : HasPropertyInterface
+  @Output() dismiss : EventEmitter<boolean> = new EventEmitter()
   
   renderContent : boolean = false
 

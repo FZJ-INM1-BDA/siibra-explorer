@@ -80,39 +80,6 @@
     </div>
 
     <div 
-      *ngIf = "mainController.selectedTemplate"
-      [outsideClick] = "true"
-      containerClass = "inputModeSearchContainer"
-      placement = "bottom"
-      triggers = "focus"
-      #inputSearchActivitiesPopover = "bs-popover"
-      [popover] = "searchMode"
-      inputSearchRegion>
-
-      <div 
-        class = "app-input-group" 
-        modeSelector>
-
-        <span 
-          *ngIf = "searchActivityTerm==''" 
-          class = "app-input-placeholder" 
-          [ngStyle]="{'z-index':focusModeSelector ? 0 : 2}">
-          <small>Mode</small>
-          <small class = "text-muted">{{mainController.viewingMode ? mainController.viewingMode : 'Select atlas regions' }}</small>
-        </span>
-        <input 
-          type = "text"
-          (click) = "inputSearchActivitiesPopover.show()"
-          (focus) = "inputSearchActivitiesPopover.show()"
-          [(ngModel)]="searchActivityTerm"
-          class = "form-control" 
-          (keydown.esc) = "inputSearchActivitiesPopover.hide();clearSearchActivityTerm();$event.target.blur()"
-          (keydown.enter) = "inputSearchActivitiesPopover.hide();selectViewingMode();$event.target.blur()" />
-      </div>
-        
-    </div>
-
-    <div 
       *ngIf = "mainController.selectedTemplate && !widgetiseSearchRegion"
       class = "input-group" 
       placement = "bottom"
@@ -168,32 +135,6 @@
 
     </atlascontrol>
   </div>
-</ng-template>
-
-<ng-template #searchMode>
-  <ul
-    [@animationFadeInOut]
-    id = "modeSelector"
-    [ngClass] = "{'darktheme':mainController.darktheme}"
-    listOfActivities>
-    <li 
-      [ngClass] = "{'selected':mainController.viewingMode == activity || (!mainController.viewingMode && activity == 'Select atlas regions')}"
-      role = "menuitem"
-      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe : mainController.selectedTemplate  | searchPipe : searchActivityTerm">
-      
-      <a class = "dropdown-item"
-        (mousedown) = "selectViewingMode(activity)"
-        [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
-      
-      </a>
-      <i
-        (mousedown) = "modalDataset = mainController.selectedTemplate[activity];showModeInfo(activity)"
-        *ngIf = "mainController.selectedTemplate[activity]" 
-        class = "info">
-        <i class = "glyphicon glyphicon-info-sign"></i>
-      </i>
-    </li>
-  </ul>
 </ng-template>
 
 <ng-template #modeInfo>

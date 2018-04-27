@@ -6,82 +6,9 @@
 
 </NehubaViewer>
 
-<nehubaui-searchresult-ui-list
-  *ngIf = "false">
-</nehubaui-searchresult-ui-list>
-
-<ng-template #receptorDataWidget>
-  
+<ng-template #datasetsResultWidget>
   <region-anchored-results>
-
   </region-anchored-results>
-
-  <!-- add jubrain hierachy here -->
-  <nehubaui-searchresult-region-list 
-    *ngIf = "false"
-    [title] = "'Receptor Data Browser'"
-    (mouseEnterRegion)="receptorMouseEnter($event)"
-    (mouseLeaveRegion)="receptorMouseLeave($event)"
-    [regions] = " selectedRegions ">
-
-    <readmoreComponent
-      *ngIf="mainController.selectedTemplate[mainController.viewingMode]"
-      [style.background-color]="'rgba(0,0,0,0.2)'">
-      <datasetBlurb
-        [dataset]="mainController.selectedTemplate[mainController.viewingMode]">
-      </datasetBlurb>
-    </readmoreComponent>
-
-  </nehubaui-searchresult-region-list>
-</ng-template>
-
-<ng-template #defaultWidget>
-  <nehubaui-searchresult-region-pill-list 
-    [startingMode] = "'docked'"
-    [title] = "'Selected Regions'"
-    [regions] = " selectedRegions ">
-    
-    <readmoreComponent
-      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
-      [style.background-color]="'rgba(0,0,0,0.2)'">
-      <datasetBlurb
-        [dataset]="selectedTemplate[viewingMode]">
-      </datasetBlurb>
-    </readmoreComponent>
-
-  </nehubaui-searchresult-region-pill-list>
-</ng-template>
-
-<ng-template #cytopmapWidget>
-  <nehubaui-searchresult-region-pill-list 
-    [additionalContent] = "'nifti'"
-    [startingMode] = "'docked'"
-    [title] = "'Cytoarchitectonic Probabilistic Map'"
-    [regions] = " selectedRegions ">
-    
-    
-    <readmoreComponent
-      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
-      [style.background-color]="'rgba(0,0,0,0.2)'">
-      <datasetBlurb
-        [dataset]="selectedTemplate[viewingMode]">
-      </datasetBlurb>
-    </readmoreComponent>
-    
-  </nehubaui-searchresult-region-pill-list>
-</ng-template>
-
-<ng-template #landmarkWidget>
-  <nehubaui-landmark-list >
-
-    <readmoreComponent
-      *ngIf="selectedTemplate && selectedTemplate[viewingMode]"
-      [style.background-color]="'rgba(0,0,0,0.2)'">
-      <datasetBlurb
-        [dataset]="selectedTemplate[viewingMode]">
-      </datasetBlurb>
-    </readmoreComponent>
-  </nehubaui-landmark-list>
 </ng-template>
 
 <nehuba-ui-splash-screen>

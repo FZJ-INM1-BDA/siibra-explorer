@@ -40,12 +40,10 @@ export class MainController{
   selectedRegionsBSubject : BehaviorSubject<RegionDescriptor[]> = new BehaviorSubject([])
 
   regionsLabelIndexMap: Map<number,RegionDescriptor> = new Map() // map NG segID to region descriptor
+  
 
-  /**
-   * viewing 
-   */
-  viewingMode : string|null = ``
-  viewingModeBSubject : BehaviorSubject<string|null> = new BehaviorSubject(null) 
+  /* viewingMode v2.0 */
+  resultsFilterBSubject : BehaviorSubject<string[]> = new BehaviorSubject([])
 
   /**
    * plugins
@@ -78,8 +76,8 @@ export class MainController{
           const template = this.loadedTemplates.find(template=>template.name==keyval[1])
           if(template) this.selectedTemplateBSubject.next(template)
         }break;
-        case 'viewingMode':{
-          if(this.nehubaViewer) this.viewingModeBSubject.next(keyval[1])
+        case 'resultsFilter':{
+          this.resultsFilterBSubject.next(keyval[1].split('_'))
         }break;
         case 'selectedRegions':{
           const selectedRegions = keyval[1].split('_')
@@ -186,11 +184,6 @@ export class MainController{
       if(parcellation)this.loadParcellation(parcellation)
     })
 
-    this.viewingModeBSubject.subscribe(mode=>{
-      
-      this.viewingMode = mode
-    })
-    
     this.selectedTemplateBSubject.subscribe((templateDescriptor)=>{
       if(templateDescriptor){
         this.loadTemplate(templateDescriptor)
@@ -200,7 +193,11 @@ export class MainController{
     
     this.selectedTemplateBSubject
       .subscribe(()=>{
-        this.viewingModeBSubject.next(null)
+        /* 
+        as new templates (and potentially new parcellations in the future) has different search results
+        the filters are cleared when a new template is selected
+        */
+        this.resultsFilterBSubject.next([])
       })
 
     this.selectedRegionsBSubject.debounceTime(10).subscribe(regions=>{
@@ -214,9 +211,9 @@ export class MainController{
       Observable.from(this.selectedParcellationBSubject
         .skip(1)
         .map(parcellation=>({'selectedParcellation' : parcellation ? parcellation.name : null}))),
-      Observable.from(this.viewingModeBSubject
+      Observable.from(this.resultsFilterBSubject
         .skip(1)
-        .map(m=>({ 'viewingMode' : m }))),
+        .map(m=>({ 'resultsFilter' : m.join('_') }))),
       Observable.from(this.selectedRegionsBSubject
         .skip(1) /* need to skip the first one, as the behaviour subject will always emit an empty array on init */
         .debounceTime(100)
@@ -244,7 +241,7 @@ export class MainController{
     INTERACTIVE_VIEWER.metadata.selectedParcellationBSubject = this.selectedParcellationBSubject
     INTERACTIVE_VIEWER.metadata.selectedRegionsBSubject = this.selectedRegionsBSubject
     INTERACTIVE_VIEWER.metadata.selectedTemplateBSubject = this.selectedTemplateBSubject
-    INTERACTIVE_VIEWER.uiHandle.viewingModeBSubject = this.viewingModeBSubject
+    INTERACTIVE_VIEWER.uiHandle.filterResultBSubject = this.resultsFilterBSubject
   }
 
   /**
@@ -263,9 +260,6 @@ export class MainController{
       return
     } 
     
-    /* TODO probably no longer needed, since the refactor of viewing mode mechanism */
-    this.viewingMode = ``
-
     this.selectedTemplate = templateDescriptor
     this.darktheme = templateDescriptor.useTheme == 'dark'
   }
@@ -553,12 +547,13 @@ export class LandmarkServices{
     const blob2 = new Blob([encoder2.encode(TEMP_CROSS_VTK)],{type:'application/octet-stream'})
     this.TEMP_crossVtkUrl = URL.createObjectURL(blob2)
 
-    this.mainController.viewingModeBSubject.subscribe(_mode=>{
-      this.landmarks = []
-      if(this.mainController.nehubaViewer){
-        this.TEMP_clearVtkLayers()
-      }
-    })
+    /* TODO think about how to implment spatial search in this iteration */
+    // this.mainController.viewingModeBSubject.subscribe(_mode=>{
+    //   this.landmarks = []
+    //   if(this.mainController.nehubaViewer){
+    //     this.TEMP_clearVtkLayers()
+    //   }
+    // })
   }
 
   clearAllLandmarks(){
@@ -678,15 +673,21 @@ export class SpatialSearch{
         this.spatialSearch(center,width,templateSpace)
           .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
+    this.mainController.resultsFilterBSubject
+      .subscribe(_filterResults=>{
+
+      })
 
   }
 
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
-  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
+  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (_center,_width,_templateSpace)=>
   {
-    if(this.mainController.viewingMode == 'iEEG Recordings')
-      this.spatialSearchResultSubject.next({center,width,templateSpace})
+    /* TODO ipmlement spatial search in revamp of search result */
+
+    // if(this.mainController.viewingMode == 'iEEG Recordings')
+    //   this.spatialSearchResultSubject.next({center,width,templateSpace})
   }
 
   /* promise race timeout (?) */
@@ -1266,7 +1267,6 @@ export class TEMP_SearchDatasetService{
           }
         }
         if(chart.data.datasets){
-          
           chart.data.datasets = chart.data.datasets
             .map(dataset=>{
               if(dataset.label && /\_sd$/.test(dataset.label)){
@@ -1320,18 +1320,16 @@ export class TEMP_SearchDatasetService{
 
 /* */
 const CHART_BASE_STYLE = {
-  fill : 'origin',
-  backgroundColor : 'rgba(255,0,255,0.3)'
+  fill : 'origin'
 }
 
 /**/
 const CHART_SD_STYLE = {
   fill : false,
+  backgroundColor : 'rgba(0,0,0,0)',
   borderDash : [10,3],
-  borderColor : 'rgba(255,0,0,1)',
   pointRadius : 0,
   pointHitRadius : 0,
-  backgroundColor : 'rgba(0,0,0,0)'
 }
 
 // const CHART_BASE_OPTION : ChartOptions = {

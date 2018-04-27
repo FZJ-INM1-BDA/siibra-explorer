@@ -1,4 +1,9 @@
+import { ChartOptions } from "chart.js";
+
+import merge from 'lodash.merge'
+
 export interface ScaleOptionInterface{
+  type? : string
   display? : boolean
   gridLines? : GridLinesOptionInterface
   ticks? :ScaleTickOptionInterface
@@ -32,7 +37,7 @@ export interface ChartColor{
 }
 
 export interface DatasetInterface{
-  labels : string[]
+  labels : string[] | number[]
   datasets : Dataset[]
 }
 
@@ -42,6 +47,7 @@ export interface Dataset{
   borderWidth? : number
   borderDash? : number[]
   fill? :string|number|boolean
+  backgroundColor : string
 }
 
 export interface LegendInterface{
@@ -61,4 +67,8 @@ export interface ScaleLabelInterface{
   labelString? : string
   fontColor? : string
   display? : boolean
+}
+
+export const applyOption = (defaultOption:ChartOptions,option?:Partial<ChartOptions>)=>{
+  merge(defaultOption,option)
 }

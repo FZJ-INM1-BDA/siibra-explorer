@@ -115,58 +115,61 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
     /* handles both selectedregion change and viewing mode change */
     Observable
-      .combineLatest(this.mainController.selectedTemplateBSubject,this.mainController.viewingModeBSubject,this.mainController.selectedRegionsBSubject)
+      .combineLatest(this.mainController.selectedTemplateBSubject,this.mainController.resultsFilterBSubject,this.mainController.selectedRegionsBSubject)
       .delay(10) /* seems necessary, otherwise, on start up segments won't show properly */
       .takeUntil(this.destroySubject) /* TIL, order matters. if delay was after take until, last event will fire after destroy subject fires */
-      .subscribe(([template,mode,regions])=>{
-        if(mode == 'Cytoarchitectonic Probabilistic Map'){
-          /* turn off the visibility of all pmaps first */
-          this.setLayerVisibility({name:/^PMap/},false)
+      .subscribe(([_template,_mode,regions])=>{
 
-          /* load pmaps that have not yet been loaded */
-          this.loadLayer( regions
-            .filter(r=>r.moreInfo.findIndex(info=>info.name==mode)>=0)
-            .reduce((prev:any,r:RegionDescriptor)=>{
-              const obj : any = {}
-              obj[`PMap ${r.name}`] = {
-                type : 'image',
-                source : r.moreInfo.find(info=>info.name==mode)!.source,
-                shader : this.viewerSegment && this.viewerSegment.constructor == RegionDescriptor && (<RegionDescriptor>this.viewerSegment).name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
-              }
-              return Object.assign({},prev,obj)
-            },{}))
-
-          /* turn on the pmaps of the selected regions */
-          regions.map(r=>({name : `PMap ${r.name}`})).forEach(layerObj=>this.setLayerVisibility(layerObj,true))
-          
-          /* turn off the segmentation layer */
+        /* TODO will need to handle showing PMaps  */
+        if(regions.length == 0){
+          this.allSeg(true)
+        }else{
           this.allSeg(false)
-        }else{
-          this.removeLayer({name:/^PMap/})
+          regions.map(re=>re.labelIndex).forEach((this.showSeg).bind(this))
         }
+        
+        // if(mode == 'Cytoarchitectonic Probabilistic Map'){
+        //   /* turn off the visibility of all pmaps first */
+        //   this.setLayerVisibility({name:/^PMap/},false)
 
-        if(mode == 'iEEG Recordings'){
-          this.allSeg(false)
-          regions.map(re=>re.labelIndex).forEach(i=>this.showSeg(i))
+        //   /* load pmaps that have not yet been loaded */
+        //   this.loadLayer( regions
+        //     .filter(r=>r.moreInfo.findIndex(info=>info.name==mode)>=0)
+        //     .reduce((prev:any,r:RegionDescriptor)=>{
+        //       const obj : any = {}
+        //       obj[`PMap ${r.name}`] = {
+        //         type : 'image',
+        //         source : r.moreInfo.find(info=>info.name==mode)!.source,
+        //         shader : this.viewerSegment && this.viewerSegment.constructor == RegionDescriptor && (<RegionDescriptor>this.viewerSegment).name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
+        //       }
+        //       return Object.assign({},prev,obj)
+        //     },{}))
 
-          this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
-          this.setSegmentationLayersOpacity(0.2)
-        }else{
-          this.setSegmentationLayersOpacity(template? template.name == 'Big Brain (Histology)' ? 0.0 : 0.5 : 0.5)
-        }
-
-        if(mode === null || mode == 'Receptor Data'){
+        //   /* turn on the pmaps of the selected regions */
+        //   regions.map(r=>({name : `PMap ${r.name}`})).forEach(layerObj=>this.setLayerVisibility(layerObj,true))
           
-          if(regions.length == 0){
-            this.allSeg(true)
-          }else{
-            this.allSeg(false)
-            regions.map(re=>re.labelIndex).forEach((this.showSeg).bind(this))
-          }
-          
-        }else{
+        //   /* turn off the segmentation layer */
+        //   this.allSeg(false)
+        // }else{
+        //   this.removeLayer({name:/^PMap/})
+        // }
 
-        }
+        // if(mode == 'iEEG Recordings'){
+        //   this.allSeg(false)
+        //   regions.map(re=>re.labelIndex).forEach(i=>this.showSeg(i))
+
+        //   this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        //   this.setSegmentationLayersOpacity(0.2)
+        // }else{
+        //   this.setSegmentationLayersOpacity(template? template.name == 'Big Brain (Histology)' ? 0.0 : 0.5 : 0.5)
+        // }
+
+        // if(mode === null || mode == 'Receptor Data'){
+          
+          
+        // }else{
+
+        // }
       })
     
     /**

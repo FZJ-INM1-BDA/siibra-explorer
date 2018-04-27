@@ -32,10 +32,8 @@ export class NehubaUIRegionMultilevel implements OnChanges{
   }
 
   /* TODO configure the mutefilter properly. decide  */
-  muteFilter = (m:RegionDescriptor):boolean=>{
-    return this.mainController.viewingMode == 'Receptor Data' ? 
-      !(m.datasets.length > 0) :
-      this.mainController.viewingMode !== null && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+  muteFilter = (_m:RegionDescriptor):boolean=>{
+    return false
   }
 
   highlightFilter = (m:RegionDescriptor):boolean=>{
