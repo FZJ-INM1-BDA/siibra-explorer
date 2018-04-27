@@ -39,6 +39,8 @@ export class MainController{
 
   regionsLabelIndexMap: Map<number,RegionDescriptor> = new Map() // map NG segID to region descriptor
 
+  viewerStateBSubject : BehaviorSubject<any|null> = new BehaviorSubject(null)
+
   /**
    * viewing 
    */
@@ -89,6 +91,12 @@ export class MainController{
           /* TODO properly do parse query string so this workaround is not needed */
           /* TODO get rid of the settimeout */
           this.selectedRegionsBSubject.next(selectedRegions)
+        }break;
+        case 'viewerState':{
+          const [o,po,pz,p,z] = keyval[1].split('__')
+          console.log(o,po,pz,p,z)
+          console.log('pos',p)
+          INTERACTIVE_VIEWER.viewerHandle.setNavigationLoc( p.split('_').map(s=>Number(s)) ,true)
         }break;
       }
     })
@@ -155,6 +163,7 @@ export class MainController{
   patchNG(){
     UrlHashBinding.prototype.setUrlHash = ()=>{
       // console.log('seturl hash')
+      // console.log('setting url hash')
     }
 
     UrlHashBinding.prototype.updateFromUrlHash = ()=>{
@@ -221,7 +230,19 @@ export class MainController{
         .map(regions=>({
           'selectedRegions':regions.map(region=>region.labelIndex).join('_')
         }))
-      )
+      ),
+      Observable.from(this.viewerStateBSubject)
+        .skip(1)
+        .debounceTime(150)
+        .map(obj=>({
+          'viewerState' : [
+            obj.orientation.join('_'),
+            obj.perspectiveOrientation.join('_'),
+            obj.perspectiveZoom,
+            obj.position.join('_'),
+            obj.zoom
+          ].join('__')
+        }))
     )
     
     merged
@@ -235,6 +256,7 @@ export class MainController{
         url.search = search.toString()
         history.replaceState(null,'',url.toString())
       })
+      
   }
 
   hookAPI(){
@@ -242,6 +264,8 @@ export class MainController{
     INTERACTIVE_VIEWER.metadata.selectedParcellationBSubject = this.selectedParcellationBSubject
     INTERACTIVE_VIEWER.metadata.selectedRegionsBSubject = this.selectedRegionsBSubject
     INTERACTIVE_VIEWER.metadata.selectedTemplateBSubject = this.selectedTemplateBSubject
+    INTERACTIVE_VIEWER.metadata.viewerStateBSubject = this.viewerStateBSubject
+
     INTERACTIVE_VIEWER.uiHandle.viewingModeBSubject = this.viewingModeBSubject
   }
 

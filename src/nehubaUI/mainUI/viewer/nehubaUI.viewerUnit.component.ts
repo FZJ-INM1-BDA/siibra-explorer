@@ -222,6 +222,11 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .takeUntil(this.destroySubject)
       .subscribe((pos:any)=>this.mousePosVoxel = pos ? pos :this.mousePosVoxel)
     
+    Observable
+      .from(this.nehubaViewer.navigationState.all)
+      .subscribe(ev=>{
+        this.mainController.viewerStateBSubject.next(ev)
+      })
     
     Observable
       .from(this.nehubaViewer.navigationState.position.inRealSpace)
