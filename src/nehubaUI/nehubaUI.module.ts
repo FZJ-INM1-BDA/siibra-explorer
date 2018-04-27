@@ -35,6 +35,7 @@ import { DynamicViewDirective, DockedWidgetView,WidgetsContainer,FloatingWidgetC
 
 /* directive */
 import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
+import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective } from 'nehubaUI/util/nehubaUI.glyphicondirectives'
 
 /* util */
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
@@ -59,7 +60,7 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, 
+    [ DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,

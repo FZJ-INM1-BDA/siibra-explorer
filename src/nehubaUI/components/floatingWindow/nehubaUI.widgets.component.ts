@@ -589,9 +589,9 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
     if(idx>=0) this.floatingWidgetService.floatingViews.splice(idx,0)
   }
 
-  @HostListener('mousedown')
-  floatingwidgetclick(){
-    console.log('click')
+  @HostListener('mousedown',['$event'])
+  floatingwidgetclick(ev:Event){
+    ev.stopImmediatePropagation()
     this.floatingWidgetService.focusFloatingViewSubject.next(this)
   }
 
