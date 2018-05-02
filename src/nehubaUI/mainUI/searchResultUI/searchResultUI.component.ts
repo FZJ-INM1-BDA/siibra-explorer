@@ -19,6 +19,8 @@ import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component';
 
 export class SearchResultUI implements OnChanges{
   @Input() searchResult : SearchResultInterface
+  @Input() showLinkedRegion : Boolean = true
+  @Input() title : string|null = null
   associatedRegions : RegionDescriptor[]
 
   fileViewerFactory : ComponentFactory<FileViewer>
@@ -78,6 +80,7 @@ export class RegionLinkClass{
 
 export interface SearchResultInterface{
   name : string,
+  type : string,
 
   thumbnail? : SearchResultFileInterface
 

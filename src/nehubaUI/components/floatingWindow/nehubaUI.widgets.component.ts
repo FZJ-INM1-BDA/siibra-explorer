@@ -474,6 +474,12 @@ interface WidgetViewChassis{
     div.panel-heading > span
     {
       flex : 1 1 auto;
+      
+      width:0px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:inline-block;
+      white-space:nowrap;
     }
     div.panel-heading > i
     {
@@ -648,7 +654,7 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
       opacity: 0.9;
       border:none;
     }
-
+    
       div.panel-heading:hover
       {
         opacity:1.0;
@@ -658,6 +664,12 @@ export class FloatingWidgetView implements AfterViewInit,WidgetViewChassis{
       div.panel-heading > span
       {
         flex : 1 1 auto;
+
+        width:0px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        display:inline-block;
+        white-space:nowrap;
       }
       div.panel-heading > i
       {

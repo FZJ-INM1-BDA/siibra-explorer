@@ -1,10 +1,12 @@
+<!-- <collapsable-panel
+  [title]="searchResult.highlight ? ('<span class = \'highlight\'>' + searchResult.name + '</span>') : searchResult.name"> -->
 <collapsable-panel
-  [title]="searchResult.highlight ? ('<span class = \'highlight\'>' + searchResult.name + '</span>') : searchResult.name">
-
+  [title] = "title ? title : searchResult.name">
   <div *ngIf = "searchResult.thumbnail" id = "thumbnailContainer">
     <file-viewer
       thumbnail
-      [searchResult] = "searchResult.thumbnail"
+      [searchResult] = "searchResult"
+      [searchResultFile] = "searchResult.thumbnail"
       *ngIf = "searchResult.thumbnail">
     </file-viewer>
     <span style = "font-size:smaller">
@@ -18,8 +20,9 @@
 
   
   <collapsable-panel
+    *ngIf = "showLinkedRegion"
     [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length  + ') '">
-    <div *ngFor = "let regionLink of regionLinks">
+    <div class = "regionLink" *ngFor = "let regionLink of regionLinks">
       
       <span fileUnit>
         {{ regionLink.moreInfo ? '(' + regionLink.moreInfo + ')' : '' }} {{ regionLink.relationship ? regionLink.relationship : '' }}  
@@ -32,22 +35,22 @@
     </div>
   </collapsable-panel>
 
-  <collapsable-panel
-    [title]="'<i class = \'glyphicon glyphicon-file\'></i> <span> Files (' + files.length  + ')</span>'">
+  <div class = "regionLink" *ngFor = "let file of files">
+    <ng-template #fileTemplate>
+      <file-viewer 
+        [searchResult] = "searchResult"
+        [searchResultFile] = "file">
 
-    <div *ngFor = "let file of files">
-      <ng-template #fileTemplate>
-        <file-viewer [searchResult] = "file">
-  
-        </file-viewer>
-      </ng-template>
-      <span fileUnit hoverable (click)="popupFileViewer(file,fileTemplate)">{{ file.name }}</span> 
-      <property-widget
-        [title]="'More information on ' + file.name"
-        [inputComponent]="file">
-      </property-widget>
-    </div>
-  </collapsable-panel>
+      </file-viewer>
+    </ng-template>
+    <span fileUnit hoverable (click)="popupFileViewer(file,fileTemplate)">
+      {{ file.name }}
+    </span> 
+    <property-widget
+      [title]="'More information on ' + file.name"
+      [inputComponent]="file">
+    </property-widget>
+  </div>
 
 </collapsable-panel>
 <span *ngIf = "!searchResult">

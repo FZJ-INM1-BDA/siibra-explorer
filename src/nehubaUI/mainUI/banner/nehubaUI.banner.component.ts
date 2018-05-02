@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit, HostListener } from '@angular/core'
+import { Pipe, PipeTransform,ViewChild,TemplateRef,Output,EventEmitter, Component, AfterViewInit } from '@angular/core'
 import { MainController,HELP_MENU,WidgitServices, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { RegionDescriptor, TemplateDescriptor, DatasetInterface, ParcellationDescriptor }from 'nehubaUI/nehuba.model'
 
@@ -48,35 +48,9 @@ export class NehubaBanner implements AfterViewInit {
   @ViewChild('modeInfoUnit') modeInfoUnit: DatasetBlurb
   @ViewChild('modeInfo') modeInfo: TemplateRef<any>
 
-  /* viewing mode variables */
-  listOfActivities : string[] = []
-  searchActivityTerm : string = ``
-  focusModeSelector : boolean = false
-
-  Array = Array
-
   modalDataset : DatasetInterface
 
   constructor(public mainController:MainController,public widgitServices:WidgitServices,public infoToUI:InfoToUIService){
-    // this.mainController.unwidgitiseSearchRegion = (templateRef:TemplateRef<any>)=>{
-    //   templateRef
-    //   this.widgetiseSearchRegion = false
-    // }
-
-    this.mainController.selectedTemplateBSubject.subscribe(()=>{
-
-      this.listOfActivities = 
-        Array
-          .from(this.mainController.regionsLabelIndexMap.values())
-          .reduce((prev:string[],curr:RegionDescriptor)=>
-            prev
-              .concat(
-                curr.moreInfo
-                  .filter(info=> info.name != 'Go To There' && prev.findIndex(i=>i==info.name) < 0)
-                  .map(i=>i.name))
-          ,[])
-    })
-
     this.mainController.selectedParcellationBSubject.subscribe((parcellation)=>{
       this.regions = parcellation ? parcellation.regions : []
     })
@@ -101,58 +75,24 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   ngAfterViewInit(){
-    // UI_CONTROL.afterTemplateSelection(()=>{
-    //   this.darktheme = gExternalControl.metadata.selectedTemplate ? gExternalControl.metadata.selectedTemplate.useTheme == 'dark' : false
-    // })
     this.mainController.selectedTemplateBSubject.subscribe((template)=>{
       if(template)this.darktheme = template.useTheme == 'dark'
     })
-  }
 
-  // showRegion(){
-  //   if(this.mainController.selectedTemplate && this.mainController.selectedParcellation){
-  //     this.showRegionDialog.emit()
-  //   }
-  // }
+    this.mainController.dedicatedViewBSubject
+      .subscribe(dedicatedView=>this.dedicatedView = dedicatedView)
+  }
+  dedicatedView : string|null = null
+
+  clearDedicatedView(){
+    this.mainController.dedicatedViewBSubject.next(null)
+  }
 
   showModeInfo(activity:string){
     const handler = this.infoToUI.getModalHandler()
     handler.title = `${this.mainController.selectedTemplate ? this.mainController.selectedTemplate.name : 'No Template Selected'} <i class = "glyphicon glyphicon-chevron-right"></i> ${activity} `
     handler.showTemplateRef(this.modeInfo)
   }
-
-  /* viewing mode functions */
-  clearSearchActivityTerm(){
-    this.searchActivityTerm = ''
-    this.focusModeSelector = false
-  }
-
-  @HostListener('body:mousedown')
-  documentMouseUp(){
-    this.focusModeSelector = false
-  }
-  
-  /* banner should no longer need to control selecting viewing mode */
-  // selectViewingMode(activity?:string){
-  //   let newActivity
-  //   if(activity){
-  //     newActivity = activity
-  //   }else{
-  //     const newPipe = new PrependNavigate()
-  //     const newP2 = new SearchPipe()
-  //     const filter = newP2.transform(newPipe.transform(this.listOfActivities,this.mainController.selectedTemplate),this.searchActivityTerm)
-      
-  //     if(filter.length > 0) { 
-  //       newActivity = filter[0] 
-  //     }else{
-  //       newActivity = this.mainController.viewingMode
-  //     }
-  //   }
-    
-  //   this.clearSearchActivityTerm()
-  //   this.focusModeSelector = false
-  //   this.mainController.viewingModeBSubject.next(newActivity == 'Select atlas regions' ? null : newActivity)
-  // }
 
   showhelp(){
     

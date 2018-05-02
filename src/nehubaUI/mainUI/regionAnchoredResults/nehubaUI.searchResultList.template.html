@@ -1,7 +1,36 @@
-<ng-content>
-</ng-content>
-<div [@animationFadeInOut] *ngFor = "let searchResults of searchResultObjects">
-  <nehubaui-searchresult-ui [searchResult]="searchResults">
+<div class = "dataBrowserHeader">
+  No region selected. Listing all datasets.
+  <br />
+  <small>
+    <i class = "text-muted">
+      select region(s) from the viewer or region heirarchy to filter by region
+    </i>
+  </small>
+</div>
+<div id = "filter" class = "well">
+  <div>
+    Filter
+  </div>
+  <small (click)="toggleEnable(type)" *ngFor = "let type of filterSearchResultbyType">
+    <i *ngIf = "type.enabled" class = "glyphicon glyphicon-check"></i>
+    <i *ngIf = "!type.enabled" class = "glyphicon glyphicon-unchecked"></i>
+    {{ type.name }}
+  </small>
+</div>
+<div 
+  *ngFor = "let searchResults of searchResultObjects | filterDatasetSearchResult : filterSearchResultbyType | searchResultPagination : currentPage : hitsPerPage">
+
+  <nehubaui-searchresult-ui 
+    [searchResult]="searchResults">
 
   </nehubaui-searchresult-ui>
+
 </div>
+
+<pagination-component
+  [hitsPerPage]="hitsPerPage"
+  [total] = "total"
+  [currentPage]="currentPage"
+  (paginationChange)="paginationChange($event)">
+
+</pagination-component>

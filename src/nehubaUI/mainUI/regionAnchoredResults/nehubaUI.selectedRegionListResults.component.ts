@@ -5,9 +5,14 @@ import { MainController } from 'nehubaUI/nehubaUI.services';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 import { Subject,Observable } from 'rxjs/Rx';
 
+import css from './nehubaUI.selectedRegionListResults.style.css'
+
 @Component({
   selector : `selected-region-list`,
-  template
+  template ,
+  styles : [
+    css
+  ]
 })
 
 export class SelectedRegionList implements OnDestroy{

@@ -16,15 +16,11 @@
 }
 
 
-:host > div.panel.panel-default > div.panel-heading:hover
-{
-  cursor:pointer;
-  background-color:rgba(128,128,128,0.3);
-}
-
 :host > div.panel.panel-default#collapsable-panel > div#panelBodyContainer
 {
   overflow:hidden;
+  box-sizing:border-box;
+  margin-left:1em;
 }
 :host > div.panel.panel-default#collapsable-panel > div > div.panel-body
 {
@@ -41,7 +37,28 @@
   background-color: rgba(0,0,0,0.1);
 }
 
+:host > div.panel.panel-default > div.panel-heading
+{
+  display:flex;
+}
+
+:host > div.panel.panel-default > div.panel-heading:hover
+{
+  cursor:pointer;
+  background-color:rgba(128,128,128,0.3);
+}
+
+:host > div#collapsable-panel > div.panel-heading > span
+{
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display:inline-block;
+  width:0;
+  overflow:hidden;
+  flex : 1 1 0px;
+}
+
 :host > div#collapsable-panel > div.panel-heading > property-widget
 {
-  float:right
+  flex : 0 0 auto;
 }

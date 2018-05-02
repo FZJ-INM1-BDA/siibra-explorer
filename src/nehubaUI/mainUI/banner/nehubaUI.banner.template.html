@@ -1,8 +1,13 @@
 <div [ngClass]="{darktheme : darktheme}" bannerContainer >
+  <!-- logo -->
   <img 
     [src] = "darktheme ? hbpimgdark : hbpimg" 
     hbplogo/>
+
+  <!-- body -->
   <div  textContainer>
+
+    <!-- template selector -->
     <div 
       container = "body"
       dropdown
@@ -40,6 +45,7 @@
       </ul>
     </div>
     
+    <!-- parcellationn selector  -->
     <div 
       *ngIf = "mainController.selectedTemplate"
       container = "body"
@@ -79,6 +85,7 @@
       </ul>
     </div>
 
+    <!-- search region -->
     <div 
       *ngIf = "mainController.selectedTemplate && !widgetiseSearchRegion"
       class = "input-group" 
@@ -103,6 +110,7 @@
         </div>
     </div>
 
+    <!-- plugins (in the future) -->
     <span 
       class = "btn btn-default"
       btnCustom
@@ -113,11 +121,29 @@
       {{ labcomponent.name.split('.')[2][0] }}
     </span>
 
-    <span 
-      glyphiconShowHelp 
-      (click)="showhelp()" 
-      [ngClass]="{darktheme : darktheme}" 
-      class = "helpbtn glyphicon glyphicon-question-sign">
+    <!-- dedicated viewing mode clear -->
+    <span
+      *ngIf = "dedicatedView">
+      <i 
+        placement = "bottom"
+        [tooltip] = "'displaying:\n' + dedicatedView.split('/')[dedicatedView.split('/').length-1]"
+        class = "helpbtn glyphicon glyphicon-blackboard">
+      </i>
+      <span
+        class = "btn btn-link"
+        (click) = "clearDedicatedView()">
+        Clear
+      </span>
+    </span>
+
+    <!-- help icon -->
+    <span>
+      <span 
+        glyphiconShowHelp 
+        (click)="showhelp()" 
+        [ngClass]="{darktheme : darktheme}" 
+        class = "helpbtn glyphicon glyphicon-question-sign">
+      </span>
     </span>
   </div>
 </div>

@@ -1,6 +1,6 @@
 import { ViewContainerRef, Component,Input,Output,EventEmitter,AfterViewInit,ViewChild,TemplateRef, OnDestroy } from '@angular/core'
 import { RegionDescriptor, LabComponent, Landmark, Multilevel, DatasetInterface } from 'nehubaUI/nehuba.model';
-import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, initMultilvl, RECEPTOR_DATASTRUCTURE_JSON, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
+import { MainController, LandmarkServices, WidgitServices, MultilevelProvider, InfoToUIService, SpatialSearch } from 'nehubaUI/nehubaUI.services';
 import { RegionTemplateRefInterface } from 'nehubaUI/nehuba.model';
 import { animationFadeInOut,animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations'
 
@@ -319,8 +319,8 @@ export class SearchResultCardRegion{
   receptorBrowserMultilevel:Multilevel
   constructor(public mainController:MainController,public widgitServices:WidgitServices){
     // this.receptorBrowserMultilevel = receptorBrowserMultilevel
-    const newMultilvl = initMultilvl(RECEPTOR_DATASTRUCTURE_JSON)
-    this.receptorBrowserMultilevel = newMultilvl
+    // const newMultilvl = initMultilvl(RECEPTOR_DATASTRUCTURE_JSON)
+    // this.receptorBrowserMultilevel = newMultilvl
   }
 
   hasReceptorData = ()=>this.region.moreInfo.some(info=>info.name == 'Receptor Data')

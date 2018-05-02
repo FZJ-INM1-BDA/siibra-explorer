@@ -1,10 +1,10 @@
-import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef, TemplateRef } from '@angular/core'
 import { vec3,NehubaViewer,Config as NehubaViewerConfig, createNehubaViewer, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports';
 
 import { Observable,Subject } from 'rxjs/Rx'
 import { RegionDescriptor, ParcellationDescriptor } from 'nehubaUI/nehuba.model';
 import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
-import { MainController, SpatialSearch, LandmarkServices, Animation, parseRegionRgbToFragmentMain, getActiveColorMapFragmentMain } from 'nehubaUI/nehubaUI.services';
+import { MainController, SpatialSearch, LandmarkServices, Animation, parseRegionRgbToFragmentMain, getActiveColorMapFragmentMain, TEMP_SearchDatasetService, WidgitServices } from 'nehubaUI/nehubaUI.services';
 import { ManagedUserLayer } from 'neuroglancer/layer'
 
 import template from './nehubaUI.viewerUnit.template.html'
@@ -14,6 +14,7 @@ import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specificat
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 import { filter } from 'rxjs/operators';
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
 
 declare var window:{
   [key:string] : any
@@ -23,7 +24,8 @@ declare var window:{
 
 @Component({
   template : template ,
-  styles : [ css ]
+  styles : [ css ],
+  providers : [ TEMP_SearchDatasetService ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
@@ -36,6 +38,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   viewerSegment : RegionDescriptor | number | null
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
+  
+  @ViewChild('datasetsResultWidget',{read:TemplateRef}) datasetsResultWidget : TemplateRef<any>
 
   editingNavState : boolean = false
   textNavigateTo(string:string){
@@ -76,9 +80,11 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
 
   constructor(
-    private mainController:MainController,
-    public spatialSearch:SpatialSearch,
-    public landmarkServices:LandmarkServices){
+    private widgetServices : WidgitServices,
+    public searchDatasetServce : TEMP_SearchDatasetService,
+    private mainController : MainController,
+    public spatialSearch : SpatialSearch,
+    public landmarkServices : LandmarkServices){
 
     this.mainController.selectedParcellationBSubject
       .debounceTime(10)
@@ -98,8 +104,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     this.destroySubject.complete()
   }
 
+  widgetComponent : WidgetComponent 
   public ngAfterViewInit(){
-    
+    this.mainController.selectedTemplateBSubject
+      .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
+      .subscribe(()=>{
+        this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
+        this.widgetComponent.changeState('docked')
+      })
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
@@ -115,10 +127,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
     /* handles both selectedregion change and viewing mode change */
     Observable
-      .combineLatest(this.mainController.selectedTemplateBSubject,this.mainController.resultsFilterBSubject,this.mainController.selectedRegionsBSubject)
+      .combineLatest(
+        this.mainController.selectedTemplateBSubject,
+        this.mainController.resultsFilterBSubject,
+        this.mainController.selectedRegionsBSubject,
+        this.mainController.dedicatedViewBSubject)
       .delay(10) /* seems necessary, otherwise, on start up segments won't show properly */
       .takeUntil(this.destroySubject) /* TIL, order matters. if delay was after take until, last event will fire after destroy subject fires */
-      .subscribe(([_template,_mode,regions])=>{
+      .subscribe(([_template,_mode,regions,dedicatedView])=>{
 
         /* TODO will need to handle showing PMaps  */
         if(regions.length == 0){
@@ -126,6 +142,28 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         }else{
           this.allSeg(false)
           regions.map(re=>re.labelIndex).forEach((this.showSeg).bind(this))
+        }
+
+        if(dedicatedView){
+          const idx = dedicatedView.indexOf('://')
+          idx < 0 ? 
+            console.warn('could not parse dedicated view protocol!') :
+            dedicatedView.slice(0,idx) == 'nifti' ? 
+              (
+                this.allSeg(false),
+                this.loadLayer({
+                  nehubaNifti : {
+                    type : 'image',
+                    source : dedicatedView,
+                    shader : getActiveColorMapFragmentMain()
+                  }
+                })
+              ) : 
+              console.warn('could not parse dedicated view param!')
+        }else{
+          this.removeLayer({
+            name : 'nehubaNifti'
+          })
         }
         
         // if(mode == 'Cytoarchitectonic Probabilistic Map'){

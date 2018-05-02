@@ -45,6 +45,9 @@ export class MainController{
   /* viewingMode v2.0 */
   resultsFilterBSubject : BehaviorSubject<string[]> = new BehaviorSubject([])
 
+  /* dedicated view */
+  dedicatedViewBSubject : BehaviorSubject<string|null> = new BehaviorSubject(null)
+
   /**
    * plugins
   */
@@ -72,6 +75,9 @@ export class MainController{
     
     Array.from(query.entries()).forEach(keyval=>{
       switch(keyval[0]){
+        case 'dedicatedView':{
+          this.dedicatedViewBSubject.next(keyval[1])
+        }break;
         case 'selectedTemplate':{
           const template = this.loadedTemplates.find(template=>template.name==keyval[1])
           if(template) this.selectedTemplateBSubject.next(template)
@@ -205,6 +211,9 @@ export class MainController{
     })
 
     const merged = Observable.merge(
+      Observable.from(this.dedicatedViewBSubject)
+        .skip(1)
+        .map(dedicatedView=>({'dedicatedView':dedicatedView})),
       Observable.from(this.selectedTemplateBSubject
         .skip(1)
         .map(template=>({ 'selectedTemplate' : template ? template.name: null }))),
@@ -1029,6 +1038,7 @@ float a = 1.0;
 export const TIMEOUT = 5000;
 export const CM_THRESHOLD = 0.05;
 
+/* TODO to be deprecated when the new results browser is adopted */
 export const initMultilvl = (json:any):Multilevel=>{
   const m = new Multilevel()
   m.name = json.name ? json.name : 'Untitled'
@@ -1039,47 +1049,6 @@ export const initMultilvl = (json:any):Multilevel=>{
   return m
 }
 
-export const RECEPTOR_DATASTRUCTURE_JSON = {
-  name : 'Receptor Browser',
-  children : [
-    {
-      name : 'Fingerprint',
-      children : []
-    },{
-      name : 'Glutamate',
-      children : [
-        {
-          name : `AMPA`,
-          children : []
-        },
-        {
-          name : `NMDA`,
-          children : []
-        },
-        {
-          name : `kainate`,
-          children : []
-        },
-        {
-          name : `mGluR2_3`,
-          children : []
-        }
-      ]
-    },{
-      name : 'GABA',
-      children : [
-        {
-          name : `GABAA`,
-          children : []
-        },
-        {
-          name : `GABAB`,
-          children : []
-        }
-      ]
-    }
-  ]
-}
 
 const TEMP_CROSS_VTK = 
 `# vtk DataFile Version 2.0
@@ -1239,11 +1208,16 @@ export class TEMP_SearchDatasetService{
   
   constructor(public mainController:MainController){
 
-    fetch('res/json/receptorAggregatedData.json')
-      .then(res=>res.json())
-      .then(json=>{
-        // this.returnedSearchResults = json
-        this.returnedSearchResultsBSubject.next(json)
+    Promise.all([
+      fetch('res/json/pmapsAggregatedData.json').then(res=>res.json()),
+      fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
+    ])
+      .then(arr=>{
+        this.returnedSearchResultsBSubject.next(
+          arr.reduce((acc,curr)=>
+            acc.concat(...curr)
+          ,[])
+        )
       })
       .catch(console.warn)
 

@@ -2,8 +2,10 @@
   <div 
     (click)="toggleShow()" 
     class = "panel-heading">
+
     <span [innerHTML]="title">
     </span>
+    
     <property-widget 
       (dismiss) = "dismiss.emit(true)"
       *ngIf = "propertyWidget" 

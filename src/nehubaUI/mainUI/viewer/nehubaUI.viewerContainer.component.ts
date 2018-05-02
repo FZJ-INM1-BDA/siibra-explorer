@@ -1,12 +1,12 @@
-import { Component,ViewChild,Input, TemplateRef, AfterViewInit } from '@angular/core'
-import { MainController, LandmarkServices, SpatialSearch, WidgitServices, TEMP_SearchDatasetService } from 'nehubaUI/nehubaUI.services'
+import { Component,ViewChild,Input, AfterViewInit } from '@angular/core'
+import { MainController, LandmarkServices, SpatialSearch, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
 import { RegionDescriptor, TemplateDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
-import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
+
 
 @Component({
   selector : 'ATLASViewer',
@@ -19,13 +19,10 @@ export class NehubaViewerContainer implements AfterViewInit{
   @Input() hideUI : boolean = false
   @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-  @ViewChild('datasetsResultWidget',{read:TemplateRef}) datasetsResultWidget : TemplateRef<any>
-
-  widgetComponent : WidgetComponent
 
   mouseEventOnViewer : Subject<any> = new Subject()
 
-  constructor(public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices,public searchDataService:TEMP_SearchDatasetService){
+  constructor(public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc = (loc,real)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationLoc(loc,real))
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationOri = (ori) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationOri(ori))
     
@@ -49,12 +46,6 @@ export class NehubaViewerContainer implements AfterViewInit{
   selectedRegions : RegionDescriptor[]
   selectedTemplate : TemplateDescriptor | null
   ngAfterViewInit(){
-    this.mainController.selectedTemplateBSubject
-      .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
-      .subscribe(()=>{
-        this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
-        this.widgetComponent.changeState('docked')
-      })
   }
 
   checkViewerExist = () => {
