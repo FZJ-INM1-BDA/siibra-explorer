@@ -1,14 +1,15 @@
-import { Component, Input, OnChanges, ComponentFactory, TemplateRef } from '@angular/core'
+import { Component, Input, OnChanges, ComponentFactory, TemplateRef, ViewChildren, OnDestroy } from '@angular/core'
 import { DatasetInterface, RegionDescriptor } from 'nehubaUI/nehuba.model';
 import { RadarChartOptionInterface } from 'nehubaUI/components/chart/radarChart/nehubaUI.radar.chart.component';
 import { LinearChartOptionInterface } from 'nehubaUI/components/chart/lineChart/nehubaUI.line.chart.component';
 import { Dataset } from 'nehubaUI/components/chart/chartInterfaces';
-
+import { Subject,Observable } from 'rxjs/Rx';
 
 import template from './searchResultUI.template.html'
 import css from './searchResultUI.style.css'
-import { MainController, WidgitServices } from 'nehubaUI/nehubaUI.services';
+import { MainController, WidgitServices, MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
 import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component';
+import { CollapsablePanel } from 'nehubaUI/components/collapsablePanel/nehubaUI.collapsablePanel.component';
 
 
 @Component({
@@ -17,15 +18,30 @@ import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component';
   styles : [ css ]
 })
 
-export class SearchResultUI implements OnChanges{
+export class SearchResultUI implements OnChanges,OnDestroy{
   @Input() searchResult : SearchResultInterface
   @Input() showLinkedRegion : Boolean = true
   @Input() title : string|null = null
+  @ViewChildren(CollapsablePanel) collapsablePanels : CollapsablePanel[] = []
+
   associatedRegions : RegionDescriptor[]
 
   fileViewerFactory : ComponentFactory<FileViewer>
-  constructor(public mainController:MainController,public widgetService:WidgitServices){
+
+  destroySubject : Subject<boolean> = new Subject()
+
+  constructor(public mainController:MainController,public widgetService:WidgitServices,private collapseableController:MasterCollapsableController){
     
+    Observable
+      .from(this.collapseableController.expandBSubject)
+      .takeUntil(this.destroySubject)
+      .subscribe(bool=>{
+        this.collapsablePanels.forEach(cp=>bool ? cp.show() : cp.hide())
+      })
+  }
+
+  ngOnDestroy(){
+    this.destroySubject.next(true)
   }
 
   //deprecated

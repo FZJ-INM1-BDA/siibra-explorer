@@ -36,4 +36,13 @@ export class CollapsablePanel implements OnChanges,AfterViewInit{
   animationEnd(){
     if(!this.panelShow) this.renderContent = false
   }
+
+  show(){
+    this.renderContent = true
+    this.panelShow = true
+  }
+
+  hide(){
+    this.panelShow = false
+  }
 }

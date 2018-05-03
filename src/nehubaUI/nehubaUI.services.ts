@@ -1197,6 +1197,12 @@ POLYGONS 20 80
 /* temporary neurorecptors array */
 export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA","BZ","D1","GABAA","GABAB","kainate","M1","M2","M3","mGluR2_3","NMDA"]
 
+@Injectable()
+
+export class MasterCollapsableController{
+  expandBSubject : BehaviorSubject<boolean> = new BehaviorSubject(false)
+}
+
 /**
  * currently only search for receptor data
  */

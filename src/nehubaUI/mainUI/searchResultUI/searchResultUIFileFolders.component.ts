@@ -1,23 +1,40 @@
-import { Component, Input, OnChanges, ChangeDetectionStrategy, Pipe, PipeTransform, TemplateRef } from '@angular/core'
-import { WidgitServices } from 'nehubaUI/nehubaUI.services'
+import { Component, Input, OnChanges/* , ChangeDetectionStrategy */, Pipe, PipeTransform, TemplateRef, OnDestroy, ViewChildren } from '@angular/core'
+import { WidgitServices, MasterCollapsableController } from 'nehubaUI/nehubaUI.services'
+import { Subject,Observable } from 'rxjs/Rx';
 
 import template from './searchResultUIFileFolders.template.html'
 import css from './searchResultUIFileFolders.style.css'
 import { SearchResultFileInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
+import { CollapsablePanel } from 'nehubaUI/components/collapsablePanel/nehubaUI.collapsablePanel.component';
 
 @Component({
   selector : `nehubaui-searchresult-filesfolder-ui`,
   template ,
   styles : [
     css
-  ],
-  changeDetection : ChangeDetectionStrategy.OnPush
+  ]/* ,
+  changeDetection : ChangeDetectionStrategy.OnPush */
 })
 
-export class SearchResultUIFileFolders implements OnChanges{
+export class SearchResultUIFileFolders implements OnChanges,OnDestroy{
   @Input() inputFiles : SearchResultFileInterface[] = []
+  @ViewChildren(CollapsablePanel) collapsablePanels : CollapsablePanel[] = []
 
-  constructor(private widgetService:WidgitServices){}
+  destroySubject : Subject<boolean> = new Subject()
+  
+  constructor(private widgetService:WidgitServices,private collapseableController:MasterCollapsableController){
+
+    Observable
+      .from(this.collapseableController.expandBSubject)
+      .takeUntil(this.destroySubject)
+      .subscribe(bool=>{
+        this.collapsablePanels.forEach(cp=>bool ? cp.show() : cp.hide())
+      })
+  }
+
+  ngOnDestroy(){
+    this.destroySubject.next(true)
+  }
 
   ngOnChanges(){
     

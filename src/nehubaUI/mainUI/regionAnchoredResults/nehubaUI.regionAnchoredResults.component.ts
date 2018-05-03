@@ -3,7 +3,7 @@ import { Component, AfterViewInit, OnDestroy } from '@angular/core'
 import template from './nehubaUI.regionAnchoredResults.template.html'
 import css from './nehubaUI.regionAnchoredResults.style.css'
 import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations';
-import { MainController, TEMP_SearchDatasetService } from 'nehubaUI/nehubaUI.services';
+import { MainController, TEMP_SearchDatasetService, MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 import { Subject,Observable } from 'rxjs/Rx';
 import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
@@ -14,7 +14,8 @@ import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
   styles : [
     css
   ],
-  animations : [ animationFadeInOut ]
+  animations : [ animationFadeInOut ],
+  providers : [ MasterCollapsableController ]
 })
 
 export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
@@ -28,7 +29,7 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   searchResultObjects : SearchResultInterface[] = []
   filterSearchResultbyType : {name : string, enabled : boolean}[] = []
 
-  constructor(private mainController:MainController,private searchDatasetService:TEMP_SearchDatasetService){
+  constructor(private mainController:MainController,private searchDatasetService:TEMP_SearchDatasetService,public collapsableContoller:MasterCollapsableController){
     Observable
       .from(this.mainController.selectedRegionsBSubject)
       .takeUntil(this.onDestroySubject)
@@ -82,6 +83,14 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
         }) :
         acc.concat(curr)
     },[] as {name:string,enabled:boolean}[])
+  }
+
+  collapseAll(){
+    this.collapsableContoller.expandBSubject.next(false)
+  }
+
+  expandAll(){
+    this.collapsableContoller.expandBSubject.next(true)
   }
 
   clearAllSelectedRegions(){
