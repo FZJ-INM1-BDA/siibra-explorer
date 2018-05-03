@@ -3,6 +3,8 @@
     (click)="toggleShow()" 
     class = "panel-heading">
 
+    <i *ngIf = "!renderContent" class = "chevron glyphicon glyphicon-chevron-right"></i>
+    <i *ngIf = "renderContent" class = "chevron glyphicon glyphicon-chevron-down"></i>
     <span [innerHTML]="title">
     </span>
     

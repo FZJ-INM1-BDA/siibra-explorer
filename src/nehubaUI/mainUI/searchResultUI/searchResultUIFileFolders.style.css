@@ -1,5 +1,7 @@
 div.zeroHeirachy
 {
+  display:flex;
+  flex-direction: row;
   padding:0.5em 15px;
   opacity:0.8;
 }
@@ -11,4 +13,18 @@ div.zeroHeirachy:hover
 .filefoldercollapsable
 {
   font-size:113%;
+}
+
+.glyphicon-file
+{
+  margin-right:1em;
+  flex:0 0 1em;
+}
+span.filename
+{
+  white-space: nowrap;
+  overflow:hidden;
+  width:0px;
+  display:inline-block; 
+  flex: 1 1 0;
 }

@@ -39,6 +39,8 @@
 
 :host > div.panel.panel-default > div.panel-heading
 {
+  padding-top:0.5em;
+  padding-bottom:0.5em;
   display:flex;
 }
 
@@ -61,4 +63,9 @@
 :host > div#collapsable-panel > div.panel-heading > property-widget
 {
   flex : 0 0 auto;
+}
+
+i.chevron
+{
+  margin-right:1em;
 }

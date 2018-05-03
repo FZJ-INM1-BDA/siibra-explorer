@@ -1,12 +1,11 @@
-import {Component, AfterViewInit, OnDestroy, Pipe, PipeTransform} from '@angular/core'
+import {Component, Pipe, PipeTransform, Input, OnChanges} from '@angular/core'
 // import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations';
-import { TEMP_SearchDatasetService, MainController } from 'nehubaUI/nehubaUI.services';
-import { Subject,Observable } from 'rxjs/Rx';
+
+
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 
 import template from './nehubaUI.searchResultList.template.html'
 import css from './nehubaUI.searchResultList.style.css'
-import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
 
 @Component({
   selector : 'nehubaui-searchresult-ui-list',
@@ -17,46 +16,12 @@ import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
   /* fade animation is more trouble and it's worth */
   // animations : [ animationFadeInOut ]
 })
-export class SearchResultUIList implements AfterViewInit, OnDestroy{
-  constructor( private mainController : MainController,private searchDatasetService:TEMP_SearchDatasetService ){
-    this.onDestroySubject = new Subject()
-  }
+export class SearchResultUIList implements OnChanges{
+  
+  @Input() searchResultObjects : SearchResultInterface[] = []
+  @Input() filterSearchResultbyType : {name : string, enabled : boolean}[] = []
 
-  onDestroySubject : Subject<any>
-  searchResultObjects : SearchResultInterface[] = []
-  filterSearchResultbyType : {name : string, enabled : boolean}[] = []
-
-  ngAfterViewInit(){
-    /* need to check if this logic works */
-    Observable
-      .combineLatest(this.searchDatasetService.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
-      .takeUntil(this.onDestroySubject)
-      .subscribe((val)=>{
-        this.searchResultObjects = (val[1] && (val[1] as ParcellationDescriptor).name == 'JuBrain Cytoarchitectonic Atlas') ?
-          val[0] : 
-          []
-
-        this.filterSearchResultbyType = this.searchResultObjects.reduce((acc,curr)=>{
-          const idx = acc.findIndex(it=>it.name===curr.type)
-          return idx >= 0 ? acc : acc.concat({name : curr.type , enabled : true})
-        },[] as {name:string,enabled:boolean}[])
-      })
-  }
-
-  ngOnDestroy(){
-    this.onDestroySubject.next(true)
-  }
-
-  toggleEnable(type:{name:string,enabled:boolean}){
-    this.filterSearchResultbyType = this.filterSearchResultbyType.reduce((acc,curr)=>{
-      return curr.name == type.name ? 
-        acc.concat({
-          name : type.name,
-          enabled : !type.enabled
-        }) :
-        acc.concat(curr)
-    },[] as {name:string,enabled:boolean}[])
-
+  ngOnChanges(){
     this.currentPage = Math.max(0,Math.min(this.currentPage,Math.ceil(this.total / this.hitsPerPage) - 1))
   }
 

@@ -1,14 +1,3 @@
-
-
-<div class = "dataBrowserHeader">
-  {{ mainController.selectedRegions.length == 0 ? 'No ' : mainController.selectedRegions.length }} region{{ mainController.selectedRegions.length == 1 ? '' : 's' }} selected
-  <a class = "btn btn-link" (click)="mainController.selectedRegionsBSubject.next([])">clear all</a>
-  <br />
-
-  <small>
-    <i class = "text-muted">click to expand and see the datasets available</i>
-  </small>
-</div>
 <collapsable-panel
   (dismiss)="onDismiss(region)"
   [title] = "region.name + renderRegionDatasetCount(region)"
@@ -18,7 +7,7 @@
   <nehubaui-searchresult-ui
     [title] = "searchResults.type"
     [showLinkedRegion] = "false"
-    *ngFor = "let searchResults of region.datasets"
+    *ngFor = "let searchResults of region.datasets | filterDatasetSearchResult : filterSearchResultbyType"
     [searchResult]="searchResults">
   </nehubaui-searchresult-ui>
 
