@@ -338,16 +338,23 @@ div#ATLASContainer
     DockedWidgetContainer
     {
 
-      .panel
+      > ng-component
       {
-        .panel-heading
+        > .panel
         {
-          padding-top:0.5em;
-          padding-bottom:0.5em;
 
-          .glyphicon
+          > .panel-heading
           {
-            font-size:0.8em;
+            padding-top:0.5em;
+            padding-bottom:0.5em;
+  
+            > .close
+            {
+              > .glyphicon
+              {
+                font-size:0.8em;
+              }
+            } 
           }
         }
       }

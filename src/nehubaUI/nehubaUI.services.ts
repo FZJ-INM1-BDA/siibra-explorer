@@ -1213,10 +1213,30 @@ export class TEMP_SearchDatasetService{
       fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
     ])
       .then(arr=>{
+        
         this.returnedSearchResultsBSubject.next(
-          arr.reduce((acc,curr)=>
-            acc.concat(...curr)
-          ,[])
+          arr
+            .reduce((acc,curr)=>
+              acc.concat(...curr)
+            ,[])
+            .map((it:SearchResultInterface)=>
+              Object.assign(
+                {},
+                it,
+                { files: it.files.map(file=>Object.assign({},file,{parentDataset : it})) }
+              )
+            )
+            /* TODO test parent dataset of thumbnail */
+            .map((it:SearchResultInterface)=>
+              Object.assign(
+                {},
+                it,
+                { 
+                  thumbnail : it.thumbnail ? 
+                    Object.assign({},it.thumbnail,{parentDataset : it}) :
+                    null 
+                }
+              ))
         )
       })
       .catch(console.warn)

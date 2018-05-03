@@ -28,6 +28,7 @@ export class SearchResultUI implements OnChanges{
     
   }
 
+  //deprecated
   popupFileViewer(file:SearchResultFileInterface,template:TemplateRef<any>){
     // console.log(file,template)
 
@@ -56,6 +57,7 @@ export class SearchResultUI implements OnChanges{
       },[] as RegionLinkClass[]) :
       []
   }
+
   name : string
   thumbnail? : SearchResultFileInterface
   property : Partial<DatasetInterface>
@@ -103,6 +105,8 @@ export interface SearchResultFileInterface{
   name : string
   mimtetype : string
   properties : Partial<DatasetInterface>
+  filename : string
+  parentDataset : SearchResultInterface
   data? : ChartInterface
   url? : string
 }

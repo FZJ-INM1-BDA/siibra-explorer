@@ -1,0 +1,14 @@
+div.zeroHeirachy
+{
+  padding:0.5em 15px;
+  opacity:0.8;
+}
+div.zeroHeirachy:hover
+{
+  opacity:0.95;
+  cursor:default;
+}
+.filefoldercollapsable
+{
+  font-size:113%;
+}

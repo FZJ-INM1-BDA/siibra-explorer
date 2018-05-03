@@ -1,4 +1,3 @@
-
 <collapsable-panel
   *ngIf = "searchResult"
   [title] = "title ? title : searchResult.name">
@@ -9,7 +8,6 @@
     id = "thumbnailContainer">
     <file-viewer
       thumbnail
-      [searchResult] = "searchResult"
       [searchResultFile] = "searchResult.thumbnail"
       *ngIf = "searchResult.thumbnail">
     </file-viewer>
@@ -38,24 +36,11 @@
       </property-widget>
     </div>
   </collapsable-panel>
+  
 
   <!-- linked files. always shown -->
-  <div class = "regionLink" *ngFor = "let file of files">
-    <ng-template #fileTemplate>
-      <file-viewer 
-        [searchResult] = "searchResult"
-        [searchResultFile] = "file">
-
-      </file-viewer>
-    </ng-template>
-    <span fileUnit hoverable (click)="popupFileViewer(file,fileTemplate)">
-      {{ file.name }}
-    </span> 
-    <property-widget
-      [title]="'More information on ' + file.name"
-      [inputComponent]="file">
-    </property-widget>
-  </div>
+  <nehubaui-searchresult-filesfolder-ui [inputFiles] = "files">
+  </nehubaui-searchresult-filesfolder-ui>
 
 </collapsable-panel>
 

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import { SearchResultFileInterface, SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
+import { SearchResultFileInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 
 import template from './fileViewer.template.html'
 import css from './fileViewer.style.css'
@@ -14,13 +14,11 @@ import { MainController } from 'nehubaUI/nehubaUI.services';
 
 export class FileViewer implements OnChanges{
   @Input() searchResultFile : SearchResultFileInterface
-  @Input() searchResult : SearchResultInterface
 
   constructor(private mainController:MainController){
   }
 
   ngOnChanges(){
-    
   }
 
   transformRegionNameToRegionDescriptor(region:{regionName:string,relationship:string,moreInfo:string}):RegionDescriptor|undefined{

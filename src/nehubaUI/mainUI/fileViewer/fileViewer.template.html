@@ -13,18 +13,18 @@
     </property-widget>
   </div>
   
-  <div *ngIf = "searchResult">
+  <div *ngIf = "searchResultFile.parentDataset">
     <span>
       the dataset this data belongs to:
     </span>
     <property-widget
-      [inputComponent]="searchResult"
-      [title]="'More information on ' + searchResult.name">
+      [inputComponent]="searchResultFile.parentDataset"
+      [title]="'More information on ' + searchResultFile.parentDataset.name">
   
     </property-widget>
-    <div *ngIf = "searchResult.regionName.length > 0">
+    <div *ngIf = "searchResultFile.parentDataset.regionName.length > 0">
       the associated regions:
-      <small class = "associatedRegions" *ngFor = "let regionname of searchResult.regionName">
+      <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
         {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
         <property-widget
           *ngIf = "transformRegionNameToRegionDescriptor(regionname)"

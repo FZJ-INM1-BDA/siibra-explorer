@@ -32,6 +32,7 @@ import { RegionAnchoredResults } from 'nehubaUI/mainUI/regionAnchoredResults/neh
 import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
 import { SelectedRegionList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
 import { DedicatedViewController } from 'nehubaUI/mainUI/fileViewer/fileViewerDedicatedView.component'
+import { SearchResultUIFileFolders,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe } from 'nehubaUI/mainUI/searchResultUI/searchResultUIFileFolders.component'
 
 /* components */
 import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.multilevel.component'
@@ -71,7 +72,7 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ FilterDatasetSearchResult,
+    [  FilterDatasetSearchResult,SearchResultUIFileFolders ,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe,
     DedicatedViewController,SearchResultPaginationPipe,PaginationComponent,
     CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,
     DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,

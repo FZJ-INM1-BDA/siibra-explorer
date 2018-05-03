@@ -2,3 +2,15 @@
 {
   display : inline-block
 }
+
+:host > i
+{
+  font-size:1em;
+  opacity : 0.8;
+}
+
+:host > i:hover
+{
+  cursor:default;
+  opacity:1.0;
+}

@@ -11,6 +11,7 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
  * basic widget class
  */
 
+
 export class WidgetComponent{
 
   state : 'docked' | 'minimised' | 'floating' = 'floating'
@@ -281,6 +282,7 @@ export class WidgetsContainer{
     this.mainController.createDisposableWidgets = (widgetComponent:WidgetComponent)=>this.createWidgetView(widgetComponent)
 
     this.widgitServices._unloadAll = ()=>{
+      console.log('unloading all')
 
       /* TODO also clear the floatingWidgetContainer array */
       this.floatingWidgetContainer.viewContainerRef.clear()

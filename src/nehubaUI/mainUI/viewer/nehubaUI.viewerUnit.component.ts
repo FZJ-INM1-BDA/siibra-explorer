@@ -107,8 +107,10 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   widgetComponent : WidgetComponent 
   public ngAfterViewInit(){
     this.mainController.selectedTemplateBSubject
+      .takeUntil(this.destroySubject)
       .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
       .subscribe(()=>{
+        
         this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
         this.widgetComponent.changeState('docked')
       })
