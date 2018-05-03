@@ -1,8 +1,12 @@
-<!-- <collapsable-panel
-  [title]="searchResult.highlight ? ('<span class = \'highlight\'>' + searchResult.name + '</span>') : searchResult.name"> -->
+
 <collapsable-panel
+  *ngIf = "searchResult"
   [title] = "title ? title : searchResult.name">
-  <div *ngIf = "searchResult.thumbnail" id = "thumbnailContainer">
+
+  <!-- thumbnail, if exists -->
+  <div 
+    *ngIf = "searchResult.thumbnail" 
+    id = "thumbnailContainer">
     <file-viewer
       thumbnail
       [searchResult] = "searchResult"
@@ -18,7 +22,7 @@
     </span>
   </div>
 
-  
+  <!-- linked region info, if flag set to true -->
   <collapsable-panel
     *ngIf = "showLinkedRegion"
     [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length  + ') '">
@@ -35,6 +39,7 @@
     </div>
   </collapsable-panel>
 
+  <!-- linked files. always shown -->
   <div class = "regionLink" *ngFor = "let file of files">
     <ng-template #fileTemplate>
       <file-viewer 
@@ -53,6 +58,8 @@
   </div>
 
 </collapsable-panel>
+
+<!-- message to show necessary input infomation is not provided -->
 <span *ngIf = "!searchResult">
   searchResultUI.template.html > searchResult is undefined.
 </span>

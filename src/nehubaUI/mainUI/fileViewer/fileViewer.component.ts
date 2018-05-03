@@ -20,7 +20,7 @@ export class FileViewer implements OnChanges{
   }
 
   ngOnChanges(){
-    console.log(this.searchResult)
+    
   }
 
   transformRegionNameToRegionDescriptor(region:{regionName:string,relationship:string,moreInfo:string}):RegionDescriptor|undefined{

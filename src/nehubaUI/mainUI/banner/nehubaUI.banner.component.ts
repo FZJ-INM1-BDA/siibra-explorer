@@ -161,19 +161,19 @@ export class ConcatFlattenArrayPipe implements PipeTransform{
   }
 }
 
-@Pipe({
-  name : 'uniquefyPipe'
-})
+// @Pipe({
+//   name : 'uniquefyPipe'
+// })
 
-export class UniquefyPipe implements PipeTransform{
-  public transform(array:any[]):any[]{
+// export class UniquefyPipe implements PipeTransform{
+//   public transform(array:any[]):any[]{
 
-    return array.reduce((acc:any[],curr)=> 
-      acc.findIndex(it=>it==curr.name) >= 0 ? 
-        acc : 
-        curr.name == 'Go To There' ?
-          acc :
-          acc.concat(curr.name)
-      ,[])
-  }
-}
+//     return array.reduce((acc:any[],curr)=> 
+//       acc.findIndex(it=>it==curr.name) >= 0 ? 
+//         acc : 
+//         curr.name == 'Go To There' ?
+//           acc :
+//           acc.concat(curr.name)
+//       ,[])
+//   }
+// }

@@ -1,5 +1,4 @@
 import { Config as Nehubaconfig } from 'nehuba/exports'
-import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 
 export class Property{
@@ -192,7 +191,7 @@ export class Dataset implements DatasetInterface {
 //   } 
 // }
 
-export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
+export class RegionDescriptor extends Multilevel{
 
   constructor(json:any,hierachy:number,parent:ParcellationDescriptor){
     super()
@@ -205,7 +204,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
       this.labelIndex = json.labelIndex
     }
     this.hierarchy = hierachy
-    this.PMapURL = json.PMapURL ? json.PMapURL : null
     this.position = json.position ? json.position : null
     this.children = json.children && json.children.constructor == Array ? json.children.map((region:any)=>new RegionDescriptor(region,hierachy+1,parent)) : []
     this.rgb = json.rgb ? 
@@ -220,13 +218,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
       null
 
     /* populate moreInfo array */
-    if(this.position){
-      const goToPosition = new DescriptorMoreInfoItem('Go To There','map-marker')
-      goToPosition.action = ()=>
-        INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(this.position as [number,number,number],true)
-      
-      this.moreInfo.push(goToPosition)
-    }
 
     // if( json.datasets ){
     //   json.datasets.map((dataset:any)=>{
@@ -234,23 +225,6 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
     //   })
     // }
 
-    if(this.PMapURL){
-      const pmap = new DescriptorMoreInfoItem('Cytoarchitectonic Probabilistic Map','picture')
-      pmap.action = () => {
-        console.log('using action to access pmap has been deprecated')
-      }
-      pmap.source = 'nifti://'+this.PMapURL
-      this.moreInfo.push(pmap)
-    }
-
-    if(json.receptorData){
-      const receptorData = new DescriptorMoreInfoItem('Receptor Data','tag')
-      receptorData.action = ()=>{
-        console.log('using action to access receptor data has been depreciated')
-      }
-      receptorData.source = json.receptorData
-      this.moreInfo.push(receptorData)
-    }
   }
 
   children : RegionDescriptor[] = []
@@ -260,29 +234,11 @@ export class RegionDescriptor extends Multilevel implements DescriptorMoreInfo{
   getUrl: string
   labelIndex : number
   position : number[]
-  PMapURL : string
   propertiesURL : string
   rgb : number[]
 
   datasets : SearchResultInterface[] = []
 
-  moreInfo : DescriptorMoreInfoItem[] = []
-}
-
-export interface DescriptorMoreInfo{
-  moreInfo : any[]
-}
-
-export class DescriptorMoreInfoItem{
-  name : string
-  desc : string
-  icon : any
-  source : string
-  action : ()=>void = ()=>{}
-  constructor(name:string,icon:string){
-    this.name = name
-    this.icon = icon
-  }
 }
 
 export class LabComponent{

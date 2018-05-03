@@ -16,7 +16,7 @@ import { ChartsModule } from 'ng2-charts'
 
 /* mainUI */
 import { NehubaContainer } from 'nehubaUI/mainUI/parent/nehubaUI.parent.component';
-import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
+import { NehubaBanner,SearchPipe,PrependNavigate,MapToValuePipe,/* UniquefyPipe, */ConcatFlattenArrayPipe } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
 import { NehubaViewerInnerContainer } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.component'
 import { NehubaViewer2DLandmarkUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewer.2dlandmark.component'
 import { NehubaViewerOverlayUnit } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerOverlay.component'
@@ -55,8 +55,6 @@ import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,Sear
 /* service */
 import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from './nehubaUI.services';
 
-import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,ListSearchResultCardPill,SearchResultPillRegion } from './nehubaUI.searchResultCard.region'
-
 
 @NgModule({
   imports:[
@@ -79,12 +77,12 @@ import { NehubaLandmarkList,SearchResultCardRegion,ListSearchResultCardRegion,Li
     DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
-    ListSearchResultCardRegion, SearchResultCardRegion ,NehubaViewer2DLandmarkUnit,ListSearchResultCardPill,SearchResultPillRegion,
-    MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,NehubaLandmarkList,
+    NehubaViewer2DLandmarkUnit,
+    MinimisedView,MinimisedWidgetContainer, DynamicViewDirective, WidgetView,DockedWidgetView,FloatingWidgetView,WidgetsContainer,FloatingWidgetContainer,DockedWidgetContainer,
     NehubaViewerInnerContainer,NehubaViewerComponent,NehubaViewerOverlayUnit,FloatingTooltip,
     Multiform, NehubaContainer,NehubaViewerContainer,NehubaUIRegionMultilevel,NehubaBanner,NehubaModalUnit,
     MultilevelSelector, NehubaModalService,
-    FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,UniquefyPipe,ConcatFlattenArrayPipe],
+    FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
   providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
   entryComponents : [ 

@@ -36,7 +36,6 @@ export class WidgetComponent{
 
   shutdown()
   {
-    console.log('widget shutdown sequence')
     this.onShutdownCallbacks.forEach((cb)=>cb())
 
     /* execute shutdown sequence */
@@ -474,7 +473,7 @@ interface WidgetViewChassis{
     div.panel-heading > span
     {
       flex : 1 1 auto;
-      
+
       width:0px;
       overflow:hidden;
       text-overflow:ellipsis;

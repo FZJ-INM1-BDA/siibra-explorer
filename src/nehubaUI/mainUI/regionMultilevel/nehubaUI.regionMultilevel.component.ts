@@ -4,6 +4,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.regionMultilevel.template.html'
 import css from './nehubaUI.regionMultilevel.style.css'
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 @Component({
   selector : 'atlascontrol',
@@ -68,8 +69,10 @@ export class NehubaUIRegionMultilevel implements OnChanges{
   multilevelDoubleClick(m:RegionDescriptor){
     
     m.isExpanded = !m.isExpanded
-    const gothere = m.moreInfo.find(info=>info.name=='Go To There')
-    if(gothere) gothere.action()
+    
+    if(m.position){
+      INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(m.position,true)
+    }
   }
 
   showMoreInfo(_item:any):void{

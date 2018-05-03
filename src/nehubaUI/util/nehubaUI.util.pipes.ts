@@ -108,34 +108,3 @@ export class FilterUncertainObject implements PipeTransform{
     }
   }
 }
-
-
-// @Pipe({
-//   name : 'pathToNestedChildren'
-// })
-
-// export class PathToNestedChildren implements PipeTransform{
-//   public transform(array:PathedObject[]):Multilevel[]{
-//     array.reduce((acc,curr)=>{
-//       if(curr.filename.indexOf('/') == 0){
-//         return acc
-//       }
-
-//       const filename = curr.filename.split('/')[0]
-//       if(filename.length == 0){
-//         return acc
-//       }
-
-//       const idx = acc.findIndex(ml=>ml.name==filename)
-//       if(idx)
-
-      
-//     },[] as Multilevel[])
-//   }
-
-  
-// }
-
-// export interface PathedObject{
-//   filename : string
-// }
