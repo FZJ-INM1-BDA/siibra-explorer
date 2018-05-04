@@ -94,8 +94,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .subscribe((parcellation)=>{
         if(parcellation) this.applyNehubaMeshFix()
       })
-
-    window['perspectiveZoom'] = this.perspectiveZoom.bind(this)
   }
 
   destroySubject : Subject<boolean> = new Subject()
@@ -467,7 +465,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   }
 
   public perspectiveRotate(ori:number[],duration:number){
-    console.log(ori,'perspective rotate')
     const currentPerspectiverOri = Array.from(this.perspectiveOri)
     if(duration > 0){
       let deltaOri = ([
