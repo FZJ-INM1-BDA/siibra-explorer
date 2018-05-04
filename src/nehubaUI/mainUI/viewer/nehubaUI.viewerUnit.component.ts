@@ -178,6 +178,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       return  (el.offsetLeft < 5) == left && (el.offsetTop < 5) == top
     })
 
+    /* TODO determine if this was necessary */
     const getObservableBasedonLocation = (left:boolean,top:boolean) =>
       Observable
         .fromEvent((<HTMLElement>this.viewerContainer.nativeElement),sliceRenderEventType )
