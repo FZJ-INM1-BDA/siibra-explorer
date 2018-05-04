@@ -31,7 +31,9 @@ export class MultilevelSelectorVisiblePipe implements PipeTransform{
   }
 
   private iterate(m:Multilevel,searchTerm:string):boolean{
-    const regex = new RegExp(searchTerm,'gi')
+    /* https://stackoverflow.com/a/6969486/6059235 */
+    const escaptedString = searchTerm.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,'\\$&')
+    const regex = new RegExp(escaptedString,'gi')
     
     return m.children.length > 0 ? 
       regex.test(m.name) || m.children.some(mc=>this.iterate(mc,searchTerm)) :
