@@ -468,7 +468,7 @@ export class FloatingWidgetService
   focusFloatingViewSubject : Subject<FloatingWidgetView> = new Subject()
   floatingViewContainerRef:ViewContainerRef
   floatingViews :FloatingWidgetView[] = []
-  floatingViewComponent : ComponentRef<FloatingWidgetView>[] = []
+  floatingViewComponentRefs : ComponentRef<FloatingWidgetView>[] = []
 }
 
 @Injectable()
