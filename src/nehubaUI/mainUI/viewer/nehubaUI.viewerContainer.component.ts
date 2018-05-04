@@ -7,7 +7,6 @@ import { RegionDescriptor, TemplateDescriptor } from 'nehubaUI/nehuba.model';
 import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
-
 @Component({
   selector : 'ATLASViewer',
   template : template,
