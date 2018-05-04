@@ -2,7 +2,6 @@
 	"globals": {
         "hideNullImageValues": true,
         "useNehubaLayout": true,
-        "useNehubaSingleMeshLayer": true,
         "useNehubaMeshLayer": true,
         "embedded":true,
         "useCustomSegmentColors":true

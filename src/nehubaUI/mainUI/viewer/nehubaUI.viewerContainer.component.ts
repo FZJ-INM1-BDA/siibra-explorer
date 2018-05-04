@@ -1,4 +1,4 @@
-import { Component,ViewChild,Input, TemplateRef, AfterViewInit } from '@angular/core'
+import { Component,ViewChild,Input, AfterViewInit } from '@angular/core'
 import { MainController, LandmarkServices, SpatialSearch, WidgitServices } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerInnerContainer } from './nehubaUI.viewer.component'
 import { Subject } from 'rxjs/Subject';
@@ -6,7 +6,7 @@ import { RegionDescriptor, TemplateDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.viewerContainer.template.html'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
-import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
+
 
 @Component({
   selector : 'ATLASViewer',
@@ -19,14 +19,6 @@ export class NehubaViewerContainer implements AfterViewInit{
   @Input() hideUI : boolean = false
   @ViewChild(NehubaViewerInnerContainer) nehubaViewerInnerContainer : NehubaViewerInnerContainer
 
-  @ViewChild('receptorDataWidget',{read:TemplateRef}) receptorDataWidget : TemplateRef<any>
-  @ViewChild('defaultWidget',{read:TemplateRef}) defaultWidget : TemplateRef<any>
-  @ViewChild('cytopmapWidget',{read:TemplateRef}) cytopmapWidget : TemplateRef<any>
-  @ViewChild('landmarkWidget',{read:TemplateRef}) landmarkWidget : TemplateRef<any>
-
-  @ViewChild('testing',{read:TemplateRef}) testing : TemplateRef<any>
-
-  widgetComponent : WidgetComponent
 
   mouseEventOnViewer : Subject<any> = new Subject()
   navigationChangeSubject :  Subject<any> = new Subject()
@@ -50,32 +42,11 @@ export class NehubaViewerContainer implements AfterViewInit{
 
     this.mainController.selectedTemplateBSubject.subscribe(t=>this.selectedTemplate=t)
     this.mainController.selectedRegionsBSubject.subscribe(rs=>this.selectedRegions = rs)
-    this.mainController.viewingModeBSubject.subscribe(m=>this.viewingMode=m)
   }
 
   selectedRegions : RegionDescriptor[]
   selectedTemplate : TemplateDescriptor | null
-  viewingMode : string | null
-
   ngAfterViewInit(){
-    this.mainController.viewingModeBSubject.delay(1).subscribe(mode=>{
-      if(this.widgetComponent) this.widgetServices.unloadWidget( this.widgetComponent )
-
-      const templateRef = mode == 'Cytoarchitectonic Probabilistic Map' ?
-        this.cytopmapWidget :
-          mode == 'iEEG Recordings' ?
-            this.landmarkWidget :
-              mode == 'Receptor Data' ?
-                this.receptorDataWidget : 
-                  this.selectedTemplate ? 
-                    this.defaultWidget :
-                    null
-
-      if ( templateRef ){
-        this.widgetComponent = this.widgetServices.widgitiseTemplateRef(templateRef,{name : mode ? mode : 'Select atlas regions'})
-        this.widgetComponent.changeState('docked')
-      }
-    })
   }
 
   checkViewerExist = () => {

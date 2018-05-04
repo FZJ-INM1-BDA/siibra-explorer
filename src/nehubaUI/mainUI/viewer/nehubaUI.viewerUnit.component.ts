@@ -1,10 +1,10 @@
-import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef, TemplateRef } from '@angular/core'
 import { vec3,NehubaViewer,Config as NehubaViewerConfig, createNehubaViewer, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports';
 
 import { Observable,Subject } from 'rxjs/Rx'
 import { RegionDescriptor, ParcellationDescriptor } from 'nehubaUI/nehuba.model';
 import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
-import { MainController, SpatialSearch, LandmarkServices, Animation, parseRegionRgbToFragmentMain, getActiveColorMapFragmentMain } from 'nehubaUI/nehubaUI.services';
+import { MainController, SpatialSearch, LandmarkServices, Animation, parseRegionRgbToFragmentMain, getActiveColorMapFragmentMain, TEMP_SearchDatasetService, WidgitServices } from 'nehubaUI/nehubaUI.services';
 import { ManagedUserLayer } from 'neuroglancer/layer'
 
 import template from './nehubaUI.viewerUnit.template.html'
@@ -14,6 +14,7 @@ import { ManagedUserLayerWithSpecification } from 'neuroglancer/layer_specificat
 import { SegmentationUserLayer } from 'neuroglancer/segmentation_user_layer';
 import { filter } from 'rxjs/operators';
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+import { WidgetComponent } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component';
 
 declare var window:{
   [key:string] : any
@@ -23,7 +24,8 @@ declare var window:{
 
 @Component({
   template : template ,
-  styles : [ css ]
+  styles : [ css ],
+  providers : [ TEMP_SearchDatasetService ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
@@ -36,6 +38,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   viewerSegment : RegionDescriptor | number | null
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
+  
+  @ViewChild('datasetsResultWidget',{read:TemplateRef}) datasetsResultWidget : TemplateRef<any>
 
   editingNavState : boolean = false
   textNavigateTo(string:string){
@@ -76,9 +80,11 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
 
   constructor(
-    private mainController:MainController,
-    public spatialSearch:SpatialSearch,
-    public landmarkServices:LandmarkServices){
+    private widgetServices : WidgitServices,
+    public searchDatasetServce : TEMP_SearchDatasetService,
+    private mainController : MainController,
+    public spatialSearch : SpatialSearch,
+    public landmarkServices : LandmarkServices){
 
     this.mainController.selectedParcellationBSubject
       .debounceTime(10)
@@ -98,8 +104,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     this.destroySubject.complete()
   }
 
+  widgetComponent : WidgetComponent 
   public ngAfterViewInit(){
-    
+    this.mainController.selectedTemplateBSubject
+      .takeUntil(this.destroySubject)
+      .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
+      .subscribe(()=>{
+        
+        this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
+        this.widgetComponent.changeState('docked')
+      })
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
@@ -109,64 +123,93 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       /* TODO: error handling?*/
       console.log('createnehubaviewer error handler',err)
     })
-    
+     
     this.mainController.nehubaViewer = this.nehubaViewer
     this.nehubaViewer.applyInitialNgState()
 
     /* handles both selectedregion change and viewing mode change */
     Observable
-      .combineLatest(this.mainController.viewingModeBSubject,this.mainController.selectedRegionsBSubject)
+      .combineLatest(
+        this.mainController.selectedTemplateBSubject,
+        this.mainController.resultsFilterBSubject,
+        this.mainController.selectedRegionsBSubject,
+        this.mainController.dedicatedViewBSubject)
       .delay(10) /* seems necessary, otherwise, on start up segments won't show properly */
       .takeUntil(this.destroySubject) /* TIL, order matters. if delay was after take until, last event will fire after destroy subject fires */
-      .subscribe(([mode,regions])=>{
-        if(mode == 'Cytoarchitectonic Probabilistic Map'){
-          /* turn off the visibility of all pmaps first */
-          this.setLayerVisibility({name:/^PMap/},false)
+      .subscribe(([_template,_mode,regions,dedicatedView])=>{
 
-          /* load pmaps that have not yet been loaded */
-          this.loadLayer( regions
-            .filter(r=>r.moreInfo.findIndex(info=>info.name==mode)>=0)
-            .reduce((prev:any,r:RegionDescriptor)=>{
-              const obj : any = {}
-              obj[`PMap ${r.name}`] = {
-                type : 'image',
-                source : r.moreInfo.find(info=>info.name==mode)!.source,
-                shader : this.viewerSegment && this.viewerSegment.constructor == RegionDescriptor && (<RegionDescriptor>this.viewerSegment).name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
-              }
-              return Object.assign({},prev,obj)
-            },{}))
-
-          /* turn on the pmaps of the selected regions */
-          regions.map(r=>({name : `PMap ${r.name}`})).forEach(layerObj=>this.setLayerVisibility(layerObj,true))
-          
-          /* turn off the segmentation layer */
+        /* TODO will need to handle showing PMaps  */
+        if(regions.length == 0){
+          this.allSeg(true)
+        }else{
           this.allSeg(false)
-        }else{
-          this.removeLayer({name:/^PMap/})
+          regions.map(re=>re.labelIndex).forEach((this.showSeg).bind(this))
         }
 
-        if(mode == 'iEEG Recordings'){
-          this.allSeg(false)
-          regions.map(re=>re.labelIndex).forEach(i=>this.showSeg(i))
-
-          this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
-          this.setSegmentationLayersOpacity(0.2)
+        if(dedicatedView){
+          const idx = dedicatedView.indexOf('://')
+          idx < 0 ? 
+            console.warn('could not parse dedicated view protocol!') :
+            dedicatedView.slice(0,idx) == 'nifti' ? 
+              (
+                this.allSeg(false),
+                this.loadLayer({
+                  nehubaNifti : {
+                    type : 'image',
+                    source : dedicatedView,
+                    shader : getActiveColorMapFragmentMain()
+                  }
+                })
+              ) : 
+              console.warn('could not parse dedicated view param!')
         }else{
-          this.setSegmentationLayersOpacity(0.5)
+          this.removeLayer({
+            name : 'nehubaNifti'
+          })
         }
+        
+        // if(mode == 'Cytoarchitectonic Probabilistic Map'){
+        //   /* turn off the visibility of all pmaps first */
+        //   this.setLayerVisibility({name:/^PMap/},false)
 
-        if(mode === null || mode == 'Receptor Data'){
+        //   /* load pmaps that have not yet been loaded */
+        //   this.loadLayer( regions
+        //     .filter(r=>r.moreInfo.findIndex(info=>info.name==mode)>=0)
+        //     .reduce((prev:any,r:RegionDescriptor)=>{
+        //       const obj : any = {}
+        //       obj[`PMap ${r.name}`] = {
+        //         type : 'image',
+        //         source : r.moreInfo.find(info=>info.name==mode)!.source,
+        //         shader : this.viewerSegment && this.viewerSegment.constructor == RegionDescriptor && (<RegionDescriptor>this.viewerSegment).name == r.name ? getActiveColorMapFragmentMain() : parseRegionRgbToFragmentMain(r)
+        //       }
+        //       return Object.assign({},prev,obj)
+        //     },{}))
+
+        //   /* turn on the pmaps of the selected regions */
+        //   regions.map(r=>({name : `PMap ${r.name}`})).forEach(layerObj=>this.setLayerVisibility(layerObj,true))
           
-          if(regions.length == 0){
-            this.allSeg(true)
-          }else{
-            this.allSeg(false)
-            regions.map(re=>re.labelIndex).forEach((this.showSeg).bind(this))
-          }
-          
-        }else{
+        //   /* turn off the segmentation layer */
+        //   this.allSeg(false)
+        // }else{
+        //   this.removeLayer({name:/^PMap/})
+        // }
 
-        }
+        // if(mode == 'iEEG Recordings'){
+        //   this.allSeg(false)
+        //   regions.map(re=>re.labelIndex).forEach(i=>this.showSeg(i))
+
+        //   this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        //   this.setSegmentationLayersOpacity(0.2)
+        // }else{
+        //   this.setSegmentationLayersOpacity(template? template.name == 'Big Brain (Histology)' ? 0.0 : 0.5 : 0.5)
+        // }
+
+        // if(mode === null || mode == 'Receptor Data'){
+          
+          
+        // }else{
+
+        // }
       })
     
     /**

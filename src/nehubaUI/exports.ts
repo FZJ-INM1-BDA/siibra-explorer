@@ -10,7 +10,7 @@ class PluginControl{
 
 class UIHandle{
   modalControl : NehubaModalService
-  viewingModeBSubject : BehaviorSubject<string|null>
+  filterResultBSubject : BehaviorSubject<string[]>
 }
 
 // export const UI_CONTROL = window['uiHandle'] = new UIHandle()

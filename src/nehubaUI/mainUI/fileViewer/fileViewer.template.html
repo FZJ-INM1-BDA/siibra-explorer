@@ -1,0 +1,72 @@
+<div class = "moreInfo">
+  <h4>
+    More information on:
+  </h4>
+  <div>
+    <span>
+      this data:
+    </span>
+    <property-widget
+      [inputComponent] = "searchResultFile"
+      [title]="'More information on ' + searchResultFile.name ">
+  
+    </property-widget>
+  </div>
+  
+  <div *ngIf = "searchResultFile.parentDataset">
+    <span>
+      the dataset this data belongs to:
+    </span>
+    <property-widget
+      [inputComponent]="searchResultFile.parentDataset"
+      [title]="'More information on ' + searchResultFile.parentDataset.name">
+  
+    </property-widget>
+    <div *ngIf = "searchResultFile.parentDataset.regionName.length > 0">
+      the associated regions:
+      <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
+        {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
+        <property-widget
+          *ngIf = "transformRegionNameToRegionDescriptor(regionname)"
+          [inputComponent]="transformRegionNameToRegionDescriptor(regionname)">
+  
+        </property-widget>
+      </small>
+    </div>
+  </div>
+      
+</div>
+
+<div 
+  *ngIf = "searchResultFile"
+  [ngSwitch]="searchResultFile.mimetype">
+  <img *ngSwitchCase="'image/jpeg'" [src] = "searchResultFile.url" />
+  <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
+    <radar-chart
+      [colors] = "searchResultFile.data.colors"
+      [labels]="searchResultFile.data.labels"
+      [radarDatasets]="searchResultFile.data.datasets"
+      *ngSwitchCase="'radar'">
+
+    </radar-chart>
+    <line-chart
+      [colors] = "searchResultFile.data.colors"
+      [options] = "searchResultFile.data.chartOptions"
+      [lineDatasets] = "searchResultFile.data.datasets"
+      *ngSwitchCase = "'line'">
+
+    </line-chart>
+    <div *ngSwitchDefault>
+      The json file is not a chart. I mean, we could dump the json, but would it really help?
+    </div>
+  </div>
+  <div *ngSwitchCase = "'application/nifti'">
+    <dedicated-view-controller
+      [dedicatedViewString]="'nifti://'+searchResultFile.url">
+
+    </dedicated-view-controller>
+  </div>
+  <div *ngSwitchDefault>
+    The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
+  </div>
+</div>

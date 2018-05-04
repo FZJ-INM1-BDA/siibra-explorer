@@ -1,65 +1,71 @@
-  <div 
-    id = "neuroglancer-container" 
-    [ngClass]="{darktheme : darktheme}"
-    #container>
-  </div>
-  
-  <div id = "nehubaui-overlay" #nehubaUiOverlay>
-    <nehubaui-overlay 
-      [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[0]"
-      class = "nehubaui-overlay-c" 
-      id = "nehubaui-overlay-c1">
-    </nehubaui-overlay>
-    <nehubaui-overlay 
-      [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[1]"
-      class = "nehubaui-overlay-c" 
-      id = "nehubaui-overlay-c2">
-    </nehubaui-overlay>
-    <nehubaui-overlay 
-      [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[2]"
-      class = "nehubaui-overlay-c" 
-      id = "nehubaui-overlay-c3">
-    </nehubaui-overlay>
-    <nehubaui-overlay 
-      [rotate3D] = "rotate3D"
-      class = "nehubaui-overlay-c" 
-      id = "nehubaui-overlay-c4">
-    </nehubaui-overlay>
-  </div>
-  
+<div 
+  id = "neuroglancer-container" 
+  [ngClass]="{darktheme : darktheme}"
+  #container>
+</div>
 
-  <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
-    <span 
-      class = "btn btn-link"
-      (click) = "landmarkServices.flatProjection = !landmarkServices.flatProjection">
-      toggle landmark flat projection
-    </span>  
+<div id = "nehubaui-overlay" #nehubaUiOverlay>
+  <nehubaui-overlay 
+    [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[0]"
+    class = "nehubaui-overlay-c" 
+    id = "nehubaui-overlay-c1">
+  </nehubaui-overlay>
+  <nehubaui-overlay 
+    [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[1]"
+    class = "nehubaui-overlay-c" 
+    id = "nehubaui-overlay-c2">
+  </nehubaui-overlay>
+  <nehubaui-overlay 
+    [nanometersToOffsetPixelsFn] = "nanometersToOffsetPixelsFn[2]"
+    class = "nehubaui-overlay-c" 
+    id = "nehubaui-overlay-c3">
+  </nehubaui-overlay>
+  <nehubaui-overlay 
+    [rotate3D] = "rotate3D"
+    class = "nehubaui-overlay-c" 
+    id = "nehubaui-overlay-c4">
+  </nehubaui-overlay>
+</div>
 
-    <br />
 
-    <span 
-      class = "btn btn-link"
-      (click)="statusPanelRealSpace = !statusPanelRealSpace">
-      {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
-    </span>
+<div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+  <span 
+    class = "btn btn-link"
+    (click) = "landmarkServices.flatProjection = !landmarkServices.flatProjection">
+    toggle landmark flat projection
+  </span>  
 
-    <br />
-    Navigation: 
-      <input 
-        (keydown.enter) = "textNavigateTo(navigateInput.value)"
-        (keydown.tab) = "textNavigateTo(navigateInput.value)"
-        [ngModel] = "navToModel()" 
-        spellcheck = "false"
-        #navigateInput
-        navigateInput/>
+  <br />
 
-    <br />
-    Mouse: 
-    <small>
-      {{ mouseCoord }}
-    </small> 
-    <br />
-    <small>
-      &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
-    </small>
-  </div>
+  <span 
+    class = "btn btn-link"
+    (click)="statusPanelRealSpace = !statusPanelRealSpace">
+    {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
+  </span>
+
+  <br />
+  Navigation: 
+    <input 
+      (keydown.enter) = "textNavigateTo(navigateInput.value)"
+      (keydown.tab) = "textNavigateTo(navigateInput.value)"
+      [ngModel] = "navToModel()" 
+      spellcheck = "false"
+      #navigateInput
+      navigateInput/>
+
+  <br />
+  Mouse: 
+  <small>
+    {{ mouseCoord }}
+  </small> 
+  <br />
+  <small>
+    &nbsp;&nbsp;{{!viewerSegment ? ' ' : viewerSegment.constructor.name == 'Number' ? ' ' : viewerSegment.name   }}
+  </small>
+</div>
+
+
+<ng-template #datasetsResultWidget>
+  <region-anchored-results>
+  </region-anchored-results>
+</ng-template>

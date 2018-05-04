@@ -1,0 +1,7 @@
+div.pagination-container
+{
+  margin:0.5em 0;
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}

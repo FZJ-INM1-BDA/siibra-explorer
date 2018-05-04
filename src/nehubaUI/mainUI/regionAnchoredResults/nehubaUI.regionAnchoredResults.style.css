@@ -1,0 +1,27 @@
+div.dataBrowserHeader
+{
+  margin: 0 1em;
+  padding : 6px 0;
+}
+
+div#filter
+{
+  margin-bottom:0px;
+}
+
+div#filter > small
+{
+  display:block;
+  opacity:0.8;
+}
+
+div#filter > small:hover
+{
+  cursor:default;
+  opacity : 1.0;
+}
+span#selectedRegionSummary
+{
+  padding:6px 0px;
+  display:inline-block;
+}

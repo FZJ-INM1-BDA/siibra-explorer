@@ -18,6 +18,7 @@ import 'zone.js';
 import 'reflect-metadata';
 import '@webcomponents/custom-elements/src/native-shim'
 import '@webcomponents/custom-elements/custom-elements.min'
+import 'chart.js/src/chart.js'
 
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
@@ -30,16 +31,9 @@ enableProdMode();
 
 platformBrowserDynamic().bootstrapModule(NehubaUI);
 
-import './assets/json/colin.json'
-import './assets/json/colinNehubaConfig.json'
-import './assets/json/colinJubrainPMap.json'
-import './assets/json/colinJubrainReceptor.json'
-import './assets/json/colinIEEG.json'
+/* needed to bootstrap json files since KG isn't yet ready */
+import './assets/receptor/receptorAggregatedData.json'
 
-import './assets/json/bigbrain.json'
-import './assets/json/bigbrainNehubaConfig.json'
-import './assets/json/waxholmRatV2_0.json'
-import './assets/json/waxholmRatV2_0NehubaConfig.json'
-import './assets/json/allenMouse.json'
-import './assets/json/allenMouseNehubaConfig.json'
-
+const requireAll = (r:any) => {r.keys().forEach(r)}
+requireAll(require.context('./assets/json/',false, /.json$/))
+requireAll(require.context('./assets/receptor/',true, /.jpg$/))

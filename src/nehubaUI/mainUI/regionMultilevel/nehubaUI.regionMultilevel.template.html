@@ -10,8 +10,11 @@
       [isVisible] = "region | multilevelSelectorVisiblePipe : multilevelProvider.searchTerm"
       [muteFilter] = "muteFilter"
       [highlightFilter] = "highlightFilter"
+      [getValueToShow] = "getValueToShow"
       (singleClick) = "multilevelSingleClick($event)"
       (doubleClick) = "multilevelDoubleClick($event)"
+      (mouseoverMultilevel) = "mouseoverMultilevel($event)"
+      (mouseoutMultilevel) = "mouseoutMultilevel($event)"
       class = "menuItemContentText"  
       *ngFor = "let region of regions"
       [data]= "region" >

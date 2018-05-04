@@ -1,0 +1,32 @@
+<div *ngIf = "inputFiles">
+  <div 
+    (click) = "popupFileViewer(file,fileTemplate)"
+    class = "zeroHeirachy"
+    *ngFor = "let file of inputFiles | searchResultFilesFolderZeroHeirachyPipe">
+
+    <i class = "glyphicon glyphicon-file"></i>
+    <span class = "filename">
+        {{ file.filename }}
+    </span>
+    
+    <ng-template #fileTemplate>
+      <file-viewer [searchResultFile] = "file">
+
+      </file-viewer>
+    </ng-template>
+  </div>
+
+  <div *ngFor = "let dir of inputFiles | searchResultFilesfolderHierachyPipe">
+    <collapsable-panel
+      class = "filefoldercollapsable"
+      [title]="dir.title">
+      
+      <nehubaui-searchresult-filesfolder-ui
+        [inputFiles] = "dir.files">
+      </nehubaui-searchresult-filesfolder-ui>
+    </collapsable-panel>
+  </div>
+</div>
+<div *ngIf = "!inputFiles">
+  search result ui file folder cannot be dispalyed as inputFiles are not provided
+</div>

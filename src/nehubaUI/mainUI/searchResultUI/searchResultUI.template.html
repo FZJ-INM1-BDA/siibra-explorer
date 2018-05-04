@@ -1,0 +1,50 @@
+<collapsable-panel
+  *ngIf = "searchResult"
+  [title] = "title ? title : searchResult.name">
+
+  <!-- thumbnail, if exists -->
+  <div 
+    *ngIf = "searchResult.thumbnail" 
+    id = "thumbnailContainer">
+    <file-viewer
+      thumbnail
+      [searchResultFile] = "searchResult.thumbnail"
+      *ngIf = "searchResult.thumbnail">
+    </file-viewer>
+    <span style = "font-size:smaller">
+      Thumbnail info:
+      <property-widget
+        [title]="'More information on ' + searchResult.thumbnail.name"
+        [inputComponent]="searchResult.thumbnail">
+      </property-widget>
+    </span>
+  </div>
+
+  <!-- linked region info, if flag set to true -->
+  <collapsable-panel
+    *ngIf = "showLinkedRegion"
+    [title]="'<i class = \'glyphicon glyphicon-link\'></i> Related Regions (' + regionLinks.length  + ') '">
+    <div class = "regionLink" *ngFor = "let regionLink of regionLinks">
+      
+      <span fileUnit>
+        {{ regionLink.moreInfo ? '(' + regionLink.moreInfo + ')' : '' }} {{ regionLink.relationship ? regionLink.relationship : '' }}  
+        {{ regionLink.region ? regionLink.region.name  : 'Specified Region not found in the label index map' }} 
+      </span> 
+      <property-widget
+        [title]="'More information on ' + regionLink.region.name"
+        [inputComponent]="regionLink.region">
+      </property-widget>
+    </div>
+  </collapsable-panel>
+  
+
+  <!-- linked files. always shown -->
+  <nehubaui-searchresult-filesfolder-ui [inputFiles] = "files">
+  </nehubaui-searchresult-filesfolder-ui>
+
+</collapsable-panel>
+
+<!-- message to show necessary input infomation is not provided -->
+<span *ngIf = "!searchResult">
+  searchResultUI.template.html > searchResult is undefined.
+</span>

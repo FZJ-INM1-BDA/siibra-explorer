@@ -11,6 +11,7 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
  * basic widget class
  */
 
+
 export class WidgetComponent{
 
   state : 'docked' | 'minimised' | 'floating' = 'floating'
@@ -36,7 +37,6 @@ export class WidgetComponent{
 
   shutdown()
   {
-    console.log('widget shutdown sequence')
     this.onShutdownCallbacks.forEach((cb)=>cb())
 
     /* execute shutdown sequence */
@@ -203,6 +203,7 @@ export class MinimisedWidgetContainer implements AfterViewInit{
       display:block;
       width:362px;
       margin-left:-21px;
+      padding-left:21px;
       height:100%;
       overflow-y:auto;
       overflow-x:hidden;
@@ -341,7 +342,6 @@ export class WidgetsContainer{
       
       this.floatingWidgetContainer.viewContainerRef.clear()
       this.dockedWidgetContainer.viewContainerRef.clear()
-      // this.minimisedWidgetContainer.viewContainerRef.clear()
     }
   }
 
@@ -383,6 +383,7 @@ export class WidgetsContainer{
     newWidget.parentViewRef = parentViewRef
     newWidget.state = state
 
+    /* TODO may no longer be necessary, with animation */
     if(this.mainController.nehubaViewer){
       this.mainController.nehubaViewer.redraw()
     }
@@ -546,10 +547,22 @@ interface WidgetViewChassis{
     div.panel-heading > span
     {
       flex : 1 1 auto;
+
+      width:0px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      display:inline-block;
+      white-space:nowrap;
     }
     div.panel-heading > i
     {
       flex : 0 0 1em;
+    }
+
+    div.panel-body
+    {
+      max-height : 80vh;
+      overflow-y : auto;
     }
     
     `
@@ -711,7 +724,11 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
       </i>
     </div>
     <div style="overflow:hidden">
-      <div [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" class = "panel-body">
+      <div 
+        id = "dockedWidgetPanelBody"
+        [@animateCollapseShow] = "showBody ? 'show' : 'collapse'" 
+        class = "panel-body">
+
         <ng-template #panelBody>
         </ng-template>
       </div>
@@ -733,7 +750,7 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
       opacity: 0.9;
       border:none;
     }
-
+    
       div.panel-heading:hover
       {
         opacity:1.0;
@@ -743,6 +760,12 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
       div.panel-heading > span
       {
         flex : 1 1 auto;
+
+        width:0px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        display:inline-block;
+        white-space:nowrap;
       }
       div.panel-heading > i
       {

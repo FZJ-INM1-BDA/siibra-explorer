@@ -59,6 +59,7 @@
 						"0"
 					],
 					"selectedAlpha": 0,
+					"notSelectedAlpha":0,
 					"transform": [
 						[
 							1,

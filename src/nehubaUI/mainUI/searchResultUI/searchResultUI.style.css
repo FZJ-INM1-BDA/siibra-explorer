@@ -1,0 +1,40 @@
+#thumbnailContainer
+{
+  width:300px; /*  TODO check if this stops the jerking when scroll bar is present */
+  margin-left:1em;
+  margin-right:1em;
+  margin-top:-11px; /* TODO the ng2-chartjs object introduces a strange 11px offset */
+}
+
+span[fileUnit]
+{
+  display: inline-block;
+  margin-left:2em;
+  white-space: nowrap;
+}
+
+[hoverable]:hover
+{
+
+  cursor: pointer;
+  color : rgba(255,255,255,0.8);
+}
+
+div.regionLink
+{
+  display:flex;
+}
+
+div.regionLink > span[fileUnit]
+{
+  width:0px;
+  text-overflow: ellipsis;
+  overflow:hidden;
+  flex : 1 1 0;
+}
+
+div.regionLink > property-widget
+{
+  flex : 0 0 auto;
+  padding:0 1em;
+}

@@ -14,6 +14,7 @@ export const animationFadeInOut =
     ])
   ])
 
+/* TODO investigate why the -12 top margin is required */
 export const animateCollapseShow = 
   trigger('animateCollapseShow',[
     state('collapse',style({
@@ -25,13 +26,13 @@ export const animateCollapseShow =
       'height':'*'
     })),
     transition('collapse => show',[
-      animate('100ms',style({
+      animate('200ms 100ms ease-out',style({
         'transform':'translateY(0px)',
         'height':'*'
       }))
     ]),
     transition('show => collapse',[
-      animate('100ms',style({
+      animate('200ms 100ms ease-in',style({
         'transform':'translateY(-100%)',
         'height':'0px'
       }))
