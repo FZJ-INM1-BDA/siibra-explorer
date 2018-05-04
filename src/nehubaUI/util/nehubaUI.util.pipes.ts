@@ -59,7 +59,9 @@ export class SearchHighlight implements PipeTransform{
     if( !searchTerm || searchTerm == '' ){
       return string
     }else{
-      let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
+      
+    /* https://stackoverflow.com/a/6969486/6059235 */
+      let sanitaized = searchTerm.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,'\\$&')
       const nbsp = string.replace(/\s/gi,' ')
       this.regExp = new RegExp(sanitaized,'gi')
       return this.sanitizer.bypassSecurityTrustHtml( nbsp.replace(this.regExp,match=> `<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`))
