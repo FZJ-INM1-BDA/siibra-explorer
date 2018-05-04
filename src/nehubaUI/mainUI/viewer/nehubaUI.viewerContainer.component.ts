@@ -29,6 +29,7 @@ export class NehubaViewerContainer implements AfterViewInit{
   widgetComponent : WidgetComponent
 
   mouseEventOnViewer : Subject<any> = new Subject()
+  navigationChangeSubject :  Subject<any> = new Subject()
 
   constructor(public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc = (loc,real)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationLoc(loc,real))

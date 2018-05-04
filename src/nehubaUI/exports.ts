@@ -69,6 +69,8 @@ class Metadata {
    * Map mapping labelIndex (used by neuroglancer and nehuba) to the RegionDescriptor object.
    */
   regionsLabelIndexMap : Map<number,RegionDescriptor>
+
+  viewerStateBSubject : BehaviorSubject<any|null>
 }
 
 const MOUSE_OVER_NEHUBA : BehaviorSubject<{nehubaOutput : any, foundRegion : RegionDescriptor | null}> = new BehaviorSubject({nehubaOutput : null, foundRegion : null})
