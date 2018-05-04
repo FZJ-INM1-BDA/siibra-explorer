@@ -34,7 +34,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   sliceViewZoom : number
   viewerPosReal : number[] = [0,0,0]
   viewerPosVoxel : number[] = [0,0,0]
-  viewerOri : number[] = [0,0,1,0]
+  viewerOri : number[] = [0,0,0,1]
+  perspectiveOri : number[] = [0,0,0,1]
+  perspectiveViewZoom : number
   viewerSegment : RegionDescriptor | number | null
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
@@ -92,6 +94,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .subscribe((parcellation)=>{
         if(parcellation) this.applyNehubaMeshFix()
       })
+
+    window['perspectiveZoom'] = this.perspectiveZoom.bind(this)
   }
 
   destroySubject : Subject<boolean> = new Subject()
@@ -268,7 +272,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     
     Observable
       .from(this.nehubaViewer.navigationState.all)
+      .takeUntil(this.destroySubject)
       .subscribe(ev=>{
+        /* TODO fix this */
         this.mainController.viewerStateBSubject.next(ev)
       })
     
@@ -289,6 +295,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .from(this.nehubaViewer.navigationState.position.inVoxels)
       .takeUntil(this.destroySubject)
       .subscribe((pos:any)=>this.viewerPosVoxel=pos)
+
+    Observable
+      .from(this.nehubaViewer.navigationState.orientation)
+      .takeUntil(this.destroySubject)
+      .subscribe((ori:any)=>this.viewerOri=ori)
+
+    Observable
+      .from(this.nehubaViewer.navigationState.perspectiveOrientation)
+      .takeUntil(this.destroySubject)
+      .subscribe((ori:any)=>this.perspectiveOri=ori)
     
     Observable
       .from(this.nehubaViewer.navigationState.sliceZoom)
@@ -303,8 +319,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
       })
 
+    Observable
+      .from(this.nehubaViewer.navigationState.perspectiveZoom)
+      .takeUntil(this.destroySubject)
+      .subscribe((zoom:any)=>this.perspectiveViewZoom=zoom)
+
     /* hibernating listener */
-    Observable.from(this.nehubaViewer.mouseOver.image)
+    Observable
+      .from(this.nehubaViewer.mouseOver.image)
       .takeUntil(this.destroySubject)
       .subscribe(ev=>{
         this.segmentListener[ev.layer.name] = ev.value
@@ -313,7 +335,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     /**
      * attaches viewerSegmentHover listener
      */
-    Observable.from(this.nehubaViewer.mouseOver.segment)
+    Observable
+      .from(this.nehubaViewer.mouseOver.segment)
       .takeUntil(this.destroySubject)
       .subscribe((seg:any)=>{
         /* seg.segment = number | 0 | null seg.layer */
@@ -391,6 +414,117 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
   public loadParcellation(_parcellation:ParcellationDescriptor){
 
+  }
+
+  public perspectiveZoom(zoom:number,duration:number){
+
+    if(duration > 0){
+      let deltaZoom = zoom - this.perspectiveViewZoom
+      let startZoom = this.perspectiveViewZoom
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this._setPerspectiveZoom(startZoom + deltaZoom*iteratedValue.value)
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
+      }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this._setPerspectiveZoom(zoom)
+    }
+  }
+
+  /* TODO waiting for proper api to do this */
+  private _setPerspectiveZoom(zoom:number){
+    this.nehubaViewer.ngviewer.perspectiveNavigationState.zoomFactor.restoreState(zoom)
+  }
+
+  public sliceZoom(zoom:number,duration:number){
+
+    if(duration > 0){
+      let deltaZoom = zoom - this.sliceViewZoom
+      let startZoom = this.sliceViewZoom
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this._setSliceZoom(startZoom + deltaZoom*iteratedValue.value)
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
+      }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this._setSliceZoom(zoom)
+    }
+  }
+
+  /* TODO waiting for proper api to do this */
+  private _setSliceZoom(zoom:number){
+    this.nehubaViewer.ngviewer.navigationState.zoomFactor.restoreState(zoom)
+  }
+
+  public perspectiveRotate(ori:number[],duration:number){
+    console.log(ori,'perspective rotate')
+    const currentPerspectiverOri = Array.from(this.perspectiveOri)
+    if(duration > 0){
+      let deltaOri = ([
+        ori[0] - currentPerspectiverOri[0],
+        ori[1] - currentPerspectiverOri[1],
+        ori[2] - currentPerspectiverOri[2],
+        ori[3] - currentPerspectiverOri[3]
+      ]).slice()
+      let startori = (currentPerspectiverOri).slice()
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this._setPerspectiveRotation(startori.map((ori,idx)=>ori+deltaOri[idx]*iteratedValue.value))
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
+      }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this._setPerspectiveRotation(ori)
+    }
+  }
+
+  /* TODO waiting for proper api to do this */
+  private _setPerspectiveRotation(ori:number[]){
+    this.nehubaViewer.ngviewer.perspectiveNavigationState.pose.orientation.restoreState(ori)
+  }
+
+  public obliqueRotate(ori:number[],duration:number){
+    const currentViewerOri = Array.from(this.viewerOri)
+    if(duration > 0){
+      let deltaOri = ([
+        ori[0] - currentViewerOri[0],
+        ori[1] - currentViewerOri[1],
+        ori[2] - currentViewerOri[2],
+        ori[3] - currentViewerOri[3]
+      ]).slice()
+      let startori = (currentViewerOri).slice()
+  
+      let iterator = (new Animation(duration,'linear')).generate()
+      let newAnimationFrame = () =>{
+        let iteratedValue = iterator.next()
+        this._setObliqueRotate(startori.map((ori,idx)=>ori+deltaOri[idx]*iteratedValue.value))
+        if(!iteratedValue.done){
+          requestAnimationFrame(newAnimationFrame)
+        }
+      }
+      requestAnimationFrame(newAnimationFrame)
+    }else{
+      this._setObliqueRotate(ori)
+    }
+  }
+
+  /* TODO waiting for proper api to do this */
+  private _setObliqueRotate(ori:number[]){
+    this.nehubaViewer.ngviewer.navigationState.pose.orientation.restoreState(ori)
   }
 
   public navigate(pos:number[],duration:number,realSpace:boolean){

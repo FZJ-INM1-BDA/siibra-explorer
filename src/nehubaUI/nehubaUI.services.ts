@@ -100,8 +100,11 @@ export class MainController{
         }break;
         case 'viewerState':{
           const [o,po,pz,p,z] = keyval[1].split('__')
-          console.log(o,po,pz,p,z)
-          console.log('pos',p)
+          
+          INTERACTIVE_VIEWER.viewerHandle.setSliceViewZoom( Number(z) )
+          INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewZoom( Number(pz) )
+          INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewOrientation( po.split('_').map(n=>Number(n)) )
+          INTERACTIVE_VIEWER.viewerHandle.setNavigationOri( o.split('_').map(n=>Number(n)))
           INTERACTIVE_VIEWER.viewerHandle.setNavigationLoc( p.split('_').map(s=>Number(s)) ,true)
         }break;
       }

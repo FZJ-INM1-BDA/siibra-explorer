@@ -22,6 +22,15 @@ class ViewerHandle {
   moveToNavigationLoc : (loc:number[],realSpace?:boolean)=>void
   moveToNavigationOri : (ori:number[])=>void
 
+  setSliceViewZoom : (zoomlevel:number)=>void
+  moveToSliceViewZoom : (zoomlevel:number)=>void
+
+  setPerspectiveViewZoom : (zoomlevel:number)=>void
+  moveToPerspectiveViewZoom : (zoomlevel:number)=>void
+
+  setPerspectiveViewOrientation : (ori:number[])=>void
+  moveToPerspectiveViewOrientation : (ori:number[])=>void
+
   showSegment : (labelIndex:number)=>void
   hideSegment : (labelIndex:number)=>void
 
