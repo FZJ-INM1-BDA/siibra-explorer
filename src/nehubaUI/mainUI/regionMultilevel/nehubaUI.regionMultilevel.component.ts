@@ -4,6 +4,7 @@ import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 
 import template from './nehubaUI.regionMultilevel.template.html'
 import css from './nehubaUI.regionMultilevel.style.css'
+import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 @Component({
   selector : 'atlascontrol',
@@ -27,8 +28,13 @@ export class NehubaUIRegionMultilevel implements OnChanges{
     })
   }
 
-  muteFilter = (m:RegionDescriptor):boolean=>{
-    return this.mainController.viewingMode !== null && m.moreInfo.findIndex(info=>info.name==this.mainController.viewingMode) < 0 
+  getDisplayName = (m:RegionDescriptor):string =>{
+    return m.name
+  }
+
+  /* TODO configure the mutefilter properly. decide  */
+  muteFilter = (_m:RegionDescriptor):boolean=>{
+    return false
   }
 
   highlightFilter = (m:RegionDescriptor):boolean=>{
@@ -52,11 +58,21 @@ export class NehubaUIRegionMultilevel implements OnChanges{
     this.updateRegionSelection()
   }
 
+  mouseoverMultilevel(m:RegionDescriptor){
+    m.datasets.forEach(ds=>ds.highlight = true)
+  }
+
+  mouseoutMultilevel(m:RegionDescriptor){
+    m.datasets.forEach(ds=>ds.highlight = false)
+  }
+
   multilevelDoubleClick(m:RegionDescriptor){
     
     m.isExpanded = !m.isExpanded
-    const gothere = m.moreInfo.find(info=>info.name=='Go To There')
-    if(gothere) gothere.action()
+    
+    if(m.position){
+      INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc(m.position,true)
+    }
   }
 
   showMoreInfo(_item:any):void{
@@ -74,5 +90,9 @@ export class NehubaUIRegionMultilevel implements OnChanges{
 
   updateRegionSelection(){
     this.mainController.selectedRegionsBSubject.next(this.multilevelProvider.selectedMultilevel as RegionDescriptor[])
+  }
+
+  getValueToShow(m:RegionDescriptor){
+    return m.name
   }
 }

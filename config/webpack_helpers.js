@@ -28,13 +28,6 @@ const extractSass = new ExtractTextPlugin({
   allChunks : true
 })
 
-// const extractHtml = new ExtractTextPlugin({
-//   filename : (getPath)=>{
-//     console.log(getPath('[name].[ext]'))
-//     return getPath('[name].[ext]').replace('src/nehubaUI/mainUI/parent','')
-//   }
-// })
-
 function modifyViewerOptions(options) {
   options = options || {};
   options.resolveLoaderRoots = [
@@ -75,7 +68,7 @@ function modifyViewerOptions(options) {
   }
 
   let ruleJson = {
-    test : /assets\/json\/.*?\.json$/,
+    test : /assets.*?\.json$/,
     use : [{
       loader : 'file-loader',
       options : {
@@ -113,7 +106,7 @@ function modifyViewerOptions(options) {
     baseConfig.module.rules.push(ruleCss)
 
     const idx2 = baseConfig.module.rules.findIndex(r=>compareRegex(r.test,/\.json$/))
-    if (idx2 >= 0) baseConfig.module.rules[idx2].exclude = /assets\/json/
+    if (idx2 >= 0) baseConfig.module.rules[idx2].exclude = /assets/
     baseConfig.module.rules.push(ruleJson)
 
     baseConfig.module.rules.push(ruleImage)

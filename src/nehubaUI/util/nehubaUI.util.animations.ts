@@ -2,18 +2,19 @@ import { trigger, transition, state, style, animate } from '@angular/animations'
 
 export const animationFadeInOut = 
   trigger('animationFadeInOut',[
-    state('void',style({'opacity' : '0.0'})),
+    state('void',style({'opacity' : '0.33'})),
     state('*',style({'opacity' : '1.0'})),
     transition('void => *',[
-      style({'opacity':'0.0'}),
-      animate('150ms',style({'opacity':'1.0'}))
+      style({'opacity':'0.32'}),
+      animate('550ms',style({'opacity':'1.0'}))
     ]),
     transition('* => void',[
       style({'opacity':'1.0'}),
-      animate('150ms',style({'opacity':'0.0'}))
+      animate('550ms',style({'opacity':'0.31'}))
     ])
   ])
 
+/* TODO investigate why the -12 top margin is required */
 export const animateCollapseShow = 
   trigger('animateCollapseShow',[
     state('collapse',style({
@@ -25,13 +26,13 @@ export const animateCollapseShow =
       'height':'*'
     })),
     transition('collapse => show',[
-      animate('100ms',style({
+      animate('200ms 100ms ease-out',style({
         'transform':'translateY(0px)',
         'height':'*'
       }))
     ]),
     transition('show => collapse',[
-      animate('100ms',style({
+      animate('200ms 100ms ease-in',style({
         'transform':'translateY(-100%)',
         'height':'0px'
       }))

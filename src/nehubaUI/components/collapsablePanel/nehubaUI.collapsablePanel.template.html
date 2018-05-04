@@ -1,0 +1,29 @@
+<div id = "collapsable-panel" class = "panel panel-default">
+  <div 
+    (click)="toggleShow()" 
+    class = "panel-heading">
+
+    <i *ngIf = "!renderContent" class = "chevron glyphicon glyphicon-chevron-right"></i>
+    <i *ngIf = "renderContent" class = "chevron glyphicon glyphicon-chevron-down"></i>
+    <span [innerHTML]="title">
+    </span>
+    
+    <property-widget 
+      (dismiss) = "dismiss.emit(true)"
+      *ngIf = "propertyWidget" 
+      [inputComponent]="propertyWidget">
+
+    </property-widget>
+  </div>
+
+  <div id = "panelBodyContainer">
+    <div 
+      (@animateCollapseShow.done) = "animationEnd()"
+      [@animateCollapseShow] = "panelShow ? 'show' : 'collapse'" 
+      class = "panel-body">
+      <ng-content *ngIf = "renderContent">
+
+      </ng-content>
+    </div>
+  </div>
+</div>

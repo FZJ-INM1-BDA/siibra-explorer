@@ -1,8 +1,13 @@
 <div [ngClass]="{darktheme : darktheme}" bannerContainer >
+  <!-- logo -->
   <img 
     [src] = "darktheme ? hbpimgdark : hbpimg" 
     hbplogo/>
+
+  <!-- body -->
   <div  textContainer>
+
+    <!-- template selector -->
     <div 
       container = "body"
       dropdown
@@ -40,6 +45,7 @@
       </ul>
     </div>
     
+    <!-- parcellationn selector  -->
     <div 
       *ngIf = "mainController.selectedTemplate"
       container = "body"
@@ -79,39 +85,7 @@
       </ul>
     </div>
 
-    <div 
-      *ngIf = "mainController.selectedTemplate"
-      [outsideClick] = "true"
-      containerClass = "inputModeSearchContainer"
-      placement = "bottom"
-      triggers = "focus"
-      #inputSearchActivitiesPopover = "bs-popover"
-      [popover] = "searchMode"
-      inputSearchRegion>
-
-      <div 
-        class = "app-input-group" 
-        modeSelector>
-
-        <span 
-          *ngIf = "searchActivityTerm==''" 
-          class = "app-input-placeholder" 
-          [ngStyle]="{'z-index':focusModeSelector ? 0 : 2}">
-          <small>Mode</small>
-          <small class = "text-muted">{{mainController.viewingMode ? mainController.viewingMode : 'Select atlas regions' }}</small>
-        </span>
-        <input 
-          type = "text"
-          (click) = "inputSearchActivitiesPopover.show()"
-          (focus) = "inputSearchActivitiesPopover.show()"
-          [(ngModel)]="searchActivityTerm"
-          class = "form-control" 
-          (keydown.esc) = "inputSearchActivitiesPopover.hide();clearSearchActivityTerm();$event.target.blur()"
-          (keydown.enter) = "inputSearchActivitiesPopover.hide();selectViewingMode();$event.target.blur()" />
-      </div>
-        
-    </div>
-
+    <!-- search region -->
     <div 
       *ngIf = "mainController.selectedTemplate && !widgetiseSearchRegion"
       class = "input-group" 
@@ -136,6 +110,7 @@
         </div>
     </div>
 
+    <!-- plugins (in the future) -->
     <span 
       class = "btn btn-default"
       btnCustom
@@ -146,11 +121,29 @@
       {{ labcomponent.name.split('.')[2][0] }}
     </span>
 
-    <span 
-      glyphiconShowHelp 
-      (click)="showhelp()" 
-      [ngClass]="{darktheme : darktheme}" 
-      class = "helpbtn glyphicon glyphicon-question-sign">
+    <!-- dedicated viewing mode clear -->
+    <span
+      *ngIf = "dedicatedView">
+      <i 
+        placement = "bottom"
+        [tooltip] = "'displaying:\n' + dedicatedView.split('/')[dedicatedView.split('/').length-1]"
+        class = "helpbtn glyphicon glyphicon-blackboard">
+      </i>
+      <span
+        class = "btn btn-link"
+        (click) = "clearDedicatedView()">
+        Clear
+      </span>
+    </span>
+
+    <!-- help icon -->
+    <span>
+      <span 
+        glyphiconShowHelp 
+        (click)="showhelp()" 
+        [ngClass]="{darktheme : darktheme}" 
+        class = "helpbtn glyphicon glyphicon-question-sign">
+      </span>
     </span>
   </div>
 </div>
@@ -168,32 +161,6 @@
 
     </atlascontrol>
   </div>
-</ng-template>
-
-<ng-template #searchMode>
-  <ul
-    [@animationFadeInOut]
-    id = "modeSelector"
-    [ngClass] = "{'darktheme':mainController.darktheme}"
-    listOfActivities>
-    <li 
-      [ngClass] = "{'selected':mainController.viewingMode == activity || (!mainController.viewingMode && activity == 'Select atlas regions')}"
-      role = "menuitem"
-      *ngFor = "let activity of mainController.regionsLabelIndexMap | mapToValuePipe | concatFlattenArrayPipe | uniquefyPipe | prependNavigatePipe : mainController.selectedTemplate  | searchPipe : searchActivityTerm">
-      
-      <a class = "dropdown-item"
-        (mousedown) = "selectViewingMode(activity)"
-        [innerHTML] = "activity | searchHighlight : searchActivityTerm ">
-      
-      </a>
-      <i
-        (click) = "modalDataset = mainController.selectedTemplate[activity];showModeInfo(activity)"
-        *ngIf = "mainController.selectedTemplate[activity]" 
-        class = "info">
-        <i class = "glyphicon glyphicon-info-sign"></i>
-      </i>
-    </li>
-  </ul>
 </ng-template>
 
 <ng-template #modeInfo>

@@ -338,16 +338,23 @@ div#ATLASContainer
     DockedWidgetContainer
     {
 
-      .panel
+      > ng-component
       {
-        .panel-heading
+        > .panel
         {
-          padding-top:0.5em;
-          padding-bottom:0.5em;
 
-          .glyphicon
+          > .panel-heading
           {
-            font-size:0.8em;
+            padding-top:0.5em;
+            padding-bottom:0.5em;
+  
+            > .close
+            {
+              > .glyphicon
+              {
+                font-size:0.8em;
+              }
+            } 
           }
         }
       }
@@ -706,6 +713,18 @@ div#ATLASContainer.darktheme
         &.btn-danger
         {
           border:1px solid rgba(235,204,209,0.5);
+        }
+        &.btn-link
+        {
+          border:none;
+          background:none;
+          color : #94b6d3;
+
+          &:hover
+          {
+            background:none;
+            color : #337ab7;
+          }
         }
         &:hover{
           background-color:gray(0.35);

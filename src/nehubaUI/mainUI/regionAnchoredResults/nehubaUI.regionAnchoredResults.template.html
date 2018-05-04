@@ -1,0 +1,38 @@
+<div class = "dataBrowserHeader">
+  <span id = "selectedRegionSummary">
+    {{ selectedRegionsLength == 0 ? 'No ' : selectedRegionsLength }} region{{ selectedRegionsLength == 1 ? '' : 's' }} selected. 
+    {{ selectedRegionsLength == 0 ? 'Listing all datasets.' : '' }}
+  </span>
+  <a 
+    *ngIf = "selectedRegionsLength > 0"
+    class = "btn btn-link" 
+    (click)="clearAllSelectedRegions()">
+    clear all
+  </a>
+</div>
+<div id = "filter" class = "well">
+  <div>
+    Filter
+  </div>
+  <small (click)="toggleEnable(type)" *ngFor = "let type of filterSearchResultbyType">
+    <i *ngIf = "type.enabled" class = "glyphicon glyphicon-check"></i>
+    <i *ngIf = "!type.enabled" class = "glyphicon glyphicon-unchecked"></i>
+    {{ type.name }}
+  </small>
+</div>
+<div>
+  <a (click)="collapseAll()" class = "btn btn-link">collapse all</a>
+  <a (click)="expandAll()" class = "btn btn-link">expand all</a>
+</div>
+<nehubaui-searchresult-ui-list
+  [searchResultObjects]="searchResultObjects"
+  [filterSearchResultbyType]="filterSearchResultbyType"
+  *ngIf = "renderFullList">
+
+</nehubaui-searchresult-ui-list>
+
+<selected-region-list 
+  [searchResultObjects]="searchResultObjects"
+  [filterSearchResultbyType]="filterSearchResultbyType"
+  *ngIf = "renderRegionFilter">
+</selected-region-list>
