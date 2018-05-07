@@ -30,7 +30,7 @@ import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component'
 import { PropertyWidget } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component'
 import { RegionAnchoredResults } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.regionAnchoredResults.component'
 import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
-import { SelectedRegionList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
+import { SelectedRegionList,FilterRegionsByDatasetCount } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
 import { DedicatedViewController } from 'nehubaUI/mainUI/fileViewer/fileViewerDedicatedView.component'
 import { SearchResultUIFileFolders,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe } from 'nehubaUI/mainUI/searchResultUI/searchResultUIFileFolders.component'
 
@@ -73,7 +73,9 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective,
+    [ 
+    FilterRegionsByDatasetCount,  
+    DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective,
     FilterDatasetSearchResult,SearchResultUIFileFolders ,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe,
     DedicatedViewController,SearchResultPaginationPipe,PaginationComponent,
     CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,

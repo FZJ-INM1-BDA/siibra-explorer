@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Input, ViewChildren } from '@angular/core'
+import { Component, OnDestroy, Input, ViewChildren, PipeTransform, Pipe } from '@angular/core'
 
 import template from './nehubaUI.selectedRegionListResults.template.html'
 import { MainController, MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
@@ -62,3 +62,15 @@ export class SelectedRegionList implements OnDestroy{
   }
 }
 
+@Pipe({
+  name : 'filterRegionByDatasetCount'
+})
+
+export class FilterRegionsByDatasetCount implements PipeTransform{
+  
+  public transform(regions:RegionDescriptor[],searchResultInterface:{name : string, enabled : boolean}[]){
+
+    const pipe = new FilterDatasetSearchResult()
+    return regions.filter(re=>pipe.transform(re.datasets,searchResultInterface).length > 0)
+  }
+}

@@ -1,5 +1,5 @@
 <collapsable-panel
-  *ngFor = "let region of selectedRegions"
+  *ngFor = "let region of selectedRegions | filterRegionByDatasetCount : filterSearchResultbyType"
   (dismiss)="onDismiss(region)"
   [title] = "renderRegionName(region)"
   [propertyWidget] = "Object.assign(region,{dismiss:true})">
