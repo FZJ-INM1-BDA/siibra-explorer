@@ -62,6 +62,24 @@ export class NehubaViewerInnerContainer {
     )
   }
 
+  
+
+  public setPerspectiveZoom = (zoom:number)=>{
+    this.nehubaViewerComponent.perspectiveZoom(zoom,0)
+  }
+
+  public moveToPerspectiveZoom = (zoom:number)=>{
+    this.nehubaViewerComponent.perspectiveZoom(zoom,300)
+  }
+
+  public setSliceViewZoom = (zoom:number)=>{
+    this.nehubaViewerComponent.sliceZoom(zoom,0)
+  }
+
+  public moveToSliceZoom = (zoom:number)=>{
+    this.nehubaViewerComponent.sliceZoom(zoom,300)
+  }
+
   /**
    * Teleport to new location
    */
@@ -70,23 +88,23 @@ export class NehubaViewerInnerContainer {
   }
 
   /**
-   * teleport to a new orientation
-   */
-  public setNavigationOrientation = (_ori:number[])=>{
-    /* waiting for proper api */
-    console.log('setNavitation ori has not yet been implemented')
-  }
-
-  public moveToNavigationOri = (_ori:number[])=>{
-    /* waiting for proper api */
-    console.log('movetoNavigation ori has not yet been implemented')
-  }
-  /**
    * Animation moving to new location
    */
   public moveToNavigationLoc = (loc:number[],realSpace?:boolean)=>{
     this.nehubaViewerComponent.navigate(loc,300,realSpace?realSpace:false)
   }
+
+  /**
+   * teleport to a new orientation
+   */
+  public setNavigationOrientation = (ori:number[])=>{
+    this.nehubaViewerComponent.obliqueRotate(ori,0)
+  }
+
+  public moveToNavigationOri = (ori:number[])=>{
+    this.nehubaViewerComponent.obliqueRotate(ori,300)
+  }
+
 
   private loadTemplate(nehubaViewerConfig:NehubaViewerConfig){
     if(this.templateLoaded){

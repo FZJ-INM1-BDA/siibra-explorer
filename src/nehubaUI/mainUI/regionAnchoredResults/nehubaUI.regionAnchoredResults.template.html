@@ -17,7 +17,16 @@
   <small (click)="toggleEnable(type)" *ngFor = "let type of filterSearchResultbyType">
     <i *ngIf = "type.enabled" class = "glyphicon glyphicon-check"></i>
     <i *ngIf = "!type.enabled" class = "glyphicon glyphicon-unchecked"></i>
-    {{ type.name }}
+    <span>
+      {{ type.name }}
+    </span>
+
+    <property-widget 
+      *ngIf = "getTypeMetadata(type.name)"
+      [title] = "'More information on ' + type.name"
+      [inputComponent]="getTypeMetadata(type.name)">
+
+    </property-widget >
   </small>
 </div>
 <div>

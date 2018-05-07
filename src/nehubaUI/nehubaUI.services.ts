@@ -14,6 +14,7 @@ import { MultilevelSelector } from 'nehubaUI/components/multilevel/nehubaUI.mult
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 import { Chart } from 'chart.js'
+import { HasPropertyInterface } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component';
 
 declare var window:{
   [key:string] : any
@@ -100,8 +101,11 @@ export class MainController{
         }break;
         case 'viewerState':{
           const [o,po,pz,p,z] = keyval[1].split('__')
-          console.log(o,po,pz,p,z)
-          console.log('pos',p)
+
+          INTERACTIVE_VIEWER.viewerHandle.setSliceViewZoom( Number(z) )
+          INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewZoom( Number(pz) )
+          INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewOrientation( po.split('_').map(n=>Number(n)) )
+          INTERACTIVE_VIEWER.viewerHandle.setNavigationOri( o.split('_').map(n=>Number(n)))
           INTERACTIVE_VIEWER.viewerHandle.setNavigationLoc( p.split('_').map(s=>Number(s)) ,true)
         }break;
       }
@@ -118,14 +122,18 @@ export class MainController{
     const message:any = {
       Error:['Your browser does not meet the minimum requirements to run neuroglancer.']
     }
+
     if(!gl){
       message['Detail'] = 'Your browser does not support WebGL.'
       
-      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
-      modalHandler.title = `<h4>Error</h4>`
-      modalHandler.body = message
-      modalHandler.footer = null
-      modalHandler.show()
+      /* TODO figure out a way to do without settimeout */
+      setTimeout(()=>{
+        const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
+      })
       return false
     }
     
@@ -133,17 +141,21 @@ export class MainController{
     const texturefloat = gl.getExtension('OES_texture_float')
     const indexuint = gl.getExtension('OES_element_index_uint')
     if( !(drawbuffer && texturefloat && indexuint) ){
-      const detail = `Your browser does not support 
-      ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
-      ${ !texturefloat ? 'OES_texture_float' : ''} 
-      ${ !indexuint ? 'OES_element_index_uint' : ''} `
-      message['Detail'] = [detail]
-      
-      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
-      modalHandler.title = `<h4>Error</h4>`
-      modalHandler.body = message
-      modalHandler.footer = null
-      modalHandler.show()
+
+      /* TODO figure out a way to do without settimeout */
+      setTimeout(()=>{
+        const detail = `Your browser does not support 
+        ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
+        ${ !texturefloat ? 'OES_texture_float' : ''} 
+        ${ !indexuint ? 'OES_element_index_uint' : ''} `
+        message['Detail'] = [detail]
+        
+        const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
+      })
       return false
     }
     return true
@@ -859,17 +871,11 @@ class DataService {
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json'
   ]
-  COLIN_JUBRAIN_PMAP_INFO = `res/json/colinJubrainPMap.json`
-  COLIN_IEEG_INFO = `res/json/colinIEEG.json`
-  COLIN_JUBRAIN_RECEPTOR_INFO = `res/json/colinJubrainReceptor.json`
+  // COLIN_JUBRAIN_PMAP_INFO = `res/json/colinJubrainPMap.json`
+  // COLIN_IEEG_INFO = `res/json/colinIEEG.json`
+  // COLIN_JUBRAIN_RECEPTOR_INFO = `res/json/colinJubrainReceptor.json`
 
 
-  // templateArray = [
-  //   'http://localhost:5080/res/json/bigbrain.json',
-  //   'http://localhost:5080/res/json/colin.json',
-  //   'http://localhost:5080/res/json/waxholmRatV2_0.json',
-  //   'http://localhost:5080/res/json/allenMouse.json'
-  // ]
 
   // COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
   // COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
@@ -885,23 +891,29 @@ class DataService {
   })
 
   fetchTemplatesData(templates:TemplateDescriptor[]):Promise<TemplateDescriptor[]>{
-    const arrPrm: Promise<TemplateDescriptor>[] = templates.map(template=>{
-      if(template.name!=`MNI Colin 27`){
-        return Promise.resolve(template)
-      }
-      return new Promise((resolve,reject)=>{
-        Promise.all([this.COLIN_JUBRAIN_PMAP_INFO,this.COLIN_IEEG_INFO,this.COLIN_JUBRAIN_RECEPTOR_INFO].map(url=>
-          this.fetchJson(url)))
-          .then(datas=>{
-            resolve(Object.assign({},template,{
-              'Cytoarchitectonic Probabilistic Map' : datas[0],
-              // 'iEEG Recordings' : datas[1],
-              'Receptor Data' : datas[2]
-            }) as TemplateDescriptor)
-          })
-          .catch(e=>reject(e))
-      })
-    })
+
+    const arrPrm : Promise<TemplateDescriptor>[] = templates.map(template=>Promise.resolve(template))
+
+    /* no longer required to fetch the metadata separately, as data are fetched from TEMP_SearchDatasetService */
+
+    // const arrPrm: Promise<TemplateDescriptor>[] = templates.map(template=>{
+    //   if(template.name!=`MNI Colin 27`){
+    //     return Promise.resolve(template)
+    //   }
+    //   return new Promise((resolve,reject)=>{
+    //     console.log('fetching colin jubrain pmap info etc')
+    //     Promise.all([this.COLIN_JUBRAIN_PMAP_INFO,this.COLIN_IEEG_INFO,this.COLIN_JUBRAIN_RECEPTOR_INFO].map(url=>
+    //       this.fetchJson(url)))
+    //       .then(datas=>{
+    //         resolve(Object.assign({},template,{
+    //           'Cytoarchitectonic Probabilistic Map' : datas[0],
+    //           // 'iEEG Recordings' : datas[1],
+    //           'Receptor Data' : datas[2]
+    //         }) as TemplateDescriptor)
+    //       })
+    //       .catch(e=>reject(e))
+    //   })
+    // })
     return new Promise((resolve,reject)=>{
       Promise.all(arrPrm)
         .then(templates=>resolve(templates))
@@ -1240,24 +1252,27 @@ export class MasterCollapsableController{
 }
 
 /**
- * currently only search for receptor data
+ * currently only search for receptor data and pmap
  */
 @Injectable()
 export class TEMP_SearchDatasetService{
   // returnedSearchResults : SearchResultInterface[] = []
 
   returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
+  searchResultMetadataMap : Map<string,HasPropertyInterface> = new Map()
   
   constructor(public mainController:MainController){
 
     Promise.all([
+      fetch('res/json/allAggregatedData.json').then(res=>res.json()),
       fetch('res/json/pmapsAggregatedData.json').then(res=>res.json()),
       fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
     ])
       .then(arr=>{
-        
+        const [ metadata, ...aggregateDataSets] = arr
+        this.searchResultMetadataMap = new Map(metadata)
         this.returnedSearchResultsBSubject.next(
-          arr
+          aggregateDataSets
             .reduce((acc,curr)=>
               acc.concat(...curr)
             ,[])

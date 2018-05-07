@@ -6,11 +6,11 @@ export const animationFadeInOut =
     state('*',style({'opacity' : '1.0'})),
     transition('void => *',[
       style({'opacity':'0.32'}),
-      animate('550ms',style({'opacity':'1.0'}))
+      animate('200ms',style({'opacity':'1.0'}))
     ]),
     transition('* => void',[
       style({'opacity':'1.0'}),
-      animate('550ms',style({'opacity':'0.31'}))
+      animate('200ms',style({'opacity':'0.31'}))
     ])
   ])
 

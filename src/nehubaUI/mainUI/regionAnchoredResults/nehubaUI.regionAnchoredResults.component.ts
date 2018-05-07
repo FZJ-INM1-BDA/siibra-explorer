@@ -45,7 +45,6 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   }
 
   ngAfterViewInit(){
-
     Observable
       .combineLatest(this.searchDatasetService.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
       .takeUntil(this.onDestroySubject)
@@ -59,6 +58,10 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
           return idx >= 0 ? acc : acc.concat({name : curr.type , enabled : true})
         },[] as {name:string,enabled:boolean}[])
       })
+  }
+
+  getTypeMetadata(type:string){
+    return this.searchDatasetService.searchResultMetadataMap.get(type)
   }
   
   animationDone(){

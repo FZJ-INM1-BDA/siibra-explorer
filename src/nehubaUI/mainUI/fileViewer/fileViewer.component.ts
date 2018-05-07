@@ -24,4 +24,10 @@ export class FileViewer implements OnChanges{
   transformRegionNameToRegionDescriptor(region:{regionName:string,relationship:string,moreInfo:string}):RegionDescriptor|undefined{
     return Array.from(this.mainController.regionsLabelIndexMap.values()).find(rd=>rd.name==region.regionName)
   }
+
+  get hasRelatedRegion(){
+    return this.searchResultFile.parentDataset.regionName ?
+      this.searchResultFile.parentDataset.regionName.filter((r:any)=>r.regionName!='none').length > 0 :
+      false
+  }
 }

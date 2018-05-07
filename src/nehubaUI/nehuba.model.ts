@@ -213,9 +213,9 @@ export class RegionDescriptor extends Multilevel{
         null
 
     //TODO pmapurl, properties url and receptorData
-    this.propertiesURL = json.PMapURL ? 
-      json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata2/${s.split(/\/|\./)[1]}.json`) : 
-      null
+    // this.propertiesURL = json.PMapURL ? 
+    //   json.PMapURL.replace(/PMaps\/.*?\.nii$/,(s:string)=>`metadata2/${s.split(/\/|\./)[1]}.json`) : 
+    //   null
 
     /* populate moreInfo array */
 

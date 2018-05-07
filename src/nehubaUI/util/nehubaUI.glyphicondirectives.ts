@@ -135,3 +135,24 @@ export class GlyphiconTooltipQuestionSignDirective extends TooltipDirective{
     this.ngOnInit()
   }
 }
+@Directive({
+  selector : '.glyphicon.glyphicon-info-sign'
+})
+
+export class GlyphiconTooltipInfoSignDirective extends TooltipDirective{
+  constructor(
+    public viewContainerRef:ViewContainerRef,
+    public rd : Renderer,
+    public elementRef:ElementRef,
+    public clf:ComponentLoaderFactory,
+  ){
+    super(viewContainerRef,rd,elementRef,clf,{
+      placement : 'bottom',
+      triggers : 'mouseenter:mouseleave',
+      container : 'body'
+    })
+
+    this.htmlContent = `more information`
+    this.ngOnInit()
+  }
+}

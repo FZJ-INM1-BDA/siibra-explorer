@@ -38,7 +38,6 @@ import css from './nehubaUI.multilevel.style.css'
     {
       flex: 0 1 auto;
       overflow:hidden;
-      display:flex;
       white-space:nowrap;
     }
 

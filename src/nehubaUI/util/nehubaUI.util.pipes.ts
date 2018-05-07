@@ -31,7 +31,9 @@ export class MultilevelSelectorVisiblePipe implements PipeTransform{
   }
 
   private iterate(m:Multilevel,searchTerm:string):boolean{
-    const regex = new RegExp(searchTerm,'gi')
+    /* https://stackoverflow.com/a/6969486/6059235 */
+    const escaptedString = searchTerm.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,'\\$&')
+    const regex = new RegExp(escaptedString,'gi')
     
     return m.children.length > 0 ? 
       regex.test(m.name) || m.children.some(mc=>this.iterate(mc,searchTerm)) :
@@ -57,7 +59,9 @@ export class SearchHighlight implements PipeTransform{
     if( !searchTerm || searchTerm == '' ){
       return string
     }else{
-      let sanitaized = searchTerm.replace(/[^\w\s]/gi, '')
+      
+    /* https://stackoverflow.com/a/6969486/6059235 */
+      let sanitaized = searchTerm.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,'\\$&')
       const nbsp = string.replace(/\s/gi,' ')
       this.regExp = new RegExp(sanitaized,'gi')
       return this.sanitizer.bypassSecurityTrustHtml( nbsp.replace(this.regExp,match=> `<span class = "highlight">${this.sanitizer.sanitize(SecurityContext.HTML,match)}</span>`))

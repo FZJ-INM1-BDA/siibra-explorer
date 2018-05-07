@@ -57,7 +57,13 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   loadTemplate(template:TemplateDescriptor){
-    if(this.mainController.selectedTemplate !== template) this.mainController.selectedTemplateBSubject.next(template)
+    if(this.mainController.selectedTemplate !== template) {
+      this.mainController.selectedTemplateBSubject.next(template)
+      
+      /* TODO when userselects a new template, they should hop out of special viewing mode, see #71 */
+      /* this is not a really elegant solution */
+      this.mainController.dedicatedViewBSubject.next(null)
+    }
   }
 
   loadParcellation(parcellation:ParcellationDescriptor){

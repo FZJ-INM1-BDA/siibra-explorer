@@ -49,7 +49,7 @@ import { PaginationComponent } from 'nehubaUI/components/pagination/nehubaUI.pag
 
 /* directive */
 import { RenderTemplateDirective } from 'nehubaUI/components/nehubaUI.renderTemplate.directive'
-import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective } from 'nehubaUI/util/nehubaUI.glyphicondirectives'
+import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective } from 'nehubaUI/util/nehubaUI.glyphicondirectives'
 
 /* util */
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
@@ -73,7 +73,7 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,
+    [ DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective,
     FilterDatasetSearchResult,SearchResultUIFileFolders ,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe,
     DedicatedViewController,SearchResultPaginationPipe,PaginationComponent,
     CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,

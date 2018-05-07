@@ -29,6 +29,15 @@ export class NehubaViewerContainer implements AfterViewInit{
     INTERACTIVE_VIEWER.viewerHandle.setNavigationLoc = (loc,real) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setNavigationLoc(loc,real))
     INTERACTIVE_VIEWER.viewerHandle.setNavigationOri = (ori) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.setNavigationOrientation(ori))
     
+    INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewOrientation = (ori) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.perspectiveRotate(ori,0))
+    INTERACTIVE_VIEWER.viewerHandle.moveToPerspectiveViewOrientation = (ori) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.perspectiveRotate(ori,300))
+
+    INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewZoom = (zoom)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.perspectiveZoom(zoom,0))
+    INTERACTIVE_VIEWER.viewerHandle.moveToPerspectiveViewZoom = (zoom)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.perspectiveZoom(zoom,300))
+    
+    INTERACTIVE_VIEWER.viewerHandle.setSliceViewZoom = (zoom) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.sliceZoom(zoom,0))
+    INTERACTIVE_VIEWER.viewerHandle.moveToSliceViewZoom = (zoom) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.nehubaViewerComponent.sliceZoom(zoom,300))
+
     INTERACTIVE_VIEWER.viewerHandle.hideSegment = (labelIndex) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.hideSegment(labelIndex))
     INTERACTIVE_VIEWER.viewerHandle.hideAllSegments = () => (this.checkViewerExist(),this.nehubaViewerInnerContainer.hideAllSegments())
     INTERACTIVE_VIEWER.viewerHandle.showSegment = (labelIndex) => (this.checkViewerExist(),this.nehubaViewerInnerContainer.showSegment(labelIndex))
