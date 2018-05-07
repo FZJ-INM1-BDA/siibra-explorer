@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core'
+import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core'
 
 import template from './nehubaUI.radar.chart.template.html'
 import css from './nehubaUI.radar.chart.style.css'
@@ -10,6 +10,8 @@ import { Color } from 'ng2-charts';
   styles : [ css ],
 })
 export class NehubaRadarChart implements OnChanges{
+
+  @ViewChild('canvas') canvas : ElementRef
   /**
    * labels of each of the columns, spider web edges
    */
@@ -81,7 +83,8 @@ export class NehubaRadarChart implements OnChanges{
     },
     color : [{
       backgroundColor : `rgba(255,255,255,0.2)`
-    }]
+    }],
+    animation : false
   }
 
   chartDataset : DatasetInterface = {

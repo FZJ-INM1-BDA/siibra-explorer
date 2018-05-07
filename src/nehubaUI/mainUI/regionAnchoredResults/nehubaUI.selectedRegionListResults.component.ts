@@ -53,4 +53,12 @@ export class SelectedRegionList implements OnDestroy{
     const pipe = new FilterDatasetSearchResult()
     return ` <small class = "text-muted">(${region.datasets ? pipe.transform(region.datasets,this.filterSearchResultbyType).length : '0'})</small>`
   }
+
+  renderRegionName(region:RegionDescriptor){
+    const pipe = new FilterDatasetSearchResult()
+    return pipe.transform(region.datasets,this.filterSearchResultbyType).length > 0 ? 
+      `<span>${region.name}${this.renderRegionDatasetCount(region)}</span>`:
+      `<del class = "text-muted">${region.name}${this.renderRegionDatasetCount(region)}</del>` 
+  }
 }
+

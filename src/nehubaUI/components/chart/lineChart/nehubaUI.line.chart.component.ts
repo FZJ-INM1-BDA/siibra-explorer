@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core'
+import { Component, Input, OnChanges, ElementRef, ViewChild } from '@angular/core'
 import {  DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption } from '../chartInterfaces'
 
 import template from './nehubaUI.line.chart.template.html'
@@ -11,6 +11,8 @@ import { Color } from 'ng2-charts';
   styles : [ css ],
 })
 export class NehubaLineChart implements OnChanges{
+  @ViewChild('canvas') canvas : ElementRef
+
   /**
    * labels of each of the columns, spider web edges
    */

@@ -1,21 +1,22 @@
 <div class = "moreInfo">
   
-    <!-- associated regions -->
-    <div *ngIf = "hasRelatedRegion">
-      Associated regions:
-      <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
-        {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
-        <property-widget
-          *ngIf = "transformRegionNameToRegionDescriptor(regionname)"
-          [inputComponent]="transformRegionNameToRegionDescriptor(regionname)">
+  <!-- associated regions -->
+  <div *ngIf = "hasRelatedRegion">
+    Associated regions:
+    <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
+      {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
+      <property-widget
+        *ngIf = "transformRegionNameToRegionDescriptor(regionname)"
+        [inputComponent]="transformRegionNameToRegionDescriptor(regionname)">
+
+      </property-widget>
+    </small>
+  </div>
+  <div *ngIf = "!hasRelatedRegion">
+    Not associated with any regions.
+  </div>
   
-        </property-widget>
-      </small>
-    </div>
-    <div *ngIf = "!hasRelatedRegion">
-      Not associated with any regions.
-    </div>
-  
+  <!-- More info panel -->
   <div>
     <span>
       More information about this data:
@@ -27,6 +28,7 @@
     </property-widget>
   </div>
   
+  <!-- More info panel -->
   <div *ngIf = "searchResultFile.parentDataset">
     <span>
       This is part of the dataset {{ searchResultFile.parentDataset.name }}
@@ -36,11 +38,10 @@
       [title]="'More information on ' + searchResultFile.parentDataset.name">
   
     </property-widget>
-
   </div>
-      
 </div>
 
+<!-- file viewer -->
 <div 
   *ngIf = "searchResultFile"
   [ngSwitch]="searchResultFile.mimetype">
@@ -50,6 +51,7 @@
   </div>
   <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
     <radar-chart
+      #childChart
       [colors] = "searchResultFile.data.colors"
       [options] = "searchResultFile.data.chartOptions"
       [labels]="searchResultFile.data.labels"
@@ -58,6 +60,7 @@
 
     </radar-chart>
     <line-chart
+      #childChart
       [colors] = "searchResultFile.data.colors"
       [options] = "searchResultFile.data.chartOptions"
       [lineDatasets] = "searchResultFile.data.datasets"
@@ -77,4 +80,12 @@
   <div *ngSwitchDefault>
     The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
   </div>
+</div>
+
+<div *ngIf = "downloadUrl">
+  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link">Download File</a>
+</div>
+
+<div *ngIf = "downloadPng">
+  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link">Download Chart as Image</a>
 </div>

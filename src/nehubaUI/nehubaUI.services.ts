@@ -1302,6 +1302,19 @@ export class TEMP_SearchDatasetService{
      * Because there is no easy way to display standard deviation natively, use a plugin 
      * */
     Chart.pluginService.register({
+
+      /* patching background color fill, so saved images do not look completely white */
+      beforeDraw: (chart)=>{
+        const ctx = chart.ctx as CanvasRenderingContext2D;
+        ctx.fillStyle = this.mainController.darktheme ? 
+          `rgba(50,50,50,0.8)` :
+          `rgba(255,255,255,0.8)`
+          
+        if(chart.canvas)ctx.fillRect(0,0,chart.canvas.width,chart.canvas.height)
+        
+      },
+
+      /* patching standard deviation for polar (potentially also line/bar etc) graph */
       afterInit : function(chart){
         if(chart.config.options && chart.config.options.tooltips){
           
