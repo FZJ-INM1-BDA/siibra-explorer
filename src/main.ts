@@ -33,3 +33,5 @@ platformBrowserDynamic().bootstrapModule(NehubaUI);
 
 const requireAll = (r:any) => {r.keys().forEach(r)}
 requireAll(require.context('./assets/json/',false, /.json$/))
+requireAll(require.context('./assets/pdf/',false,/.pdf$/))
+requireAll(require.context('./assets/receptor',true,/.jpg$/))

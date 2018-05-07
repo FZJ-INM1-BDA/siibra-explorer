@@ -2,7 +2,7 @@ import { Component, Input, OnChanges } from '@angular/core'
 
 import template from './nehubaUI.radar.chart.template.html'
 import css from './nehubaUI.radar.chart.style.css'
-import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface } from 'nehubaUI/components/chart/chartInterfaces';
+import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption } from 'nehubaUI/components/chart/chartInterfaces';
 import { Color } from 'ng2-charts';
 @Component({
   selector : `radar-chart`,
@@ -24,6 +24,8 @@ export class NehubaRadarChart implements OnChanges{
    * colors of the datasetes
   */
   @Input() colors : ChartColor[] = []
+
+  @Input() options : any
 
   mousescroll(_ev:MouseWheelEvent){
 
@@ -103,6 +105,7 @@ export class NehubaRadarChart implements OnChanges{
         },0))
     },0)
 
+    applyOption(this.chartOption,this.options)
     // this.colors = [
     //   {
     //     borderColor : 'rgba(255,255,255,1)'

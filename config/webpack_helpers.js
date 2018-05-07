@@ -89,6 +89,17 @@ function modifyViewerOptions(options) {
     }]
   }
 
+  let rulePdf = {
+    test : /.pdf$/,
+    use : [{
+      loader : 'file-loader',
+      options : {
+        name : '[name].[ext]',
+        outputPath : 'res/pdf/'
+      }
+    }]
+  }
+
   const compareRegex = (r1,r2)=>(r1 instanceof RegExp) && (r2 instanceof RegExp)
     && r1.source == r2.source  
 
@@ -110,6 +121,7 @@ function modifyViewerOptions(options) {
     baseConfig.module.rules.push(ruleJson)
 
     baseConfig.module.rules.push(ruleImage)
+    baseConfig.module.rules.push(rulePdf)
   }
   options.frontendPlugins = [ extractSass ]
   return options;
