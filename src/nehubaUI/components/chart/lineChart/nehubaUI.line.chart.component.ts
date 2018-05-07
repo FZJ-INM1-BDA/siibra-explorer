@@ -97,7 +97,6 @@ export class NehubaLineChart implements OnChanges{
   shapedLineChartDatasets : ChartDataSets[]
   
   ngOnChanges(){
-    this.colors = this.colors.map(c=>Object.assign({},c,{borderColor:'rgba(255,255,255,0.8)'}))
     this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
       data : lineDataset.data.map((v,idx)=>({
         x : idx,

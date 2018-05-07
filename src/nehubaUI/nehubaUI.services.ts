@@ -100,7 +100,7 @@ export class MainController{
         }break;
         case 'viewerState':{
           const [o,po,pz,p,z] = keyval[1].split('__')
-          
+
           INTERACTIVE_VIEWER.viewerHandle.setSliceViewZoom( Number(z) )
           INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewZoom( Number(pz) )
           INTERACTIVE_VIEWER.viewerHandle.setPerspectiveViewOrientation( po.split('_').map(n=>Number(n)) )
@@ -121,14 +121,18 @@ export class MainController{
     const message:any = {
       Error:['Your browser does not meet the minimum requirements to run neuroglancer.']
     }
+
     if(!gl){
       message['Detail'] = 'Your browser does not support WebGL.'
       
-      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
-      modalHandler.title = `<h4>Error</h4>`
-      modalHandler.body = message
-      modalHandler.footer = null
-      modalHandler.show()
+      /* TODO figure out a way to do without settimeout */
+      setTimeout(()=>{
+        const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
+      })
       return false
     }
     
@@ -136,17 +140,21 @@ export class MainController{
     const texturefloat = gl.getExtension('OES_texture_float')
     const indexuint = gl.getExtension('OES_element_index_uint')
     if( !(drawbuffer && texturefloat && indexuint) ){
-      const detail = `Your browser does not support 
-      ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
-      ${ !texturefloat ? 'OES_texture_float' : ''} 
-      ${ !indexuint ? 'OES_element_index_uint' : ''} `
-      message['Detail'] = [detail]
-      
-      const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
-      modalHandler.title = `<h4>Error</h4>`
-      modalHandler.body = message
-      modalHandler.footer = null
-      modalHandler.show()
+
+      /* TODO figure out a way to do without settimeout */
+      setTimeout(()=>{
+        const detail = `Your browser does not support 
+        ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
+        ${ !texturefloat ? 'OES_texture_float' : ''} 
+        ${ !indexuint ? 'OES_element_index_uint' : ''} `
+        message['Detail'] = [detail]
+        
+        const modalHandler = <ModalHandler>INTERACTIVE_VIEWER.uiHandle.modalControl.getModalHandler()
+        modalHandler.title = `<h4>Error</h4>`
+        modalHandler.body = message
+        modalHandler.footer = null
+        modalHandler.show()
+      })
       return false
     }
     return true
@@ -155,10 +163,10 @@ export class MainController{
   init(){
 
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('http://localhost:5080/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
 
     this.dataService.fetchTemplates
       .then((this.dataService.fetchTemplatesData).bind(this.dataService))
