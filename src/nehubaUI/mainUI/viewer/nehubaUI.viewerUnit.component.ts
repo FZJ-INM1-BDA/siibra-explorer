@@ -111,11 +111,15 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     this.mainController.selectedTemplateBSubject
       .takeUntil(this.destroySubject)
       .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
-      .subscribe(()=>{
+      .subscribe((template)=>{
         
         this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
         this.widgetComponent.changeState('docked')
+
+        /* spatial query on tempalte select */
+        this.spatialSearch.querySpatialData(this.viewerPosReal as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
+    
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
@@ -169,6 +173,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
             name : 'nehubaNifti'
           })
         }
+
+        
         
         // if(mode == 'Cytoarchitectonic Probabilistic Map'){
         //   /* turn off the visibility of all pmaps first */
@@ -277,16 +283,19 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       })
     
     Observable
-      .from(this.nehubaViewer.navigationState.position.inRealSpace)
+      .combineLatest(
+        this.nehubaViewer.navigationState.position.inRealSpace,
+        this.mainController.selectedTemplateBSubject)
       .takeUntil(this.destroySubject)
-      .subscribe((pos:any)=>{
+      .subscribe((arr:any)=>{
+        const [pos,template] = arr
         this.viewerPosReal = pos
 
         /* spatial query */
         const container = (<HTMLElement>this.viewerContainer.nativeElement)
         this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
         /* width in mm */
-        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
     
     Observable
@@ -305,16 +314,19 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .subscribe((ori:any)=>this.perspectiveOri=ori)
     
     Observable
-      .from(this.nehubaViewer.navigationState.sliceZoom)
+      .combineLatest(
+        this.nehubaViewer.navigationState.sliceZoom,
+        this.mainController.selectedTemplateBSubject)
       .takeUntil(this.destroySubject)
-      .subscribe((zoom:any)=>{
+      .subscribe((arr:any)=>{
+        const [zoom, template] = arr
         this.sliceViewZoom = zoom
       
         /* spatial query */
         const container = (<HTMLElement>this.viewerContainer.nativeElement)
         this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
         /* width in mm */
-        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
 
     Observable

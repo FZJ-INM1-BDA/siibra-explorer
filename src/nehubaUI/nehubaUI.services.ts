@@ -721,38 +721,45 @@ export class SpatialSearch{
   center : [number,number,number]
   width : number
   templateSpace : string
-  spatialSearchResultSubject : Subject<any> = new Subject()
+  spatialSearchResultSubject : BehaviorSubject<any> = new BehaviorSubject(null)
 
   constructor(private mainController:MainController,private landmarkServices:LandmarkServices){
     this.spatialSearchResultSubject
+      .filter( v => v !== null )
+      .filter( v => !isNaN(v.width ))
       .throttleTime(300)
       .subscribe(({center,width,templateSpace})=>
         this.spatialSearch(center,width,templateSpace)
-          .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
+          .then((data:any)=>(console.log(data),this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
+
     this.mainController.resultsFilterBSubject
       .subscribe(_filterResults=>{
 
       })
 
+    Observable.from(this.mainController.selectedTemplateBSubject)
+      .skip(1)
+      .subscribe(()=>{
+        this.landmarkServices.clearAllLandmarks()
+      })
+    // this.mainController.selectedTemplateBSubject.subscribe(()=>
+    //   this.landmarkServices.clearAllLandmarks())
   }
 
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
-  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (_center,_width,_templateSpace)=>
+  querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
   {
     /* TODO ipmlement spatial search in revamp of search result */
 
+    this.spatialSearchResultSubject.next({center,width,templateSpace})
     // if(this.mainController.viewingMode == 'iEEG Recordings')
     //   this.spatialSearchResultSubject.next({center,width,templateSpace})
   }
 
   /* promise race timeout (?) */
   spatialSearch(center:[number,number,number],width:number,templateSpace:string){
-
-    if(isNaN(width)){
-      return Promise.reject('width is not a number')
-    }
 
     this.center = center
     this.width = width
@@ -773,14 +780,16 @@ export class SpatialSearch{
     url.searchParams.append('rows',this.RESULTS_PER_PAGE.toString())
     
     /* TODO future for template space? */
-    const filterTemplateSpace = templateSpace == 'Colin 27' ? 
+    const filterTemplateSpace = templateSpace == 'MNI Colin 27' ? 
       'datapath:metadata/sEEG-sample.json' :
-        templateSpace == 'Waxholm Rat' ?
+        templateSpace == 'Waxholm Rat V2.0' ?
         'datapath:metadata/OSLO_sp_data_rev.json' :
-          null
+          null;
 
     if(filterTemplateSpace){
       url.searchParams.append('fq',filterTemplateSpace)
+    }else{
+      return Promise.resolve({})
     }
     url.searchParams.append('fq',`geometry.coordinates:[${center.map(n=>n-width).join(',')}+TO+${center.map(n=>n+width).join(',')}]`)
     const fetchUrl = url.toString().replace(/\%2B/gi,'+')
@@ -792,6 +801,10 @@ export class SpatialSearch{
 
 
   parseSpatialQuery = (data:any)=>{
+    if(!data.response){
+      /* empty response */
+      return
+    }
     this.numHits = data.response.numFound
     this.pagination = data.response.start / this.RESULTS_PER_PAGE
     // this.clearAllLandmarks()
@@ -975,8 +988,6 @@ class DataService {
       // }break;
     }
   }
-
-  sptialPagination : number = 0
 
 }
 
@@ -1246,7 +1257,6 @@ POLYGONS 20 80
 export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA","BZ","D1","GABAA","GABAB","kainate","M1","M2","M3","mGluR2_3","NMDA"]
 
 @Injectable()
-
 export class MasterCollapsableController{
   expandBSubject : BehaviorSubject<boolean> = new BehaviorSubject(false)
 }
