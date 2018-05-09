@@ -38,3 +38,8 @@ div.regionLink > property-widget
   flex : 0 0 auto;
   padding:0 1em;
 }
+
+hr
+{
+  margin:0.2em 1em;
+}

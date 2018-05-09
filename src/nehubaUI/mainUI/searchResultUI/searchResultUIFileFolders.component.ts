@@ -65,23 +65,42 @@ export class SearchResultFilesFolderHeirachyPipe implements PipeTransform{
     return files
       .filter(f=>f.filename.indexOf('/')>0)
       .reduce((acc,curr)=>{
-        const idx = curr.filename.indexOf('/')
+
+        /* escape the backslashes in filename */
+        const idx = this.findRealIndex(curr.filename)
+        
         const dirname = curr.filename.slice(0,idx)
-        return acc.findIndex(obj=>obj.title == dirname) >= 0 ?
+        return acc.findIndex(obj=>obj.title == this.getRealName(dirname)) >= 0 ?
           acc
             .map(obj=>{
-              return obj.title == dirname ?
+              return obj.title == this.getRealName(dirname) ?
                 Object.assign({},obj,{files:obj.files.concat(this.sliceName(curr))}) : 
                 obj
             }) :
           acc.concat({
-            title : dirname,
+            title : this.getRealName(dirname),
             files : [this.sliceName(curr)]
           })
       },[] as {title:string,files:SearchResultFileInterface[]}[])
   }
 
   private sliceName(file:SearchResultFileInterface):SearchResultFileInterface{
-    return Object.assign({},file,{filename:file.filename.slice(file.filename.indexOf('/')+1)})
+    return Object.assign({},file,
+      {
+        filename:file.filename.slice(this.findRealIndex(file.filename)+1)
+      })
+  }
+
+  private findRealIndex(filename:string):number{
+
+    let idx = filename.indexOf('/')
+    while(filename[idx-1] === '\\' && idx >= 0){
+      idx = filename.indexOf('/',idx + 1)
+    }
+    return idx
+  }
+
+  private getRealName(filename:string):string{
+    return filename.replace(/\\\//g,'/')
   }
 }

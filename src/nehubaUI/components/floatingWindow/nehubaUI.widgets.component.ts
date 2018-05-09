@@ -692,6 +692,7 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   template :
   `
   <div
+    id = "dockedWidgetUnit"
     class = "panel"
     [ngClass] = "{'panel-default':!successClassState, 'panel-success':successClassState}"
     (mousedown) = "stopBlink()" dockedWidgetUnit>
@@ -737,10 +738,10 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   `,
   styles : [
     `
-    div[dockedWidgetUnit]
+    div[dockedWidgetUnit]#dockedWidgetUnit
     {
       border-radius: 0px;
-      margin-bottom: 0px;
+      margin-bottom: 1px;
     }
 
     div.panel-heading

@@ -15,9 +15,26 @@
   <div *ngIf = "!hasRelatedRegion">
     Not associated with any regions.
   </div>
+
+  <hr />
   
   <!-- More info panel -->
-  <div>
+  <div *ngIf = "searchResultFile.parentDataset">
+    <span>
+      This is part of the dataset {{ searchResultFile.parentDataset.name }}
+    </span>
+    <property-widget
+      *ngIf = "false"
+      [inputComponent]="searchResultFile.parentDataset"
+      [title]="'More information on ' + searchResultFile.parentDataset.name">
+  
+    </property-widget>
+  </div>
+  
+  <hr />
+
+  <!-- More info panel -->
+  <div *ngIf = "false">
     <span>
       More information about this data:
     </span>
@@ -28,17 +45,6 @@
     </property-widget>
   </div>
   
-  <!-- More info panel -->
-  <div *ngIf = "searchResultFile.parentDataset">
-    <span>
-      This is part of the dataset {{ searchResultFile.parentDataset.name }}
-    </span>
-    <property-widget
-      [inputComponent]="searchResultFile.parentDataset"
-      [title]="'More information on ' + searchResultFile.parentDataset.name">
-  
-    </property-widget>
-  </div>
 </div>
 
 <!-- file viewer -->
@@ -49,6 +55,8 @@
     <!-- TODO figure out a more elegant way of dealing with draggable img -->
     <img draggable = "false" [src] = "searchResultFile.url" />
   </div>
+
+  <!-- data container -->
   <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
     <radar-chart
       #childChart
@@ -81,6 +89,13 @@
     The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
   </div>
 </div>
+
+<!-- caption -->
+<readmoreComponent *ngIf = "searchResultFile.properties.description">
+  <small id = "captions">
+    {{ searchResultFile.properties.description }}
+  </small>
+</readmoreComponent>
 
 <div *ngIf = "downloadUrl">
   <a [href]="downloadUrl" target = "_blank" class = "btn btn-link">Download File</a>

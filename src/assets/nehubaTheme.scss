@@ -116,7 +116,7 @@ div#ATLASContainer
     overflow:hidden;
 
     background-color:gray(0.95);
-    box-shadow: 0 4px 6px 0 tgray(0,0.12);
+    // box-shadow: 0 4px 6px 0 tgray(0,0.12);
 
     .panel-heading
     {
@@ -136,20 +136,20 @@ div#ATLASContainer
       background:none;
 
       position:relative;
-      &:before
-      {
-        display : block;
-        z-index : 9;
-        content : ' ';
-        position:absolute;
-        width:100%;
-        height:100%;
-        top:0px;
-        left:0px;
-        pointer-events: none;
+      // &:before
+      // {
+      //   display : block;
+      //   z-index : 9;
+      //   content : ' ';
+      //   position:absolute;
+      //   width:100%;
+      //   height:100%;
+      //   top:0px;
+      //   left:0px;
+      //   pointer-events: none;
 
-        background-color:tgray(0,0.1);
-      }
+      //   background-color:tgray(0,0.1);
+      // }
     }
   }
 
