@@ -29,7 +29,7 @@ import { SearchResultUI } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.co
 import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component'
 import { PropertyWidget } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component'
 import { RegionAnchoredResults } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.regionAnchoredResults.component'
-import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
+import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult,GroupDatasetByRegion } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
 import { SelectedRegionList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
 import { DedicatedViewController } from 'nehubaUI/mainUI/fileViewer/fileViewerDedicatedView.component'
 import { SearchResultUIFileFolders,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe } from 'nehubaUI/mainUI/searchResultUI/searchResultUIFileFolders.component'
@@ -79,6 +79,9 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,
     DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,
     
+    /* Pipes */
+    GroupDatasetByRegion,
+
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     NehubaViewer2DLandmarkUnit,

@@ -1,7 +1,7 @@
 <div class = "dataBrowserHeader">
   <span id = "selectedRegionSummary">
     {{ selectedRegionsLength == 0 ? 'No ' : selectedRegionsLength }} region{{ selectedRegionsLength == 1 ? '' : 's' }} selected. 
-    {{ selectedRegionsLength == 0 ? 'Listing all datasets.' : '' }}
+    {{ selectedRegionsLength == 0 ? 'Listing all datasets grouped by associated regions.' : '' }}
   </span>
   <a 
     *ngIf = "selectedRegionsLength > 0"
