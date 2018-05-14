@@ -8,22 +8,32 @@ div[containerDiv]
 
 div#dockResizeSliver
 {
-  flex: 0 0 20px;
-  background-color:rgba(128,128,128,0.08);
+  position:relative;
+  flex: 0 0 0px;
   z-index:6;
-  display: flex;
-  justify-content:center;
-  flex-direction:column;
 }
-  div#dockResizeSliver:hover
+
+  div#dockResizeSliver > div
   {
-    cursor:pointer;
-    background-color:rgba(128,128,128,0.2);
+    position:absolute;
+    top : 0;
+    right:0;
+    display: flex;
+    justify-content:center;
+    flex-direction:column;
+    margin-top:3em;
+    padding-left:0.5em;
+    padding-right:0.5em;
+    width:2em;
+    height:3em;
+    background-color:rgba(128,128,128,0.35);
   }
 
-  div#dockResizeSliver > i:after
+
+
+  div#dockResizeSliver > div:hover
   {
-    content : ' '
+    background-color:rgba(128,128,128,0.5);
   }
 
 WidgetsContainer

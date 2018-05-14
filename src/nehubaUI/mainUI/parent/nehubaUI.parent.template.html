@@ -26,10 +26,12 @@
   <div 
     id = "dockResizeSliver" 
     (click)="showMenu = !showMenu">
-    <i
-      [ngClass] = "showMenu ? 'glyphicon-chevron-right' : 'glyphicon-chevron-left'" 
-      class = "glyphicon">
-    </i>
+    <div glyphiconContainer>
+      <i
+        [ngClass] = "showMenu ? 'glyphicon-chevron-right' : 'glyphicon-chevron-left'" 
+        class = "glyphicon">
+      </i>
+    </div>
   </div>
 
   <WidgetsContainer 

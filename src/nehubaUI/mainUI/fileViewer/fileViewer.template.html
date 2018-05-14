@@ -19,7 +19,7 @@
   <hr />
   
   <!-- More info panel -->
-  <div *ngIf = "searchResultFile.parentDataset">
+  <div *ngIf = "searchResultFile.parentDataset && false">
     <span>
       This is part of the dataset {{ searchResultFile.parentDataset.name }}
     </span>
@@ -31,7 +31,7 @@
     </property-widget>
   </div>
   
-  <hr />
+  <hr *ngIf = "searchResultFile.parentDataset && false" />
 
   <!-- More info panel -->
   <div *ngIf = "false">
@@ -98,9 +98,9 @@
 </readmoreComponent>
 
 <div *ngIf = "downloadUrl">
-  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link">Download File</a>
+  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link" download>Download File</a>
 </div>
 
 <div *ngIf = "downloadPng">
-  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link">Download Chart as Image</a>
+  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link" download>Download Chart as Image</a>
 </div>

@@ -52,7 +52,9 @@ export class FileViewer implements OnChanges,OnDestroy,AfterViewInit{
   }
 
   transformRegionNameToRegionDescriptor(region:{regionName:string,relationship:string,moreInfo:string}):RegionDescriptor|undefined{
-    return Array.from(this.mainController.regionsLabelIndexMap.values()).find(rd=>rd.name==region.regionName)
+    const obj =  Array.from(this.mainController.regionsLabelIndexMap.values()).find(rd=>rd.name==region.regionName)
+    const { dismiss, ...remainobj } = obj as any
+    return remainobj
   }
 
   get hasRelatedRegion(){
