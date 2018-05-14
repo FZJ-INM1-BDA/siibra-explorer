@@ -5,7 +5,7 @@
   [propertyWidget] = "Object.assign(region,{dismiss:true})">
 
   <nehubaui-searchresult-ui
-    [title] = "searchResults.type"
+    
     [showLinkedRegion] = "false"
     *ngFor = "let searchResults of region.datasets | filterDatasetSearchResult : filterSearchResultbyType"
     [searchResult]="searchResults">
