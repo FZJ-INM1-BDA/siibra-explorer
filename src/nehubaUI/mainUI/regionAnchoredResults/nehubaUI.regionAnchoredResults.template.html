@@ -1,3 +1,4 @@
+<!-- status + clear all selected regions -->
 <div class = "dataBrowserHeader">
   <span id = "selectedRegionSummary">
     {{ selectedRegionsLength == 0 ? 'No ' : selectedRegionsLength }} region{{ selectedRegionsLength == 1 ? '' : 's' }} selected. 
@@ -10,6 +11,8 @@
     clear all
   </a>
 </div>
+
+<!-- filter -->
 <div id = "filter" class = "well">
   <div>
     Filter
@@ -29,10 +32,37 @@
     </property-widget >
   </small>
 </div>
+
+<!-- collapsable controller -->
 <div>
   <a (click)="collapseAll()" class = "btn btn-link">collapse all</a>
   <a (click)="expandAll()" class = "btn btn-link">expand all</a>
 </div>
+
+<!-- collapsable for spatial search -->
+<collapsable-panel
+  *ngIf = "showSpatialSearch"
+  [title]="spatialSearchResultPanelTitle">
+
+  <nehubaui-searchresult-ui
+    (mouseover) = "mouseoverSpatialSearch(searchResultObject)"
+    (mouseout) = "mouseoutSpatialSearch(searchResultObject)"
+    *ngFor = "let searchResultObject of spatialSearchResultObjects"
+    [searchResult]="searchResultObject">
+  </nehubaui-searchresult-ui>
+  <pagination-component
+    [hitsPerPage]="spatialHitsPerPage"
+    [total] = "spatialTotal"
+    [currentPage]="spatialPagination"
+    (paginationChange)="spatialPaginationChange($event)">
+
+  </pagination-component>
+  
+</collapsable-panel>
+
+<hr *ngIf = "showSpatialSearch" />
+
+<!-- if no regions are selected, display all results, grouped by regions -->
 <nehubaui-searchresult-ui-list
   [searchResultObjects]="searchResultObjects"
   [filterSearchResultbyType]="filterSearchResultbyType"
@@ -40,6 +70,7 @@
 
 </nehubaui-searchresult-ui-list>
 
+<!-- if regions are selected, display only those selected regions and the datasets -->
 <selected-region-list 
   [searchResultObjects]="searchResultObjects"
   [filterSearchResultbyType]="filterSearchResultbyType"

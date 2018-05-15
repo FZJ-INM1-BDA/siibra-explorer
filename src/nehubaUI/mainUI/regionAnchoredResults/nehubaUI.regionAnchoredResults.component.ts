@@ -3,10 +3,9 @@ import { Component, AfterViewInit, OnDestroy } from '@angular/core'
 import template from './nehubaUI.regionAnchoredResults.template.html'
 import css from './nehubaUI.regionAnchoredResults.style.css'
 import { animationFadeInOut } from 'nehubaUI/util/nehubaUI.util.animations';
-import { MainController, TEMP_SearchDatasetService, MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
+import { MainController, TEMP_SearchDatasetService, MasterCollapsableController, LandmarkServices, SpatialSearch } from 'nehubaUI/nehubaUI.services';
 import { SearchResultInterface } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.component';
 import { Subject,Observable } from 'rxjs/Rx';
-import { ParcellationDescriptor } from 'nehubaUI/nehuba.model';
 
 @Component({
   selector : `region-anchored-results`,
@@ -27,9 +26,20 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   onDestroySubject : Subject<any> = new Subject()
 
   searchResultObjects : SearchResultInterface[] = []
+  spatialSearchResultObjects : SearchResultInterface[] = []
   filterSearchResultbyType : {name : string, enabled : boolean}[] = []
 
-  constructor(private mainController:MainController,private searchDatasetService:TEMP_SearchDatasetService,public collapsableContoller:MasterCollapsableController){
+  spatialHitsPerPage : number = 10
+  spatialTotal : number = 10
+  spatialPagination : number = 0
+
+  constructor(
+    private mainController:MainController,
+    private searchDatasetService:TEMP_SearchDatasetService,
+    public collapsableContoller:MasterCollapsableController,
+    private landmarkService:LandmarkServices,
+    private spatialSearch :SpatialSearch
+  ){
     Observable
       .from(this.mainController.selectedRegionsBSubject)
       .takeUntil(this.onDestroySubject)
@@ -38,6 +48,18 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
         this.renderRegionFilter = srds.length != 0
         this.renderFullList = srds.length == 0
       })
+
+    this.updateSpatialPagination()
+  }
+
+  private updateSpatialPagination(){
+    this.spatialHitsPerPage = this.spatialSearch.RESULTS_PER_PAGE
+    this.spatialTotal = this.spatialSearch.numHits
+    this.spatialPagination = this.spatialSearch.pagination
+  }
+
+  spatialPaginationChange(pg:number){
+    this.spatialSearch.goTo(pg)
   }
 
   ngOnDestroy(){
@@ -46,18 +68,48 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
 
   ngAfterViewInit(){
     Observable
-      .combineLatest(this.searchDatasetService.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
+      .from(this.searchDatasetService.returnedSearchResultsBSubject)
       .takeUntil(this.onDestroySubject)
+      .debounceTime(300)
       .subscribe((val)=>{
-        this.searchResultObjects = (val[1] && (val[1] as ParcellationDescriptor).name == 'JuBrain Cytoarchitectonic Atlas') ?
-          val[0] : 
-          []
+        this.searchResultObjects = val
 
-        this.filterSearchResultbyType = this.searchResultObjects.reduce((acc,curr)=>{
-          const idx = acc.findIndex(it=>it.name===curr.type)
-          return idx >= 0 ? acc : acc.concat({name : curr.type , enabled : true})
-        },[] as {name:string,enabled:boolean}[])
+        // TODO  will have to decide if splitting returnedsearchresultobject into spatial and normal there are raminfication here
+        this.addToFilterSearchResultbyType(this.searchResultObjects)
       })
+
+    Observable
+      .from(this.searchDatasetService.returnedSpatialSearchResultsBSubject)
+      .takeUntil(this.onDestroySubject)
+      .debounceTime(300)
+      .subscribe(val=>{
+        this.spatialSearchResultObjects = val
+        this.updateSpatialPagination()
+
+        // TODO  will have to decide if splitting returnedsearchresultobject into spatial and normal there are raminfication here
+        this.addToFilterSearchResultbyType(this.spatialSearchResultObjects)
+      })
+  }
+
+  get showSpatialSearch(){
+    const it = this.filterSearchResultbyType.find(v=>v.name === 'Spatial Search Result')
+    return it ? it.enabled : false
+  }
+
+  get spatialSearchResultPanelTitle(){
+    return `Spatial Search Result <small class = "text-muted">(${this.spatialTotal})</small>`
+  }
+
+  private addToFilterSearchResultbyType(searchresults:SearchResultInterface[]){
+    const condensedList = searchresults.reduce((acc,curr)=>{
+      const idx = acc.findIndex(it=>it.name == curr.type)
+      return idx >= 0 ? acc : acc.concat({name : curr.type ,  enabled : true})
+    },[] as {name:string,enabled:boolean}[])
+
+    this.filterSearchResultbyType = condensedList.reduce((acc,curr)=>{
+      const idx = acc.findIndex(it=>it.name == curr.name)
+      return idx >= 0 ? acc : acc.concat(curr)
+    },this.filterSearchResultbyType)
   }
 
   getTypeMetadata(type:string){
@@ -86,6 +138,10 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
         }) :
         acc.concat(curr)
     },[] as {name:string,enabled:boolean}[])
+
+    this.mainController.resultsFilterBSubject.next(
+      this.filterSearchResultbyType.filter(v=>!v.enabled).map(v=>v.name)
+    )
   }
 
   collapseAll(){
@@ -94,6 +150,19 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
 
   expandAll(){
     this.collapsableContoller.expandBSubject.next(true)
+  }
+
+  mouseoverSpatialSearch(searchResultObject:SearchResultInterface){
+    const idx = this.landmarkService.landmarks.findIndex(lm=>lm.id === searchResultObject.id)
+    if(idx >= 0){
+      this.landmarkService.TEMP_vtkHighlight(idx)
+      this.landmarkService.landmarks[idx].hover = true
+    }
+  }
+
+  mouseoutSpatialSearch(_searchResultObject:any){
+    this.landmarkService.landmarks.forEach(lm=>lm.hover = false)
+    this.landmarkService.TEMP_clearVtkHighlight()
   }
 
   clearAllSelectedRegions(){

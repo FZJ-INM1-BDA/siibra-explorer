@@ -30,3 +30,9 @@ a.btn.btn-link
 {
   font-size:0.8em;
 }
+
+hr
+{
+  width:90%;
+  margin:0 auto;
+}

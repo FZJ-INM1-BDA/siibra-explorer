@@ -1,8 +1,9 @@
 import { Component,ViewChild , HostListener, Renderer2 } from '@angular/core'
-import { MainController, SUPPORTED_LIB, InfoToUIService, SUPPORT_LIBRARY_MAP, checkStringAsSupportLibrary } from 'nehubaUI//nehubaUI.services'
+import { MainController, SUPPORTED_LIB, InfoToUIService, SUPPORT_LIBRARY_MAP, checkStringAsSupportLibrary, TEMP_SearchDatasetService } from 'nehubaUI//nehubaUI.services'
 import { WidgetsContainer } from 'nehubaUI/components/floatingWindow/nehubaUI.widgets.component'
 import { NehubaBanner } from 'nehubaUI/mainUI/banner/nehubaUI.banner.component';
 import { showSideBar } from 'nehubaUI/util/nehubaUI.util.animations'
+import { Observable } from 'rxjs/Rx'
 
 import template from './nehubaUI.parent.template.html'
 import css from './nehubaUI.parent.style.css'
@@ -33,7 +34,8 @@ export class NehubaContainer {
   constructor(
     public infoToUI:InfoToUIService,
     public mainController:MainController, 
-    private rd2:Renderer2
+    private rd2:Renderer2,
+    private searchDatasetService:TEMP_SearchDatasetService
   ){
     this.darktheme = this.mainController.darktheme
 
@@ -89,6 +91,17 @@ export class NehubaContainer {
     this.mainController.selectedTemplateBSubject.subscribe(template=>{
       if(template)this.darktheme = template.useTheme == 'dark'
     })
+
+    Observable
+      .combineLatest(
+        this.mainController.selectedTemplateBSubject,
+        this.searchDatasetService.returnedSearchResultsBSubject,
+        this.searchDatasetService.returnedSpatialSearchResultsBSubject)
+      .filter(v=>v[0]!==null)
+      .debounceTime(200)
+      .map(v=>v[1].length + v[2].length)
+      .subscribe(searchResultsLength=>
+        this.showMenu = searchResultsLength > 0)
   }
   
   curosrPos : [number,number] = [0,0]

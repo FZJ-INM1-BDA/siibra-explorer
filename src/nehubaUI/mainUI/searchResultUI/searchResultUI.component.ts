@@ -99,6 +99,7 @@ export class RegionLinkClass{
 export interface SearchResultInterface{
   name : string,
   type : string,
+  id : string,
 
   thumbnail? : SearchResultFileInterface
 

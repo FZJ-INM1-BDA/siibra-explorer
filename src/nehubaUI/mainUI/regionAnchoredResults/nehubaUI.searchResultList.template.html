@@ -35,6 +35,7 @@
 </div>
 
 <pagination-component
+  *ngIf = "(searchResultObjects | groupDatasetByRegion : filterSearchResultbyType : allLabelledRegions).length > 0"
   [hitsPerPage]="hitsPerPage"
   [total] = "total"
   [currentPage]="currentPage"

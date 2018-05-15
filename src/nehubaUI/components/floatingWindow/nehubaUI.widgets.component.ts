@@ -276,11 +276,11 @@ export class WidgetsContainer{
       this.widgitServices.layoutChangeSubject
         .debounceTime(200)
         .subscribe(()=>{
-          this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
+          /* TODO remove all references to layoutChangeSubject. side panel open/close criteria changed */
+          // this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
         })
 
 
-      // this.floatingWidgetSerivce.focusFloatingViewSubject.subscribe(console.log)
       Observable
         .from(this.floatingWidgetSerivce.focusFloatingViewSubject)
         .subscribe(fw=>{

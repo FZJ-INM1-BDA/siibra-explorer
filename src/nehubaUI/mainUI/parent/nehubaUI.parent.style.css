@@ -21,10 +21,10 @@ div#dockResizeSliver
     display: flex;
     justify-content:center;
     flex-direction:column;
-    margin-top:3em;
-    padding-left:0.5em;
-    padding-right:0.5em;
-    width:2em;
+    margin-top:1em;
+    padding-left:0.3em;
+    padding-right:0.3em;
+    width:1.6em;
     height:3em;
     background-color:rgba(128,128,128,0.35);
   }

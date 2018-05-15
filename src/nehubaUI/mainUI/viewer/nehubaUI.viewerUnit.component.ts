@@ -24,8 +24,7 @@ declare var window:{
 
 @Component({
   template : template ,
-  styles : [ css ],
-  providers : [ TEMP_SearchDatasetService ]
+  styles : [ css ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer

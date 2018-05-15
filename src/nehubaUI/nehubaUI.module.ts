@@ -55,7 +55,7 @@ import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipRemoveSignDirective
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
-import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from './nehubaUI.services';
+import { MainController,InfoToUIService,LandmarkServices, WidgitServices, TEMP_SearchDatasetService, SpatialSearch } from './nehubaUI.services';
 
 
 @NgModule({
@@ -93,7 +93,7 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     MultilevelSelector, NehubaModalService,
     FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
-  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
+  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService,SpatialSearch,TEMP_SearchDatasetService ],
   entryComponents : [ 
       MinimisedView, 
       WidgetView, 

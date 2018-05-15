@@ -664,7 +664,7 @@ export class LandmarkServices{
         [0 , 0 , _scale[2], landmark.pos[2]*1000000],
         [0 , 0 , 0, 1 ],
       ],
-      shader
+      shader : shader ? shader : this.fragmentMainWhite
     }))
   }
 
@@ -679,8 +679,8 @@ export class LandmarkServices{
     }
   }
 
-  fragmentMainHighlight = `void main(){emitRGBA(vec4(1.0,0.0,0.0,0.6));}`
-  fragmentMainWhite = `void main(){emitRGBA(vec4(1.0,0.8,0.8,0.6));}`
+  fragmentMainHighlight = `void main(){emitRGB(vec3(1.0,0.0,0.0));}`
+  fragmentMainWhite = `void main(){emitRGB(vec3(1.0,1.0,1.0));}`
   TEMP_vtkHighlight(idx:number){
     const layer = this.mainController.nehubaViewer.ngviewer.layerManager.getLayerByName(`vtk-landmark-meshes-${idx}`) as ManagedUserLayerWithSpecification
     this.setSingleMeshUserLayerColor(layer,this.fragmentMainHighlight)
@@ -707,12 +707,164 @@ export class LandmarkServices{
   }
 }
 
+/**
+ * currently only search for receptor data and pmap
+ */
+@Injectable()
+export class TEMP_SearchDatasetService{
+  // returnedSearchResults : SearchResultInterface[] = []
+
+  returnedSpatialSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
+
+  returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
+  searchResultMetadataMap : Map<string,HasPropertyInterface> = new Map()
+  
+  constructor(private mainController:MainController){
+
+    Observable
+      .from(this.mainController.selectedParcellationBSubject)
+      .filter(p=> p!== null)
+      .subscribe(p=>{
+        if(p!.name == 'JuBrain Cytoarchitectonic Atlas'){
+          Promise.all([
+            fetch('res/json/allAggregatedData.json').then(res=>res.json()),
+            fetch('res/json/pmapsAggregatedData.json').then(res=>res.json()),
+            fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
+          ])
+            .then(arr=>{
+              const [ metadata, ...aggregateDataSets] = arr
+              this.searchResultMetadataMap = new Map(metadata)
+              this.returnedSearchResultsBSubject.next(
+                aggregateDataSets
+                  .reduce((acc,curr)=>
+                    acc.concat(...curr)
+                  ,[])
+                  .map((it:SearchResultInterface)=>
+                    Object.assign(
+                      {},
+                      it,
+                      { files: it.files.map(file=>Object.assign({},file,{parentDataset : it})) }
+                    )
+                  )
+                  /* TODO test parent dataset of thumbnail */
+                  .map((it:SearchResultInterface)=>
+                    Object.assign(
+                      {},
+                      it,
+                      { 
+                        thumbnail : it.thumbnail ? 
+                          Object.assign({},it.thumbnail,{parentDataset : it}) :
+                          null 
+                      }
+                    ))
+              )
+            })
+            .catch(console.warn)
+        }else{
+          this.returnedSearchResultsBSubject.next([])
+        }
+      })
+
+
+    /**
+     * Because there is no easy way to display standard deviation natively, use a plugin 
+     * */
+    Chart.pluginService.register({
+
+      /* patching background color fill, so saved images do not look completely white */
+      beforeDraw: (chart)=>{
+        const ctx = chart.ctx as CanvasRenderingContext2D;
+        ctx.fillStyle = this.mainController.darktheme ? 
+          `rgba(50,50,50,0.8)` :
+          `rgba(255,255,255,0.8)`
+          
+        if(chart.canvas)ctx.fillRect(0,0,chart.canvas.width,chart.canvas.height)
+        
+      },
+
+      /* patching standard deviation for polar (potentially also line/bar etc) graph */
+      afterInit : function(chart){
+        if(chart.config.options && chart.config.options.tooltips){
+          
+          chart.config.options.tooltips.callbacks = {
+            label : function(tooltipItem,data){
+              let sdValue
+              if( data.datasets && typeof tooltipItem.datasetIndex != 'undefined' && data.datasets[tooltipItem.datasetIndex].label ){
+                const sdLabel = data.datasets[tooltipItem.datasetIndex].label+'_sd'
+                const sd = data.datasets.find(dataset=> typeof dataset.label != 'undefined' && dataset.label == sdLabel)
+                if(sd && sd.data && typeof tooltipItem.index != 'undefined' && typeof tooltipItem.yLabel != 'undefined') sdValue = Number(sd.data[tooltipItem.index]) - Number(tooltipItem.yLabel)
+              }
+              return `${tooltipItem.yLabel} ${sdValue ? '('+ sdValue +')' : ''}`
+            }
+          }
+        }
+        if(chart.data.datasets){
+          chart.data.datasets = chart.data.datasets
+            .map(dataset=>{
+              if(dataset.label && /\_sd$/.test(dataset.label)){
+                const originalDS = chart.data.datasets!.find(baseDS=>typeof baseDS.label!== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/,'')))
+                if(originalDS){
+                  return Object.assign({},dataset,{
+                    data : (originalDS.data as number[]).map((datapoint,idx)=>(Number(datapoint) + Number((dataset.data as number[])[idx]))),
+                    ... CHART_SD_STYLE
+                  })
+                }else{
+                  return dataset
+                }
+              }else if (dataset.label){
+                const sdDS = chart.data.datasets!.find(sdDS=>typeof sdDS.label !=='undefined' && (sdDS.label == dataset.label + '_sd'))
+                if(sdDS){
+                  return Object.assign({},dataset,{
+                    ...CHART_BASE_STYLE
+                  })
+                }else{
+                  return dataset
+                }
+              }else{
+                return dataset
+              }
+            })
+        }
+      }
+    })
+
+    Observable
+      .combineLatest(
+        this.returnedSearchResultsBSubject,
+        this.returnedSpatialSearchResultsBSubject,
+        this.mainController.selectedParcellationBSubject)
+      .subscribe((v)=>{
+        const parcellation = v[2]
+        const searchResults = [...v[0],...v[1]]
+        if(parcellation){
+          parcellation.regions.forEach(region=>this.editAvailableDatasetOnRegion(searchResults,region))
+        }
+      })
+  }
+
+  private editAvailableDatasetOnRegion(newDataSets:SearchResultInterface[],region:RegionDescriptor){
+    region.datasets = newDataSets
+      .filter(ds=>this.checkDatasetLinkRegion(ds,region))
+    region.children.forEach(c=>this.editAvailableDatasetOnRegion(newDataSets,c))
+  }
+
+  private checkDatasetLinkRegion(dataset:SearchResultInterface,region:RegionDescriptor):boolean{
+    return dataset.regionName ? 
+      dataset.regionName.findIndex(re=>re.regionName == region.name) >= 0 : 
+      false
+  }
+}
+
 @Injectable()
 export class SpatialSearch{
 
   pagination : number = 0
   numHits : number = 0
   RESULTS_PER_PAGE : number = 10
+
+  bDoc : any[] = []
+  displayedLandmarks : Landmark[] = []
+  showFlag : boolean = true
 
   /**
    * spatial search
@@ -723,28 +875,50 @@ export class SpatialSearch{
   templateSpace : string
   spatialSearchResultSubject : BehaviorSubject<any> = new BehaviorSubject(null)
 
-  constructor(private mainController:MainController,private landmarkServices:LandmarkServices){
+  constructor(
+    private mainController:MainController,
+    private landmarkServices:LandmarkServices,
+    private searchDatasetService : TEMP_SearchDatasetService
+  ){
     this.spatialSearchResultSubject
-      .filter( v => v !== null )
-      .filter( v => !isNaN(v.width ))
+      .filter( v => v !== null && !isNaN(v.width) && this.showFlag)
       .throttleTime(300)
       .subscribe(({center,width,templateSpace})=>
         this.spatialSearch(center,width,templateSpace)
-          .then((data:any)=>(console.log(data),this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
+          .then((data:any)=>(this.landmarkServices.landmarks = [],this.parseSpatialQuery(data)))
           .catch((error:any)=>console.warn(error)))
 
     this.mainController.resultsFilterBSubject
+      .skip(1)
       .subscribe(_filterResults=>{
-
+        
       })
 
     Observable.from(this.mainController.selectedTemplateBSubject)
       .skip(1)
-      .subscribe(()=>{
+      .subscribe(template=>{
+        if(template)this.templateSpace = template.name
+
+        /* clean up behaviour subjects etc */
+        this.searchDatasetService.returnedSpatialSearchResultsBSubject.next([])
         this.landmarkServices.clearAllLandmarks()
+        this.displayedLandmarks = []
       })
-    // this.mainController.selectedTemplateBSubject.subscribe(()=>
-    //   this.landmarkServices.clearAllLandmarks())
+
+    Observable
+      .combineLatest(this.mainController.resultsFilterBSubject,this.mainController.selectedTemplateBSubject)
+      .filter(v=>v[1]!==null)
+      .map(v=>v[0])
+      .delay(100)
+      .subscribe(disabledModes=>{
+        const newShowFlag = disabledModes.findIndex(mode => mode === 'Spatial Search Result') < 0
+        if(newShowFlag != this.showFlag){
+          this.showFlag = newShowFlag
+          this.showFlag ?
+            this.show() : 
+            this.hide()
+        }
+      })
   }
 
   /* should always use larger for width when doing spatial querying */
@@ -763,7 +937,6 @@ export class SpatialSearch{
 
     this.center = center
     this.width = width
-    this.templateSpace = templateSpace
 
     const SPATIAL_SEARCH_URL = `https://kg-int.humanbrainproject.org/solr/`
     const SOLR_C = `metadata/`
@@ -795,11 +968,24 @@ export class SpatialSearch{
     const fetchUrl = url.toString().replace(/\%2B/gi,'+')
     return fetch(fetchUrl).then(r=>r.json())
   }
+
+  show(){
+    this.displayedLandmarks.forEach((lm,idx)=>{
+      idx
+      this.landmarkServices.addLandmark(lm)
+      this.landmarkServices.TEMP_parseLandmarkToVtk(lm,idx)
+    })
+  }
+
+  hide(){
+    /* TODO need to be more specific in the future */
+    this.displayedLandmarks.forEach((lm)=>{
+      lm
+      this.landmarkServices.removeLandmark(lm)
+      this.landmarkServices.TEMP_clearVtkLayers()
+    })
+  }
   
-  addLandmark = (pos:[number,number,number],id:string,properties:any)=>
-    this.landmarkServices.landmarks.push({ pos , id , properties,hover:false})
-
-
   parseSpatialQuery = (data:any)=>{
     if(!data.response){
       /* empty response */
@@ -807,22 +993,50 @@ export class SpatialSearch{
     }
     this.numHits = data.response.numFound
     this.pagination = data.response.start / this.RESULTS_PER_PAGE
-    // this.clearAllLandmarks()
     const docs = data.response.docs as any[]
 
-    docs
-      // .filter((_,idx)=>idx<20)
-      // .filter(doc=> this.landmarks.findIndex(d=>d.id==doc.id) < 0)
-      .forEach(doc=>{
+    const bDocs = docs
+      .map(doc=>{
         const pos = [0,1,2].map(idx=>`geometry.coordinates_${idx}___pdouble`).map(key=>doc[key]) as [number,number,number]
-        const { OID , ReferenceSpace, datapath, id } = doc
-        this.addLandmark(pos,doc.id,{
-          OID, ReferenceSpace, datapath, id,
-          'geometry.coordinates' : doc['geometry.coordinates']
+        
+        return ({
+          pos,
+          doc
         })
       })
+    
+    this.refreshReturnedSearchResultBSubject(bDocs)
 
-      this.landmarkServices.landmarks.forEach((l,idx)=>this.landmarkServices.TEMP_parseLandmarkToVtk(l,idx))
+    this.displayedLandmarks = bDocs.map(bDoc=>{
+      const { OID , ReferenceSpace, datapath, id } = bDoc.doc
+      const newLandmark = new Landmark()
+      newLandmark.id = OID[0]
+      newLandmark.pos = bDoc.pos
+      newLandmark.properties = {
+        ReferenceSpace,
+        datapath,
+        id
+      }
+      return newLandmark
+    })
+
+    this.landmarkServices.clearAllLandmarks()
+    this.landmarkServices.TEMP_clearVtkLayers()
+
+    this.displayedLandmarks.forEach((lm,idx)=>{
+      this.landmarkServices.addLandmark(lm)
+      this.landmarkServices.TEMP_parseLandmarkToVtk(lm,idx)
+    })
+  }
+
+  refreshReturnedSearchResultBSubject = (bDocs:{pos:[number,number,number],doc:any}[])=>{
+    this.searchDatasetService.returnedSpatialSearchResultsBSubject.next(
+      bDocs.map(bDoc=>({
+        type : 'Spatial Search Result',
+        name : `Reference space: ${bDoc.doc.ReferenceSpace} OID: ${bDoc.doc.OID[0]}`,
+        id : bDoc.doc.OID[0]
+      } as SearchResultInterface))
+    )
   }
 
   goTo = (pageIdx:number)=>{
@@ -1261,136 +1475,6 @@ export class MasterCollapsableController{
   expandBSubject : BehaviorSubject<boolean> = new BehaviorSubject(false)
 }
 
-/**
- * currently only search for receptor data and pmap
- */
-@Injectable()
-export class TEMP_SearchDatasetService{
-  // returnedSearchResults : SearchResultInterface[] = []
-
-  returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
-  searchResultMetadataMap : Map<string,HasPropertyInterface> = new Map()
-  
-  constructor(public mainController:MainController){
-
-    Promise.all([
-      fetch('res/json/allAggregatedData.json').then(res=>res.json()),
-      fetch('res/json/pmapsAggregatedData.json').then(res=>res.json()),
-      fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
-    ])
-      .then(arr=>{
-        const [ metadata, ...aggregateDataSets] = arr
-        this.searchResultMetadataMap = new Map(metadata)
-        this.returnedSearchResultsBSubject.next(
-          aggregateDataSets
-            .reduce((acc,curr)=>
-              acc.concat(...curr)
-            ,[])
-            .map((it:SearchResultInterface)=>
-              Object.assign(
-                {},
-                it,
-                { files: it.files.map(file=>Object.assign({},file,{parentDataset : it})) }
-              )
-            )
-            /* TODO test parent dataset of thumbnail */
-            .map((it:SearchResultInterface)=>
-              Object.assign(
-                {},
-                it,
-                { 
-                  thumbnail : it.thumbnail ? 
-                    Object.assign({},it.thumbnail,{parentDataset : it}) :
-                    null 
-                }
-              ))
-        )
-      })
-      .catch(console.warn)
-
-    /**
-     * Because there is no easy way to display standard deviation natively, use a plugin 
-     * */
-    Chart.pluginService.register({
-
-      /* patching background color fill, so saved images do not look completely white */
-      beforeDraw: (chart)=>{
-        const ctx = chart.ctx as CanvasRenderingContext2D;
-        ctx.fillStyle = this.mainController.darktheme ? 
-          `rgba(50,50,50,0.8)` :
-          `rgba(255,255,255,0.8)`
-          
-        if(chart.canvas)ctx.fillRect(0,0,chart.canvas.width,chart.canvas.height)
-        
-      },
-
-      /* patching standard deviation for polar (potentially also line/bar etc) graph */
-      afterInit : function(chart){
-        if(chart.config.options && chart.config.options.tooltips){
-          
-          chart.config.options.tooltips.callbacks = {
-            label : function(tooltipItem,data){
-              let sdValue
-              if( data.datasets && typeof tooltipItem.datasetIndex != 'undefined' && data.datasets[tooltipItem.datasetIndex].label ){
-                const sdLabel = data.datasets[tooltipItem.datasetIndex].label+'_sd'
-                const sd = data.datasets.find(dataset=> typeof dataset.label != 'undefined' && dataset.label == sdLabel)
-                if(sd && sd.data && typeof tooltipItem.index != 'undefined' && typeof tooltipItem.yLabel != 'undefined') sdValue = Number(sd.data[tooltipItem.index]) - Number(tooltipItem.yLabel)
-              }
-              return `${tooltipItem.yLabel} ${sdValue ? '('+ sdValue +')' : ''}`
-            }
-          }
-        }
-        if(chart.data.datasets){
-          chart.data.datasets = chart.data.datasets
-            .map(dataset=>{
-              if(dataset.label && /\_sd$/.test(dataset.label)){
-                const originalDS = chart.data.datasets!.find(baseDS=>typeof baseDS.label!== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/,'')))
-                if(originalDS){
-                  return Object.assign({},dataset,{
-                    data : (originalDS.data as number[]).map((datapoint,idx)=>(Number(datapoint) + Number((dataset.data as number[])[idx]))),
-                    ... CHART_SD_STYLE
-                  })
-                }else{
-                  return dataset
-                }
-              }else if (dataset.label){
-                const sdDS = chart.data.datasets!.find(sdDS=>typeof sdDS.label !=='undefined' && (sdDS.label == dataset.label + '_sd'))
-                if(sdDS){
-                  return Object.assign({},dataset,{
-                    ...CHART_BASE_STYLE
-                  })
-                }else{
-                  return dataset
-                }
-              }else{
-                return dataset
-              }
-            })
-        }
-      }
-    })
-
-    Observable
-      .combineLatest(this.returnedSearchResultsBSubject,this.mainController.selectedParcellationBSubject)
-      .subscribe(([searchResults,parcellation])=>{
-        if(parcellation){
-          parcellation.regions.forEach(region=>this.editAvailableDatasetOnRegion(searchResults,region))
-        }
-      })
-  }
-
-  private editAvailableDatasetOnRegion(newDataSets:SearchResultInterface[],region:RegionDescriptor){
-    region.datasets = newDataSets
-      .filter(ds=>this.checkDatasetLinkRegion(ds,region))
-    region.children.forEach(c=>this.editAvailableDatasetOnRegion(newDataSets,c))
-  }
-
-  private checkDatasetLinkRegion(dataset:SearchResultInterface,region:RegionDescriptor):boolean{
-    return dataset.regionName ? 
-      dataset.regionName.findIndex(re=>re.regionName == region.name) >= 0 : 
-      false
-  }
-}
 
 /* */
 const CHART_BASE_STYLE = {

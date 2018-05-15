@@ -9,8 +9,7 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 @Component({
   selector : 'ATLASViewer',
-  template : template,
-  providers : [ SpatialSearch ]
+  template : template
 })
 
 export class NehubaViewerContainer implements AfterViewInit{
