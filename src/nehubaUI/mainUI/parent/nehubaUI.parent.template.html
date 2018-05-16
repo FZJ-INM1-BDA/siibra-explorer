@@ -24,6 +24,7 @@
   </ATLASViewer>
 
   <div 
+    [ngClass]="{'darktheme':darktheme}"
     id = "dockResizeSliver" 
     (click)="showMenu = !showMenu">
     <div glyphiconContainer>

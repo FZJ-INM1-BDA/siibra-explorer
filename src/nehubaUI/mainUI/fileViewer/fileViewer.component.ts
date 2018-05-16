@@ -47,7 +47,7 @@ export class FileViewer implements OnChanges,OnDestroy,AfterViewInit{
     if(this.childChart){
       (<HTMLCanvasElement>this.childChart.canvas.nativeElement).toBlob((blob)=>{
         this._pngDownloadUrl = URL.createObjectURL(blob)
-      },'application/octet-stream')
+      },'image/png')
     }
   }
 

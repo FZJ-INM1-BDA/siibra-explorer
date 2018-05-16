@@ -93,15 +93,23 @@ export class NehubaContainer {
     })
 
     Observable
-      .combineLatest(
-        this.mainController.selectedTemplateBSubject,
-        this.searchDatasetService.returnedSearchResultsBSubject,
-        this.searchDatasetService.returnedSpatialSearchResultsBSubject)
-      .filter(v=>v[0]!==null)
-      .debounceTime(200)
-      .map(v=>v[1].length + v[2].length)
-      .subscribe(searchResultsLength=>
-        this.showMenu = searchResultsLength > 0)
+      .from(this.mainController.selectedTemplateBSubject)
+      .filter(v=>v!==null)
+      .debounceTime(1000)
+      .subscribe(()=>this.showMenu = 
+        (this.searchDatasetService.returnedSpatialSearchResultsBSubject.getValue().length + 
+        this.searchDatasetService.returnedSearchResultsBSubject.getValue().length) > 0)
+
+    // Observable
+    //   .combineLatest(
+    //     this.mainController.selectedTemplateBSubject,
+    //     this.searchDatasetService.returnedSearchResultsBSubject,
+    //     this.searchDatasetService.returnedSpatialSearchResultsBSubject)
+    //   .filter(v=>v[0]!==null)
+    //   .debounceTime(200)
+    //   .map(v=>v[1].length + v[2].length)
+    //   .subscribe(searchResultsLength=>
+    //     this.showMenu = searchResultsLength > 0)
   }
   
   curosrPos : [number,number] = [0,0]

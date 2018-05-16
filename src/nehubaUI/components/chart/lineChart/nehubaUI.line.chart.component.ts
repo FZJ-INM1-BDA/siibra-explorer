@@ -44,7 +44,7 @@ export class NehubaLineChart implements OnChanges{
     stepSize : 20,
     fontColor : 'white'
   }
-  chartOption : ChartOptions = {
+  chartOption : LineChartOption = {
     scales : {
       xAxes : [{
         type : 'linear',
@@ -80,6 +80,10 @@ export class NehubaLineChart implements OnChanges{
       text : 'Title',
       fontColor : 'rgba(255,255,255,1.0)'
     },
+    color : [{
+      backgroundColor : `rgba(255,255,255,0.2)`
+    }],
+    animation :undefined,
     elements : 
     {
       point : {
@@ -137,5 +141,9 @@ export interface LinearChartOptionInterface{
   }
   legend? : LegendInterface
   title? : TitleInterfacce
+  color? : Color[]
+}
+
+interface LineChartOption extends ChartOptions{
   color? : Color[]
 }

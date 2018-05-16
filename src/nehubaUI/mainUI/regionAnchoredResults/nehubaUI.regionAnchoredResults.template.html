@@ -45,9 +45,10 @@
   [title]="spatialSearchResultPanelTitle">
 
   <nehubaui-searchresult-ui
+    *ngFor = "let searchResultObject of spatialSearchResultObjects"  
     (mouseover) = "mouseoverSpatialSearch(searchResultObject)"
     (mouseout) = "mouseoutSpatialSearch(searchResultObject)"
-    *ngFor = "let searchResultObject of spatialSearchResultObjects"
+    [showLinkedRegion] = "false"
     [searchResult]="searchResultObject">
   </nehubaui-searchresult-ui>
   <pagination-component

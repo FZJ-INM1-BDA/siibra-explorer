@@ -26,14 +26,29 @@ div#dockResizeSliver
     padding-right:0.3em;
     width:1.6em;
     height:3em;
-    background-color:rgba(128,128,128,0.35);
+  }
+
+  div#dockResizeSliver > div
+  {
+    background-color:rgba(210,210,210,0.9);
+    box-shadow : 2px 4px 4px -2px rgba(180,180,180,0.7);
+  }
+
+  div#dockResizeSliver > div
+  {
+    background-color:rgba(235,235,235,0.9);
+  }
+
+  div.darktheme#dockResizeSliver > div
+  {
+    background-color:rgba(40,40,40,0.9);
+    box-shadow : 0 4px 4px -2px rgba(20,20,20,0.7);
   }
 
 
-
-  div#dockResizeSliver > div:hover
+  div.darktheme#dockResizeSliver > div:hover
   {
-    background-color:rgba(128,128,128,0.5);
+    background-color:rgba(50,50,50,0.9);
   }
 
 WidgetsContainer
