@@ -16,8 +16,11 @@
 
 import 'zone.js';
 import 'reflect-metadata';
-import '@webcomponents/custom-elements/src/native-shim'
-import '@webcomponents/custom-elements/custom-elements.min'
+
+/* breaks plugins implementing webcomponents on chrome (natively support webcomponent) */
+// import '@webcomponents/custom-elements/src/native-shim'
+// import '@webcomponents/custom-elements/custom-elements.min'
+
 import 'chart.js/src/chart.js'
 
 import { NehubaUI } from 'nehubaUI/nehubaUI.module';
