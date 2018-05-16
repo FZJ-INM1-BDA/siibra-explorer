@@ -170,12 +170,15 @@ export class MainController{
     //   .catch(console.warn)
 
     this.dataService.fetchTemplates
-      .then((this.dataService.fetchTemplatesData).bind(this.dataService))
+      // .then((this.dataService.fetchTemplatesData).bind(this.dataService))
       .then(templates=>(this.loadedTemplates = templates,INTERACTIVE_VIEWER.metadata.loadedTemplates = templates,Promise.resolve()))
       .then(()=>this.parseQueryString( window.location.search ))
     .catch((e:any)=>{
       console.error('fetching initial dataset error',e)
     })
+
+    this.dataService.fetchPlugins
+      .then(labcomponents=>this.loadedPlugins = labcomponents)
   }
 
   patchNG(){
@@ -840,6 +843,16 @@ export class TEMP_SearchDatasetService{
           parcellation.regions.forEach(region=>this.editAvailableDatasetOnRegion(searchResults,region))
         }
       })
+      
+    Observable
+      .combineLatest(
+        this.returnedSearchResultsBSubject,
+        this.returnedSpatialSearchResultsBSubject)
+      .debounceTime(200)
+      .map(v=>[...v[0],...v[1]])
+      .subscribe(v=>{
+        INTERACTIVE_VIEWER.metadata.datasetsBSubject.next(v)
+      })
   }
 
   private editAvailableDatasetOnRegion(newDataSets:SearchResultInterface[],region:RegionDescriptor){
@@ -1203,6 +1216,29 @@ class DataService {
     }
   }
 
+
+  private pluginArray = [
+    'http://localhost:8005/manifest.json'
+  ]
+
+  fetchPlugins:Promise<LabComponent[]> = new Promise((resolve,reject)=>{
+    Promise.all(this.pluginArray.map(manifestUrl=>
+      this.fetchJson(manifestUrl)
+        .then(json=>this.parsePluginManifest(json))))
+      .then(labcomponents=>resolve(labcomponents))
+      .catch(e=>reject(e))
+  })
+
+  parsePluginManifest(json:any):Promise<LabComponent>{
+    return new Promise((resolve,reject)=>{
+      try{
+        const lc = new LabComponent(json)
+        resolve(lc)
+      }catch(e){
+        reject(e)
+      }
+    })
+  }
 }
 
 /** usage

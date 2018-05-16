@@ -1,6 +1,7 @@
 import { NehubaModalService } from "nehubaUI/components/modal/nehubaUI.modal.component";
 import { TemplateDescriptor, ParcellationDescriptor, RegionDescriptor } from "nehubaUI/nehuba.model";
 import { Subject, BehaviorSubject } from "rxjs";
+import { SearchResultInterface } from "nehubaUI/mainUI/searchResultUI/searchResultUI.component";
 
 class PluginControl{
   loadExternalLibraries : (libraryNames:string[])=>Promise<any>  
@@ -78,6 +79,11 @@ class Metadata {
    * Map mapping labelIndex (used by neuroglancer and nehuba) to the RegionDescriptor object.
    */
   regionsLabelIndexMap : Map<number,RegionDescriptor>
+
+  /**
+   * 
+  */
+  datasetsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
 
   viewerStateBSubject : BehaviorSubject<any|null>
 }

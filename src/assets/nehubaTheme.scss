@@ -701,9 +701,13 @@ div#ATLASContainer.darktheme
       .btn
       {
         @extend %widgetDarkTheme;
+        &.btn-default
+        {
+          background-color:gray(0.28);
+        }
         &.btn-primary
         {
-          background-color:gray(0.35);
+          background-color:gray(0.28);
         }
         &.btn-success
         {
@@ -733,9 +737,19 @@ div#ATLASContainer.darktheme
           background-color:gray(0.35);
         }
       }
-      input, input[readonly]
+      input[type="text"], input[readonly]
       {
         @extend %widgetDarkTheme;
+
+        border:none;
+        background-color:gray(0.16);
+        border-radius:0px;
+        box-shadow: inset 0 0 4px 2px gray(0.13);
+      }
+
+      .input-group-addon
+      {
+        border:none;
       }
 
       hr

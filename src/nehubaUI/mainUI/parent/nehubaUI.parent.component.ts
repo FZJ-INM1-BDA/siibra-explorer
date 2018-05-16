@@ -9,6 +9,12 @@ import template from './nehubaUI.parent.template.html'
 import css from './nehubaUI.parent.style.css'
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
+declare var window:{
+  [key:string] : any
+  prototype : Window;
+  new() : Window;
+}
+
 @Component({
   selector : 'div#ATLASContainer',
   template : template,
@@ -29,7 +35,7 @@ export class NehubaContainer {
 
   Array = Array
 
-  loadedLibraries : Map<SUPPORTED_LIB,{counter:number,src:HTMLElement}> = new Map()
+  loadedLibraries : Map<SUPPORTED_LIB,{counter:number,src:HTMLElement|null}> = new Map()
 
   constructor(
     public infoToUI:InfoToUIService,
@@ -37,6 +43,15 @@ export class NehubaContainer {
     private rd2:Renderer2,
     private searchDatasetService:TEMP_SearchDatasetService
   ){
+
+    if('customElements' in window){
+      console.log('browser supports custom elements')
+      this.loadedLibraries.set(SUPPORTED_LIB.webcomponentsLite,{counter:1,src:null})
+    }else{
+      /* webcomponents should always be natively supported, polyfill from angular elements */
+      console.log('Browser does not support custom elements')
+    }
+
     this.darktheme = this.mainController.darktheme
 
     /* probably makes sense to associate dom manipulation to the highest level of viewer hierachy */
@@ -77,15 +92,20 @@ export class NehubaContainer {
         .map(checkStringAsSupportLibrary)
         .forEach(libname=>{
           const ledger = this.loadedLibraries.get(libname!)
-          if(ledger){
-            if(ledger.counter - 1 == 0){
-              this.rd2.removeChild(document.head,ledger.src)
-              this.loadedLibraries.delete(libname!)
-            }else{
-              this.loadedLibraries.set(libname!,{counter : ledger.counter - 1,src:ledger.src})
-            }
-          }else{
+          if(!ledger){
             console.warn('unload external libraries error. cannot find ledger entry...',libname,this.loadedLibraries)
+            return
+          }
+          if(ledger.src ===  null){
+            console.log('webcomponents is native supported. no library needs to be unloaded')
+            return
+          }
+          
+          if(ledger.counter - 1 == 0){
+            this.rd2.removeChild(document.head,ledger.src)
+            this.loadedLibraries.delete(libname!)
+          }else{
+            this.loadedLibraries.set(libname!,{counter : ledger.counter - 1,src:ledger.src})
           }
         })
     this.mainController.selectedTemplateBSubject.subscribe(template=>{

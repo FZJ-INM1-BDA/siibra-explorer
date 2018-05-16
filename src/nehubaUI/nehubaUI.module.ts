@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { createCustomElement } from '@angular/elements'
+// import { createCustomElement } from '@angular/elements'
 
 import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
@@ -111,12 +111,12 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices, TEMP_S
 })
 export class NehubaUI{
   constructor(public injector:Injector){
-    const readmoreElement = createCustomElement( ReadMoreComponent, {injector : this.injector })
-    const radarChart = createCustomElement( NehubaRadarChart, {injector : this.injector })
-    const lineChart = createCustomElement( NehubaLineChart , {injector : this.injector })
+    // const readmoreElement = createCustomElement( ReadMoreComponent, {injector : this.injector })
+    // const radarChart = createCustomElement( NehubaRadarChart, {injector : this.injector })
+    // const lineChart = createCustomElement( NehubaLineChart , {injector : this.injector })
     
-    customElements.define('readmore-component',readmoreElement)
-    customElements.define('radar-chart-component',radarChart)
-    customElements.define('line-chart-component',lineChart)
+    // customElements.define('readmore-component',readmoreElement)
+    // customElements.define('radar-chart-component',radarChart)
+    // customElements.define('line-chart-component',lineChart)
   }
 }
