@@ -33,6 +33,24 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   spatialTotal : number = 10
   spatialPagination : number = 0
 
+  TEMP_ieegDictionary : any = {}
+  TEMP_returnIeegEntries : (dataset:SearchResultInterface) => any = (dataset:SearchResultInterface)=>{
+    return dataset.id in this.TEMP_ieegDictionary ? ({
+      name : `iEEG recording site: ${this.TEMP_ieegDictionary[dataset.id].id}`,
+      thumbnail : {
+        properties : {},
+        filename : 'thumbnail',
+        name : 'Link to KG',
+        mimetype : 'application/octet-stream',
+        url : this.TEMP_ieegDictionary[dataset.id].fileName,
+        parentDataset : dataset
+      },
+      files : []
+    }) : ({
+
+    })
+  }
+
   constructor(
     private mainController:MainController,
     private searchDatasetService:TEMP_SearchDatasetService,
@@ -50,6 +68,11 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
       })
 
     this.updateSpatialPagination()
+
+    /* TODO temp fetching ieeg data */
+    fetch('res/json/ieegTable.json')
+      .then(res=>res.json())
+      .then(json=>this.TEMP_ieegDictionary = json)
   }
 
   private updateSpatialPagination(){
@@ -82,8 +105,12 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
       .from(this.searchDatasetService.returnedSpatialSearchResultsBSubject)
       .takeUntil(this.onDestroySubject)
       .debounceTime(300)
+      .map(arr=>
+        arr.map(it=>
+          Object.assign({},it,this.TEMP_returnIeegEntries(it))))
       .subscribe(val=>{
         this.spatialSearchResultObjects = val
+
         this.updateSpatialPagination()
 
         // TODO  will have to decide if splitting returnedsearchresultobject into spatial and normal there are raminfication here

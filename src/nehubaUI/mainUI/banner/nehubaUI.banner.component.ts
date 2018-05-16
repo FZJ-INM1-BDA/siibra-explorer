@@ -67,7 +67,9 @@ export class NehubaBanner implements AfterViewInit {
   }
 
   loadParcellation(parcellation:ParcellationDescriptor){
-    if(this.mainController.selectedParcellation !== parcellation) this.mainController.selectedParcellationBSubject.next(parcellation)
+    if(this.mainController.selectedParcellation !== parcellation) {
+      this.mainController.selectedParcellationBSubject.next(parcellation)
+    }
   }
 
   widgetiseSearchRegionComponent(){

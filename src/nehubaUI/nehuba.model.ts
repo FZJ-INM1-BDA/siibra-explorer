@@ -115,7 +115,10 @@ export class ParcellationDescriptor {
 
     this.regions.forEach(region=>this.iterateColorMap(region))
     this.surfaceParcellation = json.surfaceParcellation
-    if( this.surfaceParcellation ) this.colorMap.set(65535,{red:255,green:255,blue:255})
+    if( this.surfaceParcellation ) {
+      (Array.from(new Array(36).keys())).forEach(idx=>
+        this.colorMap.set(65500+idx,{red:255,green:255,blue:255}))
+    }
   }
   regions : RegionDescriptor[];
   name : string;

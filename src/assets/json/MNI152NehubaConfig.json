@@ -24,7 +24,7 @@
       "mesh": {
         "removeBasedOnNavigation": true,
         "flipRemovedOctant": true,
-		      "surfaceParcellation":true
+		      "surfaceParcellation":false
       },
       "removePerspectiveSlicesBackground": {
         "mode": "<",
@@ -78,7 +78,39 @@
         ]
         ]
       },
-      "fibre bundle": {
+      "fibre bundle long": {
+        "type": "segmentation",
+        "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/Fiber_Bundle/long-bundles_maxprob",
+        "transform": [
+          [
+            1,
+            0,
+            0,
+            -96500000
+          ],
+          [
+            0,
+            1,
+            0,
+            -132500000
+          ],
+          [
+            0,
+            0,
+            1,
+            -78500000
+          ],
+          [
+            0,
+            0,
+            0,
+            1
+          ]
+          ]
+        },
+        "fibre bundle short":{
+          "visible" : false,
+
         "type": "segmentation",
         "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/Fiber_Bundle/short-bundles_maxprob",
         "transform": [
@@ -107,7 +139,7 @@
             1
           ]
           ]
-      }
+        }
       },
       "navigation": {
       "pose": {

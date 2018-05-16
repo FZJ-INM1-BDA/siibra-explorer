@@ -45,11 +45,7 @@ export class NehubaContainer {
   ){
 
     if('customElements' in window){
-      console.log('browser supports custom elements')
       this.loadedLibraries.set(SUPPORTED_LIB.webcomponentsLite,{counter:1,src:null})
-    }else{
-      /* webcomponents should always be natively supported, polyfill from angular elements */
-      console.log('Browser does not support custom elements')
     }
 
     this.darktheme = this.mainController.darktheme

@@ -7,11 +7,19 @@
 	"nehubaConfigURL":"res/json/MNI152NehubaConfig.json",
 	"parcellations":[
 		{
-			"ngId":"fibre bundle",
+			"ngId":"fibre bundle long",
 			"type":"parcellation",
 			"surfaceParcellation":true,
 			"ngData":null,
-			"name":"Fibre Bundle Atlas",
+      "name":"Fibre Bundle Atlas - Long Bundle",
+      "regions" :[{"name":"Arcuate - Left","children":[],"labelIndex":"1"},{"name":"Arcuate - Right","children":[],"labelIndex":"31"},{"name":"Arcuate_Anterior - Left","children":[],"labelIndex":"2"},{"name":"Arcuate_Anterior - Right","children":[],"labelIndex":"32"},{"name":"Arcuate_Posterior - Left","children":[],"labelIndex":"3"},{"name":"Arcuate_Posterior - Right","children":[],"labelIndex":"33"},{"name":"Cingulum_Long - Left","children":[],"labelIndex":"4"},{"name":"Cingulum_Long - Right","children":[],"labelIndex":"34"},{"name":"Cingulum_Short - Left","children":[],"labelIndex":"5"},{"name":"Cingulum_Short - Right","children":[],"labelIndex":"35"},{"name":"Cingulum_Temporal - Left","children":[],"labelIndex":"6"},{"name":"Cingulum_Temporal - Right","children":[],"labelIndex":"36"},{"name":"CorpusCallosum_Body","children":[],"labelIndex":"7"},{"name":"CorpusCallosum_Genu","children":[],"labelIndex":"8"},{"name":"CorpusCallosum_Rostrum","children":[],"labelIndex":"9"},{"name":"CorpusCallosum_Splenium","children":[],"labelIndex":"10"},{"name":"CorticoSpinalTract - Left","children":[],"labelIndex":"11"},{"name":"CorticoSpinalTract - Right","children":[],"labelIndex":"41"},{"name":"ExternalCapsule - Left","children":[],"labelIndex":"12"},{"name":"ExternalCapsule - Right","children":[],"labelIndex":"42"},{"name":"Fornix - Left","children":[],"labelIndex":"13"},{"name":"Fornix - Right","children":[],"labelIndex":"43"},{"name":"InferiorFrontoOccipital - Left","children":[],"labelIndex":"14"},{"name":"InferiorFrontoOccipital - Right","children":[],"labelIndex":"44"},{"name":"InferiorLongitudinal - Left","children":[],"labelIndex":"15"},{"name":"InferiorLongitudinal - Right","children":[],"labelIndex":"45"},{"name":"InferiorLongitudinal_Lateral - Left","children":[],"labelIndex":"16"},{"name":"InferiorLongitudinal_Lateral - Right","children":[],"labelIndex":"46"},{"name":"MediumLongitudinal - Left","children":[],"labelIndex":"17"},{"name":"MediumLongitudinal - Right","children":[],"labelIndex":"47"},{"name":"SpinoThalamicTract - Left","children":[],"labelIndex":"18"},{"name":"SpinoThalamicTract - Right","children":[],"labelIndex":"48"},{"name":"ThalamicRadiations_Anterior - Left","children":[],"labelIndex":"19"},{"name":"ThalamicRadiations_Anterior - Right","children":[],"labelIndex":"49"},{"name":"ThalamicRadiations_Posterior - Left","children":[],"labelIndex":"20"},{"name":"ThalamicRadiations_Posterior - Right","children":[],"labelIndex":"50"},{"name":"Uncinate - Left","children":[],"labelIndex":"21"},{"name":"Uncinate - Right","children":[],"labelIndex":"51"}]
+		},
+		{
+			"ngId":"fibre bundle short",
+			"type":"parcellation",
+			"surfaceParcellation":true,
+			"ngData":null,
+			"name":"Fibre Bundle Atlas - Short Bundle",
 			"regions":[
         {
           "name": "Left Hemisphere",
@@ -1039,7 +1047,7 @@
           ]
         }
       ]
-		}
+    }
 	],
 	"properties" : {
 		"name":"MNI 152",

@@ -81,6 +81,13 @@ export class MainController{
         case 'dedicatedView':{
           this.dedicatedViewBSubject.next(keyval[1])
         }break;
+        case 'selectedParcellation':{
+          const template = this.selectedTemplateBSubject.getValue()
+          if(template){
+            const parcellation = template.parcellations.find(p=>p.name===keyval[1])
+            if(parcellation) this.selectedParcellationBSubject.next(parcellation)
+          }
+        }break;
         case 'selectedTemplate':{
           const template = this.loadedTemplates.find(template=>template.name==keyval[1])
           if(template) this.selectedTemplateBSubject.next(template)
@@ -947,7 +954,6 @@ export class SpatialSearch{
 
   /* promise race timeout (?) */
   spatialSearch(center:[number,number,number],width:number,templateSpace:string){
-
     this.center = center
     this.width = width
 
@@ -1216,20 +1222,19 @@ class DataService {
     }
   }
 
-
   private pluginArray = [
-    'http://localhost:8005/manifest.json'
+    'http://localhost:6001/plugins/webjugex/manifest.json'
   ]
 
   fetchPlugins:Promise<LabComponent[]> = new Promise((resolve,reject)=>{
     Promise.all(this.pluginArray.map(manifestUrl=>
       this.fetchJson(manifestUrl)
-        .then(json=>this.parsePluginManifest(json))))
+        .then(json=>this.parsePluginManifests(json))))
       .then(labcomponents=>resolve(labcomponents))
       .catch(e=>reject(e))
   })
 
-  parsePluginManifest(json:any):Promise<LabComponent>{
+  parsePluginManifests(json:any):Promise<LabComponent>{
     return new Promise((resolve,reject)=>{
       try{
         const lc = new LabComponent(json)

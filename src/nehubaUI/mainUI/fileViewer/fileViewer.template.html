@@ -12,7 +12,7 @@
       </property-widget>
     </small>
   </div>
-  <div *ngIf = "!hasRelatedRegion">
+  <div *ngIf = "!hasRelatedRegion && false">
     Not associated with any regions.
   </div>
 
@@ -51,6 +51,12 @@
 <div 
   *ngIf = "searchResultFile"
   [ngSwitch]="searchResultFile.mimetype">
+
+  <div emptyRow *ngSwitchCase = "'application/octet-stream'">
+    <!-- downloadable data -->
+  </div>
+
+  <!-- image  -->
   <div *ngSwitchCase="'image/jpeg'" >
     <!-- TODO figure out a more elegant way of dealing with draggable img -->
     <img draggable = "false" [src] = "searchResultFile.url" />

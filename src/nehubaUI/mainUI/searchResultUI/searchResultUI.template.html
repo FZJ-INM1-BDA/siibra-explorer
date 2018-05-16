@@ -11,13 +11,6 @@
       [searchResultFile] = "searchResult.thumbnail"
       *ngIf = "searchResult.thumbnail">
     </file-viewer>
-    <span style = "font-size:smaller">
-      Thumbnail info:
-      <property-widget
-        [title]="'More information on ' + searchResult.thumbnail.name"
-        [inputComponent]="searchResult.thumbnail">
-      </property-widget>
-    </span>
   </div>
 
   <!-- linked region info, if flag set to true -->
