@@ -6,6 +6,8 @@ import { MainController, InfoToUIService } from 'nehubaUI/nehubaUI.services'
 import { NehubaViewerComponent } from 'nehubaUI/mainUI/viewer/nehubaUI.viewerUnit.component';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
+// import { Observable } from 'rxjs/Rx'
+// import merge from 'lodash.merge'
 
 
 @Component({
@@ -55,6 +57,39 @@ export class NehubaViewerInnerContainer {
       if(!templateDescriptor) return
       this.loadTemplate(templateDescriptor.nehubaConfig)
     })
+
+    // Observable
+    //   .combineLatest(this.mainController.selectedTemplateBSubject,this.mainController.selectedParcellationBSubject)
+    //   .subscribe(([template,parcellation])=>{
+    //     if(template && parcellation){
+    //       const initState = Object.assign({},template.nehubaConfig.dataset!.initialNgState!)
+    //       const selectedLayerNgId = Object.keys(initState.layers)
+    //         .filter(layerName=>initState.layers[layerName].type === 'segmentation')
+    //         .find(layerName=>parcellation.ngId===layerName)
+
+    //       if(selectedLayerNgId){
+    //         const arrSegVisibility = Object.keys(initState.layers)
+    //           .filter(layerName=>initState.layers[layerName].type === 'segmentation')
+    //           .map(layerName=>Object.assign({},initState.layers[layerName],{
+    //             visible : layerName === selectedLayerNgId ? true : false
+    //           }))
+
+    //         const partNehubaConfig = {
+    //           dataset: {
+    //             initialNgState : {
+    //               layers :Object.assign({},initState.layers,...arrSegVisibility)
+    //             }
+    //           }  
+    //         }
+
+    //         const nehubaConfig = Object.assign({},template.nehubaConfig)
+    //         merge(partNehubaConfig,nehubaConfig)
+    //         this.loadTemplate(nehubaConfig)
+    //       }else{
+    //         this.loadTemplate(template.nehubaConfig)
+    //       }
+    //     }
+    //   })
 
     INTERACTIVE_VIEWER.viewerHandle.mouseOverNehuba.subscribe((ev)=>this.hoveredRegion=ev.foundRegion)
     this.infoToUI.getContentInfoPopoverObservable(

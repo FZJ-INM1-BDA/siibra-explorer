@@ -109,7 +109,7 @@ export class NehubaContainer {
     })
 
     Observable
-      .from(this.mainController.selectedTemplateBSubject)
+      .from(this.mainController.selectedParcellationBSubject)
       .filter(v=>v!==null)
       .debounceTime(1000)
       .subscribe(()=>this.showMenu = 

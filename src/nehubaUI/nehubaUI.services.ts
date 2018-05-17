@@ -727,9 +727,11 @@ export class TEMP_SearchDatasetService{
   returnedSpatialSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
 
   returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
-  searchResultMetadataMap : Map<string,HasPropertyInterface> = new Map()
+  searchResultMetadataMap : Map<{targetParcellation:string,datasetName:string},HasPropertyInterface> = new Map()
   
   constructor(private mainController:MainController){
+    fetch('res/json/allAggregatedData.json').then(res=>res.json())
+      .then(metadata=>this.searchResultMetadataMap = new Map(metadata))
 
     Observable
       .from(this.mainController.selectedParcellationBSubject)
@@ -737,41 +739,20 @@ export class TEMP_SearchDatasetService{
       .subscribe(p=>{
         if(p!.name == 'JuBrain Cytoarchitectonic Atlas'){
           Promise.all([
-            fetch('res/json/allAggregatedData.json').then(res=>res.json()),
             fetch('res/json/pmapsAggregatedData.json').then(res=>res.json()),
-            fetch('res/json/receptorAggregatedData.json').then(res=>res.json())
+            fetch('res/json/receptorAggregatedData.json').then(res=>res.json()),
           ])
-            .then(arr=>{
-              const [ metadata, ...aggregateDataSets] = arr
-              this.searchResultMetadataMap = new Map(metadata)
-              this.returnedSearchResultsBSubject.next(
-                aggregateDataSets
-                  .reduce((acc,curr)=>
-                    acc.concat(...curr)
-                  ,[])
-                  .map((it:SearchResultInterface)=>
-                    Object.assign(
-                      {},
-                      it,
-                      { files: it.files.map(file=>Object.assign({},file,{parentDataset : it})) }
-                    )
-                  )
-                  /* TODO test parent dataset of thumbnail */
-                  .map((it:SearchResultInterface)=>
-                    Object.assign(
-                      {},
-                      it,
-                      { 
-                        thumbnail : it.thumbnail ? 
-                          Object.assign({},it.thumbnail,{parentDataset : it}) :
-                          null 
-                      }
-                    ))
-              )
-            })
+            .then(arr=>this.sendFetchedDatasets(arr))
             .catch(console.warn)
-        }else{
-          this.returnedSearchResultsBSubject.next([])
+        }
+        else if (p!.name == 'Fibre Bundle Atlas - Short Bundle'){
+          Promise.all([fetch('res/json/swmAggregatedData.json').then(res=>res.json())])
+            .then(arr=>this.sendFetchedDatasets(arr))
+            .catch(console.warn)
+          
+        }
+        else{
+          this.sendFetchedDatasets([])
         }
       })
 
@@ -860,6 +841,34 @@ export class TEMP_SearchDatasetService{
       .subscribe(v=>{
         INTERACTIVE_VIEWER.metadata.datasetsBSubject.next(v)
       })
+  }
+
+  private sendFetchedDatasets(arr:any[]){
+
+    this.returnedSearchResultsBSubject.next(
+      arr
+        .reduce((acc,curr)=>
+          acc.concat(...curr)
+        ,[])
+        .map((it:SearchResultInterface)=>
+          Object.assign(
+            {},
+            it,
+            { files: it.files.map(file=>Object.assign({},file,{parentDataset : it})) }
+          )
+        )
+        /* TODO test parent dataset of thumbnail */
+        .map((it:SearchResultInterface)=>
+          Object.assign(
+            {},
+            it,
+            { 
+              thumbnail : it.thumbnail ? 
+                Object.assign({},it.thumbnail,{parentDataset : it}) :
+                null 
+            }
+          ))
+    )
   }
 
   private editAvailableDatasetOnRegion(newDataSets:SearchResultInterface[],region:RegionDescriptor){
@@ -1117,16 +1126,6 @@ class DataService {
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json'
   ]
-  // COLIN_JUBRAIN_PMAP_INFO = `res/json/colinJubrainPMap.json`
-  // COLIN_IEEG_INFO = `res/json/colinIEEG.json`
-  // COLIN_JUBRAIN_RECEPTOR_INFO = `res/json/colinJubrainReceptor.json`
-
-
-
-  // COLIN_JUBRAIN_PMAP_INFO = `http://localhost:5080/res/json/colinJubrainPMap.json`
-  // COLIN_IEEG_INFO = `http://localhost:5080/res/json/colinIEEG.json`
-  // COLIN_JUBRAIN_RECEPTOR_INFO = `http://localhost:5080/res/json/colinJubrainReceptor.json`
-  
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
     Promise.all(this.templateArray.map(dataset=>
       this.fetchJson(dataset)

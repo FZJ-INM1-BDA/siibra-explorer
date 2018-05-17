@@ -8,6 +8,7 @@ import template from './nehubaUI.searchResultList.template.html'
 import css from './nehubaUI.searchResultList.style.css'
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 import { MainController } from 'nehubaUI/nehubaUI.services';
+import { Observable,Subject } from 'rxjs/Rx'
 
 @Component({
   selector : 'nehubaui-searchresult-ui-list',
@@ -23,10 +24,14 @@ export class SearchResultUIList implements OnChanges{
   @Input() searchResultObjects : SearchResultInterface[] = []
   @Input() filterSearchResultbyType : {name : string, enabled : boolean}[] = []
 
-  allLabelledRegions : RegionDescriptor[] = []
+  onDestroySubject : Subject<boolean> = new Subject()
+  allLabelledRegions :RegionDescriptor[] = []
 
   constructor(private mainController:MainController){
-    this.allLabelledRegions = Array.from(this.mainController.regionsLabelIndexMap.values())
+    Observable
+      .from(this.mainController.selectedParcellationBSubject)
+      .takeUntil(this.onDestroySubject)
+      .subscribe(()=>this.allLabelledRegions = Array.from(this.mainController.regionsLabelIndexMap.values()))
   }
 
   ngOnChanges(){
@@ -36,6 +41,7 @@ export class SearchResultUIList implements OnChanges{
   renderRegionName(obj:{region:RegionDescriptor|null,searchResult:SearchResultInterface[]}){
     return `${obj.region ? obj.region.name : 'Unlinked to any region'} <small class = "text-muted">(${obj.searchResult.length})</small>`
   }
+
 
   currentPage : number = 0
   hitsPerPage : number = 15

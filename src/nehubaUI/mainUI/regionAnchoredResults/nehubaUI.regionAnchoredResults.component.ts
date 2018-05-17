@@ -90,6 +90,14 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   }
 
   ngAfterViewInit(){
+
+    /* when user toggle between parcellations, reset the filtersearchresult */
+    Observable
+      .from(this.mainController.selectedParcellationBSubject)
+      .subscribe(()=>{
+        this.filterSearchResultbyType = []
+      })
+
     Observable
       .from(this.searchDatasetService.returnedSearchResultsBSubject)
       .takeUntil(this.onDestroySubject)
@@ -140,7 +148,9 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   }
 
   getTypeMetadata(type:string){
-    return this.searchDatasetService.searchResultMetadataMap.get(type)
+    const parcellation = this.mainController.selectedParcellationBSubject.getValue()
+    const parcellationName = parcellation ? parcellation.name : ''
+    return this.searchDatasetService.searchResultMetadataMap.get({targetParcellation:parcellationName,datasetName:type})
   }
   
   animationDone(){
