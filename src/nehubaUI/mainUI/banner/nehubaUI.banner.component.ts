@@ -88,7 +88,7 @@ export class NehubaBanner implements AfterViewInit {
     })
 
     this.mainController.dedicatedViewBSubject
-      .subscribe(dedicatedView=>this.dedicatedView = dedicatedView)
+      .subscribe(dedicatedView=>this.dedicatedView = dedicatedView ? dedicatedView.url : null)
   }
   dedicatedView : string|null = null
 

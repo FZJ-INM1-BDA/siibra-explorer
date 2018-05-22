@@ -91,6 +91,13 @@
 
     </dedicated-view-controller>
   </div>
+  <div *ngSwitchCase = "'application/nehuba-layer'">
+    <dedicated-view-controller
+      [dedicatedViewString]="'nehuba-layer://'+searchResultFile.url"
+      [dedicatedViewNehubaLayerObject]="searchResultFile.data">
+
+    </dedicated-view-controller>
+  </div>
   <div *ngSwitchDefault>
     The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
   </div>

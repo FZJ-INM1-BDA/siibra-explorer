@@ -65,6 +65,7 @@ import { Observable, Subject } from 'rxjs/Rx'
 
 export class DedicatedViewController implements AfterViewInit,OnDestroy{
   @Input() dedicatedViewString : string = ``
+  @Input() dedicatedViewNehubaLayerObject : any /* nehubaLayerObject */
 
   isShowing : boolean = false
   isObstructed : boolean = false
@@ -79,8 +80,8 @@ export class DedicatedViewController implements AfterViewInit,OnDestroy{
       .from(this.mainController.dedicatedViewBSubject)
       .takeUntil(this.destroySubject)
       .subscribe(dedicatedView=>{
-        this.isShowing = dedicatedView === this.dedicatedViewString
-        this.isObstructed = dedicatedView !== null && dedicatedView != this.dedicatedViewString
+        this.isShowing = dedicatedView ? dedicatedView.url === this.dedicatedViewString : false
+        this.isObstructed = dedicatedView !== null && dedicatedView.url != this.dedicatedViewString
       })
   }
 
@@ -89,7 +90,11 @@ export class DedicatedViewController implements AfterViewInit,OnDestroy{
   }
 
   showDedicatedView(){
-    this.mainController.dedicatedViewBSubject.next(this.dedicatedViewString)
+    this.mainController.dedicatedViewBSubject.next(
+      this.dedicatedViewNehubaLayerObject ? 
+        Object.assign({},{url:this.dedicatedViewString,data:this.dedicatedViewNehubaLayerObject}) :
+        Object.assign({},{url:this.dedicatedViewString})
+    )
   }
 
   removeDedicatedView(){
@@ -99,7 +104,7 @@ export class DedicatedViewController implements AfterViewInit,OnDestroy{
   get nowShowing():string|null{
     const dedicated = this.mainController.dedicatedViewBSubject.getValue()
     return dedicated ? 
-      dedicated.split('/')[dedicated.split('/').length-1]:
+      dedicated.url.split('/')[dedicated.url.split('/').length-1]:
       null
   }
 }

@@ -49,7 +49,7 @@ export class MainController{
   resultsFilterBSubject : BehaviorSubject<string[]> = new BehaviorSubject([])
 
   /* dedicated view */
-  dedicatedViewBSubject : BehaviorSubject<string|null> = new BehaviorSubject(null)
+  dedicatedViewBSubject : BehaviorSubject<{url:string,data?:any}|null> = new BehaviorSubject(null)
 
   /**
    * plugins
@@ -79,7 +79,7 @@ export class MainController{
     Array.from(query.entries()).forEach(keyval=>{
       switch(keyval[0]){
         case 'dedicatedView':{
-          this.dedicatedViewBSubject.next(keyval[1])
+          this.dedicatedViewBSubject.next({url:keyval[1]})
         }break;
         case 'selectedParcellation':{
           const template = this.selectedTemplateBSubject.getValue()
@@ -244,7 +244,7 @@ export class MainController{
     const merged = Observable.merge(
       Observable.from(this.dedicatedViewBSubject)
         .skip(1)
-        .map(dedicatedView=>({'dedicatedView':dedicatedView})),
+        .map(dedicatedView=>({'dedicatedView':dedicatedView?dedicatedView.url:null})),
       Observable.from(this.selectedTemplateBSubject
         .skip(1)
         .map(template=>({ 'selectedTemplate' : template ? template.name: null }))),
@@ -753,6 +753,12 @@ export class TEMP_SearchDatasetService{
         }else if (p!.name == 'Fibre Bundle Atlas - Long Bundle'){
           
           Promise.all([fetch('res/json/dwmAggregatedData.json').then(res=>res.json())])
+            .then(arr=>this.sendFetchedDatasets(arr))
+            .catch(console.warn)
+        }
+        else if (p!.name == 'Grey/White matter'){
+          
+          Promise.all([fetch('res/json/dartboardAggregatedData.json').then(res=>res.json())])
             .then(arr=>this.sendFetchedDatasets(arr))
             .catch(console.warn)
         }

@@ -144,6 +144,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     
   }
 
+  temporaryLayerNames : string[] = []
+
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
     this.viewerConfig = config
 
@@ -175,12 +177,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         }
 
         if(dedicatedView){
-          const idx = dedicatedView.indexOf('://')
+          console.log(dedicatedView.data)
+          const idx = dedicatedView.url.indexOf('://')
           idx < 0 ? 
             console.warn('could not parse dedicated view protocol!') :
-            dedicatedView.slice(0,idx) == 'nifti' ? 
+            dedicatedView.url.slice(0,idx) == 'nifti' ? 
               (
                 this.allSeg(false),
+                this.temporaryLayerNames.push('nehubaNifti'),
                 this.loadLayer({
                   nehubaNifti : {
                     type : 'image',
@@ -189,11 +193,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
                   }
                 })
               ) : 
-              console.warn('could not parse dedicated view param!')
+              dedicatedView.url.slice(0,idx) == 'nehuba-layer' ? 
+                (this.allSeg(false),
+                this.temporaryLayerNames = this.temporaryLayerNames.concat(Object.keys(dedicatedView.data)),
+                this.loadLayer(dedicatedView.data)) :
+                  console.warn('could not parse dedicated view param!')
         }else{
-          this.removeLayer({
-            name : 'nehubaNifti'
-          })
+          this.temporaryLayerNames.forEach(layername=>this.removeLayer({
+            name : layername
+          }))
+          this.temporaryLayerNames = []
         }
 
         
