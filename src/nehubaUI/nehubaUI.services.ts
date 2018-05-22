@@ -750,6 +750,11 @@ export class TEMP_SearchDatasetService{
             .then(arr=>this.sendFetchedDatasets(arr))
             .catch(console.warn)
           
+        }else if (p!.name == 'Fibre Bundle Atlas - Long Bundle'){
+          
+          Promise.all([fetch('res/json/dwmAggregatedData.json').then(res=>res.json())])
+            .then(arr=>this.sendFetchedDatasets(arr))
+            .catch(console.warn)
         }
         else{
           this.sendFetchedDatasets([])
@@ -950,12 +955,14 @@ export class SpatialSearch{
       })
   }
 
+  spatialSearchEnabled : boolean = true
+
   /* should always use larger for width when doing spatial querying */
   /* otherwise, some parts of the viewer will be out of bounds */
   querySpatialData : (center:[number,number,number],width:number,templateSpace:string ) => void = (center,width,templateSpace)=>
   {
     /* TODO ipmlement spatial search in revamp of search result */
-
+    if(!this.spatialSearchEnabled) return
     this.spatialSearchResultSubject.next({center,width,templateSpace})
     // if(this.mainController.viewingMode == 'iEEG Recordings')
     //   this.spatialSearchResultSubject.next({center,width,templateSpace})
@@ -1120,6 +1127,7 @@ class DataService {
 
   /* TODO temporary solution fetch available template space from KG  */
   private templateArray = [
+    // 'res/json/infant.json',
     'res/json/bigbrain.json',
     'res/json/colin.json',
     'res/json/MNI152.json',
@@ -1222,7 +1230,7 @@ class DataService {
   }
 
   private pluginArray = [
-    'http://localhost:6001/plugins/webjugex/manifest.json'
+    // 'http://localhost:6001/plugins/webjugex/manifest.json'
   ]
 
   fetchPlugins:Promise<LabComponent[]> = new Promise((resolve,reject)=>{
@@ -1348,7 +1356,7 @@ if (x < 0.3) {
 }
 float a = 1.0;
 `
-export const TIMEOUT = 5000;
+export const TIMEOUT = 60000;
 export const CM_THRESHOLD = 0.05;
 
 /* TODO to be deprecated when the new results browser is adopted */

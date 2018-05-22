@@ -412,6 +412,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       name : this.activeParcellationId 
     }))
       .takeUntil(this.destroySubject)
+      .debounceTime(100)
       .filter(()=>
         (typeof this.mainController.selectedParcellation != 'undefined') &&
         this.mainController.selectedParcellation.surfaceParcellation)
