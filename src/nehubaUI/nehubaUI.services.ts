@@ -79,6 +79,7 @@ export class MainController{
     Array.from(query.entries()).forEach(keyval=>{
       switch(keyval[0]){
         case 'dedicatedView':{
+          /* TODO this currently does not work. need to wait for searched dataset to emit data as well as url! */
           this.dedicatedViewBSubject.next({url:keyval[1]})
         }break;
         case 'selectedParcellation':{
@@ -727,11 +728,22 @@ export class TEMP_SearchDatasetService{
   returnedSpatialSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
 
   returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
-  searchResultMetadataMap : Map<{targetParcellation:string,datasetName:string},HasPropertyInterface> = new Map()
+  searchResultMetadataMap : Map<string,Map<string,HasPropertyInterface>> = new Map()
   
   constructor(private mainController:MainController){
     fetch('res/json/allAggregatedData.json').then(res=>res.json())
-      .then(metadata=>this.searchResultMetadataMap = new Map(metadata))
+      .then(metadata=>{
+        const data = metadata.reduce((acc:[string,Map<string,HasPropertyInterface>][],curr:any)=>{
+          const idx = acc.findIndex((it)=>it[0]===curr[0].targetParcellation)
+          return idx >= 0 ? 
+            acc.map((it,i)=> i === idx ? [it[0], it[1].set(curr[0].datasetName,curr[1])] : it ) :
+            acc.concat([[ curr[0].targetParcellation , new Map([[curr[0].datasetName , curr[1]]]) ]])
+              
+              /* [[ curr[0].targetParcellation , [ curr[0].datasetName , curr[1]] ]] */
+        },[] as [string,Map<string,HasPropertyInterface>][])
+        
+        this.searchResultMetadataMap = new Map(data)
+      })
 
     Observable
       .from(this.mainController.selectedParcellationBSubject)
@@ -753,12 +765,6 @@ export class TEMP_SearchDatasetService{
         }else if (p!.name == 'Fibre Bundle Atlas - Long Bundle'){
           
           Promise.all([fetch('res/json/dwmAggregatedData.json').then(res=>res.json())])
-            .then(arr=>this.sendFetchedDatasets(arr))
-            .catch(console.warn)
-        }
-        else if (p!.name == 'Grey/White matter'){
-          
-          Promise.all([fetch('res/json/dartboardAggregatedData.json').then(res=>res.json())])
             .then(arr=>this.sendFetchedDatasets(arr))
             .catch(console.warn)
         }

@@ -177,7 +177,6 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
         }
 
         if(dedicatedView){
-          console.log(dedicatedView.data)
           const idx = dedicatedView.url.indexOf('://')
           idx < 0 ? 
             console.warn('could not parse dedicated view protocol!') :
@@ -188,7 +187,7 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
                 this.loadLayer({
                   nehubaNifti : {
                     type : 'image',
-                    source : dedicatedView,
+                    source : dedicatedView.url,
                     shader : getActiveColorMapFragmentMain()
                   }
                 })

@@ -1,5 +1,6 @@
 <collapsable-panel
   *ngIf = "searchResult"
+  [propertyWidget]="searchResult"
   [title] = "title ? title : searchResult.name">
 
   <!-- thumbnail, if exists -->
