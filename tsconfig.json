@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "target": "es2015",
+    "sourceMap": true,
+    "types" : [
+      "node"
+    ],
+    "typeRoots": [
+      "./typings",
+      "node_modules/@types"
+    ]
+  }
+}
