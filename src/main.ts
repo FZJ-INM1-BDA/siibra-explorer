@@ -1,5 +1,6 @@
 import 'zone.js'
-import { ComponentsModule } from './components/components.module'
+import 'reflect-metadata'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
+import { MainModule } from './main.module';
 
-platformBrowserDynamic().bootstrapModule(ComponentsModule)
+platformBrowserDynamic().bootstrapModule(MainModule)

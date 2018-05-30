@@ -1,0 +1,17 @@
+<div (click)="TEST_create()" class = "btn btn-default">
+  create new
+</div>
+<div (click)="nehubaDS.increment()" class = "btn btn-default">
+  +
+</div>
+<div (click)="nehubaDS.decrement()" class = "btn btn-default">
+  -
+</div>
+
+{{ nehubaDS.counter }}
+
+<ng-template #container>
+</ng-template>
+
+<ui-splashscreen *ngIf = "!viewerLoaded">
+</ui-splashscreen>

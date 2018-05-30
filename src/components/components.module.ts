@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core'
-import { BrowserModule } from '@angular/platform-browser'
 import { FormsModule } from '@angular/forms'
 
 import { TestComponent } from './test/test.component'
@@ -7,6 +6,8 @@ import {  MarkdownDom } from './markdown/markdown.component';
 import { ComponentIndex } from './main/main.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
+import { ReadmoreComponent } from './readmoore/readmore.component';
+import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
   imports : [
@@ -14,17 +15,17 @@ import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
     FormsModule
   ],
   declarations : [
-    TestComponent,
-
     /* components */
     MarkdownDom,
     ComponentIndex,
+    ReadmoreComponent,
 
     /* pipes */
     SafeHtmlPipe
   ],
-  bootstrap : [
-    ComponentIndex
+  exports : [
+    MarkdownDom,
+    ReadmoreComponent
   ]
 })
 

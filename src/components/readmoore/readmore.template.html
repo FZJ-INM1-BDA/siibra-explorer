@@ -1,0 +1,10 @@
+<div
+  [style.maxHeight]="contentContainerMaxHeight"
+  #content
+  content>
+  <ng-content>
+  </ng-content>
+</div>
+<div (click)="toggle()" sliver>
+  <i [ngClass] = "show ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'" class = "glyphicon"></i>
+</div>

@@ -1,0 +1,11 @@
+.cell
+{
+  max-height:20em;
+}
+
+textarea
+{
+  resize:none;
+  width:100%;
+  height:20em;
+}

@@ -1,12 +1,13 @@
-import { Component, OnChanges, Input } from '@angular/core'
+import { Component, OnChanges, Input, ChangeDetectionStrategy } from '@angular/core'
 import * as showdown from 'showdown'
 
 @Component({
   selector : 'markdown-dom',
   templateUrl : `./markdown.template.html`,
   styleUrls : [
-    `markdown.style.css`
-  ]
+    `./markdown.style.css`
+  ],
+  changeDetection : ChangeDetectionStrategy.OnPush
 })
 
 export class MarkdownDom implements OnChanges{
@@ -19,6 +20,5 @@ export class MarkdownDom implements OnChanges{
   }
   ngOnChanges(){
     this.innerHtml = this.converter.makeHtml(this.markdown)
-    console.log(this.innerHtml)
   }
 }
