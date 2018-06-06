@@ -27,6 +27,17 @@ module.exports = {
             name : '[name].[ext]'
           }
         }
+      },
+      {
+        type : 'javascript/auto',
+        test : /ext.*?\.json/,
+        use : [{
+          loader : 'file-loader',
+          options : {
+            name : '[name].[ext]',
+            outputPath : 'res/json'
+          }
+        }]
       }
     ]
   },

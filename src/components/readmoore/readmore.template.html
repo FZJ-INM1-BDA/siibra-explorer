@@ -5,6 +5,13 @@
   <ng-content>
   </ng-content>
 </div>
-<div (click)="toggle()" sliver>
-  <i [ngClass] = "show ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'" class = "glyphicon"></i>
+<div 
+  (click)="toggle($event)" 
+  sliver
+  hoverable>
+
+  <i 
+    [ngClass] = "show ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'" 
+    class = "glyphicon">
+  </i>
 </div>

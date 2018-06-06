@@ -14,8 +14,3 @@ div[sliver]
 {
   background-color: rgba(128,128,128,0.1);
 }
-
-div[sliver]:hover
-{
-  background-color: rgba(128,128,128,0.2);
-}

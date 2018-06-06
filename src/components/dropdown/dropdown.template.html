@@ -1,0 +1,28 @@
+<div
+  dropdown
+  containerClass = "dropdownMenu">
+
+  <span
+    class = "btn btn-default"
+    [innerHTML] = "activeDisplay(selectedItem)"
+    hoverable
+    dropdownToggle>
+  </span>
+  
+  <ul 
+    class="dropdown-menu"
+    role="menu"
+    *dropdownMenu>
+    <li 
+      *ngFor="let input of inputArray" 
+      [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
+      (click)="itemSelected.emit(input)" 
+      role="menuitem">
+      
+      <span 
+        class="dropdown-item" 
+        [innerHTML] = "listDisplay(input)">
+      </span>
+    </li>
+  </ul>
+</div>

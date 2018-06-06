@@ -1,0 +1,53 @@
+<div container>
+  <dropdown
+    (itemSelected) = "selectTemplate($event)"
+    [activeDisplay] = "displayActiveTemplate"
+    [selectedItem] = "selectedTemplate"
+    [inputArray] = "loadedTemplates$ | async">
+  
+  </dropdown>
+  
+  <dropdown
+    *ngIf = "selectedTemplate$ | async"
+    [activeDisplay] = "displayActiveParcellation"
+    [selectedItem] = "selectedParcellation"
+    [inputArray] = "selectedTemplate.parcellations">
+  </dropdown>
+
+  <div 
+    *ngIf = "selectedTemplate$ | async"
+    placement = "bottom"
+    [outsideClick] = "true"
+    [popover]="searchRegionTemplate"
+    containerClass = "inputSearchContainer"
+    triggers = ""
+    #inputSearchRegionPopover = "bs-popover"
+    searchRegionPopover>
+
+    <input 
+      (keydown.esc)="inputSearchRegionPopover.hide();$event.target.blur();searchTerm=''"
+      [(ngModel)]="searchTerm"
+      class = "form-control" 
+      (click)="inputSearchRegionPopover.show()"
+      type="text" 
+      placeholder="Regions"/>
+      
+  </div>
+</div>
+
+<ng-template #searchRegionTemplate>
+  <div hideScrollbarContainer>
+    <div treeContainer>
+      <div treeHeader>
+        <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
+        <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
+      </div>
+      <tree
+        *ngFor = "let child of selectedParcellation.regions"
+        (mouseclicktree) = "handleClickRegion($event)"
+        [renderNode]="(displayTreeNode).bind(this)"
+        [inputItem]="child">
+      </tree>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,29 @@
+<div
+  (mouseleave)="mouseleavetree.emit(inputItem);handleEv($event)"
+  (mouseenter)="mouseentertree.emit(inputItem);handleEv($event)"
+  (click)="mouseclicktree.emit(inputItem);handleEv($event)"
+  itemMasterContainer>
+  <div itemContainer>
+    <i
+      (click) = "toggleChildrenShow($event)"
+      [ngClass] = "chevronClass"
+      class = "glyphicon"
+      glyphicon>
+    </i>
+    <span 
+      [innerHTML] = "renderNode(inputItem)"
+      itemName>
+    </span>
+  </div>
+  <tree
+    *ngFor = "let child of findChildren(inputItem)"
+    [hidden] = "!childrenExpanded"
+    [inputItem] = "child"
+    [renderNode]="renderNode"
+    [searchFilter]="searchFilter"
+    (mouseentertree)="mouseentertree.emit($event)"
+    (mouseleavetree)="mouseleavetree.emit($event)"
+    (mouseclicktree)="mouseclicktree.emit($event)">
+
+  </tree>
+</div>

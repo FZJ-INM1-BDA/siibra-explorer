@@ -1,0 +1,51 @@
+div[container]
+{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction: row;
+}
+
+div[maincontent]
+{
+  flex : 1 1 0px;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+div[resizeSliver]
+{
+  width : 2.0em;
+  height: 4em;
+  margin-left:-2.0em;
+  margin-top : 2em;
+  padding-left:0.5em;
+}
+
+:host-context([darktheme="false"]) div[resizeSliver]
+{
+  background-color:rgba(30,30,30,0.08);
+}
+
+:host-context([darktheme="true"]) div[resizeSliver]
+{
+  background-color:rgba(245,245,245,0.3);
+  color:rgba(245,245,245,0.8);
+}
+
+div[resizeSliver]
+{
+  z-index: 3;
+  display:flex;
+  flex-direction: row;
+  align-items: center;
+  /* box-shadow: -1px 1px 1px 1px rgba(0,0,0,0.15); */
+}
+
+div[sidecontent]
+{
+  flex : 0 0 0px;
+  box-shadow: 8px 0 8px 8px rgba(0,0,0,0.2);
+  z-index: 3;
+}
+

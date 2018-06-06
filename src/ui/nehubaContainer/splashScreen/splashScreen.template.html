@@ -1,1 +1,18 @@
-THIS IS A SPLASH SCREEN
+<div class = "container-fluid" splashScreenContainer>
+  <div 
+    class = "row" 
+    templateCardContainer>
+    
+    <div
+      *ngFor = "let template of loadedTemplate$ | async" 
+      (click) = "selectTemplate(template)"
+      templateCard
+      hoverable>
+      
+      <h2>{{ template.properties.name }}</h2>
+      <readmore>
+        <small>{{ template.properties.description }}</small>
+      </readmore>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<div container>
+  <div maincontent>
+    <ng-content select="[maincontent]">
+    </ng-content>
+  </div>
+  <div
+    *ngIf = "showResizeSliver" 
+    (click) = "showSide = !showSide"
+    resizeSliver
+    hoverable>
+    <i class = "glyphicon"
+      [ngClass]="showSide ? 'glyphicon-chevron-right' : 'glyphicon-chevron-left'">
+    </i>
+  </div>
+  <div 
+    *ngIf = "showSide"
+    [style.flexBasis]="sideWidth + 'px'"
+    sidecontent>
+    <ng-content select="[sidecontent]">
+    </ng-content>
+  </div>
+</div>

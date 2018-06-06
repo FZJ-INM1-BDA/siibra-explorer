@@ -1,0 +1,105 @@
+tree:not([hidden])
+{
+  display:block;
+  margin-left:1em;
+}
+
+div[itemContainer]
+{
+  display:flex;
+}
+
+div[itemContainer] > [glyphicon]
+{
+  flex: 0 0 1.2em;
+  align-self: center;
+  text-align: center;
+  z-index: 1;
+}
+
+div[itemContainer] > [itemName]
+{
+  flex: 1 1 0px;
+  white-space: nowrap;
+}
+
+[itemName]:hover
+{
+  cursor:default;
+}
+
+/* dashed guiding line */
+
+tree:not(:last-child) > div[itemMasterContainer]:before
+{
+  
+  pointer-events: none;
+  top:-0.8em;
+  left:-0.5em;
+  height:100%;
+  box-sizing: border-box;
+
+  border-left: rgba(255,255,255,1) 1px dashed;
+}
+
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]
+{
+  position:relative;
+}
+
+
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+{
+  pointer-events: none;
+  content : '';
+  position:absolute;
+  width:1.5em;
+  height:100%;
+  top:-50%;
+  left:-0.5em;
+  z-index: 0;
+}
+
+tree:last-child div[itemMasterContainer] > [itemContainer]
+{
+  position:relative;
+}
+
+tree:last-child div[itemMasterContainer] > [itemContainer]:before
+{
+  pointer-events: none;
+  content : '';
+  position:absolute;
+  width:1.5em;
+  height:100%;
+  top:-50%;
+  left:-0.5em;
+  z-index: 0;
+}
+
+tree:not(:last-child) div[itemMasterContainer]:before
+{
+  border-left: rgba(128,128,128,0.6) 1px dashed;
+}
+
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+{
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+}
+
+tree div[itemMasterContainer]:last-child > [itemContainer]:before
+{
+  border-bottom: rgba(128,128,128,0.6) 1px dashed;
+  border-left : rgba(128,128,128,0.6) 1px dashed;
+}
+
+div[itemMasterContainer]
+{
+  position:relative;
+}
+div[itemMasterContainer]:before
+{
+  content:' ';
+  position:absolute;
+  z-index: 0;
+}

@@ -5,11 +5,14 @@ import { ComponentsModule } from "../components/components.module";
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { NehubaContainner } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
+import { LayoutModule } from "../layouts/layout.module";
 
 
 @NgModule({
   imports : [
     BrowserModule,
+    LayoutModule,
+    ComponentsModule
   ],
   declarations : [
     NehubaContainner,

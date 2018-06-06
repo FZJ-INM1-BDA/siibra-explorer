@@ -17,8 +17,10 @@ export class ReadmoreComponent implements OnChanges{
     
   }
 
-  private toggle(){
+  private toggle(event:MouseEvent){
     this.show = !this.show
+    event.stopPropagation()
+    event.preventDefault()
   }
 
   get contentContainerMaxHeight(){

@@ -1,14 +1,14 @@
 import { Component } from "@angular/core";
 
 @Component({
-  selector : 'components-main',
-  templateUrl : `./main.template.html`,
+  selector : 'components-exmample',
+  templateUrl : `./componentsExample.template.html`,
   styleUrls : [
-    `./main.style.css`
+    `./componentsExample.style.css`
   ]
 })
 
-export class ComponentIndex{
+export class ComponentsExample{
   markdownInput : string = `Heading
 ------
 

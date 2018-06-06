@@ -1,31 +1,47 @@
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 
-import { TestComponent } from './test/test.component'
+import { BsDropdownModule }  from 'ngx-bootstrap/dropdown';
+
 import {  MarkdownDom } from './markdown/markdown.component';
-import { ComponentIndex } from './main/main.component';
+import { ComponentsExample } from './componentsExample/componentsExample.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { ReadmoreComponent } from './readmoore/readmore.component';
 import { BrowserModule } from '@angular/platform-browser';
+import { HoverableBlockDirective } from './hoverableBlock.directive';
+import { DropdownComponent } from './dropdown/dropdown.component';
+import { TreeComponent } from './tree/tree.component';
 
 @NgModule({
   imports : [
     BrowserModule,
-    FormsModule
+    FormsModule,
+    BsDropdownModule.forRoot(),
   ],
   declarations : [
     /* components */
     MarkdownDom,
-    ComponentIndex,
+    ComponentsExample,
     ReadmoreComponent,
+    DropdownComponent,
+    TreeComponent,
+
+    /* directive */
+    HoverableBlockDirective,
 
     /* pipes */
     SafeHtmlPipe
   ],
   exports : [
     MarkdownDom,
-    ReadmoreComponent
+    ReadmoreComponent,
+    DropdownComponent,
+    TreeComponent,
+
+    HoverableBlockDirective,
+
+    ComponentsExample
   ]
 })
 
