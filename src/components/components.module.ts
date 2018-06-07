@@ -12,6 +12,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HoverableBlockDirective } from './hoverableBlock.directive';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { TreeComponent } from './tree/tree.component';
+import { PanelComponent } from './panel/panel.component';
+import { PaginationComponent } from './pagination/pagination.component';
+import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
 
 @NgModule({
   imports : [
@@ -26,22 +29,29 @@ import { TreeComponent } from './tree/tree.component';
     ReadmoreComponent,
     DropdownComponent,
     TreeComponent,
+    PanelComponent,
+    PaginationComponent,
 
     /* directive */
     HoverableBlockDirective,
 
     /* pipes */
-    SafeHtmlPipe
+    SafeHtmlPipe,
+    SearchResultPaginationPipe
   ],
   exports : [
     MarkdownDom,
     ReadmoreComponent,
     DropdownComponent,
     TreeComponent,
+    PanelComponent,
+    PaginationComponent,
+
+    SearchResultPaginationPipe,
 
     HoverableBlockDirective,
 
-    ComponentsExample
+    ComponentsExample,
   ]
 })
 

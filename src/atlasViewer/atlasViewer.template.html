@@ -4,10 +4,30 @@
     </ui-nehuba-container>
     
     <atlas-banner>
-
     </atlas-banner>
+
+    <layout-floating-container
+      zIndex = "4">
+    </layout-floating-container>
   </div>
-  <div sidecontent>
-    SIDECONTENT
+  <div 
+    sidecontent>
+    <ng-template #sideContent>
+
+    </ng-template>
   </div>
 </layout-mainside>
+
+<ng-template #databrowser>
+  <panel
+    databrowserpanel
+    [bodyCollapsable] = "true">
+    <div databrowserheading heading>
+      Data Browser
+    </div>
+    <div databrowserbody body>
+      <data-browser>
+      </data-browser>
+    </div>
+  </panel>
+</ng-template>

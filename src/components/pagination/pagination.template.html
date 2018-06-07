@@ -1,0 +1,48 @@
+<div class = "pagination-container">
+  <div class = "btn-group">
+
+    <div 
+      class = "default-control btn btn-default btn-sm" 
+      (click)="gotoFirst()"
+      >
+
+      <i class = "glyphicon glyphicon-fast-backward"></i>
+    </div>
+
+    <div 
+      class = "btn btn-default btn-sm" 
+      (click)="goto(currentPage - 1)"
+      >
+      <i class = "glyphicon glyphicon-step-backward"></i>
+    </div>
+
+    <div 
+      (click)="goto(pageNum)"
+      [ngClass]="{'btn-primary':currentPage == pageNum}"
+      *ngFor = "let pageNum of getPagination"
+      class = "pagination-control btn btn-default btn-sm"
+      >
+      {{ pageNum + 1 }}
+    </div>
+
+    <div 
+      class = "btn btn-default btn-sm" 
+      (click)="goto(currentPage + 1)"
+      >
+      <i class = "glyphicon glyphicon-step-forward"></i>
+    </div>
+    <div 
+      class = "btn btn-default btn-sm" 
+      (click)="gotoLast()"
+      >
+      <i class = "glyphicon glyphicon-fast-forward"></i>
+    </div>
+
+  </div>
+  <div *ngIf = "total > 0" class = "pagination-summary">
+    showing {{ getPageLowerBound }} - {{ getPageUpperBound }} out of {{ total }}
+  </div>
+  <div *ngIf = "total == 0" class = "pagination-summary">
+    no results
+  </div>
+</div>

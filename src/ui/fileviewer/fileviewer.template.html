@@ -1,0 +1,73 @@
+
+<!-- file viewer -->
+<div 
+  *ngIf = "searchResultFile"
+  [ngSwitch]="searchResultFile.mimetype">
+
+  <div emptyRow *ngSwitchCase = "'application/octet-stream'">
+    <!-- downloadable data -->
+  </div>
+
+  <!-- image  -->
+  <div *ngSwitchCase="'image/jpeg'" >
+    <!-- TODO figure out a more elegant way of dealing with draggable img -->
+    <img draggable = "false" [src] = "searchResultFile.url" />
+  </div>
+
+  <!-- data container -->
+  <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
+    <radar-chart
+      #childChart
+      [colors] = "searchResultFile.data.colors"
+      [options] = "searchResultFile.data.chartOptions"
+      [labels]="searchResultFile.data.labels"
+      [radarDatasets]="searchResultFile.data.datasets"
+      *ngSwitchCase="'radar'">
+
+    </radar-chart>
+    <line-chart
+      #childChart
+      [colors] = "searchResultFile.data.colors"
+      [options] = "searchResultFile.data.chartOptions"
+      [lineDatasets] = "searchResultFile.data.datasets"
+      *ngSwitchCase = "'line'">
+
+    </line-chart>
+    <div *ngSwitchDefault>
+      The json file is not a chart. I mean, we could dump the json, but would it really help?
+    </div>
+  </div>
+  <div *ngSwitchCase = "'application/nifti'">
+    APPLICATION NIFTI
+    <!-- <dedicated-view-controller
+      [dedicatedViewString]="'nifti://'+searchResultFile.url">
+
+    </dedicated-view-controller> -->
+  </div>
+  <div *ngSwitchCase = "'application/nehuba-layer'">
+    APPLICATION NEHUBA LAYER
+    <!-- <dedicated-view-controller
+      [dedicatedViewString]="'nehuba-layer://'+searchResultFile.url"
+      [dedicatedViewNehubaLayerObject]="searchResultFile.data">
+
+    </dedicated-view-controller> -->
+  </div>
+  <div *ngSwitchDefault>
+    The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
+  </div>
+</div>
+
+<!-- caption -->
+<readmore *ngIf = "searchResultFile.properties.description">
+  <small id = "captions">
+    {{ searchResultFile.properties.description }}
+  </small>
+</readmore>
+
+<div *ngIf = "downloadUrl">
+  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link" download>Download File</a>
+</div>
+
+<div *ngIf = "downloadPng">
+  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link" download>Download Chart as Image</a>
+</div>

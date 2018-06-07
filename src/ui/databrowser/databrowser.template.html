@@ -1,0 +1,87 @@
+<!-- Header -->
+<div databrowserheader>
+  <span>
+    {{ databrowserHeaderText }} 
+  </span>
+  <small
+    *ngIf = "selectedRegions.length > 0"
+    class = "btn btn-link"
+    (click) = "clearAllRegions()">
+    clear all
+  </small>
+</div>
+
+<!-- Filter -->
+<div filterBlock>
+  <div>
+    Filter
+  </div>
+  <div
+    *ngFor = "let type of dataEntries | getUniqueProperty : 'type' "
+    class = "clickable"
+    (click)="toggleTypeVisibility(type)">
+    <small>
+      <i
+        *ngIf = "typeVisible(type)" 
+        class = "glyphicon glyphicon-check">
+      </i>
+      <i
+        *ngIf = "!typeVisible(type)" 
+        class = "glyphicon glyphicon-unchecked">
+      </i>
+    </small>
+    <small>
+      {{ type }}
+    </small>
+  </div>
+</div>
+
+<!-- Data -->
+<div
+  *ngFor = "let data of dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions | searchResultPagination  : currentPage : hitsPerPage">
+  <panel 
+    [collapseBody] = "true"
+    [bodyCollapsable] = "true">
+    <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" heading>
+      <span>
+        {{ data.region ? data.region.name : 'Not associated with any region' }}
+      </span>
+      <span class = "mute-text">
+        ({{ (data.searchResults | filterDataEntriesByType : hideDataTypes).length }})
+      </span>
+    </div>
+    <div body>
+      <panel
+        *ngFor = "let searchResult of data.searchResults | filterDataEntriesByType : hideDataTypes"
+        [collapseBody] = "true"
+        [bodyCollapsable] = "true"
+        dataentry>
+
+        <div heading>
+          {{ searchResult.name }}
+        </div>
+
+        <div body>
+          <tree
+            *ngFor = "let item of searchResult.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
+            [childrenExpanded] = "false"
+            [renderNode] = "renderNode"
+            (mouseclicktree) = "handleTreeNodeClick($event)"
+            [inputItem] = " item ">
+
+          </tree>
+        </div>
+      </panel>
+    </div>
+  </panel>
+</div>
+
+<!-- pagination -->
+<pagination-component
+  *ngIf = "(dataEntries | groupDatasetByRegion : regions).length > 0"
+  [hitsPerPage]="hitsPerPage"
+  [total] = "(dataEntries | groupDatasetByRegion : regions| filterRegionDataEntries : selectedRegions).length"
+  [currentPage]="currentPage"
+  (paginationChange)="paginationChange($event)">
+
+</pagination-component>

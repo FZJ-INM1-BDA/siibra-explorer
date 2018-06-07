@@ -1,0 +1,53 @@
+div[heading]
+{
+  padding : 0.5em 1em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+[dataentry]
+{
+  width:100%;
+}
+
+[dataentry] div[heading]
+{
+  padding : 0.4em 1.6em;
+  background-color:rgba(0,0,0,0.2);
+}
+
+[dataentry] div[body]
+{
+  padding : 0.4em 2.0em;
+  background-color:rgba(0,0,0,0.3);
+} 
+
+div[databrowserheader]
+{
+  padding : 0.5em 1.0em;
+  background-color:rgba(128,128,128,0.2);
+}
+
+div[databrowserheader] > *
+{
+  padding : 0;
+  margin : 0 ;
+  border : 0 ;
+}
+
+div[filterBlock]
+{
+  padding : 0.5em 1em;
+}
+
+div.clickable:hover
+{
+  color:#dbb556;
+  cursor:default;
+}
+
+div.noResultClass
+{
+  color:rgba(128,128,128,0.8);
+  text-decoration: line-through;
+}

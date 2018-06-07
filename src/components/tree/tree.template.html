@@ -1,7 +1,8 @@
 <div
-  (mouseleave)="mouseleavetree.emit(inputItem);handleEv($event)"
-  (mouseenter)="mouseentertree.emit(inputItem);handleEv($event)"
-  (click)="mouseclicktree.emit(inputItem);handleEv($event)"
+  [hidden] = "!visibilityOnFilter"
+  (mouseleave)="mouseleavetree.emit({inputItem:inputItem,node:this});handleEv($event)"
+  (mouseenter)="mouseentertree.emit({inputItem:inputItem,node:this});handleEv($event)"
+  (click)="mouseclicktree.emit({inputItem:inputItem,node:this});handleEv($event)"
   itemMasterContainer>
   <div itemContainer>
     <i
@@ -18,6 +19,7 @@
   <tree
     *ngFor = "let child of findChildren(inputItem)"
     [hidden] = "!childrenExpanded"
+    [childrenExpanded] = "childrenExpanded"
     [inputItem] = "child"
     [renderNode]="renderNode"
     [searchFilter]="searchFilter"

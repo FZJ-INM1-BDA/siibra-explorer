@@ -16,7 +16,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 export class HoverableBlockDirective{
 
   @HostBinding('style.opacity')
-  opacity : number = 0.8
+  opacity : number = 0.9
 
   @HostBinding('style.transform')
   transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
@@ -33,7 +33,7 @@ export class HoverableBlockDirective{
 
   @HostListener('mouseleave')
   onmouseleave(){
-    this.opacity = 0.8
+    this.opacity = 0.9
     this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.1)`)
     this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
   }

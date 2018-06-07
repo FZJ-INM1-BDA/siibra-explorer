@@ -3,6 +3,7 @@ import { LayoutMainSide } from "./mainside/mainside.component";
 import { LayoutsExample } from "./layoutsExample/layoutsExample.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { ComponentsModule } from "../components/components.module";
+import { FloatingLayoutContainer } from "./floating/floating.component";
 
 
 @NgModule({
@@ -12,10 +13,14 @@ import { ComponentsModule } from "../components/components.module";
   ],
   declarations : [
     LayoutMainSide,
+    FloatingLayoutContainer,
+
     LayoutsExample
   ],
   exports : [
     LayoutMainSide,
+    FloatingLayoutContainer,
+
     LayoutsExample
   ]
 })

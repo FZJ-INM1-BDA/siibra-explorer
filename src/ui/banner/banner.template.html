@@ -46,6 +46,7 @@
         *ngFor = "let child of selectedParcellation.regions"
         (mouseclicktree) = "handleClickRegion($event)"
         [renderNode]="(displayTreeNode).bind(this)"
+        [searchFilter]="(filterTreeBySearch).bind(this)"
         [inputItem]="child">
       </tree>
     </div>

@@ -52,7 +52,7 @@ div[treeContainer]
 :host-context([darktheme="true"]) div[treeContainer]
 {
   background-color:rgba(30,30,30,0.8);
-  color:rgba(255,255,255,0.8);
+  color:rgba(255,255,255,1.0);
 }
 
 div[hideScrollbarcontainer]

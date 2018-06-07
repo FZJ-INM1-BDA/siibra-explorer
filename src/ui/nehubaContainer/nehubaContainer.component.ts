@@ -68,6 +68,7 @@ export class NehubaContainner implements OnInit{
     this.loadedParcellation$.subscribe(this.handleParcellation)
 
     this.selectedRegions$.subscribe(regions=>{
+      if(!this.nehubaViewer) return
       this.selectedRegionIndexSet = new Set(regions.map(r=>r.labelIndex))
       this.selectedRegionIndexSet.size > 0 ?
         this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
@@ -114,9 +115,11 @@ export class NehubaContainner implements OnInit{
   }
 
   private handleParcellation(parcellation:any){
+    if(!this.nehubaViewer) return
     this.mapRegions(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
     this.nehubaViewer.parcellationId = parcellation.ngId
+
   }
 
   private createNewNehuba(template:any){
@@ -137,5 +140,59 @@ export class NehubaContainner implements OnInit{
         this.mapRegions(region.children)
       }
     })
+  }
+
+  /* related to info-card */
+
+  statusPanelRealSpace : boolean = true
+
+  get mouseCoord():string{
+    return this.nehubaViewer ?
+      this.statusPanelRealSpace ? 
+        this.nehubaViewer.mousePosReal ? 
+          Array.from(this.nehubaViewer.mousePosReal.map(n=> isNaN(n) ? 0 : n/1e6))
+            .map(n=>n.toFixed(3)+'mm').join(' , ') : 
+          '0mm , 0mm , 0mm (mousePosReal not yet defined)' :
+        this.nehubaViewer.mousePosVoxel ? 
+          this.nehubaViewer.mousePosVoxel.join(' , ') :
+          '0 , 0 , 0 (mousePosVoxel not yet defined)' :
+      '0 , 0 , 0 (nehubaViewer not defined)'
+  }
+
+  get onHoverSegment():string{
+    if(!this.nehubaViewer) return 'nehubaViewer not yet initialised'
+    const region = this.regionsLabelIndexMap.get(this.nehubaViewer.mouseOverSegment)
+    return region ? 
+      region.name : 
+      this.nehubaViewer.mouseOverSegment ? 
+        `Segment labelIndex: ${this.nehubaViewer.mouseOverSegment}` : 
+        ``
+  }
+
+  editingNavState : boolean = false
+  textNavigateTo(string:string){
+    if(string.split(/[\s|,]+/).length>=3 && string.split(/[\s|,]+/).slice(0,3).every(entry=>!isNaN(Number(entry.replace(/mm/,''))))){
+      const pos = (string.split(/[\s|,]+/).slice(0,3).map((entry,idx)=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)))
+      this.nehubaViewer.setNavigationState({
+        position : (pos as [number,number,number]),
+        positionReal : this.statusPanelRealSpace
+      })
+      // this.navigate(
+      //   string.split(/[\s|,]+/).slice(0,3).map(entry=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)),
+      //   0,
+      //   this.statusPanelRealSpace
+      // )
+    }else{
+      console.log('input did not parse to coordinates ',string)
+    }
+  }
+
+  navigationValue(){
+    return this.nehubaViewer ? 
+      this.statusPanelRealSpace ? 
+        Array.from(this.nehubaViewer.navPosReal.map(n=> isNaN(n) ? 0 : n/1e6))
+          .map(n=>n.toFixed(3)+'mm').join(' , ') :
+        Array.from(this.nehubaViewer.navPosVoxel.map(n=> isNaN(n) ? 0 : n)).join(' , ') :
+      `[0,0,0] (neubaViewer is undefined)`
   }
 }

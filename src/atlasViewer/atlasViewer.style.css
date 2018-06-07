@@ -5,6 +5,11 @@
   height:100%;
 }
 
+:host[darktheme="true"]
+{
+  background-color:black;
+}
+
 layout-mainside
 {
   width:100%;
@@ -28,10 +33,29 @@ ui-nehuba-container
 
 atlas-banner
 {
-  z-index:3;
+  z-index:5;
   position:absolute;
   top : 1em;
   left: 1em;
 
   width:100%;
+}
+
+div[databrowserheading]
+{
+  font-size:110%;
+  padding : 0.5em 0.7em;
+}
+panel[databrowserpanel]
+{
+  display:block;
+  width:300px;
+  overflow-x:hidden;
+}
+
+div[sidecontent]
+{
+  height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
 }

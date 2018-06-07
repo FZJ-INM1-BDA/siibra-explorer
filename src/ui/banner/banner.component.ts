@@ -3,6 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER } from "../../services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, filter } from "rxjs/operators";
+import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
 
 @Component({
   selector : 'atlas-banner',
@@ -78,7 +79,8 @@ export class AtlasBanner{
     })
   }
 
-  handleClickRegion(region:any){
+  handleClickRegion(obj:any){
+    const region = obj.inputItem
     const selectedSet = new Set(extractLabelIdx(region))
     const intersection = new Set([...this.selectedRegions.map(r=>r.labelIndex)].filter(v=>selectedSet.has(v)))
 
@@ -119,6 +121,14 @@ export class AtlasBanner{
     return ''
   }
 
+  filterTreeBySearch(node:any):boolean{
+    return this.filterNameBySearchPipe.transform([node.name],this.searchTerm)
+  }
+
+  temp_filterTreeBySearch(node:any):boolean{
+    return
+  }
+
   clearRegions(event:Event){
     event.stopPropagation()
     event.preventDefault()
@@ -127,4 +137,6 @@ export class AtlasBanner{
       selectRegions : []
     })
   }
+
+  filterNameBySearchPipe = new FilterNameBySearch()
 }

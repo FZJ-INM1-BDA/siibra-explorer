@@ -1,0 +1,30 @@
+<div class = "panel panel-default">
+  <div
+    *ngIf = "showHeading"
+    class = "panel-heading"
+    (click) = "toggleCollapseBody($event)"
+    hoverable>
+
+    <ng-content select="[heading]">
+    </ng-content>
+
+  </div>
+  <div
+    *ngIf = "showBody"
+    class = "panel-body"
+    [hidden] = "collapseBody">
+
+    <ng-content select="[body]">
+    </ng-content>
+
+  </div>
+  <div
+    *ngIf = "showFooter"
+    [hidden] = "collapseBody"
+    class = "panel-footer">
+    
+    <ng-content select="[footer]">
+    </ng-content>
+
+  </div>
+</div>

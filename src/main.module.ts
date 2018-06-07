@@ -6,7 +6,7 @@ import { LayoutModule } from "./layouts/layout.module";
 import { Examples } from "./examples/examples.component";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule } from "@ngrx/store";
-import { changeState, newViewer } from "./services/stateStore.service";
+import { viewerState, newViewer, dataStore } from "./services/stateStore.service";
 import { AtlasBanner } from "./ui/banner/banner.component";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
@@ -26,8 +26,9 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     PopoverModule.forRoot(),
     Serv.forRoot(),
     StoreModule.forRoot({
-      viewerState : changeState,
-      newViewer : newViewer
+      viewerState : viewerState,
+      newViewer : newViewer,
+      dataStore : dataStore
     })
   ],
   declarations : [

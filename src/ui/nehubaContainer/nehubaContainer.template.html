@@ -2,3 +2,36 @@
 </ng-template>
 <ui-splashscreen *ngIf = "!viewerLoaded">
 </ui-splashscreen>
+<layout-floating-container
+  *ngIf = "viewerLoaded">
+  <div statusCard>
+
+    <span 
+      class = "btn btn-link"
+      (click)="statusPanelRealSpace = !statusPanelRealSpace">
+      {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
+    </span>
+  
+    <br />
+    <div textContainer>
+      Navigation: 
+        <input 
+          (keydown.enter) = "textNavigateTo(navigateInput.value)"
+          (keydown.tab) = "textNavigateTo(navigateInput.value)"
+          [ngModel] = "navigationValue()" 
+          spellcheck = "false"
+          #navigateInput
+          navigateInput/>
+    
+      <br />
+      Mouse: 
+      <small>
+        {{ mouseCoord }}
+      </small> 
+      <br />
+      <small>
+        &nbsp;&nbsp;{{ onHoverSegment }}
+      </small>
+    </div>
+  </div>
+</layout-floating-container>
