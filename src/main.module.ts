@@ -22,6 +22,7 @@ import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
 import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathName.pipe";
+import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
 
 @NgModule({
   imports : [
@@ -59,7 +60,8 @@ import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathNam
     /* pipes */
     GetNamesPipe,
     GetNamePipe,
-    GetFilenameFromPathnamePipe
+    GetFilenameFromPathnamePipe,
+    FilterNameBySearch
   ],
   entryComponents : [
     WidgetUnit,

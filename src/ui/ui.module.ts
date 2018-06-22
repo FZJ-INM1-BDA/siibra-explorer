@@ -50,7 +50,8 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
     CopyPropertyPipe,
     GetUniqueProperty,
     FilterDataEntriesbyType,
-    SafeStylePipe
+    SafeStylePipe,
+    
   ],
   entryComponents : [
 

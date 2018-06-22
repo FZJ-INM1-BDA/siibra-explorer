@@ -8,7 +8,6 @@ const ClosureCompilerPlugin = require('webpack-closure-compiler')
 module.exports = {
 
   entry : './src/main-aot.ts',
-  mode : "development",
   output : {
     filename : 'main.js',
     path : path.resolve(__dirname,'dist/aot')
@@ -17,15 +16,6 @@ module.exports = {
     rules: [
       {
         test : /export_nehuba.*?worker.*?\.js$/,
-        use : {
-          loader : 'file-loader',
-          options: {
-            name : '[name].[ext]'
-          }
-        }
-      },
-      {
-        test : /export_nehuba.*?.css$/,
         use : {
           loader : 'file-loader',
           options: {
@@ -49,18 +39,12 @@ module.exports = {
     ]
   },
   plugins : [
-    new ClosureCompilerPlugin({
-      compiler : {
-        compilation_level : 'whitespace_only'
-      },
-      concurrency : 4
-    }),
     new HtmlWebpackPlugin({
       template : 'src/index.html'
     }),
     new AngularCompilerPlugin({
       tsConfigPath: 'tsconfig-aot.json',
-      entryModule: 'src/components/components.module#ComponentsModule'
+      entryModule: 'src/main.module#MainModule'
     })
   ],
   resolve : {

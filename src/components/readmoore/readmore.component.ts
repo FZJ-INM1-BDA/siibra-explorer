@@ -17,7 +17,7 @@ export class ReadmoreComponent implements OnChanges{
     
   }
 
-  private toggle(event:MouseEvent){
+  public toggle(event:MouseEvent){
     this.show = !this.show
     event.stopPropagation()
     event.preventDefault()

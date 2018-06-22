@@ -239,6 +239,7 @@ export interface File{
   url? : string
   data? : any
   targetParcellation : string
+  properties : any
 }
 
 export interface Property{
