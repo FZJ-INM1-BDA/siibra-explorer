@@ -50,3 +50,39 @@ div[statusCard]
   background-color:rgba(20,20,20,0.8);
   color : rgba(250,250,250,0.8);
 }
+
+div[landmarkMasterContainer]
+{
+  background:none;
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+div[landmarkMasterContainer] > div
+{
+  flex: 0 0 50%;
+  height:50%;
+  overflow:hidden;
+  pointer-events: none;
+  position : relative;
+  border: 1 px solid blue;
+}
+
+
+div[landmarkMasterContainer] > div > [landmarkContainer] > div
+{
+  position : absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  margin-left:-0.5em;
+  margin-top:-1em;
+}
+

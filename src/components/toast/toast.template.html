@@ -1,0 +1,10 @@
+<div container>
+  <div message>
+    <ng-template #message>
+
+    </ng-template>
+  </div>
+  <div (click) = "dismiss($event)" *ngIf = "dismissable" close>
+    <i class = "glyphicon glyphicon-remove"></i>
+  </div>
+</div>

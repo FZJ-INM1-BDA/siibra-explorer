@@ -1,7 +1,9 @@
-import { Component, Input, OnChanges, OnDestroy, AfterViewInit, ViewChild, ElementRef } from '@angular/core'
+import { Component, Input, OnChanges, OnDestroy, ViewChild, ElementRef, OnInit, Output, EventEmitter } from '@angular/core'
 
 import { DomSanitizer } from '@angular/platform-browser';
-import { DataEntry, File } from '../../services/stateStore.service';
+import { File } from '../../services/stateStore.service';
+import { interval,from } from 'rxjs';
+import { switchMap,take,retry } from 'rxjs/operators'
 
 @Component({
   selector : 'file-viewer',
@@ -11,29 +13,61 @@ import { DataEntry, File } from '../../services/stateStore.service';
    ] 
 })
 
-export class FileViewer implements OnChanges,OnDestroy,AfterViewInit{
+export class FileViewer implements OnChanges,OnDestroy,OnInit{
   @Input() searchResultFile : File
+  
   @ViewChild('childChart') childChart : ChartComponentInterface
 
-  constructor(private sanitizer:DomSanitizer){
+  constructor(
+    private sanitizer:DomSanitizer
+  ){
   }
 
   private _downloadUrl : string
   private _pngDownloadUrl : string
 
   ngOnDestroy(){
-    if(this._downloadUrl){
-      URL.revokeObjectURL(this._downloadUrl)
-    }
-    if(this._pngDownloadUrl){
-      URL.revokeObjectURL(this._pngDownloadUrl)
-    }
+    this.revokeUrls()
   }
 
+  ngOnInit(){
+    this.createUrls()
+  }
   ngOnChanges(){
-    if(this._downloadUrl){
-      URL.revokeObjectURL(this._downloadUrl)
-    }
+    this.revokeUrls()
+    this.createUrls()
+  }
+
+  get downloadUrl(){
+    return this.searchResultFile.url ? 
+      this.searchResultFile.url : 
+      this._downloadUrl ? 
+        this.sanitizer.bypassSecurityTrustResourceUrl(this._downloadUrl)  :
+        null
+  }
+
+  private createUrls(){
+
+    const timer$ = interval(50)
+    const timerSet$ = timer$.pipe(
+      switchMap(()=>from(new Promise((rs,rj)=>{
+        if(!this.childChart)
+          rj('childChart not yet defined')
+        
+        this.childChart.canvas.nativeElement.toBlob((blob)=>{
+          blob ? rs(blob) : rj('blob is undefined')
+          
+        },'image/png')
+        }))),
+      retry(10),
+      take(1)
+    )
+
+    timerSet$.subscribe((blob)=>{
+      this._pngDownloadUrl = URL.createObjectURL(blob)
+    },(err)=>console.error('error',err))
+
+
     if(!this.searchResultFile.url && this.searchResultFile.data){
       const stringJson = JSON.stringify(this.searchResultFile.data)
       const newBlob = new Blob([stringJson],{type:'application/octet-stream'})
@@ -41,21 +75,13 @@ export class FileViewer implements OnChanges,OnDestroy,AfterViewInit{
     }
   }
 
-  /* seems a bit buggy right now */
-  ngAfterViewInit(){
-    if(this.childChart){
-      (<HTMLCanvasElement>this.childChart.canvas.nativeElement).toBlob((blob)=>{
-        this._pngDownloadUrl = URL.createObjectURL(blob)
-      },'image/png')
+  private revokeUrls(){
+    if(this._downloadUrl){
+      URL.revokeObjectURL(this._downloadUrl)
     }
-  }
-  
-  get downloadUrl(){
-    return this.searchResultFile.url ? 
-      this.searchResultFile.url : 
-      this._downloadUrl ? 
-        this.sanitizer.bypassSecurityTrustResourceUrl(this._downloadUrl)  :
-        null
+    if(this._pngDownloadUrl){
+      URL.revokeObjectURL(this._pngDownloadUrl)
+    }
   }
 
   get downloadName(){

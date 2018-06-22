@@ -1,0 +1,41 @@
+<div 
+  [ngStyle] = "{opacity:calcOpacity()}"
+  landmarkContainer>
+  
+  <div 
+    [style.transform] = "markerTransform | safeStyle"
+    [ngStyle] = "styleNode()"
+    nodeView 
+    #nodeView>
+    <span 
+      class="glyphicon glyphicon-map-marker">
+    </span>
+  </div>
+
+  <div
+    [style.transform] = "beamTransform | safeStyle" 
+    class = "pos-beam">
+    
+    <div 
+      *ngIf = "positionZ >= 0"
+      [ngStyle] = "styleBeamColor(false)"
+      class = "pos-beam-outer">
+    </div>
+    <div 
+      *ngIf = "positionZ >= 0"
+      [ngStyle] = "styleBeamColor(true)"
+      class = "pos-beam-inner">
+    </div>
+
+    <div 
+      *ngIf = "positionZ < 0"
+      [ngStyle] = "styleBeamDashedColor()"
+      class = "pos-beam-dashed">
+    </div>
+  </div>
+  <div 
+    [ngStyle]="styleShadow()"
+    class = "pos-shadow">
+    
+  </div>
+</div>

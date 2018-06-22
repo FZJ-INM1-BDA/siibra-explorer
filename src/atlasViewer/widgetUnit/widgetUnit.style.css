@@ -1,0 +1,43 @@
+:host
+{
+  pointer-events: all;
+  display:block;
+}
+
+div[widgetUnitHeading]
+{
+  font-size:110%;
+  padding : 0.5em 0.7em;
+  display:flex;
+  white-space: nowrap;
+}
+
+  div[widgetUnitHeading] > div[title]
+  {
+    flex : 1 1 0px;
+    overflow:hidden;
+    text-overflow: ellipsis;
+  }
+
+  div[widgetUnitHeading] > div[icons]
+  {
+    flex : 0 0 0px;
+    display:flex;
+  }
+
+  div[widgetUnitHeading] > div[icons] > i
+  {
+    margin-left:0.5em;
+  }
+
+panel[widgetUnitPanel]
+{
+  display:block;
+  width:300px;
+  overflow-x:hidden;
+}
+
+:host-context([state='floating']) div[widgetUnitHeading]:hover
+{
+  cursor : move;
+}

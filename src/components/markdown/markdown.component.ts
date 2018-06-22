@@ -13,7 +13,7 @@ import * as showdown from 'showdown'
 export class MarkdownDom implements OnChanges{
 
   @Input() markdown : string = ``
-  private innerHtml : string = ``
+  public innerHtml : string = ``
   private converter = new showdown.Converter()
   constructor(){
     this.converter.setFlavor('github')

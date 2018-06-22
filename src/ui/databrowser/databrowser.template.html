@@ -34,21 +34,78 @@
       {{ type }}
     </small>
   </div>
+  <div 
+    class = "clickable" 
+    (click) = "toggleSpatialDataVisible()">
+    <small>
+      <i
+        *ngIf = "spatialDataVisible" 
+        class = "glyphicon glyphicon-check">
+      </i>
+      <i
+        *ngIf = "!spatialDataVisible" 
+        class = "glyphicon glyphicon-unchecked">
+      </i>
+    </small>
+    <small>
+      Spatial Search
+    </small>
+  </div>
 </div>
 
 <!-- Data -->
+<div *ngIf = "spatialDataVisible">
+  <panel [collapseBody] = "true" [bodyCollapsable] = "true">
+    <div heading>
+      <span>
+        Spatial Search Data
+      </span>
+      <span class = "mute-text">
+        ({{ spatialTotalNo }})
+      </span>
+    </div>
+    <div body>
+      <div *ngFor = "let data of spatialDataEntries" spatialSearchCell>
+        {{ data.properties.description }}
+      </div>
+
+      <pagination-component
+        *ngIf = "spatialDataEntries.length > 0"
+        [hitsPerPage]="spatialPaginationHitsPerPage"
+        [total] = "spatialTotalNo"
+        [currentPage]="spatialPagination"
+        (paginationChange)="spatialPaginationChange($event)">
+
+      </pagination-component>
+    </div>
+  </panel>
+</div>
 <div
   *ngFor = "let data of dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions | searchResultPagination  : currentPage : hitsPerPage">
   <panel 
     [collapseBody] = "true"
     [bodyCollapsable] = "true">
-    <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" heading>
-      <span>
-        {{ data.region ? data.region.name : 'Not associated with any region' }}
-      </span>
-      <span class = "mute-text">
-        ({{ (data.searchResults | filterDataEntriesByType : hideDataTypes).length }})
-      </span>
+    <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" 
+      displayflex
+      heading>
+      <div maintext>
+        <span>
+          {{ data.region ? data.region.name : 'Not associated with any region' }}
+        </span>
+        <span class = "mute-text">
+          ({{ (data.searchResults | filterDataEntriesByType : hideDataTypes).length }})
+        </span>
+      </div>
+      <div propertyicons>
+        <i *ngIf = "data.region && data.region.position"
+          (click) = "gothere($event,data.region.position)" 
+          class = "glyphicon glyphicon-screenshot" >
+        </i>
+        <i *ngIf = "regionSelected(data.region)"
+          (click) = "removeRegion($event,data.region)"
+          class = "glyphicon glyphicon-remove-sign">
+        </i>
+      </div>
     </div>
     <div body>
       <panel

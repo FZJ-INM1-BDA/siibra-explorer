@@ -10,6 +10,8 @@ import { PipeTransform, Pipe } from "@angular/core";
 
 export class PathToNestedChildren implements PipeTransform{
   public transform(array:HasPathProperty[],prop?:string):NestedChildren[]{
+    if(!array)
+      return []
     return this.constructDoubleHeirachy(array)
   }
 

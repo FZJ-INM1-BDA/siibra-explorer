@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core'
+import { Component, Input, OnChanges, ViewChild, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core'
 
 import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption } from '../chart.interface';
 import { Color } from 'ng2-charts';
@@ -109,16 +109,6 @@ export class RadarChart implements OnChanges{
     },0)
 
     applyOption(this.chartOption,this.options)
-    // this.colors = [
-    //   {
-    //     borderColor : 'rgba(255,255,255,1)'
-    //   },
-    //   {
-    //     borderColor : ' rgba(255,255,255,1)',
-    //   }
-    // ]
-
-    // console.log(this.chartDataset)
   }
 }
 

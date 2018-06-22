@@ -5,6 +5,29 @@ div[heading]
   overflow: hidden;
 }
 
+div[heading][displayflex]
+{
+  display:flex;
+  flex-direction: row;
+}
+
+  div[heading][displayflex] > [maintext]
+  {
+    flex : 1 1 0px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  div[heading][displayflex] > [propertyicons]
+  {
+    flex : 0 0 auto;
+  }
+
+  div[heading][displayflex] > [propertyicons] > *
+  {
+    margin-left:0.5em;
+  }
+
 [dataentry]
 {
   width:100%;
@@ -50,4 +73,11 @@ div.noResultClass
 {
   color:rgba(128,128,128,0.8);
   text-decoration: line-through;
+}
+
+div[spatialSearchCell]
+{
+  padding: 0.3em 1em;
+  overflow:hidden;
+  white-space: nowrap;
 }

@@ -8,14 +8,15 @@
   </dropdown>
   
   <dropdown
-    *ngIf = "selectedTemplate$ | async"
+    *ngIf = "selectedTemplate"
+    (itemSelected) = "selectParcellation($event)"
     [activeDisplay] = "displayActiveParcellation"
     [selectedItem] = "selectedParcellation"
     [inputArray] = "selectedTemplate.parcellations">
   </dropdown>
 
   <div 
-    *ngIf = "selectedTemplate$ | async"
+    *ngIf = "selectedTemplate"
     placement = "bottom"
     [outsideClick] = "true"
     [popover]="searchRegionTemplate"

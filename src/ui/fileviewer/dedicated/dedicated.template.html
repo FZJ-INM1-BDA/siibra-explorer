@@ -1,0 +1,36 @@
+<span *ngIf = "!isShowing" >
+  <span 
+    *ngIf = "isObstructed">
+
+    <span class = "obstructedText">
+      The viewer is currently displaying another dataset:
+    </span>
+    
+    <div class = "well">
+      {{ nowShowing }}
+    </div>
+    <span class = "obstructedText">
+      This dataset can be displayed after the currently shown dataset is cleared.
+    </span>
+    <span (click)="removeDedicatedView()" class = "btn btn-link">
+      clear the currently shown dataset
+    </span>
+  </span>
+
+  <span
+    (click) = "showDedicatedView()"
+    class = "btn btn-link"
+    *ngIf = "!isObstructed">
+
+    show this dataset in the viewer 
+  </span>
+
+</span>
+
+<span 
+  (click) = "removeDedicatedView()"
+  *ngIf = "isShowing"
+  class = "btn btn-link">
+
+  clear this dataset from the viewer
+</span>

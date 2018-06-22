@@ -1,0 +1,31 @@
+<panel
+  [style.transform] = "transform"
+  widgetUnitPanel
+  [bodyCollapsable] = "state === 'docked'"
+  >
+  <div 
+    (mousedown) = "mousedown($event)"
+    widgetUnitHeading 
+    heading>
+    <div title>{{ title }}</div>
+    <div icons>
+      <i *ngIf = "state === 'floating'"
+        (click) = "dock($event)" 
+        class = "glyphicon glyphicon-log-in" 
+        hoverable></i>
+      <i *ngIf = "state === 'docked'"
+        (click) = "undock($event)" 
+        class = "glyphicon glyphicon-new-window" 
+        hoverable></i>
+      <i *ngIf = "exitable"
+        (click) = "exit($event)" 
+        class = "glyphicon glyphicon-remove" 
+        hoverable></i>
+    </div>
+  </div>
+  <div widgetUnitBody body>
+    <ng-template #container>
+
+    </ng-template>
+  </div>
+</panel>

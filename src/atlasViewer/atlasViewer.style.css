@@ -1,4 +1,4 @@
-:host
+:host, :host > .atlas-container
 {
   display:block;
   width:100%;
@@ -41,21 +41,71 @@ atlas-banner
   width:100%;
 }
 
-div[databrowserheading]
-{
-  font-size:110%;
-  padding : 0.5em 0.7em;
-}
-panel[databrowserpanel]
-{
-  display:block;
-  width:300px;
-  overflow-x:hidden;
-}
-
 div[sidecontent]
 {
   height:100%;
   overflow-y:auto;
   overflow-x:hidden;
+}
+
+layout-floating-container
+{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+div[toastContainer]
+{
+  position : absolute;
+  bottom: 1.7em;
+  height: 0px;
+  width : 100%;
+
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+div[toastContainer] > *
+{
+  flex : 0 0 auto;
+}
+
+[dedicatedviewertext]
+{
+  vertical-align: middle;
+}
+
+div[floatingMouseContextualContainer]
+{
+  position : absolute;
+  left: 0;
+  top : 0;
+  width : 0px;
+  height: 0px;
+}
+
+div[contextualInnerContainer]
+{
+  margin-top :1em;
+  margin-left :1em;
+  display:inline-block;
+  width:auto;
+}
+
+div[contextualInnerContainer]
+{
+  background-color:rgba(200,200,200,0.8);
+}
+
+:host-context([darktheme="true"]) div[contextualInnerContainer]
+{
+  background-color : rgba(30,30,30,0.8);
+  color : rgba(250,250,250,0.8);
+}
+
+div[contextualBlock]
+{
+  margin: 0.3em 0.5em;
+  white-space: nowrap;
 }

@@ -1,6 +1,7 @@
 :host
 {
   font-size:92%;
+  overflow:hidden;
 }
 
 .panel

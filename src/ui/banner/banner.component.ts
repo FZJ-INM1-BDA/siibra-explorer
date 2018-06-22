@@ -1,7 +1,7 @@
-import { Component, HostBinding } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER } from "../../services/stateStore.service";
-import { Observable } from "rxjs";
+import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER, getLabelIndexMap, isDefined } from "../../services/stateStore.service";
+import { Observable, Subscription, merge } from "rxjs";
 import { map, filter } from "rxjs/operators";
 import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
 
@@ -13,10 +13,10 @@ import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
   ]
 })
 
-export class AtlasBanner{
+export class AtlasBanner implements OnDestroy{
 
   public loadedTemplates$ : Observable<any[]>
-  public selectedTemplate$ : Observable<any>
+  public newViewer$ : Observable<any>
   public selectedParcellation$ : Observable<any>
   public selectedRegions$ : Observable<any[]>
 
@@ -26,6 +26,8 @@ export class AtlasBanner{
   public selectedParcellation : any
   public selectedRegions : any[] = []
 
+  private subscriptions : Subscription[] = []
+
   searchTerm : string = ''
 
   constructor(private store:Store<ViewerStateInterface>){
@@ -34,9 +36,12 @@ export class AtlasBanner{
       safeFilter('fetchedTemplates'),
       map(state=>state.fetchedTemplates))
 
-    this.selectedTemplate$ = this.store.pipe(
-      select('newViewer'),
-      filter(state=>typeof state !== 'undefined')
+    this.newViewer$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>isDefined(state) && isDefined(state.templateSelected)),
+      filter(state=>
+        !isDefined(this.selectedTemplate) || 
+        state.templateSelected.name !== this.selectedTemplate.name) 
     )
 
     this.selectedParcellation$ = this.store.pipe(
@@ -45,25 +50,39 @@ export class AtlasBanner{
       map(state=>state.parcellationSelected)
     )
 
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('regionsSelected'),
-      map(state=>state.regionsSelected)
+    this.selectedRegions$ = merge(
+      this.store.pipe(
+        select('viewerState'),
+        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+        map(state=>state.regionsSelected)
+      )
+    ) 
+    this.subscriptions.push(
+      this.newViewer$.subscribe((state)=>{
+        
+        this.selectedTemplate = state.templateSelected
+        const selectedParcellation = state.parcellationSelected ? state.parcellationSelected : this.selectedTemplate.parcellations[0]
+        this.handleParcellationChange(selectedParcellation)
+      })
     )
-
-    this.selectedTemplate$.subscribe((state)=>{
-      this.selectedTemplate = state.templateSelected
-      this.handleParcellationChange(state.parcellationSelected)
-    })
-    this.selectedParcellation$.subscribe(this.handleParcellationChange)
-    this.selectedRegions$.subscribe((ev)=>{
-      this.selectedRegions = ev
-    })
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe((this.handleParcellationChange).bind(this))
+    )
+    this.subscriptions.push(
+      this.selectedRegions$.subscribe((ev)=>{
+        this.selectedRegions = ev
+      })
+    )
   }
 
-  private handleParcellationChange(parcellation){
+  ngOnDestroy(){
+    this.subscriptions.forEach(s=>s.unsubscribe())
+  }
+
+  handleParcellationChange(parcellation){
+    // const selectedParcellation = this.selectedTemplate.parcellations.find(p=>p.ngId === parcellation.ngId)
     this.selectedParcellation = parcellation
-    this.mapRegions(parcellation.regions)
+    this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
   }
 
   selectTemplate(template:any){
@@ -71,7 +90,6 @@ export class AtlasBanner{
       return
     }
 
-    /* hmm, is this right? */
     this.store.dispatch({
       type : NEWVIEWER,
       selectTemplate : template,
@@ -79,11 +97,17 @@ export class AtlasBanner{
     })
   }
 
+  selectParcellation(parcellation:any){
+    this.store.dispatch({
+      type : SELECT_PARCELLATION,
+      selectParcellation : parcellation
+    })
+  }
+
   handleClickRegion(obj:any){
     const region = obj.inputItem
     const selectedSet = new Set(extractLabelIdx(region))
     const intersection = new Set([...this.selectedRegions.map(r=>r.labelIndex)].filter(v=>selectedSet.has(v)))
-
     this.store.dispatch({
       type : SELECT_REGIONS,
       selectRegions : intersection.size > 0 ? 
@@ -101,20 +125,9 @@ export class AtlasBanner{
   }
 
   displayTreeNode(item:any){
-    return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re=>re.labelIndex === item.labelIndex) >= 0 ? 
+    return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re=>re.labelIndex === Number(item.labelIndex)) >= 0 ? 
       `<span class = "regionSelected">${item.name}</span>` :
       `<span class = "regionNotSelected">${item.name}</span>`
-  }
-
-  private mapRegions(regions:any[]){
-    regions.forEach((region:any)=>{
-      if(region.labelIndex){
-        this.regionsLabelIndexMap.set(region.labelIndex,region)
-      }
-      if(region.children){
-        this.mapRegions(region.children)
-      }
-    })
   }
 
   get treeHeaderText():string{
@@ -123,10 +136,6 @@ export class AtlasBanner{
 
   filterTreeBySearch(node:any):boolean{
     return this.filterNameBySearchPipe.transform([node.name],this.searchTerm)
-  }
-
-  temp_filterTreeBySearch(node:any):boolean{
-    return
   }
 
   clearRegions(event:Event){

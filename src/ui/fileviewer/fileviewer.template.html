@@ -1,3 +1,6 @@
+<div *ngIf = "!searchResultFile">
+  searchResultFile as an input is required for this component to work...
+</div>
 
 <!-- file viewer -->
 <div 
@@ -38,14 +41,12 @@
     </div>
   </div>
   <div *ngSwitchCase = "'application/nifti'">
-    APPLICATION NIFTI
-    <!-- <dedicated-view-controller
-      [dedicatedViewString]="'nifti://'+searchResultFile.url">
-
-    </dedicated-view-controller> -->
+    <dedicated-viewer
+      [searchResultFile] = "searchResultFile">
+    </dedicated-viewer>
   </div>
   <div *ngSwitchCase = "'application/nehuba-layer'">
-    APPLICATION NEHUBA LAYER
+    APPLICATION NEHUBA LAYER - NOT YET IMPLEMENTED
     <!-- <dedicated-view-controller
       [dedicatedViewString]="'nehuba-layer://'+searchResultFile.url"
       [dedicatedViewNehubaLayerObject]="searchResultFile.data">

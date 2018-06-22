@@ -3,7 +3,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { ComponentsModule } from "../components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
-import { NehubaContainner } from "./nehubaContainer/nehubaContainer.component";
+import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "../layouts/layout.module";
 import { FormsModule } from "@angular/forms";
@@ -19,6 +19,9 @@ import { PathToNestedChildren } from "../util/pipes/pathToNestedChildren.pipe";
 import { CopyPropertyPipe } from "../util/pipes/copyProperty.pipe";
 import { GetUniqueProperty } from "../util/pipes/getUniqueProperty.pipe";
 import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.pipe";
+import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
+import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
+import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 
 
 @NgModule({
@@ -30,13 +33,15 @@ import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.p
     ComponentsModule
   ],
   declarations : [
-    NehubaContainner,
+    NehubaContainer,
     NehubaViewerUnit,
     SplashScreen,
     DataBrowserUI,
     FileViewer,
     RadarChart,
     LineChart,
+    DedicatedViewer,
+    LandmarkUnit,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -44,15 +49,18 @@ import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.p
     PathToNestedChildren,
     CopyPropertyPipe,
     GetUniqueProperty,
-    FilterDataEntriesbyType
+    FilterDataEntriesbyType,
+    SafeStylePipe
   ],
   entryComponents : [
 
     /* dynamically created components needs to be declared here */
-    NehubaViewerUnit
+    NehubaViewerUnit,
+    FileViewer,
+    DataBrowserUI
   ],
   exports : [
-    NehubaContainner,
+    NehubaContainer,
     NehubaViewerUnit,
     DataBrowserUI,
     FileViewer

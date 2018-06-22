@@ -1,0 +1,91 @@
+:host
+{
+  position : absolute;
+  display:block;
+}
+
+div[landmarkContainer]
+{
+  position:relative;
+  pointer-events:auto;
+}
+.pos-shadow
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+  z-index:-1;
+
+  width:2px;
+  height:2px;
+  border-radius:1px
+}
+.pos-beam
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+
+  width:1px;
+  height:1px;
+
+  box-sizing:border-box;
+}
+.pos-beam > .pos-beam-outer
+{
+  position:absolute;
+  top:0px;
+  left:-1px;
+
+  width:2px;
+  height:1px;
+
+  border-top:1px solid;
+  border-bottom:0px;
+  border-left:1px solid transparent;
+  border-right:1px solid transparent;
+}
+.pos-beam > .pos-beam-inner
+{
+  position : absolute;
+  top:0px;
+
+  left:-1px;
+  width:2px;
+  height:1px;
+
+  border-top:1px solid;
+  border-bottom:0px;
+  border-left:1px solid transparent;
+  border-right:1px solid transparent;
+}
+
+.pos-beam > .pos-beam-dashed
+{
+  position : absolute;
+  top:0px;
+
+  width:1px;
+  height:1px;
+
+  border:none;
+  border-left:1px dashed;
+}
+
+[nodeView]
+{
+  position:absolute;
+  left:0px;
+  top:0px;
+}
+
+[nodeView] > .glyphicon
+{
+  margin-left:-0.5em;
+  margin-top:-1em;
+  display:block;
+  text-shadow: rgb(0, 0, 0) -1px 0px, 
+    rgb(0, 0, 0) 0px 1px, 
+    rgb(0, 0, 0) 1px 0px, 
+    rgb(0, 0, 0) 0px -1px;
+}

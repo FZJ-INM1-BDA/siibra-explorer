@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, EventEmitter, Output } from "@angular/core";
 
 
 @Component({
@@ -14,4 +14,11 @@ export class LayoutMainSide{
   @Input() overlay : boolean = false
   @Input() showSide : boolean = false
   @Input() sideWidth : number = 300
+
+  @Output() panelShowStateChanged : EventEmitter<boolean> = new EventEmitter()
+
+  togglePanelShow(){
+    this.showSide = !this.showSide
+    this.panelShowStateChanged.emit(this.showSide)
+  }
 }

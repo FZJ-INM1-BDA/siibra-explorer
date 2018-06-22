@@ -1,0 +1,25 @@
+:host
+{
+  pointer-events: all;
+  width:100%;
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+div[container]
+{
+  background-color: rgba(240,240,240,0.8);
+  color : rgba(10,10,10,0.8);
+  display : flex;
+  align-items: center;
+}
+
+:host-context([darktheme="true"]) div[container]
+{
+  background-color: rgba(50,50,50,0.8);
+  color : rgba(255,255,255,0.8);
+  padding : 0.3em 1em;
+}
+

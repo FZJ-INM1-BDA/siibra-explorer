@@ -15,6 +15,7 @@ import { TreeComponent } from './tree/tree.component';
 import { PanelComponent } from './panel/panel.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
+import { ToastComponent } from './toast/toast.component';
 
 @NgModule({
   imports : [
@@ -31,6 +32,7 @@ import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
     TreeComponent,
     PanelComponent,
     PaginationComponent,
+    ToastComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -46,6 +48,7 @@ import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
     TreeComponent,
     PanelComponent,
     PaginationComponent,
+    ToastComponent,
 
     SearchResultPaginationPipe,
 

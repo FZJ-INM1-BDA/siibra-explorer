@@ -1,11 +1,11 @@
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, AfterViewInit } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { NehubaDataService } from "../../services/services.module";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS } from "../../services/stateStore.service";
-import { Observable } from "rxjs";
-import { filter,map } from "rxjs/operators";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, SPATIAL_GOTO_PAGE, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
+import { Observable, Subscription, fromEvent, combineLatest } from "rxjs";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged } from "rxjs/operators";
 import * as export_nehuba from 'export_nehuba'
+import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -15,32 +15,56 @@ import * as export_nehuba from 'export_nehuba'
   ]
 })
 
-export class NehubaContainner implements OnInit{
+export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
+  @ViewChild('[pos00]',{read:ElementRef}) topleft : ElementRef
+  @ViewChild('[pos01]',{read:ElementRef}) topright : ElementRef
+  @ViewChild('[pos10]',{read:ElementRef}) bottomleft : ElementRef
+  @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
 
   public viewerLoaded : boolean = false
-  private loadedTemplate$ : Observable<any>
+
+  private newViewer$ : Observable<any>
   private loadedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
+  private dedicatedView$ : Observable<string|null>
+  private fetchedSpatialDatasets$ : Observable<any[]>
+  public onHoverSegment$ : Observable<string>
 
+  private navigationChanges$ : Observable<any>
+  private redrawObservable$ : Observable<any>
+  public spatialResultsVisible$ : Observable<number>
+
+  private selectedTemplate : any | null
   private selectedRegionIndexSet : Set<number> = new Set()
+  public fetchedSpatialData : DataEntry[] = []
 
   private cr : ComponentRef<NehubaViewerUnit>
   private nehubaViewer : NehubaViewerUnit
   private regionsLabelIndexMap : Map<number,any> = new Map()
 
+  private subscriptions : Subscription[] = []
+  private nehubaViewerSubscriptions : Subscription[] = []
+
+  public nanometersToOffsetPixelsFn : Function[] = []
+
+
   constructor(
     private csf:ComponentFactoryResolver,
-    public nehubaDS : NehubaDataService,
-    private store : Store<ViewerStateInterface>
+    private store : Store<ViewerStateInterface>,
+    private elementRef : ElementRef
   ){
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
-    this.loadedTemplate$ = this.store.pipe(
-      select('newViewer'),
-      filter(state=>typeof state !== 'undefined'))
+    this.newViewer$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>isDefined(state) && isDefined(state.templateSelected)),
+      filter(state=>
+        !isDefined(this.selectedTemplate) || 
+        state.templateSelected.name !== this.selectedTemplate.name)
+    )
     
     this.loadedParcellation$ = this.store.pipe(
       select('viewerState'),
@@ -53,28 +77,200 @@ export class NehubaContainner implements OnInit{
       map(state=>state.regionsSelected)
     )
 
+    this.dedicatedView$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>typeof state !== 'undefined' && state !== null && typeof state.dedicatedView !== 'undefined'),
+      map(state=>state.dedicatedView)
+    )
+
+    this.fetchedSpatialDatasets$ = this.store.pipe(
+      select('dataStore'),
+      safeFilter('fetchedSpatialData'),
+      debounceTime(300),
+      map(state=>state.fetchedSpatialData)
+    )
+
+    this.redrawObservable$ = this.store.pipe(
+      select('uiState'),
+      safeFilter('sidePanelOpen')
+    )
+
+    this.navigationChanges$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('navigation'),
+      map(state=>state.navigation)
+    )
+
+    this.spatialResultsVisible$ = this.store.pipe(
+      select('spatialSearchState'),
+      map(state=> isDefined(state) ?
+        isDefined(state.spatialDataVisible) ?
+          state.spatialDataVisible :
+          true :
+        true),
+      distinctUntilChanged()
+    )
+
+    this.onHoverSegment$ = this.store.pipe(
+      select('uiState'),
+      filter(state=>isDefined(state)),
+      map(state=>state.mouseOverSegment ?
+        state.mouseOverSegment.constructor === Number ? 
+          state.mouseOverSegment.toString() : 
+          state.mouseOverSegment.name :
+        '' ),
+      distinctUntilChanged()
+    )
+
     /* patch NG */
     this.patchNG()
   }
 
   ngOnInit(){
 
+    this.subscriptions.push(
+      combineLatest(
+        this.fetchedSpatialDatasets$,
+        this.spatialResultsVisible$
+      ).subscribe(([fetchedSpatialData,visible])=>{
+
+        this.fetchedSpatialData = fetchedSpatialData
+        this.nehubaViewer.remove3DLandmarks()
+
+        if(visible)
+          this.nehubaViewer.add3DLandmarks(this.fetchedSpatialData.map((data:any)=>data.position))
+          
+      })
+    )
+
     /* order of subscription will determine the order of execution */
-    this.loadedTemplate$.subscribe((state)=>{
-      this.createNewNehuba(state.templateSelected)
-      this.handleParcellation(state.parcellationSelected)
+    this.subscriptions.push(
+      this.newViewer$.subscribe((state)=>{
+        this.nehubaViewerSubscriptions.forEach(s=>s.unsubscribe())
+
+        this.selectedTemplate = state.templateSelected
+        this.createNewNehuba(state.templateSelected)
+        const foundParcellation = state.templateSelected.parcellations.find(parcellation=>
+          state.parcellationSelected.name === parcellation.name)
+        this.handleParcellation(foundParcellation ? foundParcellation : state.templateSelected.parcellations[0])
+      })
+    )
+
+    this.subscriptions.push(
+      this.loadedParcellation$.subscribe((this.handleParcellation).bind(this))
+    )
+
+    this.subscriptions.push(
+      combineLatest(
+        this.selectedRegions$,
+        this.dedicatedView$
+      ).pipe(
+        filter(([_,dedicatedView])=>!isDefined(dedicatedView)),
+        map(([regions,_])=>regions)
+      )
+        .subscribe(regions=>{
+          if(!this.nehubaViewer) return
+          this.selectedRegionIndexSet = new Set(regions.map(r=>Number(r.labelIndex)))
+          this.selectedRegionIndexSet.size > 0 ?
+            this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
+            this.nehubaViewer.showAllSeg()
+          }
+        )
+    )
+
+    this.subscriptions.push(
+      this.dedicatedView$.subscribe((this.handleDedicatedView).bind(this))
+    )
+
+    this.subscriptions.push(
+      this.redrawObservable$.subscribe(()=>{
+        if(this.nehubaViewer)
+          this.nehubaViewer.nehubaViewer.redraw()
+      })
+    )
+
+    /* setup init view state */
+    combineLatest(
+      this.navigationChanges$,
+      this.selectedRegions$,
+      this.dedicatedView$
+    ).subscribe(([navigation,regions,dedicatedView])=>{
+      this.nehubaViewer.initNav = 
+        Object.assign({},navigation,{
+          positionReal : true
+        })
+      this.nehubaViewer.initRegions = regions.map(re=>re.labelIndex)
+      this.nehubaViewer.initDedicatedView = dedicatedView
     })
 
-    this.loadedParcellation$.subscribe(this.handleParcellation)
-
-    this.selectedRegions$.subscribe(regions=>{
-      if(!this.nehubaViewer) return
-      this.selectedRegionIndexSet = new Set(regions.map(r=>r.labelIndex))
-      this.selectedRegionIndexSet.size > 0 ?
-        this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
-        this.nehubaViewer.showAllSeg()
-      }
+    this.subscriptions.push(
+      this.navigationChanges$.subscribe(this.handleDispatchedNavigationChange.bind(this),console.warn)
     )
+  }
+
+  ngAfterViewInit(){
+    this.getNMToOffsetPixelFn()
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(s=>s.unsubscribe())
+  }
+
+  returnTruePos(quadrant:number,data:any){
+    const pos = quadrant > 2 ?
+      [0,0,0] :
+      this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant] ?
+        this.nanometersToOffsetPixelsFn[quadrant](data.position.map(n=>n*1e6)) :
+        [0,0,0]
+    return pos
+  }
+
+  getPositionX(quadrant:number,data:any){
+    return this.returnTruePos(quadrant,data)[0]
+  }
+  getPositionY(quadrant:number,data:any){
+    return this.returnTruePos(quadrant,data)[1]
+  }
+  getPositionZ(quadrant:number,data:any){
+    return this.returnTruePos(quadrant,data)[2]
+  }
+
+  handleMouseEnterLandmark(spatialData:any){
+    spatialData.highlight = true
+    // console.log('mouseover',spatialData)
+  }
+
+  handleMouseLeaveLandmark(spatialData:any){
+    spatialData.highlight = false
+    // console.log('mouseleave')
+  }
+
+  private getNMToOffsetPixelFn(){
+    
+    fromEvent(this.elementRef.nativeElement,'sliceRenderEvent').pipe(
+      scan((acc:Event[],event:Event)=>{
+        const target = (event as Event).target as HTMLElement
+        const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
+          0 :
+          target.offsetLeft > 5 && target.offsetTop < 5 ?
+            1 :
+            target.offsetLeft < 5 && target.offsetTop > 5 ?
+            2 :
+              target.offsetLeft > 5 && target.offsetTop > 5 ?
+              3 :
+              4
+
+        const _ = {}
+        _[key] = event
+        return Object.assign({},acc,_)
+      },[]),
+      filter(v=>{
+        const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+        return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2])) 
+      }),
+      take(1)
+    ).subscribe((events)=>
+      [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels))
   }
 
   private patchNG(){
@@ -104,23 +300,48 @@ export class NehubaContainner implements OnInit{
             type : SELECT_REGIONS,
             selectRegions : [...this.selectedRegionIndexSet].map(idx=>this.regionsLabelIndexMap.get(idx)).concat(region)
           })
-        // const idx = this.selectedRegions.findIndex(r=>r.name==foundRegion.name)
-        // if(idx>=0){
-        //   this.selectedRegionsBSubject.next(this.selectedRegions.filter((_,i)=>i!=idx))
-        // }else{
-        //   this.selectedRegionsBSubject.next(this.selectedRegions.concat(foundRegion))
-        // }
       }
     }
   }
 
   private handleParcellation(parcellation:any){
-    if(!this.nehubaViewer) return
-    this.mapRegions(parcellation.regions)
+    this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
     this.nehubaViewer.parcellationId = parcellation.ngId
-
   }
+
+  private handleDedicatedView(dedicatedView:string){
+    
+    this.handleNifti(dedicatedView)
+  }
+
+  private handleNifti(url:string|null){
+    if(!this.nehubaViewer || !this.nehubaViewer.nehubaViewer){
+      /* if nehubaviewer has not yet been initialised for one reason or another, return */
+      console.warn('handling nifti view, nehubaviewer has not yet been initialised.')
+      return
+    }
+    if(url === null){
+      this.nehubaViewer.removeLayer({
+        name : 'niftiViewer'
+      })
+      this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
+      
+    }else{
+      this.nehubaViewer.hideAllSeg()
+      this.nehubaViewer.loadLayer({
+        niftiViewer : {
+          type : 'image',
+          source : url,
+          shader : getActiveColorMapFragmentMain()
+        }
+      })
+    }
+  }
+
+  /* related spatial search */
+  oldNavigation : any = {}
+  spatialSearchPagination : number = 0
 
   private createNewNehuba(template:any){
     this.viewerLoaded = true
@@ -128,18 +349,61 @@ export class NehubaContainner implements OnInit{
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
     this.nehubaViewer = this.cr.instance
     this.nehubaViewer.config = template.nehubaConfig
+
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.debouncedViewerPositionChange.subscribe(this.handleEmittedNavigationChange.bind(this))
+    )
+
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.mouseoverSegmentEmitter.subscribe(this.handleEmittedMouseoverSegment.bind(this))
+    )
   }
 
-  /* TODO transform this into functional */
-  private mapRegions(regions:any[]){
-    regions.forEach((region:any)=>{
-      if(region.labelIndex){
-        this.regionsLabelIndexMap.set(region.labelIndex,region)
-      }
-      if(region.children){
-        this.mapRegions(region.children)
-      }
+  handleEmittedMouseoverSegment(emitted : any | number | null){
+    this.store.dispatch({
+      type : MOUSE_OVER_SEGMENT,
+      segment : emitted
     })
+  }
+
+  /* because the navigation can be changed from two sources, 
+    either dynamically (e.g. navigation panel in the UI or plugins etc) 
+    or actively (via user interaction with the viewer) 
+    or lastly, set on init
+    
+    This handler function is meant to handle anytime viewer's navigation changes from either sources */
+  handleEmittedNavigationChange(navigation){
+
+    /* If the navigation is changed dynamically, this.oldnavigation is set prior to the propagation of the navigation state to the viewer.
+      As the viewer updates the dynamically changed navigation, it will emit the navigation state. 
+      The emitted navigation state should be identical to this.oldnavigation */
+
+    const navigationChangedActively : boolean = Object.keys(this.oldNavigation).length === 0 || !Object.keys(this.oldNavigation).every(key=>{
+      return this.oldNavigation[key].constructor === Number || this.oldNavigation[key].constructor === Boolean ?
+        this.oldNavigation[key] === navigation[key] :
+        this.oldNavigation[key].every((_,idx)=>this.oldNavigation[key][idx] === navigation[key][idx])
+    })
+
+    /* if navigation is changed dynamically (ie not actively), the state would have been propagated to the store already. Hence return */
+    if( !navigationChangedActively )
+      return
+    
+    
+    /* navigation changed actively (by user interaction with the viewer)
+      probagate the changes to the store */
+
+    this.store.dispatch({
+      type : CHANGE_NAVIGATION,
+      navigation 
+    })
+  }
+
+  handleDispatchedNavigationChange(navigation){
+    /* set this.oldnavigation to represent the state of the store */
+    this.oldNavigation = Object.assign({},this.oldNavigation,navigation)
+    this.nehubaViewer.setNavigationState(Object.assign({},this.oldNavigation,{
+      positionReal : true
+    }))
   }
 
   /* related to info-card */
@@ -159,20 +423,23 @@ export class NehubaContainner implements OnInit{
       '0 , 0 , 0 (nehubaViewer not defined)'
   }
 
-  get onHoverSegment():string{
-    if(!this.nehubaViewer) return 'nehubaViewer not yet initialised'
-    const region = this.regionsLabelIndexMap.get(this.nehubaViewer.mouseOverSegment)
-    return region ? 
-      region.name : 
-      this.nehubaViewer.mouseOverSegment ? 
-        `Segment labelIndex: ${this.nehubaViewer.mouseOverSegment}` : 
-        ``
-  }
+  // get onHoverSegment():string{
+  //   if(!this.nehubaViewer) return 'nehubaViewer not yet initialised'
+  //   const region = this.regionsLabelIndexMap.get(this.nehubaViewer.mouseOverSegment)
+  //   return region ? 
+  //     region.name : 
+  //     this.nehubaViewer.mouseOverSegment !== null && 
+  //     this.nehubaViewer.mouseOverSegment !== 0 && 
+  //     this.nehubaViewer.mouseOverSegment <= 65500 ? 
+  //       `Segment labelIndex: ${this.nehubaViewer.mouseOverSegment}` : 
+  //       ``
+  // }
 
   editingNavState : boolean = false
+
   textNavigateTo(string:string){
     if(string.split(/[\s|,]+/).length>=3 && string.split(/[\s|,]+/).slice(0,3).every(entry=>!isNaN(Number(entry.replace(/mm/,''))))){
-      const pos = (string.split(/[\s|,]+/).slice(0,3).map((entry,idx)=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)))
+      const pos = (string.split(/[\s|,]+/).slice(0,3).map((entry)=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)))
       this.nehubaViewer.setNavigationState({
         position : (pos as [number,number,number]),
         positionReal : this.statusPanelRealSpace
@@ -196,3 +463,7 @@ export class NehubaContainner implements OnInit{
       `[0,0,0] (neubaViewer is undefined)`
   }
 }
+
+export const CM_THRESHOLD = `0.05`
+export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
+export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
