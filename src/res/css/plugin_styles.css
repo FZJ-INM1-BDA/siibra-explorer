@@ -1,0 +1,35 @@
+/* layout */
+
+[plugincontainer] .btn,
+[plugincontainer] .input-group-addon,
+[plugincontainer] input[type="text"],
+[plugincontainer] .panel
+{
+  border-radius:0px;
+  border:none;
+}
+
+[plugincontainer] .btn
+{
+  opacity : 0.9;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow : rgba(5, 5, 5, 0.1) 0px 4px 6px 0px;
+}
+
+[plugincontainer] .btn:hover
+{
+  opacity:1.0;
+  transform:translateY(-5%);
+  box-shadow : rgba(5, 5, 5, 0.25) 0px 4px 6px 0px;
+}
+
+/* colour */
+[darktheme="true"] [plugincontainer] .btn,
+[darktheme="true"] [plugincontainer] .input-group-addon,
+[darktheme="true"] [plugincontainer] input[type="text"],
+[darktheme="true"] [plugincontainer] .panel
+{
+  background-color:rgba(80,80,80,0.8);
+  color:white;
+}
+

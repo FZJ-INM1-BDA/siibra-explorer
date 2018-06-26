@@ -28,6 +28,8 @@ export class WidgetUnit {
 
   @Input() title : string = 'Untitled'
 
+  @Input() containerClass : string = ''
+
   @Output()
   clickedEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
 
@@ -37,10 +39,12 @@ export class WidgetUnit {
   public cf : ComponentRef<WidgetUnit>
   public widgetServices:WidgetServices
 
-  undock(event:Event){
-    event.stopPropagation()
-    event.preventDefault()
-
+  undock(event?:Event){
+    if(event){
+      event.stopPropagation()
+      event.preventDefault()
+    }
+    
     this.widgetServices.changeState(this,{
       title : this.title,
       state:'floating',
@@ -48,10 +52,12 @@ export class WidgetUnit {
     })
   }
 
-  dock(event:Event){
-    event.stopPropagation()
-    event.preventDefault()
-
+  dock(event?:Event){
+    if(event){
+      event.stopPropagation()
+      event.preventDefault()
+    }
+    
     this.widgetServices.changeState(this,{
       title : this.title,
       state:'docked',
@@ -59,9 +65,11 @@ export class WidgetUnit {
     })
   }
 
-  exit(event:Event){
-    event.stopPropagation()
-    event.preventDefault()
+  exit(event?:Event){
+    if(event){
+      event.stopPropagation()
+      event.preventDefault()
+    }
 
     this.widgetServices.exitWidget(this)
   }

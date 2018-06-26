@@ -33,7 +33,7 @@ export class WidgetServices{
     this.clickedListener.forEach(s=>s.unsubscribe())
   }
 
-  addNewWidget(guestComponentRef:ComponentRef<any>,options?:any){
+  addNewWidget(guestComponentRef:ComponentRef<any>,options?:any):ComponentRef<WidgetUnit>{
     const _option = getOption(options)
     const component = _option.state === 'floating' ? 
       this.floatingContainer.createComponent(this.widgetUnitFactory) :

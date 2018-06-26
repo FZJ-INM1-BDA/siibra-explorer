@@ -134,6 +134,10 @@ export class AtlasBanner implements OnDestroy{
     return ''
   }
 
+  getChildren(item:any){
+    return item.children
+  }
+
   filterTreeBySearch(node:any):boolean{
     return this.filterNameBySearchPipe.transform([node.name],this.searchTerm)
   }

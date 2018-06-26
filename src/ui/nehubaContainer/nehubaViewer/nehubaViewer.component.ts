@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnDestroy, Output, EventEmitter } from "@angular/core";
+import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef } from "@angular/core";
 import * as export_nehuba from 'export_nehuba'
 
 import 'export_nehuba/dist/min/chunk_worker.bundle.js'
@@ -44,6 +44,10 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this._s7$,
     this._s8$
   ]
+
+  constructor(public elementRef:ElementRef){
+    
+  }
 
   private _parcellationId : string
 
@@ -128,6 +132,13 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     })
     /* load layer triggers navigation view event, results in infinite loop */
     this.loadLayer(_)
+  }
+
+  public setLayerVisibility(condition:{name:string|RegExp},visible:boolean){
+    const viewer = this.nehubaViewer.ngviewer
+    viewer.layerManager.managedLayers
+      .filter(l=>this.filterLayers(l,condition))
+      .map(layer=>layer.setVisible(visible))
   }
 
   public remove3DLandmarks(){

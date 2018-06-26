@@ -1,0 +1,6 @@
+<div 
+  *ngFor = "let plugin of pluginServices.fetchedPluginManifests"
+  (click) = "pluginServices.launchPlugin(plugin)"
+  class = "btn btn-default">
+  {{ plugin.name }}
+</div>

@@ -5,13 +5,11 @@ import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule } from "@ngrx/store";
 import { viewerState, dataStore,spatialSearchState,uiState } from "./services/stateStore.service";
-import { AtlasBanner } from "./ui/banner/banner.component";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { FormsModule } from "@angular/forms";
 
-import { PopoverModule } from 'ngx-bootstrap/popover'
 import { AtlasViewerDataService } from "./atlasViewer/atlasViewer.dataService.service";
 import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
@@ -23,6 +21,8 @@ import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.serv
 import { ToastComponent } from "./components/toast/toast.component";
 import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathName.pipe";
 import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
+import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
+import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 
 @NgModule({
   imports : [
@@ -34,7 +34,6 @@ import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
     
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
-    PopoverModule.forRoot(),
     StoreModule.forRoot({
       viewerState ,
       dataStore ,
@@ -44,9 +43,9 @@ import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
   ],
   declarations : [
     AtlasViewer,
-    AtlasBanner,
     WidgetUnit,
     ModalUnit,
+    PluginUnit,
 
     /* directives */
     GlyphiconTooltipScreenshotDirective,
@@ -61,18 +60,20 @@ import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
     GetNamesPipe,
     GetNamePipe,
     GetFilenameFromPathnamePipe,
-    FilterNameBySearch
+    FilterNameBySearch,
   ],
   entryComponents : [
     WidgetUnit,
     ModalUnit,
     ToastComponent,
+    PluginUnit,
   ],
   providers : [
     AtlasViewerDataService,
     AtlasViewerDataService,
     WidgetServices,
-    AtlasViewerURLService
+    AtlasViewerURLService,
+    AtlasViewerAPIServices
   ],
   bootstrap : [
     AtlasViewer

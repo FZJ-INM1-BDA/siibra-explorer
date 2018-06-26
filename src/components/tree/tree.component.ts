@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy } from "@angular/core";
 
 
 @Component({
@@ -6,7 +6,8 @@ import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBi
   templateUrl : './tree.template.html',
   styleUrls : [
     './tree.style.css'
-  ]
+  ],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 
 export class TreeComponent{
@@ -18,7 +19,7 @@ export class TreeComponent{
   @Input() findChildren : (item:any)=>any[] = (item)=>item.children
   @Input() childrenExpanded : boolean = true
 
-  @Input() searchFilter : (item:any)=>boolean | null = null
+  @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
   @Output() mouseentertree : EventEmitter<any> = new EventEmitter()
   @Output() mouseleavetree : EventEmitter<any> = new EventEmitter()
@@ -53,8 +54,8 @@ export class TreeComponent{
 
   @HostBinding('attr.filterHidden')
   get visibilityOnFilter():boolean{
-    return (this.searchFilter ? 
-      this.searchFilter(this.inputItem) || (this.treeChildren.some(tree=>tree.visibilityOnFilter) ) :
-      true)
+    return this.searchFilter ? 
+      this.searchFilter(this.inputItem) :
+      false
   }
 }

@@ -22,6 +22,9 @@ import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.p
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
+import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
+import { AtlasBanner } from "./banner/banner.component";
+import { PopoverModule } from "ngx-bootstrap/popover";
 
 
 @NgModule({
@@ -30,7 +33,9 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
     FormsModule,
     BrowserModule,
     LayoutModule,
-    ComponentsModule
+    ComponentsModule,
+
+    PopoverModule.forRoot(),
   ],
   declarations : [
     NehubaContainer,
@@ -42,6 +47,8 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
     LineChart,
     DedicatedViewer,
     LandmarkUnit,
+    AtlasBanner,
+    PluginBannerUI,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -61,6 +68,8 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
     DataBrowserUI
   ],
   exports : [
+    AtlasBanner,
+    PluginBannerUI,
     NehubaContainer,
     NehubaViewerUnit,
     DataBrowserUI,

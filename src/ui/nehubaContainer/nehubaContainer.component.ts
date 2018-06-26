@@ -1,11 +1,11 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, AfterViewInit } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, SPATIAL_GOTO_PAGE, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
-import { Observable, Subscription, fromEvent, combineLatest } from "rxjs";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
+import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged } from "rxjs/operators";
 import * as export_nehuba from 'export_nehuba'
-import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
+import { AtlasViewerAPIServices } from "../../atlasViewer/atlasViewer.apiService.service";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -32,7 +32,8 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   private selectedRegions$ : Observable<any[]>
   private dedicatedView$ : Observable<string|null>
   private fetchedSpatialDatasets$ : Observable<any[]>
-  public onHoverSegment$ : Observable<string>
+  public onHoverSegmentName$ : Observable<string>
+  public onHoverSegment$ : Observable<any>
 
   private navigationChanges$ : Observable<any>
   private redrawObservable$ : Observable<any>
@@ -53,6 +54,7 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
 
   constructor(
+    private apiService :AtlasViewerAPIServices,
     private csf:ComponentFactoryResolver,
     private store : Store<ViewerStateInterface>,
     private elementRef : ElementRef
@@ -111,7 +113,28 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
       distinctUntilChanged()
     )
 
+    const segmentsUnchangedChanged = (s1,s2)=>
+      !(typeof s1 === typeof s2 ?
+        typeof s2 === 'undefined' ?
+          false :
+          typeof s2 === 'number' ?
+            s2 !== s1 :
+            s1 === s2 ?
+              false :
+              s1 === null || s2 === null ?
+                true :
+                s2.name !== s1.name :
+        true)
+    
+
     this.onHoverSegment$ = this.store.pipe(
+      select('uiState'),
+      filter(state=>isDefined(state)),
+      map(state=>state.mouseOverSegment),
+      distinctUntilChanged(segmentsUnchangedChanged)
+    )
+
+    this.onHoverSegmentName$ = this.store.pipe(
       select('uiState'),
       filter(state=>isDefined(state)),
       map(state=>state.mouseOverSegment ?
@@ -237,12 +260,10 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
   handleMouseEnterLandmark(spatialData:any){
     spatialData.highlight = true
-    // console.log('mouseover',spatialData)
   }
 
   handleMouseLeaveLandmark(spatialData:any){
     spatialData.highlight = false
-    // console.log('mouseleave')
   }
 
   private getNMToOffsetPixelFn(){
@@ -344,6 +365,9 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   spatialSearchPagination : number = 0
 
   private createNewNehuba(template:any){
+
+    this.apiService.interactiveViewer.viewerHandle = null
+
     this.viewerLoaded = true
     this.container.clear()
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
@@ -357,6 +381,78 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.mouseoverSegmentEmitter.subscribe(this.handleEmittedMouseoverSegment.bind(this))
     )
+
+    this.setupViewerHandleApi()
+  }
+
+  private setupViewerHandleApi(){
+    this.apiService.interactiveViewer.viewerHandle = {
+      setNavigationLoc : (coord,realSpace?)=>this.nehubaViewer.setNavigationState({
+        position : coord,
+        positionReal : typeof realSpace !== 'undefined' ? realSpace : true
+      }),
+      /* TODO introduce animation */
+      moveToNavigationLoc : (coord,realSpace?)=>this.nehubaViewer.setNavigationState({
+        position : coord,
+        positionReal : typeof realSpace !== 'undefined' ? realSpace : true
+      }),
+      setNavigationOri : (quat)=>this.nehubaViewer.setNavigationState({
+        orientation : quat
+      }),
+      /* TODO introduce animation */
+      moveToNavigationOri : (quat)=>this.nehubaViewer.setNavigationState({
+        orientation : quat
+      }),
+      showSegment : (labelIndex) => {
+        if(!this.selectedRegionIndexSet.has(labelIndex)) 
+          this.store.dispatch({
+            type : SELECT_REGIONS,
+            selectRegions :  [labelIndex, ...this.selectedRegionIndexSet]
+          })
+      },
+      hideSegment : (labelIndex) => {
+        if(this.selectedRegionIndexSet.has(labelIndex)){
+          this.store.dispatch({
+            type :SELECT_REGIONS,
+            selectRegions : [...this.selectedRegionIndexSet].filter(num=>num!==labelIndex)
+          })
+        }
+      },
+      showAllSegments : () => {
+        this.store.dispatch({
+          type : SELECT_REGIONS,
+          selectRegions : this.regionsLabelIndexMap.keys()
+        })
+      },
+      hideAllSegments : ()=>{
+        this.store.dispatch({
+          type : SELECT_REGIONS,
+          selectRegions : []
+        })
+      },
+      segmentColourMap : new Map(),
+      applyColourMap : (map)=>{
+        /* TODO to be implemented */
+      },
+      loadLayer : (layerObj)=>this.nehubaViewer.loadLayer(layerObj),
+      removeLayer : (condition)=>this.nehubaViewer.removeLayer(condition),
+      setLayerVisibility : (condition,visible)=>this.nehubaViewer.setLayerVisibility(condition,visible),
+      mouseEvent : merge(
+        fromEvent(this.nehubaViewer.elementRef.nativeElement,'click').pipe(
+          map((ev:MouseEvent)=>({eventName :'click',event:ev}))
+        ),
+        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mousemove').pipe(
+          map((ev:MouseEvent)=>({eventName :'mousemove',event:ev}))
+        ),
+        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mousedown').pipe(
+          map((ev:MouseEvent)=>({eventName :'mousedown',event:ev}))
+        ),
+        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mouseup').pipe(
+          map((ev:MouseEvent)=>({eventName :'mouseup',event:ev}))
+        ),
+      ) ,
+      mouseOverNehuba : this.onHoverSegment$
+    }
   }
 
   handleEmittedMouseoverSegment(emitted : any | number | null){

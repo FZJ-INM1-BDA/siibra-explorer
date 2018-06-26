@@ -16,6 +16,7 @@ import { PanelComponent } from './panel/panel.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
 import { ToastComponent } from './toast/toast.component';
+import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
 
 @NgModule({
   imports : [
@@ -39,7 +40,8 @@ import { ToastComponent } from './toast/toast.component';
 
     /* pipes */
     SafeHtmlPipe,
-    SearchResultPaginationPipe
+    SearchResultPaginationPipe,
+    TreeSearchPipe
   ],
   exports : [
     MarkdownDom,
@@ -51,6 +53,7 @@ import { ToastComponent } from './toast/toast.component';
     ToastComponent,
 
     SearchResultPaginationPipe,
+    TreeSearchPipe,
 
     HoverableBlockDirective,
 

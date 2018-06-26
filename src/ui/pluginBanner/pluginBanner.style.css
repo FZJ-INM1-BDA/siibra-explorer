@@ -1,0 +1,36 @@
+:host
+{
+  margin-left:1em;
+}
+
+.btn
+{
+  border-radius: 0px;
+  border:none;
+}
+
+.btn
+{
+  opacity : 0.9;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow : rgba(5, 5, 5, 0.1) 0px 4px 6px 0px;
+}
+
+.btn:hover
+{
+  cursor:default;
+  opacity:1.0;
+  transform:translateY(-5%);
+  box-shadow : rgba(5, 5, 5, 0.25) 0px 4px 6px 0px;
+}
+
+.btn-default
+{
+  background-color:rgba(255,255,255,0.8);
+}
+
+:host-context([darktheme="true"]) .btn-default
+{
+  background-color:rgba(80,80,80,0.8);
+  color:white;
+}

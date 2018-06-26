@@ -1,4 +1,5 @@
-<div class = "panel panel-default">
+<div class = "panel" 
+  [ngClass] = "containerClass === '' ?  'panel-default' : containerClass">
   <div
     *ngIf = "showHeading"
     class = "panel-heading"

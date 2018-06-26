@@ -34,6 +34,8 @@
       placeholder="Regions"/>
       
   </div>
+  <plugin-banner>
+  </plugin-banner>
 </div>
 
 <ng-template #searchRegionTemplate>
@@ -44,7 +46,7 @@
         <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
       </div>
       <tree
-        *ngFor = "let child of selectedParcellation.regions"
+        *ngFor = "let child of (selectedParcellation.regions | treeSearch : filterTreeBySearch.bind(this) : getChildren )"
         (mouseclicktree) = "handleClickRegion($event)"
         [renderNode]="(displayTreeNode).bind(this)"
         [searchFilter]="(filterTreeBySearch).bind(this)"

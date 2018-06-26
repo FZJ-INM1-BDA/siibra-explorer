@@ -17,6 +17,8 @@ export class PanelComponent{
   @Input() collapseBody : boolean = false
   @Input() bodyCollapsable : boolean = false
 
+  @Input() containerClass : string = ''
+
   toggleCollapseBody(event:Event){
     if(this.bodyCollapsable){
       this.collapseBody = !this.collapseBody

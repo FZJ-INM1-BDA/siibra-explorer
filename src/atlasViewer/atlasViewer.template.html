@@ -24,13 +24,10 @@
 
     </ng-template>
     <div [style.transform] = "floatingMouseContextualContainerTransform" floatingMouseContextualContainer>
-      <div contextualInnerContainer>
-        <div *ngIf = "(onhoverSegment$ | async) !== ''" contextualBlock>
-          {{ onhoverSegment$ | async }} 
+      <div *ngIf = "onhoverSegment$ | async as onhoverSegment" contextualInnerContainer>
+        <div *ngIf = "onhoverSegment !== ''" contextualBlock>
+          {{ onhoverSegment }} 
         </div>
-        <ng-template #floatingContextContainer>
-  
-        </ng-template>
       </div>
     </div>
     <div toastContainer>
@@ -40,6 +37,9 @@
   </layout-floating-container>
 
   <ng-template #temporaryContainer>
+  </ng-template>
+
+  <ng-template #pluginFactory>
     
   </ng-template>
 
@@ -56,8 +56,4 @@
   <div *ngIf = "!(dedicatedView$ | async)">
     no special data is being displayed right now
   </div>
-</ng-template>
-
-<ng-template #mouseoverSegment>
-  {{ onhoverSegment$ | async }}
 </ng-template>

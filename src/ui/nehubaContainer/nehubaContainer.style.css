@@ -86,3 +86,7 @@ div[landmarkMasterContainer] > div > [landmarkContainer] > div
   margin-top:-1em;
 }
 
+small[onHoverSegment]
+{
+  margin-left:2em;
+}

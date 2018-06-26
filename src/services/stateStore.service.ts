@@ -26,6 +26,9 @@ export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 
+export const FETCHED_PLUGIN_MANIFESTS = `FETCHED_PLUGIN_MANIFESTS`
+export const LAUNCH_PLUGIN = `LAUNCH_PLUGIN`
+
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
 
@@ -113,7 +116,8 @@ export function viewerState(state:ViewerStateInterface,action:AtlasAction){
         dedicatedView : null
       })
     case FETCHED_TEMPLATES : {
-      return Object.assign({},state,{fetchedTemplates:action.fetchedTemplate})
+      return Object.assign({},state,{
+        fetchedTemplates:action.fetchedTemplate})
     }
     case CHANGE_NAVIGATION : {
       return Object.assign({},state,{navigation : action.navigation})

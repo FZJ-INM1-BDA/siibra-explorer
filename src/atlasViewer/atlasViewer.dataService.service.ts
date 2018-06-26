@@ -4,6 +4,7 @@ import { ViewerStateInterface, FETCHED_TEMPLATES, DataEntry, FETCHED_DATAENTRIES
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { Subscription } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { PluginManifest } from "./atlasViewer.pluginService.service";
 
 @Injectable({
   providedIn : 'root'
@@ -11,22 +12,38 @@ import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.serv
 export class AtlasViewerDataService implements OnDestroy{
   
   private subscriptions : Subscription[] = []
+
+  public promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve,reject)=>{
+    // fetch('http://medpc055.ime.kfa-juelich.de:5080/collectPlugins')
+    //   .then(res=>res.json())
+    //   .then(json=>resolve(json))
+    //   .catch(err=>reject(err))
+    
+    Promise.all([
+      fetch('http://localhost:10080/jugex/manifest.json').then(res=>res.json()),
+      fetch('http://localhost:10080/testPlugin/manifest.json').then(res=>res.json())
+    ])
+      .then(arr=>resolve(arr))
+      .catch(e=>reject(e))
+  })
+
+  public promiseFetchedTemplates : Promise<any[]> = Promise.all(this.constantService.templateUrls.map(url=>
+    fetch(url)
+      .then(res=>
+        res.json())
+      .then(json=>json.nehubaConfig && !json.nehubaConfigURL ? 
+        Promise.resolve(json) :
+        fetch(json.nehubaConfigURL)
+          .then(r=>r.json())
+          .then(nehubaConfig=>Promise.resolve(Object.assign({},json,{ nehubaConfig })))
+      )))
   
   constructor(
     private store : Store<ViewerStateInterface>,
     private constantService : AtlasViewerConstantsServices
   ){
 
-    Promise.all(this.constantService.templateUrls.map(url=>
-      fetch(url)
-        .then(res=>
-          res.json())
-        .then(json=>json.nehubaConfig && !json.nehubaConfigURL ? 
-          Promise.resolve(json) :
-          fetch(json.nehubaConfigURL)
-            .then(r=>r.json())
-            .then(nehubaConfig=>Promise.resolve(Object.assign({},json,{ nehubaConfig })))
-        )))
+    this.promiseFetchedTemplates
       .then(arrJson=>
         this.store.dispatch({
           type : FETCHED_TEMPLATES,

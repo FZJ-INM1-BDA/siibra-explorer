@@ -1,4 +1,4 @@
-tree:not([filterHidden="false"]):not([hidden])
+tree
 {
   display:block;
   margin-left:1em;
@@ -31,7 +31,7 @@ div[itemContainer] > span[itemName]:hover
 
 /* dashed guiding line */
 
-tree:not([filterHidden="false"]):not(:last-child) > div[itemMasterContainer]:before
+tree:not(:last-child) > div[itemMasterContainer]:before
 {
   
   pointer-events: none;
@@ -43,13 +43,13 @@ tree:not([filterHidden="false"]):not(:last-child) > div[itemMasterContainer]:bef
   border-left: rgba(255,255,255,1) 1px dashed;
 }
 
-tree:not([filterHidden="false"]):not(:last-child) div[itemMasterContainer] > [itemContainer]
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]
 {
   position:relative;
 }
 
 
-tree:not([filterHidden="false"]):not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
 {
   pointer-events: none;
   content : '';
@@ -61,12 +61,12 @@ tree:not([filterHidden="false"]):not(:last-child) div[itemMasterContainer] > [it
   z-index: 0;
 }
 
-tree:not([filterHidden="false"]):last-child div[itemMasterContainer] > [itemContainer]
+tree:last-child div[itemMasterContainer] > [itemContainer]
 {
   position:relative;
 }
 
-tree:not([filterHidden="false"]):last-child div[itemMasterContainer] > [itemContainer]:before
+tree:last-child div[itemMasterContainer] > [itemContainer]:before
 {
   pointer-events: none;
   content : '';
@@ -78,17 +78,17 @@ tree:not([filterHidden="false"]):last-child div[itemMasterContainer] > [itemCont
   z-index: 0;
 }
 
-tree:not([filterHidden="false"]):not(:last-child) div[itemMasterContainer]:before
+tree:not(:last-child) div[itemMasterContainer]:before
 {
   border-left: rgba(128,128,128,0.6) 1px dashed;
 }
 
-tree:not([filterHidden="false"]):not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
 {
   border-bottom: rgba(128,128,128,0.6) 1px dashed;
 }
 
-tree:not([filterHidden="false"]) div[itemMasterContainer]:last-child > [itemContainer]:before
+tree div[itemMasterContainer]:last-child > [itemContainer]:before
 {
   border-bottom: rgba(128,128,128,0.6) 1px dashed;
   border-left : rgba(128,128,128,0.6) 1px dashed;
