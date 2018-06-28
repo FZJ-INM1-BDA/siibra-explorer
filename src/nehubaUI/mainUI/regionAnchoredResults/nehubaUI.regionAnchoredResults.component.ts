@@ -152,6 +152,10 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
     const parcellationName = parcellation ? parcellation.name : ''
     return this.searchDatasetService.searchResultMetadataMap.get({targetParcellation:parcellationName,datasetName:type})
   }
+
+  getTypeMetadata(type:string){
+    return this.searchDatasetService.searchResultMetadataMap.get(type)
+  }
   
   animationDone(){
     if(this.viewList)this.renderFullList = true

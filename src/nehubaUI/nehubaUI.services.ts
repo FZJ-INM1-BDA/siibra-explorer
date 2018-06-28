@@ -1134,6 +1134,7 @@ class DataService {
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json'
   ]
+  
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
     Promise.all(this.templateArray.map(dataset=>
       this.fetchJson(dataset)
@@ -1522,7 +1523,6 @@ export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA",
 export class MasterCollapsableController{
   expandBSubject : BehaviorSubject<boolean> = new BehaviorSubject(false)
 }
-
 
 /* */
 const CHART_BASE_STYLE = {
