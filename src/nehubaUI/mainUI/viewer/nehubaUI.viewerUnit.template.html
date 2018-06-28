@@ -29,13 +29,31 @@
 
 
 <div [ngClass] = "{darktheme : darktheme}" id = "viewerStatus">
+
+  <div 
+    *ngIf = "selectedTemplate && selectedTemplate.properties && selectedTemplate.properties.publications"
+    citationContainer>
+    <a
+      *ngFor = "let publication of selectedTemplate.properties.publications" 
+      href = "{{ publication.doi }}" 
+      class = "btn btn-link">
+      {{ publication.citation }}
+    </a>
+  </div>
+
+  <hr 
+    *ngIf = "selectedTemplate && selectedTemplate.properties && selectedTemplate.properties.publications"
+    />
+
   <span 
+    *ngIf = "false"
     class = "btn btn-link"
     (click) = "landmarkServices.flatProjection = !landmarkServices.flatProjection">
     toggle landmark flat projection
   </span>  
 
-  <br />
+  <br
+    *ngIf = "false" />
 
   <span 
     class = "btn btn-link"

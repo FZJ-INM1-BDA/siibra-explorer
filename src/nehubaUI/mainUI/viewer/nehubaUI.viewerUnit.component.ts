@@ -2,7 +2,7 @@ import { Component, OnDestroy, AfterViewInit, ViewChild, ElementRef, TemplateRef
 import { vec3,NehubaViewer,Config as NehubaViewerConfig, createNehubaViewer, sliceRenderEventType, SliceRenderEventDetail } from 'nehuba/exports';
 
 import { Observable,Subject } from 'rxjs/Rx'
-import { RegionDescriptor, ParcellationDescriptor } from 'nehubaUI/nehuba.model';
+import { RegionDescriptor, ParcellationDescriptor, TemplateDescriptor } from 'nehubaUI/nehuba.model';
 import { FloatingTooltip } from 'nehubaUI/components/floatingTooltip/nehubaUI.floatingTooltip.component';
 import { MainController, SpatialSearch, LandmarkServices, Animation, parseRegionRgbToFragmentMain, getActiveColorMapFragmentMain, TEMP_SearchDatasetService, WidgitServices } from 'nehubaUI/nehubaUI.services';
 import { ManagedUserLayer } from 'neuroglancer/layer'
@@ -85,6 +85,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   nanometersToOffsetPixelsFn : Function[] | null[] = [null,null,null]
   rotate3D : number[] | null = null
 
+  selectedTemplate : TemplateDescriptor | null
+
   @ViewChild(FloatingTooltip) floatingPopover : FloatingTooltip
   @ViewChild('container',{read:ElementRef}) viewerContainer : ElementRef
 
@@ -103,9 +105,9 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
 
         console.log('selecte parcellation b subject')
         
-        const template = this.mainController.selectedTemplateBSubject.getValue()
-        if(template && this.nehubaViewer && this.nehubaViewer.ngviewer){
-          template.parcellations.map(p=>p.ngId).forEach(ngId=>{
+        this.selectedTemplate = this.mainController.selectedTemplateBSubject.getValue()
+        if(this.selectedTemplate && this.nehubaViewer && this.nehubaViewer.ngviewer){
+          this.selectedTemplate.parcellations.map(p=>p.ngId).forEach(ngId=>{
             const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(ngId)
             if(layer)layer.setVisible(false)
           })
