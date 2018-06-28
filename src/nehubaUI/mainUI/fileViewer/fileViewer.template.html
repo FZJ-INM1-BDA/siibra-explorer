@@ -51,7 +51,7 @@
 <div 
   *ngIf = "searchResultFile"
   [ngSwitch]="searchResultFile.mimetype">
-
+  
   <div emptyRow *ngSwitchCase = "'application/octet-stream'">
     <!-- downloadable data -->
   </div>
@@ -61,7 +61,7 @@
     <!-- TODO figure out a more elegant way of dealing with draggable img -->
     <img draggable = "false" [src] = "searchResultFile.url" />
   </div>
-
+  
   <!-- data container -->
   <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
     <radar-chart

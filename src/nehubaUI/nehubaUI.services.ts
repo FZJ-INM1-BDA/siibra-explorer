@@ -89,6 +89,13 @@ export class MainController{
             if(parcellation) this.selectedParcellationBSubject.next(parcellation)
           }
         }break;
+        case 'selectedParcellation':{
+          const template = this.selectedTemplateBSubject.getValue()
+          if(template){
+            const parcellation = template.parcellations.find(p=>p.name===keyval[1])
+            if(parcellation) this.selectedParcellationBSubject.next(parcellation)
+          }
+        }break;
         case 'selectedTemplate':{
           const template = this.loadedTemplates.find(template=>template.name==keyval[1])
           if(template) this.selectedTemplateBSubject.next(template)
@@ -1068,7 +1075,6 @@ export class SpatialSearch{
       }
       return newLandmark
     })
-
     this.landmarkServices.clearAllLandmarks()
     this.landmarkServices.TEMP_clearVtkLayers()
 
@@ -1148,6 +1154,7 @@ class DataService {
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json'
   ]
+  
   fetchTemplates:Promise<TemplateDescriptor[]> = new Promise((resolve,reject)=>{
     Promise.all(this.templateArray.map(dataset=>
       this.fetchJson(dataset)
