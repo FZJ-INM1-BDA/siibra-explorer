@@ -49,7 +49,7 @@ export class MainController{
   resultsFilterBSubject : BehaviorSubject<string[]> = new BehaviorSubject([])
 
   /* dedicated view */
-  dedicatedViewBSubject : BehaviorSubject<string|null> = new BehaviorSubject(null)
+  dedicatedViewBSubject : BehaviorSubject<{url:string,data?:any}|null> = new BehaviorSubject(null)
 
   /**
    * plugins
@@ -79,7 +79,15 @@ export class MainController{
     Array.from(query.entries()).forEach(keyval=>{
       switch(keyval[0]){
         case 'dedicatedView':{
-          this.dedicatedViewBSubject.next(keyval[1])
+          /* TODO this currently does not work. need to wait for searched dataset to emit data as well as url! */
+          this.dedicatedViewBSubject.next({url:keyval[1]})
+        }break;
+        case 'selectedParcellation':{
+          const template = this.selectedTemplateBSubject.getValue()
+          if(template){
+            const parcellation = template.parcellations.find(p=>p.name===keyval[1])
+            if(parcellation) this.selectedParcellationBSubject.next(parcellation)
+          }
         }break;
         case 'selectedParcellation':{
           const template = this.selectedTemplateBSubject.getValue()
@@ -171,10 +179,10 @@ export class MainController{
   init(){
 
     /* dev option, use a special endpoint to fetch all plugins */
-    // fetch('http://localhost:5080/collectPlugins')
-    //   .then(res=>res.json())
-    //   .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
-    //   .catch(console.warn)
+    fetch('http://localhost:5080/collectPlugins')
+      .then(res=>res.json())
+      .then(arr=>this.loadedPlugins = (<Array<any>>arr).map(json=>new LabComponent(json)))
+      .catch(console.warn)
 
     this.dataService.fetchTemplates
       // .then((this.dataService.fetchTemplatesData).bind(this.dataService))
@@ -244,7 +252,7 @@ export class MainController{
     const merged = Observable.merge(
       Observable.from(this.dedicatedViewBSubject)
         .skip(1)
-        .map(dedicatedView=>({'dedicatedView':dedicatedView})),
+        .map(dedicatedView=>({'dedicatedView':dedicatedView?dedicatedView.url:null})),
       Observable.from(this.selectedTemplateBSubject
         .skip(1)
         .map(template=>({ 'selectedTemplate' : template ? template.name: null }))),
@@ -621,6 +629,8 @@ export class LandmarkServices{
     //     this.TEMP_clearVtkLayers()
     //   }
     // })
+
+    INTERACTIVE_VIEWER.experimental.landmarkService = this
   }
 
   clearAllLandmarks(){
@@ -727,11 +737,22 @@ export class TEMP_SearchDatasetService{
   returnedSpatialSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
 
   returnedSearchResultsBSubject : BehaviorSubject<SearchResultInterface[]> = new BehaviorSubject([])
-  searchResultMetadataMap : Map<{targetParcellation:string,datasetName:string},HasPropertyInterface> = new Map()
+  searchResultMetadataMap : Map<string,Map<string,HasPropertyInterface>> = new Map()
   
   constructor(private mainController:MainController){
     fetch('res/json/allAggregatedData.json').then(res=>res.json())
-      .then(metadata=>this.searchResultMetadataMap = new Map(metadata))
+      .then(metadata=>{
+        const data = metadata.reduce((acc:[string,Map<string,HasPropertyInterface>][],curr:any)=>{
+          const idx = acc.findIndex((it)=>it[0]===curr[0].targetParcellation)
+          return idx >= 0 ? 
+            acc.map((it,i)=> i === idx ? [it[0], it[1].set(curr[0].datasetName,curr[1])] : it ) :
+            acc.concat([[ curr[0].targetParcellation , new Map([[curr[0].datasetName , curr[1]]]) ]])
+              
+              /* [[ curr[0].targetParcellation , [ curr[0].datasetName , curr[1]] ]] */
+        },[] as [string,Map<string,HasPropertyInterface>][])
+        
+        this.searchResultMetadataMap = new Map(data)
+      })
 
     Observable
       .from(this.mainController.selectedParcellationBSubject)
@@ -1054,7 +1075,6 @@ export class SpatialSearch{
       }
       return newLandmark
     })
-
     this.landmarkServices.clearAllLandmarks()
     this.landmarkServices.TEMP_clearVtkLayers()
 
@@ -1523,6 +1543,7 @@ export const TEMP_NR = ["5-HT1A","5-HT2","alpha1","alpha2","alpha4beta2","AMPA",
 export class MasterCollapsableController{
   expandBSubject : BehaviorSubject<boolean> = new BehaviorSubject(false)
 }
+
 
 /* */
 const CHART_BASE_STYLE = {

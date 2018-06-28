@@ -150,11 +150,11 @@ export class RegionAnchoredResults implements AfterViewInit,OnDestroy{
   getTypeMetadata(type:string){
     const parcellation = this.mainController.selectedParcellationBSubject.getValue()
     const parcellationName = parcellation ? parcellation.name : ''
-    return this.searchDatasetService.searchResultMetadataMap.get({targetParcellation:parcellationName,datasetName:type})
-  }
+    const map = this.searchDatasetService.searchResultMetadataMap.get(parcellationName)
 
-  getTypeMetadata(type:string){
-    return this.searchDatasetService.searchResultMetadataMap.get(type)
+    return map ? 
+      map.get(type) : 
+      null
   }
   
   animationDone(){

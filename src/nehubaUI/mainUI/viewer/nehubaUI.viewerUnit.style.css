@@ -89,3 +89,22 @@ floatingPopover
   white-space:nowrap;
   pointer-events:none;
 }
+
+div[citationContainer]
+{
+  max-width:300px;
+}
+
+div[citationContainer] > a
+{
+  text-align: left;
+  display:block;
+  white-space: normal;
+}
+
+hr
+{
+  border-color : rgba(128,128,128,0.5);
+  margin:0.5em 0;
+  padding:0;
+}

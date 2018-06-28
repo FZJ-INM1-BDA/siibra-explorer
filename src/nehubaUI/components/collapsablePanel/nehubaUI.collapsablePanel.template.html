@@ -9,8 +9,9 @@
     </span>
     
     <property-widget 
-      (dismiss) = "dismiss.emit(true)"
       *ngIf = "propertyWidget" 
+      (dismiss) = "dismiss.emit(true)"
+      [title]="propertyWidget.name"
       [inputComponent]="propertyWidget">
 
     </property-widget>
