@@ -276,11 +276,11 @@ export class WidgetsContainer{
       this.widgitServices.layoutChangeSubject
         .debounceTime(200)
         .subscribe(()=>{
-          this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
+          /* TODO remove all references to layoutChangeSubject. side panel open/close criteria changed */
+          // this.setShowMenu.emit( this.dockedWidgetContainer.viewContainerRef.length > 0 )
         })
 
 
-      // this.floatingWidgetSerivce.focusFloatingViewSubject.subscribe(console.log)
       Observable
         .from(this.floatingWidgetSerivce.focusFloatingViewSubject)
         .subscribe(fw=>{
@@ -503,6 +503,7 @@ interface WidgetViewChassis{
     (mousedown)="stopBlink()" floatingWidgetUnit>
 
     <div 
+      id = "floatingWidgetHeading"
       class = "panel-heading"
       (mousedown)="mousedown($event)"
       (mouseup)="mouseup($event)">
@@ -534,6 +535,11 @@ interface WidgetViewChassis{
     {
       position:absolute;
       width:25em;
+      box-shadow : 0 2px 4px 4px rgba(0,0,0,0.2);
+    }
+    div[floatingWidgetUnit] > div#floatingWidgetHeading
+    {
+      background-color:rgba(128,128,128,0.4);
     }
     div[floatingWidgetUnit] > div.panel-heading:hover
     {
@@ -692,6 +698,7 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   template :
   `
   <div
+    id = "dockedWidgetUnit"
     class = "panel"
     [ngClass] = "{'panel-default':!successClassState, 'panel-success':successClassState}"
     (mousedown) = "stopBlink()" dockedWidgetUnit>
@@ -737,10 +744,16 @@ export class FloatingWidgetView implements OnDestroy,OnInit,AfterViewInit,Widget
   `,
   styles : [
     `
-    div[dockedWidgetUnit]
+    div[dockedWidgetUnit]#dockedWidgetUnit
     {
       border-radius: 0px;
-      margin-bottom: 0px;
+      margin-bottom: 1px;
+    }
+
+    
+    div[dockedWidgetUnit]#dockedWidgetUnit > div.panel-heading
+    {
+      background-color:rgba(128,128,128,0.2);
     }
 
     div.panel-heading

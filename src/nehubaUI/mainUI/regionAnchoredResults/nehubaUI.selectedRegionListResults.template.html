@@ -1,11 +1,11 @@
 <collapsable-panel
+  *ngFor = "let region of selectedRegions"
   (dismiss)="onDismiss(region)"
-  [title] = "region.name + renderRegionDatasetCount(region)"
-  [propertyWidget] = "Object.assign(region,{dismiss:true})"
-  *ngFor = "let region of selectedRegions">
+  [title] = "renderRegionName(region)"
+  [propertyWidget] = "Object.assign({},region,{dismiss:true})">
 
   <nehubaui-searchresult-ui
-    [title] = "searchResults.type"
+    
     [showLinkedRegion] = "false"
     *ngFor = "let searchResults of region.datasets | filterDatasetSearchResult : filterSearchResultbyType"
     [searchResult]="searchResults">

@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router'
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { createCustomElement } from '@angular/elements'
+// import { createCustomElement } from '@angular/elements'
 
 import { ModalModule }  from 'ngx-bootstrap/modal'
 import { ButtonsModule }  from 'ngx-bootstrap/buttons'
@@ -29,8 +29,8 @@ import { SearchResultUI } from 'nehubaUI/mainUI/searchResultUI/searchResultUI.co
 import { FileViewer } from 'nehubaUI/mainUI/fileViewer/fileViewer.component'
 import { PropertyWidget } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component'
 import { RegionAnchoredResults } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.regionAnchoredResults.component'
-import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
-import { SelectedRegionList } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
+import { SearchResultUIList,SearchResultPaginationPipe,FilterDatasetSearchResult,GroupDatasetByRegion } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.searchResultList.component'
+import { SelectedRegionList,FilterRegionsByDatasetCount } from 'nehubaUI/mainUI/regionAnchoredResults/nehubaUI.selectedRegionListResults.component'
 import { DedicatedViewController } from 'nehubaUI/mainUI/fileViewer/fileViewerDedicatedView.component'
 import { SearchResultUIFileFolders,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe } from 'nehubaUI/mainUI/searchResultUI/searchResultUIFileFolders.component'
 
@@ -55,7 +55,7 @@ import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipRemoveSignDirective
 import { FilterUncertainObject,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe  } from 'nehubaUI/util/nehubaUI.util.pipes'
 
 /* service */
-import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from './nehubaUI.services';
+import { MainController,InfoToUIService,LandmarkServices, WidgitServices, TEMP_SearchDatasetService, SpatialSearch } from './nehubaUI.services';
 
 
 @NgModule({
@@ -73,12 +73,17 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     TooltipModule.forRoot()
   ],
   declarations : 
-    [ DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective,
+    [ 
+    FilterRegionsByDatasetCount,  
+    DisplayFilteredResult, GlyphiconTooltipRemoveSignDirective,GlyphiconTooltipScreenshotDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipInfoSignDirective,
     FilterDatasetSearchResult,SearchResultUIFileFolders ,SearchResultFilesFolderHeirachyPipe,SearchResultFilesFolderZeroHeirachyPipe,
     DedicatedViewController,SearchResultPaginationPipe,PaginationComponent,
     CollapsablePanel, PropertyWidget,RegionAnchoredResults,SelectedRegionList,
     DisplayFilteredResult, NehubaRadarChart,NehubaLineChart,SearchResultUI,SearchResultUIList,FileViewer,
     
+    /* Pipes */
+    GroupDatasetByRegion,
+
     SplashScreen,RenderTemplateDirective,
     DatasetBlurb, ReadMoreComponent, 
     NehubaViewer2DLandmarkUnit,
@@ -88,7 +93,7 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
     MultilevelSelector, NehubaModalService,
     FilterUncertainObject,SearchPipe,SelectTreePipe,MultilevelSelectorVisiblePipe,SearchHighlight,KeyPipe,SearchPipe,PrependNavigate,MapToValuePipe,ConcatFlattenArrayPipe],
   bootstrap : [ NehubaContainer ],
-  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService ],
+  providers : [ MainController,LandmarkServices,WidgitServices,InfoToUIService,SpatialSearch,TEMP_SearchDatasetService ],
   entryComponents : [ 
       MinimisedView, 
       WidgetView, 
@@ -106,12 +111,12 @@ import { MainController,InfoToUIService,LandmarkServices, WidgitServices } from 
 })
 export class NehubaUI{
   constructor(public injector:Injector){
-    const readmoreElement = createCustomElement( ReadMoreComponent, {injector : this.injector })
-    const radarChart = createCustomElement( NehubaRadarChart, {injector : this.injector })
-    const lineChart = createCustomElement( NehubaLineChart , {injector : this.injector })
+    // const readmoreElement = createCustomElement( ReadMoreComponent, {injector : this.injector })
+    // const radarChart = createCustomElement( NehubaRadarChart, {injector : this.injector })
+    // const lineChart = createCustomElement( NehubaLineChart , {injector : this.injector })
     
-    customElements.define('readmore-component',readmoreElement)
-    customElements.define('radar-chart-component',radarChart)
-    customElements.define('line-chart-component',lineChart)
+    // customElements.define('readmore-component',readmoreElement)
+    // customElements.define('radar-chart-component',radarChart)
+    // customElements.define('line-chart-component',lineChart)
   }
 }

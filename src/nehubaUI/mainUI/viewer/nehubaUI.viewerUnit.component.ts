@@ -24,8 +24,7 @@ declare var window:{
 
 @Component({
   template : template ,
-  styles : [ css ],
-  providers : [ TEMP_SearchDatasetService ]
+  styles : [ css ]
 })
 export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   public nehubaViewer : NehubaViewer
@@ -40,6 +39,14 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   viewerSegment : RegionDescriptor | number | null
   mousePosReal :  number[] = [0,0,0]
   mousePosVoxel :  number[] = [0,0,0]
+
+  get activeParcellationId(){
+    const activeparcellation = this.mainController.selectedParcellationBSubject.getValue()
+    return  activeparcellation !== null ? activeparcellation.ngId : 
+      this.mainController.selectedTemplateBSubject.getValue() !== null ?
+        this.mainController.selectedTemplateBSubject.getValue()!.parcellations[0].ngId :
+        ''
+  }
   
   @ViewChild('datasetsResultWidget',{read:TemplateRef}) datasetsResultWidget : TemplateRef<any>
 
@@ -88,11 +95,26 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     public spatialSearch : SpatialSearch,
     public landmarkServices : LandmarkServices){
 
-    this.mainController.selectedParcellationBSubject
-      .debounceTime(10)
+    Observable
+      .from(this.mainController.selectedParcellationBSubject)
+      .delay(100)
       .takeUntil(this.destroySubject)
-      .subscribe((parcellation)=>{
-        if(parcellation) this.applyNehubaMeshFix()
+      .subscribe(p=>{
+
+        console.log('selecte parcellation b subject')
+        
+        const template = this.mainController.selectedTemplateBSubject.getValue()
+        if(template && this.nehubaViewer && this.nehubaViewer.ngviewer){
+          template.parcellations.map(p=>p.ngId).forEach(ngId=>{
+            const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(ngId)
+            if(layer)layer.setVisible(false)
+          })
+        }
+        if(p) {
+          const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(p.ngId)
+          if(layer) layer.setVisible(true)
+          this.applyNehubaMeshFix()
+        }
       })
   }
 
@@ -111,11 +133,15 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
     this.mainController.selectedTemplateBSubject
       .takeUntil(this.destroySubject)
       .delay(0) //to avoid potential race condition with widgetService.unloadAll() call on template select
-      .subscribe(()=>{
+      .subscribe((template)=>{
         
         this.widgetComponent = this.widgetServices.widgitiseTemplateRef(this.datasetsResultWidget,{name:'Data Browser'})
         this.widgetComponent.changeState('docked')
+
+        /* spatial query on tempalte select */
+        this.spatialSearch.querySpatialData(this.viewerPosReal as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
+    
   }
 
   public createNewNehubaViewerWithConfig(config:NehubaViewerConfig){
@@ -169,6 +195,8 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
             name : 'nehubaNifti'
           })
         }
+
+        
         
         // if(mode == 'Cytoarchitectonic Probabilistic Map'){
         //   /* turn off the visibility of all pmaps first */
@@ -277,16 +305,19 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       })
     
     Observable
-      .from(this.nehubaViewer.navigationState.position.inRealSpace)
+      .combineLatest(
+        this.nehubaViewer.navigationState.position.inRealSpace,
+        this.mainController.selectedTemplateBSubject)
       .takeUntil(this.destroySubject)
-      .subscribe((pos:any)=>{
+      .subscribe((arr:any)=>{
+        const [pos,template] = arr
         this.viewerPosReal = pos
 
         /* spatial query */
         const container = (<HTMLElement>this.viewerContainer.nativeElement)
         this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
         /* width in mm */
-        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
     
     Observable
@@ -305,16 +336,19 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       .subscribe((ori:any)=>this.perspectiveOri=ori)
     
     Observable
-      .from(this.nehubaViewer.navigationState.sliceZoom)
+      .combineLatest(
+        this.nehubaViewer.navigationState.sliceZoom,
+        this.mainController.selectedTemplateBSubject)
       .takeUntil(this.destroySubject)
-      .subscribe((zoom:any)=>{
+      .subscribe((arr:any)=>{
+        const [zoom, template] = arr
         this.sliceViewZoom = zoom
       
         /* spatial query */
         const container = (<HTMLElement>this.viewerContainer.nativeElement)
         this.spatialSearchWidth = Math.max(container.clientHeight/4,container.clientWidth/4) * this.sliceViewZoom / 1000000
         /* width in mm */
-        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,`Colin 27`)
+        this.spatialSearch.querySpatialData(this.viewerPosReal.map(num=>num/1000000) as [number,number,number],this.spatialSearchWidth,template ? template.name : '')
       })
 
     Observable
@@ -373,29 +407,43 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
       })
 
     /* patch surface parcellation of JuBrain */
-    Observable.from(this.nehubaViewer.getShownSegmentsObservable())
+    /* TODO this will break on multiple parcellations */
+    Observable.from(this.nehubaViewer.getShownSegmentsObservable({
+      name : this.activeParcellationId 
+    }))
       .takeUntil(this.destroySubject)
+      .debounceTime(100)
       .filter(()=>
         (typeof this.mainController.selectedParcellation != 'undefined') &&
         this.mainController.selectedParcellation.surfaceParcellation)
       .subscribe(segs=>{
         if( segs.length == 0 ){
-          this.nehubaViewer.clearCustomSegmentColors()
-          this.nehubaViewer.batchAddAndUpdateSegmentColors( this.mainController.selectedParcellation!.colorMap )
+          this.nehubaViewer.clearCustomSegmentColors({
+            name : this.activeParcellationId
+          })
+          this.nehubaViewer.batchAddAndUpdateSegmentColors( this.mainController.selectedParcellation!.colorMap ,{
+            name : this.activeParcellationId
+          })
         }else{
           const newColormap = new Map()
           const blankColor = {red:255,green:255,blue:255}
           this.mainController.selectedParcellation!.colorMap.forEach((activeValue,key)=>{
             newColormap.set(key, segs.find(seg=>seg==key) ? activeValue : blankColor)
           })
-          this.nehubaViewer.clearCustomSegmentColors()
-          this.nehubaViewer.batchAddAndUpdateSegmentColors( newColormap )
+          this.nehubaViewer.clearCustomSegmentColors({
+            name : this.activeParcellationId
+          })
+          this.nehubaViewer.batchAddAndUpdateSegmentColors( newColormap ,{
+            name : this.activeParcellationId
+          })
         }
       })
 
     INTERACTIVE_VIEWER.viewerHandle.segmentColorMap = this.mainController.selectedParcellation!.colorMap
     INTERACTIVE_VIEWER.viewerHandle.reapplyColorMap = (colormap)=>{ 
-      this.nehubaViewer.batchAddAndUpdateSegmentColors( colormap )
+      this.nehubaViewer.batchAddAndUpdateSegmentColors( colormap ,{
+        name : this.activeParcellationId
+      })
     }
 
     window['nehubaViewer'] = this.nehubaViewer
@@ -556,19 +604,25 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   }
 
   public showSeg(id:number){
-    this.nehubaViewer.showSegment(id)
+    this.nehubaViewer.showSegment(id , {name : this.activeParcellationId})
   }
 
   public hideSeg(id:number){
-    this.nehubaViewer.hideSegment(id)
+    this.nehubaViewer.hideSegment(id ,{name :this.activeParcellationId})
   }
 
   public allSeg(show:boolean){
-    this.nehubaViewer.getShownSegmentsNow().forEach(segID => {
-      this.nehubaViewer.hideSegment(segID)
+    this.nehubaViewer.getShownSegmentsNow({
+      name : this.activeParcellationId
+    }).forEach(segID => {
+      this.nehubaViewer.hideSegment(segID,{ 
+        name : this.activeParcellationId 
+      })
     })
     if( !show ) {
-      this.nehubaViewer.showSegment(0)
+      this.nehubaViewer.showSegment(0 , { 
+        name : this.activeParcellationId 
+      })
     }
   }
 
@@ -627,10 +681,16 @@ export class NehubaViewerComponent implements OnDestroy,AfterViewInit{
   }
 
   public applyNehubaMeshFix(){
-    this.nehubaViewer.clearCustomSegmentColors()
+    this.nehubaViewer.clearCustomSegmentColors({
+      name : this.activeParcellationId
+    })
     if(this.mainController.selectedParcellation){
-      this.nehubaViewer.setMeshesToLoad( Array.from(this.mainController.selectedParcellation.colorMap.keys()) )
-      this.nehubaViewer.batchAddAndUpdateSegmentColors( this.mainController.selectedParcellation.colorMap )
+      this.nehubaViewer.setMeshesToLoad( Array.from(this.mainController.selectedParcellation.colorMap.keys()) ,{
+        name : this.activeParcellationId
+      })
+      this.nehubaViewer.batchAddAndUpdateSegmentColors( this.mainController.selectedParcellation.colorMap ,{
+        name : this.activeParcellationId
+      })
     }
   }
 }

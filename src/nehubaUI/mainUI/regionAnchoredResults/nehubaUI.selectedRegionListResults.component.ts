@@ -1,7 +1,7 @@
-import { Component, OnDestroy, Input, ViewChildren } from '@angular/core'
+import { Component, OnDestroy, Input, ViewChildren, PipeTransform, Pipe } from '@angular/core'
 
 import template from './nehubaUI.selectedRegionListResults.template.html'
-import { MainController, MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
+import { MainController } from 'nehubaUI/nehubaUI.services';
 import { RegionDescriptor } from 'nehubaUI/nehuba.model';
 import { Subject,Observable } from 'rxjs/Rx';
 
@@ -27,18 +27,12 @@ export class SelectedRegionList implements OnDestroy{
   @Input() filterSearchResultbyType : {name : string, enabled : boolean}[] = []
   @ViewChildren(CollapsablePanel) collapsablePanels : CollapsablePanel[] = []
 
-  constructor(public mainController:MainController,private collapseableController:MasterCollapsableController ){
+  constructor(public mainController:MainController){
     Observable
       .from(this.mainController.selectedRegionsBSubject)
       .takeUntil(this.destroySubject)
-      .subscribe(regions=>this.selectedRegions=regions)
+      .subscribe(regions=>this.selectedRegions=regions.slice())
 
-    Observable
-      .from(this.collapseableController.expandBSubject)
-      .takeUntil(this.destroySubject)
-      .subscribe(bool=>{
-        this.collapsablePanels.forEach(cp=>bool ? cp.show() : cp.hide())
-      })
   }
 
   ngOnDestroy(){
@@ -52,5 +46,26 @@ export class SelectedRegionList implements OnDestroy{
   renderRegionDatasetCount(region:RegionDescriptor){
     const pipe = new FilterDatasetSearchResult()
     return ` <small class = "text-muted">(${region.datasets ? pipe.transform(region.datasets,this.filterSearchResultbyType).length : '0'})</small>`
+  }
+
+  renderRegionName(region:RegionDescriptor){
+    const pipe = new FilterDatasetSearchResult()
+    return pipe.transform(region.datasets,this.filterSearchResultbyType).length > 0 ? 
+      `<span>${region.name}${this.renderRegionDatasetCount(region)}</span>`:
+      `<del class = "text-muted">${region.name}${this.renderRegionDatasetCount(region)}</del>` 
+  }
+}
+
+@Pipe({
+  name : 'filterRegionByDatasetCount'
+})
+
+export class FilterRegionsByDatasetCount implements PipeTransform{
+  
+  public transform(regions:RegionDescriptor[],searchResultInterface:{name : string, enabled : boolean}[]){
+
+    const pipe = new FilterDatasetSearchResult()
+    const filteredRegions = regions.filter(re=>pipe.transform(re.datasets,searchResultInterface).length > 0)
+    return filteredRegions
   }
 }

@@ -1,22 +1,40 @@
 <div class = "moreInfo">
   
-    <!-- associated regions -->
-    <div *ngIf = "hasRelatedRegion">
-      Associated regions:
-      <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
-        {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
-        <property-widget
-          *ngIf = "transformRegionNameToRegionDescriptor(regionname)"
-          [inputComponent]="transformRegionNameToRegionDescriptor(regionname)">
+  <!-- associated regions -->
+  <div *ngIf = "hasRelatedRegion">
+    Associated regions:
+    <small class = "associatedRegions" *ngFor = "let regionname of searchResultFile.parentDataset.regionName">
+      {{ transformRegionNameToRegionDescriptor(regionname) ? transformRegionNameToRegionDescriptor(regionname).name : 'Could not find region' }}
+      <property-widget
+        *ngIf = "transformRegionNameToRegionDescriptor(regionname)"
+        [inputComponent]="transformRegionNameToRegionDescriptor(regionname)">
+
+      </property-widget>
+    </small>
+  </div>
+  <div *ngIf = "!hasRelatedRegion && false">
+    Not associated with any regions.
+  </div>
+
+  <hr />
   
-        </property-widget>
-      </small>
-    </div>
-    <div *ngIf = "!hasRelatedRegion">
-      Not associated with any regions.
-    </div>
+  <!-- More info panel -->
+  <div *ngIf = "searchResultFile.parentDataset && false">
+    <span>
+      This is part of the dataset {{ searchResultFile.parentDataset.name }}
+    </span>
+    <property-widget
+      *ngIf = "false"
+      [inputComponent]="searchResultFile.parentDataset"
+      [title]="'More information on ' + searchResultFile.parentDataset.name">
   
-  <div>
+    </property-widget>
+  </div>
+  
+  <hr *ngIf = "searchResultFile.parentDataset && false" />
+
+  <!-- More info panel -->
+  <div *ngIf = "false">
     <span>
       More information about this data:
     </span>
@@ -27,29 +45,25 @@
     </property-widget>
   </div>
   
-  <div *ngIf = "searchResultFile.parentDataset">
-    <span>
-      This is part of the dataset {{ searchResultFile.parentDataset.name }}
-    </span>
-    <property-widget
-      [inputComponent]="searchResultFile.parentDataset"
-      [title]="'More information on ' + searchResultFile.parentDataset.name">
-  
-    </property-widget>
-
-  </div>
-      
 </div>
 
+<!-- file viewer -->
 <div 
   *ngIf = "searchResultFile"
   [ngSwitch]="searchResultFile.mimetype">
+  <div emptyRow *ngSwitchCase = "'application/octet-stream'">
+    <!-- downloadable data -->
+  </div>
+
+  <!-- image  -->
   <div *ngSwitchCase="'image/jpeg'" >
     <!-- TODO figure out a more elegant way of dealing with draggable img -->
     <img draggable = "false" [src] = "searchResultFile.url" />
   </div>
+  <!-- data container -->
   <div [ngSwitch]="searchResultFile.data.chartType" *ngSwitchCase="'application/json'">
     <radar-chart
+      #childChart
       [colors] = "searchResultFile.data.colors"
       [options] = "searchResultFile.data.chartOptions"
       [labels]="searchResultFile.data.labels"
@@ -58,6 +72,7 @@
 
     </radar-chart>
     <line-chart
+      #childChart
       [colors] = "searchResultFile.data.colors"
       [options] = "searchResultFile.data.chartOptions"
       [lineDatasets] = "searchResultFile.data.datasets"
@@ -77,4 +92,19 @@
   <div *ngSwitchDefault>
     The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
   </div>
+</div>
+
+<!-- caption -->
+<readmoreComponent *ngIf = "searchResultFile.properties.description">
+  <small id = "captions">
+    {{ searchResultFile.properties.description }}
+  </small>
+</readmoreComponent>
+
+<div *ngIf = "downloadUrl">
+  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link" download>Download File</a>
+</div>
+
+<div *ngIf = "downloadPng">
+  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link" download>Download Chart as Image</a>
 </div>

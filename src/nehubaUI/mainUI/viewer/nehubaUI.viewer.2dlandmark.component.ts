@@ -147,7 +147,7 @@ export class NehubaViewer2DLandmarkUnit implements AfterViewInit{
       'border-top-color' : `rgba(${this.landmark.hover ? HOVER_COLOR + ',0.8' : NORMAL_COLOR + ',0.8'})`
     }) : ({
       transform : `scale(1.5,1.0)`,
-      'bordder-top-color' : 'rgb(0,0,0)'
+      'border-top-color' : 'rgb(0,0,0)'
     })
   }
 

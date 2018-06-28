@@ -1,9 +1,11 @@
-import { Component, Input, OnChanges, AfterViewInit, EventEmitter, Output } from '@angular/core'
+import { Component, Input, OnChanges, AfterViewInit, EventEmitter, Output, OnDestroy } from '@angular/core'
 
 import template from './nehubaUI.collapsablePanel.template.html'
 import css from './nehubaUI.collapsablePanel.style.css'
 import { animateCollapseShow } from 'nehubaUI/util/nehubaUI.util.animations';
 import { HasPropertyInterface } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.propertyWidget.component';
+import { MasterCollapsableController } from 'nehubaUI/nehubaUI.services';
+import { Subject,Observable } from 'rxjs/Rx';
 
 @Component({
   selector : 'collapsable-panel',
@@ -12,13 +14,27 @@ import { HasPropertyInterface } from 'nehubaUI/mainUI/propertyWidget/nehubaUI.pr
   animations : [animateCollapseShow]
 })
 
-export class CollapsablePanel implements OnChanges,AfterViewInit{
+export class CollapsablePanel implements OnChanges,AfterViewInit,OnDestroy{
   @Input() panelShow : boolean = false
   @Input() title : string = 'Untitled Panel'
   @Input() propertyWidget : HasPropertyInterface
   @Output() dismiss : EventEmitter<boolean> = new EventEmitter()
   
   renderContent : boolean = false
+  destroySubject : Subject<boolean> = new Subject()
+
+  constructor(public masterCollapsableController?:MasterCollapsableController){
+    if(this.masterCollapsableController){
+      Observable
+        .from(this.masterCollapsableController.expandBSubject)
+        .takeUntil(this.destroySubject)
+        .subscribe(ev=>ev ? this.show() : this.hide())
+    }
+  }
+
+  ngOnDestroy(){
+    this.destroySubject.next(true)
+  }
 
   ngOnChanges(){
     this.renderContent = this.panelShow
@@ -46,3 +62,8 @@ export class CollapsablePanel implements OnChanges,AfterViewInit{
     this.panelShow = false
   }
 }
+
+/* 
+TODO render on demand saves initial loading time, but on mass collapse is computationally expensive
+perhaps render on init? 
+*/

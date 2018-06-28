@@ -76,7 +76,7 @@ export class SearchResultUI implements OnChanges,OnDestroy{
 
   name : string
   thumbnail? : SearchResultFileInterface
-  property : Partial<DatasetInterface>
+  property? : Partial<DatasetInterface>
   files : SearchResultFileInterface[]
 
   regionLinks : RegionLinkClass[]
@@ -99,6 +99,7 @@ export class RegionLinkClass{
 export interface SearchResultInterface{
   name : string,
   type : string,
+  id : string,
 
   thumbnail? : SearchResultFileInterface
 
@@ -111,7 +112,7 @@ export interface SearchResultInterface{
     moreInfo : string
   })[]
 
-  properties : Partial<DatasetInterface>
+  properties? : Partial<DatasetInterface>
   files : SearchResultFileInterface[]
 
   highlight :  boolean

@@ -7,3 +7,20 @@ small.associatedRegions
   display:block;
   padding-left:1em;
 }
+
+small#captions
+{
+  display:inline-block;
+  margin:0 1em;
+}
+
+hr
+{
+  margin-top:0.5em;
+  margin-bottom:0.5em;
+}
+
+div[emptyRow]
+{
+  margin-bottom:-1em;
+}

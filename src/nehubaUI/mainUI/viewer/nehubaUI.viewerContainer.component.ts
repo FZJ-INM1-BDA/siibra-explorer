@@ -9,8 +9,7 @@ import { INTERACTIVE_VIEWER } from 'nehubaUI/exports';
 
 @Component({
   selector : 'ATLASViewer',
-  template : template,
-  providers : [ SpatialSearch ]
+  template : template
 })
 
 export class NehubaViewerContainer implements AfterViewInit{
@@ -22,7 +21,7 @@ export class NehubaViewerContainer implements AfterViewInit{
   mouseEventOnViewer : Subject<any> = new Subject()
   navigationChangeSubject :  Subject<any> = new Subject()
 
-  constructor(public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
+  constructor(public spatialSearch:SpatialSearch,public mainController:MainController,private landmarkServices:LandmarkServices,public widgetServices:WidgitServices){
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationLoc = (loc,real)=>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationLoc(loc,real))
     INTERACTIVE_VIEWER.viewerHandle.moveToNavigationOri = (ori) =>(this.checkViewerExist(),this.nehubaViewerInnerContainer.moveToNavigationOri(ori))
     
