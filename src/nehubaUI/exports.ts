@@ -101,7 +101,10 @@ export const INTERACTIVE_VIEWER = {
   uiHandle : UI_HANDLE,
   viewerHandle : VIEWER_HANDLE,
   metadata : METADATA,
-  pluginControl : PLUGIN_CONTROL
+  pluginControl : PLUGIN_CONTROL,
+  experimental : {
+    landmarkService : {}
+  }
 }
 
 declare var window:{
