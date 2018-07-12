@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy, OnChanges, AfterContentChecked, ViewChild, ElementRef } from "@angular/core";
+import { treeAnimations } from "./tree.animation";
 
 
 @Component({
@@ -7,10 +8,13 @@ import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBi
   styleUrls : [
     './tree.style.css'
   ],
+  animations : [
+    treeAnimations
+  ],
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class TreeComponent{
+export class TreeComponent implements OnChanges,AfterContentChecked{
   @Input() inputItem : any = {
     name : 'Untitled',
     children : []
@@ -26,6 +30,19 @@ export class TreeComponent{
   @Output() mouseclicktree : EventEmitter<any> = new EventEmitter()
 
   @ViewChildren(TreeComponent) treeChildren : QueryList<TreeComponent>
+  @ViewChild('childrenContainer',{ read : ElementRef }) childrenContainer : ElementRef
+
+  ngOnChanges(){
+    if(typeof this.inputItem === 'string'){
+      this.inputItem = JSON.parse(this.inputItem)
+    }
+  }
+
+  fullHeight : number = 100
+
+  ngAfterContentChecked(){
+    this.fullHeight = this.childrenContainer ? this.childrenContainer.nativeElement.offsetHeight : 0
+  }
 
   get chevronClass():string{
     return this.children ? 

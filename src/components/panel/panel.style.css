@@ -12,6 +12,11 @@
   margin:0;
 }
 
+[bodyFooterContainer]
+{
+  overflow:hidden;
+}
+
 .panel > .panel-heading
 {
   border-radius : 0;
@@ -20,15 +25,12 @@
   border:none;
 }
 
-.panel > .panel-body,
-.panel > .panel-footer
+.panel > [bodyFooterContainer] > .panel-body,
+.panel > [bodyFooterContainer] > .panel-footer
 {
+  margin-top:0px;
+  padding: 0px;
   border:none;
-}
-
-.panel > .panel-body
-{
-  padding: 0;
 }
 
 div.panel

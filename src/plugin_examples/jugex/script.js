@@ -546,8 +546,6 @@
                             domDownload.appendChild(col2)
                             return [domDownload, col1, col2]
                         }
-
-                        debugger
                         
                         container.removeChild(analysisCard)
                         const resultCard = document.createElement('fzj-xg-webjugex-result-success-card')

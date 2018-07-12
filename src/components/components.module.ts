@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import { BsDropdownModule }  from 'ngx-bootstrap/dropdown';
 
@@ -22,6 +23,7 @@ import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
   imports : [
     BrowserModule,
     FormsModule,
+    BrowserAnimationsModule,
     BsDropdownModule.forRoot(),
   ],
   declarations : [
@@ -44,6 +46,8 @@ import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
     TreeSearchPipe
   ],
   exports : [
+    BrowserAnimationsModule,
+    
     MarkdownDom,
     ReadmoreComponent,
     DropdownComponent,

@@ -114,7 +114,18 @@ span.regionSelected
   color : #dbb556
 }
 
+span.regionNotSelected,
+span.regionSelected
+{
+  cursor : default;
+}
+
 markdown-dom pre code
 {
   white-space:pre;
+}
+
+.highlight
+{
+  background-color:rgba(150,150,0,0.5);
 }

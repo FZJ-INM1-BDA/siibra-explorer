@@ -13,8 +13,9 @@
     </i>
   </div>
   <div 
-    *ngIf = "showSide"
-    [style.flexBasis]="sideWidth + 'px'"
+    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWith } }"
+    (@collapseSide.start) = "animationStart()"
+    (@collapseSide.done) = "animationEnd()"
     sidecontent>
     <ng-content select="[sidecontent]">
     </ng-content>

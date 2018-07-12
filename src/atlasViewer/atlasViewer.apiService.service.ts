@@ -1,4 +1,4 @@
-import { Injectable, Renderer2 } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter } from "../services/stateStore.service";
 import { Observable } from "rxjs";

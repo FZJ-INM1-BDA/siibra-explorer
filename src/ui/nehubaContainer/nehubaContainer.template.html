@@ -66,15 +66,35 @@
   *ngIf = "viewerLoaded">
   <div statusCard>
 
+    <!-- perhaps use a dedicated publication card next time (?) -->
+    <div
+      *ngIf = "showCitation"
+      citationContainer>
+      <a
+        *ngFor = "let publication of selectedTemplate.properties.publications" 
+        href = "{{ publication.doi }}" 
+        class = "btn btn-link">
+        {{ publication.citation }}
+      </a>
+    </div>
+
+    <hr />
+
     <span 
       class = "btn btn-link"
       (click)="statusPanelRealSpace = !statusPanelRealSpace">
       {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
     </span>
+
+    <span
+      (click) = "resetNavigation()"
+      class = "btn btn-link">
+      reset navigation
+    </span>
   
     <br />
     <div textContainer>
-      Navigation: 
+      <small>Navigation: </small>
         <input 
           (keydown.enter) = "textNavigateTo(navigateInput.value)"
           (keydown.tab) = "textNavigateTo(navigateInput.value)"
@@ -84,13 +104,13 @@
           navigateInput/>
     
       <br />
-      Mouse: 
+      <small>Mouse: </small>
       <small>
         {{ mouseCoord }}
       </small> 
       <br />
       <small onHoverSegment>
-        {{ onHoverSegment$ | async }}
+        {{ onHoverSegmentName$ | async }}
       </small>
     </div>
   </div>

@@ -4,10 +4,12 @@ import { LayoutsExample } from "./layoutsExample/layoutsExample.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { ComponentsModule } from "../components/components.module";
 import { FloatingLayoutContainer } from "./floating/floating.component";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 
 @NgModule({
   imports : [
+    BrowserAnimationsModule,
     BrowserModule,
     ComponentsModule
   ],
@@ -18,6 +20,7 @@ import { FloatingLayoutContainer } from "./floating/floating.component";
     LayoutsExample
   ],
   exports : [
+    BrowserAnimationsModule,
     LayoutMainSide,
     FloatingLayoutContainer,
 

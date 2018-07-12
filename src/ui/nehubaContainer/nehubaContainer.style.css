@@ -36,7 +36,6 @@ div[statusCard]
   left:1em;
   bottom:1em;
   width : 20em;
-  height:7em;
   pointer-events: all;
 }
 
@@ -89,4 +88,29 @@ div[landmarkMasterContainer] > div > [landmarkContainer] > div
 small[onHoverSegment]
 {
   margin-left:2em;
+}
+
+div[citationContainer]
+{
+  max-width:300px;
+}
+
+div[citationContainer] > a
+{
+  font-size: 90%;
+  text-align: left;
+  display:block;
+  white-space: normal;
+  padding-bottom:0px;
+}
+
+
+div[citationContainer] > a:not(:first-child)
+{
+  padding-top:0px;
+}
+
+hr
+{
+  margin : 0.2em 2em;
 }

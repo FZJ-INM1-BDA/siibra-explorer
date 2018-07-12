@@ -1,8 +1,8 @@
 import { Component, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER, getLabelIndexMap, isDefined } from "../../services/stateStore.service";
-import { Observable, Subscription, merge } from "rxjs";
-import { map, filter } from "rxjs/operators";
+import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER, getLabelIndexMap, isDefined, CHANGE_NAVIGATION } from "../../services/stateStore.service";
+import { Observable, Subscription, merge, Subject } from "rxjs";
+import { map, filter, debounceTime, buffer } from "rxjs/operators";
 import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
 
 @Component({
@@ -25,6 +25,7 @@ export class AtlasBanner implements OnDestroy{
   public selectedTemplate : any
   public selectedParcellation : any
   public selectedRegions : any[] = []
+  private navigation : {position : [number,number,number]} = {position : [0,0,0]}
 
   private subscriptions : Subscription[] = []
 
@@ -73,7 +74,27 @@ export class AtlasBanner implements OnDestroy{
         this.selectedRegions = ev
       })
     )
+
+    this.subscriptions.push(
+      this.handleRegionTreeClickSubject.pipe(
+        buffer(
+          this.handleRegionTreeClickSubject.pipe(
+            debounceTime(200)
+          )
+        )
+      ).subscribe(arr=>arr.length > 1 ? this.doubleClick(arr[0]) : this.singleClick(arr[0]))  
+    )
+
+    
+    this.subscriptions.push(
+      this.store.pipe(
+        select('viewerState'),
+        safeFilter('navigation'),
+        map(obj=>obj.navigation)
+      ).subscribe((navigation:any)=>this.navigation = navigation)
+    )
   }
+
 
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
@@ -104,7 +125,25 @@ export class AtlasBanner implements OnDestroy{
     })
   }
 
-  handleClickRegion(obj:any){
+  /* double click navigate to the interested area */
+  private doubleClick(obj:any){
+    if( !(obj && obj.inputItem && obj.inputItem.position) ){
+      return
+    }
+
+    this.store.dispatch({
+      type : CHANGE_NAVIGATION,
+      navigation : {
+        position : obj.inputItem.position,
+        animation : {
+          /* empty object is enough to be truthy */
+        }
+      },
+    })
+  }
+
+  /* single click selects/deselects region(s) */
+  private singleClick(obj:any){
     const region = obj.inputItem
     const selectedSet = new Set(extractLabelIdx(region))
     const intersection = new Set([...this.selectedRegions.map(r=>r.labelIndex)].filter(v=>selectedSet.has(v)))
@@ -116,6 +155,12 @@ export class AtlasBanner implements OnDestroy{
     })
   }
 
+  private handleRegionTreeClickSubject : Subject<any> = new Subject()
+
+  handleClickRegion(obj:any){
+    this.handleRegionTreeClickSubject.next(obj)
+  }
+
   displayActiveTemplate(template:any){
     return `<small>Template</small> <small class = "mute-text">${template ? '(' + template.name + ')' : ''}</small> <span class = "caret"></span>`
   }
@@ -124,12 +169,18 @@ export class AtlasBanner implements OnDestroy{
     return `<small>Parcellation</small> <small class = "mute-text">${parcellation ? '(' + parcellation.name + ')' : ''}</small> <span class = "caret"></span>`
   }
 
-  displayTreeNode(item:any){
-    return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re=>re.labelIndex === Number(item.labelIndex)) >= 0 ? 
-      `<span class = "regionSelected">${item.name}</span>` :
-      `<span class = "regionNotSelected">${item.name}</span>`
+  private insertHighlight(name:string,searchTerm:string):string{
+    const regex = new RegExp(searchTerm,'gi')
+    return name.replace(regex,(s)=>`<span class = "highlight">${s}</span>`)
   }
 
+  displayTreeNode(item:any){
+    return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re=>re.labelIndex === Number(item.labelIndex)) >= 0 ? 
+      `<span class = "regionSelected">${this.insertHighlight(item.name,this.searchTerm)}</span>` :
+      `<span class = "regionNotSelected">${this.insertHighlight(item.name,this.searchTerm)}</span>`
+  }
+
+  /* TODO obsolete? */
   get treeHeaderText():string{
     return ''
   }

@@ -104,3 +104,8 @@ div[itemMasterContainer]:before
   position:absolute;
   z-index: 0;
 }
+
+div[childrenOverflowContainer]
+{
+  overflow:hidden;
+}

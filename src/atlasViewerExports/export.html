@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=720, initial-scale=1.0">
+  <title>Interactive Viewer Exported Components</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  
+  <script src = "https://unpkg.com/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"></script>
+  <script src = "export.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded',()=>{
+      const script = `
+const inputItem = {
+  "name" : "drinks",
+  "children" : [{
+    "name":"coffee",
+    "children":[{
+      "name":"flatwhite",
+      "children":[]
+    },{
+      "name":"espresso",
+      "children":[]
+    }]
+  },{
+    "name" : "tea",
+    "children" : [{
+      "name" : "green tea",
+      "children" : [],
+    },{
+      "name" : "black tea",
+      "children" : []
+    }]
+  }] 
+}
+const tree = document.getElementById('tree-element')
+tree.setAttribute('input-item',JSON.stringify(inputItem))
+`
+      const treeSampleBox = document.getElementById('tree-element-sample-box')
+      treeSampleBox.setAttribute('script-input',script)
+      eval(script);
+
+      const markdownIncludeString = `
+You will also need \`bootstrap 3.3.7\` for formatting and \`custom-elements-es5-adapter\` for es5 shim:
+
+\`\`\`
+<${''}script src = "https://unpkg.com/@webcomponents/webcomponentsjs/custom-elements-es5-adapter.js"><${''}/script>
+<${''}link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+\`\`\`
+
+To use any of the components, include \`export.js\` in the header:
+
+\`\`\`
+<${''}script src = "third_party/atlasViewer/dist/export/export.js"></${''}script>
+\`\`\`
+
+`
+      const markdownInclude = document.getElementById('markdown-include')
+      markdownInclude.setAttribute('markdown',markdownIncludeString)
+
+      const correctMarkDown = `
+\`\`\`
+const correctMarkDown = \`
+<\$\{''\}script>
+  console.log('NOT GOTCHA')
+<\$\{''\}/script>
+\`
+
+const markdownCorrect = document.getElementById('markdown-id')
+markdownCorrect.setAttribute('markdown',correctmarkDown)
+\`\`\`
+`
+      const markdownCorrect = document.getElementById('markdown-correct')
+      markdownCorrect.setAttribute('markdown',correctMarkDown)
+    })
+  </script>
+</head>
+<body>
+
+  <div class = "jumbotron">
+    <div class = "container">
+      <div class = "row">
+        <h1>interactive viewer components</h1>
+      </div>
+      <div class = "row">
+<markdown-element id = "markdown-include">
+</markdown-element>
+      </div>
+    </div>
+  </div>
+  <div id = "container" class = "container-fluid">
+    <div class = "row">
+      <div class = "col-md-3">
+
+<sample-box sample-box-title = "readmore component">
+<readmore-element>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+</readmore-element>
+</sample-box>
+      </div>
+      <div class = "col-md-3">
+<sample-box sample-box-title = "markdown component">
+<markdown-element>
+# Heading1
+## Heading2
+### Heading3
+
+this is a paragraph
+
+- a dot point
+- a second dot point
+</markdown-element>
+</sample-box>
+<h3>
+  n.b.
+</h3>
+<p>
+<markdown-element>
+- first attempts to parse `element.getAttribute('markdown')` then `element.innerHTML`, if non-empty.
+- major gotcha: if markdown is rendered as a part of innerHTML, the dom will be rendered briefly. As a result, triple ticked script tags **will** will be evaluated. For example, the following script, if enclosed between `markdown-element` tags, will still be evaluated:
+
+```
+<script>
+console.log('GOTCHA')
+</script>
+```
+
+- To include script tags, pass it as an attribute instead:
+
+</markdown-element>
+<markdown-element id = "markdown-correct">
+</markdown-element>
+<markdown-element>
+- The `${''}` is required to breakup the `&lt;/script&gt;` tag, or the script tag will be terminated prematurely.
+</markdown-element>
+</p>
+      </div>
+      <div class = "col-md-3">
+<sample-box sample-box-title = "panel component">
+<panel-element body-collapsable = "true" show-footer = "true">
+  <div style = "padding: 0.5em;" heading>
+    panel heading
+  </div>
+  <div style = "padding: 0.5em;" body>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  </div>
+  <div style = "opacity:0.7;padding: 0.5em;" footer>
+    panel footer
+  </div>
+</panel-element>
+</sample-box>
+      </div>
+      <div class = "col-md-3">
+<sample-box sample-box-title = "tree component" id = "tree-element-sample-box">
+<tree-element id = 'tree-element'>
+
+</tree-element>
+</sample-box>
+      </div>
+    </div>
+  </div>
+</body>
+<footer>
+</footer>
+</html>

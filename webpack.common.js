@@ -1,5 +1,4 @@
 const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
 const path = require('path')
 
 module.exports = {
@@ -42,10 +41,7 @@ module.exports = {
     ]
   },
   plugins : [
-    new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)/,path.join(__dirname,'src')),
-    new HtmlWebpackPlugin({
-      template : 'src/index.html'
-    })
+    new webpack.ContextReplacementPlugin(/@angular(\\|\/)core(\\|\/)/,path.join(__dirname,'src'))
   ],
   resolve : {
     extensions : [

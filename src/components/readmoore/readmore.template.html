@@ -1,9 +1,10 @@
 <div
-  [style.maxHeight]="contentContainerMaxHeight"
-  #content
+  [@collapseState] = "{ value : show ? 'visible' : 'collapsed', params : { collapsedHeight : collapsedHeight, fullHeight : fullHeight } }"
   content>
-  <ng-content>
-  </ng-content>
+  <div #contentContainer>
+    <ng-content>
+    </ng-content>
+  </div>
 </div>
 <div 
   (click)="toggle($event)" 

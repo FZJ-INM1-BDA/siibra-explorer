@@ -1,0 +1,19 @@
+<h2>
+  {{ sampleBoxTitle }}
+</h2>
+<hr />
+<h3>
+  Result:
+</h3>
+<div class = "well" #ngContent>
+  <ng-content>
+  </ng-content>
+</div>
+<h3>
+  HTML:
+</h3>
+<pre>{{ escapedHtml }}</pre>
+<h3 *ngIf = "scriptInput">
+  Script:
+</h3>
+<pre *ngIf = "scriptInput">{{ escapedScript }}</pre>

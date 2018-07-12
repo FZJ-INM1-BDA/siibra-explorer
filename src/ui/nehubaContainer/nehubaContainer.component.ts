@@ -6,6 +6,7 @@ import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs"
 import { filter,map, take, scan, debounceTime, distinctUntilChanged } from "rxjs/operators";
 import * as export_nehuba from 'export_nehuba'
 import { AtlasViewerAPIServices } from "../../atlasViewer/atlasViewer.apiService.service";
+import { timedValues } from "../../util/generator";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -36,7 +37,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   public onHoverSegment$ : Observable<any>
 
   private navigationChanges$ : Observable<any>
-  private redrawObservable$ : Observable<any>
   public spatialResultsVisible$ : Observable<number>
 
   private selectedTemplate : any | null
@@ -44,7 +44,7 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   public fetchedSpatialData : DataEntry[] = []
 
   private cr : ComponentRef<NehubaViewerUnit>
-  private nehubaViewer : NehubaViewerUnit
+  public nehubaViewer : NehubaViewerUnit
   private regionsLabelIndexMap : Map<number,any> = new Map()
 
   private subscriptions : Subscription[] = []
@@ -71,7 +71,9 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
     this.loadedParcellation$ = this.store.pipe(
       select('viewerState'),
       safeFilter('parcellationSelected'),
-      map(state=>state.parcellationSelected))
+      map(state=>state.parcellationSelected),
+      distinctUntilChanged()
+    )
 
     this.selectedRegions$ = this.store.pipe(
       select('viewerState'),
@@ -90,11 +92,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
       safeFilter('fetchedSpatialData'),
       debounceTime(300),
       map(state=>state.fetchedSpatialData)
-    )
-
-    this.redrawObservable$ = this.store.pipe(
-      select('uiState'),
-      safeFilter('sidePanelOpen')
     )
 
     this.navigationChanges$ = this.store.pipe(
@@ -203,13 +200,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
     this.subscriptions.push(
       this.dedicatedView$.subscribe((this.handleDedicatedView).bind(this))
-    )
-
-    this.subscriptions.push(
-      this.redrawObservable$.subscribe(()=>{
-        if(this.nehubaViewer)
-          this.nehubaViewer.nehubaViewer.redraw()
-      })
     )
 
     /* setup init view state */
@@ -495,11 +485,63 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   }
 
   handleDispatchedNavigationChange(navigation){
-    /* set this.oldnavigation to represent the state of the store */
-    this.oldNavigation = Object.assign({},this.oldNavigation,navigation)
-    this.nehubaViewer.setNavigationState(Object.assign({},this.oldNavigation,{
-      positionReal : true
-    }))
+
+    /* extract the animation object */
+    const { animation, ..._navigation } = navigation
+
+    if( animation ){
+      /* animated */
+
+      const gen = timedValues()
+      const dest = Object.assign({},_navigation)
+      /* this.oldNavigation is old */
+      const delta = Object.assign({}, ...Object.keys(dest).filter(key=>key !== 'positionReal').map(key=>{
+        const returnObj = {}
+        returnObj[key] = typeof dest[key] === 'number' ?
+          dest[key] - this.oldNavigation[key] :
+          typeof dest[key] === 'object' ?
+            dest[key].map((val,idx)=>val - this.oldNavigation[key][idx]) :
+            true
+        return returnObj
+      }))
+
+      const animate = ()=>{
+        const next = gen.next()
+        const d =  next.value
+        
+        this.nehubaViewer.setNavigationState(
+          Object.assign({}, ...Object.keys(dest).filter(k=>k !== 'positionReal').map(key=>{
+            const returnObj = {}
+            returnObj[key] = typeof dest[key] === 'number' ?
+              dest[key] - ( delta[key] * ( 1 - d ) ) :
+              dest[key].map((val,idx)=>val - ( delta[key][idx] * ( 1 - d ) ) )
+            return returnObj
+          }),{
+            positionReal : true
+          })
+        )
+
+        if( !next.done ){
+          requestAnimationFrame(()=>animate())
+        }else{
+
+          /* set this.oldnavigation to represent the state of the store */
+          /* animation done, set this.oldNavigation */
+          this.oldNavigation = Object.assign({},dest)
+        }
+      }
+      requestAnimationFrame(()=>animate())
+    } else {
+      /* not animated */
+
+      /* set this.oldnavigation to represent the state of the store */
+      /* since the emitted change of navigation state is debounced, we can safely set this.oldNavigation to the destination */
+      this.oldNavigation = Object.assign({},this.oldNavigation,_navigation)
+
+      this.nehubaViewer.setNavigationState(Object.assign({},_navigation,{
+        positionReal : true
+      }))
+    }
   }
 
   /* related to info-card */
@@ -557,6 +599,51 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
           .map(n=>n.toFixed(3)+'mm').join(' , ') :
         Array.from(this.nehubaViewer.navPosVoxel.map(n=> isNaN(n) ? 0 : n)).join(' , ') :
       `[0,0,0] (neubaViewer is undefined)`
+  }
+
+  get showCitation(){
+    return this.selectedTemplate && this.selectedTemplate.properties && this.selectedTemplate.properties.publications && this.selectedTemplate.properties.publications.constructor === Array
+  }
+
+  resetNavigation(){
+    const initialNgState = this.selectedTemplate.nehubaConfig.dataset.initialNgState
+    
+    const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
+    const perspectiveOrientation = initialNgState ? initialNgState.perspectiveOrientation : undefined
+    const zoom = initialNgState ? 
+      initialNgState.navigation ?
+        initialNgState.navigation.zoomFactor :
+        undefined :
+      undefined
+
+    const position = initialNgState ? 
+      initialNgState.navigation ?
+        initialNgState.navigation.pose ?
+          initialNgState.navigation.pose.position.voxelCoordinates ?
+            initialNgState.navigation.pose.position.voxelCoordinates :
+            undefined :
+          undefined :
+        undefined :
+      undefined
+
+    const orientation = [0,0,0,1]
+
+    this.store.dispatch({
+      type : CHANGE_NAVIGATION,
+      navigation : Object.assign({},
+        {
+          perspectiveZoom,
+          perspectiveOrientation,
+          zoom,
+          position,
+          orientation
+        },{
+          positionReal : false,
+          animation : {
+
+          }
+        })
+    })
   }
 }
 

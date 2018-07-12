@@ -4,6 +4,7 @@ const Uglify = require('uglifyjs-webpack-plugin')
 const path = require('path')
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
 const ngAssets = require('./webpack.ngassets')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = merge(common,ngAssets,{
   entry : './src/main.ts',
@@ -17,6 +18,10 @@ module.exports = merge(common,ngAssets,{
         compilation_level : 'SIMPLE'
       },
       concurrency : 4
+    }),
+
+    new HtmlWebpackPlugin({
+      template : 'src/index.html'
     })
   ]
 })

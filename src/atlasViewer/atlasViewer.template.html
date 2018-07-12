@@ -1,7 +1,8 @@
 <div *ngIf = "meetsRequirement" class = "atlas-container">
 
   <layout-mainside
-    (panelShowStateChanged)="manualPanelToggle($event)">
+    (panelAnimationFlag) = "panelAnimationFlag($event)"
+    (panelShowStateChanged) = "manualPanelToggle($event)">
     <div maincontent>
       <ui-nehuba-container>
       </ui-nehuba-container>

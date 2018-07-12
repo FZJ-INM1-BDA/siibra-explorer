@@ -1,7 +1,4 @@
 <div
-  (mouseleave)="mouseleavetree.emit({inputItem:inputItem,node:this});handleEv($event)"
-  (mouseenter)="mouseentertree.emit({inputItem:inputItem,node:this});handleEv($event)"
-  (click)="mouseclicktree.emit({inputItem:inputItem,node:this});handleEv($event)"
   itemMasterContainer>
   <div itemContainer>
     <i
@@ -11,21 +8,29 @@
       glyphicon>
     </i>
     <span 
+      (mouseleave)="mouseleavetree.emit({inputItem:inputItem,node:this});handleEv($event)"
+      (mouseenter)="mouseentertree.emit({inputItem:inputItem,node:this});handleEv($event)"
+      (click)="mouseclicktree.emit({inputItem:inputItem,node:this});handleEv($event)"
       [innerHTML] = "renderNode(inputItem)"
       itemName>
     </span>
   </div>
-  <tree
-    *ngFor = "let child of (findChildren(inputItem) | treeSearch : searchFilter : findChildren )"
-    [hidden] = "!childrenExpanded"
-    [childrenExpanded] = "childrenExpanded"
-    [inputItem] = "child"
-    [renderNode]="renderNode"
-    [searchFilter]="searchFilter"
-    [findChildren] = "findChildren"
-    (mouseentertree)="mouseentertree.emit($event)"
-    (mouseleavetree)="mouseleavetree.emit($event)"
-    (mouseclicktree)="mouseclicktree.emit($event)">
-
-  </tree>
+  <div childrenOverflowContainer>
+    <div
+      [@collapseState] = "{ value :  childrenExpanded ? 'visible' : 'collapsed' , params : { fullHeight : fullHeight }}"
+      #childrenContainer>
+      <tree
+        *ngFor = "let child of (findChildren(inputItem) | treeSearch : searchFilter : findChildren )"
+        [childrenExpanded] = "childrenExpanded"
+        [inputItem] = "child"
+        [renderNode]="renderNode"
+        [searchFilter]="searchFilter"
+        [findChildren] = "findChildren"
+        (mouseentertree)="mouseentertree.emit($event)"
+        (mouseleavetree)="mouseleavetree.emit($event)"
+        (mouseclicktree)="mouseclicktree.emit($event)">
+    
+      </tree>
+    </div>
+  </div>
 </div>

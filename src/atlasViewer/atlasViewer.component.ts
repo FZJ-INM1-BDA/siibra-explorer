@@ -18,6 +18,7 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 
 import '../res/css/extra_styles.css'
+import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 
 @Component({
   selector: 'atlas-viewer',
@@ -33,15 +34,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('floatingContainer', { read: ViewContainerRef }) floatingContainer: ViewContainerRef
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
   @ViewChild('temporaryContainer', { read: ViewContainerRef }) temporaryContainer: ViewContainerRef
-
   @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
   @ViewChild('dedicatedViewerToast', { read: TemplateRef }) dedicatedViewerToast: TemplateRef<any>
-
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-
   @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
-
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
+
+  @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @HostBinding('attr.darktheme')
   darktheme: boolean = false
@@ -323,6 +322,24 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: show ? OPEN_SIDE_PANEL : CLOSE_SIDE_PANEL
     })
+  }
+
+  rafId : number | null
+
+  panelAnimationFlag(flag:boolean){
+    const redraw = ()=>{
+      if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
+        this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
+      this.rafId = requestAnimationFrame(()=>redraw())
+    }
+    if( flag ){
+      if(this.rafId)
+        cancelAnimationFrame(this.rafId)
+      this.rafId = requestAnimationFrame(()=>redraw())
+    }else{
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
   }
 
   clearDedicatedView() {

@@ -323,7 +323,9 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       type : CHANGE_NAVIGATION,
       navigation : {
         position : position,
-        positionReal : true
+        animation : {
+          
+        }
       }
     })
   }

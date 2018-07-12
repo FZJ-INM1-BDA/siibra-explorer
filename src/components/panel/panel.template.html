@@ -10,22 +10,26 @@
     </ng-content>
 
   </div>
-  <div
-    *ngIf = "showBody"
-    class = "panel-body"
-    [hidden] = "collapseBody">
+  <div bodyFooterContainer>
+    <div
+      *ngIf = "showBody"
+      class = "panel-body"
+      [@collapseState] = "{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
+      #panelBody>
 
-    <ng-content select="[body]">
-    </ng-content>
+      <ng-content select="[body]">
+      </ng-content>
 
-  </div>
-  <div
-    *ngIf = "showFooter"
-    [hidden] = "collapseBody"
-    class = "panel-footer">
-    
-    <ng-content select="[footer]">
-    </ng-content>
+    </div>
+    <div
+      *ngIf = "showFooter"
+      class = "panel-footer"
+      [@collapseState] = "{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
+      #panelFooter>
+      
+      <ng-content select="[footer]">
+      </ng-content>
 
+    </div>
   </div>
 </div>
