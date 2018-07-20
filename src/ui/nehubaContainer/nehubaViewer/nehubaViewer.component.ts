@@ -83,7 +83,9 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   public mouseOverSegment : number | null
 
   ngAfterViewInit(){
-    this.nehubaViewer = export_nehuba.createNehubaViewer(this.config,console.warn)
+    this.nehubaViewer = export_nehuba.createNehubaViewer(this.config,(err)=>{
+      /* print in debug mode */
+    })
     
     if(this.regionsLabelIndexMap){
       const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers

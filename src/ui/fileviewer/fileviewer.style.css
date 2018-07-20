@@ -8,3 +8,8 @@ div[emptyRow]
 {
   margin-bottom:-1em;
 }
+
+img
+{
+  width: 100%;
+}

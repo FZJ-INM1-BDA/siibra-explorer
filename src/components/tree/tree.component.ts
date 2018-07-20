@@ -1,5 +1,8 @@
-import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy, OnChanges, AfterContentChecked, ViewChild, ElementRef } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy, OnChanges, AfterContentChecked, ViewChild, ElementRef, Optional, OnInit, ChangeDetectorRef, OnDestroy } from "@angular/core";
 import { treeAnimations } from "./tree.animation";
+import { TreeService } from "./treeService.service";
+import { Subscription } from "rxjs";
+import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 
 @Component({
@@ -14,16 +17,12 @@ import { treeAnimations } from "./tree.animation";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class TreeComponent implements OnChanges,AfterContentChecked{
+export class TreeComponent extends ParseAttributeDirective implements OnChanges,OnInit,OnDestroy,AfterContentChecked{
   @Input() inputItem : any = {
     name : 'Untitled',
     children : []
   }
-  @Input() renderNode : (item:any)=>string = (item)=>item.name
-  @Input() findChildren : (item:any)=>any[] = (item)=>item.children
   @Input() childrenExpanded : boolean = true
-
-  @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
   @Output() mouseentertree : EventEmitter<any> = new EventEmitter()
   @Output() mouseleavetree : EventEmitter<any> = new EventEmitter()
@@ -32,16 +31,64 @@ export class TreeComponent implements OnChanges,AfterContentChecked{
   @ViewChildren(TreeComponent) treeChildren : QueryList<TreeComponent>
   @ViewChild('childrenContainer',{ read : ElementRef }) childrenContainer : ElementRef
 
-  ngOnChanges(){
-    if(typeof this.inputItem === 'string'){
-      this.inputItem = JSON.parse(this.inputItem)
+  constructor( 
+    private cdr : ChangeDetectorRef,
+    @Optional() public treeService : TreeService ){
+    super()
+  }
+  
+  subscriptions : Subscription[] = []
+
+  ngOnInit(){
+    if( this.treeService ){
+      this.subscriptions.push(
+        this.treeService.markForCheck.subscribe(()=>this.cdr.markForCheck())
+      )
     }
   }
 
-  fullHeight : number = 100
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(s=>s.unsubscribe())
+  }
+
+  _fullHeight : number = 9999
+
+  set fullHeight(num:number){
+    this._fullHeight = num
+  }
+
+  get fullHeight(){
+    return this._fullHeight
+  }
 
   ngAfterContentChecked(){
     this.fullHeight = this.childrenContainer ? this.childrenContainer.nativeElement.offsetHeight : 0
+    this.cdr.detectChanges()
+  }
+
+  mouseenter(ev:MouseEvent){
+    this.treeService.mouseenter.next({
+      inputItem : this.inputItem,
+      node : this,
+      event : ev
+    })
+  }
+
+  mouseleave(ev:MouseEvent){
+    this.treeService.mouseleave.next({
+      inputItem : this.inputItem,
+      node : this,
+      event : ev
+    })
+  }
+
+  mouseclick(ev:MouseEvent){
+    this.treeService.mouseclick.next({
+      inputItem : this.inputItem,
+      node : this,
+      event : ev
+    })
   }
 
   get chevronClass():string{
@@ -66,13 +113,43 @@ export class TreeComponent implements OnChanges,AfterContentChecked{
   }
 
   get children():any[]{
-    return this.findChildren(this.inputItem)
+    return this.treeService ? 
+      this.treeService.findChildren(this.inputItem) :
+      this.inputItem.children
   }
 
   @HostBinding('attr.filterHidden')
   get visibilityOnFilter():boolean{
-    return this.searchFilter ? 
-      this.searchFilter(this.inputItem) :
-      false
+    return this.treeService ?
+      this.treeService.searchFilter(this.inputItem) :
+      true
   }
+  handleMouseEnter(fullObj:any){
+
+    this.mouseentertree.emit(fullObj)
+
+    if(this.treeService){
+      this.treeService.mouseenter.next(fullObj)
+    }
+  }
+
+  handleMouseLeave(fullObj:any){
+    
+    this.mouseleavetree.emit(fullObj)
+
+    if(this.treeService){
+      this.treeService.mouseleave.next(fullObj)
+    }
+  }
+
+  handleMouseClick(fullObj:any){
+
+    this.mouseclicktree.emit(fullObj)
+
+    if(this.treeService){
+      this.treeService.mouseclick.next(fullObj)
+    }
+  }
+
+  public defaultSearchFilter = ()=>true
 }

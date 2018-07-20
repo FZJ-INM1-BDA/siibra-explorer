@@ -12,25 +12,23 @@ import { PanelComponent } from "../components/panel/panel.component";
 import { HoverableBlockDirective } from "../components/hoverableBlock.directive";
 import { TreeComponent } from "../components/tree/tree.component";
 import { TreeSearchPipe } from "../util/pipes/treeSearch.pipe";
+import { TreeBaseDirective } from "../components/tree/treeBase.directive";
+import { ParseAttributeDirective } from "../components/parseAttribute.directive";
+import { ComponentsModule } from "../components/components.module";
 
 @NgModule({
   imports : [
     BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    ComponentsModule,
     BsDropdownModule.forRoot()
   ],
   declarations : [
     SampleBoxUnit,
 
-    ReadmoreComponent,
-    MarkdownDom,
-    PanelComponent,
-    TreeComponent,
-
-    SafeHtmlPipe,
-    HoverableBlockDirective,
-    TreeSearchPipe
+    /* parse element attributes from string to respective datatypes */
+    ParseAttributeDirective
   ],
   entryComponents : [
     SampleBoxUnit,

@@ -13,7 +13,7 @@
     </i>
   </div>
   <div 
-    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWith } }"
+    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth } }"
     (@collapseSide.start) = "animationStart()"
     (@collapseSide.done) = "animationEnd()"
     sidecontent>

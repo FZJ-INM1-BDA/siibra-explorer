@@ -1,5 +1,6 @@
-import { Component, Input, ViewChild, ElementRef, AfterContentChecked } from "@angular/core";
+import { Component, Input, ViewChild, ElementRef, AfterContentChecked, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, SimpleChanges, HostBinding, ApplicationRef } from "@angular/core";
 import { panelAnimations } from "./panel.animation";
+import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 @Component({
   selector : 'panel',
@@ -9,10 +10,11 @@ import { panelAnimations } from "./panel.animation";
   ],
   animations : [
     panelAnimations
-  ]
+  ],
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class PanelComponent implements AfterContentChecked{
+export class PanelComponent extends ParseAttributeDirective implements AfterContentChecked{
 
   @Input() showHeading : boolean = true
   @Input() showBody : boolean = true
@@ -28,9 +30,14 @@ export class PanelComponent implements AfterContentChecked{
 
   _fullHeight : number = 0
 
+  constructor(private cdr:ChangeDetectorRef){
+    super()
+  }
+
   ngAfterContentChecked(){
     this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
       (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
+    this.cdr.detectChanges()
   }
 
   set fullHeight(num:number){
@@ -45,8 +52,8 @@ export class PanelComponent implements AfterContentChecked{
     if(this.bodyCollapsable){
       this.collapseBody = !this.collapseBody
 
-      this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
-        (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
+      // this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
+      //   (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
     }
     event.stopPropagation()
     event.preventDefault()

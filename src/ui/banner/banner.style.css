@@ -86,3 +86,34 @@ input[type="text"]
   box-shadow: inset 0 4px 6px 0 rgba(0,0,0,0.2);
   color:rgba(255,255,255,0.8);
 }
+
+:host-context([darktheme="true"]) [hbpLogoContainer]
+{
+  background-image:url('res/image/HBP_Primary_RGB_WhiteText.png')
+}
+
+:host-context([darktheme="false"]) [hbpLogoContainer]
+{
+  background-image:url('res/image/HBP_Primary_RGB_BlackText.png')
+}
+
+[hbpLogoContainer]
+{
+  display:inline-block;
+  background-size: cover;
+  pointer-events: none;
+  height:80px;
+}
+
+[hbpLogoContainer] > img
+{
+  visibility: hidden;
+  height:80px;
+  pointer-events: none;
+}
+
+:host
+{
+  display:flex;
+  height:0px;
+}

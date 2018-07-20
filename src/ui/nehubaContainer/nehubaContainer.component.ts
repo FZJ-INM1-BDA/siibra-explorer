@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import * as export_nehuba from 'export_nehuba'
 import { AtlasViewerAPIServices } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
@@ -144,6 +144,36 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
     /* patch NG */
     this.patchNG()
+
+    /* each time a new viewer is initialised, take the first event to get the translation function */
+    this.newViewer$.pipe(
+      switchMap(()=>fromEvent(this.elementRef.nativeElement,'sliceRenderEvent').pipe(
+          scan((acc:Event[],event:Event)=>{
+            const target = (event as Event).target as HTMLElement
+            const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
+              0 :
+              target.offsetLeft > 5 && target.offsetTop < 5 ?
+                1 :
+                target.offsetLeft < 5 && target.offsetTop > 5 ?
+                2 :
+                  target.offsetLeft > 5 && target.offsetTop > 5 ?
+                  3 :
+                  4
+    
+            const _ = {}
+            _[key] = event
+            return Object.assign({},acc,_)
+          },[]),
+          filter(v=>{
+            const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+            return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2])) 
+          }),
+          take(1)
+        )
+      )
+    ).subscribe((events)=>{
+      [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
+    })
   }
 
   ngOnInit(){
@@ -222,7 +252,7 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
   }
 
   ngAfterViewInit(){
-    this.getNMToOffsetPixelFn()
+    
   }
 
   ngOnDestroy(){
@@ -254,34 +284,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
   handleMouseLeaveLandmark(spatialData:any){
     spatialData.highlight = false
-  }
-
-  private getNMToOffsetPixelFn(){
-    
-    fromEvent(this.elementRef.nativeElement,'sliceRenderEvent').pipe(
-      scan((acc:Event[],event:Event)=>{
-        const target = (event as Event).target as HTMLElement
-        const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
-          0 :
-          target.offsetLeft > 5 && target.offsetTop < 5 ?
-            1 :
-            target.offsetLeft < 5 && target.offsetTop > 5 ?
-            2 :
-              target.offsetLeft > 5 && target.offsetTop > 5 ?
-              3 :
-              4
-
-        const _ = {}
-        _[key] = event
-        return Object.assign({},acc,_)
-      },[]),
-      filter(v=>{
-        const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-        return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2])) 
-      }),
-      take(1)
-    ).subscribe((events)=>
-      [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels))
   }
 
   private patchNG(){
@@ -359,6 +361,8 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
     this.apiService.interactiveViewer.viewerHandle = null
 
     this.viewerLoaded = true
+    if( this.cr )
+      this.cr.destroy()
     this.container.clear()
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
     this.nehubaViewer = this.cr.instance
@@ -527,7 +531,7 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
           /* set this.oldnavigation to represent the state of the store */
           /* animation done, set this.oldNavigation */
-          this.oldNavigation = Object.assign({},dest)
+          this.oldNavigation = Object.assign({},this.oldNavigation,dest)
         }
       }
       requestAnimationFrame(()=>animate())

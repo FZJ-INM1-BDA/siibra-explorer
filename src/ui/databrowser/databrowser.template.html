@@ -122,9 +122,10 @@
           <tree
             *ngFor = "let item of searchResult.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
             [childrenExpanded] = "false"
-            [renderNode] = "renderNode"
-            (mouseclicktree) = "handleTreeNodeClick($event)"
-            [inputItem] = " item ">
+            [renderNode] = "renderNode" 
+            (treeNodeClick) = "handleTreeNodeClick($event)"
+            [inputItem] = " item "
+            treebase>
 
           </tree>
         </div>

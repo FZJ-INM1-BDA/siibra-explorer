@@ -39,7 +39,10 @@ tree.setAttribute('input-item',JSON.stringify(inputItem))
 `
       const treeSampleBox = document.getElementById('tree-element-sample-box')
       treeSampleBox.setAttribute('script-input',script)
-      eval(script);
+      eval(script)
+
+      const tree2 = document.getElementById('tree-element')
+      tree2.addEventListener('mouseclicktree',(ev)=>console.warn(ev))
 
       const markdownIncludeString = `
 You will also need \`bootstrap 3.3.7\` for formatting and \`custom-elements-es5-adapter\` for es5 shim:
@@ -138,7 +141,7 @@ console.log('GOTCHA')
       </div>
       <div class = "col-md-3">
 <sample-box sample-box-title = "panel component">
-<panel-element body-collapsable = "true" show-footer = "true">
+<panel-element collapse-body = "false" body-collapsable = "true" show-body = "true" show-footer = "true" iv-parse-attribute>
   <div style = "padding: 0.5em;" heading>
     panel heading
   </div>
@@ -153,7 +156,7 @@ console.log('GOTCHA')
       </div>
       <div class = "col-md-3">
 <sample-box sample-box-title = "tree component" id = "tree-element-sample-box">
-<tree-element id = 'tree-element'>
+<tree-element children-expanded = "true" id = 'tree-element' treebase>
 
 </tree-element>
 </sample-box>

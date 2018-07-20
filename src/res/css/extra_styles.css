@@ -118,6 +118,7 @@ span.regionNotSelected,
 span.regionSelected
 {
   cursor : default;
+  user-select: none;
 }
 
 markdown-dom pre code

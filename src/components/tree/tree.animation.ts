@@ -4,13 +4,13 @@ import { trigger, state, style, transition, animate } from "@angular/animations"
 export const treeAnimations = trigger('collapseState',[
   state('collapsed', 
     style({ 
-      'margin-top' : '-{{ fullHeight }}px'
+      'margin-top' : '-{{ fullHeight }}px',
     }),
-    { params : { fullHeight : 9999 } }
+    { params : { fullHeight : 0 } }
   ),
   state('visible',
     style({ 
-      'margin-top' : '0px'
+      'margin-top' : '0px',
     }),
     { params : { fullHeight : 0 } }
   ),

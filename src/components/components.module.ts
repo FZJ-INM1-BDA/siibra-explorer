@@ -5,7 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { BsDropdownModule }  from 'ngx-bootstrap/dropdown';
 
 import {  MarkdownDom } from './markdown/markdown.component';
-import { ComponentsExample } from './componentsExample/componentsExample.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { ReadmoreComponent } from './readmoore/readmore.component';
@@ -18,6 +17,8 @@ import { PaginationComponent } from './pagination/pagination.component';
 import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
 import { ToastComponent } from './toast/toast.component';
 import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
+import { TreeBaseDirective } from './tree/treeBase.directive';
+
 
 @NgModule({
   imports : [
@@ -29,7 +30,6 @@ import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
   declarations : [
     /* components */
     MarkdownDom,
-    ComponentsExample,
     ReadmoreComponent,
     DropdownComponent,
     TreeComponent,
@@ -39,11 +39,12 @@ import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
 
     /* directive */
     HoverableBlockDirective,
+    TreeBaseDirective,
 
     /* pipes */
     SafeHtmlPipe,
     SearchResultPaginationPipe,
-    TreeSearchPipe
+    TreeSearchPipe,
   ],
   exports : [
     BrowserAnimationsModule,
@@ -60,8 +61,7 @@ import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
     TreeSearchPipe,
 
     HoverableBlockDirective,
-
-    ComponentsExample,
+    TreeBaseDirective,
   ]
 })
 

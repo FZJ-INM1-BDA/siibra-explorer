@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from "@angular/core";
+import { Component, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER, getLabelIndexMap, isDefined, CHANGE_NAVIGATION } from "../../services/stateStore.service";
 import { Observable, Subscription, merge, Subject } from "rxjs";
@@ -10,7 +10,8 @@ import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
   templateUrl : './banner.template.html',
   styleUrls : [
     `./banner.style.css`
-  ]
+  ],
+  changeDetection : ChangeDetectionStrategy.OnPush
 })
 
 export class AtlasBanner implements OnDestroy{
@@ -171,18 +172,15 @@ export class AtlasBanner implements OnDestroy{
 
   private insertHighlight(name:string,searchTerm:string):string{
     const regex = new RegExp(searchTerm,'gi')
-    return name.replace(regex,(s)=>`<span class = "highlight">${s}</span>`)
+    return searchTerm === '' ? 
+      name :
+      name.replace(regex,(s)=>`<span class = "highlight">${s}</span>`)
   }
 
   displayTreeNode(item:any){
     return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re=>re.labelIndex === Number(item.labelIndex)) >= 0 ? 
       `<span class = "regionSelected">${this.insertHighlight(item.name,this.searchTerm)}</span>` :
       `<span class = "regionNotSelected">${this.insertHighlight(item.name,this.searchTerm)}</span>`
-  }
-
-  /* TODO obsolete? */
-  get treeHeaderText():string{
-    return ''
   }
 
   getChildren(item:any){
@@ -204,3 +202,4 @@ export class AtlasBanner implements OnDestroy{
 
   filterNameBySearchPipe = new FilterNameBySearch()
 }
+

@@ -1,3 +1,7 @@
+
+<span hbpLogoContainer>
+  <img src = "res/image/HBP_Primary_RGB_WhiteText.png" />
+</span>
 <div container>
   <dropdown
     (itemSelected) = "selectTemplate($event)"
@@ -47,10 +51,11 @@
       </div>
       <tree
         *ngFor = "let child of (selectedParcellation.regions | treeSearch : filterTreeBySearch.bind(this) : getChildren )"
-        (mouseclicktree) = "handleClickRegion($event)"
+        (treeNodeClick) = "handleClickRegion($event)"
         [renderNode]="(displayTreeNode).bind(this)"
         [searchFilter]="(filterTreeBySearch).bind(this)"
-        [inputItem]="child">
+        [inputItem]="child"
+        treebase>
       </tree>
     </div>
   </div>
