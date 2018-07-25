@@ -10,14 +10,6 @@ module.exports = {
             name : '[name].[ext]'
           }
         }
-      },{
-        test : /(jpg|png)$/,
-        use : {
-          loader : 'file-loader',
-          options : {
-            name : 'res/image/[name].[ext]'
-          }
-        }
       }
     ]
   }

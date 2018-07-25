@@ -4,9 +4,10 @@ const Uglify = require('uglifyjs-webpack-plugin')
 const path = require('path')
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
 const ngAssets = require('./webpack.ngassets')
+const staticAssets = require('./webpack.staticassets')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-module.exports = merge(common,ngAssets,{
+module.exports = merge(common,ngAssets,staticAssets,{
   entry : './src/main.ts',
   output : {
     filename : 'main.js',

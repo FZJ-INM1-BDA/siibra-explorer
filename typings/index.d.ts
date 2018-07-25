@@ -8,3 +8,4 @@ declare module '*.css' {
   export = contents
 }
 
+declare var PLUGINDEV : boolean

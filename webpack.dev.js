@@ -2,10 +2,11 @@ const common = require('./webpack.common.js')
 const merge = require('webpack-merge')
 const path = require('path')
 const ngAssets = require('./webpack.ngassets')
+const staticAssets = require('./webpack.staticassets')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 
-module.exports = merge(common,ngAssets,{
+module.exports = merge(common,ngAssets,staticAssets,{
   entry : './src/main.ts',
   mode : 'development',
   output : {

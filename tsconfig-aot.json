@@ -4,7 +4,11 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
     "target": "es2015",
-    "sourceMap": false
+    "sourceMap": false,
+    "baseUrl": ".",
+    "paths": {
+      "third_party/*" : ["third_party/*"]
+    }
   },
   "angularCompilerOptions":{
     "annotateForClosureCompiler" : true

@@ -32,7 +32,7 @@ import { ComponentsModule } from "../components/components.module";
   ],
   entryComponents : [
     SampleBoxUnit,
-
+    
     ReadmoreComponent,
     MarkdownDom,
     TreeComponent,

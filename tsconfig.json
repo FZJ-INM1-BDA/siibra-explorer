@@ -6,5 +6,9 @@
     "skipLibCheck": true,
     "target": "es2015",
     "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "third_party/*" : ["third_party/*"]
+    }
   }
 }

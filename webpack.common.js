@@ -10,33 +10,13 @@ module.exports = {
         exclude : /node_modules/
       },
       {
-        test : /export_nehuba.*?worker.*?\.js$/,
+        test : /.*?worker.*?\.js$/,
         use : {
           loader : 'file-loader',
           options: {
             name : '[name].[ext]'
           }
         }
-      },
-      {
-        test : /export_nehuba.*?.css$/,
-        use : {
-          loader : 'file-loader',
-          options: {
-            name : '[name].[ext]'
-          }
-        }
-      },
-      {
-        type : 'javascript/auto',
-        test : /ext.*?\.json/,
-        use : [{
-          loader : 'file-loader',
-          options : {
-            name : '[name].[ext]',
-            outputPath : 'res/json'
-          }
-        }]
       }
     ]
   },
@@ -48,6 +28,9 @@ module.exports = {
       '.ts',
       '.js',
       '.json'
-    ]
+    ],
+    alias : {
+      "third_party" : path.resolve(__dirname,'third_party')
+    }
   },
 }

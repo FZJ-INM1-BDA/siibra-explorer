@@ -10,6 +10,7 @@
     "build-aot": "webpack --config webpack.aot.js",
     "build-min": "webpack --config webpack.prod.js",
     "build": "webpack --config webpack.dev.js",
+    "dev-plugin" : "PLUGINDEV=true npm run dev-server & node ./src/plugin_examples/server.js",
     "dev-server": "webpack-dev-server --config webpack.dev.js --mode development",
     "serve-plugins": "node src/plugin_examples/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"

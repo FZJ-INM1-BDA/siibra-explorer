@@ -13,28 +13,36 @@ Interactive atlas viewer is built with [Angular (v6.0)](https://angular.io/) and
 
 - node > 6
 - npm > 4
-- a compiled [nehuba](https://github.com/HumanBrainProject/nehuba)
 
-
-### Installing
-
-```
-/* in exported_nehuba (compiled nehuba) */
-npm link
-
-/* in HOME */
-
-git clone https://github.com/HumanBrainProject/interactive-viewer
-cd interactive-viewer
-npm i
-npm link exported_nehuba
-```
+### Develop Interactive Viewer
 
 To run a dev server, run:
 
 ```
+git clone https://github.com/HumanBrainProject/interactive-viewer
+cd interactive-viewer
+npm i
 npm run dev-server
 ```
+
+### Develop Plugins
+
+To develop plugins for the interactive viewer, run:
+```
+git clone https://github.com/HumanBrainProject/interactive-viewer
+cd interactive-viewer
+npm i
+PLUGINDEV=true npm run dev-plugin
+```
+
+The contents inside the folder in `./src/plugin_examples` will be automatically fetched by the dev instance of the interactive-viewer on load. 
+
+[plugin readme](src/plugin_examples/README.md)
+
+[plugin api](src/plugin_examples/plugin_api.md)
+
+[plugin migration guide](src/plugin_examples/migrationGuide.md)
+
 
 ## Deployment
 

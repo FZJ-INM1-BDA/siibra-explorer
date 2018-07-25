@@ -4,8 +4,10 @@ const ngtools = require('@ngtools/webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const AngularCompilerPlugin = ngtools.AngularCompilerPlugin
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
+const merge = require('webpack-merge')
+const staticAssets = require('./webpack.staticassets')
 
-module.exports = {
+module.exports = merge(staticAssets, {
 
   entry : './src/main-aot.ts',
   output : {
@@ -31,9 +33,18 @@ module.exports = {
       },
       {
         test : /\.(html|css)$/,
-        exclude : /export\_nehuba|index/,
+        exclude : /export\_nehuba|index|res\/css/,
         use : {
           loader : 'raw-loader',
+        }
+      },
+      {
+        test : /res\/css.*?css$/,
+        use : {
+          loader : 'file-loader',
+          options : {
+            name : '[name].[ext]'
+          }
         }
       }
     ]
@@ -52,6 +63,9 @@ module.exports = {
       '.ts',
       '.js',
       '.json'
-    ]
+    ],
+    alias : {
+      "third_party" : path.resolve(__dirname,'third_party')
+    }
   }
-}
+})

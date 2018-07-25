@@ -1,7 +1,7 @@
 import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef } from "@angular/core";
-import * as export_nehuba from 'export_nehuba'
+import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
 
-import 'export_nehuba/dist/min/chunk_worker.bundle.js'
+import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import { getActiveColorMapFragmentMain } from "../nehubaContainer.component";
 
 @Component({

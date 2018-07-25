@@ -18,7 +18,11 @@ export class AtlasViewerDataService implements OnDestroy{
     //   .then(res=>res.json())
     //   .then(json=>resolve(json))
     //   .catch(err=>reject(err))
-    
+    if(PLUGINDEV){
+      
+    }else{
+      resolve([])
+    }
     Promise.all([
       fetch('http://localhost:10080/jugex/manifest.json').then(res=>res.json()),
       fetch('http://localhost:10080/testPlugin/manifest.json').then(res=>res.json())
