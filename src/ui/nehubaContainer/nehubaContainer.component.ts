@@ -4,7 +4,6 @@ import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
-import * as export_nehuba from 'export_nehuba'
 import { AtlasViewerAPIServices } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 
@@ -142,12 +141,10 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
       distinctUntilChanged()
     )
 
-    /* patch NG */
-    this.patchNG()
-
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.newViewer$.pipe(
-      switchMap(()=>fromEvent(this.elementRef.nativeElement,'sliceRenderEvent').pipe(
+      switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+        .pipe(
           scan((acc:Event[],event:Event)=>{
             const target = (event as Event).target as HTMLElement
             const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
@@ -286,37 +283,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
     spatialData.highlight = false
   }
 
-  private patchNG(){
-
-    const { LayerManager, UrlHashBinding } = export_nehuba.getNgPatchableObj()
-    
-    UrlHashBinding.prototype.setUrlHash = ()=>{
-      // console.log('seturl hash')
-      // console.log('setting url hash')
-    }
-
-    UrlHashBinding.prototype.updateFromUrlHash = ()=>{
-      // console.log('update hash binding')
-    }
-
-    /* TODO find a more permanent fix to disable double click */
-    LayerManager.prototype.invokeAction = (arg) => {
-      const region = this.regionsLabelIndexMap.get(this.nehubaViewer.mouseOverSegment)
-      // const foundRegion = INTERACTIVE_VIEWER.viewerHandle.mouseOverNehuba.getValue().foundRegion
-      if(arg=='select'&& region ){
-        this.selectedRegionIndexSet.has(region.labelIndex) ?
-          this.store.dispatch({
-            type : SELECT_REGIONS,
-            selectRegions : [...this.selectedRegionIndexSet].filter(idx=>idx!==region.labelIndex).map(idx=>this.regionsLabelIndexMap.get(idx))
-          }) :
-          this.store.dispatch({
-            type : SELECT_REGIONS,
-            selectRegions : [...this.selectedRegionIndexSet].map(idx=>this.regionsLabelIndexMap.get(idx)).concat(region)
-          })
-      }
-    }
-  }
-
   private handleParcellation(parcellation:any){
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
@@ -374,6 +340,20 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.mouseoverSegmentEmitter.subscribe(this.handleEmittedMouseoverSegment.bind(this))
+    )
+
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.regionSelectionEmitter.subscribe(region => {
+        this.selectedRegionIndexSet.has(region.labelIndex) ?
+          this.store.dispatch({
+            type : SELECT_REGIONS,
+            selectRegions : [...this.selectedRegionIndexSet].filter(idx=>idx!==region.labelIndex).map(idx=>this.regionsLabelIndexMap.get(idx))
+          }) :
+          this.store.dispatch({
+            type : SELECT_REGIONS,
+            selectRegions : [...this.selectedRegionIndexSet].map(idx=>this.regionsLabelIndexMap.get(idx)).concat(region)
+          })
+      })
     )
 
     this.setupViewerHandleApi()
