@@ -103,9 +103,10 @@ const parseURLToElement = (url:string):HTMLElement=>{
 }
 
 export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
-  ['jquery3',parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
-  ['jquery2',parseURLToElement('http://code.jquery.com/jquery-2.2.4.min.js')],
-  ['webcomponentsLite',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
-  ['react16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
-  ['reactdom16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
+  ['jquery@3',parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
+  ['jquery@2',parseURLToElement('http://code.jquery.com/jquery-2.2.4.min.js')],
+  ['webcomponentsLite@1.1.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
+  ['react@16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
+  ['reactdom@16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
+  ['vue@2.5.16',parseURLToElement('https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js')],
 ])

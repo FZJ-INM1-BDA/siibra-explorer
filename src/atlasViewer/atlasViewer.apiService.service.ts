@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter } from "../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap } from "../services/stateStore.service";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { map, distinctUntilChanged } from "rxjs/operators";
 
 declare var window
 
@@ -13,6 +13,7 @@ declare var window
 export class AtlasViewerAPIServices{
 
   private loadedTemplates$ : Observable<any>
+  private selectParcellation$ : Observable<any>
   public interactiveViewer : InteractiveViewerInterface
 
   public loadedLibraries : Map<string,{counter:number,src:HTMLElement|null}> = new Map()
@@ -25,6 +26,12 @@ export class AtlasViewerAPIServices{
       select('viewerState'),
       safeFilter('fetchedTemplates'),
       map(state=>state.fetchedTemplates)
+    )
+
+    this.selectParcellation$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('parcellationSelected'),
+      map(state => state.parcellationSelected)
     )
 
     this.interactiveViewer = {
@@ -42,7 +49,9 @@ export class AtlasViewerAPIServices{
         selectedRegionsBSubject : this.store.pipe(
           select('viewerState'),
           safeFilter('regionsSelected'),
-          map(state=>state.regionsSelected)),
+          map(state=>state.regionsSelected),
+          distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
+        ),
 
         loadedTemplates : [],
 
@@ -69,6 +78,7 @@ export class AtlasViewerAPIServices{
 
   private init(){
     this.loadedTemplates$.subscribe(templates=>this.interactiveViewer.metadata.loadedTemplates = templates)
+    this.selectParcellation$.subscribe(parcellation => this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions))
   }
 }
 
