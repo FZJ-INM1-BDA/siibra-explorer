@@ -124,7 +124,7 @@ window.interactiveViewer
   - *loadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* Function that loads external libraries. Pass the name of the libraries as an Array of string, and returns a Promise. When promise resolves, the libraries are loaded. **n.b.** while unlikely, there is a possibility that multiple requests to load external libraries in quick succession can cause the promise to resolve before the library is actually loaded. 
 
   ```js
-  const currentlySupportedLibraries = ['jquery2','jquery3','webcomponentsLite','react16','reactdom16']
+  const currentlySupportedLibraries = ['jquery@2','jquery@3','webcomponentsLite@1.1.0','react@16','reactdom@16','vue@2.5.16']
 
   window.interactivewViewer.loadExternalLibraries(currentlySupportedLibraries)
     .then(()=>{

@@ -1,0 +1,6 @@
+{
+  "name" : "fzj.xg.webjugex",
+  "type" : "plugin",
+  "templateURL" : "http://localhost:10080/newWebJugex/template.html",
+  "scriptURL" : "http://localhost:10080/newWebJugex/script.js"
+}

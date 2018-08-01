@@ -15,6 +15,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter : EventEmitter<any | number | null> = new EventEmitter()
+  @Output() regionSelectionEmitter : EventEmitter<any> = new EventEmitter()
 
   /* only used to set initial navigation state */
   initNav : any
@@ -46,7 +47,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   ]
 
   constructor(public elementRef:ElementRef){
-    
+    this.patchNG()
   }
 
   private _parcellationId : string
@@ -102,6 +103,28 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
     })
+  }
+
+  private patchNG(){
+
+    const { LayerManager, UrlHashBinding } = export_nehuba.getNgPatchableObj()
+    
+    UrlHashBinding.prototype.setUrlHash = () => {
+      // console.log('seturl hash')
+      // console.log('setting url hash')
+    }
+
+    UrlHashBinding.prototype.updateFromUrlHash = () => {
+      // console.log('update hash binding')
+    }
+    
+    /* TODO find a more permanent fix to disable double click */
+    LayerManager.prototype.invokeAction = (arg) => {
+      const region = this.regionsLabelIndexMap.get(this.mouseOverSegment)
+      if (arg === 'select' && region) {
+        this.regionSelectionEmitter.emit(region)
+      }
+    }
   }
 
   private filterLayers(l:any,layerObj:any):boolean{

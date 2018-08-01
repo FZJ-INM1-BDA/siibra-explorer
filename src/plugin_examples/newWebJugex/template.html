@@ -1,0 +1,248 @@
+<div v-cloak id = "fzj.xg.newWebJugex.container">
+  <vue-readmore
+    :collapsed-height = "40">
+    <template slot = "readmoreContent">
+      <small id = "fzj.xg.newWebJugex.desc">
+          Find a set of differentially expressed genes between two user defined volumes of interest based on JuBrain maps. <br />
+          The tool downloads expression values of user specified sets of genes from Allen Brain API.<br />
+          Then, it uses zscores to find which genes are expressed differentially between the user specified regions of interests.<br />
+          After the analysis is finished, the genes and their calculated p values are displayed. There is also an option of downloading the gene names and their p values<br />
+          and the roi coordinates used in the analysis.
+          Please select two regions of interest, and at least one gene :
+      </small>
+    </template>
+    <template slot = "resizeSliverContentCollapsed">
+      <div class = "text-center">
+        <i class = "glyphicon glyphicon-chevron-down"></i>
+      </div>
+    </template>
+    <template slot = "resizeSliverContentShown">
+      <div class = "text-center">
+        <i class = "glyphicon glyphicon-chevron-up"></i>
+      </div>
+    </template>
+  </vue-readmore>
+
+  <div class="fzj.xg.newWebJugex.spacer"></div>
+
+  <div class="btn-group">
+    <div
+      @click = "simpleMode = true"
+      :class = "{'btn-active': simpleMode === true}"
+      class = "btn btn-default">
+      Simple
+    </div>
+    <div
+      @click = "simpleMode = false"
+      :class = "{'btn-active': simpleMode === false}"
+      class = "btn btn-default">
+      Advanced
+    </div>
+  </div>
+
+  <div class="fzj.xg.newWebJugex.spacer"></div>
+
+  <div style = "z-index:5" class="input-group">
+    <div class="input-group-addon">
+      ROI1:
+    </div>
+    <vue-autocomplete
+      ref = "roi1"
+      @selectslice = "roi1 = $event"
+      class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
+      :rawarray = "regions"
+      :placeholder = "placeholderTextRoi1">
+  
+    </vue-autocomplete>
+  </div>
+  <div style = "z-index:4" class="input-group">
+    <div class="input-group-addon">
+      ROI2:
+    </div>
+    <vue-autocomplete
+      ref = "roi2"
+      @selectslice = "roi2 = $event"
+      class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
+      :rawarray = "regions"
+      :placeholder = "placeholderTextRoi2">
+  
+    </vue-autocomplete>
+  </div>
+
+  <div class="fzj.xg.newWebJugex.spacer"></div>
+
+  <div style = "z-index:3" class = "input-group">
+    <vue-autocomplete
+      ref = "genelist"
+      @selectslice = "chosengenes.push( $event );$refs.genelist.$refs.input.focus()"
+      class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
+      :rawarray = "getAllgenes"
+      :placeholder = "'Search for genes of interest ...'">
+  
+    </vue-autocomplete>
+    
+    <div class = "input-group-btn">
+      <div webjugex-tooltip = "accepts a comma delimited utf-8 encoded file" class = "btn btn-default fzj.xg.newWebJugex.geneBtns">
+        Import
+      </div>
+    </div>
+    <div class = "input-group-btn">
+      <div webjugex-tooltip = "saves the gene list as a comma delimited, utf8 encoded csv file" class = "btn btn-default fzj.xg.newWebJugex.geneBtns">
+        Export
+      </div>
+    </div>
+
+  </div>
+
+  <vue-pill 
+    class = "fzj.xg.newWebJugex.pill"
+    @remove-pill = "removeGene(item)" 
+    v-for = "(item,index) in chosengenes" 
+    :key = "index" 
+    :name = "item">
+  </vue-pill>
+
+  <div class="fzj.xg.newWebJugex.spacer"></div>
+
+  <div 
+    @click = "singleProbeMode = !singleProbeMode"
+    class = "btn btn-default"
+    :class = "{'btn-active': singleProbeMode === true}">
+    <small>
+      Single Probe Mode
+    </small>
+  </div>
+
+  <div 
+    @click = "ignoreCustomProbe = !ignoreCustomProbe"
+    class = "btn btn-default"
+    :class = "{'btn-active': ignoreCustomProbe === true}">
+    <small>
+      Ignore Custom Probe
+    </small>
+  </div>
+
+  <div class="fzj.xg.newWebJugex.spacer"></div>
+
+  <div 
+    @click = "startAnalysis"
+    class="btn btn-default btn-block">
+    Start Differential Analysis
+  </div>
+
+</div>
+<div v-cloak id = "fzj.xg.newWebJugex.result">
+  <fzj-xg-newwebjugex-analysis-card
+    class = "fzj.xg.newWebJugex.analysisCard.container"
+    @remove-card = "removeAnalysis(index)"
+    :querydata = "item"
+    :key = "index"
+    v-for = "(item, index) in analyses">
+
+  </fzj-xg-newwebjugex-analysis-card>
+</div>
+<div class = "fzj.xg.newWebJugex.padding"></div>
+<style>
+[v-cloak]
+{
+  display:none;
+}
+#fzj\.xg\.newWebJugex\.container
+{
+  padding: 0.5em;
+}
+#fzj\.xg\.newWebJugex\.desc
+{
+  display:block;
+}
+.fzj\.xg\.newWebJugex\.autocomplete
+{
+  border : 1px rgba(0,0,0,0.1) solid;
+  width:10em;
+  padding:1em;
+  box-sizing: border-box;
+  position:absolute;
+}
+
+.fzj\.xg\.newWebJugex\.autocomplete input
+{
+  width:100%;
+}
+
+.fzj\.xg\.newWebJugex\.vueAutocompleteFormControl
+{
+  padding:0;
+}
+.fzj\.xg\.newWebJugex\.padding
+{
+  height:10em;
+}
+
+.fzj\.xg\.newWebJugex\.spacer
+{
+  height: 0.5em;
+}
+
+.fzj\.xg\.newWebJugex\.geneBtns
+{
+  height:34px;
+}
+
+#fzj\.xg\.newWebJugex\.container [webjugex-tooltip]
+{
+  position: relative;
+}
+
+#fzj\.xg\.newWebJugex\.container [webjugex-tooltip]:after
+{
+  content: attr(webjugex-tooltip);
+  position: absolute;
+  top: 3em;
+  right: 0;
+  color:white;
+  background-color:rgba(0,0,0,0.7);
+  width: 10em;
+  white-space: normal;
+  display: inline-block;
+  padding: 0.2em;
+  pointer-events: none;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+#fzj\.xg\.newWebJugex\.container [webjugex-tooltip]:hover:after
+{
+  opacity: 1;
+}
+
+#fzj\.xg\.newWebJugex\.container .btn-active
+{
+  color:rgba(255, 255, 255, 1.0);
+  text-shadow: 1px 0 0 rgba(0, 255, 0, 0.15),
+    -1px 0 0 rgba(0, 255, 0, 0.15),
+    0 1px 0 rgba(0, 255, 0, 0.15),
+    0 -1px 0 rgba(0, 255, 0, 0.15);
+}
+
+#fzj\.xg\.newWebJugex\.result
+{
+  padding: 0.5em;
+}
+
+#fzj\.xg\.newWebJugex\.result .fzj\.xg\.newWebJugex\.spinner
+{
+  animation: slidein 0.7s ease-in-out 0s infinite both;
+}
+
+@keyframes slidein {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(10px); }
+  100%   { transform: translateX(0px); }
+}
+
+
+.fzj\.xg\.newWebJugex\.analysisCard\.container
+{
+  margin-bottom: 0;
+}
+</style>
