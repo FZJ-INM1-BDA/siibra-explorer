@@ -25,19 +25,14 @@
 
   <div class="fzj.xg.newWebJugex.spacer"></div>
 
-  <div class="btn-group">
-    <div
-      @click = "simpleMode = true"
-      :class = "{'btn-active': simpleMode === true}"
-      class = "btn btn-default">
-      Simple
-    </div>
-    <div
-      @click = "simpleMode = false"
-      :class = "{'btn-active': simpleMode === false}"
-      class = "btn btn-default">
-      Advanced
-    </div>
+  <div class = "input-group">
+    <span class = "input-group-addon">
+      Simple mode:
+    </span>
+    <vue-checkbox
+      :flag = "simpleMode === true"
+      @togglecheckbox = "simpleMode = !simpleMode">
+    </vue-checkbox>
   </div>
 
   <div class="fzj.xg.newWebJugex.spacer"></div>
@@ -104,25 +99,63 @@
 
   <div class="fzj.xg.newWebJugex.spacer"></div>
 
-  <div 
-    @click = "singleProbeMode = !singleProbeMode"
-    class = "btn btn-default"
-    :class = "{'btn-active': singleProbeMode === true}">
-    <small>
-      Single Probe Mode
-    </small>
-  </div>
+  <transition name = "fade">
+    <div v-if = "!simpleMode">
 
-  <div 
-    @click = "ignoreCustomProbe = !ignoreCustomProbe"
-    class = "btn btn-default"
-    :class = "{'btn-active': ignoreCustomProbe === true}">
-    <small>
-      Ignore Custom Probe
-    </small>
-  </div>
-
-  <div class="fzj.xg.newWebJugex.spacer"></div>
+      <div class="input-group">
+        <span class="input-group-addon">
+          Single probe mode
+        </span>
+        <vue-checkbox
+          :flag = "singleProbeMode"
+          @togglecheckbox = "singleProbeMode = !singleProbeMode">
+    
+        </vue-checkbox>
+      </div>
+    
+      <div class="input-group">
+        <span class="input-group-addon">
+          Ignore custom probe
+        </span>
+        <vue-checkbox
+          :flag = "ignoreCustomProbe"
+          @togglecheckbox = "ignoreCustomProbe = !ignoreCustomProbe">
+    
+        </vue-checkbox>
+      </div>
+      
+      <div class="fzj.xg.newWebJugex.spacer"></div>
+    
+      <div class="input-group">
+        <span class="input-group-addon">
+          Hemisphere
+        </span>
+        <div 
+          @click = "lefthemisphere = !lefthemisphere"
+          :class = " lefthemisphere == true ? 'btn-active' : 'btn-inactive'"
+          class="btn btn-default">
+          Left
+        </div>
+        <div 
+          @click = "righthemisphere = !righthemisphere"
+          :class = " righthemisphere == true ? 'btn-active' : 'btn-inactive'"
+          class="btn btn-default">
+          Right
+        </div>
+      </div>
+    
+      <div class="fzj.xg.newWebJugex.spacer"></div>
+    
+      <div class="input-group">
+        <span class="input-group-addon">
+          Number of permutations
+        </span>
+        <input v-model = "nPermutations" type="text" class="form-control">
+      </div>
+    
+      <div class="fzj.xg.newWebJugex.spacer"></div>  
+    </div>
+  </transition>
 
   <div 
     @click = "startAnalysis"
@@ -215,9 +248,20 @@
   opacity: 1;
 }
 
+#fzj\.xg\.newWebJugex\.container .btn-inactive
+{
+  transition: all 0.2s;
+  color:rgba(0,0,0,0.5);
+  text-shadow: 1px 0 0 rgba(0, 0, 0, 0.15),
+    -1px 0 0 rgba(0, 0, 0, 0.15),
+    0 1px 0 rgba(0, 0, 0, 0.15),
+    0 -1px 0 rgba(0, 0, 0, 0.15);
+}
+
 #fzj\.xg\.newWebJugex\.container .btn-active
 {
-  color:rgba(255, 255, 255, 1.0);
+  transition: all 0.2s;
+  color:rgba(200, 255, 125, 1.0);
   text-shadow: 1px 0 0 rgba(0, 255, 0, 0.15),
     -1px 0 0 rgba(0, 255, 0, 0.15),
     0 1px 0 rgba(0, 255, 0, 0.15),
@@ -231,10 +275,10 @@
 
 #fzj\.xg\.newWebJugex\.result .fzj\.xg\.newWebJugex\.spinner
 {
-  animation: slidein 0.7s ease-in-out 0s infinite both;
+  animation: thinking 0.7s ease-in-out 0s infinite both;
 }
 
-@keyframes slidein {
+@keyframes thinking {
   0% { transform: translateX(0px); }
   50% { transform: translateX(10px); }
   100%   { transform: translateX(0px); }
@@ -244,5 +288,16 @@
 .fzj\.xg\.newWebJugex\.analysisCard\.container
 {
   margin-bottom: 0;
+}
+
+
+[darktheme="true"] #fzj\.xg\.newWebJugex\.container .checkbox-dial
+{
+  background-color:rgba(210,210,210,1.0);
+}
+
+[darktheme="true"] #fzj\.xg\.newWebJugex\.container .checkbox-on
+{
+  background-color:rgba(50,150,50,1.0);
 }
 </style>

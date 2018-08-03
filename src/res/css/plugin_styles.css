@@ -31,12 +31,20 @@
 
 /* colour */
 [darktheme="true"] [plugincontainer] .btn,
-[darktheme="true"] [plugincontainer] .input-group-addon,
 [darktheme="true"] [plugincontainer] input[type="text"],
 [darktheme="true"] [plugincontainer] .panel
 {
-  background-color:rgba(80,80,80,0.8);
+  background-color:rgba(81,81,81,0.8);
   color:rgba(255,255,255,0.8);
+}
+
+[darktheme="true"] [plugincontainer] .input-group-addon
+{
+  background-color:rgba(60,60,60,0.2);
+  color:rgba(255,255,255,0.8);
+  /* border-top:1px solid rgba(255,255,255,0.05);
+  border-left:1px solid rgba(255,255,255,0.05);
+  border-right:1px solid rgba(255,255,255,0.05); */
 }
 
 [darktheme="true"] [plugincontainer] hr

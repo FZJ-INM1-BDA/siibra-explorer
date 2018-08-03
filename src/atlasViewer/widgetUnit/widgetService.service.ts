@@ -130,7 +130,6 @@ function safeGetSingle(obj:any, arg:string){
 }
 
 function safeGet(obj:any, ...args:string[]){
-  debugger
   let _obj = Object.assign({}, obj)
   while(args.length > 0){
     const arg = args.shift()

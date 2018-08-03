@@ -67,6 +67,8 @@
           singleProbeMode:true,
           simpleMode:true,
           ignoreCustomProbe:false,
+          lefthemisphere:true,
+          righthemisphere:true,
           nPermutations:1000
         },
         methods: {
