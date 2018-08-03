@@ -169,7 +169,19 @@ export interface SpatialDataEntries extends Action
   visible? : boolean
 }
 
-export function spatialSearchState(state:any,action:SpatialDataEntries){
+export interface SpatialDataStateInterface{
+  spatialSearchPagination : number
+  spatialSearchTotalResults : number
+  spatialDataVisible : boolean
+}
+
+const initSpatialDataState : SpatialDataStateInterface = {
+  spatialDataVisible : false,
+  spatialSearchPagination : 0, 
+  spatialSearchTotalResults : 0
+}
+
+export function spatialSearchState(state:SpatialDataStateInterface = initSpatialDataState, action:SpatialDataEntries){
   switch (action.type){
     case SPATIAL_GOTO_PAGE:
       return Object.assign({},state,{
