@@ -15,7 +15,7 @@ import { timedValues } from "../../util/generator";
   ]
 })
 
-export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
+export class NehubaContainer implements OnInit, OnDestroy{
 
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
   @ViewChild('[pos00]',{read:ElementRef}) topleft : ElementRef
@@ -248,10 +248,6 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
     )
   }
 
-  ngAfterViewInit(){
-    
-  }
-
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
   }
@@ -398,7 +394,7 @@ export class NehubaContainer implements OnInit,OnDestroy,AfterViewInit{
           selectRegions : this.regionsLabelIndexMap.keys()
         })
       },
-      hideAllSegments : ()=>{
+      hideAllSegments : () => {
         this.store.dispatch({
           type : SELECT_REGIONS,
           selectRegions : []

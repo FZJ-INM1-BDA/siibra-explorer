@@ -28,12 +28,17 @@ export class WidgetServices{
   }
 
   clearAllWidgets(){
-    this.floatingContainer.clear()
-    this.dockedContainer.clear()
+    [...this.widgetComponentRefs].forEach((cr:ComponentRef<WidgetUnit>) => {
+      if(!cr.instance.persistency) cr.destroy()
+      
+    })
+    // this.floatingContainer.clear()
+    // this.dockedContainer.clear()
+    
     this.clickedListener.forEach(s=>s.unsubscribe())
   }
 
-  addNewWidget(guestComponentRef:ComponentRef<any>,options?:any):ComponentRef<WidgetUnit>{
+  addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
     const _option = getOption(options)
     const component = _option.state === 'floating' ? 
       this.floatingContainer.createComponent(this.widgetUnitFactory) :
@@ -54,6 +59,7 @@ export class WidgetServices{
       _component.instance.state = _option.state
       _component.instance.exitable = _option.exitable
       _component.instance.title = _option.title
+      _component.instance.persistency = _option.persistency
 
       /* internal properties, used for changing state */
       _component.instance.guestComponentRef = guestComponentRef
@@ -99,7 +105,8 @@ export class WidgetServices{
       this.widgetComponentRefs.delete(widgetRef)
       widgetRef.instance.container.detach( 0 )
       const guestComopnent = widgetRef.instance.guestComponentRef
-      this.addNewWidget(guestComopnent,options)
+      const cr = this.addNewWidget(guestComopnent,options)
+
       widgetRef.destroy()
     }else{
       console.warn('widgetref not found')
@@ -116,23 +123,36 @@ export class WidgetServices{
   }
 }
 
-function getOption(option?:WidgetOptionsInterface):WidgetOptionsInterface{
+function safeGetSingle(obj:any, arg:string){
+  return typeof obj === 'object' && obj !== null && typeof arg === 'string'
+    ? obj[arg]
+    : null
+}
+
+function safeGet(obj:any, ...args:string[]){
+  debugger
+  let _obj = Object.assign({}, obj)
+  while(args.length > 0){
+    const arg = args.shift()
+    _obj = safeGetSingle(_obj, arg)
+  }
+  return _obj
+}
+
+function getOption(option?:Partial<WidgetOptionsInterface>):WidgetOptionsInterface{
   return{
-    exitable : option ? 
-      option.exitable ?
-        option.exitable :
-        false :
-      false,
-    state : option ? 
-      option.state ?
-        option.state :
-        'floating' :
-      'floating',
-    title : option ?
-      option.title ? 
-        option.title :
-        'Untitled' :
-      'Untitled'
+    exitable : safeGet(option, 'exitable') !== null
+      ? safeGet(option, 'exitable')
+      : true,
+    state : safeGet(option, 'state')
+      ? safeGet(option, 'state')
+      : 'floating',
+    title : safeGet(option, 'title')
+      ? safeGet(option, 'title')
+      : 'Untitled',
+    persistency : safeGet(option, 'persistency')
+      ? safeGet(option, 'persistency')
+      : false
   }
 }
 
@@ -140,5 +160,6 @@ export interface WidgetOptionsInterface{
   title? : string
   state? : 'docked' | 'floating'
   exitable? : boolean
+  persistency : boolean
 }
 

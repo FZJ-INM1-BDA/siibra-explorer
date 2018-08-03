@@ -1,6 +1,6 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, Injector, ComponentRef, AfterViewInit, OnInit, TemplateRef, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER } from "../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
 import { Observable, Subscription } from "rxjs";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
@@ -178,17 +178,30 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           template.useTheme === 'dark' :
           false
 
+        /* new viewer should reset the spatial data search */
+        this.store.dispatch({
+          type : FETCHED_SPATIAL_DATA,
+          fetchedDataEntries : []
+        })
+        this.store.dispatch({
+          type : UPDATE_SPATIAL_DATA,
+          totalResults : 0
+        })
+        
         if (this.databrowserHostComponentRef) {
-          this.databrowserHostComponentRef.instance.container.detach(0)
-          this.temporaryContainer.insert(this.databrowserComponentRef.hostView)
+          // this.databrowserHostComponentRef.instance.container.detach(0)
+          // this.temporaryContainer.insert(this.databrowserComponentRef.hostView)
+        } else {
+          this.databrowserHostComponentRef =
+            this.widgetServices.addNewWidget(this.databrowserComponentRef, {
+              title: 'Data Browser',
+              exitable: false,
+              state: 'docked',
+              persistency:true
+            })
         }
+
         this.widgetServices.clearAllWidgets()
-        this.databrowserHostComponentRef =
-          this.widgetServices.addNewWidget(this.databrowserComponentRef, {
-            title: 'Data Browser',
-            exitable: false,
-            state: 'docked'
-          })
       })
     )
 

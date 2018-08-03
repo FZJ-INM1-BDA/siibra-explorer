@@ -39,6 +39,14 @@ export class WidgetUnit {
   public cf : ComponentRef<WidgetUnit>
   public widgetServices:WidgetServices
 
+  /**
+   * @param {boolean}
+   * @description when new viewer is init, if this viewer will persist
+   * @default false
+   * @TODO does it make sense to tie widget persistency with WidgetUnit class?
+   */
+  public persistency : boolean = false
+
   undock(event?:Event){
     if(event){
       event.stopPropagation()
@@ -48,7 +56,8 @@ export class WidgetUnit {
     this.widgetServices.changeState(this,{
       title : this.title,
       state:'floating',
-      exitable:this.exitable
+      exitable:this.exitable,
+      persistency:this.persistency
     })
   }
 
@@ -61,7 +70,8 @@ export class WidgetUnit {
     this.widgetServices.changeState(this,{
       title : this.title,
       state:'docked',
-      exitable:this.exitable
+      exitable:this.exitable,
+      persistency:this.persistency
     })
   }
 

@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, FETCHED_TEMPLATES, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_METADATA, Property, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
+import { ViewerStateInterface, FETCHED_TEMPLATES, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { Subscription } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
