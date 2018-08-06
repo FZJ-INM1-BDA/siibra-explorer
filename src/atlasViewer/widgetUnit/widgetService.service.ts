@@ -1,4 +1,4 @@
-import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver, Injector } from "@angular/core";
+import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver } from "@angular/core";
 
 import { WidgetUnit } from "./widgetUnit.component";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
