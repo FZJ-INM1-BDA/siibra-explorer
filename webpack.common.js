@@ -7,7 +7,7 @@ module.exports = {
       {
         test : /\.ts$/,
         loaders : ['ts-loader','angular2-template-loader?keepUrl=true'],
-        exclude : /node_modules/
+        exclude : /node_modules|[Ss]pec\.ts$/
       },
       {
         test : /.*?worker.*?\.js$/,

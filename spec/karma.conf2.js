@@ -1,10 +1,5 @@
 // Karma configuration
-// Generated on Mon Aug 06 2018 12:37:42 GMT+0200 (CEST)
-
-const merge = require('webpack-merge')
-const webpackTest = require('../webpack.test')
-const webpackConfig = require('../webpack.dev')
-const fullWebpack = merge(webpackTest, webpackConfig)
+// Generated on Mon Aug 06 2018 16:37:20 GMT+0200 (CEST)
 
 module.exports = function(config) {
   config.set({
@@ -32,10 +27,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-      './spec/test.ts' : ['webpack']
     },
 
-    webpack : fullWebpack,
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -71,10 +64,6 @@ module.exports = function(config) {
 
     // Concurrency level
     // how many browser should be started simultaneous
-    concurrency: Infinity,
-
-    mime : {
-      'text/x-typescript' : ['ts']
-    }
+    concurrency: Infinity
   })
 }
