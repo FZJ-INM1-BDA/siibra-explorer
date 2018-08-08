@@ -82,8 +82,12 @@
       </div>
     </div>
     <div class = "input-group-btn">
-      <div webjugex-tooltip = "saves the gene list as a comma delimited, utf8 encoded csv file" class = "btn btn-default fzj.xg.newWebJugex.geneBtns">
+      <div 
+        @click = "exportGene"
+        webjugex-tooltip = "saves the gene list as a comma delimited, utf8 encoded csv file" 
+        class = "btn btn-default fzj.xg.newWebJugex.geneBtns">
         Export
+        <a style = "display:none" ref = "exportGeneAnchor" :href = "'data:text/csv;charset=utf-8,' + chosenGeneCommaJoined">button</a>
       </div>
     </div>
 

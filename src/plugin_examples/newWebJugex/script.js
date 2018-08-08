@@ -1,5 +1,10 @@
 (() => {
 
+  const handler = interactiveViewer.uiHandle.getToastHandler()
+  handler.message = 'hohoho'
+  handler.dismissable = true
+  handler.show()
+
   const backendRoot = `http://medpc055.ime.kfa-juelich.de:8005`
   const srcRoot = 'http://localhost:10080/newWebJugex'
 
@@ -75,20 +80,29 @@
           removeGene: function (gene) {
             this.chosengenes = this.chosengenes.filter(g => g !== gene)
           },
+          exportGene: function(){
+            this.$refs.exportGeneAnchor.setAttribute('download', `${Date.now()}.csv`)
+            this.$refs.exportGeneAnchor.click()
+            console.log('export gene')
+          },
           startAnalysis: function () {
             const body = {
               area1: {
                 name: this.roi1,
                 PMapURL: this.regionNameToPMapURLMap.get(this.roi1)
               },
-              mode: false,
               area2: {
                 name: this.roi2,
                 PMapURL: this.regionNameToPMapURLMap.get(this.roi2)
               },
-              hemisphere: 'left',
-              selectedGenes: this.chosengenes,
-              threshold: '0.2'
+
+              simpleMode: this.simpleMode,
+              singleProbeMode: this.singleProbeMode,
+              ignoreCustomProbe: this.ignoreCustomProbe,
+
+              lh: this.lefthemisphere,
+              rh: this.righthemisphere,
+              selectedGenes: this.chosengenes
             }
 
             this.$emit('start-analysis', Object.assign({}, body))
@@ -100,6 +114,9 @@
           },
           placeholderTextRoi2: function () {
             return this.roi2 === '' ? 'Start typing to search ...': this.roi2
+          },
+          chosenGeneCommaJoined: function(){
+            return this.chosengenes.join(',')
           },
           getAllgenes: function () {
             return this.allgenes
@@ -182,29 +199,33 @@
           coorddata : null
         }),
         computed: {
+          filename: function(){
+            return `pval_nPerm${this.querydata.nPermutations}_${this.querydata.singleProbeMode ? 'singleProbeMode' : 'allProbeMode'}`
+          },
           dateString: function () {
             return `${this.datenow.getFullYear().toString()}${normaliseToTwoDigit(this.datenow.getMonth() + 1)}${normaliseToTwoDigit(this.datenow.getDate())}_${normaliseToTwoDigit(this.datenow.getHours())}${normaliseToTwoDigit(this.datenow.getMinutes())}`
           }
         },
         mounted: function () {
-          fetch(`${backendRoot}/jugex`,{
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.querydata)
-          })
-            .then(res=>res.json())
-            .then(json => {
-              this.status = true
-              const rjson = jugexResponseParser(json)
-              this.pvaldata = rjson.pval
-              this.coorddata = rjson.coord
-            })
-            .catch(e => {
-              this.status = true
-              this.error = JSON.stringify(e)
-            })
+          console.log(this.querydata)
+          // fetch(`${backendRoot}/jugex`,{
+          //   method: 'POST',
+          //   headers: {
+          //     'Content-Type': 'application/json'
+          //   },
+          //   body: JSON.stringify(this.querydata)
+          // })
+          //   .then(res=>res.json())
+          //   .then(json => {
+          //     this.status = true
+          //     const rjson = jugexResponseParser(json)
+          //     this.pvaldata = rjson.pval
+          //     this.coorddata = rjson.coord
+          //   })
+          //   .catch(e => {
+          //     this.status = true
+          //     this.error = JSON.stringify(e)
+          //   })
         }
       })
 
@@ -224,6 +245,7 @@
       })
 
       controller.$on('start-analysis', (data) => {
+        /* validation (?) */
         result.addAnalysis(data)
       })
     })

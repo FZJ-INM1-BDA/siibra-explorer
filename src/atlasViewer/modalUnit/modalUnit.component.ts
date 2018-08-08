@@ -10,6 +10,7 @@ import { Component, Input, ViewContainerRef } from '@angular/core'
 export class ModalUnit{
   @Input() title : string
   @Input() body : string = 'Modal Body Text'
+  @Input() footer: string 
 
   constructor(public viewContainerRef : ViewContainerRef){
     

@@ -34,7 +34,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   spatialTotalNo : number = 0
   hideDataTypes : Set<string> = new Set()
 
-  private _spatialDataVisible : boolean = true
+  private _spatialDataVisible : boolean = false
   private spatialSearchObj : {center:[number,number,number],searchWidth:number,templateSpace : string,pageNo:number}
 
   dedicatedViewString : string | null
@@ -213,6 +213,9 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     if(isDefined(state.spatialDataVisible))
       this._spatialDataVisible = state.spatialDataVisible
 
+    if(this._spatialDataVisible === false)
+      return
+    
     if(this.spatialPagination === this.spatialSearchObj.pageNo)
       return
 

@@ -102,23 +102,16 @@ window.interactiveViewer
 
   - modalControl
 
-    - *getModalHandler()* returns a modalHandlerObject
-
-    - *modalHandler*
+    - *getModalHandler()* returns a modalHandlerObject, which has the following methods/properties:
 
       - *hide()* : Dynamically hides the modal
       - *show()* : Shows the modal
-      - *onHide(callback(reason)=>void)* : Attaches an onHide callback. 
-      - *onHidden(callback(reason)=>void)* : Attaches an onHidden callback. 
-      - *onShow(callback(reason)=>void)* : Attaches an onShow callback. 
-      - *onShown(callback(reason)=>void)* : Attaches an onShown callback.
       - title : title of the modal (String)
-      - body : body of the modal shown (JSON, Array, String)
+      - body : body of the modal shown (String)
       - footer : footer of the modal (String)
-      - config : config of the modal
+      - dismissable : whether the modal is dismissable on click backdrop/esc key (Boolean) *n.b. if true, users will not be able to interact with the viewer unless you specifically call `handler.hide()`*
 
-  - *viewingModeBSubject* BehaviourSubject emitting strings when viewing mode has changed. 
-
+  - toastControl
 - pluginControl
 
   - *loadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* Function that loads external libraries. Pass the name of the libraries as an Array of string, and returns a Promise. When promise resolves, the libraries are loaded. **n.b.** while unlikely, there is a possibility that multiple requests to load external libraries in quick succession can cause the promise to resolve before the library is actually loaded. 

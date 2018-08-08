@@ -24,18 +24,18 @@ div[resizeSliver]
 
 :host-context([darktheme="false"]) div[resizeSliver]
 {
-  background-color:rgba(30,30,30,0.08);
+  background-color:rgba(230,230,230,0.8);
 }
 
 :host-context([darktheme="true"]) div[resizeSliver]
 {
-  background-color:rgba(245,245,245,0.3);
+  background-color:rgba(50,50,50,0.8);
   color:rgba(245,245,245,0.8);
 }
 
 div[resizeSliver]
 {
-  z-index: 3;
+  z-index: 5;
   display:flex;
   flex-direction: row;
   align-items: center;

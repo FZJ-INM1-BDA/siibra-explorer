@@ -19,6 +19,7 @@ import { PluginServices } from "./atlasViewer.pluginService.service";
 
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
+import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 
 @Component({
   selector: 'atlas-viewer',
@@ -104,6 +105,32 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+
+    this.apiService.interactiveViewer.uiHandle.getToastHandler = () => {
+      const handler = new ToastHandler()
+      let toastComponent:ComponentRef<ToastComponent>
+      handler.show = () => {
+        toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
+
+        toastComponent.instance.dismissable = handler.dismissable
+        toastComponent.instance.message = handler.message
+        toastComponent.instance.timeout = handler.timeout
+
+        const _subscription = toastComponent.instance.dismissed.subscribe(userInitiated => {
+          _subscription.unsubscribe()
+          handler.hide()
+        })
+      }
+
+      handler.hide = () => {
+        if(toastComponent){
+          toastComponent.destroy()
+          toastComponent = null
+        }
+      }
+
+      return handler
+    }
 
     this.apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
       const srcHTMLElement = libraries.map(libraryName => ({

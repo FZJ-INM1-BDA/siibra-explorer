@@ -1,4 +1,4 @@
-import { Component, Input, ViewContainerRef, ViewChild } from "@angular/core";
+import { Component, Input, ViewContainerRef, ViewChild, Output, EventEmitter } from "@angular/core";
 
 
 @Component({
@@ -8,20 +8,30 @@ import { Component, Input, ViewContainerRef, ViewChild } from "@angular/core";
 })
 
 export class ToastComponent{
-  @Input() message : string = 'template'
+  @Input() message : string 
   @Input() timeout : number = 0
   @Input() dismissable : boolean = true
 
-  @ViewChild('message',{read:ViewContainerRef}) messageContainer : ViewContainerRef
-  constructor(){
+  @Output() dismissed : EventEmitter<boolean> = new EventEmitter()
 
+  private timeoutId : number
+
+  @ViewChild('messageContainer',{read:ViewContainerRef}) messageContainer : ViewContainerRef
+  constructor(){
+    
+  }
+  
+  
+  ngOnInit(){
+    if(this.timeout > 0) this.timeoutId = setTimeout(() => this.dismissed.emit(false), this.timeout)
   }
 
   dismiss(event:MouseEvent){
     event.preventDefault()
     event.stopPropagation()
-    
-    console.warn('dismiss')
 
+    if(this.timeoutId) clearTimeout(this.timeoutId)
+
+    this.dismissed.emit(true)
   }
 }

@@ -1,8 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap } from "../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "../services/stateStore.service";
 import { Observable } from "rxjs";
-import { map, distinctUntilChanged } from "rxjs/operators";
+import { map, distinctUntilChanged, filter } from "rxjs/operators";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { ModalUnit } from "./modalUnit/modalUnit.component";
+import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
+import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 
 declare var window
 
@@ -14,18 +18,28 @@ export class AtlasViewerAPIServices{
 
   private loadedTemplates$ : Observable<any>
   private selectParcellation$ : Observable<any>
+  private selectTemplate$ : Observable<any>
+  private darktheme : boolean
   public interactiveViewer : InteractiveViewerInterface
 
   public loadedLibraries : Map<string,{counter:number,src:HTMLElement|null}> = new Map()
 
   constructor(
-    private store : Store<ViewerStateInterface>
+    private store : Store<ViewerStateInterface>,
+    private modalService: BsModalService
   ){
 
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
       safeFilter('fetchedTemplates'),
       map(state=>state.fetchedTemplates)
+    )
+
+    this.selectTemplate$ = this.store.pipe(
+      select('viewerState'),
+      filter(state => isDefined(state) && isDefined(state.templateSelected)),
+      map(state => state.templateSelected),
+      distinctUntilChanged((t1, t2) => t1.name === t2.name)
     )
 
     this.selectParcellation$ = this.store.pipe(
@@ -63,7 +77,37 @@ export class AtlasViewerAPIServices{
           map(state=>state.fetchedDataEntries)
         )
       },
-      uiHandle : {},
+      uiHandle : {
+        getModalHandler : () => {
+          const handler = new ModalHandler()
+          let modalRef
+          handler.show = () => {
+            modalRef = this.modalService.show(ModalUnit, {
+              initialState : {
+                title : handler.title,
+                body : handler.body
+                  ? handler.body
+                  : 'handler.body has yet been defined ...',
+                footer : handler.footer
+              },
+              class : this.darktheme ? 'darktheme' : 'not-darktheme',
+              backdrop : handler.dismissable ? true : 'static',
+              keyboard : handler.dismissable
+            })
+          }
+          handler.hide = () => {
+            if(modalRef){
+              modalRef.hide()
+              modalRef = null
+            }
+          }
+          return handler
+        },
+        /* to be overwritten by atlasViewer.component.ts */
+        getToastHandler : () => {
+          throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
+        }
+      },
       pluginControl : {
         loadExternalLibraries : ()=>Promise.reject('load External Library method not over written')
         ,
@@ -79,6 +123,7 @@ export class AtlasViewerAPIServices{
   private init(){
     this.loadedTemplates$.subscribe(templates=>this.interactiveViewer.metadata.loadedTemplates = templates)
     this.selectParcellation$.subscribe(parcellation => this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions))
+    this.selectTemplate$.subscribe(template => this.darktheme = template.useTheme === 'dark')
   }
 }
 
@@ -113,7 +158,8 @@ export interface InteractiveViewerInterface{
   }
 
   uiHandle : {
-    
+    getModalHandler : () => ModalHandler
+    getToastHandler : () => ToastHandler
   }
 
   pluginControl : {
@@ -122,6 +168,7 @@ export interface InteractiveViewerInterface{
     [key:string] : any
   }
 }
+
 
 export interface NGLayerObj{
 
