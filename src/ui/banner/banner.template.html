@@ -43,7 +43,7 @@
 </div>
 
 <ng-template #searchRegionTemplate>
-  <div hideScrollbarContainer>
+  <div [@showState] hideScrollbarContainer>
     <div treeContainer>
       <div treeHeader>
         <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 

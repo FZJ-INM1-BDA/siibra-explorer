@@ -43,7 +43,7 @@
     </div>
     <vue-autocomplete
       ref = "roi1"
-      @selectslice = "roi1 = $event"
+      @selectslice = "roi1 = $event;findNewInput()"
       class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
       :rawarray = "regions"
       :placeholder = "placeholderTextRoi1">
@@ -56,7 +56,7 @@
     </div>
     <vue-autocomplete
       ref = "roi2"
-      @selectslice = "roi2 = $event"
+      @selectslice = "roi2 = $event;findNewInput()"
       class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
       :rawarray = "regions"
       :placeholder = "placeholderTextRoi2">

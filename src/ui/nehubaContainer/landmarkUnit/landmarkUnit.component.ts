@@ -18,9 +18,14 @@ export class LandmarkUnit implements OnChanges{
   @Input() highlight : boolean = false
   @Input() flatProjection : boolean = false
 
+  @Input() glyphiconClass : string = 'glyphicon-map-marker'
+
   @HostBinding('style.transform')
   transform : string = `translate(${this.positionX}px, ${this.positionY}px)`
 
+  get className() {
+    return `glyphicon ${this.glyphiconClass}`
+  }
   styleNode(){
     return({
       'color' : `rgb(${this.highlight ? HOVER_COLOR : NORMAL_COLOR})`,

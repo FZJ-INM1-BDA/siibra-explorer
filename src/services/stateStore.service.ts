@@ -1,11 +1,13 @@
 import { Action } from '@ngrx/store'
 import { filter } from 'rxjs/operators';
+import { UserLandmark } from '../atlasViewer/atlasViewer.apiService.service';
 
 export const NEWVIEWER = 'NEWVIEWER'
 
 export const FETCHED_TEMPLATES = 'FETCHED_TEMPLATES'
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 export const SELECT_REGIONS = `SELECT_REGIONS`
+export const USER_LANDMARKS = `USER_LANDMARKS`
 
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 
@@ -36,6 +38,8 @@ export interface ViewerStateInterface{
   parcellationSelected : any | null
   regionsSelected : any[]
 
+  userLandmarks : UserLandmark[]
+
   navigation : any | null
 }
 
@@ -46,6 +50,8 @@ export interface AtlasAction extends Action{
   selectParcellation? : any
   selectRegions? : any[]
   dedicatedView? : string 
+
+  landmarks : UserLandmark[]
 
   navigation? : any
 }
@@ -133,6 +139,11 @@ export function viewerState(state:ViewerStateInterface,action:AtlasAction){
         regionsSelected : action.selectRegions.map(region=>Object.assign({},region,{
           labelIndex : Number(region.labelIndex)
         }))
+      })
+    }
+    case USER_LANDMARKS : {
+      return Object.assign({}, state, {
+        userLandmarks : action.landmarks
       })
     }
     default :

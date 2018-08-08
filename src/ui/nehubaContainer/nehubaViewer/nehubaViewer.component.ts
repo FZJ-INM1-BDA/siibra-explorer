@@ -138,8 +138,42 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
             layerObj[key] == l[key])
   }
 
+  public addUserLandmarks(landmarks:any[]){
+    if(!this.nehubaViewer)
+      return
+    const _ = {}
+    landmarks.forEach(lm => {
+      _[`user-${lm.id}`] = {
+        type : 'mesh',
+        source : `vtk://${ICOSAHEDRON_VTK_URL}`,
+        transform : [
+          [2 ,0 ,0 , lm.position[0]*1e6],
+          [0 ,2 ,0 , lm.position[1]*1e6],
+          [0 ,0 ,2 , lm.position[2]*1e6],
+          [0 ,0 ,0 , 1 ],
+        ],
+        shader : FRAGMENT_MAIN_WHITE
+      }
+    })
 
-  public add3DLandmarks(poss:[number,number,number][],scale?:number,type?:'icosahedron'){
+    this.loadLayer(_)
+  }
+
+  public removeUserLandmarks(){
+    if(!this.nehubaViewer)
+      return
+    this.removeLayer({
+      name : /^user\-/
+    })
+  }
+
+  public removeSpatialSearch3DLandmarks(){
+    this.removeLayer({
+      name : /vtk-[0-9]/
+    })
+  }
+
+  public addSpatialSearch3DLandmarks(poss:[number,number,number][],scale?:number,type?:'icosahedron'){
     const _ = {}
     poss.forEach((pos,idx)=>{
 
@@ -164,12 +198,6 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     viewer.layerManager.managedLayers
       .filter(l=>this.filterLayers(l,condition))
       .map(layer=>layer.setVisible(visible))
-  }
-
-  public remove3DLandmarks(){
-    this.removeLayer({
-      name : /vtk-[0-9]/
-    })
   }
 
   public removeLayer(layerObj:any){

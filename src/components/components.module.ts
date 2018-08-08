@@ -2,8 +2,6 @@ import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
-import { BsDropdownModule }  from 'ngx-bootstrap/dropdown';
-
 import {  MarkdownDom } from './markdown/markdown.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
@@ -25,7 +23,6 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     BrowserModule,
     FormsModule,
     BrowserAnimationsModule,
-    BsDropdownModule.forRoot(),
   ],
   declarations : [
     /* components */

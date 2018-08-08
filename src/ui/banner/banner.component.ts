@@ -4,12 +4,16 @@ import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx,
 import { Observable, Subscription, merge, Subject } from "rxjs";
 import { map, filter, debounceTime, buffer } from "rxjs/operators";
 import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
+import { regionAnimation } from "./regionPopover.animation";
 
 @Component({
   selector : 'atlas-banner',
   templateUrl : './banner.template.html',
   styleUrls : [
     `./banner.style.css`
+  ],
+  animations:[
+    regionAnimation
   ],
   changeDetection : ChangeDetectionStrategy.OnPush
 })

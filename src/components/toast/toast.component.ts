@@ -1,10 +1,13 @@
-import { Component, Input, ViewContainerRef, ViewChild, Output, EventEmitter } from "@angular/core";
-
+import { Component, Input, ViewContainerRef, ViewChild, Output, EventEmitter, HostBinding } from "@angular/core";
+import { toastAnimation } from "./toast.animation";
 
 @Component({
   selector : 'toast',
   templateUrl : './toast.template.html',
-  styleUrls : ['./toast.style.css']
+  styleUrls : ['./toast.style.css'],
+  animations : [
+    toastAnimation
+  ]
 })
 
 export class ToastComponent{
@@ -15,6 +18,9 @@ export class ToastComponent{
   @Output() dismissed : EventEmitter<boolean> = new EventEmitter()
 
   private timeoutId : number
+
+  @HostBinding('@exists')
+  exists : boolean = true
 
   @ViewChild('messageContainer',{read:ViewContainerRef}) messageContainer : ViewContainerRef
   constructor(){

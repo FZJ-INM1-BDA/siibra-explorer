@@ -1,4 +1,4 @@
-div[dropdown]
+div[dropdowncontainer]
 {
   position:relative;
 }
@@ -7,6 +7,7 @@ ul.dropdown-menu
 {
   width:100%;
   overflow-x:hidden;
+  display:inline-block;
 }
 
 ul.dropdown-menu,span.dropdown-item

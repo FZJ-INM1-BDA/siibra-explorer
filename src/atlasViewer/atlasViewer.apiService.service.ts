@@ -153,6 +153,9 @@ export interface InteractiveViewerInterface{
     removeLayer : (condition:{name : string | RegExp})=>string[]
     setLayerVisibility : (condition:{name : string|RegExp},visible:boolean)=>void
 
+    add3DLandmarks : (landmarks: UserLandmark[]) => void
+    remove3DLandmarks : (ids:string[]) => void
+
     mouseEvent : Observable<{eventName:string,event:MouseEvent}>
     mouseOverNehuba : Observable<{labelIndex : number, foundRegion : any | null}>
   }
@@ -169,6 +172,11 @@ export interface InteractiveViewerInterface{
   }
 }
 
+export interface UserLandmark{
+  position : [number, number, number]
+  id : string /* probably use the it to track and remove user landmarks */
+  highlight : boolean
+}
 
 export interface NGLayerObj{
 

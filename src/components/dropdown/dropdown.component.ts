@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from "@angular/core";
+import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { dropdownAnimation } from "./dropdown.animation";
 
 @Component({
@@ -39,8 +39,16 @@ export class DropdownComponent{
 
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
 
-  open : boolean = false
-  isOpenChange(event:any){
-    console.log(event)
+  @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef
+
+  openState : boolean = false
+
+  @HostListener('document:click',['$event'])
+  close(event:MouseEvent){
+    const contains = this.dropdownToggle.nativeElement.contains(event.srcElement)
+    if(contains)
+      this.openState = !this.openState
+    else
+      this.openState = false;
   }
 }

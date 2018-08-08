@@ -57,13 +57,13 @@ layout-floating-container
 
 div[toastContainer]
 {
+  pointer-events: none;
   position : absolute;
   bottom: 1.7em;
-  height: 0px;
   width : 100%;
 
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 
 div[toastContainer] > *

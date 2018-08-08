@@ -1,10 +1,10 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, AfterViewInit } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
-import { AtlasViewerAPIServices } from "../../atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 
 @Component({
@@ -32,11 +32,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private selectedRegions$ : Observable<any[]>
   private dedicatedView$ : Observable<string|null>
   private fetchedSpatialDatasets$ : Observable<any[]>
+  private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
   public onHoverSegment$ : Observable<any>
 
   private navigationChanges$ : Observable<any>
-  public spatialResultsVisible$ : Observable<number>
+  public spatialResultsVisible$ : Observable<boolean>
+  private spatialResultsVisible : boolean = false
 
   private selectedTemplate : any | null
   private selectedRegionIndexSet : Set<number> = new Set()
@@ -45,12 +47,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
   private regionsLabelIndexMap : Map<number,any> = new Map()
-
+  
+  private userLandmarks : UserLandmark[] = []
+  
   private subscriptions : Subscription[] = []
   private nehubaViewerSubscriptions : Subscription[] = []
 
   public nanometersToOffsetPixelsFn : Function[] = []
 
+  public combinedSpatialData$ : Observable<any[]>
 
   constructor(
     private apiService :AtlasViewerAPIServices,
@@ -66,7 +71,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
         !isDefined(this.selectedTemplate) || 
         state.templateSelected.name !== this.selectedTemplate.name)
     )
-    
+
     this.loadedParcellation$ = this.store.pipe(
       select('viewerState'),
       safeFilter('parcellationSelected'),
@@ -107,6 +112,14 @@ export class NehubaContainer implements OnInit, OnDestroy{
           true :
         true),
       distinctUntilChanged()
+    )
+
+    this.userLandmarks$ = this.store.pipe(
+      select('viewerState'),
+      // filter(state => isDefined(state) && isDefined(state.userLandmarks)),
+      map(state => isDefined(state) && isDefined(state.userLandmarks)
+        ? state.userLandmarks
+        : [])
     )
 
     const segmentsUnchangedChanged = (s1,s2)=>
@@ -171,6 +184,20 @@ export class NehubaContainer implements OnInit, OnDestroy{
     ).subscribe((events)=>{
       [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
     })
+
+    this.combinedSpatialData$ = combineLatest(
+      combineLatest(
+        this.fetchedSpatialDatasets$,
+        this.spatialResultsVisible$
+      )
+      .pipe(
+        map(([datas,visible, ...rest]) => visible ? datas : []),
+        map(arr => arr.map(v => Object.assign({}, v, {type : 'spatialSearchLandmark'})))
+      ),
+      this.userLandmarks$.pipe(
+        map(arr => arr.map(v => Object.assign({}, v, {type : 'userLandmark'})))
+      )
+    ).pipe(map(arr => arr[0].concat(arr[1])))
   }
 
   ngOnInit(){
@@ -182,12 +209,25 @@ export class NehubaContainer implements OnInit, OnDestroy{
       ).subscribe(([fetchedSpatialData,visible])=>{
 
         this.fetchedSpatialData = fetchedSpatialData
-        this.nehubaViewer.remove3DLandmarks()
+        this.nehubaViewer.removeSpatialSearch3DLandmarks()
 
         if(visible)
-          this.nehubaViewer.add3DLandmarks(this.fetchedSpatialData.map((data:any)=>data.position))
-          
+          this.nehubaViewer.addSpatialSearch3DLandmarks(this.fetchedSpatialData.map((data:any)=>data.position))
       })
+    )
+
+    this.subscriptions.push(
+      this.userLandmarks$.subscribe(landmarks => {
+        this.userLandmarks = landmarks
+        if(this.nehubaViewer){
+          this.nehubaViewer.removeUserLandmarks()
+          this.nehubaViewer.addUserLandmarks(landmarks)
+        }
+      })
+    )
+    
+    this.subscriptions.push(
+      this.spatialResultsVisible$.subscribe(visible => this.spatialResultsVisible = visible)
     )
 
     /* order of subscription will determine the order of execution */
@@ -260,6 +300,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
         [0,0,0]
     return pos
   }
+
+  // get combinedSpatialData$(){
+  //   return (this.fetchedSpatialData
+  //     .filter(() => this.spatialResultsVisible)
+  //     .map(v => Object.assign({}, v, {type: 'spatial'})) as any[])
+  //     .concat(this.userLandmarks.map(v => Object.assign({}, v, {type: 'user'})))
+  // }
 
   getPositionX(quadrant:number,data:any){
     return this.returnTruePos(quadrant,data)[0]
@@ -379,6 +426,24 @@ export class NehubaContainer implements OnInit, OnDestroy{
             type : SELECT_REGIONS,
             selectRegions :  [labelIndex, ...this.selectedRegionIndexSet]
           })
+      },
+      add3DLandmarks : landmarks => {
+        if(!landmarks.every(l => isDefined(l.id)))
+          throw new Error('every landmarks needs to be identified with the id field')
+        if(!landmarks.every(l=> isDefined(l.position)))
+          throw new Error('every landmarks needs to have position defined')
+        if(!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3))
+          throw new Error('position needs to be a length 3 tuple of numbers ')
+        this.store.dispatch({
+          type: USER_LANDMARKS,
+          landmarks : landmarks
+        })
+      },
+      remove3DLandmarks : ids => {
+        this.store.dispatch({
+          type : USER_LANDMARKS,
+          landmarks : this.userLandmarks.filter(l => ids.findIndex(id => id === l.id) < 0)
+        })
       },
       hideSegment : (labelIndex) => {
         if(this.selectedRegionIndexSet.has(labelIndex)){

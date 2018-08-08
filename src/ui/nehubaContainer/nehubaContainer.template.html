@@ -8,14 +8,14 @@
 
   <div>
     <layout-floating-container  
-      *ngIf = "spatialResultsVisible$ | async"
       pos00 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of fetchedSpatialData"
+        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
         (mouseenter) = "handleMouseEnterLandmark(spatialData)"
         (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
         [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
         [positionX] = "getPositionX(0,spatialData)"
         [positionY] = "getPositionY(0,spatialData)"
         [positionZ] = "getPositionZ(0,spatialData)">
@@ -24,14 +24,14 @@
   </div>
   <div>
     <layout-floating-container  
-      *ngIf = "spatialResultsVisible$ | async"
       pos01 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of fetchedSpatialData"
+        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
         (mouseenter) = "handleMouseEnterLandmark(spatialData)"
         (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
         [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
         [positionX] = "getPositionX(1,spatialData)"
         [positionY] = "getPositionY(1,spatialData)"
         [positionZ] = "getPositionZ(1,spatialData)">
@@ -40,14 +40,14 @@
   </div>
   <div>
     <layout-floating-container  
-      *ngIf = "spatialResultsVisible$ | async"
       pos10 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of fetchedSpatialData"
+        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
         (mouseenter) = "handleMouseEnterLandmark(spatialData)"
         (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
         [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
         [positionX] = "getPositionX(2,spatialData)"
         [positionY] = "getPositionY(2,spatialData)"
         [positionZ] = "getPositionZ(2,spatialData)">

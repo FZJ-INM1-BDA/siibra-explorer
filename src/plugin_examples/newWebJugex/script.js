@@ -3,7 +3,21 @@
   const handler = interactiveViewer.uiHandle.getToastHandler()
   handler.message = 'hohoho'
   handler.dismissable = true
+  handler.timeout = 0
   handler.show()
+
+  const handler2 = interactiveViewer.uiHandle.getToastHandler()
+  handler2.message = `hohoho2<a href = "alert('oh no')">test</a>`
+  handler2.dismissable = true
+  handler2.timeout = 0
+  setTimeout(()=>{
+    handler2.show()
+  },5000)
+
+  interactiveViewer.viewerHandle.add3DLandmarks([{
+    id : 'jugex-test1',
+    position : [0,0,0]
+  }])
 
   const backendRoot = `http://medpc055.ime.kfa-juelich.de:8005`
   const srcRoot = 'http://localhost:10080/newWebJugex'
@@ -12,6 +26,8 @@
   const onshutdownCB = []
   const loadedExternalLibraries = []
   const subscriptions = []
+
+  onshutdownCB.push(() => subscriptions.forEach(s => s.unsubscribe()))
 
   const loadExternalJsLibrary = (url) => new Promise((resolve,reject) => {
     const el = document.createElement('script')
@@ -77,6 +93,13 @@
           nPermutations:1000
         },
         methods: {
+          findNewInput: function(){
+            if(this.roi1 === '')
+              return this.$refs.roi1.$refs.input.focus()
+            if(this.roi2 === '')
+              return this.$refs.roi2.$refs.input.focus()
+            return this.$refs.genelist.$refs.input.focus()
+          },
           removeGene: function (gene) {
             this.chosengenes = this.chosengenes.filter(g => g !== gene)
           },
@@ -208,24 +231,25 @@
         },
         mounted: function () {
           console.log(this.querydata)
-          // fetch(`${backendRoot}/jugex`,{
-          //   method: 'POST',
-          //   headers: {
-          //     'Content-Type': 'application/json'
-          //   },
-          //   body: JSON.stringify(this.querydata)
-          // })
-          //   .then(res=>res.json())
-          //   .then(json => {
-          //     this.status = true
-          //     const rjson = jugexResponseParser(json)
-          //     this.pvaldata = rjson.pval
-          //     this.coorddata = rjson.coord
-          //   })
-          //   .catch(e => {
-          //     this.status = true
-          //     this.error = JSON.stringify(e)
-          //   })
+          const data = Object.assign({}, this.querydata, {threshold:0.2,mode:false})
+          fetch(`${backendRoot}/jugex`,{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+            .then(res=>res.json())
+            .then(json => {
+              this.status = true
+              const rjson = jugexResponseParser(json)
+              this.pvaldata = rjson.pval
+              this.coorddata = rjson.coord
+            })
+            .catch(e => {
+              this.status = true
+              this.error = JSON.stringify(e)
+            })
         }
       })
 

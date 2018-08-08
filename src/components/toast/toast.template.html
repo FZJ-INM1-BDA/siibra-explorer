@@ -4,7 +4,7 @@
 
     </ng-template>
   </div>
-  <div *ngIf = "message">
+  <div message *ngIf = "message">
     {{ message }}
   </div>
   <div (click) = "dismiss($event)" *ngIf = "dismissable" close>

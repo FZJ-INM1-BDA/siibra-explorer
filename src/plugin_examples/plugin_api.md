@@ -82,7 +82,29 @@ window.interactiveViewer
   ['PMap 001','PMap 002']
   */
   ```
-  - *setLayerVisibility(layerObject,visible)* Function that sets the visibility of a layer. Returns the names of all the layers that are affected as an Array of string.
+  - *add3DLandmarks(landmarks)* adds landmarks to both the perspective view and slice view. 
+
+  ```js
+  const landmarks = [{
+    id : `fzj-xg-jugex-1`,
+    position : [0,0,0]
+  },{
+    id : `fzj-xg-jugex-2`,
+    position : [22,27,-1]
+  }]
+  window.interactiveViewer.viewerHandle.add3DLandmarks(landmarks)
+
+  /* adds landmarks in perspective view and slice view */
+  ```
+
+  - *remove3DLandmarks(IDs)* removes the landmarks by their IDs
+  ```js
+  window.interactiveViewer.viewerHandle
+    .remove3DLandmarks(['fzj-xg-jugex-1', 'fzj-xg-jugex-1'])
+  /* removes the landmarks added above */
+  ```
+
+  - *setLayerVisibility(layerObject, visible)* Function that sets the visibility of a layer. Returns the names of all the layers that are affected as an Array of string.
 
   ```js
   const obj = {

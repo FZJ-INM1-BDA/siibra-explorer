@@ -1,25 +1,33 @@
 :host
 {
-  pointer-events: all;
-  width:100%;
-  display:flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+  pointer-events: none;
+  text-align:center;
+  margin-bottom:5px;
+  height:2em;
 }
 
 div[container]
 {
-  background-color: rgba(240,240,240,0.8);
-  color : rgba(10,10,10,0.8);
-  display : flex;
+  display : inline-block;
   align-items: center;
+  padding : 0.3em 1em;
+  pointer-events: all;
+}
+
+:host-context([darktheme="false"]) div[container]
+{
+  background-color:rgba(240,240,240,0.8);
+  box-shadow: 0 6px 6px -2px rgba(10,10,10,0.2);
 }
 
 :host-context([darktheme="true"]) div[container]
 {
   background-color: rgba(50,50,50,0.8);
   color : rgba(255,255,255,0.8);
-  padding : 0.3em 1em;
 }
 
+div[message],
+div[close]
+{
+  display:inline-block;
+}
