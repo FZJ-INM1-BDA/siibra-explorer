@@ -122,18 +122,23 @@ window.interactiveViewer
 
 - uiHandle
 
-  - modalControl
+  - *getModalHandler()* returns a modalHandler object, which has the following methods/properties:
 
-    - *getModalHandler()* returns a modalHandlerObject, which has the following methods/properties:
+    - *hide()* : Dynamically hides the modal
+    - *show()* : Shows the modal
+    - title : title of the modal (String)
+    - body : body of the modal shown (String)
+    - footer : footer of the modal (String)
+    - dismissable : whether the modal is dismissable on click backdrop/esc key (Boolean) *n.b. if true, users will not be able to interact with the viewer unless you specifically call `handler.hide()`*
 
-      - *hide()* : Dynamically hides the modal
-      - *show()* : Shows the modal
-      - title : title of the modal (String)
-      - body : body of the modal shown (String)
-      - footer : footer of the modal (String)
-      - dismissable : whether the modal is dismissable on click backdrop/esc key (Boolean) *n.b. if true, users will not be able to interact with the viewer unless you specifically call `handler.hide()`*
+  - *getToastHandler()* returns a toastHandler objectm, which has the following methods/properties:
 
-  - toastControl
+    - *show()* : Show the toast
+    - *hide()* : Dynamically hides the toast
+    - message : message on the toast
+    - dismissable : allow user dismiss the toast via x 
+    - timeout : auto hide (in ms). set to 0 for not auto hide.
+
 - pluginControl
 
   - *loadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* Function that loads external libraries. Pass the name of the libraries as an Array of string, and returns a Promise. When promise resolves, the libraries are loaded. **n.b.** while unlikely, there is a possibility that multiple requests to load external libraries in quick succession can cause the promise to resolve before the library is actually loaded. 
@@ -142,7 +147,7 @@ window.interactiveViewer
   const currentlySupportedLibraries = ['jquery@2','jquery@3','webcomponentsLite@1.1.0','react@16','reactdom@16','vue@2.5.16']
 
   window.interactivewViewer.loadExternalLibraries(currentlySupportedLibraries)
-    .then(()=>{
+    .then(() => {
       /* loaded */
     })
     .catch(e=>console.warn(e))

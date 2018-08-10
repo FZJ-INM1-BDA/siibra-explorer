@@ -103,6 +103,7 @@ export class AtlasViewerAPIServices{
           }
           return handler
         },
+        
         /* to be overwritten by atlasViewer.component.ts */
         getToastHandler : () => {
           throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
