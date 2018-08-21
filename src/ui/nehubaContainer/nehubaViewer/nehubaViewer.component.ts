@@ -86,7 +86,10 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   ngAfterViewInit(){
     this.nehubaViewer = export_nehuba.createNehubaViewer(this.config,(err)=>{
       /* print in debug mode */
-    })
+    });
+
+    // console.log(export_nehuba)
+    (<any>window).quat = export_nehuba.quat
     
     if(this.regionsLabelIndexMap){
       const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
@@ -400,7 +403,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
             ]))
           
         ]
-      ).map(val=>([val[0],this.getRgb(val[0],val[1].rgb)])) as any)
+      ).map((val:[number,any])=>([val[0],this.getRgb(val[0],val[1].rgb)])) as any)
 
     /* load colour maps */
     this.nehubaViewer.batchAddAndUpdateSegmentColors(

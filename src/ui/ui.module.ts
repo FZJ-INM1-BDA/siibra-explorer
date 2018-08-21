@@ -25,6 +25,9 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { AtlasBanner } from "./banner/banner.component";
 import { PopoverModule } from "ngx-bootstrap/popover";
+import { CitationsContainer } from "./citation/citations.component";
+import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
+import { TooltipModule } from "ngx-bootstrap/tooltip";
 
 
 @NgModule({
@@ -35,7 +38,8 @@ import { PopoverModule } from "ngx-bootstrap/popover";
     LayoutModule,
     ComponentsModule,
 
-    PopoverModule.forRoot(),
+    TooltipModule.forRoot(),
+    PopoverModule.forRoot()
   ],
   declarations : [
     NehubaContainer,
@@ -49,6 +53,8 @@ import { PopoverModule } from "ngx-bootstrap/popover";
     LandmarkUnit,
     AtlasBanner,
     PluginBannerUI,
+    CitationsContainer,
+    LayerBrowser,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -68,11 +74,13 @@ import { PopoverModule } from "ngx-bootstrap/popover";
     DataBrowserUI
   ],
   exports : [
+    CitationsContainer,
     AtlasBanner,
     PluginBannerUI,
     NehubaContainer,
     NehubaViewerUnit,
     DataBrowserUI,
+    LayerBrowser,
     FileViewer
   ]
 })

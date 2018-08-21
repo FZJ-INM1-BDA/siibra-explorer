@@ -193,6 +193,9 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   }
 
   toggleSpatialDataVisible(){
+    /* disabling spatial data for now */
+    return
+    //@ts-ignore
     this.store.dispatch({
       type : UPDATE_SPATIAL_DATA_VISIBLE,
       visible : !this._spatialDataVisible
@@ -224,7 +227,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   }
 
   handleDebouncedNavigation(navigation:any){
-    if(!isDefined(navigation.position))
+    if(!isDefined(navigation.position)||!this._spatialDataVisible)
       return
     const center = navigation.position.map(n=>n/1e6)
     const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
@@ -272,13 +275,14 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     dedicatedView : dedicatedViewString
   })
 
-  handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent}){
+  handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent},searchResult:any){
+    
+    const { properties } = searchResult
     obj.node.childrenExpanded = !obj.node.childrenExpanded
 
     if(obj.inputItem.mimetype){
-
       const component = this.fileViewerComponentFactory.create(this.injector)
-      component.instance.searchResultFile = obj.inputItem
+      component.instance.searchResultFile = Object.assign({}, obj.inputItem, { datasetProperties : properties })
       this.widgetServices.addNewWidget(component,{title:obj.inputItem.name,exitable:true,state:'floating'})
     }else{
       console.warn('the selected file has no mimetype defined')
@@ -287,7 +291,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
   get databrowserHeaderText() : string{
     return this.selectedRegions.length === 0 ?
-      `No regions selected. Listing all datasets grouped by associated regions.` :
+      `No regions selected.` :
       `${this.selectedRegions.length} region${this.selectedRegions.length > 1 ? 's' : ''} selected.`
   }
 

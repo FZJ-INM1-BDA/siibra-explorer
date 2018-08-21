@@ -3,7 +3,7 @@ import { panelAnimations } from "./panel.animation";
 import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 @Component({
-  selector : 'panel',
+  selector : 'panel-component',
   templateUrl : './panel.template.html',
   styleUrls : [
     `./panel.style.css`

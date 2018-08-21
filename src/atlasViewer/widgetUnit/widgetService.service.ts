@@ -1,4 +1,4 @@
-import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver } from "@angular/core";
+import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver, Injector } from "@angular/core";
 
 import { WidgetUnit } from "./widgetUnit.component";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
@@ -22,7 +22,8 @@ export class WidgetServices{
 
   constructor(
     private cfr:ComponentFactoryResolver,
-    private constantServce:AtlasViewerConstantsServices
+    private constantServce:AtlasViewerConstantsServices,
+    private injector : Injector
     ){
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
   }
@@ -39,12 +40,18 @@ export class WidgetServices{
   }
 
   addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
+    const component = this.widgetUnitFactory.create(this.injector)
     const _option = getOption(options)
-    const component = _option.state === 'floating' ? 
-      this.floatingContainer.createComponent(this.widgetUnitFactory) :
-      _option.state === 'docked' ? 
-        this.dockedContainer.createComponent(this.widgetUnitFactory) :
-        Error('option.state has to be either floating or docked')
+    _option.state === 'floating'
+      ? this.floatingContainer.insert(component.hostView)
+      : _option.state === 'docked'
+        ? this.dockedContainer.insert(component.hostView)
+        : this.floatingContainer.insert(component.hostView)
+    // const component = _option.state === 'floating' ? 
+    //   this.floatingContainer.createComponent(this.widgetUnitFactory) :
+    //   _option.state === 'docked' ? 
+    //     this.dockedContainer.createComponent(this.widgetUnitFactory) :
+    //     Error('option.state has to be either floating or docked')
 
     if(component.constructor === Error){
       throw component

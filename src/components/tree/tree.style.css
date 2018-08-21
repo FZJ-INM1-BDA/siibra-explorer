@@ -1,4 +1,4 @@
-tree
+tree-component
 {
   display:block;
   margin-left:1em;
@@ -31,7 +31,7 @@ div[itemContainer] > span[itemName]:hover
 
 /* dashed guiding line */
 
-tree:not(:last-child) > div[itemMasterContainer]:before
+tree-component:not(:last-child) > div[itemMasterContainer]:before
 {
   
   pointer-events: none;
@@ -43,13 +43,13 @@ tree:not(:last-child) > div[itemMasterContainer]:before
   border-left: rgba(255,255,255,1) 1px dashed;
 }
 
-tree:not(:last-child) div[itemMasterContainer] > [itemContainer]
+tree-component:not(:last-child) div[itemMasterContainer] > [itemContainer]
 {
   position:relative;
 }
 
 
-tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+tree-component:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
 {
   pointer-events: none;
   content : '';
@@ -61,12 +61,12 @@ tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
   z-index: 0;
 }
 
-tree:last-child div[itemMasterContainer] > [itemContainer]
+tree-component:last-child div[itemMasterContainer] > [itemContainer]
 {
   position:relative;
 }
 
-tree:last-child div[itemMasterContainer] > [itemContainer]:before
+tree-component:last-child div[itemMasterContainer] > [itemContainer]:before
 {
   pointer-events: none;
   content : '';
@@ -78,17 +78,17 @@ tree:last-child div[itemMasterContainer] > [itemContainer]:before
   z-index: 0;
 }
 
-tree:not(:last-child) div[itemMasterContainer]:before
+tree-component:not(:last-child) div[itemMasterContainer]:before
 {
   border-left: rgba(128,128,128,0.6) 1px dashed;
 }
 
-tree:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
+tree-component:not(:last-child) div[itemMasterContainer] > [itemContainer]:before
 {
   border-bottom: rgba(128,128,128,0.6) 1px dashed;
 }
 
-tree div[itemMasterContainer]:last-child > [itemContainer]:before
+tree-component div[itemMasterContainer]:last-child > [itemContainer]:before
 {
   border-bottom: rgba(128,128,128,0.6) 1px dashed;
   border-left : rgba(128,128,128,0.6) 1px dashed;

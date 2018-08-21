@@ -23,6 +23,7 @@ import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathNam
 import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
+import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
 
 @NgModule({
   imports : [
@@ -61,6 +62,7 @@ import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
     GetNamePipe,
     GetFilenameFromPathnamePipe,
     FilterNameBySearch,
+    NewViewerDisctinctViewToLayer
   ],
   entryComponents : [
     WidgetUnit,

@@ -67,16 +67,11 @@
   <div statusCard>
 
     <!-- perhaps use a dedicated publication card next time (?) -->
-    <div
+    <citations
+      [properties] = "selectedTemplate.properties"
       *ngIf = "showCitation"
       citationContainer>
-      <a
-        *ngFor = "let publication of selectedTemplate.properties.publications" 
-        href = "{{ publication.doi }}" 
-        class = "btn btn-link">
-        {{ publication.citation }}
-      </a>
-    </div>
+    </citations>
 
     <hr 
       *ngIf = "showCitation" />

@@ -1,0 +1,14 @@
+<div 
+  citationContainer
+  *ngFor = "let publication of properties.publications">
+  <a
+    target = "_blank"
+    [href] = "publication.doi"
+    *ngIf="publication.doi && publication.doi !== 'undefined'">
+    {{ publication.citation }}
+  </a> 
+  <span
+    *ngIf="(!publication.doi) || publication.doi === 'undefined'">
+    {{ publication.citation }}
+  </span>
+</div>

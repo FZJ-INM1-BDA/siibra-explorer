@@ -48,7 +48,7 @@ div[heading][displayflex]
 div[databrowserheader]
 {
   padding : 0.5em 1.0em;
-  background-color:rgba(128,128,128,0.2);
+  background-color:rgba(128,128,128,0.05);
 }
 
 div[databrowserheader] > *
@@ -58,14 +58,35 @@ div[databrowserheader] > *
   border : 0 ;
 }
 
+div[databrowserheader]
+{
+  white-space: nowrap;
+}
+
 div[filterBlock]
 {
   padding : 0.5em 1em;
 }
 
+div[filterBlock] > *
+{
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 div.clickable:hover
 {
   color:#dbb556;
+  cursor:default;
+}
+
+div.unclickable
+{
+  color:rgba(128,128,128,0.8);
+}
+
+div.unclickable:hover
+{
   cursor:default;
 }
 
@@ -80,4 +101,17 @@ div[spatialSearchCell]
   padding: 0.3em 1em;
   overflow:hidden;
   white-space: nowrap;
+}
+
+div[noSelectedRegion]
+{
+  padding: 1em 1em;
+  font-size:2em;
+  color: rgba(128,128,128,0.5);
+  max-height: 4em;
+}
+
+:host-context([darktheme="true"]) div[noSelectedRegion]
+{
+  background-color: rgba(0,0,0,0.2);
 }

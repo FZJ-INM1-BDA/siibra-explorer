@@ -6,7 +6,7 @@ import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 
 @Component({
-  selector : 'tree',
+  selector : 'tree-component',
   templateUrl : './tree.template.html',
   styleUrls : [
     './tree.style.css'

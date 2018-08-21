@@ -31,6 +31,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   }
 
   ngOnInit(){
+    console.log('ng onchanges',this.searchResultFile)
     this.createUrls()
   }
   ngOnChanges(){

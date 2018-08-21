@@ -1,6 +1,9 @@
+
 <div *ngIf = "meetsRequirement" class = "atlas-container">
 
   <layout-mainside
+    [showSide] = "false"
+    [overlay] = "false"
     (panelAnimationFlag) = "panelAnimationFlag($event)"
     (panelShowStateChanged) = "manualPanelToggle($event)">
     <div maincontent>
@@ -11,10 +14,79 @@
       </atlas-banner>
 
     </div>
-    <div sidecontent>
-      <ng-template #dockedContainer>
+    <div [ngSwitch] = "sidePanelView$ | async" sidecontent>
 
+      <!-- Data Browser -->
+      <div *ngSwitchCase = "'dataBrowser'">
+        <panel-component [bodyCollapsable] = "true">
+          <div heading>
+            Data Browser
+          </div>
+          <div body>
+            <data-browser>
+            </data-browser>
+          </div>
+        </panel-component>
+      </div>
+
+
+      <!-- Layer Browser -->
+      <div *ngSwitchCase = "'ngLayer'">
+        <panel-component [bodyCollapsable] = "true">
+          <div heading>
+            Layer Browser
+          </div>
+          <div body>
+            <layer-browser [layers] = "layersLoaded$ | async | newViewerDisctinctViewToLayer"></layer-browser>
+          </div>
+        </panel-component>
+      </div>
+
+      <!-- Tools Browser-->
+      <div *ngSwitchCase = "'toolsBrowser'">
+        <panel-component [bodyCollapsable] = "true">
+          <div heading>
+            Tools Browser
+          </div>
+          <div body>
+              
+          </div>
+        </panel-component>
+      </div>
+
+      <!-- Default (shown at the beginning + sliver of time during closing of side bar)-->
+      <div *ngSwitchDefault>
+        
+      </div>
+      
+      <!-- Docked Container-->
+      <ng-template #dockedContainer>
       </ng-template>
+    </div>
+
+    <div resizeSliver>
+
+      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" (click) = "toggleSidePanel('dataBrowser')" hoverable class = "tabContainer">
+        <span  [@newEvent] = "selectedRegions$ | async" class = "highlightContainer">
+        </span>
+        <i class = "glyphicon glyphicon-search"></i>
+        <span class = "badge" *ngIf = "(selectedRegions$ | async) && (selectedRegions$ | async).length > 0">
+          {{ (selectedRegions$ | async).length }}
+        </span>
+      </span>
+
+      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" (click) = "toggleSidePanel('ngLayer')" hoverable class = "tabContainer">
+        <span  [@newEvent] = "layersLoaded$ | async | newViewerDisctinctViewToLayer" class = "highlightContainer">
+        </span>
+        <i class = "glyphicon glyphicon-list"></i>
+        <span class = "badge" *ngIf = "(layersLoaded$ | async | newViewerDisctinctViewToLayer).length > 0">      
+          {{ (layersLoaded$ | async | newViewerDisctinctViewToLayer).length }}
+        </span>
+      </span>
+
+      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" (click) = "toggleSidePanel('toolsBrowser')" hoverable class = "tabContainer">
+        <i class="glyphicon glyphicon-wrench"></i>
+      </span>
     </div>
   </layout-mainside>
 

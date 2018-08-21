@@ -1,0 +1,7 @@
+{
+  "name": "fzj.xg.mime",
+  "displayName":"Mime",
+  "type": "plugin",
+  "templateURL": "http://localhost:10080/mime/template.html",
+  "scriptURL": "http://localhost:10080/mime/script.js"
+}

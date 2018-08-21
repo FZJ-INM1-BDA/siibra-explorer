@@ -3,14 +3,9 @@
     <ng-content select="[maincontent]">
     </ng-content>
   </div>
-  <div
-    *ngIf = "showResizeSliver" 
-    (click) = "togglePanelShow()"
-    resizeSliver
-    hoverable>
-    <i class = "glyphicon"
-      [ngClass]="showSide ? 'glyphicon-chevron-right' : 'glyphicon-chevron-left'">
-    </i>
+  <div resizeSliver>
+    <ng-content select = "[resizeSliver]">
+    </ng-content>
   </div>
   <div 
     [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth } }"

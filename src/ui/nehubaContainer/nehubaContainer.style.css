@@ -90,24 +90,12 @@ small[onHoverSegment]
   margin-left:2em;
 }
 
-div[citationContainer]
+[citationContainer]
 {
+  display:inline-block;
   max-width:300px;
-}
-
-div[citationContainer] > a
-{
-  font-size: 90%;
-  text-align: left;
-  display:block;
-  white-space: normal;
-  padding-bottom:0px;
-}
-
-
-div[citationContainer] > a:not(:first-child)
-{
-  padding-top:0px;
+  box-sizing: border-box;
+  padding: 0.5em 1em;
 }
 
 hr

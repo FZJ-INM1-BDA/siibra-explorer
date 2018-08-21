@@ -19,12 +19,12 @@
     <div
       [@collapseState] = "{ value :  childrenExpanded ? 'visible' : 'collapsed' , params : { fullHeight : fullHeight }}"
       #childrenContainer>
-      <tree
+      <tree-component
         *ngFor = "let child of ( treeService ? (treeService.findChildren(inputItem) | treeSearch : treeService.searchFilter : treeService.findChildren ) : inputItem.children )"
         [childrenExpanded] = "childrenExpanded"
         [inputItem] = "child">
     
-      </tree>
+      </tree-component>
     </div>
   </div>
 </div>
