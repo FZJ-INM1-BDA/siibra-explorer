@@ -13,3 +13,11 @@ img
 {
   width: 100%;
 }
+
+[citationContainer]
+{
+  display:inline-block;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em 1em;
+}

@@ -83,13 +83,12 @@ export function uiState(state:UIStateInterface,action:UIAction){
         mouseOverSegment : action.segment
       })
     case TOGGLE_SIDE_PANEL:
-      return Object.assign({},state,{
-        sidePanelOpen : state ? 
-          isDefined(state.sidePanelOpen) ?
-            !state.sidePanelOpen :
-            true :
-          true
-      })
+      return Object.assign({}, state, {
+        focusedSidePanel : typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel
+          ? null
+          : action.focusedSidePanel, 
+        sidePanelOpen : !(typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel)
+      } as Partial<UIStateInterface>)
     case OPEN_SIDE_PANEL :
       return Object.assign({},state,{
         sidePanelOpen : true
@@ -282,10 +281,12 @@ export interface Publication{
 export interface UIStateInterface{
   sidePanelOpen : boolean
   mouseOverSegment : any | number
+  focusedSidePanel : string | null
 }
 
 export interface UIAction extends Action{
   segment : any | number
+  focusedSidePanel? : string
 }
 
 export function isDefined(obj){

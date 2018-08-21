@@ -30,7 +30,7 @@ div[widgetUnitHeading]
     margin-left:0.5em;
   }
 
-panel[widgetUnitPanel]
+panel-component[widgetUnitPanel]
 {
   display:block;
   min-width:280px;

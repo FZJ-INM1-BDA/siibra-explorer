@@ -35,19 +35,13 @@
     </small>
   </div>
   <div 
-    class = "clickable" 
+    class = "unclickable" 
     (click) = "toggleSpatialDataVisible()">
     <small>
-      <i
-        *ngIf = "spatialDataVisible" 
-        class = "glyphicon glyphicon-check">
-      </i>
-      <i
-        *ngIf = "!spatialDataVisible" 
-        class = "glyphicon glyphicon-unchecked">
-      </i>
+      <i *ngIf = "spatialDataVisible" class = "glyphicon glyphicon-check"></i>
+      <i *ngIf = "!spatialDataVisible" class = "glyphicon glyphicon-unchecked"></i>
     </small>
-    <small>
+    <small placement = "bottom" tooltip = "coming soon">
       Spatial Search
     </small>
   </div>
@@ -55,7 +49,7 @@
 
 <!-- Data -->
 <div *ngIf = "spatialDataVisible">
-  <panel [collapseBody] = "true" [bodyCollapsable] = "true">
+  <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
     <div heading>
       <span>
         Spatial Search Data
@@ -78,67 +72,75 @@
 
       </pagination-component>
     </div>
-  </panel>
+  </panel-component>
 </div>
-<div
-  *ngFor = "let data of dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions | searchResultPagination  : currentPage : hitsPerPage">
-  <panel 
-    [collapseBody] = "true"
-    [bodyCollapsable] = "true">
-    <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" 
-      displayflex
-      heading>
-      <div maintext>
-        <span>
-          {{ data.region ? data.region.name : 'Not associated with any region' }}
-        </span>
-        <span class = "mute-text">
-          ({{ (data.searchResults | filterDataEntriesByType : hideDataTypes).length }})
-        </span>
-      </div>
-      <div propertyicons>
-        <i *ngIf = "data.region && data.region.position"
-          (click) = "gothere($event,data.region.position)" 
-          class = "glyphicon glyphicon-screenshot" >
-        </i>
-        <i *ngIf = "regionSelected(data.region)"
-          (click) = "removeRegion($event,data.region)"
-          class = "glyphicon glyphicon-remove-sign">
-        </i>
-      </div>
-    </div>
-    <div body>
-      <panel
-        *ngFor = "let searchResult of data.searchResults | filterDataEntriesByType : hideDataTypes"
-        [collapseBody] = "true"
-        [bodyCollapsable] = "true"
-        dataentry>
+<div *ngIf = "selectedRegions.length > 0; else noSelectedRegion">
 
-        <div heading>
-          {{ searchResult.name }}
+    <div
+    *ngFor = "let data of dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions | searchResultPagination  : currentPage : hitsPerPage">
+    <panel-component 
+      [collapseBody] = "true"
+      [bodyCollapsable] = "true">
+      <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" 
+        displayflex
+        heading>
+        <div maintext>
+          <span>
+            {{ data.region ? data.region.name : 'Not associated with any region' }}
+          </span>
+          <span class = "mute-text">
+            ({{ (data.searchResults | filterDataEntriesByType : hideDataTypes).length }})
+          </span>
         </div>
-
-        <div body>
-          <tree
-            *ngFor = "let item of searchResult.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
-            [childrenExpanded] = "false"
-            [renderNode] = "renderNode" 
-            (treeNodeClick) = "handleTreeNodeClick($event)"
-            [inputItem] = " item "
-            treebase>
-
-          </tree>
+        <div propertyicons>
+          <i *ngIf = "data.region && data.region.position"
+            (click) = "gothere($event,data.region.position)" 
+            class = "glyphicon glyphicon-screenshot" >
+          </i>
+          <i *ngIf = "regionSelected(data.region)"
+            (click) = "removeRegion($event,data.region)"
+            class = "glyphicon glyphicon-remove-sign">
+          </i>
         </div>
-      </panel>
-    </div>
-  </panel>
+      </div>
+      <div body>
+        <panel-component
+          *ngFor = "let searchResult of data.searchResults | filterDataEntriesByType : hideDataTypes"
+          [collapseBody] = "true"
+          [bodyCollapsable] = "true"
+          dataentry>
+  
+          <div heading>
+            {{ searchResult.name }}
+          </div>
+  
+          <div body>
+            <tree-component
+              *ngFor = "let item of searchResult.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
+              [childrenExpanded] = "false"
+              [renderNode] = "renderNode" 
+              (treeNodeClick) = "handleTreeNodeClick($event,searchResult)"
+              [inputItem] = " item "
+              treebase>
+  
+            </tree-component>
+          </div>
+        </panel-component>
+      </div>
+    </panel-component>
+  </div>
 </div>
+<ng-template #noSelectedRegion>
+  <div noSelectedRegion>
+    Select a region to get started
+  </div>
+</ng-template>
 
 <!-- pagination -->
 <pagination-component
-  *ngIf = "(dataEntries | groupDatasetByRegion : regions).length > 0"
+  *ngIf = "(dataEntries | groupDatasetByRegion : regions).length > 0 && (selectedRegions.length > hitsPerPage)"
   [hitsPerPage]="hitsPerPage"
-  [total] = "(dataEntries | groupDatasetByRegion : regions| filterRegionDataEntries : selectedRegions).length"
+  [total] = "(dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions).length"
   [currentPage]="currentPage"
   (paginationChange)="paginationChange($event)">
 

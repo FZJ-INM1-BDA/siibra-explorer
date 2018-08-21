@@ -94,6 +94,11 @@ label.perspective-panel-show-slice-views:hover
   border:2px solid rgba(30,30,30,0.9);
 }
 
+[darktheme="true"] a
+{
+  color:#337ab7;
+}
+
 label.perspective-panel-show-slice-views:before
 {
   margin-left: .2em;

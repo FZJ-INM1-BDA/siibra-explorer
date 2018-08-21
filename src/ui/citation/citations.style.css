@@ -1,0 +1,13 @@
+:host > div[citationContainer]
+{
+  font-size: 90%;
+  text-align: left;
+  display:block;
+  white-space: normal;
+  padding-bottom:0px;
+}
+
+:host > div[citationContainer]:not(:first-child)
+{
+  padding-top: 0px;
+}

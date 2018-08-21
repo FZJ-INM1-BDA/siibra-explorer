@@ -28,7 +28,8 @@ module.exports = {
   },
   plugins : [
     new webpack.DefinePlugin({
-      PLUGINDEV : process.env.PLUGINDEV ? true : false
+      PLUGINDEV : process.env.PLUGINDEV ? true : false,
+      BUNDLEPLUGIN : process.env.BUNDLEPLUGIN ? true : false
     })
   ]
 }

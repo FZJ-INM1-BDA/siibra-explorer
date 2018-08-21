@@ -49,14 +49,14 @@
         <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
         <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
       </div>
-      <tree
+      <tree-component
         *ngFor = "let child of (selectedParcellation.regions | treeSearch : filterTreeBySearch.bind(this) : getChildren )"
         (treeNodeClick) = "handleClickRegion($event)"
         [renderNode]="(displayTreeNode).bind(this)"
         [searchFilter]="(filterTreeBySearch).bind(this)"
         [inputItem]="child"
         treebase>
-      </tree>
+      </tree-component>
     </div>
   </div>
 </ng-template>

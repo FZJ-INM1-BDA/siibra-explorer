@@ -1,7 +1,7 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, Injector, ComponentRef, AfterViewInit, OnInit, TemplateRef, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
-import { Observable, Subscription } from "rxjs";
+import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL } from "../services/stateStore.service";
+import { Observable, Subscription, combineLatest } from "rxjs";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -20,12 +20,16 @@ import { PluginServices } from "./atlasViewer.pluginService.service";
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
+import { colorAnimation } from "./atlasViewer.animation";
 
 @Component({
   selector: 'atlas-viewer',
   templateUrl: './atlasViewer.template.html',
   styleUrls: [
     `./atlasViewer.style.css`
+  ],
+  animations : [
+    colorAnimation
   ]
 })
 
@@ -49,12 +53,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   meetsRequirement: boolean = true
 
   toastComponentFactory: ComponentFactory<ToastComponent>
-  databrowserComponentFactory: ComponentFactory<DataBrowserUI>
-  databrowserComponentRef: ComponentRef<DataBrowserUI>
-  private databrowserHostComponentRef: ComponentRef<WidgetUnit>
+  // databrowserComponentFactory: ComponentFactory<DataBrowserUI>
+  // databrowserComponentRef: ComponentRef<DataBrowserUI>
+  // private databrowserHostComponentRef: ComponentRef<WidgetUnit>
   private dedicatedViewComponentRef: ComponentRef<ToastComponent>
 
+  public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
+  public selectedRegions$: Observable<any[]>
+  public layersLoaded$: Observable<any[]>
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
   private subscriptions: Subscription[] = []
@@ -73,8 +80,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private injector: Injector
   ) {
     this.toastComponentFactory = this.cfr.resolveComponentFactory(ToastComponent)
-    this.databrowserComponentFactory = this.cfr.resolveComponentFactory(DataBrowserUI)
-    this.databrowserComponentRef = this.databrowserComponentFactory.create(this.injector)
+    // this.databrowserComponentFactory = this.cfr.resolveComponentFactory(DataBrowserUI)
+    // this.databrowserComponentRef = this.databrowserComponentFactory.create(this.injector)
+
+    this.sidePanelView$ = this.store.pipe(
+      select('uiState'),  
+      filter(state => isDefined(state)),
+      map(state => state.focusedSidePanel)
+    )
+
+    this.selectedRegions$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+      map(state=>state.regionsSelected)
+    )
 
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
@@ -101,6 +120,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           '' :
         ''),
       distinctUntilChanged()
+    )
+
+    this.layersLoaded$ = combineLatest(
+      this.newViewer$,
+      this.dedicatedView$
     )
   }
 
@@ -215,30 +239,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           totalResults : 0
         })
         
-        if (this.databrowserHostComponentRef) {
-          // this.databrowserHostComponentRef.instance.container.detach(0)
-          // this.temporaryContainer.insert(this.databrowserComponentRef.hostView)
-        } else {
-          this.databrowserHostComponentRef =
-            this.widgetServices.addNewWidget(this.databrowserComponentRef, {
-              title: 'Data Browser',
-              exitable: false,
-              state: 'docked',
-              persistency:true
-            })
-        }
+        // if (this.databrowserHostComponentRef) {
+        //   // this.databrowserHostComponentRef.instance.container.detach(0)
+        //   // this.temporaryContainer.insert(this.databrowserComponentRef.hostView)
+        // } else {
+        //   this.databrowserHostComponentRef =
+        //     this.widgetServices.addNewWidget(this.databrowserComponentRef, {
+        //       title: 'Data Browser',
+        //       exitable: false,
+        //       state: 'docked',
+        //       persistency:true
+        //     })
+        // }
 
         this.widgetServices.clearAllWidgets()
       })
     )
 
     this.subscriptions.push(
-      this.store.pipe(
-        select('uiState'),
-        safeFilter('sidePanelOpen'),
-        map(state => state.sidePanelOpen)
-      ).subscribe(show =>
-        this.layoutMainSide.showSide = show)
+      this.sidePanelView$.subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
 
     /**
@@ -358,6 +377,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     return true
   }
 
+  /* obsolete soon */
   manualPanelToggle(show: boolean) {
     this.store.dispatch({
       type: show ? OPEN_SIDE_PANEL : CLOSE_SIDE_PANEL
@@ -385,6 +405,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   clearDedicatedView() {
     this.store.dispatch({
       type: UNLOAD_DEDICATED_LAYER
+    })
+  }
+
+  toggleSidePanel(panelName:string){
+    this.store.dispatch({
+      type : TOGGLE_SIDE_PANEL,
+      focusedSidePanel :panelName
     })
   }
 
