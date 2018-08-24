@@ -16,11 +16,23 @@ module.exports = {
       {
         type : 'javascript/auto',
         test : /ext.*?\.json/,
+        exclude : /plugin_examples/,
         use : [{
           loader : 'file-loader',
           options : {
             name : '[name].[ext]',
             outputPath : 'res/json'
+          }
+        }]
+      },
+      {
+        type : 'javascript/auto',
+        test : /plugin_examples/,
+        use : [{
+          loader : 'file-loader',
+          options : {
+            name : '[name].[ext]',
+            outputPath : 'res/plugins'
           }
         }]
       }

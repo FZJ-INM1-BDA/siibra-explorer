@@ -29,11 +29,11 @@ module.exports = merge(staticAssets, {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         // test : /\.ts$/,
         loader: '@ngtools/webpack',
-        exclude : /export_nehuba/
+        exclude : /export_nehuba|plugin_example/
       },
       {
         test : /\.(html|css)$/,
-        exclude : /export\_nehuba|index|res\/css/,
+        exclude : /export\_nehuba|index|res\/css|plugin_example/,
         use : {
           loader : 'raw-loader',
         }

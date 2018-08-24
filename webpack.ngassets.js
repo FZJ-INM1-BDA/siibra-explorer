@@ -3,7 +3,7 @@ module.exports = {
     rules : [
       {
         test : /(html|css)$/,
-        exclude : /export\_nehuba|index/,
+        exclude : /export\_nehuba|index|plugin\_examples/,
         use : {
           loader : 'file-loader',
           options : {

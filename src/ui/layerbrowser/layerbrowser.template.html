@@ -1,5 +1,9 @@
 <div container>
-  <panel-component class = "layerContainer" *ngFor = "let layer of layers">
+  <panel-component
+    [ngClass] = "{'muted' : muteClass(layer)}"
+    class = "layerContainer"
+    *ngFor = "let layer of layers">
+    
     <div heading>
       {{ layer.name }}
     </div>

@@ -10,4 +10,12 @@ import { AtlasViewerLayerInterface } from "../../util/pipes/newViewerDistinctVie
 
 export class LayerBrowser{
   @Input() layers : AtlasViewerLayerInterface[] = []
+
+  public muteClass(layer:AtlasViewerLayerInterface):boolean{
+    if(this.layers.length === 0)
+      return false
+    return layer.type === 'mixable'
+      ? this.layers.some(l => l.type === 'nonmixable')
+      : false
+  }
 }

@@ -197,6 +197,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   }
 
   public setLayerVisibility(condition:{name:string|RegExp},visible:boolean){
+    if(!this.nehubaViewer)
+      return false
     const viewer = this.nehubaViewer.ngviewer
     viewer.layerManager.managedLayers
       .filter(l=>this.filterLayers(l,condition))
@@ -204,6 +206,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   }
 
   public removeLayer(layerObj:any){
+    if(!this.nehubaViewer)
+      return false
     const viewer = this.nehubaViewer.ngviewer
     const removeLayer = (i) => (viewer.layerManager.removeManagedLayer(i),i.name)
 

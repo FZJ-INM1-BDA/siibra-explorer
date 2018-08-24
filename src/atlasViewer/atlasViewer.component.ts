@@ -257,7 +257,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.sidePanelView$.subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
+      this.sidePanelView$.pipe(
+        filter(() => typeof this.layoutMainSide !== 'undefined')
+      ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
 
     /**

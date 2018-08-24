@@ -76,7 +76,77 @@ export interface DataStateInterface{
   fetchedMetadataMap : Map<string,Map<string,{properties:Property}>>
 }
 
-export function uiState(state:UIStateInterface,action:UIAction){
+interface NgLayerInterface{
+  name : string
+  source : string
+  mixability : string // base | mixable | nonmixable
+  visible : boolean
+  shader? : string
+  transform? : any
+}
+
+export const ADD_NG_LAYER = 'ADD_NG_LAYER'
+export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
+export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
+export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
+
+export interface NgViewerStateInterface{
+  layers : NgLayerInterface[]
+}
+
+export interface NgViewerAction extends Action{
+  layer : NgLayerInterface
+}
+
+const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface):NgLayerInterface => {
+  return incomingLayer.mixability === 'base'
+    ? existingLayer
+    : incomingLayer.mixability === 'mixable'
+      ? existingLayer.mixability === 'nonmixable'
+        ? Object.assign({}, existingLayer, {
+            visible : false
+          } as NgLayerInterface)
+        : existingLayer
+      /* incomingLayer.mixability === 'nonmixable' */
+      : existingLayer.mixability === 'base'
+        ? existingLayer
+        : Object.assign({}, existingLayer, {
+            visible : false
+          } as NgLayerInterface)
+}
+
+export function ngViewerState(prevState:NgViewerStateInterface = {layers:[]}, action:NgViewerAction):NgViewerStateInterface{
+  switch(action.type){
+    case ADD_NG_LAYER:
+      return Object.assign({}, prevState, {
+        layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
+      })
+    case REMOVE_NG_LAYER:
+      return Object.assign({}, prevState, {
+        layers : prevState.layers.filter(l => l.name !== action.layer.name)
+      } as NgViewerStateInterface)
+    case SHOW_NG_LAYER:
+      return Object.assign({}, prevState, {
+        layers : prevState.layers.map(l => l.name === action.layer.name
+          ? Object.assign({}, l, {
+              visible : true
+            } as NgLayerInterface)
+          : l)
+      })
+    case HIDE_NG_LAYER:
+      return Object.assign({}, prevState, {
+        layers : prevState.layers.map(l => l.name === action.layer.name
+          ? Object.assign({}, l, {
+              visible : false
+            } as NgLayerInterface)
+          : l)
+        })
+    default:
+      return prevState
+  }
+}
+
+export function uiState(state:UIStateInterface = {mouseOverSegment:null, focusedSidePanel:null, sidePanelOpen: false},action:UIAction){
   switch(action.type){
     case MOUSE_OVER_SEGMENT:
       return Object.assign({},state,{
