@@ -275,15 +275,27 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     dedicatedView : dedicatedViewString
   })
 
+  dataWindowRegistry: Set<string> = new Set()
+
   handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent},searchResult:any){
     
     const { properties } = searchResult
     obj.node.childrenExpanded = !obj.node.childrenExpanded
 
     if(obj.inputItem.mimetype){
+      if(this.dataWindowRegistry.has(obj.inputItem.name)){
+        /* already open, will not open again */
+        return 
+      }
+      /* not yet open, add the name to registry */
+      this.dataWindowRegistry.add(obj.inputItem.name)
+
       const component = this.fileViewerComponentFactory.create(this.injector)
       component.instance.searchResultFile = Object.assign({}, obj.inputItem, { datasetProperties : properties })
-      this.widgetServices.addNewWidget(component,{title:obj.inputItem.name,exitable:true,state:'floating'})
+      const compref = this.widgetServices.addNewWidget(component,{title:obj.inputItem.name,exitable:true,state:'floating'})
+
+      /* on destroy, removes name from registry */
+      compref.onDestroy(() => this.dataWindowRegistry.delete(obj.inputItem.name))
     }else{
       console.warn('the selected file has no mimetype defined')
     }

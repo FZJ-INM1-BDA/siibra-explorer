@@ -48,8 +48,9 @@
           <div heading>
             Tools Browser
           </div>
-          <div body>
-              
+          <div body>          
+            <plugin-banner>
+            </plugin-banner>
           </div>
         </panel-component>
       </div>
@@ -60,13 +61,20 @@
       </div>
       
       <!-- Docked Container-->
-      <ng-template #dockedContainer>
-      </ng-template>
+      <div dockedContainer>
+        <ng-template #dockedContainer>
+        </ng-template>
+      </div>
     </div>
 
     <div resizeSliver>
 
-      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" (click) = "toggleSidePanel('dataBrowser')" hoverable class = "tabContainer">
+      <span 
+        placement = "left"
+        [tooltip] = "!(selectedRegions$ | async) ? '' : (((selectedRegions$ | async).length === 0 ? 'No' : (selectedRegions$ | async).length) + ' selected region' + ((selectedRegions$ | async).length > 1 ? 's' : ''))"
+        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" 
+        (click) = "toggleSidePanel('dataBrowser')" 
+        class = "tabContainer">
         <span  [@newEvent] = "selectedRegions$ | async" class = "highlightContainer">
         </span>
         <i class = "glyphicon glyphicon-search"></i>
@@ -75,7 +83,12 @@
         </span>
       </span>
 
-      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" (click) = "toggleSidePanel('ngLayer')" hoverable class = "tabContainer">
+      <span 
+        placement = "left"
+        [tooltip] = "!(layersLoaded$ | async | newViewerDisctinctViewToLayer) ? '' : (((layersLoaded$ | async | newViewerDisctinctViewToLayer).length === 0 ? 'No' : (layersLoaded$ | async | newViewerDisctinctViewToLayer).length) + ' loaded layer' + ((layersLoaded$ | async | newViewerDisctinctViewToLayer).length > 1 ? 's' : ''))"
+        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" 
+        (click) = "toggleSidePanel('ngLayer')" 
+        class = "tabContainer">
         <span  [@newEvent] = "layersLoaded$ | async | newViewerDisctinctViewToLayer" class = "highlightContainer">
         </span>
         <i class = "glyphicon glyphicon-list"></i>
@@ -84,7 +97,12 @@
         </span>
       </span>
 
-      <span [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" (click) = "toggleSidePanel('toolsBrowser')" hoverable class = "tabContainer">
+      <span 
+        placement = "left"
+        tooltip = "Tools Browser"
+        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" 
+        (click) = "toggleSidePanel('toolsBrowser')" 
+        class = "tabContainer">
         <i class="glyphicon glyphicon-wrench"></i>
       </span>
     </div>

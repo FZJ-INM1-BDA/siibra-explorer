@@ -122,11 +122,21 @@ div[contextualBlock]
   color:rgba(245,245,245,0.8);
 }
 
+span.tabContainer > *
+{
+  pointer-events: none;
+}
+
 [resizeSliver]
 {
   display:flex;
   flex-direction: column;
   align-items: flex-end;
+}
+
+[resizeSliver] span.badge:hover
+{
+  cursor:default;
 }
 
 [heading]
@@ -145,6 +155,12 @@ span.tabContainer
   padding:1em 0.5em;
   margin-top:1em;
   position: relative;
+  opacity : 0.5;
+  transition: all 200ms;
+}
+span.tabContainer:hover
+{
+  opacity: 0.7;
 }
 
 span.tabContainer > span.highlightContainer
@@ -162,10 +178,13 @@ span.tabContainer > span.highlightContainer
 span.tabContainer > span.badge
 {
   margin-left:0.5em;
+  position:relative;
+  z-index:1;
 }
 
 span.tabContainer.active-tab
 {
+  opacity : 1.0;
   position:relative;
 }
 span.tabContainer.active-tab:before
@@ -176,5 +195,14 @@ span.tabContainer.active-tab:before
   top:0;
   width:100%;
   height:100%;
-  background-color:rgba(128,128,128,0.5);
+}
+
+:host-context([darktheme="true"]) span.tabContainer.active-tab:before
+{
+  background-color:rgba(20,20,20,0.8);
+}
+
+[dockedContainer]
+{
+  margin-top:0.2em;
 }

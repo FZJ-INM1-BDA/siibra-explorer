@@ -20,9 +20,13 @@ export class AtlasViewerDataService implements OnDestroy{
         : Promise.resolve([]),
       BUNDLEPLUGIN
         ? fetch('pluginsManifests.json').then(res => res.json())
-        : Promise.resolve([])
+        : Promise.resolve([]),
+      fetch('res/plugins/manifest.json')
+        .then(res => res.json())
+        .then(json => [json])
+        .catch(e => Promise.resolve([]))
     ])
-      .then(arr => resolve(arr[0].concat(arr[1])))
+      .then(arr => resolve(arr[0].concat(arr[1], arr[2])))
       .catch(reject)
   })
 

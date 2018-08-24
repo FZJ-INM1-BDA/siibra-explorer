@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { PluginServices } from "../../atlasViewer/atlasViewer.pluginService.service";
+import { PluginServices, PluginManifest } from "../../atlasViewer/atlasViewer.pluginService.service";
 
 
 @Component({
@@ -13,6 +13,12 @@ import { PluginServices } from "../../atlasViewer/atlasViewer.pluginService.serv
 export class PluginBannerUI{
   
   constructor(public pluginServices:PluginServices){
+  }
 
+  clickPlugin(plugin:PluginManifest){
+    if(PLUGINDEV)
+      this.pluginServices.launchPlugin(plugin)
+    else
+      return
   }
 }

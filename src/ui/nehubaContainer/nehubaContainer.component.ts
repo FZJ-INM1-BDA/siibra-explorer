@@ -1,7 +1,7 @@
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, AfterViewInit } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
@@ -28,7 +28,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   public viewerLoaded : boolean = false
 
   private newViewer$ : Observable<any>
-  private loadedParcellation$ : Observable<any>
+  private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
   private dedicatedView$ : Observable<string|null>
   private fetchedSpatialDatasets$ : Observable<any[]>
@@ -43,6 +43,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private selectedTemplate : any | null
   private selectedRegionIndexSet : Set<number> = new Set()
   public fetchedSpatialData : DataEntry[] = []
+
+  private ngLayersRegister : NgViewerStateInterface = {layers : []}
+  private ngLayers$ : Observable<NgViewerStateInterface>
+  private selectedParcellationNgId : string
 
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
@@ -72,7 +76,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
         state.templateSelected.name !== this.selectedTemplate.name)
     )
 
-    this.loadedParcellation$ = this.store.pipe(
+    this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
       safeFilter('parcellationSelected'),
       map(state=>state.parcellationSelected),
@@ -198,6 +202,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
         map(arr => arr.map(v => Object.assign({}, v, {type : 'userLandmark'})))
       )
     ).pipe(map(arr => arr[0].concat(arr[1])))
+
+    this.ngLayers$ = this.store.pipe(
+      select('ngViewerState')
+    )
   }
 
   ngOnInit(){
@@ -240,11 +248,38 @@ export class NehubaContainer implements OnInit, OnDestroy{
         const foundParcellation = state.templateSelected.parcellations.find(parcellation=>
           state.parcellationSelected.name === parcellation.name)
         this.handleParcellation(foundParcellation ? foundParcellation : state.templateSelected.parcellations[0])
+
+        const nehubaConfig = state.templateSelected.nehubaConfig
+        const initialSpec = nehubaConfig.dataset.initialNgState
+        const {layers} = initialSpec
+        
+        const dispatchLayers = Object.keys(layers).map(key => {
+          const layer = {
+            name : key,
+            source : layers[key].source,
+            mixability : layers[key].type === 'image'
+              ? 'base'
+              : 'mixable',
+            visible : typeof layers[key].visible === 'undefined'
+              ? true
+              : layers[key].visible,
+            transform : typeof layers[key].transform === 'undefined'
+              ? null
+              : layers[key].transform
+          }
+          this.ngLayersRegister.layers.push(layer)
+          return layer
+        })
+
+        this.store.dispatch({
+          type : ADD_NG_LAYER,
+          layer : dispatchLayers
+        })
       })
     )
 
     this.subscriptions.push(
-      this.loadedParcellation$.subscribe((this.handleParcellation).bind(this))
+      this.selectedParcellation$.subscribe((this.handleParcellation).bind(this))
     )
 
     this.subscriptions.push(
@@ -269,6 +304,42 @@ export class NehubaContainer implements OnInit, OnDestroy{
       this.dedicatedView$.subscribe((this.handleDedicatedView).bind(this))
     )
 
+    this.subscriptions.push(
+      this.ngLayers$.subscribe(ngLayersInterface => {
+        if(!this.nehubaViewer)
+          return
+        
+        const newLayers = ngLayersInterface.layers.filter(l => this.ngLayersRegister.layers.findIndex(ol => ol.name === l.name) < 0)
+        const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayersInterface.layers.findIndex(nl => nl.name === l.name) < 0)
+        
+        if(newLayers.length > 0){
+          const newLayersObj:any = {}
+          newLayers.forEach(obj => newLayersObj[obj.name] = obj)
+          this.nehubaViewer.loadLayer(newLayersObj)
+          this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
+        }
+
+        if(removeLayers.length > 0){
+          removeLayers.forEach(l => {
+            if(this.nehubaViewer.removeLayer({
+              name : l.name
+            }))
+              this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
+          })
+        }
+
+        /* this is how visibility should work, but this also hides the mesh and perspective view */
+        // ngLayersInterface.layers.forEach(l => typeof l.visible === 'undefined'
+        //   ? this.nehubaViewer.setLayerVisibility({ name : l.name}, true)
+        //   : this.nehubaViewer.setLayerVisibility({ name : l.name}, l.visible))
+
+
+        ngLayersInterface.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+          ? this.nehubaViewer.hideAllSeg()
+          : this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
+      })
+    )
+
     /* setup init view state */
     combineLatest(
       this.navigationChanges$,
@@ -281,6 +352,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
         })
       this.nehubaViewer.initRegions = regions.map(re=>re.labelIndex)
       this.nehubaViewer.initDedicatedView = dedicatedView
+
+      /* TODO abit hacky. test what happens when: select dedicated view, then change template... check ngLayerRegister */
+      if(dedicatedView){
+        const dedicatedViewLayer = {
+          name : 'niftiViewer',
+          source : dedicatedView,
+          visible: true,
+          mixability : 'nonmixable',
+          transform:null
+        }
+        this.ngLayersRegister.layers.push(dedicatedViewLayer)
+      }
     })
 
     this.subscriptions.push(
@@ -330,10 +413,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
     this.nehubaViewer.parcellationId = parcellation.ngId
+    this.selectedParcellationNgId = parcellation.ngId
   }
 
   private handleDedicatedView(dedicatedView:string){
-    
     this.handleNifti(dedicatedView)
   }
 
@@ -344,20 +427,51 @@ export class NehubaContainer implements OnInit, OnDestroy{
       return
     }
     if(url === null){
-      this.nehubaViewer.removeLayer({
-        name : 'niftiViewer'
+      this.store.dispatch({
+        type : REMOVE_NG_LAYER,
+        layer : {
+          name : 'niftiViewer'
+        }
       })
-      this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
+      
+      this.store.dispatch({
+        type : SHOW_NG_LAYER,
+        layer : {
+          name : this.selectedParcellationNgId
+        }
+      })
+      // this.nehubaViewer.removeLayer({
+    //   name : 'niftiViewer'
+      // })
+      // this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
       
     }else{
-      this.nehubaViewer.hideAllSeg()
-      this.nehubaViewer.loadLayer({
-        niftiViewer : {
-          type : 'image',
+      // this.nehubaViewer.hideAllSeg()
+      this.store.dispatch({
+        type: HIDE_NG_LAYER,
+        layer : {
+          name : this.selectedParcellationNgId
+        }
+      })
+
+      this.store.dispatch({
+        type : ADD_NG_LAYER,
+        layer : {
+          name : 'niftiViewer',
           source : url,
+          mixability : 'nonmixable',
           shader : getActiveColorMapFragmentMain()
         }
       })
+
+      // this.nehubaViewer.loadLayer({
+      //   niftiViewer : {
+      //     type : 'image',
+      //     source : url,
+      //     shader : getActiveColorMapFragmentMain()
+      //   }
+      // })
+
     }
   }
 

@@ -108,7 +108,7 @@ div[noSelectedRegion]
   padding: 1em 1em;
   font-size:2em;
   color: rgba(128,128,128,0.5);
-  max-height: 4em;
+  max-height: 6em;
 }
 
 :host-context([darktheme="true"]) div[noSelectedRegion]
