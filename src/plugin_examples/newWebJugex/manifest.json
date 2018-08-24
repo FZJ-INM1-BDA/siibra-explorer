@@ -1,5 +1,6 @@
 {
   "name" : "fzj.xg.webjugex",
+  "displayName":"JuGEx differential gene expression analysis",
   "type" : "plugin",
   "templateURL" : "http://localhost:10080/newWebJugex/template.html",
   "scriptURL" : "http://localhost:10080/newWebJugex/script.js"

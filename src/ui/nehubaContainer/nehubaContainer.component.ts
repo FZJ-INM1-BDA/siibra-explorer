@@ -47,6 +47,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private ngLayersRegister : NgViewerStateInterface = {layers : []}
   private ngLayers$ : Observable<NgViewerStateInterface>
   private selectedParcellationNgId : string
+  private selectedParcellation : any | null
 
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
@@ -414,6 +415,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
     this.nehubaViewer.parcellationId = parcellation.ngId
     this.selectedParcellationNgId = parcellation.ngId
+    this.selectedParcellation = parcellation
   }
 
   private handleDedicatedView(dedicatedView:string){
