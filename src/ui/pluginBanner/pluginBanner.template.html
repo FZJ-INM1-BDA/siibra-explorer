@@ -4,5 +4,5 @@
   *ngFor = "let plugin of pluginServices.fetchedPluginManifests"
   (click) = "clickPlugin(plugin)"
   class = "btn btn-default btn-disabled">
-  {{ plugin.name }}
+  {{ plugin.displayName ? plugin.displayName : plugin.name }}
 </div>

@@ -9,7 +9,7 @@ import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/st
 
 export class AtlasViewerConstantsServices{
   public templateUrls = [
-    'res/json/infant.json',
+    // 'res/json/infant.json',
     'res/json/bigbrain.json',
     'res/json/colin.json',
     'res/json/MNI152.json',
