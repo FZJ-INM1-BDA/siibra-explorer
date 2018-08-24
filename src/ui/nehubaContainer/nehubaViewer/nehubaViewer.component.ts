@@ -106,6 +106,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
     })
+    this.nehubaViewer.dispose()
   }
 
   private patchNG(){
