@@ -5,7 +5,6 @@ import { Observable, Subscription, combineLatest } from "rxjs";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
-import { DataBrowserUI } from "../ui/databrowser/databrowser.component";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices, SUPPORT_LIBRARY_MAP } from "./atlasViewer.constantService.service";
@@ -13,7 +12,6 @@ import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { ToastComponent } from "../components/toast/toast.component";
-import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 
@@ -218,8 +216,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           return
         }
         this.dedicatedViewComponentRef = this.toastContainer.createComponent(this.toastComponentFactory)
-        this.dedicatedViewComponentRef.instance.messageContainer.createEmbeddedView(this.dedicatedViewerToast)
-        this.dedicatedViewComponentRef.instance.dismissable = false
+        // this.dedicatedViewComponentRef.instance.messageContainer.createEmbeddedView(this.dedicatedViewerToast)
+        this.dedicatedViewComponentRef.instance.message = `hello`
+        this.dedicatedViewComponentRef.instance.dismissable = true
+        this.dedicatedViewComponentRef.instance.timeout = 1000
       })
     )
 
@@ -404,11 +404,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
   }
 
-  clearDedicatedView() {
-    this.store.dispatch({
-      type: UNLOAD_DEDICATED_LAYER
-    })
-  }
+  // clearDedicatedView() {
+  //   this.store.dispatch({
+  //     type: UNLOAD_DEDICATED_LAYER
+  //   })
+  // }
 
   toggleSidePanel(panelName:string){
     this.store.dispatch({

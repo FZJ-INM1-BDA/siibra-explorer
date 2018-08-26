@@ -41,6 +41,7 @@ export interface ViewerStateInterface{
   userLandmarks : UserLandmark[]
 
   navigation : any | null
+  dedicatedView : string[]
 }
 
 export interface AtlasAction extends Action{
@@ -49,7 +50,7 @@ export interface AtlasAction extends Action{
   selectTemplate? : any
   selectParcellation? : any
   selectRegions? : any[]
-  dedicatedView? : string 
+  dedicatedView? : string
 
   landmarks : UserLandmark[]
 
@@ -175,12 +176,17 @@ export function uiState(state:UIStateInterface = {mouseOverSegment:null, focused
 export function viewerState(state:ViewerStateInterface,action:AtlasAction){
   switch(action.type){
     case LOAD_DEDICATED_LAYER:
+      const dedicatedView = state.dedicatedView
+        ? state.dedicatedView.concat(action.dedicatedView)
+        : [action.dedicatedView]
       return Object.assign({},state,{
-        dedicatedView : action.dedicatedView
+        dedicatedView 
       })
     case UNLOAD_DEDICATED_LAYER:
       return Object.assign({},state,{
-        dedicatedView : null
+        dedicatedView : state.dedicatedView
+          ? state.dedicatedView.filter(dv => dv !== action.dedicatedView)
+          : []
       })
     case NEWVIEWER:
       return Object.assign({},state,{

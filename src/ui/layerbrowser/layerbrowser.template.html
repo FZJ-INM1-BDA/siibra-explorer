@@ -1,5 +1,18 @@
 <div container>
   <panel-component
+    [ngClass] = "{'muted' : !classVisible(ngLayer)}"
+    class = "layerContainer"
+    *ngFor = "let ngLayer of ngLayers">
+
+    <div heading>
+      {{ ngLayer.name }} : {{ ngLayer.type }}
+    </div>
+
+    <div body>
+      {{ ngLayer.source }}
+    </div>
+  </panel-component>
+  <!-- <panel-component
     [ngClass] = "{'muted' : muteClass(layer)}"
     class = "layerContainer"
     *ngFor = "let layer of layers">
@@ -10,5 +23,5 @@
     <div body>
       {{ layer.url }}
     </div>
-  </panel-component>
+  </panel-component> -->
 </div>

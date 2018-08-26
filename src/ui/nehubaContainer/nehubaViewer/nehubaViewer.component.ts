@@ -20,7 +20,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   /* only used to set initial navigation state */
   initNav : any
   initRegions : any[]
-  initDedicatedView : string
+  initDedicatedView : string[]
 
   config : any
   
@@ -327,13 +327,17 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
 
     if(this.initDedicatedView){
       this.hideAllSeg()
-      this.loadLayer({
-        niftiViewer : {
+      const _ = {}
+      
+      this.initDedicatedView.forEach((layer,index) => {
+        _[`dedicatedview-${index}`] = {
           type : 'image',
-          source : this.initDedicatedView,
+          source : layer,
           shader : getActiveColorMapFragmentMain()
         }
       })
+      
+      this.loadLayer(_)
     }
 
     this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment})=>{

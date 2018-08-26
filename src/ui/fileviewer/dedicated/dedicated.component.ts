@@ -1,8 +1,9 @@
 import { Component, OnDestroy, Input } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { DedicatedViewState, File, UNLOAD_DEDICATED_LAYER, LOAD_DEDICATED_LAYER } from "../../../services/stateStore.service";
+import { DedicatedViewState, File, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface } from "../../../services/stateStore.service";
 import { Observable, Subscription } from "rxjs";
 import { filter, map } from "rxjs/operators";
+import { getActiveColorMapFragmentMain } from "../../nehubaContainer/nehubaContainer.component";
 
 
 @Component({
@@ -16,50 +17,44 @@ import { filter, map } from "rxjs/operators";
 export class DedicatedViewer implements OnDestroy{
   @Input() searchResultFile : File
 
-  private dedicatedView$ : Observable<string|null>
-  private dedicatedViewSubscription : Subscription
-  private dedicatedView : string | null
+  private ngLayers$ : Observable<NgViewerStateInterface>
+  private ngLayersSubscription : Subscription
+  private ngLayers : Set<string> = new Set()
 
   constructor(private store:Store<DedicatedViewState>){
-    this.dedicatedView$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>typeof state !== 'undefined' && state !== null),
-      map(state=>state.dedicatedView)
+    this.ngLayers$ = this.store.pipe(
+      select('ngViewerState')
     )
 
-    this.dedicatedViewSubscription = this.dedicatedView$.subscribe(url => this.dedicatedView = url)
+    this.ngLayersSubscription = this.ngLayers$.subscribe(layersInterface => this.ngLayers = new Set(layersInterface.layers.map(l => l.source)))
   }
 
   get isShowing(){
-    return this.dedicatedView === `nifti://${this.searchResultFile.url}`
-  }
-
-  get isObstructed(){
-    return typeof this.dedicatedView !== 'undefined' &&
-      this.dedicatedView !== null &&
-      this.dedicatedView !== `nifti://${this.searchResultFile.url}`
+    return this.ngLayers.has(`nifti://${this.searchResultFile.url}`)
   }
 
   ngOnDestroy(){
-    this.dedicatedViewSubscription.unsubscribe()
+    this.ngLayersSubscription.unsubscribe()
   }
 
   showDedicatedView(){
     this.store.dispatch({
-      type : LOAD_DEDICATED_LAYER,
-      dedicatedView : `nifti://${this.searchResultFile.url}`
+      type : ADD_NG_LAYER,
+      layer : {
+        name : this.searchResultFile.url,
+        source : `nifti://${this.searchResultFile.url}`,
+        mixability : 'nonmixable',
+        shader : getActiveColorMapFragmentMain()
+      }
     })
   }
 
   removeDedicatedView(){
     this.store.dispatch({
-      type : UNLOAD_DEDICATED_LAYER,
+      type : REMOVE_NG_LAYER,
+      layer : {
+        name : this.searchResultFile.url
+      }
     })
-  }
-  
-  get nowShowing():string|null{
-    return this.dedicatedView ? 
-      this.dedicatedView.split('/')[this.dedicatedView.split('/').length-1]:
-      null
   }
 }

@@ -270,11 +270,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     return `${file.name ? file.name : file.path}`
   }
 
-  handleDedicatedViewString = (dedicatedViewString:string|null)=>this.store.dispatch({
-    type : dedicatedViewString ? LOAD_DEDICATED_LAYER : UNLOAD_DEDICATED_LAYER,
-    dedicatedView : dedicatedViewString
-  })
-
   dataWindowRegistry: Set<string> = new Set()
 
   handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent},searchResult:any){

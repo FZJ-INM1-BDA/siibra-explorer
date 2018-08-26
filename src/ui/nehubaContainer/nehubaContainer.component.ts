@@ -30,7 +30,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
-  private dedicatedView$ : Observable<string|null>
+  private dedicatedView$ : Observable<string[]|null>
   private fetchedSpatialDatasets$ : Observable<any[]>
   private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
@@ -316,6 +316,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
         if(newLayers.length > 0){
           const newLayersObj:any = {}
           newLayers.forEach(obj => newLayersObj[obj.name] = obj)
+          debugger
           this.nehubaViewer.loadLayer(newLayersObj)
           this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
         }
@@ -356,14 +357,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
       /* TODO abit hacky. test what happens when: select dedicated view, then change template... check ngLayerRegister */
       if(dedicatedView){
-        const dedicatedViewLayer = {
-          name : 'niftiViewer',
-          source : dedicatedView,
-          visible: true,
+        this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(dedicatedView.map((layer, index) => ({
+          name : `dedicatedview-${index}`,
+          source : layer,
+          visible : true,
           mixability : 'nonmixable',
-          transform:null
-        }
-        this.ngLayersRegister.layers.push(dedicatedViewLayer)
+          transform : null
+        })))
       }
     })
 
@@ -418,17 +418,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.selectedParcellation = parcellation
   }
 
-  private handleDedicatedView(dedicatedView:string){
-    this.handleNifti(dedicatedView)
-  }
-
-  private handleNifti(url:string|null){
+  private handleDedicatedView(dedicatedView:string[]){
     if(!this.nehubaViewer || !this.nehubaViewer.nehubaViewer){
       /* if nehubaviewer has not yet been initialised for one reason or another, return */
       console.warn('handling nifti view, nehubaviewer has not yet been initialised.')
       return
     }
-    if(url === null){
+
+    /* for now */
+    return
+    if(dedicatedView.length === 0){
+
+      /* remove ng layer (?) */
       this.store.dispatch({
         type : REMOVE_NG_LAYER,
         layer : {
@@ -459,8 +460,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
       this.store.dispatch({
         type : ADD_NG_LAYER,
         layer : {
-          name : 'niftiViewer',
-          source : url,
+          name : null,
+          source : dedicatedView,
           mixability : 'nonmixable',
           shader : getActiveColorMapFragmentMain()
         }
