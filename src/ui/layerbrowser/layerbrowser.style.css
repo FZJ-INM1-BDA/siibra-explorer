@@ -21,6 +21,17 @@ div[body]
 
 .muted
 {
-  text-decoration: line-through;
   opacity : 0.5;
+}
+
+.muted-text
+{
+  text-decoration: line-through;
+}
+
+.layerContainer
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 }

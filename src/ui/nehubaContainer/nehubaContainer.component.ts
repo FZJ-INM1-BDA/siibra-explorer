@@ -316,7 +316,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
         if(newLayers.length > 0){
           const newLayersObj:any = {}
           newLayers.forEach(obj => newLayersObj[obj.name] = obj)
-          debugger
           this.nehubaViewer.loadLayer(newLayersObj)
           this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
         }

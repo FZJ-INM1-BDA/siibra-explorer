@@ -135,3 +135,8 @@ markdown-dom pre code
 {
   background-color:rgba(150,150,0,0.5);
 }
+
+.glyphicon-none
+{
+  width:1em;
+}
