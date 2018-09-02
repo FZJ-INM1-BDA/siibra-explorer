@@ -1,10 +1,5 @@
-import { Component, Input, OnDestroy } from "@angular/core";
-import { AtlasViewerLayerInterface } from "../../util/pipes/newViewerDistinctViewToLayer.pipe";
-import { Observable, Subscription } from "rxjs";
-import { isDefined, ViewerStateInterface } from "../../services/stateStore.service";
-import { Store, select } from "@ngrx/store";
-import { filter, delay, distinctUntilChanged } from "rxjs/operators";
-
+import { Component, Input, Output, EventEmitter } from "@angular/core";
+import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 
 @Component({
   selector : 'layer-browser',
@@ -12,67 +7,33 @@ import { filter, delay, distinctUntilChanged } from "rxjs/operators";
   styleUrls : [ './layerbrowser.style.css' ]
 })
 
-export class LayerBrowser implements OnDestroy{
-  @Input() layers : AtlasViewerLayerInterface[] = []
+export class LayerBrowser {
 
-  ngLayers : NgLayerInterface[] = []
-  newViewer$ : Observable<any>
-  subscription : Subscription
-  disposeHandler : any
+  @Input() ngLayers : NgLayerInterface[] = []
+  @Input() lockedLayers : string[] = []
 
-  constructor(private store : Store<ViewerStateInterface>){
-    this.newViewer$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name)
-    )
+  @Output() removeLayerEmitter : EventEmitter<string> = new EventEmitter()
 
-    this.subscription = this.newViewer$.pipe(
-      delay(0)
-    ).subscribe(() => {
-      this.layerChangedHandler()
-      this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.layerChangedHandler())
-      window['viewer'].registerDisposer(this.disposeHandler)
-    })
-  }
-
-  ngOnDestroy(){
-    this.disposeHandler()
-    this.subscription.unsubscribe()
-  }
-
-  layerChangedHandler(){
-    console.log('handle layer change',window['viewer'].layerManager.managedLayers)
-
-    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
-      name : obj.name,
-      type : obj.initialSpecification.type,
-      source : obj.sourceUrl,
-      visible : obj.visible
-    }) as NgLayerInterface)
-    
-  }
-
-  public muteClass(layer:AtlasViewerLayerInterface):boolean{
-    if(this.layers.length === 0)
-      return false
-    return layer.type === 'mixable'
-      ? this.layers.some(l => l.type === 'nonmixable')
-      : false
-  }
-
-  public classVisible(layer:NgLayerInterface):boolean{
+  public classVisible(layer:any):boolean{
     return typeof layer.visible === 'undefined'
       ? true
       : layer.visible
   }
-}
 
-interface NgLayerInterface{
-  name : string
-  visible : boolean
-  source : string
-  type : string // image | segmentation | etc ...
-  transform? : [[number, number, number, number],[number, number, number, number],[number, number, number, number],[number, number, number, number]] | null
-  // colormap : string
+  checkLocked(ngLayer:NgLayerInterface):boolean{
+    if(!this.lockedLayers){
+      /* locked layer undefined. always return true for locked layer check */
+      return true
+    }else
+      return this.lockedLayers.findIndex(l => l === ngLayer.name) >= 0
+  }
+
+  removeLayer(layer:any){
+    if(this.checkLocked(layer)){
+      console.warn('this layer is locked and cannot be removed')
+    }else{
+      console.log(layer)
+      // this.removeLayerEmitter.emit()
+    }
+  }
 }

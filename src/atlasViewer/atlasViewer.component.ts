@@ -1,8 +1,8 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, Injector, ComponentRef, AfterViewInit, OnInit, TemplateRef, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest } from "rxjs";
-import { map, filter, distinctUntilChanged } from "rxjs/operators";
+import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, NgViewerStateInterface } from "../services/stateStore.service";
+import { Observable, Subscription } from "rxjs";
+import { map, filter, distinctUntilChanged, delay } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -38,7 +38,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
   @ViewChild('temporaryContainer', { read: ViewContainerRef }) temporaryContainer: ViewContainerRef
   @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
-  @ViewChild('dedicatedViewerToast', { read: TemplateRef }) dedicatedViewerToast: TemplateRef<any>
+  // @ViewChild('dedicatedViewerToast', { read: TemplateRef }) dedicatedViewerToast: TemplateRef<any>
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -51,18 +51,19 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   meetsRequirement: boolean = true
 
   toastComponentFactory: ComponentFactory<ToastComponent>
-  // databrowserComponentFactory: ComponentFactory<DataBrowserUI>
-  // databrowserComponentRef: ComponentRef<DataBrowserUI>
-  // private databrowserHostComponentRef: ComponentRef<WidgetUnit>
   private dedicatedViewComponentRef: ComponentRef<ToastComponent>
 
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
   public selectedRegions$: Observable<any[]>
-  public layersLoaded$: Observable<any[]>
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
   private subscriptions: Subscription[] = []
+
+  /* handlers for nglayer */
+  public ngLayerNames$ : Observable<any>
+  public ngLayers : NgLayerInterface[]
+  private disposeHandler : any
 
   constructor(
     private pluginService: PluginServices,
@@ -74,12 +75,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
-    private modalService: BsModalService,
-    private injector: Injector
+    private modalService: BsModalService
   ) {
     this.toastComponentFactory = this.cfr.resolveComponentFactory(ToastComponent)
-    // this.databrowserComponentFactory = this.cfr.resolveComponentFactory(DataBrowserUI)
-    // this.databrowserComponentRef = this.databrowserComponentFactory.create(this.injector)
+
+    this.ngLayerNames$ = this.store.pipe(
+      select('viewerState'),
+      filter(state => isDefined(state) && isDefined(state.templateSelected)),
+      distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
+      map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
+      delay(0)
+    )
 
     this.sidePanelView$ = this.store.pipe(
       select('uiState'),  
@@ -118,11 +124,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           '' :
         ''),
       distinctUntilChanged()
-    )
-
-    this.layersLoaded$ = combineLatest(
-      this.newViewer$,
-      this.dedicatedView$
     )
   }
 
@@ -216,10 +217,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           return
         }
         this.dedicatedViewComponentRef = this.toastContainer.createComponent(this.toastComponentFactory)
-        // this.dedicatedViewComponentRef.instance.messageContainer.createEmbeddedView(this.dedicatedViewerToast)
         this.dedicatedViewComponentRef.instance.message = `hello`
         this.dedicatedViewComponentRef.instance.dismissable = true
         this.dedicatedViewComponentRef.instance.timeout = 1000
+      })
+    )
+
+    this.subscriptions.push(
+      this.ngLayerNames$.subscribe(() => {
+        this.ngLayersChangeHandler()
+        this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
+        window['viewer'].registerDisposer(this.disposeHandler)
       })
     )
 
@@ -239,19 +247,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           totalResults : 0
         })
         
-        // if (this.databrowserHostComponentRef) {
-        //   // this.databrowserHostComponentRef.instance.container.detach(0)
-        //   // this.temporaryContainer.insert(this.databrowserComponentRef.hostView)
-        // } else {
-        //   this.databrowserHostComponentRef =
-        //     this.widgetServices.addNewWidget(this.databrowserComponentRef, {
-        //       title: 'Data Browser',
-        //       exitable: false,
-        //       state: 'docked',
-        //       persistency:true
-        //     })
-        // }
-
         this.widgetServices.clearAllWidgets()
       })
     )
@@ -379,6 +374,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     return true
   }
 
+  ngLayersChangeHandler(){
+
+    console.log('handle layer change',window['viewer'].layerManager.managedLayers)
+
+    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
+      name : obj.name,
+      type : obj.initialSpecification.type,
+      source : obj.sourceUrl,
+      visible : obj.visible
+    }) as NgLayerInterface)
+  }
+
   /* obsolete soon */
   manualPanelToggle(show: boolean) {
     this.store.dispatch({
@@ -427,4 +434,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   get floatingMouseContextualContainerTransform() {
     return `translate(${this.mousePos[0]}px,${this.mousePos[1]}px)`
   }
+}
+
+export interface NgLayerInterface{
+  name : string
+  visible : boolean
+  source : string
+  type : string // image | segmentation | etc ...
+  transform? : [[number, number, number, number],[number, number, number, number],[number, number, number, number],[number, number, number, number]] | null
+  // colormap : string
 }

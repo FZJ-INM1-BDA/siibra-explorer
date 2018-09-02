@@ -37,7 +37,11 @@
             Layer Browser
           </div>
           <div body>
-            <layer-browser [layers] = "layersLoaded$ | async | newViewerDisctinctViewToLayer"></layer-browser>
+            <layer-browser 
+              ()
+              [lockedLayers] = "ngLayerNames$ | async" 
+              [ngLayers] = "ngLayers">
+            </layer-browser>
           </div>
         </panel-component>
       </div>
@@ -85,15 +89,15 @@
 
       <span 
         placement = "left"
-        [tooltip] = "!(layersLoaded$ | async | newViewerDisctinctViewToLayer) ? '' : (((layersLoaded$ | async | newViewerDisctinctViewToLayer).length === 0 ? 'No' : (layersLoaded$ | async | newViewerDisctinctViewToLayer).length) + ' loaded layer' + ((layersLoaded$ | async | newViewerDisctinctViewToLayer).length > 1 ? 's' : ''))"
+        [tooltip] = "!ngLayers ? '' : ((ngLayers.length === 0 ? 'No' : ngLayers.length) + ' loaded layer' + (ngLayers.length > 1 ? 's' : ''))"
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" 
         (click) = "toggleSidePanel('ngLayer')" 
         class = "tabContainer">
-        <span  [@newEvent] = "layersLoaded$ | async | newViewerDisctinctViewToLayer" class = "highlightContainer">
+        <span  [@newEvent] = "ngLayers" class = "highlightContainer">
         </span>
         <i class = "glyphicon glyphicon-list"></i>
-        <span class = "badge" *ngIf = "(layersLoaded$ | async | newViewerDisctinctViewToLayer).length > 0">      
-          {{ (layersLoaded$ | async | newViewerDisctinctViewToLayer).length }}
+        <span class = "badge" *ngIf = "ngLayers && ngLayers.length > 0">      
+          {{ ngLayers.length }}
         </span>
       </span>
 

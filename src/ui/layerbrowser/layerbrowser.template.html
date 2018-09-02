@@ -1,27 +1,47 @@
 <div container>
-  <panel-component
-    [ngClass] = "{'muted' : !classVisible(ngLayer)}"
-    class = "layerContainer"
+  <div 
+    class="layerContainer"
     *ngFor = "let ngLayer of ngLayers">
 
-    <div heading>
-      {{ ngLayer.name }} : {{ ngLayer.type }}
+    <div>
+      <i 
+        class = "glyphicon" 
+        [ngClass] = "ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
+
+      </i>
+    </div>
+    <div>
+      <i 
+        container = "body"
+        placement = "bottom"
+        [tooltip] = "ngLayer.type === 'segmentation' ? null : 'only segmentation layer can hide/show segments'"
+        class = "glyphicon" 
+        [ngClass] = "ngLayer.type === 'segmentation' ? 'glyphicon-th-large' : 'glyphicon-lock muted' ">
+
+      </i>
+    </div>
+    <div>
+      <i 
+        (click) = "removeLayer(ngLayer)"
+        container = "body"
+        placement = "bottom"
+        [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : null"
+        class = "glyphicon"
+        [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' : 'glyphicon-remove-circle'">
+
+      </i>
     </div>
 
-    <div body>
-      {{ ngLayer.source }}
-    </div>
-  </panel-component>
-  <!-- <panel-component
-    [ngClass] = "{'muted' : muteClass(layer)}"
-    class = "layerContainer"
-    *ngFor = "let layer of layers">
-    
-    <div heading>
-      {{ layer.name }}
-    </div>
-    <div body>
-      {{ layer.url }}
-    </div>
-  </panel-component> -->
+    <panel-component
+      [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
+
+      <div heading>
+        {{ ngLayer.name }} : {{ ngLayer.type }}
+      </div>
+
+      <div body>
+        {{ ngLayer.source }}
+      </div>
+    </panel-component>
+  </div>
 </div>
