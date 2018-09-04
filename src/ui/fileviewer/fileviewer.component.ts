@@ -31,7 +31,6 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   }
 
   ngOnInit(){
-    console.log('ng onchanges',this.searchResultFile)
     this.createUrls()
   }
   ngOnChanges(){
@@ -47,13 +46,14 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
         null
   }
 
+  /* TODO require better way to check if a chart exists */
   private createUrls(){
 
     const timer$ = interval(50)
     const timerSet$ = timer$.pipe(
       switchMap(()=>from(new Promise((rs,rj)=>{
         if(!this.childChart)
-          rj('childChart not yet defined')
+          rj('chart not defined after 500ms')
         
         this.childChart.canvas.nativeElement.toBlob((blob)=>{
           blob ? rs(blob) : rj('blob is undefined')
@@ -66,7 +66,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
 
     timerSet$.subscribe((blob)=>{
       this._pngDownloadUrl = URL.createObjectURL(blob)
-    },(err)=>console.error('error',err))
+    },(err)=>console.warn('warning',err))
 
 
     if(!this.searchResultFile.url && this.searchResultFile.data){

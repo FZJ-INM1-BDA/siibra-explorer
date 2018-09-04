@@ -66,32 +66,29 @@
   *ngIf = "viewerLoaded">
   <div statusCard>
 
-    <citations 
+    <citations-component 
       *ngIf = "selectedParcellation.properties"
       [properties] = "selectedParcellation.properties"
       citationContainer>
 
-    </citations>
-    <citations
+    </citations-component>
+    <citations-component
       [properties] = "selectedTemplate.properties"
       *ngIf = "showCitation"
       citationContainer>
-    </citations>
+    </citations-component>
 
-    <hr 
-      *ngIf = "showCitation" />
+    <hr *ngIf = "showCitation" />
 
-    <span 
-      class = "btn btn-link"
-      (click)="statusPanelRealSpace = !statusPanelRealSpace">
-      {{statusPanelRealSpace ? 'RealSpace' : 'VoxelSpace'}}
-    </span>
-
-    <span
-      (click) = "resetNavigation()"
-      class = "btn btn-link">
-      reset navigation
-    </span>
+    <div linksContainer>
+      <a href = "#" (click)="$event.preventDefault();statusPanelRealSpace = !statusPanelRealSpace">
+        {{statusPanelRealSpace ? 'real space' : 'voxel space'}}
+      </a>
+  
+      <a href = "#" (click) = "$event.preventDefault();resetNavigation()">
+        reset navigation
+      </a>
+    </div>
   
     <br />
     <div textContainer>

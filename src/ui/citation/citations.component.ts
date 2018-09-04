@@ -3,7 +3,7 @@ import { Property } from "../../services/stateStore.service";
 
 
 @Component({
-  selector : 'citations',
+  selector : 'citations-component',
   templateUrl : './citations.template.html',
   styleUrls : [
     './citations.style.css'

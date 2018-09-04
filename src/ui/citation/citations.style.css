@@ -5,9 +5,15 @@
   display:block;
   white-space: normal;
   padding-bottom:0px;
+  margin-top:1em;
 }
 
 :host > div[citationContainer]:not(:first-child)
 {
   padding-top: 0px;
+}
+
+div[publicationContainer]
+{
+  margin-top:1em;
 }
