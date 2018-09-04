@@ -36,3 +36,14 @@ div[body]
   flex-direction: row;
   align-items: center;
 }
+
+.glyphicon.blue
+{
+  color: #337ab7;
+}
+
+.glyphicon.red
+{
+  color: red;
+}
+
