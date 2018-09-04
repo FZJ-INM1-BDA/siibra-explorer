@@ -1,0 +1,32 @@
+<div>
+
+  <div class = "row">
+    <div class = "col-xs-4 col-lg-4">
+      Species:
+    </div>
+    <div class = "col-xs-8 col-lg-8">
+      {{ species.join(',') }}
+    </div>
+  </div>
+
+  <div class = "row">
+    <div class = "col-xs-4 col-lg-4">
+      Number of Subjects:
+    </div>
+    <div class = "col-xs-8 col-lg-8">
+      {{ subjects.length }}
+    </div>
+  </div>
+
+  <div class = "row">
+    <div class = "col-xs-4 col-lg-4">
+      Sex:
+    </div>
+    <div class = "col-xs-8 col-lg-8">
+      <div *ngFor = "let sexGroup of groupBySex">
+        {{ sexGroup.name }} (n = {{ sexGroup.count }})
+      </div>
+    </div>
+  </div>
+
+</div>

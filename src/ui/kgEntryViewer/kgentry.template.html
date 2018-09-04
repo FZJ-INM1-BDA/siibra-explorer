@@ -1,0 +1,123 @@
+<div *ngIf = "kgData; else showDefault">
+
+  <readmore>
+
+    <panel-component *ngIf = "false" [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Description
+      </div>
+      <div body>
+        {{ kgData.description.value }}
+      </div>
+    </panel-component>
+
+    <panel-component *ngIf = "false"  [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Project
+      </div>
+      <div body>
+        {{ kgData.component.value }}
+      </div>
+    </panel-component>
+
+    <panel-component *ngIf = "false"  [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Contributor(s)
+      </div>
+      <div body>
+        <!-- TODO maybe object instead of array -->
+        <div *ngFor = "let contributor of kgData.contributors">
+          {{ contributor.value }}
+        </div>
+      </div>
+    </panel-component>
+
+    <panel-component *ngIf = "false"  [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Custodian(s)
+      </div>
+      <div body>
+        <!-- TODO Maybe array -->
+        {{ kgData.owners.value }}
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Related Publication(s)
+      </div>
+      <div body>
+        <!-- TODO Maybe array -->
+        <div publicationContainer *ngFor = "let publication of kgData.publications">
+          {{ publication.value.split('\n')[0] }}
+        </div>
+      </div>
+    </panel-component>
+
+    <panel-component *ngIf = "false"  [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Brain atlas
+      </div>
+      <div body>
+        {{ kgData.atlas.value }}
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Preparation
+      </div>
+      <div body>
+        {{ kgData.preparation.value }}
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Methods
+      </div>
+      <div body>
+        <div *ngFor = "let method of kgData.methods">
+          {{ method.value }}
+        </div>
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        License
+      </div>
+      <div body>
+        {{ kgData.license_info.value }}
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Files
+      </div>
+      <div body>
+        <div *ngFor = "let file of kgData.files">
+          {{ file.value }}
+        </div>
+      </div>
+    </panel-component>
+
+    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+      <div heading>
+        Subjects
+      </div>
+      <div body>
+        <kg-entry-viewer-subject-viewer
+          [subjects] = "kgData.subjects">
+
+        </kg-entry-viewer-subject-viewer>
+      </div>
+    </panel-component>
+
+  </readmore>
+
+</div>
+<ng-template #showDefault>
+  Fetching KG Data ...
+</ng-template>

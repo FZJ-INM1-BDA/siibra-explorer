@@ -28,6 +28,8 @@ import { PopoverModule } from "ngx-bootstrap/popover";
 import { CitationsContainer } from "./citation/citations.component";
 import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
+import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
+import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
 
 
 @NgModule({
@@ -55,6 +57,8 @@ import { TooltipModule } from "ngx-bootstrap/tooltip";
     PluginBannerUI,
     CitationsContainer,
     LayerBrowser,
+    KgEntryViewer,
+    SubjectViewer,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -74,6 +78,8 @@ import { TooltipModule } from "ngx-bootstrap/tooltip";
     DataBrowserUI
   ],
   exports : [
+    SubjectViewer,
+    KgEntryViewer,
     CitationsContainer,
     AtlasBanner,
     PluginBannerUI,
