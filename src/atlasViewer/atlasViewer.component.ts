@@ -332,6 +332,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.pluginService.appendSrc = (src: HTMLElement) => this.rd2.appendChild(document.head, src)
   }
 
+  /**
+   * perhaps move this to constructor?
+   */
   meetsRequirements() {
 
     const canvas = document.createElement('canvas')
@@ -386,13 +389,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }) as NgLayerInterface)
   }
 
-  /* obsolete soon */
-  manualPanelToggle(show: boolean) {
-    this.store.dispatch({
-      type: show ? OPEN_SIDE_PANEL : CLOSE_SIDE_PANEL
-    })
-  }
-
   rafId : number | null
 
   panelAnimationFlag(flag:boolean){
@@ -410,12 +406,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.rafId = null
     }
   }
-
-  // clearDedicatedView() {
-  //   this.store.dispatch({
-  //     type: UNLOAD_DEDICATED_LAYER
-  //   })
-  // }
 
   toggleSidePanel(panelName:string){
     this.store.dispatch({
