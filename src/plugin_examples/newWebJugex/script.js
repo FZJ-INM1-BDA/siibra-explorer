@@ -1,31 +1,48 @@
 (() => {
 
-  const handler = interactiveViewer.uiHandle.getToastHandler()
-  handler.message = 'hohoho'
-  handler.dismissable = true
-  handler.timeout = 0
-  handler.show()
+  // example of adding toasts and custom landmarks
 
-  const handler2 = interactiveViewer.uiHandle.getToastHandler()
-  handler2.message = `hohoho2<a href = "alert('oh no')">test</a>`
-  handler2.dismissable = true
-  handler2.timeout = 0
-  setTimeout(()=>{
-    handler2.show()
-  },5000)
+  // const handler = interactiveViewer.uiHandle.getToastHandler()
+  // handler.message = 'hohoho'
+  // handler.dismissable = true
+  // handler.timeout = 0
+  // handler.show()
 
-  interactiveViewer.viewerHandle.add3DLandmarks([{
-    id : 'jugex-test1',
-    position : [0,0,0]
-  }])
+  // const handler2 = interactiveViewer.uiHandle.getToastHandler()
+  // handler2.message = `hohoho2<a href = "alert('oh no')">test</a>`
+  // handler2.dismissable = true
+  // handler2.timeout = 0
+  // setTimeout(()=>{
+  //   handler2.show()
+  // },5000)
 
-  const backendRoot = `http://medpc055.ime.kfa-juelich.de:8005`
-  const srcRoot = 'http://localhost:10080/newWebJugex'
+  // interactiveViewer.viewerHandle.add3DLandmarks([{
+  //   id : 'jugex-test1',
+  //   position : [0,0,0]
+  // }])
+
+  const backendRoot = `http://examcopedia.club:8003`
+  const srcRoot = 'http://localhost:8080/res/plugins'
 
   /* so that on shutdown, we could unload these libraries */
   const onshutdownCB = []
   const loadedExternalLibraries = []
   const subscriptions = []
+
+  let datasetsLoaded, mouseoverReggion
+
+  const handleMouseOvernehubaEvent = (event) => {
+    if(event === null){
+      return
+    }
+    /* if either first region or second region is empty fill them */
+  }
+
+  const handleMouseClickEvent = (event) => {
+
+  }
+
+  interactiveViewer.metadata.datasetsBSubject.subscribe(datasets => datasetsLoaded = datasets)
 
   onshutdownCB.push(() => subscriptions.forEach(s => s.unsubscribe()))
 
