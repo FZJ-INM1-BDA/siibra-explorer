@@ -2,6 +2,6 @@
   "name": "fzj.hb.jugex",
   "displayName":"JuGEx",
   "type": "plugin",
-  "templateURL": "http://localhost:10080/jugex/template.html",
-  "scriptURL": "http://localhost:10080/jugex/script.js"
+  "templateURL": "http://localhost:8080/res/plugins/template.html",
+  "scriptURL": "http://localhost:8080/res/plugins/script.js"
 }

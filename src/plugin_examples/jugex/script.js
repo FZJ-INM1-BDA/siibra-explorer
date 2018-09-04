@@ -12,9 +12,9 @@
         }
 
         
-        const basePath = 'http://medpc055.ime.kfa-juelich.de:5080/plugins/webjugex/'
+        const basePath = 'res/plugins/'
 
-        const backendBasePath = 'http://medpc055.ime.kfa-juelich.de:8005/'
+        const backendBasePath = 'http://examcopedia.club:8003/'
 
         /* components like this are reusable. */
         class HoverRegionSelectorComponent extends HTMLElement {
@@ -70,7 +70,7 @@
 
             render() {
                 this.rootChild.innerHTML = this.template
-                console.log(this.selectedRegion)
+                // console.log(this.selectedRegion)
                 this.rootChild.querySelector('input[region]').value = this.selectedRegion ? this.selectedRegion.name : ''
                 this.rootChild.querySelector('div[editRegion]').addEventListener('click', () => {
                     this.rootChild.querySelector('input[region]').value = ''
@@ -581,7 +581,7 @@
                                 extension1[0].style.order = Number(resultCard.resultObj[1][key]) ? Math.round(Number(resultCard.resultObj[1][key]) * 1000) : 1000
                                 extension1[1].innerHTML = key
                                 extension1[2].innerHTML = resultCard.resultObj[1][key]
-                                resultCard.panelBody.appendChild(extension[0])
+                                resultCard.panelBody.appendChild(extension1[0])
                             }
                         }
                         else {
