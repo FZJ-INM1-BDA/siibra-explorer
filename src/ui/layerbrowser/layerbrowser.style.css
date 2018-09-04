@@ -12,6 +12,7 @@ div[container]
 div[heading]
 {
   padding: 0.2em 1em;
+  white-space: nowrap;
 }
 div[body]
 {

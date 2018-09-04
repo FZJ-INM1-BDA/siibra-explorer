@@ -5,6 +5,10 @@
 
     <div>
       <i 
+        container = "body"
+        placement = "bottom"
+        tooltip = "toggle visibility"
+        (click) = "toggleVisibility(ngLayer)"
         class = "glyphicon" 
         [ngClass] = "ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
 
@@ -14,7 +18,8 @@
       <i 
         container = "body"
         placement = "bottom"
-        [tooltip] = "ngLayer.type === 'segmentation' ? null : 'only segmentation layer can hide/show segments'"
+        [tooltip] = "ngLayer.type === 'segmentation' ? 'hide show segments' : 'only segmentation layer can hide/show segments'"
+        (click) = "toggleForceShowSegment(ngLayer)"
         class = "glyphicon" 
         [ngClass] = "ngLayer.type === 'segmentation' ? 'glyphicon-th-large' : 'glyphicon-lock muted' ">
 
@@ -25,7 +30,7 @@
         (click) = "removeLayer(ngLayer)"
         container = "body"
         placement = "bottom"
-        [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : null"
+        [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
         class = "glyphicon"
         [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' : 'glyphicon-remove-circle'">
 
