@@ -1,4 +1,3 @@
-
 <div *ngIf = "meetsRequirement" class = "atlas-container">
 
   <layout-mainside
@@ -29,7 +28,6 @@
         </panel-component>
       </div>
 
-
       <!-- Layer Browser -->
       <div *ngSwitchCase = "'ngLayer'">
         <panel-component [bodyCollapsable] = "true">
@@ -37,10 +35,7 @@
             Layer Browser
           </div>
           <div body>
-            <layer-browser 
-              ()
-              [lockedLayers] = "ngLayerNames$ | async" 
-              [ngLayers] = "ngLayers">
+            <layer-browser >
             </layer-browser>
           </div>
         </panel-component>
