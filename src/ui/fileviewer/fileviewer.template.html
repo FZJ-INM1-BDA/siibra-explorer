@@ -2,6 +2,11 @@
   searchResultFile as an input is required for this component to work...
 </div>
 
+<!-- KG Entry Viewer -->
+<kg-entry-viewer *ngIf = "searchResultFile.kgID" [kgQueryString] = "searchResultFile.kgID">
+
+</kg-entry-viewer>
+
 <!-- citation -->
 <citations-component 
   citationContainer

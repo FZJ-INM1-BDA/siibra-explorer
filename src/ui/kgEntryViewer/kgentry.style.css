@@ -1,0 +1,15 @@
+div[heading],
+div[body]
+{
+  padding: 0.5rem;
+}
+
+div[heading]
+{
+  background-color:rgba(128,128,128,0.1);
+}
+
+div[body]
+{
+  font-size: 90%;
+}
