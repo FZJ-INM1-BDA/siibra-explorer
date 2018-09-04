@@ -1,14 +1,14 @@
-<span 
-  (click) = "showDedicatedView()"
-  *ngIf = "!isShowing"
-  class = "btn btn-link">
+<a 
+  href = "#"
+  (click) = "$event.preventDefault();showDedicatedView()"
+  *ngIf = "!isShowing">
 
   show this dataset in the viewer 
-</span>
-<span 
-  (click) = "removeDedicatedView()"
-  *ngIf = "isShowing"
-  class = "btn btn-link">
+</a>
+<a 
+  href = "#"
+  (click) = "$event.preventDefault();removeDedicatedView()"
+  *ngIf = "isShowing">
 
   clear this dataset from the viewer
-</span>
+</a>

@@ -102,3 +102,9 @@ hr
 {
   margin : 0.2em 2em;
 }
+
+div[linksContainer]
+{
+  display:inline-block;
+  margin-left:1em;
+}

@@ -3,11 +3,11 @@
 </div>
 
 <!-- citation -->
-<citations 
+<citations-component 
   citationContainer
-  *ngIf = "searchResultFile"
+  *ngIf = "searchResultFile && !searchResultFile.kgID"
   [properties] = "searchResultFile.datasetProperties">
-</citations>
+</citations-component>
 
 <!-- file viewer -->
 <div 
@@ -72,10 +72,10 @@
   </small>
 </readmore>
 
-<div *ngIf = "downloadUrl">
-  <a [href]="downloadUrl" target = "_blank" class = "btn btn-link" download>Download File</a>
+<div anchorContainer *ngIf = "downloadUrl">
+  <a [href]="downloadUrl" target = "_blank" download>Download File</a>
 </div>
 
-<div *ngIf = "downloadPng">
-  <a [href] = "downloadPng" target = "_blank" class = "btn btn-link" download>Download Chart as Image</a>
+<div anchorContainer *ngIf = "downloadPng">
+  <a [href] = "downloadPng" target = "_blank" download>Download Chart as Image</a>
 </div>

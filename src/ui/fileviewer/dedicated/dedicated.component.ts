@@ -2,7 +2,6 @@ import { Component, OnDestroy, Input } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { DedicatedViewState, File, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface } from "../../../services/stateStore.service";
 import { Observable, Subscription } from "rxjs";
-import { filter, map } from "rxjs/operators";
 import { getActiveColorMapFragmentMain } from "../../nehubaContainer/nehubaContainer.component";
 
 

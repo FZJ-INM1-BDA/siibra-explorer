@@ -1,20 +1,4 @@
-.well
+a
 {
-  border-radius:0;
-  border:0;
-  width:calc(100% - 2em);
-  box-sizing:border-box;
-  margin:1em;
-  overflow-x:auto;
-}
-.obstructedText
-{
-  display:inline-block;
-  margin:0 1em;
-  width : calc(100% - 2em);
-}
-
-:host-context([darktheme="true"]) .well
-{
-  background-color:rgba(0,0,0,0.2);
+  margin: 0 1em;
 }
