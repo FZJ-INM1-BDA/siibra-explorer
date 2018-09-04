@@ -30,7 +30,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
-  private dedicatedView$ : Observable<string[]|null>
+  private hideSegmentations$ : Observable<boolean>
+
   private fetchedSpatialDatasets$ : Observable<any[]>
   private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
@@ -44,7 +45,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private selectedRegionIndexSet : Set<number> = new Set()
   public fetchedSpatialData : DataEntry[] = []
 
-  private ngLayersRegister : NgViewerStateInterface = {layers : []}
+  private ngLayersRegister : NgViewerStateInterface = {layers : [], forceShowSegment: null}
   private ngLayers$ : Observable<NgViewerStateInterface>
   private selectedParcellationNgId : string
   private selectedParcellation : any | null
@@ -69,6 +70,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     private elementRef : ElementRef
   ){
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
+
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
       filter(state=>isDefined(state) && isDefined(state.templateSelected)),
@@ -88,12 +90,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
       select('viewerState'),
       safeFilter('regionsSelected'),
       map(state=>state.regionsSelected)
-    )
-
-    this.dedicatedView$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>typeof state !== 'undefined' && state !== null && typeof state.dedicatedView !== 'undefined'),
-      map(state=>state.dedicatedView)
     )
 
     this.fetchedSpatialDatasets$ = this.store.pipe(
@@ -207,6 +203,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.ngLayers$ = this.store.pipe(
       select('ngViewerState')
     )
+
+    this.hideSegmentations$ = this.ngLayers$.pipe(
+      map(state => isDefined(state)
+        ? state.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+        : false)
+    )
   }
 
   ngOnInit(){
@@ -284,15 +286,23 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.subscriptions.push(
+
+      /* TODO add observable of forcedShowSegment */
       combineLatest(
         this.selectedRegions$,
-        this.dedicatedView$
-      ).pipe(
-        filter(([_,dedicatedView])=>!isDefined(dedicatedView)),
-        map(([regions,_])=>regions)
+        this.hideSegmentations$,
+        this.ngLayers$.pipe(
+          map(state => state.forceShowSegment)
+        )
       )
-        .subscribe(regions=>{
+        .subscribe(([regions,hideSegmentFlag,forceShowSegment])=>{
           if(!this.nehubaViewer) return
+
+          if( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ){
+            this.nehubaViewer.hideAllSeg()
+            return
+          }
+
           this.selectedRegionIndexSet = new Set(regions.map(r=>Number(r.labelIndex)))
           this.selectedRegionIndexSet.size > 0 ?
             this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
@@ -301,15 +311,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
         )
     )
 
-    this.subscriptions.push(
-      this.dedicatedView$.subscribe((this.handleDedicatedView).bind(this))
-    )
 
     this.subscriptions.push(
       this.ngLayers$.subscribe(ngLayersInterface => {
-        if(!this.nehubaViewer)
-          return
-        
+        if(!this.nehubaViewer) return
+
         const newLayers = ngLayersInterface.layers.filter(l => this.ngLayersRegister.layers.findIndex(ol => ol.name === l.name) < 0)
         const removeLayers = this.ngLayersRegister.layers.filter(l => ngLayersInterface.layers.findIndex(nl => nl.name === l.name) < 0)
         
@@ -328,16 +334,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
               this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
           })
         }
-
-        /* this is how visibility should work, but this also hides the mesh and perspective view */
-        // ngLayersInterface.layers.forEach(l => typeof l.visible === 'undefined'
-        //   ? this.nehubaViewer.setLayerVisibility({ name : l.name}, true)
-        //   : this.nehubaViewer.setLayerVisibility({ name : l.name}, l.visible))
-
-
-        ngLayersInterface.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-          ? this.nehubaViewer.hideAllSeg()
-          : this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
       })
     )
 
@@ -345,29 +341,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
     combineLatest(
       this.navigationChanges$,
       this.selectedRegions$,
-      this.dedicatedView$
-    ).subscribe(([navigation,regions,dedicatedView])=>{
+    ).subscribe(([navigation,regions])=>{
       this.nehubaViewer.initNav = 
         Object.assign({},navigation,{
           positionReal : true
         })
       this.nehubaViewer.initRegions = regions.map(re=>re.labelIndex)
-      this.nehubaViewer.initDedicatedView = dedicatedView
 
-      /* TODO abit hacky. test what happens when: select dedicated view, then change template... check ngLayerRegister */
-      if(dedicatedView){
-        this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(dedicatedView.map((layer, index) => ({
-          name : `dedicatedview-${index}`,
-          source : layer,
-          visible : true,
-          mixability : 'nonmixable',
-          transform : null
-        })))
-      }
+      /* TODO what to do with init nfiti? */
     })
 
     this.subscriptions.push(
-      this.navigationChanges$.subscribe(this.handleDispatchedNavigationChange.bind(this),console.warn)
+      this.navigationChanges$.subscribe(this.handleDispatchedNavigationChange.bind(this))
     )
   }
 
@@ -424,7 +409,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
       return
     }
 
-    /* for now */
+    /* TODO remove handle dedicated view. perhaps keep for backwards compatibility (?) */
     return
     if(dedicatedView.length === 0){
 

@@ -18,10 +18,11 @@
       <i 
         container = "body"
         placement = "bottom"
-        [tooltip] = "ngLayer.type === 'segmentation' ? 'hide show segments' : 'only segmentation layer can hide/show segments'"
-        (click) = "toggleForceShowSegment(ngLayer)"
+        [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
+        (click) = "forceSegment.hide();toggleForceShowSegment(ngLayer)"
         class = "glyphicon" 
-        [ngClass] = "ngLayer.type === 'segmentation' ? 'glyphicon-th-large' : 'glyphicon-lock muted' ">
+        #forceSegment = "bs-tooltip"
+        [ngClass] = "ngLayer.type === 'segmentation' ? ('glyphicon-th-large ' + segmentationAdditionalClass) : 'glyphicon-lock muted' ">
 
       </i>
     </div>

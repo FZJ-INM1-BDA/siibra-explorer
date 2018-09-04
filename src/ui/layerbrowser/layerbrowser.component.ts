@@ -44,10 +44,9 @@ export class LayerBrowser implements OnDestroy{
       window['viewer'].registerDisposer(this.disposeHandler)
     }))
 
-    this.subscriptions.push(this.forceShowSegment$.subscribe(state => {
-      console.log('assigning new val')
-      this.forceShowSegmentCurrentState = state
-    }))
+    this.subscriptions.push(
+      this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state)
+    )
   }
 
   ngOnDestroy(){
@@ -92,7 +91,7 @@ export class LayerBrowser implements OnDestroy{
   }
 
   toggleForceShowSegment(ngLayer:any){
-    if(!ngLayer && ngLayer.type !== 'segmentation'){
+    if(!ngLayer || ngLayer.type !== 'segmentation'){
       /* toggle only on segmentation layer */
       return
     }
@@ -118,5 +117,21 @@ export class LayerBrowser implements OnDestroy{
         name : layer.name
       }
     })
+  }
+
+  segmentationTooltip(){
+    return `toggle segments visibility: 
+${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
+  }
+
+
+  get segmentationAdditionalClass(){
+    return this.forceShowSegmentCurrentState === null
+      ? 'blue'
+      : this.forceShowSegmentCurrentState === true
+        ? 'normal'
+        : this.forceShowSegmentCurrentState === false
+          ? 'muted'
+          : 'red' 
   }
 }

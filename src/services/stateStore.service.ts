@@ -90,13 +90,16 @@ export const ADD_NG_LAYER = 'ADD_NG_LAYER'
 export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
 export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
 export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
+export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
 
 export interface NgViewerStateInterface{
   layers : NgLayerInterface[]
+  forceShowSegment : boolean | null
 }
 
 export interface NgViewerAction extends Action{
   layer : NgLayerInterface
+  forceShowSegment : boolean
 }
 
 const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface):NgLayerInterface => {
@@ -116,7 +119,7 @@ const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface
           } as NgLayerInterface)
 }
 
-export function ngViewerState(prevState:NgViewerStateInterface = {layers:[]}, action:NgViewerAction):NgViewerStateInterface{
+export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], forceShowSegment:null}, action:NgViewerAction):NgViewerStateInterface{
   switch(action.type){
     case ADD_NG_LAYER:
       return Object.assign({}, prevState, {
@@ -142,6 +145,10 @@ export function ngViewerState(prevState:NgViewerStateInterface = {layers:[]}, ac
             } as NgLayerInterface)
           : l)
         })
+    case FORCE_SHOW_SEGMENT:
+      return Object.assign({}, prevState, {
+        forceShowSegment : action.forceShowSegment
+      }) as NgViewerStateInterface
     default:
       return prevState
   }
@@ -340,6 +347,7 @@ export interface File{
   mimetype : string
   url? : string
   data? : any
+  kgID? : string
   targetParcellation : string
   properties : any
 }
