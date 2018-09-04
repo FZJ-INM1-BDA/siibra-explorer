@@ -35,6 +35,7 @@ export class AtlasViewerURLService{
       scan((acc,val)=>Object.assign({},acc,val),{})
     )
 
+    /* services has no ngOnInit lifecycle */
     this.subscriptions()
   }
 
@@ -92,6 +93,7 @@ export class AtlasViewerURLService{
         })
       }
 
+      /* TODO deprecated. keep for backwards compatiblity? */
       const dedicatedView = searchparams.get('dedicatedView')
       if(dedicatedView){
         this.store.dispatch({
@@ -136,6 +138,7 @@ export class AtlasViewerURLService{
                 _[key] = state[key]
             }
           }else{
+            /* TODO dedicatedView is decprecated */
             if(key === 'dedicatedView'){
               _[key] = null
             }
