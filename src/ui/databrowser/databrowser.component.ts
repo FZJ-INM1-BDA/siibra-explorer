@@ -227,7 +227,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   }
 
   handleDebouncedNavigation(navigation:any){
-    if(!isDefined(navigation.position)||!this._spatialDataVisible)
+    if(!isDefined(navigation.position))
       return
     const center = navigation.position.map(n=>n/1e6)
     const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
@@ -240,6 +240,9 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       templateSpace,
       pageNo
     }
+    if(!this._spatialDataVisible)
+      return
+    console.log('spatial search')
     this.atlasviewerDataService.spatialSearch(this.spatialSearchObj)
   }
 
