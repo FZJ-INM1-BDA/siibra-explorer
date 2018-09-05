@@ -309,7 +309,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.subscriptions.push(
 
-      /* TODO add observable of forcedShowSegment */
       combineLatest(
         this.selectedRegions$,
         this.hideSegmentations$,
@@ -427,66 +426,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.nehubaViewer.parcellationId = parcellation.ngId
     this.selectedParcellationNgId = parcellation.ngId
     this.selectedParcellation = parcellation
-  }
-
-  private handleDedicatedView(dedicatedView:string[]){
-    if(!this.nehubaViewer || !this.nehubaViewer.nehubaViewer){
-      /* if nehubaviewer has not yet been initialised for one reason or another, return */
-      console.warn('handling nifti view, nehubaviewer has not yet been initialised.')
-      return
-    }
-
-    /* TODO remove handle dedicated view. perhaps keep for backwards compatibility (?) */
-    return
-    if(dedicatedView.length === 0){
-
-      /* remove ng layer (?) */
-      this.store.dispatch({
-        type : REMOVE_NG_LAYER,
-        layer : {
-          name : 'niftiViewer'
-        }
-      })
-      
-      this.store.dispatch({
-        type : SHOW_NG_LAYER,
-        layer : {
-          name : this.selectedParcellationNgId
-        }
-      })
-      // this.nehubaViewer.removeLayer({
-    //   name : 'niftiViewer'
-      // })
-      // this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
-      
-    }else{
-      // this.nehubaViewer.hideAllSeg()
-      this.store.dispatch({
-        type: HIDE_NG_LAYER,
-        layer : {
-          name : this.selectedParcellationNgId
-        }
-      })
-
-      this.store.dispatch({
-        type : ADD_NG_LAYER,
-        layer : {
-          name : null,
-          source : dedicatedView,
-          mixability : 'nonmixable',
-          shader : getActiveColorMapFragmentMain()
-        }
-      })
-
-      // this.nehubaViewer.loadLayer({
-      //   niftiViewer : {
-      //     type : 'image',
-      //     source : url,
-      //     shader : getActiveColorMapFragmentMain()
-      //   }
-      // })
-
-    }
   }
 
   /* related spatial search */
