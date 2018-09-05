@@ -30,6 +30,7 @@ import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
+import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
 
 
 @NgModule({
@@ -68,7 +69,7 @@ import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.compo
     GetUniqueProperty,
     FilterDataEntriesbyType,
     SafeStylePipe,
-    
+    GetLayerNameFromDatasets
   ],
   entryComponents : [
 
