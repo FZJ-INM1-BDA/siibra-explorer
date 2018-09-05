@@ -832,7 +832,7 @@
     }
     interactiveViewer.pluginControl.loadExternalLibraries(['webcomponentsLite'])
         .then(() => code())
-        .catch(console.warn)
+        .catch(console.warn.bind(this))
 })()
 
 

@@ -379,8 +379,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   ngLayersChangeHandler(){
 
-    console.log('handle layer change',window['viewer'].layerManager.managedLayers)
-
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
       name : obj.name,
       type : obj.initialSpecification.type,

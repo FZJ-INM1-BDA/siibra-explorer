@@ -322,7 +322,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
         if(newLayers.length > 0){
           const newLayersObj:any = {}
           newLayers.forEach(obj => newLayersObj[obj.name] = obj)
-          this.nehubaViewer.loadLayer(newLayersObj)
+
+          if(!this.nehubaViewer.nehubaViewer || !this.nehubaViewer.nehubaViewer.ngviewer){
+            this.nehubaViewer.initNiftiLayers.push(newLayersObj)
+          }else{
+            this.nehubaViewer.loadLayer(newLayersObj)
+          }
           this.ngLayersRegister.layers = this.ngLayersRegister.layers.concat(newLayers)
         }
 
@@ -331,7 +336,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
             if(this.nehubaViewer.removeLayer({
               name : l.name
             }))
-              this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
+            this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
           })
         }
       })

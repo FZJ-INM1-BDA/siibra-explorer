@@ -20,6 +20,9 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   /* only used to set initial navigation state */
   initNav : any
   initRegions : any[]
+  initNiftiLayers : any[] = []
+
+  /* deprecated */
   initDedicatedView : string[]
 
   config : any
@@ -325,6 +328,12 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       this.showSegs(this.initRegions)
     }
 
+    if(this.initNiftiLayers.length > 0){
+      this.initNiftiLayers.forEach(layer => this.loadLayer(layer))
+      this.hideAllSeg()
+    }
+
+    /* dedicated view is deprecated */
     if(this.initDedicatedView){
       this.hideAllSeg()
       const _ = {}
