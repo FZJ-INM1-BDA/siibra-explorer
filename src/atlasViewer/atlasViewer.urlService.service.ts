@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER } from "../services/stateStore.service";
-import { Observable } from "rxjs";
+import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER } from "../services/stateStore.service";
+import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, take } from "rxjs/operators";
+import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 
 declare var window
 
@@ -12,6 +13,7 @@ declare var window
 
 export class AtlasViewerURLService{
   private changeQueryObservable$ : Observable<any>
+  private additionalNgLayers$ : Observable<any>
   constructor(private store : Store<ViewerStateInterface>){
 
     this.changeQueryObservable$ = this.store.pipe(
@@ -24,15 +26,30 @@ export class AtlasViewerURLService{
         isDefined(state.parcellationSelected))),
 
       /* map so that only a selection are serialized */
-      map(({templateSelected,regionsSelected,navigation,parcellationSelected,dedicatedView})=>({
+      map(({templateSelected,regionsSelected,navigation,parcellationSelected})=>({
         templateSelected,
         regionsSelected,
         navigation,
-        parcellationSelected,
-        dedicatedView
+        parcellationSelected
       }))
     ).pipe(
       scan((acc,val)=>Object.assign({},acc,val),{})
+    )
+
+    this.additionalNgLayers$ = combineLatest(
+      this.changeQueryObservable$.pipe(
+        map(state => state.templateSelected)
+      ),
+      this.store.pipe(
+        select('ngViewerState'),
+        select('layers')
+      )
+    ).pipe(
+      map(([templateSelected, layers])=>{
+        const state = templateSelected.nehubaConfig.dataset.initialNgState
+        /* TODO currently only parameterise nifti layer */
+        return layers.filter(layer => /^nifti\:\/\//.test(layer.source) && Object.keys(state.layers).findIndex(layerName => layerName === layer.name) < 0)
+      })
     )
 
     /* services has no ngOnInit lifecycle */
@@ -93,59 +110,66 @@ export class AtlasViewerURLService{
         })
       }
 
-      /* TODO deprecated. keep for backwards compatiblity? */
-      const dedicatedView = searchparams.get('dedicatedView')
-      if(dedicatedView){
-        this.store.dispatch({
-          type : LOAD_DEDICATED_LAYER,
-          dedicatedView 
-        })
+      const niftiLayers = searchparams.get('niftiLayers')
+      if(niftiLayers){
+        const layers = niftiLayers.split('__')
+        /*  */
+        layers.forEach(layer => this.store.dispatch({
+          type : ADD_NG_LAYER, 
+          layer : {
+            name : layer,
+            source : `nifti://${layer}`,
+            mixability : 'nonmixable',
+            shader : getActiveColorMapFragmentMain()
+          }
+        }))
       }
     })
 
     /* pushing state to url */
-    this.changeQueryObservable$.pipe(
-      map(state=>{
-        let _ = {}
-        for(const key in state){
-          if(isDefined(state[key])){
-            switch(key){
-              case 'navigation':
-                if(
-                  isDefined(state[key].orientation) &&
-                  isDefined(state[key].perspectiveOrientation) &&
-                  isDefined(state[key].perspectiveZoom) &&
-                  isDefined(state[key].position) &&
-                  isDefined(state[key].zoom)
-                ){
-                  _[key] = [
-                    state[key].orientation.join('_'),
-                    state[key].perspectiveOrientation.join('_'),
-                    state[key].perspectiveZoom,
-                    state[key].position.join('_'),
-                    state[key].zoom 
-                  ].join('__')
-                }
-                break;
-              case 'regionsSelected':
-                _[key] = state[key].map(region=>region.labelIndex).join('_')
-                break;
-              case 'templateSelected':
-              case 'parcellationSelected':
-                _[key] = state[key].name
-                break;
-              default:
-                _[key] = state[key]
-            }
-          }else{
-            /* TODO dedicatedView is decprecated */
-            if(key === 'dedicatedView'){
-              _[key] = null
+    combineLatest(
+      this.changeQueryObservable$.pipe(
+        map(state=>{
+          let _ = {}
+          for(const key in state){
+            if(isDefined(state[key])){
+              switch(key){
+                case 'navigation':
+                  if(
+                    isDefined(state[key].orientation) &&
+                    isDefined(state[key].perspectiveOrientation) &&
+                    isDefined(state[key].perspectiveZoom) &&
+                    isDefined(state[key].position) &&
+                    isDefined(state[key].zoom)
+                  ){
+                    _[key] = [
+                      state[key].orientation.join('_'),
+                      state[key].perspectiveOrientation.join('_'),
+                      state[key].perspectiveZoom,
+                      state[key].position.join('_'),
+                      state[key].zoom 
+                    ].join('__')
+                  }
+                  break;
+                case 'regionsSelected':
+                  _[key] = state[key].map(region=>region.labelIndex).join('_')
+                  break;
+                case 'templateSelected':
+                case 'parcellationSelected':
+                  _[key] = state[key].name
+                  break;
+                default:
+                  _[key] = state[key]
+              }
             }
           }
-        }
-        return _
-      })
+          return _
+        })
+      ),
+      this.additionalNgLayers$
+    ).pipe(
+      /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
+      map(([navigationState, niftiLayers]) => Object.assign({}, navigationState, { niftiLayers : niftiLayers.length > 0 ? niftiLayers.map(layer => layer.name).join('__') : null }))
     ).subscribe(cleanedState=>{
       const url = new URL(window.location)
       const search = new URLSearchParams( window.location.search )
