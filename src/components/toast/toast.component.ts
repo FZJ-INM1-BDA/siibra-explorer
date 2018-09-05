@@ -17,16 +17,12 @@ export class ToastComponent{
 
   @Output() dismissed : EventEmitter<boolean> = new EventEmitter()
 
-  private timeoutId : number
+  private timeoutId : any
 
   @HostBinding('@exists')
   exists : boolean = true
 
   @ViewChild('messageContainer',{read:ViewContainerRef}) messageContainer : ViewContainerRef
-  constructor(){
-    
-  }
-  
   
   ngOnInit(){
     if(this.timeout > 0) this.timeoutId = setTimeout(() => this.dismissed.emit(false), this.timeout)

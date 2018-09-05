@@ -24,6 +24,7 @@ import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
+import { ToastService } from "./services/toastService.service";
 
 @NgModule({
   imports : [
@@ -76,7 +77,8 @@ import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctVie
     AtlasViewerDataService,
     WidgetServices,
     AtlasViewerURLService,
-    AtlasViewerAPIServices
+    AtlasViewerAPIServices,
+    ToastService,
   ],
   bootstrap : [
     AtlasViewer
