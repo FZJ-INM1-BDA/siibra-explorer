@@ -125,7 +125,7 @@ export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], for
       return Object.assign({}, prevState, {
         /* this configration hides the layer if a non mixable layer already present */
         layers : action.layer.constructor === Array 
-          ? action.layer
+          ? prevState.layers.concat(action.layer)
           : prevState.layers.concat(
               Object.assign({}, action.layer, 
                 action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
