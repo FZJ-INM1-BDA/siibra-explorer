@@ -7,10 +7,10 @@
       <i 
         container = "body"
         placement = "bottom"
-        tooltip = "toggle visibility"
-        (click) = "toggleVisibility(ngLayer)"
+        [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
+        (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
         class = "glyphicon" 
-        [ngClass] = "ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
+        [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' :ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
 
       </i>
     </div>
