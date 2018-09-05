@@ -19,6 +19,7 @@ import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { colorAnimation } from "./atlasViewer.animation";
+import { ToastService, defaultToastConfig } from "../services/toastService.service";
 
 @Component({
   selector: 'atlas-viewer',
@@ -66,6 +67,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private disposeHandler : any
 
   constructor(
+    private toastService:ToastService,
     private pluginService: PluginServices,
     private rd2: Renderer2,
     private store: Store<ViewerStateInterface>,
@@ -128,6 +130,26 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+
+    this.toastService.showToast = (message, config) => {
+      const _config = Object.assign({}, defaultToastConfig, config
+        ? config
+        : {})
+      const toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
+      toastComponent.instance.message = message
+      toastComponent.instance.dismissable = _config.dismissable
+      toastComponent.instance.timeout = _config.timeout
+
+      let subscription
+
+      const dismissToast = () => {
+        if(subscription) subscription.unsubscribe()
+        toastComponent.destroy()
+      }
+
+      subscription = toastComponent.instance.dismissed.subscribe(dismissToast)
+      return dismissToast
+    }
 
     this.apiService.interactiveViewer.uiHandle.getToastHandler = () => {
       const handler = new ToastHandler()
@@ -246,7 +268,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           type : UPDATE_SPATIAL_DATA,
           totalResults : 0
         })
-        
+
         this.widgetServices.clearAllWidgets()
       })
     )
