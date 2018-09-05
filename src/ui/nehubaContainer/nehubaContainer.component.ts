@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 
@@ -241,9 +241,31 @@ export class NehubaContainer implements OnInit, OnDestroy{
       this.spatialResultsVisible$.subscribe(visible => this.spatialResultsVisible = visible)
     )
 
+    this.subscriptions.push(
+      this.newViewer$.pipe(
+        skip(1)
+      ).subscribe(() => {
+
+        /* on selecting of new template, remove additional nglayers */
+        const baseLayerNames = Object.keys(this.selectedTemplate.nehubaConfig.dataset.initialNgState.layers)
+        this.ngLayersRegister.layers
+          .filter(layer => baseLayerNames.findIndex(l => l === layer.name) < 0)
+          .map(l => l.name)
+          .forEach(layerName => {
+            this.store.dispatch({
+              type : REMOVE_NG_LAYER,
+              layer : {
+                name : layerName
+              }
+            })
+          })
+      })
+    )
+
     /* order of subscription will determine the order of execution */
     this.subscriptions.push(
       this.newViewer$.subscribe((state)=>{
+
         this.nehubaViewerSubscriptions.forEach(s=>s.unsubscribe())
 
         this.selectedTemplate = state.templateSelected
@@ -712,18 +734,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
       '0 , 0 , 0 (nehubaViewer not defined)'
   }
 
-  // get onHoverSegment():string{
-  //   if(!this.nehubaViewer) return 'nehubaViewer not yet initialised'
-  //   const region = this.regionsLabelIndexMap.get(this.nehubaViewer.mouseOverSegment)
-  //   return region ? 
-  //     region.name : 
-  //     this.nehubaViewer.mouseOverSegment !== null && 
-  //     this.nehubaViewer.mouseOverSegment !== 0 && 
-  //     this.nehubaViewer.mouseOverSegment <= 65500 ? 
-  //       `Segment labelIndex: ${this.nehubaViewer.mouseOverSegment}` : 
-  //       ``
-  // }
-
   editingNavState : boolean = false
 
   textNavigateTo(string:string){
@@ -733,11 +743,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
         position : (pos as [number,number,number]),
         positionReal : this.statusPanelRealSpace
       })
-      // this.navigate(
-      //   string.split(/[\s|,]+/).slice(0,3).map(entry=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)),
-      //   0,
-      //   this.statusPanelRealSpace
-      // )
     }else{
       console.log('input did not parse to coordinates ',string)
     }
