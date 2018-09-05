@@ -49,6 +49,7 @@
     "lodash.merge": "^4.6.1",
     "ng2-charts": "^1.6.0",
     "ngx-bootstrap": "^3.0.0",
+    "protractor": "^5.4.0",
     "raw-loader": "^0.5.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.0.0",
