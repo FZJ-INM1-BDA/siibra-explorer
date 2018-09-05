@@ -42,7 +42,7 @@
       [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
 
       <div heading>
-        {{ ngLayer.name }} : {{ ngLayer.type }}
+        {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }} : {{ ngLayer.type }}
       </div>
 
       <div body>

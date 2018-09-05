@@ -1,7 +1,7 @@
 import { Component,  OnDestroy } from "@angular/core";
 import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT } from "../../services/stateStore.service";
+import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter } from "../../services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
 import { filter, distinctUntilChanged, map, delay } from "rxjs/operators";
 
@@ -20,8 +20,17 @@ export class LayerBrowser implements OnDestroy{
   public forceShowSegment$ : Observable<boolean|null>
   private subscriptions : Subscription[] = []
   private disposeHandler : any
+  
+  /* TODO temporary measure. when datasetID can be used, will use  */
+  public fetchedDataEntries$ : Observable<any>
 
   constructor(private store : Store<ViewerStateInterface>){
+
+    this.fetchedDataEntries$ = this.store.pipe(
+      select('dataStore'),
+      safeFilter('fetchedDataEntries'),
+      map(v=>v.fetchedDataEntries)
+    )
 
     this.forceShowSegment$ = this.store.pipe(
       select('ngViewerState'),
@@ -123,7 +132,6 @@ export class LayerBrowser implements OnDestroy{
     return `toggle segments visibility: 
 ${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
   }
-
 
   get segmentationAdditionalClass(){
     return this.forceShowSegmentCurrentState === null
