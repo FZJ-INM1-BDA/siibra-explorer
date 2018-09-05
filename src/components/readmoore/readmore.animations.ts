@@ -13,11 +13,13 @@ export const readmoreAnimations : AnimationTriggerMetadata = trigger('collapseSt
     { params : { collapsedHeight : 45, fullHeight : 200 } }
   ),
   state('visible',
-    style({ 'height' : '{{ fullHeight }}px' }),
+    style({ 'height' : '*' }),
     { params : { collapsedHeight : 45, fullHeight : 200 } }
   ),
   transition('collapsed => visible',[
-    animate('180ms')
+    animate('180ms', style({
+      'height' : '{{ fullHeight }}px'
+    }))
   ]),
   transition('visible => collapsed',[
     animate('180ms')
