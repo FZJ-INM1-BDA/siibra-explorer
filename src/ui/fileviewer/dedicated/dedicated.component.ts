@@ -3,6 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { DedicatedViewState, File, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface } from "../../../services/stateStore.service";
 import { Observable, Subscription } from "rxjs";
 import { getActiveColorMapFragmentMain } from "../../nehubaContainer/nehubaContainer.component";
+import { ToastService } from "../../../services/toastService.service";
 
 
 @Component({
@@ -20,7 +21,10 @@ export class DedicatedViewer implements OnDestroy{
   private ngLayersSubscription : Subscription
   private ngLayers : Set<string> = new Set()
 
-  constructor(private store:Store<DedicatedViewState>){
+  constructor(
+    private toastService:ToastService,
+    private store:Store<DedicatedViewState>
+  ){
     this.ngLayers$ = this.store.pipe(
       select('ngViewerState')
     )
@@ -46,6 +50,12 @@ export class DedicatedViewer implements OnDestroy{
         shader : getActiveColorMapFragmentMain()
       }
     })
+    setTimeout(() => {
+      if(this.isShowing)
+        this.toastService.showToast('nifti showing')
+      else
+        this.toastService.showToast('nifti cannot be shown until current nifti layer is cleared')
+    }, 128)
   }
 
   removeDedicatedView(){

@@ -123,7 +123,14 @@ export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], for
   switch(action.type){
     case ADD_NG_LAYER:
       return Object.assign({}, prevState, {
-        layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
+
+        /* this configuration does not the addition of multiple non mixable layers */
+        layers : action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+          ? prevState.layers
+          : prevState.layers.concat(action.layer)
+
+        /* this configuration allows the addition of multiple non mixables */
+        // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
       })
     case REMOVE_NG_LAYER:
       return Object.assign({}, prevState, {
