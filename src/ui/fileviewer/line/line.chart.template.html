@@ -11,6 +11,9 @@
   [labels]="chartDataset.labels"
   #canvas>
 </canvas>
+<a [download] = "csvTitle" [href] = "csvDataUrl" *ngIf = "shapedLineChartDatasets">
+  download line graph as csv
+</a>
 <span
   *ngIf = "!shapedLineChartDatasets">
   datasets are required to display linear graph
