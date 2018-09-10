@@ -128,6 +128,15 @@ export class WidgetServices{
       console.warn('widgetref not found')
     }
   }
+
+  dockAllWidgets(){
+    /* nb cannot directly iterate the set, as the set will be updated and create and infinite loop */
+    [...this.widgetComponentRefs].forEach(cr => cr.instance.dock())
+  }
+
+  floatAllWidgets(){
+    [...this.widgetComponentRefs].forEach(cr => cr.instance.undock())
+  }
 }
 
 function safeGetSingle(obj:any, arg:string){

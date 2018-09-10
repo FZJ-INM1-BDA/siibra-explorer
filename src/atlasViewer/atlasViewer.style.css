@@ -122,7 +122,17 @@ div[contextualBlock]
   color:rgba(245,245,245,0.8);
 }
 
-span.tabContainer > *
+.pointer-events
+{
+  pointer-events: all;
+}
+
+.no-pointer-events
+{
+  pointer-events: none;
+}
+
+span.tabContainer > *:not(.pointer-events)
 {
   pointer-events: none;
 }
@@ -195,6 +205,7 @@ span.tabContainer.active-tab:before
   top:0;
   width:100%;
   height:100%;
+  pointer-events: none;
 }
 
 :host-context([darktheme="true"]) span.tabContainer.active-tab:before
