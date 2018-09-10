@@ -97,11 +97,29 @@
 
       <span 
         placement = "left"
-        tooltip = "Tools Browser"
+        (mouseover) = "_toolIconsVisible = true" 
+        (mouseout) = "_toolIconsVisible = false"
+        [tooltip] = "_toolIconDockAll ? 'dock all widgets' : _toolIconFloatAll ? 'float all widgets' : 'Tools Browser'"
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" 
         (click) = "toggleSidePanel('toolsBrowser')" 
         class = "tabContainer">
         <i class="glyphicon glyphicon-wrench"></i>
+        <span class ="badge">
+          <span [class.hidden] = "_toolIconsVisible" >
+            ...
+          </span>
+          <span [class.hidden] = "!_toolIconsVisible">
+            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.dockAllWidgets()" (mouseover) = "_toolIconDockAll = true" (mouseout) = "_toolIconDockAll = false">
+              <i class = "no-pointer-events glyphicon glyphicon-log-in"></i>
+            </span>
+            <span class = "mute-text">
+              |
+            </span>
+            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.floatAllWidgets()" (mouseover) = "_toolIconFloatAll = true" (mouseout) = "_toolIconFloatAll = false">
+              <i class = "no-pointer-events glyphicon glyphicon-new-window"></i>
+            </span>
+          </span>
+        </span>
       </span>
     </div>
   </layout-mainside>
