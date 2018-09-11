@@ -48,7 +48,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private ngLayersRegister : NgViewerStateInterface = {layers : [], forceShowSegment: null}
   private ngLayers$ : Observable<NgViewerStateInterface>
   private selectedParcellationNgId : string
-  private selectedParcellation : any | null
+  public selectedParcellation : any | null
 
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
@@ -319,12 +319,14 @@ export class NehubaContainer implements OnInit, OnDestroy{
         .subscribe(([regions,hideSegmentFlag,forceShowSegment])=>{
           if(!this.nehubaViewer) return
 
+          /* selectedregionindexset needs to be updated regardless of forceshowsegment */
+          this.selectedRegionIndexSet = new Set(regions.map(r=>Number(r.labelIndex)))
+
           if( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ){
             this.nehubaViewer.hideAllSeg()
             return
           }
 
-          this.selectedRegionIndexSet = new Set(regions.map(r=>Number(r.labelIndex)))
           this.selectedRegionIndexSet.size > 0 ?
             this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
             this.nehubaViewer.showAllSeg()
