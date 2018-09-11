@@ -31,11 +31,8 @@ export class WidgetServices{
   clearAllWidgets(){
     [...this.widgetComponentRefs].forEach((cr:ComponentRef<WidgetUnit>) => {
       if(!cr.instance.persistency) cr.destroy()
-      
     })
-    // this.floatingContainer.clear()
-    // this.dockedContainer.clear()
-    
+
     this.clickedListener.forEach(s=>s.unsubscribe())
   }
 
@@ -47,11 +44,6 @@ export class WidgetServices{
       : _option.state === 'docked'
         ? this.dockedContainer.insert(component.hostView)
         : this.floatingContainer.insert(component.hostView)
-    // const component = _option.state === 'floating' ? 
-    //   this.floatingContainer.createComponent(this.widgetUnitFactory) :
-    //   _option.state === 'docked' ? 
-    //     this.dockedContainer.createComponent(this.widgetUnitFactory) :
-    //     Error('option.state has to be either floating or docked')
 
     if(component.constructor === Error){
       throw component
