@@ -73,6 +73,19 @@ export class PluginServices{
         // changed from innerHTML to insertadjacenthtml to accomodate angular elements ... not too sure about the actual ramification
 
         */
+
+        /* initialising the plugin handler first, and in the future, perhaps populate the initState object/initStateUrl object */
+        const handler = new PluginHandler()
+        handler.initState = plugin.initState
+          ? plugin.initState
+          : null
+
+        handler.initStateUrl = plugin.initStateUrl
+          ? plugin.initStateUrl
+          : null
+          
+        this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
+
         const script = document.createElement('script')
         script.innerHTML = plugin.script
         this.appendSrc(script)
@@ -86,9 +99,6 @@ export class PluginServices{
           exitable : true,
           title : plugin.name
         })
-
-        const handler = new PluginHandler()
-        this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
 
         const unsubscribeOnPluginDestroy = []
         const shutdownCB = []
@@ -142,6 +152,8 @@ export class PluginHandler{
   onShutdown : (callback:()=>void)=>void
   blink : (sec?:number)=>void
   shutdown : ()=>void
+  initState? : any
+  initStateUrl? : string
 }
 
 export interface PluginManifest{
@@ -150,4 +162,6 @@ export interface PluginManifest{
   template? : string
   scriptURL? : string
   script? : string 
+  initState? : any
+  initStateUrl? : string
 }

@@ -162,6 +162,8 @@ window.interactiveViewer
     - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention
     - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback)
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
+    - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).
+    - *initStateUrl* : passed from `manifest.json`. Useful for setting initial state of the plugin.  Can be any JSON valid value (array, object, string).
 
     ```js
     const pluginHandler = window.interactiveViewer.pluginControl[PLUGINNAME]

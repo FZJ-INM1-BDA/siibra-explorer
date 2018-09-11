@@ -1,4 +1,7 @@
 (() => {
+
+  console.log('works?',interactiveViewer.pluginControl['fzj.xg.mime'].initState)
+
   let ref
   const appendNewScript = url => new Promise((resolve,reject) => {
     const el = document.createElement('script')
