@@ -2,6 +2,8 @@
 
   console.log('works?',interactiveViewer.pluginControl['fzj.xg.mime'].initState)
 
+  interactiveViewer.pluginControl['fzj.xg.mime'].setInitManifestUrl('http://localhost:10080/test.json')
+
   let ref
   const appendNewScript = url => new Promise((resolve,reject) => {
     const el = document.createElement('script')

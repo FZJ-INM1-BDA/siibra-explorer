@@ -28,8 +28,20 @@ export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 
+export const SET_INIT_PLUGIN = `SET_INIT_PLUGIN`
 export const FETCHED_PLUGIN_MANIFESTS = `FETCHED_PLUGIN_MANIFESTS`
 export const LAUNCH_PLUGIN = `LAUNCH_PLUGIN`
+
+export interface PluginInitManifestInterface{
+  initManifests : Map<string,string|null>
+}
+
+export interface PluginInitManifestActionInterface extends Action{
+  manifest: {
+    name : string,
+    initManifestUrl : string | null
+  }
+}
 
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
@@ -117,6 +129,18 @@ const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface
         : Object.assign({}, existingLayer, {
             visible : false
           } as NgLayerInterface)
+}
+
+export function pluginState(prevState:PluginInitManifestInterface = {initManifests : new Map()}, action:PluginInitManifestActionInterface):PluginInitManifestInterface{
+  switch(action.type){
+    case SET_INIT_PLUGIN:
+      const newMap = new Map(prevState.initManifests)
+      return Object.assign({}, prevState, {
+        initManifests : newMap.set(action.manifest.name, action.manifest.initManifestUrl)
+      } as PluginInitManifestInterface)
+    default:
+      return prevState
+  }
 }
 
 export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], forceShowSegment:null}, action:NgViewerAction):NgViewerStateInterface{

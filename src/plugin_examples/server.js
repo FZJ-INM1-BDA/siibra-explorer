@@ -22,6 +22,21 @@ app.get('/allPluginManifests', cors, (req, res) => {
   }
 })
 
+app.get('/test.json', cors, (req, res) => {
+
+  console.log('test.json pinged')
+  res.status(200).send(JSON.stringify({
+    "name": "fzj.xg.mime",
+    "displayName":"Mime",
+    "type": "plugin",
+    "templateURL": "http://localhost:10080/mime/template.html",
+    "scriptURL": "http://localhost:10080/mime/script.js",
+    "initState" : {
+      "test" : "value"
+    }
+  }))
+})
+
 app.use(cors,express.static(__dirname))
 
 app.listen(10080, () => {

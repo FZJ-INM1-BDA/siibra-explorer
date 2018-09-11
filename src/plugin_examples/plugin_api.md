@@ -164,6 +164,7 @@ window.interactiveViewer
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
     - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).
     - *initStateUrl* : passed from `manifest.json`. Useful for setting initial state of the plugin.  Can be any JSON valid value (array, object, string).
+    - *setInitManifestUrl(url|null)* set/unset the url for a manifest json that will be fetched on atlas viewer startup. the argument should be a valid URL, has necessary CORS header, and returns a valid manifest json file. null will unset the search param.
 
     ```js
     const pluginHandler = window.interactiveViewer.pluginControl[PLUGINNAME]

@@ -1,6 +1,6 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
-import { isDefined } from "../services/stateStore.service";
+import { isDefined, PluginInitManifestInterface, SET_INIT_PLUGIN } from "../services/stateStore.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -8,6 +8,7 @@ import { WidgetServices } from "./widgetUnit/widgetService.service";
 import '../res/css/plugin_styles.css'
 import { interval } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
+import { Store } from "@ngrx/store";
 
 @Injectable({
   providedIn : 'root'
@@ -24,7 +25,8 @@ export class PluginServices{
     private apiService : AtlasViewerAPIServices,
     private atlasDataService : AtlasViewerDataService,
     private widgetService : WidgetServices,
-    private cfr : ComponentFactoryResolver
+    private cfr : ComponentFactoryResolver,
+    private store : Store<PluginInitManifestInterface>
   ){
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
@@ -83,7 +85,15 @@ export class PluginServices{
         handler.initStateUrl = plugin.initStateUrl
           ? plugin.initStateUrl
           : null
-          
+
+        handler.setInitManifestUrl = (url) => this.store.dispatch({
+          type : SET_INIT_PLUGIN,
+          manifest : {
+            name : plugin.name,
+            initManifestUrl : url
+          }
+        })
+
         this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
 
         const script = document.createElement('script')
@@ -152,8 +162,11 @@ export class PluginHandler{
   onShutdown : (callback:()=>void)=>void
   blink : (sec?:number)=>void
   shutdown : ()=>void
+
   initState? : any
   initStateUrl? : string
+
+  setInitManifestUrl : (url:string|null)=>void
 }
 
 export interface PluginManifest{

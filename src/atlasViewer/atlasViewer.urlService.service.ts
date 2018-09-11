@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER, PluginInitManifestInterface } from "../services/stateStore.service";
 import { Observable,combineLatest } from "rxjs";
-import { filter, map, scan, take } from "rxjs/operators";
+import { filter, map, scan, take, distinctUntilChanged } from "rxjs/operators";
 import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
+import { PluginServices } from "./atlasViewer.pluginService.service";
 
 declare var window
 
@@ -14,7 +15,17 @@ declare var window
 export class AtlasViewerURLService{
   private changeQueryObservable$ : Observable<any>
   private additionalNgLayers$ : Observable<any>
-  constructor(private store : Store<ViewerStateInterface>){
+  private pluginState$ : Observable<PluginInitManifestInterface>
+
+  constructor(
+    private store : Store<ViewerStateInterface>,
+    private pluginService : PluginServices
+  ){
+
+    this.pluginState$ = this.store.pipe(
+      select('pluginState'),
+      distinctUntilChanged()
+    )
 
     this.changeQueryObservable$ = this.store.pipe(
       select('viewerState'),
@@ -124,6 +135,12 @@ export class AtlasViewerURLService{
           }
         }))
       }
+
+      const pluginStates = searchparams.get('pluginStates')
+      if(pluginStates){
+        const arrPluginStates = pluginStates.split('__')
+        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchPlugin(json)).catch(console.error))
+      }
     })
 
     /* pushing state to url */
@@ -166,10 +183,11 @@ export class AtlasViewerURLService{
           return _
         })
       ),
-      this.additionalNgLayers$
+      this.additionalNgLayers$,
+      this.pluginState$
     ).pipe(
       /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
-      map(([navigationState, niftiLayers]) => Object.assign({}, navigationState, { niftiLayers : niftiLayers.length > 0 ? niftiLayers.map(layer => layer.name).join('__') : null }))
+      map(([navigationState, niftiLayers, pluginState]) => Object.assign({}, navigationState, { pluginStates : Array.from(pluginState.initManifests.values()).filter(v => v !== null).length > 0 ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') : null }, { niftiLayers : niftiLayers.length > 0 ? niftiLayers.map(layer => layer.name).join('__') : null }))
     ).subscribe(cleanedState=>{
       const url = new URL(window.location)
       const search = new URLSearchParams( window.location.search )
