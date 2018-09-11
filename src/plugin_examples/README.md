@@ -3,7 +3,8 @@ Plugin README
 A plugin needs to contain three files. 
 - Manifest JSON
 - template HTML
-- script JS. 
+- script JS
+
 
 These files need to be served by GET requests over HTTP with appropriate CORS header. If your application requires a backend, it is strongly recommended to host these three files with your backend. 
 
@@ -15,13 +16,21 @@ The manifest JSON file describes the metadata associated with the plugin.
 ```json
 {
   "name":"fzj.xg.helloWorld",
+  "displayName": "Hello World - my first plugin",
   "templateURL":"http://LINK-TO-YOUR-PLUGIN-TEMPLATE/template.html",
-  "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT/script.js"
+  "scriptURL":"http://LINK-TO-YOUR-PLUGIN-SCRIPT/script.js",
+  "initState":{
+    "key1": "value1",
+    "key2" : {
+      "nestedKey1" : "nestedValue1"
+    }
+  },
+  "initStateUrl": "http://LINK-TO-PLUGIN-STATE"
 }
 ```
 *NB* 
 - Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
-
+- the `initState` object and `initStateUrl` will be available prior to the evaluation of `script.js`, and will populate the objects `interactiveViewer.pluginControl[MANIFEST.name].initState` and `interactiveViewer.pluginControl[MANIFEST.name].initStateUrl` respectively. 
 
 ---
 Template HTML
@@ -77,6 +86,11 @@ The script will always be appended **after** the rendering of the template.
 ```javascript
 (()=>{
   /* your code here */
+
+  if(interactiveViewer.pluginControl['fzj.xg.helloWorld'].initState){
+    /* init plugin with initState */
+  }
+  
   const submitButton = document.getElemenById('fzj.xg.helloWorld.submit')
   submitButton.addEventListener('click',(ev)=>{
     console.log('submit button was clicked')

@@ -3,5 +3,8 @@
   "displayName":"Mime",
   "type": "plugin",
   "templateURL": "http://localhost:10080/mime/template.html",
-  "scriptURL": "http://localhost:10080/mime/script.js"
+  "scriptURL": "http://localhost:10080/mime/script.js",
+  "initState" : {
+    "test" : "value"
+  }
 }
