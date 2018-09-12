@@ -87,12 +87,10 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   public mouseOverSegment : number | null
 
   ngAfterViewInit(){
-    this.nehubaViewer = export_nehuba.createNehubaViewer(this.config,(err)=>{
+    this.nehubaViewer = export_nehuba.createNehubaViewer(this.config, (err)=>{
       /* print in debug mode */
+      console.log('xgui3783', err)
     });
-
-    // console.log(export_nehuba)
-    (<any>window).quat = export_nehuba.quat
     
     if(this.regionsLabelIndexMap){
       const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
@@ -487,7 +485,8 @@ export interface ViewerState{
 }
 
 export function getAuxilliaryLabelIndices(){
-  return Array.from(Array(36)).map((_,i)=>65500+i)
+  return [65535]
+  // return Array.from(Array(36)).map((_,i)=>65500+i)
 }
 
 export const ICOSAHEDRON = `# vtk DataFile Version 2.0
