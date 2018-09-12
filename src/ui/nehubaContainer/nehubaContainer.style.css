@@ -108,3 +108,32 @@ div[linksContainer]
   display:inline-block;
   margin-left:1em;
 }
+
+div[landmarkMasterContainer] > div > [landmarkContainer] > div.loadingIndicator
+{
+  left: auto;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  margin-right: 0.2em;
+  margin-bottom: 0.2em;
+  width: 100%;
+  height:2em;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+div.loadingIndicator div.spinnerAnimationCircle
+{
+  font-size:150%;
+}
+
+[perspectiveLoadingText]
+{
+  margin-right: 1em;
+}
+
+:host-context([darktheme="true"]) [perspectiveLoadingText]
+{
+  color:rgba(255,255,255,0.8);
+}

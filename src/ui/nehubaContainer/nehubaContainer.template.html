@@ -20,6 +20,12 @@
         [positionY] = "getPositionY(0,spatialData)"
         [positionZ] = "getPositionZ(0,spatialData)">
       </nehuba-2dlandmark-unit>
+
+      <div *ngIf = "sliceViewLoading0$ | async" class = "loadingIndicator">
+        <div class = "spinnerAnimationCircle">
+
+        </div>
+      </div>
     </layout-floating-container>
   </div>
   <div>
@@ -36,6 +42,11 @@
         [positionY] = "getPositionY(1,spatialData)"
         [positionZ] = "getPositionZ(1,spatialData)">
       </nehuba-2dlandmark-unit>
+      <div *ngIf = "sliceViewLoading1$ | async" class = "loadingIndicator">
+        <div class = "spinnerAnimationCircle">
+
+        </div>
+      </div>
     </layout-floating-container>
   </div>
   <div>
@@ -52,12 +63,23 @@
         [positionY] = "getPositionY(2,spatialData)"
         [positionZ] = "getPositionZ(2,spatialData)">
       </nehuba-2dlandmark-unit>
+      <div *ngIf = "sliceViewLoading2$ | async" class = "loadingIndicator">
+        <div class = "spinnerAnimationCircle">
+
+        </div>
+      </div>
     </layout-floating-container>
   </div>
   <div>
     <layout-floating-container  
       pos11 
       landmarkContainer>
+      <div *ngIf = "perspectiveViewLoading$ | async" class = "loadingIndicator">
+        <div class = "spinnerAnimationCircle"></div>
+        <div perspectiveLoadingText>
+          {{ perspectiveViewLoading$ | async }}
+        </div>
+      </div>
     </layout-floating-container>
   </div>
 </div>

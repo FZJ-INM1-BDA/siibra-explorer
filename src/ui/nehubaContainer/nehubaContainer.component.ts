@@ -27,6 +27,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   public viewerLoaded : boolean = false
 
+  public sliceViewLoading0$: Observable<boolean>
+  public sliceViewLoading1$: Observable<boolean>
+  public sliceViewLoading2$: Observable<boolean>
+  public perspectiveViewLoading$: Observable<string|null>
+
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
@@ -47,7 +52,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private ngLayersRegister : NgViewerStateInterface = {layers : [], forceShowSegment: null}
   private ngLayers$ : Observable<NgViewerStateInterface>
-  private selectedParcellationNgId : string
+  
   public selectedParcellation : any | null
 
   private cr : ComponentRef<NehubaViewerUnit>
@@ -161,6 +166,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
         .pipe(
           scan((acc:Event[],event:Event)=>{
             const target = (event as Event).target as HTMLElement
+            /**
+             * 0 | 1
+             * 2 | 3
+             * 
+             * 4 ???
+             */
             const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
               0 :
               target.offsetLeft > 5 && target.offsetTop < 5 ?
@@ -185,6 +196,60 @@ export class NehubaContainer implements OnInit, OnDestroy{
     ).subscribe((events)=>{
       [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
     })
+
+    this.sliceViewLoading0$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+      .pipe(
+        filter((event:Event) => (event.target as HTMLElement).offsetLeft < 5 && (event.target as HTMLElement).offsetTop < 5),
+        map(event => {
+          const e = (event as any);
+          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
+          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
+          return Math.max(num1, num2) > 0
+        })
+      )
+
+    this.sliceViewLoading1$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+      .pipe(
+        filter((event:Event) => (event.target as HTMLElement).offsetLeft > 5 && (event.target as HTMLElement).offsetTop < 5),
+        map(event => {
+          const e = (event as any);
+          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
+          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
+          return Math.max(num1, num2) > 0
+        })
+      )
+
+    this.sliceViewLoading2$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+      .pipe(
+        filter((event:Event) => (event.target as HTMLElement).offsetLeft < 5 && (event.target as HTMLElement).offsetTop > 5),
+        map(event => {
+          const e = (event as any);
+          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
+          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
+          return Math.max(num1, num2) > 0
+        })
+      )
+
+    /* missing chunk perspective view */
+    this.perspectiveViewLoading$ = fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent')
+      .pipe(
+        filter(event => isDefined(event) && isDefined((event as any).detail) && isDefined((event as any).detail.lastLoadedMeshId) ),
+        map(event => {
+          
+          const e = (event as any)
+          const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
+          const lastLoadedIdNum = Number(lastLoadedIdString)
+          return e.detail.meshesLoaded >= this.regionsLabelIndexMap.size
+            ? null
+            : isNaN(lastLoadedIdNum)
+              ? 'Loading unknown chunk'
+              : lastLoadedIdNum >= 65500
+                ? 'Loading auxiliary chunk'
+                : this.regionsLabelIndexMap.get(lastLoadedIdNum)
+                  ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
+                  : 'Loading unknown chunk ...'
+        })
+      )
 
     this.combinedSpatialData$ = combineLatest(
       combineLatest(
@@ -397,13 +462,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     return pos
   }
 
-  // get combinedSpatialData$(){
-  //   return (this.fetchedSpatialData
-  //     .filter(() => this.spatialResultsVisible)
-  //     .map(v => Object.assign({}, v, {type: 'spatial'})) as any[])
-  //     .concat(this.userLandmarks.map(v => Object.assign({}, v, {type: 'user'})))
-  // }
-
   getPositionX(quadrant:number,data:any){
     return this.returnTruePos(quadrant,data)[0]
   }
@@ -426,7 +484,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
     this.nehubaViewer.parcellationId = parcellation.ngId
-    this.selectedParcellationNgId = parcellation.ngId
     this.selectedParcellation = parcellation
   }
 
