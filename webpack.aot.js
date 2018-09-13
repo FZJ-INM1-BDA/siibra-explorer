@@ -6,12 +6,16 @@ const AngularCompilerPlugin = ngtools.AngularCompilerPlugin
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
 const merge = require('webpack-merge')
 const staticAssets = require('./webpack.staticassets')
+const worker = require('./webpack.worker')
 
-module.exports = merge(staticAssets, {
+module.exports = merge(worker, staticAssets, {
 
-  entry : './src/main-aot.ts',
+  entry : {
+    main : './src/main-aot.ts',
+    worker : './src/util/worker.ts'
+  },
   output : {
-    filename : 'main.js',
+    filename : '[name].js',
     path : path.resolve(__dirname,'dist/aot')
   },
   module: {
@@ -27,9 +31,8 @@ module.exports = merge(staticAssets, {
       },
       {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-        // test : /\.ts$/,
         loader: '@ngtools/webpack',
-        exclude : /export_nehuba|plugin_example/
+        exclude : /worker|export_nehuba|plugin_example/
       },
       {
         test : /\.(html|css)$/,

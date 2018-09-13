@@ -239,7 +239,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
           const e = (event as any)
           const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
           const lastLoadedIdNum = Number(lastLoadedIdString)
-          return e.detail.meshesLoaded >= this.regionsLabelIndexMap.size
+          return e.detail.meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
             ? null
             : isNaN(lastLoadedIdNum)
               ? 'Loading unknown chunk'
