@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostLi
 import { dropdownAnimation } from "./dropdown.animation";
 
 @Component({
-  selector : 'dropdown',
+  selector : 'dropdown-component',
   templateUrl : './dropdown.template.html',
   styleUrls : [
     `./dropdown.style.css`

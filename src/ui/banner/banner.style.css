@@ -5,7 +5,7 @@ div[container]
   height:0px;
 }
 
-dropdown, div[container] > div[searchRegionPopover]
+dropdown-component, div[container] > div[searchRegionPopover]
 {
   margin-left:1em;
   height: 2em;

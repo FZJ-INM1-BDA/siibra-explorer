@@ -3,21 +3,21 @@
   <img src = "res/image/HBP_Primary_RGB_WhiteText.png" />
 </span>
 <div container>
-  <dropdown
+  <dropdown-component
     (itemSelected) = "selectTemplate($event)"
     [activeDisplay] = "displayActiveTemplate"
     [selectedItem] = "selectedTemplate"
     [inputArray] = "loadedTemplates$ | async">
   
-  </dropdown>
+  </dropdown-component>
   
-  <dropdown
+  <dropdown-component
     *ngIf = "selectedTemplate"
     (itemSelected) = "selectParcellation($event)"
     [activeDisplay] = "displayActiveParcellation"
     [selectedItem] = "selectedParcellation"
     [inputArray] = "selectedTemplate.parcellations">
-  </dropdown>
+  </dropdown-component>
 
   <div 
     *ngIf = "selectedTemplate"
