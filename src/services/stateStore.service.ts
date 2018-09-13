@@ -339,6 +339,11 @@ export function safeFilter(key:string){
 }
 
 export function extractLabelIdx(region:any):number[]{
+  if(!region.children || region.children.constructor !== Array){
+    return isNaN(region.labelIndex) || region.labelIndex === null
+      ? []
+      : [Number(region.labelIndex)]
+  }
   return region.children.reduce((acc,item)=>{
     return acc.concat(extractLabelIdx(item))
   },[]).concat( region.labelIndex ? Number(region.labelIndex) : [] )
