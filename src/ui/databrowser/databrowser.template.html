@@ -76,8 +76,8 @@
 </div>
 <div *ngIf = "selectedRegions.length > 0; else noSelectedRegion">
 
-    <div
-    *ngFor = "let data of dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions | searchResultPagination  : currentPage : hitsPerPage">
+  <div
+    *ngFor = "let data of selectedRegions | searchResultPagination  : currentPage : hitsPerPage | sortDataEntriesToRegion : dataEntries ">
     <panel-component 
       [collapseBody] = "true"
       [bodyCollapsable] = "true">
@@ -93,6 +93,10 @@
           </span>
         </div>
         <div propertyicons>
+          <i *ngFor = "let poi of data.region.POIs"
+            (click) = "gothere($event,poi)" 
+            class = "glyphicon glyphicon-screenshot" >
+          </i>
           <i *ngIf = "data.region && data.region.position"
             (click) = "gothere($event,data.region.position)" 
             class = "glyphicon glyphicon-screenshot" >
@@ -129,7 +133,9 @@
       </div>
     </panel-component>
   </div>
+
 </div>
+
 <ng-template #noSelectedRegion>
   <div noSelectedRegion>
     Select a region to get started
@@ -138,9 +144,9 @@
 
 <!-- pagination -->
 <pagination-component
-  *ngIf = "(dataEntries | groupDatasetByRegion : regions).length > 0 && (selectedRegions.length > hitsPerPage)"
+  *ngIf = "selectedRegions.length > 0 && selectedRegions.length > hitsPerPage"
   [hitsPerPage]="hitsPerPage"
-  [total] = "(dataEntries | groupDatasetByRegion : regions | filterRegionDataEntries : selectedRegions).length"
+  [total] = "selectedRegions.length"
   [currentPage]="currentPage"
   (paginationChange)="paginationChange($event)">
 

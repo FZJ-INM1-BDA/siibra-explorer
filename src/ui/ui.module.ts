@@ -31,6 +31,7 @@ import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
+import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
 
 
 @NgModule({
@@ -69,7 +70,8 @@ import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
     GetUniqueProperty,
     FilterDataEntriesbyType,
     SafeStylePipe,
-    GetLayerNameFromDatasets
+    GetLayerNameFromDatasets,
+    SortDataEntriesToRegion
   ],
   entryComponents : [
 
