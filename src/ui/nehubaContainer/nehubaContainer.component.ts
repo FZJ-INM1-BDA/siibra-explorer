@@ -375,8 +375,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.subscriptions.push(
 
       combineLatest(
-        this.selectedRegions$,
-        this.hideSegmentations$,
+        this.selectedRegions$.pipe(
+          distinctUntilChanged()
+        ),
+        this.hideSegmentations$.pipe(
+          distinctUntilChanged()
+        ),
         this.ngLayers$.pipe(
           map(state => state.forceShowSegment)
         )
