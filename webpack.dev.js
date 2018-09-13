@@ -4,12 +4,10 @@ const path = require('path')
 const ngAssets = require('./webpack.ngassets')
 const staticAssets = require('./webpack.staticassets')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const worker = require('./webpack.worker')
 
-module.exports = merge(common,worker,ngAssets,staticAssets,{
+module.exports = merge(common,ngAssets,staticAssets,{
   entry : {
-    main : './src/main.ts',
-    worker: './src/util/worker.ts'
+    main : './src/main.ts'
   },
   mode : 'development',
   output : {

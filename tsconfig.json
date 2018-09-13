@@ -3,7 +3,6 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
-    "lib":["webworker","es2015", "dom"],
     "target": "es2015",
     "sourceMap": true,
     "baseUrl": ".",
