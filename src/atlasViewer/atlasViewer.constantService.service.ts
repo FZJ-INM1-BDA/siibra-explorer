@@ -8,6 +8,8 @@ import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/st
 })
 
 export class AtlasViewerConstantsServices{
+
+  /* to be provided by KG in future */
   public templateUrls = [
     // 'res/json/infant.json',
     'res/json/bigbrain.json',
@@ -17,6 +19,7 @@ export class AtlasViewerConstantsServices{
     'res/json/allenMouse.json'
   ]
 
+  /* to be provided by KG in future */
   private _mapArray : [string,string[]][] = [
     [ 'JuBrain Cytoarchitectonic Atlas' ,  
       [
