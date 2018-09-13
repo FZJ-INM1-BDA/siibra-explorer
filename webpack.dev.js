@@ -4,13 +4,16 @@ const path = require('path')
 const ngAssets = require('./webpack.ngassets')
 const staticAssets = require('./webpack.staticassets')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const worker = require('./webpack.worker')
 
-
-module.exports = merge(common,ngAssets,staticAssets,{
-  entry : './src/main.ts',
+module.exports = merge(common,worker,ngAssets,staticAssets,{
+  entry : {
+    main : './src/main.ts',
+    worker: './src/util/worker.ts'
+  },
   mode : 'development',
   output : {
-    filename : 'main.js',
+    filename : '[name].js',
     path : path.resolve(__dirname,'dist/dev')
   },
   devtool:'source-map',

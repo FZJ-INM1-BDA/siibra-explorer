@@ -1,8 +1,10 @@
-import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef } from "@angular/core";
+import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef, NgZone } from "@angular/core";
 import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
 
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import { getActiveColorMapFragmentMain } from "../nehubaContainer.component";
+import { fromEvent, interval } from 'rxjs'
+import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
+import { buffer, map, filter } from "rxjs/operators";
 
 @Component({
   templateUrl : './nehubaViewer.template.html',
@@ -21,9 +23,6 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   initNav : any
   initRegions : any[]
   initNiftiLayers : any[] = []
-
-  /* deprecated */
-  initDedicatedView : string[]
 
   config : any
   
@@ -49,16 +48,87 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this._s8$
   ]
 
-  constructor(public elementRef:ElementRef){
+  ondestroySubscriptions: any[] = []
+
+  constructor(
+    public elementRef:ElementRef,
+    private workerService : AtlasWorkerService,
+    private zone : NgZone
+  ){
     this.patchNG()
+
+    this.ondestroySubscriptions.push(
+
+      fromEvent(this.workerService.worker,'message').pipe(
+        filter((message:any) => {
+  
+          if(!message){
+            // console.error('worker response message is undefined', message)
+            return false
+          }
+          if(!message.data){
+            // console.error('worker response message.data is undefined', message.data)
+            return false
+          }
+          if(message.data.type !== 'CHECKED_MESH'){
+            /* worker responded with not checked mesh, no need to act */
+            return false
+          }
+          return true
+        }),
+        map(e => e.data),
+        buffer(interval(1000)),
+        map(arr => arr.reduce((acc:Map<string,Set<number>>,curr)=> {
+          
+          const newMap = new Map(acc)
+          const set = newMap.get(curr.baseUrl)
+          if(set){
+            set.add(curr.checkedIndex)
+          }else{
+            newMap.set(curr.baseUrl,new Set([curr.checkedIndex]))
+          }
+          return newMap
+        }, new Map()))
+      ).subscribe(map => {
+        
+        Array.from(map).forEach(item => {
+          const baseUrl : string = item[0]
+          const set : Set<number> = item[1]
+  
+          /* validation passed, add to safeMeshSet */
+          const oldset = this.workerService.safeMeshSet.get(baseUrl)
+          if(oldset){
+            this.workerService.safeMeshSet.set(baseUrl, new Set([...oldset, ...set]))
+          }else{
+            this.workerService.safeMeshSet.set(baseUrl, new Set([...set]))
+          }
+  
+          /* if the active parcellation is the current parcellation, load the said mesh */
+          if(baseUrl === this._baseUrl){
+            this.nehubaViewer.setMeshesToLoad([...this.workerService.safeMeshSet.get(this._baseUrl)], {
+              name : this.parcellationId
+            })
+          }
+        })
+      })
+    )
+  }
+
+  private _baseUrl : string 
+  get numMeshesToBeLoaded():number{
+    if(!this._baseUrl)
+      return 0
+
+    const set = this.workerService.safeMeshSet.get(this._baseUrl)
+    return set
+      ? set.size
+      : 0
   }
 
   private _parcellationId : string
-
   get parcellationId(){
     return this._parcellationId
   }
-
   set parcellationId(id:string){
 
     if(this._parcellationId && this.nehubaViewer){
@@ -89,7 +159,6 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   ngAfterViewInit(){
     this.nehubaViewer = export_nehuba.createNehubaViewer(this.config, (err)=>{
       /* print in debug mode */
-      console.log('xgui3783', err)
     });
     
     if(this.regionsLabelIndexMap){
@@ -107,6 +176,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
     })
+    this.ondestroySubscriptions.forEach(s => s.unsubscribe())
     this.nehubaViewer.dispose()
   }
 
@@ -313,7 +383,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
 
   private newViewerInit(){
 
-    /* isn't this segment specific? */
+    /* isn't this layer specific? */
+    /* TODO this is layer specific. need a way to distinguish between different segmentation layers */
     this._s2$ = this.nehubaViewer.mouseOver.segment
       .subscribe(obj=>this.mouseOverSegment = obj.segment)
 
@@ -329,22 +400,6 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     if(this.initNiftiLayers.length > 0){
       this.initNiftiLayers.forEach(layer => this.loadLayer(layer))
       this.hideAllSeg()
-    }
-
-    /* dedicated view is deprecated */
-    if(this.initDedicatedView){
-      this.hideAllSeg()
-      const _ = {}
-      
-      this.initDedicatedView.forEach((layer,index) => {
-        _[`dedicatedview-${index}`] = {
-          type : 'image',
-          source : layer,
-          shader : getActiveColorMapFragmentMain()
-        }
-      })
-      
-      this.loadLayer(_)
     }
 
     this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment})=>{
@@ -399,16 +454,42 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     if(newlayer)newlayer.setVisible(true)
     else console.warn('could not find new layer',this.parcellationId)
 
+    const regex = /^(\S.*?)\:\/\/(.*?)$/.exec(newlayer.sourceUrl)
+    
+    if(!regex || !regex[2]){
+      console.error('could not parse baseUrl')
+      return
+    }
+    if(regex[1] !== 'precomputed'){
+      console.error('sourceUrl is not precomputed')
+      return
+    }
+    
+    const baseUrl = regex[2]
+    this._baseUrl = baseUrl
+
     /* load meshes */
-    this.nehubaViewer.setMeshesToLoad(
-      [
-        ...Array.from(this.regionsLabelIndexMap.keys()),
-        ...getAuxilliaryLabelIndices()
-      ],
-      {
+    /* TODO could be a bug where user loads new parcellation, but before the worker could completely populate the list */
+    const set = this.workerService.safeMeshSet.get(baseUrl)
+    if(set){
+      this.nehubaViewer.setMeshesToLoad([...set],{
         name : this.parcellationId
+      })
+    }else{
+      if(newlayer){
+        this.zone.runOutsideAngular(() => 
+          this.workerService.worker.postMessage({
+            type : 'CHECK_MESHES',
+            parcellationId : this.parcellationId,
+            baseUrl,
+            indices : [
+              ...Array.from(this.regionsLabelIndexMap.keys()),
+              ...getAuxilliaryLabelIndices()
+            ]
+          })
+        )
       }
-    )
+    }
 
     this.defaultColormap = new Map(
       Array.from(

@@ -25,6 +25,7 @@ import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.ser
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
 import { ToastService } from "./services/toastService.service";
+import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 
 @NgModule({
   imports : [
@@ -80,6 +81,7 @@ import { ToastService } from "./services/toastService.service";
     AtlasViewerURLService,
     AtlasViewerAPIServices,
     ToastService,
+    AtlasWorkerService,
   ],
   bootstrap : [
     AtlasViewer
