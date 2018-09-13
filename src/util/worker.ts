@@ -12,13 +12,17 @@ const checkMeshes = (action) => {
       : new Error(`mesh does not exist on fetched info file: ${JSON.stringify(json)}`))
     .then(meshPath => action.indices.forEach(index => {
       fetch(`${baseUrl}/${meshPath}/${index}:0`)
-        .then(() => {
-          postMessage({
-            type: 'CHECKED_MESH',
-            parcellationId: action.parcellationId,
-            checkedIndex: index,
-            baseUrl
-          })
+        .then(res => res.json())
+        .then(json => {
+          /* the perspectiveEvent only counts json that has fragments as a part of meshLoaded */
+          if(json.fragments && json.fragments.constructor === Array && json.fragments.length > 0){
+            postMessage({
+              type: 'CHECKED_MESH',
+              parcellationId: action.parcellationId,
+              checkedIndex: index,
+              baseUrl
+            })
+          }
         })
         .catch(error => {
           /* no cors error is also caught here, but also printed to the console */
