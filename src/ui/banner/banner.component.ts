@@ -132,14 +132,20 @@ export class AtlasBanner implements OnDestroy{
 
   /* double click navigate to the interested area */
   private doubleClick(obj:any){
-    if( !(obj && obj.inputItem && obj.inputItem.position) ){
+    if( !(obj && obj.inputItem && (obj.inputItem.position || obj.inputItem.POIs)) ){
       return
     }
+
+    const newPos = obj.inputItem.position
+      ? obj.inputItem.position
+      : obj.inputItem.POIs && obj.inputItem.POIs.constructor === Array && obj.inputItem.POIs.length > 0
+        ? obj.inputItem.POIs[0]
+        : null
 
     this.store.dispatch({
       type : CHANGE_NAVIGATION,
       navigation : {
-        position : obj.inputItem.position,
+        position : newPos,
         animation : {
           /* empty object is enough to be truthy */
         }

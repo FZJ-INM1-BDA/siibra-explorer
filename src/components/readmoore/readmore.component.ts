@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, ViewChild, ElementRef, AfterContentChecked
 import { readmoreAnimations } from "./readmore.animations";
 
 @Component({
-  selector : 'readmore',
+  selector : 'readmore-component',
   templateUrl : './readmore.template.html',
   styleUrls : [
     './readmore.style.css'
