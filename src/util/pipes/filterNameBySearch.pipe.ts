@@ -7,9 +7,6 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 export class FilterNameBySearch implements PipeTransform{
   public transform(searchFields:string[],searchTerm:string){
-    return searchFields.some(searchField=>{
-      const regex = new RegExp(searchTerm,'i')
-      return regex.test(searchField)
-    })
+    return searchFields.some(searchField=> new RegExp(searchTerm,'i').test(searchField))
   }
 }

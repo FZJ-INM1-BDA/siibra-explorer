@@ -1,6 +1,6 @@
 <div *ngIf = "kgData; else showDefault">
 
-  <readmore>
+  <readmore-component>
 
     <panel-component *ngIf = "false" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
@@ -115,7 +115,7 @@
       </div>
     </panel-component>
 
-  </readmore>
+  </readmore-component>
 
 </div>
 <ng-template #showDefault>

@@ -71,11 +71,11 @@
 </div>
 
 <!-- caption -->
-<readmore *ngIf = "searchResultFile.properties.description">
+<readmore-component *ngIf = "searchResultFile.properties.description">
   <small id = "captions">
     {{ searchResultFile.properties.description }}
   </small>
-</readmore>
+</readmore-component>
 
 <div anchorContainer *ngIf = "downloadUrl">
   <a [href]="downloadUrl" target = "_blank" download>Download File</a>

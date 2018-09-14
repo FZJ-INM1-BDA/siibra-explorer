@@ -33,7 +33,8 @@ export class TreeComponent extends ParseAttributeDirective implements OnChanges,
 
   constructor( 
     private cdr : ChangeDetectorRef,
-    @Optional() public treeService : TreeService ){
+    @Optional() public treeService : TreeService 
+  ){
     super()
   }
   

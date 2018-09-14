@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { Observable } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { filter,map } from 'rxjs/operators'
-import { ViewerStateInterface, AtlasAction, NEWVIEWER } from "../../../services/stateStore.service";
+import { ViewerStateInterface, NEWVIEWER } from "../../../services/stateStore.service";
 
 @Component({
   selector : 'ui-splashscreen',
