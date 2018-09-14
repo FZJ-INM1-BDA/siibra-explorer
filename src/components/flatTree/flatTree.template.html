@@ -1,0 +1,35 @@
+<div 
+  *ngFor = "let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter)"
+  [ngClass] = "getClass(flattenedItem.flattenedTreeLevel)"
+  [attr.flattenedtreelevel] = "flattenedItem.flattenedTreeLevel" 
+  [attr.collapsed] = "flattenedItem.collapsed ? flattenedItem.collapsed : false"
+  [attr.lvlId] = "flattenedItem.lvlId"
+  [hidden] = "collapseRow(flattenedItem) "
+  renderNode>
+
+  <span class = "padding-block-container">
+    <span
+      [attr.hidemargin] = "block"
+      *ngFor = "let block of flattenedItem.siblingFlags"
+      class = "padding-block">
+
+    </span>
+  </span>
+  <span 
+    *ngIf = "findChildren(flattenedItem).length > 0; else noChildren"
+    (click) = "toggleCollapse(flattenedItem)" >
+    <i [ngClass] = "isCollapsed(flattenedItem) ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'" class="glyphicon"></i>
+  </span>
+  <ng-template #noChildren>
+    <i class="glyphicon glyphicon-none">
+
+    </i>
+  </ng-template>
+  <span
+    (mouseenter) = "treeNodeEnter.emit(flattenedItem)"
+    (mouseleave) = "treeNodeLeave.emit(flattenedItem)"
+    (click) = "treeNodeClick.emit(flattenedItem)"
+    class = "render-node-text"
+    [innerHtml] = "flattenedItem | renderPipe : renderNode ">
+  </span>
+</div>

@@ -16,6 +16,12 @@ import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
 import { ToastComponent } from './toast/toast.component';
 import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
 import { TreeBaseDirective } from './tree/treeBase.directive';
+import { FlatTreeComponent } from './flatTree/flatTree.component';
+import { FlattenTreePipe } from './flatTree/flattener.pipe';
+import { RenderPipe } from './flatTree/render.pipe';
+import { HighlightPipe } from './flatTree/highlight.pipe';
+import { HasVisibleChildrenPipe } from './flatTree/hasVisibleChildren.pipe';
+import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pipe';
 
 
 @NgModule({
@@ -33,6 +39,7 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     PanelComponent,
     PaginationComponent,
     ToastComponent,
+    FlatTreeComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -42,6 +49,11 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     SafeHtmlPipe,
     SearchResultPaginationPipe,
     TreeSearchPipe,
+    FlattenTreePipe,
+    RenderPipe,
+    HighlightPipe,
+    HasVisibleChildrenPipe,
+    FitlerRowsByVisibilityPipe
   ],
   exports : [
     BrowserAnimationsModule,
@@ -53,12 +65,13 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     PanelComponent,
     PaginationComponent,
     ToastComponent,
+    FlatTreeComponent,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,
 
     HoverableBlockDirective,
-    TreeBaseDirective,
+    TreeBaseDirective
   ]
 })
 
