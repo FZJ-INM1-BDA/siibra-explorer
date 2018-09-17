@@ -180,6 +180,11 @@ export class AtlasBanner implements OnDestroy{
 
   @HostListener('document:click',['$event'])
   closeRegion(event:MouseEvent){
+
+    /* region popover may not always be rendered */
+    if(!this.inputRegionPopover)
+      return
+      
     /* FF does not implement event.srcElement so use event.originalTarget to polyfill for FF */
     const contains = this.inputRegionPopover.nativeElement.contains(event.srcElement) || this.inputRegionPopover.nativeElement.contains((event as any).originalTarget)
     if(contains)
