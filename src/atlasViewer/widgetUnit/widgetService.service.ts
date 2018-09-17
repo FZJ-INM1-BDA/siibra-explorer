@@ -116,6 +116,7 @@ export class WidgetServices{
     const widgetRef = [...this.widgetComponentRefs].find(cr=>cr.instance === widgetUnit)
     if(widgetRef){
       widgetRef.destroy()
+      this.widgetComponentRefs.delete(widgetRef)
     }else{
       console.warn('widgetref not found')
     }
