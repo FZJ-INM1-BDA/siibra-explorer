@@ -20,8 +20,8 @@ import { FlatTreeComponent } from './flatTree/flatTree.component';
 import { FlattenTreePipe } from './flatTree/flattener.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
 import { HighlightPipe } from './flatTree/highlight.pipe';
-import { HasVisibleChildrenPipe } from './flatTree/hasVisibleChildren.pipe';
 import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pipe';
+import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 
 
 @NgModule({
@@ -52,8 +52,8 @@ import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pi
     FlattenTreePipe,
     RenderPipe,
     HighlightPipe,
-    HasVisibleChildrenPipe,
-    FitlerRowsByVisibilityPipe
+    FitlerRowsByVisibilityPipe,
+    AppendSiblingFlagPipe
   ],
   exports : [
     BrowserAnimationsModule,

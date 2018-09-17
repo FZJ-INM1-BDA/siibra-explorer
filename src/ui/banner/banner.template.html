@@ -1,4 +1,3 @@
-
 <span hbpLogoContainer>
   <img src = "res/image/HBP_Primary_RGB_WhiteText.png" />
 </span>
@@ -21,40 +20,38 @@
 
   <div 
     *ngIf = "selectedTemplate"
-    placement = "bottom"
-    [outsideClick] = "true"
-    [popover]="searchRegionTemplate"
-    containerClass = "inputSearchContainer"
-    triggers = ""
-    #inputSearchRegionPopover = "bs-popover"
+    #searchRegionPopover
     searchRegionPopover>
 
     <input 
-      (keydown.esc)="inputSearchRegionPopover.hide();$event.target.blur();searchTerm=''"
-      [(ngModel)]="searchTerm"
+      (keydown.esc) = "showRegionTree = false; $event.target.blur(); searchTerm = ''"
+      (focus) = "showRegionTree = true"
+      [value] = "searchTerm"
+      (input) = "changeSearchTerm($event)"
       class = "form-control" 
-      (click)="inputSearchRegionPopover.show()"
       type="text" 
       placeholder="Regions"/>
       
-  </div>
-</div>
+    <div 
+      [@showState]
+      *ngIf = "showRegionTree" 
+      hideScrollbarContainer>
 
-<ng-template #searchRegionTemplate>
-  <div [@showState] hideScrollbarContainer>
-    <div treeContainer>
-      <div treeHeader>
-        <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
-        <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
-      </div>
-      <flat-tree-component 
-        *ngFor = "let child of selectedParcellation.regions "
-        (treeNodeClick) = "handleClickRegion({inputItem:$event})"
-        [inputItem] = "child"
-        [renderNode] = "displayTreeNode.bind(this)"
-        [searchFilter] = "filterTreeBySearch.bind(this)">
+      <div treeContainer>
+        <div treeHeader>
+          <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
+          <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
+        </div>
         
-      </flat-tree-component>
+        <flat-tree-component 
+          *ngFor = "let child of selectedParcellation.regions "
+          (treeNodeClick) = "handleClickRegion($event)"
+          [inputItem] = "child"
+          [renderNode] = "displayTreeNode.bind(this)"
+          [searchFilter] = "filterTreeBySearch.bind(this)">
+          
+        </flat-tree-component>
+      </div>
     </div>
   </div>
-</ng-template>
+</div>

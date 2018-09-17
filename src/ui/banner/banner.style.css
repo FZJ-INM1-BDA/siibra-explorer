@@ -59,6 +59,7 @@ div[hideScrollbarcontainer]
 {
   width: 20em;
   overflow:hidden;
+  margin-top:2px;
 }
 
 div[searchRegionPopover]

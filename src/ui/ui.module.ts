@@ -24,7 +24,6 @@ import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.compon
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { AtlasBanner } from "./banner/banner.component";
-import { PopoverModule } from "ngx-bootstrap/popover";
 import { CitationsContainer } from "./citation/citations.component";
 import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
@@ -42,8 +41,7 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
     LayoutModule,
     ComponentsModule,
 
-    TooltipModule.forRoot(),
-    PopoverModule.forRoot()
+    TooltipModule.forRoot()
   ],
   declarations : [
     NehubaContainer,

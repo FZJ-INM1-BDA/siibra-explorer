@@ -1,5 +1,5 @@
 <div 
-  *ngFor = "let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter)"
+  *ngFor = "let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe)"
   [ngClass] = "getClass(flattenedItem.flattenedTreeLevel)"
   [attr.flattenedtreelevel] = "flattenedItem.flattenedTreeLevel" 
   [attr.collapsed] = "flattenedItem.collapsed ? flattenedItem.collapsed : false"
@@ -17,7 +17,7 @@
   </span>
   <span 
     *ngIf = "findChildren(flattenedItem).length > 0; else noChildren"
-    (click) = "toggleCollapse(flattenedItem)" >
+    (click) = "$event.stopPropagation(); toggleCollapse(flattenedItem)" >
     <i [ngClass] = "isCollapsed(flattenedItem) ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'" class="glyphicon"></i>
   </span>
   <ng-template #noChildren>
@@ -26,9 +26,7 @@
     </i>
   </ng-template>
   <span
-    (mouseenter) = "treeNodeEnter.emit(flattenedItem)"
-    (mouseleave) = "treeNodeLeave.emit(flattenedItem)"
-    (click) = "treeNodeClick.emit(flattenedItem)"
+    (click) = "treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
     class = "render-node-text"
     [innerHtml] = "flattenedItem | renderPipe : renderNode ">
   </span>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ChangeDetectionStrategy } from "@angular/core";
+import { Component, OnDestroy, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_PARCELLATION, extractLabelIdx, SELECT_REGIONS, NEWVIEWER, getLabelIndexMap, isDefined, CHANGE_NAVIGATION } from "../../services/stateStore.service";
 import { Observable, Subscription, merge, Subject } from "rxjs";
@@ -106,7 +106,6 @@ export class AtlasBanner implements OnDestroy{
   }
 
   handleParcellationChange(parcellation){
-    // const selectedParcellation = this.selectedTemplate.parcellations.find(p=>p.ngId === parcellation.ngId)
     this.selectedParcellation = parcellation
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
   }
@@ -168,7 +167,29 @@ export class AtlasBanner implements OnDestroy{
 
   private handleRegionTreeClickSubject : Subject<any> = new Subject()
 
+  /* NB need to bind two way data binding like this. Or else, on searchInput blur, the flat tree will be rebuilt,
+    resulting in first click to be ignored */
+  changeSearchTerm(event:any){
+    if(event.target.value === this.searchTerm)
+      return
+    this.searchTerm = event.target.value
+  }
+
+  @ViewChild('searchRegionPopover', {read:ElementRef}) inputRegionPopover : ElementRef
+  public showRegionTree: boolean
+
+  @HostListener('document:click',['$event'])
+  closeRegion(event:MouseEvent){
+    /* FF does not implement event.srcElement so use event.originalTarget to polyfill for FF */
+    const contains = this.inputRegionPopover.nativeElement.contains(event.srcElement) || this.inputRegionPopover.nativeElement.contains((event as any).originalTarget)
+    if(contains)
+      this.showRegionTree = true
+    else
+      this.showRegionTree = false
+  }
+
   handleClickRegion(obj:any){
+    obj.event.stopPropagation()
     this.handleRegionTreeClickSubject.next(obj)
   }
 
