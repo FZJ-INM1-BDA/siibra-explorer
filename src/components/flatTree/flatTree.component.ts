@@ -18,19 +18,16 @@ export class FlatTreeComponent{
   @Input() childrenExpanded : boolean = true
 
   @Output() treeNodeClick : EventEmitter<any> = new EventEmitter()
-  @Output() treeNodeEnter : EventEmitter<any> = new EventEmitter()
-  @Output() treeNodeLeave : EventEmitter<any> = new EventEmitter()
+
+  /* highly non-performant. rerenders each time on mouseover or mouseout */
+  // @Output() treeNodeEnter : EventEmitter<any> = new EventEmitter()
+  // @Output() treeNodeLeave : EventEmitter<any> = new EventEmitter()
 
   @Input() renderNode : (item:any)=>string = (item)=>item.name
   @Input() findChildren : (item:any)=>any[] = (item)=>item.children ? item.children : [] 
   @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
-  constructor(){
-    // this.searchedVisibleSet = this.searchFilter()
-  }
-
   getClass(level:number){
-    // return `render-node-level-${level}`
     return [...Array(level+1)].map((v,idx) => `render-node-level-${idx}`).join(' ')
   }
 
@@ -57,9 +54,5 @@ export class FlatTreeComponent{
       .find(id => this.collapsedLevels.has(id))
         ? true
         : false
-  }
-
-  filterRows(items:any[], ){
-
   }
 }

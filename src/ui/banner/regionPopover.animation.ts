@@ -14,9 +14,14 @@ export const regionAnimation = trigger('showState',[
     })
   ),
   transition('* => void', [
-    animate('2300ms ease-in')
+    animate('230ms ease-in')
   ]),
   transition('void => *',[
-    animate('230ms ease-out')
+    style({
+      opacity : '0.0',
+    }),
+    animate('420ms ease-in', style({
+      opacity : '1.0'
+    }))
   ])
 ])
