@@ -1,0 +1,32 @@
+{
+   "reference_atlas":"CCF v3",
+   "name":"hbp-00552_GCaMP6.json",
+   "HBP_Storage_path":"bp00sp01/Pavone_SGA1_1.3.2/hbp-00552/GCaMP6/",
+   "Primary region(s)":"Anterior cingulate area, dorsal part; Anterolateral visual area; Posteromedial visual area; Primary motor area; Primary somatosensory area, barrel field; Primary somatosensory area, lower limb; Primary somatosensory area, nose; Primary somatosensory area, trunk; Primary somatosensory area, unassigned; Primary somatosensory area, upper limb; Primary visual area; Retrosplenial area, dorsal part; Retrosplenial area, lateral agranular part; Retrosplenial area, ventral part; Rostrolateral area; Secondary motor area",
+   "Landmarks":[
+      {
+         "name":"upper left corner",
+         "x":230,
+         "y":294,
+         "z":322.5
+      },
+      {
+         "name":"upper right corner",
+         "x":54.8,
+         "y":277.2,
+         "z":322.5
+      },
+      {
+         "name":"lower left corner",
+         "x":230,
+         "y":294,
+         "z":146.5
+      },
+      {
+         "name":"lower right corner",
+         "x":54.8,
+         "y":277.2,
+         "z":146.5
+      }
+   ]
+}
