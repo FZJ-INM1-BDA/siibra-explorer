@@ -401,12 +401,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   ngLayersChangeHandler(){
 
-    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
-      name : obj.name,
-      type : obj.initialSpecification.type,
-      source : obj.sourceUrl,
-      visible : obj.visible
-    }) as NgLayerInterface)
+    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
+      .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
+      .map(obj => ({
+        name : obj.name,
+        type : obj.initialSpecification.type,
+        source : obj.sourceUrl,
+        visible : obj.visible
+      }) as NgLayerInterface)
   }
 
   rafId : number | null
