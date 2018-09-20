@@ -121,6 +121,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.userLandmarks$ = this.store.pipe(
+      /* TODO: distinct until changed */
       select('viewerState'),
       // filter(state => isDefined(state) && isDefined(state.userLandmarks)),
       map(state => isDefined(state) && isDefined(state.userLandmarks)
@@ -293,7 +294,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.subscriptions.push(
-      this.userLandmarks$.subscribe(landmarks => {
+      this.userLandmarks$.pipe(
+        // distinctUntilChanged((old,new) => )
+      ).subscribe(landmarks => {
         this.userLandmarks = landmarks
         if(this.nehubaViewer){
           this.nehubaViewer.removeUserLandmarks()
