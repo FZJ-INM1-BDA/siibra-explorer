@@ -277,7 +277,8 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
   handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent},searchResult:any){
     
-    const { properties } = searchResult
+    const { properties, kgID } = searchResult
+    
     obj.node.childrenExpanded = !obj.node.childrenExpanded
 
     if(obj.inputItem.mimetype){
@@ -289,7 +290,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       this.dataWindowRegistry.add(obj.inputItem.name)
 
       const component = this.fileViewerComponentFactory.create(this.injector)
-      component.instance.searchResultFile = Object.assign({}, obj.inputItem, { datasetProperties : properties })
+      component.instance.searchResultFile = Object.assign({}, obj.inputItem, { datasetProperties : properties }, kgID ? { kgID } : {})
       const compref = this.widgetServices.addNewWidget(component,{title:obj.inputItem.name,exitable:true,state:'floating'})
 
       /* on destroy, removes name from registry */
