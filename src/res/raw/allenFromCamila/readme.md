@@ -1,0 +1,1 @@
+hbp-[0-9]{5}\_(\s*?:SubjectID)\_(\s*?:SampleID)
