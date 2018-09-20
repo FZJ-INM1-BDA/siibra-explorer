@@ -1,0 +1,23 @@
+{
+   "Reference_atlas":"CCF v3",
+   "Name":"hbp-00648_AFmr1_150519",
+   "HBP_storage_path":"bp00sp03/Sanchez_SGA1_T3.2.3/hbp-00648/",
+   "Semantic links":[
+      {
+         "Sample ID":"PrL-6",
+         "Primary region":"Prelimbic area"
+      },
+      {
+         "Sample ID":"M-6",
+         "Primary region":"Primary motor area"
+      },
+      {
+         "Sample ID":"S-6",
+         "Primary region":"Primary somatosensory area"
+      },
+      {
+         "Sample ID":"V-6",
+         "Primary region":"Anteromedial visual area"
+      }
+   ]
+}
