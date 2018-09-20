@@ -43,6 +43,12 @@ export class AtlasViewerConstantsServices{
       ]
     ],
     [
+      'Allen Mouse Brain Atlas',
+      [
+        'res/json/allenTestAggregated.json'
+      ]
+    ],
+    [
       'Fibre Bundle Atlas - Long Bundle',
       [
         'res/json/dwmAggregatedData.json'

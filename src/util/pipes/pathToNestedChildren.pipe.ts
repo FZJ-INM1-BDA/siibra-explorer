@@ -69,7 +69,9 @@ export class PathToNestedChildren implements PipeTransform{
   private getNextLevelHeirachy(file:HasPathProperty):HasPathProperty{
     return Object.assign({},file,
       {
-        path:file.path.slice(this.findRealIndex(file.path)+1)
+        path: file.path 
+          ? file.path.slice(this.findRealIndex(file.path)+1)
+          : ' '
       })
   }
 
@@ -92,6 +94,10 @@ export class PathToNestedChildren implements PipeTransform{
   }
 
   private findRealIndex(path:string):number{
+
+    if(!path){
+      return 0
+    }
 
     let idx = path.indexOf('/')
     while(path[idx-1] === '\\' && idx >= 0){

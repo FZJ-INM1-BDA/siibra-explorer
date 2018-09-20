@@ -62,6 +62,11 @@
       [searchResultFile] = "searchResultFile">
     </dedicated-viewer>
   </div>
+  <div *ngSwitchCase = "'raw'">
+    <a href = "about:blank">
+      See data in Knowledge Graph {{ searchResultFile.kgID }}
+    </a>
+  </div>
   <div *ngSwitchCase = "'application/nehuba-layer'">
     APPLICATION NEHUBA LAYER - NOT YET IMPLEMENTED
     <!-- <dedicated-view-controller
@@ -78,7 +83,7 @@
 </div>
 
 <!-- caption -->
-<readmore-component *ngIf = "searchResultFile.properties.description">
+<readmore-component *ngIf = "searchResultFile.properties && searchResultFile.properties.description">
   <small id = "captions">
     {{ searchResultFile.properties.description }}
   </small>
