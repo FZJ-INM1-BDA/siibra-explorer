@@ -1,1 +1,2590 @@
-[{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)","regionName":[{"regionName":"Area hIP1 (IPS)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)","name":"Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hIP1 (IPS)","description":"","publications":[{"doi":"https://doi.org/10.1002/cne.20849","citation":"Choi, H.J., Zilles, K., Mohlberg, H., Schleicher, A., Fink, G.R., Armstrong, E., Amunts, K. 2006. Cytoarchitectonic identification and probabilistic mapping of two distinct areas within the anterior ventral bank of the human intraparietal sulcus. J Comp Neurol. 495(1):53-69"}],"associatedRegion":"Area hIP1 (IPS)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)","regionName":[{"regionName":"Area hIP2 (IPS)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)","name":"Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hIP2 (IPS)","description":"","publications":[{"doi":"https://doi.org/10.1002/cne.20849","citation":"Choi, H.J., Zilles, K., Mohlberg, H., Schleicher, A., Fink, G.R., Armstrong, E., Amunts, K. 2006. Cytoarchitectonic identification and probabilistic mapping of two distinct areas within the anterior ventral bank of the human intraparietal sulcus. J Comp Neurol. 495(1):53-69"}],"associatedRegion":"Area hIP2 (IPS)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)","regionName":[{"regionName":"Area hIP3 (IPS)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)","name":"Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hIP3 (IPS)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area hIP3 (IPS)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PF (IPL)","regionName":[{"regionName":"Area PF (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PF (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PF (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PF.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PF (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PF (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)","regionName":[{"regionName":"Area PFcm (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFcm.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PFcm (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PFcm (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PFm (IPL)","regionName":[{"regionName":"Area PFm (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PFm (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PFm (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFm.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PFm (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PFm (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PFop (IPL)","regionName":[{"regionName":"Area PFop (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PFop (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PFop (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFop.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PFop (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PFop (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PFt (IPL)","regionName":[{"regionName":"Area PFt (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PFt (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PFt (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFt.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PFt (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PFt (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PGa (IPL)","regionName":[{"regionName":"Area PGa (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PGa (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PGa (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PGa.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PGa (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PGa (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area PGp (IPL)","regionName":[{"regionName":"Area PGp (IPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area PGp (IPL)","name":"Cytoarchitectonic Probabilistic Map for Area PGp (IPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PGp.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area PGp (IPL)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2006.06.054","citation":"Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z","citation":"Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"}],"associatedRegion":"Area PGp (IPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)","regionName":[{"regionName":"Area OP1 (POperc)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)","name":"Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area OP1 (POperc)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi105","citation":"Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106","citation":"Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"}],"associatedRegion":"Area OP1 (POperc)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)","regionName":[{"regionName":"Area OP2 (POperc)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)","name":"Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area OP2 (POperc)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhi105","citation":"Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106","citation":"Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"}],"associatedRegion":"Area OP2 (POperc)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)","regionName":[{"regionName":"Area OP3 (POperc)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)","name":"Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area OP3 (POperc)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhi105","citation":"Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106","citation":"Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"}],"associatedRegion":"Area OP3 (POperc)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)","regionName":[{"regionName":"Area OP4 (POperc)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)","name":"Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP4.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area OP4 (POperc)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhi105","citation":"Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106","citation":"Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"}],"associatedRegion":"Area OP4 (POperc)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)","regionName":[{"regionName":"Area 1 (PostCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)","name":"Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 1 (PostCG)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.1999.0440","citation":"Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548","citation":"Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"}],"associatedRegion":"Area 1 (PostCG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)","regionName":[{"regionName":"Area 2 (PostCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)","name":"Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 2 (PostCS)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.2001.0858","citation":"Grefkes, C., Geyer, S., Schormann, T., Roland, P., Zilles, K. 2001. Human somatosensory area 2: observer-independent cytoarchitectonic mapping, interindividual variability, and population map. Neuroimage. 14(3):617-31"}],"associatedRegion":"Area 2 (PostCS)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)","regionName":[{"regionName":"Area 3a (PostCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)","name":"Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_3a.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 3a (PostCG)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.1999.0440","citation":"Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548","citation":"Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"}],"associatedRegion":"Area 3a (PostCG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)","regionName":[{"regionName":"Area 3b (PostCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)","name":"Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_3b.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 3b (PostCG)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.1999.0440","citation":"Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548","citation":"Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"}],"associatedRegion":"Area 3b (PostCG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)","regionName":[{"regionName":"Area 5Ci (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5Ci.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 5Ci (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 5Ci (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 5L (SPL)","regionName":[{"regionName":"Area 5L (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 5L (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 5L (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5L.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 5L (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57 "}],"associatedRegion":"Area 5L (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 5M (SPL)","regionName":[{"regionName":"Area 5M (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 5M (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 5M (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5M.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 5M (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 5M (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 7A (SPL)","regionName":[{"regionName":"Area 7A (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 7A (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 7A (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7A.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 7A (SPL)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 7A (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 7M (SPL)","regionName":[{"regionName":"Area 7M (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 7M (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 7M (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7M.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 7M (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 7M (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 7P (SPL)","regionName":[{"regionName":"Area 7P (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 7P (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 7P (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7P.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 7P (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 7P (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)","regionName":[{"regionName":"Area 7PC (SPL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)","name":"Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7PC.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 7PC (SPL)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhm116","citation":"Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241","citation":"Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"}],"associatedRegion":"Area 7PC (SPL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)","regionName":[{"regionName":"Area TE 1.0 (HESCHL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te10.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area TE 1.0 (HESCHL)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.2000.0715","citation":"Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714","citation":"Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"}],"associatedRegion":"Area TE 1.0 (HESCHL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)","regionName":[{"regionName":"Area TE 1.1 (HESCHL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te11.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area TE 1.1 (HESCHL)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.2000.0715","citation":"Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714","citation":"Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"}],"associatedRegion":"Area TE 1.1 (HESCHL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)","regionName":[{"regionName":"Area TE 1.2 (HESCHL)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)","name":"Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te12.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area TE 1.2 (HESCHL)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.2000.0715","citation":"Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714","citation":"Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"}],"associatedRegion":"Area TE 1.2 (HESCHL)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)","regionName":[{"regionName":"Area TE 3 (STG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)","name":"Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area TE 3 (STG)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0029-1","citation":"Morosan, P., Schleicher, A., Amunts, K., Zilles, K. 2005. Multimodal architectonic mapping of human superior temporal gyrus. Anat Embryol (Berl). 210(5-6):401-6"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.1998.0385","citation":"Schleicher, A., Amunts, K., Geyer, S., Morosan, P., Zilles, K. 1999. Observer-independent method for microstructural parcellation of cerebral cortex: A quantitative approach to cytoarchitectonics. Neuroimage. 9(1):165-77     "}],"associatedRegion":"Area TE 3 (STG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)","regionName":[{"regionName":"Area FG1 (FusG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)","name":"Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area FG1 (FusG) ","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-012-0411-8","citation":"Caspers, J., Zilles, K., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Amunts, K. 2013. Cytoarchitectonical analysis and probabilistic mapping of two extrastriate areas of the human posterior fusiform gyrus. Brain Struct Funct. 218(2):511-26   "}],"associatedRegion":"Area FG1 (FusG) ","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)","regionName":[{"regionName":"Area FG2 (FusG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)","name":"Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area FG2 (FusG)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-012-0411-8","citation":"Caspers, J., Zilles, K., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Amunts, K. 2013. Cytoarchitectonical analysis and probabilistic mapping of two extrastriate areas of the human posterior fusiform gyrus. Brain Struct Funct. 218(2):511-26   "}],"associatedRegion":"Area FG2 (FusG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)","regionName":[{"regionName":"Area FG3 (FusG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)","name":"Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area FG3 (FusG)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhv225","citation":"Lorenz, S., Weiner, K.S., Caspers, J., Mohlberg, H., Schleicher, A., Bludau, S., Eickhoff, S.B., Grill-Spector, K., Zilles, K., Amunts, K. 2017. Two New Cytoarchitectonic Areas on the Human Mid-Fusiform Gyrus. Cereb Cortex. 27(1):373-385"}],"associatedRegion":"Area FG3 (FusG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)","regionName":[{"regionName":"Area FG4 (FusG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)","name":"Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG4.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area FG4 (FusG)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhv225","citation":"Lorenz, S., Weiner, K.S., Caspers, J., Mohlberg, H., Schleicher, A., Bludau, S., Eickhoff, S.B., Grill-Spector, K., Zilles, K., Amunts, K. 2017. Two New Cytoarchitectonic Areas on the Human Mid-Fusiform Gyrus. Cereb Cortex. 27(1):373-385"}],"associatedRegion":"Area FG4 (FusG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 44 (IFG)","regionName":[{"regionName":"Area 44 (IFG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 44 (IFG)","name":"Cytoarchitectonic Probabilistic Map for Area 44 (IFG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Broca_44.nii","properties":{},"kgID":"Dataset/d0abf7131bc3460ac188632f40bf0748"}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 44 (IFG)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Broca%27s+region+revisited%3A+Cytoarchitecture+and+intersubject+variability","citation":"Amunts, K., Schleicher, A., Bürgel, U., Mohlberg, H., Uylings, H.B., Zilles, K. 1999. Broca's region revisited: cytoarchitecture and intersubject variability. J Comp Neurol. 412(2):319-41"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Analysis+of+neural+mechanisms+underlying+verbal+fluency+in+cytoarchitectonically+defined+stereotaxic+space%E2%80%94The+roles+of+Brodmann+areas+44+and+45","citation":"Amunts, K., Weiss, P.H., Mohlberg, H., Pieperhoff, P., Eickhoff, S., Gurd, J.M., Marshall, J.C., Shah, N.J., Fink, G.R., Zilles, K. 2004. Analysis of neural mechanisms underlying verbal fluency in cytoarchitectonically defined stereotaxic space--the roles of Brodmann areas 44 and 45. Neuroimage. 22(1):42-56"}],"associatedRegion":"Area 44 (IFG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 45 (IFG)","regionName":[{"regionName":"Area 45 (IFG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 45 (IFG)","name":"Cytoarchitectonic Probabilistic Map for Area 45 (IFG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Broca_45.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 45 (IFG)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Broca%27s+region+revisited%3A+Cytoarchitecture+and+intersubject+variability","citation":"Amunts, K., Schleicher, A., Bürgel, U., Mohlberg, H., Uylings, H.B., Zilles, K. 1999. Broca's region revisited: cytoarchitecture and intersubject variability. J Comp Neurol. 412(2):319-41"},{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Analysis+of+neural+mechanisms+underlying+verbal+fluency+in+cytoarchitectonically+defined+stereotaxic+space%E2%80%94The+roles+of+Brodmann+areas+44+and+45","citation":"Amunts, K., Weiss, P.H., Mohlberg, H., Pieperhoff, P., Eickhoff, S., Gurd, J.M., Marshall, J.C., Shah, N.J., Fink, G.R., Zilles, K. 2004. Analysis of neural mechanisms underlying verbal fluency in cytoarchitectonically defined stereotaxic space--the roles of Brodmann areas 44 and 45. Neuroimage. 22(1):42-56"}],"associatedRegion":"Area 45 (IFG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)","regionName":[{"regionName":"Area Fp1 (Fpole)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)","name":"Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/FrontalPole_Fp1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Fp1 (Fpole)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitecture%2C+probability+maps+and+functions+of+the+human+frontal+pole","citation":"Bludau, S., Eickhoff, S.B., Mohlberg, H., Caspers, S., Laird, A.R., Fox, P.T., Schleicher, A., Zilles, K., Amunts, K. 2014. Cytoarchitecture, probability maps and functions of the human frontal pole. Neuroimage. 93 Pt 2:260-75"}],"associatedRegion":"Area Fp1 (Fpole)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)","regionName":[{"regionName":"Area Fp2 (Fpole)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)","name":"Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/FrontalPole_Fp2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Fp2 (Fpole)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitecture%2C+probability+maps+and+functions+of+the+human+frontal+pole","citation":"Bludau, S., Eickhoff, S.B., Mohlberg, H., Caspers, S., Laird, A.R., Fox, P.T., Schleicher, A., Zilles, K., Amunts, K. 2014. Cytoarchitecture, probability maps and functions of the human frontal pole. Neuroimage. 93 Pt 2:260-75"}],"associatedRegion":"Area Fp2 (Fpole)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)","regionName":[{"regionName":"Area 4a (PreCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)","name":"Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Motor_4a.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 4a (PreCG)","description":"","publications":[{"doi":"https://doi.org/10.1038/382805a0","citation":"Geyer, S., Ledberg, A., Schleicher, A., Kinomura, S., Schormann, T., Bürgel, U., Klingberg, T., Larsson, J., Zilles, K., Roland, PE. 1996. Two different areas within the primary motor cortex of man. Nature. 382(6594):805-7"}],"associatedRegion":"Area 4a (PreCG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)","regionName":[{"regionName":"Area 4p (PreCG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)","name":"Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Motor_4p.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 4p (PreCG)","description":"","publications":[{"doi":"https://doi.org/10.1038/382805a0","citation":"Geyer, S., Ledberg, A., Schleicher, A., Kinomura, S., Schormann, T., Bürgel, U., Klingberg, T., Larsson, J., Zilles, K., Roland, PE. 1996. Two different areas within the primary motor cortex of man. Nature. 382(6594):805-7"}],"associatedRegion":"Area 4p (PreCG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)","regionName":[{"regionName":"Area Fo1 (OFC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)","name":"Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Fo1 (OFC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"}],"associatedRegion":"Area Fo1 (OFC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)","regionName":[{"regionName":"Area Fo2 (OFC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)","name":"Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Fo2 (OFC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"}],"associatedRegion":"Area Fo2 (OFC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)","regionName":[{"regionName":"Area Fo3 (OFC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)","name":"Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Fo3 (OFC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"}],"associatedRegion":"Area Fo3 (OFC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 33 (ACC)","regionName":[{"regionName":"Area 33 (ACC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 33 (ACC)","name":"Cytoarchitectonic Probabilistic Map for Area 33 (ACC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_33.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 33 (ACC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "}],"associatedRegion":"Area 33 (ACC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area 25 (sACC)","regionName":[{"regionName":"Area 25 (sACC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area 25 (sACC)","name":"Cytoarchitectonic Probabilistic Map for Area 25 (sACC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_25.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area 25 (sACC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "}],"associatedRegion":"Area 25 (sACC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area s24 (sACC)","regionName":[{"regionName":"Area s24 (sACC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area s24 (sACC)","name":"Cytoarchitectonic Probabilistic Map for Area s24 (sACC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_s24.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area s24 (sACC)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.cortex.2015.11.006","citation":"Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "}],"associatedRegion":"Area s24 (sACC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area s32 (sACC)","regionName":[{"regionName":"Area s32 (sACC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area s32 (sACC)","name":"Cytoarchitectonic Probabilistic Map for Area s32 (sACC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_s32.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area s32 (sACC)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Functional+organization+of+human+subgenual+cortical+areas%3A+Relationship+between+architectonical+segregation+and+connectional+heterogeneity","citation":"Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "}],"associatedRegion":"Area s32 (sACC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)","regionName":[{"regionName":"CA1 (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"CA1 (Hippocampus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"CA1 (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)","regionName":[{"regionName":"CA2 (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"CA2 (Hippocampus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"CA2 (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)","regionName":[{"regionName":"CA3 (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA3.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"CA3 (Hippocampus)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitectonic+mapping+of+the+human+amygdala%2C+hippocampal+region+and+entorhinal+cortex%3A+intersubject+variability+and+probability+maps","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"CA3 (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for DG (Hippocampus)","regionName":[{"regionName":"DG (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for DG (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for DG (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_DG.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"DG (Hippocampus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"DG (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Entorhinal Cortex","regionName":[{"regionName":"Entorhinal Cortex","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Entorhinal Cortex","name":"Cytoarchitectonic Probabilistic Map for Entorhinal Cortex","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_EC.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Entorhinal Cortex","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"Entorhinal Cortex","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)","regionName":[{"regionName":"HATA (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_HATA.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"HATA (Hippocampus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"HATA (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)","regionName":[{"regionName":"Subc (Hippocampus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)","name":"Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_Subc.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Subc (Hippocampus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"Subc (Hippocampus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)","regionName":[{"regionName":"Area Id1 (Insula)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)","name":"Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Id1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Id1 (Insula)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhp208","citation":"Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"}],"associatedRegion":"Area Id1 (Insula)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)","regionName":[{"regionName":"Area Ig1 (Insula)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)","name":"Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Ig1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Ig1 (Insula)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhp208","citation":"Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"}],"associatedRegion":"Area Ig1 (Insula)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)","regionName":[{"regionName":"Area Ig2 (Insula)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)","name":"Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Ig2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area Ig2 (Insula)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhp208","citation":"Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"}],"associatedRegion":"Area Ig2 (Insula)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)","regionName":[{"regionName":"Area hOc1 (V1, 17, CalcS)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)","name":"Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc1.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc1 (V1, 17, CalcS)","description":"","publications":[{"doi":"https://doi.org/10.1006/nimg.1999.0516","citation":"Amunts, K., Malikovic, A., Mohlberg, H., Schormann, T., Zilles, K. 2000. Brodmann's areas 17 and 18 brought into stereotaxic space-where and how variable? Neuroimage. 11(1):66-84"}],"associatedRegion":"Area hOc1 (V1, 17, CalcS)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)","regionName":[{"regionName":"Area hOc2 (V2, 18)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)","name":"Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc2.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc2 (V2, 18)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/10686118","citation":"Amunts, K., Malikovic, A., Mohlberg, H., Schormann, T., Zilles, K. 2000. Brodmann's areas 17 and 18 brought into stereotaxic space-where and how variable? Neuroimage. 11(1):66-84"}],"associatedRegion":"Area hOc2 (V2, 18)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)","regionName":[{"regionName":"Area hOc3d (Cuneus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)","name":"Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc3d.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc3d (Cuneus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-012-0390-9","citation":"Kujovic, M., Zilles, K., Malikovic, A., Schleicher, A., Mohlberg, H., Rottschy, C., Eickhoff, S.B., Amunts, K. 2013. Cytoarchitectonic mapping of the human dorsal extrastriate cortex. Brain Struct Funct. 218(1):157-72"}],"associatedRegion":"Area hOc3d (Cuneus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)","regionName":[{"regionName":"Area hOc4d (Cuneus)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)","name":"Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4d.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc4d (Cuneus)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-012-0390-9","citation":"Kujovic, M., Zilles, K., Malikovic, A., Schleicher, A., Mohlberg, H., Rottschy, C., Eickhoff, S.B., Amunts, K. 2013. Cytoarchitectonic mapping of the human dorsal extrastriate cortex. Brain Struct Funct. 218(1):157-72"}],"associatedRegion":"Area hOc4d (Cuneus)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)","regionName":[{"regionName":"Area hOc3v (LingG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)","name":"Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc3v.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc3v (LingG)","description":"","publications":[{"doi":"https://doi.org/10.1002/hbm.20348","citation":"Rottschy, C., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Kujovic, M., Zilles, K., Amunts, K. 2007. Ventral visual cortex in humans: cytoarchitectonic mapping of two extrastriate areas. Hum Brain Mapp. 28(10):1045-59"}],"associatedRegion":"Area hOc3v (LingG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)","regionName":[{"regionName":"Area hOc4v (LingG)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)","name":"Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4v.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc4v (LingG)","description":"","publications":[{"doi":"https://doi.org/10.1002/hbm.20348","citation":"Rottschy, C., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Kujovic, M., Zilles, K., Amunts, K. 2007. Ventral visual cortex in humans: cytoarchitectonic mapping of two extrastriate areas. Hum Brain Mapp. 28(10):1045-59"}],"associatedRegion":"Area hOc4v (LingG)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)","regionName":[{"regionName":"Area hOc4la (LOC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)","name":"Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4la.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc4la (LOC)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-015-1009-8","citation":"Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Kujovic, M., Palomero-Gallagher, N., Eickhoff, S.B., Zilles, K. 2016. Cytoarchitecture of the human lateral occipital cortex: mapping of two extrastriate areas hOc4la and hOc4lp. Brain Struct Funct. 221(4):1877-97 "}],"associatedRegion":"Area hOc4la (LOC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)","regionName":[{"regionName":"Area hOc4lp (LOC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)","name":"Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4lp.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc4lp (LOC)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-015-1009-8","citation":"Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Kujovic, M., Palomero-Gallagher, N., Eickhoff, S.B., Zilles, K. 2016. Cytoarchitecture of the human lateral occipital cortex: mapping of two extrastriate areas hOc4la and hOc4lp. Brain Struct Funct. 221(4):1877-97 "}],"associatedRegion":"Area hOc4lp (LOC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)","regionName":[{"regionName":"Area hOc5 (LOC)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)","name":"Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc5.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Area hOc5 (LOC)","description":"","publications":[{"doi":"https://doi.org/10.1093/cercor/bhj181","citation":"Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Eickhoff, S.B., Wilms, M., Palomero-Gallagher, N., Armstrong, E., Zilles, K. 2007. Cytoarchitectonic analysis of the human extrastriate cortex in the region of V5/MT+: a probabilistic, stereotaxic map of area hOc5. Cereb Cortex. 17(3):562-74"}],"associatedRegion":"Area hOc5 (LOC)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for AStr (Amygdala)","regionName":[{"regionName":"AStr (Amygdala)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for AStr (Amygdala)","name":"Cytoarchitectonic Probabilistic Map for AStr (Amygdala)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_AStr.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"AStr (Amygdala)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"AStr (Amygdala)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for CM (Amygdala)","regionName":[{"regionName":"CM (Amygdala)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for CM (Amygdala)","name":"Cytoarchitectonic Probabilistic Map for CM (Amygdala)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_CM.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"CM (Amygdala)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"CM (Amygdala)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for LB (Amygdala)","regionName":[{"regionName":"LB (Amygdala)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for LB (Amygdala)","name":"Cytoarchitectonic Probabilistic Map for LB (Amygdala)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_LB.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"LB (Amygdala)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"LB (Amygdala)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for SF (Amygdala)","regionName":[{"regionName":"SF (Amygdala)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for SF (Amygdala)","name":"Cytoarchitectonic Probabilistic Map for SF (Amygdala)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_SF.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"SF (Amygdala)","description":"","publications":[{"doi":"https://doi.org/10.1007/s00429-005-0025-5","citation":"Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"}],"associatedRegion":"SF (Amygdala)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)","regionName":[{"regionName":"Ch 1-3 (Basal Forebrain)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)","name":"Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Bforebrain_123.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Ch 1-3 (Basal Forebrain)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2008.05.055","citation":"Zaborszky, L., Hoemke, L., Mohlberg, H., Schleicher, A., Amunts, K., Zilles, K. 2008. Stereotaxic probabilistic maps of the magnocellular cell groups in human basal forebrain. Neuroimage. 42(3):1127-41"}],"associatedRegion":"Ch 1-3 (Basal Forebrain)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)","regionName":[{"regionName":"Ch 4 (Basal Forebrain)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)","name":"Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Bforebrain_4.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Ch 4 (Basal Forebrain)","description":"","publications":[{"doi":"https://doi.org/10.1016/j.neuroimage.2008.05.055","citation":"Zaborszky, L., Hoemke, L., Mohlberg, H., Schleicher, A., Amunts, K., Zilles, K. 2008. Stereotaxic probabilistic maps of the magnocellular cell groups in human basal forebrain. Neuroimage. 42(3):1127-41"}],"associatedRegion":"Ch 4 (Basal Forebrain)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)","regionName":[{"regionName":"Dorsal Dentate Nucleus (Cerebellum)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)","name":"Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ndentd.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Dorsal Dentate Nucleus (Cerebellum)","description":"","publications":[{"doi":"https://doi.org/10.3389/fnana.2015.00054","citation":"Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."}],"associatedRegion":"Dorsal Dentate Nucleus (Cerebellum)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)","regionName":[{"regionName":"Ventral Dentate Nucleus (Cerebellum)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)","name":"Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ndentv.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Ventral Dentate Nucleus (Cerebellum)","description":"","publications":[{"doi":"https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitectonic+mapping+of+the+human+brain+cerebellar+nuclei+in+stereotaxic+space+and+delineation+of+their+co-activation+patterns","citation":"Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."}],"associatedRegion":"Ventral Dentate Nucleus (Cerebellum)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)","regionName":[{"regionName":"Fastigial Nucleus (Cerebellum)","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)","name":"Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Nfast.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Fastigial Nucleus (Cerebellum)","description":"","publications":[{"doi":"https://doi.org/10.3389/fnana.2015.00054","citation":"Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."}],"associatedRegion":"Fastigial Nucleus (Cerebellum)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}},{"type":"Cytoarchitectonic Probabilistic Map","name":"Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus","regionName":[{"regionName":"emboliform nucleus, globose nucleus","relationship":"equals"}],"files":[{"filename":"Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus","name":"Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus","mimetype":"application/nifti","url":"https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ninterp.nii","properties":{}}],"targetParcellation":"JuBrain Cytoarchitectonic Atlas","properties":{"name":"Interposed Nucleus (Cerebellum)","description":"","publications":[{"doi":"https://doi.org/10.3389/fnana.2015.00054","citation":"Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."}],"associatedRegion":"Interposed Nucleus (Cerebellum)","associatedParcellation":"JuBrain Cytoarchitectonic Atlas","datasetInfo":"MNIColin27_PMap.json"}}]
+[
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)",
+    "regionName": [
+      {
+        "regionName": "Area hIP1 (IPS)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hIP1 (IPS)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1002/cne.20849",
+          "citation": "Choi, H.J., Zilles, K., Mohlberg, H., Schleicher, A., Fink, G.R., Armstrong, E., Amunts, K. 2006. Cytoarchitectonic identification and probabilistic mapping of two distinct areas within the anterior ventral bank of the human intraparietal sulcus. J Comp Neurol. 495(1):53-69"
+        }
+      ],
+      "associatedRegion": "Area hIP1 (IPS)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)",
+    "regionName": [
+      {
+        "regionName": "Area hIP2 (IPS)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hIP2 (IPS)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hIP2 (IPS)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1002/cne.20849",
+          "citation": "Choi, H.J., Zilles, K., Mohlberg, H., Schleicher, A., Fink, G.R., Armstrong, E., Amunts, K. 2006. Cytoarchitectonic identification and probabilistic mapping of two distinct areas within the anterior ventral bank of the human intraparietal sulcus. J Comp Neurol. 495(1):53-69"
+        }
+      ],
+      "associatedRegion": "Area hIP2 (IPS)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)",
+    "regionName": [
+      {
+        "regionName": "Area hIP3 (IPS)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hIP3 (IPS)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/AIPS_IP3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hIP3 (IPS)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area hIP3 (IPS)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PF (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PF (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PF (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PF (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PF.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PF (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PF (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PFcm (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PFcm (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFcm.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PFcm (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PFcm (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PFm (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PFm (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PFm (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PFm (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFm.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PFm (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PFm (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PFop (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PFop (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PFop (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PFop (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFop.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PFop (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PFop (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PFt (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PFt (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PFt (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PFt (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PFt.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PFt (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PFt (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PGa (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PGa (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PGa (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PGa (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PGa.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PGa (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PGa (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area PGp (IPL)",
+    "regionName": [
+      {
+        "regionName": "Area PGp (IPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area PGp (IPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area PGp (IPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/IPL_PGp.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area PGp (IPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2006.06.054",
+          "citation": "Caspers, S., Geyer, S., Schleicher, A., Mohlberg, H., Amunts, K., Zilles, K. 2006. The human inferior parietal cortex: cytoarchitectonic parcellation and interindividual variability. Neuroimage. 33(2):430-48 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-008-0195-z",
+          "citation": "Caspers, S., Eickhoff, S.B., Geyer, S., Scheperjans, F., Mohlberg, H., Zilles, K., Amunts, K. 2008. The human inferior parietal lobule in stereotaxic space. Brain Struct Funct. 212(6):481-95"
+        }
+      ],
+      "associatedRegion": "Area PGp (IPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)",
+    "regionName": [
+      {
+        "regionName": "Area OP1 (POperc)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area OP1 (POperc)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area OP1 (POperc)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi105",
+          "citation": "Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106",
+          "citation": "Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"
+        }
+      ],
+      "associatedRegion": "Area OP1 (POperc)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)",
+    "regionName": [
+      {
+        "regionName": "Area OP2 (POperc)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area OP2 (POperc)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area OP2 (POperc)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhi105",
+          "citation": "Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106",
+          "citation": "Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"
+        }
+      ],
+      "associatedRegion": "Area OP2 (POperc)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)",
+    "regionName": [
+      {
+        "regionName": "Area OP3 (POperc)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area OP3 (POperc)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area OP3 (POperc)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhi105",
+          "citation": "Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106",
+          "citation": "Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"
+        }
+      ],
+      "associatedRegion": "Area OP3 (POperc)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)",
+    "regionName": [
+      {
+        "regionName": "Area OP4 (POperc)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area OP4 (POperc)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Operculum_OP4.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area OP4 (POperc)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhi105",
+          "citation": "Eickhoff, S.B., Schleicher, A., Zilles, K., Amunts, K. 2006. The human parietal operculum. I. Cytoarchitectonic mapping of subdivisions. Cereb Cortex. 16(2):254-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhi106",
+          "citation": "Eickhoff, S.B., Amunts, K., Mohlberg, H., Zilles, K. 2006. The human parietal operculum. II. Stereotaxic maps and correlation with functional imaging results. Cereb Cortex. 16(2):268-79"
+        }
+      ],
+      "associatedRegion": "Area OP4 (POperc)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)",
+    "regionName": [
+      {
+        "regionName": "Area 1 (PostCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 1 (PostCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 1 (PostCG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.1999.0440",
+          "citation": "Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548",
+          "citation": "Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"
+        }
+      ],
+      "associatedRegion": "Area 1 (PostCG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)",
+    "regionName": [
+      {
+        "regionName": "Area 2 (PostCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 2 (PostCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 2 (PostCS)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.2001.0858",
+          "citation": "Grefkes, C., Geyer, S., Schormann, T., Roland, P., Zilles, K. 2001. Human somatosensory area 2: observer-independent cytoarchitectonic mapping, interindividual variability, and population map. Neuroimage. 14(3):617-31"
+        }
+      ],
+      "associatedRegion": "Area 2 (PostCS)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)",
+    "regionName": [
+      {
+        "regionName": "Area 3a (PostCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 3a (PostCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_3a.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 3a (PostCG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.1999.0440",
+          "citation": "Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548",
+          "citation": "Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"
+        }
+      ],
+      "associatedRegion": "Area 3a (PostCG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)",
+    "regionName": [
+      {
+        "regionName": "Area 3b (PostCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 3b (PostCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/PSC_3b.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 3b (PostCG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.1999.0440",
+          "citation": "Geyer, S., Schleicher, A., Zilles, K. 1999. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Neuroimage. 10(1):63-83 "
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0548",
+          "citation": "Geyer, S., Schormann, T., Mohlberg, H., Zilles, K. 2000. Areas 3a, 3b, and 1 of human primary somatosensory cortex. Part 2. Spatial normalization to standard anatomical space. Neuroimage. 11(6 Pt 1):684-96"
+        }
+      ],
+      "associatedRegion": "Area 3b (PostCG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 5Ci (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 5Ci (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5Ci.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 5Ci (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 5Ci (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 5L (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 5L (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 5L (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 5L (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5L.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 5L (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57 "
+        }
+      ],
+      "associatedRegion": "Area 5L (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 5M (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 5M (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 5M (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 5M (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_5M.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 5M (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 5M (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 7A (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 7A (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 7A (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 7A (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7A.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 7A (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 7A (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 7M (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 7M (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 7M (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 7M (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7M.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 7M (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 7M (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 7P (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 7P (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 7P (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 7P (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7P.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 7P (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 7P (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)",
+    "regionName": [
+      {
+        "regionName": "Area 7PC (SPL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 7PC (SPL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/SPL_7PC.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 7PC (SPL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhm116",
+          "citation": "Scheperjans, F., Hermann, K., Eickhoff, S.B., Amunts, K., Schleicher, A., Zilles, K. 2008. Observer-independent cytoarchitectonic mapping of the human superior parietal cortex. Cereb Cortex. 18(4):846-67"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1093%2Fcercor%2Fbhm241",
+          "citation": "Scheperjans, F., Eickhoff, S.B., Hömke, L., Mohlberg, H., Hermann, K., Amunts, K., Zilles, K. 2008. Probabilistic maps, morphometry, and variability of cytoarchitectonic areas in the human superior parietal cortex. Cereb Cortex. 18(9):2141-57"
+        }
+      ],
+      "associatedRegion": "Area 7PC (SPL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)",
+    "regionName": [
+      {
+        "regionName": "Area TE 1.0 (HESCHL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.0 (HESCHL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te10.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area TE 1.0 (HESCHL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.2000.0715",
+          "citation": "Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714",
+          "citation": "Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"
+        }
+      ],
+      "associatedRegion": "Area TE 1.0 (HESCHL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)",
+    "regionName": [
+      {
+        "regionName": "Area TE 1.1 (HESCHL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.1 (HESCHL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te11.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area TE 1.1 (HESCHL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.2000.0715",
+          "citation": "Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714",
+          "citation": "Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"
+        }
+      ],
+      "associatedRegion": "Area TE 1.1 (HESCHL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)",
+    "regionName": [
+      {
+        "regionName": "Area TE 1.2 (HESCHL)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area TE 1.2 (HESCHL)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te12.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area TE 1.2 (HESCHL)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.2000.0715",
+          "citation": "Morosan, P., Rademacher, J., Schleicher, A., Amunts, K., Schormann, T., Zilles, K. 2001. Human primary auditory cortex: cytoarchitectonic subdivisions and mapping into a spatial reference system. Neuroimage. 13(4):684-701"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.2000.0714",
+          "citation": "Rademacher, J., Morosan, P., Schormann, T., Schleicher, A., Werner, C., Freund, H.J., Zilles, K. 2001. Probabilistic mapping and volume measurement of human primary auditory cortex. Neuroimage. 13(4):669-83"
+        }
+      ],
+      "associatedRegion": "Area TE 1.2 (HESCHL)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)",
+    "regionName": [
+      {
+        "regionName": "Area TE 3 (STG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area TE 3 (STG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Auditory_Te3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area TE 3 (STG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0029-1",
+          "citation": "Morosan, P., Schleicher, A., Amunts, K., Zilles, K. 2005. Multimodal architectonic mapping of human superior temporal gyrus. Anat Embryol (Berl). 210(5-6):401-6"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1006%2Fnimg.1998.0385",
+          "citation": "Schleicher, A., Amunts, K., Geyer, S., Morosan, P., Zilles, K. 1999. Observer-independent method for microstructural parcellation of cerebral cortex: A quantitative approach to cytoarchitectonics. Neuroimage. 9(1):165-77     "
+        }
+      ],
+      "associatedRegion": "Area TE 3 (STG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)",
+    "regionName": [
+      {
+        "regionName": "Area FG1 (FusG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area FG1 (FusG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area FG1 (FusG) ",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=10.1007%2Fs00429-012-0411-8",
+          "citation": "Caspers, J., Zilles, K., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Amunts, K. 2013. Cytoarchitectonical analysis and probabilistic mapping of two extrastriate areas of the human posterior fusiform gyrus. Brain Struct Funct. 218(2):511-26   "
+        }
+      ],
+      "associatedRegion": "Area FG1 (FusG) ",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)",
+    "regionName": [
+      {
+        "regionName": "Area FG2 (FusG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area FG2 (FusG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area FG2 (FusG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-012-0411-8",
+          "citation": "Caspers, J., Zilles, K., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Amunts, K. 2013. Cytoarchitectonical analysis and probabilistic mapping of two extrastriate areas of the human posterior fusiform gyrus. Brain Struct Funct. 218(2):511-26   "
+        }
+      ],
+      "associatedRegion": "Area FG2 (FusG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)",
+    "regionName": [
+      {
+        "regionName": "Area FG3 (FusG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area FG3 (FusG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area FG3 (FusG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhv225",
+          "citation": "Lorenz, S., Weiner, K.S., Caspers, J., Mohlberg, H., Schleicher, A., Bludau, S., Eickhoff, S.B., Grill-Spector, K., Zilles, K., Amunts, K. 2017. Two New Cytoarchitectonic Areas on the Human Mid-Fusiform Gyrus. Cereb Cortex. 27(1):373-385"
+        }
+      ],
+      "associatedRegion": "Area FG3 (FusG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)",
+    "regionName": [
+      {
+        "regionName": "Area FG4 (FusG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area FG4 (FusG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_FG4.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area FG4 (FusG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhv225",
+          "citation": "Lorenz, S., Weiner, K.S., Caspers, J., Mohlberg, H., Schleicher, A., Bludau, S., Eickhoff, S.B., Grill-Spector, K., Zilles, K., Amunts, K. 2017. Two New Cytoarchitectonic Areas on the Human Mid-Fusiform Gyrus. Cereb Cortex. 27(1):373-385"
+        }
+      ],
+      "associatedRegion": "Area FG4 (FusG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 44 (IFG)",
+    "regionName": [
+      {
+        "regionName": "Area 44 (IFG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 44 (IFG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 44 (IFG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Broca_44.nii",
+        "properties": {},
+        "kgID": "Dataset/d0abf7131bc3460ac188632f40bf0748"
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 44 (IFG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Broca%27s+region+revisited%3A+Cytoarchitecture+and+intersubject+variability",
+          "citation": "Amunts, K., Schleicher, A., Bürgel, U., Mohlberg, H., Uylings, H.B., Zilles, K. 1999. Broca's region revisited: cytoarchitecture and intersubject variability. J Comp Neurol. 412(2):319-41"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Analysis+of+neural+mechanisms+underlying+verbal+fluency+in+cytoarchitectonically+defined+stereotaxic+space%E2%80%94The+roles+of+Brodmann+areas+44+and+45",
+          "citation": "Amunts, K., Weiss, P.H., Mohlberg, H., Pieperhoff, P., Eickhoff, S., Gurd, J.M., Marshall, J.C., Shah, N.J., Fink, G.R., Zilles, K. 2004. Analysis of neural mechanisms underlying verbal fluency in cytoarchitectonically defined stereotaxic space--the roles of Brodmann areas 44 and 45. Neuroimage. 22(1):42-56"
+        }
+      ],
+      "associatedRegion": "Area 44 (IFG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 45 (IFG)",
+    "regionName": [
+      {
+        "regionName": "Area 45 (IFG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 45 (IFG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 45 (IFG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Broca_45.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 45 (IFG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Broca%27s+region+revisited%3A+Cytoarchitecture+and+intersubject+variability",
+          "citation": "Amunts, K., Schleicher, A., Bürgel, U., Mohlberg, H., Uylings, H.B., Zilles, K. 1999. Broca's region revisited: cytoarchitecture and intersubject variability. J Comp Neurol. 412(2):319-41"
+        },
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Analysis+of+neural+mechanisms+underlying+verbal+fluency+in+cytoarchitectonically+defined+stereotaxic+space%E2%80%94The+roles+of+Brodmann+areas+44+and+45",
+          "citation": "Amunts, K., Weiss, P.H., Mohlberg, H., Pieperhoff, P., Eickhoff, S., Gurd, J.M., Marshall, J.C., Shah, N.J., Fink, G.R., Zilles, K. 2004. Analysis of neural mechanisms underlying verbal fluency in cytoarchitectonically defined stereotaxic space--the roles of Brodmann areas 44 and 45. Neuroimage. 22(1):42-56"
+        }
+      ],
+      "associatedRegion": "Area 45 (IFG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)",
+    "regionName": [
+      {
+        "regionName": "Area Fp1 (Fpole)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Fp1 (Fpole)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/FrontalPole_Fp1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Fp1 (Fpole)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitecture%2C+probability+maps+and+functions+of+the+human+frontal+pole",
+          "citation": "Bludau, S., Eickhoff, S.B., Mohlberg, H., Caspers, S., Laird, A.R., Fox, P.T., Schleicher, A., Zilles, K., Amunts, K. 2014. Cytoarchitecture, probability maps and functions of the human frontal pole. Neuroimage. 93 Pt 2:260-75"
+        }
+      ],
+      "associatedRegion": "Area Fp1 (Fpole)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)",
+    "regionName": [
+      {
+        "regionName": "Area Fp2 (Fpole)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Fp2 (Fpole)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/FrontalPole_Fp2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Fp2 (Fpole)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitecture%2C+probability+maps+and+functions+of+the+human+frontal+pole",
+          "citation": "Bludau, S., Eickhoff, S.B., Mohlberg, H., Caspers, S., Laird, A.R., Fox, P.T., Schleicher, A., Zilles, K., Amunts, K. 2014. Cytoarchitecture, probability maps and functions of the human frontal pole. Neuroimage. 93 Pt 2:260-75"
+        }
+      ],
+      "associatedRegion": "Area Fp2 (Fpole)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)",
+    "regionName": [
+      {
+        "regionName": "Area 4a (PreCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 4a (PreCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Motor_4a.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 4a (PreCG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1038/382805a0",
+          "citation": "Geyer, S., Ledberg, A., Schleicher, A., Kinomura, S., Schormann, T., Bürgel, U., Klingberg, T., Larsson, J., Zilles, K., Roland, PE. 1996. Two different areas within the primary motor cortex of man. Nature. 382(6594):805-7"
+        }
+      ],
+      "associatedRegion": "Area 4a (PreCG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)",
+    "regionName": [
+      {
+        "regionName": "Area 4p (PreCG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 4p (PreCG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Motor_4p.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 4p (PreCG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1038/382805a0",
+          "citation": "Geyer, S., Ledberg, A., Schleicher, A., Kinomura, S., Schormann, T., Bürgel, U., Klingberg, T., Larsson, J., Zilles, K., Roland, PE. 1996. Two different areas within the primary motor cortex of man. Nature. 382(6594):805-7"
+        }
+      ],
+      "associatedRegion": "Area 4p (PreCG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)",
+    "regionName": [
+      {
+        "regionName": "Area Fo1 (OFC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Fo1 (OFC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Fo1 (OFC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"
+        }
+      ],
+      "associatedRegion": "Area Fo1 (OFC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)",
+    "regionName": [
+      {
+        "regionName": "Area Fo2 (OFC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Fo2 (OFC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Fo2 (OFC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"
+        }
+      ],
+      "associatedRegion": "Area Fo2 (OFC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)",
+    "regionName": [
+      {
+        "regionName": "Area Fo3 (OFC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Fo3 (OFC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/OFC_Fo3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Fo3 (OFC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Henssen, A., Zilles, K., Palomero-Gallagher, N., Schleicher, A., Mohlberg, H., Gerboga, F., Eickhoff, S.B., Bludau, S., Amunts, K. 2016. Cytoarchitecture and probability maps of the human medial orbitofrontal cortex. Cortex. 75:87-112"
+        }
+      ],
+      "associatedRegion": "Area Fo3 (OFC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 33 (ACC)",
+    "regionName": [
+      {
+        "regionName": "Area 33 (ACC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 33 (ACC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 33 (ACC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_33.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 33 (ACC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "
+        }
+      ],
+      "associatedRegion": "Area 33 (ACC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area 25 (sACC)",
+    "regionName": [
+      {
+        "regionName": "Area 25 (sACC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area 25 (sACC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area 25 (sACC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_25.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area 25 (sACC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "
+        }
+      ],
+      "associatedRegion": "Area 25 (sACC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area s24 (sACC)",
+    "regionName": [
+      {
+        "regionName": "Area s24 (sACC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area s24 (sACC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area s24 (sACC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_s24.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area s24 (sACC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.cortex.2015.11.006",
+          "citation": "Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "
+        }
+      ],
+      "associatedRegion": "Area s24 (sACC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area s32 (sACC)",
+    "regionName": [
+      {
+        "regionName": "Area s32 (sACC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area s32 (sACC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area s32 (sACC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cingulum_s32.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area s32 (sACC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Functional+organization+of+human+subgenual+cortical+areas%3A+Relationship+between+architectonical+segregation+and+connectional+heterogeneity",
+          "citation": "Palomero-Gallagher, N., Eickhoff, S.B., Hoffstaedter, F., Schleicher, A., Mohlberg, H., Vogt, B.A., Amunts, K., Zilles, K. 2015. Functional organization of human subgenual cortical areas: Relationship between architectonical segregation and connectional heterogeneity. Neuroimage. 115:177-90 "
+        }
+      ],
+      "associatedRegion": "Area s32 (sACC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "CA1 (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for CA1 (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "CA1 (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "CA1 (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "CA2 (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for CA2 (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "CA2 (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "CA2 (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "CA3 (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for CA3 (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_CA3.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "CA3 (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitectonic+mapping+of+the+human+amygdala%2C+hippocampal+region+and+entorhinal+cortex%3A+intersubject+variability+and+probability+maps",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "CA3 (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for DG (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "DG (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for DG (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for DG (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_DG.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "DG (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "DG (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Entorhinal Cortex",
+    "regionName": [
+      {
+        "regionName": "Entorhinal Cortex",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Entorhinal Cortex",
+        "name": "Cytoarchitectonic Probabilistic Map for Entorhinal Cortex",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_EC.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Entorhinal Cortex",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "Entorhinal Cortex",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "HATA (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for HATA (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_HATA.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "HATA (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "HATA (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)",
+    "regionName": [
+      {
+        "regionName": "Subc (Hippocampus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)",
+        "name": "Cytoarchitectonic Probabilistic Map for Subc (Hippocampus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Hippocampus_Subc.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Subc (Hippocampus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "Subc (Hippocampus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)",
+    "regionName": [
+      {
+        "regionName": "Area Id1 (Insula)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Id1 (Insula)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Id1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Id1 (Insula)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhp208",
+          "citation": "Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"
+        }
+      ],
+      "associatedRegion": "Area Id1 (Insula)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)",
+    "regionName": [
+      {
+        "regionName": "Area Ig1 (Insula)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Ig1 (Insula)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Ig1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Ig1 (Insula)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhp208",
+          "citation": "Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"
+        }
+      ],
+      "associatedRegion": "Area Ig1 (Insula)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)",
+    "regionName": [
+      {
+        "regionName": "Area Ig2 (Insula)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area Ig2 (Insula)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Insula_Ig2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area Ig2 (Insula)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhp208",
+          "citation": "Kurth, F., Eickhoff, S.B., Schleicher, A., Hoemke, L., Zilles, K., Amunts, K. 2010. Cytoarchitecture and probabilistic maps of the human posterior insular cortex. Cereb Cortex. 20(6):1448-61"
+        }
+      ],
+      "associatedRegion": "Area Ig2 (Insula)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)",
+    "regionName": [
+      {
+        "regionName": "Area hOc1 (V1, 17, CalcS)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc1 (V1, 17, CalcS)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc1.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc1 (V1, 17, CalcS)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1006/nimg.1999.0516",
+          "citation": "Amunts, K., Malikovic, A., Mohlberg, H., Schormann, T., Zilles, K. 2000. Brodmann's areas 17 and 18 brought into stereotaxic space-where and how variable? Neuroimage. 11(1):66-84"
+        }
+      ],
+      "associatedRegion": "Area hOc1 (V1, 17, CalcS)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)",
+    "regionName": [
+      {
+        "regionName": "Area hOc2 (V2, 18)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc2 (V2, 18)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc2.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc2 (V2, 18)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/10686118",
+          "citation": "Amunts, K., Malikovic, A., Mohlberg, H., Schormann, T., Zilles, K. 2000. Brodmann's areas 17 and 18 brought into stereotaxic space-where and how variable? Neuroimage. 11(1):66-84"
+        }
+      ],
+      "associatedRegion": "Area hOc2 (V2, 18)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)",
+    "regionName": [
+      {
+        "regionName": "Area hOc3d (Cuneus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc3d (Cuneus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc3d.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc3d (Cuneus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-012-0390-9",
+          "citation": "Kujovic, M., Zilles, K., Malikovic, A., Schleicher, A., Mohlberg, H., Rottschy, C., Eickhoff, S.B., Amunts, K. 2013. Cytoarchitectonic mapping of the human dorsal extrastriate cortex. Brain Struct Funct. 218(1):157-72"
+        }
+      ],
+      "associatedRegion": "Area hOc3d (Cuneus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)",
+    "regionName": [
+      {
+        "regionName": "Area hOc4d (Cuneus)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc4d (Cuneus)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4d.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc4d (Cuneus)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-012-0390-9",
+          "citation": "Kujovic, M., Zilles, K., Malikovic, A., Schleicher, A., Mohlberg, H., Rottschy, C., Eickhoff, S.B., Amunts, K. 2013. Cytoarchitectonic mapping of the human dorsal extrastriate cortex. Brain Struct Funct. 218(1):157-72"
+        }
+      ],
+      "associatedRegion": "Area hOc4d (Cuneus)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)",
+    "regionName": [
+      {
+        "regionName": "Area hOc3v (LingG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc3v (LingG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc3v.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc3v (LingG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1002/hbm.20348",
+          "citation": "Rottschy, C., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Kujovic, M., Zilles, K., Amunts, K. 2007. Ventral visual cortex in humans: cytoarchitectonic mapping of two extrastriate areas. Hum Brain Mapp. 28(10):1045-59"
+        }
+      ],
+      "associatedRegion": "Area hOc3v (LingG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)",
+    "regionName": [
+      {
+        "regionName": "Area hOc4v (LingG)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc4v (LingG)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4v.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc4v (LingG)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1002/hbm.20348",
+          "citation": "Rottschy, C., Eickhoff, S.B., Schleicher, A., Mohlberg, H., Kujovic, M., Zilles, K., Amunts, K. 2007. Ventral visual cortex in humans: cytoarchitectonic mapping of two extrastriate areas. Hum Brain Mapp. 28(10):1045-59"
+        }
+      ],
+      "associatedRegion": "Area hOc4v (LingG)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)",
+    "regionName": [
+      {
+        "regionName": "Area hOc4la (LOC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc4la (LOC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4la.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc4la (LOC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-015-1009-8",
+          "citation": "Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Kujovic, M., Palomero-Gallagher, N., Eickhoff, S.B., Zilles, K. 2016. Cytoarchitecture of the human lateral occipital cortex: mapping of two extrastriate areas hOc4la and hOc4lp. Brain Struct Funct. 221(4):1877-97 "
+        }
+      ],
+      "associatedRegion": "Area hOc4la (LOC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)",
+    "regionName": [
+      {
+        "regionName": "Area hOc4lp (LOC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc4lp (LOC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc4lp.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc4lp (LOC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-015-1009-8",
+          "citation": "Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Kujovic, M., Palomero-Gallagher, N., Eickhoff, S.B., Zilles, K. 2016. Cytoarchitecture of the human lateral occipital cortex: mapping of two extrastriate areas hOc4la and hOc4lp. Brain Struct Funct. 221(4):1877-97 "
+        }
+      ],
+      "associatedRegion": "Area hOc4lp (LOC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)",
+    "regionName": [
+      {
+        "regionName": "Area hOc5 (LOC)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)",
+        "name": "Cytoarchitectonic Probabilistic Map for Area hOc5 (LOC)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Visual_hOc5.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Area hOc5 (LOC)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1093/cercor/bhj181",
+          "citation": "Malikovic, A., Amunts, K., Schleicher, A., Mohlberg, H., Eickhoff, S.B., Wilms, M., Palomero-Gallagher, N., Armstrong, E., Zilles, K. 2007. Cytoarchitectonic analysis of the human extrastriate cortex in the region of V5/MT+: a probabilistic, stereotaxic map of area hOc5. Cereb Cortex. 17(3):562-74"
+        }
+      ],
+      "associatedRegion": "Area hOc5 (LOC)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for AStr (Amygdala)",
+    "regionName": [
+      {
+        "regionName": "AStr (Amygdala)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for AStr (Amygdala)",
+        "name": "Cytoarchitectonic Probabilistic Map for AStr (Amygdala)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_AStr.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "AStr (Amygdala)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "AStr (Amygdala)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for CM (Amygdala)",
+    "regionName": [
+      {
+        "regionName": "CM (Amygdala)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for CM (Amygdala)",
+        "name": "Cytoarchitectonic Probabilistic Map for CM (Amygdala)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_CM.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "CM (Amygdala)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "CM (Amygdala)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for LB (Amygdala)",
+    "regionName": [
+      {
+        "regionName": "LB (Amygdala)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for LB (Amygdala)",
+        "name": "Cytoarchitectonic Probabilistic Map for LB (Amygdala)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_LB.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "LB (Amygdala)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "LB (Amygdala)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for SF (Amygdala)",
+    "regionName": [
+      {
+        "regionName": "SF (Amygdala)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for SF (Amygdala)",
+        "name": "Cytoarchitectonic Probabilistic Map for SF (Amygdala)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Amygdala_SF.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "SF (Amygdala)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1007/s00429-005-0025-5",
+          "citation": "Amunts, K., Kedo, O., Kindler, M., Pieperhoff, P., Mohlberg, H., Shah, N.J., Habel, U., Schneider, F., Zilles, K. 2005. Cytoarchitectonic mapping of the human amygdala, hippocampal region and entorhinal cortex: intersubject variability and probability maps. Anat Embryol (Berl). 210(5-6):343-52"
+        }
+      ],
+      "associatedRegion": "SF (Amygdala)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)",
+    "regionName": [
+      {
+        "regionName": "Ch 1-3 (Basal Forebrain)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)",
+        "name": "Cytoarchitectonic Probabilistic Map for Ch 1-3 (Basal Forebrain)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Bforebrain_123.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Ch 1-3 (Basal Forebrain)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2008.05.055",
+          "citation": "Zaborszky, L., Hoemke, L., Mohlberg, H., Schleicher, A., Amunts, K., Zilles, K. 2008. Stereotaxic probabilistic maps of the magnocellular cell groups in human basal forebrain. Neuroimage. 42(3):1127-41"
+        }
+      ],
+      "associatedRegion": "Ch 1-3 (Basal Forebrain)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)",
+    "regionName": [
+      {
+        "regionName": "Ch 4 (Basal Forebrain)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)",
+        "name": "Cytoarchitectonic Probabilistic Map for Ch 4 (Basal Forebrain)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Bforebrain_4.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Ch 4 (Basal Forebrain)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.1016/j.neuroimage.2008.05.055",
+          "citation": "Zaborszky, L., Hoemke, L., Mohlberg, H., Schleicher, A., Amunts, K., Zilles, K. 2008. Stereotaxic probabilistic maps of the magnocellular cell groups in human basal forebrain. Neuroimage. 42(3):1127-41"
+        }
+      ],
+      "associatedRegion": "Ch 4 (Basal Forebrain)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)",
+    "regionName": [
+      {
+        "regionName": "Dorsal Dentate Nucleus (Cerebellum)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)",
+        "name": "Cytoarchitectonic Probabilistic Map for Dorsal Dentate Nucleus (Cerebellum)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ndentd.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Dorsal Dentate Nucleus (Cerebellum)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.3389/fnana.2015.00054",
+          "citation": "Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."
+        }
+      ],
+      "associatedRegion": "Dorsal Dentate Nucleus (Cerebellum)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)",
+    "regionName": [
+      {
+        "regionName": "Ventral Dentate Nucleus (Cerebellum)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)",
+        "name": "Cytoarchitectonic Probabilistic Map for Ventral Dentate Nucleus (Cerebellum)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ndentv.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Ventral Dentate Nucleus (Cerebellum)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://www.ncbi.nlm.nih.gov/pubmed/?term=Cytoarchitectonic+mapping+of+the+human+brain+cerebellar+nuclei+in+stereotaxic+space+and+delineation+of+their+co-activation+patterns",
+          "citation": "Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."
+        }
+      ],
+      "associatedRegion": "Ventral Dentate Nucleus (Cerebellum)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)",
+    "regionName": [
+      {
+        "regionName": "Fastigial Nucleus (Cerebellum)",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)",
+        "name": "Cytoarchitectonic Probabilistic Map for Fastigial Nucleus (Cerebellum)",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Nfast.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Fastigial Nucleus (Cerebellum)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.3389/fnana.2015.00054",
+          "citation": "Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."
+        }
+      ],
+      "associatedRegion": "Fastigial Nucleus (Cerebellum)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  },
+  {
+    "type": "Cytoarchitectonic Probabilistic Map",
+    "name": "Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus",
+    "regionName": [
+      {
+        "regionName": "emboliform nucleus, globose nucleus",
+        "relationship": "equals"
+      }
+    ],
+    "files": [
+      {
+        "filename": "Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus",
+        "name": "Cytoarchitectonic Probabilistic Map for emboliform nucleus, globose nucleus",
+        "mimetype": "application/nifti",
+        "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Cerebellum_Ninterp.nii",
+        "properties": {}
+      }
+    ],
+    "targetParcellation": "JuBrain Cytoarchitectonic Atlas",
+    "properties": {
+      "name": "Interposed Nucleus (Cerebellum)",
+      "description": "",
+      "publications": [
+        {
+          "doi": "https://doi.org/10.3389/fnana.2015.00054",
+          "citation": "Tellmann, S., Bludau, S., Eickhoff, S., Mohlberg, H., Minnerop, M., Amunts, K. 2015. Cytoarchitectonic mapping of the human brain cerebellar nuclei in stereotaxic space and delineation of their co-activation patterns. Front Neuroanat. 9:54."
+        }
+      ],
+      "associatedRegion": "Interposed Nucleus (Cerebellum)",
+      "associatedParcellation": "JuBrain Cytoarchitectonic Atlas",
+      "datasetInfo": "MNIColin27_PMap.json"
+    }
+  }
+]
