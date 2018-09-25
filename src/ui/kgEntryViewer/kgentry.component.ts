@@ -41,6 +41,10 @@ export class KgEntryViewer implements OnInit{
   get tableColClass2(){
     return `col-xs-8 col-lg-8 tableEntry`
   }
+
+  get kgHref(){
+    return `https://kg.humanbrainproject.org/webapp/#${this.kgQueryString}`
+  }
 }
 
 const KGROOT = `https://kg.humanbrainproject.org/api/proxy/kg/`

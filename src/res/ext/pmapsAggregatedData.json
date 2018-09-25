@@ -3,7 +3,7 @@
     "type": "Cytoarchitectonic Probabilistic Map",
     "name": "Cytoarchitectonic Probabilistic Map for Area hIP1 (IPS)",
     "regionName": [
-      {
+      {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
         "regionName": "Area hIP1 (IPS)",
         "relationship": "equals"
       }
@@ -1201,14 +1201,14 @@
         "relationship": "equals"
       }
     ],
+    "kgID": "Dataset/d0abf7131bc3460ac188632f40bf0748",
     "files": [
       {
         "filename": "Cytoarchitectonic Probabilistic Map for Area 44 (IFG)",
         "name": "Cytoarchitectonic Probabilistic Map for Area 44 (IFG)",
         "mimetype": "application/nifti",
         "url": "https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/PMaps/Broca_44.nii",
-        "properties": {},
-        "kgID": "Dataset/d0abf7131bc3460ac188632f40bf0748"
+        "properties": {}
       }
     ],
     "targetParcellation": "JuBrain Cytoarchitectonic Atlas",

@@ -42,7 +42,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.publications" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         Related Publication(s)
       </div>
@@ -63,7 +63,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.preparation" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         Preparation
       </div>
@@ -72,7 +72,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.methods" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         Methods
       </div>
@@ -83,7 +83,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.license_info" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         License
       </div>
@@ -92,7 +92,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.files" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         Files
       </div>
@@ -103,7 +103,7 @@
       </div>
     </panel-component>
 
-    <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
+    <panel-component *ngIf = "kgData.subjects" [collapseBody] = "true" [bodyCollapsable] = "true">
       <div heading>
         Subjects
       </div>
@@ -116,6 +116,9 @@
     </panel-component>
 
   </readmore-component>
+  <a target = "_blank" [href] = "kgHref">
+    See the entry in Knowledge Graph
+  </a>
 
 </div>
 <ng-template #showDefault>
