@@ -606,16 +606,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
       removeLayer : (condition)=>this.nehubaViewer.removeLayer(condition),
       setLayerVisibility : (condition,visible)=>this.nehubaViewer.setLayerVisibility(condition,visible),
       mouseEvent : merge(
-        fromEvent(this.nehubaViewer.elementRef.nativeElement,'click').pipe(
+        fromEvent(this.elementRef.nativeElement,'click').pipe(
           map((ev:MouseEvent)=>({eventName :'click',event:ev}))
         ),
-        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mousemove').pipe(
+        fromEvent(this.elementRef.nativeElement,'mousemove').pipe(
           map((ev:MouseEvent)=>({eventName :'mousemove',event:ev}))
         ),
-        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mousedown').pipe(
+
+        //TODO solve bug, mousedown does not get bubbled up because neuroglancer preventsPropagation
+        fromEvent(this.elementRef.nativeElement,'mousedown').pipe(
           map((ev:MouseEvent)=>({eventName :'mousedown',event:ev}))
         ),
-        fromEvent(this.nehubaViewer.elementRef.nativeElement,'mouseup').pipe(
+        fromEvent(this.elementRef.nativeElement,'mouseup').pipe(
           map((ev:MouseEvent)=>({eventName :'mouseup',event:ev}))
         ),
       ) ,
