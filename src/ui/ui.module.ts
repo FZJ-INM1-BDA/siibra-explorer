@@ -31,6 +31,8 @@ import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
 import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
+import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
+import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
 
 
 @NgModule({
@@ -59,6 +61,7 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
     LayerBrowser,
     KgEntryViewer,
     SubjectViewer,
+    DatasetViewerComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -69,14 +72,16 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
     FilterDataEntriesbyType,
     SafeStylePipe,
     GetLayerNameFromDatasets,
-    SortDataEntriesToRegion
+    SortDataEntriesToRegion,
+    SpatialLandmarksToDataBrowserItemPipe
   ],
   entryComponents : [
 
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     FileViewer,
-    DataBrowserUI
+    DataBrowserUI,
+    DatasetViewerComponent
   ],
   exports : [
     SubjectViewer,
@@ -88,7 +93,8 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
     NehubaViewerUnit,
     DataBrowserUI,
     LayerBrowser,
-    FileViewer
+    FileViewer,
+    DatasetViewerComponent
   ]
 })
 

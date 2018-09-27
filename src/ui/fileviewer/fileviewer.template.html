@@ -52,6 +52,11 @@
       The json file is not a chart. I mean, we could dump the json, but would it really help?
     </div>
   </div>
+  <div *ngSwitchCase = "'application/hibop'">
+    <div mimetypeTextContainer>
+        You will need to install the HiBoP software on your computer, click the 'Download File' button and open the .hibop file.
+    </div>
+  </div>
   <div *ngSwitchCase = "'application/nifti'">
     <dedicated-viewer
       [searchResultFile] = "searchResultFile">
@@ -66,7 +71,9 @@
     </dedicated-view-controller> -->
   </div>
   <div *ngSwitchDefault>
-    The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
+    <div mimetypeTextContainer>
+      The selected file with the mimetype {{ searchResultFile.mimetype }} could not be displayed.
+    </div>
   </div>
 </div>
 

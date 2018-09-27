@@ -7,7 +7,8 @@
 <div landmarkMasterContainer>
 
   <div>
-    <layout-floating-container  
+    <layout-floating-container
+      *ngIf = "false"
       pos00 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
@@ -29,7 +30,8 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
+    <layout-floating-container
+      *ngIf = "false"  
       pos01 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
@@ -50,7 +52,8 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
+    <layout-floating-container
+      *ngIf = "false"  
       pos10 
       landmarkContainer>
       <nehuba-2dlandmark-unit 
@@ -89,7 +92,7 @@
   <div statusCard>
 
     <citations-component 
-      *ngIf = "selectedParcellation.properties"
+      *ngIf = "selectedParcellation && selectedParcellation.properties"
       [properties] = "selectedParcellation.properties"
       citationContainer>
 

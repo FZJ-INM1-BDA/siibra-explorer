@@ -9,6 +9,15 @@ import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/st
 
 export class AtlasViewerConstantsServices{
 
+  public ngLandmarkLayerName = 'spatial landmark layer'
+
+  /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
+  public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {
+    return prevLandmarks.every(lm => typeof lm.name !== 'undefined') && 
+      newLandmarks.every(lm => typeof lm.name !== 'undefined') && 
+      prevLandmarks.length === newLandmarks.length
+  }
+
   /* to be provided by KG in future */
   public templateUrls = [
     // 'res/json/infant.json',

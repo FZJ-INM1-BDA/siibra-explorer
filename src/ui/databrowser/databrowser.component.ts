@@ -1,14 +1,13 @@
 import { Component, OnDestroy, ComponentFactoryResolver, ComponentFactory, OnInit, Injector } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, LOAD_DEDICATED_LAYER, UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE } from "../../services/stateStore.service";
+import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, LOAD_DEDICATED_LAYER, UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
 import { map, filter, take, distinctUntilChanged } from "rxjs/operators";
 import { HasPathProperty } from "../../util/pipes/pathToNestedChildren.pipe";
 import { TreeComponent } from "../../components/tree/tree.component";
-import { Observable, Subscription, merge } from "rxjs";
+import { Observable, Subscription, merge, combineLatest } from "rxjs";
 import { FileViewer } from "../fileviewer/fileviewer.component";
 import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
-import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 
 @Component({
   selector : 'data-browser',
@@ -25,8 +24,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   hitsPerPage : number = 15
   currentPage :  number = 0
 
-  selectedRegions : any[] = []
-
   metadataMap : Map<string,Map<string,{properties:Property}>>
   dataEntries : DataEntry[] = []
   spatialDataEntries : DataEntry[] = []
@@ -35,29 +32,27 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   hideDataTypes : Set<string> = new Set()
 
   private _spatialDataVisible : boolean = false
-  private spatialSearchObj : {center:[number,number,number],searchWidth:number,templateSpace : string,pageNo:number}
 
   dedicatedViewString : string | null
 
   private regionsLabelIndexMap : Map<number,any> = new Map()
 
-  private regionSelected$ : Observable<any>
+  public selectedRegions$ : Observable<any[]>
+  public selectedLandmarks$ : Observable<any[]>
+  public selectedPOI$ : Observable<any[]>
+
   private metadataMap$ : Observable<any>
   private fetchedDataEntries$ : Observable<any>
-  private newViewer$ : Observable<any>
   private selectParcellation$ : Observable<any>
   private dedicatedViewString$ : Observable<string|null>
   private spatialDataEntries$ : Observable<any[]>
   private spatialPagination$ : Observable<{spatialSearchPagination:number,spatialSearchTotalResults:number}>
-  private debouncedNavigation$ : Observable<any>
 
   private subscriptions : Subscription[] = []
-  private selectedTemplate : any
 
   constructor(
     private cfr : ComponentFactoryResolver,
     private store : Store<DataStateInterface>,
-    private atlasviewerDataService : AtlasViewerDataService,
     private constantService : AtlasViewerConstantsServices,
     private injector : Injector,
     private widgetServices : WidgetServices
@@ -65,13 +60,25 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     
     this.fileViewerComponentFactory = this.cfr.resolveComponentFactory(FileViewer)
 
-    this.regionSelected$ = merge(
-      this.store.pipe(
-        select('viewerState'),
-        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
-        map(state=>state.regionsSelected)
-      )
-    ) 
+    this.selectedRegions$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('regionsSelected'),
+      map(state=>state.regionsSelected)
+    )
+
+    this.selectedLandmarks$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('landmarksSelected'),
+      map(state => state.landmarksSelected)
+    )
+
+    this.selectedPOI$ = combineLatest(
+      this.selectedRegions$,
+      this.selectedLandmarks$
+    ).pipe(
+      map(results => [...results[0], ...results[1]])
+    )
+    
 
     this.metadataMap$ = this.store.pipe(
       select('dataStore'),
@@ -84,21 +91,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       safeFilter('fetchedDataEntries'),
       map(v=>v.fetchedDataEntries)
     )
-      
-    this.newViewer$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>isDefined(state) && isDefined(state.templateSelected)),
-      filter(state=>
-        !isDefined(this.selectedTemplate) || 
-        state.templateSelected.name !== this.selectedTemplate.name) 
-    )
-
-    this.debouncedNavigation$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>isDefined(state) && isDefined(state.navigation)),
-      map(state=>state.navigation)
-    )
-    
 
     this.selectParcellation$ = this.store.pipe(
       select('viewerState'),
@@ -134,28 +126,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   }
 
   ngOnInit(){
-
-    this.subscriptions.push(
-      this.newViewer$.subscribe(state=>{
-        this.selectedTemplate = state.templateSelected
-        this.handleParcellationSelection(state.parcellationSelected.regions)
-        this.store.dispatch({
-          type : FETCHED_SPATIAL_DATA,
-          fetchedDataEntries : []
-        })
-        this.store.dispatch({
-          type : SPATIAL_GOTO_PAGE,
-          pageNo : 0
-        })
-      })
-    )
-
-    this.subscriptions.push(
-      this.debouncedNavigation$.subscribe(this.handleDebouncedNavigation.bind(this))
-    )
-
-    this.subscriptions.push(this.regionSelected$
-      .subscribe(rs=>this.selectedRegions = rs))
 
     this.subscriptions.push(this.metadataMap$.subscribe(map=>(this.metadataMap = map)))
 
@@ -193,9 +163,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   }
 
   toggleSpatialDataVisible(){
-    /* disabling spatial data for now */
-    return
-    //@ts-ignore
     this.store.dispatch({
       type : UPDATE_SPATIAL_DATA_VISIBLE,
       visible : !this._spatialDataVisible
@@ -206,9 +173,10 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     return this._spatialDataVisible
   }
 
+  // TODO deprecated? rethink how to implement displaying of spatial landmarks
   handleSpatialPaginationChange(state){
-    if(isDefined (state.spatialSearchPagination) )
-      this.spatialPagination = state.spatialSearchPagination
+    // if(isDefined (state.spatialSearchPagination) )
+    //   this.spatialPagination = state.spatialSearchPagination
 
     if(isDefined(state.spatialSearchTotalResults))
       this.spatialTotalNo = state.spatialSearchTotalResults
@@ -216,34 +184,15 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     if(isDefined(state.spatialDataVisible))
       this._spatialDataVisible = state.spatialDataVisible
 
-    if(this._spatialDataVisible === false)
-      return
+    // if(this._spatialDataVisible === false)
+    //   return
     
-    if(this.spatialPagination === this.spatialSearchObj.pageNo)
-      return
+    // if(this.spatialPagination === this.spatialSearchObj.pageNo)
+    //   return
 
-    this.spatialSearchObj.pageNo = this.spatialPagination
-    this.atlasviewerDataService.spatialSearch(this.spatialSearchObj)
-  }
-
-  handleDebouncedNavigation(navigation:any){
-    if(!isDefined(navigation.position))
-      return
-    const center = navigation.position.map(n=>n/1e6)
-    const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
-    const templateSpace = this.selectedTemplate.name
-    const pageNo = this.spatialPagination
-
-    this.spatialSearchObj = {
-      center,
-      searchWidth,
-      templateSpace,
-      pageNo
-    }
-    if(!this._spatialDataVisible)
-      return
-    console.log('spatial search')
-    this.atlasviewerDataService.spatialSearch(this.spatialSearchObj)
+    // console.log('pagination change')
+    // this.spatialSearchObj.pageNo = this.spatialPagination
+    // this.atlasviewerDataService.spatialSearch(this.spatialSearchObj)
   }
 
   handleSpatialDataEntries(datas){
@@ -300,16 +249,14 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     }
   }
 
-  get databrowserHeaderText() : string{
-    return this.selectedRegions.length === 0 ?
-      `No regions selected.` :
-      `${this.selectedRegions.length} region${this.selectedRegions.length > 1 ? 's' : ''} selected.`
-  }
-
-  clearAllRegions(){
+  clearAllPOIs(){
     this.store.dispatch({
       type : SELECT_REGIONS,
       selectRegions : []
+    })
+    this.store.dispatch({
+      type : SELECT_LANDMARKS,
+      landmarks : []
     })
   }
 
@@ -328,11 +275,6 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     )
   }
 
-  regionSelected(region:any){
-    const idx = this.selectedRegions.findIndex(re=>re.name===region.name)
-    return idx >= 0
-  }
-
   gothere(event:MouseEvent,position:any){
     event.stopPropagation()
     event.preventDefault()
@@ -348,13 +290,20 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     })
   }
 
-  removeRegion(event:MouseEvent,region:any){
+  removePOI(event:MouseEvent, region:any){
     event.stopPropagation()
     event.preventDefault()
 
-    this.store.dispatch({
-      type : SELECT_REGIONS,
-      selectRegions : this.selectedRegions.filter(re=>re.name!==region.name)
-    })
+    if(region.spatialLandmark){
+      this.store.dispatch({
+        type : DESELECT_LANDMARKS,
+        deselectLandmarks : [region]
+      })
+    }else{
+      this.store.dispatch({
+        type : DESELECT_REGIONS,
+        deselectRegions : [region]
+      })
+    }
   }
 }
