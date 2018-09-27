@@ -84,6 +84,25 @@ export class AtlasViewerDataService implements OnDestroy{
 
     if(filterTemplateSpace){
       url.searchParams.append('fq',filterTemplateSpace)
+    }else if (templateSpace === 'MNI 152 ICBM 2009c Nonlinear Asymmetric'){
+      return Promise.all([
+        fetch('res/json/***REMOVED***.json').then(res=>res.json()),
+        fetch('res/json/***REMOVED***.json').then(res=>res.json())
+      ])
+        .then(arr => {
+          this.store.dispatch({
+            type : FETCHED_SPATIAL_DATA,
+            fetchedDataEntries : arr.reduce((acc,curr) => acc.concat(curr.map(obj => Object.assign({}, obj, {
+              position : obj.position.map(pos => pos/1e6),
+              properties : {}
+            }))), [])
+          })
+          this.store.dispatch({
+            type : UPDATE_SPATIAL_DATA,
+            totalResults : arr.reduce((acc,curr) => acc + curr.length, 0)
+          })
+        })
+        .catch(console.error)
     }else{
       return 
     }
@@ -93,11 +112,13 @@ export class AtlasViewerDataService implements OnDestroy{
     fetch(fetchUrl).then(r=>r.json())
       .then((resp)=>{
         const dataEntries = resp.response.docs.map(doc=>({
+          name : doc['OID'][0],
           position : doc['geometry.coordinates'][0].split(',').map(string=>Number(string)),
           properties : {
             description : doc['OID'][0],
             publications : []
-          }
+          },
+          files:[]
         }))
         this.store.dispatch({
           type : FETCHED_SPATIAL_DATA,

@@ -1,11 +1,15 @@
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, Injector } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER } from "../../services/stateStore.service";
-import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip } from "rxjs/operators";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS } from "../../services/stateStore.service";
+import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
+import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
+import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
+import { DatasetViewerComponent } from "../datasetViewer/datasetViewer.component";
+import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -24,6 +28,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
+  private datasetViewerFactory : ComponentFactory<DatasetViewerComponent>
 
   public viewerLoaded : boolean = false
 
@@ -35,12 +40,14 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
+  private selectedLandmarks$ : Observable<any[]>
   private hideSegmentations$ : Observable<boolean>
 
   private fetchedSpatialDatasets$ : Observable<any[]>
   private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
   public onHoverSegment$ : Observable<any>
+  private onHoverLandmark$ : Observable<any|null>
 
   private navigationChanges$ : Observable<any>
   public spatialResultsVisible$ : Observable<boolean>
@@ -58,6 +65,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
   private regionsLabelIndexMap : Map<number,any> = new Map()
+  private landmarksLabelIndexMap : Map<number, any> = new Map()
+  private landmarksNameMap : Map<string,number> = new Map()
   
   private userLandmarks : UserLandmark[] = []
   
@@ -69,12 +78,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
   public combinedSpatialData$ : Observable<any[]>
 
   constructor(
+    private constantService : AtlasViewerConstantsServices,
+    private atlasViewerDataService : AtlasViewerDataService,
     private apiService :AtlasViewerAPIServices,
     private csf:ComponentFactoryResolver,
     private store : Store<ViewerStateInterface>,
     private elementRef : ElementRef
   ){
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
+    this.datasetViewerFactory = this.csf.resolveComponentFactory(DatasetViewerComponent)
 
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
@@ -97,11 +109,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
       map(state=>state.regionsSelected)
     )
 
+    this.selectedLandmarks$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('landmarksSelected'),
+      map(state => state.landmarksSelected)
+    )
+
     this.fetchedSpatialDatasets$ = this.store.pipe(
       select('dataStore'),
-      safeFilter('fetchedSpatialData'),
       debounceTime(300),
-      map(state=>state.fetchedSpatialData)
+      safeFilter('fetchedSpatialData'),
+      map(state => state.fetchedSpatialData),
+      distinctUntilChanged(this.constantService.testLandmarksChanged)
     )
 
     this.navigationChanges$ = this.store.pipe(
@@ -150,17 +169,29 @@ export class NehubaContainer implements OnInit, OnDestroy{
       distinctUntilChanged(segmentsUnchangedChanged)
     )
 
-    this.onHoverSegmentName$ = this.store.pipe(
+    this.onHoverLandmark$ = this.store.pipe(
       select('uiState'),
-      filter(state=>isDefined(state)),
-      map(state=>state.mouseOverSegment ?
-        state.mouseOverSegment.constructor === Number ? 
-          state.mouseOverSegment.toString() : 
-          state.mouseOverSegment.name :
-        '' ),
-      distinctUntilChanged()
+      filter(state => isDefined(state)),
+      map(state => state.mouseOverLandmark)
     )
 
+    // TODO hack, even though octant is hidden, it seems with VTK, one can highlight
+    this.onHoverSegmentName$ = combineLatest(
+        this.store.pipe(
+          select('uiState'),
+          filter(state=>isDefined(state)),
+          map(state=>state.mouseOverSegment ?
+            state.mouseOverSegment.constructor === Number ? 
+              state.mouseOverSegment.toString() : 
+              state.mouseOverSegment.name :
+            '' ),
+          distinctUntilChanged()
+        ),
+        this.onHoverLandmark$
+      ).pipe(
+        map(results => results[1] === null ? results[0] : '')
+      )
+    
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.newViewer$.pipe(
       switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
@@ -236,7 +267,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
       .pipe(
         filter(event => isDefined(event) && isDefined((event as any).detail) && isDefined((event as any).detail.lastLoadedMeshId) ),
         map(event => {
-          
+
           const e = (event as any)
           const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
           const lastLoadedIdNum = Number(lastLoadedIdString)
@@ -280,16 +311,23 @@ export class NehubaContainer implements OnInit, OnDestroy{
   ngOnInit(){
 
     this.subscriptions.push(
+      this.fetchedSpatialDatasets$.subscribe(datasets => {
+        this.landmarksLabelIndexMap = new Map(datasets.map((v,idx) => [idx, v]) as [number, any][])
+        this.landmarksNameMap = new Map(datasets.map((v,idx) => [v.name, idx] as [string, number]))
+      })
+    )
+
+    this.subscriptions.push(
       combineLatest(
         this.fetchedSpatialDatasets$,
         this.spatialResultsVisible$
       ).subscribe(([fetchedSpatialData,visible])=>{
-
         this.fetchedSpatialData = fetchedSpatialData
-        this.nehubaViewer.removeSpatialSearch3DLandmarks()
 
         if(visible)
           this.nehubaViewer.addSpatialSearch3DLandmarks(this.fetchedSpatialData.map((data:any)=>data.position))
+        else
+          this.nehubaViewer.removeSpatialSearch3DLandmarks()
       })
     )
 
@@ -447,14 +485,81 @@ export class NehubaContainer implements OnInit, OnDestroy{
           positionReal : true
         })
       this.nehubaViewer.initRegions = regions.map(re=>re.labelIndex)
-
-      /* TODO what to do with init nfiti? */
     })
 
     this.subscriptions.push(
       this.navigationChanges$.subscribe(this.handleDispatchedNavigationChange.bind(this))
     )
+
+    /* handler to open/select landmark */
+    const clickObs$ = fromEvent(this.elementRef.nativeElement, 'click').pipe(
+        withLatestFrom(this.onHoverLandmark$),
+        filter(results => results[1] !== null),
+        map(results => results[1]),
+        withLatestFrom(
+          this.store.pipe(
+            select('dataStore'),
+            safeFilter('fetchedSpatialData'),
+            map(state => state.fetchedSpatialData)
+          )
+        )
+      )
+
+    this.subscriptions.push(
+      clickObs$.pipe(
+        buffer(
+          clickObs$.pipe(
+            debounceTime(200)
+          )
+        ),
+        filter(arr => arr.length >= 2),
+        map(arr => [...arr].reverse()[0]),
+        withLatestFrom(this.selectedLandmarks$)
+      )
+        .subscribe(([clickObs, selectedSpatialDatas]) => {
+          const [landmark, spatialDatas] = clickObs
+          const idx = Number(landmark.replace('label=',''))
+          if(isNaN(idx)){
+            console.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+            return
+          }
+
+          const newSelectedSpatialDatas = selectedSpatialDatas.findIndex(data => data.name === spatialDatas[idx].name) >= 0
+            ? selectedSpatialDatas.filter(v => v.name !== spatialDatas[idx].name)
+            : selectedSpatialDatas.concat(spatialDatas[idx])
+          
+          this.store.dispatch({
+            type : SELECT_LANDMARKS,
+            landmarks : newSelectedSpatialDatas
+          })
+          // if(this.datasetViewerRegistry.has(spatialDatas[idx].name)){
+          //   return
+          // }
+          // this.datasetViewerRegistry.add(spatialDatas[idx].name)
+          // const comp = this.datasetViewerFactory.create(this.injector)
+          // comp.instance.dataset = spatialDatas[idx]
+          // comp.onDestroy(() => this.datasetViewerRegistry.delete(spatialDatas[idx].name))
+          // this.widgetServices.addNewWidget(comp, {
+          //   exitable : true,
+          //   persistency : false,
+          //   state : 'floating',
+          //   title : `Spatial Dataset - ${spatialDatas[idx].name}`
+          // })
+        })
+    )
+
+    this.subscriptions.push(
+      this.selectedLandmarks$.pipe(
+        map(lms => lms.map(lm => this.landmarksNameMap.get(lm.name)))
+      ).subscribe(indices => {
+        const filteredIndices = indices.filter(v => typeof v !== 'undefined' && v !== null)
+        if(this.nehubaViewer)
+          this.nehubaViewer.spatialLandmarkSelectionChanged(filteredIndices)
+      })
+    )
   }
+
+  // datasetViewerRegistry : Set<string> = new Set()
 
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
@@ -515,11 +620,37 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.nehubaViewerSubscriptions.push(
-      this.nehubaViewer.mouseoverSegmentEmitter.subscribe(this.handleEmittedMouseoverSegment.bind(this))
+      this.nehubaViewer.debouncedViewerPositionChange.pipe(
+        distinctUntilChanged((a,b) => 
+          [0,1,2].every(idx => a.position[idx] === b.position[idx]) && a.zoom === b.zoom)
+      ).subscribe(this.handleNavigationPositionAndNavigationZoomChange.bind(this))
     )
 
     this.nehubaViewerSubscriptions.push(
-      this.nehubaViewer.regionSelectionEmitter.subscribe(region => {
+      this.nehubaViewer.mouseoverSegmentEmitter.subscribe(emitted => {
+        this.store.dispatch({
+          type : MOUSE_OVER_SEGMENT,
+          segment : emitted
+        })
+      })
+    )
+
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.mouseoverLandmarkEmitter.subscribe(label => {
+        this.store.dispatch({
+          type : MOUSE_OVER_LANDMARK,
+          landmark : label
+        })
+      })
+    )
+
+    // TODO hack, even though octant is hidden, it seems with vtk one can mouse on hover
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.regionSelectionEmitter.pipe(
+        withLatestFrom(this.onHoverLandmark$),
+        filter(results => results[1] === null),
+        map(results => results[0])
+      ).subscribe((region:any) => {
         this.selectedRegionIndexSet.has(region.labelIndex) ?
           this.store.dispatch({
             type : SELECT_REGIONS,
@@ -625,10 +756,19 @@ export class NehubaContainer implements OnInit, OnDestroy{
     }
   }
 
-  handleEmittedMouseoverSegment(emitted : any | number | null){
-    this.store.dispatch({
-      type : MOUSE_OVER_SEGMENT,
-      segment : emitted
+  handleNavigationPositionAndNavigationZoomChange(navigation){
+    if(!navigation.position){
+      return
+    }
+
+    const center = navigation.position.map(n=>n/1e6)
+    const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
+    const templateSpace = this.selectedTemplate.name
+    this.atlasViewerDataService.spatialSearch({
+      center,
+      searchWidth,
+      templateSpace,
+      pageNo : 0
     })
   }
 
@@ -653,7 +793,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     /* if navigation is changed dynamically (ie not actively), the state would have been propagated to the store already. Hence return */
     if( !navigationChangedActively )
       return
-    
     
     /* navigation changed actively (by user interaction with the viewer)
       probagate the changes to the store */

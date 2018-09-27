@@ -1,12 +1,12 @@
 <!-- Header -->
 <div databrowserheader>
   <span>
-    {{ databrowserHeaderText }} 
+    {{ !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest'  }} 
   </span>
   <small
-    *ngIf = "selectedRegions.length > 0"
+    *ngIf = "(selectedPOI$ | async).length > 0"
     class = "btn btn-link"
-    (click) = "clearAllRegions()">
+    (click) = "clearAllPOIs()">
     clear all
   </small>
 </div>
@@ -35,20 +35,20 @@
     </small>
   </div>
   <div 
-    class = "unclickable" 
+    class = "clickable" 
     (click) = "toggleSpatialDataVisible()">
     <small>
       <i *ngIf = "spatialDataVisible" class = "glyphicon glyphicon-check"></i>
       <i *ngIf = "!spatialDataVisible" class = "glyphicon glyphicon-unchecked"></i>
     </small>
-    <small placement = "bottom" tooltip = "coming soon">
+    <small>
       Spatial Search
     </small>
   </div>
 </div>
 
 <!-- Data -->
-<div *ngIf = "spatialDataVisible">
+<div *ngIf = "spatialDataVisible && false">
   <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
     <div heading>
       <span>
@@ -60,7 +60,12 @@
     </div>
     <div body>
       <div *ngFor = "let data of spatialDataEntries" spatialSearchCell>
-        {{ data.properties.description }}
+        <div *ngIf = "data.name">
+          {{ data.name }}
+        </div>
+        <div *ngIf = "data.properties">
+          {{ data.properties.description }}
+        </div>
       </div>
 
       <pagination-component
@@ -74,10 +79,10 @@
     </div>
   </panel-component>
 </div>
-<div *ngIf = "selectedRegions.length > 0; else noSelectedRegion">
+<div *ngIf = "(selectedPOI$ | async).length > 0; else noSelectedRegion">
 
   <div
-    *ngFor = "let data of selectedRegions | searchResultPagination  : currentPage : hitsPerPage | sortDataEntriesToRegion : dataEntries ">
+    *ngFor = "let data of (selectedRegions$ | async | sortDataEntriesToRegion : dataEntries).concat( selectedLandmarks$ | async | spatialLandmarksToDataBrowserItemPipe ) | searchResultPagination  : currentPage : hitsPerPage  ">
     <panel-component 
       [collapseBody] = "true"
       [bodyCollapsable] = "true">
@@ -101,8 +106,7 @@
             (click) = "gothere($event,data.region.position)" 
             class = "glyphicon glyphicon-screenshot" >
           </i>
-          <i *ngIf = "regionSelected(data.region)"
-            (click) = "removeRegion($event,data.region)"
+          <i (click) = "removePOI($event,data.region)"
             class = "glyphicon glyphicon-remove-sign">
           </i>
         </div>
@@ -138,15 +142,15 @@
 
 <ng-template #noSelectedRegion>
   <div noSelectedRegion>
-    Select a region to get started
+    Select a region / spatial landmark to get started
   </div>
 </ng-template>
 
 <!-- pagination -->
 <pagination-component
-  *ngIf = "selectedRegions.length > 0 && selectedRegions.length > hitsPerPage"
+  *ngIf = "(selectedPOI$ | async).length > 0 && (selectedPOI$ | async).length > hitsPerPage"
   [hitsPerPage]="hitsPerPage"
-  [total] = "selectedRegions.length"
+  [total] = "(selectedPOI$ | async).length"
   [currentPage]="currentPage"
   (paginationChange)="paginationChange($event)">
 

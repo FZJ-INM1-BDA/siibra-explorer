@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER, PluginInitManifestInterface } from "../services/stateStore.service";
 import { Observable,combineLatest } from "rxjs";
-import { filter, map, scan, take, distinctUntilChanged } from "rxjs/operators";
+import { filter, map, scan, take, distinctUntilChanged, bufferTime, debounceTime } from "rxjs/operators";
 import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 

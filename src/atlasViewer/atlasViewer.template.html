@@ -68,16 +68,17 @@
     <div resizeSliver>
 
       <span 
+        container = "body"
         placement = "left"
-        [tooltip] = "!(selectedRegions$ | async) ? '' : (((selectedRegions$ | async).length === 0 ? 'No' : (selectedRegions$ | async).length) + ' selected region' + ((selectedRegions$ | async).length > 1 ? 's' : ''))"
+        [tooltip] = "!(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest' "
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" 
         (click) = "toggleSidePanel('dataBrowser')" 
         class = "tabContainer">
-        <span  [@newEvent] = "selectedRegions$ | async" class = "highlightContainer">
+        <span  [@newEvent] = "selectedPOI$ | async" class = "highlightContainer">
         </span>
         <i class = "glyphicon glyphicon-search"></i>
-        <span class = "badge" *ngIf = "(selectedRegions$ | async) && (selectedRegions$ | async).length > 0">
-          {{ (selectedRegions$ | async).length }}
+        <span class = "badge" *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0">
+          {{ (selectedPOI$ | async).length }}
         </span>
       </span>
 
@@ -131,9 +132,14 @@
 
     </ng-template>
     <div [style.transform] = "floatingMouseContextualContainerTransform" floatingMouseContextualContainer>
+      <div *ngIf = "onhoverLandmark$ | async" contextualInnerContainer>
+        <div contextualBlock>
+          {{ onhoverLandmark$ | async }} <i><small class = "mute-text">dbl click to toggle select</small></i>
+        </div>
+      </div>
       <div *ngIf = "onhoverSegment$ | async as onhoverSegment" contextualInnerContainer>
         <div *ngIf = "onhoverSegment !== ''" contextualBlock>
-          {{ onhoverSegment }} 
+          {{ onhoverSegment }} <i><small class = "mute-text">dbl click to toggle select</small></i>
         </div>
       </div>
     </div>

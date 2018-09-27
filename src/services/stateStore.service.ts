@@ -7,6 +7,9 @@ export const NEWVIEWER = 'NEWVIEWER'
 export const FETCHED_TEMPLATES = 'FETCHED_TEMPLATES'
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 export const SELECT_REGIONS = `SELECT_REGIONS`
+export const DESELECT_REGIONS = `DESELECT_REGIONS`
+export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
+export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
 
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
@@ -27,6 +30,7 @@ export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
+export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 
 export const SET_INIT_PLUGIN = `SET_INIT_PLUGIN`
 export const FETCHED_PLUGIN_MANIFESTS = `FETCHED_PLUGIN_MANIFESTS`
@@ -50,6 +54,7 @@ export interface ViewerStateInterface{
   parcellationSelected : any | null
   regionsSelected : any[]
 
+  landmarksSelected : any[]
   userLandmarks : UserLandmark[]
 
   navigation : any | null
@@ -62,9 +67,11 @@ export interface AtlasAction extends Action{
   selectTemplate? : any
   selectParcellation? : any
   selectRegions? : any[]
+  deselectRegions? : any[]
   dedicatedView? : string
 
   landmarks : UserLandmark[]
+  deselectLandmarks : UserLandmark[]
 
   navigation? : any
 }
@@ -193,11 +200,15 @@ export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], for
   }
 }
 
-export function uiState(state:UIStateInterface = {mouseOverSegment:null, focusedSidePanel:null, sidePanelOpen: false},action:UIAction){
+export function uiState(state:UIStateInterface = {mouseOverSegment:null, mouseOverLandmark : null, focusedSidePanel:null, sidePanelOpen: false},action:UIAction){
   switch(action.type){
     case MOUSE_OVER_SEGMENT:
       return Object.assign({},state,{
         mouseOverSegment : action.segment
+      })
+    case MOUSE_OVER_LANDMARK:
+      return Object.assign({}, state, {
+        mouseOverLandmark : action.landmark
       })
     case TOGGLE_SIDE_PANEL:
       return Object.assign({}, state, {
@@ -219,7 +230,7 @@ export function uiState(state:UIStateInterface = {mouseOverSegment:null, focused
   }
 }
 
-export function viewerState(state:ViewerStateInterface,action:AtlasAction){
+export function viewerState(state:Partial<ViewerStateInterface> = {landmarksSelected : []},action:AtlasAction){
   switch(action.type){
     case LOAD_DEDICATED_LAYER:
       const dedicatedView = state.dedicatedView
@@ -239,6 +250,7 @@ export function viewerState(state:ViewerStateInterface,action:AtlasAction){
         templateSelected : action.selectTemplate,
         parcellationSelected : action.selectParcellation,
         regionsSelected : [],
+        landmarksSelected : [],
         navigation : {},
         dedicatedView : null
       })
@@ -255,11 +267,26 @@ export function viewerState(state:ViewerStateInterface,action:AtlasAction){
         regionsSelected : []
       })
     }
+    case DESELECT_REGIONS : {
+      return Object.assign({}, state, {
+        regionsSelected : state.regionsSelected.filter(re => action.deselectRegions.findIndex(dRe => dRe.name === re.name) < 0)
+      })
+    }
     case SELECT_REGIONS : {
       return Object.assign({},state,{
         regionsSelected : action.selectRegions.map(region=>Object.assign({},region,{
           labelIndex : Number(region.labelIndex)
         }))
+      })
+    }
+    case DESELECT_LANDMARKS : {
+      return Object.assign({}, state, {
+        landmarksSelected : state.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0)
+      })
+    }
+    case SELECT_LANDMARKS : {
+      return Object.assign({}, state, {
+        landmarksSelected : action.landmarks
       })
     }
     case USER_LANDMARKS : {
@@ -308,7 +335,7 @@ export interface SpatialDataStateInterface{
 }
 
 const initSpatialDataState : SpatialDataStateInterface = {
-  spatialDataVisible : false,
+  spatialDataVisible : true,
   spatialSearchPagination : 0, 
   spatialSearchTotalResults : 0
 }
@@ -409,11 +436,13 @@ export interface Publication{
 export interface UIStateInterface{
   sidePanelOpen : boolean
   mouseOverSegment : any | number
+  mouseOverLandmark : any 
   focusedSidePanel : string | null
 }
 
 export interface UIAction extends Action{
   segment : any | number
+  landmark : any
   focusedSidePanel? : string
 }
 

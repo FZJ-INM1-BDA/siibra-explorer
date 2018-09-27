@@ -1,7 +1,7 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, Injector, ComponentRef, AfterViewInit, OnInit, TemplateRef, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, NgViewerStateInterface } from "../services/stateStore.service";
-import { Observable, Subscription } from "rxjs";
+import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, NgViewerStateInterface, safeFilter } from "../services/stateStore.service";
+import { Observable, Subscription, combineLatest } from "rxjs";
 import { map, filter, distinctUntilChanged, delay } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -39,7 +39,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
   @ViewChild('temporaryContainer', { read: ViewContainerRef }) temporaryContainer: ViewContainerRef
   @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
-  // @ViewChild('dedicatedViewerToast', { read: TemplateRef }) dedicatedViewerToast: TemplateRef<any>
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -56,9 +55,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
-  public selectedRegions$: Observable<any[]>
+
+  public selectedPOI$ : Observable<any[]>
+
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
+  public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -95,10 +97,21 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(state => state.focusedSidePanel)
     )
 
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
-      map(state=>state.regionsSelected)
+    this.selectedPOI$ = combineLatest(
+      this.store.pipe(
+        select('viewerState'),
+        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+        map(state=>state.regionsSelected),
+        distinctUntilChanged()
+      ),
+      this.store.pipe(
+        select('viewerState'),
+        filter(state => isDefined(state) && isDefined(state.landmarksSelected)),
+        map(state => state.landmarksSelected),
+        distinctUntilChanged()
+      )
+    ).pipe(
+      map(results => [...results[0], ...results[1]])
     )
 
     this.newViewer$ = this.store.pipe(
@@ -115,18 +128,46 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged()
     )
 
-    this.onhoverSegment$ = this.store.pipe(
-      select('uiState'),
-      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-      map(state => isDefined(state) ?
-        state.mouseOverSegment ?
-          state.mouseOverSegment.constructor === Number ?
-            state.mouseOverSegment.toString() :
-            state.mouseOverSegment.name :
-          '' :
-        ''),
-      distinctUntilChanged()
+    this.onhoverLandmark$ = combineLatest(
+      this.store.pipe(
+        select('uiState'),
+        map(state => state.mouseOverLandmark)
+      ),
+      this.store.pipe(
+        select('dataStore'),
+        safeFilter('fetchedSpatialData'),
+        map(state=>state.fetchedSpatialData)
+      )
+    ).pipe(
+      map(([landmark, spatialDatas]) => {
+        if(landmark === null)
+          return landmark
+        const idx = Number(landmark.replace('label=',''))
+        if(isNaN(idx))
+          return `Landmark index could not be parsed as a number: ${landmark}`
+        return spatialDatas[idx].name
+      })
     )
+
+    // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
+    this.onhoverSegment$ = combineLatest(
+      this.store.pipe(
+        select('uiState'),
+        /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
+        map(state => isDefined(state) ?
+          state.mouseOverSegment ?
+            state.mouseOverSegment.constructor === Number ?
+              state.mouseOverSegment.toString() :
+              state.mouseOverSegment.name :
+            '' :
+          ''),
+        distinctUntilChanged()
+      ),
+      this.onhoverLandmark$
+    ).pipe(
+      map(([segment, onhoverLandmark]) => onhoverLandmark ? '' : segment )
+    )
+
   }
 
   ngOnInit() {
@@ -402,7 +443,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   ngLayersChangeHandler(){
 
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
-      .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
+      // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
       .map(obj => ({
         name : obj.name,
         type : obj.initialSpecification.type,
