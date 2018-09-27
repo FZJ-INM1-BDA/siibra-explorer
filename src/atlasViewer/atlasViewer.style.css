@@ -132,7 +132,8 @@ div[contextualBlock]
   pointer-events: none;
 }
 
-span.tabContainer > *:not(.pointer-events)
+span.tabContainer > *:not(.pointer-events),
+span.tabContainer > *:not(.pointer-events):before
 {
   pointer-events: none;
 }

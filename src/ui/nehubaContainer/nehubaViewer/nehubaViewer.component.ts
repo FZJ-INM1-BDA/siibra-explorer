@@ -4,7 +4,8 @@ import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import { fromEvent, interval } from 'rxjs'
 import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter } from "rxjs/operators";
+import { buffer, map, filter, debounceTime } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   templateUrl : './nehubaViewer.template.html',
@@ -17,6 +18,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter : EventEmitter<any | number | null> = new EventEmitter()
+  @Output() mouseoverLandmarkEmitter : EventEmitter<number | null> = new EventEmitter()
   @Output() regionSelectionEmitter : EventEmitter<any> = new EventEmitter()
 
   /* only used to set initial navigation state */
@@ -53,9 +55,46 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   constructor(
     public elementRef:ElementRef,
     private workerService : AtlasWorkerService,
-    private zone : NgZone
+    private zone : NgZone,
+    private constantService : AtlasViewerConstantsServices
   ){
     this.patchNG()
+
+    this.ondestroySubscriptions.push(
+      fromEvent(this.workerService.worker, 'message').pipe(
+        filter((message:any) => {
+
+          if(!message){
+            // console.error('worker response message is undefined', message)
+            return false
+          }
+          if(!message.data){
+            // console.error('worker response message.data is undefined', message.data)
+            return false
+          }
+          if(message.data.type !== 'ASSEMBLED_LANDMARK_VTK'){
+            /* worker responded with not assembled landmark, no need to act */
+            return false
+          }
+          if(!message.data.url){
+            /* file url needs to be defined */
+            return false
+          }
+          return true
+        }),
+        debounceTime(100),
+        map(e => e.data.url)
+      ).subscribe(url => {
+        this.removeSpatialSearch3DLandmarks()
+        const _ = {}
+        _[this.constantService.ngLandmarkLayerName] = {
+          type :'mesh',
+          source : `vtk://${url}`,
+          shader : FRAGMENT_MAIN_WHITE
+        }
+        this.loadLayer(_)
+      })
+    )
 
     this.ondestroySubscriptions.push(
 
@@ -141,6 +180,25 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     
     if(this.nehubaViewer)
       this.loadNewParcellation()
+  }
+
+  spatialLandmarkSelectionChanged(labels:number[]){
+    const getCondition = (label:number) => `if(label > ${label - 0.1} && label < ${label + 0.1} ){${FRAGMENT_EMIT_RED}}`
+    const newShader = `void main(){ ${labels.map(getCondition).join('else ')}else {${FRAGMENT_EMIT_WHITE}} }`
+    if(!this.nehubaViewer){
+      console.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined')
+      return
+    }
+    const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.constantService.ngLandmarkLayerName)
+    if(!landmarkLayer){
+      console.warn('landmark layer could not be found ... will not update colour map')
+      return
+    }
+    if(labels.length === 0){
+      landmarkLayer.layer.displayState.fragmentMain.restoreState(FRAGMENT_MAIN_WHITE)  
+    }else{
+      landmarkLayer.layer.displayState.fragmentMain.restoreState(newShader)
+    }
   }
 
   regionsLabelIndexMap : Map<number,any>
@@ -244,28 +302,16 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
 
   public removeSpatialSearch3DLandmarks(){
     this.removeLayer({
-      name : /vtk-[0-9]/
+      name : this.constantService.ngLandmarkLayerName
     })
   }
 
+  //pos in mm
   public addSpatialSearch3DLandmarks(poss:[number,number,number][],scale?:number,type?:'icosahedron'){
-    const _ = {}
-    poss.forEach((pos,idx)=>{
-
-      _[`vtk-${idx}`] = {
-        type : 'mesh',
-        source : `vtk://${ICOSAHEDRON_VTK_URL}`,
-        transform : [
-          [2 ,0 ,0 , pos[0]*1e6],
-          [0 ,2 ,0 , pos[1]*1e6],
-          [0 ,0 ,2 , pos[2]*1e6],
-          [0 ,0 ,0 , 1 ],
-        ],
-        shader : FRAGMENT_MAIN_WHITE
-      }
+    this.workerService.worker.postMessage({
+      type : 'GET_LANDMARK_VTK',
+      landmarks : poss.map(pos => pos.map(v => v * 1e6))
     })
-    /* load layer triggers navigation view event, results in infinite loop */
-    this.loadLayer(_)
   }
 
   public setLayerVisibility(condition:{name:string|RegExp},visible:boolean){
@@ -402,7 +448,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       this.hideAllSeg()
     }
 
-    this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment})=>{
+    this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment, ...rest})=>{
       if( segment && segment < 65500 ) {
         const region = this.regionsLabelIndexMap.get(segment)
         this.mouseoverSegmentEmitter.emit(region ? region : segment)
@@ -411,8 +457,31 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       }
     })
 
+    // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
     this._s3$ = this.nehubaViewer.navigationState.all
       .debounceTime(300)
+      .distinctUntilChanged((a, b) => {
+        const {
+          orientation: o1,
+          perspectiveOrientation: po1,
+          perspectiveZoom: pz1,
+          position: p1,
+          zoom: z1
+        } = a
+        const {
+          orientation: o2,
+          perspectiveOrientation: po2,
+          perspectiveZoom: pz2,
+          position: p2,
+          zoom: z2
+        } = b
+
+        return [0,1,2,3].every(idx => o1[idx] === o2[idx]) &&
+          [0,1,2,3].every(idx => po1[idx] === po2[idx]) &&
+          pz1 === pz2 &&
+          [0,1,2].every(idx => p1[idx] === p2[idx]) &&
+          z1 === z2
+      })
       .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom })=>{
         this.viewerState = {
           orientation,
@@ -422,6 +491,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           position,
           positionReal : false
         }
+        
         this.debouncedViewerPositionChange.emit({
           orientation : Array.from(orientation),
           perspectiveOrientation : Array.from(perspectiveOrientation),
@@ -431,6 +501,12 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           positionReal : true
         })
       })
+
+    this.ondestroySubscriptions.push(
+      this.nehubaViewer.mouseOver.layer
+        .filter(obj => obj.layer.name === this.constantService.ngLandmarkLayerName)
+        .subscribe(obj => this.mouseoverLandmarkEmitter.emit(obj.value))
+    )
 
     this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace
       .filter(v=>typeof v !== 'undefined' && v !== null)
@@ -615,3 +691,5 @@ export const _encoder = new TextEncoder()
 export const ICOSAHEDRON_VTK_URL = URL.createObjectURL( new Blob([ _encoder.encode(ICOSAHEDRON) ],{type : 'application/octet-stream'} ))
 
 export const FRAGMENT_MAIN_WHITE = `void main(){emitRGB(vec3(1.0,1.0,1.0));}`
+export const FRAGMENT_EMIT_WHITE = `emitRGB(vec3(1.0, 1.0, 1.0));`
+export const FRAGMENT_EMIT_RED = `emitRGB(vec3(1.0, 0.1, 0.12));`

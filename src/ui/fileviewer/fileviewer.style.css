@@ -32,3 +32,8 @@ div[anchorContainer]
 {
   padding:0.2em 1em;
 }
+
+div[mimetypeTextContainer]
+{
+  margin:1em;
+}

@@ -1,0 +1,6 @@
+<div *ngIf = "dataset; else defaultDisplay">
+  {{ dataset.name }}
+</div>
+<ng-template #defaultDisplay>
+  Nothing to display ...
+</ng-template>

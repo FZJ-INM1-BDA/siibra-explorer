@@ -174,6 +174,7 @@ export interface InteractiveViewerInterface{
 }
 
 export interface UserLandmark{
+  name : string
   position : [number, number, number]
   id : string /* probably use the it to track and remove user landmarks */
   highlight : boolean
