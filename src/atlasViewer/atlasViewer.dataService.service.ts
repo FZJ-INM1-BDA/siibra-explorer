@@ -93,13 +93,26 @@ export class AtlasViewerDataService implements OnDestroy{
           this.store.dispatch({
             type : FETCHED_SPATIAL_DATA,
             fetchedDataEntries : arr.reduce((acc,curr) => acc.concat(curr.map(obj => Object.assign({}, obj, {
-              position : obj.position.map(pos => pos/1e6),
               properties : {}
             }))), [])
           })
           this.store.dispatch({
             type : UPDATE_SPATIAL_DATA,
             totalResults : arr.reduce((acc,curr) => acc + curr.length, 0)
+          })
+        })
+        .catch(console.error)
+    }else if (templateSpace === 'Allen Mouse'){
+      return fetch('res/json/allenTestPlane.json')
+        .then(res => res.json())
+        .then(arr => {
+          this.store.dispatch({
+            type : FETCHED_SPATIAL_DATA,
+            fetchedDataEntries : arr.map(item => Object.assign({}, item, { properties : {} }))
+          })
+          this.store.dispatch({
+            type : UPDATE_SPATIAL_DATA,
+            totalResults : arr.length
           })
         })
         .catch(console.error)

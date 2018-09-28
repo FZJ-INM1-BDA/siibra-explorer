@@ -21,11 +21,16 @@ filenames.map(filename => {
       return {
         type : 'iEEG Recording Site',
         name : filename.replace('_MNI.pts', '').concat(`_${name.replace(/^.p/g,(s) => s.slice(0,1).concat('\''))}`),
-        position : [
-          Number(x) * 1e6,
-          Number(y) * 1e6,
-          Number(z) * 1e6
-        ],
+        templateSpace : 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
+        geometry : {
+          type : 'point',
+          space : 'real',
+          position : [
+            Number(x),
+            Number(y),
+            Number(z)
+          ],
+        },
         properties : {
           description : descContactPts,
           publications : []

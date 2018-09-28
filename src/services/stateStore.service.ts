@@ -446,6 +446,30 @@ export interface UIAction extends Action{
   focusedSidePanel? : string
 }
 
+export interface Landmark{
+  type : string //e.g. sEEG recording site, etc
+  name : string
+  templateSpace : string // possibily inherited from LandmarkBundle (?)
+  geometry : PointLandmarkGeometry | PlaneLandmarkGeometry
+  properties : Property
+  files : File[]
+}
+
+export interface LandmarkGeometry{
+  type : 'point' | 'plane'
+  space? : 'voxel' | 'real'
+}
+
+export interface PointLandmarkGeometry extends LandmarkGeometry{
+  position : [number, number, number]
+}
+
+export interface PlaneLandmarkGeometry extends LandmarkGeometry{
+  // corners have to be CW or CCW (no zigzag)
+  corners : [[number, number, number],[number, number, number],[number, number, number],[number, number, number]]
+}
+
+
 export function isDefined(obj){
   return typeof obj !== 'undefined' && obj !== null
 }
