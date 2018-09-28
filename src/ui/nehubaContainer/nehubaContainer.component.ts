@@ -1,15 +1,13 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, Injector } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
-import { DatasetViewerComponent } from "../datasetViewer/datasetViewer.component";
-import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -28,7 +26,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
   @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
-  private datasetViewerFactory : ComponentFactory<DatasetViewerComponent>
 
   public viewerLoaded : boolean = false
 
@@ -43,7 +40,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private selectedLandmarks$ : Observable<any[]>
   private hideSegmentations$ : Observable<boolean>
 
-  private fetchedSpatialDatasets$ : Observable<any[]>
+  private fetchedSpatialDatasets$ : Observable<Landmark[]>
   private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
   public onHoverSegment$ : Observable<any>
@@ -55,7 +52,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private selectedTemplate : any | null
   private selectedRegionIndexSet : Set<number> = new Set()
-  public fetchedSpatialData : DataEntry[] = []
+  public fetchedSpatialData : Landmark[] = []
 
   private ngLayersRegister : NgViewerStateInterface = {layers : [], forceShowSegment: null}
   private ngLayers$ : Observable<NgViewerStateInterface>
@@ -86,7 +83,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     private elementRef : ElementRef
   ){
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
-    this.datasetViewerFactory = this.csf.resolveComponentFactory(DatasetViewerComponent)
 
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
@@ -117,10 +113,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.fetchedSpatialDatasets$ = this.store.pipe(
       select('dataStore'),
-      debounceTime(300),
       safeFilter('fetchedSpatialData'),
       map(state => state.fetchedSpatialData),
-      distinctUntilChanged(this.constantService.testLandmarksChanged)
+      distinctUntilChanged(this.constantService.testLandmarksChanged),
+      debounceTime(300),
     )
 
     this.navigationChanges$ = this.store.pipe(
@@ -290,12 +286,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
       )
       .pipe(
         map(([datas,visible, ...rest]) => visible ? datas : []),
-        map(arr => arr.map(v => Object.assign({}, v, {type : 'spatialSearchLandmark'})))
+        // map(arr => arr.map(v => Object.assign({}, v, {type : 'spatialSearchLandmark'})))
       ),
       this.userLandmarks$.pipe(
-        map(arr => arr.map(v => Object.assign({}, v, {type : 'userLandmark'})))
+        // map(arr => arr.map(v => Object.assign({}, v, {type : 'userLandmark'})))
       )
-    ).pipe(map(arr => arr[0].concat(arr[1])))
+    ).pipe(map(arr => [...arr[0], ...arr[1]]))
 
     this.ngLayers$ = this.store.pipe(
       select('ngViewerState')
@@ -324,10 +320,21 @@ export class NehubaContainer implements OnInit, OnDestroy{
       ).subscribe(([fetchedSpatialData,visible])=>{
         this.fetchedSpatialData = fetchedSpatialData
 
-        if(visible)
-          this.nehubaViewer.addSpatialSearch3DLandmarks(this.fetchedSpatialData.map((data:any)=>data.position))
-        else
+        if(visible && this.fetchedSpatialData && this.fetchedSpatialData.length > 0){
+          this.nehubaViewer.addSpatialSearch3DLandmarks(
+            this.fetchedSpatialData
+              .map(data=> data.geometry.type === 'point'
+                ? (data.geometry as PointLandmarkGeometry).position
+                : data.geometry.type === 'plane'
+                  ? [
+                      (data.geometry as PlaneLandmarkGeometry).corners,
+                      [[0,1,2], [0,2,3]]
+                    ] 
+                  : null)
+            )
+        }else{
           this.nehubaViewer.removeSpatialSearch3DLandmarks()
+        }
       })
     )
 
