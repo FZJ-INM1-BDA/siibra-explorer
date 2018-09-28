@@ -72,7 +72,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
             // console.error('worker response message.data is undefined', message.data)
             return false
           }
-          if(message.data.type !== 'ASSEMBLED_LANDMARK_VTK'){
+          if(message.data.type !== 'ASSEMBLED_LANDMARKS_VTK'){
             /* worker responded with not assembled landmark, no need to act */
             return false
           }
@@ -307,10 +307,17 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   }
 
   //pos in mm
-  public addSpatialSearch3DLandmarks(poss:[number,number,number][],scale?:number,type?:'icosahedron'){
+  public addSpatialSearch3DLandmarks(geometries: any[],scale?:number,type?:'icosahedron'){
     this.workerService.worker.postMessage({
-      type : 'GET_LANDMARK_VTK',
-      landmarks : poss.map(pos => pos.map(v => v * 1e6))
+      type : 'GET_LANDMARKS_VTK',
+      landmarks : geometries.map(geometry => 
+        geometry === null
+          ? null
+          //gemoetry : [number,number,number] | [ [number,number,number][], [number,number,number][] ]
+          : isNaN(geometry[0])
+            ? [geometry[0].map(triplets => triplets.map(coord => (console.log(coord), coord * 1e6))), geometry[1]]
+            : geometry.map(coord => coord * 1e6)
+      )
     })
   }
 
