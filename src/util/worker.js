@@ -98,7 +98,7 @@ const getIcoPoly = (startingIdx) => `3 1 4 0
     )
   .join('\n')
 
-const getMeshVertex = (vertices) => (console.log(vertices), vertices.map(vertex => vertex.join(' ')).join('\n'))
+const getMeshVertex = (vertices) =>  vertices.map(vertex => vertex.join(' ')).join('\n')
 const getMeshPoly = (polyIndices, currentIdx) => polyIndices.map(triplet => 
   '3 '.concat(triplet.map(index => 
     index + currentIdx
@@ -109,12 +109,9 @@ let landmarkVtkUrl
 
 const encoder = new TextEncoder()
 const getLandmarksVtk = (action) => {
-  console.log('getin vtk')
 
   // landmarks are array of triples in nm (array of array of numbers)
   const landmarks = action.landmarks
-
-  console.log({landmarks})
 
   const reduce = landmarks.reduce((acc,curr,idx) => {
     //curr : null | [number,number,number] | [ [number,number,number], [number,number,number], [number,number,number] ][]
@@ -169,7 +166,6 @@ const getLandmarksVtk = (action) => {
     .concat('\n')
     .concat(reduce.labelString.join('\n'))
   
-  console.log({vtk})
   // when new set of landmarks are to be displayed, the old landmarks will be discarded
   if(landmarkVtkUrl)
     URL.revokeObjectURL(landmarkVtkUrl)
