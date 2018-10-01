@@ -37,16 +37,16 @@
       *ngIf = "showRegionTree" 
       hideScrollbarContainer>
 
-      <div treeContainer>
+      <div treeContainer #treeContainer>
         <div treeHeader>
           <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
           <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
         </div>
         
         <flat-tree-component 
-          *ngFor = "let child of selectedParcellation.regions "
+          [flatTreeViewPort] = "treeContainer"
           (treeNodeClick) = "handleClickRegion($event)"
-          [inputItem] = "child"
+          [inputItem] = "aggregatedRegionTree"
           [renderNode] = "displayTreeNode.bind(this)"
           [searchFilter] = "filterTreeBySearch.bind(this)">
           
