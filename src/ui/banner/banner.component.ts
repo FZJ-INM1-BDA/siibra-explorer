@@ -237,5 +237,12 @@ export class AtlasBanner implements OnDestroy{
   }
 
   filterNameBySearchPipe = new FilterNameBySearch()
+
+  get aggregatedRegionTree(){
+    return {
+      name : this.selectedParcellation.name,
+      children : this.selectedParcellation.regions
+    }
+  }
 }
 
