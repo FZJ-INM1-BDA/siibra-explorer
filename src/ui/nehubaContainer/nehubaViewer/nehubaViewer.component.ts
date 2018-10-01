@@ -315,7 +315,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           ? null
           //gemoetry : [number,number,number] | [ [number,number,number][], [number,number,number][] ]
           : isNaN(geometry[0])
-            ? [geometry[0].map(triplets => triplets.map(coord => (console.log(coord), coord * 1e6))), geometry[1]]
+            ? [geometry[0].map(triplets => triplets.map(coord => coord * 1e6)), geometry[1]]
             : geometry.map(coord => coord * 1e6)
       )
     })
