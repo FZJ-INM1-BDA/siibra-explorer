@@ -48,6 +48,13 @@ export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnDes
     }
   }
 
+  ngOnInit(){
+    if(this.flatTreeViewPort){
+
+      this.clusterNumber = 50
+    }
+  }
+
   ngAfterViewInit(){
 
     if(this.flatTreeViewPort){
@@ -106,6 +113,7 @@ export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnDes
   }
 
   private _currentPos : number = 0
+  public clusterNumber : number = Number.POSITIVE_INFINITY
 
   showCluster(index:number){
     return index <= this._currentPos + 1
