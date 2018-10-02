@@ -1,4 +1,4 @@
-import { EventEmitter, Component, Input, Output, ChangeDetectionStrategy, ElementRef, OnDestroy, ChangeDetectorRef, ViewChildren, QueryList, AfterViewChecked, AfterViewInit } from "@angular/core";
+import { EventEmitter, Component, Input, Output, ChangeDetectionStrategy, ElementRef, OnDestroy, ChangeDetectorRef, ViewChildren, QueryList, AfterViewChecked, AfterViewInit, OnInit } from "@angular/core";
 import { FlattenedTreeInterface } from "./flattener.pipe";
 
 @Component({
@@ -10,7 +10,7 @@ import { FlattenedTreeInterface } from "./flattener.pipe";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnDestroy{
+export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnInit, OnDestroy{
   @Input() inputItem : any = {
     name : 'Untitled',
     children : []
@@ -50,7 +50,6 @@ export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnDes
 
   ngOnInit(){
     if(this.flatTreeViewPort){
-
       this.clusterNumber = 50
     }
   }
