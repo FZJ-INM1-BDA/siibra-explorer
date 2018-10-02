@@ -22,6 +22,7 @@ import { RenderPipe } from './flatTree/render.pipe';
 import { HighlightPipe } from './flatTree/highlight.pipe';
 import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pipe';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
+import { ClusteringPipe } from './flatTree/clustering.pipe';
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
     RenderPipe,
     HighlightPipe,
     FitlerRowsByVisibilityPipe,
-    AppendSiblingFlagPipe
+    AppendSiblingFlagPipe,
+    ClusteringPipe
   ],
   exports : [
     BrowserAnimationsModule,

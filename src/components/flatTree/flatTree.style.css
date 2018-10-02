@@ -1,6 +1,33 @@
 :host
 {
   display: block;
+  height:100%;
+}
+
+[clusterContainer]
+{
+  position:relative;
+}
+
+[flatTreeStart]
+{
+  position: absolute;
+  top: 0;
+  height:50%;
+  width:1em;
+  opacity:0;
+  background-color:rgba(200,250,200,0.2);
+}
+
+[flatTreeEnd]
+{
+  position: absolute;
+  top: 0;
+  transform: translateY(100%);
+  width:1em;
+  opacity:0;
+  background-color:rgba(250,200,200,0.2);
+  height:50%;
 }
 
 .render-node-text
