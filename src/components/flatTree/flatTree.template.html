@@ -1,5 +1,5 @@
 <div class="container">
-  <div *ngFor = "let flattenedItems of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe | clusteringPipe : 50 ); let index = index" clusterContainer>
+  <div *ngFor = "let flattenedItems of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe | clusteringPipe : clusterNumber ); let index = index" clusterContainer>
 
     <div [attr.clusterindex] = "index" flatTreeStart #flatTreeStart>
     </div>
