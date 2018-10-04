@@ -12,25 +12,27 @@ export class KgEntryViewer implements OnInit{
   @Input() kgQueryString : string = null
 
   public kgData : any = null
+  public kgError : any = null
 
   ngOnInit(){
     if(this.kgQueryString){
       fetch(`${KGROOT}${this.kgQueryString}`)
         .then(res => res.json())
         .then(json => {
-          console.log({json})
           if(json.found)
             return json._source
           else
-            throw new Error('json.found returns false')
+            throw new Error('No documents were found.')
         })
         .then(json => this.kgData = json)
         .catch(e => {
           console.error('fetching KG data error', e)
           this.kgData = null
+          this.kgError = JSON.stringify(e)
         })
     }else{
       console.error('kgQueryString empty!')
+      this.kgError = 'Knowledge Graph ID empty'
     }
   }
 

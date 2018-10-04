@@ -117,10 +117,19 @@
 
   </readmore-component>
   <a target = "_blank" [href] = "kgHref">
-    See the entry in Knowledge Graph
+    See this dataset in the Knowledge Graph <i class = "glyphicon glyphicon-new-window"></i>
   </a>
 
 </div>
 <ng-template #showDefault>
-  Fetching KG Data ...
+  <div reportError *ngIf = "kgError">
+    Fetching metadata from the Knowledge Graph failed - {{ kgError }}
+  </div>
+  <div *ngIf = "!kgError">
+    Fetching KG Data 
+
+    <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+    <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+    <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+  </div>
 </ng-template>
