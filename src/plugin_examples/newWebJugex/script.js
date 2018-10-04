@@ -22,7 +22,7 @@
   // }])
 
   const backendRoot = null
-  const srcRoot = 'http://localhost:10080/newWebJugex'
+  const srcRoot = 'res/plugin_examples/newWebJugex'
   const manifestID = 'fzj.xg.webjugex'
 
   /* so that on shutdown, we could unload these libraries */

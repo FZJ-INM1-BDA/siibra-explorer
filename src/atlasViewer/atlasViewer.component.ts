@@ -484,6 +484,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.mousePos = [event.clientX, event.clientY]
   }
 
+  @HostBinding('attr.version')
+  public _version : string = VERSION
+
   get floatingMouseContextualContainerTransform() {
     return `translate(${this.mousePos[0]}px,${this.mousePos[1]}px)`
   }
