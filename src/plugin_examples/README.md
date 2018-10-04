@@ -74,7 +74,7 @@ The template HTML file describes the HTML view that will be rendered in the widg
 </form>
 ```
 *NB*
-- *bootstrap 3.6* css is already included for templating.
+- *bootstrap 3.3.6* css is already included for templating.
 - keep in mind of the widget width restriction (400px) when crafting the template
 - whilst there are no vertical limits on the widget, contents can be rendered outside the viewport. Consider setting the *max-height* attribute.
 - your template and script will interact with each other likely via *element id*. As a result, it is highly recommended that unique id's are used. Please adhere to the convention: **AFFILIATION.AUTHOR.PACKAGENAME.ELEMENTID** 
