@@ -9,4 +9,5 @@ declare module '*.css' {
 }
 
 declare var PLUGINDEV : boolean
-declare var BUNDLEPLUGIN : boolean
+declare var BUNDLEDPLUGINS : string[]
+declare var VERSION : string
