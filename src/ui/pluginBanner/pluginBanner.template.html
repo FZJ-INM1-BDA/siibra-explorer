@@ -1,8 +1,9 @@
 <div 
   placement = "bottom"
-  tooltip = "coming soon"
+  [tooltip] = "pluginEnabledFlag ? null : 'coming soon'"
   *ngFor = "let plugin of pluginServices.fetchedPluginManifests"
   (click) = "clickPlugin(plugin)"
-  class = "btn btn-default btn-disabled">
+  [ngClass] = "{'btn-disabled' : !pluginEnabledFlag}"
+  class = "btn btn-default">
   {{ plugin.displayName ? plugin.displayName : plugin.name }}
 </div>
