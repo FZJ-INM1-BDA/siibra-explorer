@@ -33,6 +33,7 @@ import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
 import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
 import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
 import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
+import { DownloadDirective } from "../util/directives/download.directive";
 
 
 @NgModule({
@@ -73,7 +74,10 @@ import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLand
     SafeStylePipe,
     GetLayerNameFromDatasets,
     SortDataEntriesToRegion,
-    SpatialLandmarksToDataBrowserItemPipe
+    SpatialLandmarksToDataBrowserItemPipe,
+
+    /* directive */
+    DownloadDirective
   ],
   entryComponents : [
 

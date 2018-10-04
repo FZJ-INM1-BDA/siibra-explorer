@@ -47,6 +47,10 @@ export class KgEntryViewer implements OnInit{
   get kgHref(){
     return `https://kg.humanbrainproject.org/webapp/#${this.kgQueryString}`
   }
+
+  public isArray(v){
+    return v.constructor === Array
+  }
 }
 
 const KGROOT = `https://kg.humanbrainproject.org/api/proxy/kg/`
