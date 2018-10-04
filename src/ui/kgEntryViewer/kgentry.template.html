@@ -47,10 +47,16 @@
         Related Publication(s)
       </div>
       <div body>
-        <!-- TODO Maybe array -->
-        <div publicationContainer *ngFor = "let publication of kgData.publications">
-          {{ publication.value.split('\n')[0] }}
+        <div *ngIf = "isArray(kgData.publications); else singlePublicationTemplate">
+          <div publicationContainer *ngFor = "let publication of kgData.publications">
+            {{ publication.value.split('\n')[0] }}
+          </div>
         </div>
+        <ng-template #singlePublicationTemplate>
+          <div publicationContainer>
+            {{ kgData.publications.value.split('\n')[0] }}
+          </div>
+        </ng-template>
       </div>
     </panel-component>
 
