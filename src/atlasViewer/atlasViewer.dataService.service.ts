@@ -126,7 +126,10 @@ export class AtlasViewerDataService implements OnDestroy{
       .then((resp)=>{
         const dataEntries = resp.response.docs.map(doc=>({
           name : doc['OID'][0],
-          position : doc['geometry.coordinates'][0].split(',').map(string=>Number(string)),
+          geometry : {
+            type : 'point',
+            position : doc['geometry.coordinates'][0].split(',').map(string=>Number(string)),
+          },
           properties : {
             description : doc['OID'][0],
             publications : []
