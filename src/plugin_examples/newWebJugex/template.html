@@ -1,6 +1,5 @@
-<div v-cloak id = "fzj.xg.newWebJugex.container">
-  <vue-readmore
-    :collapsed-height = "40">
+<div @animationend = "animationendtmp($event)" v-cloak id = "fzj.xg.newWebJugex.container"> 
+   <vue-readmore :collapsed-height = "40">
     <template slot = "readmoreContent">
       <small id = "fzj.xg.newWebJugex.desc">
           Find a set of differentially expressed genes between two user defined volumes of interest based on JuBrain maps. <br />
@@ -37,11 +36,14 @@
 
   <div class="fzj.xg.newWebJugex.spacer"></div>
 
-  <div style = "z-index:5" class="input-group">
-    <div class="input-group-addon">
+  <div 
+    style = "z-index:5" class="input-group">
+    <div 
+      class="input-group-addon">
       ROI1:
     </div>
     <vue-autocomplete
+      :warning = "roi1Warning" 
       ref = "roi1"
       @selectslice = "roi1 = $event;findNewInput()"
       class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
@@ -55,6 +57,7 @@
       ROI2:
     </div>
     <vue-autocomplete
+      :warning = "roi2Warning"
       ref = "roi2"
       @selectslice = "roi2 = $event;findNewInput()"
       class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
@@ -68,6 +71,7 @@
 
   <div style = "z-index:3" class = "input-group">
     <vue-autocomplete
+      :warning = "chosenGeneWarning"
       ref = "genelist"
       @selectslice = "chosengenes.push( $event );$refs.genelist.$refs.input.focus()"
       class = "form-control fzj.xg.newWebJugex.vueAutocompleteFormControl"
@@ -103,7 +107,7 @@
 
   <div class="fzj.xg.newWebJugex.spacer"></div>
 
-  <transition name = "fade">
+  <transition name = "fzj-xg-webjugex-fade">
     <div v-if = "!simpleMode">
 
       <div class="input-group">
@@ -134,17 +138,21 @@
         <span class="input-group-addon">
           Hemisphere
         </span>
-        <div 
-          @click = "lefthemisphere = !lefthemisphere"
-          :class = " lefthemisphere == true ? 'btn-active' : 'btn-inactive'"
-          class="btn btn-default">
-          Left
-        </div>
-        <div 
-          @click = "righthemisphere = !righthemisphere"
-          :class = " righthemisphere == true ? 'btn-active' : 'btn-inactive'"
-          class="btn btn-default">
-          Right
+        <div
+          style = "display:inline-block"
+          :warning = "hemisphereWarning">
+          <div 
+            @click = "lefthemisphere = !lefthemisphere"
+            :class = " lefthemisphere == true ? 'btn-active' : 'btn-inactive'"
+            class="btn btn-default">
+            Left
+          </div>
+          <div 
+            @click = "righthemisphere = !righthemisphere"
+            :class = " righthemisphere == true ? 'btn-active' : 'btn-inactive'"
+            class="btn btn-default">
+            Right
+          </div>
         </div>
       </div>
     
@@ -166,6 +174,15 @@
     class="btn btn-default btn-block">
     Start Differential Analysis
   </div>
+  
+  <transition name = "fzj-xg-webjugex-fade">
+    <div style = "margin-top:0.5em" class = "alert alert-danger" v-if = "warning.length > 0">
+      <i class="glyphicon glyphicon-alert"></i> WARNING: 
+      <div v-for = "w in warning">
+        {{ getWarning(w) }}
+      </div>
+    </div>
+  </transition>
 
 </div>
 <div v-cloak id = "fzj.xg.newWebJugex.result">
@@ -184,6 +201,36 @@
 {
   display:none;
 }
+
+.fzj-xg-webjugex-fade-enter-active,
+.fzj-xg-webjugex-fade-leave-active
+{
+  transition: opacity 0.3s;
+}
+
+.fzj-xg-webjugex-fade-enter,
+.fzj-xg-webjugex-fade-leave-to
+{
+  opacity: 0;
+}
+
+@keyframes flash{
+  0% {
+    outline:2px solid rgba(250, 100, 100, 0.0);
+  }
+  10% {
+    outline:2px solid rgba(250, 100, 100, 0.9);
+  }
+  100% {
+    outline:2px solid rgba(250, 100, 100, 0.0);
+  }
+}
+
+[warning]
+{
+  animation:5.5s linear flash;
+}
+
 #fzj\.xg\.newWebJugex\.container
 {
   padding: 0.5em;
@@ -212,7 +259,7 @@
 }
 .fzj\.xg\.newWebJugex\.padding
 {
-  height:10em;
+  height:2em;
 }
 
 .fzj\.xg\.newWebJugex\.spacer

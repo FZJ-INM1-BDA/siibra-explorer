@@ -21,13 +21,18 @@
   //   position : [0,0,0]
   // }])
 
-  const backendRoot = `http://examcopedia.club:8003`
-  const srcRoot = 'http://localhost:8080/res/plugins'
+  const backendRoot = null
+  const srcRoot = 'http://localhost:10080/newWebJugex'
+  const manifestID = 'fzj.xg.webjugex'
 
   /* so that on shutdown, we could unload these libraries */
   const onshutdownCB = []
   const loadedExternalLibraries = []
   const subscriptions = []
+
+  const newset = new Set()
+  newset.add('test')
+  newset.has('test')
 
   let datasetsLoaded, mouseoverReggion
 
@@ -53,7 +58,7 @@
       loadedExternalLibraries.push(el)
       resolve()
     }
-    el.onerror = () => reject()
+    el.onerror = (e) => reject(e)
     document.head.appendChild(el)
   })
 
@@ -87,6 +92,7 @@
     .then(() => loadExternalJsLibrary(`${srcRoot}/vendor.js`))
     .then(() => loadExternalJsLibrary(`${srcRoot}/app.js`))
     .then(() => {
+      window.interactiveViewer.pluginControl[manifestID].setInitManifestUrl('http://localhost:10080/newWebJugex/manifest.json')
 
       const controller = new Vue({
         el: '#fzj\\.xg\\.newWebJugex\\.container',
@@ -97,7 +103,7 @@
           }
         },
         data: {
-          allgenes: [],
+          allgenes: ["ADRA2A", "AVPR1B", "CHRM2", "CNR1", "CREB1", "CRH", "CRHR1", "CRHR2", "GAD2", "HTR1A", "HTR1B", "HTR1D", "HTR2A", "HTR3A", "HTR5A", "MAOA", "PDE1A", "SLC6A2", "SLC6A4", "SST", "TAC1", "TPH1", "GPR50", "CUX2", "TPH2"],
           chosengenes: [],
           roi1: '',
           roi2: '',
@@ -107,9 +113,15 @@
           ignoreCustomProbe:false,
           lefthemisphere:true,
           righthemisphere:true,
-          nPermutations:1000
+          nPermutations:1000,
+          warning : []
         },
         methods: {
+          animationendtmp: function(event){
+            if(event.animationName === 'flash'){
+              this.warning = []
+            }
+          },
           findNewInput: function(){
             if(this.roi1 === '')
               return this.$refs.roi1.$refs.input.focus()
@@ -120,12 +132,49 @@
           removeGene: function (gene) {
             this.chosengenes = this.chosengenes.filter(g => g !== gene)
           },
-          exportGene: function(){
+          exportGene: function () {
             this.$refs.exportGeneAnchor.setAttribute('download', `${Date.now()}.csv`)
             this.$refs.exportGeneAnchor.click()
-            console.log('export gene')
+          },
+          getWarning: function(w) {
+            switch(w){
+              case 'roi1':
+                return `ROI1 must be selected.`
+              case 'roi2':
+                return `ROI2 must be selected.`
+              case 'chosengenes':
+                return `At least 1 gene needs to be selected.`
+              case 'hemisphere':
+                return `If simple mode is off, at least 1 hemisphere needs to be selected.`
+              default:
+                return `Some other fields need to be filled.`
+            }
+          },
+          validation: function () {
+            this.warning = []
+            if(this.roi1 !== '' && this.roi2 !== '' && this.chosengenes.length > 0 && (this.simpleMode || (this.lefthemisphere || this.righthemisphere))){
+              return true
+            }
+            const warning = []
+            if(this.roi1 === ''){
+              warning.push('roi1')
+            }
+            if(this.roi2 === ''){
+              warning.push('roi2')
+            }
+            if(this.chosengenes.length <= 0){
+              warning.push('chosengenes')
+            }
+            if(!this.simpleMode && !(this.lefthemisphere || this.righthemisphere)){
+              warning.push('hemisphere')
+            }
+            this.warning = warning
           },
           startAnalysis: function () {
+            if(!this.validation()){
+              return
+            }
+              
             const body = {
               area1: {
                 name: this.roi1,
@@ -142,13 +191,25 @@
 
               lh: this.lefthemisphere,
               rh: this.righthemisphere,
-              selectedGenes: this.chosengenes
+              selectedGenes: [...this.chosengenes]
             }
 
             this.$emit('start-analysis', Object.assign({}, body))
           }
         },
         computed: {
+          hemisphereWarning : function(){
+            return this.warning.findIndex(v => v === 'hemisphere') >= 0
+          },
+          roi1Warning: function(){
+            return this.warning.findIndex(v => v === 'roi1') >= 0
+          },
+          roi2Warning: function(){
+            return this.warning.findIndex(v => v === 'roi2') >= 0
+          },
+          chosenGeneWarning: function(){
+            return this.warning.findIndex(v => v === 'chosengenes') >= 0
+          },
           placeholderTextRoi1: function () {
             return this.roi1 === '' ? 'Start typing to search ...': this.roi1
           },
@@ -286,8 +347,10 @@
       })
 
       controller.$on('start-analysis', (data) => {
-        /* validation (?) */
+        console.log({data})
+        return
         result.addAnalysis(data)
       })
     })
+    .catch(e => console.log('error',e))
 })()
