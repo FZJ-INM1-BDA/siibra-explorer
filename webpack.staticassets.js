@@ -31,8 +31,9 @@ module.exports = {
         use : [{
           loader : 'file-loader',
           options : {
-            name : '[name].[ext]',
-            outputPath : 'res/plugins'
+            name : '[path][name].[ext]',
+            outputPath : 'res',
+            context : 'src'
           }
         }]
       }
@@ -41,7 +42,15 @@ module.exports = {
   plugins : [
     new webpack.DefinePlugin({
       PLUGINDEV : process.env.PLUGINDEV ? true : false,
-      BUNDLEPLUGIN : process.env.BUNDLEPLUGIN ? true : false
+      BUNDLEDPLUGINS : process.env.BUNDLEDPLUGINS
+        ? JSON.stringify(process.env.BUNDLEDPLUGINS.split(','))
+        : JSON.stringify([]),
+      VERSION : process.env.VERSION 
+        ? JSON.stringify(process.env.VERSION) 
+        : process.env.GIT_HASH
+          ? JSON.stringify(process.env.GIT_HASH)
+          : JSON.stringify('unspecificied hash')
     })
+    // ...ignoreArr.map(dirname => new webpack.IgnorePlugin(/\.\/plugin_examples/))
   ]
 }
