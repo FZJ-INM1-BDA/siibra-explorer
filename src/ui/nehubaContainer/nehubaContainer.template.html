@@ -8,19 +8,20 @@
 
   <div>
     <layout-floating-container
-      *ngIf = "false"
       pos00 
       landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(0,spatialData)"
-        [positionY] = "getPositionY(0,spatialData)"
-        [positionZ] = "getPositionZ(0,spatialData)">
-      </nehuba-2dlandmark-unit>
+      <div *ngIf = "false">
+        <nehuba-2dlandmark-unit 
+          *ngFor = "let spatialData of (combinedSpatialData$ | async)"
+          (mouseenter) = "handleMouseEnterLandmark(spatialData)"
+          (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
+          [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+          [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+          [positionX] = "getPositionX(0,spatialData)"
+          [positionY] = "getPositionY(0,spatialData)"
+          [positionZ] = "getPositionZ(0,spatialData)">
+        </nehuba-2dlandmark-unit>
+      </div>
 
       <div *ngIf = "sliceViewLoading0$ | async" class = "loadingIndicator">
         <div class = "spinnerAnimationCircle">
@@ -30,20 +31,21 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container
-      *ngIf = "false"  
+    <layout-floating-container  
       pos01 
       landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(1,spatialData)"
-        [positionY] = "getPositionY(1,spatialData)"
-        [positionZ] = "getPositionZ(1,spatialData)">
-      </nehuba-2dlandmark-unit>
+      <div *ngIf = "false">
+        <nehuba-2dlandmark-unit 
+          *ngFor = "let spatialData of (combinedSpatialData$ | async)"
+          (mouseenter) = "handleMouseEnterLandmark(spatialData)"
+          (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
+          [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+          [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+          [positionX] = "getPositionX(1,spatialData)"
+          [positionY] = "getPositionY(1,spatialData)"
+          [positionZ] = "getPositionZ(1,spatialData)">
+        </nehuba-2dlandmark-unit>
+      </div>
       <div *ngIf = "sliceViewLoading1$ | async" class = "loadingIndicator">
         <div class = "spinnerAnimationCircle">
 
@@ -52,20 +54,21 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container
-      *ngIf = "false"  
+    <layout-floating-container  
       pos10 
       landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (combinedSpatialData$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(2,spatialData)"
-        [positionY] = "getPositionY(2,spatialData)"
-        [positionZ] = "getPositionZ(2,spatialData)">
-      </nehuba-2dlandmark-unit>
+      <div *ngIf = "false">
+        <nehuba-2dlandmark-unit 
+          *ngFor = "let spatialData of (combinedSpatialData$ | async)"
+          (mouseenter) = "handleMouseEnterLandmark(spatialData)"
+          (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
+          [highlight] = "spatialData.highlight ? spatialData.highlight : false"
+          [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+          [positionX] = "getPositionX(2,spatialData)"
+          [positionY] = "getPositionY(2,spatialData)"
+          [positionZ] = "getPositionZ(2,spatialData)">
+        </nehuba-2dlandmark-unit>
+      </div>
       <div *ngIf = "sliceViewLoading2$ | async" class = "loadingIndicator">
         <div class = "spinnerAnimationCircle">
 

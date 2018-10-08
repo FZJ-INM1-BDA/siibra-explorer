@@ -38,6 +38,14 @@ div.neuroglancer-rendered-data-panel
   position:relative;
 }
 
+.neuroglancer-position-widget-input-container,
+.neuroglancer-viewer-top-row,
+.neuroglancer-layer-panel
+{
+  display:none;
+  visibility: hidden;
+}
+
 ul#statusContainer
 {
   display:none;
