@@ -14,12 +14,13 @@ import { mainSideAnimation } from "./mainside.animation";
 
 export class LayoutMainSide{
   @Input() showResizeSliver : boolean = true
-  @Input() overlay : boolean = false
   @Input() showSide : boolean = false
   @Input() sideWidth : number = 300
+  @Input() animationFlag : boolean = false
 
   @Output() panelShowStateChanged : EventEmitter<boolean> = new EventEmitter()
-  @Output() panelAnimationFlag : EventEmitter<boolean> = new EventEmitter()
+  @Output() panelAnimationStart : EventEmitter<boolean> = new EventEmitter()
+  @Output() panelAnimationEnd : EventEmitter<boolean> = new EventEmitter()
 
   togglePanelShow(){
     this.showSide = !this.showSide
@@ -27,10 +28,10 @@ export class LayoutMainSide{
   }
 
   animationStart(){
-    this.panelAnimationFlag.emit(true)
+    this.panelAnimationStart.emit(true)
   }
 
   animationEnd(){
-    this.panelAnimationFlag.emit(false)
+    this.panelAnimationEnd.emit(true)
   }
 }

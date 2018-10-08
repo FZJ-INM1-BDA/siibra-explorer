@@ -8,7 +8,7 @@
     </ng-content>
   </div>
   <div 
-    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth } }"
+    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth, animationTiming : animationFlag ? 180 : 0 } }"
     (@collapseSide.start) = "animationStart()"
     (@collapseSide.done) = "animationEnd()"
     sidecontent>

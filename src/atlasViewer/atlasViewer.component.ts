@@ -419,7 +419,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
-
+    
     if (!colorBufferFloat) {
 
       const detail = `Your browser does not support 
@@ -449,22 +449,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       }) as NgLayerInterface)
   }
 
-  rafId : number | null
+  panelAnimationEnd(){
 
-  panelAnimationFlag(flag:boolean){
-    const redraw = ()=>{
-      if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
-        this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
-      this.rafId = requestAnimationFrame(()=>redraw())
-    }
-    if( flag ){
-      if(this.rafId)
-        cancelAnimationFrame(this.rafId)
-      this.rafId = requestAnimationFrame(()=>redraw())
-    }else{
-      cancelAnimationFrame(this.rafId)
-      this.rafId = null
-    }
+    if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
+      this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
   }
 
   toggleSidePanel(panelName:string){
