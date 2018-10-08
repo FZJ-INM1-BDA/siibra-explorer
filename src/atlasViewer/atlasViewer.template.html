@@ -159,13 +159,3 @@
 
 <markdown-dom *ngIf = "!meetsRequirement" [markdown] = "constantsService.doesNotMeetRequirementMD" >
 </markdown-dom>
-
-<ng-template #dedicatedViewerToast>
-  <!-- <div *ngIf = "dedicatedView$ | async">
-    <span dedicatedviewertext>displaying : {{ dedicatedView$ | async | getFilenameFromPathname }}. </span>
-    <span (click) = "clearDedicatedView()" class = "btn btn-link">clear</span>
-  </div> -->
-  <div *ngIf = "!(dedicatedView$ | async)">
-    no special data is being displayed right now
-  </div>
-</ng-template>
