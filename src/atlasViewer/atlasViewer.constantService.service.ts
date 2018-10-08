@@ -77,10 +77,7 @@ export class AtlasViewerConstantsServices{
 
   public doesNotMeetRequirementMD = `
 Unfortunately, your browser does not meet the minimum requirement to run the atlas viewer. 
-the atlas viewer requires **webgl1.0**, and the following extensions to be enabled in order to run: 
-- WEBGL_draw_buffers
-- OES_texture_float
-- OES_element_index_uint
+the atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled
 `
 
   get floatingWidgetStartingPos() : [number,number]{
