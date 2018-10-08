@@ -1,6 +1,6 @@
 import { Component, OnDestroy, ComponentFactoryResolver, ComponentFactory, OnInit, Injector } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, LOAD_DEDICATED_LAYER, UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
+import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
 import { map, filter, take, distinctUntilChanged } from "rxjs/operators";
 import { HasPathProperty } from "../../util/pipes/pathToNestedChildren.pipe";
 import { TreeComponent } from "../../components/tree/tree.component";
