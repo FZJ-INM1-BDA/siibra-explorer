@@ -264,7 +264,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     return Object.keys(layerObj).length == 0 && layerObj.constructor == Object ?
       true :
       Object.keys(layerObj).every(key=>
-        !(<Object>l).hasOwnProperty(key) ? 
+        !(<Object>l).hasOwnProperty(key) && !l[key] ? 
           false :
           layerObj[key] instanceof RegExp ?
             layerObj[key].test(l[key]) :
