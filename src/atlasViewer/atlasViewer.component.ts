@@ -401,7 +401,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   meetsRequirements() {
 
     const canvas = document.createElement('canvas')
-    const gl = canvas.getContext('webgl')
+    const gl = canvas.getContext('webgl2') as WebGLRenderingContext
     const message: any = {
       Error: 'Your browser does not meet the minimum requirements to run neuroglancer.'
     }
@@ -418,15 +418,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       return false
     }
 
-    const drawbuffer = gl.getExtension('WEBGL_draw_buffers')
-    const texturefloat = gl.getExtension('OES_texture_float')
-    const indexuint = gl.getExtension('OES_element_index_uint')
-    if (!(drawbuffer && texturefloat && indexuint)) {
+    const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
+
+    if (!colorBufferFloat) {
 
       const detail = `Your browser does not support 
-      ${ !drawbuffer ? 'WEBGL_draw_buffers' : ''} 
-      ${ !texturefloat ? 'OES_texture_float' : ''} 
-      ${ !indexuint ? 'OES_element_index_uint' : ''} `
+      ${ !colorBufferFloat ? 'EXT_color_buffer_float' : ''} `
       message['Detail'] = [detail]
 
       this.modalService.show(ModalUnit, {
