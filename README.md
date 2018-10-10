@@ -50,7 +50,7 @@ The contents inside the folder in `./src/plugin_examples` will be automatically 
 
 ## AOT compilation
 
-Define `BUNDLEPLUGINS` as a comma separated environment variables to bundle the plugins. 
+Define `BUNDLEDPLUGINS` as a comma separated environment variables to bundle the plugins. 
 
 ```
 [BUNDLEDPLUGINS=pluginDir1[,pluginDir2...]] npm run build-aot

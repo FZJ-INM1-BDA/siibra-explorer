@@ -1,10 +1,10 @@
 import { Component, OnDestroy, ComponentFactoryResolver, ComponentFactory, OnInit, Injector } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
-import { map, filter, take, distinctUntilChanged } from "rxjs/operators";
+import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { HasPathProperty } from "../../util/pipes/pathToNestedChildren.pipe";
 import { TreeComponent } from "../../components/tree/tree.component";
-import { Observable, Subscription, merge, combineLatest } from "rxjs";
+import { Observable, Subscription, combineLatest } from "rxjs";
 import { FileViewer } from "../fileviewer/fileviewer.component";
 import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
