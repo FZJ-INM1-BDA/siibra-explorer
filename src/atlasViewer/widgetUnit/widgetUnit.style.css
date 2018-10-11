@@ -42,3 +42,8 @@ panel-component[widgetUnitPanel]
 {
   cursor : move;
 }
+
+[emptyspan]
+{
+  opacity:0.01;
+}

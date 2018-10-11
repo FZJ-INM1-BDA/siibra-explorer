@@ -185,8 +185,11 @@ export class AtlasBanner implements OnDestroy{
     if(!this.inputRegionPopover)
       return
       
-    /* FF does not implement event.srcElement so use event.originalTarget to polyfill for FF */
-    const contains = this.inputRegionPopover.nativeElement.contains(event.srcElement) || this.inputRegionPopover.nativeElement.contains((event as any).originalTarget)
+    /* FF < 62 does not implement event.srcElement so use event.originalTarget to polyfill for FF */
+    
+    const contains = event.srcElement 
+      ? this.inputRegionPopover.nativeElement.contains(event.srcElement)
+      : this.inputRegionPopover.nativeElement.contains((event as any).originalTarget)
     if(contains)
       this.showRegionTree = true
     else
