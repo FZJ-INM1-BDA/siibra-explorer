@@ -17,10 +17,8 @@ div[resizeSliver]
 {
   /* width : 2.0em;
   height: 4em; */
-  margin-left:-2.0em;
   margin-top : 2em;
-  padding-left:0.5em;
-  width:2em;
+  width:0em;
 }
 
 div[resizeSliver]
