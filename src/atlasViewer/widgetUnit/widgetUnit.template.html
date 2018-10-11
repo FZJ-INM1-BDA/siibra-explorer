@@ -2,12 +2,14 @@
   [style.transform] = "transform"
   [containerClass] = "containerClass"
   widgetUnitPanel
-  [bodyCollapsable] = "state === 'docked'"
-  >
+  [bodyCollapsable] = "state === 'docked'">
   <div 
-    (mousedown) = "mousedown($event)"
+    draggable = "true"
+    (dragend) = "dragend($event)"
+    (dragstart) = "dragstart($event)"
     widgetUnitHeading 
     heading>
+    <div #emptyspan emptyspan>.</div>
     <div title>{{ title }}</div>
     <div icons>
       <i *ngIf = "state === 'floating'"

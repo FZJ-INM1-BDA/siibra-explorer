@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
 
 
@@ -11,6 +11,7 @@ import { WidgetServices } from "./widgetService.service";
 
 export class WidgetUnit {
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
+  @ViewChild('emptyspan',{read:ElementRef}) emtpy : ElementRef
 
   @HostBinding('attr.state')
   public state : 'docked' | 'floating' = 'docked'
@@ -96,31 +97,34 @@ export class WidgetUnit {
   reposStartMousePos : [number,number] = [0,0]
   repositionFlag : boolean = false
 
-  @HostListener('document:mousemove',['$event'])
+  /* nb FF does not provide event.clientX / event.clientY on drag event. So will have to attach dragover event listener */
+  /* ref: https://bugzilla.mozilla.org/show_bug.cgi?id=505521 */
+  @HostListener('document:dragover',['$event'])
   mousemove(ev:MouseEvent){
-    if(!this.repositionFlag) return
-
-    this.position[0] = this.reposStartViewPos[0] - this.reposStartMousePos[0] + ev.clientX
-    this.position[1] = this.reposStartViewPos[1] - this.reposStartMousePos[1] + ev.clientY
+    if(this.repositionFlag){
+      this.position[0] = this.reposStartViewPos[0] - this.reposStartMousePos[0] + ev.clientX
+      this.position[1] = this.reposStartViewPos[1] - this.reposStartMousePos[1] + ev.clientY
+    }
   }
 
-  mousedown(ev:MouseEvent){
+  dragend(ev:DragEvent){
+    this.repositionFlag = false
+  }
+
+  dragstart(ev:DragEvent){
     this.reposStartMousePos[0] = ev.clientX
     this.reposStartMousePos[1] = ev.clientY
 
     this.reposStartViewPos[0] = this.position[0]
     this.reposStartViewPos[1] = this.position[1]
 
-    this.repositionFlag = true;
-    document.body.style.pointerEvents = 'none'
-    document.body.style.userSelect = 'none'
-  }
+    this.repositionFlag = true
 
-  @HostListener('document:mouseup',['$event'])
-  mouseup(_ev:MouseEvent){
-    this.repositionFlag = false;
-    document.body.style.pointerEvents = 'all'
-    document.body.style.userSelect = 'initial'
+    /* nb FF requires dataTransfer.setData in order to fire the drag or dragover event */
+    ev.dataTransfer.setData('application/node type', '')
+
+    /* nb FF will render any invisible DOM element as a file icon.  */
+    ev.dataTransfer.setDragImage(this.emtpy.nativeElement, 0, 0)
   }
 
   get transform(){

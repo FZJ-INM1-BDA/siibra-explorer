@@ -45,8 +45,10 @@ export class DropdownComponent{
 
   @HostListener('document:click',['$event'])
   close(event:MouseEvent){
-    /* FF does not implement event.srcElement so use event.originalTarget to polyfill for FF */
-    const contains = this.dropdownToggle.nativeElement.contains(event.srcElement) || this.dropdownToggle.nativeElement.contains((event as any).originalTarget)
+    /* FF <62 does not implement event.srcElement so use event.originalTarget to polyfill for FF */
+    const contains = event.srcElement 
+      ? this.dropdownToggle.nativeElement.contains(event.srcElement)
+      : this.dropdownToggle.nativeElement.contains((event as any).originalTarget)
     if(contains)
       this.openState = !this.openState
     else
