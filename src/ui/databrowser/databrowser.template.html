@@ -1,5 +1,5 @@
 <!-- Header -->
-<div databrowserheader>
+<div *ngIf = "selectedPOI$ | async" databrowserheader>
   <span>
     {{ !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest'  }} 
   </span>
@@ -79,7 +79,7 @@
     </div>
   </panel-component>
 </div>
-<div *ngIf = "(selectedPOI$ | async).length > 0; else noSelectedRegion">
+<div *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0; else noSelectedRegion">
 
   <div
     *ngFor = "let data of (selectedRegions$ | async | sortDataEntriesToRegion : dataEntries).concat( selectedLandmarks$ | async | spatialLandmarksToDataBrowserItemPipe ) | searchResultPagination  : currentPage : hitsPerPage  ">
@@ -138,6 +138,16 @@
     </panel-component>
   </div>
 
+  <!-- pagination -->
+  <pagination-component
+    *ngIf = "(selectedPOI$ | async).length > 0 && (selectedPOI$ | async).length > hitsPerPage"
+    [hitsPerPage]="hitsPerPage"
+    [total] = "(selectedPOI$ | async).length"
+    [currentPage]="currentPage"
+    (paginationChange)="paginationChange($event)">
+
+  </pagination-component>
+
 </div>
 
 <ng-template #noSelectedRegion>
@@ -145,13 +155,3 @@
     Select a region / spatial landmark to get started
   </div>
 </ng-template>
-
-<!-- pagination -->
-<pagination-component
-  *ngIf = "(selectedPOI$ | async).length > 0 && (selectedPOI$ | async).length > hitsPerPage"
-  [hitsPerPage]="hitsPerPage"
-  [total] = "(selectedPOI$ | async).length"
-  [currentPage]="currentPage"
-  (paginationChange)="paginationChange($event)">
-
-</pagination-component>
