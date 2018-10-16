@@ -37,7 +37,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
-  private selectedLandmarks$ : Observable<any[]>
+  public selectedLandmarks$ : Observable<any[]>
+  public selectedPtLandmarks$ : Observable<any[]>
   private hideSegmentations$ : Observable<boolean>
 
   private fetchedSpatialDatasets$ : Observable<Landmark[]>
@@ -109,6 +110,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
       select('viewerState'),
       safeFilter('landmarksSelected'),
       map(state => state.landmarksSelected)
+    )
+
+    this.selectedPtLandmarks$ = this.selectedLandmarks$.pipe(
+      map(lms => lms.filter(lm => lm.geometry.type === 'point'))
     )
 
     this.fetchedSpatialDatasets$ = this.store.pipe(
@@ -533,7 +538,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
           const newSelectedSpatialDatas = selectedSpatialDatas.findIndex(data => data.name === spatialDatas[idx].name) >= 0
             ? selectedSpatialDatas.filter(v => v.name !== spatialDatas[idx].name)
-            : selectedSpatialDatas.concat(spatialDatas[idx])
+            : selectedSpatialDatas.concat(Object.assign({}, spatialDatas[idx], {_label: landmark}) )
           
           this.store.dispatch({
             type : SELECT_LANDMARKS,
@@ -576,7 +581,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     const pos = quadrant > 2 ?
       [0,0,0] :
       this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant] ?
-        this.nanometersToOffsetPixelsFn[quadrant](data.position.map(n=>n*1e6)) :
+        this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n=>n*1e6)) :
         [0,0,0]
     return pos
   }
@@ -593,10 +598,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   handleMouseEnterLandmark(spatialData:any){
     spatialData.highlight = true
+    this.store.dispatch({
+      type : MOUSE_OVER_LANDMARK,
+      landmark : spatialData._label
+    })
   }
 
   handleMouseLeaveLandmark(spatialData:any){
     spatialData.highlight = false
+    this.store.dispatch({
+      type :MOUSE_OVER_LANDMARK,
+      landmark : null
+    })
   }
 
   private handleParcellation(parcellation:any){
