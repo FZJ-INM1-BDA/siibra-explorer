@@ -615,6 +615,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private handleParcellation(parcellation:any){
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
+
+    /* TODO replace with proper KG id */
     this.nehubaViewer.parcellationId = parcellation.ngId
     this.selectedParcellation = parcellation
   }
@@ -634,6 +636,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
     this.nehubaViewer = this.cr.instance
     this.nehubaViewer.config = template.nehubaConfig
+
+    /* TODO replace with id from KG */
+    this.nehubaViewer.templateId = template.name
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.debouncedViewerPositionChange.subscribe(this.handleEmittedNavigationChange.bind(this))

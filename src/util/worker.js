@@ -112,6 +112,7 @@ const getLandmarksVtk = (action) => {
 
   // landmarks are array of triples in nm (array of array of numbers)
   const landmarks = action.landmarks
+  const template = action.template
 
   const reduce = landmarks.reduce((acc,curr,idx) => {
     //curr : null | [number,number,number] | [ [number,number,number], [number,number,number], [number,number,number] ][]
@@ -173,6 +174,7 @@ const getLandmarksVtk = (action) => {
   landmarkVtkUrl = URL.createObjectURL(new Blob( [encoder.encode(vtk)], {type : 'application/octet-stream'} ))
   postMessage({
     type : 'ASSEMBLED_LANDMARKS_VTK',
+    template,
     url : landmarkVtkUrl
   })
 }
