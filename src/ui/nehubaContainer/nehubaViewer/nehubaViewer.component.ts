@@ -83,6 +83,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           return true
         }),
         debounceTime(100),
+        filter(e => this.templateId === e.data.template),
         map(e => e.data.url)
       ).subscribe(url => {
         this.removeSpatialSearch3DLandmarks()
@@ -164,6 +165,16 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       : 0
   }
 
+  /* required to check if correct landmarks are loaded */
+  private _templateId : string
+  get templateId(){
+    return this._templateId
+  }
+  set templateId(id:string){
+    this._templateId = id
+  }
+
+  /* required to check if the correct meshes are being loaded */
   private _parcellationId : string
   get parcellationId(){
     return this._parcellationId
@@ -310,6 +321,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   public addSpatialSearch3DLandmarks(geometries: any[],scale?:number,type?:'icosahedron'){
     this.workerService.worker.postMessage({
       type : 'GET_LANDMARKS_VTK',
+      template : this.templateId,
       landmarks : geometries.map(geometry => 
         geometry === null
           ? null
