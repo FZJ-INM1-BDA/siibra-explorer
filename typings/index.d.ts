@@ -8,6 +8,6 @@ declare module '*.css' {
   export = contents
 }
 
-declare var PLUGINDEV : boolean
+declare var PLUGINDEV : string
 declare var BUNDLEDPLUGINS : string[]
 declare var VERSION : string

@@ -41,7 +41,7 @@ module.exports = {
   },
   plugins : [
     new webpack.DefinePlugin({
-      PLUGINDEV : process.env.PLUGINDEV ? true : false,
+      PLUGINDEV : JSON.stringify(process.env.PLUGINDEV),
       BUNDLEDPLUGINS : process.env.BUNDLEDPLUGINS
         ? JSON.stringify(process.env.BUNDLEDPLUGINS.split(','))
         : JSON.stringify([]),

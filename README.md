@@ -32,7 +32,11 @@ To develop plugins for the interactive viewer, run:
 git clone https://github.com/HumanBrainProject/interactive-viewer
 cd interactive-viewer
 npm i
-PLUGINDEV=true npm run dev-plugin
+npm run dev-plugin
+
+/* or define your own endpoint that returns string of manifests */
+PLUGINDEV=http://mycustom.io/allPluginmanifest npm run dev-server
+
 ```
 
 The contents inside the folder in `./src/plugin_examples` will be automatically fetched by the dev instance of the interactive-viewer on load. 
