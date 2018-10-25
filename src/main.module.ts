@@ -76,7 +76,6 @@ import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.serv
   ],
   providers : [
     AtlasViewerDataService,
-    AtlasViewerDataService,
     WidgetServices,
     AtlasViewerURLService,
     AtlasViewerAPIServices,
