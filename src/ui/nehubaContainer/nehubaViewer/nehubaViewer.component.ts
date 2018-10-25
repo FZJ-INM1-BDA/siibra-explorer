@@ -4,8 +4,9 @@ import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import { fromEvent, interval } from 'rxjs'
 import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter, debounceTime } from "rxjs/operators";
+import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
+import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
 
 @Component({
   templateUrl : './nehubaViewer.template.html',
@@ -225,21 +226,98 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   private defaultColormap : Map<number,{red:number,green:number,blue:number}>
   public mouseOverSegment : number | null
 
+  private viewportToDatas : [any, any, any] = [null, null, null]
+
+  public getNgHash : () => string = export_nehuba.getNgHash
+
   ngAfterViewInit(){
     this.nehubaViewer = export_nehuba.createNehubaViewer(this.config, (err)=>{
       /* print in debug mode */
-    });
-    
+    })
+
     if(this.regionsLabelIndexMap){
       const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
       managedLayers.slice(1).forEach(layer=>layer.setVisible(false))
       this.nehubaViewer.redraw()
     }
 
+    /* creation of the layout is done on next frame, hence the settimeout */
+    setTimeout(() => {
+      window['viewer'].display.panels.forEach(patchSliceViewPanel) 
+    })
+    
     this.newViewerInit()
     this.loadNewParcellation()
 
     window['nehubaViewer'] = this.nehubaViewer
+
+    this.ondestroySubscriptions.push(
+      fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
+        ...takeOnePipe
+      ).subscribe((events:CustomEvent[]) => {
+        [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
+      })
+    )
+
+    this.ondestroySubscriptions.push(
+
+      fromEvent(this.elementRef.nativeElement,'touchstart').pipe(
+        map((ev:TouchEvent) => {
+          const srcElement : HTMLElement = ev.srcElement || (ev as any).originalTarget
+          return {
+            startPos: [ev.touches[0].screenX, ev.touches[0].screenY],
+            elementId: identifySrcElement(srcElement),
+            srcElement
+          }
+        }),
+        switchMap(({startPos, elementId, srcElement}) => fromEvent(this.elementRef.nativeElement,'touchmove').pipe(
+          map((ev: TouchEvent) => (ev.stopPropagation(), ev.preventDefault(), ev)),
+          filter((ev:TouchEvent) => ev.touches.length === 1),
+          map((event:TouchEvent) => ({
+            startPos,
+            event,
+            elementId,
+            srcElement
+          })),
+          scan((acc,ev:any) => {
+            return acc.length < 2
+              ? acc.concat(ev)
+              : acc.slice(1).concat(ev)
+          },[]),
+          map(double => ({
+            elementId: double[0].elementId,
+            deltaX: double.length === 1
+              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenX
+              : double.length === 2
+                ? (double[0].event as TouchEvent).touches[0].screenX - (double[1].event as TouchEvent).touches[0].screenX 
+                : null,
+            deltaY: double.length === 1
+              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenY
+              : double.length === 2
+                ? (double[0].event as TouchEvent).touches[0].screenY - (double[1].event as TouchEvent).touches[0].screenY 
+                : null
+          })),
+          takeUntil(fromEvent(this.elementRef.nativeElement, 'touchend').pipe(filter((ev: TouchEvent) => ev.touches.length === 0)))
+        ))
+      ).subscribe(({ elementId, deltaX, deltaY }) => {
+        if(deltaX === null || deltaY === null){
+          console.warn('deltax/y is null')
+          return
+        }
+        if(elementId === 0 || elementId === 1 || elementId === 2){
+          const {position} = this.nehubaViewer.ngviewer.navigationState 
+          const pos = position.spatialCoordinates
+          export_nehuba.vec3.set(pos, deltaX, deltaY, 0)
+          export_nehuba.vec3.transformMat4(pos, pos, this.viewportToDatas[elementId])
+          position.changed.dispatch()
+        }else if(elementId === 3){
+          const {perspectiveNavigationState} = this.nehubaViewer.ngviewer
+          perspectiveNavigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0);
+          perspectiveNavigationState.pose.rotateRelative(this.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0);
+          this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch();
+        }
+      })
+    )
   }
   ngOnDestroy(){
     this._s$.forEach(_s$=>{
@@ -627,6 +705,24 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       green: rgb[1],
       blue : rgb[2]
     }
+  }
+}
+
+const patchSliceViewPanel = (sliceViewPanel: any) => {
+  const originalDraw = sliceViewPanel.draw
+  sliceViewPanel.draw = function (this) {
+    
+    if(this.sliceView){
+      const viewportToDataEv = new CustomEvent('viewportToData', {
+        bubbles: true,
+        detail: {
+          viewportToData : this.sliceView.viewportToData
+        }
+      })
+      this.element.dispatchEvent(viewportToDataEv)
+    }
+
+    originalDraw.call(this)
   }
 }
 

@@ -1,4 +1,4 @@
-:host > div[citationContainer]
+div[citationContainer]
 {
   font-size: 90%;
   text-align: left;
@@ -8,7 +8,7 @@
   margin-top:1em;
 }
 
-:host > div[citationContainer]:not(:first-child)
+div[citationContainer]:not(:first-child)
 {
   padding-top: 0px;
 }

@@ -1,0 +1,25 @@
+
+:host-context([darktheme="true"]) [hbpLogoContainer]
+{
+  background-image:url('res/image/HBP_Primary_RGB_WhiteText.png')
+}
+
+:host-context([darktheme="false"]) [hbpLogoContainer]
+{
+  background-image:url('res/image/HBP_Primary_RGB_BlackText.png')
+}
+
+[hbpLogoContainer]
+{
+  display:inline-block;
+  background-size: cover;
+  pointer-events: none;
+  height:80px;
+}
+
+[hbpLogoContainer] > img
+{
+  visibility: hidden;
+  height:80px;
+  pointer-events: none;
+}

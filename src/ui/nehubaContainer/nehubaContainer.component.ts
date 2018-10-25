@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, takeUntil } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
@@ -197,33 +197,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.newViewer$.pipe(
       switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
         .pipe(
-          scan((acc:Event[],event:Event)=>{
-            const target = (event as Event).target as HTMLElement
-            /**
-             * 0 | 1
-             * 2 | 3
-             * 
-             * 4 ???
-             */
-            const key = target.offsetLeft < 5 && target.offsetTop < 5 ?
-              0 :
-              target.offsetLeft > 5 && target.offsetTop < 5 ?
-                1 :
-                target.offsetLeft < 5 && target.offsetTop > 5 ?
-                2 :
-                  target.offsetLeft > 5 && target.offsetTop > 5 ?
-                  3 :
-                  4
-    
-            const _ = {}
-            _[key] = event
-            return Object.assign({},acc,_)
-          },[]),
-          filter(v=>{
-            const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-            return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2])) 
-          }),
-          take(1)
+          ...takeOnePipe
         )
       )
     ).subscribe((events)=>{
@@ -307,6 +281,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
         ? state.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
         : false)
     )
+  }
+
+  get isMobile(){
+    return this.constantService.mobile
   }
 
   ngOnInit(){
@@ -777,7 +755,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
           map((ev:MouseEvent)=>({eventName :'mouseup',event:ev}))
         ),
       ) ,
-      mouseOverNehuba : this.onHoverSegment$
+      mouseOverNehuba : this.onHoverSegment$,
+      getNgHash : this.nehubaViewer.getNgHash
     }
   }
 
@@ -973,6 +952,40 @@ export class NehubaContainer implements OnInit, OnDestroy{
     })
   }
 }
+
+export const identifySrcElement = (element:HTMLElement) => {
+  return element.offsetLeft < 5 && element.offsetTop < 5 ?
+  0 :
+  element.offsetLeft > 5 && element.offsetTop < 5 ?
+    1 :
+    element.offsetLeft < 5 && element.offsetTop > 5 ?
+    2 :
+      element.offsetLeft > 5 && element.offsetTop > 5 ?
+      3 :
+      4
+}
+
+export const takeOnePipe = [
+  scan((acc:Event[],event:Event)=>{
+    const target = (event as Event).target as HTMLElement
+    /**
+     * 0 | 1
+     * 2 | 3
+     * 
+     * 4 ???
+     */
+    const key = identifySrcElement(target)
+
+    const _ = {}
+    _[key] = event
+    return Object.assign({},acc,_)
+  },[]),
+  filter(v=>{
+    const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+    return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2])) 
+  }),
+  take(1)
+]
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`

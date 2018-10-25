@@ -90,17 +90,9 @@
   *ngIf = "viewerLoaded">
   <div statusCard>
 
-    <citations-component 
-      *ngIf = "selectedParcellation && selectedParcellation.properties"
-      [properties] = "selectedParcellation.properties"
-      citationContainer>
+    <template-parcellation-citation-container desktopTemplateCitation *ngIf = "!isMobile">
 
-    </citations-component>
-    <citations-component
-      [properties] = "selectedTemplate.properties"
-      *ngIf = "showCitation"
-      citationContainer>
-    </citations-component>
+    </template-parcellation-citation-container>
 
     <hr *ngIf = "showCitation" />
 
@@ -126,11 +118,11 @@
           navigateInput/>
     
       <br />
-      <small>Mouse: </small>
-      <small>
+      <small *ngIf = "!isMobile">Mouse: </small>
+      <small *ngIf = "!isMobile">
         {{ mouseCoord }}
       </small> 
-      <br />
+      <br *ngIf = "!isMobile" />
       <small onHoverSegment>
         {{ onHoverSegmentName$ | async }}
       </small>
