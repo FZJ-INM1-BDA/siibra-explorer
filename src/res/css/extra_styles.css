@@ -110,7 +110,7 @@ label.perspective-panel-show-slice-views:hover
 label.perspective-panel-show-slice-views:before
 {
   margin-left: .2em;
-  content: "show / hide frontal octant";
+  content: "toggle frontal octant";
   visibility: visible;
   pointer-events: all;
   color: #337ab7;
