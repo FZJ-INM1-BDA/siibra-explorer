@@ -137,3 +137,9 @@ div.loadingIndicator div.spinnerAnimationCircle
 {
   color:rgba(255,255,255,0.8);
 }
+
+[desktopTemplateCitation]
+{
+  padding: 0 1em;
+  display:block;
+}

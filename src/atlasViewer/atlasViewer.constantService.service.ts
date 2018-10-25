@@ -9,6 +9,8 @@ import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/st
 
 export class AtlasViewerConstantsServices{
 
+  public mobile: boolean
+
   public ngLandmarkLayerName = 'spatial landmark layer'
 
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
@@ -85,6 +87,13 @@ the atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` exten
   } 
 
   constructor(private store : Store<ViewerStateInterface>){
+
+    const ua = window && window.navigator && window.navigator.userAgent
+      ? window.navigator.userAgent
+      : ''
+
+    /* https://stackoverflow.com/a/25394023/6059235 */
+    this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
 
     const meta = 'res/json/allAggregatedData.json'
   

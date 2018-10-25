@@ -1,6 +1,6 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, NgViewerStateInterface, safeFilter } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
 import { map, filter, distinctUntilChanged, delay } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
@@ -474,6 +474,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   get floatingMouseContextualContainerTransform() {
     return `translate(${this.mousePos[0]}px,${this.mousePos[1]}px)`
+  }
+
+  get isMobile(){
+    return this.constantsService.mobile
   }
 }
 
