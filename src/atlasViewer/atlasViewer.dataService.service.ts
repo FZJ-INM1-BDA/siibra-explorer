@@ -16,9 +16,7 @@ export class AtlasViewerDataService implements OnDestroy{
   public promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve,reject)=>{
     Promise.all([
       PLUGINDEV
-        ? PLUGINDEV === 'true'
-          ? fetch('http://localhost:10080/allPluginmanifests').then(res=>res.json())
-          : fetch(PLUGINDEV).then(res => res.json())
+        ? fetch(PLUGINDEV).then(res => res.json())
         : Promise.resolve([]),
       Promise.all(
         BUNDLEDPLUGINS
