@@ -10,7 +10,8 @@
     "build-aot": "GIT_HASH=`git rev-parse --short HEAD` webpack --config webpack.aot.js",
     "build-min": "webpack --config webpack.prod.js",
     "build": "webpack --config webpack.dev.js",
-    "dev-plugin": "PLUGINDEV=true npm run dev-server & node ./src/plugin_examples/server.js",
+    "dev-plugin": "PLUGINDEV=true npm run dev-server & npm run plugin-server",
+    "plugin-server": "node ./src/plugin_examples/server.js",
     "dev-server": "webpack-dev-server --config webpack.dev.js --mode development",
     "serve-plugins": "node src/plugin_examples/server.js",
     "test": "karma start spec/karma.conf.js"
