@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, Injector, ComponentRef, AfterViewInit, OnInit, TemplateRef, HostListener, Renderer2 } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2 } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL, isDefined,UNLOAD_DEDICATED_LAYER, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, NgViewerStateInterface, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
