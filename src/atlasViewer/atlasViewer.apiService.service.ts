@@ -159,6 +159,8 @@ export interface InteractiveViewerInterface{
 
     mouseEvent : Observable<{eventName:string,event:MouseEvent}>
     mouseOverNehuba : Observable<{labelIndex : number, foundRegion : any | null}>
+
+    getNgHash : () => string
   }
 
   uiHandle : {

@@ -7,13 +7,36 @@
     <div maincontent>
       <ui-nehuba-container>
       </ui-nehuba-container>
-      
-      <atlas-banner>
-      </atlas-banner>
+
+      <div bannerWrapper>
+
+        <logo-container>
+        </logo-container>
+  
+        <atlas-banner *ngIf = "!isMobile">
+        </atlas-banner>
+      </div>
 
     </div>
     <div [ngSwitch] = "sidePanelView$ | async" sidecontent>
+      <div *ngSwitchCase = "'menuBrowser'">
+        <panel-component>
+          <div heading>
+            Menu
+          </div>
+          <div body>
+            <div mobileMenu>
+              <atlas-banner>
 
+              </atlas-banner>
+              <template-parcellation-citation-container mobileTemplateCitation>
+  
+              </template-parcellation-citation-container>
+            </div>
+          </div>
+        </panel-component>
+      </div>
+      
       <!-- Data Browser -->
       <div *ngSwitchCase = "'dataBrowser'">
         <panel-component [bodyCollapsable] = "true">
@@ -36,6 +59,7 @@
           <div body>
             <layer-browser >
             </layer-browser>
+            
           </div>
         </panel-component>
       </div>
@@ -66,11 +90,17 @@
     </div>
 
     <div resizeSliver>
+      <span
+        class = "tabContainer"
+        (click) = "toggleSidePanel('menuBrowser')"
+        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'menuBrowser'}" >
+        <i class="glyphicon glyphicon-info-sign"></i>
+      </span>
 
       <span 
         container = "body"
         placement = "left"
-        [tooltip] = "!(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest' "
+        [tooltip] = "isMobile ? null : !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest' "
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" 
         (click) = "toggleSidePanel('dataBrowser')" 
         class = "tabContainer">
@@ -84,7 +114,7 @@
 
       <span 
         placement = "left"
-        [tooltip] = "!ngLayers ? '' : ((ngLayers.length === 0 ? 'No' : ngLayers.length) + ' loaded layer' + (ngLayers.length > 1 ? 's' : ''))"
+        [tooltip] = "isMobile ? null : !ngLayers ? '' : ((ngLayers.length === 0 ? 'No' : ngLayers.length) + ' loaded layer' + (ngLayers.length > 1 ? 's' : ''))"
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" 
         (click) = "toggleSidePanel('ngLayer')" 
         class = "tabContainer">
@@ -100,12 +130,12 @@
         placement = "left"
         (mouseover) = "_toolIconsVisible = true" 
         (mouseout) = "_toolIconsVisible = false"
-        [tooltip] = "_toolIconDockAll ? 'dock all widgets' : _toolIconFloatAll ? 'float all widgets' : 'Tools Browser'"
+        [tooltip] = "isMobile ? null : _toolIconDockAll ? 'dock all widgets' : _toolIconFloatAll ? 'float all widgets' : 'Tools Browser'"
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" 
         (click) = "toggleSidePanel('toolsBrowser')" 
         class = "tabContainer">
         <i class="glyphicon glyphicon-wrench"></i>
-        <span class ="badge">
+        <span *ngIf = "!isMobile" class ="badge">
           <span [class.hidden] = "_toolIconsVisible" >
             ...
           </span>

@@ -34,6 +34,8 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
 import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
 import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
 import { DownloadDirective } from "../util/directives/download.directive";
+import { LogoContainer } from "./logoContainer/logoContainer.component";
+import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 
 
 @NgModule({
@@ -63,6 +65,8 @@ import { DownloadDirective } from "../util/directives/download.directive";
     KgEntryViewer,
     SubjectViewer,
     DatasetViewerComponent,
+    LogoContainer,
+    TemplateParcellationCitationsContainer,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -98,7 +102,9 @@ import { DownloadDirective } from "../util/directives/download.directive";
     DataBrowserUI,
     LayerBrowser,
     FileViewer,
-    DatasetViewerComponent
+    LogoContainer,
+    DatasetViewerComponent,
+    TemplateParcellationCitationsContainer
   ]
 })
 
