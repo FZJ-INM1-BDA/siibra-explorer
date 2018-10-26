@@ -2,9 +2,9 @@ import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef, 
 import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
 
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import { fromEvent, interval } from 'rxjs'
+import { fromEvent, interval, Observable } from 'rxjs'
 import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap } from "rxjs/operators";
+import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, takeWhile } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
 import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
 
@@ -52,6 +52,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   ]
 
   ondestroySubscriptions: any[] = []
+
+  touchStart$ : Observable<any>
 
   constructor(
     public elementRef:ElementRef,
@@ -259,17 +261,21 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       })
     )
 
+    this.touchStart$ = fromEvent(this.elementRef.nativeElement, 'touchstart').pipe(
+      map((ev:TouchEvent) => {
+        const srcElement : HTMLElement = ev.srcElement || (ev as any).originalTarget
+        return {
+          startPos: [ev.touches[0].screenX, ev.touches[0].screenY],
+          elementId: identifySrcElement(srcElement),
+          srcElement,
+          event: ev
+        }
+      })
+    )
+
     this.ondestroySubscriptions.push(
 
-      fromEvent(this.elementRef.nativeElement,'touchstart').pipe(
-        map((ev:TouchEvent) => {
-          const srcElement : HTMLElement = ev.srcElement || (ev as any).originalTarget
-          return {
-            startPos: [ev.touches[0].screenX, ev.touches[0].screenY],
-            elementId: identifySrcElement(srcElement),
-            srcElement
-          }
-        }),
+      this.touchStart$.pipe(
         switchMap(({startPos, elementId, srcElement}) => fromEvent(this.elementRef.nativeElement,'touchmove').pipe(
           map((ev: TouchEvent) => (ev.stopPropagation(), ev.preventDefault(), ev)),
           filter((ev:TouchEvent) => ev.touches.length === 1),
@@ -317,6 +323,25 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch();
         }
       })
+    )
+
+    this.ondestroySubscriptions.push(
+      this.touchStart$.pipe(
+        switchMap(() => 
+          fromEvent(this.elementRef.nativeElement, 'touchmove').pipe(
+            takeWhile((ev:TouchEvent) => ev.touches.length === 2),
+            map((ev:TouchEvent) => computeDistance(
+                [ev.touches[0].screenX, ev.touches[0].screenY],
+                [ev.touches[1].screenX, ev.touches[1].screenY]
+              )),
+            scan((acc, curr:number) => acc.length < 2
+              ? acc.concat(curr)
+              : acc.slice(1).concat(curr), []),
+            filter(dist => dist.length > 1),
+            map(dist => dist[0] / dist[1])
+          ))
+      ).subscribe(factor => 
+        this.nehubaViewer.ngviewer.navigationState.zoomBy(factor))
     )
   }
   ngOnDestroy(){
@@ -687,8 +712,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     if(this._s1$)this._s1$.unsubscribe()
     this._s1$ = this.nehubaViewer.getShownSegmentsObservable({
       name : this.parcellationId
-    }).subscribe(arrayIdx=>this.updateColorMap(arrayIdx))
-
+    }).throttleTime(100).subscribe(arrayIdx=>this.updateColorMap(arrayIdx))
   }
 
   private getRgb(labelIndex:number,rgb?:number[]):{red:number,green:number,blue:number}{
@@ -808,3 +832,4 @@ export const ICOSAHEDRON_VTK_URL = URL.createObjectURL( new Blob([ _encoder.enco
 export const FRAGMENT_MAIN_WHITE = `void main(){emitRGB(vec3(1.0,1.0,1.0));}`
 export const FRAGMENT_EMIT_WHITE = `emitRGB(vec3(1.0, 1.0, 1.0));`
 export const FRAGMENT_EMIT_RED = `emitRGB(vec3(1.0, 0.1, 0.12));`
+export const computeDistance = (pt1:[number, number], pt2:[number,number]) => ((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2) ** 0.5
