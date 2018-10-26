@@ -83,9 +83,14 @@
         Methods
       </div>
       <div body>
-        <div *ngFor = "let method of kgData.methods">
-          {{ method.value }}
+        <div *ngIf = "isArray(kgData.methods); else singleMethodTemplate">
+          <div *ngFor = "let method of kgData.methods">
+            {{ method.value }}
+          </div>
         </div>
+        <ng-template #singleMethodTemplate>
+          {{ kgData.methods.value }}
+        </ng-template>
       </div>
     </panel-component>
 
@@ -103,9 +108,14 @@
         Files
       </div>
       <div body>
-        <div *ngFor = "let file of kgData.files">
-          {{ file.value }}
+        <div *ngIf = "isArray(kgData.files);else singleFileTemplate">
+          <div *ngFor = "let file of kgData.files">
+            {{ file.value }}
+          </div>
         </div>
+        <ng-template #singleFileTemplate>
+          {{ kgData.files.value }}
+        </ng-template>
       </div>
     </panel-component>
 
