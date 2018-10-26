@@ -712,7 +712,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     if(this._s1$)this._s1$.unsubscribe()
     this._s1$ = this.nehubaViewer.getShownSegmentsObservable({
       name : this.parcellationId
-    }).throttleTime(100).subscribe(arrayIdx=>this.updateColorMap(arrayIdx))
+    }).subscribe(arrayIdx=>this.updateColorMap(arrayIdx))
   }
 
   private getRgb(labelIndex:number,rgb?:number[]):{red:number,green:number,blue:number}{
