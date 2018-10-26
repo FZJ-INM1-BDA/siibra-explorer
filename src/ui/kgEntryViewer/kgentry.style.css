@@ -12,4 +12,7 @@ div[heading]
 div[body]
 {
   font-size: 90%;
+  max-height:20em;
+  overflow-y:auto;
+  overflow-x:hidden;
 }
