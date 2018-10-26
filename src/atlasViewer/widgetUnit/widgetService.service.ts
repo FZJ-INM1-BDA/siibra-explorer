@@ -39,6 +39,11 @@ export class WidgetServices{
   addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
     const component = this.widgetUnitFactory.create(this.injector)
     const _option = getOption(options)
+
+    if(this.constantServce.mobile){
+      _option.state = 'docked'
+    }
+
     _option.state === 'floating'
       ? this.floatingContainer.insert(component.hostView)
       : _option.state === 'docked'
