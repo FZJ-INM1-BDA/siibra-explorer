@@ -88,13 +88,14 @@
 
 <layout-floating-container
   *ngIf = "viewerLoaded">
+
+
   <div statusCard>
 
     <template-parcellation-citation-container desktopTemplateCitation *ngIf = "!isMobile">
-
     </template-parcellation-citation-container>
 
-    <hr *ngIf = "showCitation" />
+    <hr *ngIf = "showCitation && !isMobile" />
 
     <div linksContainer>
       <a href = "#" (click)="$event.preventDefault();statusPanelRealSpace = !statusPanelRealSpace">
@@ -127,5 +128,14 @@
         {{ onHoverSegmentName$ | async }}
       </small>
     </div>
+  </div>
+</layout-floating-container>
+<layout-floating-container *ngIf = "isMobile" [show] = "viewerLoaded">
+
+  <div *ngIf = "showObliqueScreen | async" #mobileObliqueScreen mobileObliqueScreen>
+
+  </div>
+  <div mobileObliqueCtrl #mobileObliqueCtrl>
+    <i class="glyphicon glyphicon-globe"></i>
   </div>
 </layout-floating-container>
