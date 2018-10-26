@@ -318,9 +318,9 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
           position.changed.dispatch()
         }else if(elementId === 3){
           const {perspectiveNavigationState} = this.nehubaViewer.ngviewer
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0);
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0);
-          this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch();
+          perspectiveNavigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0)
+          perspectiveNavigationState.pose.rotateRelative(this.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0)
+          this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch()
         }
       })
     )
@@ -503,7 +503,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       }))
   }
 
-  private vec3(pos:[number,number,number]){
+  public vec3(pos:[number,number,number]){
     return export_nehuba.vec3.fromValues(...pos)
   }
 
