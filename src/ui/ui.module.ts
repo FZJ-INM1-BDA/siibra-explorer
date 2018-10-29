@@ -36,6 +36,7 @@ import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLand
 import { DownloadDirective } from "../util/directives/download.directive";
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
+import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 
 
 @NgModule({
@@ -67,6 +68,7 @@ import { TemplateParcellationCitationsContainer } from "./templateParcellationCi
     DatasetViewerComponent,
     LogoContainer,
     TemplateParcellationCitationsContainer,
+    MobileOverlay,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -104,7 +106,8 @@ import { TemplateParcellationCitationsContainer } from "./templateParcellationCi
     FileViewer,
     LogoContainer,
     DatasetViewerComponent,
-    TemplateParcellationCitationsContainer
+    TemplateParcellationCitationsContainer,
+    MobileOverlay,
   ]
 })
 
