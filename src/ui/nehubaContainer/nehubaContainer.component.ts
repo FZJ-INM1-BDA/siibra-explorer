@@ -24,8 +24,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
   @ViewChild('[pos01]',{read:ElementRef}) topright : ElementRef
   @ViewChild('[pos10]',{read:ElementRef}) bottomleft : ElementRef
   @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
-  @ViewChild('mobileObliqueCtrl', {read:ElementRef}) mobileObliqueCtrl : ElementRef
-  @ViewChild('mobileObliqueScreen', {read:ElementRef}) mobileObliqueScreen : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
 
@@ -552,48 +550,67 @@ export class NehubaContainer implements OnInit, OnDestroy{
   }
 
   // datasetViewerRegistry : Set<string> = new Set()
-  public showObliqueScreen : Observable<boolean>
+  public showObliqueScreen$ : Observable<boolean>
+  public showObliqueSelection$ : Observable<boolean>
+  public showObliqueRotate$ : Observable<boolean>
 
   ngAfterViewInit(){
-    if(this.isMobile){
+    // if(this.isMobile){
 
-      this.showObliqueScreen = merge(
-        fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart'),
-        fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend')
-      ).pipe(
-        map((ev:TouchEvent) => ev.touches.length === 1)
-      )
+    //   this.showObliqueScreen$ = merge(
+    //     fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart'),
+    //     fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend')
+    //   ).pipe(
+    //     map((ev:TouchEvent) => ev.touches.length === 1)
+    //   )
 
-      fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart').pipe(
-        switchMap(() => fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchmove').pipe(
-          takeUntil(fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend').pipe(
-            filter((ev:TouchEvent) => ev.touches.length === 0)
-          )),
-          map((ev:TouchEvent) => (ev.preventDefault(), ev.stopPropagation(), ev)),
-          filter((ev:TouchEvent) => ev.touches.length === 1),
-          map((ev:TouchEvent) => [ev.touches[0].screenX, ev.touches[0].screenY] ),
+    //   fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart').pipe(
+    //     switchMap(() => fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchmove').pipe(
+    //       takeUntil(fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend').pipe(
+    //         filter((ev:TouchEvent) => ev.touches.length === 0)
+    //       )),
+    //       map((ev:TouchEvent) => (ev.preventDefault(), ev.stopPropagation(), ev)),
+    //       filter((ev:TouchEvent) => ev.touches.length === 1),
+    //       map((ev:TouchEvent) => [ev.touches[0].screenX, ev.touches[0].screenY] ),
 
-          /* TODO reduce boiler plate, export */
-          scan((acc,curr) => acc.length < 2
-            ? acc.concat([curr])
-            : acc.slice(1).concat([curr]), []),
-          filter(isdouble => isdouble.length === 2),
-          map(double => ({
-            deltaX : double[1][0] - double[0][0],
-            deltaY : double[1][1] - double[0][1]
-          }))
-        ))
-      )
-        .subscribe(({deltaX, deltaY}) => {
-          const {navigationState} = this.nehubaViewer.nehubaViewer.ngviewer
-          navigationState.pose.rotateRelative(this.nehubaViewer.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0)
-          navigationState.pose.rotateRelative(this.nehubaViewer.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0)
-        })
-  }
+    //       /* TODO reduce boiler plate, export */
+    //       scan((acc,curr) => acc.length < 2
+    //         ? acc.concat([curr])
+    //         : acc.slice(1).concat([curr]), []),
+    //       filter(isdouble => isdouble.length === 2),
+    //       map(double => ({
+    //         deltaX : double[1][0] - double[0][0],
+    //         deltaY : double[1][1] - double[0][1]
+    //       }))
+    //     ))
+    //   )
+    //     .subscribe(({deltaX, deltaY}) => {
+          
+          
+          
+    //     })
+    // }
   }
 
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
+  }
+
+  get tunableMobileProperties(){
+    return ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z']
+  }
+
+  handleMobileOverlayEvent(obj:any){
+    const {delta, selectedProp} = obj
+
+    const idx = this.tunableMobileProperties.findIndex(p => p === selectedProp)
+    idx === 0
+      ? this.nehubaViewer.obliqueRotateX(delta)
+      : idx === 1
+        ? this.nehubaViewer.obliqueRotateY(delta)
+        : idx === 2
+          ? this.nehubaViewer.obliqueRotateZ(delta)
+          : console.warn('could not oblique rotate')
   }
 
   returnTruePos(quadrant:number,data:any){

@@ -225,3 +225,23 @@ markdown-dom pre code
   border-top: 0.2em rgba(128,128,128,0.99) solid;
   animation: spinning 700ms linear infinite running;
 }
+
+.theme-controlled.btn,
+.theme-controlled.btn,
+.theme-controlled.btn
+{
+  border-radius:0;
+  border: none;
+}
+
+[darktheme="true"] .theme-controlled.btn.btn-default
+{
+  background-color: rgba(50, 50 , 50, 1.0);
+  color: rgba(230, 230, 230, 1.0);
+}
+
+[darktheme="true"] .theme-controlled.btn.btn-default.active
+{
+  background-color: rgba(70, 70 , 70, 1.0);
+  color: rgba(255, 255, 255, 1.0);
+}

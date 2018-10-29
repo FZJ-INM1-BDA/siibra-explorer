@@ -86,9 +86,7 @@
   </div>
 </div>
 
-<layout-floating-container
-  *ngIf = "viewerLoaded">
-
+<layout-floating-container *ngIf = "viewerLoaded">
 
   <div statusCard>
 
@@ -130,12 +128,19 @@
     </div>
   </div>
 </layout-floating-container>
-<layout-floating-container *ngIf = "isMobile" [show] = "viewerLoaded">
-
-  <div *ngIf = "showObliqueScreen | async" #mobileObliqueScreen mobileObliqueScreen>
-
+<mobile-overlay 
+  *ngIf = "isMobile && viewerLoaded" 
+  [tunableProperties] = "tunableMobileProperties" 
+  (deltaValue) = "handleMobileOverlayEvent($event)">
+  <div mobileObliqueGuide guide>
+    <div>
+      <i class="glyphicon glyphicon-resize-vertical"></i> oblique mode 
+    </div>
+    <div>
+      <i class="glyphicon glyphicon-resize-horizontal"></i> rotate slice
+    </div>
   </div>
-  <div mobileObliqueCtrl #mobileObliqueCtrl>
+  <div mobileObliqueCtrl initiator>
     <i class="glyphicon glyphicon-globe"></i>
   </div>
-</layout-floating-container>
+</mobile-overlay>

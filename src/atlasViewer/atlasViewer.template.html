@@ -91,7 +91,7 @@
 
     <div resizeSliver>
       <span
-        *ngIf = "isMobile"
+        *ngIf = "isMobile || true"
         class = "tabContainer"
         (click) = "toggleSidePanel('menuBrowser')"
         [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'menuBrowser'}" >
