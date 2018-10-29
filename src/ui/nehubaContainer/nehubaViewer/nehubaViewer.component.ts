@@ -344,6 +344,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
         this.nehubaViewer.ngviewer.navigationState.zoomBy(factor))
     )
   }
+
   ngOnDestroy(){
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
@@ -385,6 +386,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
             layerObj[key] == l[key])
   }
 
+  // TODO single landmark for user landmark
   public addUserLandmarks(landmarks:any[]){
     if(!this.nehubaViewer)
       return
@@ -406,6 +408,7 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this.loadLayer(_)
   }
 
+  // TODO single landmark for user landmark
   public removeUserLandmarks(){
     if(!this.nehubaViewer)
       return
@@ -533,6 +536,18 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       this.nehubaViewer.ngviewer.navigationState.pose.orientation.restoreState( orientation )
     if( position )
       this.nehubaViewer.setPosition( this.vec3(position) , positionReal ? true : false )
+  }
+
+  public obliqueRotateX(amount:number){
+    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -amount / 4.0 * Math.PI / 180.0)
+  }
+
+  public obliqueRotateY(amount:number){
+    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([1, 0, 0]), amount / 4.0 * Math.PI / 180.0)
+  }
+
+  public obliqueRotateZ(amount:number){
+    this.nehubaViewer.ngviewer.navigationState.pose.rotateRelative(this.vec3([0, 0, 1]), amount / 4.0 * Math.PI / 180.0)
   }
 
   private updateColorMap(arrayIdx:number[]){

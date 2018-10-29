@@ -168,3 +168,13 @@ div[mobileObliqueScreen]
   transition: all 0.5s linear;
   pointer-events: all;
 }
+
+div[mobileObliqueGuide]
+{
+  position : absolute;
+  top: 40%;
+  width: 100%;
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+}
