@@ -1,6 +1,5 @@
-import { Component, AfterViewInit, OnDestroy, Output, EventEmitter, ElementRef, NgZone } from "@angular/core";
-import * as export_nehuba from 'third_party/export_nehuba/main.bundle.js'
-
+import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2 } from "@angular/core";
+import 'third_party/export_nehuba/main.bundle.js'
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import { fromEvent, interval, Observable } from 'rxjs'
 import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
@@ -15,12 +14,13 @@ import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
   ]
 })
 
-export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
+export class NehubaViewerUnit implements OnDestroy{
   
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter : EventEmitter<any | number | null> = new EventEmitter()
   @Output() mouseoverLandmarkEmitter : EventEmitter<number | null> = new EventEmitter()
   @Output() regionSelectionEmitter : EventEmitter<any> = new EventEmitter()
+  @Output() errorEmitter : EventEmitter<any> = new EventEmitter()
 
   /* only used to set initial navigation state */
   initNav : any
@@ -56,12 +56,29 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   touchStart$ : Observable<any>
 
   constructor(
+    private rd: Renderer2,
     public elementRef:ElementRef,
     private workerService : AtlasWorkerService,
     private zone : NgZone,
     private constantService : AtlasViewerConstantsServices
   ){
-    this.patchNG()
+
+    if(!this.constantService.loadExportNehubaPromise){
+      this.constantService.loadExportNehubaPromise = new Promise((resolve, reject) => {
+        const scriptEl = this.rd.createElement('script')
+        scriptEl.src = 'main.bundle.js'
+        scriptEl.onload = () => resolve(true)
+        scriptEl.onerror = (e) => reject(e)
+        this.rd.appendChild(window.document.head, scriptEl)
+      })
+    }
+
+    this.constantService.loadExportNehubaPromise
+      .then(() => {
+        this.patchNG()
+        this.loadNehuba()
+      })
+      .catch(e => this.errorEmitter.emit(e))
 
     this.ondestroySubscriptions.push(
       fromEvent(this.workerService.worker, 'message').pipe(
@@ -266,10 +283,12 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
 
   private viewportToDatas : [any, any, any] = [null, null, null]
 
-  public getNgHash : () => string = export_nehuba.getNgHash
+  public getNgHash : () => string = () => window['export_nehuba']
+    ? window['export_nehuba'].getNgHash()
+    : null
 
-  ngAfterViewInit(){
-    this.nehubaViewer = export_nehuba.createNehubaViewer(this.config, (err)=>{
+  loadNehuba(){
+    this.nehubaViewer = window['export_nehuba'].createNehubaViewer(this.config, (err)=>{
       /* print in debug mode */
     })
 
@@ -288,6 +307,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     this.loadNewParcellation()
 
     window['nehubaViewer'] = this.nehubaViewer
+
+    this.onDestroyCb.push(() => window['nehubaViewer'] = null)
 
     this.ondestroySubscriptions.push(
       fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
@@ -349,8 +370,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
         if(elementId === 0 || elementId === 1 || elementId === 2){
           const {position} = this.nehubaViewer.ngviewer.navigationState 
           const pos = position.spatialCoordinates
-          export_nehuba.vec3.set(pos, deltaX, deltaY, 0)
-          export_nehuba.vec3.transformMat4(pos, pos, this.viewportToDatas[elementId])
+          window['export_nehuba'].vec3.set(pos, deltaX, deltaY, 0)
+          window['export_nehuba'].vec3.transformMat4(pos, pos, this.viewportToDatas[elementId])
           position.changed.dispatch()
         }else if(elementId === 3){
           const {perspectiveNavigationState} = this.nehubaViewer.ngviewer
@@ -386,12 +407,17 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       if(_s$) _s$.unsubscribe()
     })
     this.ondestroySubscriptions.forEach(s => s.unsubscribe())
+    while(this.onDestroyCb.length > 0){
+      this.onDestroyCb.pop()()
+    }
     this.nehubaViewer.dispose()
   }
 
+  private onDestroyCb : (()=>void)[] = []
+
   private patchNG(){
 
-    const { LayerManager, UrlHashBinding } = export_nehuba.getNgPatchableObj()
+    const { LayerManager, UrlHashBinding } = window['export_nehuba'].getNgPatchableObj()
     
     UrlHashBinding.prototype.setUrlHash = () => {
       // console.log('seturl hash')
@@ -409,6 +435,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
         this.regionSelectionEmitter.emit(region)
       }
     }
+
+    this.onDestroyCb.push(() => LayerManager.prototype.invokeAction = (arg) => {})
   }
 
   private filterLayers(l:any,layerObj:any):boolean{
@@ -527,8 +555,8 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
       }))
   }
 
-  public vec3(pos:[number,number,number]){
-    return export_nehuba.vec3.fromValues(...pos)
+  private vec3(pos:[number,number,number]){
+    return window['export_nehuba'].vec3.fromValues(...pos)
   }
 
   public setNavigationState(newViewerState:Partial<ViewerState>){
