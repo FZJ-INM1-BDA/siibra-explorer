@@ -12,6 +12,7 @@ export class AtlasViewerConstantsServices{
   public mobile: boolean
 
   public ngLandmarkLayerName = 'spatial landmark layer'
+  public ngUserLandmarkLayerName = 'user landmark layer'
 
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
   public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {

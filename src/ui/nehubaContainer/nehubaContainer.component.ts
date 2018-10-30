@@ -146,7 +146,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
       // filter(state => isDefined(state) && isDefined(state.userLandmarks)),
       map(state => isDefined(state) && isDefined(state.userLandmarks)
         ? state.userLandmarks
-        : [])
+        : []),
+      distinctUntilChanged(userLmUnchanged)
     )
 
     const segmentsUnchangedChanged = (s1,s2)=>
@@ -327,7 +328,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
       ).subscribe(landmarks => {
         this.userLandmarks = landmarks
         if(this.nehubaViewer){
-          this.nehubaViewer.removeUserLandmarks()
           this.nehubaViewer.addUserLandmarks(landmarks)
         }
       })
@@ -753,6 +753,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
           })
       },
       add3DLandmarks : landmarks => {
+        // TODO check uniqueness of ID
         if(!landmarks.every(l => isDefined(l.id)))
           throw new Error('every landmarks needs to be identified with the id field')
         if(!landmarks.every(l=> isDefined(l.position)))
@@ -1048,3 +1049,15 @@ export const takeOnePipe = [
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
 export const getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
+
+
+export const singleLmUnchanged = (lm:{id:string,position:[number,number,number]}, map: Map<string,[number,number,number]>) => 
+  map.has(lm.id) && map.get(lm.id).every((value,idx) => value === lm.position[idx])
+
+export const userLmUnchanged = (oldlms, newlms) => {
+  const oldmap = new Map(oldlms.map(lm => [lm.id, lm.position]))
+  const newmap = new Map(newlms.map(lm => [lm.id, lm.position]))
+
+  return oldlms.every(lm => singleLmUnchanged(lm, newmap as Map<string,[number,number,number]>))
+    && newlms.every(lm => singleLmUnchanged(lm, oldmap as Map<string, [number,number,number]>))
+}
