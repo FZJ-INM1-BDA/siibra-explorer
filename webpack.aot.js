@@ -19,7 +19,7 @@ module.exports = merge(staticAssets, {
   module: {
     rules: [
       {
-        test : /export_nehuba.*?worker.*?\.js$|worker\.js/,
+        test : /export_nehuba.*?\.js$|worker\.js/,
         use : {
           loader : 'file-loader',
           options: {

@@ -13,6 +13,8 @@
     "dev-plugin": "PLUGINDEV=http://localhost:10080/allPluginmanifests npm run dev-server & npm run plugin-server",
     "plugin-server": "node ./src/plugin_examples/server.js",
     "dev-server": "webpack-dev-server --config webpack.dev.js --mode development",
+    "dev-server-aot":"webpack-dev-server --config webpack.aot.js",
+    "dev-server-all-interfaces": "webpack-dev-server --config webpack.dev.js --mode development --hot --host 0.0.0.0 --host bs-local.com",
     "serve-plugins": "node src/plugin_examples/server.js",
     "test": "karma start spec/karma.conf.js"
   },
