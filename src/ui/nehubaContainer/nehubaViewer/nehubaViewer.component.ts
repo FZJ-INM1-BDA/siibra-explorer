@@ -101,6 +101,42 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
     )
 
     this.ondestroySubscriptions.push(
+      fromEvent(this.workerService.worker, 'message').pipe(
+        filter((message:any) => {
+
+          if(!message){
+            // console.error('worker response message is undefined', message)
+            return false
+          }
+          if(!message.data){
+            // console.error('worker response message.data is undefined', message.data)
+            return false
+          }
+          if(message.data.type !== 'ASSEMBLED_USERLANDMARKS_VTK'){
+            /* worker responded with not assembled landmark, no need to act */
+            return false
+          }
+          if(!message.data.url){
+            /* file url needs to be defined */
+            return false
+          }
+          return true
+        }),
+        debounceTime(100),
+        map(e => e.data.url)
+      ).subscribe(url => {
+        this.removeSpatialSearch3DLandmarks()
+        const _ = {}
+        _[this.constantService.ngUserLandmarkLayerName] = {
+          type :'mesh',
+          source : `vtk://${url}`,
+          shader : FRAGMENT_MAIN_WHITE
+        }
+        this.loadLayer(_)
+      })
+    )
+
+    this.ondestroySubscriptions.push(
 
       fromEvent(this.workerService.worker,'message').pipe(
         filter((message:any) => {
@@ -390,36 +426,21 @@ export class NehubaViewerUnit implements AfterViewInit,OnDestroy{
   public addUserLandmarks(landmarks:any[]){
     if(!this.nehubaViewer)
       return
-    const _ = {}
-    landmarks.forEach(lm => {
-      _[`user-${lm.id}`] = {
-        type : 'mesh',
-        source : `vtk://${ICOSAHEDRON_VTK_URL}`,
-        transform : [
-          [2 ,0 ,0 , lm.position[0]*1e6],
-          [0 ,2 ,0 , lm.position[1]*1e6],
-          [0 ,0 ,2 , lm.position[2]*1e6],
-          [0 ,0 ,0 , 1 ],
-        ],
-        shader : FRAGMENT_MAIN_WHITE
-      }
-    })
-
-    this.loadLayer(_)
-  }
-
-  // TODO single landmark for user landmark
-  public removeUserLandmarks(){
-    if(!this.nehubaViewer)
-      return
-    this.removeLayer({
-      name : /^user\-/
+    this.workerService.worker.postMessage({
+      type : 'GET_USERLANDMARKS_VTK',
+      landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6))
     })
   }
 
   public removeSpatialSearch3DLandmarks(){
     this.removeLayer({
       name : this.constantService.ngLandmarkLayerName
+    })
+  }
+
+  public removeuserLandmarks(){
+    this.removeLayer({
+      name : this.constantService.ngUserLandmarkLayerName
     })
   }
 

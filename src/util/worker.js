@@ -1,5 +1,5 @@
-const validTypes = ['CHECK_MESHES', 'GET_LANDMARKS_VTK']
-const validOutType = ['CHECKED_MESH', 'ASSEMBLED_LANDMARKS_VTK']
+const validTypes = ['CHECK_MESHES', 'GET_LANDMARKS_VTK', 'GET_USERLANDMARKS_VTK']
+const validOutType = ['CHECKED_MESH', 'ASSEMBLED_LANDMARKS_VTK', 'ASSEMBLED_USERLANDMARKS_VTK']
 
 const checkMeshes = (action) => {
   
@@ -105,14 +105,10 @@ const getMeshPoly = (polyIndices, currentIdx) => polyIndices.map(triplet =>
   ).join(' '))
 ).join('\n')
 
-let landmarkVtkUrl
 
 const encoder = new TextEncoder()
-const getLandmarksVtk = (action) => {
 
-  // landmarks are array of triples in nm (array of array of numbers)
-  const landmarks = action.landmarks
-  const template = action.template
+const parseLmToVtk = (landmarks) => {
 
   const reduce = landmarks.reduce((acc,curr,idx) => {
     //curr : null | [number,number,number] | [ [number,number,number], [number,number,number], [number,number,number] ][]
@@ -151,9 +147,9 @@ const getLandmarksVtk = (action) => {
 
   // if no vertices are been rendered, do not replace old 
   if(reduce.currentVertexIndex === 0)
-    return
+    return false
 
-  const vtk = vtkHeader
+  return vtkHeader
     .concat('\n')
     .concat(getVertexHeader(reduce.currentVertexIndex))
     .concat('\n')
@@ -166,7 +162,21 @@ const getLandmarksVtk = (action) => {
     .concat(getLabelHeader(reduce.currentVertexIndex))
     .concat('\n')
     .concat(reduce.labelString.join('\n'))
+}
+
+let landmarkVtkUrl
+
+const getLandmarksVtk = (action) => {
+
+  // landmarks are array of triples in nm (array of array of numbers)
+  const landmarks = action.landmarks
+  const template = action.template
+
+  const vtk = parseLmToVtk(landmarks)
   
+  if(!vtk)
+    return
+
   // when new set of landmarks are to be displayed, the old landmarks will be discarded
   if(landmarkVtkUrl)
     URL.revokeObjectURL(landmarkVtkUrl)
@@ -179,6 +189,24 @@ const getLandmarksVtk = (action) => {
   })
 }
 
+let userLandmarkVtkUrl
+
+const getuserLandmarksVtk = (action) => {
+  const landmarks = action.landmarks
+  const vtk = parseLmToVtk(landmarks)
+  if(!vtk)
+    return
+
+  if(userLandmarkVtkUrl)
+    URL.revokeObjectURL(userLandmarkVtkUrl)
+
+  userLandmarkVtkUrl = URL.createObjectURL(new Blob( [encoder.encode(vtk)], {type : 'application/octet-stream'} ))
+  postMessage({
+    type : 'ASSEMBLED_USERLANDMARKS_VTK',
+    url : userLandmarkVtkUrl
+  })
+}
+
 onmessage = (message) => {
   
   if(validTypes.findIndex(type => type === message.data.type)>=0){
@@ -188,6 +216,9 @@ onmessage = (message) => {
         return
       case 'GET_LANDMARKS_VTK':
         getLandmarksVtk(message.data)
+        return
+      case 'GET_USERLANDMARKS_VTK':
+        getuserLandmarksVtk(message.data)
         return
       default:
         console.warn('unhandled worker action', message)
