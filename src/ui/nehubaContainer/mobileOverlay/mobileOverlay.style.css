@@ -59,8 +59,3 @@
 {
   z-index:9999;
 }
-
-:host-context([darktheme="true"])
-{
-  /* color: white; */
-}
