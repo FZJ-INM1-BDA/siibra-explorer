@@ -10,7 +10,7 @@ module.exports = {
         exclude : /node_modules|[Ss]pec\.ts$/
       },
       {
-        test : /.*?worker.*?\.js$/,
+        test : /export_nehuba|.*?worker.*?\.js$/,
         use : {
           loader : 'file-loader',
           options: {

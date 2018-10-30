@@ -2,7 +2,7 @@ import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryRe
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
-import { map, filter, distinctUntilChanged, delay } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, delay, concatMap } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -287,7 +287,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.ngLayerNames$.subscribe(() => {
+      this.ngLayerNames$.pipe(
+        concatMap(data => this.constantsService.loadExportNehubaPromise.then(data))
+      ).subscribe(() => {
         this.ngLayersChangeHandler()
         this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
         window['viewer'].registerDisposer(this.disposeHandler)
@@ -438,7 +440,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngLayersChangeHandler(){
-
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
       // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
       .map(obj => ({

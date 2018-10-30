@@ -10,6 +10,7 @@ import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/st
 export class AtlasViewerConstantsServices{
 
   public mobile: boolean
+  public loadExportNehubaPromise : Promise<boolean>
 
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
