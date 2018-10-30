@@ -224,28 +224,27 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
   dataWindowRegistry: Set<string> = new Set()
 
-  handleTreeNodeClick(obj:{inputItem:any,node:TreeComponent},searchResult:any){
-    
-    const { properties, kgID } = searchResult
-    
-    obj.node.childrenExpanded = !obj.node.childrenExpanded
+  handleFlatTreeNodeClick(payload:{dataset:DataEntry, file:File}){
+    const { dataset, file } = payload
+    const { properties, kgID } = dataset
+    if(file.mimetype){
 
-    if(obj.inputItem.mimetype){
-      if(this.dataWindowRegistry.has(obj.inputItem.name)){
+      // TODO use KG id in future
+      if(this.dataWindowRegistry.has(file.name)){
         /* already open, will not open again */
-        return 
+        return
       }
       /* not yet open, add the name to registry */
-      this.dataWindowRegistry.add(obj.inputItem.name)
+      this.dataWindowRegistry.add(file.name)
 
       const component = this.fileViewerComponentFactory.create(this.injector)
-      component.instance.searchResultFile = Object.assign({}, obj.inputItem, { datasetProperties : properties }, kgID ? { kgID } : {})
-      const compref = this.widgetServices.addNewWidget(component,{title:obj.inputItem.name,exitable:true,state:'floating'})
+      component.instance.searchResultFile = Object.assign({}, file, { datasetProperties : properties }, kgID ? { kgID } : {})
+      const compref = this.widgetServices.addNewWidget(component,{title:file.name,exitable:true,state:'floating'})
 
       /* on destroy, removes name from registry */
-      compref.onDestroy(() => this.dataWindowRegistry.delete(obj.inputItem.name))
+      compref.onDestroy(() => this.dataWindowRegistry.delete(file.name))
     }else{
-      console.warn('the selected file has no mimetype defined')
+      /** no mime type  */
     }
   }
 

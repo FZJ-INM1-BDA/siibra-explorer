@@ -112,28 +112,13 @@
         </div>
       </div>
       <div body>
-        <panel-component
-          *ngFor = "let searchResult of data.searchResults | filterDataEntriesByType : hideDataTypes"
-          [collapseBody] = "true"
-          [bodyCollapsable] = "true"
-          dataentry>
-  
-          <div heading>
-            {{ searchResult.type }}
-          </div>
-  
-          <div body>
-            <tree-component
-              *ngFor = "let item of searchResult.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
-              [childrenExpanded] = "false"
-              [renderNode] = "renderNode" 
-              (treeNodeClick) = "handleTreeNodeClick($event,searchResult)"
-              [inputItem] = " item "
-              treebase>
-  
-            </tree-component>
-          </div>
-        </panel-component>
+
+        <dataset-viewer
+          (launchFileViewer) = "handleFlatTreeNodeClick($event)"
+          [dataset] = "searchResult"
+          *ngFor = "let searchResult of data.searchResults">
+
+        </dataset-viewer>
       </div>
     </panel-component>
   </div>
