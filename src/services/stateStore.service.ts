@@ -402,6 +402,7 @@ export interface DedicatedViewAction extends Action{
 export interface DataEntry{
   type : string
   name : string
+  kgID? : string
   regionName : {
     regionName : string,
     relationship : string

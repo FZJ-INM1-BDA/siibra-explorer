@@ -115,3 +115,11 @@ div[noSelectedRegion]
 {
   background-color: rgba(0,0,0,0.2);
 }
+
+dataset-viewer
+{
+  display: block;
+  margin: 1em;
+  padding: 1em;
+  background-color: rgba(128, 128, 128, 0.2);
+}

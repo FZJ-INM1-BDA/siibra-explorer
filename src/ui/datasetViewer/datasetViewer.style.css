@@ -1,0 +1,14 @@
+div[title]
+{
+  margin: 0.5rem;
+}
+
+flat-tree-component
+{
+  overflow: hidden;
+}
+
+:host-context([darktheme="true"]) hr
+{
+  border-color: rgba(0, 0, 0, 0.5);
+}
