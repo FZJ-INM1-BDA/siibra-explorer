@@ -73,8 +73,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   public nanometersToOffsetPixelsFn : Function[] = []
 
-  public combinedSpatialData$ : Observable<any[]>
-
   constructor(
     private constantService : AtlasViewerConstantsServices,
     private atlasViewerDataService : AtlasViewerDataService,
@@ -258,20 +256,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
                   : 'Loading unknown chunk ...'
         })
       )
-
-    this.combinedSpatialData$ = combineLatest(
-      combineLatest(
-        this.fetchedSpatialDatasets$,
-        this.spatialResultsVisible$
-      )
-      .pipe(
-        map(([datas,visible, ...rest]) => visible ? datas : []),
-        // map(arr => arr.map(v => Object.assign({}, v, {type : 'spatialSearchLandmark'})))
-      ),
-      this.userLandmarks$.pipe(
-        // map(arr => arr.map(v => Object.assign({}, v, {type : 'userLandmark'})))
-      )
-    ).pipe(map(arr => [...arr[0], ...arr[1]]))
 
     this.ngLayers$ = this.store.pipe(
       select('ngViewerState')
