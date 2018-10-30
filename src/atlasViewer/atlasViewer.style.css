@@ -227,6 +227,21 @@ span.tabContainer.active-tab:before
   min-height:50em;
 }
 
+[mobileMenu] > *
+{
+  position: relative;
+}
+
+[mobileMenu] > atlas-banner
+{
+  z-index: 9999;
+}
+
+[mobileMenu] > template-parcellation-citation-container
+{
+  z-index: 9;
+}
+
 [mobileTemplateCitation]
 {
   padding: 1.5em;
