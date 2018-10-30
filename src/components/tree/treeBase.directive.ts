@@ -6,7 +6,7 @@ import { Subscription } from "rxjs";
   selector : '[treebase]',
   host :{
     'style' : `
-      background-color:red
+
     `
   },
   providers : [

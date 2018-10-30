@@ -87,16 +87,24 @@ export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnIni
   }
 
   collapsedLevels: Set<string> = new Set()
-  searchedVisibleSet: Set<string> = new Set()
+  uncollapsedLevels : Set<string> = new Set()
 
   toggleCollapse(flattenedItem:FlattenedTreeInterface){
-    this.collapsedLevels.has(flattenedItem.lvlId)
-      ? this.collapsedLevels.delete(flattenedItem.lvlId)
-      : this.collapsedLevels.add(flattenedItem.lvlId)
+    this.isCollapsed(flattenedItem)
+      ? (this.collapsedLevels.delete(flattenedItem.lvlId), this.uncollapsedLevels.add(flattenedItem.lvlId))
+      : (this.collapsedLevels.add(flattenedItem.lvlId), this.uncollapsedLevels.delete(flattenedItem.lvlId))
   }
 
   isCollapsed(flattenedItem:FlattenedTreeInterface):boolean{
-    return this.collapsedLevels.has(flattenedItem.lvlId)
+    return this.isCollapsedById(flattenedItem.lvlId)
+  }
+
+  isCollapsedById(id:string):boolean{
+    return this.collapsedLevels.has(id) 
+      ? true
+      : this.uncollapsedLevels.has(id)
+        ? false
+        : !this.childrenExpanded
   }
 
   collapseRow(flattenedItem:FlattenedTreeInterface):boolean{
@@ -106,9 +114,7 @@ export class FlatTreeComponent implements AfterViewChecked, AfterViewInit, OnIni
         .concat(acc.length === 0 
           ? curr 
           : acc[acc.length -1].concat(`_${curr}`)), [])
-      .find(id => this.collapsedLevels.has(id))
-        ? true
-        : false
+      .some(id => this.isCollapsedById(id))
   }
 
   private _currentPos : number = 0

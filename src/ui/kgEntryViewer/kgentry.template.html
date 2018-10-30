@@ -1,4 +1,4 @@
-<div *ngIf = "kgData; else showDefault">
+<div *ngIf = "kgData; else showDefault" container>
 
   <readmore-component>
 
@@ -132,8 +132,8 @@
     </panel-component>
 
   </readmore-component>
-  <a target = "_blank" [href] = "kgHref">
-    See this dataset in the Knowledge Graph <i class = "glyphicon glyphicon-new-window"></i>
+  <a target = "_blank" [href] = "kgHref" linkToKG>
+    Open in Knowledge Graph <i class = "glyphicon glyphicon-new-window"></i>
   </a>
 
 </div>
