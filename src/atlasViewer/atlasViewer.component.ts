@@ -409,7 +409,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     if (!gl) {
-      message['Detail'] = 'Your browser does not support WebGL.'
+      message['Detail'] = 'Your browser does not support WebGL2.'
 
       this.modalService.show(ModalUnit, {
         initialState: {
