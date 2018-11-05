@@ -1,7 +1,0 @@
-{
-  "name" : "fzj.xg.webjugex",
-  "displayName":"JuGEx differential gene expression analysis",
-  "type" : "plugin",
-  "templateURL" : "res/plugin_examples/newWebJugex/template.html",
-  "scriptURL" : "res/plugin_examples/newWebJugex/script.js"
-}
