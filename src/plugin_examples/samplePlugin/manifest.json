@@ -1,0 +1,11 @@
+{
+  "name":"fzj.xg.samplePlugin",
+  "displayName":"Sample Plugin Display Name (Optional)",
+  "templateURL":"http://localhost:10080/samplePlugin/template.html",
+  "scriptURL":"http://localhost:10080/samplePlugin/script.js",
+  "initState":{
+    "hello": "world",
+    "foo": "bar"
+  },
+  "initStateUrl":"http://localhost:10080/samplePlugin/optionalInitStateJson.json"
+}
