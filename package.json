@@ -7,7 +7,7 @@
     "build-export": "webpack --config webpack.export.js",
     "build-export-min": "webpack --config webpack.export.min.js",
     "build-export-aot": "webpack --config webpack.export.aot.js",
-    "build-aot": "GIT_HASH=`git rev-parse --short HEAD` webpack --config webpack.aot.js",
+    "build-aot": "GIT_HASH=`git rev-parse --short HEAD~1` webpack --config webpack.aot.js",
     "build-min": "webpack --config webpack.prod.js",
     "build": "webpack --config webpack.dev.js",
     "dev-plugin": "PLUGINDEV=http://localhost:10080/allPluginmanifests npm run dev-server & npm run plugin-server",
