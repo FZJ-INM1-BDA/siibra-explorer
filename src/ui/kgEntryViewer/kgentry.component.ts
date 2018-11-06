@@ -53,4 +53,4 @@ export class KgEntryViewer implements OnInit{
   }
 }
 
-const KGROOT = `https://kg.humanbrainproject.org/api/proxy/kg/`
+const KGROOT = `https://kg.humanbrainproject.org/proxy/default/kg/`
