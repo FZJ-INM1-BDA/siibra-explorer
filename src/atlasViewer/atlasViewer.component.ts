@@ -436,6 +436,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
       return false
     }
+
+    if(this.constantsService.mobile){
+      this.modalService.show(ModalUnit,{
+        initialState: {
+          title: 'Power and Network Usage warning',
+          body: this.constantsService.mobileWarning
+        }
+      })
+    }
     return true
   }
 
