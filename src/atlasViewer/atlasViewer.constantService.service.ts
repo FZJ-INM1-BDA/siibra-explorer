@@ -90,6 +90,8 @@ Unfortunately, your browser does not meet the minimum requirement to run the atl
 the atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled
 `
 
+  public mobileWarning = `It looks like you are on a mobile device. Please note that the atlas viewer is power and network usage intensive.`
+
   get floatingWidgetStartingPos() : [number,number]{
     return [400,100]
   } 
