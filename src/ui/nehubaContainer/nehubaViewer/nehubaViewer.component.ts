@@ -28,8 +28,13 @@ export class NehubaViewerUnit implements OnDestroy{
   initNiftiLayers : any[] = []
 
   config : any
-  
   nehubaViewer : any
+  private _dim: [number, number, number]
+  get dim(){
+    return this._dim
+      ? this._dim
+      : [1.5e9, 1.5e9, 1.5e9]
+  }
 
   _s1$ : any
   _s2$ : any
@@ -75,6 +80,19 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this.constantService.loadExportNehubaPromise
       .then(() => {
+        const layers = this.config.dataset.initialNgState.layers
+        const key = Object.keys(layers)[0]
+        const regex = /http.*$/.exec(layers[key].source)
+        if(regex[0]){
+          fetch(`${regex[0]}/info`)
+            .then(res => res.json())
+            .then(json => {
+              const {resolution, size} = json.scales[0]
+              this._dim = resolution.map((v, idx) => v * size[idx])
+            })
+            .catch(e => this.errorEmitter.emit(e))
+        }
+        
         this.patchNG()
         this.loadNehuba()
       })
@@ -456,6 +474,7 @@ export class NehubaViewerUnit implements OnDestroy{
       return
     this.workerService.worker.postMessage({
       type : 'GET_USERLANDMARKS_VTK',
+      scale: Math.min(...this.dim.map(v => v * 2e-9)),
       landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6))
     })
   }
@@ -477,6 +496,7 @@ export class NehubaViewerUnit implements OnDestroy{
     this.workerService.worker.postMessage({
       type : 'GET_LANDMARKS_VTK',
       template : this.templateId,
+      scale: Math.min(...this.dim.map(v => v * 1.4e-8)),
       landmarks : geometries.map(geometry => 
         geometry === null
           ? null
