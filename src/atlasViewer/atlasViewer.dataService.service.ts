@@ -100,8 +100,12 @@ export class AtlasViewerDataService implements OnDestroy{
         })
         .catch(console.error)
     }else if (templateSpace === 'Allen Mouse'){
-      return fetch('res/json/allenTestPlane.json')
-        .then(res => res.json())
+      return Promise.all([
+        'res/json/allen3DVolumeAggregated.json',
+        'res/json/allenTestPlane.json',
+        'res/json/allen3DReconAggregated.json'
+      ].map(url => fetch(url).then(res => res.json())))
+        .then(arr => arr.reduce((acc, curr) => acc.concat(curr), []))
         .then(arr => {
           this.store.dispatch({
             type : FETCHED_SPATIAL_DATA,
