@@ -64,6 +64,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
+  /**
+   * TODO make untangle nglayernames and its dependency on ng
+   */
   public ngLayerNames$ : Observable<any>
   public ngLayers : NgLayerInterface[]
   private disposeHandler : any
