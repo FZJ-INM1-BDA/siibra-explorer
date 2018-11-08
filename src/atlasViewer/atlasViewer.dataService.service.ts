@@ -80,10 +80,8 @@ export class AtlasViewerDataService implements OnDestroy{
         templateSpace == 'Waxholm Rat V2.0' ?
         'datapath:metadata/OSLO_sp_data_rev.json' :
           null
-
-    if(filterTemplateSpace){
-      url.searchParams.append('fq',filterTemplateSpace)
-    }else if (templateSpace === 'MNI 152 ICBM 2009c Nonlinear Asymmetric'){
+    
+    if (templateSpace === 'MNI 152 ICBM 2009c Nonlinear Asymmetric'){
       return Promise.all([
         fetch('res/json/LYONNEURO_2014_BATg.json').then(res=>res.json()),
         fetch('res/json/LYONNEURO_2014_DESj.json').then(res=>res.json())
@@ -103,6 +101,20 @@ export class AtlasViewerDataService implements OnDestroy{
         .catch(console.error)
     }else if (templateSpace === 'Allen Mouse'){
       return fetch('res/json/allenTestPlane.json')
+        .then(res => res.json())
+        .then(arr => {
+          this.store.dispatch({
+            type : FETCHED_SPATIAL_DATA,
+            fetchedDataEntries : arr.map(item => Object.assign({}, item, { properties : {} }))
+          })
+          this.store.dispatch({
+            type : UPDATE_SPATIAL_DATA,
+            totalResults : arr.length
+          })
+        })
+        .catch(console.error)
+    }else if (templateSpace === 'Waxholm Rat V2.0'){
+      return fetch('res/json/camillaWaxholmPointsAggregatedData.json')
         .then(res => res.json())
         .then(arr => {
           this.store.dispatch({

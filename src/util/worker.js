@@ -108,7 +108,7 @@ const getMeshPoly = (polyIndices, currentIdx) => polyIndices.map(triplet =>
 
 const encoder = new TextEncoder()
 
-const parseLmToVtk = (landmarks) => {
+const parseLmToVtk = (landmarks, scale) => {
 
   const reduce = landmarks.reduce((acc,curr,idx) => {
     //curr : null | [number,number,number] | [ [number,number,number], [number,number,number], [number,number,number] ][]
@@ -117,7 +117,7 @@ const parseLmToVtk = (landmarks) => {
     if(!isNaN(curr[0]))
       return {
         currentVertexIndex : acc.currentVertexIndex + 12,
-        vertexString : acc.vertexString.concat(getIcoVertex(curr, 2.8)),
+        vertexString : acc.vertexString.concat(getIcoVertex(curr, scale)),
         polyCount : acc.polyCount + 20,
         polyString : acc.polyString.concat(getIcoPoly(acc.currentVertexIndex)),
         labelString : acc.labelString.concat(Array(12).fill(idx.toString()).join('\n'))
@@ -171,8 +171,11 @@ const getLandmarksVtk = (action) => {
   // landmarks are array of triples in nm (array of array of numbers)
   const landmarks = action.landmarks
   const template = action.template
+  const scale = action.scale
+    ? action.scale
+    : 2.8
 
-  const vtk = parseLmToVtk(landmarks)
+  const vtk = parseLmToVtk(landmarks, scale)
   
   if(!vtk)
     return
@@ -193,7 +196,10 @@ let userLandmarkVtkUrl
 
 const getuserLandmarksVtk = (action) => {
   const landmarks = action.landmarks
-  const vtk = parseLmToVtk(landmarks)
+  const scale = action.scale
+    ? action.scale
+    : 2.8
+  const vtk = parseLmToVtk(landmarks, scale)
   if(!vtk)
     return
 

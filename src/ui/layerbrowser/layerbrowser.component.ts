@@ -13,6 +13,9 @@ import { filter, distinctUntilChanged, map, delay } from "rxjs/operators";
 
 export class LayerBrowser implements OnDestroy{
 
+  /**
+   * TODO make untangle nglayernames and its dependency on ng
+   */
   ngLayers : NgLayerInterface[] = []
   lockedLayers : string[] = []
 
