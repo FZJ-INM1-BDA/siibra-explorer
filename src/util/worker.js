@@ -115,6 +115,9 @@ const parseLmToVtk = (landmarks, scale) => {
     if(curr === null)
       return acc
     if(!isNaN(curr[0]))
+      /**
+       * point primitive, render icosahedron
+       */
       return {
         currentVertexIndex : acc.currentVertexIndex + 12,
         vertexString : acc.vertexString.concat(getIcoVertex(curr, scale)),
@@ -126,13 +129,16 @@ const parseLmToVtk = (landmarks, scale) => {
       //curr[0] : [number,number,number][] vertices
       //curr[1] : [number,number,number][] indices for the vertices that poly forms
       
+      /**
+       * poly primitive
+       */
       const vertices = curr[0]
       const polyIndices = curr[1]
 
       return {
         currentVertexIndex : acc.currentVertexIndex + vertices.length,
         vertexString : acc.vertexString.concat(getMeshVertex(vertices)),
-        polyCount : acc.currentVertexIndex + polyIndices.length,
+        polyCount : acc.polyCount + polyIndices.length,
         polyString : acc.polyString.concat(getMeshPoly(polyIndices, acc.currentVertexIndex)),
         labelString : acc.labelString.concat(Array(vertices.length).fill(idx.toString()).join('\n'))
       }

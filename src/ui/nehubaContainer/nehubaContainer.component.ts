@@ -1,9 +1,9 @@
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, Injector } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, DataEntry, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER, NgViewerStateInterface, HIDE_NG_LAYER, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry } from "../../services/stateStore.service";
-import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, takeUntil } from "rxjs/operators";
+import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry } from "../../services/stateStore.service";
+import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
@@ -298,7 +298,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
                       (data.geometry as PlaneLandmarkGeometry).corners,
                       [[0,1,2], [0,2,3]]
                     ] 
-                  : null)
+                  : data.geometry.type === 'mesh'
+                    ? [
+                        (data.geometry as OtherLandmarkGeometry).vertices,
+                        (data.geometry as OtherLandmarkGeometry).meshIdx
+                      ]
+                    : null)
             )
         }else{
           this.nehubaViewer.removeSpatialSearch3DLandmarks()
