@@ -451,7 +451,7 @@ export interface Landmark{
   type : string //e.g. sEEG recording site, etc
   name : string
   templateSpace : string // possibily inherited from LandmarkBundle (?)
-  geometry : PointLandmarkGeometry | PlaneLandmarkGeometry
+  geometry : PointLandmarkGeometry | PlaneLandmarkGeometry | OtherLandmarkGeometry
   properties : Property
   files : File[]
 }
@@ -470,6 +470,10 @@ export interface PlaneLandmarkGeometry extends LandmarkGeometry{
   corners : [[number, number, number],[number, number, number],[number, number, number],[number, number, number]]
 }
 
+export interface OtherLandmarkGeometry extends LandmarkGeometry{
+  vertices: [number, number, number][]
+  meshIdx: [number,number,number][]
+}
 
 export function isDefined(obj){
   return typeof obj !== 'undefined' && obj !== null
