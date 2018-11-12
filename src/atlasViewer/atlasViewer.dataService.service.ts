@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, FETCHED_TEMPLATES, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
+import { ViewerStateInterface, FETCHED_TEMPLATE, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { Subscription } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
@@ -28,30 +28,39 @@ export class AtlasViewerDataService implements OnDestroy{
       .then(arr => resolve( [ ... arr[0], ... arr[1] ] ))
       .catch(reject)
   })
-
-  public promiseFetchedTemplates : Promise<any[]> = Promise.all(this.constantService.templateUrls.map(url=>
-    fetch(url)
-      .then(res=>
-        res.json())
-      .then(json=>json.nehubaConfig && !json.nehubaConfigURL ? 
-        Promise.resolve(json) :
-        fetch(json.nehubaConfigURL)
-          .then(r=>r.json())
-          .then(nehubaConfig=>Promise.resolve(Object.assign({},json,{ nehubaConfig })))
-      )))
   
   constructor(
     private store : Store<ViewerStateInterface>,
     private constantService : AtlasViewerConstantsServices
   ){
-
-    this.promiseFetchedTemplates
-      .then(arrJson=>
-        this.store.dispatch({
-          type : FETCHED_TEMPLATES,
-          fetchedTemplate : arrJson
+    this.constantService.templateUrls.map(url => 
+      fetch(url)
+        .then(res => res.json())
+        .then(json => new Promise((resolve, reject) => {
+          if(json.nehubaConfig)
+            resolve(json)
+          else if(json.nehubaConfigURL)
+            fetch(json.nehubaConfigURL)
+              .then(res => res.json())
+              .then(json2 => resolve(
+                Object.assign({}, json, { nehubaConfig: json2 })
+              ))
+              .catch(reject)
+          else
+            reject('neither nehubaConfig nor nehubaConfigURL defined')
         }))
-      .catch(console.error)
+        .then(json => this.store.dispatch({
+          type: FETCHED_TEMPLATE,
+          fetchedTemplate: json
+        }))
+        .catch(e => {
+          console.warn('fetching template url failed', e)
+          this.store.dispatch({
+            type: FETCHED_TEMPLATE,
+            fetchedTemplate: null
+          })
+        })
+      )
 
     this.init()
   }

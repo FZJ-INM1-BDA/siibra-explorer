@@ -4,7 +4,7 @@ import { UserLandmark } from '../atlasViewer/atlasViewer.apiService.service';
 
 export const NEWVIEWER = 'NEWVIEWER'
 
-export const FETCHED_TEMPLATES = 'FETCHED_TEMPLATES'
+export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 export const SELECT_REGIONS = `SELECT_REGIONS`
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
@@ -230,7 +230,13 @@ export function uiState(state:UIStateInterface = {mouseOverSegment:null, mouseOv
   }
 }
 
-export function viewerState(state:Partial<ViewerStateInterface> = {landmarksSelected : []},action:AtlasAction){
+export function viewerState(
+  state:Partial<ViewerStateInterface> = {
+    landmarksSelected : [],
+    fetchedTemplates : []
+  },
+  action:AtlasAction
+){
   switch(action.type){
     case LOAD_DEDICATED_LAYER:
       const dedicatedView = state.dedicatedView
@@ -254,9 +260,10 @@ export function viewerState(state:Partial<ViewerStateInterface> = {landmarksSele
         navigation : {},
         dedicatedView : null
       })
-    case FETCHED_TEMPLATES : {
-      return Object.assign({},state,{
-        fetchedTemplates:action.fetchedTemplate})
+    case FETCHED_TEMPLATE : {
+      return Object.assign({}, state, {
+        fetchedTemplates: state.fetchedTemplates.concat(action.fetchedTemplate)
+      })
     }
     case CHANGE_NAVIGATION : {
       return Object.assign({},state,{navigation : action.navigation})
