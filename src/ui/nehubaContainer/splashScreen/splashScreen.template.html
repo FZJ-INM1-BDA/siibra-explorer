@@ -4,7 +4,7 @@
     templateCardContainer>
     
     <div
-      *ngFor = "let template of loadedTemplate$ | async" 
+      *ngFor = "let template of loadedTemplate$ | async | filterNull" 
       (click) = "selectTemplate(template)"
       templateCard
       hoverable>
@@ -13,6 +13,16 @@
       <readmore-component>
         <small>{{ template.properties.description }}</small>
       </readmore-component>
+    </div>
+    <div *ngIf = "(loadedTemplate$ | async).length < totalTemplates">
+      <h1 style = "text-align:center;">
+        <small>
+          Loading Templates
+        </small>
+        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+      </h1>
     </div>
   </div>
 </div>

@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { filter,map } from 'rxjs/operators'
 import { ViewerStateInterface, NEWVIEWER } from "../../../services/stateStore.service";
+import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector : 'ui-splashscreen',
@@ -14,7 +15,10 @@ import { ViewerStateInterface, NEWVIEWER } from "../../../services/stateStore.se
 
 export class SplashScreen{
   loadedTemplate$ : Observable<any[]>
-  constructor(private store:Store<ViewerStateInterface>){
+  constructor(
+    private store:Store<ViewerStateInterface>,
+    private constanceService: AtlasViewerConstantsServices  
+  ){
     this.loadedTemplate$ = this.store.pipe(
       select('viewerState'),
       filter((state:ViewerStateInterface)=> typeof state !== 'undefined' && typeof state.fetchedTemplates !== 'undefined' && state.fetchedTemplates !== null),
@@ -27,5 +31,9 @@ export class SplashScreen{
       selectTemplate : template,
       selectParcellation : template.parcellations[0]
     })
+  }
+
+  get totalTemplates(){
+    return this.constanceService.templateUrls.length
   }
 }

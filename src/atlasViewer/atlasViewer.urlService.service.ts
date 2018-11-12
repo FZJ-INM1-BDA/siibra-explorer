@@ -2,9 +2,10 @@ import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER, PluginInitManifestInterface } from "../services/stateStore.service";
 import { Observable,combineLatest } from "rxjs";
-import { filter, map, scan, take, distinctUntilChanged, bufferTime, debounceTime } from "rxjs/operators";
+import { filter, map, scan, distinctUntilChanged, takeWhile, takeLast } from "rxjs/operators";
 import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 import { PluginServices } from "./atlasViewer.pluginService.service";
+import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 
 declare var window
 
@@ -19,7 +20,8 @@ export class AtlasViewerURLService{
 
   constructor(
     private store : Store<ViewerStateInterface>,
-    private pluginService : PluginServices
+    private pluginService : PluginServices,
+    private constantService:AtlasViewerConstantsServices
   ){
 
     this.pluginState$ = this.store.pipe(
@@ -74,7 +76,9 @@ export class AtlasViewerURLService{
       select('viewerState'),
       filter(state=>isDefined(state)&&isDefined(state.fetchedTemplates)),
       map(state=>state.fetchedTemplates),
-      take(1)
+      takeWhile(fetchedTemplates => fetchedTemplates.length < this.constantService.templateUrls.length),
+      takeLast(1),
+      map(ft => ft.filter(t => t !== null))
     ).subscribe(fetchedTemplates=>{
       const searchparams = new URLSearchParams(window.location.search)
  
