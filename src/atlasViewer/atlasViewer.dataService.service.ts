@@ -127,8 +127,11 @@ export class AtlasViewerDataService implements OnDestroy{
         })
         .catch(console.error)
     }else if (templateSpace === 'Waxholm Rat V2.0'){
-      return fetch('res/json/camillaWaxholmPointsAggregatedData.json')
-        .then(res => res.json())
+      return Promise.all([
+        fetch('res/json/waxholmPlaneAggregatedData.json').then(res => res.json()),
+        fetch('res/json/camillaWaxholmPointsAggregatedData.json').then(res => res.json())
+      ])
+        .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
         .then(arr => {
           this.store.dispatch({
             type : FETCHED_SPATIAL_DATA,
