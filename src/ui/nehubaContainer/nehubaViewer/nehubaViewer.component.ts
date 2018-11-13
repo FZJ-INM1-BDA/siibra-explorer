@@ -65,7 +65,7 @@ export class NehubaViewerUnit implements OnDestroy{
     public elementRef:ElementRef,
     private workerService : AtlasWorkerService,
     private zone : NgZone,
-    private constantService : AtlasViewerConstantsServices
+    public constantService : AtlasViewerConstantsServices
   ){
 
     if(!this.constantService.loadExportNehubaPromise){
@@ -80,19 +80,9 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this.constantService.loadExportNehubaPromise
       .then(() => {
-        const layers = this.config.dataset.initialNgState.layers
-        const key = Object.keys(layers)[0]
-        const regex = /http.*$/.exec(layers[key].source)
-        if(regex[0]){
-          fetch(`${regex[0]}/info`)
-            .then(res => res.json())
-            .then(json => {
-              const {resolution, size} = json.scales[0]
-              this._dim = resolution.map((v, idx) => v * size[idx])
-            })
-            .catch(e => this.errorEmitter.emit(e))
-        }
-        
+        const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
+        const dim = Math.min(sliceZoom * sliceViewportWidth, sliceZoom * sliceViewportHeight)
+        this._dim = [dim, dim, dim]
         this.patchNG()
         this.loadNehuba()
       })
@@ -496,7 +486,7 @@ export class NehubaViewerUnit implements OnDestroy{
     this.workerService.worker.postMessage({
       type : 'GET_LANDMARKS_VTK',
       template : this.templateId,
-      scale: Math.min(...this.dim.map(v => v * 1.4e-8)),
+      scale: Math.min(...this.dim.map(v => v * this.constantService.nehubaLandmarkConstant)),
       landmarks : geometries.map(geometry => 
         geometry === null
           ? null
