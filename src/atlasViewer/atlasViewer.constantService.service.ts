@@ -15,6 +15,14 @@ export class AtlasViewerConstantsServices{
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
 
+  /**
+   * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
+   *  sliceZoom
+   *  sliceViewportWidth
+   *  sliceViewportHeight
+   */
+  public nehubaLandmarkConstant = 1e-8
+
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
   public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {
     return prevLandmarks.every(lm => typeof lm.name !== 'undefined') && 
