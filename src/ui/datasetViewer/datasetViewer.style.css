@@ -1,11 +1,7 @@
-div[title]
-{
-  margin: 0.5rem;
-}
-
 flat-tree-component
 {
   overflow: hidden;
+  white-space: nowrap;
 }
 
 :host-context([darktheme="true"]) hr

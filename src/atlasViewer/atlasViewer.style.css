@@ -58,7 +58,7 @@ layout-floating-container
   overflow:hidden;
 }
 
-div[toastContainer]
+[toastContainer]
 {
   pointer-events: none;
   position : absolute;
@@ -69,7 +69,7 @@ div[toastContainer]
   flex-direction: column;
 }
 
-div[toastContainer] > *
+[toastContainer] > *
 {
   flex : 0 0 auto;
 }
@@ -88,31 +88,24 @@ div[floatingMouseContextualContainer]
   height: 0px;
 }
 
-div[contextualInnerContainer]
+div[contextualBlock]
 {
-  margin-top :1em;
-  margin-left :1em;
+  margin: 1.3em 1.5em;
+  white-space: nowrap;
   display:inline-block;
   width:auto;
 }
 
-div[contextualInnerContainer]
+div[contextualBlock]
 {
   background-color:rgba(200,200,200,0.8);
 }
 
-:host-context([darktheme="true"]) div[contextualInnerContainer]
+:host-context([darktheme="true"]) div[contextualBlock]
 {
   background-color : rgba(30,30,30,0.8);
   color : rgba(250,250,250,0.8);
 }
-
-div[contextualBlock]
-{
-  margin: 0.3em 0.5em;
-  white-space: nowrap;
-}
-
 
 :host-context([darktheme="false"]) div[resizeSliver] > span.tabContainer
 {
@@ -225,6 +218,7 @@ span.tabContainer.active-tab:before
 [mobileMenu]
 {
   min-height:50em;
+  margin-top: 1em;
 }
 
 [mobileMenu] > *

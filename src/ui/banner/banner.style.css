@@ -1,16 +1,13 @@
 :host
 {
   display:block;
-}
-
-div[container]
-{
   display:flex;
   flex-direction: row;
   flex-wrap : wrap;
 }
 
-dropdown-component, div[container] > div[searchRegionPopover]
+dropdown-component,
+:host > div[searchRegionPopover]
 {
   margin-left:1em;
   margin-bottom: 0.4em;

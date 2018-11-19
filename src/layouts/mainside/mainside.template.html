@@ -1,18 +1,18 @@
-<div container>
-  <div maincontent>
-    <ng-content select="[maincontent]">
-    </ng-content>
-  </div>
-  <div resizeSliver>
-    <ng-content select = "[resizeSliver]">
-    </ng-content>
-  </div>
-  <div 
-    [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth, animationTiming : animationFlag ? 180 : 0 } }"
-    (@collapseSide.start) = "animationStart()"
-    (@collapseSide.done) = "animationEnd()"
-    sidecontent>
-    <ng-content select="[sidecontent]">
-    </ng-content>
-  </div>
+<div maincontent>
+  <ng-content select="[maincontent]">
+  </ng-content>
+</div>
+
+<div resizeSliver>
+  <ng-content select = "[resizeSliver]">
+  </ng-content>
+</div>
+
+<div 
+  [@collapseSide] = "{ value : showSide ? 'visible' : 'collapsed' , params : { sideWidth : sideWidth, animationTiming : animationFlag ? 180 : 0 } }"
+  (@collapseSide.start) = "animationStart()"
+  (@collapseSide.done) = "animationEnd()"
+  sidecontent>
+  <ng-content select="[sidecontent]">
+  </ng-content>
 </div>

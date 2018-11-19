@@ -11,6 +11,9 @@ import { ParseAttributeDirective } from "../parseAttribute.directive";
   animations : [
     panelAnimations
   ],
+  host: {
+    '[class]': 'getClassNames'
+  },
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
@@ -34,11 +37,21 @@ export class PanelComponent extends ParseAttributeDirective implements AfterCont
     super()
   }
 
+  get getClassNames(){
+    return `panel ${this.containerClass === '' ? 'panel-default' : this.containerClass}`
+  }
+
   ngAfterContentChecked(){
+    /**
+     * TODO check performance implication. 
+     * setting height forces a repaint (?)
+     */
     this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
       (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
     this.cdr.detectChanges()
   }
+
+  @HostBinding('class.panel-default')
 
   set fullHeight(num:number){
     this._fullHeight = num
