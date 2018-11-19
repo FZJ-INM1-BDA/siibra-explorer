@@ -1,6 +1,7 @@
-div[dropdowncontainer]
+:host
 {
   position:relative;
+  display:block;
 }
 
 ul.dropdown-menu

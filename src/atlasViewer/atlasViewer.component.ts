@@ -37,7 +37,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('dockedContainer', { read: ViewContainerRef }) dockedContainer: ViewContainerRef
   @ViewChild('floatingContainer', { read: ViewContainerRef }) floatingContainer: ViewContainerRef
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
-  @ViewChild('temporaryContainer', { read: ViewContainerRef }) temporaryContainer: ViewContainerRef
   @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
@@ -70,6 +69,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ngLayerNames$ : Observable<any>
   public ngLayers : NgLayerInterface[]
   private disposeHandler : any
+
+  get toggleMessage(){
+    return this.constantsService.toggleMessage
+  }
 
   constructor(
     private toastService:ToastService,

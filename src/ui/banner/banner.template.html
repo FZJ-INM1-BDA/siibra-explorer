@@ -1,54 +1,52 @@
-<div container>
-  <dropdown-component
-    (itemSelected) = "selectTemplate($event)"
-    [activeDisplay] = "displayActiveTemplate"
-    [selectedItem] = "selectedTemplate"
-    [inputArray] = "loadedTemplates$ | async | filterNull">
-  
-  </dropdown-component>
-  
-  <dropdown-component
-    *ngIf = "selectedTemplate"
-    (itemSelected) = "selectParcellation($event)"
-    [activeDisplay] = "displayActiveParcellation"
-    [selectedItem] = "selectedParcellation"
-    [inputArray] = "selectedTemplate.parcellations">
-  </dropdown-component>
+<dropdown-component
+  (itemSelected) = "selectTemplate($event)"
+  [activeDisplay] = "displayActiveTemplate"
+  [selectedItem] = "selectedTemplate"
+  [inputArray] = "loadedTemplates$ | async | filterNull">
 
+</dropdown-component>
+
+<dropdown-component
+  *ngIf = "selectedTemplate"
+  (itemSelected) = "selectParcellation($event)"
+  [activeDisplay] = "displayActiveParcellation"
+  [selectedItem] = "selectedParcellation"
+  [inputArray] = "selectedTemplate.parcellations">
+</dropdown-component>
+
+<div 
+  *ngIf = "selectedTemplate"
+  #searchRegionPopover
+  searchRegionPopover>
+
+  <input 
+    (keydown.esc) = "showRegionTree = false; $event.target.blur(); searchTerm = ''"
+    (focus) = "showRegionTree = true"
+    [value] = "searchTerm"
+    (input) = "changeSearchTerm($event)"
+    class = "form-control" 
+    type="text" 
+    placeholder="Regions"/>
+    
   <div 
-    *ngIf = "selectedTemplate"
-    #searchRegionPopover
-    searchRegionPopover>
+    [@showState]
+    *ngIf = "showRegionTree" 
+    hideScrollbarContainer>
 
-    <input 
-      (keydown.esc) = "showRegionTree = false; $event.target.blur(); searchTerm = ''"
-      (focus) = "showRegionTree = true"
-      [value] = "searchTerm"
-      (input) = "changeSearchTerm($event)"
-      class = "form-control" 
-      type="text" 
-      placeholder="Regions"/>
-      
-    <div 
-      [@showState]
-      *ngIf = "showRegionTree" 
-      hideScrollbarContainer>
-
-      <div treeContainer #treeContainer>
-        <div treeHeader>
-          <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
-          <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
-        </div>
-        
-        <flat-tree-component 
-          [flatTreeViewPort] = "treeContainer"
-          (treeNodeClick) = "handleClickRegion($event)"
-          [inputItem] = "aggregatedRegionTree"
-          [renderNode] = "displayTreeNode.bind(this)"
-          [searchFilter] = "filterTreeBySearch.bind(this)">
-          
-        </flat-tree-component>
+    <div treeContainer #treeContainer>
+      <div treeHeader>
+        <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
+        <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
       </div>
+      
+      <flat-tree-component 
+        [flatTreeViewPort] = "treeContainer"
+        (treeNodeClick) = "handleClickRegion($event)"
+        [inputItem] = "aggregatedRegionTree"
+        [renderNode] = "displayTreeNode.bind(this)"
+        [searchFilter] = "filterTreeBySearch.bind(this)">
+        
+      </flat-tree-component>
     </div>
   </div>
 </div>

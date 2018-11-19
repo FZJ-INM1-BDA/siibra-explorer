@@ -104,6 +104,11 @@ the atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` exten
     return [400,100]
   } 
 
+  /**
+   * message when user on hover a segment or landmark
+   */
+  public toggleMessage: string = 'double click to toggle select'
+
   constructor(private store : Store<ViewerStateInterface>){
 
     const ua = window && window.navigator && window.navigator.userAgent
