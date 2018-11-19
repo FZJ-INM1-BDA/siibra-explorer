@@ -1,6 +1,10 @@
 import { EventEmitter, Component, Input, Output, ChangeDetectionStrategy, ElementRef, OnDestroy, ChangeDetectorRef, ViewChildren, QueryList, AfterViewChecked, AfterViewInit, OnInit } from "@angular/core";
 import { FlattenedTreeInterface } from "./flattener.pipe";
 
+/**
+ * TODO to be replaced by virtual scrolling when ivy is in stable
+ */
+
 @Component({
   selector : 'flat-tree-component',
   templateUrl : './flatTree.template.html',

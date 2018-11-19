@@ -1,5 +1,6 @@
-div[container]
+:host
 {
+  display:block;
   width:100%;
   height:100%;
   display:flex;
@@ -15,8 +16,6 @@ div[maincontent]
 
 div[resizeSliver]
 {
-  /* width : 2.0em;
-  height: 4em; */
   margin-top : 2em;
   width:0em;
 }

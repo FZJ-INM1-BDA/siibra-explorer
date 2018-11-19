@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, OnDestroy } from "@angular/core";
+import { Component, ElementRef, OnDestroy, HostBinding } from "@angular/core";
 
 
 @Component({
@@ -7,8 +7,14 @@ import { Component, ElementRef, ViewChild, OnDestroy } from "@angular/core";
 
 export class PluginUnit implements OnDestroy{
   
-  @ViewChild('pluginContainer',{read:ElementRef}) 
   elementRef:ElementRef
+  
+  @HostBinding('attr.pluginContainer')
+  pluginContainer = true
+
+  constructor(er:ElementRef){
+    this.elementRef = er
+  }
 
   ngOnDestroy(){
     console.log('plugin being destroyed')

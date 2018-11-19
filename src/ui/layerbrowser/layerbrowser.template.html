@@ -1,53 +1,51 @@
-<div container>
-  <div 
-    class="layerContainer"
-    *ngFor = "let ngLayer of ngLayers">
+<div 
+  class="layerContainer"
+  *ngFor = "let ngLayer of ngLayers">
 
-    <div>
-      <i 
-        container = "body"
-        placement = "bottom"
-        [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
-        (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
-        class = "glyphicon" 
-        [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' :ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
+  <div>
+    <i 
+      container = "body"
+      placement = "bottom"
+      [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
+      (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
+      class = "glyphicon" 
+      [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' :ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
 
-      </i>
-    </div>
-    <div>
-      <i 
-        container = "body"
-        placement = "bottom"
-        [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
-        (click) = "forceSegment.hide();toggleForceShowSegment(ngLayer)"
-        class = "glyphicon" 
-        #forceSegment = "bs-tooltip"
-        [ngClass] = "ngLayer.type === 'segmentation' ? ('glyphicon-th-large ' + segmentationAdditionalClass) : 'glyphicon-lock muted' ">
-
-      </i>
-    </div>
-    <div>
-      <i 
-        (click) = "removeLayer(ngLayer)"
-        container = "body"
-        placement = "bottom"
-        [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
-        class = "glyphicon"
-        [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' : 'glyphicon-remove-circle'">
-
-      </i>
-    </div>
-
-    <panel-component
-      [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
-
-      <div heading>
-        {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }} : {{ ngLayer.type }}
-      </div>
-
-      <div bodyy>
-        {{ ngLayer.source }}
-      </div>
-    </panel-component>
+    </i>
   </div>
+  <div>
+    <i 
+      container = "body"
+      placement = "bottom"
+      [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
+      (click) = "forceSegment.hide();toggleForceShowSegment(ngLayer)"
+      class = "glyphicon" 
+      #forceSegment = "bs-tooltip"
+      [ngClass] = "ngLayer.type === 'segmentation' ? ('glyphicon-th-large ' + segmentationAdditionalClass) : 'glyphicon-lock muted' ">
+
+    </i>
+  </div>
+  <div>
+    <i 
+      (click) = "removeLayer(ngLayer)"
+      container = "body"
+      placement = "bottom"
+      [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
+      class = "glyphicon"
+      [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' : 'glyphicon-remove-circle'">
+
+    </i>
+  </div>
+
+  <panel-component
+    [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
+
+    <div heading>
+      {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }} : {{ ngLayer.type }}
+    </div>
+
+    <div bodyy>
+      {{ ngLayer.source }}
+    </div>
+  </panel-component>
 </div>

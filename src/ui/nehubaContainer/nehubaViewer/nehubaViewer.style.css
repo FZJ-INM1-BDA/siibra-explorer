@@ -1,4 +1,15 @@
 div#neuroglancer-container
 {
   height:100%;
+  width: 100%;
+}
+
+[placeholder]
+{
+  height:100%;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  display:flex;
+  flex-direction: column;
 }
