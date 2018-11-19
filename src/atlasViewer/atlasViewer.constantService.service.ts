@@ -23,6 +23,18 @@ export class AtlasViewerConstantsServices{
    */
   public nehubaLandmarkConstant = 1e-8
 
+  private TIMEOUT = 4000
+
+  /**
+   * raceFetch 
+   */
+   public raceFetch = (url) => Promise.race([
+     fetch(url),
+     new Promise((_, reject) => setTimeout(() => {
+      reject(`fetch did not resolve under ${this.TIMEOUT} ms`)
+     }, this.TIMEOUT))
+   ])
+
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
   public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {
     return prevLandmarks.every(lm => typeof lm.name !== 'undefined') && 
