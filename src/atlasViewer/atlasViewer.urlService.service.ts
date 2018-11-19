@@ -200,7 +200,7 @@ export class AtlasViewerURLService{
       })
 
       url.search = search.toString()
-      history.replaceState(null,'',url.toString())
+      history.replaceState(null, '', url.toString())
     })
   }
 }
