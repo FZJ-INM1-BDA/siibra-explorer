@@ -165,13 +165,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
             state.mouseOverSegment.constructor === Number ?
               state.mouseOverSegment.toString() :
               state.mouseOverSegment.name :
-            '' :
-          ''),
+            null :
+          null),
         distinctUntilChanged()
       ),
       this.onhoverLandmark$
     ).pipe(
-      map(([segment, onhoverLandmark]) => onhoverLandmark ? '' : segment )
+      map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
     )
 
   }

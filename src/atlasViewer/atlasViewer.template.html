@@ -158,9 +158,9 @@
         {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
       </div>
       <div 
-        *ngIf = "(onhoverSegment$ | async) !== ''" 
+        *ngIf = "onhoverSegment$ | async as onhoverSegment " 
         contextualBlock>
-        {{ onhoverSegment$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+        {{ onhoverSegment }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
       </div>
       <!-- TODO Potentially implementing plugin contextual info -->
     </div>
