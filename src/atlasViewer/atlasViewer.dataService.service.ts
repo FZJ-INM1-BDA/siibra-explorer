@@ -35,13 +35,13 @@ export class AtlasViewerDataService implements OnDestroy{
   ){
     this.constantService.templateUrls.map(url => 
       this.constantService.raceFetch(url)
-        .then((res: Response) => res.json())
+        .then(res => res.json())
         .then(json => new Promise((resolve, reject) => {
           if(json.nehubaConfig)
             resolve(json)
           else if(json.nehubaConfigURL)
             this.constantService.raceFetch(json.nehubaConfigURL)
-              .then((res: Response) => res.json())
+              .then(res => res.json())
               .then(json2 => resolve(
                 Object.assign({}, json, { nehubaConfig: json2 })
               ))

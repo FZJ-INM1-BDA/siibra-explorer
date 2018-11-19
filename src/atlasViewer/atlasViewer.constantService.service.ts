@@ -32,7 +32,7 @@ export class AtlasViewerConstantsServices{
      fetch(url),
      new Promise((_, reject) => setTimeout(() => {
       reject(`fetch did not resolve under ${this.TIMEOUT} ms`)
-     }, this.TIMEOUT))
+     }, this.TIMEOUT)) as Promise<Response>
    ])
 
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
