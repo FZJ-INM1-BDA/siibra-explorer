@@ -38,6 +38,7 @@ import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
+import { ShowToastDirective } from "../util/directives/showToast.directive";
 
 
 @NgModule({
@@ -85,7 +86,8 @@ import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
     FilterNullPipe,
 
     /* directive */
-    DownloadDirective
+    DownloadDirective,
+    ShowToastDirective
   ],
   entryComponents : [
 

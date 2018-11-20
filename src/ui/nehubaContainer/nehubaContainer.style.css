@@ -140,8 +140,8 @@ div.loadingIndicator div.spinnerAnimationCircle
 
 [desktopTemplateCitation]
 {
-  padding: 0 1em;
-  display:block;
+  padding: 0.6em 0 0 0.6em;
+  font-size:200%;
 }
 
 div[mobileObliqueCtrl]
@@ -177,4 +177,11 @@ div[mobileObliqueGuide]
   display:flex;
   flex-direction: column;
   align-items: center;
+}
+
+template-parcellation-citation-container
+{
+  width: 500px;
+  max-width: 100%;
+  display:block;
 }
