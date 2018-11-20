@@ -1,10 +1,10 @@
-import { Injectable } from "@angular/core";
+import { Injectable, TemplateRef } from "@angular/core";
 
 @Injectable({
   providedIn : 'root'
 })
 export class ToastService{
-  showToast: (message: string, config?: Partial<ToastConfig>)=>()=>void
+  showToast: (message: string | TemplateRef<any>, config?: Partial<ToastConfig>)=>()=>void
 }
 
 export interface ToastConfig{

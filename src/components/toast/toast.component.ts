@@ -1,4 +1,4 @@
-import { Component, Input, ViewContainerRef, ViewChild, Output, EventEmitter, HostBinding } from "@angular/core";
+import { Component, Input, ViewContainerRef, ViewChild, Output, EventEmitter, HostBinding, ElementRef, ChangeDetectionStrategy, OnInit } from "@angular/core";
 import { toastAnimation } from "./toast.animation";
 
 @Component({
@@ -7,10 +7,11 @@ import { toastAnimation } from "./toast.animation";
   styleUrls : ['./toast.style.css'],
   animations : [
     toastAnimation
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ToastComponent{
+export class ToastComponent implements OnInit{
   @Input() message : string 
   @Input() timeout : number = 0
   @Input() dismissable : boolean = true

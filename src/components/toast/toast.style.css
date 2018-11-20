@@ -3,7 +3,7 @@
   pointer-events: none;
   text-align:center;
   margin-bottom:5px;
-  height:2em;
+  min-height: 2em;
 }
 
 div[container]
@@ -24,6 +24,11 @@ div[container]
 {
   background-color: rgba(50,50,50,0.8);
   color : rgba(255,255,255,0.8);
+}
+
+div[message]
+{
+  vertical-align: middle;
 }
 
 div[message],

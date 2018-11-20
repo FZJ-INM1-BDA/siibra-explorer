@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2 } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2, TemplateRef } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
@@ -183,7 +183,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         ? config
         : {})
       const toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
-      toastComponent.instance.message = message
+      if(typeof message === 'string')
+        toastComponent.instance.message = message
+      if(message instanceof TemplateRef){
+        toastComponent.instance.messageContainer.createEmbeddedView(message as TemplateRef<any>)
+      }
+         
       toastComponent.instance.dismissable = _config.dismissable
       toastComponent.instance.timeout = _config.timeout
 
