@@ -105,11 +105,20 @@ export class AtlasViewerConstantsServices{
     pointHitRadius : 0,
   }
 
-  public doesNotMeetRequirementMD = `
-Unfortunately, your browser does not meet the minimum requirement to run the atlas viewer. 
-the atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled
+  public minReqMD = `
+# Hmm... it seems like we hit a snag
+It seems your browser has trouble loading interactive atlas viewer. 
+Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled. 
+- We recommend using _Chrome >= 56_ or _Firefox >= 51_. You can check your browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
+- If you are on _Chrome < 56_ or _Firefox < 51_, you may be able to enable **webgl2.0** by turning on experimental flag <https://get.webgl.org/webgl2/enable.html>.
+- If you are on an Android device we recommend _Chrome for Android_ or _Firefox for Android_. 
+- Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
 `
+  public minReqModalHeader = `Hmm... it seems your browser and is having trouble loading interactive atlas viewer`
+  public minReqWebGl2 = `Your browser does not support WebGL2.`
+  public minReqColorBufferFloat = `Your browser does not support EXT_color_bugger_float extension`
 
+  public mobileWarningHeader = `Power and Network Usage warning`
   public mobileWarning = `It looks like you are on a mobile device. Please note that the atlas viewer is power and network usage intensive.`
 
   get floatingWidgetStartingPos() : [number,number]{

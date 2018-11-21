@@ -416,42 +416,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
     const message: any = {
-      Error: 'Your browser does not meet the minimum requirements to run neuroglancer.'
+      Error: this.constantsService.minReqModalHeader
     }
 
     if (!gl) {
-      message['Detail'] = 'Your browser does not support WebGL2.'
-
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: message.Error,
-          body: message.Detail
-        }
-      })
       return false
     }
 
     const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
     
     if (!colorBufferFloat) {
-
-      const detail = `Your browser does not support 
-      ${ !colorBufferFloat ? 'EXT_color_buffer_float' : ''} `
-      message['Detail'] = [detail]
-
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: message.Error,
-          body: message.Detail
-        }
-      })
       return false
     }
 
     if(this.constantsService.mobile){
       this.modalService.show(ModalUnit,{
         initialState: {
-          title: 'Power and Network Usage warning',
+          title: this.constantsService.mobileWarningHeader,
           body: this.constantsService.mobileWarning
         }
       })
