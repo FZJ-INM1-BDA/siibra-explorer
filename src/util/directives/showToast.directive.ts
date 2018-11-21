@@ -28,10 +28,12 @@ export class ShowToastDirective{
     return this._toastLength
   }
 
+  private dismissHandler : () => void
+
   @HostListener('click', ['$event.target'])
   click(ev:MouseEvent){
-    
-    this.toastService.showToast(this.showToast, {
+    if(this.dismissHandler) this.dismissHandler()
+    this.dismissHandler = this.toastService.showToast(this.showToast, {
       dismissable: true,
       timeout: this.toastLength
     })

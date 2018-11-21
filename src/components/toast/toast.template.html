@@ -1,4 +1,4 @@
-<div container>
+<div (mouseenter) = "hover = true" (mouseleave)="hover = false" container>
   <div message>
     <ng-template #messageContainer>
 
@@ -10,4 +10,6 @@
   <div (click) = "dismiss($event)" *ngIf = "dismissable" close>
     <i class = "glyphicon glyphicon-remove"></i>
   </div>
+  <timer-component (timerEnd)="dismissed.emit(false)" [pause] = "hover" [timeout] = "timeout" timer>
+  </timer-component>
 </div>
