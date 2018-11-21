@@ -11,3 +11,4 @@ declare module '*.css' {
 declare var PLUGINDEV : string
 declare var BUNDLEDPLUGINS : string[]
 declare var VERSION : string
+declare var PRODUCTION: boolean
