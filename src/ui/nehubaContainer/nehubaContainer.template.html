@@ -91,14 +91,6 @@
   <!-- TODO export status card to its own container -->
   <div statusCard>
 
-    <div desktopTemplateCitation *ngIf = "!isMobile">
-      <i 
-        [toastLength] = "7000"
-        [showToast] = 
-        "templateAtlasCitations" 
-        class="glyphicon glyphicon-info-sign"></i>
-    </div>
-
     <hr *ngIf = "showCitation && !isMobile" />
 
     <div linksContainer>
@@ -151,11 +143,3 @@
     <i class="glyphicon glyphicon-globe"></i>
   </div>
 </mobile-overlay>
-
-<ng-template #templateAtlasCitations>
-  <h4>
-    Citations for {{ selectedTemplate ? selectedTemplate.name : '' }} and {{ selectedParcellation ? selectedParcellation.name : '' }}
-  </h4>
-  <template-parcellation-citation-container>
-  </template-parcellation-citation-container>
-</ng-template>

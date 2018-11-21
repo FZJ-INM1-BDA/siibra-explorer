@@ -15,6 +15,8 @@ export class AtlasViewerConstantsServices{
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
 
+  public citationToastDuration = 7000
+
   /**
    * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
    *  sliceZoom

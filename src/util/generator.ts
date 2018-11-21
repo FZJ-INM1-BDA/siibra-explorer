@@ -1,4 +1,4 @@
-export function* timedValues(sec:number = 500,mode:string = 'linear'){
+export function* timedValues(ms:number = 500,mode:string = 'linear'){
   const startTime = Date.now()
 
   const getValue = (fraction) =>{
@@ -8,8 +8,8 @@ export function* timedValues(sec:number = 500,mode:string = 'linear'){
         return fraction < 1 ? fraction : 1
     }
   }
-  while((Date.now() - startTime) < sec){
-    yield getValue( (Date.now() - startTime) / sec )
+  while((Date.now() - startTime) < ms){
+    yield getValue( (Date.now() - startTime) / ms )
   }
   return 1
 }
