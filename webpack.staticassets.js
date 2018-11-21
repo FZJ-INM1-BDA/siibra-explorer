@@ -51,7 +51,10 @@ module.exports = {
         ? JSON.stringify(process.env.VERSION) 
         : process.env.GIT_HASH
           ? JSON.stringify(process.env.GIT_HASH)
-          : JSON.stringify('unspecificied hash')
+          : JSON.stringify('unspecificied hash'),
+      PRODUCTION: process.env.PRODUCTION
+        ? true
+        : false
     })
     // ...ignoreArr.map(dirname => new webpack.IgnorePlugin(/\.\/plugin_examples/))
   ]

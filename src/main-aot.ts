@@ -12,4 +12,7 @@ requireAll(require.context(`./plugin_examples`, true))
 /* aot === production mode */
 enableProdMode()
 
+if(PRODUCTION)
+  console.log(`Interactive Atlas Viewer: ${VERSION}`)
+
 platformBrowserDynamic().bootstrapModule(MainModule)
