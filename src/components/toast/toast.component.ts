@@ -18,6 +18,7 @@ export class ToastComponent{
   @Output() dismissed : EventEmitter<boolean> = new EventEmitter()
 
   public progress: number = 0
+  public hover: boolean
 
   @HostBinding('@exists')
   exists : boolean = true
