@@ -1,11 +1,11 @@
-import { Directive, Input, TemplateRef, HostListener } from "@angular/core";
+import { Directive, Input, TemplateRef, HostListener, OnDestroy } from "@angular/core";
 import { ToastService } from "../../services/toastService.service";
 
 @Directive({
   selector: '[showToast]'
 })
 
-export class ShowToastDirective{
+export class ShowToastDirective implements OnDestroy{
   @Input()
   showToast : string | TemplateRef<any> = null
 
@@ -40,5 +40,9 @@ export class ShowToastDirective{
   }
 
   constructor(private toastService:ToastService){
+  }
+
+  ngOnDestroy(){
+    if(this.dismissHandler) this.dismissHandler()
   }
 }
