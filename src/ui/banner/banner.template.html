@@ -7,7 +7,7 @@
 </dropdown-component>
 
 <i 
-  *ngIf = "citationExists(selectedTemplate)" 
+  *ngIf = "citationExists(selectedTemplate) && !isMobile" 
   [toastLength] = "toastDuration"
   [showToast] = "citation"
   class="glyphicon glyphicon-info-sign"
@@ -33,7 +33,7 @@
 </dropdown-component>
 
 <i 
-  *ngIf = "citationExists(selectedParcellation)" 
+  *ngIf = "citationExists(selectedParcellation) && !isMobile" 
   [toastLength] = "toastDuration"
   [showToast] = "citation"
   class="glyphicon glyphicon-info-sign"

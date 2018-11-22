@@ -4,14 +4,13 @@
   display:flex;
   flex-direction: row;
   flex-wrap : wrap;
-  height:2.8em;
+  min-height: 2.8em;
+  padding-left: 1em;
 }
 
-dropdown-component,
-:host > div[searchRegionPopover]
+:host > *
 {
-  margin:auto 0 auto 1em;
-  vertical-align: middle;
+  margin-right:0.5em;
 }
 
 div[treeHeader]
