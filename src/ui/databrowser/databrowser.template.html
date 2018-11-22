@@ -79,10 +79,13 @@
     </div>
   </panel-component>
 </div>
-<div *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0; else noSelectedRegion">
+<div 
+  *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0; else noSelectedRegion"
+  regionsContainer>
 
   <div
-    *ngFor = "let data of (selectedRegions$ | async | sortDataEntriesToRegion : dataEntries).concat( selectedLandmarks$ | async | spatialLandmarksToDataBrowserItemPipe ) | searchResultPagination  : currentPage : hitsPerPage  ">
+    *ngFor = "let data of (selectedRegions$ | async | sortDataEntriesToRegion : dataEntries).concat( selectedLandmarks$ | async | spatialLandmarksToDataBrowserItemPipe ) | searchResultPagination  : currentPage : hitsPerPage  "
+    regionContainer>
     <panel-component 
       [collapseBody] = "true"
       [bodyCollapsable] = "true">
