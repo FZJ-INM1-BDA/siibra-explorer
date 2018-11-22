@@ -58,7 +58,8 @@ export class AtlasBanner implements OnDestroy, OnInit {
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
       safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected)
+      map(state => state.parcellationSelected),
+      distinctUntilChanged((o, n) => o === n)
     )
 
     this.selectedRegions$ = merge(
@@ -282,6 +283,10 @@ export class AtlasBanner implements OnDestroy, OnInit {
 
   get toastDuration() {
     return this.constantService.citationToastDuration
+  }
+
+  get isMobile(){
+    return this.constantService.mobile
   }
 }
 
