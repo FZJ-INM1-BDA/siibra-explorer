@@ -179,4 +179,5 @@ export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
   ['react@16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
   ['reactdom@16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
   ['vue@2.5.16',parseURLToElement('https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js')],
+  ['preact@8.4.2',parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')]
 ])
