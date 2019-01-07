@@ -8,18 +8,15 @@ import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices, SUPPORT_LIBRARY_MAP } from "./atlasViewer.constantService.service";
-import { BsModalService, BsModalRef } from "ngx-bootstrap/modal";
+import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
-import { ToastComponent } from "../components/toast/toast.component";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
-import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
-import { colorAnimation } from "./atlasViewer.animation";
-import { ToastService, defaultToastConfig } from "../services/toastService.service";
+import { colorAnimation } from "./atlasViewer.animation"
 
 @Component({
   selector: 'atlas-viewer',
@@ -50,9 +47,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   meetsRequirement: boolean = true
 
-  toastComponentFactory: ComponentFactory<ToastComponent>
-  private dedicatedViewComponentRef: ComponentRef<ToastComponent>
-
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
 
@@ -78,20 +72,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   constructor(
-    private toastService:ToastService,
     private pluginService: PluginServices,
     private rd2: Renderer2,
     private store: Store<ViewerStateInterface>,
     public dataService: AtlasViewerDataService,
-    private cfr: ComponentFactoryResolver,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService
   ) {
-    this.toastComponentFactory = this.cfr.resolveComponentFactory(ToastComponent)
-
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
@@ -185,57 +175,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   ngOnInit() {
 
-    this.toastService.showToast = (message, config) => {
-      const _config = Object.assign({}, defaultToastConfig, config
-        ? config
-        : {})
-      const toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
-      if(typeof message === 'string')
-        toastComponent.instance.message = message
-      if(message instanceof TemplateRef){
-        toastComponent.instance.messageContainer.createEmbeddedView(message as TemplateRef<any>)
-      }
-         
-      toastComponent.instance.dismissable = _config.dismissable
-      toastComponent.instance.timeout = _config.timeout
-
-      let subscription
-
-      const dismissToast = () => {
-        if(subscription) subscription.unsubscribe()
-        toastComponent.destroy()
-      }
-
-      subscription = toastComponent.instance.dismissed.subscribe(dismissToast)
-      return dismissToast
-    }
-
-    this.apiService.interactiveViewer.uiHandle.getToastHandler = () => {
-      const handler = new ToastHandler()
-      let toastComponent:ComponentRef<ToastComponent>
-      handler.show = () => {
-        toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
-
-        toastComponent.instance.dismissable = handler.dismissable
-        toastComponent.instance.message = handler.message
-        toastComponent.instance.timeout = handler.timeout
-
-        const _subscription = toastComponent.instance.dismissed.subscribe(userInitiated => {
-          _subscription.unsubscribe()
-          handler.hide()
-        })
-      }
-
-      handler.hide = () => {
-        if(toastComponent){
-          toastComponent.destroy()
-          toastComponent = null
-        }
-      }
-
-      return handler
-    }
-
     this.apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
       const srcHTMLElement = libraries.map(libraryName => ({
         name: libraryName,
@@ -299,23 +238,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           }
         })
       )
-    )
-
-    /**
-     * TODO dedicated view should be deprecated
-     */
-    this.subscriptions.push(
-      this.dedicatedView$.subscribe(string => {
-        if (string === null) {
-          if (this.dedicatedViewComponentRef)
-            this.dedicatedViewComponentRef.destroy()
-          return
-        }
-        this.dedicatedViewComponentRef = this.toastContainer.createComponent(this.toastComponentFactory)
-        this.dedicatedViewComponentRef.instance.message = `hello`
-        this.dedicatedViewComponentRef.instance.dismissable = true
-        this.dedicatedViewComponentRef.instance.timeout = 1000
-      })
     )
 
     this.subscriptions.push(

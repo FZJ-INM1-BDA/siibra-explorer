@@ -27,6 +27,7 @@ import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctVie
 import { ToastService } from "./services/toastService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { HelpDirective } from "./util/directives/help.directive";
+import { ToastContainerDirective } from "./util/directives/toastContainer.directive";
 
 @NgModule({
   imports : [
@@ -62,6 +63,7 @@ import { HelpDirective } from "./util/directives/help.directive";
     GlyphiconTooltipRemoveDirective,
     GlyphiconTooltipRemoveSignDirective,
     HelpDirective,
+    ToastContainerDirective,
 
     /* pipes */
     GetNamesPipe,
