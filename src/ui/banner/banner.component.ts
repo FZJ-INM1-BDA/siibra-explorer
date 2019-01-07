@@ -281,6 +281,10 @@ export class AtlasBanner implements OnDestroy, OnInit {
     return obj && obj.properties && obj.properties.publications && obj.properties.publications.length > 0
   }
 
+  showHelp() {
+    this.constantService.showHelpSubject$.next()
+  }
+
   get toastDuration() {
     return this.constantService.citationToastDuration
   }

@@ -84,3 +84,8 @@
     </div>
   </div>
 </div>
+
+<div *ngIf = "isMobile" class = "help-container">
+  <i (click) = "showHelp()" class="glyphicon glyphicon-question-sign"></i>
+</div>
+<i *ngIf = "!isMobile" (click) = "showHelp()" class="glyphicon glyphicon-question-sign"></i>

@@ -2,13 +2,13 @@ import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryRe
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices, SUPPORT_LIBRARY_MAP } from "./atlasViewer.constantService.service";
-import { BsModalService } from "ngx-bootstrap/modal";
+import { BsModalService, BsModalRef } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { ToastComponent } from "../components/toast/toast.component";
@@ -40,6 +40,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
+  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
@@ -56,6 +57,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private newViewer$: Observable<any>
 
   public selectedPOI$ : Observable<any[]>
+
+  public showHelp$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
@@ -101,6 +104,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.focusedSidePanel)
+    )
+
+    this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
+      debounceTime(170)
     )
 
     this.selectedPOI$ = combineLatest(
@@ -283,6 +290,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.meetsRequirement = this.meetsRequirements()
 
+    this.subscriptions.push(
+      this.showHelp$.subscribe(() => 
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: this.constantsService.showHelpTitle,
+            template: this.helpComponent
+          }
+        })
+      )
+    )
+
+    /**
+     * TODO dedicated view should be deprecated
+     */
     this.subscriptions.push(
       this.dedicatedView$.subscribe(string => {
         if (string === null) {

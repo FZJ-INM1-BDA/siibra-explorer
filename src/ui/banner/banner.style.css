@@ -102,3 +102,8 @@ citations-component
   max-width: 100%;
   display:block;
 }
+
+.help-container
+{
+  margin:1em;
+}

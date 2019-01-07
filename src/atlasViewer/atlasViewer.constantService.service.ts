@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
+import { Subject } from "rxjs";
 
 
 @Injectable({
@@ -131,6 +132,62 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    * message when user on hover a segment or landmark
    */
   public toggleMessage: string = 'double click to toggle select'
+
+  /**
+   * Observable for showing help modal
+   */
+  public showHelpSubject$: Subject<null> = new Subject()
+  public showHelpTitle: String = 'Help: Controls and Shortcuts'
+
+  private showHelpGeneralMobile = [
+    ['hold 🌏 + ↕', 'change oblique slice mode'],
+    ['hold 🌏 + ↔', 'oblique slice']
+  ]
+  private showHelpGeneralDesktop = [
+    ['num keys [0-9]', 'toggle layer visibility [0-9]'],
+    ['h', 'show help'],
+    ['?', 'show help'],
+    ['o', 'toggle perspective/orthographic']
+  ] 
+  get showHelpGeneralMap() {
+    return this.mobile
+      ? this.showHelpGeneralMobile
+      : this.showHelpGeneralDesktop
+  }
+
+  private showHelpSliceViewMobile = [
+    ['drag', 'pan']
+  ]
+  private showHelpSliceViewDesktop = [
+    ['drag', 'pan'],
+    ['shift + drag', 'oblique slice']
+  ]
+  get showHelpSliceViewMap() {
+    return this.mobile
+      ? this.showHelpSliceViewMobile
+      : this.showHelpSliceViewDesktop
+  }
+
+  private showHelpPerspectiveMobile = [
+    ['drag', 'change perspective view']
+  ]
+  private showHelpPerspectiveDesktop = [
+    ['drag', 'change perspective view']
+  ]
+  get showHelpPerspectiveViewMap() {
+    return this.mobile
+      ? this.showHelpPerspectiveMobile
+      : this.showHelpPerspectiveDesktop
+  }
+
+  get showHelpSupportText() {
+    return `Did you encounter an issue? 
+      Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>, 
+      raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>`
+  }
+
+  private supportEmailAddress = `x.gui@fz-juelich.de`
+  private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(private store : Store<ViewerStateInterface>){
 

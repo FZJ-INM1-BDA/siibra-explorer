@@ -39,6 +39,7 @@ import { TemplateParcellationCitationsContainer } from "./templateParcellationCi
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
 import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
 import { ShowToastDirective } from "../util/directives/showToast.directive";
+import { HelpComponent } from "./help/help.component";
 
 
 @NgModule({
@@ -71,6 +72,7 @@ import { ShowToastDirective } from "../util/directives/showToast.directive";
     LogoContainer,
     TemplateParcellationCitationsContainer,
     MobileOverlay,
+    HelpComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -112,6 +114,7 @@ import { ShowToastDirective } from "../util/directives/showToast.directive";
     DatasetViewerComponent,
     TemplateParcellationCitationsContainer,
     MobileOverlay,
+    HelpComponent
   ]
 })
 
