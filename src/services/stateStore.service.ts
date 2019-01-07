@@ -121,6 +121,10 @@ export interface NgViewerAction extends Action{
   forceShowSegment : boolean
 }
 
+
+/**
+ * TODO unused function, remove
+ */
 const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface):NgLayerInterface => {
   return incomingLayer.mixability === 'base'
     ? existingLayer

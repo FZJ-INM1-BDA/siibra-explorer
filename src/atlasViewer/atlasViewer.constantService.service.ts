@@ -16,7 +16,7 @@ export class AtlasViewerConstantsServices{
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
 
-  public citationToastDuration = 7000
+  public citationToastDuration = 7e3
 
   /**
    * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
@@ -26,7 +26,10 @@ export class AtlasViewerConstantsServices{
    */
   public nehubaLandmarkConstant = 1e-8
 
-  private TIMEOUT = 4000
+  /**
+   * Timeout can be longer, since configs are lazy loaded.
+   */
+  private TIMEOUT = 16000
 
   /**
    * raceFetch 

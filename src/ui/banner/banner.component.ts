@@ -31,7 +31,7 @@ export class AtlasBanner implements OnDestroy, OnInit {
   public selectedTemplate: any
   public selectedParcellation: any
   public selectedRegions: any[] = []
-  private navigation: { position: [number, number, number] } = { position: [0, 0, 0] }
+  // private navigation: { position: [number, number, number] } = { position: [0, 0, 0] }
 
   private subscriptions: Subscription[] = []
 
@@ -118,13 +118,13 @@ export class AtlasBanner implements OnDestroy, OnInit {
       ).subscribe(arr => arr.length > 1 ? this.doubleClick(arr[0]) : this.singleClick(arr[0]))
     )
 
-    this.subscriptions.push(
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('navigation'),
-        map(obj => obj.navigation)
-      ).subscribe((navigation: any) => this.navigation = navigation)
-    )
+    // this.subscriptions.push(
+    //   this.store.pipe(
+    //     select('viewerState'),
+    //     safeFilter('navigation'),
+    //     map(obj => obj.navigation)
+    //   ).subscribe((navigation: any) => this.navigation = navigation)
+    // )
   }
 
   ngOnDestroy() {
@@ -293,4 +293,3 @@ export class AtlasBanner implements OnDestroy, OnInit {
     return this.constantService.mobile
   }
 }
-
