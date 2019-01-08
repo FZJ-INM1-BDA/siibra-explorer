@@ -28,6 +28,10 @@ import { ToastService } from "./services/toastService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { HelpDirective } from "./util/directives/help.directive";
 import { ToastContainerDirective } from "./util/directives/toastContainer.directive";
+import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
+import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
+import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
+import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 
 @NgModule({
   imports : [
@@ -64,6 +68,10 @@ import { ToastContainerDirective } from "./util/directives/toastContainer.direct
     GlyphiconTooltipRemoveSignDirective,
     HelpDirective,
     ToastContainerDirective,
+    DockedContainerDirective,
+    FloatingContainerDirective,
+    PluginFactoryDirective,
+    FloatingMouseContextualContainerDirective,
 
     /* pipes */
     GetNamesPipe,

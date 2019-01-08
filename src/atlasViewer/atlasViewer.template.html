@@ -74,7 +74,10 @@
       </div>
       
       <!-- Docked Container-->
-      <div dockedContainer #dockedContainer>
+      <div dockedContainer>
+        <div dockedContainerDirective>
+
+        </div>
       </div>
     </div>
 
@@ -148,10 +151,10 @@
   <layout-floating-container
     zIndex = "9"
     #floatingOverlayContainer>
-    <ng-template #floatingContainer>
+    <div floatingContainerDirective>
 
-    </ng-template>
-    <div [style.transform] = "floatingMouseContextualContainerTransform" floatingMouseContextualContainer>
+    </div>
+    <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
       <div 
         *ngIf = "onhoverLandmark$ | async" 
         contextualBlock>
@@ -170,8 +173,9 @@
     </div>
   </layout-floating-container>
 
-  <ng-template #pluginFactory>
-  </ng-template>
+  <div pluginFactoryDirective>
+
+  </div>
 
 </div>
 

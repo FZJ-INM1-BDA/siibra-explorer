@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2, TemplateRef } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, ElementRef, OnInit, HostListener, TemplateRef } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
@@ -7,12 +7,11 @@ import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { Chart } from 'chart.js'
-import { AtlasViewerConstantsServices, SUPPORT_LIBRARY_MAP } from "./atlasViewer.constantService.service";
+import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
-import { PluginServices } from "./atlasViewer.pluginService.service";
 
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
@@ -29,19 +28,18 @@ import { colorAnimation } from "./atlasViewer.animation"
   ]
 })
 
-export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
+export class AtlasViewer implements OnDestroy, OnInit {
 
-  @ViewChild('dockedContainer', { read: ViewContainerRef }) dockedContainer: ViewContainerRef
-  @ViewChild('floatingContainer', { read: ViewContainerRef }) floatingContainer: ViewContainerRef
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
-  @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
+  /**
+   * required for styling of all child components
+   */
   @HostBinding('attr.darktheme')
   darktheme: boolean = false
 
@@ -51,7 +49,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private newViewer$: Observable<any>
 
   public selectedPOI$ : Observable<any[]>
-
   public showHelp$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
@@ -72,8 +69,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   constructor(
-    private pluginService: PluginServices,
-    private rd2: Renderer2,
     private store: Store<ViewerStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
@@ -174,59 +169,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-
-    this.apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
-      const srcHTMLElement = libraries.map(libraryName => ({
-        name: libraryName,
-        srcEl: SUPPORT_LIBRARY_MAP.get(libraryName)
-      }))
-
-      const rejected = srcHTMLElement.filter(scriptObj => scriptObj.srcEl === null)
-      if (rejected.length > 0)
-        return reject(`Some library names cannot be recognised. No libraries were loaded: ${rejected.map(srcObj => srcObj.name).join(', ')}`)
-
-      Promise.all(srcHTMLElement.map(scriptObj => new Promise((rs, rj) => {
-        if('customElements' in window && scriptObj.name === 'webcomponentsLite'){
-          return rs()
-        }
-        const existingEntry = this.apiService.loadedLibraries.get(scriptObj.name)
-        if (existingEntry) {
-          this.apiService.loadedLibraries.set(scriptObj.name, { counter: existingEntry.counter + 1, src: existingEntry.src })
-          rs()
-        } else {
-          const srcEl = scriptObj.srcEl
-          srcEl.onload = () => rs()
-          srcEl.onerror = (e: any) => rj(e)
-          this.rd2.appendChild(document.head, srcEl)
-          this.apiService.loadedLibraries.set(scriptObj.name, { counter: 1, src: srcEl })
-        }
-      })))
-        .then(() => resolve())
-        .catch(e => (console.warn(e), reject(e)))
-    })
-
-    this.apiService.interactiveViewer.pluginControl.unloadExternalLibraries = (libraries: string[]) =>
-      libraries
-        .filter((stringname) => SUPPORT_LIBRARY_MAP.get(stringname) !== null)
-        .forEach(libname => {
-          const ledger = this.apiService.loadedLibraries.get(libname!)
-          if (!ledger) {
-            console.warn('unload external libraries error. cannot find ledger entry...', libname, this.apiService.loadedLibraries)
-            return
-          }
-          if (ledger.src === null) {
-            console.log('webcomponents is native supported. no library needs to be unloaded')
-            return
-          }
-
-          if (ledger.counter - 1 == 0) {
-            this.rd2.removeChild(document.head, ledger.src)
-            this.apiService.loadedLibraries.delete(libname!)
-          } else {
-            this.apiService.loadedLibraries.set(libname!, { counter: ledger.counter - 1, src: ledger.src })
-          }
-        })
-
     this.meetsRequirement = this.meetsRequirements()
 
     this.subscriptions.push(
@@ -339,16 +281,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
+  /**
+   * For completeness sake. Root element should never be destroyed. 
+   */
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
-  }
-
-  ngAfterViewInit() {
-    this.widgetServices.floatingContainer = this.floatingContainer
-    this.widgetServices.dockedContainer = this.dockedContainer
-
-    this.pluginService.pluginViewContainerRef = this.pluginViewContainerRef
-    this.pluginService.appendSrc = (src: HTMLElement) => this.rd2.appendChild(document.head, src)
   }
 
   /**
@@ -358,9 +295,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
-    const message: any = {
-      Error: this.constantsService.minReqModalHeader
-    }
 
     if (!gl) {
       return false
@@ -407,19 +341,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
-  mousePos: [number, number] = [0, 0]
-
-  @HostListener('mousemove', ['$event'])
-  mousemove(event: MouseEvent) {
-    this.mousePos = [event.clientX, event.clientY]
-  }
-
   @HostBinding('attr.version')
   public _version : string = VERSION
-
-  get floatingMouseContextualContainerTransform() {
-    return `translate(${this.mousePos[0]}px,${this.mousePos[1]}px)`
-  }
 
   get isMobile(){
     return this.constantsService.mobile
