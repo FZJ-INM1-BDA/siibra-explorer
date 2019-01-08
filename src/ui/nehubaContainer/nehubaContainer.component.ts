@@ -349,7 +349,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     /* order of subscription will determine the order of execution */
     this.subscriptions.push(
-      this.newViewer$.subscribe((state)=>{
+      this.newViewer$.pipe(
+        map(state => {
+          const deepCopiedState = JSON.parse(JSON.stringify(state))
+          const navigation = deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation
+          navigation.zoomFactor = calculateSliceZoomFactor(navigation.zoomFactor)
+          deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation = navigation
+          return deepCopiedState
+        })
+      ).subscribe((state)=>{
 
         this.nehubaViewerSubscriptions.forEach(s=>s.unsubscribe())
 
@@ -652,6 +660,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private createNewNehuba(template:any){
 
+    /**
+     * TODO if plugin subscribes to viewerHandle, and then new template is selected, changes willl not be be sent
+     * could be considered as a bug. 
+     */
     this.apiService.interactiveViewer.viewerHandle = null
 
     this.viewerLoaded = true
@@ -1050,3 +1062,7 @@ export const userLmUnchanged = (oldlms, newlms) => {
   return oldlms.every(lm => singleLmUnchanged(lm, newmap as Map<string,[number,number,number]>))
     && newlms.every(lm => singleLmUnchanged(lm, oldmap as Map<string, [number,number,number]>))
 }
+
+export const calculateSliceZoomFactor = (originalZoom) => originalZoom
+  ? 700 * originalZoom / Math.min(window.innerHeight, window.innerWidth)
+  : 1e7
