@@ -587,9 +587,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
           
     //     })
     // }
-    this.elementRef.nativeElement.addEventListener('mousedown', event => {
-      console.log('mousedown', event)
-    }, true)
   }
 
   ngOnDestroy(){
