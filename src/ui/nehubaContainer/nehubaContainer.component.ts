@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef, HostListener } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry } from "../../services/stateStore.service";
@@ -587,6 +587,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
           
     //     })
     // }
+    this.elementRef.nativeElement.addEventListener('mousedown', event => {
+      console.log('mousedown', event)
+    }, true)
   }
 
   ngOnDestroy(){
@@ -806,11 +809,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
         fromEvent(this.elementRef.nativeElement,'mousemove').pipe(
           map((ev:MouseEvent)=>({eventName :'mousemove',event:ev}))
         ),
-
-        //TODO solve bug, mousedown does not get bubbled up because neuroglancer preventsPropagation
-        fromEvent(this.elementRef.nativeElement,'mousedown').pipe(
-          map((ev:MouseEvent)=>({eventName :'mousedown',event:ev}))
-        ),
+        /**
+         * neuroglancer prevents propagation, so use capture instead
+         */
+        Observable.create(observer => {
+          this.elementRef.nativeElement.addEventListener('mousedown', event => observer.next({eventName: 'mousedown', event}), true)
+        }) as Observable<{eventName: string, event: MouseEvent}>,
         fromEvent(this.elementRef.nativeElement,'mouseup').pipe(
           map((ev:MouseEvent)=>({eventName :'mouseup',event:ev}))
         ),
