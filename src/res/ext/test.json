@@ -1,0 +1,14 @@
+{
+  "name": "test",
+  "type": "template",
+  "species": "Human",
+  "useTheme": "dark",
+  "ngId": "greyscale",
+  "nehubaConfigURL": "res/json/testNehubaConfig.json",
+  "parcellations": [
+  ],
+  "properties": {
+    "name": "test",
+    "description": "test description"
+  }
+}

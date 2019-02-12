@@ -55,7 +55,8 @@ export class AtlasViewerConstantsServices{
     'res/json/colin.json',
     'res/json/MNI152.json',
     'res/json/waxholmRatV2_0.json',
-    'res/json/allenMouse.json'
+    'res/json/allenMouse.json',
+    'res/json/test.json'
   ]
 
   /* to be provided by KG in future */
@@ -187,6 +188,14 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     return `Did you encounter an issue? 
       Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>, 
       raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>`
+  }
+
+  incorrectParcellationNameSearchParam(title) {
+    return `The selected parcellation - ${title} - is not available. The the first parcellation of the template is selected instead.`
+  }
+
+  incorrectTemplateNameSearchParam(title) {
+    return `The selected template - ${title} - is not available.`
   }
 
   private supportEmailAddress = `x.gui@fz-juelich.de`

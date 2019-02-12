@@ -6,6 +6,7 @@ import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/o
 import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { ToastService } from "src/services/toastService.service";
 
 declare var window
 
@@ -21,7 +22,8 @@ export class AtlasViewerURLService{
   constructor(
     private store : Store<ViewerStateInterface>,
     private pluginService : PluginServices,
-    private constantService:AtlasViewerConstantsServices
+    private constantService:AtlasViewerConstantsServices,
+    private toastService: ToastService
   ){
 
     this.pluginState$ = this.store.pipe(
@@ -85,28 +87,65 @@ export class AtlasViewerURLService{
       /* first, check if any template and parcellations are to be loaded */
       const searchedTemplatename = searchparams.get('templateSelected')
       const searchedParcellationName = searchparams.get('parcellationSelected')
+
+      if (!searchedTemplatename) {
+        const urlString = window.location.href
+        /**
+         * TODO think of better way of doing this
+         */
+        history.replaceState(null, '', urlString.split('?')[0])
+        return
+      }
       
       const templateToLoad = fetchedTemplates.find(template=>template.name === searchedTemplatename)
-      if(!templateToLoad)
+      if (!templateToLoad) {
+        this.toastService.showToast(
+          this.constantService.incorrectTemplateNameSearchParam(searchedTemplatename),
+          {
+            timeout: 5000
+          }
+        )
+        const urlString = window.location.href
+        /**
+         * TODO think of better way of doing this
+         */
+        history.replaceState(null, '', urlString.split('?')[0])
         return
-      const parcellationToLoad = templateToLoad ? 
-        templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName) :
-        templateToLoad.parcellations[0]
+      }
+
+      /**
+       * TODO if search param of either template or parcellation is incorrect, wrong things are searched
+       */
+      const parcellationToLoad = templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName)
+
+      if (!parcellationToLoad) {
+        this.toastService.showToast(
+          this.constantService.incorrectParcellationNameSearchParam(searchedParcellationName),
+          {
+            timeout: 5000
+          }
+        )
+      }
       
       this.store.dispatch({
         type : NEWVIEWER,
         selectTemplate : templateToLoad,
-        selectParcellation : parcellationToLoad
+        selectParcellation : parcellationToLoad || templateToLoad.parcellations[0]
       })
 
       /* selected regions */
-      const labelIndexMap = getLabelIndexMap(parcellationToLoad.regions)
-      const selectedRegions = searchparams.get('regionsSelected')
-      if(selectedRegions){
-        this.store.dispatch({
-          type : SELECT_REGIONS,
-          selectRegions : selectedRegions.split('_').map(labelIndex=>labelIndexMap.get(Number(labelIndex)))
-        })
+      if (parcellationToLoad && parcellationToLoad.regions) {
+        /**
+         * either or both parcellationToLoad and .regions maybe empty
+         */
+        const labelIndexMap = getLabelIndexMap(parcellationToLoad.regions)
+        const selectedRegions = searchparams.get('regionsSelected')
+        if(selectedRegions){
+          this.store.dispatch({
+            type : SELECT_REGIONS,
+            selectRegions : selectedRegions.split('_').map(labelIndex=>labelIndexMap.get(Number(labelIndex)))
+          })
+        }
       }
       
       /* now that the parcellation is loaded, load the navigation state */

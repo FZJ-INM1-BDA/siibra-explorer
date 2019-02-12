@@ -132,6 +132,9 @@ export class AtlasBanner implements OnDestroy, OnInit {
   }
 
   handleParcellationChange(parcellation) {
+    if (!(parcellation && parcellation.regions)) {
+      return
+    }
     this.selectedParcellation = parcellation
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
   }

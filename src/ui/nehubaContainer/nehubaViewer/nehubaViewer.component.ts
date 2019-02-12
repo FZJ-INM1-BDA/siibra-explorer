@@ -80,9 +80,12 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this.constantService.loadExportNehubaPromise
       .then(() => {
-        const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
-        const dim = Math.min(sliceZoom * sliceViewportWidth, sliceZoom * sliceViewportHeight)
-        this._dim = [dim, dim, dim]
+        const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
+        if (fixedZoomPerspectiveSlices) {
+          const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = fixedZoomPerspectiveSlices
+          const dim = Math.min(sliceZoom * sliceViewportWidth, sliceZoom * sliceViewportHeight)
+          this._dim = [dim, dim, dim]
+        }
         this.patchNG()
         this.loadNehuba()
       })
@@ -300,6 +303,7 @@ export class NehubaViewerUnit implements OnDestroy{
   loadNehuba(){
     this.nehubaViewer = window['export_nehuba'].createNehubaViewer(this.config, (err)=>{
       /* print in debug mode */
+      console.log(err)
     })
 
     if(this.regionsLabelIndexMap){

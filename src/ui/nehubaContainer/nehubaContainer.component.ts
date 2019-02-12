@@ -353,6 +353,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
         map(state => {
           const deepCopiedState = JSON.parse(JSON.stringify(state))
           const navigation = deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation
+          if (!navigation) {
+            return deepCopiedState
+          }
           navigation.zoomFactor = calculateSliceZoomFactor(navigation.zoomFactor)
           deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation = navigation
           return deepCopiedState
@@ -646,6 +649,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
   }
 
   private handleParcellation(parcellation:any){
+    /**
+     * parcellaiton may be undefined
+     */
+    if ( !(parcellation && parcellation.regions)) {
+      return
+    }
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
     this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
 
