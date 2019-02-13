@@ -7,6 +7,7 @@ COPY . /iv
 WORKDIR /iv
 
 RUN npm i
+RUN npm run build-aot
 
 EXPOSE $PORT
 
