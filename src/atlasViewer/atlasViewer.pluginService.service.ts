@@ -107,7 +107,7 @@ export class PluginServices{
         const widgetCompRef = this.widgetService.addNewWidget(pluginUnit,{
           state : 'floating',
           exitable : true,
-          title : plugin.name
+          title : plugin.displayName || plugin.name
         })
 
         const unsubscribeOnPluginDestroy = []
@@ -171,6 +171,7 @@ export class PluginHandler{
 
 export interface PluginManifest{
   name? : string
+  displayName? : string
   templateURL? : string
   template? : string
   scriptURL? : string

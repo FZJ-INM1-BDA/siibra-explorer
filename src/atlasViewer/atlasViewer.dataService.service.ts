@@ -13,6 +13,9 @@ export class AtlasViewerDataService implements OnDestroy{
   
   private subscriptions : Subscription[] = []
 
+  /**
+   * TODO ensure 
+   */
   public promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve,reject)=>{
     Promise.all([
       PLUGINDEV
@@ -25,7 +28,7 @@ export class AtlasViewerDataService implements OnDestroy{
       )
         .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
     ])
-      .then(arr => resolve( [ ... arr[0], ... arr[1] ] ))
+      .then(arr => resolve( [].concat(arr[0]).concat(arr[1]) ))
       .catch(reject)
   })
   
