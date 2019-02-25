@@ -6,6 +6,7 @@ import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerServi
 import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, takeWhile } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
 import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
+import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 
 @Component({
   templateUrl : './nehubaViewer.template.html',
@@ -230,6 +231,15 @@ export class NehubaViewerUnit implements OnDestroy{
     return set
       ? set.size
       : 0
+  }
+
+  public applyPerformanceConfig ({ gpuLimit }: Partial<ViewerConfiguration>) {
+    if (gpuLimit && this.nehubaViewer) {
+      const limit = this.nehubaViewer.ngviewer.state.children.get('gpuMemoryLimit')
+      if (limit && limit.restoreState) {
+        limit.restoreState(gpuLimit)
+      }
+    }
   }
 
   /* required to check if correct landmarks are loaded */

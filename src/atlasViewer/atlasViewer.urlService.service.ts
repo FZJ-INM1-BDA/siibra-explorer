@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER, PluginInitManifestInterface } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, ADD_NG_LAYER } from "../services/stateStore.service";
+import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";

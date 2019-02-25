@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
 import { Subject } from "rxjs";
-
+import { ACTION_TYPES, ViewerConfiguration, viewerConfigState } from 'src/services/state/viewerConfig.store'
 
 @Injectable({
   providedIn : 'root'
@@ -138,6 +138,11 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   public toggleMessage: string = 'double click to toggle select'
 
   /**
+   * Observable for showing config modal
+   */
+  public showConfigSubject$: Subject<null> = new Subject()
+  public showConfigTitle: String = 'Settings'
+  /**
    * Observable for showing help modal
    */
   public showHelpSubject$: Subject<null> = new Subject()
@@ -209,6 +214,18 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
 
     /* https://stackoverflow.com/a/25394023/6059235 */
     this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
+
+    /**
+     * set gpu limit if user is on mobile
+     */
+    if (this.mobile) {
+      this.store.dispatch({
+        type: ACTION_TYPES.UPDATE_CONFIG,
+        config: {
+          gpuLimit: 2e8
+        } as Partial<ViewerConfiguration>
+      })  
+    }
 
     const meta = 'res/json/allAggregatedData.json'
   

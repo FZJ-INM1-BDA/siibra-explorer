@@ -8,6 +8,7 @@ import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasVie
 import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
+import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -28,6 +29,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
 
   public viewerLoaded : boolean = false
+
+  private viewerPerformanceConfig$: Observable<ViewerConfiguration>
 
   public sliceViewLoading0$: Observable<boolean>
   public sliceViewLoading1$: Observable<boolean>
@@ -81,6 +84,17 @@ export class NehubaContainer implements OnInit, OnDestroy{
     private store : Store<ViewerStateInterface>,
     private elementRef : ElementRef
   ){
+    this.viewerPerformanceConfig$ = this.store.pipe(
+      select('viewerConfigState'),
+      /**
+       * TODO: this is only a bandaid fix. Technically, we should also implement
+       * logic to take the previously set config to apply oninit
+       */
+      filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer)),
+      distinctUntilChanged(),
+      debounceTime(200)
+    )
+
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
 
     this.newViewer$ = this.store.pipe(
@@ -273,6 +287,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
   }
 
   ngOnInit(){
+
+    this.subscriptions.push(
+      this.viewerPerformanceConfig$.subscribe(config => {
+        this.nehubaViewer.applyPerformanceConfig(config)
+      })
+    )
 
     this.subscriptions.push(
       this.fetchedSpatialDatasets$.subscribe(datasets => {
@@ -882,6 +902,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
     /* extract the animation object */
     const { animation, ..._navigation } = navigation
 
+    /**
+     * remove keys that are falsy
+     */
+    Object.keys(_navigation).forEach(key => (!_navigation[key]) && delete _navigation[key])
+    
     if( animation ){
       /* animated */
 
@@ -981,28 +1006,28 @@ export class NehubaContainer implements OnInit, OnDestroy{
     return this.selectedTemplate && this.selectedTemplate.properties && this.selectedTemplate.properties.publications && this.selectedTemplate.properties.publications.constructor === Array
   }
 
-  resetNavigation(){
+  resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false} : {rotation: boolean, position: boolean, zoom: boolean}){
     const initialNgState = this.selectedTemplate.nehubaConfig.dataset.initialNgState
     
     const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
     const perspectiveOrientation = initialNgState ? initialNgState.perspectiveOrientation : undefined
-    const zoom = initialNgState ? 
-      initialNgState.navigation ?
-        initialNgState.navigation.zoomFactor :
-        undefined :
-      undefined
+    const zoom = (zoomFlag
+      && initialNgState
+      && initialNgState.navigation
+      && initialNgState.navigation.zoomFactor)
+      || undefined
 
-    const position = initialNgState ? 
-      initialNgState.navigation ?
-        initialNgState.navigation.pose ?
-          initialNgState.navigation.pose.position.voxelCoordinates ?
-            initialNgState.navigation.pose.position.voxelCoordinates :
-            undefined :
-          undefined :
-        undefined :
-      undefined
+    const position = (positionFlag
+      && initialNgState
+      && initialNgState.navigation
+      && initialNgState.navigation.pose
+      && initialNgState.navigation.pose.position.voxelCoordinates
+      && initialNgState.navigation.pose.position.voxelCoordinates)
+      || undefined
 
-    const orientation = [0,0,0,1]
+    const orientation = rotationFlag
+      ? [0,0,0,1]
+      : undefined
 
     this.store.dispatch({
       type : CHANGE_NAVIGATION,

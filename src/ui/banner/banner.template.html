@@ -1,15 +1,15 @@
 <dropdown-component
-  (itemSelected) = "selectTemplate($event)"
-  [activeDisplay] = "displayActiveTemplate"
-  [selectedItem] = "selectedTemplate"
-  [inputArray] = "loadedTemplates$ | async | filterNull">
+  (itemSelected)="selectTemplate($event)"
+  [activeDisplay]="displayActiveTemplate"
+  [selectedItem]="selectedTemplate"
+  [inputArray]="loadedTemplates$ | async | filterNull">
 
 </dropdown-component>
 
 <i 
-  *ngIf = "citationExists(selectedTemplate) && !isMobile" 
-  [toastLength] = "toastDuration"
-  [showToast] = "citation"
+  *ngIf="citationExists(selectedTemplate) && !isMobile" 
+  [toastLength]="toastDuration"
+  [showToast]="citation"
   class="glyphicon glyphicon-info-sign"
   #templateCitationAnchor>
 
@@ -18,24 +18,24 @@
       Citations for {{ selectedTemplate ? selectedTemplate.name : '' }} 
     </h4>
     <citations-component
-      [properties] = "selectedTemplate.properties">
+      [properties]="selectedTemplate.properties">
     </citations-component>
   </ng-template>
 
 </i>
 
 <dropdown-component
-  *ngIf = "selectedTemplate"
-  (itemSelected) = "selectParcellation($event)"
-  [activeDisplay] = "displayActiveParcellation"
-  [selectedItem] = "selectedParcellation"
-  [inputArray] = "selectedTemplate.parcellations">
+  *ngIf="selectedTemplate"
+  (itemSelected)="selectParcellation($event)"
+  [activeDisplay]="displayActiveParcellation"
+  [selectedItem]="selectedParcellation"
+  [inputArray]="selectedTemplate.parcellations">
 </dropdown-component>
 
 <i 
-  *ngIf = "citationExists(selectedParcellation) && !isMobile" 
-  [toastLength] = "toastDuration"
-  [showToast] = "citation"
+  *ngIf="citationExists(selectedParcellation) && !isMobile" 
+  [toastLength]="toastDuration"
+  [showToast]="citation"
   class="glyphicon glyphicon-info-sign"
   #parcellationCitationAnchor>
   <ng-template #citation>
@@ -43,49 +43,56 @@
       Citations for {{ selectedParcellation ? selectedParcellation.name : '' }} 
     </h4>
     <citations-component
-      [properties] = "selectedParcellation.properties">
+      [properties]="selectedParcellation.properties">
     </citations-component>
   </ng-template>
 </i>
 
 <div 
-  *ngIf = "selectedTemplate"
+  *ngIf="selectedTemplate"
   #searchRegionPopover
   searchRegionPopover>
 
   <input 
-    (keydown.esc) = "showRegionTree = false; $event.target.blur(); searchTerm = ''"
-    (focus) = "showRegionTree = true"
-    [value] = "searchTerm"
-    (input) = "changeSearchTerm($event)"
-    class = "form-control" 
+    (keydown.esc)="showRegionTree=false; $event.target.blur(); searchTerm=''"
+    (focus)="showRegionTree=true"
+    [value]="searchTerm"
+    (input)="changeSearchTerm($event)"
+    class="form-control" 
     type="text" 
     placeholder="Regions"/>
     
   <div 
     [@showState]
-    *ngIf = "showRegionTree" 
+    *ngIf="showRegionTree" 
     hideScrollbarContainer>
 
     <div treeContainer #treeContainer>
       <div treeHeader>
         <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
-        <span (click) = "clearRegions($event)" *ngIf = "selectedRegions.length > 0" class = "btn btn-link">clear all</span>
+        <span (click)="clearRegions($event)" *ngIf="selectedRegions.length > 0" class="btn btn-link">clear all</span>
       </div>
       
       <flat-tree-component 
-        [flatTreeViewPort] = "treeContainer"
-        (treeNodeClick) = "handleClickRegion($event)"
-        [inputItem] = "aggregatedRegionTree"
-        [renderNode] = "displayTreeNode.bind(this)"
-        [searchFilter] = "filterTreeBySearch.bind(this)">
+        [flatTreeViewPort]="treeContainer"
+        (treeNodeClick)="handleClickRegion($event)"
+        [inputItem]="aggregatedRegionTree"
+        [renderNode]="displayTreeNode.bind(this)"
+        [searchFilter]="filterTreeBySearch.bind(this)">
         
       </flat-tree-component>
     </div>
   </div>
 </div>
 
-<div *ngIf = "isMobile" class = "help-container">
-  <i (click) = "showHelp()" class="glyphicon glyphicon-question-sign"></i>
+<!-- help btn -->
+<div *ngIf="isMobile" class="help-container">
+  <i (click)="showHelp()" class="glyphicon glyphicon-question-sign"></i>
 </div>
-<i *ngIf = "!isMobile" (click) = "showHelp()" class="glyphicon glyphicon-question-sign"></i>
+<i *ngIf="!isMobile" (click)="showHelp()" class="glyphicon glyphicon-question-sign"></i>
+
+<!-- config btn -->
+<div *ngIf="isMobile" class="help-container">
+  <i (click)="showConfig()" class="glyphicon glyphicon-cog"></i>
+</div>
+<i *ngIf="!isMobile" (click)="showConfig()" class="glyphicon glyphicon-cog"></i>

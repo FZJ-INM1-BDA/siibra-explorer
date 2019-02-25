@@ -40,6 +40,7 @@ import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.com
 import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
 import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
+import { ConfigComponent } from './config/config.component'
 
 
 @NgModule({
@@ -73,6 +74,7 @@ import { HelpComponent } from "./help/help.component";
     TemplateParcellationCitationsContainer,
     MobileOverlay,
     HelpComponent,
+    ConfigComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -114,7 +116,8 @@ import { HelpComponent } from "./help/help.component";
     DatasetViewerComponent,
     TemplateParcellationCitationsContainer,
     MobileOverlay,
-    HelpComponent
+    HelpComponent,
+    ConfigComponent
   ]
 })
 

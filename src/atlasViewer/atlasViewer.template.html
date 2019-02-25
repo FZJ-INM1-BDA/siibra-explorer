@@ -179,7 +179,12 @@
 </div>
 
 <ng-template #helpComponent>
-  <help-component></help-component>
+  <help-component>
+  </help-component>
+</ng-template>
+<ng-template #viewerConfigComponent>
+  <config-component>
+  </config-component>
 </ng-template>
 
 <markdown-dom minReqMd *ngIf = "!meetsRequirement" [markdown] = "constantsService.minReqMD" >

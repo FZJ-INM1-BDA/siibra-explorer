@@ -288,6 +288,10 @@ export class AtlasBanner implements OnDestroy, OnInit {
     this.constantService.showHelpSubject$.next()
   }
 
+  showConfig() {
+    this.constantService.showConfigSubject$.next()
+  }
+
   get toastDuration() {
     return this.constantService.citationToastDuration
   }

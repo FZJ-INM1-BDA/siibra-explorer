@@ -33,6 +33,7 @@ export class AtlasViewer implements OnDestroy, OnInit {
   @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
+  @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
@@ -49,7 +50,8 @@ export class AtlasViewer implements OnDestroy, OnInit {
   private newViewer$: Observable<any>
 
   public selectedPOI$ : Observable<any[]>
-  public showHelp$: Observable<any>
+  private showHelp$: Observable<any>
+  private showConfig$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
@@ -92,6 +94,10 @@ export class AtlasViewer implements OnDestroy, OnInit {
     )
 
     this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
+      debounceTime(170)
+    )
+
+    this.showConfig$ = this.constantsService.showConfigSubject$.pipe(
       debounceTime(170)
     )
 
@@ -180,6 +186,17 @@ export class AtlasViewer implements OnDestroy, OnInit {
           }
         })
       )
+    )
+
+    this.subscriptions.push(
+      this.showConfig$.subscribe(() => {
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: this.constantsService.showConfigTitle,
+            template: this.viewerConfigComponent
+          }
+        })
+      })
     )
 
     this.subscriptions.push(

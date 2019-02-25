@@ -1,0 +1,24 @@
+<div class="input-group">
+  <span class="input-group-addon">
+    GPU Limit
+  </span>
+  <input
+    (wheel)="wheelEvent($event)"
+    type="number"
+    class="form-control"
+    [value]="gpuLimit$ | async ">
+  <div class="input-group-btn">
+    <div (click)="setGpuPreset({ value: 100 })" class="btn btn-default">
+      100
+    </div>
+    <div (click)="setGpuPreset({ value: 500 })" class="btn btn-default">
+      500
+    </div>
+    <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-default">
+      1000
+    </div>
+  </div>
+  <span class="input-group-addon">
+    MB
+  </span>
+</div>

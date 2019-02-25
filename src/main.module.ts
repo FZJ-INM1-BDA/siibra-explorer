@@ -4,7 +4,7 @@ import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule } from "@ngrx/store";
-import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState } from "./services/stateStore.service";
+import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, states } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
@@ -49,7 +49,7 @@ import { FloatingMouseContextualContainerDirective } from "./util/directives/flo
       spatialSearchState,
       uiState,
       ngViewerState,
-      pluginState
+      ...states
     })
   ],
   declarations : [

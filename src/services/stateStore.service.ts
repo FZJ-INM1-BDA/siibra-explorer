@@ -1,6 +1,13 @@
 import { Action } from '@ngrx/store'
 import { filter } from 'rxjs/operators';
 import { UserLandmark } from '../atlasViewer/atlasViewer.apiService.service';
+import { pluginState } from './state/pluginState.store'
+import { viewerConfigState } from './state/viewerConfig.store'
+
+export const states = {
+  pluginState,
+  viewerConfigState
+}
 
 export const NEWVIEWER = 'NEWVIEWER'
 
@@ -32,20 +39,10 @@ export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 
-export const SET_INIT_PLUGIN = `SET_INIT_PLUGIN`
 export const FETCHED_PLUGIN_MANIFESTS = `FETCHED_PLUGIN_MANIFESTS`
 export const LAUNCH_PLUGIN = `LAUNCH_PLUGIN`
 
-export interface PluginInitManifestInterface{
-  initManifests : Map<string,string|null>
-}
 
-export interface PluginInitManifestActionInterface extends Action{
-  manifest: {
-    name : string,
-    initManifestUrl : string | null
-  }
-}
 
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
@@ -119,39 +116,6 @@ export interface NgViewerStateInterface{
 export interface NgViewerAction extends Action{
   layer : NgLayerInterface
   forceShowSegment : boolean
-}
-
-
-/**
- * TODO unused function, remove
- */
-const mapLayer = (existingLayer:NgLayerInterface, incomingLayer:NgLayerInterface):NgLayerInterface => {
-  return incomingLayer.mixability === 'base'
-    ? existingLayer
-    : incomingLayer.mixability === 'mixable'
-      ? existingLayer.mixability === 'nonmixable'
-        ? Object.assign({}, existingLayer, {
-            visible : false
-          } as NgLayerInterface)
-        : existingLayer
-      /* incomingLayer.mixability === 'nonmixable' */
-      : existingLayer.mixability === 'base'
-        ? existingLayer
-        : Object.assign({}, existingLayer, {
-            visible : false
-          } as NgLayerInterface)
-}
-
-export function pluginState(prevState:PluginInitManifestInterface = {initManifests : new Map()}, action:PluginInitManifestActionInterface):PluginInitManifestInterface{
-  switch(action.type){
-    case SET_INIT_PLUGIN:
-      const newMap = new Map(prevState.initManifests)
-      return Object.assign({}, prevState, {
-        initManifests : newMap.set(action.manifest.name, action.manifest.initManifestUrl)
-      } as PluginInitManifestInterface)
-    default:
-      return prevState
-  }
 }
 
 export function ngViewerState(prevState:NgViewerStateInterface = {layers:[], forceShowSegment:null}, action:NgViewerAction):NgViewerStateInterface{
