@@ -4,10 +4,6 @@ import { UserLandmark } from '../atlasViewer/atlasViewer.apiService.service';
 import { pluginState } from './state/pluginState.store'
 import { viewerConfigState } from './state/viewerConfig.store'
 
-export const states = {
-  pluginState,
-  viewerConfigState
-}
 
 export const NEWVIEWER = 'NEWVIEWER'
 
@@ -452,4 +448,10 @@ export interface OtherLandmarkGeometry extends LandmarkGeometry{
 
 export function isDefined(obj){
   return typeof obj !== 'undefined' && obj !== null
+}
+
+
+export const exportedStates = {
+  pluginState,
+  viewerConfigState
 }

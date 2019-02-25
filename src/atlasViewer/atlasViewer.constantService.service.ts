@@ -56,7 +56,7 @@ export class AtlasViewerConstantsServices{
     'res/json/MNI152.json',
     'res/json/waxholmRatV2_0.json',
     'res/json/allenMouse.json',
-    'res/json/test.json'
+    // 'res/json/test.json'
   ]
 
   /* to be provided by KG in future */

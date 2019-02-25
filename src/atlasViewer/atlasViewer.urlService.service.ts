@@ -231,13 +231,27 @@ export class AtlasViewerURLService{
       this.pluginState$
     ).pipe(
       /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
-      map(([navigationState, niftiLayers, pluginState]) => Object.assign({}, navigationState, { pluginStates : Array.from(pluginState.initManifests.values()).filter(v => v !== null).length > 0 ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') : null }, { niftiLayers : niftiLayers.length > 0 ? niftiLayers.map(layer => layer.name).join('__') : null }))
+      map(([navigationState, niftiLayers, pluginState]) => {
+        return {
+          ...navigationState,
+          pluginState: Array.from(pluginState.initManifests.values()).filter(v => v !== null).length > 0 
+            ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') 
+            : null,
+          niftiLayers : niftiLayers.length > 0
+            ? niftiLayers.map(layer => layer.name).join('__')
+            : null
+        }
+      })
     ).subscribe(cleanedState=>{
       const url = new URL(window.location)
       const search = new URLSearchParams( window.location.search )
-      Object.keys(cleanedState).forEach(key=>{
-        cleanedState[key] ? search.set(key,cleanedState[key]) : search.delete(key)
-      })
+      for (const key in cleanedState) {
+        if (cleanedState[key]) {
+          search.set(key, cleanedState[key])
+        } else {
+          search.delete(key)
+        }
+      }
 
       url.search = search.toString()
       history.replaceState(null, '', url.toString())

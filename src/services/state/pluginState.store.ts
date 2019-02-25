@@ -19,7 +19,7 @@ export const ACTION_TYPES = {
 export function pluginState(prevState:PluginInitManifestInterface = {initManifests : new Map()}, action:PluginInitManifestActionInterface):PluginInitManifestInterface{
   switch(action.type){
     case ACTION_TYPES.SET_INIT_PLUGIN:
-      const newMap = new Map(prevState.initManifests)
+      const newMap = new Map(prevState.initManifests )
       return {
         ...prevState,
         initManifests: newMap.set(action.manifest.name, action.manifest.initManifestUrl)
