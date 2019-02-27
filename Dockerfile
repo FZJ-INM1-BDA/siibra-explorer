@@ -1,5 +1,8 @@
 FROM node:8 as builder
 
+ARG BACKEND_URL
+ENV BACKEND_URL=$BACKEND_URL
+
 COPY . /iv
 WORKDIR /iv
 
