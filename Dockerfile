@@ -7,11 +7,10 @@ COPY . /iv
 WORKDIR /iv
 
 ENV VERSION=devNext
-ENV NODE_ENV=production
 ENV DOCKER_BUILD=true
 
 RUN npm i
-RUN npm run docker-build-aot
+RUN npm run build-aot
 
 
 # prod container
@@ -19,6 +18,7 @@ FROM node:8-alpine
 
 ARG PORT
 ENV PORT=$PORT
+ENV NODE_ENV=production
 
 RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app
