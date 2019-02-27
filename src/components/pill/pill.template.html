@@ -1,0 +1,15 @@
+<div
+  [ngStyle]="containerStyle"
+  class="pill-container">
+  <span
+    class="pill-title">
+    {{ title }}
+  </span>
+  <span
+    [ngStyle]="closeBtnStyle"
+    class="pill-close"
+    (click)="close()"
+    *ngIf="showClose">
+    <i class="glyphicon glyphicon-remove"></i>
+  </span>
+</div>

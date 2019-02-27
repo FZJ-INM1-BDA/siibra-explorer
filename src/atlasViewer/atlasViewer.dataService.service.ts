@@ -1,8 +1,8 @@
-import { Injectable, OnDestroy, OnInit } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, FETCHED_TEMPLATE, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
 import { map, distinctUntilChanged } from "rxjs/operators";
-import { Subscription } from "rxjs";
+import { Subscription, combineLatest } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 import { PluginManifest } from "./atlasViewer.pluginService.service";
 
@@ -36,34 +36,37 @@ export class AtlasViewerDataService implements OnDestroy{
     private store : Store<ViewerStateInterface>,
     private constantService : AtlasViewerConstantsServices
   ){
-    this.constantService.templateUrls.map(url => 
-      this.constantService.raceFetch(url)
-        .then(res => res.json())
-        .then(json => new Promise((resolve, reject) => {
-          if(json.nehubaConfig)
-            resolve(json)
-          else if(json.nehubaConfigURL)
-            this.constantService.raceFetch(json.nehubaConfigURL)
-              .then(res => res.json())
-              .then(json2 => resolve(
-                Object.assign({}, json, { nehubaConfig: json2 })
-              ))
-              .catch(reject)
-          else
-            reject('neither nehubaConfig nor nehubaConfigURL defined')
-        }))
-        .then(json => this.store.dispatch({
-          type: FETCHED_TEMPLATE,
-          fetchedTemplate: json
-        }))
-        .catch(e => {
-          console.warn('fetching template url failed', e)
-          this.store.dispatch({
-            type: FETCHED_TEMPLATE,
-            fetchedTemplate: null
-          })
-        })
-      )
+    this.constantService.templateUrlsPr
+      .then(urls => 
+        urls.map(url => 
+          this.constantService.raceFetch(`${this.constantService.backendUrl}${url}`)
+            .then(res => res.json())
+            .then(json => new Promise((resolve, reject) => {
+              if(json.nehubaConfig)
+                resolve(json)
+              else if(json.nehubaConfigURL)
+                this.constantService.raceFetch(`${this.constantService.backendUrl}${json.nehubaConfigURL}`)
+                  .then(res => res.json())
+                  .then(json2 => resolve({
+                      ...json,
+                      nehubaConfig: json2
+                    }))
+                  .catch(reject)
+              else
+                reject('neither nehubaConfig nor nehubaConfigURL defined')
+            }))
+            .then(json => this.store.dispatch({
+              type: FETCHED_TEMPLATE,
+              fetchedTemplate: json
+            }))
+            .catch(e => {
+              console.warn('fetching template url failed', e)
+              this.store.dispatch({
+                type: FETCHED_TEMPLATE,
+                fetchedTemplate: null
+              })
+            })
+        ))
 
     this.init()
   }
@@ -89,7 +92,7 @@ export class AtlasViewerDataService implements OnDestroy{
     /* TODO future for template space? */
     const filterTemplateSpace = templateSpace == 'MNI Colin 27' ? 
       'datapath:metadata/sEEG-sample.json' :
-        templateSpace == 'Waxholm Rat V2.0' ?
+        templateSpace == 'Waxholm Space rat brain atlas v.2.0' ?
         'datapath:metadata/OSLO_sp_data_rev.json' :
           null
     
@@ -117,7 +120,7 @@ export class AtlasViewerDataService implements OnDestroy{
           })
         })
         .catch(console.error)
-    }else if (templateSpace === 'Allen Mouse'){
+    }else if (templateSpace === 'Allen adult mouse brain reference atlas V3'){
       return Promise.all([
         // 'res/json/allen3DVolumeAggregated.json',
         'res/json/allenTestPlane.json',
@@ -135,7 +138,7 @@ export class AtlasViewerDataService implements OnDestroy{
           })
         })
         .catch(console.error)
-    }else if (templateSpace === 'Waxholm Rat V2.0'){
+    }else if (templateSpace === 'Waxholm Space rat brain atlas v.2.0'){
       return Promise.all([
         // fetch('res/json/waxholmPlaneAggregatedData.json').then(res => res.json()),
         fetch('res/json/camillaWaxholmPointsAggregatedData.json').then(res => res.json())
@@ -194,23 +197,41 @@ export class AtlasViewerDataService implements OnDestroy{
       })
     }
 
-    const fetchData = (parcellationName : string) => {
-      const urlArrays = this.constantService.mapParcellationNameToFetchUrl.get(parcellationName)
-      urlArrays ?
-        Promise.all(urlArrays.map(url=>fetch(url).then(res=>res.json())))
-          .then(arr=>dispatchData(arr))
-          .catch(console.warn) :
-        dispatchData([])
+    const fetchData = (templateName : string, parcellationName: string) => {
+      dispatchData([])
+      const encodedTemplateName = encodeURI(templateName)
+      const encodedParcellationName = encodeURI(parcellationName)
+      Promise.all([
+        fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`)
+          .then(res => res.json()),
+        fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`)
+          .then(res => res.json())
+      ])
+        .then(arr => [...arr[0], ...arr[1]])
+        .then(arr => arr.reduce((acc, item) => {
+          const newMap = new Map(acc)
+          return newMap.set(item.name, item)
+        }, new Map()))
+        .then(map => Array.from(map.values()))
+        .then(dispatchData)
+        .catch(console.warn)
     }
-      
+
     this.subscriptions.push(
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('parcellationSelected'),
-        map(({parcellationSelected})=>(parcellationSelected.name)),
-        distinctUntilChanged()
-      )
-        .subscribe(fetchData)
+      combineLatest(
+        this.store.pipe(
+          select('viewerState'),
+          safeFilter('templateSelected'),
+          map(({templateSelected})=>(templateSelected.name)),
+          distinctUntilChanged()
+        ),
+        this.store.pipe(
+          select('viewerState'),
+          safeFilter('parcellationSelected'),
+          map(({parcellationSelected})=>(parcellationSelected.name)),
+          distinctUntilChanged()
+        )
+      ).subscribe((param : [string, string] ) => fetchData(param[0], param[1]))
     )
   }
 

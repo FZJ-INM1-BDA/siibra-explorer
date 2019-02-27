@@ -48,8 +48,23 @@ export class AtlasViewerConstantsServices{
       prevLandmarks.length === newLandmarks.length
   }
 
+  public backendUrl = BACKEND_URL
+
   /* to be provided by KG in future */
-  public templateUrls = [
+  public templateUrlsPr : Promise<string[]> = new Promise((resolve, reject) => {
+    fetch(`${this.backendUrl}templates`)
+      .then(res => res.json())
+      .then(arr => {
+        this.templateUrls = arr
+        return arr
+      })
+      .then(resolve)
+      .catch(reject)
+  })
+
+  public templateUrls = Array(100)
+
+  private _templateUrls = [
     // 'res/json/infant.json',
     'res/json/bigbrain.json',
     'res/json/colin.json',
@@ -74,7 +89,7 @@ export class AtlasViewerConstantsServices{
       ]
     ],
     [
-      'Allen Mouse Brain Atlas',
+      'Allen adult mouse brain reference atlas V3 Brain Atlas',
       [
         'res/json/allenAggregated.json'
       ]

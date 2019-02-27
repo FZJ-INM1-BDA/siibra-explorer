@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input } from "@angular/core";
+import { DataEntry } from "src/services/stateStore.service";
 
 @Component({
   selector : 'kg-entry-viewer',
@@ -8,33 +9,11 @@ import { Component, Input, OnInit } from "@angular/core";
   ]
 })
 
-export class KgEntryViewer implements OnInit{
-  @Input() kgQueryString : string = null
+export class KgEntryViewer {
+  @Input() dataset: DataEntry
 
   public kgData : any = null
   public kgError : any = null
-
-  ngOnInit(){
-    if(this.kgQueryString){
-      fetch(`${KGROOT}${this.kgQueryString}`)
-        .then(res => res.json())
-        .then(json => {
-          if(json.found)
-            return json._source
-          else
-            throw new Error('No documents were found.')
-        })
-        .then(json => this.kgData = json)
-        .catch(e => {
-          console.error('fetching KG data error', e)
-          this.kgData = null
-          this.kgError = JSON.stringify(e)
-        })
-    }else{
-      console.error('kgQueryString empty!')
-      this.kgError = 'Knowledge Graph ID empty'
-    }
-  }
 
   get tableColClass1(){
     return `col-xs-4 col-lg-4 tableEntry`
@@ -44,13 +23,7 @@ export class KgEntryViewer implements OnInit{
     return `col-xs-8 col-lg-8 tableEntry`
   }
 
-  get kgHref(){
-    return `https://kg.humanbrainproject.org/webapp/#${this.kgQueryString}`
-  }
-
   public isArray(v){
     return v.constructor === Array
   }
 }
-
-const KGROOT = `https://kg.humanbrainproject.org/proxy/default/kg/`

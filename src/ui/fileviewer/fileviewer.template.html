@@ -3,20 +3,15 @@
 </div>
 
 <!-- KG Entry Viewer -->
-<kg-entry-viewer *ngIf = "searchResultFile.kgID && false" [kgQueryString] = "searchResultFile.kgID">
-
-</kg-entry-viewer>
+<!-- <kg-entry-viewer *ngIf = "searchResultFile.kgID && false" [dataset] = "searchResultFile">
+</kg-entry-viewer> -->
 
 <!-- citation -->
-<div style="margin:1em" *ngIf="searchResultFile && !searchResultFile.kgID && searchResultFile.properties && searchResultFile.properties.publications && searchResultFile.properties.publications.length > 0">
-  <h5>
-    Citations for this dataset:
-  </h5>
-  <citations-component 
-    citationContainer
-    [properties] = "searchResultFile.properties">
-  </citations-component>
-</div>
+<!-- <citations-component 
+  citationContainer
+  *ngIf = "searchResultFile && !searchResultFile.kgID"
+  [properties] = "searchResultFile.datasetProperties">
+</citations-component> -->
 
 <!-- file viewer -->
 <div 
@@ -82,11 +77,11 @@
 </div>
 
 <!-- caption -->
-<readmore-component *ngIf = "searchResultFile.properties && searchResultFile.properties.description">
+<!-- <readmore-component *ngIf = "searchResultFile.properties && searchResultFile.properties.description">
   <small id = "captions">
     {{ searchResultFile.properties.description }}
   </small>
-</readmore-component>
+</readmore-component> -->
 
 <div anchorContainer *ngIf = "downloadUrl">
   <a [href]="downloadUrl" target = "_blank" download>Download File</a>

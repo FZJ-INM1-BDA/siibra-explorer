@@ -3,14 +3,15 @@ FROM node:8 as builder
 COPY . /iv
 WORKDIR /iv
 
-ENV VERSION=test
+ENV VERSION=devNext
+ENV NODE_ENV=production
+ENV DOCKER_BUILD=true
 
 RUN npm i
 RUN npm run build-aot
 
 
 # prod container
-
 FROM node:8-alpine 
 
 ARG PORT
@@ -19,10 +20,17 @@ ENV PORT=$PORT
 RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app
 WORKDIR /iv-app
-COPY --from=builder /iv/dist .
+
+# Copy built interactive viewer
+COPY --from=builder /iv/dist/aot ./public
+
+# Copy the express server
+COPY --from=builder /iv/deploy .
+
+# Copy the resources files needed to respond to queries
+COPY --from=builder /iv/src/res/ext ./res
+RUN npm i
 
 EXPOSE $PORT
-
-RUN npm i express
 
 ENTRYPOINT [ "node", "server.js" ]

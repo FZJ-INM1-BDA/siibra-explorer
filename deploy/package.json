@@ -1,0 +1,20 @@
+{
+  "name": "deploy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.4",
+    "openid-client": "^2.4.5"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0"
+  }
+}

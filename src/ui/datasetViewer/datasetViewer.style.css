@@ -8,3 +8,8 @@ flat-tree-component
 {
   border-color: rgba(0, 0, 0, 0.5);
 }
+
+.dataset-pill
+{
+  font-size:80%;
+}

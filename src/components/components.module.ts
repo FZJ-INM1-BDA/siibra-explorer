@@ -24,6 +24,7 @@ import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pi
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
+import { PillComponent } from './pill/pill.component';
 
 
 @NgModule({
@@ -43,6 +44,7 @@ import { TimerComponent } from './timer/timer.component';
     ToastComponent,
     FlatTreeComponent,
     TimerComponent,
+    PillComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -71,6 +73,7 @@ import { TimerComponent } from './timer/timer.component';
     ToastComponent,
     FlatTreeComponent,
     TimerComponent,
+    PillComponent,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

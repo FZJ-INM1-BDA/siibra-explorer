@@ -3,7 +3,6 @@ import { Store, select } from "@ngrx/store";
 import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { HasPathProperty } from "../../util/pipes/pathToNestedChildren.pipe";
-import { TreeComponent } from "../../components/tree/tree.component";
 import { Observable, Subscription, combineLatest } from "rxjs";
 import { FileViewer } from "../fileviewer/fileviewer.component";
 import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
@@ -21,7 +20,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
   private fileViewerComponentFactory : ComponentFactory<FileViewer>
 
-  hitsPerPage : number = 15
+  hitsPerPage : number = 5
   currentPage :  number = 0
 
   metadataMap : Map<string,Map<string,{properties:Property}>>
@@ -42,13 +41,21 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   public selectedPOI$ : Observable<any[]>
 
   private metadataMap$ : Observable<any>
-  private fetchedDataEntries$ : Observable<any>
+  public fetchedDataEntries$ : Observable<any>
   private selectParcellation$ : Observable<any>
   private dedicatedViewString$ : Observable<string|null>
   private spatialDataEntries$ : Observable<any[]>
   private spatialPagination$ : Observable<{spatialSearchPagination:number,spatialSearchTotalResults:number}>
 
   private subscriptions : Subscription[] = []
+
+  get showDataTypes(){
+    const availableDatatypes = new Set(this.dataEntries
+      .map(de => de.formats)
+      .reduce((acc, item) => acc.concat(item), [])
+      .filter(type => !this.hideDataTypes.has(type)))
+    return availableDatatypes
+  }
 
   constructor(
     private cfr : ComponentFactoryResolver,
@@ -162,6 +169,13 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     return this.constantService.spatialResultsPerPage
   }
 
+  deselectRegion(region:any){
+    this.store.dispatch({
+      type: DESELECT_REGIONS,
+      deselectRegions: [region]
+    })
+  }
+
   toggleSpatialDataVisible(){
     this.store.dispatch({
       type : UPDATE_SPATIAL_DATA_VISIBLE,
@@ -226,8 +240,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
   handleFlatTreeNodeClick(payload:{dataset:DataEntry, file:File}){
     const { dataset, file } = payload
-    const { properties, kgID } = dataset
-    if(file.mimetype){
+    if(dataset.formats.findIndex(format => format.toLowerCase() === 'nifti' ) >= 0){
 
       // TODO use KG id in future
       if(this.dataWindowRegistry.has(file.name)){
@@ -238,7 +251,7 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       this.dataWindowRegistry.add(file.name)
 
       const component = this.fileViewerComponentFactory.create(this.injector)
-      component.instance.searchResultFile = Object.assign({}, file, { datasetProperties : properties }, kgID ? { kgID } : {})
+      component.instance.searchResultFile = file
       const compref = this.widgetServices.addNewWidget(component,{title:file.name,exitable:true,state:'floating'})
 
       /* on destroy, removes name from registry */

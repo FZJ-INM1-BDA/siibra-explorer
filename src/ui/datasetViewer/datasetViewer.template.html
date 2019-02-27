@@ -1,30 +1,39 @@
 <div *ngIf = "dataset; else defaultDisplay">
+
+  <pill-component
+    class="dataset-pill"
+    [title]="format"
+    [showClose]="false"
+    *ngFor="let format of dataset.formats">
+
+  </pill-component>
+  
   <h4 title>
     {{ dataset.name }}
   </h4>
-  <kg-entry-viewer *ngIf = "dataset.kgID; else noKgID" [kgQueryString] = "dataset.kgID">
+  <kg-entry-viewer [dataset]="dataset">
 
   </kg-entry-viewer>
 
-  <hr />
-  <h5>
-    Preview Dataset
-  </h5>
-  <flat-tree-component
-    #flatTreeNode
-    *ngFor = "let item of dataset.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
-    [childrenExpanded] = "false"
-    [renderNode] = "renderNode"
-    [inputItem] = " item "
-    (treeNodeClick)= "previewFileClick($event, flatTreeNode)">
+  <div *ngIf="false">
 
-  </flat-tree-component>
-  <hr />
+      <hr />
+      <h5>
+        Preview Dataset
+      </h5>
+      <flat-tree-component
+        #flatTreeNode
+        *ngFor = "let item of dataset.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
+        [childrenExpanded] = "false"
+        [renderNode] = "renderNode"
+        [inputItem] = " item "
+        (treeNodeClick)= "previewFileClick($event, flatTreeNode)">
+    
+      </flat-tree-component>
+      <hr />
+  </div>
 </div>
 
 <ng-template #defaultDisplay>
   Nothing to display ...
-</ng-template>
-
-<ng-template #noKgID>
 </ng-template>

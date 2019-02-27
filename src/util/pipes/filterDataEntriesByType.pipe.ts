@@ -7,7 +7,7 @@ import { DataEntry } from "../../services/stateStore.service";
 })
 
 export class FilterDataEntriesbyType implements PipeTransform{
-  public transform(dataEntries:DataEntry[],hideTypeSet:Set<string>):DataEntry[]{
-    return dataEntries.filter(dataEntry=>!hideTypeSet.has(dataEntry.type))
+  public transform(dataEntries:DataEntry[],showDataType:Set<string>):DataEntry[]{
+    return dataEntries.filter(dataEntry=>dataEntry.formats.some(format => showDataType.has(format)))
   }
 }

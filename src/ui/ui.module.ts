@@ -17,7 +17,9 @@ import { RadarChart } from "./fileviewer/radar/radar.chart.component";
 import { LineChart } from "./fileviewer/line/line.chart.component";
 import { PathToNestedChildren } from "../util/pipes/pathToNestedChildren.pipe";
 import { CopyPropertyPipe } from "../util/pipes/copyProperty.pipe";
-import { GetUniqueProperty } from "../util/pipes/getUniqueProperty.pipe";
+import { GetPropMapPipe } from "../util/pipes/getPropMap.pipe";
+import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
+
 import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.pipe";
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
@@ -41,6 +43,8 @@ import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
 import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
+import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
+import { FilterDataEntriesByRegion } from "src/util/pipes/filterDataEntriesByRegion.pipe";
 
 
 @NgModule({
@@ -81,8 +85,11 @@ import { ConfigComponent } from './config/config.component'
     filterRegionDataEntries,
     PathToNestedChildren,
     CopyPropertyPipe,
-    GetUniqueProperty,
+    GetPropMapPipe,
+    GetUniquePipe,
+    FlatmapArrayPipe,
     FilterDataEntriesbyType,
+    FilterDataEntriesByRegion,
     SafeStylePipe,
     GetLayerNameFromDatasets,
     SortDataEntriesToRegion,

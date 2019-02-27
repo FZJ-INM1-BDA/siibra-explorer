@@ -71,3 +71,8 @@ div.btn.btn-primary:before
 
   pointer-events: none;
 }
+
+.pagination-control
+{
+  font-size:80%;
+}

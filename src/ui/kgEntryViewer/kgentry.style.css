@@ -22,9 +22,13 @@ div[container]
   overflow:hidden;
 }
 
-a[linkToKG]
+a[link]
 {
   display: inline-block;
   margin-top: 1rem;
-  white-space: nowrap;
+}
+
+a[link]:hover
+{
+  text-decoration: none;
 }

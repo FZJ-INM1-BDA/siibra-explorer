@@ -370,29 +370,51 @@ export interface DedicatedViewAction extends Action{
   dedicatedView : string | null
 }
 
+export interface KgInfo{
+  kgId?: string
+  descrption? : string
+  /**
+   * perhaps have contributors as a separate interface?
+   */
+  contributors? : string[]
+  publications?: Publication[]
+  preparations?: string[]
+  methods?: string[]
+  license?: string
+  files? : File[]
+
+  kgUri? : string
+}
+
 export interface DataEntry{
-  type : string
-  name : string
-  kgID? : string
-  regionName : {
-    regionName : string,
-    relationship : string
-  }[]
-
-  properties : Property
-
+  name: string
+  description: string
+  license: string[]
+  licenseInfo: string[]
+  parcellationRegion: ParcellationRegion[]
+  formats: string[]
+  custodians: string[]
+  contributors: string[]
+  referenceSpaces: ReferenceSpace[]
   files : File[]
+  publications: Publication[]
+  embargoStatus: string[]
+
+  /**
+   * TODO typo, should be kgReferences
+   */
+  kgReference: string[]
 }
 
 export interface File{
-  filename : string
-  name : string
-  mimetype : string
-  url? : string
-  data? : any
-  kgID? : string
-  targetParcellation : string
-  properties : any
+  name: string
+  absolutePath: string
+  byteSize: number
+  contentType: string
+}
+
+export interface FileSupplementData{
+  data: any
 }
 
 export interface Property{
@@ -401,8 +423,9 @@ export interface Property{
 }
 
 export interface Publication{
+  name: string
   doi : string
-  citation : string
+  cite : string
 }
 
 export interface UIStateInterface{
@@ -454,4 +477,12 @@ export function isDefined(obj){
 export const exportedStates = {
   pluginState,
   viewerConfigState
+}
+
+export interface ParcellationRegion {
+  name: string
+}
+
+export interface ReferenceSpace {
+  name: string
 }

@@ -33,7 +33,7 @@ export class DedicatedViewer implements OnDestroy{
   }
 
   get isShowing(){
-    return this.ngLayers.has(`nifti://${this.searchResultFile.url}`)
+    return this.ngLayers.has(`nifti://${this.searchResultFile.absolutePath}`)
   }
 
   ngOnDestroy(){
@@ -44,8 +44,8 @@ export class DedicatedViewer implements OnDestroy{
     this.store.dispatch({
       type : ADD_NG_LAYER,
       layer : {
-        name : this.searchResultFile.url,
-        source : `nifti://${this.searchResultFile.url}`,
+        name : this.searchResultFile.absolutePath,
+        source : `nifti://${this.searchResultFile.absolutePath}`,
         mixability : 'nonmixable',
         shader : getActiveColorMapFragmentMain()
       }
@@ -62,7 +62,7 @@ export class DedicatedViewer implements OnDestroy{
     this.store.dispatch({
       type : REMOVE_NG_LAYER,
       layer : {
-        name : this.searchResultFile.url
+        name : this.searchResultFile.absolutePath
       }
     })
   }

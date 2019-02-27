@@ -1,23 +1,10 @@
-<!-- Header -->
-<div *ngIf = "selectedPOI$ | async" databrowserheader>
-  <span>
-    {{ !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest'  }} 
-  </span>
-  <small
-    *ngIf = "(selectedPOI$ | async).length > 0"
-    class = "btn btn-link"
-    (click) = "clearAllPOIs()">
-    clear all
-  </small>
-</div>
-
 <!-- Filter -->
 <div filterBlock>
   <div>
-    Filter
+    Filter {{ dataEntries.length }}
   </div>
   <div
-    *ngFor = "let type of dataEntries | getUniqueProperty : 'type' "
+    *ngFor = "let type of dataEntries | getPropMapPipe : 'formats' | flatmapArrayPipe | getUniquePipe "
     class = "clickable"
     (click)="toggleTypeVisibility(type)">
     <small>
@@ -45,10 +32,20 @@
       Spatial Search
     </small>
   </div>
+
+  <pill-component
+    [containerStyle]="{backgroundColor:'rgba(128,128,128,0.2)'}"
+    [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
+    (closeClicked)="deselectRegion(region)"
+    [title]="region.name"
+    *ngFor="let region of selectedRegions$ | async">
+  </pill-component>
 </div>
 
 <!-- Data -->
-<div *ngIf = "spatialDataVisible && false">
+
+<!-- spatial search -->
+<div *ngIf = "false && spatialDataVisible">
   <panel-component [collapseBody] = "true" [bodyCollapsable] = "true">
     <div heading>
       <span>
@@ -79,8 +76,22 @@
     </div>
   </panel-component>
 </div>
+
+<!-- other data -->
+<pagination-component
+  (paginationChange)="currentPage = $event"
+  [hitsPerPage]="hitsPerPage"
+  [total]="(fetchedDataEntries$ | async | filterDataEntriesByType : showDataTypes | filterDataEntriesByRegion : (selectedRegions$ | async)).length"
+  [currentPage]="currentPage">
+</pagination-component>
+<dataset-viewer
+  *ngFor="let dataset of fetchedDataEntries$ | async | filterDataEntriesByType : showDataTypes | filterDataEntriesByRegion : (selectedRegions$ | async) | searchResultPagination : currentPage : hitsPerPage"
+  (launchFileViewer) = "handleFlatTreeNodeClick($event)"
+  [dataset] = "dataset">
+
+</dataset-viewer>
 <div 
-  *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0; else noSelectedRegion"
+  *ngIf = "false && (selectedPOI$ | async) && (selectedPOI$ | async).length > 0"
   regionsContainer>
 
   <div
@@ -89,7 +100,7 @@
     <panel-component 
       [collapseBody] = "true"
       [bodyCollapsable] = "true">
-      <div [ngClass] = "(data.searchResults | filterDataEntriesByType : hideDataTypes).length === 0 ? 'noResultClass' : ''" 
+      <div [ngClass] = "(data.searchResults | filterDataEntriesByType : showDataTypes).length === 0 ? 'noResultClass' : ''" 
         displayflex
         heading>
         <div maintext>

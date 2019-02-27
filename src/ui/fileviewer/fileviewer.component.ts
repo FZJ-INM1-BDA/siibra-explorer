@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, ViewChild, ElementRef, OnInit, Output, EventEmitter } from '@angular/core'
 
 import { DomSanitizer } from '@angular/platform-browser';
-import { File } from '../../services/stateStore.service';
+import { File, FileSupplementData } from '../../services/stateStore.service';
 import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
 
@@ -14,7 +14,14 @@ import { switchMap,take,retry } from 'rxjs/operators'
 })
 
 export class FileViewer implements OnChanges,OnDestroy,OnInit{
+  /**
+   * fetched directly from KG
+   */
   @Input() searchResultFile : File
+  /**
+   * currently going to have to be application specific
+   */
+  @Input() fileSupplement: FileSupplementData
   
   @ViewChild('childChart') childChart : ChartComponentInterface
 
@@ -39,8 +46,8 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   }
 
   get downloadUrl(){
-    return this.searchResultFile.url ? 
-      this.searchResultFile.url : 
+    return this.searchResultFile.absolutePath ? 
+      this.searchResultFile.absolutePath : 
       this._downloadUrl ? 
         this.sanitizer.bypassSecurityTrustResourceUrl(this._downloadUrl)  :
         null
@@ -69,8 +76,8 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
     },(err)=>console.warn('warning',err))
 
 
-    if(!this.searchResultFile.url && this.searchResultFile.data){
-      const stringJson = JSON.stringify(this.searchResultFile.data)
+    if(!this.searchResultFile.absolutePath && this.fileSupplement.data){
+      const stringJson = JSON.stringify(this.fileSupplement.data)
       const newBlob = new Blob([stringJson],{type:'application/octet-stream'})
       this._downloadUrl = URL.createObjectURL(newBlob)
     }
@@ -86,7 +93,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   }
 
   get downloadName(){
-    return this.searchResultFile.filename
+    return this.searchResultFile.name
   }
 
   get downloadPng(){
