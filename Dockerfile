@@ -11,7 +11,7 @@ ENV NODE_ENV=production
 ENV DOCKER_BUILD=true
 
 RUN npm i
-RUN npm run build-aot
+RUN npm run docker-build-aot
 
 
 # prod container
