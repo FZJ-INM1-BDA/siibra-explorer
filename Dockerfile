@@ -7,7 +7,6 @@ COPY . /iv
 WORKDIR /iv
 
 ENV VERSION=devNext
-ENV DOCKER_BUILD=true
 
 RUN npm i
 RUN npm run build-aot
@@ -19,6 +18,7 @@ FROM node:8-alpine
 ARG PORT
 ENV PORT=$PORT
 ENV NODE_ENV=production
+ENV DOCKER_BUILD=true
 
 RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app
