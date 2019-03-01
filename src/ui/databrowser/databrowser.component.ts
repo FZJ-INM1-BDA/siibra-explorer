@@ -3,7 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { DataStateInterface, Property, safeFilter, DataEntry, File, SELECT_REGIONS, getLabelIndexMap, isDefined, SPATIAL_GOTO_PAGE, CHANGE_NAVIGATION, UPDATE_SPATIAL_DATA_VISIBLE, DESELECT_REGIONS, DESELECT_LANDMARKS, SELECT_LANDMARKS } from "../../services/stateStore.service";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { HasPathProperty } from "../../util/pipes/pathToNestedChildren.pipe";
-import { Observable, Subscription, combineLatest } from "rxjs";
+import { Observable, Subscription, combineLatest, Subject } from "rxjs";
 import { FileViewer } from "../fileviewer/fileviewer.component";
 import { WidgetServices } from "../../atlasViewer/widgetUnit/widgetService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
@@ -47,6 +47,12 @@ export class DataBrowserUI implements OnDestroy,OnInit{
   private spatialDataEntries$ : Observable<any[]>
   private spatialPagination$ : Observable<{spatialSearchPagination:number,spatialSearchTotalResults:number}>
 
+  /**
+   * TODO filter types
+   */
+  public filterApplied$: Observable<any>
+  private typeVisibility$: Subject<Set<String>> = new Subject()
+
   private subscriptions : Subscription[] = []
 
   get showDataTypes(){
@@ -86,6 +92,10 @@ export class DataBrowserUI implements OnDestroy,OnInit{
       map(results => [...results[0], ...results[1]])
     )
     
+    this.filterApplied$ = combineLatest(
+      this.selectedRegions$,
+      this.typeVisibility$
+    )
 
     this.metadataMap$ = this.store.pipe(
       select('dataStore'),
@@ -149,6 +159,10 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
     this.subscriptions.push(
       this.spatialPagination$.subscribe(this.handleSpatialPaginationChange.bind(this))
+    )
+
+    this.subscriptions.push(
+      this.filterApplied$.subscribe(() => this.currentPage = 0)
     )
   }
 
@@ -285,6 +299,8 @@ export class DataBrowserUI implements OnDestroy,OnInit{
     this.hideDataTypes = new Set(
       [...this.hideDataTypes]
     )
+
+    this.typeVisibility$.next(new Set([...this.hideDataTypes]))
   }
 
   gothere(event:MouseEvent,position:any){

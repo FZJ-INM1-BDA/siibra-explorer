@@ -14,7 +14,7 @@ const nehubaConfigRouter = require('./nehubaConfig')
 const datasetRouter = require('./datasets')
 const catchError = require('./catchError')
 
-const publicPath = process.env.DOCKER_BUILD
+const publicPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
 

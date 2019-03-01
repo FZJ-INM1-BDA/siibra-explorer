@@ -18,7 +18,6 @@ FROM node:8-alpine
 ARG PORT
 ENV PORT=$PORT
 ENV NODE_ENV=production
-ENV DOCKER_BUILD=true
 
 RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app

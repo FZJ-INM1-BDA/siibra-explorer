@@ -14,10 +14,11 @@ export class FilterDataEntriesByRegion implements PipeTransform{
             /**
              * TODO: temporary hack, some dataset region name is not exactly the same as region
              */
-            const regex = new RegExp(pr.name)
+            /* https://stackoverflow.com/a/9310752/6059235 */
+            const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'))
             return selectedRegions.some(sr => regex.test(sr.name))
             /**
-             * more correct
+             * more correct, but probably should use UUID in the future
              */
             return selectedRegions.some(sr => sr.name === pr.name)
           })
