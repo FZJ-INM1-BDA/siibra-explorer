@@ -4,7 +4,7 @@ const path = require('path')
 
 let cachedData = null
 let otherQueryResult = null
-const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg-int.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
+const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
 const timeout = process.env.TIMEOUT || 5000
 
 const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
@@ -91,7 +91,7 @@ readConfigFile('MNI152.json')
 
 const filterByPRs = (prs, atlasPr) => atlasPr
   ? prs.some(pr => {
-      const regex = new RegExp((pr.name))
+      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'))
       return atlasPr.some(aPr => regex.test(aPr.name))
     })
   : false
