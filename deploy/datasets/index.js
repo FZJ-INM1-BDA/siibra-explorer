@@ -6,6 +6,11 @@ init().catch(e => {
   console.warn(`dataset init failed`, e)
 })
 
+datasetsRouter.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-cache')
+  next()
+})
+
 datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
   const { templateName } = req.params
   getDatasets({ templateName })
