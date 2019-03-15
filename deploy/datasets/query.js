@@ -11,8 +11,12 @@ const fetchDatasetFromKg = () => new Promise((resolve, reject) => {
   request(queryUrl, (err, resp, body) => {
     if (err)
       return reject(err)
-    const json = JSON.parse(body)
-    resolve(json)
+    try {
+      const json = JSON.parse(body)
+      return resolve(json)
+    } catch (e) {
+      return reject(e)
+    }
   })
 })
 
