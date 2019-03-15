@@ -34,6 +34,7 @@ export class AtlasViewer implements OnDestroy, OnInit {
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
+  @ViewChild('loginComponent', {read: TemplateRef}) loginComponent: TemplateRef <any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer

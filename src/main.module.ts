@@ -32,6 +32,7 @@ import { DockedContainerDirective } from "./util/directives/dockedContainer.dire
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
+import { AuthService } from "./services/auth.service";
 
 @NgModule({
   imports : [
@@ -94,6 +95,7 @@ import { FloatingMouseContextualContainerDirective } from "./util/directives/flo
     AtlasViewerAPIServices,
     ToastService,
     AtlasWorkerService,
+    AuthService
   ],
   bootstrap : [
     AtlasViewer
@@ -101,4 +103,10 @@ import { FloatingMouseContextualContainerDirective } from "./util/directives/flo
 })
 
 export class MainModule{
+  
+  constructor(
+    authServce: AuthService
+  ){
+    authServce.authReloadState()
+  }
 }

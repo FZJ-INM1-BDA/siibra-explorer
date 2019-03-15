@@ -6,12 +6,14 @@ import { map, filter, debounceTime, buffer, distinctUntilChanged } from "rxjs/op
 import { FilterNameBySearch } from "../../util/pipes/filterNameBySearch.pipe";
 import { regionAnimation } from "./regionPopover.animation";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service"
+import { AuthService, User, AuthMethod } from "src/services/auth.service";
 
 @Component({
   selector: 'atlas-banner',
   templateUrl: './banner.template.html',
   styleUrls: [
-    `./banner.style.css`
+    `./banner.style.css`,
+    '../../css/darkBtns.css'
   ],
   animations: [
     regionAnimation
@@ -42,7 +44,8 @@ export class AtlasBanner implements OnDestroy, OnInit {
 
   constructor(
     private store: Store<ViewerStateInterface>,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
+    private authService: AuthService
   ) {
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
@@ -137,6 +140,18 @@ export class AtlasBanner implements OnDestroy, OnInit {
     }
     this.selectedParcellation = parcellation
     this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
+  }
+
+  get user() : User | null {
+    return this.authService.user
+  }
+
+  get loginMethods(): AuthMethod[] {
+    return this.authService.loginMethods
+  }
+
+  get logoutHref(): String {
+    return this.authService.logoutHref
   }
 
   selectTemplate(template: any) {
@@ -290,6 +305,11 @@ export class AtlasBanner implements OnDestroy, OnInit {
 
   showConfig() {
     this.constantService.showConfigSubject$.next()
+  }
+
+  loginBtnOnclick() {
+    this.authService.authSaveState()
+    return true
   }
 
   get toastDuration() {

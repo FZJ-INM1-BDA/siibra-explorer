@@ -44,12 +44,6 @@ div.btn:hover:before
   opacity : 0.3;
 }
 
-:host-context([darktheme="true"]) div.btn.btn-default
-{
-  background-color:rgba(128,128,128,0.5);
-  color:rgba(240,240,240,0.9);
-}
-
 div.btn.btn-primary
 {
   transform:translateY(3%);

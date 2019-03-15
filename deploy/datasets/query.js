@@ -4,23 +4,35 @@ const path = require('path')
 
 let cachedData = null
 let otherQueryResult = null
-const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg-int.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances/public?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
+const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg-int.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
 const timeout = process.env.TIMEOUT || 5000
 
-const fetchDatasetFromKg = () => new Promise((resolve, reject) => {
-  request(queryUrl, (err, resp, body) => {
+const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
+  const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
+  const option = accessToken
+    ? {
+        auth: {
+          'bearer': accessToken
+        }
+      }
+    : {}
+  request(queryUrl, option, (err, resp, body) => {
     if (err)
       return reject(err)
-    try {
-      const json = JSON.parse(body)
-      return resolve(json)
-    } catch (e) {
-      return reject(e)
-    }
+    if (resp.statusCode >= 400)
+      return reject(resp.statusCode)
+    const json = JSON.parse(body)
+    return resolve(json)
   })
 })
 
-const getDs = () => Promise.race([
+const cacheData = ({results, ...rest}) => {
+  cachedData = results
+  otherQueryResult = rest
+  return cachedData
+}
+
+const getPublicDs = () => Promise.race([
   new Promise((rs, rj) => {
     setTimeout(() => {
       if (cachedData) {
@@ -32,13 +44,13 @@ const getDs = () => Promise.race([
       }
     }, timeout)
   }),
-  fetchDatasetFromKg()
-    .then(({results, ...rest}) => {
-      cachedData = results
-      otherQueryResult = rest
-      return cachedData
-    })
+  fetchDatasetFromKg().then(cacheData)
 ])
+
+
+const getDs = ({ user }) => user
+  ? fetchDatasetFromKg({ user }).then(({results}) => results)
+  : getPublicDs()
 
 /**
  * Needed by filter by parcellation
@@ -116,7 +128,7 @@ exports.init = () => fetchDatasetFromKg()
     cachedData = json
   })
 
-exports.getDatasets = ({ templateName, parcellationName }) => getDs()
+exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
 
 

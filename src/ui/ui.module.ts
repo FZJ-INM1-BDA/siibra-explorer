@@ -45,6 +45,7 @@ import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
 import { FilterDataEntriesByRegion } from "src/util/pipes/filterDataEntriesByRegion.pipe";
+import { PopoverModule } from 'ngx-bootstrap/popover'
 
 
 @NgModule({
@@ -55,6 +56,7 @@ import { FilterDataEntriesByRegion } from "src/util/pipes/filterDataEntriesByReg
     LayoutModule,
     ComponentsModule,
 
+    PopoverModule.forRoot(),
     TooltipModule.forRoot()
   ],
   declarations : [
