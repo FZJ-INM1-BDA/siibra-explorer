@@ -22,6 +22,7 @@ const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
     if (resp.statusCode >= 400)
       return reject(resp.statusCode)
     const json = JSON.parse(body)
+    console.log('fetch dataset form kg', json)
     return resolve(json)
   })
 })
