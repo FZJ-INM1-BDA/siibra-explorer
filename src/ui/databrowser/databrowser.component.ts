@@ -146,7 +146,10 @@ export class DataBrowserUI implements OnDestroy,OnInit{
 
     this.subscriptions.push(this.metadataMap$.subscribe(map=>(this.metadataMap = map)))
 
-    this.subscriptions.push(this.fetchedDataEntries$.subscribe(arr=>(this.dataEntries = arr)))
+    this.subscriptions.push(this.fetchedDataEntries$.subscribe(arr=>{
+      console.log('arr', arr)
+      this.dataEntries = arr
+    }))
 
     this.subscriptions.push(this.selectParcellation$.subscribe(parcellation=>
         this.handleParcellationSelection(parcellation.regions)))

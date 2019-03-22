@@ -18,9 +18,13 @@ exports.getAllTemplates = () => new Promise((resolve, reject) => {
 })
 
 exports.getTemplate = (template) => new Promise((resolve, reject) => {
-
-  const filePath = path.join(__dirname, '..', 'res', `${template}.json`)
-  fs.readFile(filePath, 'utf-8', (err, data) => {
+  let filepath
+  if (process.env.NODE_ENV === 'production') {
+    filepath = path.join(__dirname, '..', 'res', `${template}.json`)
+  } else {
+    filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', `${template}.json`)
+  }
+  fs.readFile(filepath, 'utf-8', (err, data) => {
     if (err) reject(err)
     resolve(data)
   })

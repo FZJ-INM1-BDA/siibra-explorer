@@ -63,7 +63,12 @@ const flattenArray = (array) => {
 }
 
 const readConfigFile = (filename) => new Promise((resolve, reject) => {
-  const filepath = path.join(__dirname, '..', 'res', filename)
+  let filepath
+  if (process.env.NODE_ENV === 'production') {
+    filepath = path.join(__dirname, '..', 'res', filename)
+  } else {
+    filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', filename)
+  }
   fs.readFile(filepath, 'utf-8', (err, data) => {
     if(err) reject(err)
     resolve(data)

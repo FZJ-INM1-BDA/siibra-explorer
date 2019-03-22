@@ -8,6 +8,8 @@ import { DataEntry } from "../../services/stateStore.service";
 
 export class FilterDataEntriesbyType implements PipeTransform{
   public transform(dataEntries:DataEntry[],showDataType:Set<string>):DataEntry[]{
-    return dataEntries.filter(dataEntry=>dataEntry.formats.some(format => showDataType.has(format)))
+    return showDataType.size > 0
+      ? dataEntries.filter(dataEntry=>dataEntry.formats.some(format => showDataType.has(format)))
+      : dataEntries
   }
 }
