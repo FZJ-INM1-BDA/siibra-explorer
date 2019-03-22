@@ -103,6 +103,7 @@ const filterByPRs = (prs, atlasPr) => atlasPr
   : false
 
 const filter = (datasets, {templateName, parcellationName}) => datasets.filter(ds => {
+  console.log('filtering process', {datasets, templateName, parcellationName})
   if (templateName) {
     return templateName === 'undefined'
       ? ds.referenceSpaces.length === 0
