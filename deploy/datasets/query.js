@@ -135,5 +135,6 @@ exports.init = () => fetchDatasetFromKg()
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
+    .then(json => (console.log(json), json))
 
 
