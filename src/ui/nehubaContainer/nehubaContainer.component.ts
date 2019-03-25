@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
@@ -75,6 +75,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private nehubaViewerSubscriptions : Subscription[] = []
 
   public nanometersToOffsetPixelsFn : Function[] = []
+  private viewerConfig : Partial<ViewerConfiguration> = {}
 
   constructor(
     private constantService : AtlasViewerConstantsServices,
@@ -90,9 +91,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
        * TODO: this is only a bandaid fix. Technically, we should also implement
        * logic to take the previously set config to apply oninit
        */
-      filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer)),
       distinctUntilChanged(),
-      debounceTime(200)
+      debounceTime(200),
+      tap(viewerConfig => this.viewerConfig = viewerConfig ),
+      filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer))
     )
 
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
@@ -701,7 +703,19 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.container.clear()
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
     this.nehubaViewer = this.cr.instance
-    this.nehubaViewer.config = template.nehubaConfig
+
+    /**
+     * apply viewer config such as gpu limit
+     */
+    const { gpuLimit = null } = this.viewerConfig
+    const { nehubaConfig } = template
+    
+    if (gpuLimit) {
+      const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
+      initialNgState['gpuLimit'] = gpuLimit
+    }
+    
+    this.nehubaViewer.config = nehubaConfig
 
     /* TODO replace with id from KG */
     this.nehubaViewer.templateId = template.name

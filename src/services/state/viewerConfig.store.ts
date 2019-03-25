@@ -25,7 +25,12 @@ export const ACTION_TYPES = {
   CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`
 }
 
-export function viewerConfigState(prevState:ViewerConfiguration = {animation: CONFIG_CONSTANTS.defaultAnimation, gpuLimit: CONFIG_CONSTANTS.defaultGpuLimit}, action:ViewerConfigurationAction) {
+const lsGpuLimit = localStorage.getItem('iv-gpulimit')
+const gpuLimit = lsGpuLimit && !isNaN(Number(lsGpuLimit))
+  ? Number(lsGpuLimit)
+  : CONFIG_CONSTANTS.defaultGpuLimit
+
+export function viewerConfigState(prevState:ViewerConfiguration = {animation: CONFIG_CONSTANTS.defaultAnimation, gpuLimit}, action:ViewerConfigurationAction) {
   switch (action.type) {
     case ACTION_TYPES.UPDATE_CONFIG:
       return {
@@ -39,7 +44,6 @@ export function viewerConfigState(prevState:ViewerConfiguration = {animation: CO
           (prevState.gpuLimit || CONFIG_CONSTANTS.defaultGpuLimit) + action.payload.delta,
           CONFIG_CONSTANTS.gpuLimitMin
         ))
-
       return {
         ...prevState,
         gpuLimit: newGpuLimit

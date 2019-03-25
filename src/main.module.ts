@@ -3,8 +3,8 @@ import { ComponentsModule } from "./components/components.module";
 import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
-import { StoreModule } from "@ngrx/store";
-import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, exportedStates } from "./services/stateStore.service";
+import { StoreModule, Store, select } from "@ngrx/store";
+import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
@@ -33,6 +33,7 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { AuthService } from "./services/auth.service";
+import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 
 @NgModule({
   imports : [
@@ -45,8 +46,8 @@ import { AuthService } from "./services/auth.service";
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
     StoreModule.forRoot({
-      pluginState: exportedStates.pluginState,
-      viewerConfigState: exportedStates.viewerConfigState,
+      pluginState,
+      viewerConfigState,
       ngViewerState,
       viewerState,
       dataStore,
@@ -105,8 +106,15 @@ import { AuthService } from "./services/auth.service";
 export class MainModule{
   
   constructor(
-    authServce: AuthService
+    authServce: AuthService,
+    store: Store<ViewerConfiguration>
   ){
     authServce.authReloadState()
+    store.pipe(
+      select('viewerConfigState')
+    ).subscribe(({ gpuLimit }) => {
+      if (gpuLimit)
+        window.localStorage.setItem('iv-gpulimit', gpuLimit.toString())
+    })
   }
 }

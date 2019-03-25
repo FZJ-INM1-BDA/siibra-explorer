@@ -1,8 +1,8 @@
-import { Component } from '@angular/core'
+import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Store, select } from '@ngrx/store';
 import { ViewerConfiguration, ACTION_TYPES } from 'src/services/state/viewerConfig.store'
-import { Observable } from 'rxjs';
-import { map, distinctUntilChanged } from 'rxjs/operators';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { map, distinctUntilChanged, debounce, debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'config-component',
@@ -12,12 +12,17 @@ import { map, distinctUntilChanged } from 'rxjs/operators';
   ]
 })
 
-export class ConfigComponent{
+export class ConfigComponent implements OnInit, OnDestroy{
 
   /**
    * in MB
    */
   public gpuLimit$: Observable<number>
+  public keydown$: Subject<Event> = new Subject()
+  private subscriptions: Subscription[] = []
+
+  public gpuMin : number = 100
+  public gpuMax : number = 1000
   
   constructor(private store: Store<ViewerConfiguration>) {
     this.gpuLimit$ = this.store.pipe(
@@ -26,6 +31,26 @@ export class ConfigComponent{
       distinctUntilChanged(),
       map(v => v / 1e6)
     )
+  }
+
+  ngOnInit(){
+    this.subscriptions.push(
+      this.keydown$.pipe(
+        debounceTime(250)
+      ).subscribe(ev => {
+        const val = (<HTMLInputElement>ev.srcElement).value
+        const numVal = val && Number(val)
+        if (isNaN(numVal) || numVal < this.gpuMin || numVal > this.gpuMax )
+          return
+        this.setGpuPreset({
+          value: numVal
+        })
+      })
+    )
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   public wheelEvent(ev:WheelEvent) {

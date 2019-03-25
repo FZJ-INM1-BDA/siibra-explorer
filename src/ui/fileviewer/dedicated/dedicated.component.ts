@@ -5,6 +5,9 @@ import { Observable, Subscription } from "rxjs";
 import { getActiveColorMapFragmentMain } from "../../nehubaContainer/nehubaContainer.component";
 import { ToastService } from "../../../services/toastService.service";
 
+/**
+ * TODO maybe obsolete
+ */
 
 @Component({
   selector : 'dedicated-viewer',

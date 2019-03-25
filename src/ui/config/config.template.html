@@ -5,7 +5,11 @@
   <input
     (wheel)="wheelEvent($event)"
     type="number"
+    [min]="100"
+    [max]="1000"
+    [step]="0.1"
     class="form-control"
+    (input)="keydown$.next($event)"
     [value]="gpuLimit$ | async ">
   <div class="input-group-btn">
     <div (click)="setGpuPreset({ value: 100 })" class="btn btn-default">
