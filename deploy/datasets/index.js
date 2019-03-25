@@ -13,9 +13,11 @@ datasetsRouter.use((req, res, next) => {
 
 datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
   const { templateName } = req.params
-  getDatasets({ templateName })
+  const { user } = req
+  getDatasets({ templateName, user })
     .then(ds => {
-      res.status(200).send(JSON.stringify(ds))
+      const data = JSON.stringify(ds)
+      res.status(200).send(data)
     })
     .catch(error => {
       next({

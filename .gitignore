@@ -3,4 +3,3 @@ dist
 package-lock.json
 src/res/raw
 src/plugin_examples/*/
-deploy

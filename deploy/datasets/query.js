@@ -22,7 +22,6 @@ const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
     if (resp.statusCode >= 400)
       return reject(resp.statusCode)
     const json = JSON.parse(body)
-    console.log('fetch dataset form kg', json)
     return resolve(json)
   })
 })
@@ -103,12 +102,8 @@ const filterByPRs = (prs, atlasPr) => atlasPr
   : false
 
 const filter = (datasets, {templateName, parcellationName}) => datasets.filter(ds => {
-  const datasetRS = datasets.filter(ds => ds.referenceSpaces.length > 0).map(ds => ds.referenceSpaces.map(rs => rs.name).join(' -- '))
-  console.log('filtering process', {datasetRS, templateName, parcellationName})
   if (templateName) {
-    return templateName === 'undefined'
-      ? ds.referenceSpaces.length === 0
-      : ds.referenceSpaces.some(rs => rs.name === templateName)
+    return ds.referenceSpaces.some(rs => rs.name === templateName)
   }
   if (parcellationName) {
     return ds.parcellationRegion.length > 0
@@ -138,6 +133,4 @@ exports.init = () => fetchDatasetFromKg()
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
-    .then(json => (console.log(json), json))
-
 
