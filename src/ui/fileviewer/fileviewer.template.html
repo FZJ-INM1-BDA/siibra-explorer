@@ -8,11 +8,15 @@
 </kg-entry-viewer>
 
 <!-- citation -->
-<citations-component 
-  citationContainer
-  *ngIf = "searchResultFile && !searchResultFile.kgID"
-  [properties] = "searchResultFile.datasetProperties">
-</citations-component>
+<div style="margin:1em" *ngIf="searchResultFile && !searchResultFile.kgID && searchResultFile.properties && searchResultFile.properties.publications && searchResultFile.properties.publications.length > 0">
+  <h5>
+    Citations for this dataset:
+  </h5>
+  <citations-component 
+    citationContainer
+    [properties] = "searchResultFile.properties">
+  </citations-component>
+</div>
 
 <!-- file viewer -->
 <div 
