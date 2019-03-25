@@ -101,9 +101,15 @@ export class AtlasViewerDataService implements OnDestroy{
         .then(arr => {
           this.store.dispatch({
             type : FETCHED_SPATIAL_DATA,
-            fetchedDataEntries : arr.reduce((acc,curr) => acc.concat(curr.map(obj => Object.assign({}, obj, {
-              properties : {}
-            }))), [])
+            fetchedDataEntries: arr
+              .reduce((acc, curr) => acc.concat(curr), [])
+              .map((obj, idx) => {
+                return {
+                  ...obj,
+                  name: `Spatial landmark #${idx}`,
+                  properties: {}
+                }
+              })
           })
           this.store.dispatch({
             type : UPDATE_SPATIAL_DATA,
