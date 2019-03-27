@@ -67,8 +67,6 @@ export class AtlasViewerDataService implements OnDestroy{
               })
             })
         ))
-
-    this.init()
   }
 
   /* all units in mm */
@@ -186,55 +184,6 @@ export class AtlasViewerDataService implements OnDestroy{
       })
       .catch(console.warn)
 
-  }
-
-  init(){
-
-    const dispatchData = (arr:DataEntry[][]) =>{
-      this.store.dispatch({
-        type : FETCHED_DATAENTRIES,
-        fetchedDataEntries : arr.reduce((acc,curr)=>acc.concat(curr),[])
-      })
-    }
-
-    const fetchData = (templateName : string, parcellationName: string) => {
-      dispatchData([])
-      const encodedTemplateName = encodeURI(templateName)
-      const encodedParcellationName = encodeURI(parcellationName)
-      Promise.all([
-        fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`)
-          .then(res => res.json()),
-        fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`)
-          .then(res => res.json())
-      ])
-        .then(arr => [...arr[0], ...arr[1]])
-        .then(arr => arr.reduce((acc, item) => {
-          const newMap = new Map(acc)
-          return newMap.set(item.name, item)
-        }, new Map()))
-        .then(map => Array.from(map.values()))
-        .then(dispatchData)
-        .catch(console.warn)
-    }
-
-    this.subscriptions.push(
-      combineLatest(
-        this.store.pipe(
-          select('viewerState'),
-          safeFilter('templateSelected'),
-          map(({templateSelected})=>(templateSelected.name)),
-          distinctUntilChanged()
-        ),
-        this.store.pipe(
-          select('viewerState'),
-          safeFilter('parcellationSelected'),
-          map(({parcellationSelected})=>(parcellationSelected.name)),
-          distinctUntilChanged()
-        )
-      ).pipe(
-        debounceTime(16)
-      ).subscribe((param : [string, string] ) => fetchData(param[0], param[1]))
-    )
   }
 
   ngOnDestroy(){

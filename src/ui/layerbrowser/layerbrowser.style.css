@@ -33,12 +33,12 @@ div[body]
   align-items: center;
 }
 
-.glyphicon.blue
+.fas.blue
 {
   color: #337ab7;
 }
 
-.glyphicon.red
+.fas.red
 {
   color: red;
 }

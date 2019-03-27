@@ -35,12 +35,12 @@ div[bannerWrapper]
 {
   z-index:5;
   position:absolute;
-  top : 1em;
-  left: 1em;
 
   width:100%;
   display:flex;
   height:0px;
+
+  justify-content: space-between;
 }
 
 
@@ -56,6 +56,17 @@ layout-floating-container
   width:100%;
   height:100%;
   overflow:hidden;
+}
+
+[iconWrapper]
+{
+  margin-left: 1em;
+}
+
+div[signinWrapper]
+{
+  display: flex;
+  flex-direction: row;
 }
 
 [toastContainer]

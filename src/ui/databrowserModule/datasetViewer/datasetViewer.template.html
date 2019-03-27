@@ -1,0 +1,38 @@
+<div *ngIf = "dataset; else defaultDisplay">
+  
+  <div title>
+    {{ dataset.name }}
+  </div>
+
+  <a
+    *ngFor="let kgr of kgReference"
+    target="_blank"
+    [href]="kgr">
+    open in knowledge graph
+  </a>
+  <!-- <kg-entry-viewer [dataset]="dataset">
+
+  </kg-entry-viewer> -->
+
+  <div *ngIf="false">
+
+    <hr />
+    <h5>
+      Preview Dataset
+    </h5>
+    <flat-tree-component
+      #flatTreeNode
+      *ngFor = "let item of dataset.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
+      [childrenExpanded] = "false"
+      [renderNode] = "renderNode"
+      [inputItem] = " item "
+      (treeNodeClick)= "previewFileClick($event, flatTreeNode)">
+  
+    </flat-tree-component>
+    <hr />
+  </div>
+</div>
+
+<ng-template #defaultDisplay>
+  Nothing to display ...
+</ng-template>

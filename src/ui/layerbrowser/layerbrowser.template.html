@@ -8,8 +8,8 @@
       placement = "bottom"
       [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
       (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
-      class = "glyphicon" 
-      [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' :ngLayer.visible ? 'glyphicon-eye-open' : 'glyphicon-eye-close'">
+      class = "fas" 
+      [ngClass] = "checkLocked(ngLayer) ? 'fa-lock muted' :ngLayer.visible ? 'fa-eye-open' : 'fa-eye-close'">
 
     </i>
   </div>
@@ -19,9 +19,9 @@
       placement = "bottom"
       [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
       (click) = "forceSegment.hide();toggleForceShowSegment(ngLayer)"
-      class = "glyphicon" 
+      class = "fas" 
       #forceSegment = "bs-tooltip"
-      [ngClass] = "ngLayer.type === 'segmentation' ? ('glyphicon-th-large ' + segmentationAdditionalClass) : 'glyphicon-lock muted' ">
+      [ngClass] = "ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
 
     </i>
   </div>
@@ -31,8 +31,8 @@
       container = "body"
       placement = "bottom"
       [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
-      class = "glyphicon"
-      [ngClass] = "checkLocked(ngLayer) ? 'glyphicon-lock muted' : 'glyphicon-remove-circle'">
+      class = "fas"
+      [ngClass] = "checkLocked(ngLayer) ? 'fa-lock muted' : 'fa-remove-circle'">
 
     </i>
   </div>

@@ -1,0 +1,75 @@
+
+<!-- modality picker -->
+<div>
+  <i (click)="modalityReadmore.show = !modalityReadmore.show" class="clickable">
+    Filter by Modality <small *ngIf="modalityFilter.length > 0" class="text-muted">({{ modalityFilter.length }})</small>
+  </i>
+  <readmore-component
+    #modalityReadmore
+    [collapsedHeight]="0">
+    <div class="filterWrapper">
+      <modality-picker (modalityFilterEmitter)="modalityFilter = $event">
+  
+      </modality-picker>
+    </div>
+  </readmore-component>
+  <div *ngIf="!modalityReadmore.show">
+    <pill-component
+      [containerStyle]="{backgroundColor:'rgba(128,128,128,0.2)'}"
+      [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
+      (closeClicked)="uncheckModality(modality)"
+      [title]="modality"
+      *ngFor="let modality of modalityFilter">
+  
+    </pill-component>
+  </div>
+</div>
+
+<!-- region hierarchy -->
+<div>
+  <i (click)="regionHierarchy.focusInput($event)" class="clickable">
+    Filter by parcellation region <small *ngIf="selectedRegions.length > 0" class="text-muted">({{ selectedRegions.length }})</small>
+  </i>
+  <region-hierarchy #regionHierarchy>
+  </region-hierarchy>
+  <readmore-component
+    [hidden]="selectedRegions.length === 0"
+    #selectedRegionReadmore
+    [collapsedHeight]="45">
+    <div class="filterWrapper">
+      <pill-component
+        [containerStyle]="{backgroundColor:'rgba(128,128,128,0.2)'}"
+        [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
+        (closeClicked)="deselectRegion(region)"
+        [title]="region.name"
+        *ngFor="let region of selectedRegions">
+      </pill-component>
+    </div>
+  </readmore-component>
+</div>
+
+<!-- Data Entries -->
+<div>
+  <i *ngIf="dbService.fetchedDataEntries$ | async">
+    {{ (dbService.fetchedDataEntries$ | async).length }} total results. <span *ngIf="selectedRegions.length + modalityFilter.length > 0 "> {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} filtered results.</span>
+  </i>
+  <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
+    No results to show.
+  </i>
+</div>
+<div *ngIf="dbService.fetchedDataEntries$ | async">
+  <dataset-viewer
+    class="mt-1"
+    *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
+    (launchFileViewer) = "launchFile($event)"
+    [dataset] = "dataset">
+  </dataset-viewer>
+</div>
+
+<pagination-component
+  *ngIf="dbService.fetchedDataEntries$ | async"
+  (paginationChange)="currentPage = $event"
+  [hitsPerPage]="hitsPerPage"
+  [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
+  [currentPage]="currentPage">
+</pagination-component>

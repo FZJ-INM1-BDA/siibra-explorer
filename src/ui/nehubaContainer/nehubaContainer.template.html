@@ -15,7 +15,7 @@
         (mouseenter)="handleMouseEnterLandmark(spatialData)"
         (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass]="spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
         [positionX]="getPositionX(0,spatialData)"
         [positionY]="getPositionY(0,spatialData)"
         [positionZ]="getPositionZ(0,spatialData)">
@@ -37,7 +37,7 @@
         (mouseenter)="handleMouseEnterLandmark(spatialData)"
         (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass]="spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
         [positionX]="getPositionX(1,spatialData)"
         [positionY]="getPositionY(1,spatialData)"
         [positionZ]="getPositionZ(1,spatialData)">
@@ -59,7 +59,7 @@
         (mouseenter)="handleMouseEnterLandmark(spatialData)"
         (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass]="spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
         [positionX]="getPositionX(2,spatialData)"
         [positionY]="getPositionY(2,spatialData)"
         [positionZ]="getPositionZ(2,spatialData)">
@@ -160,13 +160,13 @@
   (deltaValue)="handleMobileOverlayEvent($event)">
   <div mobileObliqueGuide guide>
     <div>
-      <i class="glyphicon glyphicon-resize-vertical"></i> oblique mode 
+      <i class="fas fa-resize-vertical"></i> oblique mode 
     </div>
     <div>
-      <i class="glyphicon glyphicon-resize-horizontal"></i> rotate slice
+      <i class="fas fa-resize-horizontal"></i> rotate slice
     </div>
   </div>
   <div mobileObliqueCtrl initiator>
-    <i class="glyphicon glyphicon-globe"></i>
+    <i class="fas fa-globe"></i>
   </div>
 </mobile-overlay>

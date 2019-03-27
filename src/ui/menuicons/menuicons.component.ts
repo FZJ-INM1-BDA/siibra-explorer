@@ -1,0 +1,138 @@
+import { Component, ViewChild, TemplateRef, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver } from "@angular/core";
+
+import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
+import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
+import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
+import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
+import { FileViewer } from "../fileviewer/fileviewer.component";
+
+@Component({
+  selector: 'menu-icons',
+  templateUrl: './menuicons.template.html',
+  styleUrls: [
+    './menuicons.style.css'
+  ]
+})
+
+export class MenuIconsBar{
+
+  /**
+   * databrowser
+   */
+  dbcf: ComponentFactory<DataBrowser>
+  dataBrowser: ComponentRef<DataBrowser> = null
+  dbWidget: ComponentRef<WidgetUnit> = null
+
+  /**
+   * file viewer
+   */
+  fcf: ComponentFactory<FileViewer>
+
+  /**
+   * layerBrowser
+   */
+  lbcf: ComponentFactory<LayerBrowser>
+  layerBrowser: ComponentRef<LayerBrowser> = null
+  lbWidget: ComponentRef<WidgetUnit> = null
+
+  constructor(
+    private widgetServices:WidgetServices,
+    private injector:Injector,
+    cfr: ComponentFactoryResolver
+  ){
+    this.dbcf = cfr.resolveComponentFactory(DataBrowser)
+    this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
+    this.fcf = cfr.resolveComponentFactory(FileViewer)
+  }
+  public clickSearch(event: MouseEvent){
+    if (this.dbWidget) {
+      this.dbWidget.destroy()
+      this.dbWidget = null
+      return
+    }
+    this.dataBrowser = this.dbcf.create(this.injector)
+    this.dbWidget = this.widgetServices.addNewWidget(this.dataBrowser, {
+      exitable: true,
+      persistency: true,
+      state: 'floating',
+      title: this.dataBrowserTitle,
+      titleHTML: `<i class="fas fa-search"></i> ${this.dataBrowserTitle}`
+    })
+
+
+    const dataWindowRegistry: Set<string> = new Set()
+
+    // const sub = this.dataBrowser.instance.launchFile.subscribe(payload => {
+    //   const { dataset, file } = payload
+    //   if(dataset.formats.findIndex(format => format.toLowerCase() === 'nifti' ) >= 0){
+  
+    //     // TODO use KG id in future
+    //     if(dataWindowRegistry.has(file.name)){
+    //       /* already open, will not open again */
+    //       return
+    //     }
+    //     /* not yet open, add the name to registry */
+    //     dataWindowRegistry.add(file.name)
+  
+    //     const component = this.fcf.create(this.injector)
+    //     component.instance.searchResultFile = file
+    //     const compref = this.widgetServices.addNewWidget(component,{title:file.name,exitable:true,state:'floating'})
+  
+    //     /* on destroy, removes name from registry */
+    //     compref.onDestroy(() => dataWindowRegistry.delete(file.name))
+    //   }else{
+    //     /** no mime type  */
+    //   }
+    // })
+
+    this.dbWidget.onDestroy(() => {
+      // sub.unsubscribe()
+      this.dataBrowser = null
+      this.dbWidget = null
+    })
+
+    const el = event.currentTarget as HTMLElement
+    const top = el.offsetTop
+    const left = el.offsetLeft + 50
+    this.dbWidget.instance.position = [left, top]
+  }
+
+  public clickLayer(event: MouseEvent){
+
+    if (this.lbWidget) {
+      this.lbWidget.destroy()
+      this.lbWidget = null
+      return
+    }
+    this.layerBrowser = this.lbcf.create(this.injector)
+    this.lbWidget = this.widgetServices.addNewWidget(this.layerBrowser, {
+      exitable: true,
+      persistency: true,
+      state: 'floating',
+      title: 'Layer Browser',
+      titleHTML: '<i class="fas fa-layer-group"></i> Layer Browser'
+    })
+
+    this.lbWidget.onDestroy(() => {
+      this.layerBrowser = null
+      this.lbWidget = null
+    })
+
+    const el = event.currentTarget as HTMLElement
+    const top = el.offsetTop
+    const left = el.offsetLeft + 50
+    this.lbWidget.instance.position = [left, top]
+  }
+
+  get databrowserIsShowing() {
+    return this.dataBrowser !== null
+  }
+
+  get layerbrowserIsShowing() {
+    return this.layerBrowser !== null
+  }
+
+  get dataBrowserTitle() {
+    return `Browse`
+  }
+}

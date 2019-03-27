@@ -6,7 +6,6 @@ import {  MarkdownDom } from './markdown/markdown.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { ReadmoreComponent } from './readmoore/readmore.component';
-import { BrowserModule } from '@angular/platform-browser';
 import { HoverableBlockDirective } from './hoverableBlock.directive';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { TreeComponent } from './tree/tree.component';
@@ -25,11 +24,12 @@ import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
 import { PillComponent } from './pill/pill.component';
+import { CommonModule } from '@angular/common';
 
 
 @NgModule({
   imports : [
-    BrowserModule,
+    CommonModule,
     FormsModule,
     BrowserAnimationsModule,
   ],

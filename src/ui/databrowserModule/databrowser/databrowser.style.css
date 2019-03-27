@@ -63,7 +63,7 @@ div[databrowserheader]
   white-space: nowrap;
 }
 
-div[filterBlock]
+:host > div
 {
   padding : 0.5em 1em;
 }
@@ -74,7 +74,7 @@ div[filterBlock] > *
   overflow: hidden;
 }
 
-div.clickable:hover
+.clickable:hover
 {
   color:#dbb556;
   cursor:default;
@@ -119,8 +119,7 @@ div[noSelectedRegion]
 dataset-viewer
 {
   display: block;
-  margin: 1em;
-  padding: 1em;
+  padding: 0.3em 1em;
   background-color: rgba(128, 128, 128, 0.2);
 }
 
@@ -133,4 +132,23 @@ div[regionsContainer]
 div[regionContainer]
 {
   margin-top:0.5em;
+}
+
+modality-picker
+{
+  font-size: 90%;
+  display:inline-block;
+}
+
+.filterWrapper
+{
+  white-space:normal;
+  max-height: 15em;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+region-hierarchy
+{
+  display:inline-block;
 }

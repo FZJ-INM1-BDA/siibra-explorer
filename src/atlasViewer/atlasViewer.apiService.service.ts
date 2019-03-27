@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, distinctUntilChanged, filter } from "rxjs/operators";
 import { BsModalService } from "ngx-bootstrap/modal";

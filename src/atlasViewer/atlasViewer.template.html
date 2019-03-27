@@ -1,152 +1,15 @@
 <div *ngIf = "meetsRequirement" class = "atlas-container" helpdirective>
 
-  <layout-mainside
-    [showSide] = "false"
-    [animationFlag] = "false"
-    (panelAnimationEnd) = "panelAnimationEnd($event)">
-    <div maincontent>
-      <ui-nehuba-container>
-      </ui-nehuba-container>
+  <ui-nehuba-container>
+  </ui-nehuba-container>
 
-      <div bannerWrapper>
-
-        <logo-container>
-        </logo-container>
-  
-        <atlas-banner *ngIf = "!isMobile">
-        </atlas-banner>
-      </div>
+  <div bannerWrapper>
+    <menu-icons iconWrapper>
+    </menu-icons>
+    <div signinWrapper>
 
     </div>
-    <div [ngSwitch] = "sidePanelView$ | async" sidecontent>
-      <div *ngSwitchCase = "'menuBrowser'">
-        <panel-component>
-          <div heading>
-            Menu
-          </div>
-          <div mobileMenu body>
-            <atlas-banner>
-
-            </atlas-banner>
-            <template-parcellation-citation-container mobileTemplateCitation>
-
-            </template-parcellation-citation-container>
-          </div>
-        </panel-component>
-      </div>
-      
-      <!-- Data Browser -->
-      <div *ngSwitchCase = "'dataBrowser'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Data Browser
-          </div>
-          <data-browser body>
-          </data-browser>
-        </panel-component>
-      </div>
-
-      <!-- Layer Browser -->
-      <div *ngSwitchCase = "'ngLayer'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Layer Browser
-          </div>
-          <layer-browser body>
-          </layer-browser>
-        </panel-component>
-      </div>
-
-      <!-- Tools Browser-->
-      <div *ngSwitchCase = "'toolsBrowser'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Tools Browser
-          </div>
-          <plugin-banner body>          
-          </plugin-banner>
-        </panel-component>
-      </div>
-
-      <!-- Default (shown at the beginning + sliver of time during closing of side bar)-->
-      <div *ngSwitchDefault>
-        
-      </div>
-      
-      <!-- Docked Container-->
-      <div dockedContainer>
-        <div dockedContainerDirective>
-
-        </div>
-      </div>
-    </div>
-
-    <div resizeSliver>
-      <span
-        *ngIf = "isMobile"
-        class = "tabContainer"
-        (click) = "toggleSidePanel('menuBrowser')"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'menuBrowser'}" >
-        <i class="glyphicon glyphicon-info-sign"></i>
-      </span>
-
-      <span 
-        container = "body"
-        placement = "left"
-        [tooltip] = "isMobile ? null : !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest' "
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" 
-        (click) = "toggleSidePanel('dataBrowser')" 
-        class = "tabContainer">
-        <span  [@newEvent] = "selectedPOI$ | async" class = "highlightContainer">
-        </span>
-        <i class = "glyphicon glyphicon-search"></i>
-        <span class = "badge" *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0">
-          {{ (selectedPOI$ | async).length }}
-        </span>
-      </span>
-
-      <span 
-        placement = "left"
-        [tooltip] = "isMobile ? null : !ngLayers ? '' : ((ngLayers.length === 0 ? 'No' : ngLayers.length) + ' loaded layer' + (ngLayers.length > 1 ? 's' : ''))"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" 
-        (click) = "toggleSidePanel('ngLayer')" 
-        class = "tabContainer">
-        <span  [@newEvent] = "ngLayers" class = "highlightContainer">
-        </span>
-        <i class = "glyphicon glyphicon-list"></i>
-        <span class = "badge" *ngIf = "ngLayers && ngLayers.length > 0">      
-          {{ ngLayers.length }}
-        </span>
-      </span>
-
-      <span 
-        placement = "left"
-        (mouseover) = "_toolIconsVisible = true" 
-        (mouseout) = "_toolIconsVisible = false"
-        [tooltip] = "isMobile ? null : _toolIconDockAll ? 'dock all widgets' : _toolIconFloatAll ? 'float all widgets' : 'Tools Browser'"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" 
-        (click) = "toggleSidePanel('toolsBrowser')" 
-        class = "tabContainer">
-        <i class="glyphicon glyphicon-wrench"></i>
-        <span *ngIf = "!isMobile" class ="badge">
-          <span [class.hidden] = "_toolIconsVisible" >
-            ...
-          </span>
-          <span [class.hidden] = "!_toolIconsVisible">
-            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.dockAllWidgets()" (mouseover) = "_toolIconDockAll = true" (mouseout) = "_toolIconDockAll = false">
-              <i class = "no-pointer-events glyphicon glyphicon-log-in"></i>
-            </span>
-            <span class = "mute-text">
-              |
-            </span>
-            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.floatAllWidgets()" (mouseover) = "_toolIconFloatAll = true" (mouseout) = "_toolIconFloatAll = false">
-              <i class = "no-pointer-events glyphicon glyphicon-new-window"></i>
-            </span>
-          </span>
-        </span>
-      </span>
-    </div>
-  </layout-mainside>
+  </div>
 
   <layout-floating-container
     zIndex = "9"

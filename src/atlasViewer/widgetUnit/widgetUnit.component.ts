@@ -34,7 +34,11 @@ export class WidgetUnit {
   @Output()
   clickedEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
 
+  @Input()
   public exitable : boolean = true
+
+  @Input()
+  public titleHTML : string = null
 
   public guestComponentRef : ComponentRef<any>
   public cf : ComponentRef<WidgetUnit>
@@ -77,6 +81,7 @@ export class WidgetUnit {
   }
 
   exit(event?:Event){
+    console.log('exit')
     if(event){
       event.stopPropagation()
       event.preventDefault()

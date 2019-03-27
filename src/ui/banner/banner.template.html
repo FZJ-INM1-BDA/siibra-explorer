@@ -10,7 +10,7 @@
   *ngIf="citationExists(selectedTemplate) && !isMobile" 
   [toastLength]="toastDuration"
   [showToast]="citation"
-  class="glyphicon glyphicon-info-sign"
+  class="fas fa-info-sign"
   #templateCitationAnchor>
 
   <ng-template #citation>
@@ -36,7 +36,7 @@
   *ngIf="citationExists(selectedParcellation) && !isMobile" 
   [toastLength]="toastDuration"
   [showToast]="citation"
-  class="glyphicon glyphicon-info-sign"
+  class="fas fa-info-sign"
   #parcellationCitationAnchor>
   <ng-template #citation>
     <h4>
@@ -87,15 +87,15 @@
 
 <!-- help btn -->
 <div *ngIf="isMobile" class="help-container">
-  <i (click)="showHelp()" class="glyphicon glyphicon-question-sign"></i>
+  <i (click)="showHelp()" class="fas fa-question-circle"></i>
 </div>
-<i *ngIf="!isMobile" (click)="showHelp()" class="glyphicon glyphicon-question-sign"></i>
+<i *ngIf="!isMobile" (click)="showHelp()" class="fas fa-question-circle"></i>
 
 <!-- config btn -->
 <div *ngIf="isMobile" class="help-container">
-  <i (click)="showConfig()" class="glyphicon glyphicon-cog"></i>
+  <i (click)="showConfig()" class="fas fa-cog"></i>
 </div>
-<i *ngIf="!isMobile" (click)="showConfig()" class="glyphicon glyphicon-cog"></i>
+<i *ngIf="!isMobile" (click)="showConfig()" class="fas fa-cog"></i>
 
 <!-- login btn -->
 <div *ngIf="isMobile" class="help-container">
@@ -105,8 +105,8 @@
     [outsideClick]="true"
     [popover]="loginPopover"
     [popoverTitle]="user ? 'Hi, ' + user.name : 'Login'"
-    [ngClass]="user ? 'glyphicon-user' : 'glyphicon-log-in'"
-    class="glyphicon"
+    [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+    class="fas"
     containerClass="popoverContainer"></i>
 </div>
 <i
@@ -116,8 +116,8 @@
   [outsideClick]="true"
   [popover]="loginPopover"
   [popoverTitle]="user ? 'Hi, ' + user.name : 'Login with'"
-  [ngClass]="user ? 'glyphicon-user' : 'glyphicon-log-in'"
-  class="glyphicon"
+  [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+  class="fas"
   containerClass="popoverContainer"></i>
 
 <ng-template #loginPopover>
@@ -126,7 +126,7 @@
     class="btn btn-sm btn-default"
     [href]="logoutHref"
     *ngIf="user">
-    <i class="glyphicon glyphicon-log-out"></i>
+    <i class="fas fa-log-out"></i>
     Logout
   </a>
   <div

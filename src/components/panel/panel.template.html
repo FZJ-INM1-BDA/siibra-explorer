@@ -1,35 +1,33 @@
 <div
   *ngIf = "showHeading"
   class = "panel-heading"
-  (click) = "toggleCollapseBody($event)"
   hoverable>
-
-  <ng-content select="[heading]">
-  </ng-content>
 
 </div>
 
-<!-- While wrapping body and footer in a diffrent div adds a lot of overhead, it enables nice transition effects -->
-<div 
-  bodyFooterContainer>
-  <div
-    *ngIf = "showBody"
-    class = "panel-body"
-    [@collapseState] = "{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
-    #panelBody>
+<div class="l-card">
+  <div class="l-card-body">
+    <div
+      *ngIf="showHeading"
+      class="l-card-title"
+      (click)="toggleCollapseBody($event)"
+      hoverable>
+      <ng-content select="[heading]">
+      </ng-content>
+    </div>
+    <!-- While wrapping body and footer in a diffrent div adds a lot of overhead, it enables nice transition effects -->
+    <div 
+      bodyFooterContainer>
+      <div
+        *ngIf = "showBody"
+        class = "l-card-text"
+        [@collapseState] = "{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
+        #panelBody>
 
-    <ng-content select="[body]">
-    </ng-content>
+        <ng-content select="[body]">
+        </ng-content>
 
-  </div>
-  <div
-    *ngIf = "showFooter"
-    class = "panel-footer"
-    [@collapseState] = "{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
-    #panelFooter>
-    
-    <ng-content select="[footer]">
-    </ng-content>
-
+      </div>
+    </div>
   </div>
 </div>

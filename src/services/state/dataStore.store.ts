@@ -32,7 +32,14 @@ export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
 export const FETCHED_METADATA = 'FETCHED_METADATA'
 export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
 
+export interface Activity{
+  methods: string[]
+  preparation: string[]
+  protocols: string[  ]
+}
+
 export interface DataEntry{
+  activity: Activity[]
   name: string
   description: string
   license: string[]

@@ -39,7 +39,7 @@
       <div *ngFor="let publication of dataset.publications">
         <a target="_blank" link [href]="'https://doi.org/' + publication.doi">
           {{ publication.cite }}
-          <i class = "glyphicon glyphicon-new-window"></i>
+          <i class = "fas fa-new-window"></i>
         </a>
       </div>
     </div>
@@ -67,7 +67,7 @@
       <div *ngFor="let file of dataset.files">
         <a link target="_blank" [href]="file.absolutePath">
           {{ file.name }}
-          <i class="glyphicon glyphicon-download-alt"></i>
+          <i class="fas fa-download-alt"></i>
         </a>
       </div>
     </div>
@@ -78,7 +78,7 @@
     [href]="'https://doi.org/' + ref"
     target="_blank">
     Open in Knowledge Graph
-    <i class = "glyphicon glyphicon-new-window"></i>
+    <i class = "fas fa-new-window"></i>
   </a>
 
 </div>

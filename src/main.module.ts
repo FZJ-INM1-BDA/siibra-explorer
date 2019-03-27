@@ -13,14 +13,13 @@ import { FormsModule } from "@angular/forms";
 import { AtlasViewerDataService } from "./atlasViewer/atlasViewer.dataService.service";
 import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
-import { GlyphiconTooltipScreenshotDirective,GlyphiconTooltipInfoSignDirective,GlyphiconTooltipLogInDirective,GlyphiconTooltipNewWindowDirective,GlyphiconTooltipQuestionSignDirective,GlyphiconTooltipRemoveDirective,GlyphiconTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
+import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { ModalModule } from 'ngx-bootstrap/modal'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
 import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathName.pipe";
-import { FilterNameBySearch } from "./util/pipes/filterNameBySearch.pipe";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
@@ -62,13 +61,13 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
     PluginUnit,
 
     /* directives */
-    GlyphiconTooltipScreenshotDirective,
-    GlyphiconTooltipInfoSignDirective,
-    GlyphiconTooltipLogInDirective,
-    GlyphiconTooltipNewWindowDirective,
-    GlyphiconTooltipQuestionSignDirective,
-    GlyphiconTooltipRemoveDirective,
-    GlyphiconTooltipRemoveSignDirective,
+    fasTooltipScreenshotDirective,
+    fasTooltipInfoSignDirective,
+    fasTooltipLogInDirective,
+    fasTooltipNewWindowDirective,
+    fasTooltipQuestionSignDirective,
+    fasTooltipRemoveDirective,
+    fasTooltipRemoveSignDirective,
     HelpDirective,
     ToastContainerDirective,
     DockedContainerDirective,
@@ -80,7 +79,6 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
     GetNamesPipe,
     GetNamePipe,
     GetFilenameFromPathnamePipe,
-    FilterNameBySearch,
     NewViewerDisctinctViewToLayer
   ],
   entryComponents : [

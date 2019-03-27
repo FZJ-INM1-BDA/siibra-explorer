@@ -1,0 +1,9 @@
+<div
+  *ngFor="let datamodality of countedDataM"
+  (click)="toggleModality(datamodality)"
+  class="clickable">
+  <i [ngClass]="datamodality.visible ? 'far fa-check-square' : 'text-muted far fa-square'">
+
+  </i>
+  {{ datamodality.name }} <span class="text-muted">({{ datamodality.occurance }})</span>
+</div>

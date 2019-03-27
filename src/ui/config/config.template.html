@@ -1,6 +1,8 @@
 <div class="input-group">
-  <span class="input-group-addon">
-    GPU Limit
+  <span class="input-group-prepend">
+    <span class="input-group-text">
+      GPU Limit
+    </span>
   </span>
   <input
     (wheel)="wheelEvent($event)"
@@ -11,18 +13,20 @@
     class="form-control"
     (input)="keydown$.next($event)"
     [value]="gpuLimit$ | async ">
-  <div class="input-group-btn">
-    <div (click)="setGpuPreset({ value: 100 })" class="btn btn-default">
-      100
-    </div>
-    <div (click)="setGpuPreset({ value: 500 })" class="btn btn-default">
-      500
-    </div>
-    <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-default">
-      1000
+
+  <div class="input-group-append">
+
+    <div (click)="setGpuPreset({ value: 100 })" class="btn btn-outline-secondary">
+        100
+      </div>
+      <div (click)="setGpuPreset({ value: 500 })" class="btn btn-outline-secondary">
+        500
+      </div>
+      <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-outline-secondary">
+        1000
+      </div>
+      <span class="input-group-text">
+        MB
+      </span>
     </div>
   </div>
-  <span class="input-group-addon">
-    MB
-  </span>
-</div>

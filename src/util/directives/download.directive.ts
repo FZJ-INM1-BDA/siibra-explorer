@@ -10,8 +10,8 @@ export class DownloadDirective{
 
   constructor(public el:ElementRef, public rd2:Renderer2){
     this.downloadIcon = rd2.createElement('i')
-    rd2.addClass(this.downloadIcon, 'glyphicon')
-    rd2.addClass(this.downloadIcon, 'glyphicon-download-alt')
+    rd2.addClass(this.downloadIcon, 'fas')
+    rd2.addClass(this.downloadIcon, 'fa-download-alt')
   }
 
   ngAfterViewInit(){

@@ -1,0 +1,10 @@
+div
+{
+  white-space: nowrap;
+}
+
+.clickable:hover
+{
+  color:#dbb556;
+  cursor:default;
+}

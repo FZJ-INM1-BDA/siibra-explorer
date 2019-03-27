@@ -7,20 +7,18 @@ import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "../layouts/layout.module";
 import { FormsModule } from "@angular/forms";
-import { DataBrowserUI } from "./databrowser/databrowser.component";
+
 import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pipe";
 import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
 import { FileViewer } from "./fileviewer/fileviewer.component";
+import { MenuIconsBar } from './menuicons/menuicons.component'
 
 import { ChartsModule } from 'ng2-charts'
 import { RadarChart } from "./fileviewer/radar/radar.chart.component";
 import { LineChart } from "./fileviewer/line/line.chart.component";
-import { PathToNestedChildren } from "../util/pipes/pathToNestedChildren.pipe";
-import { CopyPropertyPipe } from "../util/pipes/copyProperty.pipe";
 import { GetPropMapPipe } from "../util/pipes/getPropMap.pipe";
 import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
 
-import { FilterDataEntriesbyType } from "../util/pipes/filterDataEntriesByType.pipe";
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
@@ -33,7 +31,7 @@ import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
 import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion.pipe";
-import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
+
 import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
 import { DownloadDirective } from "../util/directives/download.directive";
 import { LogoContainer } from "./logoContainer/logoContainer.component";
@@ -44,8 +42,8 @@ import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
-import { FilterDataEntriesByRegion } from "src/util/pipes/filterDataEntriesByRegion.pipe";
 import { PopoverModule } from 'ngx-bootstrap/popover'
+import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 
 
 @NgModule({
@@ -55,6 +53,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     BrowserModule,
     LayoutModule,
     ComponentsModule,
+    DatabrowserModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -63,7 +62,6 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     NehubaContainer,
     NehubaViewerUnit,
     SplashScreen,
-    DataBrowserUI,
     FileViewer,
     RadarChart,
     LineChart,
@@ -75,23 +73,19 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     LayerBrowser,
     KgEntryViewer,
     SubjectViewer,
-    DatasetViewerComponent,
     LogoContainer,
     TemplateParcellationCitationsContainer,
     MobileOverlay,
     HelpComponent,
     ConfigComponent,
+    MenuIconsBar,
 
     /* pipes */
     GroupDatasetByRegion,
     filterRegionDataEntries,
-    PathToNestedChildren,
-    CopyPropertyPipe,
     GetPropMapPipe,
     GetUniquePipe,
     FlatmapArrayPipe,
-    FilterDataEntriesbyType,
-    FilterDataEntriesByRegion,
     SafeStylePipe,
     GetLayerNameFromDatasets,
     SortDataEntriesToRegion,
@@ -107,8 +101,7 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     FileViewer,
-    DataBrowserUI,
-    DatasetViewerComponent
+    LayerBrowser,
   ],
   exports : [
     SubjectViewer,
@@ -118,15 +111,14 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
     PluginBannerUI,
     NehubaContainer,
     NehubaViewerUnit,
-    DataBrowserUI,
     LayerBrowser,
     FileViewer,
     LogoContainer,
-    DatasetViewerComponent,
     TemplateParcellationCitationsContainer,
     MobileOverlay,
     HelpComponent,
-    ConfigComponent
+    ConfigComponent,
+    MenuIconsBar
   ]
 })
 

@@ -6,7 +6,7 @@ export { NgViewerAction, NgViewerStateInterface, ngViewerState, ADD_NG_LAYER, FO
 export { CHANGE_NAVIGATION, AtlasAction, DESELECT_LANDMARKS, DESELECT_REGIONS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS, ViewerStateInterface, viewerState } from './state/viewerState.store'
 export { DataEntry, ParcellationRegion, DataStateInterface, DatasetAction, FETCHED_DATAENTRIES, FETCHED_METADATA, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, dataStore, File, FileSupplementData } from './state/dataStore.store'
 export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL, UIAction, UIStateInterface, uiState } from './state/uiState.store'
-export { SPATIAL_GOTO_PAGE, SpatialDataEntries, SpatialDataStateInterface, UPDATE_SPATIAL_DATA, UPDATE_SPATIAL_DATA_VISIBLE, spatialSearchState } from './state/spatialSearchState.store'
+export { SPATIAL_GOTO_PAGE, SpatialDataEntries, SpatialDataStateInterface, UPDATE_SPATIAL_DATA, spatialSearchState } from './state/spatialSearchState.store'
 
 export function safeFilter(key:string){
   return filter((state:any)=>

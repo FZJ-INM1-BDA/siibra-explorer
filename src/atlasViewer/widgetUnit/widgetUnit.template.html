@@ -10,19 +10,26 @@
     widgetUnitHeading 
     heading>
     <div #emptyspan emptyspan>.</div>
-    <div title>{{ title }}</div>
+    <div title>
+      <div *ngIf="!titleHTML">
+          {{ title }}
+      </div>
+      <div [innerHTML]="titleHTML" *ngIf="titleHTML">
+
+      </div>
+    </div>
     <div icons>
       <i *ngIf = "state === 'floating'"
         (click) = "dock($event)" 
-        class = "glyphicon glyphicon-log-in" 
+        class = "fas fa-window-minimize" 
         hoverable></i>
       <i *ngIf = "state === 'docked'"
         (click) = "undock($event)" 
-        class = "glyphicon glyphicon-new-window" 
+        class = "fas fa-window-restore" 
         hoverable></i>
       <i *ngIf = "exitable"
         (click) = "exit($event)" 
-        class = "glyphicon glyphicon-remove" 
+        class = "fas fa-times" 
         hoverable></i>
     </div>
   </div>

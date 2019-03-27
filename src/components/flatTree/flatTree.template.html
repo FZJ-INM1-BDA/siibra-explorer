@@ -24,10 +24,10 @@
       <span 
         *ngIf = "findChildren(flattenedItem).length > 0; else noChildren"
         (click) = "$event.stopPropagation(); toggleCollapse(flattenedItem)" >
-        <i [ngClass] = "isCollapsed(flattenedItem) ? 'glyphicon-chevron-right' : 'glyphicon-chevron-down'" class="glyphicon"></i>
+        <i [ngClass] = "isCollapsed(flattenedItem) ? 'fa-chevron-right' : 'fa-chevron-down'" class="fas"></i>
       </span>
       <ng-template #noChildren>
-        <i class="glyphicon glyphicon-none">
+        <i class="fas fa-none">
     
         </i>
       </ng-template>

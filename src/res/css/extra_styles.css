@@ -2,6 +2,7 @@ html
 {
   width:100%;
   height:100%;
+  font-size:90%;
 }
 body
 {
@@ -10,7 +11,7 @@ body
   margin:0;
   border:0;
 
-  /* required for glyphicon tooltip directives */
+  /* required for fas tooltip directives */
   overflow:hidden;
 }
 div.scale-bar-container
@@ -149,7 +150,7 @@ markdown-dom pre code
   background-color:rgba(150,150,0,0.5);
 }
 
-.glyphicon-none
+.fa-none
 {
   width:1em;
 }

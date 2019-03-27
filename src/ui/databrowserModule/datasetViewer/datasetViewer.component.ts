@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { DataEntry } from "../../services/stateStore.service";
+import { DataEntry } from "src/services/stateStore.service";
 
 @Component({
   selector : 'dataset-viewer',
@@ -30,5 +30,15 @@ export class DatasetViewerComponent{
     return obj.name
       ? obj.name
       : obj.path
+  }
+
+  get methods(): string[]{
+    return this.dataset.activity.reduce((acc, act) => {
+      return acc.concat(act.methods)
+    }, [])
+  }
+
+  get kgReference(): string[] {
+    return this.dataset.kgReference.map(ref => `https://doi.org/${ref}`)
   }
 }

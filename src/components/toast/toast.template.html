@@ -8,7 +8,7 @@
     {{ message }}
   </div>
   <div (click) = "dismiss($event)" *ngIf = "dismissable" close>
-    <i class = "glyphicon glyphicon-remove"></i>
+    <i class = "fas fa-remove"></i>
   </div>
   <timer-component (timerEnd)="dismissed.emit(false)" [pause] = "hover" [timeout] = "timeout" timer>
   </timer-component>

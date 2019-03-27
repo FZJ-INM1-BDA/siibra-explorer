@@ -5,11 +5,11 @@
     class="pill-title">
     {{ title }}
   </span>
-  <span
+  <div
     [ngStyle]="closeBtnStyle"
-    class="pill-close"
+    class="pill-close rounded-circle"
     (click)="close()"
     *ngIf="showClose">
-    <i class="glyphicon glyphicon-remove"></i>
-  </span>
+    <i class="fas fa-times-circle"></i>
+  </div>
 </div>

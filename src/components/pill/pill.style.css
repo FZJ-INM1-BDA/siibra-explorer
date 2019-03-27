@@ -15,15 +15,11 @@
 .pill-close
 {
   flex: 0 0 auto;
-  width:1.4em;
-  height: 1.4em;
-  font-size:0.8em;
-  padding: 0.2em;
-  border-radius: 0.7em;
   box-sizing: border-box;
 
+  line-height: 1;
   margin-left: 0.4em;
-  margin-right: -0.8em;
+  margin-right: -0.6em;
 }
 
 :host
