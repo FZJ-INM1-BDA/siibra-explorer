@@ -38,6 +38,9 @@ export class ConfigComponent implements OnInit, OnDestroy{
       this.keydown$.pipe(
         debounceTime(250)
       ).subscribe(ev => {
+        /**
+         * maybe greak in FF. ev.srcElement is IE non standard property
+         */
         const val = (<HTMLInputElement>ev.srcElement).value
         const numVal = val && Number(val)
         if (isNaN(numVal) || numVal < this.gpuMin || numVal > this.gpuMax )

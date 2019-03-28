@@ -55,6 +55,16 @@ export class ModalityPicker implements OnInit, OnDestroy{
     )
   }
 
+  clearAll(){
+    this.countedDataM = this.countedDataM.map(cdm => {
+      return {
+        ...cdm,
+        visible: false
+      }
+    })
+    this.modalityFilterEmitter.emit([])
+  }
+
   reduceDataentry(accumulator:{name:string, occurance:number}[], dataentry: DataEntry) {
     const methods = dataentry.activity
       .map(a => a.methods)

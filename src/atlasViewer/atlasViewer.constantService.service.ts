@@ -3,6 +3,7 @@ import { Store } from "@ngrx/store";
 import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
 import { Subject } from "rxjs";
 import { ACTION_TYPES, ViewerConfiguration, viewerConfigState } from 'src/services/state/viewerConfig.store'
+import { User } from "src/services/auth.service";
 
 @Injectable({
   providedIn : 'root'
@@ -151,6 +152,11 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    * message when user on hover a segment or landmark
    */
   public toggleMessage: string = 'double click to toggle select'
+
+  /**
+   * observable for showing login modal
+   */
+  public showSigninSubject$: Subject<any> = new Subject()
 
   /**
    * Observable for showing config modal

@@ -1,0 +1,33 @@
+<dropdown-component
+  (itemSelected)="changeTemplate($event)"
+  [activeDisplay]="displayActiveTemplate"
+  [selectedItem]="selectedTemplate$ | async"
+  [inputArray]="loadedTemplates$ | async | filterNull">
+
+</dropdown-component>
+
+<!-- help btn -->
+<div
+  *ngIf="!isMobile" 
+  (click)="showHelp()" 
+  class="btn btn-outline-secondary btn-sm rounded-circle">
+  <i class="fas fa-question-circle"></i>
+</div>
+
+<!-- config btn -->
+<div
+  *ngIf="!isMobile" 
+  (click)="showConfig()"
+  class="btn btn-outline-secondary btn-sm rounded-circle">
+  <i class="fas fa-cog"></i>
+</div>
+
+<!-- signin -->
+<div
+  *ngIf="!isMobile"
+  (click)="showSignin()"
+  class="btn btn-outline-secondary btn-sm rounded-circle">
+  <i
+    [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+    class="fas"></i>
+</div>

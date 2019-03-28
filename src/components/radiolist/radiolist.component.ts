@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from "@angular/core";
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from "@angular/core";
 
 @Component({
   selector: 'radio-list',
@@ -26,5 +26,18 @@ import { Component, ChangeDetectionStrategy } from "@angular/core";
 })
 
 export class RadioList{
-  
+  @Input() 
+  listDisplay : (item:any) => string = (obj) => obj.name
+
+  @Output()
+  itemSelected : EventEmitter<any> = new EventEmitter()
+
+  @Input()
+  selectedItem: any | null = null
+
+  @Input()
+  inputArray: any[] = []
+
+  @Input()
+  ulClass: string = ''
 }

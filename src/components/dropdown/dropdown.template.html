@@ -5,20 +5,12 @@
   #dropdownToggle
   dropdownToggle>
 </span>
+<radio-list
+  [ulClass]="'dropdown-menu'"
+  (itemSelected)="itemSelected.emit($event)"
+  [listDisplay]="listDisplay"
+  [selectedItem]="selectedItem"
+  [inputArray]="inputArray"
+  [@showState]="openState ? 'show' : 'hide'">
 
-<ul 
-  class="dropdown-menu"
-  role="menu"
-  [@showState] = "openState ? 'show' : 'hide'">
-  <li 
-    *ngFor="let input of inputArray" 
-    [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    (click)="itemSelected.emit(input); openState = false" 
-    role="menuitem">
-    
-    <span 
-      class="dropdown-item" 
-      [innerHTML] = "listDisplay(input)">
-    </span>
-  </li>
-</ul>
+</radio-list>

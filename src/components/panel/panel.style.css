@@ -47,6 +47,12 @@ div.panel-body
   color:rgba(223,240,216  ,0.9);
 }
 
+div.l-card-body
+{
+  color:rgba(0, 0, 0, 0.9);
+  background-color:rgba(230, 230, 230, 0.8);
+}
+
 :host-context([darktheme="true"]) div.l-card-body
 {
   color:rgba(255,255,255,0.9);

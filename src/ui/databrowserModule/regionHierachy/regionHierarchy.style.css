@@ -52,14 +52,11 @@ div[hideScrollbarcontainer]
 
 div[searchRegionPopover]
 {
-  height:2em;
+  /* height:2em; */
 }
 
 input[type="text"]
 {
-  border-radius:0px;
-  height:2.6em;
-  width:20em;
   border:none;
 }
 
@@ -78,5 +75,5 @@ input[type="text"]
 
 .regionSearch
 {
-  font-size: 80%;
+  width:20em;
 }

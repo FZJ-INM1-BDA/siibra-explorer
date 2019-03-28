@@ -25,6 +25,7 @@ import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
 import { PillComponent } from './pill/pill.component';
 import { CommonModule } from '@angular/common';
+import { RadioList } from './radiolist/radiolist.component';
 
 
 @NgModule({
@@ -45,6 +46,7 @@ import { CommonModule } from '@angular/common';
     FlatTreeComponent,
     TimerComponent,
     PillComponent,
+    RadioList,
 
     /* directive */
     HoverableBlockDirective,
@@ -74,6 +76,7 @@ import { CommonModule } from '@angular/common';
     FlatTreeComponent,
     TimerComponent,
     PillComponent,
+    RadioList,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

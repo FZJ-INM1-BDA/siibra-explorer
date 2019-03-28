@@ -1,16 +1,14 @@
-
 <ul 
-  class="dropdown-menu"
-  role="menu"
-  [@showState] = "openState ? 'show' : 'hide'">
+  [ngClass]="ulClass"
+  role="menu">
   <li 
     *ngFor="let input of inputArray" 
     [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    (click)="itemSelected.emit(input); openState = false" 
+    (click)="itemSelected.emit({previous: selectedItem, current: input})" 
     role="menuitem">
     
     <span 
-      class="dropdown-item" 
+      class="dropdown-item-1" 
       [innerHTML] = "listDisplay(input)">
     </span>
   </li>

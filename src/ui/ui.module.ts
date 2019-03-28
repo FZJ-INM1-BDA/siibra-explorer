@@ -23,7 +23,6 @@ import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
-import { AtlasBanner } from "./banner/banner.component";
 import { CitationsContainer } from "./citation/citations.component";
 import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
@@ -44,6 +43,8 @@ import { ConfigComponent } from './config/config.component'
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
 import { PopoverModule } from 'ngx-bootstrap/popover'
 import { DatabrowserModule } from "./databrowserModule/databrowser.module";
+import { SigninBanner } from "./signinBanner/signinBanner.components";
+import { SigninModal } from "./signinModal/signinModal.component";
 
 
 @NgModule({
@@ -67,7 +68,6 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
     LineChart,
     DedicatedViewer,
     LandmarkUnit,
-    AtlasBanner,
     PluginBannerUI,
     CitationsContainer,
     LayerBrowser,
@@ -79,6 +79,8 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
     HelpComponent,
     ConfigComponent,
     MenuIconsBar,
+    SigninBanner,
+    SigninModal,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -107,7 +109,6 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
     SubjectViewer,
     KgEntryViewer,
     CitationsContainer,
-    AtlasBanner,
     PluginBannerUI,
     NehubaContainer,
     NehubaViewerUnit,
@@ -118,7 +119,9 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
     MobileOverlay,
     HelpComponent,
     ConfigComponent,
-    MenuIconsBar
+    MenuIconsBar,
+    SigninBanner,
+    SigninModal
   ]
 })
 

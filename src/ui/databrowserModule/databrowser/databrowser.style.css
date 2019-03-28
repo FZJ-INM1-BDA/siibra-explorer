@@ -148,7 +148,41 @@ modality-picker
   overflow-x:hidden;
 }
 
-region-hierarchy
+.spinnerAnimationCircleContainer
 {
-  display:inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinnerAnimationCircleContainer > .spinnerAnimationCircle
+{
+  font-size: 300%;
+}
+
+.parcellationSelectionWrapper
+{
+  width: 100%;
+  display:flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.parcellationSelectionWrapper > *:first-child
+{
+  flex: 1 0 0;
+}
+.parcellationSelectionWrapper > *:last-child
+{
+  flex: 0 0 0;
+}
+
+.toggleParcellationBtn
+{
+  margin-left: -2.5em;
+  z-index: 1;
+}
+
+radio-list
+{
+  display: block;
 }

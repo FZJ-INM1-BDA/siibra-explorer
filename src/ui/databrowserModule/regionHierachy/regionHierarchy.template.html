@@ -1,16 +1,19 @@
 <div 
   #searchRegionPopover
   searchRegionPopover>
-  <input 
-    #searchTermInput
-    tabindex="0"
-    (keydown.esc)="escape($event)"
-    (focus)="showRegionTree = true"
-    [value]="searchTerm"
-    (input)="changeSearchTerm($event)"
-    class="form-control regionSearch"
-    type="text" 
-    [placeholder]="getInputPlaceholder(selectedParcellation)"/>
+  <div class="input-group regionSearch">
+    <input 
+      #searchTermInput
+      tabindex="0"
+      (keydown.esc)="escape($event)"
+      (focus)="showRegionTree = true"
+      [value]="searchTerm"
+      (input)="changeSearchTerm($event)"
+      class="form-control form-control-sm"
+      type="text" 
+      [placeholder]="getInputPlaceholder(selectedParcellation)"/>
+
+  </div>
     
   <div
     *ngIf="showRegionTree" 

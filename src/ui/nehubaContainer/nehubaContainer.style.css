@@ -45,7 +45,7 @@ div[statusCard]
 }
 
 :host-context([darktheme=true]) div[statusCard],
-input
+:host-context([darktheme=true]) input
 {
   background-color:rgba(20,20,20,0.8);
   color : rgba(250,250,250,0.8);

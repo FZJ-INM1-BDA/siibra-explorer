@@ -1,7 +1,7 @@
-import { Component, OnDestroy, OnInit, Input, Injector, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, Injector, ViewChild } from "@angular/core";
 import { DataEntry, File } from "src/services/stateStore.service";
 import { Subscription } from "rxjs";
-import { ComponentFactory, ComponentRef } from "@angular/core/src/render3";
+import { ComponentFactory } from "@angular/core/src/render3";
 import { FileViewer } from "src/ui/fileviewer/fileviewer.component";
 import { DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
@@ -23,6 +23,22 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   get selectedRegions(){
     return this.dbService.selectedRegions
+  }
+
+  get selectedParcellation(){
+    return this.dbService.selectedParcellation
+  }
+
+  get availableParcellations(){
+    return (this.dbService.selectedTemplate && this.dbService.selectedTemplate.parcellations) || []
+  }
+
+  get fetchingFlag(){
+    return this.dbService.fetchingFlag
+  }
+
+  get fetchError(){
+    return this.dbService.fetchError
   }
 
   /**
@@ -50,7 +66,11 @@ export class DataBrowser implements OnDestroy,OnInit{
   modalityPicker: ModalityPicker
 
   ngOnInit(){
-
+    this.subscriptions.push(
+      this.dbService.selectedRegions$.subscribe(() => {
+        this.resetCurrentPage()
+      })
+    )
     /**
      * TODO fix
      */
@@ -62,6 +82,13 @@ export class DataBrowser implements OnDestroy,OnInit{
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
   }
+
+  retryFetchData(event: MouseEvent){
+    event.preventDefault()
+    this.dbService.manualFetchDataset$.next(null)
+  }
+
+  public showParcellationList: boolean = false
 
   deselectRegion(region:any){
     /**
@@ -105,6 +132,25 @@ export class DataBrowser implements OnDestroy,OnInit{
     }else{
       /** no mime type  */
     }
+  }
+
+  changeParcellation(payload) {
+    this.showParcellationList = false
+    this.dbService.changeParcellation(payload)
+  }
+
+  /**
+   * when filter changes, it is necessary to set current page to 0,
+   * or one may overflow and see no dataset
+   */
+  resetCurrentPage(){
+    this.currentPage = 0
+  }
+
+  resetFilters(event:MouseEvent){
+    event.preventDefault()
+    this.modalityPicker.clearAll()
+    this.dbService.updateRegionSelection([])
   }
 }
 

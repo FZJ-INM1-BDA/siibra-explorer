@@ -6,9 +6,8 @@
   <div bannerWrapper>
     <menu-icons iconWrapper>
     </menu-icons>
-    <div signinWrapper>
-
-    </div>
+    <signin-banner signinWrapper>
+    </signin-banner>
   </div>
 
   <layout-floating-container
@@ -48,6 +47,11 @@
 <ng-template #viewerConfigComponent>
   <config-component>
   </config-component>
+</ng-template>
+<ng-template #signinModalComponent>
+  <signin-modal>
+    
+  </signin-modal>
 </ng-template>
 
 <markdown-dom minReqMd *ngIf = "!meetsRequirement" [markdown] = "constantsService.minReqMD" >

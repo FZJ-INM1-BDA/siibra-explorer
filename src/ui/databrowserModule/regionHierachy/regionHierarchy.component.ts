@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input } from "@angular/core";
+import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output } from "@angular/core";
 import {  Subscription, Subject } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "../filterNameBySearch.pipe";
@@ -19,7 +19,11 @@ export class RegionHierarchy implements OnInit{
   @Input()
   public selectedRegions: any[] = []
 
-  public showRegionTree: boolean = false
+  private _showRegionTree: boolean = false
+
+  @Output()
+  showRegionFlagChanged: EventEmitter<boolean> = new EventEmitter()
+
   public searchTerm: string = ''
   private subscriptions: Subscription[] = []
 
@@ -51,6 +55,15 @@ export class RegionHierarchy implements OnInit{
     private cdr:ChangeDetectorRef,
     private dbService: DatabrowserService
   ){
+  }
+
+  get showRegionTree(){
+    return this._showRegionTree
+  }
+
+  set showRegionTree(flag: boolean){
+    this._showRegionTree = flag
+    this.showRegionFlagChanged.emit(this._showRegionTree)
   }
 
   ngOnInit(){

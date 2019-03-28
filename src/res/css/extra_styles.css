@@ -246,24 +246,3 @@ markdown-dom pre code
   background-color: rgba(70, 70 , 70, 1.0);
   color: rgba(255, 255, 255, 1.0);
 }
-
-.popoverContainer .popover-header
-{
-  border: none;
-}
-
-[darktheme="true"] .popoverContainer.popover
-{
-  background-color: rgba(50,50,50);
-  color: white;
-}
-
-[darktheme="true"] .popoverContainer.popover .popover-header
-{
-  background-color: rgba(75,75,75);
-}
-
-[darktheme="true"] .popoverContainer.popover.bottom .popover-arrow.arrow::after
-{
-  border-bottom-color: rgb(75,75,75);
-}

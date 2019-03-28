@@ -6,9 +6,11 @@
   </i>
   <readmore-component
     #modalityReadmore
+    [animationLength]="0"
     [collapsedHeight]="0">
     <div class="filterWrapper">
-      <modality-picker (modalityFilterEmitter)="modalityFilter = $event">
+      <modality-picker
+        (modalityFilterEmitter)="modalityFilter = $event; resetCurrentPage()">
   
       </modality-picker>
     </div>
@@ -27,13 +29,38 @@
 
 <!-- region hierarchy -->
 <div>
-  <i (click)="regionHierarchy.focusInput($event)" class="clickable">
+  <i (click)="!regionHierarchy.showRegionTree ? regionHierarchy.focusInput($event) : {}" class="clickable">
     Filter by parcellation region <small *ngIf="selectedRegions.length > 0" class="text-muted">({{ selectedRegions.length }})</small>
   </i>
-  <region-hierarchy #regionHierarchy>
-  </region-hierarchy>
+
+  <!-- parcellation toggle btn -->
+  <div class="parcellationSelectionWrapper">
+    <!-- region selector -->
+    <region-hierarchy
+      (showRegionFlagChanged)="$event ? (showParcellationList = false) : {}"
+      #regionHierarchy>
+    </region-hierarchy>
+
+    <div
+      (click)="showParcellationList = !showParcellationList"
+      class="toggleParcellationBtn btn btn-secondary btn-sm">
+      <i [ngClass]="showParcellationList ? 'fa-chevron-down' : 'fa-chevron-left' " class="fas"></i>
+    </div>
+  </div>
+
+
+  <!-- parcellation selector -->
+  <radio-list
+    *ngIf="selectedParcellation && showParcellationList"
+    class="mt-1 mb-0"
+    (itemSelected)="changeParcellation($event)"
+    [selectedItem]="selectedParcellation"
+    [inputArray]="availableParcellations">
+  </radio-list>
+
   <readmore-component
     [hidden]="selectedRegions.length === 0"
+    [animationLength]="0"
     #selectedRegionReadmore
     [collapsedHeight]="45">
     <div class="filterWrapper">
@@ -48,28 +75,53 @@
   </readmore-component>
 </div>
 
-<!-- Data Entries -->
-<div>
-  <i *ngIf="dbService.fetchedDataEntries$ | async">
-    {{ (dbService.fetchedDataEntries$ | async).length }} total results. <span *ngIf="selectedRegions.length + modalityFilter.length > 0 "> {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} filtered results.</span>
-  </i>
-  <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
-    No results to show.
-  </i>
-</div>
-<div *ngIf="dbService.fetchedDataEntries$ | async">
-  <dataset-viewer
-    class="mt-1"
-    *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
-    (launchFileViewer) = "launchFile($event)"
-    [dataset] = "dataset">
-  </dataset-viewer>
+<div
+  *ngIf="fetchingFlag; else fetched"
+  class="spinnerAnimationCircleContainer">
+  <div class="spinnerAnimationCircle"></div>
+  <div>Fetching datasets...</div>
 </div>
 
-<pagination-component
-  *ngIf="dbService.fetchedDataEntries$ | async"
-  (paginationChange)="currentPage = $event"
-  [hitsPerPage]="hitsPerPage"
-  [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
-  [currentPage]="currentPage">
-</pagination-component>
+<ng-template #fetched>
+  <div class="ml-2 mr-2 alert alert-danger" *ngIf="fetchError; else showData">
+    <i class="fas fa-exclamation-triangle"></i> Error fetching data. <a href="#" (click)="retryFetchData($event)" class="btn btn-link text-info">retry</a>
+  </div>
+</ng-template>
+
+<ng-template #showData>
+  <!-- Data Entries -->
+  <div>
+    <i *ngIf="dbService.fetchedDataEntries$ | async">
+      {{ (dbService.fetchedDataEntries$ | async).length }} total results. 
+      <span
+        *ngIf="selectedRegions.length + modalityFilter.length > 0 "> 
+        {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} 
+        filtered results.
+        <a
+          href="#"
+          class="btn btn-sm btn-link"
+          (click)="resetFilters($event)">reset filters
+        </a>
+      </span>
+    </i>
+    <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
+      No results to show.
+    </i>
+  </div>
+  <div *ngIf="dbService.fetchedDataEntries$ | async">
+    <dataset-viewer
+      class="mt-1"
+      *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
+      (launchFileViewer) = "launchFile($event)"
+      [dataset] = "dataset">
+    </dataset-viewer>
+  </div>
+  
+  <pagination-component
+    *ngIf="dbService.fetchedDataEntries$ | async"
+    (paginationChange)="currentPage = $event"
+    [hitsPerPage]="hitsPerPage"
+    [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
+    [currentPage]="currentPage">
+  </pagination-component>
+</ng-template>
