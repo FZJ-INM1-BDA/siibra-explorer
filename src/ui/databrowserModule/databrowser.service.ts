@@ -36,6 +36,7 @@ export class DatabrowserService implements OnDestroy{
 
   public fetchedDataEntries$: Observable<DataEntry[]>
 
+  public fetchDataObservable$: Observable<any>
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
   constructor(
@@ -80,8 +81,7 @@ export class DatabrowserService implements OnDestroy{
       this.selectedRegions$.subscribe(r => this.selectedRegions = r)
     )
 
-    this.subscriptions.push(
-      combineLatest(
+    this.fetchDataObservable$ = combineLatest(
         this.store.pipe(
           select('viewerState'),
           safeFilter('templateSelected'),
@@ -95,7 +95,10 @@ export class DatabrowserService implements OnDestroy{
           distinctUntilChanged()
         ),
         this.manualFetchDataset$
-      ).pipe(
+      )
+
+    this.subscriptions.push(
+      this.fetchDataObservable$.pipe(
         debounceTime(16)
       ).subscribe((param : [string, string, null] ) => this.fetchData(param[0], param[1]))
     )

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, Injector, ViewChild } from "@angular/core";
 import { DataEntry, File } from "src/services/stateStore.service";
-import { Subscription } from "rxjs";
+import { Subscription, merge } from "rxjs";
 import { ComponentFactory } from "@angular/core/src/render3";
 import { FileViewer } from "src/ui/fileviewer/fileviewer.component";
 import { DatabrowserService } from "../databrowser.service";
@@ -67,10 +67,14 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   ngOnInit(){
     this.subscriptions.push(
-      this.dbService.selectedRegions$.subscribe(() => {
+      merge(
+        this.dbService.selectedRegions$,
+        this.dbService.fetchDataObservable$
+      ).subscribe(() => {
         this.resetCurrentPage()
       })
     )
+    
     /**
      * TODO fix
      */
