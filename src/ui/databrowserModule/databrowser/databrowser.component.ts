@@ -1,8 +1,6 @@
-import { Component, OnDestroy, OnInit, Injector, ViewChild } from "@angular/core";
-import { DataEntry, File } from "src/services/stateStore.service";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge } from "rxjs";
-import { ComponentFactory } from "@angular/core/src/render3";
-import { FileViewer } from "src/ui/fileviewer/fileviewer.component";
 import { DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 
@@ -50,7 +48,6 @@ export class DataBrowser implements OnDestroy,OnInit{
   public gemoetryFilter: any
 
   constructor(
-    private injector: Injector,
     private dbService: DatabrowserService
   ){
 
@@ -72,6 +69,11 @@ export class DataBrowser implements OnDestroy,OnInit{
         this.dbService.fetchDataObservable$
       ).subscribe(() => {
         this.resetCurrentPage()
+        /**
+         * Only reset modality picker
+         * resetting all creates infinite loop
+         */
+        this.modalityPicker.clearAll()
       })
     )
     
@@ -93,7 +95,7 @@ export class DataBrowser implements OnDestroy,OnInit{
   }
 
   public showParcellationList: boolean = false
-
+  
   deselectRegion(region:any){
     /**
      * when user clicks x on region selector
@@ -108,34 +110,10 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.modalityPicker.toggleModality({name: modality})
   }
 
-  /**
-   * TODO
-   * work around for now. 
-   * service does not have injector, and thus cannot create componentt
-   */
-  private fileViewerComponentFactory: ComponentFactory<FileViewer>
-  private dataWindowRegistry: Set<string> = new Set()
-  launchFile({dataset, file}:{dataset:DataEntry, file:File}){
-
-    if(dataset.formats.findIndex(format => format.toLowerCase() === 'nifti' ) >= 0){
-
-      // TODO use KG id in future
-      if(this.dataWindowRegistry.has(file.name)){
-        /* already open, will not open again */
-        return
-      }
-      /* not yet open, add the name to registry */
-      this.dataWindowRegistry.add(file.name)
-
-      const component = this.fileViewerComponentFactory.create(this.injector)
-      component.instance.searchResultFile = file
-      // const compref = this.dbService.attachFileViewer(component, file)
-
-      /* on destroy, removes name from registry */
-      // compref.onDestroy(() => this.dataWindowRegistry.delete(file.name))
-    }else{
-      /** no mime type  */
-    }
+  public filePreviewName: string
+  onShowPreviewDataset(payload: {datasetName:string, event:MouseEvent}){
+    const { datasetName, event } = payload
+    this.filePreviewName = datasetName
   }
 
   changeParcellation(payload) {
@@ -151,8 +129,8 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.currentPage = 0
   }
 
-  resetFilters(event:MouseEvent){
-    event.preventDefault()
+  resetFilters(event?:MouseEvent){
+    event && event.preventDefault()
     this.modalityPicker.clearAll()
     this.dbService.updateRegionSelection([])
   }

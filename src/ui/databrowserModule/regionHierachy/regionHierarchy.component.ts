@@ -1,7 +1,7 @@
 import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output } from "@angular/core";
 import {  Subscription, Subject } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
-import { FilterNameBySearch } from "../filterNameBySearch.pipe";
+import { FilterNameBySearch } from "../util/filterNameBySearch.pipe";
 import { DatabrowserService } from "../databrowser.service";
 
 @Component({

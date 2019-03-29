@@ -4,7 +4,6 @@ import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
-import { FileViewer } from "../fileviewer/fileviewer.component";
 
 @Component({
   selector: 'menu-icons',
@@ -23,10 +22,6 @@ export class MenuIconsBar{
   dataBrowser: ComponentRef<DataBrowser> = null
   dbWidget: ComponentRef<WidgetUnit> = null
 
-  /**
-   * file viewer
-   */
-  fcf: ComponentFactory<FileViewer>
 
   /**
    * layerBrowser
@@ -42,7 +37,6 @@ export class MenuIconsBar{
   ){
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
-    this.fcf = cfr.resolveComponentFactory(FileViewer)
   }
   public clickSearch(event: MouseEvent){
     if (this.dbWidget) {
@@ -58,32 +52,6 @@ export class MenuIconsBar{
       title: this.dataBrowserTitle,
       titleHTML: `<i class="fas fa-search"></i> ${this.dataBrowserTitle}`
     })
-
-
-    const dataWindowRegistry: Set<string> = new Set()
-
-    // const sub = this.dataBrowser.instance.launchFile.subscribe(payload => {
-    //   const { dataset, file } = payload
-    //   if(dataset.formats.findIndex(format => format.toLowerCase() === 'nifti' ) >= 0){
-  
-    //     // TODO use KG id in future
-    //     if(dataWindowRegistry.has(file.name)){
-    //       /* already open, will not open again */
-    //       return
-    //     }
-    //     /* not yet open, add the name to registry */
-    //     dataWindowRegistry.add(file.name)
-  
-    //     const component = this.fcf.create(this.injector)
-    //     component.instance.searchResultFile = file
-    //     const compref = this.widgetServices.addNewWidget(component,{title:file.name,exitable:true,state:'floating'})
-  
-    //     /* on destroy, removes name from registry */
-    //     compref.onDestroy(() => dataWindowRegistry.delete(file.name))
-    //   }else{
-    //     /** no mime type  */
-    //   }
-    // })
 
     this.dbWidget.onDestroy(() => {
       // sub.unsubscribe()

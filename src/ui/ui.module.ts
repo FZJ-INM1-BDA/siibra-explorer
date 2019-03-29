@@ -10,16 +10,11 @@ import { FormsModule } from "@angular/forms";
 
 import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pipe";
 import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
-import { FileViewer } from "./fileviewer/fileviewer.component";
 import { MenuIconsBar } from './menuicons/menuicons.component'
 
-import { ChartsModule } from 'ng2-charts'
-import { RadarChart } from "./fileviewer/radar/radar.chart.component";
-import { LineChart } from "./fileviewer/line/line.chart.component";
 import { GetPropMapPipe } from "../util/pipes/getPropMap.pipe";
 import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
 
-import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
@@ -45,11 +40,11 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
 import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { SigninModal } from "./signinModal/signinModal.component";
+import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
 
 
 @NgModule({
   imports : [
-    ChartsModule,
     FormsModule,
     BrowserModule,
     LayoutModule,
@@ -63,10 +58,6 @@ import { SigninModal } from "./signinModal/signinModal.component";
     NehubaContainer,
     NehubaViewerUnit,
     SplashScreen,
-    FileViewer,
-    RadarChart,
-    LineChart,
-    DedicatedViewer,
     LandmarkUnit,
     PluginBannerUI,
     CitationsContainer,
@@ -93,6 +84,7 @@ import { SigninModal } from "./signinModal/signinModal.component";
     SortDataEntriesToRegion,
     SpatialLandmarksToDataBrowserItemPipe,
     FilterNullPipe,
+    FilterNgLayer,
 
     /* directive */
     DownloadDirective,
@@ -102,7 +94,6 @@ import { SigninModal } from "./signinModal/signinModal.component";
 
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
-    FileViewer,
     LayerBrowser,
   ],
   exports : [
@@ -113,7 +104,6 @@ import { SigninModal } from "./signinModal/signinModal.component";
     NehubaContainer,
     NehubaViewerUnit,
     LayerBrowser,
-    FileViewer,
     LogoContainer,
     TemplateParcellationCitationsContainer,
     MobileOverlay,

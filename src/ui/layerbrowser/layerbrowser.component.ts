@@ -21,6 +21,10 @@ export class LayerBrowser implements OnDestroy{
 
   public forceShowSegmentCurrentState : boolean | null = null
   public forceShowSegment$ : Observable<boolean|null>
+  
+  public ngLayers$: Observable<any>
+  public advancedMode: boolean = false
+
   private subscriptions : Subscription[] = []
   private disposeHandler : any
   
@@ -29,6 +33,19 @@ export class LayerBrowser implements OnDestroy{
 
   constructor(private store : Store<ViewerStateInterface>){
 
+    this.ngLayers$ = store.pipe(
+      select('viewerState'),
+      select('templateSelected'),
+      map(templateSelected => (templateSelected && !this.advancedMode && [
+        templateSelected.ngId,
+        ...templateSelected.parcellations.map(p => p.ngId)
+      ]) || [])
+    )
+
+    /**
+     * TODO
+     * this is no longer populated
+     */
     this.fetchedDataEntries$ = this.store.pipe(
       select('dataStore'),
       safeFilter('fetchedDataEntries'),
@@ -49,6 +66,11 @@ export class LayerBrowser implements OnDestroy{
       delay(0)
     ).subscribe((lockedLayerNames:string[]) => {
 
+      /**
+       * TODO
+       * if layerbrowser is init before nehuba
+       * window['viewer'] will return undefined
+       */
       this.lockedLayers = lockedLayerNames
 
       this.ngLayersChangeHandler()

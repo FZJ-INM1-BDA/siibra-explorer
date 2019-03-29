@@ -6,7 +6,6 @@ import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime } fro
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
-import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
@@ -229,6 +228,8 @@ export class AtlasViewer implements OnDestroy, OnInit {
           template.useTheme === 'dark' :
           false
 
+        this.constantsService.darktheme = this.darktheme
+        
         /* new viewer should reset the spatial data search */
         this.store.dispatch({
           type : FETCHED_SPATIAL_DATA,
@@ -249,67 +250,6 @@ export class AtlasViewer implements OnDestroy, OnInit {
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
 
-    /**
-     * Because there is no easy way to display standard deviation natively, use a plugin 
-     * */
-    Chart.pluginService.register({
-
-      /* patching background color fill, so saved images do not look completely white */
-      beforeDraw: (chart) => {
-        const ctx = chart.ctx as CanvasRenderingContext2D;
-        ctx.fillStyle = this.darktheme ?
-          `rgba(50,50,50,0.8)` :
-          `rgba(255,255,255,0.8)`
-
-        if (chart.canvas) ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height)
-
-      },
-
-      /* patching standard deviation for polar (potentially also line/bar etc) graph */
-      afterInit: (chart) => {
-        if (chart.config.options && chart.config.options.tooltips) {
-
-          chart.config.options.tooltips.callbacks = {
-            label: function (tooltipItem, data) {
-              let sdValue
-              if (data.datasets && typeof tooltipItem.datasetIndex != 'undefined' && data.datasets[tooltipItem.datasetIndex].label) {
-                const sdLabel = data.datasets[tooltipItem.datasetIndex].label + '_sd'
-                const sd = data.datasets.find(dataset => typeof dataset.label != 'undefined' && dataset.label == sdLabel)
-                if (sd && sd.data && typeof tooltipItem.index != 'undefined' && typeof tooltipItem.yLabel != 'undefined') sdValue = Number(sd.data[tooltipItem.index]) - Number(tooltipItem.yLabel)
-              }
-              return `${tooltipItem.yLabel} ${sdValue ? '(' + sdValue + ')' : ''}`
-            }
-          }
-        }
-        if (chart.data.datasets) {
-          chart.data.datasets = chart.data.datasets
-            .map(dataset => {
-              if (dataset.label && /\_sd$/.test(dataset.label)) {
-                const originalDS = chart.data.datasets!.find(baseDS => typeof baseDS.label !== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/, '')))
-                if (originalDS) {
-                  return Object.assign({}, dataset, {
-                    data: (originalDS.data as number[]).map((datapoint, idx) => (Number(datapoint) + Number((dataset.data as number[])[idx]))),
-                    ... this.constantsService.chartSdStyle
-                  })
-                } else {
-                  return dataset
-                }
-              } else if (dataset.label) {
-                const sdDS = chart.data.datasets!.find(sdDS => typeof sdDS.label !== 'undefined' && (sdDS.label == dataset.label + '_sd'))
-                if (sdDS) {
-                  return Object.assign({}, dataset, {
-                    ...this.constantsService.chartBaseStyle
-                  })
-                } else {
-                  return dataset
-                }
-              } else {
-                return dataset
-              }
-            })
-        }
-      }
-    })
   }
 
   /**

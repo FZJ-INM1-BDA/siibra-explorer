@@ -43,8 +43,8 @@
 
     <div
       (click)="showParcellationList = !showParcellationList"
-      class="toggleParcellationBtn btn btn-secondary btn-sm">
-      <i [ngClass]="showParcellationList ? 'fa-chevron-down' : 'fa-chevron-left' " class="fas"></i>
+      class="toggleParcellationBtn btn btn-secondary btn-sm rounded-circle">
+      <i [ngClass]="showParcellationList ? '' : 'r-90' " class="fas fa-chevron-down"></i>
     </div>
   </div>
 
@@ -89,39 +89,63 @@
 </ng-template>
 
 <ng-template #showData>
-  <!-- Data Entries -->
-  <div>
-    <i *ngIf="dbService.fetchedDataEntries$ | async">
-      {{ (dbService.fetchedDataEntries$ | async).length }} total results. 
-      <span
-        *ngIf="selectedRegions.length + modalityFilter.length > 0 "> 
-        {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} 
-        filtered results.
-        <a
-          href="#"
-          class="btn btn-sm btn-link"
-          (click)="resetFilters($event)">reset filters
-        </a>
-      </span>
-    </i>
-    <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
-      No results to show.
-    </i>
+  <!-- datawrapper -->
+  <div
+    [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
+    class="dataEntryWrapper">
+
+    <!-- dataentries -->
+    <div class="dataEntry">
+      <div>
+        <i *ngIf="dbService.fetchedDataEntries$ | async">
+          {{ (dbService.fetchedDataEntries$ | async).length }} total results. 
+          <span
+            *ngIf="selectedRegions.length + modalityFilter.length > 0 "> 
+            {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} 
+            filtered results.
+            <a
+              href="#"
+              class="btn btn-sm btn-link"
+              (click)="resetFilters($event)">reset filters
+            </a>
+          </span>
+        </i>
+        <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
+          No results to show.
+        </i>
+      </div>
+      <div *ngIf="dbService.fetchedDataEntries$ | async">
+        <dataset-viewer
+          class="mt-1"
+          *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
+          (showPreviewDataset)="onShowPreviewDataset($event)"
+          [dataset]="dataset">
+        </dataset-viewer>
+      </div>
+      
+      <pagination-component
+        *ngIf="dbService.fetchedDataEntries$ | async"
+        (paginationChange)="currentPage = $event"
+        [hitsPerPage]="hitsPerPage"
+        [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
+        [currentPage]="currentPage">
+      </pagination-component>
+    </div>
+
+    <!-- file preview -->
+    <div
+      class="filePreview">
+      <div class="filePreviewContainer">
+        <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <preview-component
+          *ngIf="filePreviewName"
+          [datasetName]="filePreviewName">
+
+        </preview-component>
+          
+      </div>
+    </div>
   </div>
-  <div *ngIf="dbService.fetchedDataEntries$ | async">
-    <dataset-viewer
-      class="mt-1"
-      *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
-      (launchFileViewer) = "launchFile($event)"
-      [dataset] = "dataset">
-    </dataset-viewer>
-  </div>
-  
-  <pagination-component
-    *ngIf="dbService.fetchedDataEntries$ | async"
-    (paginationChange)="currentPage = $event"
-    [hitsPerPage]="hitsPerPage"
-    [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
-    [currentPage]="currentPage">
-  </pagination-component>
 </ng-template>

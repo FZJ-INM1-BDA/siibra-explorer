@@ -81,7 +81,6 @@ export class WidgetUnit {
   }
 
   exit(event?:Event){
-    console.log('exit')
     if(event){
       event.stopPropagation()
       event.preventDefault()

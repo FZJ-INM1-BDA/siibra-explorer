@@ -246,3 +246,8 @@ markdown-dom pre code
   background-color: rgba(70, 70 , 70, 1.0);
   color: rgba(255, 255, 255, 1.0);
 }
+
+.r-90
+{
+  transform: rotate(90deg)!important;
+}

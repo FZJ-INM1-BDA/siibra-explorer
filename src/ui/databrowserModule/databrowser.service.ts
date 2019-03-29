@@ -1,7 +1,7 @@
 import { Injectable, ComponentRef, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { SELECT_REGIONS, extractLabelIdx, CHANGE_NAVIGATION, DataEntry, File, safeFilter, isDefined, getLabelIndexMap, FETCHED_DATAENTRIES, SELECT_PARCELLATION } from "src/services/stateStore.service";
+import { SELECT_REGIONS, extractLabelIdx, CHANGE_NAVIGATION, DataEntry, File, safeFilter, isDefined, getLabelIndexMap, FETCHED_DATAENTRIES, SELECT_PARCELLATION, ADD_NG_LAYER, NgViewerStateInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { map, distinctUntilChanged, filter, debounceTime } from "rxjs/operators";
 import { Subscription, combineLatest, Observable, BehaviorSubject } from "rxjs";
@@ -44,6 +44,14 @@ export class DatabrowserService implements OnDestroy{
     private store: Store<ViewerConfiguration>,
     private widgetService: WidgetServices
   ){
+
+    this.subscriptions.push(
+      this.store.pipe(
+        select('ngViewerState')
+      ).subscribe(layersInterface => 
+        this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, ''))))
+    )
+
     this.selectedRegions$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.regionsSelected)),
@@ -82,20 +90,20 @@ export class DatabrowserService implements OnDestroy{
     )
 
     this.fetchDataObservable$ = combineLatest(
-        this.store.pipe(
-          select('viewerState'),
-          safeFilter('templateSelected'),
-          map(({templateSelected})=>(templateSelected.name)),
-          distinctUntilChanged()
-        ),
-        this.store.pipe(
-          select('viewerState'),
-          safeFilter('parcellationSelected'),
-          map(({parcellationSelected})=>(parcellationSelected.name)),
-          distinctUntilChanged()
-        ),
-        this.manualFetchDataset$
-      )
+      this.store.pipe(
+        select('viewerState'),
+        safeFilter('templateSelected'),
+        map(({templateSelected})=>(templateSelected.name)),
+        distinctUntilChanged()
+      ),
+      this.store.pipe(
+        select('viewerState'),
+        safeFilter('parcellationSelected'),
+        map(({parcellationSelected})=>(parcellationSelected.name)),
+        distinctUntilChanged()
+      ),
+      this.manualFetchDataset$
+    )
 
     this.subscriptions.push(
       this.fetchDataObservable$.pipe(
@@ -107,7 +115,7 @@ export class DatabrowserService implements OnDestroy{
   ngOnDestroy(){
     this.subscriptions.forEach(s => s.unsubscribe())
   }
-
+  
   public updateRegionSelection(regions: any[]) {
     this.store.dispatch({
       type: SELECT_REGIONS,
@@ -213,6 +221,44 @@ export class DatabrowserService implements OnDestroy{
            */
         }
       })
+  }
+
+  public fetchPreviewData(datasetName: string){
+    const encodedDatasetName = encodeURI(datasetName)
+    return new Promise((resolve, reject) => {
+      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`)
+        .then(res => res.json())
+        .then(resolve)
+        .catch(reject)
+    })
+  }
+
+  /**
+   * dedicated viewing (nifti heat maps etc)
+   */
+  private niftiLayerName: string = `nifty layer`
+  public ngLayers : Set<string> = new Set()
+  public showNewNgLayer({ url }):void{
+
+    const layer = {
+      name : url,
+      source : `nifti://${url}`,
+      mixability : 'nonmixable',
+      shader : this.constantService.getActiveColorMapFragmentMain()
+    }
+    this.store.dispatch({
+      type: ADD_NG_LAYER,
+      layer
+    })
+  }
+
+  removeNgLayer({ url }) {
+    this.store.dispatch({
+      type : REMOVE_NG_LAYER,
+      layer : {
+        name : url
+      }
+    })
   }
 
   public temporaryFilterDataentryName = temporaryFilterDataentryName

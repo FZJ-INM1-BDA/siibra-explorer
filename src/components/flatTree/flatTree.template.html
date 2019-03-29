@@ -24,7 +24,7 @@
       <span 
         *ngIf = "findChildren(flattenedItem).length > 0; else noChildren"
         (click) = "$event.stopPropagation(); toggleCollapse(flattenedItem)" >
-        <i [ngClass] = "isCollapsed(flattenedItem) ? 'fa-chevron-right' : 'fa-chevron-down'" class="fas"></i>
+        <i [ngClass] = "isCollapsed(flattenedItem) ? '' : 'r-270'" class="fas fa-chevron-down"></i>
       </span>
       <ng-template #noChildren>
         <i class="fas fa-none">

@@ -1,0 +1,26 @@
+<div *ngIf="activeFile">
+  {{ activeFile.name }}
+</div>
+<file-viewer
+  *ngIf="activeFile"
+  [previewFile]="activeFile">
+
+</file-viewer>
+
+<hr />
+<readmore-component
+  [collapsedHeight]="65">
+
+  <div class="readmore-wrapper">
+
+    <flat-tree-component
+      #flatTreeNode
+      *ngFor="let item of previewFiles | copyProperty : 'filename' : 'path' | pathToNestedChildren"
+      [childrenExpanded]="false"
+      [renderNode]="renderNode.bind(this)"
+      [inputItem]="item"
+      (treeNodeClick)="previewFileClick($event, flatTreeNode)">
+    
+    </flat-tree-component>
+  </div>
+</readmore-component>

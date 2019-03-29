@@ -9,28 +9,17 @@ import { DataEntry } from "src/services/stateStore.service";
 
 export class DatasetViewerComponent{
   @Input() dataset : DataEntry
-  @Output() launchFileViewer : EventEmitter<{dataset:DataEntry, file:any}> = new EventEmitter()
+  
+  @Output() showPreviewDataset: EventEmitter<{datasetName:string, event:MouseEvent}> = new EventEmitter()
 
-  previewFileClick(ev, el){
-    
-    ev.event.preventDefault()
-    ev.event.stopPropagation()
 
-    if(ev.inputItem.children.length > 0){
-      el.toggleCollapse(ev.inputItem)
-    }else{
-      this.launchFileViewer.emit({
-        dataset : this.dataset,
-        file : ev.inputItem
-      })
-    }
+  previewDataset(event:MouseEvent){
+    this.showPreviewDataset.emit({
+      event,
+      datasetName: this.dataset.name
+    })
   }
 
-  renderNode(obj){
-    return obj.name
-      ? obj.name
-      : obj.path
-  }
 
   get methods(): string[]{
     return this.dataset.activity.reduce((acc, act) => {

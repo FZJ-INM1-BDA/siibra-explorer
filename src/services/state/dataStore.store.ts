@@ -53,6 +53,8 @@ export interface DataEntry{
   publications: Publication[]
   embargoStatus: string[]
 
+  preview?: boolean
+
   /**
    * TODO typo, should be kgReferences
    */
@@ -119,7 +121,15 @@ export interface File{
   name: string
   absolutePath: string
   byteSize: number
-  contentType: string
+  contentType: string,
+}
+
+export interface ViewerPreviewFile{
+  name: string
+  filename: string
+  mimetype: string
+  url?: string
+  data?: any
 }
 
 export interface FileSupplementData{

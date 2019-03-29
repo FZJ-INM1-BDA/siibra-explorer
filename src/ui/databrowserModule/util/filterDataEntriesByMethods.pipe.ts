@@ -1,6 +1,6 @@
 import { PipeTransform, Pipe } from "@angular/core";
-import { DataEntry } from "../../services/stateStore.service";
-import { temporaryFilterDataentryName } from './databrowser.service'
+import { DataEntry } from "src/services/stateStore.service";
+import { temporaryFilterDataentryName } from '../databrowser.service'
 
 @Pipe({
   name : 'filterDataEntriesByMethods'

@@ -1,51 +1,61 @@
-<div 
-  class="layerContainer"
-  *ngFor = "let ngLayer of ngLayers">
-
-  <div>
-    <i 
-      container = "body"
-      placement = "bottom"
-      [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
+<ng-container *ngIf="ngLayers$ | async | filterNgLayer : ngLayers as filteredNgLayers; else noLayerPlaceHolder">
+  <ng-container *ngIf="filteredNgLayers.length > 0; else noLayerPlaceHolder">
+    <div 
+      class="layerContainer"
+      *ngFor = "let ngLayer of filteredNgLayers">
+    
+      <div
       (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
-      class = "fas" 
-      [ngClass] = "checkLocked(ngLayer) ? 'fa-lock muted' :ngLayer.visible ? 'fa-eye-open' : 'fa-eye-close'">
-
-    </i>
-  </div>
-  <div>
-    <i 
-      container = "body"
-      placement = "bottom"
-      [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
+      class="btn btn-sm btn-outline-secondary rounded-circle">
+        <i 
+          container = "body"
+          placement = "bottom"
+          [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
+          [ngClass] = "checkLocked(ngLayer) ? 'fas fa-lock muted' :ngLayer.visible ? 'far fa-eye' : 'far fa-eye-slash'">
+    
+        </i>
+      </div>
+      <div *ngIf="advancedMode"
       (click) = "forceSegment.hide();toggleForceShowSegment(ngLayer)"
-      class = "fas" 
-      #forceSegment = "bs-tooltip"
-      [ngClass] = "ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
-
-    </i>
-  </div>
-  <div>
-    <i 
-      (click) = "removeLayer(ngLayer)"
-      container = "body"
-      placement = "bottom"
-      [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
-      class = "fas"
-      [ngClass] = "checkLocked(ngLayer) ? 'fa-lock muted' : 'fa-remove-circle'">
-
-    </i>
-  </div>
-
-  <panel-component
-    [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
-
-    <div heading>
-      {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }} : {{ ngLayer.type }}
+        class="btn btn-sm btn-outline-secondary rounded-circle">
+        <i 
+          container = "body"
+          placement = "bottom"
+          [tooltip] = "ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
+          class = "fas" 
+          #forceSegment = "bs-tooltip"
+          [ngClass] = "ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
+    
+        </i>
+      </div>
+      <div
+        (click) = "removeLayer(ngLayer)"
+        class="btn btn-sm btn-outline-secondary rounded-circle">
+        <i 
+          container = "body"
+          placement = "bottom"
+          [tooltip] = "checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
+          [ngClass] = "checkLocked(ngLayer) ? 'fas fa-lock muted' : 'far fa-times-circle'">
+    
+        </i>
+      </div>
+      <panel-component
+        [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
+    
+        <div heading>
+          {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }} : {{ ngLayer.type }}
+        </div>
+    
+        <div bodyy>
+          {{ ngLayer.source }}
+        </div>
+      </panel-component>
     </div>
+  </ng-container>
+</ng-container>
 
-    <div bodyy>
-      {{ ngLayer.source }}
-    </div>
-  </panel-component>
-</div>
+<ng-template #noLayerPlaceHolder>
+  <h5 class="noLayerPlaceHolder text-muted">
+    No additional layers added.
+  </h5>
+</ng-template>

@@ -13,7 +13,8 @@ router.get('/', (req, res, next) => {
     })
     .catch(error => next({
       code: 500,
-      error
+      error,
+      trace: 'getTemplate'
     }))
 })
 
@@ -34,7 +35,8 @@ router.get('/:template', (req, res, next) => {
     })
     .catch(error => next({
       code: 500,
-      error
+      error,
+      trace: 'getTemplate/template'
     }))
 })
 

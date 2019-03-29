@@ -4,12 +4,26 @@
     {{ dataset.name }}
   </div>
 
-  <a
-    *ngFor="let kgr of kgReference"
-    target="_blank"
-    [href]="kgr">
-    open in knowledge graph
-  </a>
+  <div class="btn-group">
+
+    <a
+      *ngFor="let kgr of kgReference"
+      class="btn btn-sm btn-outline-secondary"
+      target="_blank"
+      tooltip="show in knowledge graph"
+      [href]="kgr">
+      <i class="fas fa-brain"></i>
+    </a>
+  
+    <a
+      *ngIf="dataset.preview"
+      class="btn btn-sm btn-outline-secondary"
+      (click)="previewDataset($event)"
+      tooltip="preview dataset"
+      href="#">
+      <i class="fas fa-chart-pie"></i>
+    </a>
+  </div>
   <!-- <kg-entry-viewer [dataset]="dataset">
 
   </kg-entry-viewer> -->
@@ -20,15 +34,6 @@
     <h5>
       Preview Dataset
     </h5>
-    <flat-tree-component
-      #flatTreeNode
-      *ngFor = "let item of dataset.files | copyProperty : 'filename' : 'path' | pathToNestedChildren"
-      [childrenExpanded] = "false"
-      [renderNode] = "renderNode"
-      [inputItem] = " item "
-      (treeNodeClick)= "previewFileClick($event, flatTreeNode)">
-  
-    </flat-tree-component>
     <hr />
   </div>
 </div>

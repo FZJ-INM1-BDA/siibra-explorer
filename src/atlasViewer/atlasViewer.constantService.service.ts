@@ -2,8 +2,10 @@ import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
 import { Subject } from "rxjs";
-import { ACTION_TYPES, ViewerConfiguration, viewerConfigState } from 'src/services/state/viewerConfig.store'
-import { User } from "src/services/auth.service";
+import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
+
+export const CM_THRESHOLD = `0.05`
+export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
 
 @Injectable({
   providedIn : 'root'
@@ -11,8 +13,11 @@ import { User } from "src/services/auth.service";
 
 export class AtlasViewerConstantsServices{
 
+  public darktheme: boolean = false
   public mobile: boolean
   public loadExportNehubaPromise : Promise<boolean>
+
+  public getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
@@ -201,6 +206,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   private showHelpPerspectiveMobile = [
     ['drag', 'change perspective view']
   ]
+  
   private showHelpPerspectiveDesktop = [
     ['drag', 'change perspective view']
   ]

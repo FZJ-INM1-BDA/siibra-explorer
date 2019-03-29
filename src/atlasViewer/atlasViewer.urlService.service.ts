@@ -4,7 +4,6 @@ import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_RE
 import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
-import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 import { ToastService } from "src/services/toastService.service";
@@ -175,7 +174,7 @@ export class AtlasViewerURLService{
             name : layer,
             source : `nifti://${layer}`,
             mixability : 'nonmixable',
-            shader : getActiveColorMapFragmentMain()
+            shader : this.constantService.getActiveColorMapFragmentMain()
           }
         }))
       }

@@ -1,6 +1,7 @@
 const fs = require('fs')
 const request = require('request')
 const path = require('path')
+const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 
 let cachedData = null
 let otherQueryResult = null
@@ -9,10 +10,10 @@ const timeout = process.env.TIMEOUT || 5000
 
 const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
   const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
-  const option = accessToken
+  const option = accessToken || process.env.ACCESS_TOKEN
     ? {
         auth: {
-          'bearer': accessToken
+          'bearer': accessToken || process.env.ACCESS_TOKEN
         }
       }
     : {}
@@ -101,27 +102,39 @@ const filterByPRs = (prs, atlasPr) => atlasPr
     })
   : false
 
-const filter = (datasets, {templateName, parcellationName}) => datasets.filter(ds => {
-  if (templateName) {
-    return ds.referenceSpaces.some(rs => rs.name === templateName)
-  }
-  if (parcellationName) {
-    return ds.parcellationRegion.length > 0
-      ? filterByPRs(
-          ds.parcellationRegion, 
-          parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain && !/infant/.test(ds.name)
-            ?  juBrain
-            : parcellationName === 'Fibre Bundle Atlas - Long Bundle' && longBundle
-              ?  longBundle
-              : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
-                ?  shortBundle
-                : null
-        )
-      : false
-  }
+const manualFilter = require('./supplements/parcellation')
 
-  return false
-})
+const filter = (datasets, {templateName, parcellationName}) => datasets
+  .filter(ds => {
+    if (templateName) {
+      return ds.referenceSpaces.some(rs => rs.name === templateName)
+    }
+    if (parcellationName) {
+      return ds.parcellationRegion.length > 0
+        ? filterByPRs(
+            ds.parcellationRegion, 
+            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain && !/infant/.test(ds.name)
+              ? juBrain
+              : parcellationName === 'Fibre Bundle Atlas - Long Bundle' && longBundle
+                ? longBundle
+                : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
+                  ? shortBundle
+                  : null
+          )
+        : manualFilter({ parcellationName, dataset: ds })
+    }
+
+    return false
+  })
+  .map(ds => {
+    return {
+      ...ds,
+      ...parcellationName && ds.parcellationRegion.length === 0
+        ? { parcellationRegion: [{ name: manualFilter({ parcellationName, dataset: ds }) }] }
+        : {},
+      preview: hasPreview({ datasetName: ds.name })
+    }
+  })
 
 /**
  * on init, populate the cached data
@@ -134,3 +147,4 @@ exports.init = () => fetchDatasetFromKg()
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
 
+exports.getPreview = ({ datasetName }) => getPreviewFile({ datasetName })

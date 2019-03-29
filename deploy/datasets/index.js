@@ -1,6 +1,6 @@
 const express = require('express')
 const datasetsRouter = express.Router()
-const { init, getDatasets } = require('./query')
+const { init, getDatasets, getPreview } = require('./query')
 
 init().catch(e => {
   console.warn(`dataset init failed`, e)
@@ -22,12 +22,11 @@ datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
     .catch(error => {
       next({
         code: 500,
-        error
+        error,
+        trace: 'parcellationName'
       })
     })
 })
-
-
 
 datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
   const { parcellationName } = req.params
@@ -39,7 +38,30 @@ datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
     .catch(error => {
       next({
         code: 500,
-        error
+        error,
+        trace: 'parcellationName'
+      })
+    })
+})
+
+datasetsRouter.get('/preview/:datasetName', (req, res, next) => {
+  const { datasetName } = req.params
+  getPreview({ datasetName })
+    .then(preview => {
+      if (preview) {
+        res.status(200).send(JSON.stringify(preview))
+      } else {
+        next({
+          code: 404,
+          trace: 'preview'
+        })
+      }
+    })
+    .catch(error => {
+      next({
+        code: 500,
+        error,
+        trace: 'preview'
       })
     })
 })

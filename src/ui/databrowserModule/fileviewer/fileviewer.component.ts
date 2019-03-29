@@ -1,9 +1,9 @@
 import { Component, Input, OnChanges, OnDestroy, ViewChild, ElementRef, OnInit, Output, EventEmitter } from '@angular/core'
 
 import { DomSanitizer } from '@angular/platform-browser';
-import { File, FileSupplementData } from '../../services/stateStore.service';
 import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
+import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
 
 @Component({
   selector : 'file-viewer',
@@ -17,11 +17,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   /**
    * fetched directly from KG
    */
-  @Input() searchResultFile : File
-  /**
-   * currently going to have to be application specific
-   */
-  @Input() fileSupplement: FileSupplementData
+  @Input() previewFile : ViewerPreviewFile
   
   @ViewChild('childChart') childChart : ChartComponentInterface
 
@@ -46,11 +42,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   }
 
   get downloadUrl(){
-    return this.searchResultFile.absolutePath ? 
-      this.searchResultFile.absolutePath : 
-      this._downloadUrl ? 
-        this.sanitizer.bypassSecurityTrustResourceUrl(this._downloadUrl)  :
-        null
+    return this.previewFile.url
   }
 
   /* TODO require better way to check if a chart exists */
@@ -60,8 +52,9 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
     const timerSet$ = timer$.pipe(
       switchMap(()=>from(new Promise((rs,rj)=>{
         if(!this.childChart)
-          rj('chart not defined after 500ms')
+          return rj('chart not defined after 500ms')
         
+        debugger
         this.childChart.canvas.nativeElement.toBlob((blob)=>{
           blob ? rs(blob) : rj('blob is undefined')
           
@@ -76,8 +69,8 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
     },(err)=>console.warn('warning',err))
 
 
-    if(!this.searchResultFile.absolutePath && this.fileSupplement.data){
-      const stringJson = JSON.stringify(this.fileSupplement.data)
+    if(!this.previewFile.url && this.previewFile.data){
+      const stringJson = JSON.stringify(this.previewFile.data)
       const newBlob = new Blob([stringJson],{type:'application/octet-stream'})
       this._downloadUrl = URL.createObjectURL(newBlob)
     }
@@ -86,14 +79,16 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   private revokeUrls(){
     if(this._downloadUrl){
       URL.revokeObjectURL(this._downloadUrl)
+      this._downloadUrl = null
     }
     if(this._pngDownloadUrl){
       URL.revokeObjectURL(this._pngDownloadUrl)
+      this._pngDownloadUrl = null
     }
   }
 
   get downloadName(){
-    return this.searchResultFile.name
+    return this.previewFile.name
   }
 
   get downloadPng(){
