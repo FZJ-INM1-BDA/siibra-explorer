@@ -19,7 +19,7 @@
       </div>
     </div>
     <div icons>
-      <i *ngIf = "state === 'floating'"
+      <i *ngIf = "canBeDocked && state === 'floating'"
         (click) = "dock($event)" 
         class = "fas fa-window-minimize" 
         hoverable></i>

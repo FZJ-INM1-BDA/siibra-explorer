@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
 
 
@@ -9,7 +9,7 @@ import { WidgetServices } from "./widgetService.service";
   ]
 })
 
-export class WidgetUnit {
+export class WidgetUnit implements OnInit{
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
   @ViewChild('emptyspan',{read:ElementRef}) emtpy : ElementRef
 
@@ -22,6 +22,13 @@ export class WidgetUnit {
   @HostBinding('style.height')
   height : string = this.state === 'docked' ? null : '0px'
 
+  get transform(){
+    return this.state === 'floating' ?
+      `translate(${this.position[0]}px, ${this.position[1]}px)` :
+      `translate(0 , 0)`
+  }
+
+  public canBeDocked: boolean = false
   @HostListener('mousedown')
   clicked(){
     this.clickedEmitter.emit(this)
@@ -43,6 +50,10 @@ export class WidgetUnit {
   public guestComponentRef : ComponentRef<any>
   public cf : ComponentRef<WidgetUnit>
   public widgetServices:WidgetServices
+
+  ngOnInit(){
+    this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'
+  }
 
   /**
    * @param {boolean}
@@ -129,12 +140,6 @@ export class WidgetUnit {
 
     /* nb FF will render any invisible DOM element as a file icon.  */
     ev.dataTransfer.setDragImage(this.emtpy.nativeElement, 0, 0)
-  }
-
-  get transform(){
-    return this.state === 'floating' ?
-      `translate(${this.position[0]}px, ${this.position[1]}px)` :
-      `translate(0 , 0)`
   }
 
 }
