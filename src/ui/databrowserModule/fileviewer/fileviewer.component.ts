@@ -53,8 +53,6 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
       switchMap(()=>from(new Promise((rs,rj)=>{
         if(!this.childChart)
           return rj('chart not defined after 500ms')
-        
-        debugger
         this.childChart.canvas.nativeElement.toBlob((blob)=>{
           blob ? rs(blob) : rj('blob is undefined')
           

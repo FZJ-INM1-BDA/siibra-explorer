@@ -756,6 +756,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
         filter(results => results[1] === null),
         map(results => results[0])
       ).subscribe((region:any) => {
+        /**
+         * TODO
+         * region may have labelIndex as well as children
+         */
         this.selectedRegionIndexSet.has(region.labelIndex) ?
           this.store.dispatch({
             type : SELECT_REGIONS,

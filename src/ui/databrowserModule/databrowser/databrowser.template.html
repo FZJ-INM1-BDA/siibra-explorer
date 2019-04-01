@@ -91,6 +91,7 @@
 <ng-template #showData>
   <!-- datawrapper -->
   <div
+    *ngIf="dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : rebuiltSomeSelectedRegions as filteredDataEntry"
     [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
     class="dataEntryWrapper">
 
@@ -100,8 +101,8 @@
         <i *ngIf="dbService.fetchedDataEntries$ | async">
           {{ (dbService.fetchedDataEntries$ | async).length }} total results. 
           <span
-            *ngIf="selectedRegions.length + modalityFilter.length > 0 "> 
-            {{ (dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length }} 
+            *ngIf="rebuiltSomeSelectedRegions.length + modalityFilter.length > 0 "> 
+            {{ filteredDataEntry.length }} 
             filtered results.
             <a
               href="#"
@@ -117,7 +118,7 @@
       <div *ngIf="dbService.fetchedDataEntries$ | async">
         <dataset-viewer
           class="mt-1"
-          *ngFor="let dataset of dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions | searchResultPagination : currentPage : hitsPerPage"
+          *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
           (showPreviewDataset)="onShowPreviewDataset($event)"
           [dataset]="dataset">
         </dataset-viewer>
@@ -127,7 +128,7 @@
         *ngIf="dbService.fetchedDataEntries$ | async"
         (paginationChange)="currentPage = $event"
         [hitsPerPage]="hitsPerPage"
-        [total]="(dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : selectedRegions).length"
+        [total]="filteredDataEntry.length"
         [currentPage]="currentPage">
       </pagination-component>
     </div>

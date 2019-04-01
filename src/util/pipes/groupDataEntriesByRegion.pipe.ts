@@ -5,8 +5,7 @@ import { DataEntry } from "../../services/stateStore.service";
   name : 'groupDatasetByRegion'
 })
 export class GroupDatasetByRegion implements PipeTransform{
-  public transform(datasets:DataEntry[], regions:any[]): {region:any|null,searchResults:DataEntry[]}[]
-  {
+  public transform(datasets:DataEntry[], regions:any[]): {region:any|null,searchResults:DataEntry[]}[]{
     
     return datasets.reduce((acc,curr)=>{
       return (curr.parcellationRegion && curr.parcellationRegion.length > 0)

@@ -8,7 +8,7 @@ import { temporaryFilterDataentryName } from '../databrowser.service'
 
 export class FilterDataEntriesbyMethods implements PipeTransform{
   public transform(dataEntries:DataEntry[],showDataMethods:string[]):DataEntry[]{
-    return showDataMethods.length > 0
+    return dataEntries && showDataMethods && showDataMethods.length > 0
       ? dataEntries.filter(dataEntry => {
           return dataEntry.activity.some(a => a.methods.some(m => showDataMethods.findIndex(dm => dm === temporaryFilterDataentryName(m)) >= 0))
         })

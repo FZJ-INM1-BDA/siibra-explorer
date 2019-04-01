@@ -4,8 +4,9 @@ import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { SELECT_REGIONS, extractLabelIdx, CHANGE_NAVIGATION, DataEntry, File, safeFilter, isDefined, getLabelIndexMap, FETCHED_DATAENTRIES, SELECT_PARCELLATION, ADD_NG_LAYER, NgViewerStateInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { map, distinctUntilChanged, filter, debounceTime } from "rxjs/operators";
-import { Subscription, combineLatest, Observable, BehaviorSubject } from "rxjs";
+import { Subscription, combineLatest, Observable, BehaviorSubject, fromEvent } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 
 export function temporaryFilterDataentryName(name: string):string{
   return /autoradiography/.test(name)
@@ -27,6 +28,9 @@ export class DatabrowserService implements OnDestroy{
 
   public selectedRegions$: Observable<any[]>
   public selectedRegions: any[] = []
+  public rebuiltSelectedRegions: any[] = []
+  public rebuiltSomeSelectedRegions: any[] = []
+
   public regionsLabelIndexMap: Map<number, any> = new Map()
 
   public fetchingFlag: boolean = false
@@ -42,7 +46,8 @@ export class DatabrowserService implements OnDestroy{
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private store: Store<ViewerConfiguration>,
-    private widgetService: WidgetServices
+    private widgetService: WidgetServices,
+    private workerService: AtlasWorkerService
   ){
 
     this.subscriptions.push(
@@ -86,7 +91,15 @@ export class DatabrowserService implements OnDestroy{
     )
 
     this.subscriptions.push(
-      this.selectedRegions$.subscribe(r => this.selectedRegions = r)
+      this.selectedRegions$.subscribe(r => {
+        this.selectedRegions = r
+        console.log(r)
+        this.workerService.worker.postMessage({
+          type: 'BUILD_REGION_SELECTION_TREE',
+          selectedRegions: r,
+          regions: this.selectedParcellation.regions
+        })
+      })
     )
 
     this.fetchDataObservable$ = combineLatest(
@@ -110,6 +123,21 @@ export class DatabrowserService implements OnDestroy{
         debounceTime(16)
       ).subscribe((param : [string, string, null] ) => this.fetchData(param[0], param[1]))
     )
+
+    this.subscriptions.push(
+      fromEvent(this.workerService.worker, 'message').pipe(
+        filter((message:MessageEvent) => message && message.data && message.data.type === 'RETURN_REBUILT_REGION_SELECTION_TREE'),
+        map(message => message.data),
+      ).subscribe((payload:any) => {
+        /**
+         * rebuiltSelectedRegion contains super region that are 
+         * selected as a result of all of its children that are selectted
+         */
+        const { rebuiltSelectedRegions, rebuiltSomeSelectedRegions } = payload
+        this.rebuiltSomeSelectedRegions = rebuiltSomeSelectedRegions
+        this.rebuiltSelectedRegions = rebuiltSelectedRegions
+      })
+    )
   }
 
   ngOnDestroy(){
@@ -117,10 +145,23 @@ export class DatabrowserService implements OnDestroy{
   }
   
   public updateRegionSelection(regions: any[]) {
+    const filteredRegion = regions.filter(r => r.labelIndex !== null && typeof r.labelIndex !== 'undefined')
     this.store.dispatch({
       type: SELECT_REGIONS,
-      selectRegions: regions
+      selectRegions: filteredRegion
     })
+  }
+
+  public deselectRegion(region) {
+    const regionsToDelect = []
+    const recursiveFlatten = (region:any) => {
+      regionsToDelect.push(region)
+      if (region.children && region.children.map)
+        region.children.map(recursiveFlatten)
+    }
+    recursiveFlatten(region)
+    const selectedRegions = this.selectedRegions.filter(r => !regionsToDelect.some(deR => deR.name === r.name))
+    this.updateRegionSelection(selectedRegions)
   }
 
   public changeParcellation({ current, previous }){
@@ -134,13 +175,13 @@ export class DatabrowserService implements OnDestroy{
 
   public singleClickRegion(region) {
     const selectedSet = new Set(extractLabelIdx(region))
-    const intersection = new Set([...this.selectedRegions.map(r => r.labelIndex)].filter(v => selectedSet.has(v)))
-    this.store.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: intersection.size > 0
-        ? this.selectedRegions.filter(v => !intersection.has(v.labelIndex))
-        : this.selectedRegions.concat([...selectedSet].map(idx => this.regionsLabelIndexMap.get(idx)))
-    })
+    const filteredSelectedRegion = this.selectedRegions.filter(r => r.labelIndex)
+    const intersection = new Set([...filteredSelectedRegion.map(r => r.labelIndex)].filter(v => selectedSet.has(v)))
+    this.updateRegionSelection(
+      intersection.size > 0
+        ? filteredSelectedRegion.filter(v => !intersection.has(v.labelIndex))
+        : filteredSelectedRegion.concat([...selectedSet].map(idx => this.regionsLabelIndexMap.get(idx)))
+    )
   }
 
   public doubleClickRegion(region) {

@@ -3,6 +3,7 @@ import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge } from "rxjs";
 import { DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
+import { skip } from "rxjs/operators";
 
 @Component({
   selector : 'data-browser',
@@ -21,6 +22,10 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   get selectedRegions(){
     return this.dbService.selectedRegions
+  }
+
+  get rebuiltSomeSelectedRegions(){
+    return this.dbService.rebuiltSomeSelectedRegions
   }
 
   get selectedParcellation(){
@@ -65,7 +70,7 @@ export class DataBrowser implements OnDestroy,OnInit{
   ngOnInit(){
     this.subscriptions.push(
       merge(
-        this.dbService.selectedRegions$,
+        // this.dbService.selectedRegions$,
         this.dbService.fetchDataObservable$
       ).subscribe(() => {
         this.resetCurrentPage()
@@ -96,14 +101,11 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   public showParcellationList: boolean = false
   
+  /**
+   * when user clicks x on region selector
+   */
   deselectRegion(region:any){
-    /**
-     * when user clicks x on region selector
-     */
-    
-    this.dbService.updateRegionSelection(
-      this.selectedRegions.filter(r => r.name !== region.name)
-    )
+    this.dbService.deselectRegion(region)
   }
 
   uncheckModality(modality:string){
