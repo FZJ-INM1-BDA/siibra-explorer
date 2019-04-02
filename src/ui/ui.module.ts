@@ -95,6 +95,7 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     LayerBrowser,
+    PluginBannerUI
   ],
   exports : [
     SubjectViewer,

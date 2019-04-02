@@ -24,7 +24,7 @@ export class PluginBannerUI{
   }
 
   get pluginEnabledFlag(){
-    return PLUGINDEV || BUNDLEDPLUGINS.length > 0
+    return true || PLUGINDEV || BUNDLEDPLUGINS.length > 0
       ? true
       : false
   }

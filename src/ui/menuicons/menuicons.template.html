@@ -27,8 +27,10 @@
 </div>
 <div
   tooltip="Plugins"
+  (click)="clickPlugins($event)"
   placement="right"
-  class="btn btn-sm btn-secondary rounded-circle">
+  [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+  class="btn btn-sm rounded-circle">
   <i class="fas fa-tools">
     
   </i>

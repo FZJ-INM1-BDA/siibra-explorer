@@ -93,7 +93,6 @@ export class DatabrowserService implements OnDestroy{
     this.subscriptions.push(
       this.selectedRegions$.subscribe(r => {
         this.selectedRegions = r
-        console.log(r)
         this.workerService.worker.postMessage({
           type: 'BUILD_REGION_SELECTION_TREE',
           selectedRegions: r,

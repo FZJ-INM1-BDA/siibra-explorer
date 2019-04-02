@@ -12,6 +12,7 @@ import { toastAnimation } from "./toast.animation";
 
 export class ToastComponent{
   @Input() message : string 
+  @Input() htmlMessage: string
   @Input() timeout : number = 0
   @Input() dismissable : boolean = true
 

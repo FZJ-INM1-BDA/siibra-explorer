@@ -4,6 +4,7 @@ import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
+import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 
 @Component({
   selector: 'menu-icons',
@@ -22,13 +23,19 @@ export class MenuIconsBar{
   dataBrowser: ComponentRef<DataBrowser> = null
   dbWidget: ComponentRef<WidgetUnit> = null
 
-
   /**
    * layerBrowser
    */
   lbcf: ComponentFactory<LayerBrowser>
   layerBrowser: ComponentRef<LayerBrowser> = null
   lbWidget: ComponentRef<WidgetUnit> = null
+
+  /**
+   * pluginBrowser
+   */
+  pbcf: ComponentFactory<PluginBannerUI>
+  pluginBanner: ComponentRef<PluginBannerUI> = null
+  pbWidget: ComponentRef<WidgetUnit> = null
 
   constructor(
     private widgetServices:WidgetServices,
@@ -37,6 +44,7 @@ export class MenuIconsBar{
   ){
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
+    this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
   }
   public clickSearch(event: MouseEvent){
     if (this.dbWidget) {
@@ -92,12 +100,42 @@ export class MenuIconsBar{
     this.lbWidget.instance.position = [left, top]
   }
 
+  public clickPlugins(event: MouseEvent){
+    if(this.pbWidget) {
+      this.pbWidget.destroy()
+      this.pbWidget = null
+      return
+    }
+    this.pluginBanner = this.pbcf.create(this.injector)
+    this.pbWidget = this.widgetServices.addNewWidget(this.pluginBanner, {
+      exitable: true,
+      persistency: true,
+      state: 'floating',
+      title: 'Plugin Browser',
+      titleHTML: '<i class="fas fa-tools"></i> Plugin Browser'
+    })
+
+    this.pbWidget.onDestroy(() => {
+      this.pbWidget = null
+      this.pluginBanner = null
+    })
+
+    const el = event.currentTarget as HTMLElement
+    const top = el.offsetTop
+    const left = el.offsetLeft + 50
+    this.pbWidget.instance.position = [left, top]
+  }
+
   get databrowserIsShowing() {
     return this.dataBrowser !== null
   }
 
   get layerbrowserIsShowing() {
     return this.layerBrowser !== null
+  }
+
+  get pluginbrowserIsShowing() {
+    return this.pluginBanner !== null
   }
 
   get dataBrowserTitle() {

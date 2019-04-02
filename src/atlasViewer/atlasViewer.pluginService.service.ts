@@ -53,7 +53,7 @@ export class PluginServices{
             fetch(plugin.scriptURL)
               .then(res=>res.text())
               .then(script=>plugin.script = script) :
-            Promise.reject('both template and templateURL are not defined') 
+            Promise.reject('both script and scriptURL are not defined') 
       ])
   }
 
@@ -108,6 +108,7 @@ export class PluginServices{
         const widgetCompRef = this.widgetService.addNewWidget(pluginUnit,{
           state : 'floating',
           exitable : true,
+          persistency: plugin.persistency,
           title : plugin.displayName || plugin.name
         })
 
@@ -179,4 +180,5 @@ export interface PluginManifest{
   script? : string 
   initState? : any
   initStateUrl? : string
+  persistency? : boolean
 }

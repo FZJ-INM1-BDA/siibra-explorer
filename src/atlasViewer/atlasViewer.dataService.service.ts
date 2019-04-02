@@ -20,6 +20,17 @@ export class AtlasViewerDataService implements OnDestroy{
       PLUGINDEV
         ? fetch(PLUGINDEV).then(res => res.json())
         : Promise.resolve([]),
+      new Promise(resolve => {
+        fetch(`${this.constantService.backendUrl}plugins`)
+          .then(res => res.json())
+          .then(arr => Promise.all(
+            arr.map(url => fetch(url).then(res => res.json()))
+          ))
+          .then(resolve)
+          .catch(e => {
+            resolve([])
+          })
+      }),
       Promise.all(
         BUNDLEDPLUGINS
           .filter(v => typeof v === 'string')

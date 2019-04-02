@@ -51,6 +51,7 @@ export class ToastContainerDirective{
 
         toastComponent.instance.dismissable = handler.dismissable
         toastComponent.instance.message = handler.message
+        toastComponent.instance.htmlMessage = handler.htmlMessage
         toastComponent.instance.timeout = handler.timeout
 
         const _subscription = toastComponent.instance.dismissed.subscribe(userInitiated => {

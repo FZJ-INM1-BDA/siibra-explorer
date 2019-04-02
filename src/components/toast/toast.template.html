@@ -4,12 +4,25 @@
 
     </ng-template>
   </div>
-  <div message *ngIf = "message">
+  <div message
+    [innerHTML]="htmlMessage"
+    *ngIf = "htmlMessage">
+  </div>
+  <div
+    message
+    *ngIf="message && !htmlMessage">
     {{ message }}
   </div>
-  <div (click) = "dismiss($event)" *ngIf = "dismissable" close>
-    <i class = "fas fa-remove"></i>
+  <div
+    (click)="dismiss($event)"
+    *ngIf="dismissable" close>
+    <i class="fas fa-remove"></i>
   </div>
-  <timer-component (timerEnd)="dismissed.emit(false)" [pause] = "hover" [timeout] = "timeout" timer>
+  <timer-component
+    *ngIf="timeout > 0"
+    (timerEnd)="dismissed.emit(false)"
+    [pause]="hover"
+    [timeout]="timeout"
+    timer>
   </timer-component>
 </div>
