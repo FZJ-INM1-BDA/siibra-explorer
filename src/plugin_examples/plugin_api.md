@@ -136,6 +136,7 @@ window.interactiveViewer
     - *show()* : Show the toast
     - *hide()* : Dynamically hides the toast
     - message : message on the toast
+    - htmlMessage : HTML message. If used to display user content, beware of script injection. Angular strips `style` attribute, so use `class` and bootstrap for styling.
     - dismissable : allow user dismiss the toast via x 
     - timeout : auto hide (in ms). set to 0 for not auto hide.
 

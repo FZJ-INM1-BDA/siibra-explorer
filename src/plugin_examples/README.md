@@ -25,7 +25,8 @@ The manifest JSON file describes the metadata associated with the plugin.
       "nestedKey1" : "nestedValue1"
     }
   },
-  "initStateUrl": "http://LINK-TO-PLUGIN-STATE"
+  "initStateUrl": "http://LINK-TO-PLUGIN-STATE",
+  "persistency": false
 }
 ```
 *NB* 
@@ -98,9 +99,10 @@ The script will always be appended **after** the rendering of the template.
 })()
 ```
 *NB*
+- JS is loaded and executed **before** the attachment of DOM (template). This is to allow webcomponents have a chance to be loaded. If your script needs the DOM to be attached, use a `setTimeout` callback to delay script execution.
 - ensure the script is scoped locally, instead of poisoning the global scope
 - for every observable subscription, call *unsubscribe()* in the *onShutdown* callback
 - some frameworks such as *jquery2*, *jquery3*, *react/reactdom* and *webcomponents* can be loaded via *interactiveViewer.pluinControl.loadExternalLibraries([LIBRARY_NAME_1, LIBRARY_NAME_2])*. if the libraries are loaded, remember to hook *interactiveViewer.pluginControl.unloadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* in the *onShutdown* callback
 - when/if using webcomponents, please be aware that the `connectedCallback()` and `disconnectedCallback()` will be called everytime user toggle between *floating* and *docked* modes. 
-- when user navigate to a new template all existing widgets will be destroyed.
+- when user navigate to a new template all existing widgets will be destroyed, unless the `persistency` is set to `true` in `mannifest.json`.
 - for a list of APIs, see [plugin_api.md](plugin_api.md)
