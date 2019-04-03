@@ -1,4 +1,5 @@
 <dropdown-component
+  *ngIf="!isMobile"
   (itemSelected)="changeTemplate($event)"
   [activeDisplay]="displayActiveTemplate"
   [selectedItem]="selectedTemplate$ | async"
@@ -23,11 +24,12 @@
 </div>
 
 <!-- signin -->
-<div
-  *ngIf="!isMobile"
-  (click)="showSignin()"
-  class="btn btn-outline-secondary btn-sm rounded-circle">
-  <i
-    [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-    class="fas"></i>
+<div class="btnWrapper">
+  <div
+    (click)="showSignin()"
+    class="btn btn-outline-secondary btn-sm rounded-circle">
+    <i
+      [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+      class="fas"></i>
+  </div>
 </div>

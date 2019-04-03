@@ -11,7 +11,8 @@ import { map, filter, distinctUntilChanged } from "rxjs/operators";
   selector: 'signin-banner',
   templateUrl: './signinBanner.template.html',
   styleUrls: [
-    './signinBanner.style.css'
+    './signinBanner.style.css',
+    '../btnShadow.style.css'
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })

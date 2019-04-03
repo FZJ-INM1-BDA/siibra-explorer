@@ -13,3 +13,15 @@ export function* timedValues(ms:number = 500,mode:string = 'linear'){
   }
   return 1
 }
+
+export function clamp(val: number, min: number, max: number) {
+  const _min = min < max ? min : max
+  const _max = min < max ? max : min
+  return Math.min(
+    Math.max(
+      val,
+      _min
+    ),
+    _max
+  )
+}

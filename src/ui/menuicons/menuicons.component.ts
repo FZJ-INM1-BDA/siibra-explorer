@@ -5,12 +5,14 @@ import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector: 'menu-icons',
   templateUrl: './menuicons.template.html',
   styleUrls: [
-    './menuicons.style.css'
+    './menuicons.style.css',
+    '../btnShadow.style.css'
   ]
 })
 
@@ -37,9 +39,14 @@ export class MenuIconsBar{
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
 
+  get isMobile(){
+    return this.constantService.mobile
+  }
+
   constructor(
     private widgetServices:WidgetServices,
     private injector:Injector,
+    private constantService:AtlasViewerConstantsServices,
     cfr: ComponentFactoryResolver
   ){
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)

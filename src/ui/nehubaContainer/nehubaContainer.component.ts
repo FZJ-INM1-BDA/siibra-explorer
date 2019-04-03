@@ -577,53 +577,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
   public showObliqueRotate$ : Observable<boolean>
 
   ngAfterViewInit(){
-    // if(this.isMobile){
-
-    //   this.showObliqueScreen$ = merge(
-    //     fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart'),
-    //     fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend')
-    //   ).pipe(
-    //     map((ev:TouchEvent) => ev.touches.length === 1)
-    //   )
-
-    //   fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchstart').pipe(
-    //     switchMap(() => fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchmove').pipe(
-    //       takeUntil(fromEvent(this.mobileObliqueCtrl.nativeElement, 'touchend').pipe(
-    //         filter((ev:TouchEvent) => ev.touches.length === 0)
-    //       )),
-    //       map((ev:TouchEvent) => (ev.preventDefault(), ev.stopPropagation(), ev)),
-    //       filter((ev:TouchEvent) => ev.touches.length === 1),
-    //       map((ev:TouchEvent) => [ev.touches[0].screenX, ev.touches[0].screenY] ),
-
-    //       /* TODO reduce boiler plate, export */
-    //       scan((acc,curr) => acc.length < 2
-    //         ? acc.concat([curr])
-    //         : acc.slice(1).concat([curr]), []),
-    //       filter(isdouble => isdouble.length === 2),
-    //       map(double => ({
-    //         deltaX : double[1][0] - double[0][0],
-    //         deltaY : double[1][1] - double[0][1]
-    //       }))
-    //     ))
-    //   )
-    //     .subscribe(({deltaX, deltaY}) => {
-          
-          
-          
-    //     })
-    // }
   }
 
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
   }
 
-  get tunableMobileProperties(){
-    return ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z']
-  }
+  public tunableMobileProperties = ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z']
+  public selectedProp = null
 
   handleMobileOverlayEvent(obj:any){
     const {delta, selectedProp} = obj
+    this.selectedProp = selectedProp
 
     const idx = this.tunableMobileProperties.findIndex(p => p === selectedProp)
     idx === 0

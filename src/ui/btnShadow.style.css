@@ -1,0 +1,23 @@
+.btnWrapper
+{
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.btnWrapper > .btn
+{
+  width: 2.5em;
+  height: 2.5em;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btnWrapper.btnWrapper-lg > .btn
+{
+  width: 3em;
+  height: 3em;
+}

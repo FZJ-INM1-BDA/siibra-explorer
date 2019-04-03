@@ -1,6 +1,7 @@
-import { Component, Input, Output,EventEmitter, ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy, OnDestroy } from "@angular/core";
+import { Component, Input, Output,EventEmitter, ElementRef, ViewChild, AfterViewInit, ChangeDetectionStrategy, OnDestroy, OnInit, OnChanges } from "@angular/core";
 import { fromEvent, Subject, Observable, merge, concat, of, combineLatest } from "rxjs";
-import { map, switchMap, takeUntil, filter, scan, take } from "rxjs/operators";
+import { map, switchMap, takeUntil, filter, scan, take, tap } from "rxjs/operators";
+import { clamp } from "src/util/generator";
 
 @Component({
   selector : 'mobile-overlay',
@@ -24,15 +25,15 @@ div:not(.active) > span:before
   display: inline-block;
 }
     `
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  ]
 })
 
-export class MobileOverlay implements AfterViewInit, OnDestroy{
+export class MobileOverlay implements OnInit, OnDestroy{
   @Input() tunableProperties : string [] = []
   @Output() deltaValue : EventEmitter<{delta:number, selectedProp : string}> = new EventEmitter() 
   @ViewChild('initiator', {read: ElementRef}) initiator : ElementRef
   @ViewChild('mobileMenuContainer', {read: ElementRef}) menuContainer : ElementRef
+  @ViewChild('intersector', {read: ElementRef}) intersector: ElementRef
 
   private _onDestroySubject : Subject<boolean> = new Subject()
 
@@ -42,25 +43,38 @@ export class MobileOverlay implements AfterViewInit, OnDestroy{
       ? this._focusedProperties
       : this.tunableProperties[0]
   }
+  get focusedIndex(){
+    return this._focusedProperties
+      ? this.tunableProperties.findIndex(p => p === this._focusedProperties)
+      : 0
+  }
 
   public showScreen$ : Observable<boolean>
   public showProperties$ : Observable<boolean>
+  public showDelta$: Observable<boolean>
+  public showInitiator$: Observable<boolean>
   private _drag$ : Observable<any>
-
+  private intersectionObserver: IntersectionObserver
+  
   ngOnDestroy(){
     this._onDestroySubject.next(true)
     this._onDestroySubject.complete()
   }
 
-  ngAfterViewInit(){
+  ngOnInit(){
+    const config = {
+      root: this.intersector.nativeElement,
+      threshold: [...Array(10)].map((_, k) => k / 10)
+    }
 
-    this.showScreen$ = merge(
-      fromEvent(this.initiator.nativeElement, 'touchstart'),
-      fromEvent(this.initiator.nativeElement, 'touchend'),
-    ).pipe(
-      map((ev:TouchEvent) => ev.touches.length === 1)
-    )
+    this.intersectionObserver = new IntersectionObserver((arg) => {
+      if (arg[0].isIntersecting) {
+        this.focusItemIndex = 2- Math.floor(arg[0].intersectionRatio * this.tunableProperties.length)
+      }
+    }, config)
 
+    this.intersectionObserver.observe(this.menuContainer.nativeElement)
+  
     this._drag$ = fromEvent(this.initiator.nativeElement, 'touchmove').pipe(
       takeUntil(fromEvent(this.initiator.nativeElement, 'touchend').pipe(
         filter((ev:TouchEvent) => ev.touches.length === 0)
@@ -73,19 +87,56 @@ export class MobileOverlay implements AfterViewInit, OnDestroy{
       filter(ev => ev.length === 2)
     )
 
-    this.showProperties$ = fromEvent(this.initiator.nativeElement, 'touchstart').pipe(    
-      switchMap(() => concat(
-        this._drag$.pipe(
-          map(double => ({
-            deltaX : double[1].touches[0].screenX - double[0].touches[0].screenX,
-            deltaY : double[1].touches[0].screenY - double[0].touches[0].screenY
-          })),
-          scan((acc, _curr) => acc),
-          map(v => v.deltaY ** 2 > v.deltaX ** 2)
-        ),
-        of(false)
-        )
+    this.showProperties$ = concat(
+      of(false),
+      fromEvent(this.initiator.nativeElement, 'touchstart').pipe( 
+        switchMap(() => concat(
+          this._drag$.pipe(
+            map(double => ({
+              deltaX : double[1].touches[0].screenX - double[0].touches[0].screenX,
+              deltaY : double[1].touches[0].screenY - double[0].touches[0].screenY
+            })),
+            scan((acc, _curr) => acc),
+            map(v => v.deltaY ** 2 > v.deltaX ** 2)
+          ),
+          of(false)
+        ))
       )
+    )
+
+
+    this.showDelta$ = concat(
+      of(false),
+      fromEvent(this.initiator.nativeElement, 'touchstart').pipe( 
+        switchMap(() => concat(
+          this._drag$.pipe(
+            map(double => ({
+              deltaX : double[1].touches[0].screenX - double[0].touches[0].screenX,
+              deltaY : double[1].touches[0].screenY - double[0].touches[0].screenY
+            })),
+            scan((acc, _curr) => acc),
+            map(v => v.deltaX ** 2 > v.deltaY ** 2)
+          ),
+          of(false)
+        ))
+      )
+    )
+
+    this.showInitiator$ = combineLatest(
+      this.showProperties$,
+      this.showDelta$
+    ).pipe(
+      map(([flag1, flag2]) => !flag1 && !flag2)
+    )
+
+    this.showScreen$ = combineLatest(
+      merge(
+        fromEvent(this.initiator.nativeElement, 'touchstart'),
+        fromEvent(this.initiator.nativeElement, 'touchend')
+      ),
+      this.showInitiator$
+    ).pipe(
+      map(([ev, showInitiator] : [TouchEvent, boolean]) => showInitiator && ev.touches.length === 1)
     )
 
     fromEvent(this.initiator.nativeElement, 'touchstart').pipe(
@@ -130,7 +181,16 @@ export class MobileOverlay implements AfterViewInit, OnDestroy{
       filter(v => v[0]),
       map(v => v[1]),
       takeUntil(this._onDestroySubject)
-    ).subscribe(v => this.scrollHeight = v.deltaY)
+    ).subscribe(v => {
+      const deltaY = v.deltaY
+      const cellHeight = this.menuContainer && this.tunableProperties && this.tunableProperties.length > 0 && this.menuContainer.nativeElement.offsetHeight / this.tunableProperties.length
+      const adjHeight = - this.focusedIndex * cellHeight - cellHeight * 0.5
+
+      const min = - cellHeight * 0.5
+      const max = - this.tunableProperties.length * cellHeight + cellHeight * 0.5
+      const finalYTranslate = clamp(adjHeight + deltaY, min, max )
+      this.menuTransform = `translate(0px, ${finalYTranslate}px)`
+    })
 
     this.showProperties$.pipe(
       takeUntil(this._onDestroySubject),
@@ -139,47 +199,12 @@ export class MobileOverlay implements AfterViewInit, OnDestroy{
       if(this.focusItemIndex >= 0){
         this._focusedProperties = this.tunableProperties[this.focusItemIndex]
       }
-      this.scrollHeight = 0
     })
+    
   }
 
-  scrollHeight : number = 0
+  public menuTransform = `translate(0px, 0px)`
 
-  get defaultY(){
-    return this.tunableProperties.findIndex(p => p === this.focusedProperty) * this.menuCellHeight
-  }
+  public focusItemIndex: number = 0
 
-  get menuTransform(){
-    return `translate(0px, ${this.menuYTranslate}px)`
-  }
-
-  get menuYTranslate(){
-    return this.menuContainer
-      ? Math.max(
-          Math.min(
-            this.defaultY + this.scrollHeight, 
-            this.menuContainerHeight / 2 - this.menuCellHeight / 2
-            ),
-          - this.menuContainerHeight / 2 + this.menuCellHeight / 2
-          )
-      : this.defaultY
-  }
-
-  get menuContainerHeight(){
-    return this.menuContainer
-      ? this.menuContainer.nativeElement.offsetHeight
-      : 0
-  }
-
-  get menuCellHeight(){
-    return this.tunableProperties.length > 0
-      ? this.menuContainerHeight / this.tunableProperties.length
-      : 0
-  }
-
-  get focusItemIndex():number{
-    return this.menuContainer
-      ? Math.floor((this.menuContainerHeight / 2 - this.menuYTranslate) / this.menuCellHeight)
-      : -1
-  }
 }

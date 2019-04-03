@@ -155,15 +155,22 @@
 </div>
 
 <mobile-overlay 
-  *ngIf="isMobile && viewerLoaded" 
+  *ngIf="isMobile && viewerLoaded"
   [tunableProperties]="tunableMobileProperties" 
   (deltaValue)="handleMobileOverlayEvent($event)">
-  <div mobileObliqueGuide guide>
-    <div>
-      <i class="fas fa-resize-vertical"></i> oblique mode 
+  <div class="base" delta>
+    <div mobileObliqueGuide class="p-2 mb-4 shadow">
+      {{ selectedProp }}
     </div>
-    <div>
-      <i class="fas fa-resize-horizontal"></i> rotate slice
+  </div>
+  <div class="base" guide>
+    <div mobileObliqueGuide class="p-2 mb-4 shadow">
+      <div>
+        <i class="fas fa-arrows-alt-v"></i> oblique mode 
+      </div>
+      <div>
+        <i class="fas fa-arrows-alt-h"></i> rotate slice
+      </div>
     </div>
   </div>
   <div mobileObliqueCtrl initiator>
