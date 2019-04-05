@@ -5,6 +5,13 @@
   #dropdownToggle
   dropdownToggle>
 </span>
+
+<!-- needed to ensure dropdown width matches  -->
+<ul class="m-0 h-0 o-h">
+  <li *ngFor="let item of inputArray">
+    {{ listDisplay(item) }}
+  </li>
+</ul>
 <radio-list
   [ulClass]="'dropdown-menu'"
   (itemSelected)="itemSelected.emit($event)"

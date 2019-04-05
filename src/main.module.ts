@@ -33,6 +33,8 @@ import { PluginFactoryDirective } from "./util/directives/pluginFactory.directiv
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { AuthService } from "./services/auth.service";
 import { ViewerConfiguration } from "./services/state/viewerConfig.store";
+import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
+import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 
 @NgModule({
   imports : [
@@ -74,6 +76,7 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
     FloatingContainerDirective,
     PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
+    FixedMouseContextualContainerDirective,
 
     /* pipes */
     GetNamesPipe,
@@ -94,7 +97,13 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
     AtlasViewerAPIServices,
     ToastService,
     AtlasWorkerService,
-    AuthService
+    AuthService,
+
+    /**
+     * TODO
+     * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
+     */
+    DatabrowserService
   ],
   bootstrap : [
     AtlasViewer
@@ -105,7 +114,14 @@ export class MainModule{
   
   constructor(
     authServce: AuthService,
-    store: Store<ViewerConfiguration>
+    store: Store<ViewerConfiguration>,
+
+    /**
+     * instantiate singleton
+     * allow for pre fetching of dataentry
+     * TODO only fetch when traffic is idle
+     */
+    dbSerivce: DatabrowserService
   ){
     authServce.authReloadState()
     store.pipe(

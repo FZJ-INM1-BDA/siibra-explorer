@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, ElementRef, OnInit, HostListener, TemplateRef } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, Injector } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest } from "rxjs";
@@ -15,6 +15,8 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
+import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 
 @Component({
   selector: 'atlas-viewer',
@@ -29,7 +31,6 @@ import { colorAnimation } from "./atlasViewer.animation"
 
 export class AtlasViewer implements OnDestroy, OnInit {
 
-  @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
@@ -38,6 +39,7 @@ export class AtlasViewer implements OnDestroy, OnInit {
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
+  @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
   /**
    * required for styling of all child components
    */
@@ -49,12 +51,14 @@ export class AtlasViewer implements OnDestroy, OnInit {
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
 
+  public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
   private showHelp$: Observable<any>
   private showConfig$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
+  public onhoverSegmentForFixed$: Observable<string>
   public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
@@ -77,7 +81,9 @@ export class AtlasViewer implements OnDestroy, OnInit {
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private databrowserService: DatabrowserService,
+    private injector: Injector
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -101,13 +107,15 @@ export class AtlasViewer implements OnDestroy, OnInit {
       debounceTime(170)
     )
 
+    this.selectedRegions$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+      map(state=>state.regionsSelected),
+      distinctUntilChanged()
+    )
+
     this.selectedPOI$ = combineLatest(
-      this.store.pipe(
-        select('viewerState'),
-        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
-        map(state=>state.regionsSelected),
-        distinctUntilChanged()
-      ),
+      this.selectedRegions$,
       this.store.pipe(
         select('viewerState'),
         filter(state => isDefined(state) && isDefined(state.landmarksSelected)),
@@ -158,21 +166,41 @@ export class AtlasViewer implements OnDestroy, OnInit {
       this.store.pipe(
         select('uiState'),
         /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-        map(state => isDefined(state) ?
-          state.mouseOverSegment ?
-            state.mouseOverSegment.constructor === Number ?
-              state.mouseOverSegment.toString() :
-              state.mouseOverSegment.name :
-            null :
-          null),
-        distinctUntilChanged()
+        map(state => state
+            && state.mouseOverSegment
+            && (isNaN(state.mouseOverSegment)
+              ? state.mouseOverSegment
+              : state.mouseOverSegment.toString())),
+        distinctUntilChanged((o, n) => o === n || (o && n && o.name && n.name && o.name === n.name))
       ),
       this.onhoverLandmark$
     ).pipe(
       map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
     )
 
+    this.onhoverSegmentForFixed$ = this.onhoverSegment$.pipe(
+      filter(() => !this.rClContextualMenu || !this.rClContextualMenu.isShown )
+    )
+
+
+    this.selectedParcellation$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('parcellationSelected'),
+      map(state=>state.parcellationSelected),
+      distinctUntilChanged(),
+    )
+
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe(parcellation => this.selectedParcellation = parcellation)
+    )
+
+    this.subscriptions.push(
+      this.newViewer$.subscribe(template => this.selectedTemplate = template)
+    )
   }
+
+  private selectedParcellation$: Observable<any>
+  private selectedParcellation: any
 
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
@@ -305,11 +333,26 @@ export class AtlasViewer implements OnDestroy, OnInit {
       this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
   }
 
+  nehubaClickHandler(event:MouseEvent){
+    if (!this.rClContextualMenu) return
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY
+    ]
+    this.rClContextualMenu.show()
+  }
+
   toggleSidePanel(panelName:string){
     this.store.dispatch({
       type : TOGGLE_SIDE_PANEL,
       focusedSidePanel :panelName
     })
+  }
+
+  private selectedTemplate: any
+  searchRegion(regions:any[]){
+    this.rClContextualMenu.hide()
+    this.databrowserService.createDatabrowser({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
   }
 
   @HostBinding('attr.version')

@@ -1,86 +1,75 @@
-
-<!-- modality picker -->
-<div>
-  <i (click)="modalityReadmore.show = !modalityReadmore.show" class="clickable">
-    Filter by Modality <small *ngIf="modalityFilter.length > 0" class="text-muted">({{ modalityFilter.length }})</small>
-  </i>
-  <readmore-component
-    #modalityReadmore
-    [animationLength]="0"
-    [collapsedHeight]="0">
-    <div class="filterWrapper">
-      <modality-picker
-        (modalityFilterEmitter)="modalityFilter = $event; resetCurrentPage()">
-  
-      </modality-picker>
-    </div>
-  </readmore-component>
-  <div *ngIf="!modalityReadmore.show">
-    <pill-component
-      [containerStyle]="{backgroundColor:'rgba(128,128,128,0.2)'}"
-      [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
-      (closeClicked)="uncheckModality(modality)"
-      [title]="modality"
-      *ngFor="let modality of modalityFilter">
-  
-    </pill-component>
-  </div>
-</div>
-
-<!-- region hierarchy -->
-<div>
-  <i (click)="!regionHierarchy.showRegionTree ? regionHierarchy.focusInput($event) : {}" class="clickable">
-    Filter by parcellation region <small *ngIf="selectedRegions.length > 0" class="text-muted">({{ selectedRegions.length }})</small>
-  </i>
-
-  <!-- parcellation toggle btn -->
-  <div class="parcellationSelectionWrapper">
-    <!-- region selector -->
-    <region-hierarchy
-      (showRegionFlagChanged)="$event ? (showParcellationList = false) : {}"
-      #regionHierarchy>
-    </region-hierarchy>
-
-    <div
-      (click)="showParcellationList = !showParcellationList"
-      class="toggleParcellationBtn btn btn-secondary btn-sm rounded-circle">
-      <i [ngClass]="showParcellationList ? '' : 'r-90' " class="fas fa-chevron-down"></i>
-    </div>
-  </div>
-
-
-  <!-- parcellation selector -->
-  <radio-list
-    *ngIf="selectedParcellation && showParcellationList"
-    class="mt-1 mb-0"
-    (itemSelected)="changeParcellation($event)"
-    [selectedItem]="selectedParcellation"
-    [inputArray]="availableParcellations">
-  </radio-list>
-
-  <readmore-component
-    [hidden]="selectedRegions.length === 0"
-    [animationLength]="0"
-    #selectedRegionReadmore
-    [collapsedHeight]="45">
-    <div class="filterWrapper">
-      <pill-component
-        [containerStyle]="{backgroundColor:'rgba(128,128,128,0.2)'}"
-        [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
-        (closeClicked)="deselectRegion(region)"
-        [title]="region.name"
-        *ngFor="let region of selectedRegions">
-      </pill-component>
-    </div>
-  </readmore-component>
-</div>
-
 <div
-  *ngIf="fetchingFlag; else fetched"
-  class="spinnerAnimationCircleContainer">
-  <div class="spinnerAnimationCircle"></div>
-  <div>Fetching datasets...</div>
+  [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
+  class="dataEntryWrapper">
+
+  <!-- main window -->
+  <div
+    class="t-a-ease-500"
+    [style.height]="filePreviewName ? '0px' : 'auto'">
+
+    <!-- description -->
+    <readmore-component>
+      <div class="p-2">
+        Datasets relevant to
+        <span
+          *ngFor="let region of regions"
+          class="badge badge-secondary mr-1">
+          {{ region.name }}
+        </span>
+      </div>
+    </readmore-component>
+    
+    <!-- modality picker -->
+    <div>
+      <span
+        placement="bottom"
+        container="body"
+        [popover]="countedDataM.length > 0 ? modalityPicker : null"
+        [outsideClick]="true"
+        [containerClass]="darktheme ? 'darktheme' : ''"
+        class="clickable btn-sm btn btn-secondary btn-block">
+        Filter by Modality <small *ngIf="visibleCountedDataM.length as visibleDMLength">({{ visibleDMLength }})</small>
+      </span>
+    </div>
+  
+    <!-- datasets container -->
+    <div
+      *ngIf="fetchingFlag; else fetched"
+      class="spinnerAnimationCircleContainer">
+      <div class="spinnerAnimationCircle"></div>
+      <div>Fetching datasets...</div>
+    </div>
+
+  </div>
+
+  <!-- file previewer -->
+  <div
+    class="filePreview">
+    <div class="filePreviewContainer">
+      <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <preview-component
+        *ngIf="filePreviewName"
+        [datasetName]="filePreviewName">
+
+      </preview-component>
+        
+    </div>
+  </div>
 </div>
+
+<ng-template #modalityPicker>
+  <div class="filterWrapper">
+    <modality-picker
+      (click)="$event.stopPropagation();"
+      class="mw-100"
+      [countedDataM]="countedDataM"
+      (modalityFilterEmitter)="handleModalityFilterEvent($event)">
+
+    </modality-picker>
+  </div>
+</ng-template>
 
 <ng-template #fetched>
   <div class="ml-2 mr-2 alert alert-danger" *ngIf="fetchError; else showData">
@@ -90,18 +79,16 @@
 
 <ng-template #showData>
   <!-- datawrapper -->
-  <div
-    *ngIf="dbService.fetchedDataEntries$ | async | filterDataEntriesByMethods : modalityFilter | filterDataEntriesByRegion : rebuiltSomeSelectedRegions as filteredDataEntry"
-    [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
-    class="dataEntryWrapper">
+  <div *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry"
+>
 
     <!-- dataentries -->
     <div class="dataEntry">
       <div>
-        <i *ngIf="dbService.fetchedDataEntries$ | async">
-          {{ (dbService.fetchedDataEntries$ | async).length }} total results. 
+        <i *ngIf="dataentries.length > 0">
+          {{ dataentries.length }} total results. 
           <span
-            *ngIf="rebuiltSomeSelectedRegions.length + modalityFilter.length > 0 "> 
+            *ngIf="visibleCountedDataM.length > 0 "> 
             {{ filteredDataEntry.length }} 
             filtered results.
             <a
@@ -111,11 +98,11 @@
             </a>
           </span>
         </i>
-        <i *ngIf="!(dbService.fetchedDataEntries$ | async)">
+        <i *ngIf="dataentries.length === 0">
           No results to show.
         </i>
       </div>
-      <div *ngIf="dbService.fetchedDataEntries$ | async">
+      <div *ngIf="dataentries.length > 0">
         <dataset-viewer
           class="mt-1"
           *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
@@ -133,20 +120,6 @@
       </pagination-component>
     </div>
 
-    <!-- file preview -->
-    <div
-      class="filePreview">
-      <div class="filePreviewContainer">
-        <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
-          <i class="fas fa-arrow-left"></i>
-        </div>
-        <preview-component
-          *ngIf="filePreviewName"
-          [datasetName]="filePreviewName">
-
-        </preview-component>
-          
-      </div>
-    </div>
   </div>
 </ng-template>
+

@@ -4,10 +4,7 @@ import { DataBrowser } from "./databrowser/databrowser.component";
 import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
 import { ComponentsModule } from "src/components/components.module";
 import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
-import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
-import { FilterNameBySearch } from "./util/filterNameBySearch.pipe";
 import { FormsModule } from "@angular/forms";
-import { DatabrowserService } from "./databrowser.service";
 import { PathToNestedChildren } from "./util/pathToNestedChildren.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
 import { FilterDataEntriesbyMethods } from "./util/filterDataEntriesByMethods.pipe";
@@ -21,6 +18,8 @@ import { LineChart } from "./fileviewer/line/line.chart.component";
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { PopoverModule } from "ngx-bootstrap/popover";
+import { UtilModule } from "src/util/util.module";
 
 @NgModule({
   imports:[
@@ -28,13 +27,14 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
     CommonModule,
     ComponentsModule,
     FormsModule,
-    TooltipModule.forRoot()
+    UtilModule,
+    TooltipModule.forRoot(),
+    PopoverModule.forRoot()
   ],
   declarations: [
     DataBrowser,
     DatasetViewerComponent,
     ModalityPicker,
-    RegionHierarchy,
     PreviewComponent,
     FileViewer,
     RadarChart,
@@ -44,7 +44,6 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
     /**
      * pipes
      */
-    FilterNameBySearch,
     PathToNestedChildren,
     CopyPropertyPipe,
     FilterDataEntriesbyMethods,
@@ -55,10 +54,7 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
   ],
   entryComponents:[
     DataBrowser
-  ],
-  providers:[
-    DatabrowserService
-  ],
+  ]
   /**
    * shouldn't need bootstrap, so no need for browser module
    */

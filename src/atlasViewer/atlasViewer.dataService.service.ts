@@ -79,6 +79,10 @@ export class AtlasViewerDataService implements OnDestroy{
         ))
   }
 
+  public searchDataset(){
+    
+  }
+
   /* all units in mm */
   public spatialSearch(obj:any){
     const {center,searchWidth,templateSpace,pageNo} = obj

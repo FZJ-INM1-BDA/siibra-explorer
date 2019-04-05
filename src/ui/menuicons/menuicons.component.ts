@@ -6,6 +6,7 @@ import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { DatabrowserService } from "../databrowserModule/databrowser.service";
 
 @Component({
   selector: 'menu-icons',
@@ -47,37 +48,37 @@ export class MenuIconsBar{
     private widgetServices:WidgetServices,
     private injector:Injector,
     private constantService:AtlasViewerConstantsServices,
+    dbService: DatabrowserService,
     cfr: ComponentFactoryResolver
   ){
+
+    dbService.createDatabrowser = this.clickSearch.bind(this)
+
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
   }
-  public clickSearch(event: MouseEvent){
-    if (this.dbWidget) {
-      this.dbWidget.destroy()
-      this.dbWidget = null
-      return
-    }
-    this.dataBrowser = this.dbcf.create(this.injector)
-    this.dbWidget = this.widgetServices.addNewWidget(this.dataBrowser, {
+
+  /**
+   * TODO
+   * temporary measure
+   * migrate to  nehubaOverlay
+   */
+  public clickSearch({ regions, template, parcellation }){
+    const dataBrowser = this.dbcf.create(this.injector)
+    dataBrowser.instance.regions = regions
+    dataBrowser.instance.template = template
+    dataBrowser.instance.parcellation = parcellation
+    const title = regions.length > 1
+      ? `Data associated with ${regions.length} regions`
+      : `Data associated with ${regions[0].name}`
+    this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
       state: 'floating',
-      title: this.dataBrowserTitle,
-      titleHTML: `<i class="fas fa-search"></i> ${this.dataBrowserTitle}`
+      title,
+      titleHTML: `<i class="fas fa-search"></i> ${title}`
     })
-
-    this.dbWidget.onDestroy(() => {
-      // sub.unsubscribe()
-      this.dataBrowser = null
-      this.dbWidget = null
-    })
-
-    const el = event.currentTarget as HTMLElement
-    const top = el.offsetTop
-    const left = el.offsetLeft + 50
-    this.dbWidget.instance.position = [left, top]
   }
 
   public clickLayer(event: MouseEvent){

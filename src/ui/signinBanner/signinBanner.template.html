@@ -1,3 +1,22 @@
+<ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
+  <region-hierarchy
+    [selectedRegions]="selectedRegions$ | async | filterNull"
+    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+    *ngIf="selectedParcellation$ | async as selectedParcellation"
+    [selectedParcellation]="selectedParcellation">
+
+  </region-hierarchy>
+  <dropdown-component
+    *ngIf="selectedParcellation$ | async as selectedParcellation"
+    (itemSelected)="changeParcellation($event)"
+    [activeDisplay]="displayActiveParcellation"
+    [selectedItem]="selectedParcellation"
+    [inputArray]="selectedTemplate.parcellations">
+  
+  </dropdown-component>
+</ng-container>
+
 <dropdown-component
   *ngIf="!isMobile"
   (itemSelected)="changeTemplate($event)"

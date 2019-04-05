@@ -247,7 +247,66 @@ markdown-dom pre code
   color: rgba(255, 255, 255, 1.0);
 }
 
+.darktheme.popover
+{
+  background-color:rgba(0, 0, 0, 0.8);
+}
+
+.darktheme.popover .popover-body
+{
+  color:white;
+}
+
+.darktheme.popover.popover-bottom>.arrow::after
+{
+  border-bottom-color: rgba(0, 0, 0, 0.8);
+}
+
 .r-90
 {
   transform: rotate(90deg)!important;
+}
+
+.ws-no-wrap
+{
+  white-space: nowrap!important;
+}
+.ws-initial
+{
+  white-space: initial!important;
+}
+
+.mw-100
+{
+  max-width: 100%!important;
+}
+
+.mw-50
+{
+  max-width: 50%!important;
+}
+
+.mw-60
+{
+  max-width: 60%!important;
+}
+
+.pe-all
+{
+  pointer-events: all;
+}
+
+.t-a-ease-500
+{
+  transition: all ease 500ms;
+}
+
+.o-h
+{
+  overflow:hidden;
+}
+
+.h-0
+{
+  height: 0px;
 }

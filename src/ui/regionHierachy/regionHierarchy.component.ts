@@ -1,8 +1,7 @@
 import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output } from "@angular/core";
 import {  Subscription, Subject } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
-import { FilterNameBySearch } from "../util/filterNameBySearch.pipe";
-import { DatabrowserService } from "../databrowser.service";
+import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 
 @Component({
   selector: 'region-hierarchy',
@@ -19,41 +18,41 @@ export class RegionHierarchy implements OnInit{
   @Input()
   public selectedRegions: any[] = []
 
+  @Input()
+  public selectedParcellation: any
+
   private _showRegionTree: boolean = false
 
   @Output()
-  showRegionFlagChanged: EventEmitter<boolean> = new EventEmitter()
+  private showRegionFlagChanged: EventEmitter<boolean> = new EventEmitter()
+
+  @Output()
+  private singleClickRegion: EventEmitter<any> = new EventEmitter()
+
+  @Output()
+  private doubleClickRegion: EventEmitter<any> = new EventEmitter()
 
   public searchTerm: string = ''
   private subscriptions: Subscription[] = []
-
-  @ViewChild('searchRegionPopover', { read: ElementRef })
-  private searchRegionPopover: ElementRef
 
   @ViewChild('searchTermInput', {read: ElementRef})
   private searchTermInput: ElementRef
 
   @HostListener('document:click', ['$event'])
   closeRegion(event: MouseEvent) {
-    if (!this.searchRegionPopover)
-      return
-    const contains = this.searchRegionPopover.nativeElement.contains(event.target)
+    const contains = this.el.nativeElement.contains(event.target)
     this.showRegionTree = contains
     if (!this.showRegionTree)
       this.searchTerm = ''
   }
 
-  get selectedParcellation(){
-    return this.dbService.selectedParcellation
-  }
-
   get regionsLabelIndexMap() {
-    return this.dbService.regionsLabelIndexMap
+    return null
   }
 
   constructor(
     private cdr:ChangeDetectorRef,
-    private dbService: DatabrowserService
+    private el:ElementRef
   ){
   }
 
@@ -119,8 +118,23 @@ export class RegionHierarchy implements OnInit{
   private handleRegionTreeClickSubject: Subject<any> = new Subject()
 
   handleClickRegion(obj: any) {
-    obj.event.stopPropagation()
+    const {event} = obj
+    /**
+     * TODO figure out why @closeRegion gets triggered, but also, contains returns false
+     */
+    if (event)
+      event.stopPropagation()
     this.handleRegionTreeClickSubject.next(obj)
+  }
+
+  /* single click selects/deselects region(s) */
+  private singleClick(obj: any) {
+    if (!obj)
+      return
+    const { inputItem : region } = obj
+    if (!region)
+      return
+    this.singleClickRegion.emit(region)
   }
 
   /* double click navigate to the interested area */
@@ -130,17 +144,7 @@ export class RegionHierarchy implements OnInit{
     const { inputItem : region } = obj
     if (!region)
       return
-    this.dbService.doubleClickRegion(region)
-  }
-
-  /* single click selects/deselects region(s) */
-  private singleClick(obj: any) {
-    this.dbService.singleClickRegion(obj.inputItem)
-
-    /**
-     * TODO may no longer be needed
-     */
-    this.cdr.markForCheck()
+    this.doubleClickRegion.emit(region)
   }
 
   private insertHighlight(name: string, searchTerm: string): string {

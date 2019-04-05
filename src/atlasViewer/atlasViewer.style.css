@@ -128,3 +128,8 @@ markdown-dom[minReqMd]
   margin: 1em;
   display:block;
 }
+
+[fixedMouseContextualContainerDirective]
+{
+  width: 15rem;
+}

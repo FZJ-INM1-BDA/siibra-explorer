@@ -12,7 +12,6 @@ import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pip
 import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
 import { MenuIconsBar } from './menuicons/menuicons.component'
 
-import { GetPropMapPipe } from "../util/pipes/getPropMap.pipe";
 import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
 
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
@@ -41,6 +40,9 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { SigninModal } from "./signinModal/signinModal.component";
 import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
+import { UtilModule } from "src/util/util.module";
+import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
+import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 
 
 @NgModule({
@@ -50,6 +52,7 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
     LayoutModule,
     ComponentsModule,
     DatabrowserModule,
+    UtilModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -72,11 +75,11 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
     MenuIconsBar,
     SigninBanner,
     SigninModal,
+    RegionHierarchy,
 
     /* pipes */
     GroupDatasetByRegion,
     filterRegionDataEntries,
-    GetPropMapPipe,
     GetUniquePipe,
     FlatmapArrayPipe,
     SafeStylePipe,
@@ -85,6 +88,7 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
     SpatialLandmarksToDataBrowserItemPipe,
     FilterNullPipe,
     FilterNgLayer,
+    FilterNameBySearch,
 
     /* directive */
     DownloadDirective,
@@ -117,5 +121,4 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
 })
 
 export class UIModule{
-
 }

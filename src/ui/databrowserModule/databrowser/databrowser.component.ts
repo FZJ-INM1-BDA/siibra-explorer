@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
+import { DataEntry, DataStateInterface } from "src/services/stateStore.service";
 import { Subscription, merge } from "rxjs";
-import { DatabrowserService } from "../databrowser.service";
+import { DatabrowserService, CountedDataModality, getModalityFromDE } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
-import { skip } from "rxjs/operators";
 
 @Component({
   selector : 'data-browser',
@@ -15,33 +14,29 @@ import { skip } from "rxjs/operators";
 
 export class DataBrowser implements OnDestroy,OnInit{
 
+  public regions: any[] = []
+  public template: any
+  public parcellation: any
+
+  public dataentries: DataEntry[] = []
+
   public currentPage: number = 0
   public hitsPerPage: number = 5
 
-  public dataEntries: DataEntry[] = []
+  public fetchingFlag: boolean = false
+  public fetchError: boolean = false
+  /**
+   * TODO filter types
+   */
+  private subscriptions : Subscription[] = []
+  public countedDataM: CountedDataModality[] = []
+  public visibleCountedDataM: CountedDataModality[] = []
 
-  get selectedRegions(){
-    return this.dbService.selectedRegions
-  }
+  @ViewChild(ModalityPicker)
+  modalityPicker: ModalityPicker
 
-  get rebuiltSomeSelectedRegions(){
-    return this.dbService.rebuiltSomeSelectedRegions
-  }
-
-  get selectedParcellation(){
-    return this.dbService.selectedParcellation
-  }
-
-  get availableParcellations(){
-    return (this.dbService.selectedTemplate && this.dbService.selectedTemplate.parcellations) || []
-  }
-
-  get fetchingFlag(){
-    return this.dbService.fetchingFlag
-  }
-
-  get fetchError(){
-    return this.dbService.fetchError
+  get darktheme(){
+    return this.dbService.darktheme
   }
 
   /**
@@ -58,16 +53,26 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   }
 
-  /**
-   * TODO filter types
-   */
-  public modalityFilter: string[] = []
-  private subscriptions : Subscription[] = []
-
-  @ViewChild(ModalityPicker)
-  modalityPicker: ModalityPicker
 
   ngOnInit(){
+    const { regions, parcellation, template } = this
+    this.fetchingFlag = true
+    this.dbService.getDataByRegion({ regions, parcellation, template })
+      .then(de => {
+        this.dataentries = de
+        this.fetchingFlag = false
+        return de
+      })
+      .then(this.dbService.getModalityFromDE)
+      .then(modalities => {
+        this.countedDataM = modalities
+      })
+      .catch(e => {
+        console.error(e)
+        this.fetchingFlag = false
+        this.fetchError = true
+      })
+
     this.subscriptions.push(
       merge(
         // this.dbService.selectedRegions$,
@@ -78,7 +83,7 @@ export class DataBrowser implements OnDestroy,OnInit{
          * Only reset modality picker
          * resetting all creates infinite loop
          */
-        this.modalityPicker.clearAll()
+        this.clearAll()
       })
     )
     
@@ -94,6 +99,23 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.subscriptions.forEach(s=>s.unsubscribe())
   }
 
+  clearAll(){
+    this.countedDataM = this.countedDataM.map(cdm => {
+      return {
+        ...cdm,
+        visible: false
+      }
+    })
+    this.visibleCountedDataM = []
+    this.resetCurrentPage()
+  }
+
+  handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
+    this.countedDataM = modalityFilter
+    this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
+    this.resetCurrentPage()
+  }
+
   retryFetchData(event: MouseEvent){
     event.preventDefault()
     this.dbService.manualFetchDataset$.next(null)
@@ -101,26 +123,10 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   public showParcellationList: boolean = false
   
-  /**
-   * when user clicks x on region selector
-   */
-  deselectRegion(region:any){
-    this.dbService.deselectRegion(region)
-  }
-
-  uncheckModality(modality:string){
-    this.modalityPicker.toggleModality({name: modality})
-  }
-
   public filePreviewName: string
   onShowPreviewDataset(payload: {datasetName:string, event:MouseEvent}){
     const { datasetName, event } = payload
     this.filePreviewName = datasetName
-  }
-
-  changeParcellation(payload) {
-    this.showParcellationList = false
-    this.dbService.changeParcellation(payload)
   }
 
   /**
@@ -132,9 +138,7 @@ export class DataBrowser implements OnDestroy,OnInit{
   }
 
   resetFilters(event?:MouseEvent){
-    event && event.preventDefault()
-    this.modalityPicker.clearAll()
-    this.dbService.updateRegionSelection([])
+    this.clearAll()
   }
 }
 

@@ -26,11 +26,6 @@
         (click) = "$event.stopPropagation(); toggleCollapse(flattenedItem)" >
         <i [ngClass] = "isCollapsed(flattenedItem) ? '' : 'r-270'" class="fas fa-chevron-down"></i>
       </span>
-      <ng-template #noChildren>
-        <i class="fas fa-none">
-    
-        </i>
-      </ng-template>
       <span
         (click) = "treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
         class = "render-node-text"
@@ -42,3 +37,9 @@
   <div [attr.clusterindex] = "index" flatTreeEnd #flatTreeEnd>
   </div>
 </div>
+
+<ng-template #noChildren>
+  <i class="fas fa-none">
+
+  </i>
+</ng-template>
