@@ -32,6 +32,7 @@
 /* colour */
 [darktheme="true"] [plugincontainer] .btn,
 [darktheme="true"] [plugincontainer] input[type="text"],
+[darktheme="true"] [plugincontainer] input[type="number"],
 [darktheme="true"] [plugincontainer] .panel
 {
   background-color:rgba(81,81,81,0.8);

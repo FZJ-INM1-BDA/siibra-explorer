@@ -1,7 +1,7 @@
 :host
 {
   font-size:92%;
-  overflow:hidden;
+  overflow:visible;
   box-shadow: 0px 4px 16px -4px rgba(0,0,0,0.2);
   border-radius : 0;
   border:none;
@@ -11,7 +11,7 @@
 
 [bodyFooterContainer]
 {
-  overflow:hidden;
+  overflow:visible;
 }
 
 :host > .panel-heading
