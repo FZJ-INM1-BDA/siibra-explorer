@@ -291,6 +291,11 @@ markdown-dom pre code
   max-width: 60%!important;
 }
 
+.mh-20em
+{
+  max-height: 20em;
+}
+
 .pe-all
 {
   pointer-events: all;

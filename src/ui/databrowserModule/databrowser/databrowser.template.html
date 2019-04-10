@@ -1,60 +1,63 @@
-<div
-  [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
-  class="dataEntryWrapper">
+<div class="overflow-container">
 
-  <!-- main window -->
   <div
-    class="t-a-ease-500"
-    [style.height]="filePreviewName ? '0px' : 'auto'">
+    [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
+    class="dataEntryWrapper">
 
-    <!-- description -->
-    <readmore-component>
-      <div class="p-2">
-        Datasets relevant to
+    <!-- main window -->
+    <div
+      class="t-a-ease-500"
+      [style.height]="filePreviewName ? '0px' : 'auto'">
+
+      <!-- description -->
+      <readmore-component>
+        <div class="p-2 mh-20em overflow-auto">
+          Datasets relevant to
+          <span
+            *ngFor="let region of regions"
+            class="badge badge-secondary mr-1">
+            {{ region.name }}
+          </span>
+        </div>
+      </readmore-component>
+      
+      <!-- modality picker -->
+      <div>
         <span
-          *ngFor="let region of regions"
-          class="badge badge-secondary mr-1">
-          {{ region.name }}
+          placement="bottom"
+          container="body"
+          [popover]="countedDataM.length > 0 ? modalityPicker : null"
+          [outsideClick]="true"
+          [containerClass]="darktheme ? 'darktheme' : ''"
+          class="clickable btn-sm btn btn-secondary btn-block">
+          Filter by Modality <small *ngIf="visibleCountedDataM.length as visibleDMLength">({{ visibleDMLength }})</small>
         </span>
       </div>
-    </readmore-component>
     
-    <!-- modality picker -->
-    <div>
-      <span
-        placement="bottom"
-        container="body"
-        [popover]="countedDataM.length > 0 ? modalityPicker : null"
-        [outsideClick]="true"
-        [containerClass]="darktheme ? 'darktheme' : ''"
-        class="clickable btn-sm btn btn-secondary btn-block">
-        Filter by Modality <small *ngIf="visibleCountedDataM.length as visibleDMLength">({{ visibleDMLength }})</small>
-      </span>
-    </div>
-  
-    <!-- datasets container -->
-    <div
-      *ngIf="fetchingFlag; else fetched"
-      class="spinnerAnimationCircleContainer">
-      <div class="spinnerAnimationCircle"></div>
-      <div>Fetching datasets...</div>
-    </div>
-
-  </div>
-
-  <!-- file previewer -->
-  <div
-    class="filePreview">
-    <div class="filePreviewContainer">
-      <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
-        <i class="fas fa-arrow-left"></i>
+      <!-- datasets container -->
+      <div
+        *ngIf="fetchingFlag; else fetched"
+        class="spinnerAnimationCircleContainer">
+        <div class="spinnerAnimationCircle"></div>
+        <div>Fetching datasets...</div>
       </div>
-      <preview-component
-        *ngIf="filePreviewName"
-        [datasetName]="filePreviewName">
 
-      </preview-component>
-        
+    </div>
+
+    <!-- file previewer -->
+    <div
+      class="filePreview">
+      <div class="filePreviewContainer">
+        <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <preview-component
+          *ngIf="filePreviewName"
+          [datasetName]="filePreviewName">
+
+        </preview-component>
+          
+      </div>
     </div>
   </div>
 </div>
@@ -112,7 +115,6 @@
       </div>
       
       <pagination-component
-        *ngIf="dbService.fetchedDataEntries$ | async"
         (paginationChange)="currentPage = $event"
         [hitsPerPage]="hitsPerPage"
         [total]="filteredDataEntry.length"

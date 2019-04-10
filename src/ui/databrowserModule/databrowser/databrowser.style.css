@@ -63,11 +63,6 @@ div[databrowserheader]
   white-space: nowrap;
 }
 
-:host > div
-{
-  padding : 0.5em 1em;
-}
-
 div[filterBlock] > *
 {
   white-space: nowrap;
@@ -188,7 +183,7 @@ radio-list
 }
 
 /* datawrapper */
-:host > .dataEntryWrapper
+:host .dataEntryWrapper
 {
   white-space: nowrap;
   overflow: hidden;
@@ -210,4 +205,13 @@ radio-list
 {
   max-height: 100%;
   overflow:auto;
+}
+
+.overflow-container
+{
+  overflow:hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }

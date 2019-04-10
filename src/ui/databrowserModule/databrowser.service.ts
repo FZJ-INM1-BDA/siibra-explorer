@@ -7,11 +7,16 @@ import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRI
 import { map, distinctUntilChanged, debounceTime, filter, tap } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
+import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
+
+const noMethodDisplayName = 'No methods described'
 
 export function temporaryFilterDataentryName(name: string):string{
   return /autoradiography/.test(name)
     ? 'autoradiography'
-    : name
+    : NO_METHODS === name
+      ? noMethodDisplayName
+      : name
 }
 
 function generateToken() {
@@ -218,10 +223,14 @@ export class DatabrowserService implements OnDestroy{
   public getModalityFromDE = getModalityFromDE
 }
 
+
 export function reduceDataentry(accumulator:{name:string, occurance:number}[], dataentry: DataEntry) {
   const methods = dataentry.activity
     .map(a => a.methods)
-    .reduce((acc, item) => acc.concat(item), [])
+    .reduce((acc, item) => acc.concat(
+      item.length > 0
+        ? item
+        : NO_METHODS ), [])
     .map(temporaryFilterDataentryName)
 
   const newDE = Array.from(new Set(methods))
