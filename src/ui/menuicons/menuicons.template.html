@@ -45,6 +45,7 @@
 </div>
 
 <div
+  *ngIf="false"
   [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
   class="btnWrapper">
   <div
@@ -56,5 +57,49 @@
     <i class="fas fa-tools">
       
     </i>
+  </div>
+</div>
+
+<div
+  *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+  [tooltip]="manifest.displayName || manifest.name"
+  placement="right"
+  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+  class="btnWrapper">
+
+  <div
+    (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
+    [ngClass]="!pluginServices.launchedPlugins.has(manifest.name) ? 'btn-outline-secondary' : pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
+    class="shadow btn btn-sm rounded-circle">
+    {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+  </div>
+</div>
+
+<div
+  *ngFor="let manifest of pluginServices.orphanPlugins"
+  [tooltip]="manifest.displayName || manifest.name"
+  placement="right"
+  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+  class="btnWrapper">
+
+  <div
+    (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
+    [ngClass]="pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
+    class="shadow btn btn-sm rounded-circle">
+    {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+  </div>
+</div>
+
+<div
+  *ngFor="let wu of dbService.instantiatedWidgetUnits"
+  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+  placement="right"
+  [tooltip]="wu.title"
+  class="btnWrapper">
+  <div
+    (click)="widgetServices.minimisedWindow.delete(wu)"
+    [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
+    class="shadow btn btn-sm rounded-circle">
+    <i class="fas fa-search"></i>
   </div>
 </div>

@@ -20,6 +20,8 @@ export class WidgetServices{
 
   private clickedListener : Subscription[] = []
 
+  public minimisedWindow: Set<WidgetUnit> = new Set()
+
   constructor(
     private cfr:ComponentFactoryResolver,
     private constantServce:AtlasViewerConstantsServices,
@@ -34,6 +36,10 @@ export class WidgetServices{
     })
 
     this.clickedListener.forEach(s=>s.unsubscribe())
+  }
+
+  minimise(wu:WidgetUnit){
+    this.minimisedWindow.add(wu)
   }
 
   addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
@@ -83,6 +89,7 @@ export class WidgetServices{
       _component.instance.setWidthHeight()
 
       this.widgetComponentRefs.add( _component )
+      _component.onDestroy(() => this.minimisedWindow.delete(_component.instance))
 
       this.clickedListener.push(
         _component.instance.clickedEmitter.subscribe((widgetUnit:WidgetUnit)=>{

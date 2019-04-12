@@ -7,6 +7,7 @@ import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.co
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
+import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
 
 @Component({
   selector: 'menu-icons',
@@ -48,11 +49,12 @@ export class MenuIconsBar{
     private widgetServices:WidgetServices,
     private injector:Injector,
     private constantService:AtlasViewerConstantsServices,
-    dbService: DatabrowserService,
-    cfr: ComponentFactoryResolver
+    public dbService: DatabrowserService,
+    cfr: ComponentFactoryResolver,
+    public pluginServices:PluginServices
   ){
 
-    dbService.createDatabrowser = this.clickSearch.bind(this)
+    this.dbService.createDatabrowser = this.clickSearch.bind(this)
 
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
@@ -72,13 +74,21 @@ export class MenuIconsBar{
     const title = regions.length > 1
       ? `Data associated with ${regions.length} regions`
       : `Data associated with ${regions[0].name}`
-    this.widgetServices.addNewWidget(dataBrowser, {
+    const widgetUnit = this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
       state: 'floating',
       title,
       titleHTML: `<i class="fas fa-search"></i> ${title}`
     })
+    return {
+      dataBrowser,
+      widgetUnit
+    }
+  }
+
+  public catchError(e) {
+    
   }
 
   public clickLayer(event: MouseEvent){

@@ -82,8 +82,7 @@ export class AtlasViewer implements OnDestroy, OnInit {
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService,
-    private databrowserService: DatabrowserService,
-    private injector: Injector
+    private databrowserService: DatabrowserService
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -352,7 +351,7 @@ export class AtlasViewer implements OnDestroy, OnInit {
   private selectedTemplate: any
   searchRegion(regions:any[]){
     this.rClContextualMenu.hide()
-    this.databrowserService.createDatabrowser({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
+    this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
   }
 
   @HostBinding('attr.version')

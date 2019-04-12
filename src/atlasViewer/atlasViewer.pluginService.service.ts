@@ -10,6 +10,7 @@ import '../res/css/plugin_styles.css'
 import { interval } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { Store } from "@ngrx/store";
+import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 
 @Injectable({
   providedIn : 'root'
@@ -31,6 +32,14 @@ export class PluginServices{
   ){
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
+    this.apiService.interactiveViewer.uiHandle.launchNewWidget = (manifest) => this.launchPlugin(manifest)
+      .then(handler => {
+        this.orphanPlugins.add(manifest)
+        handler.onShutdown(() => {
+          this.orphanPlugins.delete(manifest)
+        })
+      })
+    
 
     this.atlasDataService.promiseFetchedPluginManifests
       .then(arr=>
@@ -57,14 +66,24 @@ export class PluginServices{
       ])
   }
 
+  public launchedPlugins: Set<string> = new Set()
+  private mapPluginNameToWidgetUnit: Map<string, WidgetUnit> = new Map()
+
+  pluginMinimised(pluginManifest:PluginManifest){
+    return this.widgetService.minimisedWindow.has( this.mapPluginNameToWidgetUnit.get(pluginManifest.name) )
+  }
+
+  public orphanPlugins: Set<PluginManifest> = new Set()
   launchPlugin(plugin:PluginManifest){
     if(this.apiService.interactiveViewer.pluginControl[plugin.name])
     {
       console.warn('plugin already launched. blinking for 10s.')
       this.apiService.interactiveViewer.pluginControl[plugin.name].blink(10)
-      return
+      const wu = this.mapPluginNameToWidgetUnit.get(plugin.name)
+      this.widgetService.minimisedWindow.delete(wu)
+      return Promise.reject('plugin already launched')
     }
-    this.readyPlugin(plugin)
+    return this.readyPlugin(plugin)
       .then(()=>{
         const pluginUnit = this.pluginViewContainerRef.createComponent( this.pluginUnitFactory )
         /* TODO in v0.2, I used:
@@ -112,8 +131,15 @@ export class PluginServices{
           title : plugin.displayName || plugin.name
         })
 
+        this.launchedPlugins.add(plugin.name)
+        this.mapPluginNameToWidgetUnit.set(plugin.name, widgetCompRef.instance)
+
         const unsubscribeOnPluginDestroy = []
-        const shutdownCB = []
+        const shutdownCB = [
+          () => {
+            this.launchedPlugins.delete(plugin.name)
+          }
+        ]
 
         handler.onShutdown = (cb)=>{
           if(typeof cb !== 'function'){
@@ -148,6 +174,7 @@ export class PluginServices{
         handler.onShutdown(()=>{
           unsubscribeOnPluginDestroy.forEach(s=>s.unsubscribe())
           delete this.apiService.interactiveViewer.pluginControl[plugin.name]
+          this.mapPluginNameToWidgetUnit.delete(plugin.name)
         })
         
         pluginUnit.onDestroy(()=>{
@@ -155,8 +182,9 @@ export class PluginServices{
             shutdownCB.pop()()
           }
         })
+
+        return handler
       })
-      .catch(console.error)
   }
 }
 

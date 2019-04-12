@@ -22,6 +22,14 @@ export class WidgetUnit implements OnInit{
   @HostBinding('style.height')
   height : string = this.state === 'docked' ? null : '0px'
 
+  @HostBinding('style.display')
+  get isMinimised(){
+    return this.widgetServices.minimisedWindow.has(this) ? 'none' : null
+  }
+  /**
+   * TODO
+   * upgrade to angular>=7, and use cdk to handle draggable components
+   */
   get transform(){
     return this.state === 'floating' ?
       `translate(${this.position[0]}px, ${this.position[1]}px)` :
@@ -48,8 +56,13 @@ export class WidgetUnit implements OnInit{
   public titleHTML : string = null
 
   public guestComponentRef : ComponentRef<any>
-  public cf : ComponentRef<WidgetUnit>
   public widgetServices:WidgetServices
+  public cf : ComponentRef<WidgetUnit>
+
+  public id: string 
+  constructor(){
+    this.id = Date.now().toString()
+  }
 
   ngOnInit(){
     this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'

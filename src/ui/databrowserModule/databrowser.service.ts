@@ -8,6 +8,9 @@ import { map, distinctUntilChanged, debounceTime, filter, tap } from "rxjs/opera
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
+import { ComponentRef } from "@angular/core/src/render3";
+import { DataBrowser } from "./databrowser/databrowser.component";
+import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -30,7 +33,15 @@ export class DatabrowserService implements OnDestroy{
 
   public darktheme: boolean = false
 
-  public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => void
+  public instantiatedWidgetUnits: WidgetUnit[] = []
+  public queryData: (arg:{regions: any[], template:any, parcellation: any}) => void = (arg) => {
+    const { dataBrowser, widgetUnit } = this.createDatabrowser(arg)
+    this.instantiatedWidgetUnits.push(widgetUnit.instance)
+    widgetUnit.onDestroy(() => {
+      this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
+    })
+  }
+  public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit:ComponentRef<WidgetUnit>}
   public getDataByRegion: ({regions, parcellation, template}:{regions:any[], parcellation:any, template: any}) => Promise<DataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
     this.lowLevelQuery(template.name, parcellation.name)
       .then(de => this.filterDEByRegion.transform(de, regions))
