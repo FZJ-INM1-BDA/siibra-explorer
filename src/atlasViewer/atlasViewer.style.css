@@ -123,13 +123,24 @@ div[contextualBlock]
   display:block;
 }
 
-markdown-dom[minReqMd]
-{
-  margin: 1em;
-  display:block;
-}
-
 [fixedMouseContextualContainerDirective]
 {
   width: 15rem;
+}
+
+div[minReq]
+{
+  width: 100%;
+  height: 100%;
+}
+
+div[imageContainer]
+{
+  flex-grow: 1;
+  background: no-repeat center / contain;
+}
+
+div.displayCard
+{
+  opacity: 0.8;
 }

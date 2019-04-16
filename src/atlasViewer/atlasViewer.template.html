@@ -88,5 +88,34 @@
   </signin-modal>
 </ng-template>
 
-<markdown-dom minReqMd *ngIf = "!meetsRequirement" [markdown] = "constantsService.minReqMD" >
-</markdown-dom>
+<div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
+  <div class="jumbotron bg-light text-center mb-0">
+    <div>
+      <h1 class="mb-3">
+        <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
+      </h1>
+      <p>
+        We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a> or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox</a> for viewing the interactive viewer.
+      </p>
+      <div class="col-6 d-inline-block text-left">
+        <readmore-component
+          [collapsedHeight]="0">
+          <markdown-dom [markdown]="constantsService.minReqExplaner">
+
+          </markdown-dom>
+        </readmore-component>
+      </div>
+      
+    </div>
+  </div>
+  <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
+    <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer [style.backgroundImage]="'url(' + preview.previewSrc + ')'" >
+      <div class="mt-2 card d-inline-block displayCard">
+        <div class="card-body">
+          {{ preview.text }}
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+</div>

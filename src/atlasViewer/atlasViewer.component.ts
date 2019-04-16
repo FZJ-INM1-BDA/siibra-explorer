@@ -1,12 +1,12 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, Injector } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime } from "rxjs/operators";
+import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, scan } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
-import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
@@ -69,6 +69,9 @@ export class AtlasViewer implements OnDestroy, OnInit {
   public ngLayerNames$ : Observable<any>
   public ngLayers : NgLayerInterface[]
   private disposeHandler : any
+
+  public unsupportedPreviewIdx: number = 0
+  public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -203,6 +206,23 @@ export class AtlasViewer implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
+
+    if (!this.meetsRequirement) {
+      merge(
+        of(-1),
+        interval(UNSUPPORTED_INTERVAL)
+      ).pipe(
+        map(v => {
+          let idx = v
+          while (idx < 0) {
+            idx = v + this.unsupportedPreviews.length
+          }
+          return idx % this.unsupportedPreviews.length
+        })
+      ).subscribe(val => {
+        this.unsupportedPreviewIdx = val
+      })
+    }
 
     this.subscriptions.push(
       this.showHelp$.subscribe(() => 

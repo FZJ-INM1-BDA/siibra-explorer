@@ -133,6 +133,12 @@ export class AtlasViewerConstantsServices{
     pointHitRadius : 0,
   }
 
+  public minReqExplaner = `
+  - Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
+  - You can check browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
+  - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
+  `
+
   public minReqMD = `
 # Hmm... it seems like we hit a snag
 It seems your browser has trouble loading interactive atlas viewer. 
@@ -284,6 +290,19 @@ const parseURLToElement = (url:string):HTMLElement=>{
   el.src = url
   return el
 }
+
+export const UNSUPPORTED_PREVIEW = [{
+  text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',
+  previewSrc: './res/image/1.png'
+},{
+  text: 'Preview of Big Brain 2015 Release',
+  previewSrc: './res/image/2.png'
+},{
+  text: 'Preview of Waxholm Rat V2.0',
+  previewSrc: './res/image/3.png'
+}]
+
+export const UNSUPPORTED_INTERVAL = 7000
 
 export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
   ['jquery@3',parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
