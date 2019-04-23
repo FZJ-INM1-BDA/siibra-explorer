@@ -32,13 +32,7 @@ export class PluginServices{
   ){
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
-    this.apiService.interactiveViewer.uiHandle.launchNewWidget = (manifest) => this.launchPlugin(manifest)
-      .then(handler => {
-        this.orphanPlugins.add(manifest)
-        handler.onShutdown(() => {
-          this.orphanPlugins.delete(manifest)
-        })
-      })
+    this.apiService.interactiveViewer.uiHandle.launchNewWidget = this.launchNewWidget.bind(this) 
     
 
     this.atlasDataService.promiseFetchedPluginManifests
@@ -46,6 +40,14 @@ export class PluginServices{
         this.fetchedPluginManifests = arr)
       .catch(console.error)
   }
+
+  launchNewWidget = (manifest) => this.launchPlugin(manifest)
+    .then(handler => {
+      this.orphanPlugins.add(manifest)
+      handler.onShutdown(() => {
+        this.orphanPlugins.delete(manifest)
+      })
+    })
 
   readyPlugin(plugin:PluginManifest):Promise<any>{
     return Promise.all([

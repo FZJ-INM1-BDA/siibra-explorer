@@ -182,7 +182,7 @@ export class AtlasViewerURLService{
       const pluginStates = searchparams.get('pluginStates')
       if(pluginStates){
         const arrPluginStates = pluginStates.split('__')
-        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchPlugin(json)).catch(console.error))
+        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchNewWidget(json)).catch(console.error))
       }
     })
 
