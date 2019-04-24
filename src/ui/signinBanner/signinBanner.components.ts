@@ -4,7 +4,7 @@ import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { Subscription, Observable } from "rxjs";
-import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS } from "src/services/stateStore.service";
+import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION } from "src/services/stateStore.service";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
 
@@ -84,7 +84,14 @@ export class SigninBanner implements OnInit, OnDestroy{
   }
 
   changeParcellation({ current, previous }){
-
+    const { ngId: prevNgId} = previous
+    const { ngId: currNgId} = current
+    if (prevNgId === currNgId)
+      return
+    this.store.dispatch({
+      type: SELECT_PARCELLATION,
+      selectParcellation: current
+    })
   }
 
   handleRegionClick({ mode = 'single', region }){

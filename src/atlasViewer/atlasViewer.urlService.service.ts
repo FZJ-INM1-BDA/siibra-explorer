@@ -82,6 +82,12 @@ export class AtlasViewerURLService{
       take(1),
       map(ft => ft.filter(t => t !== null))
     ).subscribe(fetchedTemplates=>{
+
+      /**
+       * TODO
+       * consider what to do when we have ill formed search params
+       * param validation?
+       */
       const searchparams = new URLSearchParams(window.location.search)
  
       /* first, check if any template and parcellations are to be loaded */
@@ -107,7 +113,7 @@ export class AtlasViewerURLService{
         )
         const urlString = window.location.href
         /**
-         * TODO think of better way of doing this
+         * TODO think of better way of doing this... maybe pushstate?
          */
         history.replaceState(null, '', urlString.split('?')[0])
         return
@@ -143,7 +149,9 @@ export class AtlasViewerURLService{
         if(selectedRegions){
           this.store.dispatch({
             type : SELECT_REGIONS,
-            selectRegions : selectedRegions.split('_').map(labelIndex=>labelIndexMap.get(Number(labelIndex)))
+            selectRegions : selectedRegions.split('_')
+              .map(labelIndex=>labelIndexMap.get(Number(labelIndex)))
+              .filter(region => !!region)
           })
         }
       }
