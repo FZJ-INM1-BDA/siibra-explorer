@@ -1,7 +1,11 @@
-module.exports = ({code = 500, error = 'an error had occured'}, req, res, next) => {
+module.exports = ({code = 500, error = 'an error had occured', trace = 'undefined trace'}, req, res, next) => {
   /**
    * probably use more elaborate logging?
    */
-  console.log('Catching error', JSON.stringify(error))
+  console.log('Catching error', {
+    code,
+    error,
+    trace
+  })
   res.sendStatus(code)
 }
