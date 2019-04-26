@@ -3,17 +3,36 @@ const request = require('request')
 const path = require('path')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 
+const kgQueryUtil = require('./../auth/util')
+
 let cachedData = null
 let otherQueryResult = null
 const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
 const timeout = process.env.TIMEOUT || 5000
 
+let getPublicAccessToken
+try {
+  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
+  getPublicAccessToken = getPublic
+} catch (e) {
+  console.log('kgQueryUtil error', e)
+}
+
 const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
+
   const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
-  const option = accessToken || process.env.ACCESS_TOKEN
+  let publicAccessToken
+  if (!accessToken && getPublicAccessToken) {
+    try {
+      publicAccessToken = await getPublicAccessToken()
+    } catch (e) {
+      console.log('getPublicAccessToken Error', e)
+    }
+  }
+  const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
     ? {
         auth: {
-          'bearer': accessToken || process.env.ACCESS_TOKEN
+          'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
         }
       }
     : {}

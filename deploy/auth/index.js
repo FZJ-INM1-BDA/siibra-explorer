@@ -7,6 +7,11 @@ module.exports = async (app) => {
   app.use(passport.session())
 
   passport.serializeUser((user, done) => {
+    const { tokenset, rest } = user
+    console.log({
+      tokenset,
+      rest
+    })
     objStoreDb.set(user.id, user)
     done(null, user.id)
   })

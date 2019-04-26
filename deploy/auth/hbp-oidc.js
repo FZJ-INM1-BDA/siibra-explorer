@@ -23,6 +23,7 @@ module.exports = async (app) => {
     discoveryUrl,
     redirectUri,
     cb,
+    scope: 'openid offline_access',
     clientConfig: {
       redirect_uris: [ redirectUri ],
       response_types: [ 'code' ]
