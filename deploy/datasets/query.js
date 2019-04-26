@@ -21,7 +21,7 @@ let getPublicAccessToken
   }
 })()
 
-const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
+const fetchDatasetFromKg = async (arg) => {
 
   const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
   let publicAccessToken
@@ -39,15 +39,19 @@ const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
         }
       }
     : {}
-  request(queryUrl, option, (err, resp, body) => {
-    if (err)
-      return reject(err)
-    if (resp.statusCode >= 400)
-      return reject(resp.statusCode)
-    const json = JSON.parse(body)
-    return resolve(json)
+
+  return await new Promise((resolve, reject) => {
+    request(queryUrl, option, (err, resp, body) => {
+      if (err)
+        return reject(err)
+      if (resp.statusCode >= 400)
+        return reject(resp.statusCode)
+      const json = JSON.parse(body)
+      return resolve(json)
+    })
   })
-})
+}
+
 
 const cacheData = ({results, ...rest}) => {
   cachedData = results
