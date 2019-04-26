@@ -11,12 +11,15 @@ const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproje
 const timeout = process.env.TIMEOUT || 5000
 
 let getPublicAccessToken
-try {
-  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
-  getPublicAccessToken = getPublic
-} catch (e) {
-  console.log('kgQueryUtil error', e)
-}
+
+(async () => {
+  try {
+    const { getPublicAccessToken: getPublic } = await kgQueryUtil()
+    getPublicAccessToken = getPublic
+  } catch (e) {
+    console.log('kgQueryUtil error', e)
+  }
+})()
 
 const fetchDatasetFromKg = (arg) => new Promise((resolve, reject) => {
 
