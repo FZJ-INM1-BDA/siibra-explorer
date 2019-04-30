@@ -1,8 +1,8 @@
 const fs = require('fs')
 
 const filenames = [
-  '***REMOVED***_MNI.pts',
-  '***REMOVED***_MNI.pts'
+  '**removed**.pts',
+  '**removed**.pts'
 ]
 
 const descContactPts = 'This spatial point represent a contact point in an electrode. Brain activity was recorded while the subject conduct several tasks.'
