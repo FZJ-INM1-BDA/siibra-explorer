@@ -9,6 +9,7 @@ let cachedData = null
 let otherQueryResult = null
 const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
 const timeout = process.env.TIMEOUT || 5000
+const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
 let getPublicAccessToken
 
@@ -84,8 +85,10 @@ const getDs = ({ user }) => user
  */
 
 const flattenArray = (array) => {
-  return array.filter(item => item.children.length === 0).concat(
-    ...array.filter(item => item.children.length > 0).map(item => flattenArray(item.children))
+  return array.concat(
+    ...array.map(item => item.children && item.children instanceof Array
+      ? flattenArray(item.children)
+      : [])
   )
 }
 
@@ -105,6 +108,8 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
 let juBrain = null
 let shortBundle = null
 let longBundle = null
+let waxholm = null
+let allen = null
 
 readConfigFile('colin.json')
   .then(data => JSON.parse(data))
@@ -121,9 +126,16 @@ readConfigFile('MNI152.json')
   })
   .catch(console.error)
 
+readConfigFile('waxholmRatV2_0.json')
+  .then(data => JSON.parse(data))
+  .then(json => {
+    waxholm = flattenArray(json.parcellations[0].regions)
+  })
+  .catch(console.error)
+
 const filterByPRs = (prs, atlasPr) => atlasPr
   ? prs.some(pr => {
-      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'))
+      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
       return atlasPr.some(aPr => regex.test(aPr.name))
     })
   : false
@@ -132,6 +144,8 @@ const manualFilter = require('./supplements/parcellation')
 
 const filter = (datasets, {templateName, parcellationName}) => datasets
   .filter(ds => {
+    if (/infant/.test(ds.name))
+      return false
     if (templateName) {
       return ds.referenceSpaces.some(rs => rs.name === templateName)
     }
@@ -139,13 +153,15 @@ const filter = (datasets, {templateName, parcellationName}) => datasets
       return ds.parcellationRegion.length > 0
         ? filterByPRs(
             ds.parcellationRegion, 
-            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain && !/infant/.test(ds.name)
+            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
               ? juBrain
               : parcellationName === 'Fibre Bundle Atlas - Long Bundle' && longBundle
                 ? longBundle
                 : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
                   ? shortBundle
-                  : null
+                  : parcellationName === 'Whole Brain (v2.0)'
+                    ? waxholm
+                    : null
           )
         : manualFilter({ parcellationName, dataset: ds })
     }
@@ -174,3 +190,34 @@ exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user
     .then(json => filter(json, {templateName, parcellationName}))
 
 exports.getPreview = ({ datasetName }) => getPreviewFile({ datasetName })
+
+/**
+ * TODO
+ * change to real spatial query
+ */
+const cachedMap = new Map()
+const fetchSpatialDataFromKg = async ({ templateName }) => {
+  const cachedResult = cachedMap.get(templateName)
+  if (cachedResult) 
+    return cachedResult
+    
+  try {
+    const filename = path.join(STORAGE_PATH, templateName + '.json')
+    const exists = fs.existsSync(filename)
+
+    if (!exists)
+      return []
+    
+    const data = fs.readFileSync(filename, 'utf-8')
+    const json = JSON.parse(data)
+    cachedMap.set(templateName, json)
+    return json
+  } catch (e) {
+    console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
+    return []
+  }
+}
+
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg }) => {
+  return await fetchSpatialDataFromKg({ templateName })
+}

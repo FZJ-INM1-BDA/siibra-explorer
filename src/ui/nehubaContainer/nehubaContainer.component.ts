@@ -840,13 +840,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     const center = navigation.position.map(n=>n/1e6)
     const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
-    const templateSpace = this.selectedTemplate.name
-    this.atlasViewerDataService.spatialSearch({
-      center,
-      searchWidth,
-      templateSpace,
-      pageNo : 0
-    })
+    const { selectedTemplate } = this
+    // this.atlasViewerDataService.spatialSearch({
+    //   center,
+    //   searchWidth,
+    //   selectedTemplate,
+    //   pageNo : 0
+    // })
   }
 
   /* because the navigation can be changed from two sources, 

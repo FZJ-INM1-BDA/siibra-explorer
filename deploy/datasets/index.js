@@ -11,6 +11,8 @@ datasetsRouter.use((req, res, next) => {
   next()
 })
 
+datasetsRouter.use('/spatialSearch', require('./spatialRouter'))
+
 datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
   const { templateName } = req.params
   const { user } = req

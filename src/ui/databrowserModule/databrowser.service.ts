@@ -1,10 +1,10 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent } from "rxjs";
+import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, from, of } from "rxjs";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRIES } from "src/services/stateStore.service";
-import { map, distinctUntilChanged, debounceTime, filter, tap } from "rxjs/operators";
+import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
+import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
@@ -13,6 +13,18 @@ import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 
 const noMethodDisplayName = 'No methods described'
+
+/**
+ * param for .toFixed method
+ * 6: nm
+ * 3: um
+ * 0: mm
+ */
+const SPATIAL_SEARCH_PRECISION = 6
+/**
+ * in ms
+ */
+const SPATIAL_SEARCH_DEBOUNCE = 500
 
 export function temporaryFilterDataentryName(name: string):string{
   return /autoradiography/.test(name)
@@ -57,6 +69,9 @@ export class DatabrowserService implements OnDestroy{
   public fetchDataObservable$: Observable<any>
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
+  private fetchSpatialData$: Observable<any>
+  public spatialDatasets$: Observable<any>
+
   constructor(
     private workerService: AtlasWorkerService,
     private constantService: AtlasViewerConstantsServices,
@@ -80,8 +95,42 @@ export class DatabrowserService implements OnDestroy{
       })
     )
 
+  this.fetchSpatialData$ = combineLatest(
+    this.store.pipe(
+      select('viewerState'),
+      select('navigation')
+    ),
+    this.store.pipe(
+      select('viewerState'),
+      select('templateSelected')
+    )
+  ).pipe(
+    debounceTime(SPATIAL_SEARCH_DEBOUNCE)
+  )
 
-    this.fetchDataObservable$ = combineLatest(
+  this.spatialDatasets$ = this.fetchSpatialData$.pipe(
+    switchMap(([navigation, templateSelected]) => {
+
+        /**
+       * templateSelected and templateSelected.name must be defined for spatial search
+       */
+      if (!templateSelected || !templateSelected.name)
+        return from(Promise.reject('templateSelected must not be empty'))
+      const encodedTemplateName = encodeURI(templateSelected.name)
+
+      // in mm
+      const center = navigation.position.map(n=>n/1e6)
+      const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
+      const pt1 = center.map(v => (v - searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
+      const pt2 = center.map(v => (v + searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
+      
+      return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`)
+        .then(res => res.json()))
+    }),
+    catchError((err) => (console.log(err), of([])))
+  )
+
+  this.fetchDataObservable$ = combineLatest(
       this.store.pipe(
         select('viewerState'),
         safeFilter('templateSelected'),
@@ -100,6 +149,19 @@ export class DatabrowserService implements OnDestroy{
 
     this.fetchDataStatus$ = combineLatest(
       this.fetchDataObservable$
+    )
+
+    this.subscriptions.push(
+      this.spatialDatasets$.subscribe(arr => {
+        this.store.dispatch({
+          type: FETCHED_SPATIAL_DATA,
+          fetchedDataEntries: arr
+        })
+        this.store.dispatch({
+          type : UPDATE_SPATIAL_DATA,
+          totalResults : arr.length
+        })
+      })
     )
 
     this.subscriptions.push(
