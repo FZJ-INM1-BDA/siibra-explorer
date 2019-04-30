@@ -109,6 +109,7 @@ export class DatabrowserService implements OnDestroy{
   )
 
   this.spatialDatasets$ = this.fetchSpatialData$.pipe(
+    filter(([navigation, templateSelected]) => !!navigation && !!navigation.position && !!templateSelected && !!templateSelected.name),
     switchMap(([navigation, templateSelected]) => {
 
         /**
