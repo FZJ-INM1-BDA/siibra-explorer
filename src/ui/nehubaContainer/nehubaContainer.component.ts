@@ -328,7 +328,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
                     : null)
             )
         }else{
-          this.nehubaViewer.removeSpatialSearch3DLandmarks()
+          if (this.nehubaViewer && this.nehubaViewer.removeSpatialSearch3DLandmarks instanceof Function)
+            this.nehubaViewer.removeSpatialSearch3DLandmarks()
         }
       })
     )
