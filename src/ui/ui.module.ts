@@ -43,6 +43,7 @@ import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
 import { UtilModule } from "src/util/util.module";
 import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
 import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
+import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 
 
 @NgModule({
@@ -76,6 +77,8 @@ import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
     SigninBanner,
     SigninModal,
     RegionHierarchy,
+
+    StatusCardComponent,
 
     /* pipes */
     GroupDatasetByRegion,
