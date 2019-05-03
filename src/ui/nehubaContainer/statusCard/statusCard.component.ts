@@ -66,7 +66,7 @@ export class StatusCardComponent{
    * 
    * the info re: nehubaViewer can stay there, too
    */
-  resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false} : {rotation: boolean, position: boolean, zoom: boolean}){
+  resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false} : {rotation?: boolean, position?: boolean, zoom?: boolean}){
     const initialNgState = this.selectedTemplate.nehubaConfig.dataset.initialNgState
     
     const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
