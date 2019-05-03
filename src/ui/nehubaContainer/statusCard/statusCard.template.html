@@ -1,7 +1,5 @@
 <div statusCard>
 
-    <hr *ngIf="showCitation && !isMobile" />
-
     <div linksContainer>
       <span>
         reset: 
@@ -53,7 +51,7 @@
       </small> 
       <br *ngIf="!isMobile" />
       <small onHoverSegment>
-        {{ onHoverSegmentName$ | async }}
+        {{ onHoverSegmentName }}
       </small>
     </div>
   </div>

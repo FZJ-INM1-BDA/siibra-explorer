@@ -193,20 +193,20 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     // TODO hack, even though octant is hidden, it seems with VTK, one can highlight
     this.onHoverSegmentName$ = combineLatest(
-        this.store.pipe(
-          select('uiState'),
-          filter(state=>isDefined(state)),
-          map(state=>state.mouseOverSegment ?
-            state.mouseOverSegment.constructor === Number ? 
-              state.mouseOverSegment.toString() : 
-              state.mouseOverSegment.name :
-            '' ),
-          distinctUntilChanged()
-        ),
-        this.onHoverLandmark$
-      ).pipe(
-        map(results => results[1] === null ? results[0] : '')
-      )
+      this.store.pipe(
+        select('uiState'),
+        filter(state=>isDefined(state)),
+        map(state=>state.mouseOverSegment ?
+          state.mouseOverSegment.constructor === Number ? 
+            state.mouseOverSegment.toString() : 
+            state.mouseOverSegment.name :
+          '' ),
+        distinctUntilChanged()
+      ),
+      this.onHoverLandmark$
+    ).pipe(
+      map(results => results[1] === null ? results[0] : '')
+    )
     
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.newViewer$.pipe(
