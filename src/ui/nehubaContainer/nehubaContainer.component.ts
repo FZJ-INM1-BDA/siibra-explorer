@@ -193,20 +193,20 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     // TODO hack, even though octant is hidden, it seems with VTK, one can highlight
     this.onHoverSegmentName$ = combineLatest(
-        this.store.pipe(
-          select('uiState'),
-          filter(state=>isDefined(state)),
-          map(state=>state.mouseOverSegment ?
-            state.mouseOverSegment.constructor === Number ? 
-              state.mouseOverSegment.toString() : 
-              state.mouseOverSegment.name :
-            '' ),
-          distinctUntilChanged()
-        ),
-        this.onHoverLandmark$
-      ).pipe(
-        map(results => results[1] === null ? results[0] : '')
-      )
+      this.store.pipe(
+        select('uiState'),
+        filter(state=>isDefined(state)),
+        map(state=>state.mouseOverSegment ?
+          state.mouseOverSegment.constructor === Number ? 
+            state.mouseOverSegment.toString() : 
+            state.mouseOverSegment.name :
+          '' ),
+        distinctUntilChanged()
+      ),
+      this.onHoverLandmark$
+    ).pipe(
+      map(results => results[1] === null ? results[0] : '')
+    )
     
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.newViewer$.pipe(
@@ -946,90 +946,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
     }
   }
 
-  /* related to info-card */
-
-  statusPanelRealSpace : boolean = true
-
-  get mouseCoord():string{
-    return this.nehubaViewer ?
-      this.statusPanelRealSpace ? 
-        this.nehubaViewer.mousePosReal ? 
-          Array.from(this.nehubaViewer.mousePosReal.map(n=> isNaN(n) ? 0 : n/1e6))
-            .map(n=>n.toFixed(3)+'mm').join(' , ') : 
-          '0mm , 0mm , 0mm (mousePosReal not yet defined)' :
-        this.nehubaViewer.mousePosVoxel ? 
-          this.nehubaViewer.mousePosVoxel.join(' , ') :
-          '0 , 0 , 0 (mousePosVoxel not yet defined)' :
-      '0 , 0 , 0 (nehubaViewer not defined)'
-  }
-
-  editingNavState : boolean = false
-
-  textNavigateTo(string:string){
-    if(string.split(/[\s|,]+/).length>=3 && string.split(/[\s|,]+/).slice(0,3).every(entry=>!isNaN(Number(entry.replace(/mm/,''))))){
-      const pos = (string.split(/[\s|,]+/).slice(0,3).map((entry)=>Number(entry.replace(/mm/,''))*(this.statusPanelRealSpace ? 1000000 : 1)))
-      this.nehubaViewer.setNavigationState({
-        position : (pos as [number,number,number]),
-        positionReal : this.statusPanelRealSpace
-      })
-    }else{
-      console.log('input did not parse to coordinates ',string)
-    }
-  }
-
-  navigationValue(){
-    return this.nehubaViewer ? 
-      this.statusPanelRealSpace ? 
-        Array.from(this.nehubaViewer.navPosReal.map(n=> isNaN(n) ? 0 : n/1e6))
-          .map(n=>n.toFixed(3)+'mm').join(' , ') :
-        Array.from(this.nehubaViewer.navPosVoxel.map(n=> isNaN(n) ? 0 : n)).join(' , ') :
-      `[0,0,0] (neubaViewer is undefined)`
-  }
-
-  get showCitation(){
-    return this.selectedTemplate && this.selectedTemplate.properties && this.selectedTemplate.properties.publications && this.selectedTemplate.properties.publications.constructor === Array
-  }
-
-  resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false} : {rotation: boolean, position: boolean, zoom: boolean}){
-    const initialNgState = this.selectedTemplate.nehubaConfig.dataset.initialNgState
-    
-    const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
-    const perspectiveOrientation = initialNgState ? initialNgState.perspectiveOrientation : undefined
-    const zoom = (zoomFlag
-      && initialNgState
-      && initialNgState.navigation
-      && initialNgState.navigation.zoomFactor)
-      || undefined
-
-    const position = (positionFlag
-      && initialNgState
-      && initialNgState.navigation
-      && initialNgState.navigation.pose
-      && initialNgState.navigation.pose.position.voxelCoordinates
-      && initialNgState.navigation.pose.position.voxelCoordinates)
-      || undefined
-
-    const orientation = rotationFlag
-      ? [0,0,0,1]
-      : undefined
-
-    this.store.dispatch({
-      type : CHANGE_NAVIGATION,
-      navigation : Object.assign({},
-        {
-          perspectiveZoom,
-          perspectiveOrientation,
-          zoom,
-          position,
-          orientation
-        },{
-          positionReal : false,
-          animation : {
-
-          }
-        })
-    })
-  }
 }
 
 export const identifySrcElement = (element:HTMLElement) => {

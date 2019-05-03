@@ -7,17 +7,12 @@
 <div landmarkMasterContainer>
 
   <div>
-    <layout-floating-container
-      pos00 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter)="handleMouseEnterLandmark(spatialData)"
-        (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+    <layout-floating-container pos00 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
         [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-        [positionX]="getPositionX(0,spatialData)"
-        [positionY]="getPositionY(0,spatialData)"
+        [positionX]="getPositionX(0,spatialData)" [positionY]="getPositionY(0,spatialData)"
         [positionZ]="getPositionZ(0,spatialData)">
       </nehuba-2dlandmark-unit>
 
@@ -29,20 +24,15 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos01 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter)="handleMouseEnterLandmark(spatialData)"
-        (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+    <layout-floating-container pos01 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
         [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-        [positionX]="getPositionX(1,spatialData)"
-        [positionY]="getPositionY(1,spatialData)"
+        [positionX]="getPositionX(1,spatialData)" [positionY]="getPositionY(1,spatialData)"
         [positionZ]="getPositionZ(1,spatialData)">
       </nehuba-2dlandmark-unit>
-      
+
       <div *ngIf="sliceViewLoading1$ | async" class="loadingIndicator">
         <div class="spinnerAnimationCircle">
 
@@ -51,20 +41,15 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos10 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter)="handleMouseEnterLandmark(spatialData)"
-        (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+    <layout-floating-container pos10 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
         [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-        [positionX]="getPositionX(2,spatialData)"
-        [positionY]="getPositionY(2,spatialData)"
+        [positionX]="getPositionX(2,spatialData)" [positionY]="getPositionY(2,spatialData)"
         [positionZ]="getPositionZ(2,spatialData)">
       </nehuba-2dlandmark-unit>
-      
+
       <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
         <div class="spinnerAnimationCircle">
 
@@ -73,9 +58,7 @@
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos11 
-      landmarkContainer>
+    <layout-floating-container pos11 landmarkContainer>
       <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
         <div class="spinnerAnimationCircle"></div>
         <div perspectiveLoadingText>
@@ -87,76 +70,17 @@
 </div>
 
 <layout-floating-container *ngIf="viewerLoaded">
-
-  <!-- TODO export status card to its own container -->
-  <div statusCard>
-
-    <hr *ngIf="showCitation && !isMobile" />
-
-    <div linksContainer>
-      <span>
-        reset: 
-      </span>
-      <a
-        href="#"
-        (click)="$event.preventDefault();resetNavigation({position:true})">
-        position
-      </a>
-
-      <a
-        href="#"
-        (click)="$event.preventDefault();resetNavigation({rotation:true})">
-        rotation
-      </a>
-
-      <a
-        href="#"
-        (click)="$event.preventDefault();resetNavigation({zoom:true})">
-        zoom
-      </a>
-
-      <br />
-      <span>
-        space:
-      </span>
-      
-      <a href="#" (click)="$event.preventDefault();statusPanelRealSpace=!statusPanelRealSpace">
-        {{statusPanelRealSpace ? 'physical' : 'voxel'}}
-      </a>
-  
-    </div>
-  
-    <br />
-    <div textContainer>
-      <small>Navigation: </small>
-        <input 
-          (keydown.enter)="textNavigateTo(navigateInput.value)"
-          (keydown.tab)="textNavigateTo(navigateInput.value)"
-          [ngModel]="navigationValue()" 
-          spellcheck="false"
-          #navigateInput
-          navigateInput/>
-    
-      <br />
-      <small *ngIf="!isMobile">Mouse: </small>
-      <small *ngIf="!isMobile">
-        {{ mouseCoord }}
-      </small> 
-      <br *ngIf="!isMobile" />
-      <small onHoverSegment>
-        {{ onHoverSegmentName$ | async }}
-      </small>
-    </div>
-  </div>
+  <!-- StatusCard container-->
+  <ui-status-card [selectedTemplate]="selectedTemplate" [isMobile]="isMobile"
+    [onHoverSegmentName]="onHoverSegmentName$ | async" [nehubaViewer]="nehubaViewer">
+  </ui-status-card>
 </layout-floating-container>
 
 <div id="scratch-pad">
-  
+
 </div>
 
-<mobile-overlay 
-  *ngIf="isMobile && viewerLoaded"
-  [tunableProperties]="tunableMobileProperties" 
+<mobile-overlay *ngIf="isMobile && viewerLoaded" [tunableProperties]="tunableMobileProperties"
   (deltaValue)="handleMobileOverlayEvent($event)">
   <div class="base" delta>
     <div mobileObliqueGuide class="p-2 mb-4 shadow">
@@ -166,7 +90,7 @@
   <div class="base" guide>
     <div mobileObliqueGuide class="p-2 mb-4 shadow">
       <div>
-        <i class="fas fa-arrows-alt-v"></i> oblique mode 
+        <i class="fas fa-arrows-alt-v"></i> oblique mode
       </div>
       <div>
         <i class="fas fa-arrows-alt-h"></i> rotate slice
