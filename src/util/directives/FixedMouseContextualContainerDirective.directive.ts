@@ -1,4 +1,5 @@
 import { Directive, Input, HostBinding, HostListener, ElementRef, OnChanges, Output, EventEmitter } from "@angular/core";
+import { ConsoleReporter } from "jasmine";
 
 @Directive({
   selector: '[fixedMouseContextualContainerDirective]'
@@ -50,11 +51,16 @@ export class FixedMouseContextualContainerDirective implements OnChanges{
 
   @HostListener('document:click', ['$event'])
   documentClick(event: MouseEvent){
-    if (this.styleDisplay === 'none')
-      return
-    if (this.el.nativeElement.contains(event.target)) 
-      return
+    if (event.which !== 3) {
+      console.log(event.target);
+      console.log(event.which);
+      if (this.styleDisplay === 'none')
+        return
+      if (this.el.nativeElement.contains(event.target))
+        return
 
-    this.hide()
+      this.hide()
+    }
   }
+
 }

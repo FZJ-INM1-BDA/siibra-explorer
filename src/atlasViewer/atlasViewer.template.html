@@ -27,7 +27,10 @@
         <div
           *ngIf="onhoverSegmentForFixed$ | async; let onhoverSegmentFixed"
           (click)="searchRegion([onhoverSegmentFixed])"
-          class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block">
+          class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block"
+          data-toggle="tooltip" 
+          data-placement="top" 
+          [title]="onhoverSegmentFixed.name">
           Search KG for {{ onhoverSegmentFixed.name }}
         </div>
 

@@ -130,7 +130,6 @@ div[contextualBlock]
 
 [fixedMouseContextualContainerDirective] div[body]
 {
-  background-color: blue;
   overflow: hidden;
 }
 
