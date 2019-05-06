@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, Injector } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, Injector, AfterViewInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
@@ -29,12 +29,13 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
   ]
 })
 
-export class AtlasViewer implements OnDestroy, OnInit {
+export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
   @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
@@ -297,6 +298,22 @@ export class AtlasViewer implements OnDestroy, OnInit {
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
 
+  }
+
+  ngAfterViewInit() {
+    // Show modal for Agree cookies
+    if (!localStorage.getItem('cookies') || localStorage.getItem('cookies') !== 'agreed') {
+      setTimeout(() => {
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: 'Cookie Disclaimer',
+            template: this.cookieAgreementComponent,
+          },
+          // backdrop: 'static',
+          // keyboard: false
+        });  
+      });
+    }
   }
 
   /**
