@@ -1,14 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans');
-
 .cookie-text {
     text-align: justify;
-    font-family: 'Open Sans', sans-serif;
 }
 
 .cookie-text-small {
     text-align: justify;
     font-size: 11px;
-    font-family: 'Open Sans', sans-serif;
 }
 
 .show-more-button-on-cookie-agreement {

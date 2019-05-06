@@ -1,20 +1,20 @@
-import { Component } from '@angular/core'
-import { BsModalService } from 'ngx-bootstrap/modal/bs-modal.service';
+import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core'
 
 @Component({
-    selector: 'cookie-agreement',
-    templateUrl: './cookieAgreement.template.html',
-    styleUrls: [
-      './cookieAgreement.style.css'
-    ]
+  selector: 'cookie-agreement',
+  templateUrl: './cookieAgreement.template.html',
+  styleUrls: [
+    './cookieAgreement.style.css'
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CookieAgreement {
-  showMore = false;   
+  showMore = false;
 
-  constructor(private modalService: BsModalService,) {}
+  @Output()
+  clickedOk: EventEmitter<null> = new EventEmitter()
 
-  AgreeCookies() {
-    localStorage.setItem('cookies', 'agreed');
-    this.modalService.hide(1);
+  agreeCookies() {
+    this.clickedOk.emit(null)
   }
 }

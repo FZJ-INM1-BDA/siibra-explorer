@@ -91,7 +91,7 @@
   </signin-modal>
 </ng-template>
 <ng-template #cookieAgreementComponent>
-  <cookie-agreement>
+  <cookie-agreement (clickedOk)="cookieClickedOk()">
   </cookie-agreement>
 </ng-template>
 

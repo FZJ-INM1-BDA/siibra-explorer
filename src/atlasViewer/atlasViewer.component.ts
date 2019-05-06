@@ -363,6 +363,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       }) as NgLayerInterface)
   }
 
+  cookieClickedOk(){
+    this.modalService.hide(1)
+    localStorage.setItem('cookies', 'agreed');
+  }
+
   panelAnimationEnd(){
 
     if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
