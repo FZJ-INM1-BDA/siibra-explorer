@@ -1,11 +1,10 @@
 import { Directive, Input, HostBinding, HostListener, ElementRef, OnChanges, Output, EventEmitter } from "@angular/core";
-import { ConsoleReporter } from "jasmine";
 
 @Directive({
   selector: '[fixedMouseContextualContainerDirective]'
 })
 
-export class FixedMouseContextualContainerDirective implements OnChanges{
+export class FixedMouseContextualContainerDirective {
 
   private defaultPos: [number, number] = [-1e3, -1e3]
   public isShown: boolean = false
@@ -23,10 +22,6 @@ export class FixedMouseContextualContainerDirective implements OnChanges{
     private el: ElementRef
   ){
     
-  }
-
-  ngOnChanges(changes){
-    console.log({changes})
   }
 
   public show(){
@@ -51,16 +46,12 @@ export class FixedMouseContextualContainerDirective implements OnChanges{
 
   @HostListener('document:click', ['$event'])
   documentClick(event: MouseEvent){
-    if (event.which !== 3) {
-      console.log(event.target);
-      console.log(event.which);
+    if (event.button !== 2) {
       if (this.styleDisplay === 'none')
         return
       if (this.el.nativeElement.contains(event.target))
         return
-
       this.hide()
     }
   }
-
 }
