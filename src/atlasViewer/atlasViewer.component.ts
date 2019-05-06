@@ -297,19 +297,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // Show modal for Agree cookies
-    if (!localStorage.getItem('cookies') || localStorage.getItem('cookies') !== 'agreed') {
-      setTimeout(() => {
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: 'Cookie Disclaimer',
-            template: this.cookieAgreementComponent,
-          },
-          // backdrop: 'static',
-          // keyboard: false
-        });  
-      });
+    
+    /**
+     * Show Cookie disclaimer if not yet agreed
+     */
+    if (localStorage.getItem('cookies') !== 'agreed') {
+      this.modalService.show(ModalUnit, {
+        initialState: {
+          title: 'Cookie Disclaimer',
+          template: this.cookieAgreementComponent,
+        }
+      }); 
     }
+
+    this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverSegment$),
+      map(([_flag, onhoverSegment]) => onhoverSegment)
+    )
   }
 
   /**
@@ -317,13 +321,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
-  }
-
-  ngAfterViewInit(){
-    this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegment$),
-      map(([_flag, onhoverSegment]) => onhoverSegment)
-    )  
   }
 
   /**
