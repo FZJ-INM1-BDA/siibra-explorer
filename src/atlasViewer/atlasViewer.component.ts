@@ -1,8 +1,8 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, Injector } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, scan } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -29,7 +29,7 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
   ]
 })
 
-export class AtlasViewer implements OnDestroy, OnInit {
+export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
@@ -180,10 +180,6 @@ export class AtlasViewer implements OnDestroy, OnInit {
       map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
     )
 
-    this.onhoverSegmentForFixed$ = this.onhoverSegment$.pipe(
-      filter(() => !this.rClContextualMenu || !this.rClContextualMenu.isShown )
-    )
-
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
@@ -304,6 +300,13 @@ export class AtlasViewer implements OnDestroy, OnInit {
    */
   ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
+  }
+
+  ngAfterViewInit(){
+    this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverSegment$),
+      map(([_flag, onhoverSegment]) => onhoverSegment)
+    )  
   }
 
   /**
