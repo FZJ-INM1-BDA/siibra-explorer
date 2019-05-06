@@ -35,6 +35,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
   @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
@@ -295,6 +296,22 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   }
 
+  ngAfterViewInit() {
+    // Show modal for Agree cookies
+    if (!localStorage.getItem('cookies') || localStorage.getItem('cookies') !== 'agreed') {
+      setTimeout(() => {
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: 'Cookie Disclaimer',
+            template: this.cookieAgreementComponent,
+          },
+          // backdrop: 'static',
+          // keyboard: false
+        });  
+      });
+    }
+  }
+
   /**
    * For completeness sake. Root element should never be destroyed. 
    */
@@ -347,6 +364,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         source : obj.sourceUrl,
         visible : obj.visible
       }) as NgLayerInterface)
+  }
+
+  cookieClickedOk(){
+    this.modalService.hide(1)
+    localStorage.setItem('cookies', 'agreed');
   }
 
   panelAnimationEnd(){

@@ -90,6 +90,10 @@
     
   </signin-modal>
 </ng-template>
+<ng-template #cookieAgreementComponent>
+  <cookie-agreement (clickedOk)="cookieClickedOk()">
+  </cookie-agreement>
+</ng-template>
 
 <div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
   <div class="jumbotron bg-light text-center mb-0">
