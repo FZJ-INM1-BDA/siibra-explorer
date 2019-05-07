@@ -8,10 +8,6 @@ module.exports = async (app) => {
 
   passport.serializeUser((user, done) => {
     const { tokenset, rest } = user
-    console.log({
-      tokenset,
-      rest
-    })
     objStoreDb.set(user.id, user)
     done(null, user.id)
   })
@@ -35,6 +31,8 @@ module.exports = async (app) => {
   })
 
   app.get('/logout', (req, res) => {
+    if (req.user && req.user.id)
+      objStoreDb.delete(req.user.id)
     req.logout()
     res.redirect('/')
   })
