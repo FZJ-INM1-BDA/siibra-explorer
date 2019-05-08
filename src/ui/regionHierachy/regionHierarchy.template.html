@@ -17,18 +17,18 @@
   hideScrollbarContainer>
 
   <div treeContainer #treeContainer>
-    <div *ngIf="false" treeHeader>
+    <div treeHeader>
       <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
       <span (click)="clearRegions($event)" *ngIf="selectedRegions.length > 0" class="btn btn-link">clear all</span>
     </div>
     
     <ng-container *ngIf="selectedParcellation && selectedParcellation.regions as regions">
-
+      <!-- TODO deprecate flat tree component, opt for material cdk infinit scroll component -->
       <flat-tree-component
         *ngFor="let region of regions"
         [flatTreeViewPort]="treeContainer"
         (treeNodeClick)="handleClickRegion($event)"
-        [inputItem]="aggregatedRegionTree"
+        [inputItem]="region"
         [renderNode]="displayTreeNode.bind(this)"
         [searchFilter]="filterTreeBySearch.bind(this)">
         
