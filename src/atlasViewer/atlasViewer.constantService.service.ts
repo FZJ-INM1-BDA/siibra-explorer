@@ -172,13 +172,12 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   /**
    * Observable for showing config modal
    */
-  public showConfigSubject$: Subject<null> = new Subject()
   public showConfigTitle: String = 'Settings'
   /**
    * Observable for showing help modal
    */
   public showHelpSubject$: Subject<null> = new Subject()
-  public showHelpTitle: String = 'Help: Controls and Shortcuts'
+  public showHelpTitle: String = 'About'
 
   private showHelpGeneralMobile = [
     ['hold 🌏 + ↕', 'change oblique slice mode'],

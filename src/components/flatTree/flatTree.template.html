@@ -26,8 +26,7 @@
     
         </span>
       </span>
-      <span 
-        class="test"
+      <span
         *ngIf="findChildren(flattenedItem).length > 0; else noChildren"
         (click)="$event.stopPropagation(); toggleCollapse(flattenedItem)" >
         <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>

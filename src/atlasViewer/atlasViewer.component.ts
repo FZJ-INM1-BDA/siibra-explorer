@@ -33,7 +33,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('viewerConfigComponent', {read: TemplateRef}) viewerConfigComponent : TemplateRef<any>
   @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -55,7 +54,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
   private showHelp$: Observable<any>
-  private showConfig$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegment$: Observable<string>
@@ -103,10 +101,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
-      debounceTime(170)
-    )
-
-    this.showConfig$ = this.constantsService.showConfigSubject$.pipe(
       debounceTime(170)
     )
 
@@ -240,17 +234,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           initialState: {
             title: user ? 'Logout' : `Login`,
             template: this.signinModalComponent
-          }
-        })
-      })
-    )
-
-    this.subscriptions.push(
-      this.showConfig$.subscribe(() => {
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: this.constantsService.showConfigTitle,
-            template: this.viewerConfigComponent
           }
         })
       })

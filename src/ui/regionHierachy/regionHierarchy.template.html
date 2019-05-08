@@ -17,9 +17,16 @@
   hideScrollbarContainer>
 
   <div treeContainer #treeContainer>
-    <div treeHeader>
-      <span>{{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected</span> 
-      <span (click)="clearRegions($event)" *ngIf="selectedRegions.length > 0" class="btn btn-link">clear all</span>
+    <div class="d-inline-flex align-items-center">
+      <div>
+        {{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected
+      </div>
+      <div
+        (click)="clearRegions($event)"
+        [ngClass]="{ 'invisible': selectedRegions.length === 0 }"
+        class="btn btn-link">
+        clear all
+      </div>
     </div>
     
     <ng-container *ngIf="selectedParcellation && selectedParcellation.regions as regions">
