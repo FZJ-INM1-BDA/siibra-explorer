@@ -315,3 +315,8 @@ markdown-dom pre code
 {
   height: 0px;
 }
+
+.pe-none
+{
+  pointer-events: none;
+}

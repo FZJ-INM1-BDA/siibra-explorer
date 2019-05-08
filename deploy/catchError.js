@@ -7,5 +7,5 @@ module.exports = ({code = 500, error = 'an error had occured', trace = 'undefine
     error,
     trace
   })
-  res.sendStatus(code)
+  res.status(code).send()
 }

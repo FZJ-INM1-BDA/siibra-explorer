@@ -15,6 +15,7 @@ import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
 import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
+import { TabsModule } from 'ngx-bootstrap/tabs'
 import { ModalModule } from 'ngx-bootstrap/modal'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
@@ -46,6 +47,7 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
     
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
+    TabsModule.forRoot(),
     StoreModule.forRoot({
       pluginState,
       viewerConfigState,

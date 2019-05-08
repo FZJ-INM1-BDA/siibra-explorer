@@ -1,22 +1,4 @@
 
-div[treeHeader]
-{
-  height: 55px;
-}
-
-div[treeHeader] > span 
-{
-  display:inline-block;
-  padding: 12px 0px;
-  line-height:2em;
-  border:none;
-}
-
-div[treeHeader] > span.btn.btn-link
-{
-  margin-left:2em;
-}
-
 div[treeContainer]
 {
   padding:1em;

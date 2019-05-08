@@ -1,22 +1,3 @@
-<ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
-  <region-hierarchy
-    [selectedRegions]="selectedRegions$ | async | filterNull"
-    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
-    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
-    *ngIf="selectedParcellation$ | async as selectedParcellation"
-    [selectedParcellation]="selectedParcellation">
-
-  </region-hierarchy>
-  <dropdown-component
-    *ngIf="selectedParcellation$ | async as selectedParcellation"
-    (itemSelected)="changeParcellation($event)"
-    [activeDisplay]="displayActiveParcellation"
-    [selectedItem]="selectedParcellation"
-    [inputArray]="selectedTemplate.parcellations">
-  
-  </dropdown-component>
-</ng-container>
-
 <dropdown-component
   *ngIf="!isMobile"
   (itemSelected)="changeTemplate($event)"
@@ -26,6 +7,26 @@
 
 </dropdown-component>
 
+<ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
+  <dropdown-component
+    *ngIf="selectedParcellation$ | async as selectedParcellation"
+    (itemSelected)="changeParcellation($event)"
+    [activeDisplay]="displayActiveParcellation"
+    [selectedItem]="selectedParcellation"
+    [inputArray]="selectedTemplate.parcellations">
+  
+  </dropdown-component>
+  <region-hierarchy
+    [selectedRegions]="selectedRegions$ | async | filterNull"
+    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+    (clearAllRegions)="clearAllRegions()"
+    *ngIf="selectedParcellation$ | async as selectedParcellation"
+    [selectedParcellation]="selectedParcellation">
+
+  </region-hierarchy>
+</ng-container>
+
 <!-- help btn -->
 <div
   *ngIf="!isMobile" 
@@ -34,21 +35,11 @@
   <i class="fas fa-question-circle"></i>
 </div>
 
-<!-- config btn -->
-<div
-  *ngIf="!isMobile" 
-  (click)="showConfig()"
-  class="btn btn-outline-secondary btn-sm rounded-circle">
-  <i class="fas fa-cog"></i>
-</div>
-
 <!-- signin -->
-<div class="btnWrapper">
-  <div
-    (click)="showSignin()"
-    class="btn btn-outline-secondary btn-sm rounded-circle">
-    <i
-      [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-      class="fas"></i>
-  </div>
+<div
+  (click)="showSignin()"
+  class="btn btn-outline-secondary btn-sm rounded-circle">
+  <i
+    [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+    class="fas"></i>
 </div>

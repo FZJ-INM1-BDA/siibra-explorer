@@ -121,12 +121,15 @@ export class SigninBanner implements OnInit, OnDestroy{
     this.constantService.showHelpSubject$.next()
   }
 
-  showConfig() {
-    this.constantService.showConfigSubject$.next()
-  }
-
   showSignin() {
     this.constantService.showSigninSubject$.next(this.user)
+  }
+
+  clearAllRegions(){
+    this.store.dispatch({
+      type: SELECT_REGIONS,
+      selectRegions: []
+    })
   }
 
   get isMobile(){

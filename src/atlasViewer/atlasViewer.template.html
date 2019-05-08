@@ -78,12 +78,24 @@
 </div>
 
 <ng-template #helpComponent>
-  <help-component>
-  </help-component>
-</ng-template>
-<ng-template #viewerConfigComponent>
-  <config-component>
-  </config-component>
+  <tabset>
+    <tab heading="Help">
+      <help-component>
+      </help-component>
+    </tab>
+    <tab heading="Settings">
+      <div class="mt-2">
+        <config-component>
+        </config-component>
+      </div>
+    </tab>
+    <tab heading="Privacy Policy">
+      <div class="mt-2">
+        <cookie-agreement>
+        </cookie-agreement>
+      </div>
+    </tab>
+  </tabset>
 </ng-template>
 <ng-template #signinModalComponent>
   <signin-modal>
@@ -91,8 +103,12 @@
   </signin-modal>
 </ng-template>
 <ng-template #cookieAgreementComponent>
-  <cookie-agreement (clickedOk)="cookieClickedOk()">
+  <cookie-agreement>
   </cookie-agreement>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="cookieClickedOk()">Ok</button>
+  </div>
 </ng-template>
 
 <div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">

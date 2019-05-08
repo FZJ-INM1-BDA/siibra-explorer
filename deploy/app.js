@@ -38,9 +38,6 @@ app.use(session({
  */
 configureAuth(app)
 
-const catchError = require('./catchError')
-app.use(catchError)
-
 const publicPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
@@ -60,5 +57,8 @@ app.use('/templates', templateRouter)
 app.use('/nehubaConfig', nehubaConfigRouter)
 app.use('/datasets', datasetRouter)
 app.use('/plugins', pluginRouter)
+
+const catchError = require('./catchError')
+app.use(catchError)
 
 module.exports = app

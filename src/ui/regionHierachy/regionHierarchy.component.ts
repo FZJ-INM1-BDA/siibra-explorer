@@ -32,6 +32,9 @@ export class RegionHierarchy implements OnInit{
   @Output()
   private doubleClickRegion: EventEmitter<any> = new EventEmitter()
 
+  @Output()
+  private clearAllRegions: EventEmitter<null> = new EventEmitter()
+
   public searchTerm: string = ''
   private subscriptions: Subscription[] = []
 
@@ -54,6 +57,11 @@ export class RegionHierarchy implements OnInit{
     private cdr:ChangeDetectorRef,
     private el:ElementRef
   ){
+  }
+
+  clearRegions(event:MouseEvent){
+    event.stopPropagation()
+    this.clearAllRegions.emit()
   }
 
   get showRegionTree(){
