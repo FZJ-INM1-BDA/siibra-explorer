@@ -13,15 +13,6 @@ const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
 let getPublicAccessToken
 
-(async () => {
-  try {
-    const { getPublicAccessToken: getPublic } = await kgQueryUtil()
-    getPublicAccessToken = getPublic
-  } catch (e) {
-    console.log('kgQueryUtil error', e)
-  }
-})()
-
 const fetchDatasetFromKg = async (arg) => {
 
   const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
@@ -40,7 +31,6 @@ const fetchDatasetFromKg = async (arg) => {
         }
       }
     : {}
-
   return await new Promise((resolve, reject) => {
     request(queryUrl, option, (err, resp, body) => {
       if (err)
@@ -181,10 +171,11 @@ const filter = (datasets, {templateName, parcellationName}) => datasets
 /**
  * on init, populate the cached data
  */
-exports.init = () => fetchDatasetFromKg()
-  .then(json => {
-    cachedData = json
-  })
+exports.init = async () => {
+  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
+  getPublicAccessToken = getPublic
+  cachedData = await fetchDatasetFromKg()
+}
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
