@@ -301,14 +301,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     /**
      * Show Cookie disclaimer if not yet agreed
      */
-    if (localStorage.getItem('cookies') !== 'agreed') {
+    /**
+     * TODO avoid creating new views in lifecycle hooks in general
+     */
+    of(localStorage.getItem('cookies') !== 'agreed').pipe(
+      delay(0),
+      filter(flag => flag)
+    ).subscribe(() => {
       this.modalService.show(ModalUnit, {
         initialState: {
           title: 'Cookie Disclaimer',
-          template: this.cookieAgreementComponent,
+          template: this.cookieAgreementComponent
         }
-      }); 
-    }
+      }) 
+    })
 
     this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegment$),
