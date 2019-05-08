@@ -7,6 +7,7 @@ import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, ta
 import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
 import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
+import { pipeFromArray } from "rxjs/internal/util/pipe";
 
 @Component({
   templateUrl : './nehubaViewer.template.html',
@@ -335,9 +336,13 @@ export class NehubaViewerUnit implements OnDestroy{
     this.onDestroyCb.push(() => window['nehubaViewer'] = null)
 
     this.ondestroySubscriptions.push(
-      fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
-        ...takeOnePipe
-      ).subscribe((events:CustomEvent[]) => {
+      // fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
+      //   ...takeOnePipe
+      // ).subscribe((events:CustomEvent[]) => {
+      //   [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
+      // })
+      pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'viewportToData'))
+      .subscribe((events:CustomEvent[]) => {
         [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       })
     )
