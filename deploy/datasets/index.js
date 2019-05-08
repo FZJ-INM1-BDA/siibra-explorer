@@ -18,8 +18,7 @@ datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
   const { user } = req
   getDatasets({ templateName, user })
     .then(ds => {
-      const data = JSON.stringify(ds)
-      res.status(200).send(data)
+      res.status(200).json(ds)
     })
     .catch(error => {
       next({
@@ -35,7 +34,7 @@ datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
   const { user } = req
   getDatasets({ parcellationName, user })
     .then(ds => {
-      res.status(200).send(JSON.stringify(ds))
+      res.status(200).json(ds)
     })
     .catch(error => {
       next({
@@ -51,7 +50,7 @@ datasetsRouter.get('/preview/:datasetName', (req, res, next) => {
   getPreview({ datasetName })
     .then(preview => {
       if (preview) {
-        res.status(200).send(JSON.stringify(preview))
+        res.status(200).json(preview)
       } else {
         next({
           code: 404,
