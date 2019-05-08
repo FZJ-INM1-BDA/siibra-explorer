@@ -9,6 +9,7 @@ import { timedValues } from "../../util/generator";
 import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
+import { pipeFromArray } from "rxjs/internal/util/pipe";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -210,11 +211,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
     
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.newViewer$.pipe(
-      switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
-        .pipe(
-          ...takeOnePipe
-        )
-      )
+      // switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+      //   .pipe(
+      //     ...takeOnePipe
+      //   )
+      // )
+
+      switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')))
+
+
     ).subscribe((events)=>{
       [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
     })

@@ -75,15 +75,17 @@ export class MobileOverlay implements OnInit, OnDestroy{
 
     this.intersectionObserver.observe(this.menuContainer.nativeElement)
   
+    const scanDragScanAccumulator: (acc:TouchEvent[], item: TouchEvent, idx: number) => TouchEvent[] = (acc,curr) => acc.length < 2
+      ? acc.concat(curr)
+      : acc.slice(1).concat(curr)
+      
     this._drag$ = fromEvent(this.initiator.nativeElement, 'touchmove').pipe(
       takeUntil(fromEvent(this.initiator.nativeElement, 'touchend').pipe(
         filter((ev:TouchEvent) => ev.touches.length === 0)
       )),
       map((ev:TouchEvent) => (ev.preventDefault(), ev.stopPropagation(), ev)),
       filter((ev:TouchEvent) => ev.touches.length === 1),
-      scan((acc,curr) => acc.length < 2
-        ? acc.concat(curr)
-        : acc.slice(1).concat(curr), []),
+      scan(scanDragScanAccumulator, []),
       filter(ev => ev.length === 2)
     )
 

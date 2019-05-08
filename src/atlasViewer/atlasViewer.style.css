@@ -1,3 +1,5 @@
+/* @import '~@angular/material/prebuilt-themes/indigo-pink.css'; */
+
 :host, :host > .atlas-container
 {
   display:block;
