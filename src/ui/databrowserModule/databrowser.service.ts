@@ -299,8 +299,7 @@ export class DatabrowserService implements OnDestroy{
 
 
 export function reduceDataentry(accumulator:{name:string, occurance:number}[], dataentry: DataEntry) {
-  const methods = dataentry.activity
-    .map(a => a.methods)
+  const methods = dataentry.methods
     .reduce((acc, item) => acc.concat(
       item.length > 0
         ? item

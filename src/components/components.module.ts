@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import {  MarkdownDom } from './markdown/markdown.component';
@@ -31,6 +32,7 @@ import { RadioList } from './radiolist/radiolist.component';
 @NgModule({
   imports : [
     CommonModule,
+    ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
   ],

@@ -1,7 +1,22 @@
-import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output } from "@angular/core";
-import {  Subscription, Subject } from "rxjs";
+import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, AfterViewInit } from "@angular/core";
+import {  Subscription, Subject, fromEvent } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
+
+const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
+  const regex = new RegExp(searchTerm, 'gi')
+  return searchTerm === '' ?
+    name :
+    name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
+}
+
+const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => (item:any) =>  {
+  return typeof item.labelIndex !== 'undefined' && selectedRegions.findIndex(re => re.labelIndex === Number(item.labelIndex)) >= 0 ?
+    `<span class = "regionSelected">${insertHighlight(item.name, searchTerm)}</span>` :
+    `<span class = "regionNotSelected">${insertHighlight(item.name, searchTerm)}</span>`
+}
+
+const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name], searchTerm)
 
 @Component({
   selector: 'region-hierarchy',
@@ -12,8 +27,7 @@ import { FilterNameBySearch } from "./filterNameBySearch.pipe";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class RegionHierarchy implements OnInit{
-
+export class RegionHierarchy implements OnInit, AfterViewInit{
 
   @Input()
   public selectedRegions: any[] = []
@@ -57,6 +71,12 @@ export class RegionHierarchy implements OnInit{
     private cdr:ChangeDetectorRef,
     private el:ElementRef
   ){
+
+  }
+
+  ngOnChanges(){
+    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
+    this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
   }
 
   clearRegions(event:MouseEvent){
@@ -74,6 +94,11 @@ export class RegionHierarchy implements OnInit{
   }
 
   ngOnInit(){
+    this.aggregatedRegionTree = {
+      name: this.selectedParcellation.name,
+      children: this.selectedParcellation.regions
+    }
+
     this.subscriptions.push(
       this.handleRegionTreeClickSubject.pipe(
         buffer(
@@ -82,6 +107,16 @@ export class RegionHierarchy implements OnInit{
           )
         )
       ).subscribe(arr => arr.length > 1 ? this.doubleClick(arr[0]) : this.singleClick(arr[0]))
+    )
+  }
+
+  ngAfterViewInit(){
+    this.subscriptions.push(
+      fromEvent(this.searchTermInput.nativeElement, 'input').pipe(
+        debounceTime(200)
+      ).subscribe(ev => {
+        this.changeSearchTerm(ev)
+      })
     )
   }
 
@@ -120,6 +155,7 @@ export class RegionHierarchy implements OnInit{
     /**
      * TODO maybe introduce debounce
      */
+    this.ngOnChanges()
     this.cdr.markForCheck()
   }
 
@@ -155,28 +191,11 @@ export class RegionHierarchy implements OnInit{
     this.doubleClickRegion.emit(region)
   }
 
-  private insertHighlight(name: string, searchTerm: string): string {
-    const regex = new RegExp(searchTerm, 'gi')
-    return searchTerm === '' ?
-      name :
-      name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
-  }
+  public displayTreeNode: (item:any) => string
 
-  displayTreeNode(item: any) {
-    return typeof item.labelIndex !== 'undefined' && this.selectedRegions.findIndex(re => re.labelIndex === Number(item.labelIndex)) >= 0 ?
-      `<span class = "regionSelected">${this.insertHighlight(item.name, this.searchTerm)}</span>` :
-      `<span class = "regionNotSelected">${this.insertHighlight(item.name, this.searchTerm)}</span>`
-  }
+  private filterNameBySearchPipe = new FilterNameBySearch()
+  public filterTreeBySearch: (node:any) => boolean 
 
-  filterNameBySearchPipe = new FilterNameBySearch()
-  filterTreeBySearch(node: any): boolean {
-    return this.filterNameBySearchPipe.transform([node.name], this.searchTerm)
-  }
+  public aggregatedRegionTree: any
 
-  get aggregatedRegionTree() {
-    return {
-      name: this.selectedParcellation.name,
-      children: this.selectedParcellation.regions
-    }
-  }
 }

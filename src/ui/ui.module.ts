@@ -1,5 +1,4 @@
 import { NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
 import { ComponentsModule } from "../components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
@@ -50,7 +49,6 @@ import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 @NgModule({
   imports : [
     FormsModule,
-    BrowserModule,
     LayoutModule,
     ComponentsModule,
     DatabrowserModule,
