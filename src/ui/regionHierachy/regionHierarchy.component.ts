@@ -75,6 +75,10 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnChanges(){
+    this.aggregatedRegionTree = {
+      name: this.selectedParcellation.name,
+      children: this.selectedParcellation.regions
+    }
     this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
   }
@@ -94,10 +98,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnInit(){
-    this.aggregatedRegionTree = {
-      name: this.selectedParcellation.name,
-      children: this.selectedParcellation.regions
-    }
 
     this.subscriptions.push(
       this.handleRegionTreeClickSubject.pipe(
