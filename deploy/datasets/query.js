@@ -16,13 +16,10 @@ let getPublicAccessToken
 const fetchDatasetFromKg = async (arg) => {
 
   const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
+  const releasedOnly = !accessToken
   let publicAccessToken
   if (!accessToken && getPublicAccessToken) {
-    try {
-      publicAccessToken = await getPublicAccessToken()
-    } catch (e) {
-      console.log('getPublicAccessToken Error', e)
-    }
+    publicAccessToken = await getPublicAccessToken()
   }
   const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
     ? {
@@ -32,7 +29,7 @@ const fetchDatasetFromKg = async (arg) => {
       }
     : {}
   return await new Promise((resolve, reject) => {
-    request(queryUrl, option, (err, resp, body) => {
+    request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
       if (err)
         return reject(err)
       if (resp.statusCode >= 400)
@@ -132,7 +129,7 @@ const filterByPRs = (prs, atlasPr) => atlasPr
 
 const manualFilter = require('./supplements/parcellation')
 
-const filter = (datasets, {templateName, parcellationName}) => datasets
+const filter = (datasets = [], {templateName, parcellationName}) => datasets
   .filter(ds => {
     if (/infant/.test(ds.name))
       return false
@@ -149,7 +146,7 @@ const filter = (datasets, {templateName, parcellationName}) => datasets
                 ? longBundle
                 : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
                   ? shortBundle
-                  : parcellationName === 'Whole Brain (v2.0)'
+                  : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
                     ? waxholm
                     : null
           )
@@ -174,7 +171,8 @@ const filter = (datasets, {templateName, parcellationName}) => datasets
 exports.init = async () => {
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
-  cachedData = await fetchDatasetFromKg()
+  const {results = []} = await fetchDatasetFromKg()
+  cacheData = results
 }
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })

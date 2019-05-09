@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { DataEntry, DataStateInterface } from "src/services/stateStore.service";
+import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge } from "rxjs";
-import { DatabrowserService, CountedDataModality, getModalityFromDE } from "../databrowser.service";
+import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 
 @Component({

@@ -37,6 +37,8 @@ app.use(session({
  * async function, but can start server without
  */
 configureAuth(app)
+  .then(() => console.log('configure auth properly'))
+  .catch(e => console.error('configure auth failed', e))
 
 const publicPath = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
