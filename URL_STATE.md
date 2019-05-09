@@ -2,7 +2,7 @@
 # URL State  
 
 
-User can run Interactive Atlas Viewer with the already selected state. It is possible to save application URL on any state and then after using this URL to run application state where the link was saved. With that, the user can create own state with writing URL and run an application with the self-made state.  
+Interactive Atlas Viewer could be run with already selected state. It is possible to create or save application URL so, that it will contain specific data which will usefull to run application with already defined state. In URL, this specific data, is saved as URL query parameters.
   
 ## URL query parameters in Interactive Atlas Viewer  
   
