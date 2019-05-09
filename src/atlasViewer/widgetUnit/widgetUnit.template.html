@@ -2,13 +2,13 @@
   [style.transform] = "transform"
   [containerClass] = "containerClass"
   widgetUnitPanel
-  [bodyCollapsable] = "state === 'docked'">
+  [bodyCollapsable] = "state === 'docked'"
+  [cdkDragDisabled]="state === 'docked'"
+  cdkDrag>
   <div 
-    draggable = "true"
-    (dragend) = "dragend($event)"
-    (dragstart) = "dragstart($event)"
-    widgetUnitHeading 
-    heading>
+    widgetUnitHeading
+    heading
+    cdkDragHandle>
     <div #emptyspan emptyspan>.</div>
     <div title>
       <div *ngIf="!titleHTML">

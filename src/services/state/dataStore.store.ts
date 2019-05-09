@@ -53,6 +53,9 @@ export interface DataEntry{
   publications: Publication[]
   embargoStatus: string[]
 
+  methods: string[]
+  protocols: string[]
+
   preview?: boolean
 
   /**

@@ -1,5 +1,6 @@
 import { NgModule } from "@angular/core";
 import { ComponentsModule } from "./components/components.module";
+import { DragDropModule } from '@angular/cdk/drag-drop'
 import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
@@ -43,6 +44,7 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
     CommonModule,
     LayoutModule,
     ComponentsModule,
+    DragDropModule,
     UIModule,
     
     ModalModule.forRoot(),

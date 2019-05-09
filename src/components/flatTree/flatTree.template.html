@@ -1,47 +1,37 @@
-<div *ngFor="let flattenedItems of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe | clusteringPipe : clusterNumber ); let index = index" clusterContainer>
+<cdk-virtual-scroll-viewport
+  (wheel)="$event.stopPropagation()"
+  itemSize="15">
 
   <div
-    class="pe-none"
-    [attr.clusterindex]="index"
-    flatTreeStart
-    #flatTreeStart>
-  </div>
+    *cdkVirtualFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe ); let index = index" 
+    [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"
+    class="text-nowrap"
+    [attr.flattenedtreelevel]="flattenedItem.flattenedTreeLevel" 
+    [attr.collapsed]="flattenedItem.collapsed ? flattenedItem.collapsed : false"
+    [attr.lvlId]="flattenedItem.lvlId"
+    [hidden]="collapseRow(flattenedItem) "
+    renderNode>
 
-  <div *ngIf="showCluster(index)">
-    <div
-      *ngFor="let flattenedItem of flattenedItems"
-      [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"
-      class="text-nowrap"
-      [attr.flattenedtreelevel]="flattenedItem.flattenedTreeLevel" 
-      [attr.collapsed]="flattenedItem.collapsed ? flattenedItem.collapsed : false"
-      [attr.lvlId]="flattenedItem.lvlId"
-      [hidden]="collapseRow(flattenedItem) "
-      renderNode>
-    
-      <span class="padding-block-container">
-        <span
-          *ngFor="let block of flattenedItem.siblingFlags"
-          [attr.hidemargin]="block"
-          class="padding-block">
-    
-        </span>
-      </span>
+    <span class="padding-block-container">
       <span
-        *ngIf="findChildren(flattenedItem).length > 0; else noChildren"
-        (click)="$event.stopPropagation(); toggleCollapse(flattenedItem)" >
-        <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>
-      </span>
-      <span
-        (click)="treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
-        class="render-node-text"
-        [innerHtml]="flattenedItem | renderPipe : renderNode ">
-      </span>
-    </div>
-  </div>
+        *ngFor="let block of flattenedItem.siblingFlags"
+        [attr.hidemargin]="block"
+        class="padding-block">
 
-  <div [attr.clusterindex]="index" flatTreeEnd #flatTreeEnd>
+      </span>
+    </span>
+    <span
+      *ngIf="findChildren(flattenedItem).length > 0; else noChildren"
+      (click)="$event.stopPropagation(); toggleCollapse(flattenedItem)" >
+      <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>
+    </span>
+    <span
+      (click)="treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
+      class="render-node-text"
+      [innerHtml]="flattenedItem | renderPipe : renderNode ">
+    </span>
   </div>
-</div>
+</cdk-virtual-scroll-viewport>
 
 <ng-template #noChildren>
   <i class="fas fa-none">

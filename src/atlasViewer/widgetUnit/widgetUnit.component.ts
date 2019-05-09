@@ -121,38 +121,4 @@ export class WidgetUnit implements OnInit{
   /* floating widget specific functionalities */
 
   position : [number,number] = [400,100]
-  reposStartViewPos : [number,number] = [0,0]
-  reposStartMousePos : [number,number] = [0,0]
-  repositionFlag : boolean = false
-
-  /* nb FF does not provide event.clientX / event.clientY on drag event. So will have to attach dragover event listener */
-  /* ref: https://bugzilla.mozilla.org/show_bug.cgi?id=505521 */
-  @HostListener('document:dragover',['$event'])
-  mousemove(ev:MouseEvent){
-    if(this.repositionFlag){
-      this.position[0] = this.reposStartViewPos[0] - this.reposStartMousePos[0] + ev.clientX
-      this.position[1] = this.reposStartViewPos[1] - this.reposStartMousePos[1] + ev.clientY
-    }
-  }
-
-  dragend(ev:DragEvent){
-    this.repositionFlag = false
-  }
-
-  dragstart(ev:DragEvent){
-    this.reposStartMousePos[0] = ev.clientX
-    this.reposStartMousePos[1] = ev.clientY
-
-    this.reposStartViewPos[0] = this.position[0]
-    this.reposStartViewPos[1] = this.position[1]
-
-    this.repositionFlag = true
-
-    /* nb FF requires dataTransfer.setData in order to fire the drag or dragover event */
-    ev.dataTransfer.setData('application/node type', '')
-
-    /* nb FF will render any invisible DOM element as a file icon.  */
-    ev.dataTransfer.setDragImage(this.emtpy.nativeElement, 0, 0)
-  }
-
 }

@@ -24,7 +24,7 @@ datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
       next({
         code: 500,
         error,
-        trace: 'parcellationName'
+        trace: 'templateName'
       })
     })
 })

@@ -4,8 +4,8 @@ div[treeContainer]
   padding:1em;
   z-index: 3;
 
-  max-height:20em;
-  width: calc(100% + 2em);
+  height:20em;
+  width: calc(100% + 4em);
   overflow-y:auto;
   overflow-x:hidden;
 
@@ -52,4 +52,14 @@ input[type="text"]
 .regionSearch
 {
   width:20em;
+}
+
+.tree-header
+{
+  flex: 0 0 auto;
+}
+
+.tree-body
+{
+  flex: 1 1 auto;
 }
