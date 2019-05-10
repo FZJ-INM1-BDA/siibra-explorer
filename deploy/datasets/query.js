@@ -172,7 +172,7 @@ exports.init = async () => {
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
   const {results = []} = await fetchDatasetFromKg()
-  cacheData = results
+  cachedData = results
 }
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
