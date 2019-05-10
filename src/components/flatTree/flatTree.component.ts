@@ -21,6 +21,8 @@ export class FlatTreeComponent{
   }
   @Input() childrenExpanded : boolean = true
 
+  @Input() useDefaultList: boolean = false
+
   @Output() treeNodeClick : EventEmitter<any> = new EventEmitter()
 
   /* highly non-performant. rerenders each time on mouseover or mouseout */

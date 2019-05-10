@@ -2,6 +2,12 @@ import { Component, Input, OnInit } from "@angular/core";
 import { DatabrowserService } from "../databrowser.service";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 
+const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path = 'unpathed'}) => name
+? activeFileName === name
+  ? `<span class="text-warning">${name}</span>`
+  : name
+: path
+
 @Component({
   selector: 'preview-component',
   templateUrl: './preview.template.html',
@@ -20,7 +26,7 @@ export class PreviewComponent implements OnInit{
   constructor(
     private dbrService:DatabrowserService
   ){
-  
+    this.renderNode = getRenderNodeFn()
   }
 
   previewFileClick(ev, el){
@@ -32,20 +38,11 @@ export class PreviewComponent implements OnInit{
       el.toggleCollapse(ev.inputItem)
     }else{
       this.activeFile = ev.inputItem
-      // this.launchFileViewer.emit({
-      //   dataset : this.dataset,
-      //   file : ev.inputItem
-      // })
+      this.renderNode = getRenderNodeFn(this.activeFile)
     }
   }
 
-  renderNode(obj){
-    return obj.name
-      ? this.activeFile.name === obj.name
-        ? `<span class="text-warning">${obj.name}</span>`
-        : obj.name
-      : obj.path
-  }
+  public renderNode: (obj:any) => string
 
   ngOnInit(){
     if (this.datasetName) {
@@ -54,6 +51,7 @@ export class PreviewComponent implements OnInit{
           this.previewFiles = json as ViewerPreviewFile[]
           if (this.previewFiles.length > 0)
             this.activeFile = this.previewFiles[0]
+            this.renderNode = getRenderNodeFn(this.activeFile)
         })
         .catch(e => {
           this.error = JSON.stringify(e)

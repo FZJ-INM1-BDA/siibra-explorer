@@ -20,6 +20,7 @@ import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { UtilModule } from "src/util/util.module";
+import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 
 @NgModule({
   imports:[
@@ -47,7 +48,8 @@ import { UtilModule } from "src/util/util.module";
     PathToNestedChildren,
     CopyPropertyPipe,
     FilterDataEntriesbyMethods,
-    FilterDataEntriesByRegion
+    FilterDataEntriesByRegion,
+    AggregateArrayIntoRootPipe
   ],
   exports:[
     DataBrowser

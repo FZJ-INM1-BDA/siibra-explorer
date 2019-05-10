@@ -8,19 +8,15 @@
 </file-viewer>
 
 <hr />
-<readmore-component
-  [collapsedHeight]="65">
+<div class="readmore-wrapper">
 
-  <div class="readmore-wrapper">
-
-    <flat-tree-component
-      #flatTreeNode
-      *ngFor="let item of previewFiles | copyProperty : 'filename' : 'path' | pathToNestedChildren"
-      [childrenExpanded]="false"
-      [renderNode]="renderNode.bind(this)"
-      [inputItem]="item"
-      (treeNodeClick)="previewFileClick($event, flatTreeNode)">
-    
-    </flat-tree-component>
-  </div>
-</readmore-component>
+  <flat-tree-component
+    #flatTreeNode
+    *ngIf="previewFiles | copyProperty : 'filename' : 'path' | pathToNestedChildren | aggregateArrayIntoRootPipe : 'Files'; let rootFile"
+    [useDefaultList]="true"
+    [renderNode]="renderNode"
+    [inputItem]="rootFile"
+    (treeNodeClick)="previewFileClick($event, flatTreeNode)">
+  
+  </flat-tree-component>
+</div>

@@ -1,4 +1,5 @@
 <cdk-virtual-scroll-viewport
+  *ngIf="!useDefaultList"
   (wheel)="$event.stopPropagation()"
   itemSize="15">
 
@@ -32,6 +33,42 @@
     </span>
   </div>
 </cdk-virtual-scroll-viewport>
+
+<div class="overflow-auto">
+
+  <div class="overflow-hidden default-container">
+    <div
+      *ngFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe )" 
+      [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"
+      class="text-nowrap"
+      [attr.flattenedtreelevel]="flattenedItem.flattenedTreeLevel" 
+      [attr.collapsed]="flattenedItem.collapsed ? flattenedItem.collapsed : false"
+      [attr.lvlId]="flattenedItem.lvlId"
+      [hidden]="collapseRow(flattenedItem) "
+      renderNode>
+  
+      <span class="padding-block-container">
+        <span
+          *ngFor="let block of flattenedItem.siblingFlags"
+          [attr.hidemargin]="block"
+          class="padding-block">
+  
+        </span>
+      </span>
+      <span
+        *ngIf="findChildren(flattenedItem).length > 0; else noChildren"
+        (click)="$event.stopPropagation(); toggleCollapse(flattenedItem)" >
+        <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>
+      </span>
+      <span
+        (click)="treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
+        class="render-node-text"
+        [innerHtml]="flattenedItem | renderPipe : renderNode ">
+      </span>
+    </div>
+  </div>
+</div>
+
 
 <ng-template #noChildren>
   <i class="fas fa-none">
