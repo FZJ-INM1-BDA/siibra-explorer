@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild, Input } from "@angular/core";
 import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
@@ -14,8 +14,13 @@ import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 
 export class DataBrowser implements OnDestroy,OnInit{
 
+  @Input()
   public regions: any[] = []
+
+  @Input()
   public template: any
+  
+  @Input()
   public parcellation: any
 
   public dataentries: DataEntry[] = []
@@ -55,6 +60,15 @@ export class DataBrowser implements OnDestroy,OnInit{
 
 
   ngOnInit(){
+    this.regions = this.regions.map(r => {
+      /**
+       * TODO to be replaced with properly region UUIDs from KG
+       */
+      return {
+        id: `${this.parcellation.name}/${r.name}`,
+        ...r
+      }
+    })
     const { regions, parcellation, template } = this
     this.fetchingFlag = true
     this.dbService.getDataByRegion({ regions, parcellation, template })

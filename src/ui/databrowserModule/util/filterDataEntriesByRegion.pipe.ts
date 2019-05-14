@@ -10,6 +10,9 @@ export class FilterDataEntriesByRegion implements PipeTransform{
     return dataentries && selectedRegions && selectedRegions.length > 0
       ? dataentries.filter(de => 
           de.parcellationRegion.some(pr => {
+            if (pr.id && selectedRegions.some(r => r.id === pr.id)) {
+              return true
+            }
 
             /**
              * TODO: temporary hack, some dataset region name is not exactly the same as region

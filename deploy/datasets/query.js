@@ -2,6 +2,7 @@ const fs = require('fs')
 const request = require('request')
 const path = require('path')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
+const { manualFilter: manualFilterDWM, manualMap: manualMapDWM } = require('./supplements/util/mapDwm')
 
 const kgQueryUtil = require('./../auth/util')
 
@@ -137,18 +138,19 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
       return ds.referenceSpaces.some(rs => rs.name === templateName)
     }
     if (parcellationName) {
+      if (parcellationName === 'Fibre Bundle Atlas - Long Bundle'){
+        return manualFilterDWM(ds)
+      }
       return ds.parcellationRegion.length > 0
         ? filterByPRs(
             ds.parcellationRegion, 
             parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
               ? juBrain
-              : parcellationName === 'Fibre Bundle Atlas - Long Bundle' && longBundle
-                ? longBundle
-                : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
-                  ? shortBundle
-                  : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
-                    ? waxholm
-                    : null
+              : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
+                ? shortBundle
+                : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
+                  ? waxholm
+                  : null
           )
         : manualFilter({ parcellationName, dataset: ds })
     }
@@ -156,6 +158,9 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
     return false
   })
   .map(ds => {
+    if (parcellationName && parcellationName === 'Fibre Bundle Atlas - Long Bundle') {
+      return manualMapDWM(ds)
+    }
     return {
       ...ds,
       ...parcellationName && ds.parcellationRegion.length === 0

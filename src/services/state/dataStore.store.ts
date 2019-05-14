@@ -65,6 +65,7 @@ export interface DataEntry{
 }
 
 export interface ParcellationRegion {
+  id?: string
   name: string
 }
 
