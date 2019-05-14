@@ -162,7 +162,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   /**
    * message when user on hover a segment or landmark
    */
-  public toggleMessage: string = 'double click to toggle select'
+  public toggleMessage: string = 'double click to toggle select, right click to search'
 
   /**
    * observable for showing login modal
