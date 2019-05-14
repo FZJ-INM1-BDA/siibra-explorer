@@ -1,7 +1,7 @@
 <ng-template #container>
 </ng-template>
 
-<ui-splashscreen *ngIf="!viewerLoaded">
+<ui-splashscreen (contextmenu)="$event.stopPropagation();" *ngIf="!viewerLoaded">
 </ui-splashscreen>
 
 <div landmarkMasterContainer>
