@@ -7,6 +7,11 @@ div[statusCard]
   pointer-events: all;
 }
 
+input
+{
+  background-color:rgba(240, 240, 240, 0.8);
+}
+
 :host-context([darktheme=false]) div[statusCard]
 {
   background-color:rgba(230,230,230,0.8);
