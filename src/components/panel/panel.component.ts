@@ -64,6 +64,8 @@ export class PanelComponent extends ParseAttributeDirective implements AfterCont
   toggleCollapseBody(event:Event){
     if(this.bodyCollapsable){
       this.collapseBody = !this.collapseBody
+      this.showBody = !this.showBody
+      this.showFooter = !this.showFooter
 
       // this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
       //   (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)

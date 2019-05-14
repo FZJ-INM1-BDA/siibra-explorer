@@ -29,7 +29,7 @@ import { DownloadDirective } from "../util/directives/download.directive";
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
-import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
+import { FilterNullPipe } from "../util/pipes/filterNull.pipe";AngularMaterialModule
 import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
@@ -45,6 +45,7 @@ import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
+import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
 
 
 @NgModule({
@@ -54,6 +55,7 @@ import { KGToS } from "./kgtos/kgtos.component";
     ComponentsModule,
     DatabrowserModule,
     UtilModule,
+    AngularMaterialModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -122,7 +124,8 @@ import { KGToS } from "./kgtos/kgtos.component";
     SigninBanner,
     SigninModal,
     CookieAgreement,
-    KGToS
+    KGToS,
+    AngularMaterialModule
   ]
 })
 

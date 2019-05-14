@@ -1,7 +1,7 @@
 
 :host-context([darktheme="true"]) ul
 {
-  background-color:rgba(30,30,30,0.8);
+  background-color:rgba(30,30,30);
 }
 
 :host-context([darktheme="true"]) li[role="menuitem"]
@@ -18,9 +18,8 @@
 
 :host-context([darktheme="false"]) ul
 {
-  background-color:rgba(255,255,255,0.8);
+  background-color:rgba(255,255,255);
 }
-
 :host-context([darktheme="false"]) li[role="menuitem"]:hover
 {
   cursor:default;

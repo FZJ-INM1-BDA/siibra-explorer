@@ -3,7 +3,8 @@ import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter } from "../../services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
-import { filter, distinctUntilChanged, map, delay } from "rxjs/operators";
+import { filter, distinctUntilChanged, map, delay, throttle,tap, take, withLatestFrom, mergeMap, buffer } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector : 'layer-browser',
@@ -31,7 +32,9 @@ export class LayerBrowser implements OnDestroy{
   /* TODO temporary measure. when datasetID can be used, will use  */
   public fetchedDataEntries$ : Observable<any>
 
-  constructor(private store : Store<ViewerStateInterface>){
+  constructor(
+    private store : Store<ViewerStateInterface>,
+    private constantsService: AtlasViewerConstantsServices){
 
     this.ngLayers$ = store.pipe(
       select('viewerState'),
@@ -58,14 +61,36 @@ export class LayerBrowser implements OnDestroy{
       map(state => state.forceShowSegment)
     )
 
-    this.subscriptions.push(this.store.pipe(
+    const throttleObs = this.store.pipe(
+      select('ngViewerState'),
+
+      filter(state => state && state.nehubaReady),
+    )
+
+    throttleObs.subscribe((val) => {
+      console.log('throtld obs emitted', val)
+    })
+
+    /**
+     * TODO leakage? after change of template still hanging the reference?
+     */
+    this.subscriptions.push(
+      
+      
+      this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
       distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
       map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
-      delay(0)
+      buffer(this.store.pipe(
+        select('ngViewerState'),
+        select('nehubaReady'),
+        filter(flag => flag)
+      )),
+      delay(0),
+      map(arr => arr[arr.length - 1])
     ).subscribe((lockedLayerNames:string[]) => {
-
+      console.log('subscription')
       /**
        * TODO
        * if layerbrowser is init before nehuba
@@ -155,7 +180,7 @@ export class LayerBrowser implements OnDestroy{
 
   segmentationTooltip(){
     return `toggle segments visibility: 
-${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
+    ${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
   }
 
   get segmentationAdditionalClass(){
@@ -166,5 +191,9 @@ ${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSeg
         : this.forceShowSegmentCurrentState === false
           ? 'muted'
           : 'red' 
+  }
+
+  get isMobile(){
+    return this.constantsService.mobile
   }
 }

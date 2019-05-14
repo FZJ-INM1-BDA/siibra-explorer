@@ -40,4 +40,6 @@ export class RadioList{
 
   @Input()
   ulClass: string = ''
+
+  @Input() isMobile: boolean;
 }

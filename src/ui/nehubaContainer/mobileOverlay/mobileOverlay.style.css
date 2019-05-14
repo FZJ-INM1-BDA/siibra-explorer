@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   position: absolute;
-  z-index: 1000;
+  z-index: 999;
 
   pointer-events: none;
 }

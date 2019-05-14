@@ -23,7 +23,7 @@ ui-nehuba-container
 
 div[bannerWrapper]
 {
-  z-index:5;
+  z-index:1000;
   position:absolute;
 
   width:100%;
@@ -150,4 +150,28 @@ div[imageContainer]
 div.displayCard
 {
   opacity: 0.8;
+}
+
+.mobileNavigationPanel {
+  width: calc(100% - 50px); 
+  background-color: white; 
+  left: 0;
+  padding: 20px 5px;
+}
+
+.menuButtonMobile {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.logoContainerMobile {
+  width: 100%; 
+  display:flex; 
+  justify-content: center;
+}
+
+mat-card {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); 
+  margin: 5px;
 }

@@ -35,6 +35,8 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   @Input()
   public selectedParcellation: any
 
+  @Input() isMobile: boolean;
+
   private _showRegionTree: boolean = false
 
   @Output()

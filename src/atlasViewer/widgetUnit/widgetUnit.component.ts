@@ -1,5 +1,6 @@
 import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
+import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 
 
 @Component({
@@ -60,7 +61,9 @@ export class WidgetUnit implements OnInit{
   public cf : ComponentRef<WidgetUnit>
 
   public id: string 
-  constructor(){
+  constructor(
+    private constantsService: AtlasViewerConstantsServices
+    ){
     this.id = Date.now().toString()
   }
 
@@ -121,4 +124,8 @@ export class WidgetUnit implements OnInit{
   /* floating widget specific functionalities */
 
   position : [number,number] = [400,100]
+
+  get isMobile(){
+    return this.constantsService.mobile
+  }
 }

@@ -18,6 +18,7 @@ import { pipeFromArray } from "rxjs/internal/util/pipe";
 
 export class NehubaViewerUnit implements OnDestroy{
   
+  @Output() nehubaReady: EventEmitter<null> = new EventEmitter()
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter : EventEmitter<any | number | null> = new EventEmitter()
   @Output() mouseoverLandmarkEmitter : EventEmitter<number | null> = new EventEmitter()
@@ -326,6 +327,7 @@ export class NehubaViewerUnit implements OnDestroy{
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
       window['viewer'].display.panels.forEach(patchSliceViewPanel) 
+      this.nehubaReady.emit(null)
     })
     
     this.newViewerInit()

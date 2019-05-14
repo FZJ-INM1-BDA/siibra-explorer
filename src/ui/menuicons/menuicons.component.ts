@@ -1,4 +1,4 @@
-import { Component, ViewChild, TemplateRef, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver } from "@angular/core";
+import { Component, ViewChild, TemplateRef, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, OnInit, AfterViewInit } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -18,7 +18,7 @@ import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.servic
   ]
 })
 
-export class MenuIconsBar{
+export class MenuIconsBar implements AfterViewInit{
 
   /**
    * databrowser
@@ -89,6 +89,24 @@ export class MenuIconsBar{
 
   public catchError(e) {
     
+  }
+
+
+  ngAfterViewInit() {
+    if (this.isMobile) setTimeout(() => this.createLayerBrowserComponentForMobile(), 0)
+  }
+
+  createLayerBrowserComponentForMobile() {
+    setTimeout(() => {
+      this.layerBrowser = this.lbcf.create(this.injector)    
+      this.lbWidget = this.widgetServices.addNewWidget(this.layerBrowser, {
+        exitable: true,
+        persistency: true,
+        state: 'floating',
+        title: 'Layer Browser',
+        titleHTML: '<i class="fas fa-layer-group"></i> Layer Browser'
+      })
+    })
   }
 
   public clickLayer(event: MouseEvent){

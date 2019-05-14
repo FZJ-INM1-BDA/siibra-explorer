@@ -34,7 +34,6 @@ panel-component[widgetUnitPanel]
 {
   display:block;
   min-width:280px;
-  max-width:300px;
 }
 
 :host-context([state='floating']) div[widgetUnitHeading]:hover

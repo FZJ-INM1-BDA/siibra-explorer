@@ -21,6 +21,8 @@ export class DropdownComponent{
   @Input() listDisplay : (obj:any)=>string = (obj)=>obj.name
   @Input() activeDisplay : (obj:any|null)=>string = (obj)=>obj ? obj.name : `Please select an item.`
 
+  @Input() isMobile: boolean;
+
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
 
   @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef

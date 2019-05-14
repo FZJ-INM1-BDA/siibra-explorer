@@ -3,7 +3,7 @@
     #searchTermInput
     tabindex="0"
     (keydown.esc)="escape($event)"
-    (focus)="showRegionTree = true"
+    (focus)="showRegionTree = true && !isMobile"
     [value]="searchTerm"
     class="form-control form-control-sm"
     type="text" 

@@ -1,45 +1,61 @@
-<dropdown-component
-  *ngIf="!isMobile"
-  (itemSelected)="changeTemplate($event)"
-  [activeDisplay]="displayActiveTemplate"
-  [selectedItem]="selectedTemplate$ | async"
-  [inputArray]="loadedTemplates$ | async | filterNull">
+<div [ngClass]="isMobile? 'whenMobile' : 'whenNotMobile'" >
 
-</dropdown-component>
-
-<ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
   <dropdown-component
-    *ngIf="selectedParcellation$ | async as selectedParcellation"
-    (itemSelected)="changeParcellation($event)"
-    [activeDisplay]="displayActiveParcellation"
-    [selectedItem]="selectedParcellation"
-    [inputArray]="selectedTemplate.parcellations">
-  
+    (itemSelected)="changeTemplate($event)"
+    [activeDisplay]="displayActiveTemplate"
+    [selectedItem]="selectedTemplate$ | async"
+    [inputArray]="loadedTemplates$ | async | filterNull"
+    [isMobile] = "isMobile"
+    [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
   </dropdown-component>
-  <region-hierarchy
-    [selectedRegions]="selectedRegions$ | async | filterNull"
-    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
-    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
-    (clearAllRegions)="clearAllRegions()"
-    *ngIf="selectedParcellation$ | async as selectedParcellation"
-    [selectedParcellation]="selectedParcellation">
 
-  </region-hierarchy>
-</ng-container>
+  <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
+    <dropdown-component
+      *ngIf="selectedParcellation$ | async as selectedParcellation"
+      (itemSelected)="changeParcellation($event)"
+      [activeDisplay]="displayActiveParcellation"
+      [selectedItem]="selectedParcellation"
+      [inputArray]="selectedTemplate.parcellations"
+      [isMobile] = "isMobile"
+      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
 
-<!-- help btn -->
-<div
-  *ngIf="!isMobile" 
-  (click)="showHelp()" 
-  class="btn btn-outline-secondary btn-sm rounded-circle">
-  <i class="fas fa-question-circle"></i>
-</div>
+    </dropdown-component>
+    <region-hierarchy
+      [selectedRegions]="selectedRegions$ | async | filterNull"
+      (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+      (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+      (clearAllRegions)="clearAllRegions()"
+      [isMobile] = "isMobile"
+      *ngIf="selectedParcellation$ | async as selectedParcellation"
+      [selectedParcellation]="selectedParcellation"
+      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
 
-<!-- signin -->
-<div
-  (click)="showSignin()"
-  class="btn btn-outline-secondary btn-sm rounded-circle">
-  <i
-    [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-    class="fas"></i>
+    </region-hierarchy>
+  </ng-container>
+
+  <!-- help btn -->
+  <div
+    *ngIf="!isMobile" 
+    (click)="showHelp()" 
+    class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+    <i class="fas fa-question-circle"></i>
+  </div>
+
+  <!-- signin -->
+  <div 
+    *ngIf="!isMobile" 
+    (click)="showSignin()"
+    class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+    <i
+      [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+      class="fas"></i>
+  </div>
+
+  <div
+    *ngIf="isMobile" 
+    (click)="showSignin()"
+    class="login-button-mobile">
+    <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
+  </div>
+
 </div>

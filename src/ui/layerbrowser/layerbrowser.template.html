@@ -1,7 +1,8 @@
 <ng-container *ngIf="ngLayers$ | async | filterNgLayer : ngLayers as filteredNgLayers; else noLayerPlaceHolder">
   <ng-container *ngIf="filteredNgLayers.length > 0; else noLayerPlaceHolder">
-    <div 
+    <div
       class="layerContainer"
+      [ngStyle] = "isMobile && {'overflow': 'hidden'}"
       *ngFor = "let ngLayer of filteredNgLayers">
     
       <div
@@ -40,6 +41,7 @@
         </i>
       </div>
       <panel-component
+      
         [ngClass] = "{'muted-text muted' : !classVisible(ngLayer)}">
     
         <div heading>

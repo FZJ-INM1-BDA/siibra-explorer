@@ -1,6 +1,6 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
@@ -38,6 +38,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
+  @ViewChild('dockedContainer', {read: ViewContainerRef}) dockedContainer: ViewContainerRef
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
@@ -74,12 +75,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
+  public sidePanelOpen$: Observable<boolean>
+  mobileMenuOpened: boolean = false;
+
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
 
   constructor(
     private store: Store<ViewerStateInterface>,
+    private uiStore: Store<UIStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -101,6 +106,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.focusedSidePanel)
+    )
+
+    this.sidePanelOpen$ = this.store.pipe(
+      select('uiState'),  
+      filter(state => isDefined(state)),
+      map(state => state.sidePanelOpen)
     )
 
     this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
@@ -280,6 +291,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
 
+    this.subscriptions.push(
+      this.sidePanelOpen$
+      .subscribe(v => this.mobileMenuOpened = v)
+    )
+
   }
 
   ngAfterViewInit() {
@@ -321,6 +337,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       })
     })
+    this.widgetServices.dockedContainer = this.dockedContainer
 
     this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegment$),
@@ -415,6 +432,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   searchRegion(regions:any[]){
     this.rClContextualMenu.hide()
     this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
+    // if (this.isMobile) this.mobileMenuOpened = !this.mobileMenuOpened
+    if (this.isMobile) {
+      this.uiStore.dispatch({
+        type : OPEN_SIDE_PANEL
+      })
+    }
   }
 
   @HostBinding('attr.version')
@@ -422,6 +445,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   get isMobile(){
     return this.constantsService.mobile
+  }
+
+  changeMenuState() {
+    if (this.mobileMenuOpened) {
+      this.uiStore.dispatch({
+        type : CLOSE_SIDE_PANEL
+      })
+    } else {
+      this.uiStore.dispatch({
+        type : OPEN_SIDE_PANEL
+      })
+    }
   }
 }
 

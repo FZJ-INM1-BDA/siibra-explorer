@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy, OnInit } from "@angular/core";
+import { Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input } from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
@@ -26,6 +26,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
+  @Input() darktheme: boolean
 
   constructor(
     private constantService: AtlasViewerConstantsServices,

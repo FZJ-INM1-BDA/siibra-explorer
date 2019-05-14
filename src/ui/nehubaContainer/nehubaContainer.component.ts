@@ -10,6 +10,7 @@ import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataServic
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
+import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -59,7 +60,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private selectedRegionIndexSet : Set<number> = new Set()
   public fetchedSpatialData : Landmark[] = []
 
-  private ngLayersRegister : NgViewerStateInterface = {layers : [], forceShowSegment: null}
+  private ngLayersRegister : Partial<NgViewerStateInterface> = {layers : [], forceShowSegment: null}
   private ngLayers$ : Observable<NgViewerStateInterface>
   
   public selectedParcellation : any | null
@@ -389,7 +390,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
           return deepCopiedState
         })
       ).subscribe((state)=>{
-
+        this.store.dispatch({
+          type: NEHUBA_READY,
+          nehubaReady: false
+        })
         this.nehubaViewerSubscriptions.forEach(s=>s.unsubscribe())
 
         this.selectedTemplate = state.templateSelected
@@ -693,6 +697,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.debouncedViewerPositionChange.subscribe(this.handleEmittedNavigationChange.bind(this))
+    )
+
+    this.nehubaViewerSubscriptions.push(
+      /**
+       * TODO when user selects new template, window.viewer 
+       */
+      this.nehubaViewer.nehubaReady.subscribe(() => {
+        this.store.dispatch({
+          type: NEHUBA_READY,
+          nehubaReady: true
+        })
+      })
     )
 
     this.nehubaViewerSubscriptions.push(

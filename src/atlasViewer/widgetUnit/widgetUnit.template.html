@@ -4,7 +4,9 @@
   widgetUnitPanel
   [bodyCollapsable] = "state === 'docked'"
   [cdkDragDisabled]="state === 'docked'"
-  cdkDrag>
+  cdkDrag
+  [ngStyle]="{'max-width': isMobile? '100%' : '300px',
+              'margin-bottom': isMobile? '5px': '0'}">
   <div 
     widgetUnitHeading
     heading
@@ -20,16 +22,17 @@
     </div>
     <div icons>
       <i
+        *ngIf="!isMobile"
         (click)="widgetServices.minimise(this)"
         class="fas fa-window-minimize"
         hoverable>
 
       </i>
-      <i *ngIf = "canBeDocked && state === 'floating'"
+      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
         (click) = "dock($event)" 
         class = "fas fa-window-minimize" 
         hoverable></i>
-      <i *ngIf = "state === 'docked'"
+      <i *ngIf = "state === 'docked' && !isMobile"
         (click) = "undock($event)" 
         class = "fas fa-window-restore" 
         hoverable></i>
