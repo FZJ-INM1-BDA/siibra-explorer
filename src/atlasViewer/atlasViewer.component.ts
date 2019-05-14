@@ -1,5 +1,5 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
-import { Store, select } from "@ngrx/store";
+import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
@@ -17,6 +17,7 @@ import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component
 import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 
 @Component({
   selector: 'atlas-viewer',
@@ -35,6 +36,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
   @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
+  @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
@@ -84,7 +86,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService,
-    private databrowserService: DatabrowserService
+    private databrowserService: DatabrowserService,
+    private dispatcher$: ActionsSubject
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -287,9 +290,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     /**
      * TODO avoid creating new views in lifecycle hooks in general
      */
-    of(localStorage.getItem('cookies') !== 'agreed').pipe(
-      delay(0),
-      filter(flag => flag)
+    this.store.pipe(
+      select('uiState'),
+      select('agreedCookies'),
+      filter(agreed => !agreed),
+      delay(0)
     ).subscribe(() => {
       this.modalService.show(ModalUnit, {
         initialState: {
@@ -297,6 +302,24 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           template: this.cookieAgreementComponent
         }
       }) 
+    })
+
+    this.dispatcher$.pipe(
+      filter(({type}) => type === SHOW_KG_TOS),
+      withLatestFrom(this.store.pipe(
+        select('uiState'),
+        select('agreedKgTos')
+      )),
+      map(([_, agreed]) => agreed),
+      filter(flag => !flag),
+      delay(0)
+    ).subscribe(val => {
+      this.modalService.show(ModalUnit, {
+        initialState: {
+          title: 'Knowldge Graph ToS',
+          template: this.kgTosComponent
+        }
+      })
     })
 
     this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
@@ -352,9 +375,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       }) as NgLayerInterface)
   }
 
+  kgTosClickedOk(){
+    this.modalService.hide(1)
+    this.store.dispatch({
+      type: AGREE_KG_TOS
+    })
+  }
+
   cookieClickedOk(){
     this.modalService.hide(1)
-    localStorage.setItem('cookies', 'agreed');
+    this.store.dispatch({
+      type: AGREE_COOKIE
+    })
   }
 
   panelAnimationEnd(){

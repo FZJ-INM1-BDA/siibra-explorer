@@ -44,6 +44,7 @@ import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
 import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
+import { KGToS } from "./kgtos/kgtos.component";
 
 
 @NgModule({
@@ -78,6 +79,7 @@ import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
     RegionHierarchy,
     StatusCardComponent,
     CookieAgreement,
+    KGToS,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -120,6 +122,7 @@ import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
     SigninBanner,
     SigninModal,
     CookieAgreement,
+    KGToS
   ]
 })
 

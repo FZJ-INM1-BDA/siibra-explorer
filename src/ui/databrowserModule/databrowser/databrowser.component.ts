@@ -60,6 +60,7 @@ export class DataBrowser implements OnDestroy,OnInit{
 
 
   ngOnInit(){
+    this.dbService.dbComponentInit(this)
     this.regions = this.regions.map(r => {
       /**
        * TODO to be replaced with properly region UUIDs from KG

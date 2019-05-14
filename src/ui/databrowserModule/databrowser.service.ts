@@ -11,6 +11,7 @@ import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { ComponentRef } from "@angular/core/src/render3";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
+import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -291,6 +292,12 @@ export class DatabrowserService implements OnDestroy{
       type: 'BUILD_REGION_SELECTION_TREE',
       selectedRegions,
       regions
+    })
+  }
+
+  public dbComponentInit(db:DataBrowser){
+    this.store.dispatch({
+      type: SHOW_KG_TOS
     })
   }
 

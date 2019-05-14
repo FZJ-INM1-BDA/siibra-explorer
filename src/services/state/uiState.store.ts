@@ -1,15 +1,37 @@
 import { Action } from '@ngrx/store'
 
-export function uiState(state:UIStateInterface = {mouseOverSegment:null, mouseOverLandmark : null, focusedSidePanel:null, sidePanelOpen: false},action:UIAction){
+const agreedCookieKey = 'agreed-cokies'
+const aggredKgTosKey = 'agreed-kg-tos'
+
+const defaultState : UIStateInterface = {
+  mouseOverSegment: null,
+  mouseOverLandmark: null,
+  focusedSidePanel: null,
+  sidePanelOpen: false,
+
+  /**
+   * replace with server side logic (?)
+   */
+  agreedCookies: localStorage.getItem(agreedCookieKey) === 'agreed',
+  agreedKgTos: localStorage.getItem(aggredKgTosKey) === 'agreed'
+}
+
+export function uiState(state:UIStateInterface = defaultState,action:UIAction){
   switch(action.type){
     case MOUSE_OVER_SEGMENT:
-      return Object.assign({},state,{
+      return {
+        ...state,
         mouseOverSegment : action.segment
-      })
+      }
     case MOUSE_OVER_LANDMARK:
-      return Object.assign({}, state, {
+      return {
+        ...state,
         mouseOverLandmark : action.landmark
-      })
+      }
+    /**
+     * TODO deprecated
+     * remove ASAP
+     */
     case TOGGLE_SIDE_PANEL:
       return Object.assign({}, state, {
         focusedSidePanel : typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel
@@ -17,15 +39,35 @@ export function uiState(state:UIStateInterface = {mouseOverSegment:null, mouseOv
           : action.focusedSidePanel, 
         sidePanelOpen : !(typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel)
       } as Partial<UIStateInterface>)
-    case OPEN_SIDE_PANEL :
-      return Object.assign({},state,{
-        sidePanelOpen : true
-      })
-    case CLOSE_SIDE_PANEL :
-      return Object.assign({},state,{
-        sidePanelOpen : false
-      })
-    default :
+    case OPEN_SIDE_PANEL:
+      return {
+        ...state,
+        sidePanelOpen: true
+      }
+    case CLOSE_SIDE_PANEL:
+      return {
+        ...state,
+        sidePanelOpen: false
+      }
+    case AGREE_COOKIE:
+      /**
+       * TODO replace with server side logic
+       */
+      localStorage.setItem(agreedCookieKey, 'agreed')
+      return {
+        ...state,
+        agreedCookies: true
+      }
+    case AGREE_KG_TOS:
+      /**
+       * TODO replace with server side logic
+       */
+      localStorage.setItem(aggredKgTosKey, 'agreed')
+      return {
+        ...state,
+        agreedKgTos: true
+      }
+    default:
       return state
   }
 }
@@ -35,6 +77,9 @@ export interface UIStateInterface{
   mouseOverSegment : any | number
   mouseOverLandmark : any 
   focusedSidePanel : string | null
+
+  agreedCookies: boolean
+  agreedKgTos: boolean
 }
 
 export interface UIAction extends Action{
@@ -49,3 +94,7 @@ export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
+
+export const AGREE_COOKIE = `AGREE_COOKIE`
+export const AGREE_KG_TOS = `AGREE_KG_TOS`
+export const SHOW_KG_TOS = `SHOW_KG_TOS`

@@ -95,6 +95,12 @@
         </cookie-agreement>
       </div>
     </tab>
+    <tab heading="KG ToS">
+      <div class="mt-2">
+        <kgtos-component>
+        </kgtos-component>
+      </div>
+    </tab>
   </tabset>
 </ng-template>
 <ng-template #signinModalComponent>
@@ -102,12 +108,21 @@
     
   </signin-modal>
 </ng-template>
+
 <ng-template #cookieAgreementComponent>
   <cookie-agreement>
   </cookie-agreement>
 
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" (click)="cookieClickedOk()">Ok</button>
+  </div>
+</ng-template>
+
+<ng-template #kgToS>
+  <kgtos-component>
+  </kgtos-component>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="kgTosClickedOk()">Ok</button>
   </div>
 </ng-template>
 
