@@ -1,6 +1,6 @@
 <ul
   [ngClass]="[ulClass, isMobile? 'radioListBorder' : '']"
-  [ngStyle]="{'opacity': isMobile? '1' : '0.8'}"
+  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
   role="menu">
   <li 
     *ngFor="let input of inputArray" 
