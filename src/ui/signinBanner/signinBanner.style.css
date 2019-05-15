@@ -49,10 +49,14 @@ dropdown-component
   margin: 0 3px;
 }
 
-.login-button-mobile {
+.login-button-panel-mobile {
   order: -1;
   align-self: flex-start; 
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
 }
+
 .login-button-mobile > button {
   outline: none;
   background-color: transparent;

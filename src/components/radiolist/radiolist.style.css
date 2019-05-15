@@ -55,3 +55,9 @@ ul,span.dropdown-item-1
   white-space: nowrap;
   border:none;
 }
+
+.radioListBorder {
+  border-style: solid;
+  border-width: 0px 1px 1px 1px;
+  border-color: white
+}

@@ -6,7 +6,8 @@
     [selectedItem]="selectedTemplate$ | async"
     [inputArray]="loadedTemplates$ | async | filterNull"
     [isMobile] = "isMobile"
-    [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
+    [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'"
+    [darktheme] ="darktheme">
   </dropdown-component>
 
   <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
@@ -17,7 +18,8 @@
       [selectedItem]="selectedParcellation"
       [inputArray]="selectedTemplate.parcellations"
       [isMobile] = "isMobile"
-      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
+      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'"
+      [darktheme] ="darktheme">
 
     </dropdown-component>
     <region-hierarchy
@@ -51,11 +53,19 @@
       class="fas"></i>
   </div>
 
-  <div
-    *ngIf="isMobile" 
-    (click)="showSignin()"
-    class="login-button-mobile">
-    <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
+  <div class="login-button-panel-mobile">
+    <div
+      *ngIf="isMobile" 
+      (click)="showSignin()"
+      class="login-button-mobile">
+      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
+    </div>
+
+    <div (click)="showHelp()" class="login-button-mobile">
+      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Help</button>
+    </div>
+
   </div>
+
 
 </div>

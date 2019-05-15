@@ -1,5 +1,5 @@
-<ul 
-  [ngClass]="ulClass"
+<ul
+  [ngClass]="[ulClass, isMobile? 'radioListBorder' : '']"
   [ngStyle]="{'opacity': isMobile? '1' : '0.8'}"
   role="menu">
   <li 

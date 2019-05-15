@@ -18,6 +18,7 @@ import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { TabsetComponent } from "ngx-bootstrap/tabs";
 
 @Component({
   selector: 'atlas-viewer',
@@ -43,6 +44,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+
+  @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
   /**
    * required for styling of all child components
    */
@@ -437,6 +441,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.uiStore.dispatch({
         type : OPEN_SIDE_PANEL
       })
+      this.mobileMenuTabs.tabs[1].active = true
     }
   }
 

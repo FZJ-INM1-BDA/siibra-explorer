@@ -15,9 +15,25 @@
                        [fixedInViewport]="true" 
                        [(opened)]="mobileMenuOpened" 
                        class="mobileNavigationPanel"
-                       [ngStyle]="{'background-color': darktheme? 'black' : 'white'}" >
+                       [ngStyle]="{'background-color': darktheme? '#404040' : '#F2F2F2'}" >
+
+              <!-- 'absorbs' the auto-focus behavior -->
+              <button mat-button style="height: 0; position: absolute;"></button>
               <logo-container class="logoContainerMobile"></logo-container>
-              <mat-card>
+
+              <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
+                <tab heading="Template">
+                  <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+                </tab>
+                <tab heading="Containers">
+                  <menu-icons iconWrapper hidden #MenuIcons>
+                  </menu-icons>
+                  <ng-template #dockedContainer>
+                  </ng-template>
+                </tab>
+              </tabset>
+
+              <!-- <mat-card>
                   <mat-card-title [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}" >Template Selection</mat-card-title>
                   <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
               </mat-card>
@@ -28,7 +44,7 @@
                 </menu-icons>
                 <ng-template #dockedContainer>
                 </ng-template>
-              </mat-card>
+              </mat-card> -->
           </mat-sidenav>
           
           <mat-sidenav-content>

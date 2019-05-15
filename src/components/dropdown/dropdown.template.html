@@ -3,7 +3,10 @@
   [innerHTML] = "activeDisplay(selectedItem)"
   hoverable
   #dropdownToggle
-  dropdownToggle>
+  dropdownToggle
+              
+  [ngStyle]="{'border': isMobile? '1px solid' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+
 </span>
 
 <!-- needed to ensure dropdown width matches  -->
@@ -19,6 +22,7 @@
   [selectedItem]="selectedItem"
   [inputArray]="inputArray"
   [@showState]="openState ? 'show' : 'hide'"
-  [isMobile] = "isMobile">
+  [isMobile] = "isMobile"
+  [darktheme] = "darktheme">
 
 </radio-list>
