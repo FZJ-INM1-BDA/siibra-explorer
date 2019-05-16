@@ -38,6 +38,10 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 
+import 'hammerjs';
+import 'hammer-timejs';
+
+
 @NgModule({
   imports : [
     FormsModule,
