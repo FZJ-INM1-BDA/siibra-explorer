@@ -151,10 +151,16 @@
           </div>
   
           <div
-            *ngIf="selectedRegions$ | async; let selectedRegions"
+            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
             Search KG for {{ selectedRegions && selectedRegions.length }} selected regions
+          </div>
+          
+          <div
+            class="p-2 text-muted"
+            *ngIf="!(onhoverSegmentForFixed$ | async) && (selectedRegions$ | async)?.length === 0">
+            Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
   
           <ng-template #noRegionSelected>
