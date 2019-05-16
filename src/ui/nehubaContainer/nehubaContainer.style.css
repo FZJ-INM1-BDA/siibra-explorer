@@ -153,6 +153,7 @@ div[mobileObliqueGuide] > *
 {
 
   background-color: rgba(50,50,50,0.8);
+  color: white;
 }
 
 div#scratch-pad

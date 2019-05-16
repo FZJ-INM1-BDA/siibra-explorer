@@ -140,4 +140,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   get user() : User | null {
     return this.authService.user
   }
+
+  public flexItemIsMobileClass = 'mt-2'
+  public flexItemIsDesktopClass = 'mr-2'
 }

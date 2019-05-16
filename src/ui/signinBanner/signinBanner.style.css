@@ -1,8 +1,3 @@
-:host
-{
-
-}
-
 :host > *
 {
   flex: 0 0 0;
@@ -60,15 +55,4 @@ dropdown-component
 .login-button-mobile > button {
   outline: none;
   background-color: transparent;
-}
-
-
-.selectTemplateDetailsMobile {
-  width: 100%;
-  margin-top: 5px; 
-}
-
-
-.selectTemplateDetaiNoMobile {
-  margin: 0 3px; 
 }

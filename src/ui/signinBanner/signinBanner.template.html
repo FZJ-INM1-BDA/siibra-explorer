@@ -1,4 +1,6 @@
-<div [ngClass]="isMobile? 'whenMobile' : 'whenNotMobile'" >
+<div
+  class="d-flex"  
+  [ngClass]="{ 'flex-column w-100 align-items-stretch' : isMobile}" >
 
   <dropdown-component
     (itemSelected)="changeTemplate($event)"
@@ -6,7 +8,7 @@
     [selectedItem]="selectedTemplate$ | async"
     [inputArray]="loadedTemplates$ | async | filterNull"
     [isMobile] = "isMobile"
-    [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'"
+    [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
     [darktheme] ="darktheme">
   </dropdown-component>
 
@@ -18,7 +20,7 @@
       [selectedItem]="selectedParcellation"
       [inputArray]="selectedTemplate.parcellations"
       [isMobile] = "isMobile"
-      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'"
+      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
       [darktheme] ="darktheme">
 
     </dropdown-component>
@@ -29,8 +31,9 @@
       (clearAllRegions)="clearAllRegions()"
       [isMobile] = "isMobile"
       *ngIf="selectedParcellation$ | async as selectedParcellation"
+      class="h-0"
       [selectedParcellation]="selectedParcellation"
-      [ngClass]="isMobile ? 'selectTemplateDetailsMobile' : 'selectTemplateDetaiNoMobile'">
+      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass">
 
     </region-hierarchy>
   </ng-container>

@@ -97,7 +97,7 @@
       </div>
     </div>
   </div>
-  <div mobileObliqueCtrl initiator>
+  <div (contextmenu)="$event.stopPropagation(); $event.preventDefaul();" mobileObliqueCtrl initiator>
     <i class="fas fa-globe"></i>
   </div>
 </mobile-overlay>
