@@ -33,12 +33,10 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
      * remove ASAP
      */
     case TOGGLE_SIDE_PANEL:
-      return Object.assign({}, state, {
-        focusedSidePanel : typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel
-          ? null
-          : action.focusedSidePanel, 
-        sidePanelOpen : !(typeof action.focusedSidePanel  === 'undefined' || state.focusedSidePanel === action.focusedSidePanel)
-      } as Partial<UIStateInterface>)
+      return {
+        ...state,
+        sidePanelOpen: !state.sidePanelOpen
+      }
     case OPEN_SIDE_PANEL:
       return {
         ...state,

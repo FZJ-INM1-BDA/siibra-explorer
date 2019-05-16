@@ -53,6 +53,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @HostBinding('attr.darktheme')
   darktheme: boolean = false
 
+  @HostBinding('attr.ismobile')
+  get isMobile(){
+    return this.constantsService.mobile
+  }
+
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -80,7 +85,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
   public sidePanelOpen$: Observable<boolean>
-  mobileMenuOpened: boolean = false;
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -88,7 +92,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   constructor(
     private store: Store<ViewerStateInterface>,
-    private uiStore: Store<UIStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -294,12 +297,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         filter(() => typeof this.layoutMainSide !== 'undefined')
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
-
-    this.subscriptions.push(
-      this.sidePanelOpen$
-      .subscribe(v => this.mobileMenuOpened = v)
-    )
-
   }
 
   ngAfterViewInit() {
@@ -436,9 +433,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   searchRegion(regions:any[]){
     this.rClContextualMenu.hide()
     this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
-    // if (this.isMobile) this.mobileMenuOpened = !this.mobileMenuOpened
     if (this.isMobile) {
-      this.uiStore.dispatch({
+      this.store.dispatch({
         type : OPEN_SIDE_PANEL
       })
       this.mobileMenuTabs.tabs[1].active = true
@@ -448,20 +444,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @HostBinding('attr.version')
   public _version : string = VERSION
 
-  get isMobile(){
-    return this.constantsService.mobile
-  }
-
-  changeMenuState() {
-    if (this.mobileMenuOpened) {
-      this.uiStore.dispatch({
-        type : CLOSE_SIDE_PANEL
-      })
-    } else {
-      this.uiStore.dispatch({
-        type : OPEN_SIDE_PANEL
+  changeMenuState({open, close}:{open?:boolean, close?:boolean} = {}) {
+    if (open) {
+      return this.store.dispatch({
+        type: OPEN_SIDE_PANEL
       })
     }
+    if (close) {
+      return this.store.dispatch({
+        type: CLOSE_SIDE_PANEL
+      })
+    }
+    this.store.dispatch({
+      type: TOGGLE_SIDE_PANEL
+    })
   }
 }
 

@@ -3,7 +3,7 @@ import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter } from "../../services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
-import { filter, distinctUntilChanged, map, delay, throttle,tap, take, withLatestFrom, mergeMap, buffer } from "rxjs/operators";
+import { filter, distinctUntilChanged, map, delay, buffer } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
@@ -61,47 +61,36 @@ export class LayerBrowser implements OnDestroy{
       map(state => state.forceShowSegment)
     )
 
-    const throttleObs = this.store.pipe(
-      select('ngViewerState'),
-
-      filter(state => state && state.nehubaReady),
-    )
-
-    throttleObs.subscribe((val) => {
-      console.log('throtld obs emitted', val)
-    })
 
     /**
      * TODO leakage? after change of template still hanging the reference?
      */
     this.subscriptions.push(
-      
-      
-      this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
-      map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
-      buffer(this.store.pipe(
-        select('ngViewerState'),
-        select('nehubaReady'),
-        filter(flag => flag)
-      )),
-      delay(0),
-      map(arr => arr[arr.length - 1])
-    ).subscribe((lockedLayerNames:string[]) => {
-      console.log('subscription')
-      /**
-       * TODO
-       * if layerbrowser is init before nehuba
-       * window['viewer'] will return undefined
-       */
-      this.lockedLayers = lockedLayerNames
+        this.store.pipe(
+        select('viewerState'),
+        filter(state => isDefined(state) && isDefined(state.templateSelected)),
+        distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
+        map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
+        buffer(this.store.pipe(
+          select('ngViewerState'),
+          select('nehubaReady'),
+          filter(flag => flag)
+        )),
+        delay(0),
+        map(arr => arr[arr.length - 1])
+      ).subscribe((lockedLayerNames:string[]) => {
+        /**
+         * TODO
+         * if layerbrowser is init before nehuba
+         * window['viewer'] will return undefined
+         */
+        this.lockedLayers = lockedLayerNames
 
-      this.ngLayersChangeHandler()
-      this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
-      window['viewer'].registerDisposer(this.disposeHandler)
-    }))
+        this.ngLayersChangeHandler()
+        this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
+        window['viewer'].registerDisposer(this.disposeHandler)
+      })
+    )
 
     this.subscriptions.push(
       this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state)

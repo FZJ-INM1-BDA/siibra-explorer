@@ -1,140 +1,67 @@
-<div *ngIf = "meetsRequirement" class = "atlas-container" helpdirective>
+<ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
-  <ui-nehuba-container (contextmenu)="nehubaClickHandler($event)">
-  </ui-nehuba-container>
-
-  <div bannerWrapper>
-    <menu-icons *ngIf ="!isMobile" iconWrapper>
-    </menu-icons>
-    <signin-banner *ngIf ="!isMobile" signinWrapper>
-    </signin-banner>
-    
-    <div *ngIf ="isMobile" >
-        <mat-sidenav-container>
-          <mat-sidenav #sidenav 
-                       [fixedInViewport]="true" 
-                       [(opened)]="mobileMenuOpened" 
-                       class="mobileNavigationPanel"
-                       [ngStyle]="{'background-color': darktheme? '#404040' : '#F2F2F2'}" >
-
-              <!-- 'absorbs' the auto-focus behavior -->
-              <button mat-button style="height: 0; position: absolute;"></button>
-              <logo-container class="logoContainerMobile"></logo-container>
-
-              <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
-                <tab heading="Template">
-                  <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
-                </tab>
-                <tab heading="Containers">
-                  <menu-icons iconWrapper hidden #MenuIcons>
-                  </menu-icons>
-                  <ng-template #dockedContainer>
-                  </ng-template>
-                </tab>
-              </tabset>
-
-              <!-- <mat-card>
-                  <mat-card-title [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}" >Template Selection</mat-card-title>
-                  <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
-              </mat-card>
-
-              <mat-card>
-                <mat-card-title [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Panel Containers</mat-card-title>                
-                <menu-icons iconWrapper hidden #MenuIcons>
-                </menu-icons>
-                <ng-template #dockedContainer>
-                </ng-template>
-              </mat-card> -->
-          </mat-sidenav>
-          
-          <mat-sidenav-content>
-          </mat-sidenav-content>
-
-        </mat-sidenav-container>
-        <div class="btnWrapper btnWrapper-lg menuButtonMobile" (click)="changeMenuState()">
-          <div
-            class="shadow btn btn-sm btn-outline-secondary rounded-circle">
-            <i class="fas fa-bars"></i>
-          </div>
-        </div>            
-    </div>
-
-
-  </div>
-
-  <layout-floating-container
-    zIndex = "9"
-    #floatingOverlayContainer>
-    <div floatingContainerDirective>
-
-    </div>
-    
-    <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>
-      <div heading>
-        <h5 class="pe-all p-2 m-0">
-          What's here?
-        </h5>
-      </div>
-      <div body>
-
-        <div
-          *ngIf="onhoverSegmentForFixed$ | async; let onhoverSegmentFixed"
-          (click)="searchRegion([onhoverSegmentFixed])"
-          class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block"
-          data-toggle="tooltip" 
-          data-placement="top" 
-          [title]="onhoverSegmentFixed.name">
-          Search KG for {{ onhoverSegmentFixed.name }}
-        </div>
-
-        <div
-          *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
-          (click)="searchRegion(selectedRegions)"
-          class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-          Search KG for {{ selectedRegions && selectedRegions.length }} selected regions
-        </div>
-
-        <div
-          class="p-2 text-muted"
-          *ngIf="!(onhoverSegmentForFixed$ | async) && (selectedRegions$ | async)?.length === 0">
-          Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
-        </div>
-        
-        <ng-template #noRegionSelected>
-          <div
-            (click)="searchRegion()"
-            class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            No region selected. Search KG for all datasets in this template space.
-          </div>
-        </ng-template>
-
-      </div>
-    </panel-component>
-    
-    <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
-      <div 
-        *ngIf="onhoverLandmark$ | async" 
-        contextualBlock>
-        {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
-      </div>
-      <div 
-        *ngIf="onhoverSegment$ | async; let onhoverSegment" 
-        contextualBlock>
-        {{ onhoverSegment.name }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
-      </div>
-      <!-- TODO Potentially implementing plugin contextual info -->
-    </div>
-
-    <div toastContainer>
-      <div toastDirective>
+<!-- if not mobile -->
+  <ng-template [ngIf]="!isMobile" [ngIfElse]="mobileTemplate">
+    <ng-container *ngTemplateOutlet="viewerBody">
+    </ng-container>
+  </ng-template>
+  
+  <!-- if mobile -->
+  <ng-template #mobileTemplate>
+    <mat-sidenav-container
+      (backdropClick)="changeMenuState({close: true})"
+      class="w-100 h-100">
+      <mat-sidenav
+        #sidenav
+        [fixedInViewport]="true"
+        [disableClose]="true"
+        [opened]="sidePanelOpen$ | async" 
+        class="mobileNavigationPanel p-2"
+        [ngStyle]="{'background-color': darktheme? '#404040' : '#F2F2F2'}" >
+  
+        <!-- 'absorbs' the auto-focus behavior -->
+        <button mat-button style="height: 0; position: absolute;"></button>
+        <logo-container class="logoContainerMobile"></logo-container>
+  
+        <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
+          <tab heading="Template">
+            <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+          </tab>
+          <tab heading="Containers">
+            <menu-icons iconWrapper hidden #MenuIcons>
+            </menu-icons>
+            <panel-component>
+              <div class="m-2" heading>
+                Layer Browser
+              </div>
+              <div class="m-2" body>
+                <layer-browser></layer-browser>
+              </div>
+            </panel-component>
+            <ng-template #dockedContainer>
+            </ng-template>
+          </tab>
+        </tabset>
+  
+      </mat-sidenav>
+      
+      <mat-sidenav-content>
+        <ng-container *ngTemplateOutlet="viewerBody">
+  
+        </ng-container>
+      </mat-sidenav-content>
+  
+    </mat-sidenav-container>
+  
+    <div class="btnWrapper btnWrapper-lg menuButtonMobile m-2" (click)="changeMenuState()">
+      <div
+        class="shadow btn btn-sm btn-secondary rounded-circle">
+        <i class="fas fa-bars"></i>
       </div>
     </div>
-  </layout-floating-container>
+  </ng-template>
+</ng-container>
 
-  <div pluginFactoryDirective>
-  </div>
-
-</div>
 
 <ng-template #helpComponent>
   <tabset>
@@ -168,6 +95,14 @@
   </signin-modal>
 </ng-template>
 
+<ng-template #kgToS>
+    <kgtos-component>
+    </kgtos-component>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="kgTosClickedOk()">Ok</button>
+    </div>
+  </ng-template>
+
 <ng-template #cookieAgreementComponent>
   <cookie-agreement>
   </cookie-agreement>
@@ -177,42 +112,117 @@
   </div>
 </ng-template>
 
-<ng-template #kgToS>
-  <kgtos-component>
-  </kgtos-component>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-primary" (click)="kgTosClickedOk()">Ok</button>
+<!-- atlas template -->
+<ng-template #viewerBody>
+  <div class="atlas-container" helpdirective>
+
+    <ui-nehuba-container (contextmenu)="nehubaClickHandler($event)">
+    </ui-nehuba-container>
+  
+    <div *ngIf="!isMobile" bannerWrapper>
+      <menu-icons iconWrapper>
+      </menu-icons>
+      <signin-banner signinWrapper>
+      </signin-banner>
+    </div>
+  
+    <layout-floating-container
+      zIndex = "9"
+      #floatingOverlayContainer>
+      <div floatingContainerDirective>
+  
+      </div>
+      
+      <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>
+        <div heading>
+          <h5 class="pe-all p-2 m-0">
+            What's here?
+          </h5>
+        </div>
+        <div body>
+          <div
+            *ngIf="onhoverSegmentForFixed$ | async; let onhoverSegmentFixed"
+            (click)="searchRegion([onhoverSegmentFixed])"
+            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block"
+            data-toggle="tooltip" 
+            data-placement="top" 
+            [title]="onhoverSegmentFixed.name">
+            Search KG for {{ onhoverSegmentFixed.name }}
+          </div>
+  
+          <div
+            *ngIf="selectedRegions$ | async; let selectedRegions"
+            (click)="searchRegion(selectedRegions)"
+            class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+            Search KG for {{ selectedRegions && selectedRegions.length }} selected regions
+          </div>
+  
+          <ng-template #noRegionSelected>
+            <div
+              (click)="searchRegion()"
+              class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+              No region selected. Search KG for all datasets in this template space.
+            </div>
+          </ng-template>
+  
+        </div>
+      </panel-component>
+      
+      <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
+        <div 
+          *ngIf="onhoverLandmark$ | async" 
+          contextualBlock>
+          {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+        </div>
+        <div 
+          *ngIf="onhoverSegment$ | async; let onhoverSegment" 
+          contextualBlock>
+          {{ onhoverSegment.name }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+        </div>
+        <!-- TODO Potentially implementing plugin contextual info -->
+      </div>
+  
+      <div toastContainer>
+        <div toastDirective>
+        </div>
+      </div>
+    </layout-floating-container>
+  
+    <div pluginFactoryDirective>
+    </div>
   </div>
 </ng-template>
 
-<div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
-  <div class="jumbotron bg-light text-center mb-0">
-    <div>
-      <h1 class="mb-3">
-        <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
-      </h1>
-      <p>
-        We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a> or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox</a> for viewing the interactive viewer.
-      </p>
-      <div class="col-6 d-inline-block text-left">
-        <readmore-component
-          [collapsedHeight]="0">
-          <markdown-dom [markdown]="constantsService.minReqExplaner">
-
-          </markdown-dom>
-        </readmore-component>
+<!-- does not meet req template -->
+<ng-template #doesNotMeetReqTemplate>
+  <div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
+    <div class="jumbotron bg-light text-center mb-0">
+      <div>
+        <h1 class="mb-3">
+          <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
+        </h1>
+        <p>
+          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a> or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox</a> for viewing the interactive viewer.
+        </p>
+        <div class="col-6 d-inline-block text-left">
+          <readmore-component
+            [collapsedHeight]="0">
+            <markdown-dom [markdown]="constantsService.minReqExplaner">
+  
+            </markdown-dom>
+          </readmore-component>
+        </div>
+        
       </div>
-      
     </div>
-  </div>
-  <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
-    <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer [style.backgroundImage]="'url(' + preview.previewSrc + ')'" >
-      <div class="mt-2 card d-inline-block displayCard">
-        <div class="card-body">
-          {{ preview.text }}
+    <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
+      <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer [style.backgroundImage]="'url(' + preview.previewSrc + ')'" >
+        <div class="mt-2 card d-inline-block displayCard">
+          <div class="card-body">
+            {{ preview.text }}
+          </div>
         </div>
       </div>
-    </div>
-  </ng-container>
-
-</div>
+    </ng-container>
+  </div>
+</ng-template>
