@@ -39,6 +39,10 @@ import { FixedMouseContextualContainerDirective } from "./util/directives/FixedM
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 
+import 'hammerjs';
+import 'hammer-timejs';
+
+
 @NgModule({
   imports : [
     FormsModule,
