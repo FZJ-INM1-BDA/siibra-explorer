@@ -1,6 +1,7 @@
 const fs = require('fs')
 const request = require('request')
 const path = require('path')
+const { commonSenseDsFilter } = require('./supplements/commonSense')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { manualFilter: manualFilterDWM, manualMap: manualMapDWM } = require('./supplements/util/mapDwm')
 
@@ -121,6 +122,9 @@ readConfigFile('waxholmRatV2_0.json')
   })
   .catch(console.error)
 
+/**
+ * deprecated
+ */
 const filterByPRs = (prs, atlasPr) => atlasPr
   ? prs.some(pr => {
       const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
@@ -130,7 +134,9 @@ const filterByPRs = (prs, atlasPr) => atlasPr
 
 const manualFilter = require('./supplements/parcellation')
 
+
 const filter = (datasets = [], {templateName, parcellationName}) => datasets
+  .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
   .filter(ds => {
     if (/infant/.test(ds.name))
       return false
@@ -152,7 +158,7 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
                   ? waxholm
                   : null
           )
-        : manualFilter({ parcellationName, dataset: ds })
+        : false
     }
 
     return false

@@ -36,21 +36,27 @@
   </ng-container>
 
   <!-- help btn -->
-  <div
-    *ngIf="!isMobile" 
-    (click)="showHelp()" 
-    class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-    <i class="fas fa-question-circle"></i>
+  <div class="btnWrapper">
+    <div
+      *ngIf="!isMobile" 
+      (click)="showHelp()" 
+      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+      <i class="fas fa-question-circle"></i>
+    </div>
   </div>
 
   <!-- signin -->
-  <div 
-    *ngIf="!isMobile" 
-    (click)="showSignin()"
-    class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-    <i
-      [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-      class="fas"></i>
+
+  <div class="btnWrapper">
+
+    <div 
+      *ngIf="!isMobile" 
+      (click)="showSignin()"
+      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+      <i
+        [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+        class="fas"></i>
+    </div>
   </div>
 
   <div *ngIf="isMobile" class="login-button-panel-mobile">
