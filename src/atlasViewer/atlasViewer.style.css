@@ -23,7 +23,7 @@ ui-nehuba-container
 
 div[bannerWrapper]
 {
-  z-index:5;
+  z-index:1000;
   position:absolute;
 
   width:100%;
