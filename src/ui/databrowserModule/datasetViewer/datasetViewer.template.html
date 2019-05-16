@@ -1,5 +1,7 @@
 <div *ngIf = "dataset; else defaultDisplay">
-  
+  <ng-content select="[regionTagsContainer]">
+
+  </ng-content>
   <div title>
     {{ dataset.name }}
   </div>

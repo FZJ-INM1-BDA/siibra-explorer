@@ -12,6 +12,7 @@ import { ComponentRef } from "@angular/core/src/render3";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { regionFlattener } from "src/util/regionFlattener";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -57,7 +58,7 @@ export class DatabrowserService implements OnDestroy{
   public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit:ComponentRef<WidgetUnit>}
   public getDataByRegion: ({regions, parcellation, template}:{regions:any[], parcellation:any, template: any}) => Promise<DataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
     this.lowLevelQuery(template.name, parcellation.name)
-      .then(de => this.filterDEByRegion.transform(de, regions))
+      .then(de => this.filterDEByRegion.transform(de, regions, parcellation.regions.map(regionFlattener).reduce((acc, item) => acc.concat(item), [])))
       .then(resolve)
       .catch(reject)
   })
@@ -240,6 +241,9 @@ export class DatabrowserService implements OnDestroy{
         .then(res => res.json())
     ])
       .then(arr => [...arr[0], ...arr[1]])
+      /**
+       * remove duplicates
+       */
       .then(arr => arr.reduce((acc, item) => {
         const newMap = new Map(acc)
         return newMap.set(item.name, item)
@@ -302,6 +306,12 @@ export class DatabrowserService implements OnDestroy{
   }
 
   public getModalityFromDE = getModalityFromDE
+
+  public getBackgroundColorStyleFromRegion(region:any = null){
+    return region && region.rgb
+      ? `rgb(${region.rgb.join(',')})`
+      : `white`
+  }
 }
 
 

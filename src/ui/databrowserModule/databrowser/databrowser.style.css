@@ -215,3 +215,12 @@ radio-list
   margin: 0;
   padding: 0;
 }
+
+.dot
+{
+  width: 0.5rem;
+  height: 0.5rem;
+  display: inline-block;
+  border-radius: 50%;
+  background-color:white;
+}

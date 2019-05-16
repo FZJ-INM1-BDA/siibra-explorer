@@ -58,7 +58,6 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   }
 
-
   ngOnInit(){
     this.dbService.dbComponentInit(this)
     this.regions = this.regions.map(r => {
@@ -154,6 +153,10 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   resetFilters(event?:MouseEvent){
     this.clearAll()
+  }
+
+  getBackgroundColorStyleFromRegion(region:any) {
+    return this.dbService.getBackgroundColorStyleFromRegion(region)
   }
 }
 

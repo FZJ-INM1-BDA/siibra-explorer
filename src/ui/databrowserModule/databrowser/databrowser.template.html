@@ -16,7 +16,12 @@
           <span
             *ngFor="let region of regions"
             class="badge badge-secondary mr-1">
-            {{ region.name }}
+            <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+              
+            </span>
+            <span>
+              {{ region.name }}
+            </span>
           </span>
         </div>
       </readmore-component>
@@ -111,6 +116,19 @@
           *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
           (showPreviewDataset)="onShowPreviewDataset($event)"
           [dataset]="dataset">
+          <div regionTagsContainer>
+
+            <span
+              *ngFor="let region of dataset.parcellationRegion"
+              class="badge badge-secondary mr-1">
+              <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+                
+              </span>
+              <span>
+                {{ region.name }}
+              </span>
+            </span>
+          </div>
         </dataset-viewer>
       </div>
       
