@@ -15,11 +15,11 @@
           Datasets relevant to
           <span
             *ngFor="let region of regions"
-            class="badge badge-secondary mr-1">
+            class="badge badge-secondary mr-1 mw-100">
             <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
               
             </span>
-            <span>
+            <span class="d-inline-block mw-100 overflow-hidden text-truncate">
               {{ region.name }}
             </span>
           </span>
@@ -118,13 +118,14 @@
           [dataset]="dataset">
           <div regionTagsContainer>
 
+            <!-- TODO may want to separate the region badge into a separate component -->
             <span
               *ngFor="let region of dataset.parcellationRegion"
-              class="badge badge-secondary mr-1">
+              class="badge badge-secondary mr-1 mw-100">
               <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
                 
               </span>
-              <span>
+              <span class="d-inline-block mw-100 overflow-hidden text-truncate">
                 {{ region.name }}
               </span>
             </span>
