@@ -56,24 +56,3 @@ radio-list
   overflow-x:hidden;
   display:block;
 }
-
-.drop-down-open-dark {
-  border-width: 1px 1px 0 1px;
-  border-style: solid;
-  border-color: white
-}
-.drop-down-open-light {
-  border-width: 1px 1px 0 1px solid black;
-  border-style: solid;
-  border-color: black;
-}
-.drop-down-closed-dark {
-  border-width: 1px;
-  border-style: solid;
-  border-color: white
-}
-.drop-down-closed-light {
-  border: 1px;
-  border-style: solid;
-  border-color: black
-}

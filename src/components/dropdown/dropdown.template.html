@@ -1,3 +1,4 @@
+<!-- TODO remove dependency on ismobile -->
 <span
   class = "btn btn-default"
   [innerHTML] = "activeDisplay(selectedItem)"
@@ -5,18 +6,18 @@
   #dropdownToggle
   dropdownToggle
               
-  [ngStyle]="{'border': isMobile? '1px solid' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
 
 </span>
 
 <!-- needed to ensure dropdown width matches  -->
-<ul class="m-0 h-0 o-h">
+<ul class="m-0 h-0 overflow-hidden">
   <li *ngFor="let item of inputArray">
     {{ listDisplay(item) }}
   </li>
 </ul>
 <radio-list
-  [ulClass]="'dropdown-menu'"
+  [ulClass]="'dropdown-menu shadow'"
   (itemSelected)="itemSelected.emit($event)"
   [listDisplay]="listDisplay"
   [selectedItem]="selectedItem"
