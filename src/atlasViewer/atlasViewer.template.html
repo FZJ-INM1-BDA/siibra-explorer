@@ -133,6 +133,7 @@
   
       </div>
       
+      <!-- TODO move to nehuba overlay container -->
       <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>
         <div heading>
           <h5 class="pe-all p-2 m-0">
@@ -147,14 +148,14 @@
             data-toggle="tooltip" 
             data-placement="top" 
             [title]="onhoverSegmentFixed.name">
-            Search KG for {{ onhoverSegmentFixed.name }}
+            Search for data related to {{ onhoverSegmentFixed.name }}
           </div>
   
           <div
             *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            Search KG for {{ selectedRegions && selectedRegions.length }} selected regions
+            Search for data related to all {{ selectedRegions && selectedRegions.length }} selected regions
           </div>
           
           <div

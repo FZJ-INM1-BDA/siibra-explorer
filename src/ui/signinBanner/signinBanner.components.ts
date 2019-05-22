@@ -4,9 +4,10 @@ import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { Subscription, Observable } from "rxjs";
-import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION } from "src/services/stateStore.service";
+import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
+import { ToastService } from "src/services/toastService.service";
 
 @Component({
   selector: 'signin-banner',
@@ -31,7 +32,8 @@ export class SigninBanner implements OnInit, OnDestroy{
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private authService: AuthService,
-    private store: Store<ViewerConfiguration>
+    private store: Store<ViewerConfiguration>,
+    private toastService: ToastService
   ){
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
@@ -98,16 +100,48 @@ export class SigninBanner implements OnInit, OnDestroy{
   handleRegionClick({ mode = 'single', region }){
     if (!region)
       return
-    const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
-    const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
-    const selectedRegionNames = new Set(this.selectedRegions.map(r => r.name))
-    const selectAll = flattenedRegion.every(r => !selectedRegionNames.has(r.name))
-    this.store.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: selectAll
-        ? this.selectedRegions.concat(flattenedRegion)
-        : this.selectedRegions.filter(r => !flattenedRegionNames.has(r.name))
-    })
+    
+    /**
+     * single click on region hierarchy => toggle selection
+     */
+    if (mode === 'single') {
+      const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
+      const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
+      const selectedRegionNames = new Set(this.selectedRegions.map(r => r.name))
+      const selectAll = flattenedRegion.every(r => !selectedRegionNames.has(r.name))
+      this.store.dispatch({
+        type: SELECT_REGIONS,
+        selectRegions: selectAll
+          ? this.selectedRegions.concat(flattenedRegion)
+          : this.selectedRegions.filter(r => !flattenedRegionNames.has(r.name))
+      })
+    }
+
+    /**
+     * double click on region hierarchy => navigate to region area if it exists
+     */
+    if (mode === 'double') {
+
+      /**
+       * if position is defined, go to position (in nm)
+       * if not, show error messagea s toast
+       * 
+       * nb: currently, only supports a single triplet
+       */
+      if (region.position) {
+        this.store.dispatch({
+          type: CHANGE_NAVIGATION,
+          navigation: {
+            position: region.position
+          }
+        })
+      } else {
+        this.toastService.showToast(`${region.name} does not have a position defined`, {
+          timeout: 5000,
+          dismissable: true
+        })
+      }
+    }
   }
 
   displayActiveParcellation(parcellation:any){
