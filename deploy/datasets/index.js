@@ -76,10 +76,12 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   : path.join(__dirname, '..', '..', 'dist', 'aot')
 
 
-const RECEPTOR_PATH = path.join(PUBLIC_PATH, 'res', 'image', 'receptor')
+const RECEPTOR_PATH = path.join(PUBLIC_PATH, 'res', 'image')
 fs.readdir(RECEPTOR_PATH, (err, files) => {
-  if (err)
+  if (err) {
     console.log('reading receptor error', err)
+    return
+  }
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
 })
 
