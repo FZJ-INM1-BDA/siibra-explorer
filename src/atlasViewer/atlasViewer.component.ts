@@ -39,7 +39,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
-  @ViewChild('dockedContainer', {read: ViewContainerRef}) dockedContainer: ViewContainerRef
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
@@ -338,7 +337,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       })
     })
-    this.widgetServices.dockedContainer = this.dockedContainer
 
     this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegment$),
