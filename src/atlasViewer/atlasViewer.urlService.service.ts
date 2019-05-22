@@ -51,6 +51,9 @@ export class AtlasViewerURLService{
       scan((acc,val)=>Object.assign({},acc,val),{})
     )
 
+    /**
+     * TODO change additionalNgLayer to id, querying node backend for actual urls
+     */
     this.additionalNgLayers$ = combineLatest(
       this.changeQueryObservable$.pipe(
         map(state => state.templateSelected)

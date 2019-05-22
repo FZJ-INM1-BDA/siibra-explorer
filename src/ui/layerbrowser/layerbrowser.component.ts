@@ -9,7 +9,10 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 @Component({
   selector : 'layer-browser',
   templateUrl : './layerbrowser.template.html',
-  styleUrls : [ './layerbrowser.style.css' ]
+  styleUrls : [ 
+    './layerbrowser.style.css',
+    '../btnShadow.style.css'
+  ]
 })
 
 export class LayerBrowser implements OnDestroy{
@@ -66,11 +69,11 @@ export class LayerBrowser implements OnDestroy{
      * TODO leakage? after change of template still hanging the reference?
      */
     this.subscriptions.push(
-        this.store.pipe(
+      this.store.pipe(
         select('viewerState'),
-        filter(state => isDefined(state) && isDefined(state.templateSelected)),
+        select('templateSelected'),
         distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
-        map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
+        map(templateSelected => Object.keys(templateSelected.nehubaConfig.dataset.initialNgState.layers)),
         buffer(this.store.pipe(
           select('ngViewerState'),
           select('nehubaReady'),
@@ -102,7 +105,6 @@ export class LayerBrowser implements OnDestroy{
   }
 
   ngLayersChangeHandler(){
-
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
       name : obj.name,
       type : obj.initialSpecification.type,
@@ -119,8 +121,8 @@ export class LayerBrowser implements OnDestroy{
 
   checkLocked(ngLayer:NgLayerInterface):boolean{
     if(!this.lockedLayers){
-      /* locked layer undefined. always return true for locked layer check */
-      return true
+      /* locked layer undefined. always return false */
+      return false
     }else
       return this.lockedLayers.findIndex(l => l === ngLayer.name) >= 0
   }
