@@ -93,6 +93,615 @@
                     ]
                 }
             ]
+        },
+        {
+            "name": "interpolated",
+            "type": "parcellation",
+            "visible": false,
+            "ngData": true,
+            "ngId": "interpolated",
+            "regions": [
+                {
+                    "name": "OlfactoryCortex_Olfac (interpolated)",
+                    "labelIndex": 1,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Olfactl (interpolated)",
+                    "labelIndex": 2,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Olfactm (interpolated)",
+                    "labelIndex": 3,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Olfal (interpolated)",
+                    "labelIndex": 4,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Olfaltl (interpolated)",
+                    "labelIndex": 5,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Olfam (interpolated)",
+                    "labelIndex": 6,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_PirF (interpolated)",
+                    "labelIndex": 7,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_PirI (interpolated)",
+                    "labelIndex": 8,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_PirItl (interpolated)",
+                    "labelIndex": 9,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_PirItm (interpolated)",
+                    "labelIndex": 10,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_PirT (interpolated)",
+                    "labelIndex": 11,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_RR (interpolated)",
+                    "labelIndex": 12,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_Tu (interpolated)",
+                    "labelIndex": 13,
+                    "children": []
+                },
+                {
+                    "name": "OlfactoryCortex_TuTi (interpolated)",
+                    "labelIndex": 14,
+                    "children": []
+                },
+                {
+                    "name": "area47_Fo4 (interpolated)",
+                    "labelIndex": 15,
+                    "children": []
+                },
+                {
+                    "name": "area47_Fo5 (interpolated)",
+                    "labelIndex": 16,
+                    "children": []
+                },
+                {
+                    "name": "area47_Fo6 (interpolated)",
+                    "labelIndex": 17,
+                    "children": []
+                },
+                {
+                    "name": "area47_Fo7 (interpolated)",
+                    "labelIndex": 18,
+                    "children": []
+                },
+                {
+                    "name": "area6d_6d1 (interpolated)",
+                    "labelIndex": 19,
+                    "children": []
+                },
+                {
+                    "name": "area6d_6d2 (interpolated)",
+                    "labelIndex": 20,
+                    "children": []
+                },
+                {
+                    "name": "area6d_6d3 (interpolated)",
+                    "labelIndex": 21,
+                    "children": []
+                },
+                {
+                    "name": "area8_8a (interpolated)",
+                    "labelIndex": 22,
+                    "children": []
+                },
+                {
+                    "name": "area8_8b (interpolated)",
+                    "labelIndex": 23,
+                    "children": []
+                },
+                {
+                    "name": "area8_8c (interpolated)",
+                    "labelIndex": 24,
+                    "children": []
+                },
+                {
+                    "name": "area8_8d (interpolated)",
+                    "labelIndex": 25,
+                    "children": []
+                },
+                {
+                    "name": "auditory_TI1 (interpolated)",
+                    "labelIndex": 26,
+                    "children": []
+                },
+                {
+                    "name": "auditory_TI2 (interpolated)",
+                    "labelIndex": 27,
+                    "children": []
+                },
+                {
+                    "name": "auditory_TPJ (interpolated)",
+                    "labelIndex": 28,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te10 (interpolated)",
+                    "labelIndex": 29,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te11 (interpolated)",
+                    "labelIndex": 30,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te12 (interpolated)",
+                    "labelIndex": 31,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te21 (interpolated)",
+                    "labelIndex": 32,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te22 (interpolated)",
+                    "labelIndex": 33,
+                    "children": []
+                },
+                {
+                    "name": "auditory_Te3 (interpolated)",
+                    "labelIndex": 34,
+                    "children": []
+                },
+                {
+                    "name": "bst_BSTLC (interpolated)",
+                    "labelIndex": 35,
+                    "children": []
+                },
+                {
+                    "name": "bst_BSTLD (interpolated)",
+                    "labelIndex": 36,
+                    "children": []
+                },
+                {
+                    "name": "bst_BSTLP (interpolated)",
+                    "labelIndex": 37,
+                    "children": []
+                },
+                {
+                    "name": "bst_BSTM (interpolated)",
+                    "labelIndex": 38,
+                    "children": []
+                },
+                {
+                    "name": "gp_Acb (interpolated)",
+                    "labelIndex": 39,
+                    "children": []
+                },
+                {
+                    "name": "gp_EGP (interpolated)",
+                    "labelIndex": 40,
+                    "children": []
+                },
+                {
+                    "name": "gp_IGP (interpolated)",
+                    "labelIndex": 41,
+                    "children": []
+                },
+                {
+                    "name": "gp_Olfal (interpolated)",
+                    "labelIndex": 42,
+                    "children": []
+                },
+                {
+                    "name": "gp_Olfam (interpolated)",
+                    "labelIndex": 43,
+                    "children": []
+                },
+                {
+                    "name": "gp_PirF (interpolated)",
+                    "labelIndex": 44,
+                    "children": []
+                },
+                {
+                    "name": "gp_PirT (interpolated)",
+                    "labelIndex": 45,
+                    "children": []
+                },
+                {
+                    "name": "gp_Tu (interpolated)",
+                    "labelIndex": 46,
+                    "children": []
+                },
+                {
+                    "name": "gp_TuTi (interpolated)",
+                    "labelIndex": 47,
+                    "children": []
+                },
+                {
+                    "name": "gp_astrlat (interpolated)",
+                    "labelIndex": 48,
+                    "children": []
+                },
+                {
+                    "name": "gp_cdl (interpolated)",
+                    "labelIndex": 49,
+                    "children": []
+                },
+                {
+                    "name": "gp_cdm (interpolated)",
+                    "labelIndex": 50,
+                    "children": []
+                },
+                {
+                    "name": "gp_cdv (interpolated)",
+                    "labelIndex": 51,
+                    "children": []
+                },
+                {
+                    "name": "gp_lml (interpolated)",
+                    "labelIndex": 52,
+                    "children": []
+                },
+                {
+                    "name": "gp_mml (interpolated)",
+                    "labelIndex": 53,
+                    "children": []
+                },
+                {
+                    "name": "gp_pc (interpolated)",
+                    "labelIndex": 54,
+                    "children": []
+                },
+                {
+                    "name": "gp_pgcd (interpolated)",
+                    "labelIndex": 55,
+                    "children": []
+                },
+                {
+                    "name": "gp_pgp (interpolated)",
+                    "labelIndex": 56,
+                    "children": []
+                },
+                {
+                    "name": "gp_pl (interpolated)",
+                    "labelIndex": 57,
+                    "children": []
+                },
+                {
+                    "name": "gp_pli (interpolated)",
+                    "labelIndex": 58,
+                    "children": []
+                },
+                {
+                    "name": "gp_pm (interpolated)",
+                    "labelIndex": 59,
+                    "children": []
+                },
+                {
+                    "name": "gp_pv (interpolated)",
+                    "labelIndex": 60,
+                    "children": []
+                },
+                {
+                    "name": "gp_scgp (interpolated)",
+                    "labelIndex": 61,
+                    "children": []
+                },
+                {
+                    "name": "gp_ts (interpolated)",
+                    "labelIndex": 62,
+                    "children": []
+                },
+                {
+                    "name": "gp_vp (interpolated)",
+                    "labelIndex": 63,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_35a (interpolated)",
+                    "labelIndex": 64,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_35b (interpolated)",
+                    "labelIndex": 65,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_35i (interpolated)",
+                    "labelIndex": 66,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_35l (interpolated)",
+                    "labelIndex": 67,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_35m (interpolated)",
+                    "labelIndex": 68,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_AAA (interpolated)",
+                    "labelIndex": 69,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_AHid (interpolated)",
+                    "labelIndex": 70,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_AHiv (interpolated)",
+                    "labelIndex": 71,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_APir (interpolated)",
+                    "labelIndex": 72,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_AStr (interpolated)",
+                    "labelIndex": 73,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Bl (interpolated)",
+                    "labelIndex": 74,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Bm (interpolated)",
+                    "labelIndex": 75,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_CA1 (interpolated)",
+                    "labelIndex": 76,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_CA2 (interpolated)",
+                    "labelIndex": 77,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_CA3 (interpolated)",
+                    "labelIndex": 78,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_CA4 (interpolated)",
+                    "labelIndex": 79,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_CASub (interpolated)",
+                    "labelIndex": 80,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Ce (interpolated)",
+                    "labelIndex": 81,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_EC (interpolated)",
+                    "labelIndex": 82,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_FD (interpolated)",
+                    "labelIndex": 83,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_HATA (interpolated)",
+                    "labelIndex": 84,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_La (interpolated)",
+                    "labelIndex": 85,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Me (interpolated)",
+                    "labelIndex": 86,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_PaS (interpolated)",
+                    "labelIndex": 87,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Pl (interpolated)",
+                    "labelIndex": 88,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_PreS (interpolated)",
+                    "labelIndex": 89,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_ProS (interpolated)",
+                    "labelIndex": 90,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_Sub (interpolated)",
+                    "labelIndex": 91,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_THl (interpolated)",
+                    "labelIndex": 92,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_THm (interpolated)",
+                    "labelIndex": 93,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_TrS (interpolated)",
+                    "labelIndex": 94,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_VCod (interpolated)",
+                    "labelIndex": 95,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_VCov (interpolated)",
+                    "labelIndex": 96,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_area35a (interpolated)",
+                    "labelIndex": 97,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_area35b (interpolated)",
+                    "labelIndex": 98,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_ice (interpolated)",
+                    "labelIndex": 99,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_icm (interpolated)",
+                    "labelIndex": 100,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_iol (interpolated)",
+                    "labelIndex": 101,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_ld (interpolated)",
+                    "labelIndex": 102,
+                    "children": []
+                },
+                {
+                    "name": "hippocampus_lm (interpolated)",
+                    "labelIndex": 103,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifj1 (interpolated)",
+                    "labelIndex": 104,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifj2 (interpolated)",
+                    "labelIndex": 105,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifs1 (interpolated)",
+                    "labelIndex": 106,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifs2 (interpolated)",
+                    "labelIndex": 107,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifs3 (interpolated)",
+                    "labelIndex": 108,
+                    "children": []
+                },
+                {
+                    "name": "ifs_ifs4 (interpolated)",
+                    "labelIndex": 109,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hIP4 (interpolated)",
+                    "labelIndex": 110,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hIP5 (interpolated)",
+                    "labelIndex": 111,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hIP6 (interpolated)",
+                    "labelIndex": 112,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hIP7 (interpolated)",
+                    "labelIndex": 113,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hIP8 (interpolated)",
+                    "labelIndex": 114,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hOc6 (interpolated)",
+                    "labelIndex": 115,
+                    "children": []
+                },
+                {
+                    "name": "pIPS_hPO1 (interpolated)",
+                    "labelIndex": 116,
+                    "children": []
+                },
+                {
+                    "name": "sma_presma (interpolated)",
+                    "labelIndex": 117,
+                    "children": []
+                },
+                {
+                    "name": "sma_sma (interpolated)",
+                    "labelIndex": 118,
+                    "children": []
+                },
+                {
+                    "name": "sts_Te4 (interpolated)",
+                    "labelIndex": 119,
+                    "children": []
+                },
+                {
+                    "name": "sts_Te5 (interpolated)",
+                    "labelIndex": 120,
+                    "children": []
+                }
+            ]
         }
     ],
     "properties": {

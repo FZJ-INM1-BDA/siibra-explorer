@@ -162,6 +162,41 @@
                             1
                         ]
                     ]
+                },
+                "interpolated": {
+                    "type": "segmentation",
+                    "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/BigBrainRelease.2015/2019_05_22_interpolated_areas",
+                    "segments": [
+                        "0"
+                    ],
+                    "selectedAlpha": 0.45,
+                    "notSelectedAlpha": 0,
+                    "transform": [
+                        [
+                            1,
+                            0,
+                            0,
+                            -70677184
+                        ],
+                        [
+                            0,
+                            1,
+                            0,
+                            -51990000
+                        ],
+                        [
+                            0,
+                            0,
+                            1,
+                            -58788284
+                        ],
+                        [
+                            0,
+                            0,
+                            0,
+                            1
+                        ]
+                    ]
                 }
             },
             "navigation": {
