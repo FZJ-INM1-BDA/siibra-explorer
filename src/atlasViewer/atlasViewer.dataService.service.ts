@@ -1,9 +1,12 @@
 import { Injectable, OnDestroy } from "@angular/core";
-import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, FETCHED_TEMPLATE, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
-import { Subscription, combineLatest } from "rxjs";
+import { Store } from "@ngrx/store";
+import { ViewerStateInterface, FETCHED_TEMPLATE, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
+import { Subscription } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
-import { PluginManifest } from "./atlasViewer.pluginService.service";
+
+/**
+ * TODO move constructor into else where and deprecate ASAP
+ */
 
 @Injectable({
   providedIn : 'root'
@@ -11,36 +14,6 @@ import { PluginManifest } from "./atlasViewer.pluginService.service";
 export class AtlasViewerDataService implements OnDestroy{
   
   private subscriptions : Subscription[] = []
-
-  /**
-   * TODO ensure 
-   */
-  public promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve,reject)=>{
-    Promise.all([
-      PLUGINDEV
-        ? fetch(PLUGINDEV).then(res => res.json())
-        : Promise.resolve([]),
-      new Promise(resolve => {
-        fetch(`${this.constantService.backendUrl}plugins`)
-          .then(res => res.json())
-          .then(arr => Promise.all(
-            arr.map(url => fetch(url).then(res => res.json()))
-          ))
-          .then(resolve)
-          .catch(e => {
-            resolve([])
-          })
-      }),
-      Promise.all(
-        BUNDLEDPLUGINS
-          .filter(v => typeof v === 'string')
-          .map(v => fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
-      )
-        .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
-    ])
-      .then(arr => resolve( [].concat(arr[0]).concat(arr[1]) ))
-      .catch(reject)
-  })
   
   constructor(
     private store : Store<ViewerStateInterface>,

@@ -1,5 +1,4 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
-import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { PluginInitManifestInterface, ACTION_TYPES } from "src/services/state/pluginState.store";
 import { isDefined } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
@@ -11,6 +10,7 @@ import { interval } from "rxjs";
 import { take, takeUntil } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
+import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
 
 @Injectable({
   providedIn : 'root'
@@ -25,7 +25,7 @@ export class PluginServices{
 
   constructor(
     private apiService : AtlasViewerAPIServices,
-    private atlasDataService : AtlasViewerDataService,
+    private constantService : AtlasViewerConstantsServices,
     private widgetService : WidgetServices,
     private cfr : ComponentFactoryResolver,
     private store : Store<PluginInitManifestInterface>
@@ -34,8 +34,44 @@ export class PluginServices{
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
     this.apiService.interactiveViewer.uiHandle.launchNewWidget = this.launchNewWidget.bind(this) 
     
-
-    this.atlasDataService.promiseFetchedPluginManifests
+    const promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve, reject) => {
+      Promise.all([
+        /**
+         * PLUGINDEV should return an array of 
+         */
+        PLUGINDEV
+          ? fetch(PLUGINDEV).then(res => res.json())
+          : Promise.resolve([]),
+        new Promise(resolve => {
+          fetch(`${this.constantService.backendUrl}plugins`)
+            .then(res => res.json())
+            .then(arr => Promise.all(
+              arr.map(url => new Promise(rs => 
+                /**
+                 * instead of failing all promises when fetching manifests, only fail those that fails to fetch
+                 */
+                fetch(url).then(res => res.json()).then(rs).catch(e => (console.log('fetching manifest error', e), rs(null))))
+              )
+            ))
+            .then(manifests => resolve(
+              manifests.filter(m => !!m)
+            ))
+            .catch(e => {
+              resolve([])
+            })
+        }),
+        Promise.all(
+          BUNDLEDPLUGINS
+            .filter(v => typeof v === 'string')
+            .map(v => fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
+        )
+          .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
+      ])
+        .then(arr => resolve( [].concat(arr[0]).concat(arr[1]) ))
+        .catch(reject)
+    })
+    
+    promiseFetchedPluginManifests
       .then(arr=>
         this.fetchedPluginManifests = arr)
       .catch(console.error)
