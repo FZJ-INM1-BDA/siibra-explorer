@@ -40,10 +40,11 @@ configureAuth(app)
   .then(() => console.log('configure auth properly'))
   .catch(e => console.error('configure auth failed', e))
 
-const publicPath = process.env.NODE_ENV === 'production'
+const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
-app.use(express.static(publicPath))
+
+app.use(express.static(PUBLIC_PATH))
 
 app.use((req, res, next) => {
   res.set('Content-Type', 'application/json')

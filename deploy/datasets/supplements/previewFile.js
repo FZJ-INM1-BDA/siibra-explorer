@@ -4,6 +4,7 @@ const path = require('path')
 const DISABLE_RECEPTOR_PREVIEW = process.env.DISABLE_RECEPTOR_PREVIEW
 const DISABLE_JUBRAIN_PMAP = process.env.DISABLE_JUBRAIN_PMAP
 const DISABLE_DWM_PMAP = process.env.DISABLE_DWM_PMAP
+const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 
 let previewMap = new Map(),
   previewMapKeySet = new Set()
@@ -32,6 +33,18 @@ Promise.all([
     console.error('preview file error', e)
   })
 
-exports.getPreviewFile = ({ datasetName }) => Promise.resolve(previewMap.get(datasetName))
+exports.getPreviewFile = ({ datasetName }) => Promise.resolve(
+  previewMap.get(datasetName)
+    .map(file => {
+      return {
+        ...file,
+        ...(file.url && !/^http/.test(file.url)
+          ? {
+            url: `${HOSTNAME}/${file.url}`
+          }
+          : {})
+      }
+    })
+)
 exports.getAllPreviewDSNames = () => Array.from(previewMap.keys())
 exports.hasPreview = ({ datasetName }) => previewMapKeySet.has(datasetName)

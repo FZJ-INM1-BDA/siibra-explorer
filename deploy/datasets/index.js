@@ -1,4 +1,6 @@
 const express = require('express')
+const path = require('path')
+const fs = require('fs')
 const datasetsRouter = express.Router()
 const { init, getDatasets, getPreview } = require('./query')
 
@@ -65,6 +67,30 @@ datasetsRouter.get('/preview/:datasetName', (req, res, next) => {
         trace: 'preview'
       })
     })
+})
+
+const previewFileMap = new Map()
+
+const PUBLIC_PATH = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, '..', 'public')
+  : path.join(__dirname, '..', '..', 'dist', 'aot')
+
+
+const RECEPTOR_PATH = path.join(PUBLIC_PATH, 'res', 'image', 'receptor')
+fs.readdir(RECEPTOR_PATH, (err, files) => {
+  if (err)
+    console.log('reading receptor error', err)
+  files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
+})
+
+datasetsRouter.get('/previewFile', (req, res) => {
+  const { file } = req.query
+  const filePath = previewFileMap.get(file)
+  if (filePath) {
+    fs.createReadStream(filePath).pipe(res)
+  } else {
+    res.status(404).send()
+  }
 })
 
 module.exports = datasetsRouter
