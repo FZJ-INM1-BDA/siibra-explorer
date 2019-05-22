@@ -72,8 +72,8 @@ export class MenuIconsBar{
     dataBrowser.instance.template = template
     dataBrowser.instance.parcellation = parcellation
     const title = regions.length > 1
-      ? `Data associated with ${regions.length} regions`
-      : `Data associated with ${regions[0].name}`
+      ? `Search: ${regions.length} regions`
+      : `Search: ${regions[0].name}`
     const widgetUnit = this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
