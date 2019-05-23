@@ -21,6 +21,7 @@ export class PluginServices{
   public fetchedPluginManifests : PluginManifest[] = []
   public pluginViewContainerRef : ViewContainerRef 
   public appendSrc : (script:HTMLElement)=>void
+  public removeSrc: (script:HTMLElement) => void
   private pluginUnitFactory : ComponentFactory<PluginUnit>
 
   constructor(
@@ -34,6 +35,9 @@ export class PluginServices{
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
     this.apiService.interactiveViewer.uiHandle.launchNewWidget = this.launchNewWidget.bind(this) 
     
+    /**
+     * TODO convert to rxjs streams, instead of Promise.all
+     */
     const promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve, reject) => {
       Promise.all([
         /**
@@ -134,8 +138,13 @@ export class PluginServices{
 
         */
 
-        /* initialising the plugin handler first, and in the future, perhaps populate the initState object/initStateUrl object */
         const handler = new PluginHandler()
+        this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
+
+        /**
+         * define the handler properties prior to appending plugin script
+         * so that plugin script can access properties w/o timeout
+         */
         handler.initState = plugin.initState
           ? plugin.initState
           : null
@@ -152,11 +161,24 @@ export class PluginServices{
           }
         })
 
-        this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
+        const shutdownCB = [
+          () => {
+            this.launchedPlugins.delete(plugin.name)
+          }
+        ]
+
+        handler.onShutdown = (cb) => {
+          if(typeof cb !== 'function'){
+            console.warn('onShutdown requires the argument to be a function') 
+            return
+          }
+          shutdownCB.push(cb)
+        }
 
         const script = document.createElement('script')
         script.innerHTML = plugin.script
         this.appendSrc(script)
+        handler.onShutdown(() => this.removeSrc(script))
 
         const template = document.createElement('div')
         template.insertAdjacentHTML('afterbegin',plugin.template)
@@ -173,19 +195,6 @@ export class PluginServices{
         this.mapPluginNameToWidgetUnit.set(plugin.name, widgetCompRef.instance)
 
         const unsubscribeOnPluginDestroy = []
-        const shutdownCB = [
-          () => {
-            this.launchedPlugins.delete(plugin.name)
-          }
-        ]
-
-        handler.onShutdown = (cb)=>{
-          if(typeof cb !== 'function'){
-            console.warn('onShutdown requires the argument to be a function') 
-            return
-          }
-          shutdownCB.push(cb)
-        }
 
         handler.blink = (sec?:number)=>{
           if(typeof sec !== 'number')
@@ -227,9 +236,9 @@ export class PluginServices{
 }
 
 export class PluginHandler{
-  onShutdown : (callback:()=>void)=>void
-  blink : (sec?:number)=>void
-  shutdown : ()=>void
+  onShutdown : (callback:()=>void)=>void = (_) => {}
+  blink : (sec?:number)=>void = (_) => {}
+  shutdown : ()=>void = () => {}
 
   initState? : any
   initStateUrl? : string

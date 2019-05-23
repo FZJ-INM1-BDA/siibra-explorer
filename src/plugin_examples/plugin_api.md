@@ -162,12 +162,12 @@ window.interactiveViewer
   - **[PLUGINNAME]** returns a plugin handler. This would be how to interface with the plugins.
 
     
-    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention
-    - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback)
+    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback, silently fails if called on startup)
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
     - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).
     - *initStateUrl* : passed from `manifest.json`. Useful for setting initial state of the plugin.  Can be any JSON valid value (array, object, string).
-    - *setInitManifestUrl(url|null)* set/unset the url for a manifest json that will be fetched on atlas viewer startup. the argument should be a valid URL, has necessary CORS header, and returns a valid manifest json file. null will unset the search param.
+    - *setInitManifestUrl(url|null)* set/unset the url for a manifest json that will be fetched on atlas viewer startup. the argument should be a valid URL, has necessary CORS header, and returns a valid manifest json file. null will unset the search param. Useful for passing/preserving state. If called multiple times, the last one will take effect.
 
     ```js
     const pluginHandler = window.interactiveViewer.pluginControl[PLUGINNAME]

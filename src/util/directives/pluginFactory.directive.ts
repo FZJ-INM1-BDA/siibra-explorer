@@ -16,6 +16,7 @@ export class PluginFactoryDirective{
   ){
     pluginService.pluginViewContainerRef = viewContainerRef
     pluginService.appendSrc = (src: HTMLElement) => rd2.appendChild(document.head, src)
+    pluginService.removeSrc = (src: HTMLElement) => rd2.removeChild(document.head, src)
 
     apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
       const srcHTMLElement = libraries.map(libraryName => ({
