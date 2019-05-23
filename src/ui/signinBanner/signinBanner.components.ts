@@ -97,6 +97,7 @@ export class SigninBanner implements OnInit, OnDestroy{
     })
   }
 
+  // TODO handle mobile
   handleRegionClick({ mode = 'single', region }){
     if (!region)
       return

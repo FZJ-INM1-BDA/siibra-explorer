@@ -259,6 +259,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
       })  
     }
 
+    /**
+     * TODO deprecate
+     */
     const meta = 'res/json/allAggregatedData.json'
   
     fetch(meta)

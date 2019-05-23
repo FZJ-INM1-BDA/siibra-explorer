@@ -262,6 +262,11 @@ markdown-dom pre code
   border-bottom-color: rgba(0, 0, 0, 0.8);
 }
 
+.darktheme.popover.popover-right>.arrow::after
+{
+  border-right-color: rgba(0, 0, 0, 0.8);
+}
+
 .r-90
 {
   transform: rotate(90deg)!important;

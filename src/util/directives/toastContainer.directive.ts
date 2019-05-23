@@ -17,11 +17,12 @@ export class ToastContainerDirective{
   ){
     const toastComponentFactory = this.cfr.resolveComponentFactory(ToastComponent)
     
-    this.toastService.showToast = (message, config) => {
+    this.toastService.showToast = (message, config = {}) => {
 
-      const _config = Object.assign({}, defaultToastConfig, config
-        ? config
-        : {})
+      const _config = {
+        ...defaultToastConfig,
+        ...config
+      } 
       const toastComponent = this.viewContainerRef.createComponent(toastComponentFactory)
       if(typeof message === 'string')
         toastComponent.instance.message = message

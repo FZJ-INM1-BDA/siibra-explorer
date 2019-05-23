@@ -15,8 +15,9 @@
   </div>
   <div
     (click)="dismiss($event)"
+    class="ml-2"
     *ngIf="dismissable" close>
-    <i class="fas fa-remove"></i>
+    <i class="fas fa-times"></i>
   </div>
   <timer-component
     *ngIf="timeout > 0"

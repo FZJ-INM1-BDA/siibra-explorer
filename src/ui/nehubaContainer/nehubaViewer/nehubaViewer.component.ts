@@ -480,7 +480,6 @@ export class NehubaViewerUnit implements OnDestroy{
   }
 
   private filterLayers(l:any,layerObj:any):boolean{
-    debugger
     /**
      * if selector is an empty object, select all layers
      */
