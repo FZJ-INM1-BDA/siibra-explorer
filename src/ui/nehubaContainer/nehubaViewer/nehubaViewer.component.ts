@@ -482,7 +482,7 @@ export class NehubaViewerUnit implements OnDestroy{
   }
 
   // TODO single landmark for user landmark
-  public addUserLandmarks(landmarks:any[]){
+  public updateUserLandmarks(landmarks:any[]){
     if(!this.nehubaViewer)
       return
     this.workerService.worker.postMessage({

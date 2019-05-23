@@ -45,64 +45,80 @@ export function viewerState(
       const dedicatedView = state.dedicatedView
         ? state.dedicatedView.concat(action.dedicatedView)
         : [action.dedicatedView]
-      return Object.assign({},state,{
+      return {
+        ...state,
         dedicatedView 
-      })
+      }
     case UNLOAD_DEDICATED_LAYER:
-      return Object.assign({},state,{
+      return {
+        ...state,
         dedicatedView : state.dedicatedView
           ? state.dedicatedView.filter(dv => dv !== action.dedicatedView)
           : []
-      })
+      }
     case NEWVIEWER:
-      return Object.assign({},state,{
+      return {
+        ...state,
         templateSelected : action.selectTemplate,
         parcellationSelected : action.selectParcellation,
         regionsSelected : [],
         landmarksSelected : [],
         navigation : {},
         dedicatedView : null
-      })
+      }
     case FETCHED_TEMPLATE : {
-      return Object.assign({}, state, {
+      return {
+        ...state,
         fetchedTemplates: state.fetchedTemplates.concat(action.fetchedTemplate)
-      })
+      }
     }
     case CHANGE_NAVIGATION : {
-      return Object.assign({},state,{navigation : action.navigation})
+      return {
+        ...state,
+        navigation : action.navigation
+      }
     }
     case SELECT_PARCELLATION : {
-      return Object.assign({},state,{
+      return {
+        ...state,
         parcellationSelected : action.selectParcellation,
         regionsSelected : []
-      })
+      }
     }
     case DESELECT_REGIONS : {
-      return Object.assign({}, state, {
+      return {
+        ...state,
         regionsSelected : state.regionsSelected.filter(re => action.deselectRegions.findIndex(dRe => dRe.name === re.name) < 0)
-      })
+      }
     }
     case SELECT_REGIONS : {
-      return Object.assign({},state,{
-        regionsSelected : action.selectRegions.map(region=>Object.assign({},region,{
-          labelIndex : Number(region.labelIndex)
-        }))
-      })
+      return {
+        ...state,
+        regionsSelected : action.selectRegions.map(region => {
+          return {
+            ...region,
+            labelIndex: Number(region.labelIndex)
+          }
+        })
+      }
     }
     case DESELECT_LANDMARKS : {
-      return Object.assign({}, state, {
+      return {
+        ...state,
         landmarksSelected : state.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0)
-      })
+      }
     }
     case SELECT_LANDMARKS : {
-      return Object.assign({}, state, {
+      return {
+        ...state,
         landmarksSelected : action.landmarks
-      })
+      }
     }
     case USER_LANDMARKS : {
-      return Object.assign({}, state, {
-        userLandmarks : action.landmarks
-      })
+      return {
+        ...state,
+        userLandmarks: action.landmarks
+      } 
     }
     default :
       return state

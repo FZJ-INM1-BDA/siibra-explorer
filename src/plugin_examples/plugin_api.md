@@ -100,7 +100,7 @@ window.interactiveViewer
   - *remove3DLandmarks(IDs)* removes the landmarks by their IDs
   ```js
   window.interactiveViewer.viewerHandle
-    .remove3DLandmarks(['fzj-xg-jugex-1', 'fzj-xg-jugex-1'])
+    .remove3DLandmarks(['fzj-xg-jugex-1', 'fzj-xg-jugex-2'])
   /* removes the landmarks added above */
   ```
 

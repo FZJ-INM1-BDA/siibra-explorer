@@ -346,7 +346,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
       ).subscribe(landmarks => {
         this.userLandmarks = landmarks
         if(this.nehubaViewer){
-          this.nehubaViewer.addUserLandmarks(landmarks)
+          this.nehubaViewer.updateUserLandmarks(landmarks)
         }
       })
     )
