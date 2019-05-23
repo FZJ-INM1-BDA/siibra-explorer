@@ -147,16 +147,25 @@ export class NehubaViewerUnit implements OnDestroy{
             /* worker responded with not assembled landmark, no need to act */
             return false
           }
-          if(!message.data.url){
-            /* file url needs to be defined */
-            return false
-          }
+          /**
+           * nb url may be undefined
+           * if undefined, user have removed all user landmarks, and all that needs to be done
+           * is remove the user landmark layer
+           * 
+           * message.data.url
+           */
+
           return true
         }),
         debounceTime(100),
         map(e => e.data.url)
       ).subscribe(url => {
-        this.removeSpatialSearch3DLandmarks()
+        this.removeuserLandmarks()
+
+        /**
+         * url may be null if user removes all landmarks
+         */
+        if (!url) return
         const _ = {}
         _[this.constantService.ngUserLandmarkLayerName] = {
           type :'mesh',
@@ -471,14 +480,31 @@ export class NehubaViewerUnit implements OnDestroy{
   }
 
   private filterLayers(l:any,layerObj:any):boolean{
-    return Object.keys(layerObj).length == 0 && layerObj.constructor == Object ?
-      true :
-      Object.keys(layerObj).every(key=>
-        !(<Object>l).hasOwnProperty(key) && !l[key] ? 
-          false :
-          layerObj[key] instanceof RegExp ?
-            layerObj[key].test(l[key]) :
-            layerObj[key] == l[key])
+    debugger
+    /**
+     * if selector is an empty object, select all layers
+     */
+    return layerObj instanceof Object && Object.keys(layerObj).every(key => 
+      /**
+       * the property described by the selector must exist and ...
+       */
+      !!l[key] && 
+        /**
+         * if the selector is regex, test layer property
+         */
+        ( layerObj[key] instanceof RegExp
+          ? layerObj[key].test(l[key])
+          /**
+           * if selector is string, test for strict equality
+           */
+          : typeof layerObj[key] === 'string'
+            ? layerObj[key] === l[key]
+            /**
+             * otherwise do not filter
+             */
+            : false 
+        )
+      )
   }
 
   // TODO single landmark for user landmark
@@ -487,7 +513,7 @@ export class NehubaViewerUnit implements OnDestroy{
       return
     this.workerService.worker.postMessage({
       type : 'GET_USERLANDMARKS_VTK',
-      scale: Math.min(...this.dim.map(v => v * 2e-9)),
+      scale: Math.min(...this.dim.map(v => v * this.constantService.nehubaLandmarkConstant)),
       landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6))
     })
   }

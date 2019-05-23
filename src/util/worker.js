@@ -205,6 +205,22 @@ const getuserLandmarksVtk = (action) => {
   const scale = action.scale
     ? action.scale
     : 2.8
+
+  /**
+   * if userlandmarks vtk is empty, that means user removed all landmarks
+   * thus, removing revoking URL, and send null as assembled userlandmark vtk
+   */
+  if (landmarks.length === 0) {
+
+    if(userLandmarkVtkUrl) URL.revokeObjectURL(userLandmarkVtkUrl)
+
+    postMessage({
+      type: 'ASSEMBLED_USERLANDMARKS_VTK'
+    })
+
+    return
+  }
+
   const vtk = parseLmToVtk(landmarks, scale)
   if(!vtk)
     return
