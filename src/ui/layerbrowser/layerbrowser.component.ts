@@ -73,6 +73,7 @@ export class LayerBrowser implements OnDestroy{
         select('viewerState'),
         select('templateSelected'),
         distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
+        filter(templateSelected => !!templateSelected),
         map(templateSelected => Object.keys(templateSelected.nehubaConfig.dataset.initialNgState.layers)),
         buffer(this.store.pipe(
           select('ngViewerState'),
