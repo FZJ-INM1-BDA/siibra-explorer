@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
+import { ViewerStateInterface, Property } from "../services/stateStore.service";
 import { Subject } from "rxjs";
 import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 
@@ -258,31 +258,6 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
         } as Partial<ViewerConfiguration>
       })  
     }
-
-    /**
-     * TODO deprecate
-     */
-    const meta = 'res/json/allAggregatedData.json'
-  
-    fetch(meta)
-      .then(res=>res.json())
-      .then(metadata=>{
-        const data = metadata.reduce((acc:[string,Map<string,{properties:Property}>][],curr:any)=>{
-          const idx = acc.findIndex((it)=>it[0]===curr[0].targetParcellation)
-          return idx >= 0 ? 
-            acc.map((it,i)=> i === idx ? [it[0], it[1].set(curr[0].datasetName,curr[1])] : it ) :
-            acc.concat([[ curr[0].targetParcellation , new Map([[curr[0].datasetName , curr[1]]]) ]])
-              
-              /* [[ curr[0].targetParcellation , [ curr[0].datasetName , curr[1]] ]] */
-        },[] as [string,Map<string,{properties:Property}>][])
-        
-        this.store.dispatch({
-          type : FETCHED_METADATA,
-          fetchedMetadataMap : new Map(data)
-        })
-        
-      })
-      .catch(console.error)
   }
 }
 
