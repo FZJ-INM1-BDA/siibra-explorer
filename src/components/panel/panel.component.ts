@@ -8,16 +8,13 @@ import { ParseAttributeDirective } from "../parseAttribute.directive";
   styleUrls : [
     `./panel.style.css`
   ],
-  animations : [
-    panelAnimations
-  ],
   host: {
     '[class]': 'getClassNames'
   },
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class PanelComponent extends ParseAttributeDirective implements AfterContentChecked{
+export class PanelComponent extends ParseAttributeDirective {
 
   @Input() showHeading : boolean = true
   @Input() showBody : boolean = true
@@ -31,9 +28,7 @@ export class PanelComponent extends ParseAttributeDirective implements AfterCont
   @ViewChild('panelBody',{ read : ElementRef }) efPanelBody : ElementRef
   @ViewChild('panelFooter',{ read : ElementRef }) efPanelFooter : ElementRef
 
-  _fullHeight : number = 0
-
-  constructor(private cdr:ChangeDetectorRef){
+  constructor(){
     super()
   }
 
@@ -41,36 +36,11 @@ export class PanelComponent extends ParseAttributeDirective implements AfterCont
     return `panel ${this.containerClass === '' ? 'panel-default' : this.containerClass}`
   }
 
-  ngAfterContentChecked(){
-    /**
-     * TODO check performance implication. 
-     * setting height forces a repaint (?)
-     */
-    this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
-      (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
-    this.cdr.detectChanges()
-  }
-
-  @HostBinding('class.panel-default')
-
-  set fullHeight(num:number){
-    this._fullHeight = num
-  }
-
-  get fullHeight(){
-    return this._fullHeight
-  }
-
-  toggleCollapseBody(event:Event){
+  toggleCollapseBody(_event:Event){
     if(this.bodyCollapsable){
       this.collapseBody = !this.collapseBody
       this.showBody = !this.showBody
       this.showFooter = !this.showFooter
-
-      // this.fullHeight = (this.efPanelBody ? this.efPanelBody.nativeElement.offsetHeight : 0) +
-      //   (this.efPanelFooter ? this.efPanelFooter.nativeElement.offsetHeight : 0)
     }
-    event.stopPropagation()
-    event.preventDefault()
   }
 }

@@ -21,7 +21,6 @@
       <div
         *ngIf="showBody"
         class="l-card-text"
-        [@collapseState]="{ value : collapseBody ? 'collapsed' : 'visible', params : { fullHeight : fullHeight } }"
         #panelBody>
 
         <ng-content select="[body]">

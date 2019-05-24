@@ -4,7 +4,7 @@
   itemSize="15">
 
   <div
-    *cdkVirtualFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe ); templateCacheSize: 0" 
+    *cdkVirtualFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe )" 
     [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"
     class="text-nowrap"
     [attr.flattenedtreelevel]="flattenedItem.flattenedTreeLevel" 
