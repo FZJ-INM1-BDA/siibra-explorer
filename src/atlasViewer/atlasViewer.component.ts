@@ -459,12 +459,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       type: TOGGLE_SIDE_PANEL
     })
   }
-
-  onSwipeLeft(event) {
-    this.store.dispatch({
-      type: CLOSE_SIDE_PANEL
-    })
-  }
 }
 
 export interface NgLayerInterface{
