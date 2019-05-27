@@ -5,12 +5,32 @@
   <li 
     *ngFor="let input of inputArray" 
     [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    (click)="itemSelected.emit({previous: selectedItem, current: input})" 
     role="menuitem">
     
+    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input)">
+      i
+    </span>
+
     <span 
-      class="dropdown-item-1" 
+      (click)="itemSelected.emit({previous: selectedItem, current: input})" 
+      class="dropdown-item-1 textSpan" 
       [innerHTML] = "listDisplay(input)">
     </span>
+
+
+
+    
+<ng-template #publicationTemplate>
+    <div *ngIf="input['properties'] && input['properties']['publications']" class="timerToast">
+        <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications(input)">↓</button>
+          <p>{{input['name']}} Publication(s)</p>
+          <div *ngFor="let p of input['properties']['publications']">
+            <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
+          </div>
+      </div>
+</ng-template>
+
+
+
   </li>
 </ul>

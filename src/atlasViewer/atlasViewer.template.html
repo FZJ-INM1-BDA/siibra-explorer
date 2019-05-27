@@ -233,3 +233,23 @@
     </ng-container>
   </div>
 </ng-template>
+
+<ng-template #publications >
+  <div *ngIf="tPublication || pPublication" class="timerToast">
+    <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications()">↓</button>
+
+    <div *ngIf="tPublication">
+      <p>{{selectedTemplate['name']}} Publication(s)</p>
+      <div *ngFor="let tp of tPublication">
+        <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
+      </div>
+      <hr *ngIf="pPublication">
+    </div>
+    <div *ngIf="pPublication">
+      <p>{{selectedParcellation['name']}} Publication(s)</p>
+      <div *ngFor="let pp of pPublication">
+        <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>
+      </div>  
+    </div>
+  </div>
+</ng-template>

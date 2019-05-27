@@ -37,6 +37,7 @@ import { AuthService } from "./services/auth.service";
 import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
+import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 
 @NgModule({
   imports : [
@@ -102,7 +103,8 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
     ToastService,
     AtlasWorkerService,
     AuthService,
-
+    ZipFileDownloadService,
+    
     /**
      * TODO
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module

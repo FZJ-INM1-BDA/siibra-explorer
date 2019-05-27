@@ -27,6 +27,7 @@ import { TimerComponent } from './timer/timer.component';
 import { PillComponent } from './pill/pill.component';
 import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 
 
 @NgModule({
@@ -35,6 +36,7 @@ import { RadioList } from './radiolist/radiolist.component';
     ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
+    AngularMaterialModule
   ],
   declarations : [
     /* components */
