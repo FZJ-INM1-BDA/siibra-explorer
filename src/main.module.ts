@@ -42,6 +42,7 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import 'hammerjs';
 import 'hammer-timejs';
 
+import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 
 @NgModule({
   imports : [
@@ -108,7 +109,8 @@ import 'hammer-timejs';
     ToastService,
     AtlasWorkerService,
     AuthService,
-
+    ZipFileDownloadService,
+    
     /**
      * TODO
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module

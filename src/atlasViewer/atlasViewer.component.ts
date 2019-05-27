@@ -19,6 +19,8 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
+import { ToastService } from "src/services/toastService.service";
+import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
 
 @Component({
   selector: 'atlas-viewer',
@@ -45,6 +47,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+  @ViewChild('publications') publications: TemplateRef<any>
 
   /**
    * required for styling of all child components
@@ -85,6 +88,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
+  handleToast
+  tPublication
+  pPublication
+
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
@@ -98,7 +105,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService,
     private databrowserService: DatabrowserService,
-    private dispatcher$: ActionsSubject
+    private dispatcher$: ActionsSubject,
+    private toastService: ToastService,
+    private zipFileDownloadService: ZipFileDownloadService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -203,14 +212,71 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => this.selectedParcellation = parcellation)
-    )
 
     this.subscriptions.push(
       this.newViewer$.subscribe(template => this.selectedTemplate = template)
     )
+
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe(parcellation => {
+        this.selectedParcellation = parcellation
+
+        if (this.selectedTemplate && this.selectedParcellation) {
+          if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
+            this.tPublication = this.selectedTemplate['properties']['publications']
+          } else {
+            this.tPublication = null
+          }
+          if (this.selectedParcellation['properties'] && this.selectedParcellation['properties']['publications']) {
+            this.pPublication = this.selectedParcellation['properties']['publications']
+          } else {
+            this.pPublication = null
+          }
+        } else {
+          this.tPublication = null
+          this.pPublication = null
+        }
+        
+        if (this.tPublication || this.pPublication) {
+
+          if (this.handleToast) {
+            this.handleToast()
+            this.handleToast = null
+          }
+          this.handleToast = this.toastService.showToast(this.publications, {
+              timeout: 7000
+          })
+          
+        }
+      })
+    )
+
+
   }
+
+  downloadPublications() {
+    const filename = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name + '.txt'
+    let publicationsText = ''
+
+    if (this.tPublication) {
+      publicationsText += this.selectedTemplate.name + ' Publications:\r\n'
+      this.tPublication.forEach((tp, i) => {
+        publicationsText += '\t' + (i+1) + '. ' + tp['citation'] + ' - ' + tp['doi'] + '\r\n'
+      });
+    }
+
+    if (this.pPublication) {
+      if (this.tPublication) publicationsText += '\r\n\r\n'
+      publicationsText += this.selectedParcellation.name + ' Publications:\r\n'
+      this.pPublication.forEach((pp, i) => {
+        publicationsText += '\t' + (i+1) + '. ' + pp['citation'] + ' - ' + pp['doi'] + '\r\n'
+      });
+    }
+    
+    this.zipFileDownloadService.saveTextAsFile(publicationsText, filename)
+    publicationsText = ''
+  }
+
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
