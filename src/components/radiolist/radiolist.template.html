@@ -5,15 +5,14 @@
   <li 
     *ngFor="let input of inputArray" 
     [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    role="menuitem">
+    role="menuitem"
+    (click)="itemSelected.emit({previous: selectedItem, current: input})">
     
-    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input)">
+    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()">
       i
     </span>
 
-    <span 
-      (click)="itemSelected.emit({previous: selectedItem, current: input})" 
-      class="dropdown-item-1 textSpan" 
+    <span class="dropdown-item-1 textSpan" 
       [innerHTML] = "listDisplay(input)">
     </span>
 
