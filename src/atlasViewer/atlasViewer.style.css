@@ -21,9 +21,10 @@ ui-nehuba-container
   height:100%;
 }
 
+/* zindex of banner wrapper needs to be lower than zindex of floating layer */
 div[bannerWrapper]
 {
-  z-index:1000;
+  z-index:12;
   position:absolute;
 
   width:100%;

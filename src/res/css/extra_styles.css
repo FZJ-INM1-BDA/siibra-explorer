@@ -325,7 +325,13 @@ markdown-dom pre code
 {
   height:100%;
 }
+
 .overflow-x-hidden
 {
   overflow-x:hidden;
+}
+
+.muted
+{
+  opacity : 0.5!important;
 }

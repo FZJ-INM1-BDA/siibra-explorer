@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { DataEntry } from "src/services/stateStore.service";
 
-const isSubRegion = (high, low) => high.name === low.name
+const isSubRegion = (high, low) => (high.id && low.id && high.id === low.id) || high.name === low.name
   ? true
   : high.children && high.children.some
     ? high.children.some(r => isSubRegion(r, low))

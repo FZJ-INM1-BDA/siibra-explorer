@@ -1,8 +1,8 @@
 <!-- TODO remove dependency on ismobile -->
 <span
-  class = "btn btn-default"
-  [innerHTML] = "activeDisplay(selectedItem)"
-  hoverable
+  class="btn btn-default"
+  [innerHTML]="activeDisplay(selectedItem)"
+  [hoverable]="{translateY:-2}"
   #dropdownToggle
   dropdownToggle
               
@@ -23,7 +23,7 @@
   [selectedItem]="selectedItem"
   [inputArray]="inputArray"
   [@showState]="openState ? 'show' : 'hide'"
-  [isMobile] = "isMobile"
-  [darktheme] = "darktheme">
+  [isMobile]="isMobile"
+  [darktheme]="darktheme">
 
 </radio-list>
