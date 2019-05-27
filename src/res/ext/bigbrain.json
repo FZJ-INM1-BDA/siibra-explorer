@@ -103,132 +103,127 @@
             "regions": [
                 {
                     "name": "Area 6d1 (PreG)",
-                    "labelIndex": 19,
+                    "labelIndex": 1,
                     "children": []
                 },
                 {
                     "name": "Area 6d2 (PreG)",
-                    "labelIndex": 20,
+                    "labelIndex": 2,
                     "children": []
                 },
                 {
                     "name": "Area 6d3 (SFS)",
-                    "labelIndex": 21,
+                    "labelIndex": 3,
                     "children": []
                 },
                 {
                     "name": "Area TE 1.0 (HESCHL)",
-                    "labelIndex": 29,
+                    "labelIndex": 4,
                     "children": []
                 },
                 {
                     "name": "Area TE 1.1 (HESCHL)",
-                    "labelIndex": 30,
+                    "labelIndex": 5,
                     "children": []
                 },
                 {
                     "name": "Area TE 1.2 (HESCHL)",
-                    "labelIndex": 31,
+                    "labelIndex": 6,
                     "children": []
                 },
                 {
                     "name": "Area TE 3 (STG)",
-                    "labelIndex": 34,
+                    "labelIndex": 7,
                     "children": []
                 },
                 {
                     "name": "Entorhinal Cortex",
-                    "labelIndex": 82,
-                    "children": []
-                },
-                {
-                    "name": "HATA (Hippocampus)",
-                    "labelIndex": 84,
+                    "labelIndex": 8,
                     "children": []
                 },
                 {
                     "name": "Area ifj1 (IFS/PreS)",
-                    "labelIndex": 104,
+                    "labelIndex": 9,
                     "children": []
                 },
                 {
                     "name": "Area ifj2 (IFS/PreS)",
-                    "labelIndex": 105,
+                    "labelIndex": 10,
                     "children": []
                 },
                 {
                     "name": "Area ifs1 (IFS)",
-                    "labelIndex": 106,
+                    "labelIndex": 11,
                     "children": []
                 },
                 {
                     "name": "Area ifs2 (IFS)",
-                    "labelIndex": 107,
+                    "labelIndex": 12,
                     "children": []
                 },
                 {
                     "name": "Area ifs3 (IFS)",
-                    "labelIndex": 108,
+                    "labelIndex": 13,
                     "children": []
                 },
                 {
                     "name": "Area ifs4 (IFS)",
-                    "labelIndex": 109,
+                    "labelIndex": 14,
                     "children": []
                 },
                 {
                     "name": "Area hIP4 (IPS)",
-                    "labelIndex": 110,
+                    "labelIndex": 15,
                     "children": []
                 },
                 {
                     "name": "Area hIP5 (IPS)",
-                    "labelIndex": 111,
+                    "labelIndex": 16,
                     "children": []
                 },
                 {
                     "name": "Area hIP6 (IPS)",
-                    "labelIndex": 112,
+                    "labelIndex": 17,
                     "children": []
                 },
                 {
                     "name": "Area hIP7 (IPS)",
-                    "labelIndex": 113,
+                    "labelIndex": 18,
                     "children": []
                 },
                 {
                     "name": "Area hIP8 (IPS)",
-                    "labelIndex": 114,
+                    "labelIndex": 19,
                     "children": []
                 },
                 {
                     "name": "Area hOc6 (POS)",
-                    "labelIndex": 115,
+                    "labelIndex": 20,
                     "children": []
                 },
                 {
                     "name": "Area hPO1 (POS)",
-                    "labelIndex": 116,
+                    "labelIndex": 21,
                     "children": []
                 },
                 {
                     "name": "Area 6ma (preSMA, mesial SFG)",
-                    "labelIndex": 117,
+                    "labelIndex": 22,
                     "children": []
                 },
                 {
                     "name": "Area 6mp (SMA, mesial SFG)",
-                    "labelIndex": 118,
+                    "labelIndex": 23,
                     "children": []
                 },
                 {
                     "name": "Area STS1 (STS)",
-                    "labelIndex": 119,
+                    "labelIndex": 24,
                     "children": []
                 },
                 {
                     "name": "Area STS2 (STS)",
-                    "labelIndex": 120,
+                    "labelIndex": 25,
                     "children": []
                 }
             ]
