@@ -40,6 +40,8 @@ export class RadioList{
 
   @Input()
   ulClass: string = ''
+  
+  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
   @Input() isMobile: boolean
   @Input() darktheme: boolean

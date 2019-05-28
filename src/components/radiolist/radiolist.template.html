@@ -4,7 +4,7 @@
   role="menu">
   <li 
     *ngFor="let input of inputArray" 
-    [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
+    [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'" 
     (click)="itemSelected.emit({previous: selectedItem, current: input})" 
     role="menuitem">
     

@@ -17,6 +17,7 @@ export class DropdownComponent{
 
   @Input() inputArray : any[] = []
   @Input() selectedItem : any | null = null
+  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
   @Input() listDisplay : (obj:any)=>string = (obj)=>obj.name
   @Input() activeDisplay : (obj:any|null)=>string = (obj)=>obj ? obj.name : `Please select an item.`
