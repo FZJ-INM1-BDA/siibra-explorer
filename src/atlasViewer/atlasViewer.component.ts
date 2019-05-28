@@ -67,8 +67,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private showHelp$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
-  public onhoverSegment$: Observable<string>
-  public onhoverSegmentForFixed$: Observable<string>
+  public onhoverSegments$: Observable<string[]>
+  public onhoverSegmentsForFixed$: Observable<string[]>
   public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
@@ -179,22 +179,22 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegment$ = combineLatest(
+    this.onhoverSegments$ = combineLatest(
       this.store.pipe(
         select('uiState'),
+        select('mouseOverSegments'),
+        filter(v => !!v),
+        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
         /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-        map(state => state
-            && state.mouseOverSegment
-            && (isNaN(state.mouseOverSegment)
-              ? state.mouseOverSegment
-              : state.mouseOverSegment.toString())),
-        distinctUntilChanged((o, n) => o === n || (o && n && o.name && n.name && o.name === n.name))
+
       ),
       this.onhoverLandmark$
     ).pipe(
-      map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
+      map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
+      map(segments => segments.length === 0
+          ? null
+          : segments.map(s => s.segment) )
     )
-
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
@@ -338,9 +338,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
     })
 
-    this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegment$),
-      map(([_flag, onhoverSegment]) => onhoverSegment)
+    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverSegments$),
+      map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
   }
 

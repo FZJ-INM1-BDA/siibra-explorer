@@ -142,7 +142,7 @@
         </div>
         <div body>
           <div
-            *ngIf="onhoverSegmentForFixed$ | async; let onhoverSegmentFixed"
+            *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
             class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block"
             data-toggle="tooltip" 
@@ -160,7 +160,7 @@
           
           <div
             class="p-2 text-muted"
-            *ngIf="!(onhoverSegmentForFixed$ | async) && (selectedRegions$ | async)?.length === 0">
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">
             Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
   
@@ -182,9 +182,12 @@
           {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
         <div 
-          *ngIf="onhoverSegment$ | async; let onhoverSegment" 
+          *ngIf="onhoverSegments$ | async; let onhoverSegments"
           contextualBlock>
-          {{ onhoverSegment.name }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+          <div *ngFor="let segment of onhoverSegments">
+            {{ segment.name || segment }}
+          </div>
+          <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>

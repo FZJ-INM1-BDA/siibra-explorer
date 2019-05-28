@@ -1,16 +1,17 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, SELECT_REGIONS, getLabelIndexMap, CHANGE_NAVIGATION, isDefined, MOUSE_OVER_SEGMENT, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
-import { AtlasViewerDataService } from "../../atlasViewer/atlasViewer.dataService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
+import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
+import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -57,7 +58,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private spatialResultsVisible : boolean = false
 
   private selectedTemplate : any | null
-  private selectedRegionIndexSet : Set<number> = new Set()
+  private selectedRegionIndexSet : Set<string> = new Set()
   public fetchedSpatialData : Landmark[] = []
 
   private ngLayersRegister : Partial<NgViewerStateInterface> = {layers : [], forceShowSegment: null}
@@ -67,7 +68,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private cr : ComponentRef<NehubaViewerUnit>
   public nehubaViewer : NehubaViewerUnit
-  private regionsLabelIndexMap : Map<number,any> = new Map()
+  private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>> = new Map()
   private landmarksLabelIndexMap : Map<number, any> = new Map()
   private landmarksNameMap : Map<string,number> = new Map()
   
@@ -81,7 +82,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   constructor(
     private constantService : AtlasViewerConstantsServices,
-    private atlasViewerDataService : AtlasViewerDataService,
     private apiService :AtlasViewerAPIServices,
     private csf:ComponentFactoryResolver,
     private store : Store<ViewerStateInterface>,
@@ -118,8 +118,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.selectedRegions$ = this.store.pipe(
       select('viewerState'),
-      safeFilter('regionsSelected'),
-      map(state=>state.regionsSelected)
+      select('regionsSelected'),
+      filter(rs => !!rs)
     )
 
     this.selectedLandmarks$ = this.store.pipe(
@@ -267,15 +267,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
           const e = (event as any)
           const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
           const lastLoadedIdNum = Number(lastLoadedIdString)
+          /**
+           * TODO dig into event detail to see if the exact mesh loaded
+           */
           return e.detail.meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
             ? null
             : isNaN(lastLoadedIdNum)
               ? 'Loading unknown chunk'
               : lastLoadedIdNum >= 65500
                 ? 'Loading auxiliary chunk'
-                : this.regionsLabelIndexMap.get(lastLoadedIdNum)
-                  ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
-                  : 'Loading unknown chunk ...'
+                // : this.regionsLabelIndexMap.get(lastLoadedIdNum)
+                //   ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
+                  : 'Loading meshes ...'
         })
       )
 
@@ -452,7 +455,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
           if(!this.nehubaViewer) return
 
           /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-          this.selectedRegionIndexSet = new Set(regions.map(r=>Number(r.labelIndex)))
+          this.selectedRegionIndexSet = new Set(regions.map(({ngId, labelIndex})=>generateLabelIndexId({ ngId, labelIndex })))
 
           if( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ){
             this.nehubaViewer.hideAllSeg()
@@ -506,7 +509,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
         Object.assign({},navigation,{
           positionReal : true
         })
-      this.nehubaViewer.initRegions = regions.map(re=>re.labelIndex)
+      this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) =>generateLabelIndexId({ ngId, labelIndex }))
     })
 
     this.subscriptions.push(
@@ -652,11 +655,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
     if ( !(parcellation && parcellation.regions)) {
       return
     }
-    this.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
-    this.nehubaViewer.regionsLabelIndexMap = this.regionsLabelIndexMap
+
+    /**
+     * first, get all all the ngIds, including parent id from parcellation (if defined)
+     */
+    const ngIds = getNgIds(parcellation.regions).concat( parcellation.ngId ? parcellation.ngId : [])
+
+    this.multiNgIdsRegionsLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
+
+    this.nehubaViewer.multiNgIdsLabelIndexMap = this.multiNgIdsRegionsLabelIndexMap
 
     /* TODO replace with proper KG id */
-    this.nehubaViewer.parcellationId = parcellation.ngId
+    this.nehubaViewer.ngIds = [...ngIds]
     this.selectedParcellation = parcellation
   }
 
@@ -718,11 +728,34 @@ export class NehubaContainer implements OnInit, OnDestroy{
       ).subscribe(this.handleNavigationPositionAndNavigationZoomChange.bind(this))
     )
 
+    const accumulatorFn: (
+      acc:Map<string, { segment: string | null, segmentId: number | null }>,
+      arg: {layer: {name: string}, segmentId: number|null, segment: string | null}
+    ) => Map<string, {segment: string | null, segmentId: number|null}>
+    = (acc, arg) => {
+      const { layer, segment, segmentId } = arg
+      const { name } = layer
+      const newMap = new Map(acc)
+      newMap.set(name, {segment, segmentId})
+      return newMap
+    }
+
     this.nehubaViewerSubscriptions.push(
-      this.nehubaViewer.mouseoverSegmentEmitter.subscribe(emitted => {
+      
+      this.nehubaViewer.mouseoverSegmentEmitter.pipe(
+        scan(accumulatorFn, new Map()),
+        map(map => Array.from(map.entries()).filter(([_ngId, { segmentId }]) => segmentId))
+      ).subscribe(arrOfArr => {
         this.store.dispatch({
-          type : MOUSE_OVER_SEGMENT,
-          segment : emitted
+          type: MOUSE_OVER_SEGMENTS,
+          segments: arrOfArr.map( ([ngId, {segment, segmentId}]) => {
+            return {
+              layer: {
+                name: ngId,
+              },
+              segment: segment || `${ngId}#${segmentId}`
+            }
+          } )
         })
       })
     )
@@ -736,26 +769,41 @@ export class NehubaContainer implements OnInit, OnDestroy{
       })
     )
 
+    const onhoverSegments$ = this.store.pipe(
+      select('uiState'),
+      select('mouseOverSegments'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
+    )
+
     // TODO hack, even though octant is hidden, it seems with vtk one can mouse on hover
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.regionSelectionEmitter.pipe(
         withLatestFrom(this.onHoverLandmark$),
         filter(results => results[1] === null),
-        map(results => results[0])
-      ).subscribe((region:any) => {
-        /**
-         * TODO
-         * region may have labelIndex as well as children
-         */
-        this.selectedRegionIndexSet.has(region.labelIndex) ?
-          this.store.dispatch({
-            type : SELECT_REGIONS,
-            selectRegions : [...this.selectedRegionIndexSet].filter(idx=>idx!==region.labelIndex).map(idx=>this.regionsLabelIndexMap.get(idx))
-          }) :
-          this.store.dispatch({
-            type : SELECT_REGIONS,
-            selectRegions : [...this.selectedRegionIndexSet].map(idx=>this.regionsLabelIndexMap.get(idx)).concat(region)
+        withLatestFrom(onhoverSegments$),
+        map(results => results[1]),
+        filter(arr => arr.length > 0),
+        map(arr => {
+          return arr.map(({ layer, segment }) => {
+            const ngId = segment.ngId || layer.name
+            const labelIndex = segment.labelIndex
+            return generateLabelIndexId({ ngId, labelIndex })
           })
+        })
+      ).subscribe((ids:string[]) => {
+        const deselectFlag = ids.some(id => this.selectedRegionIndexSet.has(id))
+
+        const set = new Set(this.selectedRegionIndexSet)
+        if (deselectFlag) {
+          ids.forEach(id => set.delete(id))
+        } else {
+          ids.forEach(id => set.add(id))
+        }
+        this.store.dispatch({
+          type: SELECT_REGIONS_WITH_ID,
+          selectRegionIds: [...set]
+        })
       })
     )
 
@@ -781,11 +829,16 @@ export class NehubaContainer implements OnInit, OnDestroy{
         orientation : quat
       }),
       showSegment : (labelIndex) => {
-        if(!this.selectedRegionIndexSet.has(labelIndex)) 
-          this.store.dispatch({
-            type : SELECT_REGIONS,
-            selectRegions :  [labelIndex, ...this.selectedRegionIndexSet]
-          })
+        /**
+         * TODO reenable with updated select_regions api
+         */
+        console.warn(`showSegment is temporarily disabled`)
+
+        // if(!this.selectedRegionIndexSet.has(labelIndex)) 
+        //   this.store.dispatch({
+        //     type : SELECT_REGIONS,
+        //     selectRegions :  [labelIndex, ...this.selectedRegionIndexSet]
+        //   })
       },
       add3DLandmarks : landmarks => {
         // TODO check uniqueness of ID
@@ -807,22 +860,33 @@ export class NehubaContainer implements OnInit, OnDestroy{
         })
       },
       hideSegment : (labelIndex) => {
-        if(this.selectedRegionIndexSet.has(labelIndex)){
-          this.store.dispatch({
-            type :SELECT_REGIONS,
-            selectRegions : [...this.selectedRegionIndexSet].filter(num=>num!==labelIndex)
-          })
-        }
+        /**
+         * TODO reenable with updated select_regions api
+         */
+        console.warn(`hideSegment is temporarily disabled`)
+
+        // if(this.selectedRegionIndexSet.has(labelIndex)){
+        //   this.store.dispatch({
+        //     type :SELECT_REGIONS,
+        //     selectRegions : [...this.selectedRegionIndexSet].filter(num=>num!==labelIndex)
+        //   })
+        // }
       },
       showAllSegments : () => {
+        const selectRegionIds = []
+        this.multiNgIdsRegionsLabelIndexMap.forEach((map, ngId) => {
+          Array.from(map.keys()).forEach(labelIndex => {
+            selectRegionIds.push(generateLabelIndexId({ ngId, labelIndex }))
+          })
+        })
         this.store.dispatch({
-          type : SELECT_REGIONS,
-          selectRegions : this.regionsLabelIndexMap.keys()
+          type : SELECT_REGIONS_WITH_ID,
+          selectRegionIds 
         })
       },
       hideAllSegments : () => {
         this.store.dispatch({
-          type : SELECT_REGIONS,
+          type : SELECT_REGIONS_WITH_ID,
           selectRegions : []
         })
       },
