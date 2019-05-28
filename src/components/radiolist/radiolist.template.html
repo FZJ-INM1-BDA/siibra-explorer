@@ -23,7 +23,7 @@
     <div *ngIf="input['properties'] && input['properties']['publications']" class="timerToast">
         <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications(input)">↓</button>
           <p>{{input['name']}} Publication(s)</p>
-          <div *ngFor="let p of input['properties']['publications']">
+          <div *ngFor="let p of input['properties']['publications']" class="textPartInPublications">
             <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
           </div>
       </div>

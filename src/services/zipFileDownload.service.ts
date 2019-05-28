@@ -1,33 +1,35 @@
 import { Injectable } from "@angular/core";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
+import {map} from "rxjs/operators";
 
 @Injectable({ providedIn: 'root' })
 
 export class ZipFileDownloadService {
-    saveTextAsFile(data, filename) {
 
-        if (!data) {
-            console.error('Console.save: No data')
-            return;
-        }
-        if (!filename) filename = 'Publication.json'
+    constructor(private httpClient: HttpClient, private constantService: AtlasViewerConstantsServices) {}
 
-        var blob = new Blob([data], { type: 'text/plain' }),
-            e = document.createEvent('MouseEvents'),
-            a = document.createElement('a')
-        // FOR IE:
-
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-            window.navigator.msSaveOrOpenBlob(blob, filename);
-        }
-        else {
-            var e = document.createEvent('MouseEvents'),
-                a = document.createElement('a');
-
-            a.download = filename;
-            a.href = window.URL.createObjectURL(blob);
-            a.dataset.downloadurl = ['text/plain', a.download, a.href].join(':');
-            e.initEvent('click', true, false);
-            a.dispatchEvent(e);
-        }
+    downloadZip(publicationsText, fileName) {
+        const correctedName = fileName.replace(/[|&;$%@"<>()+,/]/g, "")
+        console.log(correctedName)
+        this.httpClient.post(this.constantService.backendUrl + 'datasets/downloadParcellationThemself', {
+                fileName: correctedName,
+                publicationsText: publicationsText,
+            }
+        ,{responseType: "blob"}
+        ).subscribe(data => {
+            this.downloadFile(data, correctedName)
+        })
     }
+
+    downloadFile(data, fileName) {
+        const blob = new Blob([data], { type: 'text/csv' });
+        const url= window.URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.download = fileName + '.zip';
+        anchor.href = url;
+        anchor.click();
+    }
+
+
 }

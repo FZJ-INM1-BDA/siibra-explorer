@@ -255,7 +255,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   downloadPublications() {
-    const filename = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name + '.txt'
+    const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
     let publicationsText = ''
 
     if (this.tPublication) {
@@ -273,7 +273,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       });
     }
     
-    this.zipFileDownloadService.saveTextAsFile(publicationsText, filename)
+    this.zipFileDownloadService.downloadZip(publicationsText, fileName)
     publicationsText = ''
   }
 

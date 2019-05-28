@@ -66,12 +66,12 @@ export class RadioList{
 
 
   downloadPublications(item) {
-    const filename = item['name'] + ' publications.txt'
+    const filename = item['name']
     let publicationsText = item['name'] + ' Publications:\r\n'
       item['properties']['publications'].forEach((p, i) => {
         publicationsText += '\t' + (i+1) + '. ' + p['citation'] + ' - ' + p['doi'] + '\r\n'
       });
-    this.zipFileDownloadService.saveTextAsFile(publicationsText, filename)
+    this.zipFileDownloadService.downloadZip(publicationsText, filename)
     publicationsText = ''
   }
 }

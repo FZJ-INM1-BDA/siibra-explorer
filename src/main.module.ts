@@ -38,6 +38,7 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { ZipFileDownloadService } from "./services/zipFileDownload.service";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   imports : [
@@ -59,7 +60,8 @@ import { ZipFileDownloadService } from "./services/zipFileDownload.service";
       dataStore,
       spatialSearchState,
       uiState,
-    })
+    }),
+    HttpClientModule
   ],
   declarations : [
     AtlasViewer,
