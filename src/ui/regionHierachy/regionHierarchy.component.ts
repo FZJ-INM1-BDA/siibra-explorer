@@ -11,17 +11,17 @@ const insertHighlight :(name:string, searchTerm:string) => string = (name:string
     name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
 }
 
-const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => ({ ngId, name, labelIndex }) =>  {
+const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => ({ ngId, name, status, labelIndex }) =>  {
   return !!labelIndex
     && !!ngId
     && selectedRegions.findIndex(re =>
       generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex })
     ) >= 0
-      ? `<span class="regionSelected">${insertHighlight(name, searchTerm)}</span>`
-      : `<span class="regionNotSelected">${insertHighlight(name, searchTerm)}</span>`
+      ? `<span class="regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+      : `<span class="regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
 }
 
-const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name], searchTerm)
+const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name, node.status], searchTerm)
 
 @Component({
   selector: 'region-hierarchy',

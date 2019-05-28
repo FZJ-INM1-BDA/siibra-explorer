@@ -16,6 +16,7 @@
     <dropdown-component
       *ngIf="selectedParcellation$ | async as selectedParcellation"
       (itemSelected)="changeParcellation($event)"
+      [checkSelected]="compareParcellation"
       [activeDisplay]="displayActiveParcellation"
       [selectedItem]="selectedParcellation"
       [inputArray]="selectedTemplate.parcellations"

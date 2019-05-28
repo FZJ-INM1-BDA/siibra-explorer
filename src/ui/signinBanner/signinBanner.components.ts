@@ -9,6 +9,8 @@ import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
 import { ToastService } from "src/services/toastService.service";
 
+const compareParcellation = (o, n) => o.name === n.name
+
 @Component({
   selector: 'signin-banner',
   templateUrl: './signinBanner.template.html',
@@ -20,6 +22,8 @@ import { ToastService } from "src/services/toastService.service";
 })
 
 export class SigninBanner implements OnInit, OnDestroy{
+
+  public compareParcellation = compareParcellation
 
   private subscriptions: Subscription[] = []
   public loadedTemplates$: Observable<any[]>
