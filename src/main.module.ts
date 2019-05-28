@@ -38,6 +38,7 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 
+
 @NgModule({
   imports : [
     FormsModule,
