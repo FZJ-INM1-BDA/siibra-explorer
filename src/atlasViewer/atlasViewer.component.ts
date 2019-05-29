@@ -47,6 +47,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+  @ViewChild('publications') publications: TemplateRef<any>
+
 
   @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
