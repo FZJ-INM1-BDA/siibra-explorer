@@ -109,7 +109,7 @@ var JSZip = require("jszip");
 datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
 
 
-  //TODo We can add termsOfUse Text file somewhere - will be better
+  //ToDo We can add termsOfUse Text file somewhere - will be better
   const termsOfUse = 'Access to the data and metadata provided through HBP Knowledge Graph Data Platform ' +
       '("KG") requires that you cite and acknowledge said data and metadata according to the Terms and' +
       ' Conditions of the Platform.\r\n## Citation requirements are outlined - https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use#citations' +
@@ -123,23 +123,20 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
   zip.file("Publications.txt", req.body['publicationsText'])
   zip.file("Terms of use.txt", termsOfUse)
 
-  var nii = zip.folder("nifti")
 
   //ToDo: Need to download files dynamicly. Nii folder should remove
   if (req.body['fileName'].includes("JuBrain Cytoarchitectonic Atlas")) {
+    var nii = zip.folder("nifti")
     nii.file('jubrain-max-pmap-v22c_space-mnicolin27.nii', path.join(__dirname, 'nii') + '/' + 'jubrain-max-pmap-v22c_space-mnicolin27.nii')
   }
-
-  // JSZipUtils.getBinaryContent('https://object.cscs.ch/v1/AUTH_227176556f3c4bb38df9feea4b91200c/JuBrain/data-derived/jubrain-pmaps-v22c/jubrain-max-pmap-v22c_space-mnicolin27.nii', (err, data) => {
-  //   if(err) {throw err}
-  //   zip.file(filename, data, {binary:true})
-  // })
 
   zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
       .pipe(fs.createWriteStream( path.join(__dirname, 'zips') + '/' + req.body['fileName'] + '.zip'))
       .on('finish', () => {
         res.sendFile(path.join(__dirname, 'zips') + '/' + req.body['fileName'] + '.zip')
       })
+
+
 
 });
 
