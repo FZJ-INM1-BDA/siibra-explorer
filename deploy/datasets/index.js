@@ -123,22 +123,17 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
   zip.file("Publications.txt", req.body['publicationsText'])
   zip.file("Terms of use.txt", termsOfUse)
 
-
   //ToDo: Need to download files dynamicly. Nii folder should remove
   if (req.body['fileName'].includes("JuBrain Cytoarchitectonic Atlas")) {
     var nii = zip.folder("nifti")
     nii.file('jubrain-max-pmap-v22c_space-mnicolin27.nii', path.join(__dirname, 'nii') + '/' + 'jubrain-max-pmap-v22c_space-mnicolin27.nii')
   }
 
-  if (!fs.existsSync(path.join(__dirname, 'zips'))){
-    fs.mkdirSync(path.join(__dirname, 'zips'));
-  }
-
-  zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
-      .pipe(fs.createWriteStream( path.join(__dirname, 'zips') + '/' + req.body['fileName'] + '.zip'))
-      .on('finish', () => {
-        res.sendFile(path.join(__dirname, 'zips') + '/' + req.body['fileName'] + '.zip')
-      })
+  zip.generateAsync({type:"base64"})
+      .then(function (content) {
+        // location.href="data:application/zip;base64,"+content;
+        res.end(content)
+      });
 
 
 

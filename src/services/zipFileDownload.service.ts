@@ -13,7 +13,7 @@ export class ZipFileDownloadService {
         this.httpClient.post(this.constantService.backendUrl + 'datasets/downloadParcellationThemself', {
                 fileName: correctedName,
                 publicationsText: publicationsText,
-            },{responseType: "blob"}
+            },{responseType: "text"}
         ).subscribe(data => {
             console.log(data)
             this.downloadFile(data, correctedName)
@@ -22,43 +22,33 @@ export class ZipFileDownloadService {
 
     downloadFile(data, fileName) {
 
-        // const contentType = 'application/zip';
-        // const b64Data = data
-        //
-        // const blob = b64toBlob(b64Data, contentType);
-        //
-        // const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
-        //     const byteCharacters = atob(b64Data);
-        //     const byteArrays = [];
-        //
-        //     for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        //         const slice = byteCharacters.slice(offset, offset + sliceSize);
-        //
-        //         const byteNumbers = new Array(slice.length);
-        //         for (let i = 0; i < slice.length; i++) {
-        //             byteNumbers[i] = slice.charCodeAt(i);
-        //         }
-        //
-        //         const byteArray = new Uint8Array(byteNumbers);
-        //         byteArrays.push(byteArray);
-        //     }
-        //
-        //     const blob = new Blob(byteArrays, {type: contentType});
-        //     return blob;
-        // }
+        const contentType = 'application/zip';
+        const b64Data = data
 
 
+        const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
+            const byteCharacters = atob(b64Data);
+            const byteArrays = [];
+
+            for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+                const slice = byteCharacters.slice(offset, offset + sliceSize);
+
+                const byteNumbers = new Array(slice.length);
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            const blob = new Blob(byteArrays, {type: contentType});
+            return blob;
+        }
 
 
-
-
-
-
-
-
-
-
-        const blob = new Blob([data], { type: 'text/csv' });
+        const blob = b64toBlob(b64Data, contentType);
+        // const blob = new Blob([data], { type: 'text/csv' });
         const url= window.URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.download = fileName + '.zip';
