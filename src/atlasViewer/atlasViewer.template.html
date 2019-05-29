@@ -26,6 +26,14 @@
         <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
           <tab heading="Template">
             <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+            <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
+              <ui-status-card 
+                  [selectedTemplate]="selectedTemplate" 
+                  [isMobile]="isMobile"
+                  [onHoverSegmentName]="this.nehubaContainer.onHoverSegmentName$ | async"
+                  [nehubaViewer]="this.nehubaContainer.nehubaViewer">
+              </ui-status-card>
+            </layout-floating-container>
           </tab>
           <tab heading="Containers">
             <menu-icons iconWrapper hidden #MenuIcons>

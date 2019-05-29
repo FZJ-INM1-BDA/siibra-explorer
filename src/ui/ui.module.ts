@@ -125,7 +125,8 @@ import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
     SigninModal,
     CookieAgreement,
     KGToS,
-    AngularMaterialModule
+    AngularMaterialModule,
+    StatusCardComponent
   ]
 })
 
