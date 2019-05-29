@@ -9,13 +9,11 @@ export class ZipFileDownloadService {
 
     downloadZip(publicationsText, fileName) {
         const correctedName = fileName.replace(/[|&;$%@"<>()+,/]/g, "")
-        console.log(correctedName)
         this.httpClient.post(this.constantService.backendUrl + 'datasets/downloadParcellationThemself', {
                 fileName: correctedName,
                 publicationsText: publicationsText,
             },{responseType: "text"}
         ).subscribe(data => {
-            console.log(data)
             this.downloadFile(data, correctedName)
         })
     }
