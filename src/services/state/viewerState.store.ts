@@ -88,7 +88,7 @@ export function viewerState(
       return {
         ...state,
         parcellationSelected: parcellation,
-        regionsSelecteds: []
+        regionsSelected: []
       }
     }
     case SELECT_REGIONS:

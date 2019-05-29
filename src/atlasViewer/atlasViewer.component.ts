@@ -191,7 +191,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.onhoverLandmark$
     ).pipe(
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
-      map(segments => segments.length === 0
+      map(segments => !segments || segments.length === 0
           ? null
           : segments.map(s => s.segment) )
     )
