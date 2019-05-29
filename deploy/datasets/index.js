@@ -130,6 +130,10 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
     nii.file('jubrain-max-pmap-v22c_space-mnicolin27.nii', path.join(__dirname, 'nii') + '/' + 'jubrain-max-pmap-v22c_space-mnicolin27.nii')
   }
 
+  if (!fs.existsSync(path.join(__dirname, 'zips'))){
+    fs.mkdirSync(path.join(__dirname, 'zips'));
+  }
+
   zip.generateNodeStream({type:'nodebuffer',streamFiles:true})
       .pipe(fs.createWriteStream( path.join(__dirname, 'zips') + '/' + req.body['fileName'] + '.zip'))
       .on('finish', () => {
