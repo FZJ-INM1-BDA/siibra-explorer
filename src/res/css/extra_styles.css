@@ -335,3 +335,8 @@ markdown-dom pre code
 {
   opacity : 0.5!important;
 }
+
+.text-semi-transparent
+{
+  opacity: 0.5;
+}

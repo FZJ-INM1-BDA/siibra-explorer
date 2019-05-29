@@ -141,6 +141,13 @@
           </h5>
         </div>
         <div body>
+
+          <div
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+            class="p-2">
+            Search for data relating to:
+          </div>
+          
           <div
             *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
@@ -148,14 +155,19 @@
             data-toggle="tooltip" 
             data-placement="top" 
             [title]="onhoverSegmentFixed.name">
-            Search for data related to {{ onhoverSegmentFixed.name }}
+            <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
           </div>
   
           <div
             *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            Search for data related to all {{ selectedRegions && selectedRegions.length }} selected regions
+            <ng-container *ngIf="selectedRegions.length > 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
+            </ng-container>
+            <ng-container *ngIf="selectedRegions.length === 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
+            </ng-container>
           </div>
           
           <div
