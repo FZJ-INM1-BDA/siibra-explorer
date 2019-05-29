@@ -1,10 +1,8 @@
 import { Injectable } from "@angular/core";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {HttpClient} from "@angular/common/http";
 import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
-import {map} from "rxjs/operators";
 
 @Injectable({ providedIn: 'root' })
-
 export class ZipFileDownloadService {
 
     constructor(private httpClient: HttpClient, private constantService: AtlasViewerConstantsServices) {}
@@ -15,9 +13,9 @@ export class ZipFileDownloadService {
         this.httpClient.post(this.constantService.backendUrl + 'datasets/downloadParcellationThemself', {
                 fileName: correctedName,
                 publicationsText: publicationsText,
-            }
-        ,{responseType: "blob"}
+            },{responseType: "blob"}
         ).subscribe(data => {
+            console.log(data)
             this.downloadFile(data, correctedName)
         })
     }
