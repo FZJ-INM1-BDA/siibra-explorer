@@ -123,10 +123,12 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
   zip.file("Publications.txt", req.body['publicationsText'])
   zip.file("Terms of use.txt", termsOfUse)
 
+
+
   //ToDo: Need to download files dynamicly. Nii folder should remove
   if (req.body['fileName'].includes("JuBrain Cytoarchitectonic Atlas")) {
     var nii = zip.folder("nifti")
-    nii.file('jubrain-max-pmap-v22c_space-mnicolin27.nii', path.join(__dirname, 'nii') + '/' + 'jubrain-max-pmap-v22c_space-mnicolin27.nii')
+    nii.file('jubrain-max-pmap-v22c_space-mnicolin27.nii', fs.readFileSync(path.join(__dirname, 'nii') + '/' + 'jubrain-max-pmap-v22c_space-mnicolin27.nii'))
   }
 
   zip.generateAsync({type:"base64"})
