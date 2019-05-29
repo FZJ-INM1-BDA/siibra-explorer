@@ -1,8 +1,8 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
+import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -48,6 +48,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
   @ViewChild('publications') publications: TemplateRef<any>
+
+
+  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components
@@ -408,6 +411,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegment$),
       map(([_flag, onhoverSegment]) => onhoverSegment)
     )
+
+    this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
   /**
@@ -523,6 +528,27 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       type: TOGGLE_SIDE_PANEL
     })
   }
+
+
+  closeMenuWithSwipe(documentToSwipe: ElementRef) {
+    const swipeDistance = 150; // swipe distance
+    const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
+        .pipe(
+          switchMap(startEvent =>
+            fromEvent(documentToSwipe.nativeElement, "touchmove")
+                .pipe(
+                  takeUntil(fromEvent(documentToSwipe.nativeElement, "touchend"))
+                  ,map(event => event['touches'][0].pageX)
+                  ,scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0)
+                  ,takeLast(1)
+                  ,filter(difference => difference >= swipeDistance)
+                )))
+    // Subscription
+    swipeLeft$.subscribe(val => {
+      this.changeMenuState({close: true})
+    })
+  }
+
 }
 
 export interface NgLayerInterface{

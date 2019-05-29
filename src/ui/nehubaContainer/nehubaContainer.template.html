@@ -69,7 +69,7 @@
   </div>
 </div>
 
-<layout-floating-container *ngIf="viewerLoaded">
+<layout-floating-container *ngIf="viewerLoaded && !isMobile">
   <!-- StatusCard container-->
   <ui-status-card [selectedTemplate]="selectedTemplate" [isMobile]="isMobile"
     [onHoverSegmentName]="onHoverSegmentName$ | async" [nehubaViewer]="nehubaViewer">

@@ -17,7 +17,6 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "jszip": "^3.2.1",
-    "jszip-utils": "0.0.2",
     "jwt-decode": "^2.2.0",
     "memorystore": "^1.6.1",
     "openid-client": "^2.4.5",

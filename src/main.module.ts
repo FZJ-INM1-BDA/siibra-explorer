@@ -40,6 +40,7 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 import {HttpClientModule} from "@angular/common/http";
 
+
 @NgModule({
   imports : [
     FormsModule,

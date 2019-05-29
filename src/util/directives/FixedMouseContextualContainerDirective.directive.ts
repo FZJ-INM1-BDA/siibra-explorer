@@ -25,6 +25,9 @@ export class FixedMouseContextualContainerDirective {
   }
 
   public show(){
+    if ((window.innerWidth - this.mousePos[0]) < 220) {
+      this.mousePos[0] = window.innerWidth-220
+    }
     this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
     this.styleDisplay = 'block'
     this.isShown = true
