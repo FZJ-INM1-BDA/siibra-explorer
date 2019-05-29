@@ -37,6 +37,7 @@ import { AuthService } from "./services/auth.service";
 import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
+import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 
 @NgModule({
   imports : [
@@ -85,6 +86,7 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
     /* pipes */
     GetNamesPipe,
     GetNamePipe,
+    TransformOnhoverSegmentPipe,
     GetFilenameFromPathnamePipe,
     NewViewerDisctinctViewToLayer
   ],

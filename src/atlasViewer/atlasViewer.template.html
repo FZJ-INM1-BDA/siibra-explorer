@@ -184,8 +184,9 @@
         <div 
           *ngIf="onhoverSegments$ | async; let onhoverSegments"
           contextualBlock>
-          <div *ngFor="let segment of onhoverSegments">
-            {{ segment.name || segment }}
+          <div
+            *ngFor="let segment of onhoverSegments"
+            [innerHtml]="segment | transformOnhoverSegment">
           </div>
           <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
@@ -212,7 +213,8 @@
           <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
         </h1>
         <p>
-          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a> or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox</a> for viewing the interactive viewer.
+          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a>
+          <!-- or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox (&lt; 67)</a> for viewing the interactive viewer. -->
         </p>
         <div class="col-6 d-inline-block text-left">
           <readmore-component

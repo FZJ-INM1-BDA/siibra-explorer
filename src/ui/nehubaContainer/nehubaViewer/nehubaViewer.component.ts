@@ -298,8 +298,10 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this._ngIds = val
     
-    if(this.nehubaViewer)
+    if(this.nehubaViewer){
       this.loadNewParcellation()
+      this.showAllSeg()
+    }
   }
 
   spatialLandmarkSelectionChanged(labels:number[]){
