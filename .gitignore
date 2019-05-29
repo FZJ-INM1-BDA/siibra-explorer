@@ -6,4 +6,3 @@ src/plugin_examples/*/
 .vscode
 .idea
 deploy/datasets/data/
-!zips/.gitkeep
