@@ -190,3 +190,7 @@ mat-sidenav {
   align-self: flex-end;
   outline: none;
 }
+
+.textPartInPublications {
+  text-align: left;
+}

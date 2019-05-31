@@ -43,6 +43,7 @@ import 'hammerjs';
 import 'hammer-timejs';
 
 import { ZipFileDownloadService } from "./services/zipFileDownload.service";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   imports : [
@@ -64,7 +65,8 @@ import { ZipFileDownloadService } from "./services/zipFileDownload.service";
       dataStore,
       spatialSearchState,
       uiState,
-    })
+    }),
+    HttpClientModule
   ],
   declarations : [
     AtlasViewer,

@@ -78,3 +78,7 @@ ul,span.dropdown-item-1
   align-self: flex-end;
   outline: none;
 }
+
+.textPartInPublications {
+  text-align: left;
+}
