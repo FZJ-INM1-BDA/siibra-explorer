@@ -1,4 +1,4 @@
-import { Directive, HostListener, HostBinding } from "@angular/core";
+import { Directive, HostListener, HostBinding, Input } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
 @Directive({
@@ -15,6 +15,26 @@ import { DomSanitizer } from "@angular/platform-browser";
 
 export class HoverableBlockDirective{
 
+  @Input('hoverable')
+  config:any = {
+    disable: false,
+    translateY: -5
+  }
+
+  private _disable = false
+  private _translateY = -5
+
+  ngOnChanges(){
+    this._disable = this.config && !!this.config.disable
+    /**
+     * 0 is evaluated as falsy, but a valid number
+     * conditional tests for whether we need to fall back to default
+     */
+    this._translateY = this.config && this.config.translateY !== 0 && !!Number(this.config.translateY)
+      ? Number(this.config.translateY)
+      : -5
+  }
+
   @HostBinding('style.opacity')
   opacity : number = 0.9
 
@@ -26,13 +46,19 @@ export class HoverableBlockDirective{
 
   @HostListener('mouseenter')
   onMouseenter(){
+    if (this._disable) return
     this.opacity = 1.0
     this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.25)`)
-    this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(-2%)`)
+    /**
+     * n.b. risk of XSS. But sincle translate Y is passed through Number, and corerced into a number,
+     * and using 5 as a fallback, it should be safe
+     */
+    this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(${this._translateY}px)`)
   }
 
   @HostListener('mouseleave')
   onmouseleave(){
+    if (this._disable) return
     this.opacity = 0.9
     this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.1)`)
     this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)

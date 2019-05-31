@@ -54,7 +54,8 @@ module.exports = {
           : JSON.stringify('unspecificied hash'),
       PRODUCTION: process.env.PRODUCTION
         ? true
-        : false
+        : false,
+      BACKEND_URL: JSON.stringify(process.env.BACKEND_URL || 'http://localhost:3000/')
     })
     // ...ignoreArr.map(dirname => new webpack.IgnorePlugin(/\.\/plugin_examples/))
   ]

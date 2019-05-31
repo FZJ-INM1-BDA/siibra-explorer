@@ -1,0 +1,78 @@
+<div
+  class="d-flex"  
+  [ngClass]="{ 'flex-column w-100 align-items-stretch' : isMobile}" >
+
+  <dropdown-component
+    (itemSelected)="changeTemplate($event)"
+    [activeDisplay]="displayActiveTemplate"
+    [selectedItem]="selectedTemplate$ | async"
+    [inputArray]="loadedTemplates$ | async | filterNull"
+    [isMobile] = "isMobile"
+    [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
+    [darktheme] ="darktheme">
+  </dropdown-component>
+
+  <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
+    <dropdown-component
+      *ngIf="selectedParcellation$ | async as selectedParcellation"
+      (itemSelected)="changeParcellation($event)"
+      [checkSelected]="compareParcellation"
+      [activeDisplay]="displayActiveParcellation"
+      [selectedItem]="selectedParcellation"
+      [inputArray]="selectedTemplate.parcellations"
+      [isMobile] = "isMobile"
+      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
+      [darktheme] ="darktheme">
+
+    </dropdown-component>
+    <region-hierarchy
+      [selectedRegions]="selectedRegions$ | async | filterNull"
+      (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+      (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+      (clearAllRegions)="clearAllRegions()"
+      [isMobile] = "isMobile"
+      *ngIf="selectedParcellation$ | async as selectedParcellation"
+      class="h-0"
+      [selectedParcellation]="selectedParcellation"
+      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass">
+
+    </region-hierarchy>
+  </ng-container>
+
+  <!-- help btn -->
+  <div class="btnWrapper">
+    <div
+      *ngIf="!isMobile" 
+      (click)="showHelp()" 
+      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+      <i class="fas fa-question-circle"></i>
+    </div>
+  </div>
+
+  <!-- signin -->
+
+  <div class="btnWrapper">
+
+    <div 
+      *ngIf="!isMobile" 
+      (click)="showSignin()"
+      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
+      <i
+        [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
+        class="fas"></i>
+    </div>
+  </div>
+
+  <div *ngIf="isMobile" class="login-button-panel-mobile">
+    <div
+      (click)="showSignin()"
+      class="login-button-mobile">
+      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
+    </div>
+
+    <div (click)="showHelp()" class="login-button-mobile">
+      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Help</button>
+    </div>
+
+  </div>
+</div>

@@ -20,6 +20,8 @@ export class WidgetServices{
 
   private clickedListener : Subscription[] = []
 
+  public minimisedWindow: Set<WidgetUnit> = new Set()
+
   constructor(
     private cfr:ComponentFactoryResolver,
     private constantServce:AtlasViewerConstantsServices,
@@ -34,6 +36,10 @@ export class WidgetServices{
     })
 
     this.clickedListener.forEach(s=>s.unsubscribe())
+  }
+
+  minimise(wu:WidgetUnit){
+    this.minimisedWindow.add(wu)
   }
 
   addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
@@ -64,6 +70,7 @@ export class WidgetServices{
       _component.instance.exitable = _option.exitable
       _component.instance.title = _option.title
       _component.instance.persistency = _option.persistency
+      _component.instance.titleHTML = _option.titleHTML
 
       /* internal properties, used for changing state */
       _component.instance.guestComponentRef = guestComponentRef
@@ -82,6 +89,7 @@ export class WidgetServices{
       _component.instance.setWidthHeight()
 
       this.widgetComponentRefs.add( _component )
+      _component.onDestroy(() => this.minimisedWindow.delete(_component.instance))
 
       this.clickedListener.push(
         _component.instance.clickedEmitter.subscribe((widgetUnit:WidgetUnit)=>{
@@ -157,15 +165,10 @@ function getOption(option?:Partial<WidgetOptionsInterface>):WidgetOptionsInterfa
     exitable : safeGet(option, 'exitable') !== null
       ? safeGet(option, 'exitable')
       : true,
-    state : safeGet(option, 'state')
-      ? safeGet(option, 'state')
-      : 'floating',
-    title : safeGet(option, 'title')
-      ? safeGet(option, 'title')
-      : 'Untitled',
-    persistency : safeGet(option, 'persistency')
-      ? safeGet(option, 'persistency')
-      : false
+    state : safeGet(option, 'state') || 'floating',
+    title : safeGet(option, 'title') || 'Untitled',
+    persistency : safeGet(option, 'persistency') || false,
+    titleHTML: safeGet(option, 'titleHTML') || null
   }
 }
 
@@ -173,6 +176,7 @@ export interface WidgetOptionsInterface{
   title? : string
   state? : 'docked' | 'floating'
   exitable? : boolean
-  persistency : boolean
+  persistency? : boolean
+  titleHTML? : string
 }
 

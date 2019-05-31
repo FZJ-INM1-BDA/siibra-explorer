@@ -4,8 +4,14 @@
   </h4>
 </div>
 
-<div class = "modal-body">
+<div *ngIf = "!template" class = "modal-body">
   {{ body }}
+</div>
+
+<div *ngIf = "template" class="modal-body">
+  <ng-template #templateContainer>
+
+  </ng-template>
 </div>
 
 <div *ngIf = "footer" class = "modal-footer">

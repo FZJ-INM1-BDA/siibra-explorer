@@ -2,27 +2,43 @@
   [style.transform] = "transform"
   [containerClass] = "containerClass"
   widgetUnitPanel
-  [bodyCollapsable] = "state === 'docked'">
+  [bodyCollapsable] = "state === 'docked'"
+  [cdkDragDisabled]="state === 'docked'"
+  cdkDrag
+  [ngStyle]="{'max-width': isMobile? '100%' : '300px',
+              'margin-bottom': isMobile? '5px': '0'}">
   <div 
-    draggable = "true"
-    (dragend) = "dragend($event)"
-    (dragstart) = "dragstart($event)"
-    widgetUnitHeading 
-    heading>
+    widgetUnitHeading
+    heading
+    cdkDragHandle>
     <div #emptyspan emptyspan>.</div>
-    <div title>{{ title }}</div>
+    <div title>
+      <div *ngIf="!titleHTML">
+        {{ title }}
+      </div>
+      <div [innerHTML]="titleHTML" *ngIf="titleHTML">
+
+      </div>
+    </div>
     <div icons>
-      <i *ngIf = "state === 'floating'"
+      <i
+        *ngIf="!isMobile"
+        (click)="widgetServices.minimise(this)"
+        class="fas fa-window-minimize"
+        hoverable>
+
+      </i>
+      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
         (click) = "dock($event)" 
-        class = "glyphicon glyphicon-log-in" 
+        class = "fas fa-window-minimize" 
         hoverable></i>
-      <i *ngIf = "state === 'docked'"
+      <i *ngIf = "state === 'docked' && !isMobile"
         (click) = "undock($event)" 
-        class = "glyphicon glyphicon-new-window" 
+        class = "fas fa-window-restore" 
         hoverable></i>
       <i *ngIf = "exitable"
         (click) = "exit($event)" 
-        class = "glyphicon glyphicon-remove" 
+        class = "fas fa-times" 
         hoverable></i>
     </div>
   </div>

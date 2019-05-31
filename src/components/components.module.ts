@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import {  MarkdownDom } from './markdown/markdown.component';
 
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { ReadmoreComponent } from './readmoore/readmore.component';
-import { BrowserModule } from '@angular/platform-browser';
 import { HoverableBlockDirective } from './hoverableBlock.directive';
 import { DropdownComponent } from './dropdown/dropdown.component';
 import { TreeComponent } from './tree/tree.component';
@@ -24,13 +24,19 @@ import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pi
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
+import { PillComponent } from './pill/pill.component';
+import { CommonModule } from '@angular/common';
+import { RadioList } from './radiolist/radiolist.component';
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 
 
 @NgModule({
   imports : [
-    BrowserModule,
+    CommonModule,
+    ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
+    AngularMaterialModule
   ],
   declarations : [
     /* components */
@@ -43,6 +49,8 @@ import { TimerComponent } from './timer/timer.component';
     ToastComponent,
     FlatTreeComponent,
     TimerComponent,
+    PillComponent,
+    RadioList,
 
     /* directive */
     HoverableBlockDirective,
@@ -71,6 +79,8 @@ import { TimerComponent } from './timer/timer.component';
     ToastComponent,
     FlatTreeComponent,
     TimerComponent,
+    PillComponent,
+    RadioList,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

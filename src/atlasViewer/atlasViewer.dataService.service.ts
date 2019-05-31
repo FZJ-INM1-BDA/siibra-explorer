@@ -1,10 +1,12 @@
-import { Injectable, OnDestroy, OnInit } from "@angular/core";
-import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, FETCHED_TEMPLATE, DataEntry, FETCHED_DATAENTRIES, safeFilter, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
-import { map, distinctUntilChanged } from "rxjs/operators";
+import { Injectable, OnDestroy } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { ViewerStateInterface, FETCHED_TEMPLATE, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "../services/stateStore.service";
 import { Subscription } from "rxjs";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
-import { PluginManifest } from "./atlasViewer.pluginService.service";
+
+/**
+ * TODO move constructor into else where and deprecate ASAP
+ */
 
 @Injectable({
   providedIn : 'root'
@@ -12,57 +14,46 @@ import { PluginManifest } from "./atlasViewer.pluginService.service";
 export class AtlasViewerDataService implements OnDestroy{
   
   private subscriptions : Subscription[] = []
-
-  public promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve,reject)=>{
-    Promise.all([
-      PLUGINDEV
-        ? fetch(PLUGINDEV).then(res => res.json())
-        : Promise.resolve([]),
-      Promise.all(
-        BUNDLEDPLUGINS
-          .filter(v => typeof v === 'string')
-          .map(v => fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
-      )
-        .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
-    ])
-      .then(arr => resolve( [ ... arr[0], ... arr[1] ] ))
-      .catch(reject)
-  })
   
   constructor(
     private store : Store<ViewerStateInterface>,
     private constantService : AtlasViewerConstantsServices
   ){
-    this.constantService.templateUrls.map(url => 
-      this.constantService.raceFetch(url)
-        .then(res => res.json())
-        .then(json => new Promise((resolve, reject) => {
-          if(json.nehubaConfig)
-            resolve(json)
-          else if(json.nehubaConfigURL)
-            this.constantService.raceFetch(json.nehubaConfigURL)
-              .then(res => res.json())
-              .then(json2 => resolve(
-                Object.assign({}, json, { nehubaConfig: json2 })
-              ))
-              .catch(reject)
-          else
-            reject('neither nehubaConfig nor nehubaConfigURL defined')
-        }))
-        .then(json => this.store.dispatch({
-          type: FETCHED_TEMPLATE,
-          fetchedTemplate: json
-        }))
-        .catch(e => {
-          console.warn('fetching template url failed', e)
-          this.store.dispatch({
-            type: FETCHED_TEMPLATE,
-            fetchedTemplate: null
-          })
-        })
-      )
+    this.constantService.templateUrlsPr
+      .then(urls => 
+        urls.map(url => 
+          this.constantService.raceFetch(`${this.constantService.backendUrl}${url}`)
+            .then(res => res.json())
+            .then(json => new Promise((resolve, reject) => {
+              if(json.nehubaConfig)
+                resolve(json)
+              else if(json.nehubaConfigURL)
+                this.constantService.raceFetch(`${this.constantService.backendUrl}${json.nehubaConfigURL}`)
+                  .then(res => res.json())
+                  .then(json2 => resolve({
+                      ...json,
+                      nehubaConfig: json2
+                    }))
+                  .catch(reject)
+              else
+                reject('neither nehubaConfig nor nehubaConfigURL defined')
+            }))
+            .then(json => this.store.dispatch({
+              type: FETCHED_TEMPLATE,
+              fetchedTemplate: json
+            }))
+            .catch(e => {
+              console.warn('fetching template url failed', e)
+              this.store.dispatch({
+                type: FETCHED_TEMPLATE,
+                fetchedTemplate: null
+              })
+            })
+        ))
+  }
 
-    this.init()
+  public searchDataset(){
+    
   }
 
   /* all units in mm */
@@ -86,7 +77,7 @@ export class AtlasViewerDataService implements OnDestroy{
     /* TODO future for template space? */
     const filterTemplateSpace = templateSpace == 'MNI Colin 27' ? 
       'datapath:metadata/sEEG-sample.json' :
-        templateSpace == 'Waxholm Rat V2.0' ?
+        templateSpace == 'Waxholm Space rat brain atlas v.2.0' ?
         'datapath:metadata/OSLO_sp_data_rev.json' :
           null
     
@@ -98,9 +89,15 @@ export class AtlasViewerDataService implements OnDestroy{
         .then(arr => {
           this.store.dispatch({
             type : FETCHED_SPATIAL_DATA,
-            fetchedDataEntries : arr.reduce((acc,curr) => acc.concat(curr.map(obj => Object.assign({}, obj, {
-              properties : {}
-            }))), [])
+            fetchedDataEntries: arr
+              .reduce((acc, curr) => acc.concat(curr), [])
+              .map((obj, idx) => {
+                return {
+                  ...obj,
+                  name: `Spatial landmark #${idx}`,
+                  properties: {}
+                }
+              })
           })
           this.store.dispatch({
             type : UPDATE_SPATIAL_DATA,
@@ -108,9 +105,9 @@ export class AtlasViewerDataService implements OnDestroy{
           })
         })
         .catch(console.error)
-    }else if (templateSpace === 'Allen Mouse'){
+    }else if (templateSpace === 'Allen adult mouse brain reference atlas V3'){
       return Promise.all([
-        'res/json/allen3DVolumeAggregated.json',
+        // 'res/json/allen3DVolumeAggregated.json',
         'res/json/allenTestPlane.json',
         'res/json/allen3DReconAggregated.json'
       ].map(url => fetch(url).then(res => res.json())))
@@ -126,9 +123,9 @@ export class AtlasViewerDataService implements OnDestroy{
           })
         })
         .catch(console.error)
-    }else if (templateSpace === 'Waxholm Rat V2.0'){
+    }else if (templateSpace === 'Waxholm Space rat brain atlas v.2.0'){
       return Promise.all([
-        fetch('res/json/waxholmPlaneAggregatedData.json').then(res => res.json()),
+        // fetch('res/json/waxholmPlaneAggregatedData.json').then(res => res.json()),
         fetch('res/json/camillaWaxholmPointsAggregatedData.json').then(res => res.json())
       ])
         .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
@@ -174,35 +171,6 @@ export class AtlasViewerDataService implements OnDestroy{
       })
       .catch(console.warn)
 
-  }
-
-  init(){
-
-    const dispatchData = (arr:DataEntry[][]) =>{
-      this.store.dispatch({
-        type : FETCHED_DATAENTRIES,
-        fetchedDataEntries : arr.reduce((acc,curr)=>acc.concat(curr),[])
-      })
-    }
-
-    const fetchData = (parcellationName : string) => {
-      const urlArrays = this.constantService.mapParcellationNameToFetchUrl.get(parcellationName)
-      urlArrays ?
-        Promise.all(urlArrays.map(url=>fetch(url).then(res=>res.json())))
-          .then(arr=>dispatchData(arr))
-          .catch(console.warn) :
-        dispatchData([])
-    }
-      
-    this.subscriptions.push(
-      this.store.pipe(
-        select('viewerState'),
-        safeFilter('parcellationSelected'),
-        map(({parcellationSelected})=>(parcellationSelected.name)),
-        distinctUntilChanged()
-      )
-        .subscribe(fetchData)
-    )
   }
 
   ngOnDestroy(){

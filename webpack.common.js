@@ -30,7 +30,8 @@ module.exports = {
       '.json'
     ],
     alias : {
-      "third_party" : path.resolve(__dirname,'third_party')
+      "third_party" : path.resolve(__dirname,'third_party'),
+      "src" : path.resolve(__dirname,'src')
     }
   },
 }

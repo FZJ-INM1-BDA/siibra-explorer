@@ -1,0 +1,146 @@
+<div class="overflow-container">
+
+  <div
+    [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
+    class="dataEntryWrapper">
+
+    <!-- main window -->
+    <div
+      class="t-a-ease-500"
+      [style.height]="filePreviewName ? '0px' : 'auto'">
+
+      <!-- description -->
+      <readmore-component>
+        <div class="p-2 mh-20em overflow-auto">
+          Datasets relevant to
+          <span
+            *ngFor="let region of regions"
+            class="badge badge-secondary mr-1 mw-100">
+            <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+              
+            </span>
+            <span class="d-inline-block mw-100 overflow-hidden text-truncate">
+              {{ region.name }}
+            </span>
+          </span>
+        </div>
+      </readmore-component>
+      
+      <!-- modality picker -->
+      <div>
+        <span
+          placement="right"
+          container="body"
+          [popover]="countedDataM.length > 0 ? modalityPicker : null"
+          [outsideClick]="true"
+          [containerClass]="darktheme ? 'darktheme' : ''"
+          class="clickable btn-sm btn btn-secondary btn-block">
+          Filter by Modality <small *ngIf="visibleCountedDataM.length as visibleDMLength">({{ visibleDMLength }})</small>
+        </span>
+      </div>
+    
+      <!-- datasets container -->
+      <div
+        *ngIf="fetchingFlag; else fetched"
+        class="spinnerAnimationCircleContainer">
+        <div class="spinnerAnimationCircle"></div>
+        <div>Fetching datasets...</div>
+      </div>
+
+    </div>
+
+    <!-- file previewer -->
+    <div
+      class="filePreview">
+      <div class="filePreviewContainer">
+        <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <preview-component
+          *ngIf="filePreviewName"
+          [datasetName]="filePreviewName">
+
+        </preview-component>
+          
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #modalityPicker>
+  <div class="filterWrapper">
+    <modality-picker
+      (click)="$event.stopPropagation();"
+      class="mw-100"
+      [countedDataM]="countedDataM"
+      (modalityFilterEmitter)="handleModalityFilterEvent($event)">
+
+    </modality-picker>
+  </div>
+</ng-template>
+
+<ng-template #fetched>
+  <div class="ml-2 mr-2 alert alert-danger" *ngIf="fetchError; else showData">
+    <i class="fas fa-exclamation-triangle"></i> Error fetching data. <a href="#" (click)="retryFetchData($event)" class="btn btn-link text-info">retry</a>
+  </div>
+</ng-template>
+
+<ng-template #showData>
+  <!-- datawrapper -->
+  <div *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry"
+>
+
+    <!-- dataentries -->
+    <div class="dataEntry">
+      <div>
+        <i *ngIf="dataentries.length > 0">
+          {{ dataentries.length }} total results. 
+          <span
+            *ngIf="visibleCountedDataM.length > 0 "> 
+            {{ filteredDataEntry.length }} 
+            filtered results.
+            <a
+              href="#"
+              class="btn btn-sm btn-link"
+              (click)="resetFilters($event)">reset filters
+            </a>
+          </span>
+        </i>
+        <i *ngIf="dataentries.length === 0">
+          No results to show.
+        </i>
+      </div>
+      <div *ngIf="dataentries.length > 0">
+        <dataset-viewer
+          class="mt-1"
+          *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
+          (showPreviewDataset)="onShowPreviewDataset($event)"
+          [dataset]="dataset">
+          <div regionTagsContainer>
+
+            <!-- TODO may want to separate the region badge into a separate component -->
+            <span
+              *ngFor="let region of dataset.parcellationRegion"
+              class="badge badge-secondary mr-1 mw-100">
+              <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+                
+              </span>
+              <span class="d-inline-block mw-100 overflow-hidden text-truncate">
+                {{ region.name }}
+              </span>
+            </span>
+          </div>
+        </dataset-viewer>
+      </div>
+      
+      <pagination-component
+        (paginationChange)="currentPage = $event"
+        [hitsPerPage]="hitsPerPage"
+        [total]="filteredDataEntry.length"
+        [currentPage]="currentPage">
+      </pagination-component>
+    </div>
+
+  </div>
+</ng-template>
+

@@ -1,5 +1,5 @@
-const validTypes = ['CHECK_MESHES', 'GET_LANDMARKS_VTK', 'GET_USERLANDMARKS_VTK']
-const validOutType = ['CHECKED_MESH', 'ASSEMBLED_LANDMARKS_VTK', 'ASSEMBLED_USERLANDMARKS_VTK']
+const validTypes = ['CHECK_MESHES', 'GET_LANDMARKS_VTK', 'GET_USERLANDMARKS_VTK', 'BUILD_REGION_SELECTION_TREE']
+const validOutType = ['CHECKED_MESH', 'ASSEMBLED_LANDMARKS_VTK', 'ASSEMBLED_USERLANDMARKS_VTK', 'RETURN_REBUILT_REGION_SELECTION_TREE']
 
 const checkMeshes = (action) => {
   
@@ -205,6 +205,22 @@ const getuserLandmarksVtk = (action) => {
   const scale = action.scale
     ? action.scale
     : 2.8
+
+  /**
+   * if userlandmarks vtk is empty, that means user removed all landmarks
+   * thus, removing revoking URL, and send null as assembled userlandmark vtk
+   */
+  if (landmarks.length === 0) {
+
+    if(userLandmarkVtkUrl) URL.revokeObjectURL(userLandmarkVtkUrl)
+
+    postMessage({
+      type: 'ASSEMBLED_USERLANDMARKS_VTK'
+    })
+
+    return
+  }
+
   const vtk = parseLmToVtk(landmarks, scale)
   if(!vtk)
     return
@@ -219,9 +235,42 @@ const getuserLandmarksVtk = (action) => {
   })
 }
 
+const rebuildSelectedRegion = (payload) => {
+  const { selectedRegions, regions } = payload
+
+  /**
+   * active tree branch
+   * branch is active if ALL children are active
+   */
+  const activeTreeBranch = []
+  const isRegionActive = (region) => selectedRegions.some(r => r.name === region.name)
+    || region.children && region.children.length > 0 && region.children.every(isRegionActive)
+  
+  /**
+   * some active tree branch
+   * branch is active if SOME children are active
+   */
+  const someActiveTreeBranch = []
+  const isSomeRegionActive = (region) => selectedRegions.some(r => r.name === region.name)
+    || region.children && region.children.length > 0 && region.children.some(isSomeRegionActive)
+
+  const handleRegion = (r) => {
+    isRegionActive(r) ? activeTreeBranch.push(r) : {}
+    isSomeRegionActive(r) ? someActiveTreeBranch.push(r) : {}
+    if (r.children && r.children.length > 0) 
+      r.children.forEach(handleRegion)
+  }
+  regions.forEach(handleRegion)
+  postMessage({
+    type: 'RETURN_REBUILT_REGION_SELECTION_TREE',
+    rebuiltSelectedRegions: activeTreeBranch,
+    rebuiltSomeSelectedRegions: someActiveTreeBranch
+  })
+}
+
 onmessage = (message) => {
   
-  if(validTypes.findIndex(type => type === message.data.type)>=0){
+  if(validTypes.findIndex(type => type === message.data.type) >= 0){
     switch(message.data.type){
       case 'CHECK_MESHES':
         checkMeshes(message.data)
@@ -231,6 +280,9 @@ onmessage = (message) => {
         return
       case 'GET_USERLANDMARKS_VTK':
         getuserLandmarksVtk(message.data)
+        return
+      case 'BUILD_REGION_SELECTION_TREE':
+        rebuildSelectedRegion(message.data)
         return
       default:
         console.warn('unhandled worker action', message)

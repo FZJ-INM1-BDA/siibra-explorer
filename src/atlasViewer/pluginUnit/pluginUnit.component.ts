@@ -17,7 +17,8 @@ export class PluginUnit implements OnDestroy{
   }
 
   ngOnDestroy(){
-    console.log('plugin being destroyed')
+    if (!PRODUCTION)
+      console.log('plugin being destroyed')
   }
 
 }

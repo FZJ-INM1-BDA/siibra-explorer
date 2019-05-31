@@ -1,83 +1,66 @@
 <ng-template #container>
 </ng-template>
 
-<ui-splashscreen *ngIf = "!viewerLoaded">
+<ui-splashscreen (contextmenu)="$event.stopPropagation();" *ngIf="!viewerLoaded">
 </ui-splashscreen>
 
 <div landmarkMasterContainer>
 
   <div>
-    <layout-floating-container
-      pos00 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(0,spatialData)"
-        [positionY] = "getPositionY(0,spatialData)"
-        [positionZ] = "getPositionZ(0,spatialData)">
+    <layout-floating-container pos00 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+        [highlight]="spatialData.highlight ? spatialData.highlight : false"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+        [positionX]="getPositionX(0,spatialData)" [positionY]="getPositionY(0,spatialData)"
+        [positionZ]="getPositionZ(0,spatialData)">
       </nehuba-2dlandmark-unit>
 
-      <div *ngIf = "sliceViewLoading0$ | async" class = "loadingIndicator">
-        <div class = "spinnerAnimationCircle">
+      <div *ngIf="sliceViewLoading0$ | async" class="loadingIndicator">
+        <div class="spinnerAnimationCircle">
 
         </div>
       </div>
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos01 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(1,spatialData)"
-        [positionY] = "getPositionY(1,spatialData)"
-        [positionZ] = "getPositionZ(1,spatialData)">
+    <layout-floating-container pos01 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+        [highlight]="spatialData.highlight ? spatialData.highlight : false"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+        [positionX]="getPositionX(1,spatialData)" [positionY]="getPositionY(1,spatialData)"
+        [positionZ]="getPositionZ(1,spatialData)">
       </nehuba-2dlandmark-unit>
-      
-      <div *ngIf = "sliceViewLoading1$ | async" class = "loadingIndicator">
-        <div class = "spinnerAnimationCircle">
+
+      <div *ngIf="sliceViewLoading1$ | async" class="loadingIndicator">
+        <div class="spinnerAnimationCircle">
 
         </div>
       </div>
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos10 
-      landmarkContainer>
-      <nehuba-2dlandmark-unit 
-        *ngFor = "let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter) = "handleMouseEnterLandmark(spatialData)"
-        (mouseleave) = "handleMouseLeaveLandmark(spatialData)"
-        [highlight] = "spatialData.highlight ? spatialData.highlight : false"
-        [glyphiconClass] = "spatialData.type === 'userLandmark' ? 'glyphicon-chevron-down' : 'glyphicon-map-marker'"
-        [positionX] = "getPositionX(2,spatialData)"
-        [positionY] = "getPositionY(2,spatialData)"
-        [positionZ] = "getPositionZ(2,spatialData)">
+    <layout-floating-container pos10 landmarkContainer>
+      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+        [highlight]="spatialData.highlight ? spatialData.highlight : false"
+        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+        [positionX]="getPositionX(2,spatialData)" [positionY]="getPositionY(2,spatialData)"
+        [positionZ]="getPositionZ(2,spatialData)">
       </nehuba-2dlandmark-unit>
-      
-      <div *ngIf = "sliceViewLoading2$ | async" class = "loadingIndicator">
-        <div class = "spinnerAnimationCircle">
+
+      <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
+        <div class="spinnerAnimationCircle">
 
         </div>
       </div>
     </layout-floating-container>
   </div>
   <div>
-    <layout-floating-container  
-      pos11 
-      landmarkContainer>
-      <div *ngIf = "perspectiveViewLoading$ | async" class = "loadingIndicator">
-        <div class = "spinnerAnimationCircle"></div>
+    <layout-floating-container pos11 landmarkContainer>
+      <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
+        <div class="spinnerAnimationCircle"></div>
         <div perspectiveLoadingText>
           {{ perspectiveViewLoading$ | async }}
         </div>
@@ -86,60 +69,35 @@
   </div>
 </div>
 
-<layout-floating-container *ngIf = "viewerLoaded">
-
-  <!-- TODO export status card to its own container -->
-  <div statusCard>
-
-    <hr *ngIf = "showCitation && !isMobile" />
-
-    <div linksContainer>
-      <a href = "#" (click)="$event.preventDefault();statusPanelRealSpace = !statusPanelRealSpace">
-        {{statusPanelRealSpace ? 'real space' : 'voxel space'}}
-      </a>
-  
-      <a href = "#" (click) = "$event.preventDefault();resetNavigation()">
-        reset navigation
-      </a>
-    </div>
-  
-    <br />
-    <div textContainer>
-      <small>Navigation: </small>
-        <input 
-          (keydown.enter) = "textNavigateTo(navigateInput.value)"
-          (keydown.tab) = "textNavigateTo(navigateInput.value)"
-          [ngModel] = "navigationValue()" 
-          spellcheck = "false"
-          #navigateInput
-          navigateInput/>
-    
-      <br />
-      <small *ngIf = "!isMobile">Mouse: </small>
-      <small *ngIf = "!isMobile">
-        {{ mouseCoord }}
-      </small> 
-      <br *ngIf = "!isMobile" />
-      <small onHoverSegment>
-        {{ onHoverSegmentName$ | async }}
-      </small>
-    </div>
-  </div>
+<layout-floating-container *ngIf="viewerLoaded && !isMobile">
+  <!-- StatusCard container-->
+  <ui-status-card [selectedTemplate]="selectedTemplate" [isMobile]="isMobile"
+    [onHoverSegmentName]="onHoverSegmentName$ | async" [nehubaViewer]="nehubaViewer">
+  </ui-status-card>
 </layout-floating-container>
 
-<mobile-overlay 
-  *ngIf = "isMobile && viewerLoaded" 
-  [tunableProperties] = "tunableMobileProperties" 
-  (deltaValue) = "handleMobileOverlayEvent($event)">
-  <div mobileObliqueGuide guide>
-    <div>
-      <i class="glyphicon glyphicon-resize-vertical"></i> oblique mode 
-    </div>
-    <div>
-      <i class="glyphicon glyphicon-resize-horizontal"></i> rotate slice
+<div id="scratch-pad">
+
+</div>
+
+<mobile-overlay *ngIf="isMobile && viewerLoaded" [tunableProperties]="tunableMobileProperties"
+  (deltaValue)="handleMobileOverlayEvent($event)">
+  <div class="base" delta>
+    <div mobileObliqueGuide class="p-2 mb-4 shadow">
+      {{ selectedProp }}
     </div>
   </div>
-  <div mobileObliqueCtrl initiator>
-    <i class="glyphicon glyphicon-globe"></i>
+  <div class="base" guide>
+    <div mobileObliqueGuide class="p-2 mb-4 shadow">
+      <div>
+        <i class="fas fa-arrows-alt-v"></i> oblique mode
+      </div>
+      <div>
+        <i class="fas fa-arrows-alt-h"></i> rotate slice
+      </div>
+    </div>
+  </div>
+  <div (contextmenu)="$event.stopPropagation(); $event.preventDefaul();" mobileObliqueCtrl initiator>
+    <i class="fas fa-globe"></i>
   </div>
 </mobile-overlay>

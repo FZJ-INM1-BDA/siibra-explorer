@@ -1,0 +1,23 @@
+:host
+{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+:host > *
+{
+  margin-top: 1em;
+  display:inline-block;
+}
+
+:host >>> .tooltip-inner
+{
+  background-color: rgba(128, 128, 128, 0.5);
+}
+
+:host >>> .tooltip.right .tooltip-arrow::before,
+:host >>> .tooltip.right .tooltip-arrow
+{
+  border-right-color: rgba(128, 128, 128, 0.5);
+}

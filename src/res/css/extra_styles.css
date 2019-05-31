@@ -2,6 +2,7 @@ html
 {
   width:100%;
   height:100%;
+  font-size:90%;
 }
 body
 {
@@ -10,7 +11,7 @@ body
   margin:0;
   border:0;
 
-  /* required for glyphicon tooltip directives */
+  /* required for fas tooltip directives */
   overflow:hidden;
 }
 div.scale-bar-container
@@ -23,6 +24,7 @@ div.scale-bar-container
   padding: 2px;
   font-weight: 700;
   pointer-events: none;
+  user-select: none;
 }
 
 div.scale-bar
@@ -149,7 +151,7 @@ markdown-dom pre code
   background-color:rgba(150,150,0,0.5);
 }
 
-.glyphicon-none
+.fa-none
 {
   width:1em;
 }
@@ -244,4 +246,98 @@ markdown-dom pre code
 {
   background-color: rgba(70, 70 , 70, 1.0);
   color: rgba(255, 255, 255, 1.0);
+}
+
+.darktheme.popover
+{
+  background-color:rgba(0, 0, 0, 0.8);
+}
+
+.darktheme.popover .popover-body
+{
+  color:white;
+}
+
+.darktheme.popover.popover-bottom>.arrow::after
+{
+  border-bottom-color: rgba(0, 0, 0, 0.8);
+}
+
+.darktheme.popover.popover-right>.arrow::after
+{
+  border-right-color: rgba(0, 0, 0, 0.8);
+}
+
+.r-90
+{
+  transform: rotate(90deg)!important;
+}
+
+.ws-no-wrap
+{
+  white-space: nowrap!important;
+}
+.ws-initial
+{
+  white-space: initial!important;
+}
+
+.mw-100
+{
+  max-width: 100%!important;
+}
+
+.mw-50
+{
+  max-width: 50%!important;
+}
+
+.mw-60
+{
+  max-width: 60%!important;
+}
+
+.mh-20em
+{
+  max-height: 20em;
+}
+
+.pe-all
+{
+  pointer-events: all;
+}
+
+.t-a-ease-500
+{
+  transition: all ease 500ms;
+}
+
+.h-0
+{
+  height: 0px;
+}
+
+.pe-none
+{
+  pointer-events: none;
+}
+
+.h-100
+{
+  height:100%;
+}
+
+.overflow-x-hidden
+{
+  overflow-x:hidden;
+}
+
+.muted
+{
+  opacity : 0.5!important;
+}
+
+.text-semi-transparent
+{
+  opacity: 0.5;
 }

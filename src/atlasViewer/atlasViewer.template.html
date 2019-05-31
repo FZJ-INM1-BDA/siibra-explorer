@@ -1,179 +1,280 @@
-<div *ngIf = "meetsRequirement" class = "atlas-container">
+<ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
-  <layout-mainside
-    [showSide] = "false"
-    [animationFlag] = "false"
-    (panelAnimationEnd) = "panelAnimationEnd($event)">
-    <div maincontent>
-      <ui-nehuba-container>
-      </ui-nehuba-container>
-
-      <div bannerWrapper>
-
-        <logo-container>
-        </logo-container>
+<!-- if not mobile -->
+  <ng-template [ngIf]="!isMobile" [ngIfElse]="mobileTemplate">
+    <ng-container *ngTemplateOutlet="viewerBody">
+    </ng-container>
+  </ng-template>
   
-        <atlas-banner *ngIf = "!isMobile">
-        </atlas-banner>
-      </div>
-
-    </div>
-    <div [ngSwitch] = "sidePanelView$ | async" sidecontent>
-      <div *ngSwitchCase = "'menuBrowser'">
-        <panel-component>
-          <div heading>
-            Menu
-          </div>
-          <div mobileMenu body>
-            <atlas-banner>
-
-            </atlas-banner>
-            <template-parcellation-citation-container mobileTemplateCitation>
-
-            </template-parcellation-citation-container>
-          </div>
-        </panel-component>
-      </div>
+  <!-- if mobile -->
+  <ng-template #mobileTemplate>
+    <mat-sidenav-container
+      (backdropClick)="changeMenuState({close: true})"
+      class="w-100 h-100">
+      <mat-sidenav
+        #sidenav
+        [fixedInViewport]="true"
+        [disableClose]="true"
+        [opened]="sidePanelOpen$ | async" 
+        class="mobileNavigationPanel p-2"
+        [ngStyle]="{'background-color': darktheme? '#404040' : '#F2F2F2'}" >
+  
+        <!-- 'absorbs' the auto-focus behavior -->
+        <button mat-button style="height: 0; position: absolute;"></button>
+        <logo-container class="logoContainerMobile"></logo-container>
+  
+        <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
+          <tab heading="Template">
+            <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+            <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
+              <ui-status-card 
+                  [selectedTemplate]="selectedTemplate" 
+                  [isMobile]="isMobile"
+                  [onHoverSegmentName]="this.nehubaContainer.onHoverSegmentName$ | async"
+                  [nehubaViewer]="this.nehubaContainer.nehubaViewer">
+              </ui-status-card>
+            </layout-floating-container>
+          </tab>
+          <tab heading="Containers">
+            <menu-icons iconWrapper hidden #MenuIcons>
+            </menu-icons>
+            <panel-component>
+              <div class="m-2" heading>
+                Layer Browser
+              </div>
+              <div class="m-2" body>
+                <layer-browser></layer-browser>
+              </div>
+            </panel-component>
+            <div dockedContainerDirective>
+            </div>
+          </tab>
+        </tabset>
+  
+      </mat-sidenav>
       
-      <!-- Data Browser -->
-      <div *ngSwitchCase = "'dataBrowser'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Data Browser
-          </div>
-          <data-browser body>
-          </data-browser>
-        </panel-component>
-      </div>
-
-      <!-- Layer Browser -->
-      <div *ngSwitchCase = "'ngLayer'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Layer Browser
-          </div>
-          <layer-browser body>
-          </layer-browser>
-        </panel-component>
-      </div>
-
-      <!-- Tools Browser-->
-      <div *ngSwitchCase = "'toolsBrowser'">
-        <panel-component [bodyCollapsable] = "true">
-          <div heading>
-            Tools Browser
-          </div>
-          <plugin-banner body>          
-          </plugin-banner>
-        </panel-component>
-      </div>
-
-      <!-- Default (shown at the beginning + sliver of time during closing of side bar)-->
-      <div *ngSwitchDefault>
-        
-      </div>
-      
-      <!-- Docked Container-->
-      <div dockedContainer #dockedContainer>
+      <mat-sidenav-content>
+        <ng-container *ngTemplateOutlet="viewerBody">
+  
+        </ng-container>
+      </mat-sidenav-content>
+  
+    </mat-sidenav-container>
+  
+    <div class="btnWrapper btnWrapper-lg menuButtonMobile m-2" (click)="changeMenuState()">
+      <div
+        class="shadow btn btn-sm btn-secondary rounded-circle">
+        <i class="fas fa-bars"></i>
       </div>
     </div>
+  </ng-template>
+</ng-container>
 
-    <div resizeSliver>
-      <span
-        *ngIf = "isMobile"
-        class = "tabContainer"
-        (click) = "toggleSidePanel('menuBrowser')"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'menuBrowser'}" >
-        <i class="glyphicon glyphicon-info-sign"></i>
-      </span>
 
-      <span 
-        container = "body"
-        placement = "left"
-        [tooltip] = "isMobile ? null : !(selectedPOI$ | async) ? '' : (((selectedPOI$ | async).length === 0 ? 'No' : (selectedPOI$ | async).length) + ' selected region' + ((selectedPOI$ | async).length > 1 ? 's' : '')) + ' of interest' "
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'dataBrowser'}" 
-        (click) = "toggleSidePanel('dataBrowser')" 
-        class = "tabContainer">
-        <span  [@newEvent] = "selectedPOI$ | async" class = "highlightContainer">
-        </span>
-        <i class = "glyphicon glyphicon-search"></i>
-        <span class = "badge" *ngIf = "(selectedPOI$ | async) && (selectedPOI$ | async).length > 0">
-          {{ (selectedPOI$ | async).length }}
-        </span>
-      </span>
-
-      <span 
-        placement = "left"
-        [tooltip] = "isMobile ? null : !ngLayers ? '' : ((ngLayers.length === 0 ? 'No' : ngLayers.length) + ' loaded layer' + (ngLayers.length > 1 ? 's' : ''))"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'ngLayer'}" 
-        (click) = "toggleSidePanel('ngLayer')" 
-        class = "tabContainer">
-        <span  [@newEvent] = "ngLayers" class = "highlightContainer">
-        </span>
-        <i class = "glyphicon glyphicon-list"></i>
-        <span class = "badge" *ngIf = "ngLayers && ngLayers.length > 0">      
-          {{ ngLayers.length }}
-        </span>
-      </span>
-
-      <span 
-        placement = "left"
-        (mouseover) = "_toolIconsVisible = true" 
-        (mouseout) = "_toolIconsVisible = false"
-        [tooltip] = "isMobile ? null : _toolIconDockAll ? 'dock all widgets' : _toolIconFloatAll ? 'float all widgets' : 'Tools Browser'"
-        [ngClass] = "{'active-tab' : (sidePanelView$ | async) === 'toolsBrowser'}" 
-        (click) = "toggleSidePanel('toolsBrowser')" 
-        class = "tabContainer">
-        <i class="glyphicon glyphicon-wrench"></i>
-        <span *ngIf = "!isMobile" class ="badge">
-          <span [class.hidden] = "_toolIconsVisible" >
-            ...
-          </span>
-          <span [class.hidden] = "!_toolIconsVisible">
-            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.dockAllWidgets()" (mouseover) = "_toolIconDockAll = true" (mouseout) = "_toolIconDockAll = false">
-              <i class = "no-pointer-events glyphicon glyphicon-log-in"></i>
-            </span>
-            <span class = "mute-text">
-              |
-            </span>
-            <span class = "pointer-events" (click) = "$event.stopPropagation();this.widgetServices.floatAllWidgets()" (mouseover) = "_toolIconFloatAll = true" (mouseout) = "_toolIconFloatAll = false">
-              <i class = "no-pointer-events glyphicon glyphicon-new-window"></i>
-            </span>
-          </span>
-        </span>
-      </span>
-    </div>
-  </layout-mainside>
-
-  <layout-floating-container
-    zIndex = "9"
-    #floatingOverlayContainer>
-    <ng-template #floatingContainer>
-
-    </ng-template>
-    <div [style.transform] = "floatingMouseContextualContainerTransform" floatingMouseContextualContainer>
-      <div 
-        *ngIf = "onhoverLandmark$ | async" 
-        contextualBlock>
-        {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+<ng-template #helpComponent>
+  <tabset>
+    <tab heading="Help">
+      <help-component>
+      </help-component>
+    </tab>
+    <tab heading="Settings">
+      <div class="mt-2">
+        <config-component>
+        </config-component>
       </div>
-      <div 
-        *ngIf = "onhoverSegment$ | async as onhoverSegment " 
-        contextualBlock>
-        {{ onhoverSegment }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+    </tab>
+    <tab heading="Privacy Policy">
+      <div class="mt-2">
+        <cookie-agreement>
+        </cookie-agreement>
       </div>
-      <!-- TODO Potentially implementing plugin contextual info -->
-    </div>
-    <div toastContainer>
-      <ng-template #toastContainer>
-      </ng-template>
-    </div>
-  </layout-floating-container>
+    </tab>
+    <tab heading="Terms of Use">
+      <div class="mt-2">
+        <kgtos-component>
+        </kgtos-component>
+      </div>
+    </tab>
+  </tabset>
+</ng-template>
+<ng-template #signinModalComponent>
+  <signin-modal>
+    
+  </signin-modal>
+</ng-template>
 
-  <ng-template #pluginFactory>
+<ng-template #kgToS>
+    <kgtos-component>
+    </kgtos-component>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" (click)="kgTosClickedOk()">Ok</button>
+    </div>
   </ng-template>
 
-</div>
+<ng-template #cookieAgreementComponent>
+  <cookie-agreement>
+  </cookie-agreement>
 
-<markdown-dom minReqMd *ngIf = "!meetsRequirement" [markdown] = "constantsService.minReqMD" >
-</markdown-dom>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="cookieClickedOk()">Ok</button>
+  </div>
+</ng-template>
+
+<!-- atlas template -->
+<ng-template #viewerBody>
+  <div class="atlas-container" helpdirective>
+
+    <ui-nehuba-container (contextmenu)="nehubaClickHandler($event)">
+    </ui-nehuba-container>
+  
+    <div *ngIf="!isMobile" bannerWrapper>
+      <menu-icons iconWrapper>
+      </menu-icons>
+      <signin-banner signinWrapper>
+      </signin-banner>
+    </div>
+  
+    <layout-floating-container
+      zIndex="13"
+      #floatingOverlayContainer>
+      <div floatingContainerDirective>
+  
+      </div>
+      
+      <!-- TODO move to nehuba overlay container -->
+      <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>
+        <div heading>
+          <h5 class="pe-all p-2 m-0">
+            What's here?
+          </h5>
+        </div>
+        <div body>
+
+          <div
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+            class="p-2">
+            Search for data relating to:
+          </div>
+          
+          <div
+            *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
+            (click)="searchRegion([onhoverSegmentFixed])"
+            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
+            data-toggle="tooltip" 
+            data-placement="top" 
+            [title]="onhoverSegmentFixed.name">
+            <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
+          </div>
+  
+          <div
+            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
+            (click)="searchRegion(selectedRegions)"
+            class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+            <ng-container *ngIf="selectedRegions.length > 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
+            </ng-container>
+            <ng-container *ngIf="selectedRegions.length === 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
+            </ng-container>
+          </div>
+          
+          <div
+            class="p-2 text-muted"
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">
+            Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
+          </div>
+  
+          <ng-template #noRegionSelected>
+            <div
+              (click)="searchRegion()"
+              class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+              No region selected. Search KG for all datasets in this template space.
+            </div>
+          </ng-template>
+  
+        </div>
+      </panel-component>
+      
+      <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
+        <div 
+          *ngIf="onhoverLandmark$ | async" 
+          contextualBlock>
+          {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+        </div>
+        <div 
+          *ngIf="onhoverSegments$ | async; let onhoverSegments"
+          contextualBlock>
+          <div
+            *ngFor="let segment of onhoverSegments"
+            [innerHtml]="segment | transformOnhoverSegment">
+          </div>
+          <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+        </div>
+        <!-- TODO Potentially implementing plugin contextual info -->
+      </div>
+  
+      <div toastContainer>
+        <div toastDirective>
+        </div>
+      </div>
+    </layout-floating-container>
+  
+    <div pluginFactoryDirective>
+    </div>
+  </div>
+</ng-template>
+
+<!-- does not meet req template -->
+<ng-template #doesNotMeetReqTemplate>
+  <div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
+    <div class="jumbotron bg-light text-center mb-0">
+      <div>
+        <h1 class="mb-3">
+          <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
+        </h1>
+        <p>
+          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a>
+          <!-- or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox (&lt; 67)</a> for viewing the interactive viewer. -->
+        </p>
+        <div class="col-6 d-inline-block text-left">
+          <readmore-component
+            [collapsedHeight]="0">
+            <markdown-dom [markdown]="constantsService.minReqExplaner">
+  
+            </markdown-dom>
+          </readmore-component>
+        </div>
+        
+      </div>
+    </div>
+    <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
+      <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer [style.backgroundImage]="'url(' + preview.previewSrc + ')'" >
+        <div class="mt-2 card d-inline-block displayCard">
+          <div class="card-body">
+            {{ preview.text }}
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #publications >
+  <div *ngIf="tPublication || pPublication" class="timerToast">
+    <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications()">↓</button>
+
+    <div *ngIf="tPublication">
+      <p>{{selectedTemplate['name']}} Publication(s)</p>
+      <div *ngFor="let tp of tPublication" class="textPartInPublications">
+        <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
+      </div>
+      <hr *ngIf="pPublication">
+    </div>
+    <div *ngIf="pPublication">
+      <p>{{selectedParcellation['name']}} Publication(s)</p>
+      <div *ngFor="let pp of pPublication" class="textPartInPublications">
+        <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>
+      </div>  
+    </div>
+  </div>
+</ng-template>

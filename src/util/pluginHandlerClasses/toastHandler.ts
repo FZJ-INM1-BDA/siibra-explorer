@@ -4,4 +4,5 @@ export class ToastHandler{
   dismissable : boolean = true
   show : () => void
   hide : () => void
+  htmlMessage: string
 }

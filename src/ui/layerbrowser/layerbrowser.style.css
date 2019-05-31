@@ -16,11 +16,6 @@ div[body]
   background-color:rgba(0, 0, 0, 0.1);
 }
 
-.muted
-{
-  opacity : 0.5;
-}
-
 .muted-text
 {
   text-decoration: line-through;
@@ -33,13 +28,17 @@ div[body]
   align-items: center;
 }
 
-.glyphicon.blue
+.fas.blue
 {
   color: #337ab7;
 }
 
-.glyphicon.red
+.fas.red
 {
   color: red;
 }
 
+.noLayerPlaceHolder
+{
+  padding: 0.5em 1em;
+}

@@ -4,16 +4,18 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
   selector : 'pagination-component',
   templateUrl : './pagination.template.html',
   styleUrls : [
-    './pagination.style.css'
+    './pagination.style.css',
+    '../../css/darkBtns.css'
   ]
 })
 
-export class PaginationComponent{
+export class PaginationComponent {
   @Input() total : number = 0
   @Input() hitsPerPage : number = 15
   @Input() currentPage : number = 0
 
   @Output() paginationChange : EventEmitter<number> = new EventEmitter()
+  @Output() outOfBound: EventEmitter<number> = new EventEmitter()
 
   goto(pgnum:number){
     const emitValue = pgnum < 0 ? 

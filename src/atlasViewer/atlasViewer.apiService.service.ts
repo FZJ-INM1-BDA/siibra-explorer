@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, distinctUntilChanged, filter } from "rxjs/operators";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
+import { PluginManifest } from "./atlasViewer.pluginService.service";
 
 declare var window
 
@@ -107,6 +108,13 @@ export class AtlasViewerAPIServices{
         /* to be overwritten by atlasViewer.component.ts */
         getToastHandler : () => {
           throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
+        },
+
+        /**
+         * to be overwritten by atlas
+         */
+        launchNewWidget: (manifest) => {
+          return Promise.reject('Needs to be overwritted')
         }
       },
       pluginControl : {
@@ -119,6 +127,11 @@ export class AtlasViewerAPIServices{
     }
     window['interactiveViewer'] = this.interactiveViewer
     this.init()
+
+    /**
+     * TODO debugger debug
+     */
+    window.uiHandle = this.interactiveViewer.uiHandle
   }
 
   private init(){
@@ -164,8 +177,9 @@ export interface InteractiveViewerInterface{
   }
 
   uiHandle : {
-    getModalHandler : () => ModalHandler
-    getToastHandler : () => ToastHandler
+    getModalHandler: () => ModalHandler
+    getToastHandler: () => ToastHandler
+    launchNewWidget: (manifest:PluginManifest) => Promise<any>
   }
 
   pluginControl : {

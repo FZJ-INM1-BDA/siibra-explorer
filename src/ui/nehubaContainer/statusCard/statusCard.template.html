@@ -1,0 +1,57 @@
+<div statusCard>
+
+    <div linksContainer>
+      <span>
+        reset: 
+      </span>
+      <a
+        href="#"
+        (click)="$event.preventDefault();resetNavigation({position:true})">
+        position
+      </a>
+
+      <a
+        href="#"
+        (click)="$event.preventDefault();resetNavigation({rotation:true})">
+        rotation
+      </a>
+
+      <a
+        href="#"
+        (click)="$event.preventDefault();resetNavigation({zoom:true})">
+        zoom
+      </a>
+
+      <br />
+      <span>
+        space:
+      </span>
+      
+      <a href="#" (click)="$event.preventDefault();statusPanelRealSpace=!statusPanelRealSpace">
+        {{statusPanelRealSpace ? 'physical' : 'voxel'}}
+      </a>
+  
+    </div>
+  
+    <br />
+    <div textContainer>
+      <small>Navigation: </small>
+        <input 
+          (keydown.enter)="textNavigateTo(navigateInput.value)"
+          (keydown.tab)="textNavigateTo(navigateInput.value)"
+          [ngModel]="navigationValue()" 
+          spellcheck="false"
+          #navigateInput
+          navigateInput/>
+    
+      <br />
+      <small *ngIf="!isMobile">Mouse: </small>
+      <small *ngIf="!isMobile">
+        {{ mouseCoord }}
+      </small> 
+      <br *ngIf="!isMobile" />
+      <small onHoverSegment>
+        {{ onHoverSegmentName }}
+      </small>
+    </div>
+  </div>

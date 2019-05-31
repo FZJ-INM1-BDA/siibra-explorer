@@ -1,11 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, getLabelIndexMap, SELECT_REGIONS, CHANGE_NAVIGATION, LOAD_DEDICATED_LAYER, ADD_NG_LAYER, PluginInitManifestInterface } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER, generateLabelIndexId } from "../services/stateStore.service";
+import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
-import { getActiveColorMapFragmentMain } from "../ui/nehubaContainer/nehubaContainer.component";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { ToastService } from "src/services/toastService.service";
+import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 
 declare var window
 
@@ -21,7 +23,8 @@ export class AtlasViewerURLService{
   constructor(
     private store : Store<ViewerStateInterface>,
     private pluginService : PluginServices,
-    private constantService:AtlasViewerConstantsServices
+    private constantService:AtlasViewerConstantsServices,
+    private toastService: ToastService
   ){
 
     this.pluginState$ = this.store.pipe(
@@ -49,6 +52,9 @@ export class AtlasViewerURLService{
       scan((acc,val)=>Object.assign({},acc,val),{})
     )
 
+    /**
+     * TODO change additionalNgLayer to id, querying node backend for actual urls
+     */
     this.additionalNgLayers$ = combineLatest(
       this.changeQueryObservable$.pipe(
         map(state => state.templateSelected)
@@ -80,33 +86,77 @@ export class AtlasViewerURLService{
       take(1),
       map(ft => ft.filter(t => t !== null))
     ).subscribe(fetchedTemplates=>{
+
+      /**
+       * TODO
+       * consider what to do when we have ill formed search params
+       * param validation?
+       */
       const searchparams = new URLSearchParams(window.location.search)
  
       /* first, check if any template and parcellations are to be loaded */
       const searchedTemplatename = searchparams.get('templateSelected')
       const searchedParcellationName = searchparams.get('parcellationSelected')
+
+      if (!searchedTemplatename) {
+        const urlString = window.location.href
+        /**
+         * TODO think of better way of doing this
+         */
+        history.replaceState(null, '', urlString.split('?')[0])
+        return
+      }
       
       const templateToLoad = fetchedTemplates.find(template=>template.name === searchedTemplatename)
-      if(!templateToLoad)
+      if (!templateToLoad) {
+        this.toastService.showToast(
+          this.constantService.incorrectTemplateNameSearchParam(searchedTemplatename),
+          {
+            timeout: 5000
+          }
+        )
+        const urlString = window.location.href
+        /**
+         * TODO think of better way of doing this... maybe pushstate?
+         */
+        history.replaceState(null, '', urlString.split('?')[0])
         return
-      const parcellationToLoad = templateToLoad ? 
-        templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName) :
-        templateToLoad.parcellations[0]
+      }
+
+      /**
+       * TODO if search param of either template or parcellation is incorrect, wrong things are searched
+       */
+      const parcellationToLoad = templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName)
+
+      if (!parcellationToLoad) {
+        this.toastService.showToast(
+          this.constantService.incorrectParcellationNameSearchParam(searchedParcellationName),
+          {
+            timeout: 5000
+          }
+        )
+      }
       
       this.store.dispatch({
         type : NEWVIEWER,
         selectTemplate : templateToLoad,
-        selectParcellation : parcellationToLoad
+        selectParcellation : parcellationToLoad || templateToLoad.parcellations[0]
       })
 
       /* selected regions */
-      const labelIndexMap = getLabelIndexMap(parcellationToLoad.regions)
-      const selectedRegions = searchparams.get('regionsSelected')
-      if(selectedRegions){
-        this.store.dispatch({
-          type : SELECT_REGIONS,
-          selectRegions : selectedRegions.split('_').map(labelIndex=>labelIndexMap.get(Number(labelIndex)))
-        })
+      if (parcellationToLoad && parcellationToLoad.regions) {
+        /**
+         * either or both parcellationToLoad and .regions maybe empty
+         */
+        const selectedRegionsParam = searchparams.get('regionsSelected')
+        if(selectedRegionsParam){
+          const ids = selectedRegionsParam.split('_')
+
+          this.store.dispatch({
+            type : SELECT_REGIONS_WITH_ID,
+            selectRegionIds: ids
+          })
+        }
       }
       
       /* now that the parcellation is loaded, load the navigation state */
@@ -135,7 +185,7 @@ export class AtlasViewerURLService{
             name : layer,
             source : `nifti://${layer}`,
             mixability : 'nonmixable',
-            shader : getActiveColorMapFragmentMain()
+            shader : this.constantService.getActiveColorMapFragmentMain()
           }
         }))
       }
@@ -143,7 +193,7 @@ export class AtlasViewerURLService{
       const pluginStates = searchparams.get('pluginStates')
       if(pluginStates){
         const arrPluginStates = pluginStates.split('__')
-        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchPlugin(json)).catch(console.error))
+        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchNewWidget(json)).catch(console.error))
       }
     })
 
@@ -173,7 +223,7 @@ export class AtlasViewerURLService{
                   }
                   break;
                 case 'regionsSelected':
-                  _[key] = state[key].map(region=>region.labelIndex).join('_')
+                  _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
                   break;
                 case 'templateSelected':
                 case 'parcellationSelected':
@@ -191,13 +241,27 @@ export class AtlasViewerURLService{
       this.pluginState$
     ).pipe(
       /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
-      map(([navigationState, niftiLayers, pluginState]) => Object.assign({}, navigationState, { pluginStates : Array.from(pluginState.initManifests.values()).filter(v => v !== null).length > 0 ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') : null }, { niftiLayers : niftiLayers.length > 0 ? niftiLayers.map(layer => layer.name).join('__') : null }))
+      map(([navigationState, niftiLayers, pluginState]) => {
+        return {
+          ...navigationState,
+          pluginState: Array.from(pluginState.initManifests.values()).filter(v => v !== null).length > 0 
+            ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') 
+            : null,
+          niftiLayers : niftiLayers.length > 0
+            ? niftiLayers.map(layer => layer.name).join('__')
+            : null
+        }
+      })
     ).subscribe(cleanedState=>{
       const url = new URL(window.location)
       const search = new URLSearchParams( window.location.search )
-      Object.keys(cleanedState).forEach(key=>{
-        cleanedState[key] ? search.set(key,cleanedState[key]) : search.delete(key)
-      })
+      for (const key in cleanedState) {
+        if (cleanedState[key]) {
+          search.set(key, cleanedState[key])
+        } else {
+          search.delete(key)
+        }
+      }
 
       url.search = search.toString()
       history.replaceState(null, '', url.toString())

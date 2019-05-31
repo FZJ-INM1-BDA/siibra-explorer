@@ -1,0 +1,112 @@
+<div *ngIf = "!previewFile">
+  previewFile as an input is required for this component to work...
+</div>
+
+<!-- KG Entry Viewer -->
+<!-- <kg-entry-viewer *ngIf = "previewFile.kgID && false" [dataset] = "previewFile">
+</kg-entry-viewer> -->
+
+<!-- citation -->
+<!-- <citations-component 
+  citationContainer
+  *ngIf = "previewFile && !previewFile.kgID"
+  [properties] = "previewFile.datasetProperties">
+</citations-component> -->
+
+<!-- file viewer -->
+<div 
+  *ngIf = "previewFile"
+  [ngSwitch]="previewFile.mimetype">
+
+  <div emptyRow *ngSwitchCase = "'application/octet-stream'">
+    <!-- downloadable data -->
+  </div>
+
+  <!-- image  -->
+  <div *ngSwitchCase="'image/jpeg'" >
+    <!-- TODO figure out a more elegant way of dealing with draggable img -->
+    <img draggable = "false" [src] = "previewFile.url" />
+  </div>
+
+  <!-- data container -->
+  <div [ngSwitch]="previewFile.data.chartType" *ngSwitchCase="'application/json'">
+    <radar-chart
+      #childChart
+      [colors] = "previewFile.data.colors"
+      [options] = "previewFile.data.chartOptions"
+      [labels]="previewFile.data.labels"
+      [radarDatasets]="previewFile.data.datasets"
+      *ngSwitchCase="'radar'">
+
+    </radar-chart>
+    <line-chart
+      #childChart
+      [colors] = "previewFile.data.colors"
+      [options] = "previewFile.data.chartOptions"
+      [lineDatasets] = "previewFile.data.datasets"
+      *ngSwitchCase = "'line'">
+
+    </line-chart>
+    <div *ngSwitchDefault>
+      The json file is not a chart. I mean, we could dump the json, but would it really help?
+    </div>
+  </div>
+  <div *ngSwitchCase = "'application/hibop'">
+    <div mimetypeTextContainer>
+        You will need to install the HiBoP software on your computer, click the 'Download File' button and open the .hibop file.
+    </div>
+  </div>
+  <div *ngSwitchCase = "'application/nifti'">
+    <dedicated-viewer
+      [previewFile] = "previewFile">
+    </dedicated-viewer>
+  </div>
+  <div *ngSwitchCase = "'application/nehuba-layer'">
+    APPLICATION NEHUBA LAYER - NOT YET IMPLEMENTED
+    <!-- <dedicated-view-controller
+      [dedicatedViewString]="'nehuba-layer://'+previewFile.url"
+      [dedicatedViewNehubaLayerObject]="previewFile.data">
+
+    </dedicated-view-controller> -->
+  </div>
+  <div *ngSwitchDefault>
+    <div mimetypeTextContainer>
+      The selected file with the mimetype {{ previewFile.mimetype }} could not be displayed.
+    </div>
+  </div>
+</div>
+
+<!-- caption -->
+<!-- <readmore-component *ngIf = "previewFile.properties && previewFile.properties.description">
+  <small id = "captions">
+    {{ previewFile.properties.description }}
+  </small>
+</readmore-component> -->
+
+<div
+  anchorContainer
+  *ngIf="downloadUrl">
+  <a
+    class="btn btn-sm btn-outline-secondary rounded-circle"
+    tooltip="Download file"
+    container="body"
+    [href]="downloadUrl"
+    target="_blank"
+    download>
+    <i class="far fa-arrow-alt-circle-down"></i>
+  </a>
+</div>
+
+<div
+  anchorContainer
+  *ngIf="downloadPng">
+  <a
+    class="btn btn-sm btn-outline-secondary rounded-circle"
+    tooltip="Download chart as an image"
+    container="body"
+    [href]="downloadPng"
+    target="_blank"
+    download>
+    <i class="far fa-image"></i>
+  </a>
+</div>

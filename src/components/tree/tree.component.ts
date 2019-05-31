@@ -96,10 +96,10 @@ export class TreeComponent extends ParseAttributeDirective implements OnChanges,
     return this.children ? 
       this.children.length > 0 ?
         this.childrenExpanded ? 
-          'glyphicon-chevron-down' :
-          'glyphicon-chevron-right' :
-        'glyphicon-none' :
-      'glyphicon-none'
+          'fa-chevron-down' :
+          'fa-chevron-right' :
+        'fa-none' :
+      'fa-none'
   }
 
   public handleEv(event:Event){

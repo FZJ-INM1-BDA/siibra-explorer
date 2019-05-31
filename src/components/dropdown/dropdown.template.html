@@ -1,24 +1,30 @@
+<!-- TODO remove dependency on ismobile -->
 <span
-  class = "btn btn-default"
-  [innerHTML] = "activeDisplay(selectedItem)"
-  hoverable
+  class="btn btn-default"
+  [innerHTML]="activeDisplay(selectedItem)"
+  [hoverable]="{translateY:-2}"
   #dropdownToggle
-  dropdownToggle>
+  dropdownToggle
+              
+  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+
 </span>
 
-<ul 
-  class="dropdown-menu"
-  role="menu"
-  [@showState] = "openState ? 'show' : 'hide'">
-  <li 
-    *ngFor="let input of inputArray" 
-    [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    (click)="itemSelected.emit(input); openState = false" 
-    role="menuitem">
-    
-    <span 
-      class="dropdown-item" 
-      [innerHTML] = "listDisplay(input)">
-    </span>
+<!-- needed to ensure dropdown width matches  -->
+<ul class="m-0 h-0 overflow-hidden">
+  <li *ngFor="let item of inputArray">
+    {{ listDisplay(item) }}
   </li>
 </ul>
+<radio-list
+  [ulClass]="'dropdown-menu shadow'"
+  (itemSelected)="itemSelected.emit($event)"
+  [listDisplay]="listDisplay"
+  [checkSelected]="checkSelected"
+  [selectedItem]="selectedItem"
+  [inputArray]="inputArray"
+  [@showState]="openState ? 'show' : 'hide'"
+  [isMobile]="isMobile"
+  [darktheme]="darktheme">
+
+</radio-list>
