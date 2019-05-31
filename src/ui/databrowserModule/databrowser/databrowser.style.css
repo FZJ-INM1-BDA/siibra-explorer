@@ -1,0 +1,224 @@
+div[heading]
+{
+  padding : 0.5em 1em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+div[heading][displayflex]
+{
+  display:flex;
+  flex-direction: row;
+}
+
+  div[heading][displayflex] > [maintext]
+  {
+    flex : 1 1 0px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  div[heading][displayflex] > [propertyicons]
+  {
+    flex : 0 0 auto;
+  }
+
+  div[heading][displayflex] > [propertyicons] > *
+  {
+    margin-left:0.5em;
+  }
+
+[dataentry]
+{
+  width:100%;
+}
+
+[dataentry] div[heading]
+{
+  padding : 0.4em 1.6em;
+  background-color:rgba(0,0,0,0.2);
+}
+
+[dataentry] div[body]
+{
+  padding : 0.4em 2.0em;
+  background-color:rgba(0,0,0,0.3);
+} 
+
+div[databrowserheader]
+{
+  padding : 0.5em 1.0em;
+  background-color:rgba(128,128,128,0.05);
+}
+
+div[databrowserheader] > *
+{
+  padding : 0;
+  margin : 0 ;
+  border : 0 ;
+}
+
+div[databrowserheader]
+{
+  white-space: nowrap;
+}
+
+div[filterBlock] > *
+{
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.clickable:hover
+{
+  color:#dbb556;
+  cursor:default;
+}
+
+div.unclickable
+{
+  color:rgba(128,128,128,0.8);
+}
+
+div.unclickable:hover
+{
+  cursor:default;
+}
+
+div.noResultClass
+{
+  color:rgba(128,128,128,0.8);
+  text-decoration: line-through;
+}
+
+div[spatialSearchCell]
+{
+  padding: 0.3em 1em;
+  overflow:hidden;
+  white-space: nowrap;
+}
+
+div[noSelectedRegion]
+{
+  padding: 1em 1em;
+  font-size:2em;
+  color: rgba(128,128,128,0.5);
+  max-height: 6em;
+}
+
+:host-context([darktheme="true"]) div[noSelectedRegion]
+{
+  background-color: rgba(0,0,0,0.2);
+}
+
+dataset-viewer
+{
+  display: block;
+}
+
+div[regionsContainer]
+{
+  background-color:rgba(0, 0, 0, 0.3);
+  padding:0.5em 0.7em;
+}
+
+div[regionContainer]
+{
+  margin-top:0.5em;
+}
+
+modality-picker
+{
+  font-size: 90%;
+  display:inline-block;
+}
+
+.filterWrapper
+{
+  white-space:normal;
+  max-height: 15em;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.spinnerAnimationCircleContainer
+{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinnerAnimationCircleContainer > .spinnerAnimationCircle
+{
+  font-size: 300%;
+}
+
+.parcellationSelectionWrapper
+{
+  width: 100%;
+  display:flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.parcellationSelectionWrapper > *:first-child
+{
+  flex: 1 0 0;
+}
+.parcellationSelectionWrapper > *:last-child
+{
+  flex: 0 0 0;
+}
+
+.toggleParcellationBtn
+{
+  margin-left: -2.5em;
+  z-index: 1;
+}
+
+radio-list
+{
+  display: block;
+}
+
+/* datawrapper */
+:host .dataEntryWrapper
+{
+  white-space: nowrap;
+  overflow: hidden;
+  width:200%;
+  padding: 0;
+  transition: transform 190ms ease;
+}
+
+.dataEntryWrapper > *
+{
+  vertical-align: top;
+  white-space: initial;
+  width: 50%;
+  display:inline-block;
+  padding: 0.5em 1em;
+}
+
+.filePreviewContainer
+{
+  max-height: 100%;
+  overflow:auto;
+}
+
+.overflow-container
+{
+  overflow:hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.dot
+{
+  width: 0.5rem;
+  height: 0.5rem;
+  display: inline-block;
+  border-radius: 50%;
+  background-color:white;
+}

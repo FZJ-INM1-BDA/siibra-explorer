@@ -100,7 +100,7 @@ window.interactiveViewer
   - *remove3DLandmarks(IDs)* removes the landmarks by their IDs
   ```js
   window.interactiveViewer.viewerHandle
-    .remove3DLandmarks(['fzj-xg-jugex-1', 'fzj-xg-jugex-1'])
+    .remove3DLandmarks(['fzj-xg-jugex-1', 'fzj-xg-jugex-2'])
   /* removes the landmarks added above */
   ```
 
@@ -136,9 +136,12 @@ window.interactiveViewer
     - *show()* : Show the toast
     - *hide()* : Dynamically hides the toast
     - message : message on the toast
+    - htmlMessage : HTML message. If used to display user content, beware of script injection. Angular strips `style` attribute, so use `class` and bootstrap for styling.
     - dismissable : allow user dismiss the toast via x 
     - timeout : auto hide (in ms). set to 0 for not auto hide.
 
+  - *launchNewWidget(manifest)* returns a Promise. expects a JSON object, with the same key value as a plugin manifest. the *name* key must be unique, or the promise will be rejected. 
+  
 - pluginControl
 
   - *loadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* Function that loads external libraries. Pass the name of the libraries as an Array of string, and returns a Promise. When promise resolves, the libraries are loaded. **n.b.** while unlikely, there is a possibility that multiple requests to load external libraries in quick succession can cause the promise to resolve before the library is actually loaded. 
@@ -159,12 +162,12 @@ window.interactiveViewer
   - **[PLUGINNAME]** returns a plugin handler. This would be how to interface with the plugins.
 
     
-    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention
-    - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback)
+    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback, silently fails if called on startup)
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
     - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).
     - *initStateUrl* : passed from `manifest.json`. Useful for setting initial state of the plugin.  Can be any JSON valid value (array, object, string).
-    - *setInitManifestUrl(url|null)* set/unset the url for a manifest json that will be fetched on atlas viewer startup. the argument should be a valid URL, has necessary CORS header, and returns a valid manifest json file. null will unset the search param.
+    - *setInitManifestUrl(url|null)* set/unset the url for a manifest json that will be fetched on atlas viewer startup. the argument should be a valid URL, has necessary CORS header, and returns a valid manifest json file. null will unset the search param. Useful for passing/preserving state. If called multiple times, the last one will take effect.
 
     ```js
     const pluginHandler = window.interactiveViewer.pluginControl[PLUGINNAME]

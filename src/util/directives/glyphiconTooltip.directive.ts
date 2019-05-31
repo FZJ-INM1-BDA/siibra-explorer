@@ -6,10 +6,10 @@ import { TooltipDirective } from 'ngx-bootstrap/tooltip'
 import { ComponentLoaderFactory } from 'ngx-bootstrap/component-loader';
 
 @Directive({
-  selector : '.glyphicon.glyphicon-screenshot'
+  selector : '.fas.fa-screenshot'
 })
 
-export class GlyphiconTooltipScreenshotDirective extends TooltipDirective{
+export class fasTooltipScreenshotDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -28,10 +28,10 @@ export class GlyphiconTooltipScreenshotDirective extends TooltipDirective{
 }
 
 @Directive({
-  selector : '.glyphicon.glyphicon-remove-sign'
+  selector : '.fas.fa-remove-sign'
 })
 
-export class GlyphiconTooltipRemoveSignDirective extends TooltipDirective{
+export class fasTooltipRemoveSignDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -50,10 +50,10 @@ export class GlyphiconTooltipRemoveSignDirective extends TooltipDirective{
 }
 
 @Directive({
-  selector : '.glyphicon.glyphicon-remove'
+  selector : '.fas.fa-remove'
 })
 
-export class GlyphiconTooltipRemoveDirective extends TooltipDirective{
+export class fasTooltipRemoveDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -72,10 +72,10 @@ export class GlyphiconTooltipRemoveDirective extends TooltipDirective{
 }
 
 @Directive({
-  selector : '.glyphicon.glyphicon-new-window'
+  selector : '.fas.fa-new-window'
 })
 
-export class GlyphiconTooltipNewWindowDirective extends TooltipDirective{
+export class fasTooltipNewWindowDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -94,10 +94,10 @@ export class GlyphiconTooltipNewWindowDirective extends TooltipDirective{
 }
 
 @Directive({
-  selector : '.glyphicon.glyphicon-log-in'
+  selector : '.fas.fa-log-in'
 })
 
-export class GlyphiconTooltipLogInDirective extends TooltipDirective{
+export class fasTooltipLogInDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -115,10 +115,10 @@ export class GlyphiconTooltipLogInDirective extends TooltipDirective{
   }
 }
 @Directive({
-  selector : '.glyphicon.glyphicon-question-sign'
+  selector : '.fas.fa-question-circle'
 })
 
-export class GlyphiconTooltipQuestionSignDirective extends TooltipDirective{
+export class fasTooltipQuestionSignDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,
@@ -136,10 +136,10 @@ export class GlyphiconTooltipQuestionSignDirective extends TooltipDirective{
   }
 }
 @Directive({
-  selector : '.glyphicon.glyphicon-info-sign'
+  selector : '.fas.fa-info-sign'
 })
 
-export class GlyphiconTooltipInfoSignDirective extends TooltipDirective{
+export class fasTooltipInfoSignDirective extends TooltipDirective{
   constructor(
     public viewContainerRef:ViewContainerRef,
     public rd : Renderer2,

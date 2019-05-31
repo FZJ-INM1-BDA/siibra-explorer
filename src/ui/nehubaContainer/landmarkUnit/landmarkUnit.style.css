@@ -79,7 +79,7 @@ div[landmarkContainer]
   top:0px;
 }
 
-[nodeView] > .glyphicon
+[nodeView] > .fas
 {
   margin-left:-0.5em;
   margin-top:-1em;

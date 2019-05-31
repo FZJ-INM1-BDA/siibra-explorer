@@ -27,12 +27,6 @@
   cursor: default;
 }
 
-:host-context([darktheme="true"]) .btn-default
-{
-  background-color:rgba(80,80,80,0.8);
-  color:white;
-}
-
 .btn.btn-disabled.btn.btn-disabled.btn.btn-disabled.btn.btn-disabled
 {
   opacity:0.5;

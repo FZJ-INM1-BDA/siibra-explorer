@@ -1,0 +1,57 @@
+
+:host-context([darktheme="true"]) ul
+{
+  background-color:rgba(30,30,30);
+}
+
+:host-context([darktheme="true"]) li[role="menuitem"]
+{
+  color:rgba(255,255,255,0.8);
+}
+
+:host-context([darktheme="true"]) li[role="menuitem"]:hover
+{
+  cursor:default;
+  background-color:rgba(128,128,128,0.2);
+}
+
+
+:host-context([darktheme="false"]) ul
+{
+  background-color:rgba(255,255,255);
+}
+:host-context([darktheme="false"]) li[role="menuitem"]:hover
+{
+  cursor:default;
+  background-color:rgba(128,128,128,0.2);
+  opacity:0.85;
+}
+li[role="menuitem"]
+{
+  transition : opacity 0.3s ease,background-color 0.2s ease ;
+  opacity:0.75;
+}
+
+
+
+li[role="menuitem"]
+{
+  padding:0.5em 0.8em;
+  border-radius:0px;
+  cursor:default;
+}
+
+ul
+{
+  width:100%;
+  overflow-x:hidden;
+  display:inline-block;
+}
+
+ul,span.dropdown-item-1
+{
+  padding:0px;
+  border-radius:0px;
+  white-space: nowrap;
+  border:none;
+}

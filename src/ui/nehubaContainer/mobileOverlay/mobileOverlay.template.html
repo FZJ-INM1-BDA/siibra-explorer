@@ -1,18 +1,26 @@
-<div screen *ngIf = "showProperties$ | async">
-  <div [style.transform] = "menuTransform" class = "btn-group-vertical" role = "group" mobileMenuContainer #mobileMenuContainer>
-    <div 
-      *ngFor = "let p of tunableProperties; let i = index"
-      [ngClass] = "{'active' : p === focusedProperty, 'scrollFocus' : i === focusItemIndex}" 
-      class = "btn btn-default theme-controlled">
-      <span>
-        {{ p }}
-      </span>
+<div screen [hidden]="!(showProperties$ | async)">
+  <div intersector #intersector>
+    <div [style.transform] = "menuTransform" class = "btn-group-vertical" role = "group" mobileMenuContainer #mobileMenuContainer>
+      <div 
+        *ngFor = "let p of tunableProperties; let i = index"
+        [ngClass] = "{'active' : p === focusedProperty, 'scrollFocus': i === focusItemIndex}" 
+        class = "btn btn-default theme-controlled property scrollFocus">
+        <!-- scrollFocus class -->
+        <span>
+          {{ p }}
+        </span>
+      </div>
     </div>
   </div>
 </div>
-<ng-content *ngIf = "showScreen$ | async" select = "[guide]" guide>
+
+<ng-content *ngIf="showDelta$ | async" select="[delta]" guide>
 </ng-content>
-<div #initiator>
+
+<ng-content *ngIf="showScreen$ | async" select="[guide]" guide>
+</ng-content>
+
+<div [hidden]="!(showInitiator$ | async)" #initiator>
   <ng-content select="[initiator]">
   </ng-content>
 </div>

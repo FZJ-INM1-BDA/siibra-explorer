@@ -5,22 +5,21 @@ import { DataEntry } from "../../services/stateStore.service";
   name : 'groupDatasetByRegion'
 })
 export class GroupDatasetByRegion implements PipeTransform{
-  public transform(datasets:DataEntry[], regions:any[]): {region:any|null,searchResults:DataEntry[]}[]
-  {
+  public transform(datasets:DataEntry[], regions:any[]): {region:any|null,searchResults:DataEntry[]}[]{
     
     return datasets.reduce((acc,curr)=>{
-      return (curr.regionName && curr.regionName.length > 0)
-        ? curr.regionName.reduce((acc2,reName)=>{
+      return (curr.parcellationRegion && curr.parcellationRegion.length > 0)
+        ? curr.parcellationRegion.reduce((acc2,reName)=>{
           const idx = acc.findIndex(it => it.region === null 
-            ? reName.regionName === 'none' 
-            : it.region.name === reName.regionName )
+            ? reName.name === 'none' 
+            : it.region.name === reName.name )
 
           return idx >= 0
             ? acc2.map((v,i)=> i === idx 
               ? Object.assign({},v,{searchResults : v.searchResults.concat(curr)}) 
               : v ) 
             : acc2.concat({
-                region : this.getRegionFromRegionName(reName.regionName, regions),
+                region : this.getRegionFromRegionName(reName.name, regions),
                 searchResults : [ curr ]
               })
           },acc)

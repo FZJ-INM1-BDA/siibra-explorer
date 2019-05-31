@@ -1,0 +1,16 @@
+<ul
+  [ngClass]="ulClass"
+  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
+  role="menu">
+  <li 
+    *ngFor="let input of inputArray" 
+    [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'" 
+    (click)="itemSelected.emit({previous: selectedItem, current: input})" 
+    role="menuitem">
+    
+    <span 
+      class="dropdown-item-1" 
+      [innerHTML] = "listDisplay(input)">
+    </span>
+  </li>
+</ul>

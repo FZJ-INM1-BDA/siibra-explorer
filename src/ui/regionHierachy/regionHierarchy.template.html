@@ -1,0 +1,47 @@
+<div class="input-group regionSearch">
+  <input 
+    #searchTermInput
+    tabindex="0"
+    (keydown.esc)="escape($event)"
+    (focus)="showRegionTree = true && !isMobile"
+    [value]="searchTerm"
+    class="form-control form-control-sm"
+    type="text" 
+    autocomplete="off"
+    [placeholder]="getInputPlaceholder(selectedParcellation)"/>
+
+</div>
+  
+<div
+  *ngIf="showRegionTree" 
+  hideScrollbarContainer>
+
+  <div
+    class="d-flex flex-column"
+    treeContainer
+    #treeContainer>
+    <div class="tree-header d-inline-flex align-items-center">
+      <div>
+        {{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected
+      </div>
+      <div
+        (click)="clearRegions($event)"
+        [ngClass]="{ 'invisible': selectedRegions.length === 0 }"
+        class="btn btn-link">
+        clear all
+      </div>
+    </div>
+    
+    <div
+      *ngIf="selectedParcellation && selectedParcellation.regions as regions"
+      class="tree-body">
+      <flat-tree-component
+        (treeNodeClick)="handleClickRegion($event)"
+        [inputItem]="aggregatedRegionTree"
+        [renderNode]="displayTreeNode"
+        [searchFilter]="filterTreeBySearch">
+        
+      </flat-tree-component>
+    </div> 
+  </div>
+</div>

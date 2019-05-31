@@ -9,7 +9,7 @@ div[itemContainer]
   display:flex;
 }
 
-div[itemContainer] > [glyphicon]
+div[itemContainer] > [fas]
 {
   flex: 0 0 1.2em;
   align-self: center;

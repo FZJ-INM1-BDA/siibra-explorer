@@ -1,5 +1,5 @@
 <div
-  [@collapseState] = "{ value : show ? 'visible' : 'collapsed', params : { collapsedHeight : collapsedHeight, fullHeight : fullHeight } }"
+  [@collapseState] = "{ value : show ? 'visible' : 'collapsed', params : { collapsedHeight: collapsedHeight, fullHeight: fullHeight, animationLength: animationLength } }"
   content>
   <div #contentContainer>
     <ng-content>
@@ -9,10 +9,10 @@
 <div 
   (click)="toggle($event)" 
   sliver
-  hoverable>
+  [hoverable]="{translateY:-1}">
 
   <i 
-    [ngClass] = "show ? 'glyphicon-chevron-up' : 'glyphicon-chevron-down'" 
-    class = "glyphicon">
+    [ngClass] = "show ? 'fa-chevron-up' : 'fa-chevron-down'" 
+    class = "fas">
   </i>
 </div>

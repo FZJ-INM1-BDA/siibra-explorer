@@ -1,0 +1,15 @@
+<div
+  [ngStyle]="containerStyle"
+  class="pill-container">
+  <span
+    class="text-truncate pill-title">
+    {{ title }}
+  </span>
+  <div
+    [ngStyle]="closeBtnStyle"
+    class="pill-close rounded-circle"
+    (click)="close()"
+    *ngIf="showClose">
+    <i class="fas fa-times-circle"></i>
+  </div>
+</div>

@@ -1,25 +1,24 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, OnDestroy, ElementRef, ComponentRef, AfterViewInit, OnInit, HostListener, Renderer2, TemplateRef } from "@angular/core";
-import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap } from "rxjs/operators";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
+import { Store, select, ActionsSubject } from "@ngrx/store";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
+import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
-import { Chart } from 'chart.js'
-import { AtlasViewerConstantsServices, SUPPORT_LIBRARY_MAP } from "./atlasViewer.constantService.service";
+import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
-import { ToastComponent } from "../components/toast/toast.component";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
-import { PluginServices } from "./atlasViewer.pluginService.service";
 
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
-import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
-import { colorAnimation } from "./atlasViewer.animation";
-import { ToastService, defaultToastConfig } from "../services/toastService.service";
+import { colorAnimation } from "./atlasViewer.animation"
+import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { TabsetComponent } from "ngx-bootstrap/tabs";
 
 @Component({
   selector: 'atlas-viewer',
@@ -34,31 +33,42 @@ import { ToastService, defaultToastConfig } from "../services/toastService.servi
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
-  @ViewChild('dockedContainer', { read: ViewContainerRef }) dockedContainer: ViewContainerRef
-  @ViewChild('floatingContainer', { read: ViewContainerRef }) floatingContainer: ViewContainerRef
-  @ViewChild('databrowser', { read: ElementRef }) databrowser: ElementRef
-  @ViewChild('toastContainer', { read: ViewContainerRef }) toastContainer: ViewContainerRef
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('pluginFactory', { read: ViewContainerRef }) pluginViewContainerRef: ViewContainerRef
+  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
+  @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
+  @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
+  @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+
+  @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
+  /**
+   * required for styling of all child components
+   */
   @HostBinding('attr.darktheme')
   darktheme: boolean = false
 
-  meetsRequirement: boolean = true
+  @HostBinding('attr.ismobile')
+  get isMobile(){
+    return this.constantsService.mobile
+  }
 
-  toastComponentFactory: ComponentFactory<ToastComponent>
-  private dedicatedViewComponentRef: ComponentRef<ToastComponent>
+  meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
 
+  public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
+  private showHelp$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
-  public onhoverSegment$: Observable<string>
+  public onhoverSegments$: Observable<string[]>
+  public onhoverSegmentsForFixed$: Observable<string[]>
   public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
@@ -70,25 +80,26 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public ngLayers : NgLayerInterface[]
   private disposeHandler : any
 
+  public unsupportedPreviewIdx: number = 0
+  public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
+
+  public sidePanelOpen$: Observable<boolean>
+
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
 
   constructor(
-    private toastService:ToastService,
-    private pluginService: PluginServices,
-    private rd2: Renderer2,
     private store: Store<ViewerStateInterface>,
     public dataService: AtlasViewerDataService,
-    private cfr: ComponentFactoryResolver,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private databrowserService: DatabrowserService,
+    private dispatcher$: ActionsSubject
   ) {
-    this.toastComponentFactory = this.cfr.resolveComponentFactory(ToastComponent)
-
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
@@ -103,13 +114,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(state => state.focusedSidePanel)
     )
 
+    this.sidePanelOpen$ = this.store.pipe(
+      select('uiState'),  
+      filter(state => isDefined(state)),
+      map(state => state.sidePanelOpen)
+    )
+
+    this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
+      debounceTime(170)
+    )
+
+    this.selectedRegions$ = this.store.pipe(
+      select('viewerState'),
+      filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+      map(state=>state.regionsSelected),
+      distinctUntilChanged()
+    )
+
     this.selectedPOI$ = combineLatest(
-      this.store.pipe(
-        select('viewerState'),
-        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
-        map(state=>state.regionsSelected),
-        distinctUntilChanged()
-      ),
+      this.selectedRegions$,
       this.store.pipe(
         select('viewerState'),
         filter(state => isDefined(state) && isDefined(state.landmarksSelected)),
@@ -156,144 +179,83 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegment$ = combineLatest(
+    this.onhoverSegments$ = combineLatest(
       this.store.pipe(
         select('uiState'),
+        select('mouseOverSegments'),
+        filter(v => !!v),
+        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
         /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-        map(state => isDefined(state) ?
-          state.mouseOverSegment ?
-            state.mouseOverSegment.constructor === Number ?
-              state.mouseOverSegment.toString() :
-              state.mouseOverSegment.name :
-            null :
-          null),
-        distinctUntilChanged()
+
       ),
       this.onhoverLandmark$
     ).pipe(
-      map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
+      map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
+      map(segments => !segments || segments.length === 0
+          ? null
+          : segments.map(s => s.segment) )
     )
 
-  }
-
-  ngOnInit() {
-
-    this.toastService.showToast = (message, config) => {
-      const _config = Object.assign({}, defaultToastConfig, config
-        ? config
-        : {})
-      const toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
-      if(typeof message === 'string')
-        toastComponent.instance.message = message
-      if(message instanceof TemplateRef){
-        toastComponent.instance.messageContainer.createEmbeddedView(message as TemplateRef<any>)
-      }
-         
-      toastComponent.instance.dismissable = _config.dismissable
-      toastComponent.instance.timeout = _config.timeout
-
-      let subscription
-
-      const dismissToast = () => {
-        if(subscription) subscription.unsubscribe()
-        toastComponent.destroy()
-      }
-
-      subscription = toastComponent.instance.dismissed.subscribe(dismissToast)
-      return dismissToast
-    }
-
-    this.apiService.interactiveViewer.uiHandle.getToastHandler = () => {
-      const handler = new ToastHandler()
-      let toastComponent:ComponentRef<ToastComponent>
-      handler.show = () => {
-        toastComponent = this.toastContainer.createComponent(this.toastComponentFactory)
-
-        toastComponent.instance.dismissable = handler.dismissable
-        toastComponent.instance.message = handler.message
-        toastComponent.instance.timeout = handler.timeout
-
-        const _subscription = toastComponent.instance.dismissed.subscribe(userInitiated => {
-          _subscription.unsubscribe()
-          handler.hide()
-        })
-      }
-
-      handler.hide = () => {
-        if(toastComponent){
-          toastComponent.destroy()
-          toastComponent = null
-        }
-      }
-
-      return handler
-    }
-
-    this.apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
-      const srcHTMLElement = libraries.map(libraryName => ({
-        name: libraryName,
-        srcEl: SUPPORT_LIBRARY_MAP.get(libraryName)
-      }))
-
-      const rejected = srcHTMLElement.filter(scriptObj => scriptObj.srcEl === null)
-      if (rejected.length > 0)
-        return reject(`Some library names cannot be recognised. No libraries were loaded: ${rejected.map(srcObj => srcObj.name).join(', ')}`)
-
-      Promise.all(srcHTMLElement.map(scriptObj => new Promise((rs, rj) => {
-        if('customElements' in window && scriptObj.name === 'webcomponentsLite'){
-          return rs()
-        }
-        const existingEntry = this.apiService.loadedLibraries.get(scriptObj.name)
-        if (existingEntry) {
-          this.apiService.loadedLibraries.set(scriptObj.name, { counter: existingEntry.counter + 1, src: existingEntry.src })
-          rs()
-        } else {
-          const srcEl = scriptObj.srcEl
-          srcEl.onload = () => rs()
-          srcEl.onerror = (e: any) => rj(e)
-          this.rd2.appendChild(document.head, srcEl)
-          this.apiService.loadedLibraries.set(scriptObj.name, { counter: 1, src: srcEl })
-        }
-      })))
-        .then(() => resolve())
-        .catch(e => (console.warn(e), reject(e)))
-    })
-
-    this.apiService.interactiveViewer.pluginControl.unloadExternalLibraries = (libraries: string[]) =>
-      libraries
-        .filter((stringname) => SUPPORT_LIBRARY_MAP.get(stringname) !== null)
-        .forEach(libname => {
-          const ledger = this.apiService.loadedLibraries.get(libname!)
-          if (!ledger) {
-            console.warn('unload external libraries error. cannot find ledger entry...', libname, this.apiService.loadedLibraries)
-            return
-          }
-          if (ledger.src === null) {
-            console.log('webcomponents is native supported. no library needs to be unloaded')
-            return
-          }
-
-          if (ledger.counter - 1 == 0) {
-            this.rd2.removeChild(document.head, ledger.src)
-            this.apiService.loadedLibraries.delete(libname!)
-          } else {
-            this.apiService.loadedLibraries.set(libname!, { counter: ledger.counter - 1, src: ledger.src })
-          }
-        })
-
-    this.meetsRequirement = this.meetsRequirements()
+    this.selectedParcellation$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('parcellationSelected'),
+      map(state=>state.parcellationSelected),
+      distinctUntilChanged(),
+    )
 
     this.subscriptions.push(
-      this.dedicatedView$.subscribe(string => {
-        if (string === null) {
-          if (this.dedicatedViewComponentRef)
-            this.dedicatedViewComponentRef.destroy()
-          return
-        }
-        this.dedicatedViewComponentRef = this.toastContainer.createComponent(this.toastComponentFactory)
-        this.dedicatedViewComponentRef.instance.message = `hello`
-        this.dedicatedViewComponentRef.instance.dismissable = true
-        this.dedicatedViewComponentRef.instance.timeout = 1000
+      this.selectedParcellation$.subscribe(parcellation => this.selectedParcellation = parcellation)
+    )
+
+    this.subscriptions.push(
+      this.newViewer$.subscribe(template => this.selectedTemplate = template)
+    )
+  }
+
+  private selectedParcellation$: Observable<any>
+  private selectedParcellation: any
+
+  ngOnInit() {
+    this.meetsRequirement = this.meetsRequirements()
+
+    if (!this.meetsRequirement) {
+      merge(
+        of(-1),
+        interval(UNSUPPORTED_INTERVAL)
+      ).pipe(
+        map(v => {
+          let idx = v
+          while (idx < 0) {
+            idx = v + this.unsupportedPreviews.length
+          }
+          return idx % this.unsupportedPreviews.length
+        })
+      ).subscribe(val => {
+        this.unsupportedPreviewIdx = val
+      })
+    }
+
+    this.subscriptions.push(
+      this.showHelp$.subscribe(() => 
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: this.constantsService.showHelpTitle,
+            template: this.helpComponent
+          }
+        })
+      )
+    )
+
+    this.subscriptions.push(
+      this.constantsService.showSigninSubject$.pipe(
+        debounceTime(160)
+      ).subscribe(user => {
+        this.modalService.show(ModalUnit, {
+          initialState: {
+            title: user ? 'Logout' : `Login`,
+            template: this.signinModalComponent
+          }
+        })
       })
     )
 
@@ -313,6 +275,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           template.useTheme === 'dark' :
           false
 
+        this.constantsService.darktheme = this.darktheme
+        
         /* new viewer should reset the spatial data search */
         this.store.dispatch({
           type : FETCHED_SPATIAL_DATA,
@@ -332,80 +296,59 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         filter(() => typeof this.layoutMainSide !== 'undefined')
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
-
-    /**
-     * Because there is no easy way to display standard deviation natively, use a plugin 
-     * */
-    Chart.pluginService.register({
-
-      /* patching background color fill, so saved images do not look completely white */
-      beforeDraw: (chart) => {
-        const ctx = chart.ctx as CanvasRenderingContext2D;
-        ctx.fillStyle = this.darktheme ?
-          `rgba(50,50,50,0.8)` :
-          `rgba(255,255,255,0.8)`
-
-        if (chart.canvas) ctx.fillRect(0, 0, chart.canvas.width, chart.canvas.height)
-
-      },
-
-      /* patching standard deviation for polar (potentially also line/bar etc) graph */
-      afterInit: (chart) => {
-        if (chart.config.options && chart.config.options.tooltips) {
-
-          chart.config.options.tooltips.callbacks = {
-            label: function (tooltipItem, data) {
-              let sdValue
-              if (data.datasets && typeof tooltipItem.datasetIndex != 'undefined' && data.datasets[tooltipItem.datasetIndex].label) {
-                const sdLabel = data.datasets[tooltipItem.datasetIndex].label + '_sd'
-                const sd = data.datasets.find(dataset => typeof dataset.label != 'undefined' && dataset.label == sdLabel)
-                if (sd && sd.data && typeof tooltipItem.index != 'undefined' && typeof tooltipItem.yLabel != 'undefined') sdValue = Number(sd.data[tooltipItem.index]) - Number(tooltipItem.yLabel)
-              }
-              return `${tooltipItem.yLabel} ${sdValue ? '(' + sdValue + ')' : ''}`
-            }
-          }
-        }
-        if (chart.data.datasets) {
-          chart.data.datasets = chart.data.datasets
-            .map(dataset => {
-              if (dataset.label && /\_sd$/.test(dataset.label)) {
-                const originalDS = chart.data.datasets!.find(baseDS => typeof baseDS.label !== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/, '')))
-                if (originalDS) {
-                  return Object.assign({}, dataset, {
-                    data: (originalDS.data as number[]).map((datapoint, idx) => (Number(datapoint) + Number((dataset.data as number[])[idx]))),
-                    ... this.constantsService.chartSdStyle
-                  })
-                } else {
-                  return dataset
-                }
-              } else if (dataset.label) {
-                const sdDS = chart.data.datasets!.find(sdDS => typeof sdDS.label !== 'undefined' && (sdDS.label == dataset.label + '_sd'))
-                if (sdDS) {
-                  return Object.assign({}, dataset, {
-                    ...this.constantsService.chartBaseStyle
-                  })
-                } else {
-                  return dataset
-                }
-              } else {
-                return dataset
-              }
-            })
-        }
-      }
-    })
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   ngAfterViewInit() {
-    this.widgetServices.floatingContainer = this.floatingContainer
-    this.widgetServices.dockedContainer = this.dockedContainer
+    
+    /**
+     * Show Cookie disclaimer if not yet agreed
+     */
+    /**
+     * TODO avoid creating new views in lifecycle hooks in general
+     */
+    this.store.pipe(
+      select('uiState'),
+      select('agreedCookies'),
+      filter(agreed => !agreed),
+      delay(0)
+    ).subscribe(() => {
+      this.modalService.show(ModalUnit, {
+        initialState: {
+          title: 'Cookie Disclaimer',
+          template: this.cookieAgreementComponent
+        }
+      }) 
+    })
 
-    this.pluginService.pluginViewContainerRef = this.pluginViewContainerRef
-    this.pluginService.appendSrc = (src: HTMLElement) => this.rd2.appendChild(document.head, src)
+    this.dispatcher$.pipe(
+      filter(({type}) => type === SHOW_KG_TOS),
+      withLatestFrom(this.store.pipe(
+        select('uiState'),
+        select('agreedKgTos')
+      )),
+      map(([_, agreed]) => agreed),
+      filter(flag => !flag),
+      delay(0)
+    ).subscribe(val => {
+      this.modalService.show(ModalUnit, {
+        initialState: {
+          title: 'Knowldge Graph ToS',
+          template: this.kgTosComponent
+        }
+      })
+    })
+
+    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverSegments$),
+      map(([_flag, onhoverSegments]) => onhoverSegments || [])
+    )
+  }
+
+  /**
+   * For completeness sake. Root element should never be destroyed. 
+   */
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   /**
@@ -413,11 +356,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   meetsRequirements() {
 
+    const testFirefox = /Firefox\/([0-9]*?)\.[0-9]*?/.exec(navigator.userAgent)
+    if (testFirefox && Number(testFirefox[1]) >= 67)
+      return false
+
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
-    const message: any = {
-      Error: this.constantsService.minReqModalHeader
-    }
 
     if (!gl) {
       return false
@@ -451,10 +395,33 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       }) as NgLayerInterface)
   }
 
+  kgTosClickedOk(){
+    this.modalService.hide(1)
+    this.store.dispatch({
+      type: AGREE_KG_TOS
+    })
+  }
+
+  cookieClickedOk(){
+    this.modalService.hide(1)
+    this.store.dispatch({
+      type: AGREE_COOKIE
+    })
+  }
+
   panelAnimationEnd(){
 
     if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
       this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
+  }
+
+  nehubaClickHandler(event:MouseEvent){
+    if (!this.rClContextualMenu) return
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY
+    ]
+    this.rClContextualMenu.show()
   }
 
   toggleSidePanel(panelName:string){
@@ -464,22 +431,35 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
-  mousePos: [number, number] = [0, 0]
-
-  @HostListener('mousemove', ['$event'])
-  mousemove(event: MouseEvent) {
-    this.mousePos = [event.clientX, event.clientY]
+  private selectedTemplate: any
+  searchRegion(regions:any[]){
+    this.rClContextualMenu.hide()
+    this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
+    if (this.isMobile) {
+      this.store.dispatch({
+        type : OPEN_SIDE_PANEL
+      })
+      this.mobileMenuTabs.tabs[1].active = true
+    }
   }
 
   @HostBinding('attr.version')
   public _version : string = VERSION
 
-  get floatingMouseContextualContainerTransform() {
-    return `translate(${this.mousePos[0]}px,${this.mousePos[1]}px)`
-  }
-
-  get isMobile(){
-    return this.constantsService.mobile
+  changeMenuState({open, close}:{open?:boolean, close?:boolean} = {}) {
+    if (open) {
+      return this.store.dispatch({
+        type: OPEN_SIDE_PANEL
+      })
+    }
+    if (close) {
+      return this.store.dispatch({
+        type: CLOSE_SIDE_PANEL
+      })
+    }
+    this.store.dispatch({
+      type: TOGGLE_SIDE_PANEL
+    })
   }
 }
 

@@ -1,0 +1,17 @@
+<div>
+  <h2>General</h2>
+  <div *ngFor = "let entry of generalHelp">
+    <b>{{ entry[0] }}</b>: {{ entry[1] }}
+  </div>
+  <h2>Slice View</h2>
+  <div *ngFor = "let entry of sliceviewHelp">
+    <b>{{ entry[0] }}</b>: {{ entry[1] }}
+  </div>
+  <h2>Perspective View</h2>
+  <div *ngFor = "let entry of perspectiveviewHelp">
+    <b>{{ entry[0] }}</b>: {{ entry[1] }}
+  </div>
+  <hr />
+  <div [innerHTML] = "supportText">
+  </div>
+</div>

@@ -1,0 +1,26 @@
+flat-tree-component
+{
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+:host-context([darktheme="true"]) hr
+{
+  border-color: rgba(0, 0, 0, 0.5);
+}
+
+.dataset-pill
+{
+  font-size:80%;
+}
+
+.ds-container
+{
+
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.preview-container
+{
+  flex: 0 0 2em;
+}

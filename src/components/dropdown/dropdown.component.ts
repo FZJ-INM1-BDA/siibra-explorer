@@ -7,22 +7,6 @@ import { dropdownAnimation } from "./dropdown.animation";
   styleUrls : [
     `./dropdown.style.css`
   ],
-  styles : [
-    `
-ul > li.selected > span:before
-{
-  content: '\u2022';
-  width : 1em;
-  display:inline-block;
-}
-ul > li:not(.selected) > span:before
-{
-  content: ' ';
-  width : 1em;
-  display:inline-block;
-}  
-    `
-  ],
   animations:[
     dropdownAnimation
   ],
@@ -33,9 +17,13 @@ export class DropdownComponent{
 
   @Input() inputArray : any[] = []
   @Input() selectedItem : any | null = null
+  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
   @Input() listDisplay : (obj:any)=>string = (obj)=>obj.name
   @Input() activeDisplay : (obj:any|null)=>string = (obj)=>obj ? obj.name : `Please select an item.`
+
+  @Input() isMobile: boolean
+  @Input() darktheme: boolean
 
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
 
@@ -45,10 +33,7 @@ export class DropdownComponent{
 
   @HostListener('document:click',['$event'])
   close(event:MouseEvent){
-    /* FF <62 does not implement event.srcElement so use event.originalTarget to polyfill for FF */
-    const contains = event.srcElement 
-      ? this.dropdownToggle.nativeElement.contains(event.srcElement)
-      : this.dropdownToggle.nativeElement.contains((event as any).originalTarget)
+    const contains = this.dropdownToggle.nativeElement.contains(event.target)
     if(contains)
       this.openState = !this.openState
     else
