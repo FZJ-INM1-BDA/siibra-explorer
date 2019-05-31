@@ -55,3 +55,30 @@ ul,span.dropdown-item-1
   white-space: nowrap;
   border:none;
 }
+
+.infoIcon {
+  margin-right: 5px;
+  display: inline-block;
+  border: 1px solid gray;
+  border-radius: 15px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.timerToast {
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.downloadPublications {
+  align-self: flex-end;
+  outline: none;
+}
+
+.textPartInPublications {
+  text-align: left;
+}

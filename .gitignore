@@ -4,3 +4,5 @@ package-lock.json
 src/res/raw
 src/plugin_examples/*/
 .vscode
+.idea
+deploy/datasets/data/

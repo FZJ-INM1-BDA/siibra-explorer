@@ -1,8 +1,8 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
+import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -19,6 +19,8 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
+import { ToastService } from "src/services/toastService.service";
+import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
 
 @Component({
   selector: 'atlas-viewer',
@@ -45,6 +47,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+  @ViewChild('publications') publications: TemplateRef<any>
+  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components
@@ -85,6 +89,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
+  handleToast
+  tPublication
+  pPublication
+
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
@@ -98,7 +106,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService,
     private databrowserService: DatabrowserService,
-    private dispatcher$: ActionsSubject
+    private dispatcher$: ActionsSubject,
+    private toastService: ToastService,
+    private zipFileDownloadService: ZipFileDownloadService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -203,14 +213,71 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => this.selectedParcellation = parcellation)
-    )
 
     this.subscriptions.push(
       this.newViewer$.subscribe(template => this.selectedTemplate = template)
     )
+
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe(parcellation => {
+        this.selectedParcellation = parcellation
+
+        if (this.selectedTemplate && this.selectedParcellation) {
+          if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
+            this.tPublication = this.selectedTemplate['properties']['publications']
+          } else {
+            this.tPublication = null
+          }
+          if (this.selectedParcellation['properties'] && this.selectedParcellation['properties']['publications']) {
+            this.pPublication = this.selectedParcellation['properties']['publications']
+          } else {
+            this.pPublication = null
+          }
+        } else {
+          this.tPublication = null
+          this.pPublication = null
+        }
+        
+        if (this.tPublication || this.pPublication) {
+
+          if (this.handleToast) {
+            this.handleToast()
+            this.handleToast = null
+          }
+          this.handleToast = this.toastService.showToast(this.publications, {
+              timeout: 7000
+          })
+          
+        }
+      })
+    )
+
+
   }
+
+  downloadPublications() {
+    const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
+    let publicationsText = ''
+
+    if (this.tPublication) {
+      publicationsText += this.selectedTemplate.name + ' Publications:\r\n'
+      this.tPublication.forEach((tp, i) => {
+        publicationsText += '\t' + (i+1) + '. ' + tp['citation'] + ' - ' + tp['doi'] + '\r\n'
+      });
+    }
+
+    if (this.pPublication) {
+      if (this.tPublication) publicationsText += '\r\n\r\n'
+      publicationsText += this.selectedParcellation.name + ' Publications:\r\n'
+      this.pPublication.forEach((pp, i) => {
+        publicationsText += '\t' + (i+1) + '. ' + pp['citation'] + ' - ' + pp['doi'] + '\r\n'
+      });
+    }
+    
+    this.zipFileDownloadService.downloadZip(publicationsText, fileName)
+    publicationsText = ''
+  }
+
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
@@ -342,6 +409,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
+
+    this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
   /**
@@ -461,6 +530,27 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       type: TOGGLE_SIDE_PANEL
     })
   }
+
+
+  closeMenuWithSwipe(documentToSwipe: ElementRef) {
+    const swipeDistance = 150; // swipe distance
+    const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
+        .pipe(
+          switchMap(startEvent =>
+            fromEvent(documentToSwipe.nativeElement, "touchmove")
+                .pipe(
+                  takeUntil(fromEvent(documentToSwipe.nativeElement, "touchend"))
+                  ,map(event => event['touches'][0].pageX)
+                  ,scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0)
+                  ,takeLast(1)
+                  ,filter(difference => difference >= swipeDistance)
+                )))
+    // Subscription
+    swipeLeft$.subscribe(val => {
+      this.changeMenuState({close: true})
+    })
+  }
+
 }
 
 export interface NgLayerInterface{

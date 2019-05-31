@@ -24,6 +24,7 @@ div.scale-bar-container
   padding: 2px;
   font-weight: 700;
   pointer-events: none;
+  user-select: none;
 }
 
 div.scale-bar
