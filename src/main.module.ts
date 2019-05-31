@@ -38,10 +38,6 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
-
-import 'hammerjs';
-import 'hammer-timejs';
-
 import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 import {HttpClientModule} from "@angular/common/http";
 
