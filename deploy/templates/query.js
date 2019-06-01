@@ -12,7 +12,7 @@ exports.getAllTemplates = () => new Promise((resolve, reject) => {
     'colin',
     'MNI152',
     'waxholmRatV2_0',
-    'allenMouse'
+    // 'allenMouse'
   ]
   resolve(templates)
 })
