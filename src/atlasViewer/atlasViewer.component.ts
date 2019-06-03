@@ -425,10 +425,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    */
   meetsRequirements() {
 
-    const testFirefox = /Firefox\/([0-9]*?)\.[0-9]*?/.exec(navigator.userAgent)
-    if (testFirefox && Number(testFirefox[1]) >= 67)
-      return false
-
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
 
