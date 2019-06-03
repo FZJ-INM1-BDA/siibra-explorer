@@ -3,7 +3,6 @@ div[splashScreenContainer]
 
   height:100%;
   display:flex;
-  /* flex-direction: column; */
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -15,15 +14,29 @@ div[splashScreenHeader] {
   width: 100%;
   background-color: #EF5450;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   color: #FFFFFF;
 }
 
 
-span[splashScreenHeaderTitle] {
+.splashScreenHeaderTitle {
   font-size: 45px;
+}
+
+
+.splashScreenHeaderLogoContainer {
+  flex: 1;
+}
+.splashScreenHeaderLogo {
+  margin-left: 50px;
+  width: 100px;
+  height: auto;
+}
+
+.spaceForFill {
+  flex: 1;
 }
 
 div[splashScreenTemplate] {
@@ -42,7 +55,6 @@ div[splashScreenTemplateItem] {
   margin: 20px 20px;
   display: flex;
   flex-direction: row;
-  /* flex-direction: row; */
   flex-wrap: wrap;
   justify-content: center;
 
@@ -52,8 +64,6 @@ div[splashScreenTemplateHeader] {
   align-self: center;
   text-align: center;
   font-size: 30px;
-  font-size: 2vw;
-  /* font-size: 30px; */
   margin: 0 0 20px 0;
 
 }
@@ -89,6 +99,7 @@ div[splashScreenTemplateBodyImage] {
 .template-card:hover {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
 }
+
 
 @media screen and (max-width: 670px) {
   span[splashScreenHeaderTitle] {
