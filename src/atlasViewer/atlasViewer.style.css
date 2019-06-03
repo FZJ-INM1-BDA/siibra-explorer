@@ -178,3 +178,19 @@ mat-sidenav {
 .mpobileMenuTabs {
   margin: 40px 0 0 5px;
 }
+
+.timerToast {
+  max-width: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.downloadPublications {
+  align-self: flex-end;
+  outline: none;
+}
+
+.textPartInPublications {
+  text-align: left;
+}

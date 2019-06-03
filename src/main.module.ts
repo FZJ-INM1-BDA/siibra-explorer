@@ -37,7 +37,8 @@ import { AuthService } from "./services/auth.service";
 import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
-import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
+import { ZipFileDownloadService } from "./services/zipFileDownload.service";
+import {HttpClientModule} from "@angular/common/http";
 
 @NgModule({
   imports : [
@@ -59,7 +60,8 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
       dataStore,
       spatialSearchState,
       uiState,
-    })
+    }),
+    HttpClientModule
   ],
   declarations : [
     AtlasViewer,
@@ -104,7 +106,8 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
     ToastService,
     AtlasWorkerService,
     AuthService,
-
+    ZipFileDownloadService,
+    
     /**
      * TODO
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
