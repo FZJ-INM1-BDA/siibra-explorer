@@ -3,7 +3,6 @@ div[splashScreenContainer]
 
   height:100%;
   display:flex;
-  /* flex-direction: column; */
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
@@ -91,15 +90,6 @@ div[splashScreenTemplateBodyImage] {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
 }
 
-/* @media screen and (max-width: 1500px) {
-  div[splashScreenTemplateBody] {
-    flex-direction: column;
-  }
-  .template-card {
-    width: 40%;
-  }
-} */
-
 @media screen and (max-width: 670px) {
   span[splashScreenHeaderTitle] {
     visibility: hidden;
@@ -120,13 +110,10 @@ div[templateCardContainer]
   flex-direction: row;
   flex-wrap:nowrap;
   align-items: center;
-
   overflow-x:auto;
 }
-
 div[templateCard]
 {
-
   position:relative;
   flex: 0 1 25em;
   min-width: 20em;
@@ -135,11 +122,9 @@ div[templateCard]
   padding: 0em 1em;
   margin : 0em 1em;
   box-sizing: border-box;
-
   background-color:rgb(242,242,242);
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.12);
 }
-
 div[templateCard]:hover
 {
   background-color:rgba(242,242,242,0.8);

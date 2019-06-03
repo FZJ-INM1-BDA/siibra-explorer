@@ -13,6 +13,7 @@
           <div splashScreenTemplateBodyImage>
             <img class="template-image" [src]="'./res/image/' + correctString(template.properties.name) + '.png'">
           </div>
+          <!-- ToDo: remove substring-->
           <div splashScreenTemplateBodyDescription>
             {{template.properties.description.substring(0, 500)}}
           </div>
