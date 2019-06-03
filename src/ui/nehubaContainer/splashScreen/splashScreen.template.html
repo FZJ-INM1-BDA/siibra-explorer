@@ -34,11 +34,13 @@
   <div
     class = "row"
     templateCardContainer>
+
     <div
       *ngFor = "let template of loadedTemplate$ | async | filterNull"
       (click) = "selectTemplate(template)"
       templateCard
       hoverable>
+
       <h2>{{ template.properties.name }}</h2>
       <readmore-component>
         <small>{{ template.properties.description }}</small>
