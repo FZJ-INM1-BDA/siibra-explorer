@@ -38,7 +38,6 @@ div[splashScreenTemplate] {
 div[splashScreenTemplateItem] {
   max-width: 600px;
   width: 400px;
-  background-color: blue;
   margin: 20px 20px;
   display: flex;
   flex-direction: row;
