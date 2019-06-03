@@ -4,7 +4,7 @@
   </div>
   <div splashScreenTemplate>
   <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
-    <div class="template-card">
+    <div class="template-card" (click) = "selectTemplate(template)">
 
       <div splashScreenTemplateHeader>
         {{template.properties.name}}
