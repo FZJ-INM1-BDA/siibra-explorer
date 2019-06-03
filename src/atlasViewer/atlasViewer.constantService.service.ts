@@ -137,7 +137,6 @@ export class AtlasViewerConstantsServices{
   - Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
   - You can check browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
   - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
-  - Mozilla Firefox v67 introduced [a conflict with neuroglancer](https://github.com/google/neuroglancer/issues/138). Until this is fixed, it is advised to use chrome for the interactive atlas viewer.
   `
 
   public minReqMD = `
