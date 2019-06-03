@@ -36,4 +36,8 @@ export class SplashScreen{
   get totalTemplates(){
     return this.constanceService.templateUrls.length
   }
+
+  correctString(name){
+    return name.replace(/[|&;$%@()+,\s./]/g, '')
+  }
 }

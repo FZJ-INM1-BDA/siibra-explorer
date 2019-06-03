@@ -1,3 +1,32 @@
+<div splashScreenContainer>
+  <div splashScreenHeader>
+    <span splashScreenHeaderTitle media="screen and (min-width: 670px)">Iteractive Atlas Viewer</span>
+  </div>
+  <div splashScreenTemplate>
+  <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
+    <div class="template-card">
+
+      <div splashScreenTemplateHeader>
+        {{template.properties.name}}
+      </div>
+      <div splashScreenTemplateBody>
+        <div splashScreenTemplateBodyImage>
+          <img class="template-image" [src]="'./res/image/' + correctString(template.properties.name) + '.png'">
+        </div>
+        <div splashScreenTemplateBodyDescription>
+            {{template.properties.description.substring(0, 500)}}
+          </div>
+      </div>
+
+  </div>
+  </div>
+
+  </div>
+</div>
+
+
+
+<!-- 
 <div class = "container-fluid" splashScreenContainer>
   <div 
     class = "row" 
@@ -25,4 +54,4 @@
       </h1>
     </div>
   </div>
-</div>
+</div> -->
