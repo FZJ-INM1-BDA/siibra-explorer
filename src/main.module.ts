@@ -40,6 +40,8 @@ import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 import {HttpClientModule} from "@angular/common/http";
+import { EffectsModule } from "@ngrx/effects";
+import { UseEffects } from "./services/effect/effect";
 
 @NgModule({
   imports : [
@@ -53,6 +55,9 @@ import {HttpClientModule} from "@angular/common/http";
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
+    EffectsModule.forRoot([
+      UseEffects
+    ]),
     StoreModule.forRoot({
       pluginState,
       viewerConfigState,

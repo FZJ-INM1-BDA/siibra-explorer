@@ -93,7 +93,7 @@ export function getLabelIndexMap(regions:any[]):Map<number,any>{
     })
   }
 
-  reduceRegions(regions)
+  if (regions && regions.forEach) reduceRegions(regions)
   return returnMap
 }
 
@@ -148,26 +148,4 @@ export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inh
   if (found) return found
   debugger
   return null
-}
-
-export function propagateNgId(parcellation) {
-  const recursivePropagateNgId = (region, {ngId}) => {
-    return {
-      ngId,
-      ...region,
-      ...( region.children && region.children.map
-        ? {
-          children: region.children.map(c => recursivePropagateNgId(c, { ngId: region.ngId || ngId }))
-        }
-        : {} )
-    }
-  }
-  const regions = parcellation.regions && parcellation.regions.map
-    ? parcellation.regions.map(r => recursivePropagateNgId(r, { ngId: parcellation.ngId }))
-    : []
-
-  return {
-    ...parcellation,
-    regions
-  }
 }

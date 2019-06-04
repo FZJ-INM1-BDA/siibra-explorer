@@ -1,5 +1,18 @@
-const validTypes = ['CHECK_MESHES', 'GET_LANDMARKS_VTK', 'GET_USERLANDMARKS_VTK', 'BUILD_REGION_SELECTION_TREE']
-const validOutType = ['CHECKED_MESH', 'ASSEMBLED_LANDMARKS_VTK', 'ASSEMBLED_USERLANDMARKS_VTK', 'RETURN_REBUILT_REGION_SELECTION_TREE']
+const validTypes = [
+  'CHECK_MESHES',
+  'GET_LANDMARKS_VTK',
+  'GET_USERLANDMARKS_VTK',
+  'BUILD_REGION_SELECTION_TREE',
+  'PROPAGATE_NG_ID'
+]
+
+const validOutType = [
+  'CHECKED_MESH',
+  'ASSEMBLED_LANDMARKS_VTK',
+  'ASSEMBLED_USERLANDMARKS_VTK',
+  'RETURN_REBUILT_REGION_SELECTION_TREE',
+  'UPDATE_PARCELLATION_REGIONS'
+]
 
 const checkMeshes = (action) => {
   
@@ -268,6 +281,39 @@ const rebuildSelectedRegion = (payload) => {
   })
 }
 
+const propagateNgId = (parcellation) => {
+  const recursivePropagateNgId = (region, {ngId}) => {
+    return {
+      ngId,
+      ...region,
+      ...( region.children && region.children.map
+        ? {
+          children: region.children.map(c => recursivePropagateNgId(c, { ngId: region.ngId || ngId }))
+        }
+        : {} )
+    }
+  }
+  const regions = parcellation.regions && parcellation.regions.map
+    ? parcellation.regions.map(r => recursivePropagateNgId(r, { ngId: parcellation.ngId }))
+    : []
+
+  return {
+    ...parcellation,
+    regions
+  }
+}
+
+const processPropagateNgId = (payload) => {
+  const { parcellation } = payload
+  const p = parcellation.ngId
+    ? parcellation
+    : propagateNgId(parcellation)
+  postMessage({
+    type: 'UPDATE_PARCELLATION_REGIONS',
+    parcellation: p
+  })
+}
+
 onmessage = (message) => {
   
   if(validTypes.findIndex(type => type === message.data.type) >= 0){
@@ -284,8 +330,13 @@ onmessage = (message) => {
       case 'BUILD_REGION_SELECTION_TREE':
         rebuildSelectedRegion(message.data)
         return
+      case 'PROPAGATE_NG_ID':
+        processPropagateNgId(message.data)
+        return
       default:
         console.warn('unhandled worker action', message)
     }
+  } else {
+    console.warn('unhandled worker action', message)
   }
 }
