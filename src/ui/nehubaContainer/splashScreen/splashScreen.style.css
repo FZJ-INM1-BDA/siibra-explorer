@@ -1,13 +1,16 @@
 div[splashScreenContainer]
 {
+  height: 100%;
   display:flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
   overflow-y:auto;
 }
 
 div[splashScreenHeader] {
-  min-height: 100px;
+  min-height: 90px;
+  max-height: 100px;
   width: 100%;
   background-color: #EF5450;
   display: flex;
@@ -98,7 +101,7 @@ div[splashScreenTemplateBodyImage] {
 }
 
 @media screen and (max-width: 670px) {
-  span[splashScreenHeaderTitle] {
+  .splashScreenHeaderTitle {
     visibility: hidden;
   }
   div[splashScreenTemplate] {
