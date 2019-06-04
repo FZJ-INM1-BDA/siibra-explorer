@@ -17,8 +17,9 @@ export class SplashScreen{
   loadedTemplate$ : Observable<any[]>
   constructor(
     private store:Store<ViewerStateInterface>,
-    private constanceService: AtlasViewerConstantsServices  
-  ){
+    private constanceService: AtlasViewerConstantsServices,
+    private constantsService: AtlasViewerConstantsServices,
+){
     this.loadedTemplate$ = this.store.pipe(
       select('viewerState'),
       filter((state:ViewerStateInterface)=> typeof state !== 'undefined' && typeof state.fetchedTemplates !== 'undefined' && state.fetchedTemplates !== null),
@@ -39,5 +40,9 @@ export class SplashScreen{
 
   correctString(name){
     return name.replace(/[|&;$%@()+,\s./]/g, '')
+  }
+
+  get isMobile(){
+    return this.constantsService.mobile
   }
 }

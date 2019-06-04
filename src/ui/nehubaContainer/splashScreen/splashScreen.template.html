@@ -2,7 +2,10 @@
   <div splashScreenHeader>
     <div class="splashScreenHeaderLogoContainer"><img class="splashScreenHeaderLogo " src="./res/image/HBP_Primary_RGB_WhiteText.png"> </div>
     <span class="splashScreenHeaderTitle" media="screen and (min-width: 670px)">HBP Atlas Viewer</span>
-    <div class="spaceForFill"></div>
+    <div class="spaceForFill">
+      <signin-banner *ngIf="!isMobile">
+      </signin-banner>
+    </div>
   </div>
   <div splashScreenTemplate>
     <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
