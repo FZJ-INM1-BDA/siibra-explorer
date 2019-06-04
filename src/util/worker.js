@@ -20,9 +20,12 @@ const checkMeshes = (action) => {
   const baseUrl = action.baseUrl
   fetch(`${baseUrl}/info`)
     .then(res => res.json())
-    .then(json => json.mesh
-      ? json.mesh
-      : new Error(`mesh does not exist on fetched info file: ${JSON.stringify(json)}`))
+    .then(({mesh}) => {
+      if (mesh)
+        return mesh
+      else 
+        throw new Error('mesh does not exist')
+    })
     .then(meshPath => action.indices.forEach(index => {
       fetch(`${baseUrl}/${meshPath}/${index}:0`)
         .then(res => res.json())
@@ -42,7 +45,7 @@ const checkMeshes = (action) => {
         })
     }))
     .catch(error => {
-      console.error('parsing info json error', error)
+      // console.error('parsing info json error', error)
     })
 }
 
