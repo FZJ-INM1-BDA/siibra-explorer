@@ -31,7 +31,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
-  private selectedTemplate: any
+  selectedTemplate: any
   @Input() darktheme: boolean
 
   constructor(
