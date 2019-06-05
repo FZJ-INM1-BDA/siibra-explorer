@@ -8,22 +8,22 @@ import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
   styleUrls: [
     './radiolist.style.css'
   ],
-  styles: [
-    `
-    ul > li.selected > .textSpan:before
-    {
-      content: '\u2022';
-      width : 1em;
-      display:inline-block;
-    }
-    ul > li:not(.selected) > .textSpan:before
-    {
-      content: ' ';
-      width : 1em;
-      display:inline-block;
-    }  
-    `
-  ],
+  // styles: [
+  //   `
+  //   ul > li.selected > .textSpan:before
+  //   {
+  //     content: '\u2022';
+  //     width : 1em;
+  //     display:inline-block;
+  //   }
+  //   ul > li:not(.selected) > .textSpan:before
+  //   {
+  //     content: ' ';
+  //     width : 1em;
+  //     display:inline-block;
+  //   }
+  //   `
+  // ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
@@ -68,6 +68,7 @@ export class RadioList{
 
 
   downloadPublications(item) {
+    console.log(item['properties']['publications'])
     const filename = item['name']
     let publicationsText = item['name'] + ' Publications:\r\n'
       item['properties']['publications'].forEach((p, i) => {
