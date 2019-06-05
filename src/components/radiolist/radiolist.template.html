@@ -2,30 +2,41 @@
   [ngClass]="ulClass"
   [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
   role="menu">
-  <li 
-    *ngFor="let input of inputArray" 
+
+  <li
+    *ngFor="let input of inputArray"
     [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
     role="menuitem"
-    (click)="itemSelected.emit({previous: selectedItem, current: input})">
-    
-    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()">
+    (click)="itemSelected.emit({previous: selectedItem, current: input})"
+    style="display: flex; justify-content: space-between;">
+
+
+
+    <span class="dropdown-item-1 textSpan"
+      #DropDownText
+      [innerHTML] = "listDisplay(input)"
+      [ngStyle]="input['properties'] && input['properties']['publications'] ? {'width': 'calc(100% - 30px)', 'overflow': 'hidden'} : {}"
+      [matTooltip]="overflowText(DropDownText)? DropDownText.innerHTML: ''">
+    </span>
+
+    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()"
+    style="align-self: flex-end;">
       i
     </span>
 
-    <span class="dropdown-item-1 textSpan" 
-      [innerHTML] = "listDisplay(input)">
-    </span>
 
-
-
-    
 <ng-template #publicationTemplate>
     <div *ngIf="input['properties'] && input['properties']['publications']" class="timerToast">
-        <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications(input)">↓</button>
+          <p>{{input['name']}}</p>
+          <p class="textPartInPublications">{{input['properties']['description']}}</p>
           <p>{{input['name']}} Publication(s)</p>
           <div *ngFor="let p of input['properties']['publications']" class="textPartInPublications">
             <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
           </div>
+      <div class="download-buttons-panel">
+        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
+        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Download &nbsp;<i class="fas fa-download"></i></button>
+      </div>
       </div>
 </ng-template>
 
