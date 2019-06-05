@@ -15,8 +15,9 @@
     <span class="dropdown-item-1 textSpan"
       #DropDownText
       [innerHTML] = "listDisplay(input)"
+      [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
       [ngStyle]="input['properties'] && input['properties']['publications'] ? {'width': 'calc(100% - 30px)', 'overflow': 'hidden'} : {}"
-      [matTooltip]="overflowText(DropDownText)? DropDownText.innerHTML: ''">
+      [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
     </span>
 
     <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()"
