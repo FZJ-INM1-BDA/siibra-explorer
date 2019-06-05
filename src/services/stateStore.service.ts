@@ -97,6 +97,11 @@ export function getLabelIndexMap(regions:any[]):Map<number,any>{
   return returnMap
 }
 
+/**
+ * 
+ * @param regions regions to deep iterate to find all ngId 's, filtering out falsy values
+ * n.b. returns non unique list
+ */
 export function getNgIds(regions: any[]): string[]{
   return regions && regions.map
     ? regions

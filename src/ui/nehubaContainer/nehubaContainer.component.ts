@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
@@ -43,6 +43,36 @@ const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test
     ]
   ]
 }: {}
+const isFirstRow = (cell: HTMLElement) => {
+  const { parentElement:row } = cell
+  const { parentElement:container } = row
+  return container.firstElementChild === row
+}
+
+const isFirstCell = (cell:HTMLElement) => {
+  const { parentElement:row } = cell
+  return row.firstElementChild === cell
+}
+
+const scanFn : (acc:[boolean, boolean, boolean], curr: CustomEvent) => [boolean, boolean, boolean] = (acc, curr) => {
+
+  const target = <HTMLElement>curr.target
+  const targetIsFirstRow = isFirstRow(target)
+  const targetIsFirstCell = isFirstCell(target)
+  const idx = targetIsFirstRow
+    ? targetIsFirstCell
+      ? 0
+      : 1
+    : targetIsFirstCell
+      ? 2
+      : null
+
+  const returnAcc = [...acc]
+  const num1 = typeof curr.detail.missingChunks === 'number' ? curr.detail.missingChunks : 0
+  const num2 = typeof curr.detail.missingImageChunks === 'number' ? curr.detail.missingImageChunks : 0
+  returnAcc[idx] = Math.max(num1, num2) > 0
+  return returnAcc as [boolean, boolean, boolean]
+}
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -66,6 +96,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private viewerPerformanceConfig$: Observable<ViewerConfiguration>
 
+  private sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public sliceViewLoading0$: Observable<boolean>
   public sliceViewLoading1$: Observable<boolean>
   public sliceViewLoading2$: Observable<boolean>
@@ -256,37 +287,23 @@ export class NehubaContainer implements OnInit, OnDestroy{
       [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
     })
 
-    this.sliceViewLoading0$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+    this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+      scan(scanFn, [null, null, null]),
+    )
+
+    this.sliceViewLoading0$ = this.sliceViewLoadingMain$
       .pipe(
-        filter((event:Event) => (event.target as HTMLElement).offsetLeft < 5 && (event.target as HTMLElement).offsetTop < 5),
-        map(event => {
-          const e = (event as any);
-          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
-          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
-          return Math.max(num1, num2) > 0
-        })
+        map(arr => arr[0])
       )
 
-    this.sliceViewLoading1$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+    this.sliceViewLoading1$ = this.sliceViewLoadingMain$
       .pipe(
-        filter((event:Event) => (event.target as HTMLElement).offsetLeft > 5 && (event.target as HTMLElement).offsetTop < 5),
-        map(event => {
-          const e = (event as any);
-          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
-          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
-          return Math.max(num1, num2) > 0
-        })
+        map(arr => arr[1])
       )
 
-    this.sliceViewLoading2$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
+    this.sliceViewLoading2$ = this.sliceViewLoadingMain$
       .pipe(
-        filter((event:Event) => (event.target as HTMLElement).offsetLeft < 5 && (event.target as HTMLElement).offsetTop > 5),
-        map(event => {
-          const e = (event as any);
-          const num1 = typeof e.detail.missingChunks === 'number' ? e.detail.missingChunks : 0
-          const num2 = typeof e.detail.missingImageChunks === 'number' ? e.detail.missingImageChunks : 0
-          return Math.max(num1, num2) > 0
-        })
+        map(arr => arr[2])
       )
 
     /* missing chunk perspective view */
@@ -702,7 +719,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
     this.nehubaViewer.multiNgIdsLabelIndexMap = this.multiNgIdsRegionsLabelIndexMap
 
     /* TODO replace with proper KG id */
-    this.nehubaViewer.ngIds = [...ngIds]
+    /**
+     * need to set unique array of ngIds, or else workers will be overworked
+     */
+    this.nehubaViewer.ngIds = Array.from(new Set(ngIds))
     this.selectedParcellation = parcellation
   }
 
@@ -1070,15 +1090,18 @@ export class NehubaContainer implements OnInit, OnDestroy{
 }
 
 export const identifySrcElement = (element:HTMLElement) => {
-  return element.offsetLeft < 5 && element.offsetTop < 5 ?
-  0 :
-  element.offsetLeft > 5 && element.offsetTop < 5 ?
-    1 :
-    element.offsetLeft < 5 && element.offsetTop > 5 ?
-    2 :
-      element.offsetLeft > 5 && element.offsetTop > 5 ?
-      3 :
-      4
+  const elementIsFirstRow = isFirstRow(element)
+  const elementIsFirstCell = isFirstCell(element)
+
+  return elementIsFirstCell && elementIsFirstRow
+    ? 0
+    : !elementIsFirstCell && elementIsFirstRow
+    ? 1
+    : elementIsFirstCell && !elementIsFirstRow
+      ? 2
+      : !elementIsFirstCell && !elementIsFirstRow
+        ? 3
+        : 4
 }
 
 export const takeOnePipe = [
