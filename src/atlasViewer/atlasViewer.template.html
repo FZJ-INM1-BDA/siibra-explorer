@@ -261,20 +261,33 @@
 
 <ng-template #publications >
   <div *ngIf="tPublication || pPublication" class="timerToast">
-    <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications()">↓</button>
+<!--    <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications()">↓</button>-->
 
-    <div *ngIf="tPublication">
-      <p>{{selectedTemplate['name']}} Publication(s)</p>
+
+
+    <div *ngIf="tPublication && selectedTemplate['name']">
+      <p>{{selectedTemplate['name']}}</p>
+      <p class="textPartInPublications">{{selectedTemplate['properties']['description']}}</p>
+
+      <p>Publication(s)</p>
       <div *ngFor="let tp of tPublication" class="textPartInPublications">
         <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
       </div>
       <hr *ngIf="pPublication">
     </div>
     <div *ngIf="pPublication">
-      <p>{{selectedParcellation['name']}} Publication(s)</p>
+      <p>{{selectedParcellation['name']}}</p>
+      <p class="textPartInPublications">{{selectedParcellation['properties']['description']}}</p>
+
+      <p>Publication(s)</p>
       <div *ngFor="let pp of pPublication" class="textPartInPublications">
         <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>
       </div>  
+    </div>
+
+    <div class="download-buttons-panel">
+      <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
+      <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Download &nbsp;<i class="fas fa-download"></i></button>
     </div>
   </div>
 </ng-template>

@@ -76,4 +76,8 @@ export class RadioList{
     this.zipFileDownloadService.downloadZip(publicationsText, filename)
     publicationsText = ''
   }
+
+  overflowText(event) {
+    return (event.offsetWidth < event.scrollWidth);
+  }
 }
