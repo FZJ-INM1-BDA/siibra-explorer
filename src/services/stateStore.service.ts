@@ -151,6 +151,5 @@ export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inh
   const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
   const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
   if (found) return found
-  debugger
   return null
 }

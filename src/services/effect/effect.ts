@@ -69,7 +69,7 @@ export class UseEffects implements OnDestroy{
       const { selectRegionIds } = action
       const { ngId: defaultNgId } = parcellation
 
-      const regionsSelected = (<any[]>selectRegionIds)
+      const selectRegions = (<any[]>selectRegionIds)
         .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
         .map(({ ngId, labelIndex }) => {
           return {
@@ -90,10 +90,9 @@ export class UseEffects implements OnDestroy{
           if (!v) console.log(`SELECT_REGIONS_WITH_ID, some ids cannot be parsed intto label index`)
           return !!v
         })
-      console.log('regionsselectd', regionsSelected)
       return {
         type: SELECT_REGIONS,
-        regionsSelected
+        selectRegions
       }
     })
   )
