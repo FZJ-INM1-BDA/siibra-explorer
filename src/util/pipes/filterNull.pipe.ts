@@ -6,6 +6,6 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 export class FilterNullPipe implements PipeTransform{
   public transform(arr:any[]){
-    return arr.filter(obj => obj !== null)
+    return (arr && arr.filter(obj => obj !== null)) || []
   }
 }
