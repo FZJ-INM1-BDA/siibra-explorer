@@ -13,6 +13,37 @@ import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 
+const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
+const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
+? {
+  transform: [
+    [
+      1e6,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1e6,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1e6,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1
+    ]
+  ]
+}: {}
+
 @Component({
   selector : 'ui-nehuba-container',
   templateUrl : './nehubaContainer.template.html',
@@ -479,7 +510,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
         
         if(newLayers.length > 0){
           const newLayersObj:any = {}
-          newLayers.forEach(obj => newLayersObj[obj.name] = obj)
+          newLayers.forEach(({ name, source, ...rest }) => newLayersObj[name] = {
+            ...rest,
+            source
+            // source: getProxyUrl(source),
+            // ...getProxyOther({source})
+          })
 
           if(!this.nehubaViewer.nehubaViewer || !this.nehubaViewer.nehubaViewer.ngviewer){
             this.nehubaViewer.initNiftiLayers.push(newLayersObj)

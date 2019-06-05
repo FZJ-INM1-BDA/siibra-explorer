@@ -1,11 +1,12 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Effect, Actions, ofType } from "@ngrx/effects";
-import { Observable, Subscription, merge, fromEvent } from "rxjs";
+import { Observable, Subscription, merge, fromEvent, combineLatest } from "rxjs";
 import { SHOW_KG_TOS } from "../state/uiState.store";
 import { withLatestFrom, map, tap, switchMap, filter } from "rxjs/operators";
 import { Store, select } from "@ngrx/store";
-import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION } from "../state/viewerState.store";
+import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
 import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
+import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,8 @@ import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
 export class UseEffects implements OnDestroy{
 
   constructor(
-    private actions$: Actions
+    private actions$: Actions,
+    private store$: Store<any>
   ){
     this.subscriptions.push(
       this.newParcellationSelected$.subscribe(parcellation => {
@@ -47,6 +49,53 @@ export class UseEffects implements OnDestroy{
     this.parcellationSelected$
   ).pipe(
     map(({selectParcellation}) => selectParcellation)
+  )
+
+  private updatedParcellation$ = this.store$.pipe(
+    select('viewerState'),
+    select('parcellationSelected'),
+    filter(p => !!p && !!p.regions)
+  )
+
+  /**
+   * for backwards compatibility.
+   * older versions of atlas viewer may only have labelIndex as region identifier
+   */
+  @Effect()
+  onSelectRegionWithId = this.actions$.pipe(
+    ofType(SELECT_REGIONS_WITH_ID),
+    withLatestFrom(this.updatedParcellation$),
+    map(([action, parcellation]) => {
+      const { selectRegionIds } = action
+      const { ngId: defaultNgId } = parcellation
+
+      const regionsSelected = (<any[]>selectRegionIds)
+        .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
+        .map(({ ngId, labelIndex }) => {
+          return {
+            labelIndexId: generateLabelIndexId({
+              ngId: ngId || defaultNgId,
+              labelIndex 
+            })
+          }
+        })
+        .map(({ labelIndexId }) => {
+          return recursiveFindRegionWithLabelIndexId({ 
+            regions: parcellation.regions,
+            labelIndexId,
+            inheritedNgId: defaultNgId
+          })
+        })
+        .filter(v => {
+          if (!v) console.log(`SELECT_REGIONS_WITH_ID, some ids cannot be parsed intto label index`)
+          return !!v
+        })
+      console.log('regionsselectd', regionsSelected)
+      return {
+        type: SELECT_REGIONS,
+        regionsSelected
+      }
+    })
   )
 
   /**
