@@ -14,11 +14,6 @@ export class FilterCollapsePipe implements PipeTransform{
         ? false
         : !defaultCollapse
     }
-    console.log({
-      array,
-      collapsedLevels,
-      uncollapsedLevels
-    })
     const returnArray =  array.filter(item => {
       return !item.lvlId.split('_')
         .filter((v,idx,arr) => idx < arr.length -1 )
@@ -28,8 +23,6 @@ export class FilterCollapsePipe implements PipeTransform{
             : acc[acc.length -1].concat(`_${curr}`)), [])
         .some(id => isCollapsedById(id))
     })
-
-    console.log(returnArray)
     return returnArray
   }
 }
