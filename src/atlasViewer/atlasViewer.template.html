@@ -287,7 +287,11 @@
 
     <div class="download-buttons-panel">
       <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
-      <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Download &nbsp;<i class="fas fa-download"></i></button>
+      <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()" [disabled] = "downloadingProcess" >
+        Download &nbsp;
+        <span *ngIf="niiFileSize > 0">(.nii {{niiFileSize/10000 | number:'.1-2'}} Mb) &nbsp;</span>
+        <i class="fas" [ngClass]="!downloadingProcess? 'fa-download' :'fa-spinner fa-pulse'"></i>
+      </button>
     </div>
   </div>
 </ng-template>
