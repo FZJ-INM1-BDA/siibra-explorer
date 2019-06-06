@@ -21,6 +21,7 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiSt
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { ToastService } from "src/services/toastService.service";
 import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
+import {forEach} from "@angular/router/src/utils/collection";
 
 @Component({
   selector: 'atlas-viewer',
@@ -92,6 +93,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   handleToast
   tPublication
   pPublication
+  downloadingProcess = false
+  niiFileSize = 0
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -221,6 +224,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
+        this.niiFileSize = 0
+
 
         if (this.selectedTemplate && this.selectedParcellation) {
           if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
@@ -233,6 +238,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           } else {
             this.pPublication = null
           }
+          if(this.selectedParcellation['properties'] && this.selectedParcellation['properties']['nifty']) {
+            this.selectedParcellation['properties']['nifty'].forEach(nii => {
+              this.niiFileSize += nii['size']
+            })
+          }
+
         } else {
           this.tPublication = null
           this.pPublication = null
@@ -247,7 +258,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           this.handleToast = this.toastService.showToast(this.publications, {
               timeout: 7000
           })
-          
         }
       })
     )
@@ -256,6 +266,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   downloadPublications() {
+    this.downloadingProcess = true
+
     const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
     let publicationsText = ''
 
@@ -274,7 +286,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       });
     }
     
-    this.zipFileDownloadService.downloadZip(publicationsText, fileName)
+    this.zipFileDownloadService.downloadZip(
+        publicationsText,
+        fileName,
+        this.selectedParcellation['properties'] && this.selectedParcellation['properties']['nifty']? this.selectedParcellation['properties']['nifty'] : 0).subscribe(data => {
+      this.downloadingProcess = false
+    })
     publicationsText = ''
   }
 

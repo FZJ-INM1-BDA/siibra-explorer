@@ -8,22 +8,22 @@ import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
   styleUrls: [
     './radiolist.style.css'
   ],
-  // styles: [
-  //   `
-  //   ul > li.selected > .textSpan:before
-  //   {
-  //     content: '\u2022';
-  //     width : 1em;
-  //     display:inline-block;
-  //   }
-  //   ul > li:not(.selected) > .textSpan:before
-  //   {
-  //     content: ' ';
-  //     width : 1em;
-  //     display:inline-block;
-  //   }
-  //   `
-  // ],
+  styles: [
+    // `
+    // ul > li.selected > .textSpan:before
+    // {
+    //   content: '\u2022';
+    //   width : 1em;
+    //   display:inline-block;
+    // }
+    // ul > li:not(.selected) > .textSpan:before
+    // {
+    //   content: ' ';
+    //   width : 1em;
+    //   display:inline-block;
+    // }
+    // `
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
@@ -50,12 +50,21 @@ export class RadioList{
 
   @ViewChild('publicationTemplate') publicationTemplate: TemplateRef<any>
 
+  downloadingProcess = false
   handleToast
+  niiFileSize = 0
 
   constructor(private toastService: ToastService,
               private zipFileDownloadService: ZipFileDownloadService) {}
 
   showToast(item) {
+    this.niiFileSize = 0
+    if(item['properties']['nifty']) {
+      item['properties']['nifty'].forEach(nii => {
+        this.niiFileSize += nii['size']
+      })
+    }
+
     if (this.handleToast) {
       this.handleToast()
       this.handleToast = null
@@ -63,18 +72,20 @@ export class RadioList{
     this.handleToast = this.toastService.showToast(this.publicationTemplate, {
         timeout: 7000
     })
-
   }
 
 
   downloadPublications(item) {
-    console.log(item['properties']['publications'])
+    this.downloadingProcess = true
+
     const filename = item['name']
     let publicationsText = item['name'] + ' Publications:\r\n'
       item['properties']['publications'].forEach((p, i) => {
         publicationsText += '\t' + (i+1) + '. ' + p['citation'] + ' - ' + p['doi'] + '\r\n'
       });
-    this.zipFileDownloadService.downloadZip(publicationsText, filename)
+    this.zipFileDownloadService.downloadZip(publicationsText, filename, item['properties']['nifty']? item['properties']['nifty'] : 0).subscribe(data => {
+      this.downloadingProcess = false
+    })
     publicationsText = ''
   }
 
