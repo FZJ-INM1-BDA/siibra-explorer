@@ -105,6 +105,8 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnInit(){
+    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
+    this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
 
     this.subscriptions.push(
       this.handleRegionTreeClickSubject.pipe(
@@ -118,6 +120,20 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(){
+    /**
+     * TODO
+     * bandaid fix on
+     * when region search loses focus, the searchTerm is cleared,
+     * but hierarchy filter does not reset
+     */
+    this.subscriptions.push(
+      fromEvent(this.searchTermInput.nativeElement, 'focus').pipe(
+        
+      ).subscribe(() => {
+        this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
+        this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
+      })
+    )
     this.subscriptions.push(
       fromEvent(this.searchTermInput.nativeElement, 'input').pipe(
         debounceTime(200)
