@@ -31,7 +31,6 @@ export class SigninBanner implements OnInit, OnDestroy{
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
-  @Input() darktheme: boolean
 
   constructor(
     private constantService: AtlasViewerConstantsServices,

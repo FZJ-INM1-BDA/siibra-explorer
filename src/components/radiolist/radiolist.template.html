@@ -1,6 +1,6 @@
 <ul
   [ngClass]="ulClass"
-  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
+  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': constantService.darktheme? 'white' : 'black'}"
   role="menu">
   <li 
     *ngFor="let input of inputArray" 

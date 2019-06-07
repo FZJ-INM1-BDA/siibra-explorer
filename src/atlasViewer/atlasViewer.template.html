@@ -25,7 +25,7 @@
   
         <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
           <tab heading="Template">
-            <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+            <signin-banner signinWrapper></signin-banner>
             <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
               <ui-status-card 
                   [selectedTemplate]="selectedTemplate" 

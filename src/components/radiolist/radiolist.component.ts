@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit, ViewChild, TemplateRef } from "@angular/core";
 import { ToastService } from "src/services/toastService.service";
 import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
+import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector: 'radio-list',
@@ -45,15 +46,14 @@ export class RadioList{
   
   @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
-  @Input() isMobile: boolean
-  @Input() darktheme: boolean
 
   @ViewChild('publicationTemplate') publicationTemplate: TemplateRef<any>
 
   handleToast
 
   constructor(private toastService: ToastService,
-              private zipFileDownloadService: ZipFileDownloadService) {}
+              private zipFileDownloadService: ZipFileDownloadService,
+              private constantService: AtlasViewerConstantsServices,) {}
 
   showToast(item) {
     if (this.handleToast) {
@@ -75,5 +75,9 @@ export class RadioList{
       });
     this.zipFileDownloadService.downloadZip(publicationsText, filename)
     publicationsText = ''
+  }
+
+  get isMobile(){
+    return this.constantService.mobile
   }
 }

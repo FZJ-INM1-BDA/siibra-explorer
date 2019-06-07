@@ -6,7 +6,7 @@
   #dropdownToggle
   dropdownToggle
               
-  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': constantsService.darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
 
 </span>
 
@@ -23,8 +23,6 @@
   [checkSelected]="checkSelected"
   [selectedItem]="selectedItem"
   [inputArray]="inputArray"
-  [@showState]="openState ? 'show' : 'hide'"
-  [isMobile]="isMobile"
-  [darktheme]="darktheme">
+  [@showState]="openState ? 'show' : 'hide'">
 
 </radio-list>
