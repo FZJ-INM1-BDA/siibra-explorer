@@ -1,4 +1,11 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  ComponentRef,
+  Injector,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  ViewChild, ElementRef
+} from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -8,6 +15,7 @@ import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import {MatMenuTrigger} from "@angular/material";
 
 @Component({
   selector: 'menu-icons',
@@ -40,6 +48,9 @@ export class MenuIconsBar{
   pbcf: ComponentFactory<PluginBannerUI>
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
+
+  @ViewChild (MatMenuTrigger) private menuTrigger: MatMenuTrigger;
+  @ViewChild ('multiSearchButton', { read: ElementRef }) multiSearchButton: ElementRef;
 
   get isMobile(){
     return this.constantService.mobile
@@ -159,4 +170,16 @@ export class MenuIconsBar{
   get dataBrowserTitle() {
     return `Browse`
   }
+
+
+
+  opensearchMenu() {
+    let menu = document.getElementById('searchMenuBtn');
+    menu.style.display = '';
+    menu.style.position = 'absolute';
+    menu.style.left = this.multiSearchButton.nativeElement.getBoundingClientRect().left + 35 + 'px';
+    menu.style.top = this.multiSearchButton.nativeElement.getBoundingClientRect().top + 'px';
+    this.menuTrigger.openMenu();
+  }
+
 }
