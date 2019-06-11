@@ -173,8 +173,14 @@ export class MenuIconsBar {
   }
 
 
+  test(wu)
+  {
+    this.widgetServices.moveFloatingToFront(wu);
+  }
 
   opensearchMenu() {
+
+
     let menu = document.getElementById('searchMenuBtn');
     menu.style.display = '';
     menu.style.position = 'absolute';
