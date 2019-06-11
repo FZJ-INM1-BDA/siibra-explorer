@@ -56,17 +56,27 @@
 .mat-menu-item {
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
 }
 .mat-menu-item-minimised {
   background-color: #6c757d;
 }
 .opened-search-icon {
-  color: lawngreen;
-  margin-left: 5px;
+  /* color: lawngreen; */
+  font-size: 5px;
+  margin-right: 5px;
 }
 
 .search-opened-icon {
   margin-left: 3px;
+}
+
+
+::ng-deep .mat-menu-content {
+  background-color: rgba(255, 255, 255, 0) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+::ng-deep .mat-menu-panel {
+  background-color: rgba(255, 255, 255, 0) !important;
 }

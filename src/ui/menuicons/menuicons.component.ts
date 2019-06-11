@@ -4,7 +4,7 @@ import {
   Injector,
   ComponentFactory,
   ComponentFactoryResolver,
-  ViewChild, ElementRef
+  ViewChild, ElementRef, AfterViewInit
 } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
@@ -26,7 +26,7 @@ import {MatMenuTrigger} from "@angular/material";
   ]
 })
 
-export class MenuIconsBar{
+export class MenuIconsBar {
 
   /**
    * databrowser
@@ -51,6 +51,7 @@ export class MenuIconsBar{
 
   @ViewChild (MatMenuTrigger) private menuTrigger: MatMenuTrigger;
   @ViewChild ('multiSearchButton', { read: ElementRef }) multiSearchButton: ElementRef;
+  @ViewChild ('searchMenuContent', { read: ElementRef }) searchMenuContent: ElementRef;
 
   get isMobile(){
     return this.constantService.mobile
@@ -84,7 +85,7 @@ export class MenuIconsBar{
     dataBrowser.instance.parcellation = parcellation
     const title = regions.length > 1
       ? `Search: ${regions.length} regions`
-      : `Search: ${regions[0].name}`
+      : `${regions[0].name}`
     const widgetUnit = this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
