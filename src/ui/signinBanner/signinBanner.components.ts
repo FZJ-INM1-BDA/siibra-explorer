@@ -31,6 +31,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
+  selectedTemplate: any
   @Input() darktheme: boolean
 
   constructor(
@@ -71,6 +72,9 @@ export class SigninBanner implements OnInit, OnDestroy{
       this.selectedRegions$.subscribe(regions => {
         this.selectedRegions = regions
       })
+    )
+    this.subscriptions.push(
+        this.selectedTemplate$.subscribe(template => this.selectedTemplate = template)
     )
   }
 

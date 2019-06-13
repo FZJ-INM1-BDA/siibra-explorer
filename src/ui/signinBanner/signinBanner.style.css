@@ -46,10 +46,24 @@ dropdown-component
 
 .login-button-panel-mobile {
   order: -1;
-  align-self: flex-start; 
+  align-self: flex-start;
   width: 100%;
   display: flex;
   justify-content: space-between;
+}
+
+.login-button-panel-splash {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: auto;
+  text-align: right
+}
+.login-button-splash > button {
+  color: #FFFFFF;
+  outline: none;
+  background-color: coral;
+  margin: 5px;
 }
 
 .login-button-mobile > button {
