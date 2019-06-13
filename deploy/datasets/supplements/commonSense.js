@@ -11,7 +11,8 @@ const humanParcellationSet = new Set([
   'Area V2',
   'JuBrain Cytoarchitectonic Atlas',
   'Fibre Bundle Atlas - Short Bundle',
-  'Fibre Bundle Atlas - Long Bundle'
+  'Fibre Bundle Atlas - Long Bundle',
+  'Cytoarchitectonic Maps'
 ])
 
 const ratTemplateSet = new Set([

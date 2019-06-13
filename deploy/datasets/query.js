@@ -64,11 +64,6 @@ const getPublicDs = () => Promise.race([
   fetchDatasetFromKg().then(cacheData)
 ])
 
-
-const getDs = ({ user }) => user
-  ? fetchDatasetFromKg({ user }).then(({results}) => results)
-  : getPublicDs()
-
 /**
  * Needed by filter by parcellation
  */
@@ -94,31 +89,54 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
   })
 })
 
-let juBrain = null
-let shortBundle = null
-let longBundle = null
-let waxholm = null
-let allen = null
+const parcellationNameToFlattenedRegion = new Map()
+
+const appendMap = (parcellation) => {
+  const { name, regions } = parcellation
+  parcellationNameToFlattenedRegion.set(name, flattenArray(regions))
+}
+
+readConfigFile('bigbrain.json')
+  .then(data => JSON.parse(data))
+  .then(json => {
+    const p = json.parcellations.find(p => p.name === 'Cytoarchitectonic Maps')
+    if (p) {
+      appendMap(p)
+    }
+  })
+  .catch(console.error)
 
 readConfigFile('colin.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    juBrain = flattenArray(json.parcellations[0].regions)
+    const p = json.parcellations.find(p => p.name === 'JuBrain Cytoarchitectonic Atlas')
+    if (p) {
+      appendMap(p)
+    }
   })
   .catch(console.error)
 
 readConfigFile('MNI152.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    longBundle = flattenArray(json.parcellations[0].regions)
-    shortBundle = flattenArray(json.parcellations[1].regions)
+    const p1 = json.parcellations.find(p => p.name === 'fibre bundle long')
+    if (p1) {
+      appendMap(p1)
+    }
+    const p2 = json.parcellations.find(p => p.name === 'fibre bundle short')
+    if (p2) {
+      appendMap(p2)
+    }
   })
   .catch(console.error)
 
 readConfigFile('waxholmRatV2_0.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    waxholm = flattenArray(json.parcellations[0].regions)
+    const p = json.parcellations.find(p => p.name === 'Waxholm Space rat brain atlas v.2.0')
+    if (p) {
+      appendMap(p)
+    }
   })
   .catch(console.error)
 
@@ -135,7 +153,7 @@ const filterByPRs = (prs, atlasPr) => atlasPr
 const manualFilter = require('./supplements/parcellation')
 
 
-const filter = (datasets = [], {templateName, parcellationName}) => datasets
+const filterDataset = (datasets = [], {templateName, parcellationName}) => datasets
   .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
   .filter(ds => {
     if (/infant/.test(ds.name))
@@ -147,18 +165,14 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
       if (parcellationName === 'Fibre Bundle Atlas - Long Bundle'){
         return manualFilterDWM(ds)
       }
-      return ds.parcellationRegion.length > 0
-        ? filterByPRs(
-            ds.parcellationRegion, 
-            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
-              ? juBrain
-              : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
-                ? shortBundle
-                : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
-                  ? waxholm
-                  : null
-          )
-        : false
+      if (ds.parcellationRegion.length > 0) {
+        const flattenedRegions = parcellationNameToFlattenedRegion.get(parcellationName)
+        if (flattenedRegions) {
+          return filterByPRs(ds.parcellationRegion, flattenedRegions)
+        }
+      } else {
+        return false
+      }
     }
 
     return false
@@ -186,8 +200,10 @@ exports.init = async () => {
   cachedData = results
 }
 
-exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
-    .then(json => filter(json, {templateName, parcellationName}))
+exports.getDatasets = ({ templateName, parcellationName, user }) => (user
+  ? fetchDatasetFromKg({ user }).then(({results}) => results)
+  : getPublicDs())
+    .then(json => filterDataset(json, {templateName, parcellationName}))
 
 exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
