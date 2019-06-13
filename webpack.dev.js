@@ -7,7 +7,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = merge(common,ngAssets,staticAssets,{
   entry : {
-    main : './src/main.ts'
+    main : './src/main.ts',
+    styles: "./src/styles.css"
   },
   mode : 'development',
   output : {
@@ -15,7 +16,17 @@ module.exports = merge(common,ngAssets,staticAssets,{
     path : path.resolve(__dirname,'dist/dev')
   },
   devtool:'source-map',
-
+  // module: {
+  //   rules: [
+  //     {
+  //       test: /\.css$/,
+  //       use: [
+  //         "style-loader",
+  //         'css-loader'
+  //       ]
+  //     }
+  //   ]
+  // },
   plugins : [
     new HtmlWebpackPlugin({
       template : 'src/index.html'
