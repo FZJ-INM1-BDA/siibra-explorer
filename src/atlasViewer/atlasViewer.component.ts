@@ -557,7 +557,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
 
   closeMenuWithSwipe(documentToSwipe: ElementRef) {
-    if (documentToSwipe.nativeElement) {
+    if (documentToSwipe && documentToSwipe.nativeElement) {
       const swipeDistance = 150; // swipe distance
       const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
           .pipe(
