@@ -3,6 +3,8 @@ const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
 const { init, getDatasets, getPreview } = require('./query')
+const url = require('url')
+const qs = require('querystring')
 
 const bodyParser = require('body-parser')
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
@@ -56,7 +58,10 @@ datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
 
 datasetsRouter.get('/preview/:datasetName', (req, res, next) => {
   const { datasetName } = req.params
-  getPreview({ datasetName })
+  const ref = url.parse(req.headers.referer)
+  const { templateSelected, parcellationSelected } = qs.parse(ref.query)
+  
+  getPreview({ datasetName, templateSelected })
     .then(preview => {
       if (preview) {
         res.status(200).json(preview)
