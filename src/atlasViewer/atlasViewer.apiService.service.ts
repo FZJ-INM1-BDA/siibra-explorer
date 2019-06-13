@@ -172,6 +172,10 @@ export interface InteractiveViewerInterface{
 
     mouseEvent : Observable<{eventName:string,event:MouseEvent}>
     mouseOverNehuba : Observable<{labelIndex : number, foundRegion : any | null}>
+    /**
+     * TODO add to documentation
+     */
+    mouseOverNehubaLayers: Observable<{layer:{name:string}, segment: any | number }[]>
 
     getNgHash : () => string
   }

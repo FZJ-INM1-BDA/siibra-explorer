@@ -28,6 +28,7 @@ import { PillComponent } from './pill/pill.component';
 import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
+import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
 
 
 @NgModule({
@@ -65,7 +66,8 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
     HighlightPipe,
     FitlerRowsByVisibilityPipe,
     AppendSiblingFlagPipe,
-    ClusteringPipe
+    ClusteringPipe,
+    FilterCollapsePipe
   ],
   exports : [
     BrowserAnimationsModule,

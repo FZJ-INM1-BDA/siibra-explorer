@@ -23,6 +23,12 @@ import { ToastService } from "src/services/toastService.service";
 import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
 import {forEach} from "@angular/router/src/utils/collection";
 
+/**
+ * TODO
+ * check against auxlillary mesh indicies, to only filter out aux indicies
+ */
+const filterFn = (segment) => typeof segment.segment !== 'string'
+
 @Component({
   selector: 'atlas-viewer',
   templateUrl: './atlasViewer.template.html',
@@ -204,9 +210,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.onhoverLandmark$
     ).pipe(
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
-      map(segments => !segments || segments.length === 0
-          ? null
-          : segments.map(s => s.segment) )
+      map(segments => {
+        if (!segments)
+          return null
+        const filteredSeg = segments.filter(filterFn)
+        return filteredSeg.length > 0
+          ? segments.map(s => s.segment) 
+          : null
+        })
     )
 
     this.selectedParcellation$ = this.store.pipe(
