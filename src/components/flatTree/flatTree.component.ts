@@ -43,9 +43,15 @@ export class FlatTreeComponent{
   uncollapsedLevels : Set<string> = new Set()
 
   toggleCollapse(flattenedItem:FlattenedTreeInterface){
-    this.isCollapsed(flattenedItem)
-      ? (this.collapsedLevels.delete(flattenedItem.lvlId), this.uncollapsedLevels.add(flattenedItem.lvlId))
-      : (this.collapsedLevels.add(flattenedItem.lvlId), this.uncollapsedLevels.delete(flattenedItem.lvlId))
+    if (this.isCollapsed(flattenedItem)) {
+      this.collapsedLevels.delete(flattenedItem.lvlId)
+      this.uncollapsedLevels.add(flattenedItem.lvlId)
+    } else {
+      this.collapsedLevels.add(flattenedItem.lvlId)
+      this.uncollapsedLevels.delete(flattenedItem.lvlId)
+    }
+    this.collapsedLevels = new Set(this.collapsedLevels)
+    this.uncollapsedLevels = new Set(this.uncollapsedLevels)
   }
 
   isCollapsed(flattenedItem:FlattenedTreeInterface):boolean{

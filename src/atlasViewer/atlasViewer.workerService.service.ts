@@ -1,11 +1,16 @@
 import { Injectable } from "@angular/core";
 
+/**
+ * export the worker, so that services that does not require dependency injection can import the worker
+ */
+export const worker = new Worker('worker.js')
+
 @Injectable({
   providedIn:'root'
 })
 
 export class AtlasWorkerService{
-  public worker = new Worker('worker.js')
+  public worker = worker
   public safeMeshSet : Map<string, Set<number>> = new Map()
 }
 
