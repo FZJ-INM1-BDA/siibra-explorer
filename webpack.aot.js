@@ -10,8 +10,7 @@ const staticAssets = require('./webpack.staticassets')
 module.exports = merge(staticAssets, {
 
   entry : {
-    main : './src/main-aot.ts',
-    styles: './src/styles.css'
+    main : './src/main-aot.ts'
   },
   output : {
     filename : '[name].js',
@@ -48,13 +47,6 @@ module.exports = merge(staticAssets, {
             name : '[name].[ext]'
           }
         }
-      },
-      {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          'css-loader'
-        ]
       }
     ]
   },
