@@ -3,6 +3,7 @@
   [ngClass]="{ 'flex-column w-100 align-items-stretch' : isMobile}" >
 
   <dropdown-component
+    *ngIf="selectedTemplate || isMobile"
     (itemSelected)="changeTemplate($event)"
     [activeDisplay]="displayActiveTemplate"
     [selectedItem]="selectedTemplate$ | async"
@@ -42,7 +43,7 @@
   <!-- help btn -->
   <div class="btnWrapper">
     <div
-      *ngIf="!isMobile" 
+      *ngIf="!isMobile && selectedTemplate"
       (click)="showHelp()" 
       class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
       <i class="fas fa-question-circle"></i>
@@ -54,7 +55,7 @@
   <div class="btnWrapper">
 
     <div 
-      *ngIf="!isMobile" 
+      *ngIf="!isMobile && selectedTemplate"
       (click)="showSignin()"
       class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
       <i
@@ -75,4 +76,18 @@
     </div>
 
   </div>
+
+
+  <div *ngIf="!selectedTemplate && !isMobile" class="login-button-panel-splash">
+    <div
+      (click)="showSignin()"
+      class="login-button-splash">
+      <button mat-button>Log In</button>
+    </div>
+    <div (click)="showHelp()" class="login-button-splash">
+      <button mat-button>Help</button>
+    </div>
+  </div>
+
+
 </div>

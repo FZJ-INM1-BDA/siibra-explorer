@@ -1,3 +1,4 @@
+/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
 
 :host-context([darktheme="true"]) ul
 {
@@ -54,10 +55,13 @@ ul,span.dropdown-item-1
   border-radius:0px;
   white-space: nowrap;
   border:none;
+  overflow: hidden;
+  text-overflow: ellipsis
 }
 
+
 .infoIcon {
-  margin-right: 5px;
+  margin-left: 5px;
   display: inline-block;
   border: 1px solid gray;
   border-radius: 15px;
@@ -71,14 +75,37 @@ ul,span.dropdown-item-1
   max-width: 700px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  max-height: 500px;
+  padding-right: 10px;
+  overflow-y: auto;
 }
 
-.downloadPublications {
+.download-buttons-panel {
   align-self: flex-end;
+}
+.downloadPublications {
+  margin: 5px;
   outline: none;
 }
 
 .textPartInPublications {
-  text-align: left;
+  text-align: justify;
+}
+
+
+.timerToast:hover::-webkit-scrollbar-thumb{
+  background: #888;
+  border-radius: 10px;
+}
+.timerToast::-webkit-scrollbar {
+  width: 7px;
+}
+.timerToast::-webkit-scrollbar-track {
+  background: transparent;
+}
+.timerToast::-webkit-scrollbar-thumb {
+  background: #CCC;
+}
+.timerToast::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

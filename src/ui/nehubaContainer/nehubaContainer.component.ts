@@ -113,6 +113,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private userLandmarks$ : Observable<UserLandmark[]>
   public onHoverSegmentName$ : Observable<string>
   public onHoverSegment$ : Observable<any>
+  public onHoverSegments$: Observable<any[]>
   private onHoverLandmark$ : Observable<any|null>
 
   private navigationChanges$ : Observable<any>
@@ -228,25 +229,86 @@ export class NehubaContainer implements OnInit, OnDestroy{
       distinctUntilChanged(userLmUnchanged)
     )
 
-    const segmentsUnchangedChanged = (s1,s2)=>
-      !(typeof s1 === typeof s2 ?
-        typeof s2 === 'undefined' ?
-          false :
-          typeof s2 === 'number' ?
-            s2 !== s1 :
-            s1 === s2 ?
-              false :
-              s1 === null || s2 === null ?
-                true :
-                s2.name !== s1.name :
-        true)
-    
-
-    this.onHoverSegment$ = this.store.pipe(
+    this.onHoverSegments$ = this.store.pipe(
       select('uiState'),
-      filter(state=>isDefined(state)),
-      map(state=>state.mouseOverSegment),
-      distinctUntilChanged(segmentsUnchangedChanged)
+      select('mouseOverSegments'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.length === n.length
+        && n.every(segment =>
+          o.find(oSegment => oSegment.layer.name === segment.layer.name
+            && oSegment.segment === segment.segment)))
+    )
+
+    const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
+
+      const getLayerName = ({layer} = {layer:{}}) => {
+        const { name } = <any>layer
+        return name
+      }
+
+      const newEntries = curr.filter(entry => {
+        const name = getLayerName(entry)
+        return acc.map(getLayerName).indexOf(name) < 0
+      })
+
+      const entryChanged: (itemPrevState, newArr) => boolean = (itemPrevState, newArr) => {
+        const layerName = getLayerName(itemPrevState)
+        const { segment } = itemPrevState
+        const foundItem = newArr.find((_item) =>
+          getLayerName(_item) === layerName)
+
+        if (foundItem) {
+          const { segment:foundSegment } = foundItem
+          return segment !== foundSegment 
+        } else {
+          /**
+           * if item was not found in the new array, meaning hovering nothing
+           */
+          return segment !== null
+        }
+      }
+
+      const getItemFromLayerName = (item, arr) => {
+        const foundItem = arr.find(i => getLayerName(i) === getLayerName(item))
+        return foundItem
+          ? foundItem
+          : {
+            layer: item.layer,
+            segment: null
+          }
+      }
+
+      const getReduceExistingLayers = (newArr) => ([changed, unchanged], _curr) => {
+        const changedFlag = entryChanged(_curr, newArr)
+        return changedFlag
+          ? [ changed.concat( getItemFromLayerName(_curr, newArr) ), unchanged ]
+          : [ changed, unchanged.concat(_curr) ]
+      }
+
+      /**
+       * now, for all the previous layers, separate into changed and unchanged layers
+       */
+      const [changed, unchanged] = acc.reduce(getReduceExistingLayers(curr), [[], []])
+      return [...newEntries, ...changed, ...unchanged]
+    } 
+
+    this.onHoverSegment$ = this.onHoverSegments$.pipe(
+      scan(sortByFreshness, []),
+      /**
+       * take the first element after sort by freshness
+       */
+      map(arr => arr[0]),
+      /**
+       * map to the older interface
+       */
+      filter(v => !!v),
+      map(({ segment }) => {
+
+        return {
+          labelIndex: (isNaN(segment) && Number(segment.labelIndex)) || null,
+          foundRegion: (isNaN(segment) && segment) || null
+        }
+      })
     )
 
     this.onHoverLandmark$ = this.store.pipe(
@@ -825,19 +887,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
       })
     )
 
-    const onhoverSegments$ = this.store.pipe(
-      select('uiState'),
-      select('mouseOverSegments'),
-      filter(v => !!v),
-      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
-    )
-
     // TODO hack, even though octant is hidden, it seems with vtk one can mouse on hover
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.regionSelectionEmitter.pipe(
         withLatestFrom(this.onHoverLandmark$),
         filter(results => results[1] === null),
-        withLatestFrom(onhoverSegments$),
+        withLatestFrom(this.onHoverSegments$),
         map(results => results[1]),
         filter(arr => arr.length > 0),
         map(arr => {
@@ -970,7 +1025,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
           map((ev:MouseEvent)=>({eventName :'mouseup',event:ev}))
         ),
       ) ,
-      mouseOverNehuba : this.onHoverSegment$,
+      mouseOverNehuba : this.onHoverSegment$.pipe(
+        tap(() => console.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.'))
+      ),
+      mouseOverNehubaLayers: this.onHoverSegments$,
       getNgHash : this.nehubaViewer.getNgHash
     }
   }

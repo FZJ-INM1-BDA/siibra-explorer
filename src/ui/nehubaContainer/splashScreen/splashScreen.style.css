@@ -1,8 +1,118 @@
 div[splashScreenContainer]
 {
-  height:100%;
+  height: 100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y:auto;
 }
 
+div[splashScreenHeader] {
+  min-height: 90px;
+  max-height: 100px;
+  width: 100%;
+  background-color: #EF5450;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+}
+
+
+.splashScreenHeaderTitle {
+  font-size: 45px;
+}
+
+
+.splashScreenHeaderLogoContainer {
+  flex: 1;
+}
+.splashScreenHeaderLogo {
+  margin-left: 50px;
+  width: 100px;
+  height: auto;
+}
+
+.spaceForFill {
+  flex: 1;
+}
+
+div[splashScreenTemplate] {
+
+  width: 100%;
+  margin: 20px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+}
+
+div[splashScreenTemplateItem] {
+  max-width: 600px;
+  width: 400px;
+  margin: 20px 20px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+
+}
+
+div[splashScreenTemplateHeader] {
+  align-self: center;
+  text-align: center;
+  font-size: 30px;
+  margin: 0 0 20px 0;
+
+}
+
+div[splashScreenTemplateBody] {
+  display: flex;
+  flex-direction: column;
+}
+
+div[splashScreenTemplateBodyDescription] {
+  flex: 1;
+  text-align: justify;
+  margin: 0 10px 10px 10px;
+}
+div[splashScreenTemplateBodyImage] {
+  flex: 1;
+}
+
+.template-image {
+  width: 100%;
+  height: auto;
+}
+
+.template-card {
+  width: 100%;
+  cursor: pointer;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+.template-card:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 5px 5px rgba(0,0,0,0.22);
+}
+
+@media screen and (max-width: 670px) {
+  .splashScreenHeaderTitle {
+    visibility: hidden;
+  }
+  div[splashScreenTemplate] {
+    margin: 20px 20px;
+  }
+  div[splashScreenTemplateBody] {
+    flex-direction: column;
+  }
+}
+
+/*
 div[templateCardContainer]
 {
   height:100%;
@@ -10,13 +120,10 @@ div[templateCardContainer]
   flex-direction: row;
   flex-wrap:nowrap;
   align-items: center;
-
   overflow-x:auto;
 }
-
 div[templateCard]
 {
-
   position:relative;
   flex: 0 1 25em;
   min-width: 20em;
@@ -25,12 +132,10 @@ div[templateCard]
   padding: 0em 1em;
   margin : 0em 1em;
   box-sizing: border-box;
-
   background-color:rgb(242,242,242);
   box-shadow: 0 4px 6px 0 rgba(0,0,0,0.12);
 }
-
 div[templateCard]:hover
 {
   background-color:rgba(242,242,242,0.8);
-}
+} */
