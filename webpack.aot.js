@@ -48,13 +48,6 @@ module.exports = merge(staticAssets, {
             name : '[name].[ext]'
           }
         }
-      },
-      {
-        test: /\.css$/,
-        use: [
-          "style-loader",
-          'css-loader'
-        ]
       }
     ]
   },
