@@ -1,4 +1,11 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  ComponentRef,
+  Injector,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  ViewChild, ElementRef, AfterViewInit
+} from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -8,6 +15,7 @@ import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import {MatMenuTrigger} from "@angular/material";
 
 @Component({
   selector: 'menu-icons',
@@ -18,7 +26,7 @@ import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.servic
   ]
 })
 
-export class MenuIconsBar{
+export class MenuIconsBar {
 
   /**
    * databrowser
@@ -40,6 +48,10 @@ export class MenuIconsBar{
   pbcf: ComponentFactory<PluginBannerUI>
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
+
+  @ViewChild (MatMenuTrigger) private menuTrigger: MatMenuTrigger;
+  @ViewChild ('multiSearchButton', { read: ElementRef }) multiSearchButton: ElementRef;
+  @ViewChild ('searchMenuContent', { read: ElementRef }) searchMenuContent: ElementRef;
 
   get isMobile(){
     return this.constantService.mobile
@@ -73,7 +85,7 @@ export class MenuIconsBar{
     dataBrowser.instance.parcellation = parcellation
     const title = regions.length > 1
       ? `Search: ${regions.length} regions`
-      : `Search: ${regions[0].name}`
+      : `${regions[0].name}`
     const widgetUnit = this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
@@ -159,4 +171,22 @@ export class MenuIconsBar{
   get dataBrowserTitle() {
     return `Browse`
   }
+
+
+  test(wu)
+  {
+    this.widgetServices.moveFloatingToFront(wu);
+  }
+
+  opensearchMenu() {
+
+
+    let menu = document.getElementById('searchMenuBtn');
+    menu.style.display = '';
+    menu.style.position = 'absolute';
+    menu.style.left = this.multiSearchButton.nativeElement.getBoundingClientRect().left + 35 + 'px';
+    menu.style.top = this.multiSearchButton.nativeElement.getBoundingClientRect().top + 'px';
+    this.menuTrigger.openMenu();
+  }
+
 }

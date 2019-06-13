@@ -21,3 +21,62 @@
 {
   border-right-color: rgba(128, 128, 128, 0.5);
 }
+
+.search-fab {
+  width: 32px;
+  height: 32px;
+  line-height: 14px;
+  font-size: 14px;
+  background-color: #6c757d;
+  outline: none
+}
+.search-fab:hover {
+  background-color: #596268;
+}
+.search-fab ::ng-deep .mat-button-wrapper {
+           line-height: 14px;
+           padding: 0;
+         }
+.mat-icon {
+  font-size: 14px;
+  padding-right: 4px;
+  padding-top: 4px;
+}
+
+.search-list {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.minimised-fab {
+  background-color: #337ab7;
+}
+
+.mat-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+.mat-menu-item-minimised {
+  background-color: #6c757d;
+}
+.opened-search-icon {
+  /* color: lawngreen; */
+  font-size: 5px;
+  margin-right: 5px;
+}
+
+.search-opened-icon {
+  margin-left: 3px;
+}
+
+
+::ng-deep .mat-menu-content {
+  background-color: rgba(255, 255, 255, 0) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+::ng-deep .mat-menu-panel {
+  background-color: rgba(255, 255, 255, 0) !important;
+}

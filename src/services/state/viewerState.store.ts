@@ -1,6 +1,5 @@
 import { Action } from '@ngrx/store'
 import { UserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
-import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId, propagateNgId } from '../stateStore.service';
 
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
@@ -25,6 +24,8 @@ export interface AtlasAction extends Action{
   selectRegionIds: string[]
   deselectRegions? : any[]
   dedicatedView? : string
+
+  updatedParcellation? : any
 
   landmarks : UserLandmark[]
   deselectLandmarks : UserLandmark[]
@@ -59,13 +60,18 @@ export function viewerState(
           : []
       }
     case NEWVIEWER:
-      const { selectParcellation } = action
-      const parcellation = propagateNgId( selectParcellation )
+      const { selectParcellation: parcellation } = action
+      // const parcellation = propagateNgId( selectParcellation ): parcellation
+      const { regions, ...parcellationWORegions } = parcellation
       return {
         ...state,
         templateSelected : action.selectTemplate,
-        parcellationSelected : parcellation,
-        regionsSelected : [],
+        parcellationSelected : {
+          ...parcellationWORegions,
+          regions: null
+        },
+        // taken care of by effect.ts
+        // regionsSelected : [],
         landmarksSelected : [],
         navigation : {},
         dedicatedView : null
@@ -83,12 +89,20 @@ export function viewerState(
       }
     }
     case SELECT_PARCELLATION : {
-      const { selectParcellation } = action
-      const parcellation = propagateNgId( selectParcellation )
+      const { selectParcellation:parcellation } = action
+      const { regions, ...parcellationWORegions } = parcellation
       return {
         ...state,
-        parcellationSelected: parcellation,
-        regionsSelected: []
+        parcellationSelected: parcellationWORegions,
+        // taken care of by effect.ts
+        // regionsSelected: []
+      }
+    }
+    case UPDATE_PARCELLATION: {
+      const { updatedParcellation } = action
+      return {
+        ...state,
+        parcellationSelected: updatedParcellation
       }
     }
     case SELECT_REGIONS:
@@ -97,41 +111,6 @@ export function viewerState(
         ...state,
         regionsSelected: selectRegions
       }
-    case SELECT_REGIONS_WITH_ID : {
-      const { parcellationSelected } = state
-      const { selectRegionIds } = action
-      const { ngId: defaultNgId } = parcellationSelected
-
-      /**
-       * for backwards compatibility.
-       * older versions of atlas viewer may only have labelIndex as region identifier
-       */
-      const regionsSelected = selectRegionIds
-        .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
-        .map(({ ngId, labelIndex }) => {
-          return {
-            labelIndexId: generateLabelIndexId({
-              ngId: ngId || defaultNgId,
-              labelIndex 
-            })
-          }
-        })
-        .map(({ labelIndexId }) => {
-          return recursiveFindRegionWithLabelIndexId({ 
-            regions: parcellationSelected.regions,
-            labelIndexId,
-            inheritedNgId: defaultNgId
-          })
-        })
-        .filter(v => {
-          if (!v) console.log(`SELECT_REGIONS_WITH_ID, some ids cannot be parsed intto label index`)
-          return !!v
-        })
-      return {
-        ...state,
-        regionsSelected
-      }
-    }
     case DESELECT_LANDMARKS : {
       return {
         ...state,
@@ -164,6 +143,8 @@ export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
+export const UPDATE_PARCELLATION = `UPDATE_PARCELLATION`
+
 export const SELECT_REGIONS = `SELECT_REGIONS`
 export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`

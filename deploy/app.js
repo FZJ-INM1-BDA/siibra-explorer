@@ -55,11 +55,13 @@ const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
 const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
+const previewRouter = require('./preview')
 
 app.use('/templates', templateRouter)
 app.use('/nehubaConfig', nehubaConfigRouter)
 app.use('/datasets', datasetRouter)
 app.use('/plugins', pluginRouter)
+app.use('/preview', previewRouter)
 
 const catchError = require('./catchError')
 app.use(catchError)

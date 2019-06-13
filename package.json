@@ -34,6 +34,7 @@
     "@angular/language-service": "^7.2.15",
     "@angular/platform-browser": "^7.2.15",
     "@angular/platform-browser-dynamic": "^7.2.15",
+    "@ngrx/effects": "^7.4.0",
     "@ngrx/store": "^6.0.1",
     "@ngtools/webpack": "^6.0.5",
     "@types/chart.js": "^2.7.20",

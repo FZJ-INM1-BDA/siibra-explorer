@@ -189,7 +189,7 @@ exports.init = async () => {
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
 
-exports.getPreview = ({ datasetName }) => getPreviewFile({ datasetName })
+exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
 /**
  * TODO
