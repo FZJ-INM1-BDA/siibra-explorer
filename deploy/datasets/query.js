@@ -282,7 +282,9 @@ function getUserToken(arg) {
     const releasedOnly = !accessToken
     let publicAccessToken
     if (!accessToken && getPublicAccessToken) {
-        publicAccessToken = await getPublicAccessToken()
+        // ToDo Here was await but I removed it because of error
+        // publicAccessToken = await getPublicAccessToken()
+        publicAccessToken = getPublicAccessToken()
     }
     const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
         ? {
