@@ -8,11 +8,24 @@
   "parcellations": [
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
-      "ngId": "jubrain v17 left",
+      "ngId": "jubrain mni152 v18 left",
       "properties": {
         "version": "1.0",
         "description": "not yet",
-        "publications": []
+        "publications": [
+          {
+            "doi": "https://doi.org/10.1038/nrn2776",
+            "citation": "Zilles K, Amunts K (2010) Centenary of Brodmann’s map – conception and fate. Nature Reviews Neuroscience 11(2): 139-145 "
+          },
+          {
+            "doi": "https://doi.org/10.1016/j.neuroimage.2007.02.037",
+            "citation": "Amunts K, Schleicher A, Zilles K (2007) Cytoarchitecture of the cerebral cortex – more than localization. Neuroimage 37: 1061-1065"
+          },
+          {
+            "doi": "http://dx.doi.org/10.1016/B978-012693019-1/50023-X",
+            "citation": "Zilles K, Schleicher A, Palomero-Gallagher N, Amunts K (2002) Quantitative analysis of cyto- and receptor architecture of the human brain. In: /Brain Mapping: The Methods/, J. C. Mazziotta and A. Toga (eds.), USA: Elsevier, 2002, p. 573-602."
+          }
+        ]
       },
       "regions": [
         {
@@ -63,7 +76,7 @@
                                 167
                               ],
                               "labelIndex": 286,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -3648265,
@@ -78,7 +91,7 @@
                                 233,
                                 167
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 286,
                               "children": [],
                               "position": [
@@ -118,7 +131,7 @@
                                 12
                               ],
                               "labelIndex": 264,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -17620275,
@@ -133,7 +146,7 @@
                                 243,
                                 12
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 264,
                               "children": [],
                               "position": [
@@ -173,7 +186,7 @@
                                 167
                               ],
                               "labelIndex": 286,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -3648265,
@@ -188,7 +201,7 @@
                                 233,
                                 167
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 286,
                               "children": [],
                               "position": [
@@ -237,7 +250,7 @@
                                 222
                               ],
                               "labelIndex": 187,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": []
                             },
                             {
@@ -247,7 +260,7 @@
                                 16,
                                 222
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 187,
                               "children": []
                             }
@@ -282,7 +295,7 @@
                                 202
                               ],
                               "labelIndex": 22,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": []
                             },
                             {
@@ -292,7 +305,7 @@
                                 180,
                                 202
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 22,
                               "children": []
                             }
@@ -318,7 +331,7 @@
                                 22
                               ],
                               "labelIndex": 186,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": []
                             },
                             {
@@ -328,7 +341,7 @@
                                 168,
                                 22
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 186,
                               "children": []
                             }
@@ -363,7 +376,7 @@
                                 9
                               ],
                               "labelIndex": 235,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -19722222,
@@ -378,7 +391,7 @@
                                 200,
                                 9
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 235,
                               "children": [],
                               "position": [
@@ -409,7 +422,7 @@
                                 185
                               ],
                               "labelIndex": 228,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -24442675,
@@ -424,7 +437,7 @@
                                 178,
                                 185
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 228,
                               "children": [],
                               "position": [
@@ -455,7 +468,7 @@
                                 129
                               ],
                               "labelIndex": 237,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -29180412,
@@ -470,7 +483,7 @@
                                 190,
                                 129
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 237,
                               "children": [],
                               "position": [
@@ -510,7 +523,7 @@
                                 190
                               ],
                               "labelIndex": 16,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": []
                             },
                             {
@@ -520,7 +533,7 @@
                                 4,
                                 190
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 16,
                               "children": []
                             }
@@ -546,7 +559,7 @@
                                 220
                               ],
                               "labelIndex": 21,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -22534091,
@@ -561,7 +574,7 @@
                                 120,
                                 220
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 21,
                               "children": [],
                               "position": [
@@ -619,7 +632,7 @@
                                 106
                               ],
                               "labelIndex": 208,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -8012999,
@@ -634,7 +647,7 @@
                                 20,
                                 106
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 208,
                               "children": [],
                               "position": [
@@ -665,7 +678,7 @@
                                 76
                               ],
                               "labelIndex": 131,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -8469145,
@@ -680,7 +693,7 @@
                                 245,
                                 76
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 131,
                               "children": [],
                               "position": [
@@ -711,7 +724,7 @@
                                 28
                               ],
                               "labelIndex": 132,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -33528332,
@@ -726,7 +739,7 @@
                                 89,
                                 28
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 132,
                               "children": [],
                               "position": [
@@ -757,7 +770,7 @@
                                 58
                               ],
                               "labelIndex": 130,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -18756077,
@@ -772,7 +785,7 @@
                                 185,
                                 58
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 130,
                               "children": [],
                               "position": [
@@ -803,7 +816,7 @@
                                 236
                               ],
                               "labelIndex": 135,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -2488934,
@@ -818,7 +831,7 @@
                                 61,
                                 236
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 135,
                               "children": [],
                               "position": [
@@ -849,7 +862,7 @@
                                 19
                               ],
                               "labelIndex": 134,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -20931652,
@@ -864,7 +877,7 @@
                                 204,
                                 19
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 134,
                               "children": [],
                               "position": [
@@ -895,7 +908,7 @@
                                 146
                               ],
                               "labelIndex": 136,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -15736664,
@@ -910,7 +923,7 @@
                                 242,
                                 146
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 136,
                               "children": [],
                               "position": [
@@ -950,7 +963,7 @@
                                 221
                               ],
                               "labelIndex": 74,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37009402,
@@ -965,7 +978,7 @@
                                 47,
                                 221
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 74,
                               "children": [],
                               "position": [
@@ -996,7 +1009,7 @@
                                 132
                               ],
                               "labelIndex": 72,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -61452452,
@@ -1011,7 +1024,7 @@
                                 80,
                                 132
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 72,
                               "children": [],
                               "position": [
@@ -1042,7 +1055,7 @@
                                 80
                               ],
                               "labelIndex": 75,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -41843266,
@@ -1057,7 +1070,7 @@
                                 122,
                                 80
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 75,
                               "children": [],
                               "position": [
@@ -1088,7 +1101,7 @@
                                 34
                               ],
                               "labelIndex": 73,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -52293320,
@@ -1103,7 +1116,7 @@
                                 182,
                                 34
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 73,
                               "children": [],
                               "position": [
@@ -1143,7 +1156,7 @@
                                 250
                               ],
                               "labelIndex": 125,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -47975865,
@@ -1158,7 +1171,7 @@
                                 185,
                                 250
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 125,
                               "children": [],
                               "position": [
@@ -1189,7 +1202,7 @@
                                 155
                               ],
                               "labelIndex": 127,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -46100804,
@@ -1204,7 +1217,7 @@
                                 246,
                                 155
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 127,
                               "children": [],
                               "position": [
@@ -1235,7 +1248,7 @@
                                 50
                               ],
                               "labelIndex": 126,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -32589090,
@@ -1250,7 +1263,7 @@
                                 133,
                                 50
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 126,
                               "children": [],
                               "position": [
@@ -1281,7 +1294,7 @@
                                 35
                               ],
                               "labelIndex": 252,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -43927866,
@@ -1296,7 +1309,7 @@
                                 13,
                                 35
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 252,
                               "children": [],
                               "position": [
@@ -1336,7 +1349,7 @@
                                 145
                               ],
                               "labelIndex": 112,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -56791928,
@@ -1351,7 +1364,7 @@
                                 76,
                                 145
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 112,
                               "children": [],
                               "position": [
@@ -1382,7 +1395,7 @@
                                 177
                               ],
                               "labelIndex": 111,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -62520113,
@@ -1397,7 +1410,7 @@
                                 153,
                                 177
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 111,
                               "children": [],
                               "position": [
@@ -1428,7 +1441,7 @@
                                 61
                               ],
                               "labelIndex": 206,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -62326709,
@@ -1443,7 +1456,7 @@
                                 211,
                                 61
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 206,
                               "children": [],
                               "position": [
@@ -1474,7 +1487,7 @@
                                 83
                               ],
                               "labelIndex": 108,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -46213502,
@@ -1489,7 +1502,7 @@
                                 116,
                                 83
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 108,
                               "children": [],
                               "position": [
@@ -1520,7 +1533,7 @@
                                 131
                               ],
                               "labelIndex": 110,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -50169585,
@@ -1535,7 +1548,7 @@
                                 236,
                                 131
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 110,
                               "children": [],
                               "position": [
@@ -1566,7 +1579,7 @@
                                 232
                               ],
                               "labelIndex": 109,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -57342169,
@@ -1581,7 +1594,7 @@
                                 135,
                                 232
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 109,
                               "children": [],
                               "position": [
@@ -1612,7 +1625,7 @@
                                 120
                               ],
                               "labelIndex": 113,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -53295618,
@@ -1627,7 +1640,7 @@
                                 128,
                                 120
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 113,
                               "children": [],
                               "position": [
@@ -1667,7 +1680,7 @@
                                 235
                               ],
                               "labelIndex": 297,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -16522864,
@@ -1682,7 +1695,7 @@
                                 232,
                                 235
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 297,
                               "children": [],
                               "position": [
@@ -1722,7 +1735,7 @@
                                 210
                               ],
                               "labelIndex": 295,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -29185032,
@@ -1737,7 +1750,7 @@
                                 87,
                                 210
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 295,
                               "children": [],
                               "position": [
@@ -1768,7 +1781,7 @@
                                 229
                               ],
                               "labelIndex": 133,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -31442940,
@@ -1783,7 +1796,7 @@
                                 172,
                                 229
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 133,
                               "children": [],
                               "position": [
@@ -1814,7 +1827,7 @@
                                 3
                               ],
                               "labelIndex": 293,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -18598696,
@@ -1829,7 +1842,7 @@
                                 109,
                                 3
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 293,
                               "children": [],
                               "position": [
@@ -1860,7 +1873,7 @@
                                 184
                               ],
                               "labelIndex": 294,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -31264133,
@@ -1875,7 +1888,7 @@
                                 52,
                                 184
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 294,
                               "children": [],
                               "position": [
@@ -1906,7 +1919,7 @@
                                 218
                               ],
                               "labelIndex": 296,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -24182639,
@@ -1921,7 +1934,7 @@
                                 196,
                                 218
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 296,
                               "children": [],
                               "position": [
@@ -1952,7 +1965,7 @@
                                 82
                               ],
                               "labelIndex": 128,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37649600,
@@ -1967,7 +1980,7 @@
                                 149,
                                 82
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 128,
                               "children": [],
                               "position": [
@@ -1998,7 +2011,7 @@
                                 37
                               ],
                               "labelIndex": 292,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -32177576,
@@ -2013,7 +2026,7 @@
                                 233,
                                 37
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 292,
                               "children": [],
                               "position": [
@@ -2044,7 +2057,7 @@
                                 203
                               ],
                               "labelIndex": 129,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -48109229,
@@ -2059,7 +2072,7 @@
                                 245,
                                 203
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 129,
                               "children": [],
                               "position": [
@@ -2108,7 +2121,7 @@
                                 10
                               ],
                               "labelIndex": 119,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -18518125,
@@ -2123,7 +2136,7 @@
                                 218,
                                 10
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 119,
                               "children": [],
                               "position": [
@@ -2154,7 +2167,7 @@
                                 48
                               ],
                               "labelIndex": 120,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -14416089,
@@ -2169,7 +2182,7 @@
                                 191,
                                 48
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 120,
                               "children": [],
                               "position": [
@@ -2200,7 +2213,7 @@
                                 26
                               ],
                               "labelIndex": 291,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -17598229,
@@ -2215,7 +2228,7 @@
                                 66,
                                 26
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 291,
                               "children": [],
                               "position": [
@@ -2255,7 +2268,7 @@
                                 155
                               ],
                               "labelIndex": 9,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -27885066,
@@ -2270,7 +2283,7 @@
                                 77,
                                 155
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 9,
                               "children": [],
                               "position": [
@@ -2301,7 +2314,7 @@
                                 155
                               ],
                               "labelIndex": 10,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -19368217,
@@ -2316,7 +2329,7 @@
                                 179,
                                 155
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 10,
                               "children": [],
                               "position": [
@@ -2356,7 +2369,7 @@
                                 22
                               ],
                               "labelIndex": 7,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -10978138,
@@ -2371,7 +2384,7 @@
                                 110,
                                 22
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 7,
                               "children": [],
                               "position": [
@@ -2402,7 +2415,7 @@
                                 147
                               ],
                               "labelIndex": 8,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -10265298,
@@ -2417,7 +2430,7 @@
                                 132,
                                 147
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 8,
                               "children": [],
                               "position": [
@@ -2457,7 +2470,7 @@
                                 0
                               ],
                               "labelIndex": 6,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -43339493,
@@ -2472,7 +2485,7 @@
                                 0,
                                 0
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 6,
                               "children": [],
                               "position": [
@@ -2503,7 +2516,7 @@
                                 189
                               ],
                               "labelIndex": 118,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -47307308,
@@ -2518,7 +2531,7 @@
                                 168,
                                 189
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 118,
                               "children": [],
                               "position": [
@@ -2549,7 +2562,7 @@
                                 253
                               ],
                               "labelIndex": 117,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -34774834,
@@ -2564,7 +2577,7 @@
                                 113,
                                 253
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 117,
                               "children": [],
                               "position": [
@@ -2613,13 +2626,8 @@
                                 160
                               ],
                               "labelIndex": 248,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -39114634,
-                                13825203,
-                                28231707
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifj1 (IFS/PreS) - right hemisphere",
@@ -2628,14 +2636,9 @@
                                 244,
                                 160
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 248,
-                              "children": [],
-                              "position": [
-                                42958484,
-                                16095668,
-                                26297834
-                              ]
+                              "children": []
                             }
                           ]
                         },
@@ -2659,13 +2662,8 @@
                                 211
                               ],
                               "labelIndex": 247,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -45664223,
-                                18206745,
-                                23127566
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifs4 (IFS) - right hemisphere",
@@ -2674,14 +2672,9 @@
                                 17,
                                 211
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 247,
-                              "children": [],
-                              "position": [
-                                42233716,
-                                20120690,
-                                28285441
-                              ]
+                              "children": []
                             }
                           ]
                         },
@@ -2705,13 +2698,8 @@
                                 136
                               ],
                               "labelIndex": 244,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -41240214,
-                                26505338,
-                                21403915
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifs1 (IFS) - right hemisphere",
@@ -2720,14 +2708,9 @@
                                 20,
                                 136
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 244,
-                              "children": [],
-                              "position": [
-                                37182877,
-                                25882979,
-                                24050152
-                              ]
+                              "children": []
                             }
                           ]
                         },
@@ -2751,13 +2734,8 @@
                                 132
                               ],
                               "labelIndex": 249,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -41304065,
-                                7595935,
-                                29817073
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifj2 (IFS/PreS) - right hemisphere",
@@ -2766,14 +2744,9 @@
                                 247,
                                 132
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 249,
-                              "children": [],
-                              "position": [
-                                42472872,
-                                11106174,
-                                24003274
-                              ]
+                              "children": []
                             }
                           ]
                         },
@@ -2797,13 +2770,8 @@
                                 247
                               ],
                               "labelIndex": 245,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -46574074,
-                                23629630,
-                                20222222
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifs2 (IFS) - right hemisphere",
@@ -2812,14 +2780,9 @@
                                 42,
                                 247
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 245,
-                              "children": [],
-                              "position": [
-                                43901709,
-                                23803419,
-                                22797009
-                              ]
+                              "children": []
                             }
                           ]
                         },
@@ -2843,13 +2806,8 @@
                                 126
                               ],
                               "labelIndex": 246,
-                              "ngId": "jubrain v17 left",
-                              "children": [],
-                              "position": [
-                                -42019070,
-                                19604186,
-                                28443256
-                              ]
+                              "ngId": "jubrain mni152 v18 left",
+                              "children": []
                             },
                             {
                               "name": "Area ifs3 (IFS) - right hemisphere",
@@ -2858,14 +2816,9 @@
                                 30,
                                 126
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 246,
-                              "children": [],
-                              "position": [
-                                38801055,
-                                21694631,
-                                32716683
-                              ]
+                              "children": []
                             }
                           ]
                         }
@@ -2898,7 +2851,7 @@
                                 75
                               ],
                               "labelIndex": 2,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -54134365,
@@ -2913,7 +2866,7 @@
                                 74,
                                 75
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 2,
                               "children": [],
                               "position": [
@@ -2944,7 +2897,7 @@
                                 146
                               ],
                               "labelIndex": 1,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -54741552,
@@ -2959,7 +2912,7 @@
                                 103,
                                 146
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 1,
                               "children": [],
                               "position": [
@@ -2999,7 +2952,7 @@
                                 27
                               ],
                               "labelIndex": 287,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -21374190,
@@ -3014,7 +2967,7 @@
                                 33,
                                 27
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 287,
                               "children": [],
                               "position": [
@@ -3045,7 +2998,7 @@
                                 180
                               ],
                               "labelIndex": 288,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -16167826,
@@ -3060,7 +3013,7 @@
                                 151,
                                 180
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 288,
                               "children": [],
                               "position": [
@@ -3100,7 +3053,7 @@
                                 222
                               ],
                               "labelIndex": 299,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -5793912,
@@ -3115,7 +3068,7 @@
                                 108,
                                 222
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 299,
                               "children": [],
                               "position": [
@@ -3155,7 +3108,7 @@
                                 21
                               ],
                               "labelIndex": 289,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -24754304,
@@ -3170,7 +3123,7 @@
                                 239,
                                 21
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 289,
                               "children": [],
                               "position": [
@@ -3210,7 +3163,7 @@
                                 200
                               ],
                               "labelIndex": 212,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -19102858,
@@ -3225,7 +3178,7 @@
                                 14,
                                 200
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 212,
                               "children": [],
                               "position": [
@@ -3256,7 +3209,7 @@
                                 211
                               ],
                               "labelIndex": 211,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -6503595,
@@ -3271,7 +3224,7 @@
                                 137,
                                 211
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 211,
                               "children": [],
                               "position": [
@@ -3311,7 +3264,7 @@
                                 124
                               ],
                               "labelIndex": 123,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37145015,
@@ -3326,7 +3279,7 @@
                                 92,
                                 124
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 123,
                               "children": [],
                               "position": [
@@ -3357,7 +3310,7 @@
                                 183
                               ],
                               "labelIndex": 124,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -17759520,
@@ -3372,7 +3325,7 @@
                                 239,
                                 183
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 124,
                               "children": [],
                               "position": [
@@ -3412,7 +3365,7 @@
                                 87
                               ],
                               "labelIndex": 298,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -5060089,
@@ -3427,7 +3380,7 @@
                                 95,
                                 87
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 298,
                               "children": [],
                               "position": [
@@ -3467,7 +3420,7 @@
                                 250
                               ],
                               "labelIndex": 5,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -22798035,
@@ -3482,7 +3435,7 @@
                                 189,
                                 250
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 5,
                               "children": [],
                               "position": [
@@ -3513,7 +3466,7 @@
                                 179
                               ],
                               "labelIndex": 3,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -8931833,
@@ -3528,7 +3481,7 @@
                                 255,
                                 179
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 3,
                               "children": [],
                               "position": [
@@ -3559,7 +3512,7 @@
                                 0
                               ],
                               "labelIndex": 4,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -10107850,
@@ -3574,7 +3527,7 @@
                                 255,
                                 0
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 4,
                               "children": [],
                               "position": [
@@ -3614,7 +3567,7 @@
                                 34
                               ],
                               "labelIndex": 274,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -45695111,
@@ -3629,7 +3582,7 @@
                                 123,
                                 34
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 274,
                               "children": [],
                               "position": [
@@ -3660,7 +3613,7 @@
                                 168
                               ],
                               "labelIndex": 273,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -42412158,
@@ -3675,7 +3628,7 @@
                                 76,
                                 168
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 273,
                               "children": [],
                               "position": [
@@ -3715,7 +3668,7 @@
                                 91
                               ],
                               "labelIndex": 325,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -39738252,
@@ -3730,7 +3683,7 @@
                                 11,
                                 91
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 325,
                               "children": [],
                               "position": [
@@ -3761,7 +3714,7 @@
                                 186
                               ],
                               "labelIndex": 327,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37151362,
@@ -3776,7 +3729,7 @@
                                 211,
                                 186
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 327,
                               "children": [],
                               "position": [
@@ -3807,7 +3760,7 @@
                                 53
                               ],
                               "labelIndex": 324,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -29237908,
@@ -3822,7 +3775,7 @@
                                 204,
                                 53
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 324,
                               "children": [],
                               "position": [
@@ -3853,7 +3806,7 @@
                                 187
                               ],
                               "labelIndex": 326,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -45788648,
@@ -3868,7 +3821,7 @@
                                 156,
                                 187
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 326,
                               "children": [],
                               "position": [
@@ -3917,7 +3870,7 @@
                                 40
                               ],
                               "labelIndex": 115,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -33927907,
@@ -3932,7 +3885,7 @@
                                 111,
                                 40
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 115,
                               "children": [],
                               "position": [
@@ -3963,7 +3916,7 @@
                                 82
                               ],
                               "labelIndex": 114,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -38185879,
@@ -3978,7 +3931,7 @@
                                 61,
                                 82
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 114,
                               "children": [],
                               "position": [
@@ -4018,7 +3971,7 @@
                                 62
                               ],
                               "labelIndex": 339,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -41710811,
@@ -4033,7 +3986,7 @@
                                 217,
                                 62
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 339,
                               "children": [],
                               "position": [
@@ -4073,7 +4026,7 @@
                                 38
                               ],
                               "labelIndex": 159,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -32161180,
@@ -4088,7 +4041,7 @@
                                 202,
                                 38
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 159,
                               "children": [],
                               "position": [
@@ -4128,7 +4081,7 @@
                                 216
                               ],
                               "labelIndex": 116,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -41135158,
@@ -4143,7 +4096,7 @@
                                 112,
                                 216
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 116,
                               "children": [],
                               "position": [
@@ -4174,7 +4127,7 @@
                                 50
                               ],
                               "labelIndex": 338,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -40449519,
@@ -4189,7 +4142,7 @@
                                 6,
                                 50
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 338,
                               "children": [],
                               "position": [
@@ -4220,7 +4173,7 @@
                                 113
                               ],
                               "labelIndex": 337,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37849096,
@@ -4235,7 +4188,7 @@
                                 174,
                                 113
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 337,
                               "children": [],
                               "position": [
@@ -4266,7 +4219,7 @@
                                 119
                               ],
                               "labelIndex": 340,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -37077741,
@@ -4281,7 +4234,7 @@
                                 127,
                                 119
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 340,
                               "children": [],
                               "position": [
@@ -4330,7 +4283,7 @@
                                 4
                               ],
                               "labelIndex": 271,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -55442669,
@@ -4345,7 +4298,7 @@
                                 228,
                                 4
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 271,
                               "children": [],
                               "position": [
@@ -4376,7 +4329,7 @@
                                 123
                               ],
                               "labelIndex": 272,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -57958891,
@@ -4391,7 +4344,7 @@
                                 117,
                                 123
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 272,
                               "children": [],
                               "position": [
@@ -4431,7 +4384,7 @@
                                 108
                               ],
                               "labelIndex": 31,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -65021452,
@@ -4446,7 +4399,7 @@
                                 104,
                                 108
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 31,
                               "children": [],
                               "position": [
@@ -4486,7 +4439,7 @@
                                 192
                               ],
                               "labelIndex": 30,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -51139794,
@@ -4501,7 +4454,7 @@
                                 251,
                                 192
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 30,
                               "children": [],
                               "position": [
@@ -4532,7 +4485,7 @@
                                 68
                               ],
                               "labelIndex": 33,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -39537206,
@@ -4547,7 +4500,7 @@
                                 113,
                                 68
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 33,
                               "children": [],
                               "position": [
@@ -4578,7 +4531,7 @@
                                 222
                               ],
                               "labelIndex": 27,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -47745772,
@@ -4593,7 +4546,7 @@
                                 84,
                                 222
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 27,
                               "children": [],
                               "position": [
@@ -4633,7 +4586,7 @@
                                 58
                               ],
                               "labelIndex": 107,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -30094949,
@@ -4648,7 +4601,7 @@
                                 183,
                                 58
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 107,
                               "children": [],
                               "position": [
@@ -4679,7 +4632,7 @@
                                 175
                               ],
                               "labelIndex": 238,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -44817844,
@@ -4694,7 +4647,7 @@
                                 220,
                                 175
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 238,
                               "children": [],
                               "position": [
@@ -4725,7 +4678,7 @@
                                 37
                               ],
                               "labelIndex": 239,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -31763265,
@@ -4740,7 +4693,7 @@
                                 147,
                                 37
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 239,
                               "children": [],
                               "position": [
@@ -4771,7 +4724,7 @@
                                 149
                               ],
                               "labelIndex": 106,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -44484053,
@@ -4786,7 +4739,7 @@
                                 94,
                                 149
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 106,
                               "children": [],
                               "position": [
@@ -4835,7 +4788,7 @@
                                 195
                               ],
                               "labelIndex": 232,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -10315842,
@@ -4850,7 +4803,7 @@
                                 164,
                                 195
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 232,
                               "children": [],
                               "position": [
@@ -4881,7 +4834,7 @@
                                 229
                               ],
                               "labelIndex": 231,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -3951741,
@@ -4896,7 +4849,7 @@
                                 195,
                                 229
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 231,
                               "children": [],
                               "position": [
@@ -4927,7 +4880,7 @@
                                 250
                               ],
                               "labelIndex": 46,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -7960610,
@@ -4942,7 +4895,7 @@
                                 94,
                                 250
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 46,
                               "children": [],
                               "position": [
@@ -4973,7 +4926,7 @@
                                 220
                               ],
                               "labelIndex": 184,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -5565878,
@@ -4988,7 +4941,7 @@
                                 68,
                                 220
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 184,
                               "children": [],
                               "position": [
@@ -5019,7 +4972,7 @@
                                 201
                               ],
                               "labelIndex": 183,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -4719528,
@@ -5034,7 +4987,7 @@
                                 34,
                                 201
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 183,
                               "children": [],
                               "position": [
@@ -5065,7 +5018,7 @@
                                 14
                               ],
                               "labelIndex": 47,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -8368982,
@@ -5080,7 +5033,7 @@
                                 135,
                                 14
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 47,
                               "children": [],
                               "position": [
@@ -5111,7 +5064,7 @@
                                 245
                               ],
                               "labelIndex": 39,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -6094628,
@@ -5126,7 +5079,7 @@
                                 57,
                                 245
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 39,
                               "children": [],
                               "position": [
@@ -5166,7 +5119,7 @@
                                 214
                               ],
                               "labelIndex": 60,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -23891483,
@@ -5181,7 +5134,7 @@
                                 159,
                                 214
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 60,
                               "children": [],
                               "position": [
@@ -5212,7 +5165,7 @@
                                 217
                               ],
                               "labelIndex": 191,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -28408447,
@@ -5227,7 +5180,7 @@
                                 191,
                                 217
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 191,
                               "children": [],
                               "position": [
@@ -5258,7 +5211,7 @@
                                 120
                               ],
                               "labelIndex": 61,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -27551185,
@@ -5273,7 +5226,7 @@
                                 55,
                                 120
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 61,
                               "children": [],
                               "position": [
@@ -5304,7 +5257,7 @@
                                 219
                               ],
                               "labelIndex": 192,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -22231264,
@@ -5319,7 +5272,7 @@
                                 125,
                                 219
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 192,
                               "children": [],
                               "position": [
@@ -5350,7 +5303,7 @@
                                 73
                               ],
                               "labelIndex": 68,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -14934109,
@@ -5365,7 +5318,7 @@
                                 12,
                                 73
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 68,
                               "children": [],
                               "position": [
@@ -5432,7 +5385,7 @@
                                 10
                               ],
                               "labelIndex": 251,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -9205882,
@@ -5447,7 +5400,7 @@
                                 29,
                                 10
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 251,
                               "children": [],
                               "position": [
@@ -5487,7 +5440,7 @@
                                 99
                               ],
                               "labelIndex": 240,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -17069823,
@@ -5502,7 +5455,7 @@
                                 201,
                                 99
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 240,
                               "children": [],
                               "position": [
@@ -5533,7 +5486,7 @@
                                 9
                               ],
                               "labelIndex": 241,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -13748954,
@@ -5548,7 +5501,7 @@
                                 129,
                                 9
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 241,
                               "children": [],
                               "position": [
@@ -5588,7 +5541,7 @@
                                 10
                               ],
                               "labelIndex": 219,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -4666667,
@@ -5603,7 +5556,7 @@
                                 100,
                                 10
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 219,
                               "children": [],
                               "position": [
@@ -5643,7 +5596,7 @@
                                 10
                               ],
                               "labelIndex": 251,
-                              "ngId": "jubrain v17 left",
+                              "ngId": "jubrain mni152 v18 left",
                               "children": [],
                               "position": [
                                 -9205882,
@@ -5658,7 +5611,7 @@
                                 29,
                                 10
                               ],
-                              "ngId": "jubrain v17 right",
+                              "ngId": "jubrain mni152 v18 right",
                               "labelIndex": 251,
                               "children": [],
                               "position": [
