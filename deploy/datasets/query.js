@@ -17,21 +17,10 @@ let getPublicAccessToken
 
 const fetchDatasetFromKg = async (arg) => {
 
-  const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
-  const releasedOnly = !accessToken
-  let publicAccessToken
-  if (!accessToken && getPublicAccessToken) {
-    publicAccessToken = await getPublicAccessToken()
-  }
-  const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-    ? {
-        auth: {
-          'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-        }
-      }
-    : {}
+  const userState = getUserToken(arg)
+
   return await new Promise((resolve, reject) => {
-    request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+    request(`${queryUrl}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, userState.option, (err, resp, body) => {
       if (err)
         return reject(err)
       if (resp.statusCode >= 400)
@@ -196,17 +185,15 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg }) => {
-  // const cachedResult = cachedMap.get(templateName)
-  // if (cachedResult) 
-  //   return cachedResult
-    
-  try {
-    const filename = path.join(STORAGE_PATH, templateName + '.json')
+const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
+   try {
+    // const filename = path.join(STORAGE_PATH, templateName + '.json')
+    const filename = path.join(__dirname + '/data/waxholm-hbp-00937-transformed.json')
     const exists = fs.existsSync(filename)
 
     if (!exists)
       return []
+
     
     const data = fs.readFileSync(filename, 'utf-8')
     const json = JSON.parse(data)
@@ -216,16 +203,39 @@ const fetchSpatialDataFromKg = async ({ templateName, queryArg }) => {
       cubeDots.push(element.split('_'))
     });
 
-    // cachedMap.set(templateName, json.filter(filterByqueryArg(cubeDots)))
-    return json.filter(filterByqueryArg(cubeDots))
-  } catch (e) {
+
+    if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
+      return json.filter(filterByqueryArg(cubeDots))
+    } else {
+        if (user && user.req) {
+            const centerDifference = [-9.550781, -24.355468, -9.707031]
+            let calculatedCubeDots = []
+            cubeDots.forEach((dots, index) => {
+                calculatedCubeDots[index] = cubeDots[index].map((num, idx) => {
+                    return +num - centerDifference[idx]
+                })
+            })
+
+            calculatedCubeDots = calculatedCubeDots.map(x => transformToWoxel(x))
+
+            const resultFromKG = await getSpatialSearchOk({calculatedCubeDots, req})
+
+            if (resultFromKG && resultFromKG['total'] && resultFromKG['total'] > 0) {
+                return json.filter(filterByqueryArg(cubeDots))
+            } else {
+                return []
+            }
+        }
+      
+    }
+   } catch (e) {
     console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
     return []
   }
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg })
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, req }) => {
+  return await fetchSpatialDataFromKg({ templateName, queryArg, req })
 }
 
 
@@ -242,4 +252,53 @@ function filterByqueryArg(cubeDots) {
   } 
   return false;   
 }
+
+
+async function getSpatialSearchOk(arg) {
+
+    const userState = getUserToken(arg.req)
+    const option = {
+        headers: {
+            'Authorization': userState.token
+        }
+    }
+
+    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10&boundingBox=waxholmV2:180,750,390,200,780,400'
+
+    return await new Promise((resolve, reject) => {
+        request(`${spatialQuery}${'&boundingBox=waxholmV2:' + arg.calculatedCubeDots[0].concat(arg.calculatedCubeDots[1])}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+            if (err)
+                return reject(err)
+            if (resp.statusCode >= 400)
+                return reject(resp.statusCode)
+            const json = JSON.parse(body)
+            return resolve(json)
+        })
+    })
+}
+
+function getUserToken(arg) {
+    const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
+    const releasedOnly = !accessToken
+    let publicAccessToken
+    if (!accessToken && getPublicAccessToken) {
+        publicAccessToken = await getPublicAccessToken()
+    }
+    const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+        ? {
+            auth: {
+                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+            }
+        }
+        : {}
+
+    return {option, releasedOnly, token: accessToken || publicAccessToken || process.env.ACCESS_TOKEN}
+}
+
+const transformToWoxel = (coord) => {
+  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
+  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
+}
+
     
