@@ -17,7 +17,7 @@ let getPublicAccessToken
 
 const fetchDatasetFromKg = async (arg) => {
 
-  const userState = getUserToken(arg)
+  const userState = await getUserKGRequestInfo(arg)
 
   return await new Promise((resolve, reject) => {
     request(`${queryUrl}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, userState.option, (err, resp, body) => {
@@ -187,8 +187,7 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
 const cachedMap = new Map()
 const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
    try {
-    // const filename = path.join(STORAGE_PATH, templateName + '.json')
-    const filename = path.join(__dirname + '/data/waxholm-hbp-00937-transformed.json')
+    const filename = path.join(STORAGE_PATH, templateName + '.json')
     const exists = fs.existsSync(filename)
 
     if (!exists)
@@ -207,26 +206,20 @@ const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
     if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
       return json.filter(filterByqueryArg(cubeDots))
     } else {
-        if (user && user.req) {
-            const centerDifference = [-9.550781, -24.355468, -9.707031]
-            let calculatedCubeDots = []
-            cubeDots.forEach((dots, index) => {
-                calculatedCubeDots[index] = cubeDots[index].map((num, idx) => {
-                    return +num - centerDifference[idx]
-                })
+        const centerDifference = [-9.550781, -24.355468, -9.707031]
+        let calculatedCubeDots = []
+        cubeDots.forEach((dots, index) => {
+            calculatedCubeDots[index] = cubeDots[index].map((num, idx) => {
+                return +num - centerDifference[idx]
             })
-
-            calculatedCubeDots = calculatedCubeDots.map(x => transformToWoxel(x))
-
-            const resultFromKG = await getSpatialSearchOk({calculatedCubeDots, req})
-
-            if (resultFromKG && resultFromKG['total'] && resultFromKG['total'] > 0) {
-                return json.filter(filterByqueryArg(cubeDots))
-            } else {
-                return []
-            }
+        })
+        calculatedCubeDots = calculatedCubeDots.map(x => transformToWoxel(x))
+        const resultFromKG = await getSpatialSearchOk({calculatedCubeDots, req})
+        if (resultFromKG && resultFromKG['total'] && resultFromKG['total'] > 0) {
+            return json.filter(filterByqueryArg(cubeDots))
+        } else {
+            return []
         }
-      
     }
    } catch (e) {
     console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
@@ -256,14 +249,14 @@ function filterByqueryArg(cubeDots) {
 
 async function getSpatialSearchOk(arg) {
 
-    const userState = getUserToken(arg.req)
+    const userState = await getUserKGRequestInfo(arg.req)
     const option = {
         headers: {
             'Authorization': userState.token
         }
     }
 
-    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10&boundingBox=waxholmV2:180,750,390,200,780,400'
+    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
 
     return await new Promise((resolve, reject) => {
         request(`${spatialQuery}${'&boundingBox=waxholmV2:' + arg.calculatedCubeDots[0].concat(arg.calculatedCubeDots[1])}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
@@ -277,14 +270,12 @@ async function getSpatialSearchOk(arg) {
     })
 }
 
-function getUserToken(arg) {
+async function getUserKGRequestInfo(arg) {
     const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
     const releasedOnly = !accessToken
     let publicAccessToken
     if (!accessToken && getPublicAccessToken) {
-        // ToDo Here was await but I removed it because of error
-        // publicAccessToken = await getPublicAccessToken()
-        publicAccessToken = getPublicAccessToken()
+        publicAccessToken = await getPublicAccessToken()
     }
     const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
         ? {
