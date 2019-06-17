@@ -28,20 +28,20 @@
 
 
   <ng-template #publicationTemplate>
-    <div *ngIf="choosenItem >= 0">
-      <div *ngIf="inputArray[choosenItem]['properties'] && (inputArray[choosenItem]['properties']['publications'] || inputArray[choosenItem]['properties']['description'])">
-        <reference-toast-component *ngIf="inputArray[choosenItem]['type'] && inputArray[choosenItem]['type'] === 'template'; else parcellationToast"
-          [templateName] = "inputArray[choosenItem]['name'] ? inputArray[choosenItem]['name'] : null"
-          [templateDescription] = "inputArray[choosenItem]['properties'] && inputArray[choosenItem]['properties']['description']? inputArray[choosenItem]['properties']['description'] : null"
-          [templatePublications] = "inputArray[choosenItem]['properties'] && inputArray[choosenItem]['properties']['publications']? inputArray[choosenItem]['properties']['publications']: null"> 
+    <div *ngIf="chosenItemIndex >= 0">
+      <div *ngIf="inputArray[chosenItemIndex]['properties'] && (inputArray[chosenItemIndex]['properties']['publications'] || inputArray[chosenItemIndex]['properties']['description'])">
+        <reference-toast-component *ngIf="inputArray[chosenItemIndex]['type'] && inputArray[chosenItemIndex]['type'] === 'template'; else parcellationToast"
+          [templateName] = "inputArray[chosenItemIndex]['name'] ? inputArray[chosenItemIndex]['name'] : null"
+          [templateDescription] = "inputArray[chosenItemIndex]['properties'] && inputArray[chosenItemIndex]['properties']['description']? inputArray[chosenItemIndex]['properties']['description'] : null"
+          [templatePublications] = "inputArray[chosenItemIndex]['properties'] && inputArray[chosenItemIndex]['properties']['publications']? inputArray[chosenItemIndex]['properties']['publications']: null">
         </reference-toast-component>
       
         <ng-template #parcellationToast>
           <reference-toast-component
-            [parcellationName] = "inputArray[choosenItem]['name']? inputArray[choosenItem]['name'] : null"
-            [parcellationDescription] = "inputArray[choosenItem]['properties'] && inputArray[choosenItem]['properties']['description']? inputArray[choosenItem]['properties']['description'] : null"
-            [parcellationPublications] = "inputArray[choosenItem]['properties'] && inputArray[choosenItem]['properties']['publications']? inputArray[choosenItem]['properties']['publications']: null"
-            [parcellationNifti] = "inputArray[choosenItem]['properties'] && inputArray[choosenItem]['properties']['nifti']? inputArray[choosenItem]['properties']['nifti'] : null">
+            [parcellationName] = "inputArray[chosenItemIndex]['name']? inputArray[chosenItemIndex]['name'] : null"
+            [parcellationDescription] = "inputArray[chosenItemIndex]['properties'] && inputArray[chosenItemIndex]['properties']['description']? inputArray[chosenItemIndex]['properties']['description'] : null"
+            [parcellationPublications] = "inputArray[chosenItemIndex]['properties'] && inputArray[chosenItemIndex]['properties']['publications']? inputArray[chosenItemIndex]['properties']['publications']: null"
+            [parcellationNifti] = "inputArray[chosenItemIndex]['properties'] && inputArray[chosenItemIndex]['properties']['nifti']? inputArray[chosenItemIndex]['properties']['nifti'] : null">
           </reference-toast-component>
         </ng-template>
       </div>

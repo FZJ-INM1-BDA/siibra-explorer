@@ -35,13 +35,13 @@ export class RadioList{
   @ViewChild('publicationTemplate',{read:TemplateRef} ) publicationTemplate: TemplateRef<any>
 
   handleToast: any
-  choosenItem: number
+  chosenItemIndex: number
 
   constructor(private toastService: ToastService,
               private zipFileDownloadService: ZipFileDownloadService) {}
 
   showToast(index) {
-    this.choosenItem = index
+    this.chosenItemIndex = index
     if (this.handleToast) {
       this.handleToast()
       this.handleToast = null

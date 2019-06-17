@@ -1,8 +1,6 @@
 
 .timerToast {
     max-width: 700px;
-    display: flex;
-    flex-direction: column;
     max-height: 500px;
     padding-right: 10px;
     overflow-y: auto;

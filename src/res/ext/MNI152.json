@@ -13,7 +13,7 @@
         "version": "1.0",
         "description": "not yet",
         "publications": [],
-        "nifty": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "44000"}]
+        "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "44000"}]
       },
       "regions": [
         {

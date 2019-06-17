@@ -31,9 +31,6 @@ export class WidgetServices{
   }
 
   moveFloatingToFront(widgetUnit) {
-    console.log(this.floatingContainer)
-
-
     const widget = [...this.widgetComponentRefs].find(widget=>widget.instance===widgetUnit)
     if(!widget)
       return
@@ -42,8 +39,6 @@ export class WidgetServices{
       return
     this.floatingContainer.detach(idx)
     this.floatingContainer.insert(widget.hostView)
-
-
   }
 
   clearAllWidgets(){
