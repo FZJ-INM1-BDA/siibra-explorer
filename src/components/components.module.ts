@@ -28,6 +28,7 @@ import { PillComponent } from './pill/pill.component';
 import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
+import { ReferenceToastComponent } from './referenceToast/referenceToast.component';
 
 
 @NgModule({
@@ -51,6 +52,7 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
     TimerComponent,
     PillComponent,
     RadioList,
+    ReferenceToastComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -81,6 +83,7 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
     TimerComponent,
     PillComponent,
     RadioList,
+    ReferenceToastComponent,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

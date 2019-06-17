@@ -60,10 +60,11 @@ dropdown-component
   text-align: right
 }
 .login-button-splash > button {
+  width: 100%;
   color: #FFFFFF;
   outline: none;
   background-color: coral;
-  margin: 5px;
+  margin: 3px;
 }
 
 .login-button-mobile > button {

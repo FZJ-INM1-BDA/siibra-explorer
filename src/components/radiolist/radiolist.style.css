@@ -59,53 +59,14 @@ ul,span.dropdown-item-1
   text-overflow: ellipsis
 }
 
-
 .infoIcon {
   margin-left: 5px;
   display: inline-block;
   border: 1px solid gray;
   border-radius: 15px;
+  min-width: 24px;
   width: 24px;
   height: 24px;
   cursor: pointer;
   text-align: center;
-}
-
-.timerToast {
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
-  max-height: 500px;
-  padding-right: 10px;
-  overflow-y: auto;
-}
-
-.download-buttons-panel {
-  align-self: flex-end;
-}
-.downloadPublications {
-  margin: 5px;
-  outline: none;
-}
-
-.textPartInPublications {
-  text-align: justify;
-}
-
-
-.timerToast:hover::-webkit-scrollbar-thumb{
-  background: #888;
-  border-radius: 10px;
-}
-.timerToast::-webkit-scrollbar {
-  width: 7px;
-}
-.timerToast::-webkit-scrollbar-track {
-  background: transparent;
-}
-.timerToast::-webkit-scrollbar-thumb {
-  background: #CCC;
-}
-.timerToast::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }

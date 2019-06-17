@@ -17,7 +17,6 @@ export class SplashScreen{
   loadedTemplate$ : Observable<any[]>
   constructor(
     private store:Store<ViewerStateInterface>,
-    private constanceService: AtlasViewerConstantsServices,
     private constantsService: AtlasViewerConstantsServices,
 ){
     this.loadedTemplate$ = this.store.pipe(
@@ -35,7 +34,7 @@ export class SplashScreen{
   }
 
   get totalTemplates(){
-    return this.constanceService.templateUrls.length
+    return this.constantsService.templateUrls.length
   }
 
   correctString(name){
