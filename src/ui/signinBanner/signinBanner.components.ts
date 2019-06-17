@@ -55,9 +55,7 @@ export class SigninBanner implements OnInit, OnDestroy{
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
-      distinctUntilChanged((o, n) => o === n || (o && n && o.name === n.name)),
+      select('parcellationSelected'),
     )
 
     this.selectedRegions$ = this.store.pipe(

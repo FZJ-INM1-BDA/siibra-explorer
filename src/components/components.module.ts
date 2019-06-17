@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { ReferenceToastComponent } from './referenceToast/referenceToast.component';
+import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
 
 
 @NgModule({
@@ -67,7 +68,8 @@ import { ReferenceToastComponent } from './referenceToast/referenceToast.compone
     HighlightPipe,
     FitlerRowsByVisibilityPipe,
     AppendSiblingFlagPipe,
-    ClusteringPipe
+    ClusteringPipe,
+    FilterCollapsePipe
   ],
   exports : [
     BrowserAnimationsModule,

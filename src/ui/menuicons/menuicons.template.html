@@ -12,7 +12,7 @@
     [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
     class="shadow btn btn-sm rounded-circle">
     <i class="fas fa-search">
-      
+
     </i>
   </div>
 </div>
@@ -78,16 +78,52 @@
   </div>
 </div>
 
-<div
-  *ngFor="let wu of dbService.instantiatedWidgetUnits"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  placement="right"
-  [tooltip]="wu.title"
-  class="btnWrapper">
-  <div
-    (click)="widgetServices.minimisedWindow.delete(wu)"
-    [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-search"></i>
-  </div>
+<div *ngIf="!isMobile">
+    <button *ngIf="dbService.instantiatedWidgetUnits.length === 1"
+            mat-mini-fab color="primary"
+            class="search-fab"
+            [ngClass]="widgetServices.minimisedWindow.has(dbService.instantiatedWidgetUnits[0]) ? 'minimised-fab' : ''"
+            (click)="widgetServices.minimisedWindow.delete(dbService.instantiatedWidgetUnits[0])"
+            placement="right"
+            [tooltip]="dbService.instantiatedWidgetUnits[0].title">
+        <i class="fas fa-search"></i>
+    </button>
+
+    <button mat-button [matMenuTriggerFor]="searchMenu" id="searchMenuBtn" style="display:none;"></button>
+    <button *ngIf="dbService.instantiatedWidgetUnits.length > 1"
+            #multiSearchButton
+            mat-mini-fab color="primary"
+            class="search-fab"
+    (click)="opensearchMenu()">
+        <i class="fas fa-search"></i>
+        <i class="fas fa-chevron-right search-opened-icon"></i>
+    </button>
+
+    <mat-menu #searchMenu="matMenu" #searchMenuContent>
+        <div *ngFor="let wu of dbService.instantiatedWidgetUnits" cla>
+            <span class="mat-menu-item" mat-menu-item (click)="widgetServices.minimisedWindow.delete(wu);!widgetServices.minimisedWindow.has(wu)? this.widgetServices.moveFloatingToFront(wu) : null"
+                  [ngStyle]="{'color': constantService.darktheme? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)',
+                  'background-color': constantService.darktheme? 'rgba(30,30,30,0.8)' : 'rgba(255,255,255,0.8)'}">
+                <i class="opened-search-icon" [ngClass]="!widgetServices.minimisedWindow.has(wu)? 'fas fa-circle' : 'far fa-circle'"></i>
+                {{wu.title}}
+            </span>
+        </div>
+    </mat-menu>
+
+</div>
+
+<div *ngIf="isMobile">
+    <div
+      *ngFor="let wu of dbService.instantiatedWidgetUnits"
+      [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+      placement="right"
+      [tooltip]="wu.title"
+      class="btnWrapper">
+      <div
+        (click)="widgetServices.minimisedWindow.delete(wu)"
+        [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
+        class="shadow btn btn-sm rounded-circle">
+        <i class="fas fa-search"></i>
+      </div>
+    </div>
 </div>

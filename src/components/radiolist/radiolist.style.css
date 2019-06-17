@@ -1,5 +1,3 @@
-/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
-
 :host-context([darktheme="true"]) ul
 {
   background-color:rgba(30,30,30);
