@@ -1,0 +1,33 @@
+<div class="timerToast d-flex flex-column">
+    <div *ngIf="templateDescription">
+        <p *ngIf="templateName">{{templateName}}</p>
+        <p class="text-justify">{{templateDescription}}</p>
+    </div>
+    <div *ngIf="templatePublications">
+        <p>Publication(s)</p>
+        <div *ngFor="let tp of templatePublications" class="text-justify">
+            <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
+        </div>
+        <hr *ngIf="parcellationPublications">
+    </div>
+    <div *ngIf="parcellationDescription">
+        <p *ngIf="parcellationName">{{parcellationName}}</p>
+        <p class="text-justify">{{parcellationDescription}}</p>
+    </div>
+
+    <div *ngIf="parcellationPublications">
+        <p>Publication(s)</p>
+        <div *ngFor="let pp of parcellationPublications" class="text-justify">
+            <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>
+        </div>
+    </div>
+
+    <div class="align-self-end">
+        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
+        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()" [disabled] = "downloadingProcess" >
+            Download &nbsp;
+            <span *ngIf="niiFileSize > 0">(.nii {{niiFileSize/1000000 | number:'.1-2'}} Mb) &nbsp;</span>
+            <i class="fas" [ngClass]="!downloadingProcess? 'fa-download' :'fa-spinner fa-pulse'"></i>
+        </button>
+    </div>
+</div>

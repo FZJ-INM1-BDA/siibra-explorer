@@ -2,34 +2,23 @@
   [ngClass]="ulClass"
   [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
   role="menu">
-  <li 
-    *ngFor="let input of inputArray" 
+  <li
+    *ngFor="let input of inputArray; let i = index"
+    class="d-flex justify-content-between"
     [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
     role="menuitem"
     (click)="itemSelected.emit({previous: selectedItem, current: input})">
     
-    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()">
+    <span class="dropdown-item-1 textSpan"
+          #DropDownText
+          [innerHTML] = "listDisplay(input)"
+          [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
+          [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
+    </span>
+
+    <span *ngIf="input['properties'] && (input['properties']['publications'] || input['properties']['description'])"
+          class="infoIcon align-self-end" (click)="clickListButton(i);$event.stopPropagation()">
       i
     </span>
-
-    <span class="dropdown-item-1 textSpan" 
-      [innerHTML] = "listDisplay(input)">
-    </span>
-
-
-
-    
-<ng-template #publicationTemplate>
-    <div *ngIf="input['properties'] && input['properties']['publications']" class="timerToast">
-        <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications(input)">↓</button>
-          <p>{{input['name']}} Publication(s)</p>
-          <div *ngFor="let p of input['properties']['publications']" class="textPartInPublications">
-            <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
-          </div>
-      </div>
-</ng-template>
-
-
-
   </li>
 </ul>

@@ -20,7 +20,6 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { ToastService } from "src/services/toastService.service";
-import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
 
 /**
  * TODO
@@ -96,8 +95,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public sidePanelOpen$: Observable<boolean>
 
   handleToast
-  tPublication
-  pPublication
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -114,7 +111,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private toastService: ToastService,
-    private zipFileDownloadService: ZipFileDownloadService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -233,24 +229,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
 
-        if (this.selectedTemplate && this.selectedParcellation) {
-          if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
-            this.tPublication = this.selectedTemplate['properties']['publications']
-          } else {
-            this.tPublication = null
-          }
-          if (this.selectedParcellation['properties'] && this.selectedParcellation['properties']['publications']) {
-            this.pPublication = this.selectedParcellation['properties']['publications']
-          } else {
-            this.pPublication = null
-          }
-        } else {
-          this.tPublication = null
-          this.pPublication = null
-        }
-        
-        if (this.tPublication || this.pPublication) {
-
+        if ((this.selectedParcellation['properties'] &&
+            (this.selectedParcellation['properties']['publications'] || this.selectedParcellation['properties']['description']))
+            || (this.selectedTemplate['properties'] &&
+                (this.selectedTemplate['properties']['publications'] || this.selectedTemplate['properties']['description']))) {
           if (this.handleToast) {
             this.handleToast()
             this.handleToast = null
@@ -258,37 +240,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           this.handleToast = this.toastService.showToast(this.publications, {
               timeout: 7000
           })
-          
         }
       })
     )
-
-
   }
-
-  downloadPublications() {
-    const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
-    let publicationsText = ''
-
-    if (this.tPublication) {
-      publicationsText += this.selectedTemplate.name + ' Publications:\r\n'
-      this.tPublication.forEach((tp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + tp['citation'] + ' - ' + tp['doi'] + '\r\n'
-      });
-    }
-
-    if (this.pPublication) {
-      if (this.tPublication) publicationsText += '\r\n\r\n'
-      publicationsText += this.selectedParcellation.name + ' Publications:\r\n'
-      this.pPublication.forEach((pp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + pp['citation'] + ' - ' + pp['doi'] + '\r\n'
-      });
-    }
-    
-    this.zipFileDownloadService.downloadZip(publicationsText, fileName)
-    publicationsText = ''
-  }
-
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any

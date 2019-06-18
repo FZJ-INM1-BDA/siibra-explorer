@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input } from "@angular/core";
+import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef} from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
@@ -32,6 +32,12 @@ export class SigninBanner implements OnInit, OnDestroy{
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
   @Input() darktheme: boolean
+
+  @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
+
+  dismissToastHandler: any
+  chosenTemplateIndex: number
+  chosenParcellationIndex: number
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
@@ -167,6 +173,19 @@ export class SigninBanner implements OnInit, OnDestroy{
     this.store.dispatch({
       type: SELECT_REGIONS,
       selectRegions: []
+    })
+  }
+
+  showInfoToast($event, toastType) {
+    this.chosenTemplateIndex = toastType === 'template'? $event : null
+    this.chosenParcellationIndex = toastType === 'parcellation'? $event : null
+
+    if (this.dismissToastHandler) {
+      this.dismissToastHandler()
+      this.dismissToastHandler = null
+    }
+    this.dismissToastHandler = this.toastService.showToast(this.publicationTemplate, {
+      timeout: 7000
     })
   }
 
