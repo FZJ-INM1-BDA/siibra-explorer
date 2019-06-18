@@ -4,48 +4,22 @@
   role="menu">
 
   <li
-    *ngFor="let input of inputArray"
+    *ngFor="let input of inputArray; let i = index"
+    class="d-flex justify-content-between"
     [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
     role="menuitem"
-    (click)="itemSelected.emit({previous: selectedItem, current: input})"
-    style="display: flex; justify-content: space-between;">
-
-
-
+    (click)="itemSelected.emit({previous: selectedItem, current: input})">
+    
     <span class="dropdown-item-1 textSpan"
-      #DropDownText
-      [innerHTML] = "listDisplay(input)"
-      [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
-      [ngStyle]="input['properties'] && input['properties']['publications'] ? {'width': 'calc(100% - 30px)', 'overflow': 'hidden'} : {}"
-      [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
+          #DropDownText
+          [innerHTML] = "listDisplay(input)"
+          [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
+          [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
     </span>
 
-    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()"
-    style="align-self: flex-end;">
+    <span *ngIf="input['properties'] && (input['properties']['publications'] || input['properties']['description'])"
+          class="infoIcon align-self-end" (click)="clickListButton(i);$event.stopPropagation()">
       i
     </span>
-
-
-<ng-template #publicationTemplate *ngIf="input['properties'] && input['properties']['publications']">
-    <div  class="timerToast">
-          <p>{{input['name']}}</p>
-          <p class="textPartInPublications">{{input['properties']['description']}}</p>
-          <p>Publication(s)</p>
-          <div *ngFor="let p of input['properties']['publications']" class="textPartInPublications">
-            <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
-          </div>
-      <div class="download-buttons-panel">
-        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications(input)">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
-        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications(input)" [disabled] = "downloadingProcess" >
-            Download &nbsp;
-            <span *ngIf="niiFileSize > 0">(.nii {{niiFileSize/10000 | number:'.1-2'}} Mb) &nbsp;</span>
-            <i class="fas" [ngClass]="!downloadingProcess? 'fa-download' :'fa-spinner fa-pulse'"></i>
-        </button>
-      </div>
-      </div>
-</ng-template>
-
-
-
   </li>
 </ul>

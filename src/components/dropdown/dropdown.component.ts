@@ -26,6 +26,7 @@ export class DropdownComponent{
   @Input() darktheme: boolean
 
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
+  @Output() listItemButtonClicked: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef
 

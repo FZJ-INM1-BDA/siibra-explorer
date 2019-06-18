@@ -20,8 +20,6 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { ToastService } from "src/services/toastService.service";
-import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
-import {forEach} from "@angular/router/src/utils/collection";
 
 /**
  * TODO
@@ -96,11 +94,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  handleToast
-  tPublication
-  pPublication
-  downloadingProcess = false
-  niiFileSize = 0
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -117,7 +110,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private toastService: ToastService,
-    private zipFileDownloadService: ZipFileDownloadService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -238,30 +230,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.niiFileSize = 0
 
 
-        if (this.selectedTemplate && this.selectedParcellation) {
-          if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
-            this.tPublication = this.selectedTemplate['properties']['publications']
-          } else {
-            this.tPublication = null
-          }
-          if (this.selectedParcellation['properties'] && this.selectedParcellation['properties']['publications']) {
-            this.pPublication = this.selectedParcellation['properties']['publications']
-          } else {
-            this.pPublication = null
-          }
-          if(this.selectedParcellation['properties'] && this.selectedParcellation['properties']['nifty']) {
-            this.selectedParcellation['properties']['nifty'].forEach(nii => {
-              this.niiFileSize += nii['size']
-            })
-          }
 
-        } else {
-          this.tPublication = null
-          this.pPublication = null
-        }
-        
-        if (this.tPublication || this.pPublication) {
-
+        if ((this.selectedParcellation['properties'] &&
+            (this.selectedParcellation['properties']['publications'] || this.selectedParcellation['properties']['description']))
+            || (this.selectedTemplate['properties'] &&
+                (this.selectedTemplate['properties']['publications'] || this.selectedTemplate['properties']['description']))) {
           if (this.handleToast) {
             this.handleToast()
             this.handleToast = null
@@ -272,38 +245,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       })
     )
-
-
-  }
-
-  downloadPublications() {
-    this.downloadingProcess = true
-
-    const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
-    let publicationsText = ''
-
-    if (this.tPublication) {
-      publicationsText += this.selectedTemplate.name + ' Publications:\r\n'
-      this.tPublication.forEach((tp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + tp['citation'] + ' - ' + tp['doi'] + '\r\n'
-      });
-    }
-
-    if (this.pPublication) {
-      if (this.tPublication) publicationsText += '\r\n\r\n'
-      publicationsText += this.selectedParcellation.name + ' Publications:\r\n'
-      this.pPublication.forEach((pp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + pp['citation'] + ' - ' + pp['doi'] + '\r\n'
-      });
-    }
-    
-    this.zipFileDownloadService.downloadZip(
-        publicationsText,
-        fileName,
-        this.selectedParcellation['properties'] && this.selectedParcellation['properties']['nifty']? this.selectedParcellation['properties']['nifty'] : 0).subscribe(data => {
-      this.downloadingProcess = false
-    })
-    publicationsText = ''
   }
 
 
@@ -557,22 +498,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
 
   closeMenuWithSwipe(documentToSwipe: ElementRef) {
-    const swipeDistance = 150; // swipe distance
-    const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
-        .pipe(
-          switchMap(startEvent =>
-            fromEvent(documentToSwipe.nativeElement, "touchmove")
-                .pipe(
-                  takeUntil(fromEvent(documentToSwipe.nativeElement, "touchend"))
-                  ,map(event => event['touches'][0].pageX)
-                  ,scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0)
-                  ,takeLast(1)
-                  ,filter(difference => difference >= swipeDistance)
-                )))
-    // Subscription
-    swipeLeft$.subscribe(val => {
-      this.changeMenuState({close: true})
-    })
+    if (documentToSwipe && documentToSwipe.nativeElement) {
+      const swipeDistance = 150; // swipe distance
+      const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, 'touchstart')
+          .pipe(
+              switchMap(startEvent =>
+                  fromEvent(documentToSwipe.nativeElement, 'touchmove')
+                      .pipe(
+                          takeUntil(fromEvent(documentToSwipe.nativeElement, 'touchend')),
+                          map(event => event['touches'][0].pageX),
+                          scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0),
+                          takeLast(1),
+                          filter(difference => difference >= swipeDistance)
+                      )))
+      this.subscriptions.push(
+        swipeLeft$.subscribe(() => {
+          this.changeMenuState({close: true})
+        })
+      )
+    }
   }
 
 }

@@ -23,10 +23,8 @@ export class ZipFileDownloadService {
     }
 
     downloadFile(data, fileName) {
-
         const contentType = 'application/zip';
         const b64Data = data
-
 
         const b64toBlob = (b64Data, contentType='', sliceSize=512) => {
             const byteCharacters = atob(b64Data);
@@ -48,9 +46,7 @@ export class ZipFileDownloadService {
             return blob;
         }
 
-
         const blob = b64toBlob(b64Data, contentType);
-        // const blob = new Blob([data], { type: 'text/csv' });
         const url= window.URL.createObjectURL(blob);
         const anchor = document.createElement("a");
         anchor.download = fileName + '.zip';

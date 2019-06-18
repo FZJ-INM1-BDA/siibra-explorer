@@ -10,7 +10,8 @@
     [inputArray]="loadedTemplates$ | async | filterNull"
     [isMobile] = "isMobile"
     [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-    [darktheme] ="darktheme">
+    [darktheme] ="darktheme"
+    (listItemButtonClicked)="showInfoToast($event, 'template')">
   </dropdown-component>
 
   <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
@@ -23,7 +24,8 @@
       [inputArray]="selectedTemplate.parcellations"
       [isMobile] = "isMobile"
       [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-      [darktheme] ="darktheme">
+      [darktheme] ="darktheme"
+      (listItemButtonClicked)="showInfoToast($event, 'parcellation')">>
 
     </dropdown-component>
     <region-hierarchy
@@ -76,18 +78,28 @@
     </div>
 
   </div>
-
-
-  <div *ngIf="!selectedTemplate && !isMobile" class="login-button-panel-splash">
-    <div
-      (click)="showSignin()"
-      class="login-button-splash">
-      <button mat-button>Log In</button>
-    </div>
-    <div (click)="showHelp()" class="login-button-splash">
-      <button mat-button>Help</button>
-    </div>
-  </div>
-
-
 </div>
+
+<ng-template #publicationTemplate>
+  <div *ngIf="loadedTemplates$ | async as loadedTemplates">
+    <div *ngIf="chosenTemplateIndex !== null; else parcellationToast">
+      <reference-toast-component *ngIf="loadedTemplates[chosenTemplateIndex]['properties'] && (loadedTemplates[chosenTemplateIndex]['properties']['description'] || loadedTemplates[chosenTemplateIndex]['properties']['publications'])"
+                               [templateName] = "loadedTemplates[chosenTemplateIndex]['name'] ? loadedTemplates[chosenTemplateIndex]['name'] : null"
+                               [templateDescription] = "loadedTemplates[chosenTemplateIndex]['properties']['description']? loadedTemplates[chosenTemplateIndex]['properties']['description'] : null"
+                               [templatePublications] = "loadedTemplates[chosenTemplateIndex]['properties']['publications']? loadedTemplates[chosenTemplateIndex]['properties']['publications']: null">
+      </reference-toast-component>
+    </div>
+    <ng-template #parcellationToast>
+      <div *ngIf="(selectedTemplate$ | async) as selectedTemplate">
+        <div *ngIf="selectedTemplate.parcellations[chosenParcellationIndex]['properties'] && (selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description'] || selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications'])">
+        <reference-toast-component
+              [parcellationName] = "selectedTemplate.parcellations[chosenParcellationIndex]['name']? selectedTemplate.parcellations[chosenParcellationIndex]['name'] : null"
+              [parcellationDescription] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description'] : null"
+              [parcellationPublications] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']: null"
+              [parcellationNifti] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti'] : null">
+        </reference-toast-component>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</ng-template>
