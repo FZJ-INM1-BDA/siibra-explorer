@@ -5,8 +5,7 @@
   [hoverable]="{translateY:-2}"
   #dropdownToggle
   dropdownToggle
-              
-  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+  [ngStyle]="{'border': isMobile? '1px solid' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
 
 </span>
 
@@ -27,5 +26,4 @@
   [isMobile]="isMobile"
   [darktheme]="darktheme"
   (listItemButtonClicked) = listItemButtonClicked.emit($event)>
-
 </radio-list>
