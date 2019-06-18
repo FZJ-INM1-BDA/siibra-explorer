@@ -495,22 +495,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
 
   closeMenuWithSwipe(documentToSwipe: ElementRef) {
-    const swipeDistance = 150; // swipe distance
-    const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
-        .pipe(
-          switchMap(startEvent =>
-            fromEvent(documentToSwipe.nativeElement, "touchmove")
-                .pipe(
-                  takeUntil(fromEvent(documentToSwipe.nativeElement, "touchend"))
-                  ,map(event => event['touches'][0].pageX)
-                  ,scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0)
-                  ,takeLast(1)
-                  ,filter(difference => difference >= swipeDistance)
-                )))
-    // Subscription
-    swipeLeft$.subscribe(val => {
-      this.changeMenuState({close: true})
-    })
+    if (documentToSwipe && documentToSwipe.nativeElement) {
+      const swipeDistance = 150; // swipe distance
+      const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, 'touchstart')
+          .pipe(
+              switchMap(startEvent =>
+                  fromEvent(documentToSwipe.nativeElement, 'touchmove')
+                      .pipe(
+                          takeUntil(fromEvent(documentToSwipe.nativeElement, 'touchend')),
+                          map(event => event['touches'][0].pageX),
+                          scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0),
+                          takeLast(1),
+                          filter(difference => difference >= swipeDistance)
+                      )))
+      this.subscriptions.push(
+        swipeLeft$.subscribe(() => {
+          this.changeMenuState({close: true})
+        })
+      )
+    }
   }
 
 }
