@@ -25,6 +25,7 @@
   [inputArray]="inputArray"
   [@showState]="openState ? 'show' : 'hide'"
   [isMobile]="isMobile"
-  [darktheme]="darktheme">
+  [darktheme]="darktheme"
+  (listItemButtonClicked) = listItemButtonClicked.emit($event)>
 
 </radio-list>

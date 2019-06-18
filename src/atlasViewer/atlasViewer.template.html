@@ -23,7 +23,7 @@
         <button mat-button style="height: 0; position: absolute;"></button>
         <logo-container class="logoContainerMobile"></logo-container>
   
-        <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
+        <tabset #mobileMenuTabs [justified]="true" class="mobileMenuTabs" >
           <tab heading="Template">
             <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
             <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
@@ -128,9 +128,9 @@
     </ui-nehuba-container>
   
     <div *ngIf="!isMobile" bannerWrapper>
-      <menu-icons iconWrapper>
+      <menu-icons iconWrapper *ngIf="selectedTemplate">
       </menu-icons>
-      <signin-banner signinWrapper>
+      <signin-banner signinWrapper *ngIf="selectedTemplate">
       </signin-banner>
     </div>
   
@@ -260,21 +260,13 @@
 </ng-template>
 
 <ng-template #publications >
-  <div *ngIf="tPublication || pPublication" class="timerToast">
-    <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications()">↓</button>
-
-    <div *ngIf="tPublication">
-      <p>{{selectedTemplate['name']}} Publication(s)</p>
-      <div *ngFor="let tp of tPublication" class="textPartInPublications">
-        <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
-      </div>
-      <hr *ngIf="pPublication">
-    </div>
-    <div *ngIf="pPublication">
-      <p>{{selectedParcellation['name']}} Publication(s)</p>
-      <div *ngFor="let pp of pPublication" class="textPartInPublications">
-        <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>
-      </div>  
-    </div>
-  </div>
+  <reference-toast-component
+          [templateName] = "selectedTemplate['name']? selectedTemplate['name'] : null"
+          [parcellationName] = "selectedParcellation['name']? selectedParcellation['name'] : null"
+          [templateDescription] = "selectedTemplate['properties'] && selectedTemplate['properties']['description']? selectedTemplate['properties']['description'] : null"
+          [parcellationDescription] = "selectedParcellation['properties'] && selectedParcellation['properties']['description']? selectedParcellation['properties']['description'] : null"
+          [templatePublications] = "selectedTemplate['properties'] && selectedTemplate['properties']['publications']? selectedTemplate['properties']['publications']: null"
+          [parcellationPublications] = "selectedParcellation['properties'] && selectedParcellation['properties']['publications']? selectedParcellation['properties']['publications']: null"
+          [parcellationNifti] = "selectedParcellation['properties'] && selectedParcellation['properties']['nifti']? selectedParcellation['properties']['nifti'] : null">
+  </reference-toast-component>
 </ng-template>
