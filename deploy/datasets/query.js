@@ -15,21 +15,10 @@ const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
 let getPublicAccessToken
 
-const fetchDatasetFromKg = async (arg) => {
+const fetchDatasetFromKg = async ({ user } = {}) => {
 
-  const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
-  const releasedOnly = !accessToken
-  let publicAccessToken
-  if (!accessToken && getPublicAccessToken) {
-    publicAccessToken = await getPublicAccessToken()
-  }
-  const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-    ? {
-        auth: {
-          'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-        }
-      }
-    : {}
+  const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+
   return await new Promise((resolve, reject) => {
     request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
       if (err)
@@ -196,36 +185,39 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg }) => {
-  // const cachedResult = cachedMap.get(templateName)
-  // if (cachedResult) 
-  //   return cachedResult
-    
-  try {
+const fetchSpatialDataFromKg = async ({ templateName, queryArg, user }) => {
+   try {
     const filename = path.join(STORAGE_PATH, templateName + '.json')
     const exists = fs.existsSync(filename)
 
     if (!exists)
       return []
+
     
     const data = fs.readFileSync(filename, 'utf-8')
     const json = JSON.parse(data)
-    var splitQueryArg = queryArg.split('__');
-    const cubeDots = []    
-    splitQueryArg.forEach(element => {
-      cubeDots.push(element.split('_'))
-    });
+    const coordsString = queryArg.split('__');
+    const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
 
-    // cachedMap.set(templateName, json.filter(filterByqueryArg(cubeDots)))
-    return json.filter(filterByqueryArg(cubeDots))
-  } catch (e) {
+    if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
+      return json.filter(filterByqueryArg(boundingBoxCorners))
+    } else {
+        const boundingBoxInWaxhomV2VoxelSpace = boundingBoxCorners.map(transformWaxholmV2NmToVoxel)
+        const { total = 0 } = await getSpatialSearchOk({boundingBoxInWaxhomV2VoxelSpace, user})
+        if (total > 0) {
+            return json.filter(filterByqueryArg(boundingBoxCorners))
+        } else {
+            return []
+        }
+    }
+   } catch (e) {
     console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
     return []
   }
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg })
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
+  return await fetchSpatialDataFromKg({ templateName, queryArg, user })
 }
 
 
@@ -237,9 +229,68 @@ function filterByqueryArg(cubeDots) {
     if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
       && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
       && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
-      return true;
+      return true
     }
+    return false
   } 
-  return false;   
 }
+
+
+async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
+
+    const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+
+    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
+
+    return await new Promise((resolve, reject) => {
+        request(`${spatialQuery}&boundingBox=waxholmV2:${boundingBoxInWaxhomV2VoxelSpace.map(cornerCoord => cornerCoord.join(',')).join(',')}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+            if (err)
+                return reject(err)
+            if (resp.statusCode >= 400)
+                return reject(resp.statusCode)
+            const json = JSON.parse(body)
+            return resolve(json)
+        })
+    })
+}
+
+async function getUserKGRequestInfo({ user }) {
+    const accessToken = user && user.tokenset && user.tokenset.access_token
+    const releasedOnly = !accessToken
+    let publicAccessToken
+    if (!accessToken && getPublicAccessToken) {
+        publicAccessToken = await getPublicAccessToken()
+    }
+    const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+        ? {
+            auth: {
+                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+            }
+        }
+        : {}
+
+    return {option, releasedOnly, token: accessToken || publicAccessToken || process.env.ACCESS_TOKEN}
+}
+
+/**
+ * 
+ */
+const transformWaxholmV2NmToVoxel = (coord) => {
+  /**
+   * as waxholm is already in RAS, does not need to swap axis
+   */
+
+  /**
+   * atlas viewer applies translation (below in nm) in order to center the brain
+   * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
+   */
+  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+  
+  /**
+   * mm/voxel
+   */
+  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
+  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
+}
+
     
