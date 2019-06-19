@@ -69,3 +69,18 @@ ul,span.dropdown-item-1
   cursor: pointer;
   text-align: center;
 }
+
+:host-context([darktheme="true"]) .radioListMenu {
+  border-color: white;
+}
+:host-context([darktheme="false"]) .radioListMenu {
+  border-color: black;
+}
+:host-context([isMobile="true"]) .radioListMenu {
+  opacity: 1;
+  border-style: solid;
+  border-width: 0px 1px 1px 1px;
+}
+:host-context([isMobile="false"]) radioListMenu {
+  opacity: 0.8;
+}

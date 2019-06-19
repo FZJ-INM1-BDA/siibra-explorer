@@ -27,9 +27,6 @@ export class RadioList{
   
   @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
-  @Input() isMobile: boolean
-  @Input() darktheme: boolean
-
   @Output() listItemButtonClicked = new EventEmitter<string>();
 
   clickListButton(i) {

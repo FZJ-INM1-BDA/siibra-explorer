@@ -7,9 +7,7 @@
     [activeDisplay]="displayActiveTemplate"
     [selectedItem]="selectedTemplate$ | async"
     [inputArray]="loadedTemplates$ | async | filterNull"
-    [isMobile] = "isMobile"
     [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-    [darktheme] ="darktheme"
     (listItemButtonClicked)="showInfoToast($event, 'template')">
   </dropdown-component>
 
@@ -21,9 +19,7 @@
       [activeDisplay]="displayActiveParcellation"
       [selectedItem]="selectedParcellation"
       [inputArray]="selectedTemplate.parcellations"
-      [isMobile] = "isMobile"
       [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-      [darktheme] ="darktheme"
       (listItemButtonClicked)="showInfoToast($event, 'parcellation')">>
 
     </dropdown-component>
