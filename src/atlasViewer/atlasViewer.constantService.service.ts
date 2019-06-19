@@ -282,8 +282,8 @@ export const UNSUPPORTED_PREVIEW = [{
 export const UNSUPPORTED_INTERVAL = 7000
 
 export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
-  ['jquery@3',parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
-  ['jquery@2',parseURLToElement('http://code.jquery.com/jquery-2.2.4.min.js')],
+  ['jquery@3',parseURLToElement('https://code.jquery.com/jquery-3.3.1.min.js')],
+  ['jquery@2',parseURLToElement('https://code.jquery.com/jquery-2.2.4.min.js')],
   ['webcomponentsLite@1.1.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
   ['react@16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
   ['reactdom@16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
