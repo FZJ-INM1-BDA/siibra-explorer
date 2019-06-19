@@ -8,6 +8,9 @@
         <div *ngFor="let tp of templatePublications" class="text-justify">
             <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
         </div>
+        <div class="d-flex justify-content-end">
+            <a class="align-self-end" *ngIf="templateExternalLink" href="{{templateExternalLink}}" target="_blank"><button mat-raised-button color="primary" class="downloadPublications">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button></a>
+        </div>
         <hr *ngIf="parcellationPublications">
     </div>
     <div *ngIf="parcellationDescription">
@@ -23,7 +26,7 @@
     </div>
 
     <div class="align-self-end">
-        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button>
+        <a *ngIf="parcellationExternalLink" href="{{parcellationExternalLink}}" target="_blank"><button mat-raised-button color="primary" class="downloadPublications">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button></a>
         <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()" [disabled] = "downloadingProcess" >
             Download &nbsp;
             <span *ngIf="niiFileSize > 0">(.nii {{niiFileSize/1000000 | number:'.1-2'}} Mb) &nbsp;</span>

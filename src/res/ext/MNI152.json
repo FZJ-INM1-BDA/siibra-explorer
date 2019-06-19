@@ -13,7 +13,8 @@
         "version": "1.0",
         "description": "not yet",
         "publications": [],
-        "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "4400000"}]
+        "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "4400000"}],
+        "externalLink":  "http://doi.org/10.25493/8EGG-ZAR"
       },
       "regions": [
         {
@@ -5686,6 +5687,9 @@
       "surfaceParcellation": true,
       "ngData": null,
       "name": "Fibre Bundle Atlas - Long Bundle",
+      "properties": {
+        "externalLink":  "http://10.25493/V5BH-P7P"
+      },
       "regions": [
         {
           "name": "Arcuate - Left",

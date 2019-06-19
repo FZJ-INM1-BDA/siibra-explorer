@@ -82,7 +82,8 @@
       <reference-toast-component *ngIf="loadedTemplates[chosenTemplateIndex]['properties'] && (loadedTemplates[chosenTemplateIndex]['properties']['description'] || loadedTemplates[chosenTemplateIndex]['properties']['publications'])"
                                [templateName] = "loadedTemplates[chosenTemplateIndex]['name'] ? loadedTemplates[chosenTemplateIndex]['name'] : null"
                                [templateDescription] = "loadedTemplates[chosenTemplateIndex]['properties']['description']? loadedTemplates[chosenTemplateIndex]['properties']['description'] : null"
-                               [templatePublications] = "loadedTemplates[chosenTemplateIndex]['properties']['publications']? loadedTemplates[chosenTemplateIndex]['properties']['publications']: null">
+                               [templatePublications] = "loadedTemplates[chosenTemplateIndex]['properties']['publications']? loadedTemplates[chosenTemplateIndex]['properties']['publications']: null"
+                               [templateExternalLink] ="loadedTemplates[chosenTemplateIndex]['properties']['externalLink']? loadedTemplates[chosenTemplateIndex]['properties']['externalLink']: null">
       </reference-toast-component>
     </div>
     <ng-template #parcellationToast>
@@ -92,7 +93,8 @@
               [parcellationName] = "selectedTemplate.parcellations[chosenParcellationIndex]['name']? selectedTemplate.parcellations[chosenParcellationIndex]['name'] : null"
               [parcellationDescription] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description'] : null"
               [parcellationPublications] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']: null"
-              [parcellationNifti] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti'] : null">
+              [parcellationNifti] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti'] : null"
+              [parcellationExternalLink] ="selectedTemplate.parcellations[chosenParcellationIndex]['properties']['externalLink']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['externalLink']: null">
         </reference-toast-component>
         </div>
       </div>

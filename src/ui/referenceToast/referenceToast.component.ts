@@ -16,6 +16,8 @@ export class ReferenceToastComponent implements OnInit{
     @Input() templatePublications? : any
     @Input() parcellationPublications? : any
     @Input() parcellationNifti? : any
+    @Input() templateExternalLink? : any
+    @Input() parcellationExternalLink? : any
 
     downloadingProcess = false
     niiFileSize = 0
