@@ -3,19 +3,16 @@ import { Action } from '@ngrx/store'
 export function dataStore(state:any,action:DatasetAction){
   switch (action.type){
     case FETCHED_DATAENTRIES: {
-      return Object.assign({},state,{
+      return {
+        ...state,
         fetchedDataEntries : action.fetchedDataEntries
-      })
+      }
     }
     case FETCHED_SPATIAL_DATA :{
-      return Object.assign({},state,{
+      return {
+        ...state,
         fetchedSpatialData : action.fetchedDataEntries
-      })
-    }
-    case FETCHED_METADATA : {
-      return Object.assign({},state,{
-        fetchedMetadataMap : action.fetchedMetadataMap
-      })
+      }
     }
     default:
       return state
@@ -25,11 +22,9 @@ export function dataStore(state:any,action:DatasetAction){
 export interface DatasetAction extends Action{
   fetchedDataEntries : DataEntry[]
   fetchedSpatialData : DataEntry[]
-  fetchedMetadataMap : Map<string,Map<string,{properties:Property}>>
 }
 
 export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
-export const FETCHED_METADATA = 'FETCHED_METADATA'
 export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
 
 export interface Activity{
