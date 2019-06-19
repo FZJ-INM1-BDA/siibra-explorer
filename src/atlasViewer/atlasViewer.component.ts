@@ -1,8 +1,8 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom } from "rxjs/operators";
+import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -19,6 +19,13 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
+import { ToastService } from "src/services/toastService.service";
+
+/**
+ * TODO
+ * check against auxlillary mesh indicies, to only filter out aux indicies
+ */
+const filterFn = (segment) => typeof segment.segment !== 'string'
 
 @Component({
   selector: 'atlas-viewer',
@@ -45,6 +52,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+  @ViewChild('publications') publications: TemplateRef<any>
+  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components
@@ -67,8 +76,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private showHelp$: Observable<any>
 
   public dedicatedView$: Observable<string | null>
-  public onhoverSegment$: Observable<string>
-  public onhoverSegmentForFixed$: Observable<string>
+  public onhoverSegments$: Observable<string[]>
+  public onhoverSegmentsForFixed$: Observable<string[]>
   public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
@@ -85,6 +94,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
+
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
@@ -98,7 +108,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public apiService: AtlasViewerAPIServices,
     private modalService: BsModalService,
     private databrowserService: DatabrowserService,
-    private dispatcher$: ActionsSubject
+    private dispatcher$: ActionsSubject,
+    private toastService: ToastService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -179,22 +190,27 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegment$ = combineLatest(
+    this.onhoverSegments$ = combineLatest(
       this.store.pipe(
         select('uiState'),
+        select('mouseOverSegments'),
+        filter(v => !!v),
+        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
         /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
-        map(state => state
-            && state.mouseOverSegment
-            && (isNaN(state.mouseOverSegment)
-              ? state.mouseOverSegment
-              : state.mouseOverSegment.toString())),
-        distinctUntilChanged((o, n) => o === n || (o && n && o.name && n.name && o.name === n.name))
+
       ),
       this.onhoverLandmark$
     ).pipe(
-      map(([segment, onhoverLandmark]) => onhoverLandmark ? null : segment )
+      map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
+      map(segments => {
+        if (!segments)
+          return null
+        const filteredSeg = segments.filter(filterFn)
+        return filteredSeg.length > 0
+          ? segments.map(s => s.segment) 
+          : null
+        })
     )
-
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
@@ -203,14 +219,34 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => this.selectedParcellation = parcellation)
-    )
 
     this.subscriptions.push(
       this.newViewer$.subscribe(template => this.selectedTemplate = template)
     )
+
+    this.subscriptions.push(
+      this.selectedParcellation$.subscribe(parcellation => {
+        this.selectedParcellation = parcellation
+        this.niiFileSize = 0
+
+
+
+        if ((this.selectedParcellation['properties'] &&
+            (this.selectedParcellation['properties']['publications'] || this.selectedParcellation['properties']['description']))
+            || (this.selectedTemplate['properties'] &&
+                (this.selectedTemplate['properties']['publications'] || this.selectedTemplate['properties']['description']))) {
+          if (this.handleToast) {
+            this.handleToast()
+            this.handleToast = null
+          }
+          this.handleToast = this.toastService.showToast(this.publications, {
+              timeout: 7000
+          })
+        }
+      })
+    )
   }
+
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
@@ -338,10 +374,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
     })
 
-    this.onhoverSegmentForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegment$),
-      map(([_flag, onhoverSegment]) => onhoverSegment)
+    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverSegments$),
+      map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
+
+    this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
   /**
@@ -457,6 +495,30 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       type: TOGGLE_SIDE_PANEL
     })
   }
+
+
+  closeMenuWithSwipe(documentToSwipe: ElementRef) {
+    if (documentToSwipe && documentToSwipe.nativeElement) {
+      const swipeDistance = 150; // swipe distance
+      const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, 'touchstart')
+          .pipe(
+              switchMap(startEvent =>
+                  fromEvent(documentToSwipe.nativeElement, 'touchmove')
+                      .pipe(
+                          takeUntil(fromEvent(documentToSwipe.nativeElement, 'touchend')),
+                          map(event => event['touches'][0].pageX),
+                          scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0),
+                          takeLast(1),
+                          filter(difference => difference >= swipeDistance)
+                      )))
+      this.subscriptions.push(
+        swipeLeft$.subscribe(() => {
+          this.changeMenuState({close: true})
+        })
+      )
+    }
+  }
+
 }
 
 export interface NgLayerInterface{

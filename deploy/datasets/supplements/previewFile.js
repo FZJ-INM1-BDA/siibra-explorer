@@ -3,6 +3,7 @@ const path = require('path')
 
 const DISABLE_RECEPTOR_PREVIEW = process.env.DISABLE_RECEPTOR_PREVIEW
 const DISABLE_JUBRAIN_PMAP = process.env.DISABLE_JUBRAIN_PMAP
+const DISABLE_JUBRAIN_PMAP_V17 = process.env.DISABLE_JUBRAIN_PMAP_V17
 const DISABLE_DWM_PMAP = process.env.DISABLE_DWM_PMAP
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 
@@ -22,7 +23,8 @@ const readFile = (filename) => new Promise((resolve) => {
 Promise.all([
   DISABLE_RECEPTOR_PREVIEW ? Promise.resolve([]) : readFile('receptorPreview.json'),
   DISABLE_JUBRAIN_PMAP ? Promise.resolve([]) : readFile('pmapJubrainPreview.json'),
-  DISABLE_DWM_PMAP ? Promise.resolve([]) : readFile('pmapDWMPreview.json')
+  DISABLE_DWM_PMAP ? Promise.resolve([]) : readFile('pmapDWMPreview.json'),
+  DISABLE_JUBRAIN_PMAP_V17 ? Promise.resolve([]) : readFile('pmapJuBrainV17Preview.json')
 ])
   .then(arrOfA => arrOfA.reduce((acc, item) => acc.concat(item), []))
   .then(iterable => {
@@ -33,8 +35,13 @@ Promise.all([
     console.error('preview file error', e)
   })
 
-exports.getPreviewFile = ({ datasetName }) => Promise.resolve(
+exports.getPreviewFile = ({ datasetName, templateSelected }) => Promise.resolve(
   previewMap.get(datasetName)
+    .filter(({ templateSpace }) => {
+      if (!templateSpace) return true
+      if (!templateSelected) return true
+      return templateSpace === templateSelected
+    })
     .map(file => {
       return {
         ...file,

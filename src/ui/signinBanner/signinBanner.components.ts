@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input } from "@angular/core";
+import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef} from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
@@ -8,6 +8,8 @@ import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, 
 import { map, filter, distinctUntilChanged } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
 import { ToastService } from "src/services/toastService.service";
+
+const compareParcellation = (o, n) => o.name === n.name
 
 @Component({
   selector: 'signin-banner',
@@ -21,13 +23,22 @@ import { ToastService } from "src/services/toastService.service";
 
 export class SigninBanner implements OnInit, OnDestroy{
 
+  public compareParcellation = compareParcellation
+
   private subscriptions: Subscription[] = []
   public loadedTemplates$: Observable<any[]>
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
+  selectedTemplate: any
   @Input() darktheme: boolean
+
+  @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
+
+  dismissToastHandler: any
+  chosenTemplateIndex: number
+  chosenParcellationIndex: number
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
@@ -50,9 +61,7 @@ export class SigninBanner implements OnInit, OnDestroy{
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
-      safeFilter('parcellationSelected'),
-      map(state => state.parcellationSelected),
-      distinctUntilChanged((o, n) => o === n || (o && n && o.name === n.name)),
+      select('parcellationSelected'),
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -69,6 +78,9 @@ export class SigninBanner implements OnInit, OnDestroy{
       this.selectedRegions$.subscribe(regions => {
         this.selectedRegions = regions
       })
+    )
+    this.subscriptions.push(
+        this.selectedTemplate$.subscribe(template => this.selectedTemplate = template)
     )
   }
 
@@ -165,6 +177,19 @@ export class SigninBanner implements OnInit, OnDestroy{
     this.store.dispatch({
       type: SELECT_REGIONS,
       selectRegions: []
+    })
+  }
+
+  showInfoToast($event, toastType) {
+    this.chosenTemplateIndex = toastType === 'template'? $event : null
+    this.chosenParcellationIndex = toastType === 'parcellation'? $event : null
+
+    if (this.dismissToastHandler) {
+      this.dismissToastHandler()
+      this.dismissToastHandler = null
+    }
+    this.dismissToastHandler = this.toastService.showToast(this.publicationTemplate, {
+      timeout: 7000
     })
   }
 

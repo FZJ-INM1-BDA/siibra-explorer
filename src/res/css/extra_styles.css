@@ -24,6 +24,7 @@ div.scale-bar-container
   padding: 2px;
   font-weight: 700;
   pointer-events: none;
+  user-select: none;
 }
 
 div.scale-bar
@@ -325,7 +326,18 @@ markdown-dom pre code
 {
   height:100%;
 }
+
 .overflow-x-hidden
 {
   overflow-x:hidden;
+}
+
+.muted
+{
+  opacity : 0.5!important;
+}
+
+.text-semi-transparent
+{
+  opacity: 0.5;
 }

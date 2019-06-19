@@ -189,17 +189,17 @@ exports.init = async () => {
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
     .then(json => filter(json, {templateName, parcellationName}))
 
-exports.getPreview = ({ datasetName }) => getPreviewFile({ datasetName })
+exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
 /**
  * TODO
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName }) => {
-  const cachedResult = cachedMap.get(templateName)
-  if (cachedResult) 
-    return cachedResult
+const fetchSpatialDataFromKg = async ({ templateName, queryArg }) => {
+  // const cachedResult = cachedMap.get(templateName)
+  // if (cachedResult) 
+  //   return cachedResult
     
   try {
     const filename = path.join(STORAGE_PATH, templateName + '.json')
@@ -210,8 +210,14 @@ const fetchSpatialDataFromKg = async ({ templateName }) => {
     
     const data = fs.readFileSync(filename, 'utf-8')
     const json = JSON.parse(data)
-    cachedMap.set(templateName, json)
-    return json
+    var splitQueryArg = queryArg.split('__');
+    const cubeDots = []    
+    splitQueryArg.forEach(element => {
+      cubeDots.push(element.split('_'))
+    });
+
+    // cachedMap.set(templateName, json.filter(filterByqueryArg(cubeDots)))
+    return json.filter(filterByqueryArg(cubeDots))
   } catch (e) {
     console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
     return []
@@ -219,5 +225,21 @@ const fetchSpatialDataFromKg = async ({ templateName }) => {
 }
 
 exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg }) => {
-  return await fetchSpatialDataFromKg({ templateName })
+  return await fetchSpatialDataFromKg({ templateName, queryArg })
 }
+
+
+function filterByqueryArg(cubeDots) {
+  return function (item) {
+    const px = item.geometry.position[0]
+    const py = item.geometry.position[1]
+    const pz = item.geometry.position[2]
+    if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
+      && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
+      && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
+      return true;
+    }
+  } 
+  return false;   
+}
+    

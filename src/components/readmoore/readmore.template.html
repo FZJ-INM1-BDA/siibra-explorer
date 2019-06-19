@@ -9,7 +9,7 @@
 <div 
   (click)="toggle($event)" 
   sliver
-  hoverable>
+  [hoverable]="{translateY:-1}">
 
   <i 
     [ngClass] = "show ? 'fa-chevron-up' : 'fa-chevron-down'" 

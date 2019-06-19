@@ -1,3 +1,4 @@
+/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
 
 :host-context([darktheme="true"]) ul
 {
@@ -54,4 +55,34 @@ ul,span.dropdown-item-1
   border-radius:0px;
   white-space: nowrap;
   border:none;
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+
+.infoIcon {
+  margin-left: 5px;
+  display: inline-block;
+  border: 1px solid gray;
+  border-radius: 15px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  cursor: pointer;
+  text-align: center;
+}
+
+:host-context([darktheme="true"]) .radioListMenu {
+  border-color: white;
+}
+:host-context([darktheme="false"]) .radioListMenu {
+  border-color: black;
+}
+:host-context([isMobile="true"]) .radioListMenu {
+  opacity: 1;
+  border-style: solid;
+  border-width: 0px 1px 1px 1px;
+}
+:host-context([isMobile="false"]) radioListMenu {
+  opacity: 0.8;
 }

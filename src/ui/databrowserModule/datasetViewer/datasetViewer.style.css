@@ -13,3 +13,14 @@ flat-tree-component
 {
   font-size:80%;
 }
+
+.ds-container
+{
+
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.preview-container
+{
+  flex: 0 0 2em;
+}

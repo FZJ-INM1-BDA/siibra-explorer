@@ -23,9 +23,17 @@
         <button mat-button style="height: 0; position: absolute;"></button>
         <logo-container class="logoContainerMobile"></logo-container>
   
-        <tabset #mobileMenuTabs [justified]="true" class="mpobileMenuTabs" >
+        <tabset #mobileMenuTabs [justified]="true" class="mobileMenuTabs" >
           <tab heading="Template">
             <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
+            <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
+              <ui-status-card 
+                  [selectedTemplate]="selectedTemplate" 
+                  [isMobile]="isMobile"
+                  [onHoverSegmentName]="this.nehubaContainer.onHoverSegmentName$ | async"
+                  [nehubaViewer]="this.nehubaContainer.nehubaViewer">
+              </ui-status-card>
+            </layout-floating-container>
           </tab>
           <tab heading="Containers">
             <menu-icons iconWrapper hidden #MenuIcons>
@@ -119,7 +127,7 @@
     <ui-nehuba-container (contextmenu)="nehubaClickHandler($event)">
     </ui-nehuba-container>
   
-    <div *ngIf="!isMobile" bannerWrapper>
+    <div *ngIf="!isMobile && selectedTemplate" bannerWrapper>
       <menu-icons iconWrapper>
       </menu-icons>
       <signin-banner signinWrapper>
@@ -127,7 +135,7 @@
     </div>
   
     <layout-floating-container
-      zIndex = "9"
+      zIndex="13"
       #floatingOverlayContainer>
       <div floatingContainerDirective>
   
@@ -141,26 +149,38 @@
           </h5>
         </div>
         <div body>
+
           <div
-            *ngIf="onhoverSegmentForFixed$ | async; let onhoverSegmentFixed"
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+            class="p-2">
+            Search for data relating to:
+          </div>
+          
+          <div
+            *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
-            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block"
+            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
             data-toggle="tooltip" 
             data-placement="top" 
             [title]="onhoverSegmentFixed.name">
-            Search for data related to {{ onhoverSegmentFixed.name }}
+            <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
           </div>
   
           <div
             *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            Search for data related to all {{ selectedRegions && selectedRegions.length }} selected regions
+            <ng-container *ngIf="selectedRegions.length > 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
+            </ng-container>
+            <ng-container *ngIf="selectedRegions.length === 1">
+              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
+            </ng-container>
           </div>
           
           <div
             class="p-2 text-muted"
-            *ngIf="!(onhoverSegmentForFixed$ | async) && (selectedRegions$ | async)?.length === 0">
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">
             Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
   
@@ -182,9 +202,13 @@
           {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
         <div 
-          *ngIf="onhoverSegment$ | async; let onhoverSegment" 
+          *ngIf="onhoverSegments$ | async; let onhoverSegments"
           contextualBlock>
-          {{ onhoverSegment.name }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+          <div
+            *ngFor="let segment of onhoverSegments"
+            [innerHtml]="segment | transformOnhoverSegment">
+          </div>
+          <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
@@ -209,7 +233,8 @@
           <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
         </h1>
         <p>
-          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a> or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox</a> for viewing the interactive viewer.
+          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a>
+          or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox)</a> for viewing the interactive viewer.
         </p>
         <div class="col-6 d-inline-block text-left">
           <readmore-component
@@ -232,4 +257,16 @@
       </div>
     </ng-container>
   </div>
+</ng-template>
+
+<ng-template #publications >
+  <reference-toast-component
+          [templateName] = "selectedTemplate['name']? selectedTemplate['name'] : null"
+          [parcellationName] = "selectedParcellation['name']? selectedParcellation['name'] : null"
+          [templateDescription] = "selectedTemplate['properties'] && selectedTemplate['properties']['description']? selectedTemplate['properties']['description'] : null"
+          [parcellationDescription] = "selectedParcellation['properties'] && selectedParcellation['properties']['description']? selectedParcellation['properties']['description'] : null"
+          [templatePublications] = "selectedTemplate['properties'] && selectedTemplate['properties']['publications']? selectedTemplate['properties']['publications']: null"
+          [parcellationPublications] = "selectedParcellation['properties'] && selectedParcellation['properties']['publications']? selectedParcellation['properties']['publications']: null"
+          [parcellationNifti] = "selectedParcellation['properties'] && selectedParcellation['properties']['nifti']? selectedParcellation['properties']['nifti'] : null">
+  </reference-toast-component>
 </ng-template>

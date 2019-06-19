@@ -83,8 +83,8 @@ export class AtlasViewerDataService implements OnDestroy{
     
     if (templateSpace === 'MNI 152 ICBM 2009c Nonlinear Asymmetric'){
       return Promise.all([
-        fetch('res/json/***REMOVED***.json').then(res=>res.json()),
-        fetch('res/json/***REMOVED***.json').then(res=>res.json())
+        fetch('res/json/**removed**.json').then(res=>res.json()),
+        fetch('res/json/**removed**.json').then(res=>res.json())
       ])
         .then(arr => {
           this.store.dispatch({

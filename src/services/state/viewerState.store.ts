@@ -20,9 +20,12 @@ export interface AtlasAction extends Action{
 
   selectTemplate? : any
   selectParcellation? : any
-  selectRegions? : any[]
+  selectRegions?: any[]
+  selectRegionIds: string[]
   deselectRegions? : any[]
   dedicatedView? : string
+
+  updatedParcellation? : any
 
   landmarks : UserLandmark[]
   deselectLandmarks : UserLandmark[]
@@ -57,11 +60,18 @@ export function viewerState(
           : []
       }
     case NEWVIEWER:
+      const { selectParcellation: parcellation } = action
+      // const parcellation = propagateNgId( selectParcellation ): parcellation
+      const { regions, ...parcellationWORegions } = parcellation
       return {
         ...state,
         templateSelected : action.selectTemplate,
-        parcellationSelected : action.selectParcellation,
-        regionsSelected : [],
+        parcellationSelected : {
+          ...parcellationWORegions,
+          regions: null
+        },
+        // taken care of by effect.ts
+        // regionsSelected : [],
         landmarksSelected : [],
         navigation : {},
         dedicatedView : null
@@ -79,29 +89,28 @@ export function viewerState(
       }
     }
     case SELECT_PARCELLATION : {
+      const { selectParcellation:parcellation } = action
+      const { regions, ...parcellationWORegions } = parcellation
       return {
         ...state,
-        parcellationSelected : action.selectParcellation,
-        regionsSelected : []
+        parcellationSelected: parcellationWORegions,
+        // taken care of by effect.ts
+        // regionsSelected: []
       }
     }
-    case DESELECT_REGIONS : {
+    case UPDATE_PARCELLATION: {
+      const { updatedParcellation } = action
       return {
         ...state,
-        regionsSelected : state.regionsSelected.filter(re => action.deselectRegions.findIndex(dRe => dRe.name === re.name) < 0)
+        parcellationSelected: updatedParcellation
       }
     }
-    case SELECT_REGIONS : {
+    case SELECT_REGIONS:
+      const { selectRegions } = action
       return {
         ...state,
-        regionsSelected : action.selectRegions.map(region => {
-          return {
-            ...region,
-            labelIndex: Number(region.labelIndex)
-          }
-        })
+        regionsSelected: selectRegions
       }
-    }
     case DESELECT_LANDMARKS : {
       return {
         ...state,
@@ -134,8 +143,10 @@ export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
+export const UPDATE_PARCELLATION = `UPDATE_PARCELLATION`
+
 export const SELECT_REGIONS = `SELECT_REGIONS`
-export const DESELECT_REGIONS = `DESELECT_REGIONS`
+export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`

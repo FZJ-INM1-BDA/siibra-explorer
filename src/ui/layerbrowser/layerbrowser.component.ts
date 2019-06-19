@@ -1,7 +1,7 @@
 import { Component,  OnDestroy } from "@angular/core";
 import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter } from "../../services/stateStore.service";
+import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
 import { filter, distinctUntilChanged, map, delay, buffer } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -42,12 +42,28 @@ export class LayerBrowser implements OnDestroy{
     this.ngLayers$ = store.pipe(
       select('viewerState'),
       select('templateSelected'),
-      map(templateSelected => (templateSelected && !this.advancedMode && [
-        templateSelected.ngId,
-        ...templateSelected.parcellations.map(p => p.ngId)
-      ]) || [])
+      map(templateSelected => {
+        if (!templateSelected) return []
+        if (this.advancedMode) return []
+        return [
+          templateSelected.ngId,
+          ...templateSelected.parcellations.reduce((acc, curr) => {
+            return acc.concat([
+              curr.ngId,
+              ...getNgIds(curr.regions)
+            ])
+          }, [])
+        ]
+      }),
+      /**
+       * get unique array
+       */
+      map(nonUniqueArray => Array.from(new Set(nonUniqueArray))),
+      /**
+       * remove falsy values
+       */
+      map(arr => arr.filter(v => !!v))
     )
-
     /**
      * TODO
      * this is no longer populated
@@ -73,6 +89,7 @@ export class LayerBrowser implements OnDestroy{
         select('viewerState'),
         select('templateSelected'),
         distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
+        filter(templateSelected => !!templateSelected),
         map(templateSelected => Object.keys(templateSelected.nehubaConfig.dataset.initialNgState.layers)),
         buffer(this.store.pipe(
           select('ngViewerState'),

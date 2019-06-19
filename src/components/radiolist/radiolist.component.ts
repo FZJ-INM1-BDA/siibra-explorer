@@ -1,26 +1,10 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from "@angular/core";
+import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit, ViewChild, TemplateRef } from "@angular/core";
 
 @Component({
   selector: 'radio-list',
   templateUrl: './radiolist.template.html',
   styleUrls: [
     './radiolist.style.css'
-  ],
-  styles: [
-    `
-    ul > li.selected > span:before
-    {
-      content: '\u2022';
-      width : 1em;
-      display:inline-block;
-    }
-    ul > li:not(.selected) > span:before
-    {
-      content: ' ';
-      width : 1em;
-      display:inline-block;
-    }  
-    `
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -40,8 +24,16 @@ export class RadioList{
 
   @Input()
   ulClass: string = ''
+  
+  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
-  @Input() isMobile: boolean
-  @Input() darktheme: boolean
+  @Output() listItemButtonClicked = new EventEmitter<string>();
 
+  clickListButton(i) {
+    this.listItemButtonClicked.emit(i)
+  }
+
+  overflowText(event) {
+    return (event.offsetWidth < event.scrollWidth)
+  }
 }

@@ -4,6 +4,7 @@ const agreedCookieKey = 'agreed-cokies'
 const aggredKgTosKey = 'agreed-kg-tos'
 
 const defaultState : UIStateInterface = {
+  mouseOverSegments: [],
   mouseOverSegment: null,
   mouseOverLandmark: null,
   focusedSidePanel: null,
@@ -18,6 +19,12 @@ const defaultState : UIStateInterface = {
 
 export function uiState(state:UIStateInterface = defaultState,action:UIAction){
   switch(action.type){
+    case MOUSE_OVER_SEGMENTS:
+      const { segments } = action
+      return {
+        ...state,
+        mouseOverSegments: segments
+      }
     case MOUSE_OVER_SEGMENT:
       return {
         ...state,
@@ -71,6 +78,12 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
 }
 
 export interface UIStateInterface{
+  mouseOverSegments: {
+    layer: {
+      name: string
+    }
+    segment: any | null
+  }[]
   sidePanelOpen : boolean
   mouseOverSegment : any | number
   mouseOverLandmark : any 
@@ -81,12 +94,19 @@ export interface UIStateInterface{
 }
 
 export interface UIAction extends Action{
-  segment : any | number
-  landmark : any
+  segment: any | number
+  landmark: any
   focusedSidePanel? : string
+  segments?:{
+    layer: {
+      name: string
+    }
+    segment: any | null
+  }[]
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
+export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 
 export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'

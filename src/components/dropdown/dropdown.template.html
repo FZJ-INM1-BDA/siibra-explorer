@@ -1,13 +1,11 @@
 <!-- TODO remove dependency on ismobile -->
 <span
-  class = "btn btn-default"
-  [innerHTML] = "activeDisplay(selectedItem)"
-  hoverable
+  class="btn btn-default dropdownTitle"
+  [innerHTML]="activeDisplay(selectedItem)"
+  [hoverable]="{translateY:-2}"
   #dropdownToggle
   dropdownToggle
-              
-  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
-
+  [ngClass]="openState ? 'dropdownTitleOpen' : 'dropdownTitle'">
 </span>
 
 <!-- needed to ensure dropdown width matches  -->
@@ -20,10 +18,9 @@
   [ulClass]="'dropdown-menu shadow'"
   (itemSelected)="itemSelected.emit($event)"
   [listDisplay]="listDisplay"
+  [checkSelected]="checkSelected"
   [selectedItem]="selectedItem"
   [inputArray]="inputArray"
   [@showState]="openState ? 'show' : 'hide'"
-  [isMobile] = "isMobile"
-  [darktheme] = "darktheme">
-
+  (listItemButtonClicked) = listItemButtonClicked.emit($event)>
 </radio-list>

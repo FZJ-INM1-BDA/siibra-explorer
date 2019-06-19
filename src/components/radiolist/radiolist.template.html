@@ -1,16 +1,25 @@
 <ul
   [ngClass]="ulClass"
-  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
+  class="radioListMenu"
   role="menu">
-  <li 
-    *ngFor="let input of inputArray" 
-    [ngClass]="selectedItem === input ? 'selected' : 'notselected'" 
-    (click)="itemSelected.emit({previous: selectedItem, current: input})" 
-    role="menuitem">
+
+  <li
+    *ngFor="let input of inputArray; let i = index"
+    class="d-flex justify-content-between"
+    [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
+    role="menuitem"
+    (click)="itemSelected.emit({previous: selectedItem, current: input})">
     
-    <span 
-      class="dropdown-item-1" 
-      [innerHTML] = "listDisplay(input)">
+    <span class="dropdown-item-1 textSpan"
+          #DropDownText
+          [innerHTML] = "listDisplay(input)"
+          [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
+          [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
+    </span>
+
+    <span *ngIf="input['properties'] && (input['properties']['publications'] || input['properties']['description'])"
+          class="infoIcon align-self-end" (click)="clickListButton(i);$event.stopPropagation()">
+      i
     </span>
   </li>
 </ul>

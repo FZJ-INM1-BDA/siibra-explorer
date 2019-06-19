@@ -27,6 +27,8 @@ import { TimerComponent } from './timer/timer.component';
 import { PillComponent } from './pill/pill.component';
 import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
+import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
 
 
 @NgModule({
@@ -35,6 +37,7 @@ import { RadioList } from './radiolist/radiolist.component';
     ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
+    AngularMaterialModule
   ],
   declarations : [
     /* components */
@@ -63,7 +66,8 @@ import { RadioList } from './radiolist/radiolist.component';
     HighlightPipe,
     FitlerRowsByVisibilityPipe,
     AppendSiblingFlagPipe,
-    ClusteringPipe
+    ClusteringPipe,
+    FilterCollapsePipe
   ],
   exports : [
     BrowserAnimationsModule,

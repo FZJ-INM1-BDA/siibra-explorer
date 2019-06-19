@@ -2,6 +2,7 @@ import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, C
 import {  Subscription, Subject, fromEvent } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
+import { generateLabelIndexId } from "src/services/stateStore.service";
 
 const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
@@ -10,13 +11,17 @@ const insertHighlight :(name:string, searchTerm:string) => string = (name:string
     name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
 }
 
-const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => (item:any) =>  {
-  return typeof item.labelIndex !== 'undefined' && selectedRegions.findIndex(re => re.labelIndex === Number(item.labelIndex)) >= 0 ?
-    `<span class = "regionSelected">${insertHighlight(item.name, searchTerm)}</span>` :
-    `<span class = "regionNotSelected">${insertHighlight(item.name, searchTerm)}</span>`
+const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => ({ ngId, name, status, labelIndex }) =>  {
+  return !!labelIndex
+    && !!ngId
+    && selectedRegions.findIndex(re =>
+      generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex })
+    ) >= 0
+      ? `<span class="regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+      : `<span class="regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
 }
 
-const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name], searchTerm)
+const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name, node.status], searchTerm)
 
 @Component({
   selector: 'region-hierarchy',
@@ -100,6 +105,8 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnInit(){
+    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
+    this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
 
     this.subscriptions.push(
       this.handleRegionTreeClickSubject.pipe(
@@ -113,6 +120,20 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(){
+    /**
+     * TODO
+     * bandaid fix on
+     * when region search loses focus, the searchTerm is cleared,
+     * but hierarchy filter does not reset
+     */
+    this.subscriptions.push(
+      fromEvent(this.searchTermInput.nativeElement, 'focus').pipe(
+        
+      ).subscribe(() => {
+        this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
+        this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
+      })
+    )
     this.subscriptions.push(
       fromEvent(this.searchTermInput.nativeElement, 'input').pipe(
         debounceTime(200)

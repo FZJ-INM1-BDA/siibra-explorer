@@ -46,6 +46,7 @@ import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.com
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
+import {ReferenceToastComponent} from "src/ui/referenceToast/referenceToast.component";
 
 
 @NgModule({
@@ -82,6 +83,7 @@ import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    ReferenceToastComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -125,7 +127,9 @@ import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
     SigninModal,
     CookieAgreement,
     KGToS,
-    AngularMaterialModule
+    AngularMaterialModule,
+    StatusCardComponent,
+    ReferenceToastComponent
   ]
 })
 
