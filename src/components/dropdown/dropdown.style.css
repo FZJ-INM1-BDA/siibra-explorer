@@ -58,11 +58,11 @@ radio-list
 }
 
 
-.dropdownTitle {
+:host-context([isMobile="true"]) .dropdownTitle {
   border: 1px solid !important;
 }
 
-.dropdownTitleOpen {
+:host-context([isMobile="true"]) .dropdownTitleOpen {
   border: solid !important;
   border-width: 1px 1px 0 1px !important;
 }
