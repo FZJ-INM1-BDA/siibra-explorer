@@ -1,3 +1,4 @@
+/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
 
 :host-context([darktheme="true"]) ul
 {
@@ -57,6 +58,7 @@ ul,span.dropdown-item-1
   overflow: hidden;
   text-overflow: ellipsis
 }
+
 
 .infoIcon {
   margin-left: 5px;

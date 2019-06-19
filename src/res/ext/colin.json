@@ -5683,6 +5683,6 @@
   ],
   "properties": {
     "name": "MNI Colin 27",
-    "description": "This is a stereotaxic average of 27 T1-weighted MRI scans of the same individual. In 1998, a new atlas with much higher definition than MNI305s was created at the MNI. One individual (CJH) was scanned 27 times and the images linearly registered to create an average with high SNR and structure definition (Holmes et al., 1998). This average was linearly registered to the average 305. Ironically, this dataset was not originally intended for use as a stereotaxic template but as the sub- strate for an ROI parcellation scheme to be used with ANIMAL non-linear spatial normalization (Collins et al., 1995), i.e. it was intended for the purpose of segmentation, NOT stereotaxy. As a single brain atlas, it did not capture anatomical variability and was, to some degree, a reversion to the Talairach approach. However, the high definition proved too attractive to the community and, after non-linear mapping to fit the MNI305 space, it has been adopted by many groups as a stereotaxic template (e.g., AFNI, Cox,; Brainstorm, Tadel et al., 2011; SPM, Litvak et al., 2011; Fieldtrip, Oostenveld et al., 2011)."
+    "description": "A stereotaxic average of 27 T1-weighted MRI scans of the same individual. (Holmes et al., 1998), mapped to fit the MNI305 space.  Although not capturing brain variability, it is well established in neuroscience due to its high definition. HBP provides the JuBrain probabilistic cytoarchitectonic atlas (Amunts et al.) in this space."
   }
 }

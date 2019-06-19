@@ -94,7 +94,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  handleToast
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -228,6 +227,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
+        this.niiFileSize = 0
+
+
 
         if ((this.selectedParcellation['properties'] &&
             (this.selectedParcellation['properties']['publications'] || this.selectedParcellation['properties']['description']))
@@ -244,6 +246,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
     )
   }
+
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any

@@ -130,6 +130,7 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
 
 
 
+
   //ToDo: Need to download files dynamically. Nii folder should be removed
   if (req.body['niiFiles']) {
     var nii = zip.folder("nifti")
