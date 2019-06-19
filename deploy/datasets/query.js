@@ -15,12 +15,12 @@ const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
 let getPublicAccessToken
 
-const fetchDatasetFromKg = async (arg) => {
+const fetchDatasetFromKg = async ({ user } = {}) => {
 
-  const userState = await getUserKGRequestInfo(arg)
+  const { releasedOnly, option } = await getUserKGRequestInfo({ user })
 
   return await new Promise((resolve, reject) => {
-    request(`${queryUrl}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, userState.option, (err, resp, body) => {
+    request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
       if (err)
         return reject(err)
       if (resp.statusCode >= 400)
@@ -185,7 +185,7 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
+const fetchSpatialDataFromKg = async ({ templateName, queryArg, user }) => {
    try {
     const filename = path.join(STORAGE_PATH, templateName + '.json')
     const exists = fs.existsSync(filename)
@@ -196,27 +196,16 @@ const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
     
     const data = fs.readFileSync(filename, 'utf-8')
     const json = JSON.parse(data)
-    var splitQueryArg = queryArg.split('__');
-    const cubeDots = []    
-    splitQueryArg.forEach(element => {
-      cubeDots.push(element.split('_'))
-    });
-
+    const coordsString = queryArg.split('__');
+    const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
 
     if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
-      return json.filter(filterByqueryArg(cubeDots))
+      return json.filter(filterByqueryArg(boundingBoxCorners))
     } else {
-        const centerDifference = [-9.550781, -24.355468, -9.707031]
-        let calculatedCubeDots = []
-        cubeDots.forEach((dots, index) => {
-            calculatedCubeDots[index] = cubeDots[index].map((num, idx) => {
-                return +num - centerDifference[idx]
-            })
-        })
-        calculatedCubeDots = calculatedCubeDots.map(x => transformToWoxel(x))
-        const resultFromKG = await getSpatialSearchOk({calculatedCubeDots, req})
-        if (resultFromKG && resultFromKG['total'] && resultFromKG['total'] > 0) {
-            return json.filter(filterByqueryArg(cubeDots))
+        const boundingBoxInWaxhomV2VoxelSpace = boundingBoxCorners.map(transformWaxholmV2NmToVoxel)
+        const { total = 0 } = await getSpatialSearchOk({boundingBoxInWaxhomV2VoxelSpace, user})
+        if (total > 0) {
+            return json.filter(filterByqueryArg(boundingBoxCorners))
         } else {
             return []
         }
@@ -227,8 +216,8 @@ const fetchSpatialDataFromKg = async ({ templateName, queryArg, req }) => {
   }
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, req }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg, req })
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
+  return await fetchSpatialDataFromKg({ templateName, queryArg, user })
 }
 
 
@@ -240,26 +229,21 @@ function filterByqueryArg(cubeDots) {
     if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
       && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
       && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
-      return true;
+      return true
     }
+    return false
   } 
-  return false;   
 }
 
 
-async function getSpatialSearchOk(arg) {
+async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
 
-    const userState = await getUserKGRequestInfo(arg.req)
-    const option = {
-        headers: {
-            'Authorization': userState.token
-        }
-    }
+    const { releasedOnly, option } = await getUserKGRequestInfo({ user })
 
     const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
 
     return await new Promise((resolve, reject) => {
-        request(`${spatialQuery}${'&boundingBox=waxholmV2:' + arg.calculatedCubeDots[0].concat(arg.calculatedCubeDots[1])}${userState.releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+        request(`${spatialQuery}&boundingBox=waxholmV2:${boundingBoxInWaxhomV2VoxelSpace.map(cornerCoord => cornerCoord.join(',')).join(',')}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
             if (err)
                 return reject(err)
             if (resp.statusCode >= 400)
@@ -270,8 +254,8 @@ async function getSpatialSearchOk(arg) {
     })
 }
 
-async function getUserKGRequestInfo(arg) {
-    const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
+async function getUserKGRequestInfo({ user }) {
+    const accessToken = user && user.tokenset && user.tokenset.access_token
     const releasedOnly = !accessToken
     let publicAccessToken
     if (!accessToken && getPublicAccessToken) {
@@ -288,8 +272,23 @@ async function getUserKGRequestInfo(arg) {
     return {option, releasedOnly, token: accessToken || publicAccessToken || process.env.ACCESS_TOKEN}
 }
 
-const transformToWoxel = (coord) => {
+/**
+ * 
+ */
+const transformWaxholmV2NmToVoxel = (coord) => {
+  /**
+   * as waxholm is already in RAS, does not need to swap axis
+   */
+
+  /**
+   * atlas viewer applies translation (below in nm) in order to center the brain
+   * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
+   */
   const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+  
+  /**
+   * mm/voxel
+   */
   const voxelDim = [0.0390625, 0.0390625, 0.0390625]
   return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
 }

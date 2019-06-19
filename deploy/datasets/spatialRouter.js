@@ -25,8 +25,9 @@ router.get('/templateName/:templateName/:queryGeometry/:queryArg', (req, res, ne
       trace: 'dataset#spatialRouter'
     })
 
+  const { user } = req
 
-  getSpatialDatasets({ templateName, queryGeometry, queryArg, req })
+  getSpatialDatasets({ templateName, queryGeometry, queryArg, user })
     .then(arr => res.status(200).json(arr))
     .catch(error => {
       next({
