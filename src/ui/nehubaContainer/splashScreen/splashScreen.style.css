@@ -9,15 +9,12 @@ div[splashScreenContainer]
 }
 
 div[splashScreenHeader] {
-  min-height: 90px;
   max-height: 100px;
   width: 100%;
-  background-color: #EF5450;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  color: #FFFFFF;
 }
 
 
@@ -28,6 +25,7 @@ div[splashScreenHeader] {
 
 .splashScreenHeaderLogoContainer {
   flex: 1;
+  padding-top: 20px;
 }
 .splashScreenHeaderLogo {
   margin-left: 50px;
@@ -40,9 +38,7 @@ div[splashScreenHeader] {
 }
 
 div[splashScreenTemplate] {
-
   width: 100%;
-  margin: 20px 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -61,10 +57,14 @@ div[splashScreenTemplateItem] {
 }
 
 div[splashScreenTemplateHeader] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70px;
   align-self: center;
   text-align: center;
   font-size: 30px;
-  margin: 0 0 20px 0;
+  margin: 5px 0;
 
 }
 
@@ -111,31 +111,3 @@ div[splashScreenTemplateBodyImage] {
     flex-direction: column;
   }
 }
-
-/*
-div[templateCardContainer]
-{
-  height:100%;
-  display:flex;
-  flex-direction: row;
-  flex-wrap:nowrap;
-  align-items: center;
-  overflow-x:auto;
-}
-div[templateCard]
-{
-  position:relative;
-  flex: 0 1 25em;
-  min-width: 20em;
-  width: 20em;
-  max-width: 20em;
-  padding: 0em 1em;
-  margin : 0em 1em;
-  box-sizing: border-box;
-  background-color:rgb(242,242,242);
-  box-shadow: 0 4px 6px 0 rgba(0,0,0,0.12);
-}
-div[templateCard]:hover
-{
-  background-color:rgba(242,242,242,0.8);
-} */

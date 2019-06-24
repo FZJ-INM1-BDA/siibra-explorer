@@ -1,16 +1,15 @@
 <div splashScreenContainer>
-  <div splashScreenHeader>
-    <div class="splashScreenHeaderLogoContainer"><img class="splashScreenHeaderLogo " src="./res/image/HBP_Primary_RGB_WhiteText.png"> </div>
-    <span class="splashScreenHeaderTitle" media="screen and (min-width: 670px)">HBP Atlas Viewer</span>
+  <div splashScreenHeader *ngIf="!isMobile">
+    <div class="splashScreenHeaderLogoContainer"><img class="splashScreenHeaderLogo " src="./res/image/HBP_Primary_RGB_BlackText.png"> </div>
     <div class="spaceForFill">
-      <signin-banner *ngIf="!isMobile">
-      </signin-banner>
     </div>
+    <signin-banner >
+    </signin-banner>
   </div>
+
   <div splashScreenTemplate>
     <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
       <div class="template-card" (click) = "selectTemplate(template)">
-
         <div splashScreenTemplateHeader>
           {{template.properties.name}}
         </div>
@@ -22,41 +21,7 @@
             {{template.properties.description}}
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
 </div>
-
-
-
-<!--
-<div class = "container-fluid" splashScreenContainer>
-  <div
-    class = "row"
-    templateCardContainer>
-
-    <div
-      *ngFor = "let template of loadedTemplate$ | async | filterNull"
-      (click) = "selectTemplate(template)"
-      templateCard
-      hoverable>
-
-      <h2>{{ template.properties.name }}</h2>
-      <readmore-component>
-        <small>{{ template.properties.description }}</small>
-      </readmore-component>
-    </div>
-    <div *ngIf = "(loadedTemplate$ | async).length < totalTemplates">
-      <h1 style = "text-align:center;">
-        <small>
-          Loading Templates
-        </small>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      </h1>
-    </div>
-  </div>
-</div> -->
