@@ -167,17 +167,14 @@
           </div>
   
           <div
-            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
+            *ngIf="(selectedRegions$ | async)?.length > 1 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            <ng-container *ngIf="selectedRegions.length > 1">
+            <ng-container>
               <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
             </ng-container>
-            <ng-container *ngIf="selectedRegions.length === 1">
-              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
-            </ng-container>
           </div>
-          
+
           <div
             class="p-2 text-muted"
             *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">

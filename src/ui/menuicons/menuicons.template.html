@@ -91,3 +91,59 @@
     <i class="fas fa-search"></i>
   </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div *ngIf="!isMobile && selectedRegions">
+
+  <button mat-button #selectedRegionsMenuOpener [matMenuTriggerFor]="regionMenu" id="selectedRegionsMenuOpener" style="display:none;"></button>
+  <button *ngIf="selectedRegions.length > 0"
+          #selectedRegionsButton
+          mat-mini-fab color="primary"
+          class="search-fab"
+          (click)="opensearchMenu()"
+          [tooltip]="'Selected regions'" placement="right">
+    <i class="fas fa-registered"></i>
+  </button>
+
+  <mat-menu #regionMenu="matMenu">
+    <div [ngClass]="constantService.darktheme? 'textForDark' : 'textForDarkLight'">
+      <div class="container-fluid text-right"><span (click)="clearSelectedRegions()" class="removeSelectedRegionIcon">Clear</span></div>
+      <div *ngFor="let sr of selectedRegions" class="d-flex justify-content-center align-items-center">
+        <span class="mat-menu-item" mat-menu-item (click)="regionClicked(sr)">
+          {{sr.name}}
+        </span>
+        <i class="fas fa-times removeSelectedRegionIcon" (click)="removeRegionFromSelectedList(sr); selectedRegions.length > 1? $event.stopPropagation() : null"></i>
+      </div>
+    </div>
+  </mat-menu>
+
+</div>
+
+<div *ngIf="isMobile">
+  <div
+          *ngFor="let wu of dbService.instantiatedWidgetUnits"
+          [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+          placement="right"
+          [tooltip]="wu.title"
+          class="btnWrapper">
+    <div
+            (click)="widgetServices.minimisedWindow.delete(wu)"
+            [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
+            class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-search"></i>
+    </div>
+  </div>
+

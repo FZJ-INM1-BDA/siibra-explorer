@@ -1,4 +1,11 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  ComponentRef,
+  Injector,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  ElementRef, ViewChild, OnInit, OnDestroy
+} from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -8,6 +15,13 @@ import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import {MatMenuTrigger} from "@angular/material";
+import {Observable, Subscription} from "rxjs";
+import {select, Store} from "@ngrx/store";
+import {distinctUntilChanged, filter, map} from "rxjs/operators";
+import {CHANGE_NAVIGATION, isDefined, SELECT_REGIONS, ViewerStateInterface} from "src/services/stateStore.service";
+import {regionFlattener} from "src/util/regionFlattener";
+import {ToastService} from "src/services/toastService.service";
 
 @Component({
   selector: 'menu-icons',
@@ -18,7 +32,7 @@ import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.servic
   ]
 })
 
-export class MenuIconsBar{
+export class MenuIconsBar implements OnInit, OnDestroy {
 
   /**
    * databrowser
@@ -41,6 +55,13 @@ export class MenuIconsBar{
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
 
+
+  private subscriptions: Subscription[] = []
+  public selectedRegions$: Observable<any[]>
+  private selectedRegions: any[] = []
+  @ViewChild('selectedRegionsMenuOpener', {read: MatMenuTrigger}) protected regionMenuTrigger : MatMenuTrigger;
+  @ViewChild ('selectedRegionsButton', { read: ElementRef }) multiSearchButton: ElementRef;
+
   get isMobile(){
     return this.constantService.mobile
   }
@@ -51,7 +72,9 @@ export class MenuIconsBar{
     private constantService:AtlasViewerConstantsServices,
     public dbService: DatabrowserService,
     cfr: ComponentFactoryResolver,
-    public pluginServices:PluginServices
+    public pluginServices:PluginServices,
+    private store: Store<ViewerStateInterface>,
+    private toastService: ToastService,
   ){
 
     this.dbService.createDatabrowser = this.clickSearch.bind(this)
@@ -59,6 +82,25 @@ export class MenuIconsBar{
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
+
+    this.selectedRegions$ = this.store.pipe(
+        select('viewerState'),
+        filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
+        map(state=>state.regionsSelected),
+        distinctUntilChanged()
+    )
+  }
+
+  ngOnInit(): void {
+    this.subscriptions.push(
+        this.selectedRegions$.subscribe(regions => {
+          this.selectedRegions = regions
+        })
+    )
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   /**
@@ -142,6 +184,47 @@ export class MenuIconsBar{
     const top = el.offsetTop
     const left = el.offsetLeft + 50
     this.pbWidget.instance.position = [left, top]
+  }
+
+  opensearchMenu() {
+    let menu = document.getElementById('selectedRegionsMenuOpener');
+    menu.style.display = '';
+    menu.style.position = 'absolute';
+    menu.style.left = this.multiSearchButton.nativeElement.getBoundingClientRect().left + 35 + 'px';
+    menu.style.top = this.multiSearchButton.nativeElement.getBoundingClientRect().top + 'px';
+    this.regionMenuTrigger.openMenu();
+  }
+
+  removeRegionFromSelectedList(region) {
+    const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
+    const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
+    this.store.dispatch({
+      type: SELECT_REGIONS,
+      selectRegions: this.selectedRegions.filter(r => !flattenedRegionNames.has(r.name))
+    })
+  }
+
+  clearSelectedRegions() {
+    this.store.dispatch({
+      type: SELECT_REGIONS,
+      selectRegions: []
+    })
+  }
+
+  regionClicked(region) {
+    if (region.position) {
+      this.store.dispatch({
+        type: CHANGE_NAVIGATION,
+        navigation: {
+          position: region.position
+        }
+      })
+    } else {
+      this.toastService.showToast(`${region.name} does not have a position defined`, {
+        timeout: 5000,
+        dismissable: true
+      })
+    }
   }
 
   get databrowserIsShowing() {
