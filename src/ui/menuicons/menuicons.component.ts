@@ -190,8 +190,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     let menu = document.getElementById('selectedRegionsMenuOpener');
     menu.style.display = '';
     menu.style.position = 'absolute';
-    menu.style.left = this.multiSearchButton.nativeElement.getBoundingClientRect().left + 35 + 'px';
-    menu.style.top = this.multiSearchButton.nativeElement.getBoundingClientRect().top + 'px';
+    menu.style.transform = 'translate(40px, 0)'
     this.regionMenuTrigger.openMenu();
   }
 

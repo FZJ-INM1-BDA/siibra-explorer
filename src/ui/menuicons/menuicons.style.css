@@ -88,6 +88,15 @@
   cursor: pointer;
 }
 
+.matMenuContainer {
+  background-color: rgba(128,128,128, 1)
+}
+
+pill-component {
+  width: 100%;
+  cursor: pointer;
+}
+
 ::ng-deep .mat-menu-content {
   background-color: rgba(255, 255, 255, 0) !important;
   padding-top: 0 !important;

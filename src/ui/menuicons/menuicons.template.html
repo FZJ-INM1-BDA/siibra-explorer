@@ -92,20 +92,6 @@
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 <div *ngIf="!isMobile && selectedRegions">
 
   <button mat-button #selectedRegionsMenuOpener [matMenuTriggerFor]="regionMenu" id="selectedRegionsMenuOpener" style="display:none;"></button>
@@ -119,14 +105,16 @@
   </button>
 
   <mat-menu #regionMenu="matMenu">
-    <div [ngClass]="constantService.darktheme? 'textForDark' : 'textForDarkLight'">
+    <div class = "matMenuContainer">
       <div class="container-fluid text-right"><span (click)="clearSelectedRegions()" class="removeSelectedRegionIcon">Clear</span></div>
-      <div *ngFor="let sr of selectedRegions" class="d-flex justify-content-center align-items-center">
-        <span class="mat-menu-item" mat-menu-item (click)="regionClicked(sr)">
-          {{sr.name}}
-        </span>
-        <i class="fas fa-times removeSelectedRegionIcon" (click)="removeRegionFromSelectedList(sr); selectedRegions.length > 1? $event.stopPropagation() : null"></i>
-      </div>
+        <pill-component
+                (click)="regionClicked(sr); selectedRegions.length > 0? $event.stopPropagation() : null"
+                [containerStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
+                [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.8)'}"
+                (closeClicked)="removeRegionFromSelectedList(sr)"
+                [title]="sr.name"
+                *ngFor="let sr of selectedRegions">
+        </pill-component>
     </div>
   </mat-menu>
 
@@ -147,3 +135,4 @@
     </div>
   </div>
 
+</div>
