@@ -36,6 +36,15 @@ module.exports = {
             context : 'src'
           }
         }]
+      },
+      {
+        test: /indigo-pink\.css/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }
       }
     ]
   },
