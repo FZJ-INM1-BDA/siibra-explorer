@@ -3,7 +3,7 @@
         <p *ngIf="templateName">{{templateName}}</p>
         <p class="text-justify">{{templateDescription}}</p>
     </div>
-    <div *ngIf="templatePublications">
+    <div *ngIf="templatePublications && templatePublications.length">
         <p>Publication(s)</p>
         <div *ngFor="let tp of templatePublications" class="text-justify">
             <a [href]="tp['doi']" target="_blank">{{tp['citation']}}</a>
@@ -18,7 +18,7 @@
         <p class="text-justify">{{parcellationDescription}}</p>
     </div>
 
-    <div *ngIf="parcellationPublications">
+    <div *ngIf="parcellationPublications && parcellationPublications.length">
         <p>Publication(s)</p>
         <div *ngFor="let pp of parcellationPublications" class="text-justify">
             <a [href]="pp['doi']" target="_blank">{{pp['citation']}}</a>

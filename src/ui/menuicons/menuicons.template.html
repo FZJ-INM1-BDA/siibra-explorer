@@ -108,9 +108,10 @@
     <div class = "matMenuContainer">
       <div class="container-fluid text-right"><span (click)="clearSelectedRegions()" class="removeSelectedRegionIcon">Clear</span></div>
         <pill-component
-                (click)="regionClicked(sr); selectedRegions.length > 0? $event.stopPropagation() : null"
+                (click)="regionClicked(sr)"
                 [containerStyle]="{backgroundColor:'rgba(128,128,128,0.5)'}"
                 [closeBtnStyle]="{backgroundColor:'rgba(128,128,128,0.8)'}"
+                [stopPropagationClose] = "selectedRegions.length > 1"
                 (closeClicked)="removeRegionFromSelectedList(sr)"
                 [title]="sr.name"
                 *ngFor="let sr of selectedRegions">
