@@ -4,7 +4,7 @@ import {
   Injector,
   ComponentFactory,
   ComponentFactoryResolver,
-  ElementRef, ViewChild, OnInit, OnDestroy
+  ElementRef, ViewChild, OnInit, OnDestroy, ViewEncapsulation
 } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
@@ -29,7 +29,7 @@ import {ToastService} from "src/services/toastService.service";
   styleUrls: [
     './menuicons.style.css',
     '../btnShadow.style.css'
-  ]
+  ],
 })
 
 export class MenuIconsBar implements OnInit, OnDestroy {
@@ -61,6 +61,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
   selectedRegions: any[] = []
   @ViewChild('selectedRegionsMenuOpener', {read: MatMenuTrigger}) protected regionMenuTrigger : MatMenuTrigger;
   @ViewChild('selectedSearchMenuOpener', {read: MatMenuTrigger}) protected searchMenuTrigger : MatMenuTrigger;
+  @ViewChild('pluginMenuOpener', {read: MatMenuTrigger}) protected pluginMenuTrigger : MatMenuTrigger;
 
   get isMobile(){
     return this.constantService.mobile
@@ -200,6 +201,14 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     menu.style.position = 'absolute';
     menu.style.transform = 'translate(40px, 0)'
     this.searchMenuTrigger.openMenu();
+  }
+
+  openPluginMenu() {
+    let menu = document.getElementById('pluginMenuOpener');
+    menu.style.display = '';
+    menu.style.position = 'absolute';
+    menu.style.transform = 'translate(40px, 0)'
+    this.pluginMenuTrigger.openMenu();
   }
 
   removeRegionFromSelectedList(region) {

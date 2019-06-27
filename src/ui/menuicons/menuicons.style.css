@@ -63,13 +63,6 @@
   align-items: center;
   top: -20px;
   right: -22px;
-}
-
-:host-context([darktheme="true"]) .mat-badge-content {
-  background-color: #596268;
-}
-
-:host-context([darktheme="false"]) .mat-badge-content {
   background-color: #596268;
 }
 
@@ -79,9 +72,11 @@
   display: flex;
   align-items: center;
 }
+
 .mat-menu-item-minimised {
   background-color: #6c757d;
 }
+
 .opened-search-icon {
   font-size: 5px;
   margin-right: 5px;
@@ -91,12 +86,12 @@
   margin-left: 3px;
 }
 
-.textForDark * {
+.textForDark > * {
   color: rgba(255,255,255,0.8);
   background-color: rgba(30,30,30,1);
 }
 
-.textForDarkLight * {
+.textForDarkLight > * {
   color: rgba(0,0,0,0.5);
   background-color: rgba(255,255,255,1);
 }
@@ -104,6 +99,16 @@
 .removeSelectedRegionIcon {
   margin: 0 10px;
   cursor: pointer;
+}
+
+.menuThemColorsDark {
+  color: rgba(255,255,255,0.8);
+  background-color: rgba(30,30,30,1);
+}
+
+.menuThemColorsLight {
+  color: rgba(0,0,0,0.5);
+  background-color: rgba(255,255,255,1);
 }
 
 pill-component {
