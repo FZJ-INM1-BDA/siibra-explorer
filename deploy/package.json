@@ -23,7 +23,8 @@
     "nomiseco": "0.0.2",
     "openid-client": "^2.4.5",
     "passport": "^0.4.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "through2": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

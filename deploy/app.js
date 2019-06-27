@@ -84,8 +84,9 @@ app.use(require('./devBanner'))
  * only use compression for production
  * this allows locally built aot to be served without errors
  */
-
-const { compressionMiddleware } = require('nomiseco')
+const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
+const { compressionMiddleware, setAlwaysOff } = require('nomiseco')
+if (LOCAL_CDN_FLAG) setAlwaysOff(true)
 
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 

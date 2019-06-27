@@ -8,7 +8,25 @@ const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { init: kgQueryUtilInit, getUserKGRequestParam } = require('./util')
 
 let cachedData = null
-let otherQueryResult = null
+
+const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
+const CACHE_DATASET_FILENAME = process.env.CACHE_DATASET_FILENAME || 'cachedKgDataset.json'
+
+fs.readFile(path.join(STORAGE_PATH, CACHE_DATASET_FILENAME), 'utf-8', (err, data) => {
+  /**
+   * the file may or may not be present on init
+   */
+  if (err) return
+
+  try {
+    cachedData = JSON.parse(data)
+  }catch (e) {
+    /**
+     * parsing saved cached json error
+     */
+    console.error(e)
+  }
+})
 
 const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.eu`
 const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_3`
@@ -48,6 +66,9 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
+  fs.writeFile(path.join(STORAGE_PATH, CACHE_DATASET_FILENAME), JSON.stringify(results), (err) => {
+    if (err) console.error('writing cached data fail')
+  })
   return cachedData
 }
 
