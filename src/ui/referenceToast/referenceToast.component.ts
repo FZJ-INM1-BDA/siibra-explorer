@@ -85,7 +85,9 @@ export class ReferenceToastComponent implements OnInit{
         this.zipFileDownloadService.downloadZip(
             publicationsText,
             fileName,
-            this.parcellationNifti? this.parcellationNifti : 0).subscribe(data => {
+            this.parcellationNifti? this.parcellationNifti : 0
+        )
+        .then(() => {
             this.downloadingProcess = false
         })
         publicationsText = ''
