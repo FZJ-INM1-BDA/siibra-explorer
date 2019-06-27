@@ -50,7 +50,7 @@
 
 <div *ngIf="!isMobile
             && ((pluginServices.fetchedPluginManifests && pluginServices.fetchedPluginManifests.length)
-            || (pluginServices.orphanPlugins && pluginServices.orphanPlugins.length))">
+            || pluginServices.orphanPlugins)">
 
   <button mat-button
           #pluginMenuOpener
@@ -84,8 +84,8 @@
           </span>
         </div>
       </div>
-      <div *ngIf="pluginServices.orphanPlugins && pluginServices.orphanPlugins.length">
-        <div *ngFor="let manifest of pluginServices.fetchedPluginManifests">
+      <div *ngIf="pluginServices.orphanPlugins">
+        <div *ngFor="let manifest of pluginServices.orphanPlugins">
           <span class="mat-menu-item"
                 [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'"
                 (click)="pluginServices.launchPlugin(manifest).catch(catchError)">
