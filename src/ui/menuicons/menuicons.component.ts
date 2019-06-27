@@ -58,9 +58,9 @@ export class MenuIconsBar implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = []
   public selectedRegions$: Observable<any[]>
-  private selectedRegions: any[] = []
+  selectedRegions: any[] = []
   @ViewChild('selectedRegionsMenuOpener', {read: MatMenuTrigger}) protected regionMenuTrigger : MatMenuTrigger;
-  @ViewChild ('selectedRegionsButton', { read: ElementRef }) multiSearchButton: ElementRef;
+  @ViewChild('selectedSearchMenuOpener', {read: MatMenuTrigger}) protected searchMenuTrigger : MatMenuTrigger;
 
   get isMobile(){
     return this.constantService.mobile
@@ -114,8 +114,8 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     dataBrowser.instance.template = template
     dataBrowser.instance.parcellation = parcellation
     const title = regions.length > 1
-      ? `Search: ${regions.length} regions`
-      : `Search: ${regions[0].name}`
+      ? `${regions.length} regions`
+      : `${regions[0].name}`
     const widgetUnit = this.widgetServices.addNewWidget(dataBrowser, {
       exitable: true,
       persistency: true,
@@ -186,12 +186,20 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.pbWidget.instance.position = [left, top]
   }
 
-  opensearchMenu() {
+  openRegionMenu() {
     let menu = document.getElementById('selectedRegionsMenuOpener');
     menu.style.display = '';
     menu.style.position = 'absolute';
     menu.style.transform = 'translate(40px, 0)'
     this.regionMenuTrigger.openMenu();
+  }
+
+  openSearchMenu() {
+    let menu = document.getElementById('selectedSearchMenuOpener');
+    menu.style.display = '';
+    menu.style.position = 'absolute';
+    menu.style.transform = 'translate(40px, 0)'
+    this.searchMenuTrigger.openMenu();
   }
 
   removeRegionFromSelectedList(region) {
