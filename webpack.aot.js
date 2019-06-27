@@ -34,7 +34,7 @@ module.exports = merge(staticAssets, {
       },
       {
         test : /\.(html|css)$/,
-        exclude : /export\_nehuba|index|res\/css|plugin_example/,
+        exclude : /export\_nehuba|index|res\/css|plugin_example|material\/prebuilt-themes/,
         use : {
           loader : 'raw-loader',
         }
