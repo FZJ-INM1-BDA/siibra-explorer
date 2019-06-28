@@ -94,9 +94,25 @@ export class AtlasViewerURLService{
        */
       const searchparams = new URLSearchParams(window.location.search)
  
+      /**
+       * TODO
+       * triage: change of template and parcellation names is breaking old links
+       * change back when camilla/oli updated the links to new versions
+       */
+
       /* first, check if any template and parcellations are to be loaded */
-      const searchedTemplatename = searchparams.get('templateSelected')
-      const searchedParcellationName = searchparams.get('parcellationSelected')
+      const searchedTemplatename = (() => {
+        const param = searchparams.get('templateSelected')
+        if (param === 'Allen Mouse') return `Allen adult mouse brain reference atlas V3`
+        if (param === 'Waxholm Rat V2.0') return 'Waxholm Space rat brain atlas v.2.0'
+        return param
+      })()
+      const searchedParcellationName = (() => {
+        const param = searchparams.get('parcellationSelected')
+        if (param === 'Allen Mouse Brain Atlas') return 'Allen adult mouse brain reference atlas V3 Brain Atlas'
+        if (param === 'Whole Brain (v2.0)') return 'Waxholm Space rat brain atlas v.2.0'
+        return param
+      })()
 
       if (!searchedTemplatename) {
         const urlString = window.location.href
