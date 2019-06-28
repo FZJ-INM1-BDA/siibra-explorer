@@ -3,6 +3,7 @@ import {  Subscription, Subject, fromEvent } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 import { generateLabelIndexId } from "src/services/stateStore.service";
+import {promise} from "selenium-webdriver";
 
 const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
@@ -62,12 +63,20 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   @ViewChild('searchTermInput', {read: ElementRef})
   private searchTermInput: ElementRef
 
+  countItemsIntoTheTree: number
+  windowHeight: number
+
   @HostListener('document:click', ['$event'])
   closeRegion(event: MouseEvent) {
     const contains = this.el.nativeElement.contains(event.target)
     this.showRegionTree = contains
     if (!this.showRegionTree)
       this.searchTerm = ''
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.windowHeight = event.target.innerHeight;
   }
 
   get regionsLabelIndexMap() {
@@ -78,7 +87,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     private cdr:ChangeDetectorRef,
     private el:ElementRef
   ){
-
+    this.windowHeight = window.innerHeight;
   }
 
   ngOnChanges(){
@@ -102,6 +111,11 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   set showRegionTree(flag: boolean){
     this._showRegionTree = flag
     this.showRegionFlagChanged.emit(this._showRegionTree)
+    this.countItemsIntoTheTree = 1
+    if (this.aggregatedRegionTree.children &&
+        this.aggregatedRegionTree.children.length > 0) {
+      this.countItems(this.aggregatedRegionTree)
+    }
   }
 
   ngOnInit(){
@@ -155,6 +169,19 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     this.searchTerm = '';
     (event.target as HTMLInputElement).blur()
 
+  }
+
+  countItems(objectToCount) {
+    objectToCount.children.forEach(object => {
+      this.countItemsIntoTheTree += 1
+      if (object.children && object.children.length > 0) this.countItems(object)
+    })
+  }
+  regionHierarchyHeight(){
+    return({
+      'height' : (this.countItemsIntoTheTree * 15 + 60).toString() + 'px',
+      'max-height': (this.windowHeight - 100) + 'px'
+    })
   }
 
   focusInput(event?:MouseEvent){

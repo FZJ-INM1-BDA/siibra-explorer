@@ -37,7 +37,7 @@
   *ngIf="useDefaultList"
   class="overflow-auto">
 
-  <div class="overflow-hidden default-container">
+  <div class="overflow-hidden default-container" style="background-color: #dbb556">
     <div
       *ngFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe )" 
       [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"

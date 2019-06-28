@@ -25,7 +25,7 @@
         *ngIf="!isMobile"
         (click)="widgetServices.minimise(this)"
         class="fas fa-window-minimize"
-        hoverable>
+        [hoverable] ="{translateY: -1}">
 
       </i>
       <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
@@ -34,12 +34,12 @@
         hoverable></i>
       <i *ngIf = "state === 'docked' && !isMobile"
         (click) = "undock($event)" 
-        class = "fas fa-window-restore" 
+        class = "fas fa-window-restore"
         hoverable></i>
       <i *ngIf = "exitable"
         (click) = "exit($event)" 
         class = "fas fa-times" 
-        hoverable></i>
+        [hoverable] ="{translateY: -1}"></i>
     </div>
   </div>
   <div widgetUnitBody body>
