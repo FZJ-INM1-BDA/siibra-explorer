@@ -215,8 +215,14 @@ export class AtlasViewerURLService{
 
     /* pushing state to url */
     combineLatest(
-      this.changeQueryObservable$.pipe(
-        map(state=>{
+      combineLatest(
+        this.changeQueryObservable$,
+        this.store.pipe(
+          select('viewerState'),
+          select('parcellationSelected')
+        )
+      ).pipe(
+        map(([state, parcellationSelected])=>{
           let _ = {}
           for(const key in state){
             if(isDefined(state[key])){
@@ -239,7 +245,7 @@ export class AtlasViewerURLService{
                   }
                   break;
                 case 'regionsSelected':
-                  _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                  _[key] = state[key].map(({ ngId = parcellationSelected && parcellationSelected.ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
                   break;
                 case 'templateSelected':
                 case 'parcellationSelected':

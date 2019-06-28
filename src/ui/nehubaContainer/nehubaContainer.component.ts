@@ -497,13 +497,16 @@ export class NehubaContainer implements OnInit, OnDestroy{
         ),
         this.ngLayers$.pipe(
           map(state => state.forceShowSegment)
-        )
+        ),
+        this.selectedParcellation$
       )
-        .subscribe(([regions,hideSegmentFlag,forceShowSegment])=>{
+        .subscribe(([regions,hideSegmentFlag,forceShowSegment, selectedParcellation])=>{
           if(!this.nehubaViewer) return
 
+          const { ngId: defaultNgId } = selectedParcellation
+
           /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-          this.selectedRegionIndexSet = new Set(regions.map(({ngId, labelIndex})=>generateLabelIndexId({ ngId, labelIndex })))
+          this.selectedRegionIndexSet = new Set(regions.map(({ngId = defaultNgId, labelIndex})=>generateLabelIndexId({ ngId, labelIndex })))
 
           if( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ){
             this.nehubaViewer.hideAllSeg()
@@ -557,12 +560,14 @@ export class NehubaContainer implements OnInit, OnDestroy{
     combineLatest(
       this.navigationChanges$,
       this.selectedRegions$,
-    ).subscribe(([navigation,regions])=>{
+      this.selectedParcellation$
+    ).subscribe(([navigation,regions, selectedParcellation])=>{
       this.nehubaViewer.initNav = 
         Object.assign({},navigation,{
           positionReal : true
         })
-      this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) =>generateLabelIndexId({ ngId, labelIndex }))
+      const { ngId : defaultNgId } = selectedParcellation
+      this.nehubaViewer.initRegions = regions.map(({ ngId = defaultNgId, labelIndex }) =>generateLabelIndexId({ ngId, labelIndex }))
     })
 
     this.subscriptions.push(
