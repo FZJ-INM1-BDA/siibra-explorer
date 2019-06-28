@@ -127,7 +127,7 @@ export class DatabrowserService implements OnDestroy{
       const pt1 = center.map(v => (v - searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
       const pt2 = center.map(v => (v + searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
       
-      return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`)
+      return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`, this.constantService.getFetchOption())
         .then(res => res.json()))
     }),
     catchError((err) => (console.log(err), of([])))
@@ -197,7 +197,7 @@ export class DatabrowserService implements OnDestroy{
   public fetchPreviewData(datasetName: string){
     const encodedDatasetName = encodeURI(datasetName)
     return new Promise((resolve, reject) => {
-      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`)
+      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`, this.constantService.getFetchOption())
         .then(res => res.json())
         .then(resolve)
         .catch(reject)
@@ -235,9 +235,9 @@ export class DatabrowserService implements OnDestroy{
     const encodedTemplateName = encodeURI(templateName)
     const encodedParcellationName = encodeURI(parcellationName)
     return Promise.all([
-      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`)
+      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`, this.constantService.getFetchOption())
         .then(res => res.json()),
-      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`)
+      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`, this.constantService.getFetchOption())
         .then(res => res.json())
     ])
       .then(arr => [...arr[0], ...arr[1]])

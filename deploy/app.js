@@ -44,6 +44,11 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
 
+app.use((_req, res, next) => {
+  res.setHeader('Referrer-Policy', 'origin-when-cross-origin')
+  next()
+})
+
 app.use(express.static(PUBLIC_PATH))
 
 app.use((req, res, next) => {
