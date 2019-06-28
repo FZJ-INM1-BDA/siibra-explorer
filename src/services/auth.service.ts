@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
 
@@ -19,8 +20,8 @@ export class AuthService{
     href: 'hbp-oidc/auth'
   }]
 
-  constructor() {
-    fetch('user')
+  constructor(constantService: AtlasViewerConstantsServices) {
+    fetch('user', constantService.getFetchOption())
       .then(res => res.json())
       .then(user => this.user = user)
       .catch(e => {

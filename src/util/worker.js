@@ -18,7 +18,9 @@ const checkMeshes = (action) => {
   
   /* filtering now done on the angular level */
   const baseUrl = action.baseUrl
-  fetch(`${baseUrl}/info`)
+  fetch(`${baseUrl}/info`, {
+    referrerPolicy: 'no-referrer'
+  })
     .then(res => res.json())
     .then(({mesh}) => {
       if (mesh)
@@ -27,7 +29,9 @@ const checkMeshes = (action) => {
         throw new Error('mesh does not exist')
     })
     .then(meshPath => action.indices.forEach(index => {
-      fetch(`${baseUrl}/${meshPath}/${index}:0`)
+      fetch(`${baseUrl}/${meshPath}/${index}:0`, {
+        referrerPolicy: 'no-referrer'
+      })
         .then(res => res.json())
         .then(json => {
           /* the perspectiveEvent only counts json that has fragments as a part of meshLoaded */
