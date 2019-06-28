@@ -32,8 +32,7 @@ exports.getTemplateNehubaConfig = ({configId, acceptedEncoding, returnAsStream})
     if (returnAsStream) return fs.createReadStream(`${filepath}.gz`)
     else return getFileAsPromise(`${filepath}.gz`)
   }
-
-  let data = ''
+  
   if (returnAsStream) return fs.createReadStream(filepath).pipe(
     through2.obj(function(file, enc, cb){
       cb(null, reconfigureUrl(file.toString()))
