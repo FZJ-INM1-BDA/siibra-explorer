@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip } = require('./query')
 const url = require('url')
 const qs = require('querystring')
 
@@ -10,21 +10,24 @@ const bodyParser = require('body-parser')
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
-
 init().catch(e => {
   console.warn(`dataset init failed`, e)
 })
 
-datasetsRouter.use((req, res, next) => {
+const cacheMaxAge24Hr = (_req, res, next) => {
+  const oneDay = 24 * 60 * 60
+  res.setHeader('Cache-Control', `max-age=${oneDay}`)
+  next()
+}
+
+const noCacheMiddleWare = (_req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache')
   next()
-})
+}
 
+datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter'))
 
-
-datasetsRouter.use('/spatialSearch', require('./spatialRouter'))
-
-datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
+datasetsRouter.get('/templateName/:templateName', noCacheMiddleWare, (req, res, next) => {
   const { templateName } = req.params
   const { user } = req
   getDatasets({ templateName, user })
@@ -40,7 +43,7 @@ datasetsRouter.get('/templateName/:templateName', (req, res, next) => {
     })
 })
 
-datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
+datasetsRouter.get('/parcellationName/:parcellationName', noCacheMiddleWare, (req, res, next) => {
   const { parcellationName } = req.params
   const { user } = req
   getDatasets({ parcellationName, user })
@@ -56,7 +59,7 @@ datasetsRouter.get('/parcellationName/:parcellationName', (req, res, next) => {
     })
 })
 
-datasetsRouter.get('/preview/:datasetName', (req, res, next) => {
+datasetsRouter.get('/preview/:datasetName', cacheMaxAge24Hr, (req, res, next) => {
   const { datasetName } = req.params
   const ref = url.parse(req.headers.referer)
   const { templateSelected, parcellationSelected } = qs.parse(ref.query)
@@ -97,7 +100,7 @@ fs.readdir(RECEPTOR_PATH, (err, files) => {
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
 })
 
-datasetsRouter.get('/previewFile', (req, res) => {
+datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   const { file } = req.query
   const filePath = previewFileMap.get(file)
   if (filePath) {
@@ -107,7 +110,37 @@ datasetsRouter.get('/previewFile', (req, res) => {
   }
 })
 
+const checkKgQuery = (req, res, next) => {
+  const { kgSchema } = req.query
+  if (kgSchema !== 'minds/core/dataset/v1.0.0') return res.status(400).send('Only kgSchema is required and the only accepted value is minds/core/dataset/v1.0.0')
+  else return next()
+}
 
+datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
+  
+  const { kgId } = req.query
+  const { user } = req
+  const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
+  stream.pipe(res)
+})
+
+datasetsRouter.get('/downloadKgFiles', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
+  const { kgId } = req.query
+  const { user } = req
+  try {
+    const stream = await getDatasetFileAsZip({ user, kgId })
+    res.setHeader('Content-Type', 'application/zip')
+    stream.pipe(res)
+  } catch (e) {
+    console.log('datasets/index#downloadKgFiles', e)
+    res.status(400).send(e)
+  }
+})
+
+/**
+ * TODO
+ * deprecate jszip in favour of archiver
+ */
 
 var JSZip = require("jszip");
 

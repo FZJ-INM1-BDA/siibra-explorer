@@ -27,7 +27,7 @@
 
     <div class="align-self-end">
         <a *ngIf="parcellationExternalLink" href="{{parcellationExternalLink}}" target="_blank"><button mat-raised-button color="primary" class="downloadPublications">Explore &nbsp;<i class="fas fa-external-link-alt"></i></button></a>
-        <button mat-raised-button color="primary" class="downloadPublications" (click)="downloadPublications()" [disabled] = "downloadingProcess" >
+        <button mat-raised-button color="primary" class="downloadPublications" (click)="kgId ? downloadZipFromKg() : downloadPublications()" [disabled] = "downloadingProcess" >
             Download &nbsp;
             <span *ngIf="niiFileSize > 0">(.nii {{niiFileSize/1000000 | number:'.1-2'}} Mb) &nbsp;</span>
             <i class="fas" [ngClass]="!downloadingProcess? 'fa-download' :'fa-spinner fa-pulse'"></i>

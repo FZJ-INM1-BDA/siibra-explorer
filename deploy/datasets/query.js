@@ -1,6 +1,8 @@
 const fs = require('fs')
 const request = require('request')
+const URL = require('url')
 const path = require('path')
+const archiver = require('archiver')
 const { commonSenseDsFilter } = require('./supplements/commonSense')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { manualFilter: manualFilterDWM, manualMap: manualMapDWM } = require('./supplements/util/mapDwm')
@@ -9,7 +11,25 @@ const kgQueryUtil = require('./../auth/util')
 
 let cachedData = null
 let otherQueryResult = null
-const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
+
+const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
+const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_1`
+const KG_PARAM = {
+  size: process.env.KG_SEARCH_SIZE || '450',
+  vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
+}
+
+const KG_QUERY_DATASETS_URL = new URL.URL(`${KG_ROOT}${KG_PATH}/instances`)
+for (let key in KG_PARAM) {
+  KG_QUERY_DATASETS_URL.searchParams.set(key, KG_PARAM[key])
+}
+
+const getKgQuerySingleDatasetUrl = ({ kgId }) => {
+  const _newUrl = new URL.URL(KG_QUERY_DATASETS_URL)
+  _newUrl.pathname = `${KG_PATH}/instances/${kgId}`
+  return _newUrl
+}
+
 const timeout = process.env.TIMEOUT || 5000
 const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
@@ -17,10 +37,10 @@ let getPublicAccessToken
 
 const fetchDatasetFromKg = async ({ user } = {}) => {
 
-  const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+  const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   return await new Promise((resolve, reject) => {
-    request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+    request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
       if (err)
         return reject(err)
       if (resp.statusCode >= 400)
@@ -238,7 +258,7 @@ function filterByqueryArg(cubeDots) {
 
 async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
 
-    const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+    const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
     const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
 
@@ -254,22 +274,30 @@ async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
     })
 }
 
-async function getUserKGRequestInfo({ user }) {
-    const accessToken = user && user.tokenset && user.tokenset.access_token
+let publicAccessToken
+
+async function getUserKGRequestParam({ user }) {
+    /**
+     * n.b. ACCESS_TOKEN env var is usually only set during dev
+     */
+    const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
     const releasedOnly = !accessToken
-    let publicAccessToken
-    if (!accessToken && getPublicAccessToken) {
+    if (!accessToken && !publicAccessToken && getPublicAccessToken) {
         publicAccessToken = await getPublicAccessToken()
     }
-    const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+    const option = accessToken || publicAccessToken
         ? {
             auth: {
-                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+                'bearer': accessToken || publicAccessToken
             }
         }
         : {}
 
-    return {option, releasedOnly, token: accessToken || publicAccessToken || process.env.ACCESS_TOKEN}
+    return {
+      option,
+      releasedOnly,
+      token: accessToken || publicAccessToken
+    }
 }
 
 /**
@@ -293,4 +321,37 @@ const transformWaxholmV2NmToVoxel = (coord) => {
   return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
 }
 
-    
+const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
+  const { option, releasedOnly } = await getUserKGRequestParam({ user })
+  const _url = getKgQuerySingleDatasetUrl({ kgId })
+  if (releasedOnly) _url.searchParams.set('databaseScope', 'RELEASED')
+  if (returnAsStream) return request(_url, option)
+  else return new Promise((resolve, reject) => {
+    request(_url, option, (err, resp, body) => {
+      if (err) return reject(err)
+      if (resp.statusCode >= 400) return reject(resp.statusCode)
+      return resolve(JSON.parse(body))
+    })
+  })
+}
+
+const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
+  if (!kgId) {
+    throw new Error('kgId must be defined')
+  }
+
+  const result = await getDatasetFromId({ user, kgId })
+  const { files } = result
+  const zip = archiver('zip')
+  for (let file of files) {
+    const { name, absolutePath } = file
+    zip.append(request(absolutePath), { name })
+  }
+
+  zip.finalize()
+
+  return zip
+}
+
+exports.getDatasetFromId = getDatasetFromId
+exports.getDatasetFileAsZip = getDatasetFileAsZip

@@ -14,7 +14,9 @@
         "description": "not yet",
         "publications": [],
         "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "4400000"}],
-        "externalLink":  "https://doi.org/10.25493/8EGG-ZAR"
+        "externalLink":  "https://doi.org/10.25493/8EGG-ZAR",
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
       },
       "regions": [
         {

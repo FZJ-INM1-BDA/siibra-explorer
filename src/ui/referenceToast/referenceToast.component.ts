@@ -19,6 +19,8 @@ export class ReferenceToastComponent implements OnInit{
     @Input() templateExternalLink? : any
     @Input() parcellationExternalLink? : any
 
+    @Input() kgId?: string
+
     downloadingProcess = false
     niiFileSize = 0
 
@@ -30,6 +32,13 @@ export class ReferenceToastComponent implements OnInit{
                 this.niiFileSize += nii['size']
             })
         }
+    }
+
+    downloadZipFromKg() {
+        this.downloadingProcess = true
+        this.zipFileDownloadService.downloadZipFromKg(this.kgId)
+            .then(() => this.downloadingProcess = false)
+            .catch(console.error)
     }
 
     downloadPublications() {

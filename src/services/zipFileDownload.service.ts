@@ -9,6 +9,19 @@ export class ZipFileDownloadService {
     /**
      * TODO make naming more generic
      */
+    downloadZipFromKg(kgId: string, filename: string = 'download'){
+        const _url = new URL(`${this.constantService.backendUrl}datasets/downloadKgFiles`)
+        const searchParam = _url.searchParams
+        searchParam.set('kgSchema', 'minds/core/dataset/v1.0.0')
+        searchParam.set('kgId', kgId)
+        return fetch(_url.toString())
+            .then(res => {
+                if (res.status >= 400) throw new Error(res.status.toString())
+                return res.blob()
+            })
+            .then(data => this.simpleDownload(data, filename))
+    }
+
     downloadZip(publicationsText, fileName, niiFiles) {
         const correctedName = fileName.replace(/[|&;$%@"<>()+,/]/g, "")
         const body = {

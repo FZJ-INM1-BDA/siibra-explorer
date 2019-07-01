@@ -269,6 +269,7 @@
           [parcellationPublications] = "selectedParcellation['properties'] && selectedParcellation['properties']['publications']? selectedParcellation['properties']['publications']: null"
           [parcellationNifti] = "selectedParcellation['properties'] && selectedParcellation['properties']['nifti']? selectedParcellation['properties']['nifti'] : null"
           [templateExternalLink] ="selectedTemplate['properties'] && selectedTemplate['properties']['externalLink']? selectedTemplate['properties']['externalLink']: null"
-          [parcellationExternalLink] ="selectedParcellation['properties'] && selectedParcellation['properties']['externalLink']? selectedParcellation['properties']['externalLink']: null">
+          [parcellationExternalLink] ="selectedParcellation['properties'] && selectedParcellation['properties']['externalLink']? selectedParcellation['properties']['externalLink']: null"
+          [kgId]="selectedParcellation.properties?.kgId">
   </reference-toast-component>
 </ng-template>
