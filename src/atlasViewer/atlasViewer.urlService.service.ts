@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER, generateLabelIndexId } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER } from "../services/stateStore.service";
 import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { PluginServices } from "./atlasViewer.pluginService.service";
-import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { AtlasViewerConstantsServices, encodeNumber, separator, decodeToNumber } from "./atlasViewer.constantService.service";
 import { ToastService } from "src/services/toastService.service";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 
@@ -157,6 +157,34 @@ export class AtlasViewerURLService{
             selectRegionIds: ids
           })
         }
+
+        const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
+        if (cRegionsSelectedParam) {
+          try {
+            const json = JSON.parse(cRegionsSelectedParam)
+  
+            const selectRegionIds = []
+  
+            for (let ngId in json) {
+              const val = json[ngId]
+              const labelIndicies = val.split(separator).map(decodeToNumber)
+              for (let labelIndex of labelIndicies) {
+                selectRegionIds.push(`${ngId}#${labelIndex}`)
+              }
+            }
+  
+            this.store.dispatch({
+              type: SELECT_REGIONS_WITH_ID,
+              selectRegionIds
+            })
+  
+          } catch (e) {
+            /**
+             * parsing cRegionSelected error
+             */
+            console.log('parsing cRegionSelected error', e)
+          }
+        }
       }
       
       /* now that the parcellation is loaded, load the navigation state */
@@ -222,9 +250,37 @@ export class AtlasViewerURLService{
                     ].join('__')
                   }
                   break;
-                case 'regionsSelected':
-                  _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                case 'regionsSelected': {
+                  // _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                  const ngIdLabelIndexMap : Map<string, number[]> = state[key].reduce((acc, curr) => {
+                    const returnMap = new Map(acc)
+                    const { ngId, labelIndex } = curr
+                    const existingArr = (returnMap as Map<string, number[]>).get(ngId)
+                    if (existingArr) {
+                      existingArr.push(labelIndex)
+                    } else {
+                      returnMap.set(ngId, [labelIndex])
+                    }
+                    return returnMap
+                  }, new Map())
+
+                  if (ngIdLabelIndexMap.size === 0) {
+                    _['cRegionsSelected'] = null
+                    _[key] = null
+                    break;
+                  }
+                  
+                  const returnObj = {}
+
+                  for (let entry of ngIdLabelIndexMap) {
+                    const [ ngId, labelIndicies ] = entry
+                    returnObj[ngId] = labelIndicies.map(encodeNumber).join(separator)
+                  }
+                  
+                  _['cRegionsSelected'] = JSON.stringify(returnObj)
+                  _[key] = null
                   break;
+                }
                 case 'templateSelected':
                 case 'parcellationSelected':
                   _[key] = state[key].name

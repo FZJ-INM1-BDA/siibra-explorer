@@ -291,3 +291,54 @@ export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
   ['preact@8.4.2',parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
   ['d3@5.7.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')]
 ])
+
+/**
+ * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)
+ * The constraint is that the cipher needs to be commpatible with URI encoding
+ * and a URI compatible separator is required. 
+ * 
+ * The implementation below came from 
+ * https://stackoverflow.com/a/6573119/6059235
+ * 
+ * While a faster solution exist in the same post, this operation is expected to be done:
+ * - once per 1 sec frequency
+ * - on < 1000 numbers
+ * 
+ * So performance is not really that important (Also, need to learn bitwise operation)
+ */
+
+const cipher = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-"
+export const separator = "."
+
+export const encodeNumber = (number: number) => {
+
+  if (isNaN(Number(number)) || number === null ||
+    number === Number.POSITIVE_INFINITY)
+    throw "The input is not valid"
+  if (number < 0)
+    throw "Can't represent negative numbers now"
+
+  let rixit // like 'digit', only in some non-decimal radix 
+  let residual = Math.floor(number)
+  let result = ''
+  while (true) {
+    rixit = residual % 64
+    // console.log("rixit : " + rixit)
+    // console.log("result before : " + result)
+    result = cipher.charAt(rixit) + result
+    // console.log("result after : " + result)
+    // console.log("residual before : " + residual)
+    residual = Math.floor(residual / 64)
+    // console.log("residual after : " + residual)
+
+    if (residual == 0)
+      break;
+    }
+  return result
+}
+
+export const decodeToNumber = (encodedString: string) => {
+  return [...encodedString].reduce((acc,curr) => {
+    return acc * 64 + cipher.indexOf(curr)
+  }, 0)
+}
