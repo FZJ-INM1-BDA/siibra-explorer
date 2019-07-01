@@ -140,14 +140,8 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
     })
   }
 
-  zip.generateAsync({type:"base64"})
-      .then(function (content) {
-        // location.href="data:application/zip;base64,"+content;
-        res.end(content)
-      });
-
-
-
+  res.setHeader('Content-Type', 'application/zip')
+  zip.generateNodeStream().pipe(res)
 });
 
 module.exports = datasetsRouter
