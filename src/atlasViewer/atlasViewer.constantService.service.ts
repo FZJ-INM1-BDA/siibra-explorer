@@ -309,7 +309,7 @@ export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
 
 const cipher = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-'
 export const separator = "."
-const negFlag = '!'
+const negString = '~'
 
 const encodeInt = (number: number) => {
   if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
@@ -321,7 +321,7 @@ const encodeInt = (number: number) => {
   let result = ''
 
   if (number < 0) {
-    result += negFlag
+    result += negString
     residual = Math.floor(number * -1)
   } else {
     residual = Math.floor(number)
@@ -364,7 +364,7 @@ export const encodeNumber: (number:number, option?: B64EncodingOption) => string
 
 const decodetoInt = (encodedString: string) => {
   let _encodedString, negFlag = false
-  if (encodedString.slice(-1) === '!') {
+  if (encodedString.slice(-1) === negString) {
     negFlag = true
     _encodedString = encodedString.slice(0, -1)
   } else {
