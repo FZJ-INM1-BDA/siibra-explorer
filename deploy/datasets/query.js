@@ -187,25 +187,14 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
 const cachedMap = new Map()
 const fetchSpatialDataFromKg = async ({ templateName, queryArg, user }) => {
    try {
-    const filename = path.join(STORAGE_PATH, templateName + '.json')
-    const exists = fs.existsSync(filename)
-
-    if (!exists)
-      return []
-
-    
-    const data = fs.readFileSync(filename, 'utf-8')
-    const json = JSON.parse(data)
     const coordsString = queryArg.split('__');
     const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
 
-    if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
-      return json.filter(filterByqueryArg(boundingBoxCorners))
-    } else {
+    if (templateName === 'Waxholm Space rat brain atlas v.2.0') {
         const boundingBoxInWaxhomV2VoxelSpace = boundingBoxCorners.map(transformWaxholmV2NmToVoxel)
-        const { total = 0 } = await getSpatialSearchOk({boundingBoxInWaxhomV2VoxelSpace, user})
-        if (total > 0) {
-            return json.filter(filterByqueryArg(boundingBoxCorners))
+        const spatialData = await fetchSpatialData({boundingBoxInWaxhomV2VoxelSpace, user})
+        if (spatialData.length) {
+            return spatialData
         } else {
             return []
         }
@@ -220,35 +209,33 @@ exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, use
   return await fetchSpatialDataFromKg({ templateName, queryArg, user })
 }
 
-
-function filterByqueryArg(cubeDots) {
-  return function (item) {
-    const px = item.geometry.position[0]
-    const py = item.geometry.position[1]
-    const pz = item.geometry.position[2]
-    if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
-      && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
-      && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
-      return true
-    }
-    return false
-  } 
-}
-
-
-async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
-
+async function fetchSpatialData({ user, boundingBoxInWaxhomV2VoxelSpace }) {
     const { releasedOnly, option } = await getUserKGRequestInfo({ user })
-
-    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
+    const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinates/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
 
     return await new Promise((resolve, reject) => {
+        // ToDo need too add: "${releasedOnly ? '&databaseScope=RELEASED' : ''}"
         request(`${spatialQuery}&boundingBox=waxholmV2:${boundingBoxInWaxhomV2VoxelSpace.map(cornerCoord => cornerCoord.join(',')).join(',')}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
             if (err)
                 return reject(err)
-            if (resp.statusCode >= 400)
+            if (resp.statusCode >= 400) {
                 return reject(resp.statusCode)
-            const json = JSON.parse(body)
+            }
+
+            const json = JSON.parse(body).results.map(res => {
+                return {name: res.name,
+                      templateSpace: res['dataset'][0]['name'],
+                      geometry: {
+                        type: "point",
+                        space: "real",
+                        position: transformVoxelToWaxholmV2Nm ([
+                            res['coordinates'][0]['x'],
+                            res['coordinates'][0]['y'],
+                            res['coordinates'][0]['z'],
+
+                        ])}
+                      }
+            })
             return resolve(json)
         })
     })
@@ -269,7 +256,7 @@ async function getUserKGRequestInfo({ user }) {
         }
         : {}
 
-    return {option, releasedOnly, token: accessToken || publicAccessToken || process.env.ACCESS_TOKEN}
+    return {option, releasedOnly}
 }
 
 /**
@@ -285,12 +272,18 @@ const transformWaxholmV2NmToVoxel = (coord) => {
    * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
    */
   const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
-  
+
   /**
    * mm/voxel
    */
   const voxelDim = [0.0390625, 0.0390625, 0.0390625]
   return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
+}
+
+const transformVoxelToWaxholmV2Nm = (coord) => {
+  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
+  return coord.map((v, idx) => (v * voxelDim[idx]) + transl[idx])
 }
 
     
