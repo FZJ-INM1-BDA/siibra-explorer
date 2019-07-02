@@ -1,6 +1,9 @@
 import {} from 'jasmine'
 import { TestBed, async } from '@angular/core/testing'
 import { DropdownComponent } from './dropdown.component';
+import { HoverableBlockDirective } from '../hoverableBlock.directive'
+import { RadioList } from '../radiolist/radiolist.component'
+import { AngularMaterialModule } from '../../ui/sharedModules/angularMaterial.module'
 
 describe('dropdown component', () => {
   it('jasmine works', () => {
@@ -8,7 +11,14 @@ describe('dropdown component', () => {
   })
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations : [ DropdownComponent ]
+      imports: [
+        AngularMaterialModule
+      ],
+      declarations : [ 
+        DropdownComponent,
+        HoverableBlockDirective,
+        RadioList
+      ]
     }).compileComponents()
   }))
   it('should create component', async(()=>{
