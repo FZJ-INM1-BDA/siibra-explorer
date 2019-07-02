@@ -148,6 +148,9 @@ export class AtlasViewerURLService{
         /**
          * either or both parcellationToLoad and .regions maybe empty
          */
+        /**
+         * backwards compatibility
+         */
         const selectedRegionsParam = searchparams.get('regionsSelected')
         if(selectedRegionsParam){
           const ids = selectedRegionsParam.split('_')
@@ -167,7 +170,7 @@ export class AtlasViewerURLService{
   
             for (let ngId in json) {
               const val = json[ngId]
-              const labelIndicies = val.split(separator).map(decodeToNumber)
+              const labelIndicies = val.split(separator).map(n =>decodeToNumber(n))
               for (let labelIndex of labelIndicies) {
                 selectRegionIds.push(`${ngId}#${labelIndex}`)
               }
@@ -199,6 +202,26 @@ export class AtlasViewerURLService{
             perspectiveZoom : Number(pz),
             position : p.split('_').map(n=>Number(n)),
             zoom : Number(z)
+          }
+        })
+      }
+
+      const cViewerState = searchparams.get('cNavigation')
+      if (cViewerState) {
+        const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
+        const o = cO.split(separator).map(s => decodeToNumber(s, {float: true}))
+        const po = cPO.split(separator).map(s => decodeToNumber(s, {float: true}))
+        const pz = decodeToNumber(cPZ)
+        const p = cP.split(separator).map(s => decodeToNumber(s))
+        const z = decodeToNumber(cZ)
+        this.store.dispatch({
+          type : CHANGE_NAVIGATION,
+          navigation : {
+            orientation: o,
+            perspectiveOrientation: po,
+            perspectiveZoom: pz,
+            position: p,
+            zoom: z
           }
         })
       }
@@ -241,13 +264,23 @@ export class AtlasViewerURLService{
                     isDefined(state[key].position) &&
                     isDefined(state[key].zoom)
                   ){
-                    _[key] = [
-                      state[key].orientation.join('_'),
-                      state[key].perspectiveOrientation.join('_'),
-                      state[key].perspectiveZoom,
-                      state[key].position.join('_'),
-                      state[key].zoom 
-                    ].join('__')
+                    const {
+                      orientation, 
+                      perspectiveOrientation, 
+                      perspectiveZoom, 
+                      position, 
+                      zoom
+                    } = state[key]
+
+                    _['cNavigation'] = [
+                      orientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      perspectiveOrientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      encodeNumber(Math.floor(perspectiveZoom)),
+                      Array.from(position).map((v:number) => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+                      encodeNumber(Math.floor(zoom)) 
+                    ].join(`${separator}${separator}`)
+                    
+                    _[key] = null
                   }
                   break;
                 case 'regionsSelected': {
@@ -274,7 +307,7 @@ export class AtlasViewerURLService{
 
                   for (let entry of ngIdLabelIndexMap) {
                     const [ ngId, labelIndicies ] = entry
-                    returnObj[ngId] = labelIndicies.map(encodeNumber).join(separator)
+                    returnObj[ngId] = labelIndicies.map(n => encodeNumber(n)).join(separator)
                   }
                   
                   _['cRegionsSelected'] = JSON.stringify(returnObj)
