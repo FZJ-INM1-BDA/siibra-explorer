@@ -9,12 +9,14 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain v17 left",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+      }],
       "properties": {
         "version": "1.0",
         "description": "not yet",
-        "publications": [],
-        "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "4400000"}],
-        "externalLink":  "https://doi.org/10.25493/8EGG-ZAR"
+        "publications": []
       },
       "regions": [
         {
@@ -5687,8 +5689,11 @@
       "surfaceParcellation": true,
       "ngData": null,
       "name": "Fibre Bundle Atlas - Long Bundle",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "fcbb049b-edd5-4fb5-acbc-7bf8ee933e24"
+      }],
       "properties": {
-        "externalLink":  "https://doi.org/10.25493/V5BH-P7P"
       },
       "regions": [
         {
@@ -5889,6 +5894,10 @@
       "surfaceParcellation": true,
       "ngData": null,
       "name": "Fibre Bundle Atlas - Short Bundle",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "f58e4425-6614-4ad9-ac26-5e946b1296cb"
+      }],
       "regions": [
         {
           "name": "Left Hemisphere",
@@ -6919,7 +6928,7 @@
     }
   ],
   "properties": {
-    "name": "MNI 152",
+    "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
     "description": "An unbiased non-linear average of multiple subjects from the MNI152 database, which provides high-spatial resolution and signal-to-noise while not being biased towards a single brain (Fonov et al., 2011). This template space is widely used as a reference space in neuroimaging. HBP provides the JuBrain probabilistic cytoarchitectonic atlas (Amunts/Zilles, 2015) as well as a probabilistic atlas of large fibre bundles (Guevara, Mangin et al., 2017) in this space."
   }
 }

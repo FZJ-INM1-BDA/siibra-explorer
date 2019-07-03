@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { dropdownAnimation } from "./dropdown.animation";
+import { HasExtraButtons, ExraBtnClickEvent } from '../radiolist/radiolist.component'
 
 @Component({
   selector : 'dropdown-component',
@@ -15,7 +16,7 @@ import { dropdownAnimation } from "./dropdown.animation";
 
 export class DropdownComponent{
 
-  @Input() inputArray : any[] = []
+  @Input() inputArray : HasExtraButtons[] = []
   @Input() selectedItem : any | null = null
   @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
@@ -23,7 +24,7 @@ export class DropdownComponent{
   @Input() activeDisplay : (obj:any|null)=>string = (obj)=>obj ? obj.name : `Please select an item.`
 
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
-  @Output() listItemButtonClicked: EventEmitter<any> = new EventEmitter()
+  @Output() extraBtnClicked: EventEmitter<ExraBtnClickEvent> = new EventEmitter()
 
   @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef
 
