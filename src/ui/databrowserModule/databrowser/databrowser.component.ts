@@ -74,7 +74,6 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.dbService.getDataByRegion({ regions, parcellation, template })
       .then(de => {
         this.dataentries = de
-        this.fetchingFlag = false
         return de
       })
       .then(this.dbService.getModalityFromDE)
@@ -83,8 +82,10 @@ export class DataBrowser implements OnDestroy,OnInit{
       })
       .catch(e => {
         console.error(e)
-        this.fetchingFlag = false
         this.fetchError = true
+      })
+      .finally(() => {
+        this.fetchingFlag = false
       })
 
     this.subscriptions.push(

@@ -2901,7 +2901,12 @@
                                 74,
                                 75
                               ],
+                              "synonyms":[
+                                "Area 44v",
+                                "Area 44d"
+                              ],
                               "labelIndex": 2,
+                              
                               "ngId": "jubrain colin v17 left",
                               "children": [],
                               "position": [
@@ -2916,6 +2921,10 @@
                                 54,
                                 74,
                                 75
+                              ],
+                              "synonyms":[
+                                "Area 44v",
+                                "Area 44d"
                               ],
                               "ngId": "jubrain colin v17 right",
                               "labelIndex": 2,

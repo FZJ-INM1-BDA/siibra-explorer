@@ -137,7 +137,8 @@ readConfigFile('waxholmRatV2_0.json')
 const filterByPRs = (prs, atlasPr) => atlasPr
   ? prs.some(pr => {
       const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
-      return atlasPr.some(aPr => regex.test(aPr.name))
+      return atlasPr.some(aPr => regex.test(aPr.name)
+        || aPr.synonyms && aPr.synonyms.length && aPr.synonyms.some(syn => syn === pr.name) )
     })
   : false
 
