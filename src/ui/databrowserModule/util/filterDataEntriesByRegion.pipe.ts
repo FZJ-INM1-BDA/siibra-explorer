@@ -34,7 +34,9 @@ export class FilterDataEntriesByRegion implements PipeTransform{
                 /**
                  * TODO replace pseudo id with real uuid
                  */
-                return (r.id && id && r.id === id) || regex.test(r.name)
+                return (r.id && id && r.id === id)
+                  || regex.test(r.name)
+                  || r.synonyms && r.synonyms.length && r.synonyms.some(syn => syn === name) 
                 /**
                  * more correct, but probably should use UUID in the future
                  */
