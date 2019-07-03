@@ -32,7 +32,7 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 }
 
 
-const cacheData = ({results, ...rest}) => {
+const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
   return cachedData
@@ -55,7 +55,7 @@ const getPublicDs = () => Promise.race([
 
 
 const getDs = ({ user }) => user
-  ? fetchDatasetFromKg({ user }).then(({results}) => results)
+  ? fetchDatasetFromKg({ user }).then(({ results }) => results)
   : getPublicDs()
 
 /**
@@ -78,7 +78,7 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
     filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', filename)
   }
   fs.readFile(filepath, 'utf-8', (err, data) => {
-    if(err) reject(err)
+    if (err) reject(err)
     resolve(data)
   })
 })
@@ -116,16 +116,16 @@ readConfigFile('waxholmRatV2_0.json')
  */
 const filterByPRs = (prs, atlasPr) => atlasPr
   ? prs.some(pr => {
-      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
-      return atlasPr.some(aPr => regex.test(aPr.name))
-    })
+    const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
+    return atlasPr.some(aPr => regex.test(aPr.name))
+  })
   : false
 
 const manualFilter = require('./supplements/parcellation')
 
 
-const filter = (datasets = [], {templateName, parcellationName}) => datasets
-  .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
+const filter = (datasets = [], { templateName, parcellationName }) => datasets
+  .filter(ds => commonSenseDsFilter({ ds, templateName, parcellationName }))
   .filter(ds => {
     if (/infant/.test(ds.name))
       return false
@@ -133,20 +133,20 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
       return ds.referenceSpaces.some(rs => rs.name === templateName)
     }
     if (parcellationName) {
-      if (parcellationName === 'Fibre Bundle Atlas - Long Bundle'){
+      if (parcellationName === 'Fibre Bundle Atlas - Long Bundle') {
         return manualFilterDWM(ds)
       }
       return ds.parcellationRegion.length > 0
         ? filterByPRs(
-            ds.parcellationRegion, 
-            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
-              ? juBrain
-              : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
-                ? shortBundle
-                : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
-                  ? waxholm
-                  : null
-          )
+          ds.parcellationRegion,
+          parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
+            ? juBrain
+            : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
+              ? shortBundle
+              : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
+                ? waxholm
+                : null
+        )
         : false
     }
 
@@ -171,12 +171,12 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
 exports.init = async () => {
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
-  const {results = []} = await fetchDatasetFromKg()
+  const { results = [] } = await fetchDatasetFromKg()
   cachedData = results
 }
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
-    .then(json => filter(json, {templateName, parcellationName}))
+  .then(json => filter(json, { templateName, parcellationName }))
 
 exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
@@ -185,82 +185,121 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg, user }) => {
-   try {
-    const coordsString = queryArg.split('__');
-    const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
 
-    if (templateName === 'Waxholm Space rat brain atlas v.2.0') {
-        const boundingBoxInWaxhomV2VoxelSpace = boundingBoxCorners.map(transformWaxholmV2NmToVoxel)
-        const spatialData = await fetchSpatialData({boundingBoxInWaxhomV2VoxelSpace, user})
-        if (spatialData.length) {
-            return spatialData
-        } else {
-            return []
-        }
+/**
+ * TODO change to URL constructor to improve readability
+ */
+const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinates/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
+
+const getXformFn = (templateSpace) => {
+  const _ = {}
+  switch(templateSpace){
+    case 'Waxholm Space rat brain atlas v.2.0': 
+      _['nmToVoxel'] = transformWaxholmV2NmToVoxel
+      _['voxelToNm'] = transformWaxholmV2VoxelToNm
+      break;
+    default: {
+      _['nmToVoxel'] = defaultXform
+      _['voxelToNm'] = defaultXform
     }
-   } catch (e) {
-    console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
-    return []
+  }
+  return _
+}
+
+const getSpatialSearcParam = ({ templateName, queryArg }) => {
+  let kgSpaceName
+  const { nmToVoxel } = getXformFn(templateName)
+
+  const coordsString = queryArg.split('__');
+  const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
+  const bbInVoxelSpace = boundingBoxCorners.map(nmToVoxel)
+
+  switch (templateName){
+    case 'Waxholm Space rat brain atlas v.2.0':
+      kgSpaceName = 'waxholmV2'
+      break;
+    default: 
+      kgSpaceName = templateName
+  }
+  return {
+    boundingBox: `${kgSpaceName}:${bbInVoxelSpace.map(v => v.join(',')).join(',')}`
   }
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg, user })
+const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, user }) => {
+
+  const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+
+  const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
+  const url = require('url')
+  const search = new url.URLSearchParams()
+  
+  for (let key in _) {
+    search.append(key, _[key])  
+  }
+  if (releasedOnly) search.append('databaseScope', 'RELEASED')
+  
+  const _url = `${spatialQuery}&${search.toString()}`
+  return await new Promise((resolve, reject) => {
+    request(_url, option, (err, resp, body) => {
+      if (err)
+        return reject(err)
+      if (resp.statusCode >= 400) {
+        return reject(resp.statusCode)
+      }
+      const json = JSON.parse(body)
+
+      const { voxelToNm } = getXformFn(templateName)
+
+      const _ = json.results.map(({ name, coordinates}) => {
+        return {
+          name,
+          templateSpace: templateName,
+          geometry: {
+            type: 'point',
+            space: 'real',
+            position: voxelToNm([
+              coordinates[0].x,
+              coordinates[0].y,
+              coordinates[0].z
+            ])
+          }
+        }
+      })
+
+      return resolve(_)
+    })
+  })
 }
 
-async function fetchSpatialData({ user, boundingBoxInWaxhomV2VoxelSpace }) {
-    const { releasedOnly, option } = await getUserKGRequestInfo({ user })
-    const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinates/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
-
-    return await new Promise((resolve, reject) => {
-        // ToDo need too add: "${releasedOnly ? '&databaseScope=RELEASED' : ''}"
-        request(`${spatialQuery}&boundingBox=waxholmV2:${boundingBoxInWaxhomV2VoxelSpace.map(cornerCoord => cornerCoord.join(',')).join(',')}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
-            if (err)
-                return reject(err)
-            if (resp.statusCode >= 400) {
-                return reject(resp.statusCode)
-            }
-
-            const json = JSON.parse(body).results.map(res => {
-                return {name: res.name,
-                      templateSpace: res['dataset'][0]['name'],
-                      geometry: {
-                        type: "point",
-                        space: "real",
-                        position: transformVoxelToWaxholmV2Nm ([
-                            res['coordinates'][0]['x'],
-                            res['coordinates'][0]['y'],
-                            res['coordinates'][0]['z'],
-
-                        ])}
-                      }
-            })
-            return resolve(json)
-        })
-    })
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
+  /**
+   * Local data can be injected here
+   */
+  return await fetchSpatialDataFromKg({ templateName, queryGeometry, queryArg, user })
 }
 
 async function getUserKGRequestInfo({ user }) {
-    const accessToken = user && user.tokenset && user.tokenset.access_token
-    const releasedOnly = !accessToken
-    let publicAccessToken
-    if (!accessToken && getPublicAccessToken) {
-        publicAccessToken = await getPublicAccessToken()
+  const accessToken = user && user.tokenset && user.tokenset.access_token
+  const releasedOnly = !accessToken
+  let publicAccessToken
+  if (!accessToken && getPublicAccessToken) {
+    publicAccessToken = await getPublicAccessToken()
+  }
+  const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+    ? {
+      auth: {
+        'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+      }
     }
-    const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-        ? {
-            auth: {
-                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-            }
-        }
-        : {}
+    : {}
 
-    return {option, releasedOnly}
+  return {option, releasedOnly}
 }
 
 /**
- * 
+ * perhaps export the xform fns into a different module
+ * ideally, in the future, KG can handle xform of voxel to nm
  */
 const transformWaxholmV2NmToVoxel = (coord) => {
   /**
@@ -271,19 +310,19 @@ const transformWaxholmV2NmToVoxel = (coord) => {
    * atlas viewer applies translation (below in nm) in order to center the brain
    * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
    */
-  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
 
   /**
    * mm/voxel
    */
   const voxelDim = [0.0390625, 0.0390625, 0.0390625]
-  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
+  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx])
 }
 
-const transformVoxelToWaxholmV2Nm = (coord) => {
-  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
+const transformWaxholmV2VoxelToNm = (coord) => {
+  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
   const voxelDim = [0.0390625, 0.0390625, 0.0390625]
   return coord.map((v, idx) => (v * voxelDim[idx]) + transl[idx])
 }
 
-    
+const defaultXform = (coord) => coord
