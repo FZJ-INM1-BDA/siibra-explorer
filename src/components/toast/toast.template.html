@@ -1,29 +1,45 @@
-<div (mouseenter) = "hover = true" (mouseleave)="hover = false" container>
-  <div message>
-    <ng-template #messageContainer>
+<div
+  class="d-flex flex-column m-auto"
+  (mouseenter)="hover = true"
+  (mouseleave)="hover = false"
+  container>
 
-    </ng-template>
+  <!-- body -->
+  <div class="d-flex flex-row justify-content-between align-items-start">
+
+    <!-- contents -->
+    <div message>
+      <ng-template #messageContainer>
+  
+      </ng-template>
+    </div>
+    <div message
+      [innerHTML]="htmlMessage"
+      *ngIf = "htmlMessage">
+    </div>
+    <div
+      message
+      *ngIf="message && !htmlMessage">
+      {{ message }}
+    </div>
+
+    <!-- dismiss btn -->
+    <div
+      (click)="dismiss($event)"
+      class="m-2"
+      *ngIf="dismissable" close>
+      <i class="fas fa-times"></i>
+    </div>
   </div>
-  <div message
-    [innerHTML]="htmlMessage"
-    *ngIf = "htmlMessage">
-  </div>
-  <div
-    message
-    *ngIf="message && !htmlMessage">
-    {{ message }}
-  </div>
-  <div
-    (click)="dismiss($event)"
-    class="ml-2"
-    *ngIf="dismissable" close>
-    <i class="fas fa-times"></i>
-  </div>
+
+  <!-- timer -->
   <timer-component
+    class="flex-"
     *ngIf="timeout > 0"
     (timerEnd)="dismissed.emit(false)"
     [pause]="hover"
     [timeout]="timeout"
     timer>
   </timer-component>
+
 </div>

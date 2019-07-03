@@ -7,8 +7,9 @@
     (itemSelected)="changeTemplate($event)"
     [activeDisplay]="displayActiveTemplate"
     [selectedItem]="selectedTemplate$ | async"
-    [inputArray]="loadedTemplates$ | async | filterNull"
+    [inputArray]="loadedTemplates$ | async | filterNull | templateParcellationsDecorationPipe"
     [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
+    (extraBtnClicked)="handleExtraBtnClicked($event, 'template')"
     (listItemButtonClicked)="showInfoToast($event, 'template')">
   </dropdown-component>
 
@@ -19,9 +20,10 @@
       [checkSelected]="compareParcellation"
       [activeDisplay]="displayActiveParcellation"
       [selectedItem]="selectedParcellation"
-      [inputArray]="selectedTemplate.parcellations"
+      [inputArray]="selectedTemplate.parcellations | templateParcellationsDecorationPipe"
       [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-      (listItemButtonClicked)="showInfoToast($event, 'parcellation')">>
+      (extraBtnClicked)="handleExtraBtnClicked($event, 'parcellation')"
+      (listItemButtonClicked)="showInfoToast($event, 'parcellation')">
 
     </dropdown-component>
     <region-hierarchy
@@ -76,28 +78,16 @@
   </div>
 </div>
 
+<!-- TODO somehow, using async pipe here does not work -->
+<!-- maybe have something to do with bufferTime, and that it replays from the beginning?  -->
 <ng-template #publicationTemplate>
-  <div *ngIf="loadedTemplates$ | async as loadedTemplates">
-    <div *ngIf="chosenTemplateIndex !== null; else parcellationToast">
-      <reference-toast-component *ngIf="loadedTemplates[chosenTemplateIndex]['properties'] && (loadedTemplates[chosenTemplateIndex]['properties']['description'] || loadedTemplates[chosenTemplateIndex]['properties']['publications'])"
-                               [templateName] = "loadedTemplates[chosenTemplateIndex]['name'] ? loadedTemplates[chosenTemplateIndex]['name'] : null"
-                               [templateDescription] = "loadedTemplates[chosenTemplateIndex]['properties']['description']? loadedTemplates[chosenTemplateIndex]['properties']['description'] : null"
-                               [templatePublications] = "loadedTemplates[chosenTemplateIndex]['properties']['publications']? loadedTemplates[chosenTemplateIndex]['properties']['publications']: null"
-                               [templateExternalLink] ="loadedTemplates[chosenTemplateIndex]['properties']['externalLink']? loadedTemplates[chosenTemplateIndex]['properties']['externalLink']: null">
-      </reference-toast-component>
-    </div>
-    <ng-template #parcellationToast>
-      <div *ngIf="(selectedTemplate$ | async) as selectedTemplate">
-        <div *ngIf="selectedTemplate.parcellations[chosenParcellationIndex]['properties'] && (selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description'] || selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications'])">
-        <reference-toast-component
-              [parcellationName] = "selectedTemplate.parcellations[chosenParcellationIndex]['name']? selectedTemplate.parcellations[chosenParcellationIndex]['name'] : null"
-              [parcellationDescription] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['description'] : null"
-              [parcellationPublications] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['publications']: null"
-              [parcellationNifti] = "selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['nifti'] : null"
-              [parcellationExternalLink] ="selectedTemplate.parcellations[chosenParcellationIndex]['properties']['externalLink']? selectedTemplate.parcellations[chosenParcellationIndex]['properties']['externalLink']: null">
-        </reference-toast-component>
-        </div>
-      </div>
-    </ng-template>
-  </div>
+  <single-dataset-view
+    *ngFor="let focusedDataset of focusedDatasets"
+    [name]="focusedDataset.name"
+    [description]="focusedDataset.description"
+    [publications]="focusedDataset.publications"
+    [kgSchema]="focusedDataset.kgSchema"
+    [kgId]="focusedDataset.kgId">
+    
+  </single-dataset-view>
 </ng-template>

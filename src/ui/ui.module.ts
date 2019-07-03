@@ -45,8 +45,8 @@ import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
-import { AngularMaterialModule } from "./sharedModules/angularMaterial.module";
-import {ReferenceToastComponent} from "src/ui/referenceToast/referenceToast.component";
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 
 
 @NgModule({
@@ -83,7 +83,6 @@ import {ReferenceToastComponent} from "src/ui/referenceToast/referenceToast.comp
     StatusCardComponent,
     CookieAgreement,
     KGToS,
-    ReferenceToastComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -97,6 +96,7 @@ import {ReferenceToastComponent} from "src/ui/referenceToast/referenceToast.comp
     FilterNullPipe,
     FilterNgLayer,
     FilterNameBySearch,
+    TemplateParcellationsDecorationPipe,
 
     /* directive */
     DownloadDirective,
@@ -127,9 +127,7 @@ import {ReferenceToastComponent} from "src/ui/referenceToast/referenceToast.comp
     SigninModal,
     CookieAgreement,
     KGToS,
-    AngularMaterialModule,
-    StatusCardComponent,
-    ReferenceToastComponent
+    StatusCardComponent
   ]
 })
 

@@ -11,15 +11,18 @@
     (click)="itemSelected.emit({previous: selectedItem, current: input})">
     
     <span class="dropdown-item-1 textSpan"
-          #DropDownText
-          [innerHTML] = "listDisplay(input)"
-          [style.fontWeight] = "checkSelected(selectedItem, input)? 'bold' : ''"
-          [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
+      #DropDownText
+      [innerHTML]="listDisplay(input)"
+      [ngClass]="checkSelected(selectedItem, input) ? 'font-weight-bold' : ''"
+      [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
     </span>
 
-    <span *ngIf="input['properties'] && (input['properties']['publications'] || input['properties']['description'])"
-          class="infoIcon align-self-end" (click)="clickListButton(i);$event.stopPropagation()">
-      i
-    </span>
+    <ng-container *ngIf="input.extraButtons as extraButtons">
+      <span *ngFor="let extraBtn of extraButtons"
+        [ngClass]="extraBtn.class"
+        (click)="handleExtraBtnClick(extraBtn, input, $event)">
+        <i [ngClass]="extraBtn.faIcon"></i>
+      </span>
+    </ng-container>
   </li>
 </ul>

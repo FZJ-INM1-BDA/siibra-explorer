@@ -20,20 +20,40 @@ export class RadioList{
   selectedItem: any | null = null
 
   @Input()
-  inputArray: any[] = []
+  inputArray: HasExtraButtons[] = []
 
   @Input()
   ulClass: string = ''
   
   @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
-  @Output() listItemButtonClicked = new EventEmitter<string>();
+  @Output() extraBtnClicked = new EventEmitter<ExraBtnClickEvent>()
 
-  clickListButton(i) {
-    this.listItemButtonClicked.emit(i)
+  handleExtraBtnClick(extraBtn:ExtraButton, inputItem:any, event:MouseEvent){
+    this.extraBtnClicked.emit({
+      extraBtn,
+      inputItem,
+      event
+    })
   }
 
   overflowText(event) {
     return (event.offsetWidth < event.scrollWidth)
   }
+}
+
+interface ExtraButton{
+  name: string,
+  faIcon: string
+  class?: string
+}
+
+export interface HasExtraButtons{
+  extraButtons?: ExtraButton[]
+}
+
+export interface ExraBtnClickEvent{
+  extraBtn:ExtraButton
+  inputItem:any
+  event:MouseEvent
 }

@@ -12,6 +12,7 @@ div[container]
   align-items: center;
   padding : 0.3em 1em 0em 1em;
   pointer-events: all;
+  max-width:80%;
 }
 
 :host-context([darktheme="false"]) div[container]
@@ -36,8 +37,10 @@ div[close]
 {
   display:inline-block;
 }
+
 timer-component
 {
+  flex: 0 0 0.5em;
   margin: 0 -1em;
   height:0.5em;
   width: calc(100% + 2em);

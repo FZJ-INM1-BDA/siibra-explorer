@@ -3,7 +3,7 @@ module.exports = {
     rules : [
       {
         test : /(html|css)$/,
-        exclude : /export\_nehuba|index|plugin\_examples/,
+        exclude : /export\_nehuba|index|plugin\_examples|indigo-pink\.css/,
         use : {
           loader : 'file-loader',
           options : {

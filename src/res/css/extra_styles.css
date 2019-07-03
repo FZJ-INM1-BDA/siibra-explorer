@@ -341,3 +341,8 @@ markdown-dom pre code
 {
   opacity: 0.5;
 }
+
+[darktheme="true"] .card
+{
+  background:none;
+}
