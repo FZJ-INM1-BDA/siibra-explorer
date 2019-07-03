@@ -203,7 +203,8 @@ export class SigninBanner implements OnInit, OnDestroy{
         this.store.dispatch({
           type: CHANGE_NAVIGATION,
           navigation: {
-            position: region.position
+            position: region.position,
+            animation: {}
           }
         })
       } else {

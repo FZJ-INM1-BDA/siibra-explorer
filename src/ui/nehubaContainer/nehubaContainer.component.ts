@@ -1090,7 +1090,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
      */
     Object.keys(_navigation).forEach(key => (!_navigation[key]) && delete _navigation[key])
     
-    if( animation ){
+    const { animation: globalAnimationFlag } = this.viewerConfig
+    if( globalAnimationFlag && animation ){
       /* animated */
 
       const gen = timedValues()
