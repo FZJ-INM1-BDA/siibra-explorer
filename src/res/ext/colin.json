@@ -9,12 +9,14 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain colin v17 left",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+      }],
       "properties": {
         "version": "1.0",
         "description": "not yet",
-        "publications": [],
-        "nifti": [{"file":  "jubrain-max-pmap-v22c_space-mnicolin27.nii", "size": "4400000"}],
-        "externalLink":  "https://doi.org/10.25493/8EGG-ZAR"
+        "publications": []
       },
       "regions": [
         {
@@ -837,6 +839,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 7A"
+                          ],
                           "rgb": [
                             38,
                             204,
@@ -1177,6 +1182,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 3b"
+                          ],
                           "rgb": [
                             239,
                             246,
@@ -1324,6 +1332,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFm"
+                          ],
                           "rgb": [
                             53,
                             76,
@@ -1370,6 +1381,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFop"
+                          ],
                           "rgb": [
                             146,
                             153,
@@ -1416,6 +1430,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PF"
+                          ],
                           "rgb": [
                             226,
                             211,
@@ -1462,6 +1479,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGp"
+                          ],
                           "rgb": [
                             92,
                             116,
@@ -1508,6 +1528,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGa"
+                          ],
                           "rgb": [
                             42,
                             236,
@@ -1554,6 +1577,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFt"
+                          ],
                           "rgb": [
                             120,
                             135,
@@ -1600,6 +1626,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFcm"
+                          ],
                           "rgb": [
                             98,
                             128,
@@ -2390,6 +2419,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area hOc1"
+                          ],
                           "rgb": [
                             190,
                             132,
@@ -2886,6 +2918,10 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 44v",
+                            "Area 44d"
+                          ],
                           "rgb": [
                             54,
                             74,
@@ -2900,6 +2936,7 @@
                                 75
                               ],
                               "labelIndex": 2,
+                              
                               "ngId": "jubrain colin v17 left",
                               "children": [],
                               "position": [
@@ -2932,6 +2969,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 45"
+                          ],
                           "rgb": [
                             167,
                             103,
@@ -3299,6 +3339,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 4p"
+                          ],
                           "rgb": [
                             116,
                             92,
@@ -4566,6 +4609,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area Te1"
+                          ],
                           "rgb": [
                             252,
                             84,
@@ -4621,6 +4667,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG1"
+                          ],
                           "rgb": [
                             131,
                             183,
@@ -4759,6 +4808,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG2"
+                          ],
                           "rgb": [
                             67,
                             94,

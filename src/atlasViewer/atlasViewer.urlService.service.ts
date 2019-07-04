@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER, generateLabelIndexId } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER } from "../services/stateStore.service";
 import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { PluginServices } from "./atlasViewer.pluginService.service";
-import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { AtlasViewerConstantsServices, encodeNumber, separator, decodeToNumber } from "./atlasViewer.constantService.service";
 import { ToastService } from "src/services/toastService.service";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 
@@ -148,6 +148,9 @@ export class AtlasViewerURLService{
         /**
          * either or both parcellationToLoad and .regions maybe empty
          */
+        /**
+         * backwards compatibility
+         */
         const selectedRegionsParam = searchparams.get('regionsSelected')
         if(selectedRegionsParam){
           const ids = selectedRegionsParam.split('_')
@@ -156,6 +159,34 @@ export class AtlasViewerURLService{
             type : SELECT_REGIONS_WITH_ID,
             selectRegionIds: ids
           })
+        }
+
+        const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
+        if (cRegionsSelectedParam) {
+          try {
+            const json = JSON.parse(cRegionsSelectedParam)
+  
+            const selectRegionIds = []
+  
+            for (let ngId in json) {
+              const val = json[ngId]
+              const labelIndicies = val.split(separator).map(n =>decodeToNumber(n))
+              for (let labelIndex of labelIndicies) {
+                selectRegionIds.push(`${ngId}#${labelIndex}`)
+              }
+            }
+  
+            this.store.dispatch({
+              type: SELECT_REGIONS_WITH_ID,
+              selectRegionIds
+            })
+  
+          } catch (e) {
+            /**
+             * parsing cRegionSelected error
+             */
+            console.log('parsing cRegionSelected error', e)
+          }
         }
       }
       
@@ -171,6 +202,26 @@ export class AtlasViewerURLService{
             perspectiveZoom : Number(pz),
             position : p.split('_').map(n=>Number(n)),
             zoom : Number(z)
+          }
+        })
+      }
+
+      const cViewerState = searchparams.get('cNavigation')
+      if (cViewerState) {
+        const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
+        const o = cO.split(separator).map(s => decodeToNumber(s, {float: true}))
+        const po = cPO.split(separator).map(s => decodeToNumber(s, {float: true}))
+        const pz = decodeToNumber(cPZ)
+        const p = cP.split(separator).map(s => decodeToNumber(s))
+        const z = decodeToNumber(cZ)
+        this.store.dispatch({
+          type : CHANGE_NAVIGATION,
+          navigation : {
+            orientation: o,
+            perspectiveOrientation: po,
+            perspectiveZoom: pz,
+            position: p,
+            zoom: z
           }
         })
       }
@@ -213,18 +264,56 @@ export class AtlasViewerURLService{
                     isDefined(state[key].position) &&
                     isDefined(state[key].zoom)
                   ){
-                    _[key] = [
-                      state[key].orientation.join('_'),
-                      state[key].perspectiveOrientation.join('_'),
-                      state[key].perspectiveZoom,
-                      state[key].position.join('_'),
-                      state[key].zoom 
-                    ].join('__')
+                    const {
+                      orientation, 
+                      perspectiveOrientation, 
+                      perspectiveZoom, 
+                      position, 
+                      zoom
+                    } = state[key]
+
+                    _['cNavigation'] = [
+                      orientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      perspectiveOrientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      encodeNumber(Math.floor(perspectiveZoom)),
+                      Array.from(position).map((v:number) => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+                      encodeNumber(Math.floor(zoom)) 
+                    ].join(`${separator}${separator}`)
+                    
+                    _[key] = null
                   }
                   break;
-                case 'regionsSelected':
-                  _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                case 'regionsSelected': {
+                  // _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                  const ngIdLabelIndexMap : Map<string, number[]> = state[key].reduce((acc, curr) => {
+                    const returnMap = new Map(acc)
+                    const { ngId, labelIndex } = curr
+                    const existingArr = (returnMap as Map<string, number[]>).get(ngId)
+                    if (existingArr) {
+                      existingArr.push(labelIndex)
+                    } else {
+                      returnMap.set(ngId, [labelIndex])
+                    }
+                    return returnMap
+                  }, new Map())
+
+                  if (ngIdLabelIndexMap.size === 0) {
+                    _['cRegionsSelected'] = null
+                    _[key] = null
+                    break;
+                  }
+                  
+                  const returnObj = {}
+
+                  for (let entry of ngIdLabelIndexMap) {
+                    const [ ngId, labelIndicies ] = entry
+                    returnObj[ngId] = labelIndicies.map(n => encodeNumber(n)).join(separator)
+                  }
+                  
+                  _['cRegionsSelected'] = JSON.stringify(returnObj)
+                  _[key] = null
                   break;
+                }
                 case 'templateSelected':
                 case 'parcellationSelected':
                   _[key] = state[key].name

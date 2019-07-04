@@ -1,4 +1,4 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef, Renderer2 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
@@ -12,6 +12,7 @@ import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 
+import '@angular/material/prebuilt-themes/indigo-pink.css'
 import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
@@ -52,7 +53,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
-  @ViewChild('publications') publications: TemplateRef<any>
   @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
@@ -94,8 +94,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  dismissToastHandler: any
-
   get toggleMessage(){
     return this.constantsService.toggleMessage
   }
@@ -111,6 +109,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private toastService: ToastService,
+    private rd: Renderer2
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -228,19 +227,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
-
-        if ((this.selectedParcellation['properties'] &&
-            (this.selectedParcellation['properties']['publications'] || this.selectedParcellation['properties']['description']))
-            || (this.selectedTemplate['properties'] &&
-                (this.selectedTemplate['properties']['publications'] || this.selectedTemplate['properties']['description']))) {
-          if (this.dismissToastHandler) {
-            this.dismissToastHandler()
-            this.dismissToastHandler = null
-          }
-          this.dismissToastHandler = this.toastService.showToast(this.publications, {
-              timeout: 7000
-          })
-        }
       })
     )
   }
@@ -334,6 +320,19 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     
+    /**
+     * preload the main bundle after atlas viewer has been loaded. 
+     * This should speed up where user first navigate to the home page,
+     * and the main.bundle should be downloading after atlasviewer has been rendered
+     */
+    if (this.meetsRequirement) {
+      const prefecthMainBundle = this.rd.createElement('link')
+      prefecthMainBundle.rel = 'preload'
+      prefecthMainBundle.as = 'script'
+      prefecthMainBundle.href = 'main.bundle.js'
+      this.rd.appendChild(document.head, prefecthMainBundle)
+    }
+
     /**
      * Show Cookie disclaimer if not yet agreed
      */

@@ -1,13 +1,14 @@
-import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef} from "@angular/core";
+import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef } from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { Subscription, Observable } from "rxjs";
+import { Subscription, Observable, merge, Subject, interval } from "rxjs";
 import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, CHANGE_NAVIGATION } from "src/services/stateStore.service";
-import { map, filter, distinctUntilChanged } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, bufferTime, delay, share, tap } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
 import { ToastService } from "src/services/toastService.service";
+import { getSchemaIdFromName } from "src/util/pipes/templateParcellationDecoration.pipe";
 
 const compareParcellation = (o, n) => o.name === n.name
 
@@ -36,9 +37,10 @@ export class SigninBanner implements OnInit, OnDestroy{
 
   @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
 
-  dismissToastHandler: any
-  chosenTemplateIndex: number
-  chosenParcellationIndex: number
+  public focusedDatasets$: Observable<any[]>
+  private userFocusedDataset$: Subject<any> = new Subject()
+  public focusedDatasets: any[] = []
+  private dismissToastHandler: () => void
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
@@ -54,14 +56,15 @@ export class SigninBanner implements OnInit, OnDestroy{
 
     this.selectedTemplate$ = this.store.pipe(
       select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o, n) => o.templateSelected.name === n.templateSelected.name),
-      map(state => state.templateSelected)
+      select('templateSelected'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.name === n.name),
     )
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
       select('parcellationSelected'),
+      filter(v => !!v)
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -69,6 +72,43 @@ export class SigninBanner implements OnInit, OnDestroy{
       safeFilter('regionsSelected'),
       map(state => state.regionsSelected),
       distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
+    )
+
+    this.focusedDatasets$ = merge(
+      this.selectedTemplate$.pipe(
+        map(v => [v])
+      ),
+      this.selectedParcellation$.pipe(
+        distinctUntilChanged((o, n) => o.name === n.name),
+        map(p => {
+          if (!p.originDatasets || !p.originDatasets.map) return [p]
+          return p.originDatasets.map(od => {
+            return {
+              ...p,
+              ...od
+            }
+          })
+        })
+      ),
+      this.userFocusedDataset$.pipe(
+        filter(v => !!v)
+      )
+    ).pipe(
+      bufferTime(100),
+      map(arrOfArr => arrOfArr.reduce((acc, curr) => acc.concat(curr), [])),
+      filter(arr => arr.length > 0),
+      /**
+       * merge properties field with the root level
+       * with the prop in properties taking priority
+       */
+      map(arr => arr.map(item => {
+        const { properties } = item
+        return {
+          ...item,
+          ...properties
+        }
+      })),
+      share()
     )
   }
 
@@ -80,7 +120,28 @@ export class SigninBanner implements OnInit, OnDestroy{
       })
     )
     this.subscriptions.push(
-        this.selectedTemplate$.subscribe(template => this.selectedTemplate = template)
+      this.selectedTemplate$.subscribe(template => this.selectedTemplate = template)
+    )
+
+    this.subscriptions.push(
+      this.focusedDatasets$.subscribe(() => {
+        if (this.dismissToastHandler) this.dismissToastHandler()
+      })
+    )
+
+    this.subscriptions.push(
+      this.focusedDatasets$.pipe(
+        /**
+         * creates the illusion that the toast complete disappears before reappearing
+         */
+        delay(100)
+      ).subscribe(arr => {
+        this.focusedDatasets = arr
+        this.dismissToastHandler = this.toastService.showToast(this.publicationTemplate, {
+          dismissable: true,
+          timeout:7000
+        })
+      })
     )
   }
 
@@ -89,8 +150,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   }
 
   changeTemplate({ current, previous }){
-    if (previous && current && current.name === previous.name)
-      return
+    if (previous && current && current.name === previous.name) return
     this.store.dispatch({
       type: NEWVIEWER,
       selectTemplate: current,
@@ -101,8 +161,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   changeParcellation({ current, previous }){
     const { ngId: prevNgId} = previous
     const { ngId: currNgId} = current
-    if (prevNgId === currNgId)
-      return
+    if (prevNgId === currNgId) return
     this.store.dispatch({
       type: SELECT_PARCELLATION,
       selectParcellation: current
@@ -111,8 +170,7 @@ export class SigninBanner implements OnInit, OnDestroy{
 
   // TODO handle mobile
   handleRegionClick({ mode = 'single', region }){
-    if (!region)
-      return
+    if (!region) return
     
     /**
      * single click on region hierarchy => toggle selection
@@ -145,7 +203,8 @@ export class SigninBanner implements OnInit, OnDestroy{
         this.store.dispatch({
           type: CHANGE_NAVIGATION,
           navigation: {
-            position: region.position
+            position: region.position,
+            animation: {}
           }
         })
       } else {
@@ -180,17 +239,23 @@ export class SigninBanner implements OnInit, OnDestroy{
     })
   }
 
-  showInfoToast($event, toastType) {
-    this.chosenTemplateIndex = toastType === 'template'? $event : null
-    this.chosenParcellationIndex = toastType === 'parcellation'? $event : null
+  handleExtraBtnClicked(event, toastType: 'parcellation' | 'template'){
+    const { 
+      extraBtn,
+      inputItem,
+      event: extraBtnClickEvent
+    } = event
 
-    if (this.dismissToastHandler) {
-      this.dismissToastHandler()
-      this.dismissToastHandler = null
-    }
-    this.dismissToastHandler = this.toastService.showToast(this.publicationTemplate, {
-      timeout: 7000
-    })
+    const { name } = extraBtn
+    const { kgSchema, kgId } = getSchemaIdFromName(name)
+
+    this.userFocusedDataset$.next([{
+      ...inputItem,
+      kgSchema,
+      kgId
+    }])
+
+    extraBtnClickEvent.stopPropagation()
   }
 
   get isMobile(){

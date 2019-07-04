@@ -1,0 +1,54 @@
+<div class="card">
+  <div class="card-body">
+
+    <!-- title -->
+    <h5 class="card-title">
+      {{ name }}
+    </h5>
+
+    <!-- description -->
+    <p class="card-text">
+      {{ description }}
+    </p>
+
+    <hr>
+    <!-- publications -->
+    <a
+      *ngFor="let publication of publications"
+      [href]="'https://doi.org/' + publication.doi"
+      target="_blank">
+      {{ publication.cite }}
+    </a>
+
+    <!-- footer -->
+    <div class="d-flex justify-content-end">
+
+      <!-- explore -->
+      <a
+        *ngFor="let kgRef of appendedKgReferences"
+        class="m-2"
+        mat-raised-button
+        color="primary"
+        [href]="kgRef"
+        target="_blank">
+        <span>
+          Explore
+        </span>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+
+      <!-- download -->
+      <a
+        class="m-2"
+        *ngIf="files.length > 0"
+        mat-raised-button
+        color="primary">
+        <span>
+          Download Zip
+        </span>
+        <span *ngIf="false">({{ numOfFiles }} files ~ {{ totalFileByteSize / 1e6 | number: '.1-2' }} MB)</span>
+        <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+      </a>
+    </div>
+  </div>
+</div>

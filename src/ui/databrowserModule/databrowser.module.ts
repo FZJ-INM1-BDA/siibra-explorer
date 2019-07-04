@@ -21,6 +21,9 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { UtilModule } from "src/util/util.module";
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
+import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
+import { SingleDatasetView } from './singleDataset/singleDataset.component'
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 
 @NgModule({
   imports:[
@@ -29,6 +32,7 @@ import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
     ComponentsModule,
     FormsModule,
     UtilModule,
+    AngularMaterialModule,
     TooltipModule.forRoot(),
     PopoverModule.forRoot()
   ],
@@ -41,6 +45,7 @@ import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
     RadarChart,
     LineChart,
     DedicatedViewer,
+    SingleDatasetView,
 
     /**
      * pipes
@@ -52,10 +57,14 @@ import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
     AggregateArrayIntoRootPipe
   ],
   exports:[
-    DataBrowser
+    DataBrowser,
+    SingleDatasetView
   ],
   entryComponents:[
     DataBrowser
+  ],
+  providers: [
+    KgSingleDatasetService
   ]
   /**
    * shouldn't need bootstrap, so no need for browser module

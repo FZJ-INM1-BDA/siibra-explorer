@@ -291,3 +291,97 @@ export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
   ['preact@8.4.2',parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
   ['d3@5.7.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')]
 ])
+
+/**
+ * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)
+ * The constraint is that the cipher needs to be commpatible with URI encoding
+ * and a URI compatible separator is required. 
+ * 
+ * The implementation below came from 
+ * https://stackoverflow.com/a/6573119/6059235
+ * 
+ * While a faster solution exist in the same post, this operation is expected to be done:
+ * - once per 1 sec frequency
+ * - on < 1000 numbers
+ * 
+ * So performance is not really that important (Also, need to learn bitwise operation)
+ */
+
+const cipher = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-'
+export const separator = "."
+const negString = '~'
+
+const encodeInt = (number: number) => {
+  if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY)
+    throw 'The input is not valid'
+
+  let rixit // like 'digit', only in some non-decimal radix 
+  let residual
+  let result = ''
+
+  if (number < 0) {
+    result += negString
+    residual = Math.floor(number * -1)
+  } else {
+    residual = Math.floor(number)
+  }
+
+  while (true) {
+    rixit = residual % 64
+    // console.log("rixit : " + rixit)
+    // console.log("result before : " + result)
+    result = cipher.charAt(rixit) + result
+    // console.log("result after : " + result)
+    // console.log("residual before : " + residual)
+    residual = Math.floor(residual / 64)
+    // console.log("residual after : " + residual)
+
+    if (residual == 0)
+      break;
+    }
+  return result
+}
+
+interface B64EncodingOption {
+  float: boolean
+}
+
+const defaultB64EncodingOption = {
+  float: false
+}
+
+export const encodeNumber: (number:number, option?: B64EncodingOption) => string = (number: number, { float = false }: B64EncodingOption = defaultB64EncodingOption) => {
+  if (!float) return encodeInt(number)
+  else {
+    const floatArray = new Float32Array(1)
+    floatArray[0] = number
+    const intArray = new Uint32Array(floatArray.buffer)
+    const castedInt = intArray[0]
+    return encodeInt(castedInt)
+  }
+}
+
+const decodetoInt = (encodedString: string) => {
+  let _encodedString, negFlag = false
+  if (encodedString.slice(-1) === negString) {
+    negFlag = true
+    _encodedString = encodedString.slice(0, -1)
+  } else {
+    _encodedString = encodedString
+  }
+  return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc,curr) => {
+    return acc * 64 + cipher.indexOf(curr)
+  }, 0)
+}
+
+export const decodeToNumber: (encodedString:string, option?: B64EncodingOption) => number = (encodedString: string, {float = false} = defaultB64EncodingOption) => {
+  if (!float) return decodetoInt(encodedString)
+  else {
+    const _int = decodetoInt(encodedString)
+    const intArray = new Uint32Array(1)
+    intArray[0] = _int
+    const castedFloat = new Float32Array(intArray.buffer)
+    return castedFloat[0]
+  }
+}

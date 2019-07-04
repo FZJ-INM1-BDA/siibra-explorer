@@ -1,5 +1,7 @@
+import { TemplateRef } from "@angular/core";
+
 export class ToastHandler{
-  message : string = 'handler.body'
+  message : string | TemplateRef<any> = 'handler.body'
   timeout : number = 3000
   dismissable : boolean = true
   show : () => void

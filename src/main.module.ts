@@ -10,6 +10,7 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { FormsModule } from "@angular/forms";
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 
 import { AtlasViewerDataService } from "./atlasViewer/atlasViewer.dataService.service";
 import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
@@ -38,7 +39,6 @@ import { ViewerConfiguration } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
-import { ZipFileDownloadService } from "./services/zipFileDownload.service";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
@@ -51,6 +51,7 @@ import { UseEffects } from "./services/effect/effect";
     ComponentsModule,
     DragDropModule,
     UIModule,
+    AngularMaterialModule,
     
     ModalModule.forRoot(),
     TooltipModule.forRoot(),
@@ -112,7 +113,6 @@ import { UseEffects } from "./services/effect/effect";
     ToastService,
     AtlasWorkerService,
     AuthService,
-    ZipFileDownloadService,
     
     /**
      * TODO
