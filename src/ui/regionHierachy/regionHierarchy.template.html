@@ -38,6 +38,7 @@
       class="tree-body">
       <flat-tree-component
         (treeNodeClick)="handleClickRegion($event)"
+        (uncollaspedItemsNumber)="uncollapsedFlatTreeItems($event)"
         [inputItem]="aggregatedRegionTree"
         [renderNode]="displayTreeNode"
         [searchFilter]="filterTreeBySearch">

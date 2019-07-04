@@ -3,7 +3,6 @@ import {  Subscription, Subject, fromEvent } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 import { generateLabelIndexId } from "src/services/stateStore.service";
-import {promise} from "selenium-webdriver";
 
 const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
@@ -111,11 +110,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   set showRegionTree(flag: boolean){
     this._showRegionTree = flag
     this.showRegionFlagChanged.emit(this._showRegionTree)
-    this.countItemsIntoTheTree = 1
-    if (this.aggregatedRegionTree.children &&
-        this.aggregatedRegionTree.children.length > 0) {
-      this.countItems(this.aggregatedRegionTree)
-    }
   }
 
   ngOnInit(){
@@ -155,6 +149,15 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
         this.changeSearchTerm(ev)
       })
     )
+
+    setTimeout(() => {
+      this.countItemsIntoTheTree = 1
+      if (this.aggregatedRegionTree.children &&
+          this.aggregatedRegionTree.children.length > 0) {
+        this.countItems(this.aggregatedRegionTree)
+      }
+    })
+
   }
 
   getInputPlaceholder(parcellation:any) {
@@ -177,6 +180,11 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
       if (object.children && object.children.length > 0) this.countItems(object)
     })
   }
+
+  uncollapsedFlatTreeItems(event) {
+    this.countItemsIntoTheTree = event
+  }
+
   regionHierarchyHeight(){
     return({
       'height' : (this.countItemsIntoTheTree * 15 + 60).toString() + 'px',

@@ -1,5 +1,6 @@
-import { EventEmitter, Component, Input, Output, ChangeDetectionStrategy } from "@angular/core";
+import {EventEmitter, Component, Input, Output, ChangeDetectionStrategy, OnChanges, ViewChild} from "@angular/core";
 import { FlattenedTreeInterface } from "./flattener.pipe";
+import {CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 
 /**
  * TODO to be replaced by virtual scrolling when ivy is in stable
@@ -14,7 +15,7 @@ import { FlattenedTreeInterface } from "./flattener.pipe";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class FlatTreeComponent{
+export class FlatTreeComponent implements OnChanges {
   @Input() inputItem : any = {
     name : 'Untitled',
     children : []
@@ -33,6 +34,9 @@ export class FlatTreeComponent{
   @Input() findChildren : (item:any)=>any[] = (item)=>item.children ? item.children : [] 
   @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
+  @ViewChild('flatTreeVirtualScrollViewPort') _temp: CdkVirtualScrollViewport
+  @Output() uncollaspedItemsNumber = new EventEmitter<number>()
+
   public flattenedItems : any[] = []
 
   getClass(level:number){
@@ -41,6 +45,12 @@ export class FlatTreeComponent{
 
   collapsedLevels: Set<string> = new Set()
   uncollapsedLevels : Set<string> = new Set()
+
+  ngOnChanges(): void {
+    if (this._temp) {
+      setTimeout(() => {this.uncollaspedItemsNumber.emit(this._temp.getDataLength())})
+    }
+  }
 
   toggleCollapse(flattenedItem:FlattenedTreeInterface){
     if (this.isCollapsed(flattenedItem)) {
@@ -52,6 +62,7 @@ export class FlatTreeComponent{
     }
     this.collapsedLevels = new Set(this.collapsedLevels)
     this.uncollapsedLevels = new Set(this.uncollapsedLevels)
+    setTimeout(() => {this.uncollaspedItemsNumber.emit(this._temp.getDataLength())})
   }
 
   isCollapsed(flattenedItem:FlattenedTreeInterface):boolean{
