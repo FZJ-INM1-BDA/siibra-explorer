@@ -8,6 +8,8 @@ import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { Store, select } from "@ngrx/store";
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'menu-icons',
@@ -45,13 +47,16 @@ export class MenuIconsBar{
     return this.constantService.mobile
   }
 
+  public selectedTemplate$: Observable<any>
+
   constructor(
     private widgetServices:WidgetServices,
     private injector:Injector,
     private constantService:AtlasViewerConstantsServices,
     public dbService: DatabrowserService,
     cfr: ComponentFactoryResolver,
-    public pluginServices:PluginServices
+    public pluginServices:PluginServices,
+    store: Store<any>
   ){
 
     this.dbService.createDatabrowser = this.clickSearch.bind(this)
@@ -59,6 +64,11 @@ export class MenuIconsBar{
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
+
+    this.selectedTemplate$ = store.pipe(
+      select('viewerState'),
+      select('templateSelected')
+    )
   }
 
   /**

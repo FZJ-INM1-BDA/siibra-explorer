@@ -128,10 +128,9 @@
     </ui-nehuba-container>
   
     <div *ngIf="!isMobile" bannerWrapper>
-      <menu-icons iconWrapper *ngIf="selectedTemplate">
+      <menu-icons iconWrapper>
       </menu-icons>
 
-      <div *ngIf="!selectedTemplate"></div>
       <signin-banner signinWrapper [ngStyle]="{'margin-right': !selectedTemplate? '20px': ''}">
       </signin-banner>
     </div>

@@ -1,48 +1,10 @@
-div[splashScreenContainer]
+.appendMargin
 {
-  height: 100%;
-  display:flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  overflow-y:auto;
+  padding-top:10em;
 }
-
-div[splashScreenHeader] {
-  max-height: 100px;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
 
 .splashScreenHeaderTitle {
   font-size: 45px;
-}
-
-
-.splashScreenHeaderLogoContainer {
-  flex: 1;
-  padding-top: 20px;
-}
-.splashScreenHeaderLogo {
-  margin-left: 50px;
-  width: 100px;
-  height: auto;
-}
-
-.spaceForFill {
-  flex: 1;
-}
-
-div[splashScreenTemplate] {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-
 }
 
 div[splashScreenTemplateItem] {
@@ -66,20 +28,6 @@ div[splashScreenTemplateHeader] {
   font-size: 30px;
   margin: 5px 0;
 
-}
-
-div[splashScreenTemplateBody] {
-  display: flex;
-  flex-direction: column;
-}
-
-div[splashScreenTemplateBodyDescription] {
-  flex: 1;
-  text-align: justify;
-  margin: 0 10px 10px 10px;
-}
-div[splashScreenTemplateBodyImage] {
-  flex: 1;
 }
 
 .template-image {

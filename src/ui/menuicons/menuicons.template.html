@@ -1,93 +1,96 @@
 <logo-container *ngIf="!isMobile">
 </logo-container>
 
-<div
-  *ngIf="false"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
+<!-- hide icons when templates has yet been selected -->
+<ng-template [ngIf]="selectedTemplate$ | async">
   <div
-    [tooltip]="dataBrowserTitle"
+    *ngIf="false"
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
+    <div
+      [tooltip]="dataBrowserTitle"
+      placement="right"
+      (click)="clickSearch($event)"
+      [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-search">
+        
+      </i>
+    </div>
+  </div>
+
+  <div
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
+    <div
+      tooltip="Layer"
+      placement="right"
+      (click)="clickLayer($event)"
+      [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-layer-group">
+        
+      </i>
+    </div>
+  </div>
+
+  <div
+    *ngIf="false"
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
+    <div
+      tooltip="Plugins"
+      (click)="clickPlugins($event)"
+      placement="right"
+      [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-tools">
+        
+      </i>
+    </div>
+  </div>
+
+  <div
+    *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+    [tooltip]="manifest.displayName || manifest.name"
     placement="right"
-    (click)="clickSearch($event)"
-    [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-search">
-      
-    </i>
-  </div>
-</div>
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
 
-<div
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
+    <div
+      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
+      [ngClass]="!pluginServices.launchedPlugins.has(manifest.name) ? 'btn-outline-secondary' : pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
+      class="shadow btn btn-sm rounded-circle">
+      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+    </div>
+  </div>
+
   <div
-    tooltip="Layer"
+    *ngFor="let manifest of pluginServices.orphanPlugins"
+    [tooltip]="manifest.displayName || manifest.name"
     placement="right"
-    (click)="clickLayer($event)"
-    [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-layer-group">
-      
-    </i>
-  </div>
-</div>
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
 
-<div
-  *ngIf="false"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
+    <div
+      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
+      [ngClass]="pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
+      class="shadow btn btn-sm rounded-circle">
+      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+    </div>
+  </div>
+
   <div
-    tooltip="Plugins"
-    (click)="clickPlugins($event)"
+    *ngFor="let wu of dbService.instantiatedWidgetUnits"
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
     placement="right"
-    [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-tools">
-      
-    </i>
+    [tooltip]="wu.title"
+    class="btnWrapper">
+    <div
+      (click)="widgetServices.minimisedWindow.delete(wu)"
+      [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-search"></i>
+    </div>
   </div>
-</div>
-
-<div
-  *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-  [tooltip]="manifest.displayName || manifest.name"
-  placement="right"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
-
-  <div
-    (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-    [ngClass]="!pluginServices.launchedPlugins.has(manifest.name) ? 'btn-outline-secondary' : pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-    class="shadow btn btn-sm rounded-circle">
-    {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-  </div>
-</div>
-
-<div
-  *ngFor="let manifest of pluginServices.orphanPlugins"
-  [tooltip]="manifest.displayName || manifest.name"
-  placement="right"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
-
-  <div
-    (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-    [ngClass]="pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-    class="shadow btn btn-sm rounded-circle">
-    {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-  </div>
-</div>
-
-<div
-  *ngFor="let wu of dbService.instantiatedWidgetUnits"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  placement="right"
-  [tooltip]="wu.title"
-  class="btnWrapper">
-  <div
-    (click)="widgetServices.minimisedWindow.delete(wu)"
-    [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-search"></i>
-  </div>
-</div>
+</ng-template>

@@ -1,21 +1,16 @@
-<div splashScreenContainer>
-  <div splashScreenHeader *ngIf="!isMobile">
-    <div class="splashScreenHeaderLogoContainer"><img class="splashScreenHeaderLogo " src="./res/image/HBP_Primary_RGB_BlackText.png"> </div>
-    <div class="spaceForFill">
-    </div>
-  </div>
+<div [ngClass]="isMobile ? '' : 'appendMargin'" class="h-100 d-flex flex-column justify-content-start align-items-center overflow-auto">
 
-  <div splashScreenTemplate>
+  <div class="d-flex w-100 flex-wrap justify-content-center">
     <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
       <div class="template-card" (click) = "selectTemplate(template)">
         <div splashScreenTemplateHeader>
           {{template.properties.name}}
         </div>
-        <div splashScreenTemplateBody>
-          <div splashScreenTemplateBodyImage>
+        <div class="d-flex flex-column">
+          <div class="flex-grow-1">
             <img class="template-image" [src]="'./res/image/' + correctString(template.properties.name) + '.png'">
           </div>
-          <div splashScreenTemplateBodyDescription>
+          <div class="flex-grow-1 text-justify ml-2 mr-2 mb-2 mt-0">
             {{template.properties.description}}
           </div>
         </div>
