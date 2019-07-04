@@ -47,6 +47,7 @@ import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
+import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 
 
 @NgModule({
@@ -97,6 +98,7 @@ import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParc
     FilterNgLayer,
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
+    AppendtooltipTextPipe,
 
     /* directive */
     DownloadDirective,

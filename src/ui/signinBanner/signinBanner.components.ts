@@ -3,14 +3,16 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { Subscription, Observable, merge, Subject, interval } from "rxjs";
+import { Subscription, Observable, merge, Subject, combineLatest } from "rxjs";
 import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, CHANGE_NAVIGATION } from "src/services/stateStore.service";
-import { map, filter, distinctUntilChanged, bufferTime, delay, share, tap } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, bufferTime, delay, share, tap, withLatestFrom } from "rxjs/operators";
 import { regionFlattener } from "src/util/regionFlattener";
 import { ToastService } from "src/services/toastService.service";
 import { getSchemaIdFromName } from "src/util/pipes/templateParcellationDecoration.pipe";
 
-const compareParcellation = (o, n) => o.name === n.name
+const compareParcellation = (o, n) => !o || !n
+  ? false
+  : o.name === n.name
 
 @Component({
   selector: 'signin-banner',
@@ -27,12 +29,14 @@ export class SigninBanner implements OnInit, OnDestroy{
   public compareParcellation = compareParcellation
 
   private subscriptions: Subscription[] = []
+  
   public loadedTemplates$: Observable<any[]>
+
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
+
   public selectedRegions$: Observable<any[]>
   private selectedRegions: any[] = []
-  selectedTemplate: any
   @Input() darktheme: boolean
 
   @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
@@ -74,28 +78,19 @@ export class SigninBanner implements OnInit, OnDestroy{
       distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
     )
 
-    this.focusedDatasets$ = merge(
-      this.selectedTemplate$.pipe(
-        map(v => [v])
+    this.focusedDatasets$ = this.userFocusedDataset$.pipe(
+      filter(v => !!v),
+      withLatestFrom(
+        combineLatest(this.selectedTemplate$, this.selectedParcellation$)
       ),
-      this.selectedParcellation$.pipe(
-        distinctUntilChanged((o, n) => o.name === n.name),
-        map(p => {
-          if (!p.originDatasets || !p.originDatasets.map) return [p]
-          return p.originDatasets.map(od => {
-            return {
-              ...p,
-              ...od
-            }
-          })
-        })
-      ),
-      this.userFocusedDataset$.pipe(
-        filter(v => !!v)
-      )
     ).pipe(
+      map(([userFocusedDataset, [selectedTemplate, selectedParcellation]]) => {
+        const { type, ...rest } = userFocusedDataset
+        if (type === 'template') return { ...selectedTemplate,  ...rest}
+        if (type === 'parcellation') return { ...selectedParcellation, ...rest }
+        return { ...rest }
+      }),
       bufferTime(100),
-      map(arrOfArr => arrOfArr.reduce((acc, curr) => acc.concat(curr), [])),
       filter(arr => arr.length > 0),
       /**
        * merge properties field with the root level
@@ -118,9 +113,6 @@ export class SigninBanner implements OnInit, OnDestroy{
       this.selectedRegions$.subscribe(regions => {
         this.selectedRegions = regions
       })
-    )
-    this.subscriptions.push(
-      this.selectedTemplate$.subscribe(template => this.selectedTemplate = template)
     )
 
     this.subscriptions.push(
@@ -239,6 +231,22 @@ export class SigninBanner implements OnInit, OnDestroy{
     })
   }
 
+  handleActiveDisplayBtnClicked(event, type: 'parcellation' | 'template'){
+    const { 
+      extraBtn,
+      event: extraBtnClickEvent
+    } = event
+
+    const { name } = extraBtn
+    const { kgSchema, kgId } = getSchemaIdFromName(name)
+    
+    this.userFocusedDataset$.next({
+      kgSchema,
+      kgId,
+      type
+    })
+  }
+
   handleExtraBtnClicked(event, toastType: 'parcellation' | 'template'){
     const { 
       extraBtn,
@@ -249,11 +257,11 @@ export class SigninBanner implements OnInit, OnDestroy{
     const { name } = extraBtn
     const { kgSchema, kgId } = getSchemaIdFromName(name)
 
-    this.userFocusedDataset$.next([{
+    this.userFocusedDataset$.next({
       ...inputItem,
       kgSchema,
       kgId
-    }])
+    })
 
     extraBtnClickEvent.stopPropagation()
   }

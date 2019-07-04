@@ -8,13 +8,13 @@
     class="d-flex justify-content-between"
     [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
     role="menuitem"
-    (click)="itemSelected.emit({previous: selectedItem, current: input})">
+    (click)="itemSelected.emit({previous: selectedItem, current: input})"
+    [matTooltip]="input.tooltipText">
     
     <span class="dropdown-item-1 textSpan"
       #DropDownText
       [innerHTML]="listDisplay(input)"
-      [ngClass]="checkSelected(selectedItem, input) ? 'font-weight-bold' : ''"
-      [matTooltip]="overflowText(DropDownText)? DropDownText.innerText: ''">
+      [ngClass]="checkSelected(selectedItem, input) ? 'font-weight-bold' : ''">
     </span>
 
     <ng-container *ngIf="input.extraButtons as extraButtons">

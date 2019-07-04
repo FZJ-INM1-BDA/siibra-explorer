@@ -342,7 +342,8 @@ markdown-dom pre code
   opacity: 0.5;
 }
 
-[darktheme="true"] .card
+.card
 {
   background:none;
+  border:none;
 }

@@ -1,12 +1,28 @@
 <!-- TODO remove dependency on ismobile -->
-<span
-  class="btn btn-default dropdownTitle"
-  [innerHTML]="activeDisplay(selectedItem)"
-  [hoverable]="{translateY:-2}"
-  #dropdownToggle
-  dropdownToggle
-  [ngClass]="openState ? 'dropdownTitleOpen' : 'dropdownTitle'">
-</span>
+<div class="d-flex flex-column">
+  <div class="d-flex">
+
+    <span
+      class="btn btn-default dropdownTitle flex-grow-1 m-auto"
+      [innerHTML]="activeDisplay(selectedItem)"
+      [hoverable]="{translateY:-2}"
+      #dropdownToggle
+      dropdownToggle
+      [ngClass]="openState ? 'dropdownTitleOpen' : 'dropdownTitle'">
+    </span>
+    
+    <span
+      *ngFor="let btn of activeDisplayBtns"
+      class="btn btn-default"
+      (click)="handleActiveDisplayBtnClick(btn, $event)"
+      [hoverable]="{translateY:-1}"
+      dropdownToggle>
+      <div class="d-flex align-items-center">
+        <small [ngClass]="btn.faIcon"></small>
+      </div>
+    </span>
+  </div>
+</div>
 
 <!-- needed to ensure dropdown width matches  -->
 <ul class="m-0 h-0 overflow-hidden">

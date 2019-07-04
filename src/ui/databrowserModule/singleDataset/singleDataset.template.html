@@ -11,14 +11,17 @@
       {{ description }}
     </p>
 
-    <hr>
+    <hr *ngIf="showFooter">
     <!-- publications -->
-    <a
-      *ngFor="let publication of publications"
-      [href]="'https://doi.org/' + publication.doi"
-      target="_blank">
-      {{ publication.cite }}
-    </a>
+    <div class="d-flex flex-column">
+
+      <a
+        *ngFor="let publication of publications"
+        [href]="publication.doi | doiParserPipe"
+        target="_blank">
+        {{ publication.cite }}
+      </a>
+    </div>
 
     <!-- footer -->
     <div class="d-flex justify-content-end">
@@ -39,6 +42,8 @@
 
       <!-- download -->
       <a
+        (click)="downloadZipFromKg()"
+        [disabled]="downloadInProgress"
         class="m-2"
         *ngIf="files.length > 0"
         mat-raised-button
@@ -46,7 +51,7 @@
         <span>
           Download Zip
         </span>
-        <span *ngIf="false">({{ numOfFiles }} files ~ {{ totalFileByteSize / 1e6 | number: '.1-2' }} MB)</span>
+        <span>({{ numOfFiles }} files ~ {{ totalFileByteSize / 1e6 | number: '.1-2' }} MB)</span>
         <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
       </a>
     </div>
