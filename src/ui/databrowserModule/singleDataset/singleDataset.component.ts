@@ -27,7 +27,7 @@ export class SingleDatasetView implements OnInit {
    * sic!
    */
   private kgReference: string[] = []
-  private files: File[] = []
+  public files: File[] = []
   private methods: string[] = []
   /**
    * sic!
