@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef } from "@angular/core";
 import { dropdownAnimation } from "./dropdown.animation";
-import { HasExtraButtons, ExraBtnClickEvent } from '../radiolist/radiolist.component'
+import { HasExtraButtons, ExraBtnClickEvent, ExtraButton } from '../radiolist/radiolist.component'
 
 @Component({
   selector : 'dropdown-component',
@@ -15,6 +15,9 @@ import { HasExtraButtons, ExraBtnClickEvent } from '../radiolist/radiolist.compo
 })
 
 export class DropdownComponent{
+
+  @Input() activeDisplayBtns: ExtraButton[] = []
+  @Output() activeDisplayBtnClicked: EventEmitter<{extraBtn: ExtraButton, event: MouseEvent}> = new EventEmitter()
 
   @Input() inputArray : HasExtraButtons[] = []
   @Input() selectedItem : any | null = null
@@ -37,5 +40,12 @@ export class DropdownComponent{
       this.openState = !this.openState
     else
       this.openState = false;
+  }
+
+  handleActiveDisplayBtnClick(btn: ExtraButton, event: MouseEvent){
+    this.activeDisplayBtnClicked.emit({
+      extraBtn: btn,
+      event
+    })
   }
 }

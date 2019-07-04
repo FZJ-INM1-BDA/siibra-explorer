@@ -24,6 +24,7 @@ import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
 import { SingleDatasetView } from './singleDataset/singleDataset.component'
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 
 @NgModule({
   imports:[
@@ -54,7 +55,8 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
     CopyPropertyPipe,
     FilterDataEntriesbyMethods,
     FilterDataEntriesByRegion,
-    AggregateArrayIntoRootPipe
+    AggregateArrayIntoRootPipe,
+    DoiParserPipe
   ],
   exports:[
     DataBrowser,

@@ -42,7 +42,7 @@ export class RadioList{
   }
 }
 
-interface ExtraButton{
+export interface ExtraButton{
   name: string,
   faIcon: string
   class?: string

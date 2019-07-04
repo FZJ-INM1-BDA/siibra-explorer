@@ -15,29 +15,36 @@ const notEmptyArray = (arr) => !!arr && arr instanceof Array && arr.length > 0
 })
 
 export class TemplateParcellationsDecorationPipe implements PipeTransform{
-  public transform(parcellations:any[]){
-    return parcellations.map(p => {
-      const { description, properties = {}, publications } = p
-      const { description:pDescriptions, publications: pPublications } = properties
-      const defaultOriginaldataset = notNullNotEmptyString(description)
-        || notNullNotEmptyString(pDescriptions)
-        || notEmptyArray(publications)
-        || notEmptyArray(pPublications)
-          ? [{}]
-          : []
+  private decorateSingle(p:any){
 
-      const { originDatasets = defaultOriginaldataset } = p
-      return {
-        ...p,
-        extraButtons: originDatasets
-          .map(({ kgSchema, kgId }) => {
-            return {
-              name: getNameFromSchemaId({ kgSchema, kgId }),
-              faIcon: 'fas fa-info-circle'
-            }
-          })
-      }
-    })
+    const { description, properties = {}, publications } = p
+    const { description:pDescriptions, publications: pPublications } = properties
+    const defaultOriginaldataset = notNullNotEmptyString(description)
+      || notNullNotEmptyString(pDescriptions)
+      || notEmptyArray(publications)
+      || notEmptyArray(pPublications)
+        ? [{}]
+        : []
+
+    const { originDatasets = defaultOriginaldataset } = p
+    return {
+      ...p,
+      extraButtons: originDatasets
+        .map(({ kgSchema, kgId }) => {
+          return {
+            name: getNameFromSchemaId({ kgSchema, kgId }),
+            faIcon: 'fas fa-info'
+          }
+        })
+    }
+  }
+  private decorateArray (array:any[]) {
+    return array.map(this.decorateSingle)
+  }
+  public transform(item:any){
+    if (!item) return item
+    if(item instanceof Array) return this.decorateArray(item)
+    else return this.decorateSingle(item)
   }
 }
 

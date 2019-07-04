@@ -93,6 +93,12 @@ export class SingleDatasetView implements OnInit {
       : null
   }
 
+  get showFooter(){
+    return (this.appendedKgReferences && this.appendedKgReferences.length > 0)
+      || (this.publications && this.publications.length > 0)
+      || (this.files && this.files.length > 0)
+  }
+
   downloadZipFromKg() {
     this.downloadInProgress = true
     const { kgId, kgSchema }  = this

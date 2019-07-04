@@ -4,11 +4,14 @@
 
   <dropdown-component
     (itemSelected)="changeTemplate($event)"
+    [checkSelected]="compareParcellation"
     [activeDisplay]="displayActiveTemplate"
     [selectedItem]="selectedTemplate$ | async"
-    [inputArray]="loadedTemplates$ | async | filterNull | templateParcellationsDecorationPipe"
+    [inputArray]="loadedTemplates$ | async | filterNull | appendTooltipTextPipe"
     [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
     (extraBtnClicked)="handleExtraBtnClicked($event, 'template')"
+    [activeDisplayBtns]="(selectedTemplate$ | async | templateParcellationsDecorationPipe)?.extraButtons"
+    (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'template')"
     (listItemButtonClicked)="showInfoToast($event, 'template')">
   </dropdown-component>
 
@@ -19,9 +22,11 @@
       [checkSelected]="compareParcellation"
       [activeDisplay]="displayActiveParcellation"
       [selectedItem]="selectedParcellation"
-      [inputArray]="selectedTemplate.parcellations | templateParcellationsDecorationPipe"
+      [inputArray]="selectedTemplate.parcellations | appendTooltipTextPipe"
       [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
       (extraBtnClicked)="handleExtraBtnClicked($event, 'parcellation')"
+      [activeDisplayBtns]="(selectedParcellation | templateParcellationsDecorationPipe)?.extraButtons"
+      (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'parcellation')"
       (listItemButtonClicked)="showInfoToast($event, 'parcellation')">
 
     </dropdown-component>
