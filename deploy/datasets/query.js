@@ -5,7 +5,6 @@ const path = require('path')
 const archiver = require('archiver')
 const { commonSenseDsFilter } = require('./supplements/commonSense')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-const { manualFilter: manualFilterDWM, manualMap: manualMapDWM } = require('./supplements/util/mapDwm')
 
 const kgQueryUtil = require('./../auth/util')
 
@@ -15,7 +14,7 @@ let otherQueryResult = null
 const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
 const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_1`
 const KG_PARAM = {
-  size: process.env.KG_SEARCH_SIZE || '450',
+  size: process.env.KG_SEARCH_SIZE || '1000',
   vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
 }
 
@@ -58,20 +57,29 @@ const cacheData = ({results, ...rest}) => {
   return cachedData
 }
 
-const getPublicDs = () => Promise.race([
-  new Promise((rs, rj) => {
-    setTimeout(() => {
-      if (cachedData) {
-        rs(cachedData)
-      } else {
-        /**
-         * cached data not available, have to wait
-         */
-      }
-    }, timeout)
-  }),
-  fetchDatasetFromKg().then(cacheData)
-])
+let fetchingPublicDataInProgress = false
+let getPublicDsPr
+
+const getPublicDs = async () => {
+
+  /**
+   * every request to public ds will trigger a refresh pull from master KG (throttled pending on resolved request)
+   */
+  if (!fetchingPublicDataInProgress) {
+    fetchingPublicDataInProgress = true
+    getPublicDsPr = fetchDatasetFromKg()
+      .then(_ => {
+        fetchingPublicDataInProgress = false
+        getPublicDsPr = null
+        return _
+      })
+      .then(cacheData)
+  }
+
+  if (cachedData) return Promise.resolve(cachedData)
+  if (getPublicDsPr) return getPublicDsPr
+  throw `cached Data not yet resolved, neither is get public ds defined`
+} 
 
 
 const getDs = ({ user }) => user
@@ -103,47 +111,68 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
   })
 })
 
-let juBrain = null
-let shortBundle = null
-let longBundle = null
-let waxholm = null
-let allen = null
+const populateSet = (flattenedRegions, set = new Set()) => {
+  if (!(set instanceof Set)) throw `set needs to be an instance of Set`
+  if (!(flattenedRegions instanceof Array)) throw `flattenedRegions needs to be an instance of Array`
+  for (const region of flattenedRegions) {
+    const { name, relatedAreas } = region
+    if (name) set.add(name)
+    if (relatedAreas && relatedAreas instanceof Array && relatedAreas.length > 0) {
+      for (const relatedArea of relatedAreas) {
+        if(typeof relatedArea === 'string') set.add(relatedArea)
+        else console.warn(`related area not an instance of String. skipping`, relatedArea)
+      }
+    }
+  }
+  return set
+}
+
+let juBrainSet = new Set(),
+  shortBundleSet = new Set(),
+  longBundleSet = new Set(),
+  waxholmSet = new Set(),
+  allenSet = new Set()
 
 readConfigFile('colin.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    juBrain = flattenArray(json.parcellations[0].regions)
+    const juBrain = flattenArray(json.parcellations[0].regions)
+    juBrainSet = populateSet(juBrain)
+    
   })
   .catch(console.error)
 
 readConfigFile('MNI152.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    longBundle = flattenArray(json.parcellations[0].regions)
-    shortBundle = flattenArray(json.parcellations[1].regions)
+    const longBundle = flattenArray(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
+    const shortBundle = flattenArray(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
+
+    longBundleSet = populateSet(longBundle)
+    shortBundleSet = populateSet(shortBundle)
   })
   .catch(console.error)
 
 readConfigFile('waxholmRatV2_0.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    waxholm = flattenArray(json.parcellations[0].regions)
+    const waxholm = flattenArray(json.parcellations[0].regions)
+
+    waxholmSet = populateSet(waxholm)
   })
   .catch(console.error)
 
-/**
- * deprecated
- */
-const filterByPRs = (prs, atlasPr) => atlasPr
-  ? prs.some(pr => {
-      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
-      return atlasPr.some(aPr => regex.test(aPr.name)
-        || aPr.synonyms && aPr.synonyms.length && aPr.synonyms.some(syn => syn === pr.name) )
-    })
-  : false
+readConfigFile('allenMouse.json')
+  .then(data => JSON.parse(data))
+  .then(json => {
+    const flattenedAllen = flattenArray(json.parcellations[0].regions)
+    allenSet = populateSet(flattenedAllen)
+  })
 
-const manualFilter = require('./supplements/parcellation')
-
+const filterByPRSet = (prs, atlasPrSet = new Set()) => {
+  if (!(atlasPrSet instanceof Set)) throw `atlasPrSet needs to be a set!`
+  return prs.some(({ name }) => atlasPrSet.has(name))
+}
 
 const filter = (datasets = [], {templateName, parcellationName}) => datasets
   .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
@@ -154,34 +183,36 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
       return ds.referenceSpaces.some(rs => rs.name === templateName)
     }
     if (parcellationName) {
-      if (parcellationName === 'Fibre Bundle Atlas - Long Bundle'){
-        return manualFilterDWM(ds)
+      if (ds.parcellationRegion.length === 0) return false
+
+      let useSet
+      switch (parcellationName) {
+        case 'JuBrain Cytoarchitectonic Atlas': 
+          useSet = juBrainSet
+        break;
+        case 'Fibre Bundle Atlas - Short Bundle':
+          useSet = shortBundleSet
+        break;
+        case 'Fibre Bundle Atlas - Long Bundle':
+          useSet = longBundleSet
+        break;
+        case 'Waxholm Space rat brain atlas v.2.0':
+          useSet = waxholmSet
+        break;
+        case 'Allen adult mouse brain reference atlas V3 Brain Atlas':
+          useSet = allenSet
+        break;
+        default:
+          useSet = new Set()
       }
-      return ds.parcellationRegion.length > 0
-        ? filterByPRs(
-            ds.parcellationRegion, 
-            parcellationName === 'JuBrain Cytoarchitectonic Atlas' && juBrain
-              ? juBrain
-              : parcellationName === 'Fibre Bundle Atlas - Short Bundle' && shortBundle
-                ? shortBundle
-                : parcellationName === 'Waxholm Space rat brain atlas v.2.0'
-                  ? waxholm
-                  : null
-          )
-        : false
+      return filterByPRSet(ds.parcellationRegion, useSet)
     }
 
     return false
   })
   .map(ds => {
-    if (parcellationName && parcellationName === 'Fibre Bundle Atlas - Long Bundle') {
-      return manualMapDWM(ds)
-    }
     return {
       ...ds,
-      ...parcellationName && ds.parcellationRegion.length === 0
-        ? { parcellationRegion: [{ name: manualFilter({ parcellationName, dataset: ds }) }] }
-        : {},
       preview: hasPreview({ datasetName: ds.name })
     }
   })
@@ -192,8 +223,7 @@ const filter = (datasets = [], {templateName, parcellationName}) => datasets
 exports.init = async () => {
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
-  const {results = []} = await fetchDatasetFromKg()
-  cachedData = results
+  return await getPublicDs()
 }
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })

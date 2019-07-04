@@ -24,23 +24,13 @@ export class FilterDataEntriesByRegion implements PipeTransform{
              */
             const newParcellationRegion = de.parcellationRegion.map(({name, id, ...rest}) => {
 
-              /**
-               * TODO: temporary hack, some dataset region name is not exactly the same as region
-               */
-              /* https://stackoverflow.com/a/9310752/6059235 */
-              const regex = new RegExp(name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
-
               const found = flattenedAllRegions.find(r => {
                 /**
                  * TODO replace pseudo id with real uuid
                  */
                 return (r.id && id && r.id === id)
-                  || regex.test(r.name)
-                  || r.synonyms && r.synonyms.length && r.synonyms.some(syn => syn === name) 
-                /**
-                 * more correct, but probably should use UUID in the future
-                 */
-                return r.name === name
+                  || r.name === name
+                  || r.relatedAreas && r.relatedAreas.length && r.relatedAreas.some(syn => syn === name) 
               })
               return found
                 ? { name, id, ...rest, ...found }
