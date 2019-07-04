@@ -839,6 +839,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 7A"
+                          ],
                           "rgb": [
                             38,
                             204,
@@ -1179,6 +1182,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 3b"
+                          ],
                           "rgb": [
                             239,
                             246,
@@ -1326,6 +1332,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFm"
+                          ],
                           "rgb": [
                             53,
                             76,
@@ -1372,6 +1381,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFop"
+                          ],
                           "rgb": [
                             146,
                             153,
@@ -1418,6 +1430,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PF"
+                          ],
                           "rgb": [
                             226,
                             211,
@@ -1464,6 +1479,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGp"
+                          ],
                           "rgb": [
                             92,
                             116,
@@ -1510,6 +1528,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGa"
+                          ],
                           "rgb": [
                             42,
                             236,
@@ -1556,6 +1577,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFt"
+                          ],
                           "rgb": [
                             120,
                             135,
@@ -1602,6 +1626,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFcm"
+                          ],
                           "rgb": [
                             98,
                             128,
@@ -2392,6 +2419,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area hOc1"
+                          ],
                           "rgb": [
                             190,
                             132,
@@ -2888,6 +2918,10 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 44v",
+                            "Area 44d"
+                          ],
                           "rgb": [
                             54,
                             74,
@@ -2900,10 +2934,6 @@
                                 54,
                                 74,
                                 75
-                              ],
-                              "synonyms":[
-                                "Area 44v",
-                                "Area 44d"
                               ],
                               "labelIndex": 2,
                               "ngId": "jubrain v17 left",
@@ -2920,10 +2950,6 @@
                                 54,
                                 74,
                                 75
-                              ],
-                              "synonyms":[
-                                "Area 44v",
-                                "Area 44d"
                               ],
                               "ngId": "jubrain v17 right",
                               "labelIndex": 2,
@@ -2942,6 +2968,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 45"
+                          ],
                           "rgb": [
                             167,
                             103,
@@ -3309,6 +3338,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 4p"
+                          ],
                           "rgb": [
                             116,
                             92,
@@ -4576,6 +4608,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area Te1"
+                          ],
                           "rgb": [
                             252,
                             84,
@@ -4631,6 +4666,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG1"
+                          ],
                           "rgb": [
                             131,
                             183,
@@ -4769,6 +4807,9 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG2"
+                          ],
                           "rgb": [
                             67,
                             94,
@@ -5707,62 +5748,98 @@
         {
           "name": "Arcuate - Left",
           "children": [],
-          "labelIndex": "1"
+          "labelIndex": "1",
+          "relatedAreas": [
+            "Direct segment of the left arcuate fasciculus"
+          ]
         },
         {
           "name": "Arcuate - Right",
           "children": [],
-          "labelIndex": "31"
+          "labelIndex": "31",
+          "relatedAreas": [
+            "Direct segment of the right arcuate fasciculus"
+          ]
         },
         {
           "name": "Arcuate_Anterior - Left",
           "children": [],
-          "labelIndex": "2"
+          "labelIndex": "2",
+          "relatedAreas": [
+            "Anterior segment of the left arcuate fasciculus"
+          ]
         },
         {
           "name": "Arcuate_Anterior - Right",
           "children": [],
-          "labelIndex": "32"
+          "labelIndex": "32",
+          "relatedAreas": [
+            "Anterior segment of the right arcuate fasciculus"
+          ]
         },
         {
           "name": "Arcuate_Posterior - Left",
           "children": [],
-          "labelIndex": "3"
+          "labelIndex": "3",
+          "relatedAreas": [
+            "Posterior segment of the left arcuate fasciculus"
+          ]
         },
         {
           "name": "Arcuate_Posterior - Right",
           "children": [],
-          "labelIndex": "33"
+          "labelIndex": "33",
+          "relatedAreas": [
+            "Posterior segment of the right arcuate fasciculus"
+          ]
         },
         {
           "name": "Cingulum_Long - Left",
           "children": [],
-          "labelIndex": "4"
+          "labelIndex": "4",
+          "relatedAreas": [
+            "Left long cingulate fibres"
+          ]
         },
         {
           "name": "Cingulum_Long - Right",
           "children": [],
-          "labelIndex": "34"
+          "labelIndex": "34",
+          "relatedAreas": [
+            "Right long cingulate fibres"
+          ]
         },
         {
           "name": "Cingulum_Short - Left",
           "children": [],
-          "labelIndex": "5"
+          "labelIndex": "5",
+          "relatedAreas": [
+            "Left short cingulate fibres"
+          ]
         },
         {
           "name": "Cingulum_Short - Right",
           "children": [],
-          "labelIndex": "35"
+          "labelIndex": "35",
+          "relatedAreas": [
+            "Right short cingulate fibres"
+          ]
         },
         {
           "name": "Cingulum_Temporal - Left",
           "children": [],
-          "labelIndex": "6"
+          "labelIndex": "6",
+          "relatedAreas": [
+            "Left temporal cingulate fibres"
+          ]
         },
         {
           "name": "Cingulum_Temporal - Right",
           "children": [],
-          "labelIndex": "36"
+          "labelIndex": "36",
+          "relatedAreas": [
+            "Right temporal cingulate fibres"
+          ]
         },
         {
           "name": "CorpusCallosum_Body",
@@ -5787,12 +5864,18 @@
         {
           "name": "CorticoSpinalTract - Left",
           "children": [],
-          "labelIndex": "11"
+          "labelIndex": "11",
+          "relatedAreas": [
+            "Left corticospinal tract"
+          ]
         },
         {
           "name": "CorticoSpinalTract - Right",
           "children": [],
-          "labelIndex": "41"
+          "labelIndex": "41",
+          "relatedAreas": [
+            "Right corticospinal tract"
+          ]
         },
         {
           "name": "ExternalCapsule - Left",
@@ -5807,32 +5890,50 @@
         {
           "name": "Fornix - Left",
           "children": [],
-          "labelIndex": "13"
+          "labelIndex": "13",
+          "relatedAreas": [
+            "Left fornix"
+          ]
         },
         {
           "name": "Fornix - Right",
           "children": [],
-          "labelIndex": "43"
+          "labelIndex": "43",
+          "relatedAreas": [
+            "Right fornix"
+          ]
         },
         {
           "name": "InferiorFrontoOccipital - Left",
           "children": [],
-          "labelIndex": "14"
+          "labelIndex": "14",
+          "relatedAreas": [
+            "Left inferior fronto-occipital fasciculus"
+          ]
         },
         {
           "name": "InferiorFrontoOccipital - Right",
           "children": [],
-          "labelIndex": "44"
+          "labelIndex": "44",
+          "relatedAreas": [
+            "Right inferior fronto-occipital fasciculus"
+          ]
         },
         {
           "name": "InferiorLongitudinal - Left",
           "children": [],
-          "labelIndex": "15"
+          "labelIndex": "15",
+          "relatedAreas": [
+            "Left inferior longitudinal fasciculus"
+          ]
         },
         {
           "name": "InferiorLongitudinal - Right",
           "children": [],
-          "labelIndex": "45"
+          "labelIndex": "45",
+          "relatedAreas": [
+            "Right inferior longitudinal fasciculus"
+          ]
         },
         {
           "name": "InferiorLongitudinal_Lateral - Left",
@@ -5887,12 +5988,18 @@
         {
           "name": "Uncinate - Left",
           "children": [],
-          "labelIndex": "21"
+          "labelIndex": "21",
+          "relatedAreas": [
+            "Left uncinate fasciculus"
+          ]
         },
         {
           "name": "Uncinate - Right",
           "children": [],
-          "labelIndex": "51"
+          "labelIndex": "51",
+          "relatedAreas": [
+            "Right uncinate fasciculus"
+          ]
         }
       ]
     },
