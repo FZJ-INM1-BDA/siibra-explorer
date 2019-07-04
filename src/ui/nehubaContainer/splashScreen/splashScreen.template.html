@@ -1,62 +1,20 @@
-<div splashScreenContainer>
-  <div splashScreenHeader>
-    <div class="splashScreenHeaderLogoContainer"><img class="splashScreenHeaderLogo " src="./res/image/HBP_Primary_RGB_WhiteText.png"> </div>
-    <span class="splashScreenHeaderTitle" media="screen and (min-width: 670px)">HBP Atlas Viewer</span>
-    <div class="spaceForFill">
-      <signin-banner *ngIf="!isMobile">
-      </signin-banner>
-    </div>
-  </div>
-  <div splashScreenTemplate>
+<div [ngClass]="isMobile ? '' : 'appendMargin'" class="h-100 d-flex flex-column justify-content-start align-items-center overflow-auto">
+
+  <div class="d-flex w-100 flex-wrap justify-content-center">
     <div *ngFor="let template of loadedTemplate$ | async | filterNull" splashScreenTemplateItem>
       <div class="template-card" (click) = "selectTemplate(template)">
-
         <div splashScreenTemplateHeader>
           {{template.properties.name}}
         </div>
-        <div splashScreenTemplateBody>
-          <div splashScreenTemplateBodyImage>
+        <div class="d-flex flex-column">
+          <div class="flex-grow-1">
             <img class="template-image" [src]="'./res/image/' + correctString(template.properties.name) + '.png'">
           </div>
-          <div splashScreenTemplateBodyDescription>
+          <div class="flex-grow-1 text-justify ml-2 mr-2 mb-2 mt-0">
             {{template.properties.description}}
           </div>
         </div>
-
       </div>
     </div>
-
   </div>
 </div>
-
-
-
-<!--
-<div class = "container-fluid" splashScreenContainer>
-  <div
-    class = "row"
-    templateCardContainer>
-
-    <div
-      *ngFor = "let template of loadedTemplate$ | async | filterNull"
-      (click) = "selectTemplate(template)"
-      templateCard
-      hoverable>
-
-      <h2>{{ template.properties.name }}</h2>
-      <readmore-component>
-        <small>{{ template.properties.description }}</small>
-      </readmore-component>
-    </div>
-    <div *ngIf = "(loadedTemplate$ | async).length < totalTemplates">
-      <h1 style = "text-align:center;">
-        <small>
-          Loading Templates
-        </small>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-        <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      </h1>
-    </div>
-  </div>
-</div> -->

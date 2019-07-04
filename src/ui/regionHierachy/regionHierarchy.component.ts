@@ -62,12 +62,25 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   @ViewChild('searchTermInput', {read: ElementRef})
   private searchTermInput: ElementRef
 
+  /**
+   * set the height to max, bound by max-height
+   */
+  numTotalRenderedRegions: number = 999
+  windowHeight: number
+
   @HostListener('document:click', ['$event'])
   closeRegion(event: MouseEvent) {
     const contains = this.el.nativeElement.contains(event.target)
     this.showRegionTree = contains
-    if (!this.showRegionTree)
+    if (!this.showRegionTree){
       this.searchTerm = ''
+      this.numTotalRenderedRegions = 999
+    }
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.windowHeight = event.target.innerHeight;
   }
 
   get regionsLabelIndexMap() {
@@ -78,7 +91,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     private cdr:ChangeDetectorRef,
     private el:ElementRef
   ){
-
+    this.windowHeight = window.innerHeight;
   }
 
   ngOnChanges(){
@@ -155,6 +168,18 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     this.searchTerm = '';
     (event.target as HTMLInputElement).blur()
 
+  }
+
+  handleTotalRenderedListChanged(changeEvent: {previous: number, current: number}){
+    const { current } = changeEvent
+    this.numTotalRenderedRegions = current
+  }
+
+  regionHierarchyHeight(){
+    return({
+      'height' : (this.numTotalRenderedRegions * 15 + 60).toString() + 'px',
+      'max-height': (this.windowHeight - 100) + 'px'
+    })
   }
 
   focusInput(event?:MouseEvent){

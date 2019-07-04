@@ -1,10 +1,11 @@
 <cdk-virtual-scroll-viewport
   *ngIf="!useDefaultList"
   (wheel)="$event.stopPropagation()"
-  itemSize="15">
+  itemSize="15"
+  #flatTreeVirtualScrollViewPort>
 
   <div
-    *cdkVirtualFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe | filterCollapsePipe : collapsedLevels : uncollapsedLevels : childrenExpanded )" 
+    *cdkVirtualFor="let flattenedItem of (inputItem | flattenTreePipe : findChildren | filterRowsByVisbilityPipe : findChildren : searchFilter | appendSiblingFlagPipe | filterCollapsePipe : collapsedLevels : uncollapsedLevels : childrenExpanded )"
     [ngClass]="getClass(flattenedItem.flattenedTreeLevel)"
     class="text-nowrap"
     [attr.flattenedtreelevel]="flattenedItem.flattenedTreeLevel" 

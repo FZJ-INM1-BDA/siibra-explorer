@@ -17,6 +17,7 @@
   hideScrollbarContainer>
 
   <div
+    [ngStyle]="regionHierarchyHeight()"
     class="d-flex flex-column"
     treeContainer
     #treeContainer>
@@ -37,6 +38,7 @@
       class="tree-body">
       <flat-tree-component
         (treeNodeClick)="handleClickRegion($event)"
+        (totalRenderedListChanged)="handleTotalRenderedListChanged($event)"
         [inputItem]="aggregatedRegionTree"
         [renderNode]="displayTreeNode"
         [searchFilter]="filterTreeBySearch">
