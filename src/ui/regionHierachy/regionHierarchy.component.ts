@@ -62,15 +62,20 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   @ViewChild('searchTermInput', {read: ElementRef})
   private searchTermInput: ElementRef
 
-  countItemsIntoTheTree: number
+  /**
+   * set the height to max, bound by max-height
+   */
+  numTotalRenderedRegions: number = 999
   windowHeight: number
 
   @HostListener('document:click', ['$event'])
   closeRegion(event: MouseEvent) {
     const contains = this.el.nativeElement.contains(event.target)
     this.showRegionTree = contains
-    if (!this.showRegionTree)
+    if (!this.showRegionTree){
       this.searchTerm = ''
+      this.numTotalRenderedRegions = 999
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -149,15 +154,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
         this.changeSearchTerm(ev)
       })
     )
-
-    setTimeout(() => {
-      this.countItemsIntoTheTree = 1
-      if (this.aggregatedRegionTree.children &&
-          this.aggregatedRegionTree.children.length > 0) {
-        this.countItems(this.aggregatedRegionTree)
-      }
-    })
-
   }
 
   getInputPlaceholder(parcellation:any) {
@@ -174,20 +170,14 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
 
   }
 
-  countItems(objectToCount) {
-    objectToCount.children.forEach(object => {
-      this.countItemsIntoTheTree += 1
-      if (object.children && object.children.length > 0) this.countItems(object)
-    })
-  }
-
-  uncollapsedFlatTreeItems(event) {
-    this.countItemsIntoTheTree = event
+  handleTotalRenderedListChanged(changeEvent: {previous: number, current: number}){
+    const { current } = changeEvent
+    this.numTotalRenderedRegions = current
   }
 
   regionHierarchyHeight(){
     return({
-      'height' : (this.countItemsIntoTheTree * 15 + 60).toString() + 'px',
+      'height' : (this.numTotalRenderedRegions * 15 + 60).toString() + 'px',
       'max-height': (this.windowHeight - 100) + 'px'
     })
   }
