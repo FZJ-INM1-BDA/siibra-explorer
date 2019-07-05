@@ -12,7 +12,7 @@
     (extraBtnClicked)="handleExtraBtnClicked($event, 'template')"
     [activeDisplayBtns]="(selectedTemplate$ | async | templateParcellationsDecorationPipe)?.extraButtons"
     (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'template')"
-    (listItemButtonClicked)="showInfoToast($event, 'template')">
+    (listItemButtonClicked)="handleExtraBtnClicked($event, 'template')">
   </dropdown-component>
 
   <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
@@ -27,7 +27,7 @@
       (extraBtnClicked)="handleExtraBtnClicked($event, 'parcellation')"
       [activeDisplayBtns]="(selectedParcellation | templateParcellationsDecorationPipe)?.extraButtons"
       (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'parcellation')"
-      (listItemButtonClicked)="showInfoToast($event, 'parcellation')">
+      (listItemButtonClicked)="handleExtraBtnClicked($event, 'parcellation')">
 
     </dropdown-component>
     <region-hierarchy
