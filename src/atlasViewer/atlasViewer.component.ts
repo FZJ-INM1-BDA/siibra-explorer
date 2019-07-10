@@ -78,6 +78,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
+  public onhoverLandmarksForFixed$: Observable<any>
   public onhoverLandmark$ : Observable<string | null>
   private subscriptions: Subscription[] = []
 
@@ -376,6 +377,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
 
+    this.onhoverLandmarksForFixed$ = this.rClContextualMenu.onShow.pipe(
+        withLatestFrom(this.onhoverLandmark$),
+        map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
+    )
+
     this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
@@ -472,6 +478,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
       this.mobileMenuTabs.tabs[1].active = true
     }
+  }
+
+  openLandmarkUrl(landmark) {
+    this.rClContextualMenu.hide()
+    window.open("https://www.google.com", "_blank");
   }
 
   @HostBinding('attr.version')

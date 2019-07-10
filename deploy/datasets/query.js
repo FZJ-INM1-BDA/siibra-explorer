@@ -279,7 +279,7 @@ const getSpatialSearcParam = ({ templateName, queryArg }) => {
 
 const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, user }) => {
 
-  const { releasedOnly, option } = await getUserKGRequestInfo({ user })
+  const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
   const url = require('url')
