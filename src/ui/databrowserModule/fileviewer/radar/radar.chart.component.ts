@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, ViewChild, ElementRef, AfterViewInit, Afte
 
 import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption } from '../chart.interface';
 import { Color } from 'ng2-charts';
+import {DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
 @Component({
   selector : `radar-chart`,
   templateUrl : './radar.chart.template.html',
@@ -28,6 +29,12 @@ export class RadarChart implements OnChanges{
   @Input() colors : ChartColor[] = []
 
   @Input() options : any
+
+  constructor(private dbService: DatabrowserService) {}
+
+  get darktheme(){
+    return this.dbService.darktheme
+  }
 
   mousescroll(_ev:MouseWheelEvent){
 
@@ -61,25 +68,25 @@ export class RadarChart implements OnChanges{
       },
       ticks : {
         showLabelBackdrop : false,
-        fontColor : 'white'
+        fontColor : this.darktheme? 'white' : 'black'
       },
       angleLines : {
         color : 'rgba(128,128,128,0.2)'
       },
       pointLabels : {
-        fontColor : 'white'
+        fontColor : this.darktheme? 'white' : 'black'
       }
     },
     legend : {
       display: true,
       labels : {
-        fontColor : 'white'
+        fontColor : this.darktheme? 'white' : 'black'
       }
     },
     title :{
       text : 'Radar graph',
       display : true,
-      fontColor : 'rgba(255,255,255,1.0)'
+      fontColor : this.darktheme? 'rgba(255,255,255,1.0)' : 'black'
     },
     color : [{
       backgroundColor : `rgba(255,255,255,0.2)`
