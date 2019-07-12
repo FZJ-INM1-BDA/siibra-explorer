@@ -24,7 +24,7 @@ export class ToastComponent{
   @HostBinding('@exists')
   exists : boolean = true
 
-  @ViewChild('messageContainer',{read:ViewContainerRef}) messageContainer : ViewContainerRef
+  @ViewChild('messageContainer',{static: true, read:ViewContainerRef}) messageContainer : ViewContainerRef
 
   dismiss(event:MouseEvent){
     event.preventDefault()

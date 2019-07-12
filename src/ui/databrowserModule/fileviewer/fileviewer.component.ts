@@ -19,6 +19,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
    */
   @Input() previewFile : ViewerPreviewFile
   
+  // @ts-ignore
   @ViewChild('childChart') childChart : ChartComponentInterface
 
   constructor(

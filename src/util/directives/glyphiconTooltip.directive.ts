@@ -16,6 +16,7 @@ export class fasTooltipScreenshotDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -38,6 +39,7 @@ export class fasTooltipRemoveSignDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -60,6 +62,7 @@ export class fasTooltipRemoveDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -82,6 +85,7 @@ export class fasTooltipNewWindowDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -104,6 +108,7 @@ export class fasTooltipLogInDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -125,6 +130,7 @@ export class fasTooltipQuestionSignDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',
@@ -146,6 +152,7 @@ export class fasTooltipInfoSignDirective extends TooltipDirective{
     public elementRef:ElementRef,
     public clf:ComponentLoaderFactory,
   ){
+    // @ts-ignore
     super(viewContainerRef,rd,elementRef,clf,{
       placement : 'bottom',
       triggers : 'mouseenter:mouseleave',

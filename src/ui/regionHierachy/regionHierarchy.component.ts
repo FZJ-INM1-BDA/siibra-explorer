@@ -59,7 +59,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   public searchTerm: string = ''
   private subscriptions: Subscription[] = []
 
-  @ViewChild('searchTermInput', {read: ElementRef})
+  @ViewChild('searchTermInput', {static: false, read: ElementRef})
   private searchTermInput: ElementRef
 
   /**

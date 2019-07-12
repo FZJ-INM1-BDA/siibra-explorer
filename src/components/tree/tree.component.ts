@@ -29,7 +29,7 @@ export class TreeComponent extends ParseAttributeDirective implements OnChanges,
   @Output() mouseclicktree : EventEmitter<any> = new EventEmitter()
 
   @ViewChildren(TreeComponent) treeChildren : QueryList<TreeComponent>
-  @ViewChild('childrenContainer',{ read : ElementRef }) childrenContainer : ElementRef
+  @ViewChild('childrenContainer',{static: false, read : ElementRef }) childrenContainer : ElementRef
 
   constructor( 
     private cdr : ChangeDetectorRef,

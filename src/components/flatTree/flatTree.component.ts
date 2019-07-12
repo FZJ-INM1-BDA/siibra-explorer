@@ -34,6 +34,7 @@ export class FlatTreeComponent implements AfterViewChecked {
   @Input() findChildren : (item:any)=>any[] = (item)=>item.children ? item.children : [] 
   @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
+  // @ts-ignore
   @ViewChild('flatTreeVirtualScrollViewPort') virtualScrollViewPort: CdkVirtualScrollViewport
   @Output() totalRenderedListChanged = new EventEmitter<{ previous: number, current: number }>()
   private totalDataLength: number = null
@@ -48,14 +49,17 @@ export class FlatTreeComponent implements AfterViewChecked {
   uncollapsedLevels : Set<string> = new Set()
 
   ngAfterViewChecked(){
-    const currentTotalDataLength = this.virtualScrollViewPort.getDataLength()
-    const previousDataLength = this.totalDataLength
+    if (this.virtualScrollViewPort) {
+      const currentTotalDataLength = this.virtualScrollViewPort.getDataLength()
 
-    this.totalRenderedListChanged.emit({
-      current: currentTotalDataLength,
-      previous: previousDataLength
-    })
-    this.totalDataLength = currentTotalDataLength
+      const previousDataLength = this.totalDataLength
+
+      this.totalRenderedListChanged.emit({
+        current: currentTotalDataLength,
+        previous: previousDataLength
+      })
+      this.totalDataLength = currentTotalDataLength
+    }
   }
 
   toggleCollapse(flattenedItem:FlattenedTreeInterface){

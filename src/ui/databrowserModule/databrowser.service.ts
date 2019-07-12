@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from "@angular/core";
+import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, from, of } from "rxjs";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
@@ -8,7 +8,6 @@ import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchE
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
-import { ComponentRef } from "@angular/core/src/render3";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";

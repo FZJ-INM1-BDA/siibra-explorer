@@ -13,6 +13,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 })
 export class LineChart implements OnChanges{
 
+  // @ts-ignore
   @ViewChild('canvas') canvas : ElementRef
 
   /**

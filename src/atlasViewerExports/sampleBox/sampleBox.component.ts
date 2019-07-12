@@ -20,7 +20,7 @@ export class SampleBoxUnit implements OnInit, OnChanges{
   @Input() sampleBoxTitle = ``
   @Input() scriptInput
   
-  @ViewChild('ngContent',{read:ElementRef}) ngContent : ElementRef
+  @ViewChild('ngContent',{static: false, read:ElementRef}) ngContent : ElementRef
 
   escapedHtml : string = ``
   escapedScript : string = ``
