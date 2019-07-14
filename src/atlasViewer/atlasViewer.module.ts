@@ -62,14 +62,22 @@ import {RouterModule} from "@angular/router";
             UseEffects
         ]),
         StoreModule.forRoot({
-            pluginState,
-            viewerConfigState,
-            ngViewerState,
-            viewerState,
-            dataStore,
-            spatialSearchState,
-            uiState,
-        }),
+                pluginState,
+                viewerConfigState,
+                ngViewerState,
+                viewerState,
+                dataStore,
+                spatialSearchState,
+                uiState,
+            }, {
+                runtimeChecks: {
+                    strictStateImmutability: true,
+                    strictActionImmutability: true,
+                    strictStateSerializability: true,
+                    strictActionSerializability: true,
+                }
+            }
+        ),
         HttpClientModule
     ],
     declarations : [

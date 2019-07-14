@@ -1,7 +1,6 @@
 import {PreloadAllModules, RouterModule, Routes} from "@angular/router";
 import {NgModule} from "@angular/core";
-import {AtlasViewer} from "src/atlasViewer/atlasViewer.component";
-// import {HelpPageComponent} from "src/helpPage/helpPage.component";
+import {HelpPageComponent} from "src/helpPage/helpPage.component";
 
 const appRoutes: Routes = [
     {
@@ -10,8 +9,7 @@ const appRoutes: Routes = [
         pathMatch: 'full'
     },
 
-    { path: '', component: AtlasViewer, pathMatch: 'full'},
-    // { path: 'help', component: HelpPageComponent},
+    { path: 'help', component: HelpPageComponent},
     { path: '**', redirectTo: ''}
 ];
 
