@@ -1,0 +1,37 @@
+.header-component {
+    background: url('http://coresofts.com/image-data/BP.jpg');
+    background-size: 100%;
+    background-repeat: no-repeat;
+    filter: blur(3px);
+    height: calc(100vw - 800px);
+    max-height: 500px;
+    min-height: 200px;
+}
+
+.main-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 800px;
+    margin: auto;
+}
+
+.card {
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    outline: none;
+    margin: -50px 10px 60px 10px;
+    cursor: pointer;
+}
+
+.card-image {
+    width: 100px;
+    height: auto;
+    align-self: center;
+}
+
+mat-card-header {
+    display: flex; 
+    justify-content: center;
+}

@@ -1,0 +1,16 @@
+.image-container
+{
+  flex: 1 0 0;
+}
+
+.text-container
+{
+  flex: 1 0 0;
+  text-align: justify;
+  margin-right: 10px;
+}
+
+img
+{
+  width: 100%;
+}

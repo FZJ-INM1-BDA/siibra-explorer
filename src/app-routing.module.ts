@@ -1,15 +1,13 @@
 import {PreloadAllModules, RouterModule, Routes} from "@angular/router";
 import {NgModule} from "@angular/core";
-import {HelpPageComponent} from "src/helpPage/helpPage.component";
+import {AtlasViewer} from "src/atlasViewer/atlasViewer.component";
 
 const appRoutes: Routes = [
+    { path: '', component: AtlasViewer, pathMatch: 'full'},
     {
-        path: '',
-        loadChildren: () => import('./atlasViewer/atlasViewer.module').then(mod => mod.AtlasViewerModule),
-        pathMatch: 'full'
+        path: 'help',
+        loadChildren: () => import('./helpPage/helpPage.module').then(mod => mod.HelpPageModule),
     },
-
-    { path: 'help', component: HelpPageComponent},
     { path: '**', redirectTo: ''}
 ];
 

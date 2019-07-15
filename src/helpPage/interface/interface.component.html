@@ -1,0 +1,102 @@
+
+<div class="main-container">
+  <H1 >Quick Start</H1>
+  <div class="description-text">
+    <p>On the first page of interactive atlas you can see the list of templates. Each item of the list contains name and description</p>
+    <img class="container-image" src="http://coresofts.com/image-data/BP_Start.JPG">
+    <div class="flex">
+      <p>Notice the arrow button. Usually description text is collapsed into the main screen. If you want to open full description, open it using the arrow button. To choose one of the templates, just click the relevant one from the list.
+      </p>
+      <!-- <img class="desc-image" src="http://coresofts.com/image-data/BP_start_desc.JPG"> -->
+    </div>
+    <p>After you choose the template, brain images will appear on the screen</p>
+
+
+  </div>
+
+  <img class="full-image" src="http://coresofts.com/image-data/BP12.png" >
+
+  <div class="description-text">
+    <p>The simple page of the brain atlas viewer consists of 9 basic parts. The parts are marked with white squares. Now let's describe the parts</p>
+
+    <div class="list-item">
+      <p> <strong>1,2,3</strong> - Orthogonal 2D cross sections of the brain volume.</p>
+      <p> <strong>4</strong> - The 3D overview of the brain volume.</p>
+      <p> <strong>5</strong> - Logo and icons to open floating widgets such as search, layers and plugins. <span class = "link" (click)="goToRegion(Five)">click for details</span></p>
+      <p> <strong>6</strong> - Inside the square, you can see the coordinates of intersection of 2D views and position of cursor. From here, it is possible to reset position, rotation, and zoom level for both 2D cross sections and 3D overview of brain volume. <span class = "link" (click)="goToRegion(Six)">click for details</span></p>
+      <p> <strong>7</strong> - Scale bar indicating current level of zoom.</p>
+      <p> <strong>8</strong> - In this part it is possible to select templates and parcellations. Also, it provides the ability to search, select or deselect regions of parcellation. This panel contains help and login buttons as well. <span class = "link" (click)="goToRegion(Eight)">click for details</span></p>
+      <p> <strong>9</strong> - By clicking on the text, you can hide and show frontal octant in the 3D overview of the brain volume.</p>
+    </div>
+  </div>
+
+  <div class="description-text">
+    <p>Let's deep dive into the regions 5, 6 and 8. These parts are complex. The items of each part could perform different functions, which mostly belong to one category.</p>
+  </div>
+
+  <div class="description-text" #Five>
+      <p><strong>5</strong></p>
+  </div>
+
+  <div class="description-text">
+      <p>As mentioned above, this part consists of a logo and icons. Icons are used to open and collapse floating widgets such as layer browser, plugins, and search. Let's look at the image of these icons</p>
+  </div>
+
+  <div class="description-text">
+      <img class="container-image" style="max-width: 400px;" src='http://coresofts.com/image-data/five.png'>
+  </div>
+
+
+  <div class="description-text">
+      <p>There are 3 types of icons. 1. The icon for layer browser. 2. Icons for plugins. 3. Icons for search functions. And here is the image of the floating widgets themselves</p>
+
+      <table class="image-table">
+        <tr><td>Layer Browser</td><td>Plugin</td><td>Search</td></tr>
+        <tr>
+          <td>
+            <img src="http://coresofts.com/image-data/layer.JPG">
+          </td>
+          <td>
+            <img src="http://coresofts.com/image-data/widget.JPG">
+          </td>
+          <td>
+            <img src="http://coresofts.com/image-data/search.JPG">
+          </td>
+        </tr>
+      </table>
+
+  </div>
+
+
+
+  <div class="description-text" #Six>
+      <p><strong>6</strong></p>
+  </div>
+
+  <div class="description-text" >
+      <p>In the first example, the part under the number 6 is not visible well. So let's have a closer look at it.</p>
+  </div>
+  <div class="description-text" >
+      <img class="container-image" style="max-width: 400px;" src='http://coresofts.com/image-data/navigation_tracker.gif'>
+  </div>
+  <div class="description-text list-item" >
+      <p>As you can see, we have 4 constant and 1 transient line</p>
+      <p>1 - Reset: by clicking labels on this line you can reset position, rotation and zoom.</p>
+      <p>2 - Space: here you can change display units from physical space to voxel-based coordinates.</p>
+      <p>3 - Navigation: from here you can see and change the coordinates of the intersection point of orthogonal 2D cross sections of the brain volume.</p>
+      <p>4 - Mouse: coordinates of the position under mouse cursor either in physical space or in voxel units.</p>
+      <p>5 - The last line is only visible when mouse cursor hovers over some region of parcellation. Accordingly, the line content is the region name.</p>
+  </div>
+
+
+  <div class="description-text" #Eight>
+      <p><strong>8</strong></p>
+  </div>
+  <div class="description-text" >
+      <p>Let's now have a closer look at part 8</p>
+      <img class="container-image" src='http://coresofts.com/image-data/templates.gif'>
+      <p>You can select different templates and parcellation from drop-down menus. Also, you can find and select the specific regions of parcellation.</p>
+  </div>
+
+
+</div>
