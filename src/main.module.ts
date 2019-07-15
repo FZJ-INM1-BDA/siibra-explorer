@@ -4,9 +4,7 @@ import {AngularMaterialModule} from 'src/ui/sharedModules/angularMaterial.module
 
 import {AppComponent} from "src/app.component";
 import {AppRoutingModule} from "src/app-routing.module";
-import {HelpPageComponent} from "src/helpPage/helpPage.component";
 import {BrowserModule} from "@angular/platform-browser";
-import {RouterModule} from "@angular/router";
 import {EffectsModule} from "@ngrx/effects";
 import {UseEffects} from "src/services/effect/effect";
 import {select, Store, StoreModule} from "@ngrx/store";

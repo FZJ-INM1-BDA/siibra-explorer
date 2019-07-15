@@ -78,7 +78,6 @@
   },
   "dependencies": {
     "@angular/cdk": "^8.0.2",
-    "@angular/cli": "^8.1.1",
     "@angular/material": "^8.0.2",
     "@angular/router": "^8.1.1",
     "zone.js": "^0.9.1"
