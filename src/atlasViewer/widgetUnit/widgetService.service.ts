@@ -30,6 +30,17 @@ export class WidgetServices{
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
   }
 
+  moveFloatingToFront(widgetUnit) {
+    const widget = [...this.widgetComponentRefs].find(widget=>widget.instance===widgetUnit)
+    if(!widget)
+      return
+    const idx = this.floatingContainer.indexOf(widget.hostView)
+    if(idx === this.floatingContainer.length - 1 )
+      return
+    this.floatingContainer.detach(idx)
+    this.floatingContainer.insert(widget.hostView)
+  }
+
   clearAllWidgets(){
     [...this.widgetComponentRefs].forEach((cr:ComponentRef<WidgetUnit>) => {
       if(!cr.instance.persistency) cr.destroy()
