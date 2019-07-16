@@ -1,36 +1,38 @@
 <logo-container *ngIf="!isMobile">
 </logo-container>
 
-<div
-  *ngIf="false"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
+<!-- hide icons when templates has yet been selected -->
+<ng-template [ngIf]="selectedTemplate$ | async">
   <div
-    [tooltip]="dataBrowserTitle"
-    placement="right"
-    (click)="clickSearch($event)"
-    [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-search">
-      
-    </i>
-  </div>
-</div>
+    *ngIf="false"
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
+    <div
+      [tooltip]="dataBrowserTitle"
+      placement="right"
+      (click)="clickSearch($event)"
+      [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-search">
 
-<div
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
-  <div
-    tooltip="Layer"
-    placement="right"
-    (click)="clickLayer($event)"
-    [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-layer-group">
-      
-    </i>
+      </i>
+    </div>
   </div>
-</div>
+
+  <div
+    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
+    class="btnWrapper">
+    <div
+      tooltip="Layer"
+      placement="right"
+      (click)="clickLayer($event)"
+      [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
+      class="shadow btn btn-sm rounded-circle">
+      <i class="fas fa-layer-group">
+
+      </i>
+    </div>
+  </div>
 
 <div
   *ngIf="false"

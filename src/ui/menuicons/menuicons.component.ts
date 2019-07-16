@@ -4,7 +4,7 @@ import {
   Injector,
   ComponentFactory,
   ComponentFactoryResolver,
-  ElementRef, ViewChild, OnInit, OnDestroy, ViewEncapsulation
+  ViewChild, OnInit, OnDestroy
 } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
@@ -67,6 +67,8 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     return this.constantService.mobile
   }
 
+  public selectedTemplate$: Observable<any>
+
   constructor(
     private widgetServices:WidgetServices,
     private injector:Injector,
@@ -74,7 +76,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     public dbService: DatabrowserService,
     cfr: ComponentFactoryResolver,
     public pluginServices:PluginServices,
-    private store: Store<ViewerStateInterface>,
+    private store: Store<any>,
     private toastService: ToastService,
   ){
 
@@ -83,6 +85,11 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
     this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
+
+    this.selectedTemplate$ = store.pipe(
+      select('viewerState'),
+      select('templateSelected')
+    )
 
     this.selectedRegions$ = this.store.pipe(
         select('viewerState'),
