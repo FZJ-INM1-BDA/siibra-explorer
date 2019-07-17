@@ -348,7 +348,7 @@ async function getUserKGRequestParam({ user }) {
     const option = accessToken || publicAccessToken
         ? {
             auth: {
-                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
+                'bearer': accessToken || publicAccessToken
             }
         }
         : {}
