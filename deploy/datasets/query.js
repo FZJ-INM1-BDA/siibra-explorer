@@ -240,7 +240,7 @@ const cachedMap = new Map()
 /**
  * TODO change to URL constructor to improve readability
  */
-const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinates/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
+const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinatesNG/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
 
 const getXformFn = (templateSpace) => {
   const _ = {}
@@ -302,10 +302,14 @@ const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, u
 
       const { voxelToNm } = getXformFn(templateName)
 
-      const _ = json.results.map(({ name, coordinates}) => {
+      const _ = json.results.map(({ name, coordinates, dataset}) => {
         return {
           name,
           templateSpace: templateName,
+          dataset: {
+            name: dataset[0].name,
+            externalLink: 'https://kg.humanbrainproject.eu/instances/Dataset/' + dataset[0].identifier,
+          },
           geometry: {
             type: 'point',
             space: 'real',
@@ -344,7 +348,7 @@ async function getUserKGRequestParam({ user }) {
     const option = accessToken || publicAccessToken
         ? {
             auth: {
-                'bearer': accessToken || publicAccessToken
+                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
             }
         }
         : {}
