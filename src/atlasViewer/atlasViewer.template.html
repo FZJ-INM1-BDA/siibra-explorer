@@ -158,7 +158,7 @@
 
           <div *ngIf="(onhoverLandmarksForFixed$ | async) as onhoverLandmarksForFixed">
             <div
-                    *ngIf="onhoverLandmarksForFixed.externalUrl.length > 0"
+                    *ngIf="onhoverLandmarksForFixed && onhoverLandmarksForFixed.externalUrl && onhoverLandmarksForFixed.externalUrl.length > 0"
                     class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
                     data-toggle="tooltip"
                     data-placement="top"
