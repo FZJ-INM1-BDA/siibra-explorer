@@ -152,17 +152,29 @@
         <div body>
 
           <div
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0 || (onhoverLandmarksForFixed$ | async)?.externalUrl.length > 0"
             class="p-2">
             Search for data relating to:
+          </div>
+
+          <div *ngIf="(onhoverLandmarksForFixed$ | async) as onhoverLandmarksForFixed">
+            <div
+                    *ngIf="onhoverLandmarksForFixed && onhoverLandmarksForFixed.externalUrl && onhoverLandmarksForFixed.externalUrl.length > 0"
+                    class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    (click)="openLandmarkUrl(onhoverLandmarksForFixed)"
+                    [title]="onhoverLandmarksForFixed.landmarkName">
+                Explore dataset of {{ onhoverLandmarksForFixed.landmarkName }} <i class="fas fa-external-link-alt"></i>
+            </div>
           </div>
           
           <div
             *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
             class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
-            data-toggle="tooltip" 
-            data-placement="top" 
+            data-toggle="tooltip"
+            data-placement="top"
             [title]="onhoverSegmentFixed.name">
             <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
           </div>
@@ -190,7 +202,7 @@
 
           <div
             class="p-2 text-muted"
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0 && (onhoverLandmarksForFixed$ | async)?.length === 0">
             Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
   
@@ -206,12 +218,12 @@
       </panel-component>
       
       <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
-        <div 
-          *ngIf="onhoverLandmark$ | async" 
+        <div
+          *ngIf="onhoverLandmark$ | async"
           contextualBlock>
-          {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+          {{ (onhoverLandmark$ | async)?.landmarkName }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
-        <div 
+        <div
           *ngIf="onhoverSegments$ | async; let onhoverSegments"
           contextualBlock>
           <div

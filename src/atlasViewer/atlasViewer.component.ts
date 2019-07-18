@@ -78,7 +78,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
-  public onhoverLandmark$ : Observable<string | null>
+  public onhoverLandmarksForFixed$: Observable<any>
+  public onhoverLandmark$ : Observable<{landmarkName: string, externalUrl: string} | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -185,7 +186,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         const idx = Number(landmark.replace('label=',''))
         if(isNaN(idx))
           return `Landmark index could not be parsed as a number: ${landmark}`
-        return spatialDatas[idx].name
+        return  {
+                  landmarkName: spatialDatas[idx].name,
+                  externalUrl: (spatialDatas[idx].dataset
+                      && spatialDatas[idx].dataset.externalLink)? spatialDatas[idx].dataset.externalLink : null
+                }
       })
     )
 
@@ -376,6 +381,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
 
+    this.onhoverLandmarksForFixed$ = this.rClContextualMenu.onShow.pipe(
+        withLatestFrom(this.onhoverLandmark$),
+        map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
+    )
+
     this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
@@ -472,6 +482,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
       this.mobileMenuTabs.tabs[1].active = true
     }
+  }
+
+  openLandmarkUrl(landmark) {
+    this.rClContextualMenu.hide()
+    window.open(landmark.externalUrl, "_blank");
   }
 
   @HostBinding('attr.version')
