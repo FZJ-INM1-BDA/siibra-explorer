@@ -1,19 +1,19 @@
-
 <mat-toolbar class="toolbar">
-  <div class="logo"><img class="image" src="http://coresofts.com/image-data/HBP_Primary_RGB_WhiteText.png" (click) ="navigateTo('')">
-    <span  (click) ="navigateTo('')" *ngIf="!isMobile">Help page of Interactive Atlas Viewer</span>
-  </div>
+    <div class="logo">
+        <i class="fas fa-arrow-left" (click)="goBack()"></i>
+        <img class="image" src="http://coresofts.com/image-data/HBP_Primary_RGB_WhiteText.png" [routerLink]="['/']">
+    </div>
+    <span class="logo" (click)="navigateTo('')" *ngIf="!isMobile">Help</span>
 
-  <span class="fill-between-right-and-left"></span>
-
-  <button class ="menu-item" mat-button (click) ="navigateTo('interface')">
-    <span class="text">Quick Start</span>
-  </button>
-  <button class ="menu-item" (click) ="navigateTo('tutorial')" mat-button>
-    <span class="text">Quick Tutotials</span>
-  </button>
-
-  <!-- <button class ="menu-item" (click) ="navigateTo('api')" mat-button>
-    <span class="text">API</span>
-  </button> -->
+    <div class="logo">
+        <button class="menu-item" mat-button (click)="navigateTo('interface')">
+            <span class="text">Quick Start</span>
+        </button>
+        <button class="menu-item" (click)="navigateTo('tutorial')" mat-button>
+            <span class="text">Quick Tutotials</span>
+        </button>
+    </div>
+    <!-- <button class ="menu-item" (click) ="navigateTo('api')" mat-button>
+      <span class="text">API</span>
+    </button> -->
 </mat-toolbar>

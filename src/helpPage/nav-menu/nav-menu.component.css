@@ -1,7 +1,9 @@
 .toolbar {
     font-family: 'Raleway', sans-serif;
-    background-color: #EF5450;
+    background-color: #7BC0E8;
     color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
 }
 .fill-between-right-and-left {
     flex: 1 1 auto;
@@ -16,7 +18,7 @@
 .image {
     width: auto;
     height: 50px;
-    margin-right: 10px;
+    margin-left: 20px;
 }
 
 .menu-item {

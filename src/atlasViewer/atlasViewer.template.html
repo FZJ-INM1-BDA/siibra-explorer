@@ -74,6 +74,15 @@
 <ng-template #helpComponent>
   <tabset>
     <tab heading="Help">
+      <div class="d-flex justify-content-center">
+        <button mat-fab
+                color="primary"
+                class="help-guide-button"
+                [routerLink]="['/help']"
+        >
+          Guide
+        </button>
+      </div>
       <help-component>
       </help-component>
     </tab>
@@ -128,10 +137,6 @@
     </ui-nehuba-container>
   
     <div *ngIf="!isMobile" bannerWrapper>
-      <button style="width: 100px; height: 100px; z-index: 1009; background-color: #337ab7;"
-              [routerLink]="['/help']">
-        Test Routing
-      </button>
       <menu-icons iconWrapper>
       </menu-icons>
 

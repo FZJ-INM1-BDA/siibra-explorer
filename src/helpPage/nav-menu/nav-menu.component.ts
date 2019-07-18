@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { IsMobileService } from '../resources/services/is-Movile.service';
+import {Location} from '@angular/common';
 
 @Component({
   selector: 'app-nav-menu',
@@ -10,7 +11,7 @@ export class NavMenuComponent implements OnInit {
 
   isMobile: boolean;
 
-  constructor(private isMobileService: IsMobileService) { }
+  constructor(private isMobileService: IsMobileService, private _location: Location) { }
 
   @Output() page = new EventEmitter<string>();
 
@@ -32,5 +33,8 @@ export class NavMenuComponent implements OnInit {
     return window.innerWidth >= 750
   }
 
+  goBack() {
+    this._location.back();
+  }
 
 }
