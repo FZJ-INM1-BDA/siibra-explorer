@@ -180,15 +180,24 @@
           </div>
   
           <div
-            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
+            *ngIf="(selectedRegions$ | async)?.length > 1 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            <ng-container *ngIf="selectedRegions.length > 1">
+            <ng-container>
               <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
             </ng-container>
-            <ng-container *ngIf="selectedRegions.length === 1">
-              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
-            </ng-container>
+          </div>
+
+          <div *ngIf="(onhoverSegmentsForFixed$ | async) as onhoverSegmentsForFixed">
+            <div *ngIf="(selectedRegions$ | async)?.length === 1 && (selectedRegions$ | async) as selectedRegions">
+              <div *ngIf="!onhoverSegmentsForFixed[0] || onhoverSegmentsForFixed[0].name !== selectedRegions[0].name"
+                    (click)="searchRegion(selectedRegions)"
+                    class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+                <ng-container>
+                  <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }} selected regions
+                </ng-container>
+              </div>
+            </div>
           </div>
 
           <div
