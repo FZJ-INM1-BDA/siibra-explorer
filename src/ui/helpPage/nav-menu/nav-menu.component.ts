@@ -34,7 +34,7 @@ export class NavMenuComponent implements OnInit {
   }
 
   goBack() {
-    this._location.back();
+    window.close();
   }
 
 }

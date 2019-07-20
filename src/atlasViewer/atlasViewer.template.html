@@ -78,7 +78,8 @@
         <button mat-fab
                 color="primary"
                 class="help-guide-button"
-                [routerLink]="['/help']"
+                target="_blank"
+                (click)="openHelpPage()"
         >
           Guide
         </button>

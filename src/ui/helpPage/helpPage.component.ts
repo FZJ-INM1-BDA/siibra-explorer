@@ -27,7 +27,8 @@ export class HelpPageComponent {
 
   @HostListener('window:popstate', ['$event'])
   onPopState(event) {
-    if (!window.location.pathname || window.location.pathname === '/') {
+    console.log(event)
+    if (!window.location.pathname || window.location.pathname === '/help') {
       this.activePage = ''
     }
   }

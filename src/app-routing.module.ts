@@ -6,7 +6,7 @@ const appRoutes: Routes = [
     { path: '', component: AtlasViewer, pathMatch: 'full'},
     {
         path: 'help',
-        loadChildren: () => import('./helpPage/helpPage.module').then(mod => mod.HelpPageModule),
+        loadChildren: () => import('./ui/helpPage/helpPage.module').then(mod => mod.HelpPageModule),
     },
     { path: '**', redirectTo: ''}
 ];

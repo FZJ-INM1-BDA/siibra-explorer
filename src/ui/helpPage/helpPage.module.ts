@@ -7,7 +7,7 @@ import { HomeComponent } from './home/home.component';
 import { IsMobileService } from './resources/services/is-Movile.service';
 import {CommonModule} from "@angular/common";
 import {AngularMaterialModule} from "src/ui/sharedModules/angularMaterial.module";
-import {HelpPageComponent} from "src/helpPage/helpPage.component";
+import {HelpPageComponent} from "src/ui/helpPage/helpPage.component";
 import {RouterModule} from "@angular/router";
 
 

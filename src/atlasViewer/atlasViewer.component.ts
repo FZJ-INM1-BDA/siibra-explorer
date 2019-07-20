@@ -520,6 +520,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
   }
 
+  openHelpPage() {
+    window.open(window.location.origin + '/help', "_blank")
+    this.modalService.hide(1)
+  }
+
 }
 
 export interface NgLayerInterface{

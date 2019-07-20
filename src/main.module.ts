@@ -55,7 +55,7 @@ import {AtlasWorkerService} from "src/atlasViewer/atlasViewer.workerService.serv
 import {AuthService} from "src/services/auth.service";
 import {DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {HelpPageModule} from "src/helpPage/helpPage.module";
+import {HelpPageModule} from "src/ui/helpPage/helpPage.module";
 
 @NgModule({
     imports: [

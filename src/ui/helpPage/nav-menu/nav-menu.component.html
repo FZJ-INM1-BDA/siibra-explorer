@@ -1,7 +1,7 @@
 <mat-toolbar class="toolbar">
     <div class="logo">
-        <i class="fas fa-arrow-left" (click)="goBack()"></i>
-        <img class="image" src="http://coresofts.com/image-data/HBP_Primary_RGB_WhiteText.png" [routerLink]="['/']">
+        <i class="fas fa-times" (click)="goBack()"></i>
+        <img class="image" src="http://coresofts.com/image-data/HBP_Primary_RGB_WhiteText.png" (click)="navigateTo('')">
     </div>
     <span class="logo" (click)="navigateTo('')" *ngIf="!isMobile">Help</span>
 
