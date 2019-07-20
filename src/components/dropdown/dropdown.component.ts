@@ -29,7 +29,7 @@ export class DropdownComponent{
   @Output() itemSelected : EventEmitter<any> = new EventEmitter()
   @Output() extraBtnClicked: EventEmitter<ExraBtnClickEvent> = new EventEmitter()
 
-  @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef
+  @ViewChild('dropdownToggle',{ read:ElementRef}) dropdownToggle : ElementRef
 
   openState : boolean = false
 

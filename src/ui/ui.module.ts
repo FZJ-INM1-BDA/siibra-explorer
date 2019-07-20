@@ -48,10 +48,12 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import {CommonModule} from "@angular/common";
 
 
 @NgModule({
   imports : [
+      CommonModule,
     FormsModule,
     LayoutModule,
     ComponentsModule,

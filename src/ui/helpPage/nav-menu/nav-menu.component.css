@@ -1,0 +1,33 @@
+.toolbar {
+    font-family: 'Raleway', sans-serif;
+    background-color: #7BC0E8;
+    color: #FFFFFF;
+    display: flex;
+    justify-content: space-between;
+}
+.fill-between-right-and-left {
+    flex: 1 1 auto;
+}
+
+.logo {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    outline: none;
+}
+.image {
+    width: auto;
+    height: 50px;
+    margin-left: 20px;
+}
+
+.menu-item {
+    font-family: 'Raleway', sans-serif;
+    display: flex;
+    align-items: center;
+    margin: 0 5px 0 15px;
+
+}
+.text {
+    margin-left: 5px;
+}

@@ -5,7 +5,7 @@
 Interactive Atlas Viewer could be run with already selected state. It is possible to create or save application URL so, that it will contain specific data which will usefull to run application with already defined state. In URL, this specific data, is saved as URL query parameters.
   
 ## URL query parameters in Interactive Atlas Viewer  
-  
+ 
   
 URL query parameters are variables which are located after URL and separated from the URL with "?" mark. URL query parameter variable contains variable name and value. Url query parameters are divided by "&" symbol. it is not possible to use whitespaces in the URL query. In Interactive Atlas Viewer, URL query parameters are used to save or create an application state. There are 6 main parameters which are used to save the application state. They are: navigation, niftiLayers, parcellationSelected, pluginState, regionsSelected and templateSelected.  
   
@@ -95,7 +95,7 @@ The region belongs to parcellation, so user can not add regionsSelected without 
   
 ### Nifti Layers - parameter  
 
-Nifti Layers parameter adds to the application URL, when the user selects the nifti layer of selected regions. The value of this parameter is text. Especially, it is a link where the nifti file is located.  
+Nifti Layers parameter adds to the application URL, when the user selects the nifti layer of selected region(s). The value of this parameter is text. Especially, it is a link where the nifti file is located.  
 Example  
 
 ```  

@@ -74,6 +74,16 @@
 <ng-template #helpComponent>
   <tabset>
     <tab heading="Help">
+      <div class="d-flex justify-content-center">
+        <button mat-fab
+                color="primary"
+                class="help-guide-button"
+                target="_blank"
+                (click)="openHelpPage()"
+        >
+          Guide
+        </button>
+      </div>
       <help-component>
       </help-component>
     </tab>

@@ -1,0 +1,19 @@
+<mat-toolbar class="toolbar">
+    <div class="logo">
+        <i class="fas fa-times" (click)="goBack()"></i>
+        <img class="image" src="http://coresofts.com/image-data/HBP_Primary_RGB_WhiteText.png" (click)="navigateTo('')">
+    </div>
+    <span class="logo" (click)="navigateTo('')" *ngIf="!isMobile">Help</span>
+
+    <div class="logo">
+        <button class="menu-item" mat-button (click)="navigateTo('interface')">
+            <span class="text">Quick Start</span>
+        </button>
+        <button class="menu-item" (click)="navigateTo('tutorial')" mat-button>
+            <span class="text">Quick Tutotials</span>
+        </button>
+    </div>
+    <!-- <button class ="menu-item" (click) ="navigateTo('api')" mat-button>
+      <span class="text">API</span>
+    </button> -->
+</mat-toolbar>

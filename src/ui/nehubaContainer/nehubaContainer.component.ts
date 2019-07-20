@@ -84,11 +84,11 @@ const scanFn : (acc:[boolean, boolean, boolean], curr: CustomEvent) => [boolean,
 
 export class NehubaContainer implements OnInit, OnDestroy{
 
-  @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
-  @ViewChild('[pos00]',{read:ElementRef}) topleft : ElementRef
-  @ViewChild('[pos01]',{read:ElementRef}) topright : ElementRef
-  @ViewChild('[pos10]',{read:ElementRef}) bottomleft : ElementRef
-  @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
+  @ViewChild('container',{ read:ViewContainerRef}) container : ViewContainerRef
+  @ViewChild('[pos00]',{ read:ElementRef}) topleft : ElementRef
+  @ViewChild('[pos01]',{ read:ElementRef}) topright : ElementRef
+  @ViewChild('[pos10]',{ read:ElementRef}) bottomleft : ElementRef
+  @ViewChild('[pos11]',{ read:ElementRef}) bottomright : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
 

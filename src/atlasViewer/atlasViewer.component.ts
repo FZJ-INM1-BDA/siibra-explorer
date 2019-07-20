@@ -42,16 +42,20 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
-  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
-  @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
+  @ViewChild('helpComponent', { read: TemplateRef}) helpComponent : TemplateRef<any>
+  @ViewChild('signinModalComponent', { read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', { read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
+  @ViewChild('kgToS', { read: TemplateRef}) kgTosComponent: TemplateRef<any>
+  // @ts-ignore
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
+  // @ts-ignore
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
+  // @ts-ignore
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
+  // @ts-ignore
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
   @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
@@ -529,6 +533,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         })
       )
     }
+  }
+
+  openHelpPage() {
+    window.open(window.location.origin + '/help', "_blank")
+    this.modalService.hide(1)
   }
 
 }

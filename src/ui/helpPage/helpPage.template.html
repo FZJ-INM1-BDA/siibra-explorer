@@ -1,0 +1,6 @@
+<div class="helpBody">
+    <app-nav-menu (page)="pageChanged($event)"></app-nav-menu>
+    <app-home (page)="pageChanged($event)" *ngIf="!activePage || activePage == 'home'"></app-home>
+    <app-interface *ngIf="activePage === 'interface'"></app-interface>
+    <app-tutorial *ngIf="activePage === 'tutorial'"></app-tutorial>
+</div>

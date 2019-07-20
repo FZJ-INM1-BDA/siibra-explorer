@@ -9,23 +9,26 @@
   <link rel = "stylesheet" href = "extra_styles.css">
   <link rel = "stylesheet" href = "plugin_styles.css">
   <link rel = "stylesheet" href = "indigo-pink.css">
+  <base href="/">
+
 
   <title>Interactive Atlas Viewer</title>
 </head>
 <body>
-  <atlas-viewer>
-    <h1 style = "text-align:center;">
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-    </h1>
-  </atlas-viewer>
+<app-component></app-component>
+<!--  <atlas-viewer>-->
+<!--    <h1 style = "text-align:center;">-->
+<!--      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>-->
+<!--      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>-->
+<!--      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>-->
+<!--    </h1>-->
+<!--  </atlas-viewer>-->
   <script>
     /**
      * Catching Safari 10 bug:
-     * 
+     *
      * https://bugs.webkit.org/show_bug.cgi?id=171041
-     * 
+     *
      */
     try{
       eval('(()=>{\

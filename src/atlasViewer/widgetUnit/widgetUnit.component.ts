@@ -11,8 +11,11 @@ import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.ser
 })
 
 export class WidgetUnit implements OnInit{
-  @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
-  @ViewChild('emptyspan',{read:ElementRef}) emtpy : ElementRef
+
+  // @ts-ignore
+  @ViewChild('container',{ read:ViewContainerRef}) container : ViewContainerRef
+  // @ts-ignore
+  @ViewChild('emptyspan',{ read:ElementRef}) emtpy : ElementRef
 
   @HostBinding('attr.state')
   public state : 'docked' | 'floating' = 'docked'

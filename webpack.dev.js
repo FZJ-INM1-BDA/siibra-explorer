@@ -12,7 +12,10 @@ module.exports = merge(common,ngAssets,staticAssets,{
   mode : 'development',
   output : {
     filename : '[name].js',
-    path : path.resolve(__dirname,'dist/dev')
+    path : path.resolve(__dirname,'dist/dev'),
+  },
+  devServer: {
+    historyApiFallback: true,
   },
   devtool:'source-map',
 

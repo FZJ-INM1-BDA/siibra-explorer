@@ -31,9 +31,9 @@ div:not(.active) > span:before
 export class MobileOverlay implements OnInit, OnDestroy{
   @Input() tunableProperties : string [] = []
   @Output() deltaValue : EventEmitter<{delta:number, selectedProp : string}> = new EventEmitter() 
-  @ViewChild('initiator', {read: ElementRef}) initiator : ElementRef
-  @ViewChild('mobileMenuContainer', {read: ElementRef}) menuContainer : ElementRef
-  @ViewChild('intersector', {read: ElementRef}) intersector: ElementRef
+  @ViewChild('initiator', { read: ElementRef}) initiator : ElementRef
+  @ViewChild('mobileMenuContainer', { read: ElementRef}) menuContainer : ElementRef
+  @ViewChild('intersector', { read: ElementRef}) intersector: ElementRef
 
   private _onDestroySubject : Subject<boolean> = new Subject()
 

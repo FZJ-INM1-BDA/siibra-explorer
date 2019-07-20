@@ -29,7 +29,7 @@ export class MarkdownDom implements OnChanges,OnInit{
       this.innerHtml = this.converter.makeHtml(this.contentWrapper.nativeElement.innerHTML)
   }
 
-  @ViewChild('ngContentWrapper', {read : ElementRef})
+  @ViewChild('ngContentWrapper', { read : ElementRef})
   contentWrapper : ElementRef
 
 }

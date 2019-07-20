@@ -11,6 +11,7 @@ import { Color } from 'ng2-charts';
 })
 export class RadarChart implements OnChanges{
 
+  // @ts-ignore
   @ViewChild('canvas') canvas : ElementRef
   /**
    * labels of each of the columns, spider web edges
