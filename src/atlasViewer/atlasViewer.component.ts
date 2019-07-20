@@ -41,11 +41,11 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
-  @ViewChild('floatingMouseContextualContainer', {static: false, read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('helpComponent', {static: false, read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('signinModalComponent', {static: false, read: TemplateRef}) signinModalComponent : TemplateRef<any>
-  @ViewChild('cookieAgreementComponent', {static: false, read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
-  @ViewChild('kgToS', {static: false, read: TemplateRef}) kgTosComponent: TemplateRef<any>
+  @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
+  @ViewChild('helpComponent', { read: TemplateRef}) helpComponent : TemplateRef<any>
+  @ViewChild('signinModalComponent', { read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', { read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
+  @ViewChild('kgToS', { read: TemplateRef}) kgTosComponent: TemplateRef<any>
   // @ts-ignore
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
@@ -57,7 +57,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   // @ts-ignore
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
-  @ViewChild('sidenav', {static: false, read: ElementRef} ) mobileSideNav: ElementRef
+  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components

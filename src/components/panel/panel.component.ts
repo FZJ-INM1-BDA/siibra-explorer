@@ -25,8 +25,8 @@ export class PanelComponent extends ParseAttributeDirective {
 
   @Input() containerClass : string = ''
 
-  @ViewChild('panelBody',{static: false, read : ElementRef }) efPanelBody : ElementRef
-  @ViewChild('panelFooter',{static: false, read : ElementRef }) efPanelFooter : ElementRef
+  @ViewChild('panelBody',{ read : ElementRef }) efPanelBody : ElementRef
+  @ViewChild('panelFooter',{ read : ElementRef }) efPanelFooter : ElementRef
 
   constructor(){
     super()

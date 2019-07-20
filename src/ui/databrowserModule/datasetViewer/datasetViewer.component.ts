@@ -11,7 +11,7 @@ export class DatasetViewerComponent{
   @Input() dataset : DataEntry
   
   @Output() showPreviewDataset: EventEmitter<{datasetName:string, event:MouseEvent}> = new EventEmitter()
-  @ViewChild('kgrRef', {static: false, read:ElementRef}) kgrRef: ElementRef
+  @ViewChild('kgrRef', { read:ElementRef}) kgrRef: ElementRef
 
   previewDataset(event:MouseEvent){
     if (!this.dataset.preview) return

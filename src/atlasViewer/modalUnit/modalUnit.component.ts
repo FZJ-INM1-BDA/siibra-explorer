@@ -13,7 +13,7 @@ export class ModalUnit implements AfterViewInit{
   @Input() template: TemplateRef<any>
   @Input() footer: string 
 
-  @ViewChild('templateContainer', {static: false, read:ViewContainerRef}) templateContainer : ViewContainerRef
+  @ViewChild('templateContainer', { read:ViewContainerRef}) templateContainer : ViewContainerRef
 
   constructor(public viewContainerRef : ViewContainerRef){
     
