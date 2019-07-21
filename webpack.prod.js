@@ -13,6 +13,9 @@ module.exports = merge(common,ngAssets,staticAssets,{
     filename : 'main.js',
     path : path.resolve(__dirname,'dist/prod')
   },
+  devServer: {
+    historyApiFallback: true,
+  },
   plugins : [
     new ClosureCompilerPlugin({
       compiler : {
