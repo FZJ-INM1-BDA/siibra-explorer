@@ -35,7 +35,6 @@ export class FixedMouseContextualContainerDirective {
         this.mousePos[1] = window.innerHeight-this.el.nativeElement.offsetHeight
       }
       this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
-      console.log(this.el.nativeElement.offsetHeight)
     })
     this.isShown = true
     this.onShow.emit()

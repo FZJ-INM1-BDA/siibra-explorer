@@ -137,6 +137,10 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     }
   }
 
+  pinSearchWidget() {
+
+  }
+
   public catchError(e) {
     
   }
