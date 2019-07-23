@@ -4,7 +4,7 @@ import {
   Injector,
   ComponentFactory,
   ComponentFactoryResolver,
-  ViewChild, OnInit, OnDestroy
+  ViewChild, OnInit, OnDestroy, ElementRef, HostListener
 } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
@@ -59,9 +59,16 @@ export class MenuIconsBar implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = []
   public selectedRegions$: Observable<any[]>
   selectedRegions: any[] = []
-  @ViewChild('selectedRegionsMenuOpener', {read: MatMenuTrigger}) protected regionMenuTrigger : MatMenuTrigger;
-  @ViewChild('selectedSearchMenuOpener', {read: MatMenuTrigger}) protected searchMenuTrigger : MatMenuTrigger;
-  @ViewChild('pluginMenuOpener', {read: MatMenuTrigger}) protected pluginMenuTrigger : MatMenuTrigger;
+
+  regionMenuTrigger = false
+  @ViewChild('selectedRegionsMenu', {read: ElementRef}) selectedRegionsMenu: ElementRef
+  @ViewChild('selectedRegionsButton', {read: ElementRef}) selectedRegionsButton: ElementRef
+  searchMenuTrigger = false
+  @ViewChild('selectedSearchMenu', {read: ElementRef}) selectedSearchMenu: ElementRef
+  @ViewChild('selectedSearchButton', {read: ElementRef}) selectedSearchButton: ElementRef
+  pluginMenuTrigger = false
+  @ViewChild('pluginMenu', {read: ElementRef}) pluginMenu: ElementRef
+  @ViewChild('pluginButton', {read: ElementRef}) pluginButton: ElementRef
 
   get isMobile(){
     return this.constantService.mobile
@@ -111,6 +118,41 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
+  @HostListener('document:click', ['$event', '$event.target'])
+  onClick(event: MouseEvent, targetElement: HTMLElement): void {
+    if (!targetElement) {
+      return;
+    }
+    if (this.regionMenuTrigger) {
+      if (this.selectedRegionsMenu && !this.selectedRegionsMenu.nativeElement.contains(targetElement)) {
+        this.regionMenuTrigger = false
+      }
+    } else {
+      if (this.selectedRegionsButton && this.selectedRegionsButton.nativeElement.contains(targetElement)) {
+        this.regionMenuTrigger = true
+      }
+    }
+    if (this.searchMenuTrigger) {
+      if (this.selectedSearchMenu && !this.selectedSearchMenu.nativeElement.contains(targetElement)) {
+        this.searchMenuTrigger = false
+      }
+    } else {
+      if (this.selectedSearchButton && this.selectedSearchButton.nativeElement.contains(targetElement)) {
+        this.searchMenuTrigger = true
+      }
+    }
+    if (this.pluginMenuTrigger) {
+      if (this.pluginMenu && !this.pluginMenu.nativeElement.contains(targetElement)) {
+        this.pluginMenuTrigger = false
+      }
+    } else {
+      if (this.pluginButton && this.pluginButton.nativeElement.contains(targetElement)) {
+        this.pluginMenuTrigger = true
+      }
+    }
+
+  }
+
   /**
    * TODO
    * temporary measure
@@ -135,14 +177,6 @@ export class MenuIconsBar implements OnInit, OnDestroy {
       dataBrowser,
       widgetUnit
     }
-  }
-
-  pinSearchWidget() {
-
-  }
-
-  public catchError(e) {
-    
   }
 
   public clickLayer(event: MouseEvent){
@@ -199,35 +233,40 @@ export class MenuIconsBar implements OnInit, OnDestroy {
   }
 
   openRegionMenu() {
-    let menu = document.getElementById('selectedRegionsMenuOpener');
-    menu.style.display = '';
-    menu.style.position = 'absolute';
-    menu.style.transform = 'translate(40px, 0)'
-    this.regionMenuTrigger.openMenu();
+    if (!this.regionMenuTrigger) {
+      this.selectedRegionsMenu.nativeElement.style.display = ''
+      this.selectedRegionsMenu.nativeElement.style.position = 'absolute'
+      this.selectedRegionsMenu.nativeElement.style.transform = 'translate(150px, -30px)'
+    } else {
+      this.regionMenuTrigger = false;
+    }
   }
 
   openSearchMenu() {
-    let menu = document.getElementById('selectedSearchMenuOpener');
-    menu.style.display = '';
-    menu.style.position = 'absolute';
-    menu.style.transform = 'translate(40px, 0)'
-    this.searchMenuTrigger.openMenu();
+    if (!this.searchMenuTrigger) {
+      this.selectedSearchMenu.nativeElement.style.display = ''
+      this.selectedSearchMenu.nativeElement.style.position = 'absolute'
+      this.selectedSearchMenu.nativeElement.style.transform = 'translate(150px, -30px)'
+    } else {
+      this.searchMenuTrigger = false;
+    }
   }
 
   openPluginMenu() {
-    let menu = document.getElementById('pluginMenuOpener');
-    menu.style.display = '';
-    menu.style.position = 'absolute';
-    menu.style.transform = 'translate(40px, 0)'
-    this.pluginMenuTrigger.openMenu();
+    if (!this.pluginMenuTrigger) {
+      this.pluginMenu.nativeElement.style.display = ''
+      this.pluginMenu.nativeElement.style.position = 'absolute'
+      this.pluginMenu.nativeElement.style.transform = 'translate(150px, -30px)'
+    } else {
+      this.pluginMenuTrigger = false;
+    }
   }
 
   removeRegionFromSelectedList(region) {
-    const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
-    const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
+    if (this.selectedRegions && this.selectedRegions.length === 1) this.regionMenuTrigger = false
     this.store.dispatch({
       type: SELECT_REGIONS,
-      selectRegions: this.selectedRegions.filter(r => !flattenedRegionNames.has(r.name))
+      selectRegions: this.selectedRegions.filter(r => r.name !== region.name)
     })
   }
 
@@ -236,6 +275,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
       type: SELECT_REGIONS,
       selectRegions: []
     })
+    this.regionMenuTrigger = false
   }
 
   regionClicked(region) {
