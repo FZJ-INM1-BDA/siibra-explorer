@@ -1,6 +1,7 @@
 import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
+import {DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
 
 
 @Component({
@@ -63,15 +64,23 @@ export class WidgetUnit implements OnInit{
   public widgetServices:WidgetServices
   public cf : ComponentRef<WidgetUnit>
 
+  askBeforeExit = false
+  titleTextBoxVisible = false
+  @ViewChild('widgetTitleInput', {read: ElementRef}) widgetTitleInput: ElementRef
+
   public id: string 
   constructor(
-    private constantsService: AtlasViewerConstantsServices
-    ){
+    private constantsService: AtlasViewerConstantsServices,
+    private dataBrowserService:DatabrowserService) {
     this.id = Date.now().toString()
   }
 
   ngOnInit(){
     this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'
+  }
+
+  widgetUnitIncludesWidget(widgetUnit) {
+    return this.dataBrowserService.instantiatedWidgetUnits.includes(widgetUnit)
   }
 
   /**
@@ -111,12 +120,17 @@ export class WidgetUnit implements OnInit{
   }
 
   exit(event?:Event){
+    this.askBeforeExit = false
     if(event){
       event.stopPropagation()
       event.preventDefault()
     }
 
     this.widgetServices.exitWidget(this)
+  }
+
+  exitClicked() {
+    this.askBeforeExit = true
   }
 
   setWidthHeight(){
@@ -130,5 +144,19 @@ export class WidgetUnit implements OnInit{
 
   get isMobile(){
     return this.constantsService.mobile
+  }
+
+  pinWidget(title: string = '') {
+    if (title.length) {
+      this.title = title
+      this.titleHTML = '<i class="fas fa-search"></i> ' + title
+    }
+    this.titleTextBoxVisible = false
+    this.dataBrowserService.pushWidgetUnitInstance(this)
+  }
+
+  showTitleTextBox() {
+    this.titleTextBoxVisible = true
+    setTimeout(() => {this.widgetTitleInput.nativeElement.focus()})
   }
 }

@@ -45,3 +45,34 @@ panel-component[widgetUnitPanel]
 {
   opacity:0.01;
 }
+
+.crossed-out:after {
+  content: '|';
+  display: inline-block;
+  text-align: center;
+  font-size: 20px;
+  margin: -14px;
+  max-width: 15px !important;
+  width: 15px !important;
+  mix-blend-mode: difference;
+  -webkit-transform: rotate(-45deg);
+  -moz-transform: rotate(-45deg);
+  -o-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+
+.pin-icon-div {
+  margin: 0 10px;
+}
+
+.exitButtons {
+  border: 1px solid black;
+  border-radius: 10px;
+  padding: 1px 5px;
+  margin-left: 3px;
+}
+
+.dock-icons {
+  margin-left: 5px;
+}

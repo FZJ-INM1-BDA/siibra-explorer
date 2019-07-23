@@ -49,11 +49,19 @@ export class DatabrowserService implements OnDestroy{
   public instantiatedWidgetUnits: WidgetUnit[] = []
   public queryData: (arg:{regions: any[], template:any, parcellation: any}) => void = (arg) => {
     const { dataBrowser, widgetUnit } = this.createDatabrowser(arg)
-    this.instantiatedWidgetUnits.push(widgetUnit.instance)
     widgetUnit.onDestroy(() => {
       this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
     })
   }
+  public pushWidgetUnitInstance(widgetUnit) {
+    this.instantiatedWidgetUnits.push(widgetUnit)
+  }
+  public removeWidgetUnitInstance(widgetUnit) {
+    this.instantiatedWidgetUnits.splice(this.instantiatedWidgetUnits.indexOf(widgetUnit), 1);
+  }
+
+
+
   public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit:ComponentRef<WidgetUnit>}
   public getDataByRegion: ({regions, parcellation, template}:{regions:any[], parcellation:any, template: any}) => Promise<DataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
     this.lowLevelQuery(template.name, parcellation.name)

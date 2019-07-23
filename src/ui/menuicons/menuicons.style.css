@@ -71,6 +71,7 @@
   max-height: 30px;
   display: flex;
   align-items: center;
+  cursor: pointer;
 }
 
 .mat-menu-item-minimised {
@@ -123,4 +124,18 @@ pill-component {
 }
 ::ng-deep .mat-menu-panel {
   background-color: rgba(255, 255, 255, 0) !important;
+}
+
+.mat-menu-trigger-button-start-position {
+  position: absolute;
+  left: -100px;
+}
+
+.icon-menu {
+  max-width: 300px;
+  z-index: 1000;
+}
+
+.menu-padding {
+  padding: 10px;
 }

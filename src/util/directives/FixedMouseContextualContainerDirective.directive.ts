@@ -30,13 +30,10 @@ export class FixedMouseContextualContainerDirective {
     }
     this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
     this.styleDisplay = 'block'
-    setTimeout(() => {
-      if ((window.innerHeight - this.mousePos[1]) < this.el.nativeElement.offsetHeight) {
-        this.mousePos[1] = window.innerHeight-this.el.nativeElement.offsetHeight
-      }
-      this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
-      console.log(this.el.nativeElement.offsetHeight)
-    })
+    if ((window.innerHeight - this.mousePos[1]) < this.el.nativeElement.offsetHeight) {
+      this.mousePos[1] = window.innerHeight-this.el.nativeElement.offsetHeight
+    }
+    this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
     this.isShown = true
     this.onShow.emit()
   }
