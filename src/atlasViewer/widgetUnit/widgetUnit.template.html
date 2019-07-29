@@ -13,7 +13,7 @@
     cdkDragHandle>
     <div #emptyspan emptyspan>.</div>
     <div title>
-      <div *ngIf="!askBeforeExit && !titleTextBoxVisible">
+      <div *ngIf="!titleTextBoxVisible">
         <div *ngIf="!titleHTML">
           {{ title }}
         </div>
@@ -21,15 +21,13 @@
 
         </div>
       </div>
-      <div *ngIf="askBeforeExit" class="d-flex justify-content-between">
-        <span>Exit without pin? </span>
-        <div>
-          <button class="exitButtons" (click)="exit($event)">exit</button>
-          <button class="exitButtons" (click)="askBeforeExit = false">cancel</button>
-        </div>
-      </div>
       <div *ngIf="titleTextBoxVisible" class="d-flex justify-content-between">
-        <input type="text" [placeholder]="title" #widgetTitleInput class="w-100">
+        <input type="text"
+               [placeholder]="title"
+               #widgetTitleInput
+               class="w-100"
+               (keyup.enter)="pinWidget(widgetTitleInput.value)"
+               (keyup.escape)="titleTextBoxVisible = false">
         <div class="float-right">
           <button class="exitButtons" (click)="pinWidget(widgetTitleInput.value)">pin</button>
           <button class="exitButtons" (click)="titleTextBoxVisible = false">cancel</button>
@@ -39,23 +37,23 @@
     <div icons>
 
 
-    <span *ngIf="!isMobile && !askBeforeExit && !titleTextBoxVisible" class="dock-icons">
-      <span *ngIf="!widgetUnitIncludesWidget(this); else WidgetIncluded" class="d-flex align-items-center">
-        <div class="pin-icon-div">
+    <span *ngIf="!isMobile && !titleTextBoxVisible" class="ml-2">
+      <span *ngIf="!isDataBrowserWidget(this); else WidgetIncluded" class="d-flex align-items-center">
+        <div class="ml-2 mr-2">
           <i (click)="showTitleTextBox()"
              class="fas fa-thumbtack"
              [hoverable] ="{translateY: -1}">
           </i>
         </div>
         <i *ngIf = "exitable"
-           (click) = "this.askBeforeExit = true"
+           (click) = "exit($event)"
            class = "fas fa-times"
            [hoverable] ="{translateY: -1}">
         </i>
       </span>
       <ng-template #WidgetIncluded >
         <span class="d-flex align-items-center">
-          <span class="pin-icon-div" (click)="dataBrowserService.removeWidgetUnitInstance(this)">
+          <span class="ml-2 mr-2" (click)="this.widgetMediatorService.removeWidgetUnitInstance(this)">
             <span style="width: 15px; max-width: 15px;"
                   class="fa-stack crossed-out"
                   [hoverable] ="{translateY: -1}">

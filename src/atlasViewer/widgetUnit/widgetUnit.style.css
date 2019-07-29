@@ -62,17 +62,9 @@ panel-component[widgetUnitPanel]
   transform: rotate(-45deg);
 }
 
-.pin-icon-div {
-  margin: 0 10px;
-}
-
 .exitButtons {
   border: 1px solid black;
   border-radius: 10px;
   padding: 1px 5px;
   margin-left: 3px;
-}
-
-.dock-icons {
-  margin-left: 5px;
 }

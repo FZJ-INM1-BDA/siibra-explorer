@@ -18,60 +18,51 @@
     </div>
   </div>
 </ng-template>
-<div
-  *ngIf="false"
-  [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-  class="btnWrapper">
-  <div
-    tooltip="Plugins"
-    (click)="clickPlugins($event)"
-    placement="right"
-    [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-    class="shadow btn btn-sm rounded-circle">
-    <i class="fas fa-tools">
 
-    </i>
-  </div>
-</div>
 
-<div *ngIf="!isMobile
-            && ((pluginServices.fetchedPluginManifests && pluginServices.fetchedPluginManifests.length)
-            || pluginServices.orphanPlugins)">
+<div *ngIf="!isMobile">
+  <div *ngIf="(pluginServices.fetchedPluginManifests && pluginServices.fetchedPluginManifests.length)
+            || pluginServices.orphanPlugins"
+        elementOutClick
+       (outsideClick)="this.pluginMenuTrigger = !$event"
+        class="position-relative">
 
-  <button mat-mini-fab color="primary"
-          #pluginButton
-          class="search-fab"
-          (click)="openPluginMenu()"
-          [tooltip]="!pluginMenuTrigger? 'Tools' : null"
-          placement="right">
-    <i class="fas fa-wrench"></i>
-  </button>
+    <button mat-mini-fab color="primary"
+            #pluginButton
+            class="search-fab"
+            [tooltip]="!pluginMenuTrigger? 'Tools' : null"
+            placement="right">
+      <i class="fas fa-wrench"></i>
+    </button>
 
-  <div [hidden]="!pluginMenuTrigger" #pluginMenu class="mat-menu-trigger-button-start-position icon-menu">
-    <div class = "matMenuContainer"
-         [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
-      <div class="container-fluid text-right">
+    <div [hidden]="!pluginMenuTrigger"
+         #pluginMenu
+         class="mat-menu-trigger-button-start-position position-absolute position-absolute icon-menu ">
+      <div class="matMenuContainer"
+           [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
+        <div class="container-fluid text-right">
         <span class="removeSelectedRegionIcon">
           Tools
         </span>
-      </div>
-      <div *ngIf="pluginServices.fetchedPluginManifests && pluginServices.fetchedPluginManifests.length">
-        <div *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-             [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
-          <span class="mat-menu-item"
-                [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'"
-                (click)="pluginServices.launchPlugin(manifest).catch(catchError)">
-            {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-          </span>
         </div>
-      </div>
-      <div *ngIf="pluginServices.orphanPlugins">
-        <div *ngFor="let manifest of pluginServices.orphanPlugins">
+        <div *ngIf="pluginServices.fetchedPluginManifests && pluginServices.fetchedPluginManifests.length">
+          <div *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+               [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
           <span class="mat-menu-item"
                 [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'"
                 (click)="pluginServices.launchPlugin(manifest).catch(catchError)">
             {{ (manifest.displayName || manifest.name).slice(0, 1) }}
           </span>
+          </div>
+        </div>
+        <div *ngIf="pluginServices.orphanPlugins">
+          <div *ngFor="let manifest of pluginServices.orphanPlugins">
+          <span class="mat-menu-item"
+                [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'"
+                (click)="pluginServices.launchPlugin(manifest).catch(catchError)">
+            {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+          </span>
+          </div>
         </div>
       </div>
     </div>
@@ -89,48 +80,56 @@
     <i class="fas fa-search"></i>
   </button>
 
-  <button *ngIf="dbService.instantiatedWidgetUnits.length > 1"
-          #selectedSearchButton
-          mat-mini-fab color="primary"
-          class="search-fab"
-          (click)="openSearchMenu()"
-          [matBadge] = "dbService.instantiatedWidgetUnits ? dbService.instantiatedWidgetUnits.length : null">
-    <i class="fas fa-search"></i>
-    <i class="fas fa-chevron-right search-opened-icon"></i>
-  </button>
+  <div elementOutClick
+       (outsideClick)="this.searchMenuTrigger = !$event"
+       class="position-relative">
 
-  <div [hidden]="!searchMenuTrigger" #selectedSearchMenu class="mat-menu-trigger-button-start-position icon-menu">
-    <div [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'" class="menu-padding">
-      <div class="container-fluid text-center">
+    <button *ngIf="dbService.instantiatedWidgetUnits.length > 1"
+            #selectedSearchButton
+            mat-mini-fab color="primary"
+            class="search-fab"
+            [matBadge]="dbService.instantiatedWidgetUnits ? dbService.instantiatedWidgetUnits.length : null">
+      <i class="fas fa-search"></i>
+      <i class="fas fa-chevron-right search-opened-icon"></i>
+    </button>
+
+    <div [hidden]="!searchMenuTrigger" #selectedSearchMenu class="mat-menu-trigger-button-start-position position-absolute icon-menu">
+      <div [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'" class="p-2">
+        <div class="container-fluid text-center">
         <span class="removeSelectedRegionIcon">
           KG Search
         </span>
-      </div>
-      <div *ngFor="let wu of dbService.instantiatedWidgetUnits"
-           [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
+        </div>
+        <div *ngFor="let wu of dbService.instantiatedWidgetUnits"
+             [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
               <span class="mat-menu-item"
                     (click)="widgetServices.minimisedWindow.delete(wu);!widgetServices.minimisedWindow.has(wu)? this.widgetServices.moveFloatingToFront(wu) : null"
                     [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
-                  <i class="opened-search-icon" [ngClass]="!widgetServices.minimisedWindow.has(wu)? 'fas fa-circle' : 'far fa-circle'"></i>
+                  <i class="opened-search-icon"
+                     [ngClass]="!widgetServices.minimisedWindow.has(wu)? 'fas fa-circle' : 'far fa-circle'"></i>
                 {{wu.title}}
               </span>
+        </div>
       </div>
     </div>
   </div>
+
 </div>
 
-<div *ngIf="!isMobile && selectedRegions">
+<div *ngIf="!isMobile && selectedRegions"
+     elementOutClick
+     (outsideClick)="this.regionMenuTrigger = !$event"
+      class="position-relative">
   <button *ngIf="selectedRegions.length > 0"
           #selectedRegionsButton
           mat-mini-fab color="primary"
           class="search-fab"
-          (click)="openRegionMenu()"
           [tooltip]="!regionMenuTrigger? 'Selected regions' : null" placement="right"
           [matBadge] = "selectedRegions ? selectedRegions.length : null">
     <i class="fas fa-registered"></i>
   </button>
 
-  <div [hidden]="!regionMenuTrigger" #selectedRegionsMenu class="mat-menu-trigger-button-start-position icon-menu">
+  <div [hidden]="!regionMenuTrigger" #selectedRegionsMenu class="mat-menu-trigger-button-start-position position-absolute icon-menu">
     <div class = "matMenuContainer" [ngClass]="constantService.darktheme? 'menuThemColorsDark': 'menuThemColorsLight'">
       <div class="container-fluid text-right"><span (click)="clearSelectedRegions()" class="removeSelectedRegionIcon">Clear</span></div>
       <pill-component

@@ -14,6 +14,7 @@
 :host >>> .tooltip-inner
 {
   background-color: rgba(128, 128, 128, 0.5);
+
 }
 
 :host >>> .tooltip.right .tooltip-arrow::before,
@@ -72,6 +73,8 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .mat-menu-item-minimised {
@@ -127,8 +130,8 @@ pill-component {
 }
 
 .mat-menu-trigger-button-start-position {
-  position: absolute;
-  left: -100px;
+  left: 40px;
+  top: 0;
 }
 
 .icon-menu {

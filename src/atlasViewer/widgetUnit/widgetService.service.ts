@@ -25,7 +25,7 @@ export class WidgetServices{
   constructor(
     private cfr:ComponentFactoryResolver,
     private constantServce:AtlasViewerConstantsServices,
-    private injector : Injector
+    private injector : Injector,
     ){
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
   }

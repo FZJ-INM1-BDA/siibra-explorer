@@ -15,12 +15,10 @@ import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
-import {MatMenuTrigger} from "@angular/material";
 import {Observable, Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
 import {distinctUntilChanged, filter, map} from "rxjs/operators";
-import {CHANGE_NAVIGATION, isDefined, SELECT_REGIONS, ViewerStateInterface} from "src/services/stateStore.service";
-import {regionFlattener} from "src/util/regionFlattener";
+import {CHANGE_NAVIGATION, isDefined, SELECT_REGIONS} from "src/services/stateStore.service";
 import {ToastService} from "src/services/toastService.service";
 
 @Component({
@@ -118,41 +116,6 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  @HostListener('document:click', ['$event', '$event.target'])
-  onClick(event: MouseEvent, targetElement: HTMLElement): void {
-    if (!targetElement) {
-      return;
-    }
-    if (this.regionMenuTrigger) {
-      if (this.selectedRegionsMenu && !this.selectedRegionsMenu.nativeElement.contains(targetElement)) {
-        this.regionMenuTrigger = false
-      }
-    } else {
-      if (this.selectedRegionsButton && this.selectedRegionsButton.nativeElement.contains(targetElement)) {
-        this.regionMenuTrigger = true
-      }
-    }
-    if (this.searchMenuTrigger) {
-      if (this.selectedSearchMenu && !this.selectedSearchMenu.nativeElement.contains(targetElement)) {
-        this.searchMenuTrigger = false
-      }
-    } else {
-      if (this.selectedSearchButton && this.selectedSearchButton.nativeElement.contains(targetElement)) {
-        this.searchMenuTrigger = true
-      }
-    }
-    if (this.pluginMenuTrigger) {
-      if (this.pluginMenu && !this.pluginMenu.nativeElement.contains(targetElement)) {
-        this.pluginMenuTrigger = false
-      }
-    } else {
-      if (this.pluginButton && this.pluginButton.nativeElement.contains(targetElement)) {
-        this.pluginMenuTrigger = true
-      }
-    }
-
-  }
-
   /**
    * TODO
    * temporary measure
@@ -232,36 +195,6 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.pbWidget.instance.position = [left, top]
   }
 
-  openRegionMenu() {
-    if (!this.regionMenuTrigger) {
-      this.selectedRegionsMenu.nativeElement.style.display = ''
-      this.selectedRegionsMenu.nativeElement.style.position = 'absolute'
-      this.selectedRegionsMenu.nativeElement.style.transform = 'translate(150px, -30px)'
-    } else {
-      this.regionMenuTrigger = false;
-    }
-  }
-
-  openSearchMenu() {
-    if (!this.searchMenuTrigger) {
-      this.selectedSearchMenu.nativeElement.style.display = ''
-      this.selectedSearchMenu.nativeElement.style.position = 'absolute'
-      this.selectedSearchMenu.nativeElement.style.transform = 'translate(150px, -30px)'
-    } else {
-      this.searchMenuTrigger = false;
-    }
-  }
-
-  openPluginMenu() {
-    if (!this.pluginMenuTrigger) {
-      this.pluginMenu.nativeElement.style.display = ''
-      this.pluginMenu.nativeElement.style.position = 'absolute'
-      this.pluginMenu.nativeElement.style.transform = 'translate(150px, -30px)'
-    } else {
-      this.pluginMenuTrigger = false;
-    }
-  }
-
   removeRegionFromSelectedList(region) {
     if (this.selectedRegions && this.selectedRegions.length === 1) this.regionMenuTrigger = false
     this.store.dispatch({
@@ -275,7 +208,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
       type: SELECT_REGIONS,
       selectRegions: []
     })
-    this.regionMenuTrigger = false
+    setTimeout(()=>this.regionMenuTrigger = false)
   }
 
   regionClicked(region) {

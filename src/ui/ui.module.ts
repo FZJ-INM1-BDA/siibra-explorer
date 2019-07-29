@@ -48,6 +48,8 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
+import {SharedDirectivesModule} from "src/ui/sharedModules/sharedDirectives.module";
 
 
 @NgModule({
@@ -58,6 +60,7 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     DatabrowserModule,
     UtilModule,
     AngularMaterialModule,
+    SharedDirectivesModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()

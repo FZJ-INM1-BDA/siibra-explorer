@@ -1,7 +1,7 @@
 import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
-import {DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
+import {WidgetMediatorService} from "src/atlasViewer/widgetUnit/widgetMediator.service";
 
 
 @Component({
@@ -51,6 +51,10 @@ export class WidgetUnit implements OnInit{
   @Output()
   clickedEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
 
+
+  @Output()
+  dataBrowserEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
+
   @Input()
   public exitable : boolean = true
 
@@ -61,14 +65,13 @@ export class WidgetUnit implements OnInit{
   public widgetServices:WidgetServices
   public cf : ComponentRef<WidgetUnit>
 
-  askBeforeExit = false
   titleTextBoxVisible = false
   @ViewChild('widgetTitleInput', {read: ElementRef}) widgetTitleInput: ElementRef
 
   public id: string 
   constructor(
     private constantsService: AtlasViewerConstantsServices,
-    private dataBrowserService:DatabrowserService) {
+    private widgetMediatorService: WidgetMediatorService) {
     this.id = Date.now().toString()
   }
 
@@ -76,8 +79,8 @@ export class WidgetUnit implements OnInit{
     this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'
   }
 
-  widgetUnitIncludesWidget(widgetUnit) {
-    return this.dataBrowserService.instantiatedWidgetUnits.includes(widgetUnit)
+  isDataBrowserWidget(widgetUnit) {
+    return this.widgetMediatorService.isDataBrowserWidget(widgetUnit)
   }
 
   /**
@@ -117,17 +120,12 @@ export class WidgetUnit implements OnInit{
   }
 
   exit(event?:Event){
-    this.askBeforeExit = false
     if(event){
       event.stopPropagation()
       event.preventDefault()
     }
 
     this.widgetServices.exitWidget(this)
-  }
-
-  exitClicked() {
-    this.askBeforeExit = true
   }
 
   setWidthHeight(){
@@ -149,7 +147,8 @@ export class WidgetUnit implements OnInit{
       this.titleHTML = '<i class="fas fa-search"></i> ' + title
     }
     this.titleTextBoxVisible = false
-    this.dataBrowserService.pushWidgetUnitInstance(this)
+    this.widgetMediatorService.pinWidget(this)
+    this.widgetServices.minimise(this)
   }
 
   showTitleTextBox() {

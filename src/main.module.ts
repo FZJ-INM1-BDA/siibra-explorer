@@ -42,6 +42,7 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import {WidgetMediatorService} from "src/atlasViewer/widgetUnit/widgetMediator.service";
 
 @NgModule({
   imports : [
@@ -113,6 +114,7 @@ import { UseEffects } from "./services/effect/effect";
     ToastService,
     AtlasWorkerService,
     AuthService,
+    WidgetMediatorService,
     
     /**
      * TODO
