@@ -48,6 +48,7 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import {ConnectivityMatrixBrowserComponent} from "src/ui/connectivityMatrixBrowser/connectivityMatrixBrowser.component";
 
 
 @NgModule({
@@ -84,6 +85,7 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    ConnectivityMatrixBrowserComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -109,7 +111,8 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     LayerBrowser,
-    PluginBannerUI
+    PluginBannerUI,
+    ConnectivityMatrixBrowserComponent
   ],
   exports : [
     SubjectViewer,
@@ -129,7 +132,8 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    ConnectivityMatrixBrowserComponent
   ]
 })
 

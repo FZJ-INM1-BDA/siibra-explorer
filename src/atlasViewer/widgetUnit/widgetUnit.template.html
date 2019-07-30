@@ -22,13 +22,13 @@
     </div>
     <div icons>
       <i
-        *ngIf="!isMobile"
+        *ngIf="!isMobile && minimizable"
         (click)="widgetServices.minimise(this)"
         class="fas fa-window-minimize"
         [hoverable] ="{translateY: -1}">
 
       </i>
-      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
+      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile && minimizable"
         (click) = "dock($event)" 
         class = "fas fa-window-minimize" 
         hoverable></i>

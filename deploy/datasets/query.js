@@ -384,5 +384,24 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   return zip
 }
 
+
+const getConnectedAreas = async (areaName) => {
+    const spatialQuery = 'http://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity/area'
+
+    return await new Promise((resolve, reject) => {
+        request(`${spatialQuery}}`, (err, resp, body) => {
+            if (err)
+                return reject(err)
+            if (resp.statusCode >= 400)
+                return reject(resp.statusCode)
+            const json = JSON.parse(body)
+            return resolve(json)
+        })
+    })
+}
+
+
+
 exports.getDatasetFromId = getDatasetFromId
 exports.getDatasetFileAsZip = getDatasetFileAsZip
+exports.getConnectedAreas = getConnectedAreas
