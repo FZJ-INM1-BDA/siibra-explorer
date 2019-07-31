@@ -306,10 +306,7 @@ const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, u
         return {
           name,
           templateSpace: templateName,
-          dataset: {
-            name: dataset[0].name,
-            externalLink: 'https://kg.humanbrainproject.eu/instances/Dataset/' + dataset[0].identifier,
-          },
+          dataset: dataset.map(ds => ds = {name: ds.name, externalLink: 'https://kg.humanbrainproject.eu/instances/Dataset/' + ds.identifier}),
           geometry: {
             type: 'point',
             space: 'real',

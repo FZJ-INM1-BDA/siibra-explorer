@@ -151,20 +151,25 @@
         <div body>
 
           <div
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0 || (onhoverLandmarksForFixed$ | async)?.externalUrl.length > 0"
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
             class="p-2">
             Search for data relating to:
           </div>
 
           <div *ngIf="(onhoverLandmarksForFixed$ | async) as onhoverLandmarksForFixed">
-            <div
-                    *ngIf="onhoverLandmarksForFixed && onhoverLandmarksForFixed.externalUrl && onhoverLandmarksForFixed.externalUrl.length > 0"
-                    class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    (click)="openLandmarkUrl(onhoverLandmarksForFixed)"
-                    [title]="onhoverLandmarksForFixed.landmarkName">
-                Explore dataset of {{ onhoverLandmarksForFixed.landmarkName }} <i class="fas fa-external-link-alt"></i>
+            <div *ngIf="onhoverLandmarksForFixed && onhoverLandmarksForFixed.datasets && onhoverLandmarksForFixed.datasets.length > 0">
+              <div class="p-2">
+                Explore datasets for {{onhoverLandmarksForFixed.landmarkName}}
+              </div>
+              <div
+                      *ngFor="let dataset of onhoverLandmarksForFixed.datasets"
+                      class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
+                      data-toggle="tooltip"
+                      data-placement="top"
+                      (click)="openLandmarkUrl(dataset)"
+                      [title]="dataset.name">
+                {{ dataset.name }} <i class="fas fa-external-link-alt"></i>
+              </div>
             </div>
           </div>
           

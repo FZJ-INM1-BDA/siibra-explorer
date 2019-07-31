@@ -79,7 +79,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
   public onhoverLandmarksForFixed$: Observable<any>
-  public onhoverLandmark$ : Observable<{landmarkName: string, externalUrl: string} | null>
+  public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -188,8 +188,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           return `Landmark index could not be parsed as a number: ${landmark}`
         return  {
                   landmarkName: spatialDatas[idx].name,
-                  externalUrl: (spatialDatas[idx].dataset
-                      && spatialDatas[idx].dataset.externalLink)? spatialDatas[idx].dataset.externalLink : null
+                  datasets: (spatialDatas[idx].dataset
+                      && spatialDatas[idx].dataset.length)? spatialDatas[idx].dataset : null
                 }
       })
     )
@@ -484,9 +484,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
   }
 
-  openLandmarkUrl(landmark) {
+  openLandmarkUrl(dataset) {
     this.rClContextualMenu.hide()
-    window.open(landmark.externalUrl, "_blank");
+    window.open(dataset.externalLink, "_blank")
   }
 
   @HostBinding('attr.version')
