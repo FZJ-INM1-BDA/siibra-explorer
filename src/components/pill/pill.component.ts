@@ -11,6 +11,7 @@ import { Component, Input, Output, EventEmitter } from "@angular/core";
 export class PillComponent{
   @Input() title: string = 'Untitled Pill'
   @Input() showClose: boolean = true
+
   @Output() pillClicked: EventEmitter<boolean> = new EventEmitter()
   @Output() closeClicked: EventEmitter<{userInitiated:boolean, event: MouseEvent}> = new EventEmitter()
 
