@@ -195,7 +195,8 @@ export class MenuIconsBar implements OnInit, OnDestroy {
     this.pbWidget.instance.position = [left, top]
   }
 
-  removeRegionFromSelectedList(region) {
+  removeRegionFromSelectedList(region, event) {
+    event.event.stopPropagation()
     if (this.selectedRegions && this.selectedRegions.length === 1) this.regionMenuTrigger = false
     this.store.dispatch({
       type: SELECT_REGIONS,

@@ -11,9 +11,8 @@ import { Component, Input, Output, EventEmitter } from "@angular/core";
 export class PillComponent{
   @Input() title: string = 'Untitled Pill'
   @Input() showClose: boolean = true
-  @Input() stopPropagationClose: boolean = false
   @Output() pillClicked: EventEmitter<boolean> = new EventEmitter()
-  @Output() closeClicked: EventEmitter<boolean> = new EventEmitter()
+  @Output() closeClicked: EventEmitter<{userInitiated:boolean, event: MouseEvent}> = new EventEmitter()
 
   @Input() containerStyle: any = {
     backgroundColor: 'grey'
@@ -22,7 +21,7 @@ export class PillComponent{
     backgroundColor: 'lightgrey'
   }
 
-  close() {
-    this.closeClicked.emit(true)
+  close(event) {
+    this.closeClicked.emit({userInitiated:true, event: event})
   }
 }

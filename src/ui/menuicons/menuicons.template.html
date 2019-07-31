@@ -136,8 +136,7 @@
               (click)="regionClicked(sr)"
               [containerStyle]="constantService.darktheme? {backgroundColor:'rgba(30,30,30,0)'} : {backgroundColor:'rgba(255,255,255,0.8)'}"
               [closeBtnStyle]="constantService.darktheme? {backgroundColor:'rgba(30,30,30,0)'} : {backgroundColor:'rgba(255,255,255,0.8)'}"
-              [stopPropagationClose] = "selectedRegions.length > 1"
-              (closeClicked)="removeRegionFromSelectedList(sr)"
+              (closeClicked)="removeRegionFromSelectedList(sr, $event)"
               [title]="sr.name"
               *ngFor="let sr of selectedRegions">
       </pill-component>

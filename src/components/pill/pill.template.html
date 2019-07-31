@@ -8,7 +8,7 @@
   <div
     [ngStyle]="closeBtnStyle"
     class="pill-close rounded-circle"
-    (click)="stopPropagationClose? $event.stopPropagation() : false; close()"
+    (click)="close($event)"
     *ngIf="showClose">
     <i class="fas fa-times-circle"></i>
   </div>
