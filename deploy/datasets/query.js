@@ -386,16 +386,27 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
 
 
 const getConnectedAreas = async (areaName) => {
-    const spatialQuery = 'http://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity/area'
+    if (areaName.indexOf(' - right hemisphere') > -1 || areaName.indexOf(' - left hemisphere') > -1)
+        areaName = areaName.replace(areaName.indexOf(' - left hemisphere') > -1 ? ' - left hemisphere' : ' - right hemisphere', '');
+
+    const options = {
+        url: 'http://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        json: {'area':`${areaName}`}
+    };
 
     return await new Promise((resolve, reject) => {
-        request(`${spatialQuery}}`, (err, resp, body) => {
+        request.post(options, (err, resp, body) => {
             if (err)
                 return reject(err)
-            if (resp.statusCode >= 400)
-                return reject(resp.statusCode)
-            const json = JSON.parse(body)
-            return resolve(json)
+            if (resp.statusCode >= 400) {
+                return reject(resp.statusCode)}
+            body = Object.keys(body).map(key => { return {name: key, numberOfConnections: body[key]} })
+
+            return resolve(body)
         })
     })
 }

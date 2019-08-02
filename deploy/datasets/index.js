@@ -177,8 +177,9 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
   zip.generateNodeStream().pipe(res)
 })
 
-datasetsRouter.get('/getConnectedAreas', async (req, res) => {
-  const { regionName } = req.query
+datasetsRouter.post('/getConnectedAreas', async (req, res) => {
+
+  const regionName = req.body.regionName
 
   try {
     const stream = await getConnectedAreas(regionName)

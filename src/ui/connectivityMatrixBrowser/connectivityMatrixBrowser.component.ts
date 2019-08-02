@@ -1,4 +1,5 @@
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
+import {Observable} from "rxjs";
 
 @Component({
     selector: 'connectivity-matrix-browser',
@@ -6,5 +7,5 @@ import {Component} from "@angular/core";
 })
 export class ConnectivityMatrixBrowserComponent {
 
-    connectedAreas: any = []
+    connectedAreas: Promise<any>
 }

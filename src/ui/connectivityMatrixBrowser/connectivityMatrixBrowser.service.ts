@@ -24,19 +24,23 @@ export class ConnectivityMatrixBrowserService {
 
     getConnectedAreas(regionName) {
         const _url = new URL(`${this.constantService.backendUrl}datasets/getConnectedAreas`)
-        const searchParam = _url.searchParams
-        searchParam.set('regionName', regionName)
-
-        return fetch(_url.toString())
+        const data = {
+            regionName: regionName
+        }
+        return fetch(_url.toString(), {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)})
             .then(res => {
                 if (res.status >= 400) throw new Error(res.status.toString())
-                return res.json()
+                return res.clone().json()
             })
     }
 
     searchConnectedAreas(regionName, position) {
-        const connectedAreas = this.getConnectedAreas(regionName)
-
         this.connectivityMatrixBrowser = this.cmbcf.create(this.injector)
         this.connectivityMatrixBrowser.instance.connectedAreas = this.getConnectedAreas(regionName)
 
