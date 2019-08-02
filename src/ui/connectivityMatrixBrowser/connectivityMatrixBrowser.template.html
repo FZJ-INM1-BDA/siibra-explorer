@@ -4,9 +4,9 @@
     <div *ngFor="let connectedArea of (connectedAreas | async)">
         <div *ngIf="connectedArea['numberOfConnections']" class="d-flex justify-content-between border-bottom">
             <span>{{connectedArea['name']}}</span>
-            <div>
+            <div class="d-flex align-items-center">
                 <span style="background: rgba(0, 0, 0, 0.3)"
-                      [matTooltip]="'Number of connections'"
+                      [matTooltip]="connectedArea['numberOfConnections'] + ' connections'"
                       [matTooltipShowDelay]="1000"
                       class="m-2">
                     {{connectedArea['numberOfConnections']}}
