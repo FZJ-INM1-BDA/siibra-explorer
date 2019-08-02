@@ -1,16 +1,16 @@
 import { NgModule } from "@angular/core";
 import { LayoutMainSide } from "./mainside/mainside.component";
 import { LayoutsExample } from "./layoutsExample/layoutsExample.component";
-import { BrowserModule } from "@angular/platform-browser";
 import { ComponentsModule } from "../components/components.module";
 import { FloatingLayoutContainer } from "./floating/floating.component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+// import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import {CommonModule} from "@angular/common";
 
 
 @NgModule({
   imports : [
-    BrowserAnimationsModule,
-    BrowserModule,
+    // BrowserAnimationsModule,
+    CommonModule,
     ComponentsModule
   ],
   declarations : [
@@ -20,7 +20,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
     LayoutsExample
   ],
   exports : [
-    BrowserAnimationsModule,
+    // BrowserAnimationsModule,
     LayoutMainSide,
     FloatingLayoutContainer,
 

@@ -51,7 +51,7 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 }
 
 
-const cacheData = ({results, ...rest}) => {
+const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
   return cachedData
@@ -83,7 +83,7 @@ const getPublicDs = async () => {
 
 
 const getDs = ({ user }) => user
-  ? fetchDatasetFromKg({ user }).then(({results}) => results)
+  ? fetchDatasetFromKg({ user }).then(({ results }) => results)
   : getPublicDs()
 
 /**
@@ -106,7 +106,7 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
     filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', filename)
   }
   fs.readFile(filepath, 'utf-8', (err, data) => {
-    if(err) reject(err)
+    if (err) reject(err)
     resolve(data)
   })
 })
@@ -174,8 +174,8 @@ const filterByPRSet = (prs, atlasPrSet = new Set()) => {
   return prs.some(({ name }) => atlasPrSet.has(name))
 }
 
-const filter = (datasets = [], {templateName, parcellationName}) => datasets
-  .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
+const filter = (datasets = [], { templateName, parcellationName }) => datasets
+  .filter(ds => commonSenseDsFilter({ ds, templateName, parcellationName }))
   .filter(ds => {
     if (/infant/.test(ds.name))
       return false
@@ -227,7 +227,7 @@ exports.init = async () => {
 }
 
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
-    .then(json => filter(json, {templateName, parcellationName}))
+  .then(json => filter(json, { templateName, parcellationName }))
 
 exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
@@ -236,73 +236,102 @@ exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ dat
  * change to real spatial query
  */
 const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg, user }) => {
-   try {
-    const filename = path.join(STORAGE_PATH, templateName + '.json')
-    const exists = fs.existsSync(filename)
 
-    if (!exists)
-      return []
+/**
+ * TODO change to URL constructor to improve readability
+ */
+const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinatesNG/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
 
-    
-    const data = fs.readFileSync(filename, 'utf-8')
-    const json = JSON.parse(data)
-    const coordsString = queryArg.split('__');
-    const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
-
-    if (templateName !== 'Waxholm Space rat brain atlas v.2.0') {
-      return json.filter(filterByqueryArg(boundingBoxCorners))
-    } else {
-        const boundingBoxInWaxhomV2VoxelSpace = boundingBoxCorners.map(transformWaxholmV2NmToVoxel)
-        const { total = 0 } = await getSpatialSearchOk({boundingBoxInWaxhomV2VoxelSpace, user})
-        if (total > 0) {
-            return json.filter(filterByqueryArg(boundingBoxCorners))
-        } else {
-            return []
-        }
+const getXformFn = (templateSpace) => {
+  const _ = {}
+  switch(templateSpace){
+    case 'Waxholm Space rat brain atlas v.2.0': 
+      _['nmToVoxel'] = transformWaxholmV2NmToVoxel
+      _['voxelToNm'] = transformWaxholmV2VoxelToNm
+      break;
+    default: {
+      _['nmToVoxel'] = defaultXform
+      _['voxelToNm'] = defaultXform
     }
-   } catch (e) {
-    console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
-    return []
+  }
+  return _
+}
+
+const getSpatialSearcParam = ({ templateName, queryArg }) => {
+  let kgSpaceName
+  const { nmToVoxel } = getXformFn(templateName)
+
+  const coordsString = queryArg.split('__');
+  const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
+  const bbInVoxelSpace = boundingBoxCorners.map(nmToVoxel)
+
+  switch (templateName){
+    case 'Waxholm Space rat brain atlas v.2.0':
+      kgSpaceName = 'waxholmV2'
+      break;
+    default: 
+      kgSpaceName = templateName
+  }
+  return {
+    boundingBox: `${kgSpaceName}:${bbInVoxelSpace.map(v => v.join(',')).join(',')}`
   }
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg, user })
-}
+const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, user }) => {
 
+  const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
-function filterByqueryArg(cubeDots) {
-  return function (item) {
-    const px = item.geometry.position[0]
-    const py = item.geometry.position[1]
-    const pz = item.geometry.position[2]
-    if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
-      && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
-      && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
-      return true
-    }
-    return false
-  } 
-}
+  const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
+  const url = require('url')
+  const search = new url.URLSearchParams()
+  
+  for (let key in _) {
+    search.append(key, _[key])  
+  }
+  if (releasedOnly) search.append('databaseScope', 'RELEASED')
+  
+  const _url = `${spatialQuery}&${search.toString()}`
+  return await new Promise((resolve, reject) => {
+    request(_url, option, (err, resp, body) => {
+      if (err)
+        return reject(err)
+      if (resp.statusCode >= 400) {
+        return reject(resp.statusCode)
+      }
+      const json = JSON.parse(body)
 
+      const { voxelToNm } = getXformFn(templateName)
 
-async function getSpatialSearchOk({ user, boundingBoxInWaxhomV2VoxelSpace }) {
+      const _ = json.results.map(({ name, coordinates, dataset}) => {
+        return {
+          name,
+          templateSpace: templateName,
+          dataset: {
+            name: dataset[0].name,
+            externalLink: 'https://kg.humanbrainproject.eu/instances/Dataset/' + dataset[0].identifier,
+          },
+          geometry: {
+            type: 'point',
+            space: 'real',
+            position: voxelToNm([
+              coordinates[0].x,
+              coordinates[0].y,
+              coordinates[0].z
+            ])
+          }
+        }
+      })
 
-    const { releasedOnly, option } = await getUserKGRequestParam({ user })
-
-    const spatialQuery = 'https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/spatialSimple/instances?size=10'
-
-    return await new Promise((resolve, reject) => {
-        request(`${spatialQuery}&boundingBox=waxholmV2:${boundingBoxInWaxhomV2VoxelSpace.map(cornerCoord => cornerCoord.join(',')).join(',')}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
-            if (err)
-                return reject(err)
-            if (resp.statusCode >= 400)
-                return reject(resp.statusCode)
-            const json = JSON.parse(body)
-            return resolve(json)
-        })
+      return resolve(_)
     })
+  })
+}
+
+exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
+  /**
+   * Local data can be injected here
+   */
+  return await fetchSpatialDataFromKg({ templateName, queryGeometry, queryArg, user })
 }
 
 let publicAccessToken
@@ -319,7 +348,7 @@ async function getUserKGRequestParam({ user }) {
     const option = accessToken || publicAccessToken
         ? {
             auth: {
-                'bearer': accessToken || publicAccessToken
+                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
             }
         }
         : {}
@@ -332,7 +361,8 @@ async function getUserKGRequestParam({ user }) {
 }
 
 /**
- * 
+ * perhaps export the xform fns into a different module
+ * ideally, in the future, KG can handle xform of voxel to nm
  */
 const transformWaxholmV2NmToVoxel = (coord) => {
   /**
@@ -343,15 +373,22 @@ const transformWaxholmV2NmToVoxel = (coord) => {
    * atlas viewer applies translation (below in nm) in order to center the brain
    * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
    */
-  const transl = [-9550781,-24355468,-9707031].map(v => v / 1e6)
-  
+  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
+
   /**
    * mm/voxel
    */
   const voxelDim = [0.0390625, 0.0390625, 0.0390625]
-  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx] )
+  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx])
 }
 
+const transformWaxholmV2VoxelToNm = (coord) => {
+  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
+  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
+  return coord.map((v, idx) => (v * voxelDim[idx]) + transl[idx])
+}
+
+const defaultXform = (coord) => coord
 const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
   const { option, releasedOnly } = await getUserKGRequestParam({ user })
   const _url = getKgQuerySingleDatasetUrl({ kgId })

@@ -1,7 +1,6 @@
 import { NgModule, Injector } from "@angular/core";
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { createCustomElement } from '@angular/elements'
-import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule } from "@angular/forms";
 import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { ReadmoreComponent } from "../components/readmoore/readmore.component";
@@ -15,11 +14,12 @@ import { TreeSearchPipe } from "../util/pipes/treeSearch.pipe";
 import { TreeBaseDirective } from "../components/tree/treeBase.directive";
 import { ParseAttributeDirective } from "../components/parseAttribute.directive";
 import { ComponentsModule } from "../components/components.module";
+import {CommonModule} from "@angular/common";
 
 @NgModule({
   imports : [
-    BrowserModule,
-    BrowserAnimationsModule,
+    CommonModule,
+    // BrowserAnimationsModule,
     FormsModule,
     ComponentsModule,
     BsDropdownModule.forRoot()

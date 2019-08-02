@@ -39,7 +39,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   private selectedRegions: any[] = []
   @Input() darktheme: boolean
 
-  @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
+  @ViewChild('publicationTemplate', { read:TemplateRef}) publicationTemplate: TemplateRef<any>
 
   public focusedDatasets$: Observable<any[]>
   private userFocusedDataset$: Subject<any> = new Subject()

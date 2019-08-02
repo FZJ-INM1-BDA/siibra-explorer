@@ -6,3 +6,4 @@ src/plugin_examples/*/
 .vscode
 .idea
 deploy/datasets/data/
+.DS_Store

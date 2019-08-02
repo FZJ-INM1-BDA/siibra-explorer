@@ -16,6 +16,9 @@ module.exports = merge(staticAssets, {
     filename : '[name].js',
     path : path.resolve(__dirname,'dist/aot')
   },
+  devServer: {
+    historyApiFallback: true,
+  },
   module: {
     rules: [
       {

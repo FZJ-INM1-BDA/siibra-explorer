@@ -176,3 +176,8 @@ mat-sidenav {
 .mobileMenuTabs {
   margin: 40px 0 0 5px;
 }
+
+.help-guide-button {
+  margin-top: 20px;
+  outline: none
+}

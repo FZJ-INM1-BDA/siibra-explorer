@@ -49,10 +49,12 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import {ConnectivityMatrixBrowserComponent} from "src/ui/connectivityMatrixBrowser/connectivityMatrixBrowser.component";
+import {CommonModule} from "@angular/common";
 
 
 @NgModule({
   imports : [
+      CommonModule,
     FormsModule,
     LayoutModule,
     ComponentsModule,

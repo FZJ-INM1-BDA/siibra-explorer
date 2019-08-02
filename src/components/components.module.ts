@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ScrollingModule } from '@angular/cdk/scrolling'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import {  MarkdownDom } from './markdown/markdown.component';
 
@@ -36,7 +36,7 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     CommonModule,
     ScrollingModule,
     FormsModule,
-    BrowserAnimationsModule,
+    // BrowserAnimationsModule,
     AngularMaterialModule
   ],
   declarations : [
@@ -70,7 +70,7 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     FilterCollapsePipe
   ],
   exports : [
-    BrowserAnimationsModule,
+    // BrowserAnimationsModule,
     
     MarkdownDom,
     ReadmoreComponent,

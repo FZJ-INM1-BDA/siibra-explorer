@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from "@angular/core";
+import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, from, of } from "rxjs";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
@@ -8,7 +8,6 @@ import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchE
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
-import { ComponentRef } from "@angular/core/src/render3";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
@@ -50,11 +49,19 @@ export class DatabrowserService implements OnDestroy{
   public instantiatedWidgetUnits: WidgetUnit[] = []
   public queryData: (arg:{regions: any[], template:any, parcellation: any}) => void = (arg) => {
     const { dataBrowser, widgetUnit } = this.createDatabrowser(arg)
-    this.instantiatedWidgetUnits.push(widgetUnit.instance)
     widgetUnit.onDestroy(() => {
       this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
     })
   }
+  public pushWidgetUnitInstance(widgetUnit) {
+    this.instantiatedWidgetUnits.push(widgetUnit)
+  }
+  public removeWidgetUnitInstance(widgetUnit) {
+    this.instantiatedWidgetUnits.splice(this.instantiatedWidgetUnits.indexOf(widgetUnit), 1);
+  }
+
+
+
   public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit:ComponentRef<WidgetUnit>}
   public getDataByRegion: ({regions, parcellation, template}:{regions:any[], parcellation:any, template: any}) => Promise<DataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
     this.lowLevelQuery(template.name, parcellation.name)

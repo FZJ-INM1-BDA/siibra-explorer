@@ -74,6 +74,16 @@
 <ng-template #helpComponent>
   <tabset>
     <tab heading="Help">
+      <div class="d-flex justify-content-center">
+        <button mat-fab
+                color="primary"
+                class="help-guide-button"
+                target="_blank"
+                (click)="openHelpPage()"
+        >
+          Guide
+        </button>
+      </div>
       <help-component>
       </help-component>
     </tab>
@@ -152,33 +162,41 @@
         <div body>
 
           <div
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0 || (onhoverLandmarksForFixed$ | async)?.externalUrl"
             class="p-2">
             Search for data relating to:
+          </div>
+
+          <div *ngIf="(onhoverLandmarksForFixed$ | async) as onhoverLandmarksForFixed">
+            <div
+                    *ngIf="onhoverLandmarksForFixed && onhoverLandmarksForFixed.externalUrl && onhoverLandmarksForFixed.externalUrl.length > 0"
+                    class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    (click)="openLandmarkUrl(onhoverLandmarksForFixed)"
+                    [title]="onhoverLandmarksForFixed.landmarkName">
+                Explore dataset of {{ onhoverLandmarksForFixed.landmarkName }} <i class="fas fa-external-link-alt"></i>
+            </div>
           </div>
           
           <div
             *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
             class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
-            data-toggle="tooltip" 
-            data-placement="top" 
+            data-toggle="tooltip"
+            data-placement="top"
             [title]="onhoverSegmentFixed.name">
             <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
           </div>
   
           <div
-            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
+            *ngIf="(selectedRegions$ | async)?.length > 1 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
-            <ng-container *ngIf="selectedRegions.length > 1">
+            <ng-container>
               <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions
             </ng-container>
-            <ng-container *ngIf="selectedRegions.length === 1">
-              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}
-            </ng-container>
           </div>
-
 
           <div
                   *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
@@ -194,11 +212,22 @@
                   data-placement="top"
                   [title]="onhoverSegmentFixed.name">
             <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
+            <div>
+          <div *ngIf="(onhoverSegmentsForFixed$ | async) as onhoverSegmentsForFixed">
+            <div *ngIf="(selectedRegions$ | async)?.length === 1 && (selectedRegions$ | async) as selectedRegions">
+              <div *ngIf="!onhoverSegmentsForFixed[0] || onhoverSegmentsForFixed[0].name !== selectedRegions[0].name"
+                    (click)="searchRegion(selectedRegions)"
+                    class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+                <ng-container>
+                  <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }} selected regions
+                </ng-container>
+              </div>
+            </div>
           </div>
 
           <div
             class="p-2 text-muted"
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0">
+            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0 && (onhoverLandmarksForFixed$ | async)?.length === 0">
             Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
   
@@ -214,12 +243,12 @@
       </panel-component>
       
       <div floatingMouseContextualContainer floatingMouseContextualContainerDirective>
-        <div 
-          *ngIf="onhoverLandmark$ | async" 
+        <div
+          *ngIf="onhoverLandmark$ | async"
           contextualBlock>
-          {{ onhoverLandmark$ | async }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
+          {{ (onhoverLandmark$ | async)?.landmarkName }} <i><small class = "mute-text">{{ toggleMessage }}</small></i>
         </div>
-        <div 
+        <div
           *ngIf="onhoverSegments$ | async; let onhoverSegments"
           contextualBlock>
           <div

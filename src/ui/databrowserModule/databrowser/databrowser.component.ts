@@ -37,6 +37,7 @@ export class DataBrowser implements OnDestroy,OnInit{
   public countedDataM: CountedDataModality[] = []
   public visibleCountedDataM: CountedDataModality[] = []
 
+  // @ts-ignore
   @ViewChild(ModalityPicker)
   modalityPicker: ModalityPicker
 

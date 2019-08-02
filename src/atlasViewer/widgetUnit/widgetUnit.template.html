@@ -13,33 +13,73 @@
     cdkDragHandle>
     <div #emptyspan emptyspan>.</div>
     <div title>
-      <div *ngIf="!titleHTML">
-        {{ title }}
-      </div>
-      <div [innerHTML]="titleHTML" *ngIf="titleHTML">
+      <div *ngIf="!askBeforeExit && !titleTextBoxVisible">
+        <div *ngIf="!titleHTML">
+          {{ title }}
+        </div>
+        <div [innerHTML]="titleHTML" *ngIf="titleHTML">
 
+        </div>
+      </div>
+      <div *ngIf="askBeforeExit" class="d-flex justify-content-between">
+        <span>Exit without pin? </span>
+        <div>
+          <button class="exitButtons" (click)="exit($event)">exit</button>
+          <button class="exitButtons" (click)="askBeforeExit = false">cancel</button>
+        </div>
+      </div>
+      <div *ngIf="titleTextBoxVisible" class="d-flex justify-content-between">
+        <input type="text" [placeholder]="title" #widgetTitleInput class="w-100">
+        <div class="float-right">
+          <button class="exitButtons" (click)="pinWidget(widgetTitleInput.value)">pin</button>
+          <button class="exitButtons" (click)="titleTextBoxVisible = false">cancel</button>
+        </div>
       </div>
     </div>
     <div icons>
-      <i
-        *ngIf="!isMobile && minimizable"
-        (click)="widgetServices.minimise(this)"
-        class="fas fa-window-minimize"
-        [hoverable] ="{translateY: -1}">
 
-      </i>
-      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile && minimizable"
-        (click) = "dock($event)" 
-        class = "fas fa-window-minimize" 
-        hoverable></i>
-      <i *ngIf = "state === 'docked' && !isMobile"
-        (click) = "undock($event)" 
-        class = "fas fa-window-restore"
-        hoverable></i>
-      <i *ngIf = "exitable"
-        (click) = "exit($event)" 
-        class = "fas fa-times" 
-        [hoverable] ="{translateY: -1}"></i>
+    <span *ngIf="!isMobile && !askBeforeExit && !titleTextBoxVisible" class="dock-icons">
+      <span *ngIf="!widgetUnitIncludesWidget(this); else WidgetIncluded" class="d-flex align-items-center">
+        <div class="pin-icon-div">
+          <i (click)="showTitleTextBox()"
+             class="fas fa-thumbtack"
+             [hoverable] ="{translateY: -1}">
+          </i>
+        </div>
+        <i *ngIf = "exitable"
+           (click) = "this.askBeforeExit = true"
+           class = "fas fa-times"
+           [hoverable] ="{translateY: -1}">
+        </i>
+      </span>
+      <ng-template #WidgetIncluded >
+        <span class="d-flex align-items-center">
+          <span class="pin-icon-div" (click)="dataBrowserService.removeWidgetUnitInstance(this)">
+            <span style="width: 15px; max-width: 15px;"
+                  class="fa-stack crossed-out"
+                  [hoverable] ="{translateY: -1}">
+              <i class="fas fa-thumbtack">
+              </i>
+            </span>
+          </span>
+          <i (click)="widgetServices.minimise(this) *ngIf="minimizable"
+             class="fas fa-window-minimize"
+             [hoverable] ="{translateY: -1}">
+          </i>
+        </span>
+      </ng-template>
+    </span>
+
+      <span>
+        <i *ngIf = "canBeDocked && state === 'floating' && !isMobile && minimizable"
+          (click) = "dock($event)"
+          class = "fas fa-window-minimize"
+          hoverable></i>
+        <i *ngIf = "state === 'docked' && !isMobile"
+          (click) = "undock($event)"
+          class = "fas fa-window-restore"
+          hoverable></i>
+      </span>
     </div>
   </div>
   <div widgetUnitBody body>
@@ -47,4 +87,5 @@
 
     </ng-template>
   </div>
+
 </panel-component>

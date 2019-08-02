@@ -54,16 +54,20 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
-  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
-  @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
+  @ViewChild('helpComponent', { read: TemplateRef}) helpComponent : TemplateRef<any>
+  @ViewChild('signinModalComponent', { read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  @ViewChild('cookieAgreementComponent', { read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
+  @ViewChild('kgToS', { read: TemplateRef}) kgTosComponent: TemplateRef<any>
+  // @ts-ignore
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
+  // @ts-ignore
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
+  // @ts-ignore
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
+  // @ts-ignore
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
   @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
@@ -90,7 +94,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
-  public onhoverLandmark$ : Observable<string | null>
+  public onhoverLandmarksForFixed$: Observable<any>
+  public onhoverLandmark$ : Observable<{landmarkName: string, externalUrl: string} | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -198,7 +203,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         const idx = Number(landmark.replace('label=',''))
         if(isNaN(idx))
           return `Landmark index could not be parsed as a number: ${landmark}`
-        return spatialDatas[idx].name
+        return  {
+                  landmarkName: spatialDatas[idx].name,
+                  externalUrl: (spatialDatas[idx].dataset
+                      && spatialDatas[idx].dataset.externalLink)? spatialDatas[idx].dataset.externalLink : null
+                }
       })
     )
 
@@ -389,6 +398,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
 
+    this.onhoverLandmarksForFixed$ = this.rClContextualMenu.onShow.pipe(
+        withLatestFrom(this.onhoverLandmark$),
+        map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
+    )
+
     this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
@@ -487,6 +501,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
   }
 
+  openLandmarkUrl(landmark) {
+    this.rClContextualMenu.hide()
+    window.open(landmark.externalUrl, "_blank");
+  }
+
   @HostBinding('attr.version')
   public _version : string = VERSION
 
@@ -541,6 +560,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
       this.mobileMenuTabs.tabs[1].active = true
     }
+  }
+  openHelpPage() {
+    window.open(window.location.origin + '/help', "_blank")
+    this.modalService.hide(1)
   }
 
 }
