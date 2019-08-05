@@ -37,7 +37,7 @@ The backend reads the environment variable `PLUGIN_URLS` and separate the string
 ["http://localhost:3001/manifest.json","http://localhost:9001/manifest.json"]
 ```
 
-The developer may choose to do any of the following:
+Plugin developers may choose to do any of the following:
 
 _shell_
 
@@ -61,7 +61,7 @@ then, simple start the dev process with
 $ npm run dev
 ```
 
-
+Plugin developers can start their own webserver, use [interactive-viewer-plugin-template](https://github.com/HumanBrainProject/interactive-viewer-plugin-template), or (coming soon) provide link to a github repository.
 
 
 [plugin readme](src/plugin_examples/README.md)
