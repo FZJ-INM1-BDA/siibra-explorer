@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, OnInit } from "@angular/core";
 import { WidgetServices } from "./widgetService.service";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 
@@ -12,7 +12,6 @@ import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.ser
 
 export class WidgetUnit implements OnInit{
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
-  @ViewChild('emptyspan',{read:ElementRef}) emtpy : ElementRef
 
   @HostBinding('attr.state')
   public state : 'docked' | 'floating' = 'docked'
@@ -27,25 +26,63 @@ export class WidgetUnit implements OnInit{
   get isMinimised(){
     return this.widgetServices.minimisedWindow.has(this) ? 'none' : null
   }
-  /**
-   * TODO
-   * upgrade to angular>=7, and use cdk to handle draggable components
-   */
+
+  @HostBinding('style.transform')
   get transform(){
-    return this.state === 'floating' ?
-      `translate(${this.position[0]}px, ${this.position[1]}px)` :
-      `translate(0 , 0)`
+    return `translate(${this.position.map(v => v + 'px').join(',')})`
+  }
+
+  /**
+   * Timed alternates of blinkOn property should result in attention grabbing blink behaviour
+   */
+  private _blinkOn: boolean = false
+  get blinkOn(){
+    return this._blinkOn
+  }
+
+  set blinkOn(val: boolean) {
+    this._blinkOn = !!val
+  }
+
+  get showProgress(){
+    return this.progressIndicator !== null
+  }
+
+  /**
+   * Some plugins may like to show progress indicator for long running processes
+   * If null, no progress is running
+   * This value should be between 0 and 1
+   */
+  private _progressIndicator: number = null
+  get progressIndicator(){
+    return this._progressIndicator
+  }
+
+  set progressIndicator(val:number) {
+    console.log(`new progress indicator ${val}`)
+    if (isNaN(val)) {
+      this._progressIndicator = null
+      return
+    }
+    if (val < 0) {
+      this._progressIndicator = 0
+      return
+    }
+    if (val > 1) {
+      this._progressIndicator = 1
+      return
+    }
+    this._progressIndicator = val
   }
 
   public canBeDocked: boolean = false
   @HostListener('mousedown')
   clicked(){
     this.clickedEmitter.emit(this)
+    this.blinkOn = false
   }
 
   @Input() title : string = 'Untitled'
-
-  @Input() containerClass : string = ''
 
   @Output()
   clickedEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
@@ -63,7 +100,7 @@ export class WidgetUnit implements OnInit{
   public id: string 
   constructor(
     private constantsService: AtlasViewerConstantsServices
-    ){
+  ){
     this.id = Date.now().toString()
   }
 

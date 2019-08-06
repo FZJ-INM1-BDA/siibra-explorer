@@ -162,7 +162,8 @@ window.interactiveViewer
   - **[PLUGINNAME]** returns a plugin handler. This would be how to interface with the plugins.
 
     
-    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *blink()* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *setProgressIndicator(val:number|null)* : Set the progress of the plugin. Useful for giving user feedbacks on the progress of a long running process. Call the function with null to unset the progress.
     - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback, silently fails if called on startup)
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
     - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).

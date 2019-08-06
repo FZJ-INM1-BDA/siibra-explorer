@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
+import { ProgressBar } from './progress/progress.component';
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
 
     /* directive */
     HoverableBlockDirective,
@@ -83,6 +85,7 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

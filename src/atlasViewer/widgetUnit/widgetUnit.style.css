@@ -41,7 +41,44 @@ panel-component[widgetUnitPanel]
   cursor : move;
 }
 
-[emptyspan]
+:host > panel-component
 {
-  opacity:0.01;
+  max-width: 100%;
+  width: 300px;
+  border-width: 1px !important;
+  border: solid;
+  box-sizing: border-box;
+}
+
+@keyframes blink 
+{
+  0% {
+    border-color: rgba(128, 128, 200, 0.0);
+  }
+
+  100% {
+    border-color: rgba(128, 128, 200, 1.0);
+  }
+}
+
+.blinkOn
+{
+  animation: 0.5s blink ease-in-out 9 alternate; 
+  border: 1px solid rgba(128, 128, 200, 1.0) !important;
+}
+
+[heading]
+{
+  position:relative;
+}
+
+[heading] > [progressBar]
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0.2;
+  pointer-events: none;
 }

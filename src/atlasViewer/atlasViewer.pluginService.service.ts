@@ -6,8 +6,6 @@ import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import '../res/css/plugin_styles.css'
-import { interval } from "rxjs";
-import { take, takeUntil } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
@@ -197,22 +195,10 @@ export class PluginServices{
         const unsubscribeOnPluginDestroy = []
 
         handler.blink = (sec?:number)=>{
-          if(typeof sec !== 'number')
-            console.warn(`sec is not a number, default blink interval used`)
-          widgetCompRef.instance.containerClass = ''
-          interval(typeof sec === 'number' ? sec * 1000 : 500).pipe(
-            take(11),
-            takeUntil(widgetCompRef.instance.clickedEmitter)
-          ).subscribe(()=>
-            widgetCompRef.instance.containerClass = widgetCompRef.instance.containerClass === 'panel-success' ? 
-              '' : 
-              'panel-success')
+          widgetCompRef.instance.blinkOn = true
         }
 
-        unsubscribeOnPluginDestroy.push(
-          widgetCompRef.instance.clickedEmitter.subscribe(()=>
-            widgetCompRef.instance.containerClass = '')
-          )
+        handler.setProgressIndicator = (val) => widgetCompRef.instance.progressIndicator = val
 
         handler.shutdown = ()=>{
           widgetCompRef.instance.exit()
@@ -244,6 +230,8 @@ export class PluginHandler{
   initStateUrl? : string
 
   setInitManifestUrl : (url:string|null)=>void
+
+  setProgressIndicator: (progress:number) => void
 }
 
 export interface PluginManifest{
