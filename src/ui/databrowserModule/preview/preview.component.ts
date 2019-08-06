@@ -51,6 +51,11 @@ export class PreviewComponent implements OnInit{
           this.previewFiles = json as ViewerPreviewFile[]
           if (this.previewFiles.length > 0)
             this.activeFile = this.previewFiles[0]
+            if (!this.dbrService.darktheme && this.activeFile && this.activeFile.data && this.activeFile.data.colors) {
+              this.activeFile.data.colors = this.activeFile.data.colors.map(colors => {
+                return {...colors, borderColor: 'rgba(0,0,0,0.5)', mixBlendMode: 'difference'}
+              })
+            }
             this.renderNode = getRenderNodeFn(this.activeFile)
         })
         .catch(e => {

@@ -43,6 +43,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
 import {WidgetMediatorService} from "src/atlasViewer/widgetUnit/widgetMediator.service";
+import {ConnectivityMatrixBrowserService} from "src/ui/connectivityMatrixBrowser/connectivityMatrixBrowser.service";
 
 @NgModule({
   imports : [
@@ -115,6 +116,7 @@ import {WidgetMediatorService} from "src/atlasViewer/widgetUnit/widgetMediator.s
     AtlasWorkerService,
     AuthService,
     WidgetMediatorService,
+    ConnectivityMatrixBrowserService,
     
     /**
      * TODO

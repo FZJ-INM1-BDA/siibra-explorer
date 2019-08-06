@@ -50,7 +50,7 @@ import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParc
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
 import {SharedDirectivesModule} from "src/ui/sharedModules/sharedDirectives.module";
-
+import {ConnectivityMatrixBrowserComponent} from "src/ui/connectivityMatrixBrowser/connectivityMatrixBrowser.component";
 
 @NgModule({
   imports : [
@@ -87,6 +87,7 @@ import {SharedDirectivesModule} from "src/ui/sharedModules/sharedDirectives.modu
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    ConnectivityMatrixBrowserComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -112,7 +113,8 @@ import {SharedDirectivesModule} from "src/ui/sharedModules/sharedDirectives.modu
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     LayerBrowser,
-    PluginBannerUI
+    PluginBannerUI,
+    ConnectivityMatrixBrowserComponent
   ],
   exports : [
     SubjectViewer,
@@ -132,7 +134,8 @@ import {SharedDirectivesModule} from "src/ui/sharedModules/sharedDirectives.modu
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    ConnectivityMatrixBrowserComponent
   ]
 })
 

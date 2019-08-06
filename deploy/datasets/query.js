@@ -421,5 +421,35 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   return zip
 }
 
+
+const getConnectedAreas = async (areaName) => {
+    if (areaName.indexOf(' - right hemisphere') > -1 || areaName.indexOf(' - left hemisphere') > -1)
+        areaName = areaName.replace(areaName.indexOf(' - left hemisphere') > -1 ? ' - left hemisphere' : ' - right hemisphere', '');
+
+    const options = {
+        url: 'http://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        json: {'area':`${areaName}`}
+    };
+
+    return await new Promise((resolve, reject) => {
+        request.post(options, (err, resp, body) => {
+            if (err)
+                return reject(err)
+            if (resp.statusCode >= 400) {
+                return reject(resp.statusCode)}
+            body = Object.keys(body).map(key => { return {name: key, numberOfConnections: body[key]} })
+
+            return resolve(body)
+        })
+    })
+}
+
+
+
 exports.getDatasetFromId = getDatasetFromId
 exports.getDatasetFileAsZip = getDatasetFileAsZip
+exports.getConnectedAreas = getConnectedAreas

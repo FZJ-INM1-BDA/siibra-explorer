@@ -199,6 +199,21 @@
               </div>
             </div>
           </div>
+          <div
+                  *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+                  class="p-2">
+            Search connected areas for:
+          </div>
+
+          <div
+                  *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
+                  (click)="searchConnectedAreas(onhoverSegmentFixed.name, $event)"
+                  class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
+                  data-toggle="tooltip"
+                  data-placement="top"
+                  [title]="onhoverSegmentFixed.name">
+            <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
+          </div>
 
           <div
             class="p-2 text-muted"

@@ -79,6 +79,7 @@ export class WidgetServices{
       /* common properties */
       _component.instance.state = _option.state
       _component.instance.exitable = _option.exitable
+      _component.instance.minimizable = _option.minimizable
       _component.instance.title = _option.title
       _component.instance.persistency = _option.persistency
       _component.instance.titleHTML = _option.titleHTML
@@ -176,6 +177,9 @@ function getOption(option?:Partial<WidgetOptionsInterface>):WidgetOptionsInterfa
     exitable : safeGet(option, 'exitable') !== null
       ? safeGet(option, 'exitable')
       : true,
+    minimizable : safeGet(option, 'minimizable') !== (null || undefined)
+      ? safeGet(option, 'minimizable')
+      : true,
     state : safeGet(option, 'state') || 'floating',
     title : safeGet(option, 'title') || 'Untitled',
     persistency : safeGet(option, 'persistency') || false,
@@ -187,6 +191,7 @@ export interface WidgetOptionsInterface{
   title? : string
   state? : 'docked' | 'floating'
   exitable? : boolean
+  minimizable? : boolean
   persistency? : boolean
   titleHTML? : string
 }

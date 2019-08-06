@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getConnectedAreas } = require('./query')
 const url = require('url')
 const qs = require('querystring')
 
@@ -175,6 +175,18 @@ datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
 
   res.setHeader('Content-Type', 'application/zip')
   zip.generateNodeStream().pipe(res)
-});
+})
+
+datasetsRouter.post('/getConnectedAreas', async (req, res) => {
+
+  const regionName = req.body.regionName
+
+  try {
+    const stream = await getConnectedAreas(regionName)
+    res.send(stream)
+  } catch (e) {
+    res.status(400).send(e)
+  }
+})
 
 module.exports = datasetsRouter

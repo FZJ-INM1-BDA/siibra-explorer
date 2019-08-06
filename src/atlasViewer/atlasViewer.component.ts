@@ -1,4 +1,15 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef, Renderer2 } from "@angular/core";
+import {
+  Component,
+  HostBinding,
+  ViewChild,
+  ViewContainerRef,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  AfterViewInit,
+  ElementRef,
+  Renderer2,
+} from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
@@ -21,6 +32,7 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { ToastService } from "src/services/toastService.service";
+import {ConnectivityMatrixBrowserService} from "src/ui/connectivityMatrixBrowser/connectivityMatrixBrowser.service";
 
 /**
  * TODO
@@ -110,7 +122,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private toastService: ToastService,
-    private rd: Renderer2
+    private rd: Renderer2,
+    private connectivityMatrixBrowserService: ConnectivityMatrixBrowserService,
   ) {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
@@ -528,6 +541,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
           this.changeMenuState({close: true})
         })
       )
+    }
+  }
+
+  searchConnectedAreas(regionName, event) {
+    const position = {top: event.clientY-20, left: event.clientX-100}
+
+    this.rClContextualMenu.hide()
+    this.connectivityMatrixBrowserService.searchConnectedAreas(regionName, position)
+
+    if (this.isMobile) {
+      this.store.dispatch({
+        type : OPEN_SIDE_PANEL
+      })
+      this.mobileMenuTabs.tabs[1].active = true
     }
   }
 

@@ -59,6 +59,9 @@ export class WidgetUnit implements OnInit{
   public exitable : boolean = true
 
   @Input()
+  public minimizable : boolean = true
+
+  @Input()
   public titleHTML : string = null
 
   public guestComponentRef : ComponentRef<any>
@@ -101,6 +104,7 @@ export class WidgetUnit implements OnInit{
       title : this.title,
       state:'floating',
       exitable:this.exitable,
+      minimizable:this.minimizable,
       persistency:this.persistency
     })
   }
@@ -115,6 +119,7 @@ export class WidgetUnit implements OnInit{
       title : this.title,
       state:'docked',
       exitable:this.exitable,
+      minimizable:this.minimizable,
       persistency:this.persistency
     })
   }
