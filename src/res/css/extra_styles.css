@@ -347,3 +347,17 @@ markdown-dom pre code
   background:none;
   border:none;
 }
+
+/* TODO fix hack */
+/* ngx boostrap default z index for modal-container is 1050, which is higher than material tooltip 1000 */
+/* when migration away from ngx bootstrap is complete, remove these classes */
+
+modal-container.modal
+{
+  z-index: 950;
+}
+
+bs-modal-backdrop.modal-backdrop
+{
+  z-index: 940;
+}

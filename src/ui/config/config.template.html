@@ -1,7 +1,8 @@
-<div class="input-group">
+<div class="input-group mb-2">
   <span class="input-group-prepend">
     <span class="input-group-text">
       GPU Limit
+      <small tooltipClass="z-1060" [matTooltip]="GPU_TOOLTIP" class="ml-2 fas fa-question"></small>
     </span>
   </span>
   <input
@@ -17,16 +18,25 @@
   <div class="input-group-append">
 
     <div (click)="setGpuPreset({ value: 100 })" class="btn btn-outline-secondary">
-        100
-      </div>
-      <div (click)="setGpuPreset({ value: 500 })" class="btn btn-outline-secondary">
-        500
-      </div>
-      <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-outline-secondary">
-        1000
-      </div>
-      <span class="input-group-text">
-        MB
-      </span>
+      100
     </div>
+    <div (click)="setGpuPreset({ value: 500 })" class="btn btn-outline-secondary">
+      500
+    </div>
+    <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-outline-secondary">
+      1000
+    </div>
+    <span class="input-group-text">
+      MB
+    </span>
   </div>
+</div>
+
+<div>
+  <mat-checkbox
+    [checked]="animationFlag$ | async"
+    (change)="toggleAnimationFlag($event)">
+    Enable Animation
+  </mat-checkbox>
+  <small [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
+</div>

@@ -35,7 +35,7 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { AuthService } from "./services/auth.service";
-import { ViewerConfiguration } from "./services/state/viewerConfig.store";
+import { ViewerConfiguration, LOCAL_STORAGE_CONST } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
@@ -141,9 +141,13 @@ export class MainModule{
     authServce.authReloadState()
     store.pipe(
       select('viewerConfigState')
-    ).subscribe(({ gpuLimit }) => {
-      if (gpuLimit)
-        window.localStorage.setItem('iv-gpulimit', gpuLimit.toString())
+    ).subscribe(({ gpuLimit, animation }) => {
+      if (gpuLimit) {
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.GPU_LIMIT, gpuLimit.toString())
+      }
+      if (typeof animation !== 'undefined' && animation !== null) {
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.ANIMATION, animation.toString())
+      }
     })
   }
 }
