@@ -59,7 +59,6 @@ export class WidgetUnit implements OnInit{
   }
 
   set progressIndicator(val:number) {
-    console.log(`new progress indicator ${val}`)
     if (isNaN(val)) {
       this._progressIndicator = null
       return
