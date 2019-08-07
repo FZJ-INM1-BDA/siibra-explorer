@@ -42,6 +42,8 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { DragDropDirective } from "./util/directives/dragDrop.directive";
+import { LocalFileService } from "./services/localFile.service";
 
 @NgModule({
   imports : [
@@ -91,6 +93,7 @@ import { UseEffects } from "./services/effect/effect";
     PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
     FixedMouseContextualContainerDirective,
+    DragDropDirective,
 
     /* pipes */
     GetNamesPipe,
@@ -113,6 +116,7 @@ import { UseEffects } from "./services/effect/effect";
     ToastService,
     AtlasWorkerService,
     AuthService,
+    LocalFileService,
     
     /**
      * TODO
