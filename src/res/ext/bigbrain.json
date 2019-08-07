@@ -3,7 +3,7 @@
   "type": "template",
   "species": "Human",
   "useTheme": "light",
-  "nehubaId": " grey value: ",
+  "ngId": " grey value: ",
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {

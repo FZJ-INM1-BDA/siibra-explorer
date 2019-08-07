@@ -2,7 +2,7 @@
   "name": "Allen adult mouse brain reference atlas V3",
   "type": "template",
   "species": "Mouse",
-  "ngId": "",
+  "ngId": "stpt",
   "useTheme": "dark",
   "nehubaConfigURL": "nehubaConfig/allenMouseNehubaConfig",
   "parcellations": [

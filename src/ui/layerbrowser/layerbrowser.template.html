@@ -1,4 +1,4 @@
-<ng-container *ngIf="ngLayers$ | async | filterNgLayer : ngLayers as filteredNgLayers; else noLayerPlaceHolder">
+<ng-container *ngIf="ngLayers$ | async | filterNgLayer : (loadedNgLayers$ | async) as filteredNgLayers; else noLayerPlaceHolder">
   <ng-container *ngIf="filteredNgLayers.length > 0; else noLayerPlaceHolder">
     <div
       class="layerContainer overflow-hidden"
