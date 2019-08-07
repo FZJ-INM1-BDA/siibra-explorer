@@ -3,7 +3,7 @@ import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
-import { filter, distinctUntilChanged, map, delay, buffer } from "rxjs/operators";
+import { filter, map } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
@@ -20,7 +20,7 @@ export class LayerBrowser implements OnDestroy{
   /**
    * TODO make untangle nglayernames and its dependency on ng
    */
-  ngLayers : NgLayerInterface[] = []
+  loadedNgLayers$: Observable<NgLayerInterface[]>
   lockedLayers : string[] = []
 
   public forceShowSegmentCurrentState : boolean | null = null
@@ -80,36 +80,9 @@ export class LayerBrowser implements OnDestroy{
       map(state => state.forceShowSegment)
     )
 
-
-    /**
-     * TODO leakage? after change of template still hanging the reference?
-     */
-    this.subscriptions.push(
-      this.store.pipe(
-        select('viewerState'),
-        select('templateSelected'),
-        distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
-        filter(templateSelected => !!templateSelected),
-        map(templateSelected => Object.keys(templateSelected.nehubaConfig.dataset.initialNgState.layers)),
-        buffer(this.store.pipe(
-          select('ngViewerState'),
-          select('nehubaReady'),
-          filter(flag => flag)
-        )),
-        delay(0),
-        map(arr => arr[arr.length - 1])
-      ).subscribe((lockedLayerNames:string[]) => {
-        /**
-         * TODO
-         * if layerbrowser is init before nehuba
-         * window['viewer'] will return undefined
-         */
-        this.lockedLayers = lockedLayerNames
-
-        this.ngLayersChangeHandler()
-        this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
-        window['viewer'].registerDisposer(this.disposeHandler)
-      })
+    this.loadedNgLayers$ = this.store.pipe(
+      select('viewerState'),
+      select('loadedNgLayers')
     )
 
     this.subscriptions.push(
@@ -119,15 +92,6 @@ export class LayerBrowser implements OnDestroy{
 
   ngOnDestroy(){
     this.subscriptions.forEach(s => s.unsubscribe())
-  }
-
-  ngLayersChangeHandler(){
-    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
-      name : obj.name,
-      type : obj.initialSpecification.type,
-      source : obj.sourceUrl,
-      visible : obj.visible
-    }) as NgLayerInterface)
   }
 
   public classVisible(layer:any):boolean{
@@ -140,8 +104,9 @@ export class LayerBrowser implements OnDestroy{
     if(!this.lockedLayers){
       /* locked layer undefined. always return false */
       return false
-    }else
+    }else{
       return this.lockedLayers.findIndex(l => l === ngLayer.name) >= 0
+    }
   }
 
   toggleVisibility(layer:any){

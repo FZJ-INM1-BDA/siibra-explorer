@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store'
 import { UserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
+import { NgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
@@ -13,6 +14,8 @@ export interface ViewerStateInterface{
 
   navigation : any | null
   dedicatedView : string[]
+
+  loadedNgLayers: NgLayerInterface[]
 }
 
 export interface AtlasAction extends Action{
@@ -36,7 +39,8 @@ export interface AtlasAction extends Action{
 export function viewerState(
   state:Partial<ViewerStateInterface> = {
     landmarksSelected : [],
-    fetchedTemplates : []
+    fetchedTemplates : [],
+    loadedNgLayers: []
   },
   action:AtlasAction
 ){
@@ -129,6 +133,24 @@ export function viewerState(
         userLandmarks: action.landmarks
       } 
     }
+    case NEHUBA_LAYER_CHANGED: {
+      if (!window['viewer']) {
+        return {
+          ...state,
+          loadedNgLayers: []
+        }
+      } else {
+        return {
+          ...state,
+          loadedNgLayers: (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
+            name : obj.name,
+            type : obj.initialSpecification.type,
+            source : obj.sourceUrl,
+            visible : obj.visible
+          }) as NgLayerInterface)
+        }
+      }
+    }
     default :
       return state
   }
@@ -150,3 +172,5 @@ export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
+
+export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`

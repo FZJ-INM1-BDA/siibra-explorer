@@ -11,7 +11,7 @@ import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
-import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
+import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED } from "src/services/state/viewerState.store";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -825,6 +825,14 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.debouncedViewerPositionChange.subscribe(this.handleEmittedNavigationChange.bind(this))
+    )
+
+    this.nehubaViewerSubscriptions.push(
+      this.nehubaViewer.layersChanged.subscribe(() => {
+        this.store.dispatch({
+          type: NEHUBA_LAYER_CHANGED
+        })
+      })
     )
 
     this.nehubaViewerSubscriptions.push(

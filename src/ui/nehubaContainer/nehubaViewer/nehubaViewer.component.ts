@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2 } from "@angular/core";
 import 'third_party/export_nehuba/main.bundle.js'
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import { fromEvent, interval, Observable } from 'rxjs'
+import { fromEvent, interval, Observable, Subscription } from 'rxjs'
 import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
 import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, takeWhile } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
@@ -23,6 +23,8 @@ import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 export class NehubaViewerUnit implements OnDestroy{
   
   @Output() nehubaReady: EventEmitter<null> = new EventEmitter()
+  @Output() layersChanged: EventEmitter<null> = new EventEmitter()
+  private layersChangedHandler: any
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter: 
     EventEmitter<{
@@ -73,7 +75,7 @@ export class NehubaViewerUnit implements OnDestroy{
     this._s9$
   ]
 
-  ondestroySubscriptions: any[] = []
+  ondestroySubscriptions: Subscription[] = []
 
   touchStart$ : Observable<any>
 
@@ -105,6 +107,9 @@ export class NehubaViewerUnit implements OnDestroy{
         }
         this.patchNG()
         this.loadNehuba()
+
+        this.layersChangedHandler = this.nehubaViewer.ngviewer.layerManager.layersChanged.add(() => this.layersChanged.emit(null))
+        this.nehubaViewer.ngviewer.registerDisposer(this.layersChangedHandler)
       })
       .catch(e => this.errorEmitter.emit(e))
 
