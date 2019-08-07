@@ -32,11 +32,11 @@
   </div>
 </div>
 
-<div>
-  <mat-checkbox
+<div class="d-flex align-items-center">
+  <mat-slide-toggle
     [checked]="animationFlag$ | async"
     (change)="toggleAnimationFlag($event)">
     Enable Animation
-  </mat-checkbox>
+  </mat-slide-toggle>
   <small [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
 </div>

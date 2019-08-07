@@ -3,7 +3,7 @@ import { Store, select } from '@ngrx/store';
 import { ViewerConfiguration, ACTION_TYPES } from 'src/services/state/viewerConfig.store'
 import { Observable, Subject, Subscription } from 'rxjs';
 import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
-import { MatCheckboxChange } from '@angular/material';
+import { MatSlideToggleChange } from '@angular/material';
 
 const GPU_TOOLTIP = `GPU TOOLTIP`
 const ANIMATION_TOOLTIP = `ANIMATION_TOOLTIP`
@@ -78,7 +78,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
     })
   }
 
-  public toggleAnimationFlag(ev: MatCheckboxChange ){
+  public toggleAnimationFlag(ev: MatSlideToggleChange ){
     const { checked } = ev
     this.store.dispatch({
       type: ACTION_TYPES.UPDATE_CONFIG,
