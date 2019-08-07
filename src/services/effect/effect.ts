@@ -1,6 +1,6 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Effect, Actions, ofType } from "@ngrx/effects";
-import { Subscription, merge, fromEvent } from "rxjs";
+import { Subscription, merge, fromEvent, combineLatest } from "rxjs";
 import { withLatestFrom, map, filter } from "rxjs/operators";
 import { Store, select } from "@ngrx/store";
 import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
@@ -61,9 +61,12 @@ export class UseEffects implements OnDestroy{
    * older versions of atlas viewer may only have labelIndex as region identifier
    */
   @Effect()
-  onSelectRegionWithId = this.actions$.pipe(
-    ofType(SELECT_REGIONS_WITH_ID),
-    withLatestFrom(this.updatedParcellation$),
+  onSelectRegionWithId = combineLatest(
+    this.actions$.pipe(
+      ofType(SELECT_REGIONS_WITH_ID)
+    ),
+    this.updatedParcellation$
+  ).pipe(
     map(([action, parcellation]) => {
       const { selectRegionIds } = action
       const { ngId: defaultNgId } = parcellation
