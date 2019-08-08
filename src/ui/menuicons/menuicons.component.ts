@@ -1,4 +1,4 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -7,9 +7,10 @@ import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.co
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
-import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { map, shareReplay } from "rxjs/operators";
 
 @Component({
   selector: 'menu-icons',
@@ -43,8 +44,23 @@ export class MenuIconsBar{
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
 
-  get isMobile(){
-    return this.constantService.mobile
+  isMobile: boolean = false
+  mobileRespBtnClass: string
+
+  public darktheme$: Observable<boolean>
+
+  public themedBtnClass$: Observable<string>
+
+  public skeletonBtnClass$: Observable<string>
+  
+  private layerBrowserExists$: BehaviorSubject<boolean> = new BehaviorSubject(false)
+  public layerBrowserBtnClass$: Observable<string> 
+
+  public toolBtnClass$: Observable<string>
+  public getKgSearchBtnCls$: Observable<[Set<WidgetUnit>, string]>
+  
+  get darktheme(){
+    return this.constantService.darktheme
   }
 
   public selectedTemplate$: Observable<any>
@@ -59,6 +75,9 @@ export class MenuIconsBar{
     store: Store<any>
   ){
 
+    this.isMobile = this.constantService.mobile
+    this.mobileRespBtnClass = this.constantService.mobile ? 'btn-lg' : 'btn-sm'
+
     this.dbService.createDatabrowser = this.clickSearch.bind(this)
 
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
@@ -68,6 +87,40 @@ export class MenuIconsBar{
     this.selectedTemplate$ = store.pipe(
       select('viewerState'),
       select('templateSelected')
+    )
+
+    this.themedBtnClass$ = this.constantService.darktheme$.pipe(
+      map(flag => flag ? 'btn-dark' : 'btn-light' ),
+      shareReplay(1)
+    )
+
+    this.skeletonBtnClass$ = this.constantService.darktheme$.pipe(
+      map(flag => `${this.mobileRespBtnClass} ${flag ? 'text-light' : 'text-dark'}`),
+      shareReplay(1)
+    )
+
+    this.layerBrowserBtnClass$ = combineLatest(
+      this.layerBrowserExists$,
+      this.themedBtnClass$
+    ).pipe(
+      map(([flag,themedBtnClass]) => `${this.mobileRespBtnClass} ${flag ? 'btn-primary' : themedBtnClass}`)
+    )
+
+    this.launchedPlugins$ = this.pluginServices.launchedPlugins$.pipe(
+      map(set => Array.from(set))
+    )
+
+    this.getPluginBtnClass$ = combineLatest(
+      this.pluginServices.launchedPlugins$,
+      this.pluginServices.minimisedPlugins$,
+      this.themedBtnClass$
+    )
+
+    this.darktheme$ = this.constantService.darktheme$
+
+    this.getKgSearchBtnCls$ = combineLatest(
+      this.widgetServices.minimisedWindow$,
+      this.themedBtnClass$
     )
   }
 
@@ -98,7 +151,7 @@ export class MenuIconsBar{
   }
 
   public catchError(e) {
-    
+    this.constantService.catchError(e)
   }
 
   public clickLayer(event: MouseEvent){
@@ -117,7 +170,10 @@ export class MenuIconsBar{
       titleHTML: '<i class="fas fa-layer-group"></i> Layer Browser'
     })
 
+    this.layerBrowserExists$.next(true)
+
     this.lbWidget.onDestroy(() => {
+      this.layerBrowserExists$.next(false)
       this.layerBrowser = null
       this.lbWidget = null
     })
@@ -154,19 +210,19 @@ export class MenuIconsBar{
     this.pbWidget.instance.position = [left, top]
   }
 
-  get databrowserIsShowing() {
-    return this.dataBrowser !== null
+  public clickPluginIcon(manifest: PluginManifest){
+    this.pluginServices.launchPlugin(manifest)
+      .catch(this.constantService.catchError)
   }
 
-  get layerbrowserIsShowing() {
-    return this.layerBrowser !== null
+  public searchIconClickHandler(wu: WidgetUnit){
+    if (this.widgetServices.isMinimised(wu)) {
+      this.widgetServices.unminimise(wu)
+    } else {
+      this.widgetServices.minimise(wu)
+    }
   }
 
-  get pluginbrowserIsShowing() {
-    return this.pluginBanner !== null
-  }
-
-  get dataBrowserTitle() {
-    return `Browse`
-  }
+  public getPluginBtnClass$: Observable<[Set<string>, Set<string>, string]>
+  public launchedPlugins$: Observable<string[]>
 }

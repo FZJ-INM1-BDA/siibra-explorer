@@ -3,93 +3,90 @@
 
 <!-- hide icons when templates has yet been selected -->
 <ng-template [ngIf]="selectedTemplate$ | async">
+
+  <!-- layer browser -->
   <div
-    *ngIf="false"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
+    matTooltip="Layer"
+    matTooltipPosition="right"
+    (click)="clickLayer($event)"
+    [class]="layerBrowserBtnClass$ | async"
+    class="btn">
+    <i class="fas fa-layer-group">
+    </i>
+  </div>
+
+  <!-- tools -->
+  <div class="position-relative sleight-of-hand">
+
+    <!-- shown after mouse over -->
+    <div class="position-absolute d-flex flex-row sleight-of-hand-back">
+
+      <!-- add new tool btn -->
+      <div
+        matTooltip="Add new plugin"
+        [matTooltipShowDelay]="100"
+        matTooltipPosition="below"
+        [class]="(skeletonBtnClass$ | async)">
+        <i class="fas fa-plus"></i>
+      </div>
+
+      <!-- render all fetched tools -->
+      <div
+        *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+        [matTooltip]="manifest.displayName || manifest.name"
+        matTooltipPosition="below"
+        (click)="clickPluginIcon(manifest)"
+        [class]="(getPluginBtnClass$ | async | menuIconPluginBtnClsPipe : manifest.name) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
+        {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+      </div>
+
+      <small
+        *ngIf="pluginServices.fetchedPluginManifests.length === 0"
+        [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+        No plugins loaded.
+      </small>
+    </div>
+
+    <!-- shown icon prior to mouse over -->
     <div
-      [tooltip]="dataBrowserTitle"
-      placement="right"
-      (click)="clickSearch($event)"
-      [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-search">
-        
-      </i>
+      [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+      [class]="(skeletonBtnClass$ | async) + ' position-relative btn sleight-of-hand-front'">
+      <i class="fas fa-tools"></i>
     </div>
   </div>
 
-  <div
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-    <div
-      tooltip="Layer"
-      placement="right"
-      (click)="clickLayer($event)"
-      [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-layer-group">
-        
-      </i>
+  <!-- search kg -->
+  <div class="position-relative sleight-of-hand">
+
+    <!-- shown after mouse over -->
+    <div class="position-absolute d-flex flex-row sleight-of-hand-back align-items-center">
+
+      <div
+        [ngClass]="(skeletonBtnClass$ | async) + ' position-relative btn text-muted'">
+        <i class="fas fa-search"></i>
+      </div>
+
+      <!-- render all searched kg -->
+      <div
+        *ngFor="let wu of dbService.instantiatedWidgetUnits"
+        [class]="(getKgSearchBtnCls$ | async | menuIconKgSearchBtnClsPipe : wu) + ' btn w-1em bs-content-box ' + mobileRespBtnClass"
+        [matTooltip]="wu.title"
+        (click)="searchIconClickHandler(wu)"
+        matTooltipPosition="below">
+        <i class="fas fa-search"></i>
+      </div>
+
+      <small
+        *ngIf="dbService.instantiatedWidgetUnits.length === 0"
+        [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+        Right click any area to search
+      </small>
     </div>
-  </div>
 
-  <div
-    *ngIf="false"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
+    <!-- shown icon prior to mouse over -->
     <div
-      tooltip="Plugins"
-      (click)="clickPlugins($event)"
-      placement="right"
-      [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-tools">
-        
-      </i>
-    </div>
-  </div>
-
-  <div
-    *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-    [tooltip]="manifest.displayName || manifest.name"
-    placement="right"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-
-    <div
-      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-      [ngClass]="!pluginServices.launchedPlugins.has(manifest.name) ? 'btn-outline-secondary' : pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
-      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-    </div>
-  </div>
-
-  <div
-    *ngFor="let manifest of pluginServices.orphanPlugins"
-    [tooltip]="manifest.displayName || manifest.name"
-    placement="right"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-
-    <div
-      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-      [ngClass]="pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
-      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-    </div>
-  </div>
-
-  <div
-    *ngFor="let wu of dbService.instantiatedWidgetUnits"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    placement="right"
-    [tooltip]="wu.title"
-    class="btnWrapper">
-    <div
-      (click)="widgetServices.minimisedWindow.delete(wu)"
-      [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
+      [class]="(skeletonBtnClass$ | async) + ' position-relative btn sleight-of-hand-front'"
+      [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
       <i class="fas fa-search"></i>
     </div>
   </div>

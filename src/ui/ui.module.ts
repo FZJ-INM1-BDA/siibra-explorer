@@ -48,6 +48,8 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import { MenuIconPluginBtnClsPipe } from "src/util/pipes/menuIconPluginBtnCls.pipe";
+import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCls.pipe";
 
 
 @NgModule({
@@ -99,6 +101,8 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
+    MenuIconPluginBtnClsPipe,
+    MenuIconKgSearchBtnClsPipe,
 
     /* directive */
     DownloadDirective,

@@ -21,3 +21,25 @@
 {
   border-right-color: rgba(128, 128, 128, 0.5);
 }
+
+.sleight-of-hand-back > *:not(:first-child)
+{
+  margin-left: 0.1em;
+}
+
+.sleight-of-hand:hover *
+{
+  transition: opacity 300ms ease-in-out;
+}
+
+.sleight-of-hand:not(:hover) .sleight-of-hand-back
+{
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sleight-of-hand:hover .sleight-of-hand-front
+{
+  opacity: 0;
+  pointer-events: none;
+}
