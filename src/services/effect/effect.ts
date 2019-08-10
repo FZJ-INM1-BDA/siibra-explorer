@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Effect, Actions, ofType } from "@ngrx/effects";
-import { Subscription, merge, fromEvent, combineLatest } from "rxjs";
-import { withLatestFrom, map, filter } from "rxjs/operators";
+import { Subscription, merge, fromEvent, combineLatest, Observable } from "rxjs";
+import { withLatestFrom, map, filter, shareReplay } from "rxjs/operators";
 import { Store, select } from "@ngrx/store";
-import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
+import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID, DESELECT_REGIONS } from "../state/viewerState.store";
 import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
 import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
 
@@ -24,7 +24,29 @@ export class UseEffects implements OnDestroy{
         })
       })
     )
+
+    this.regionsSelected$ = this.store$.pipe(
+      select('viewerState'),
+      select('regionsSelected'),
+      shareReplay(1)
+    )
+
+    this.onDeselectRegions = this.actions$.pipe(
+      ofType(DESELECT_REGIONS),
+      withLatestFrom(this.regionsSelected$),
+      map(([action, regionsSelected]) => {
+        const { deselectRegions } = action
+        const deselectSet = new Set((deselectRegions as any[]).map(r => r.name))
+        const selectRegions = regionsSelected.filter(r => !deselectSet.has(r.name))
+        return {
+          type: SELECT_REGIONS,
+          selectRegions
+        }
+      })
+    )
   }
+
+  private regionsSelected$: Observable<any[]>
 
   ngOnDestroy(){
     while(this.subscriptions.length > 0) {
@@ -55,6 +77,9 @@ export class UseEffects implements OnDestroy{
     select('parcellationSelected'),
     filter(p => !!p && !!p.regions)
   )
+
+  @Effect()
+  onDeselectRegions: Observable<any> 
 
   /**
    * for backwards compatibility.

@@ -1,0 +1,32 @@
+:host:not(:hover) > .sleight-of-hand-back
+{
+  opacity: 0;
+  pointer-events: none;
+}
+
+:host:hover > .sleight-of-hand-front
+{
+  opacity: 0;
+  pointer-events: none;
+}
+
+:host *
+{
+  transition: opacity 300ms ease-in-out;
+}
+
+:host
+{
+  position: relative;
+}
+
+:host > .sleight-of-hand-front
+{
+  position: relative;
+}
+
+:host > .sleight-of-hand-back
+{
+  position:  absolute;
+  z-index: 1;
+}

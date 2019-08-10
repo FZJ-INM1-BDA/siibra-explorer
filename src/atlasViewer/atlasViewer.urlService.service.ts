@@ -57,7 +57,8 @@ export class AtlasViewerURLService{
      */
     this.additionalNgLayers$ = combineLatest(
       this.changeQueryObservable$.pipe(
-        map(state => state.templateSelected)
+        select('templateSelected'),
+        filter(v => !!v)
       ),
       this.store.pipe(
         select('ngViewerState'),

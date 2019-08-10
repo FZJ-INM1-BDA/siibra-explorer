@@ -40,7 +40,8 @@ export function viewerState(
   state:Partial<ViewerStateInterface> = {
     landmarksSelected : [],
     fetchedTemplates : [],
-    loadedNgLayers: []
+    loadedNgLayers: [],
+    regionsSelected: []
   },
   action:AtlasAction
 ){
@@ -167,6 +168,7 @@ export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 export const UPDATE_PARCELLATION = `UPDATE_PARCELLATION`
 
+export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
 export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`

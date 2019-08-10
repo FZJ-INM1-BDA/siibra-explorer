@@ -50,7 +50,7 @@ import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParc
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { MenuIconPluginBtnClsPipe } from "src/util/pipes/menuIconPluginBtnCls.pipe";
 import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCls.pipe";
-
+import { ScrollingModule } from "@angular/cdk/scrolling"
 
 @NgModule({
   imports : [
@@ -59,6 +59,7 @@ import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCl
     ComponentsModule,
     DatabrowserModule,
     UtilModule,
+    ScrollingModule,
     AngularMaterialModule,
 
     PopoverModule.forRoot(),

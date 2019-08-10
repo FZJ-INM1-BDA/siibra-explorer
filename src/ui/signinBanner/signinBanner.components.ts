@@ -200,6 +200,9 @@ export class SigninBanner implements OnInit, OnDestroy{
           }
         })
       } else {
+        /**
+         * TODO convert to snack bar
+         */
         this.toastService.showToast(`${region.name} does not have a position defined`, {
           timeout: 5000,
           dismissable: true

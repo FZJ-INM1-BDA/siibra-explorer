@@ -9,8 +9,11 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
+import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
+import { MatSnackBar } from "@angular/material";
+import { ToastService } from "src/services/toastService.service";
 
 @Component({
   selector: 'menu-icons',
@@ -22,6 +25,8 @@ import { map, shareReplay } from "rxjs/operators";
 })
 
 export class MenuIconsBar{
+
+  public badgetPosition: string = 'above before'
 
   /**
    * databrowser
@@ -64,6 +69,7 @@ export class MenuIconsBar{
   }
 
   public selectedTemplate$: Observable<any>
+  public selectedRegions$: Observable<any[]>
 
   constructor(
     private widgetServices:WidgetServices,
@@ -72,7 +78,8 @@ export class MenuIconsBar{
     public dbService: DatabrowserService,
     cfr: ComponentFactoryResolver,
     public pluginServices:PluginServices,
-    store: Store<any>
+    private store: Store<any>,
+    private toastService: ToastService
   ){
 
     this.isMobile = this.constantService.mobile
@@ -87,6 +94,16 @@ export class MenuIconsBar{
     this.selectedTemplate$ = store.pipe(
       select('viewerState'),
       select('templateSelected')
+    )
+
+    this.selectedRegions$ = merge(
+      of([]),
+      store.pipe(
+        select('viewerState'),
+        select('regionsSelected')
+      )
+    ).pipe(
+      shareReplay(1)
     )
 
     this.themedBtnClass$ = this.constantService.darktheme$.pipe(
@@ -221,6 +238,58 @@ export class MenuIconsBar{
     } else {
       this.widgetServices.minimise(wu)
     }
+  }
+
+  public closeWidget(event: MouseEvent, wu:WidgetUnit){
+    event.stopPropagation()
+    this.widgetServices.exitWidget(wu)
+  }
+
+  public deselectRegion(event: MouseEvent, region: any){
+    event.stopPropagation()
+    
+    this.store.dispatch({
+      type: DESELECT_REGIONS,
+      deselectRegions: [region]
+    })
+  }
+
+  public deselectAllRegions(event: MouseEvent){
+    event.stopPropagation()
+    this.store.dispatch({
+      type: SELECT_REGIONS,
+      selectRegions: []
+    })
+  }
+
+  public gotoRegion(event: MouseEvent, region:any){
+    event.stopPropagation()
+
+    if (region.position) {
+      this.store.dispatch({
+        type: CHANGE_NAVIGATION,
+        navigation: {
+          position: region.position,
+          animation: {}
+        }
+      })
+    } else {
+      /**
+       * TODO convert to snack bar
+       */
+      this.toastService.showToast(`${region.name} does not have a position defined`, {
+        timeout: 5000,
+        dismissable: true
+      })
+    }
+  }
+
+  public renameKgSearchWidget(event:MouseEvent, wu: WidgetUnit) {
+    event.stopPropagation()
+  }
+
+  public favKgSearch(event: MouseEvent, wu: WidgetUnit) {
+    event.stopPropagation()
   }
 
   public getPluginBtnClass$: Observable<[Set<string>, Set<string>, string]>

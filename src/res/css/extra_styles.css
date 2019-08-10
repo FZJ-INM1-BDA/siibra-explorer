@@ -137,8 +137,12 @@ span.regionSelected
 span.regionNotSelected,
 span.regionSelected
 {
-  cursor : default;
   user-select: none;
+}
+
+.cursor-default
+{
+  cursor: default;
 }
 
 markdown-dom pre code
