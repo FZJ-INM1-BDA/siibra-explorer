@@ -50,15 +50,15 @@
           [class]="(getPluginBtnClass$ | async | menuIconPluginBtnClsPipe : manifest.name) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
           {{ (manifest.displayName || manifest.name).slice(0, 1) }}
         </div>
-      </div>
 
-      <!-- add new tool btn -->
-      <div
-        matTooltip="Add new plugin"
-        [matTooltipShowDelay]="100"
-        matTooltipPosition="below"
-        [class]="(skeletonBtnClass$ | async)">
-        <i class="fas fa-plus"></i>
+        <!-- add new tool btn -->
+        <div
+          matTooltip="Add new plugin"
+          [matTooltipShowDelay]="100"
+          matTooltipPosition="right"
+          [class]="(skeletonBtnClass$ | async)">
+          <i class="fas fa-plus"></i>
+        </div>
       </div>
     </div>
   </sleight-of-hand>

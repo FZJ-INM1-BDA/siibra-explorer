@@ -351,3 +351,13 @@ markdown-dom pre code
   background:none;
   border:none;
 }
+
+.w-1em
+{
+  width: 1em;
+}
+
+.bs-content-box
+{
+  box-sizing: content-box;
+}
