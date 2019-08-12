@@ -12,7 +12,6 @@ import { Store, select } from "@ngrx/store";
 import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
 import { map, shareReplay } from "rxjs/operators";
 import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
-import { MatSnackBar } from "@angular/material";
 import { ToastService } from "src/services/toastService.service";
 
 @Component({
@@ -124,7 +123,8 @@ export class MenuIconsBar{
     )
 
     this.launchedPlugins$ = this.pluginServices.launchedPlugins$.pipe(
-      map(set => Array.from(set))
+      map(set => Array.from(set)),
+      shareReplay(1)
     )
 
     this.getPluginBtnClass$ = combineLatest(

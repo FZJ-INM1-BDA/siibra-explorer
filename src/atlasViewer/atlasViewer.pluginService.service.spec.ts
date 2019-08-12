@@ -94,13 +94,13 @@ describe('PluginServices', () => {
         'when template/script has yet been fetched, repeated launchPlugin should not result in repeated fetching',
         inject([HttpTestingController], (httpMock:HttpTestingController) => {
 
-          expect(pluginService.pluginLaunching.has(MOCK_PLUGIN_MANIFEST.name)).toBeFalsy()
+          expect(pluginService.pluginIsLaunching(MOCK_PLUGIN_MANIFEST.name)).toBeFalsy()
           pluginService.launchPlugin(MOCK_PLUGIN_MANIFEST)
           pluginService.launchPlugin(MOCK_PLUGIN_MANIFEST)
           expect(httpMock.match(MOCK_PLUGIN_MANIFEST.scriptURL).length).toBe(1)
           expect(httpMock.match(MOCK_PLUGIN_MANIFEST.templateURL).length).toBe(1)
 
-          expect(pluginService.pluginLaunching.has(MOCK_PLUGIN_MANIFEST.name)).toBeTruthy()
+          expect(pluginService.pluginIsLaunching(MOCK_PLUGIN_MANIFEST.name)).toBeTruthy()
         })
       )
     })

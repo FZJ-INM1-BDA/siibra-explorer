@@ -274,6 +274,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
      * DO NOT REMOVE
      * general catch all & reflect in UI
      */
+    console.warn(e)
   }
 }
 

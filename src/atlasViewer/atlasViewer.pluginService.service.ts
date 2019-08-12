@@ -29,7 +29,7 @@ export class PluginServices{
   /**
    * TODO remove polyfil and convert all calls to this.fetch to http client
    */
-  public fetch: (url:string) => Promise<any> = (url) => this.http.get(url).toPromise()
+  public fetch: (url:string, httpOption?: any) => Promise<any> = (url, httpOption = {}) => this.http.get(url, httpOption).toPromise()
 
   constructor(
     private apiService : AtlasViewerAPIServices,
@@ -56,19 +56,19 @@ export class PluginServices{
           : Promise.resolve([]),
         new Promise(resolve => {
           this.fetch(`${this.constantService.backendUrl}plugins`)
-            .then(res => res.json())
             .then(arr => Promise.all(
               arr.map(url => new Promise(rs => 
                 /**
                  * instead of failing all promises when fetching manifests, only fail those that fails to fetch
                  */
-                this.fetch(url).then(res => res.json()).then(rs).catch(e => (console.log('fetching manifest error', e), rs(null))))
+                this.fetch(url).then(rs).catch(e => (this.constantService.catchError(`fetching manifest error: ${e.toString()}`), rs(null))))
               )
             ))
             .then(manifests => resolve(
               manifests.filter(m => !!m)
             ))
             .catch(e => {
+              this.constantService.catchError(e)
               resolve([])
             })
         }),
@@ -120,15 +120,13 @@ export class PluginServices{
         isDefined(plugin.template) ?
           Promise.resolve('template already provided') :
           isDefined(plugin.templateURL) ?
-            this.fetch(plugin.templateURL)
-              .then(res=>res.text())
+            this.fetch(plugin.templateURL, {responseType: 'text'})
               .then(template=>plugin.template = template) :
             Promise.reject('both template and templateURL are not defined') ,
         isDefined(plugin.script) ?
           Promise.resolve('script already provided') :
           isDefined(plugin.scriptURL) ?
-            this.fetch(plugin.scriptURL)
-              .then(res=>res.text())
+            this.fetch(plugin.scriptURL, {responseType: 'text'})
               .then(script=>plugin.script = script) :
             Promise.reject('both script and scriptURL are not defined') 
       ])
