@@ -51,9 +51,12 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { MenuIconPluginBtnClsPipe } from "src/util/pipes/menuIconPluginBtnCls.pipe";
 import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCls.pipe";
 import { ScrollingModule } from "@angular/cdk/scrolling"
+import { HttpClientModule } from "@angular/common/http";
+
 
 @NgModule({
   imports : [
+    HttpClientModule,
     FormsModule,
     LayoutModule,
     ComponentsModule,
