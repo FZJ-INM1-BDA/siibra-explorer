@@ -1,8 +1,8 @@
 import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, AfterViewInit } from "@angular/core";
 import {  Subscription, Subject, fromEvent } from "rxjs";
 import { buffer, debounceTime } from "rxjs/operators";
-import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 import { generateLabelIndexId } from "src/services/stateStore.service";
+import { FilterNameBySearch } from "src/ui/viewerStateController/regionHierachy/filterNameBySearch.pipe";
 
 const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
