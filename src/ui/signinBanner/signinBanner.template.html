@@ -2,48 +2,6 @@
   class="d-flex"  
   [ngClass]="{ 'flex-column w-100 align-items-stretch' : isMobile}" >
 
-  <dropdown-component
-    (itemSelected)="changeTemplate($event)"
-    [checkSelected]="compareParcellation"
-    [activeDisplay]="displayActiveTemplate"
-    [selectedItem]="selectedTemplate$ | async"
-    [inputArray]="loadedTemplates$ | async | filterNull | appendTooltipTextPipe"
-    [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-    (extraBtnClicked)="handleExtraBtnClicked($event, 'template')"
-    [activeDisplayBtns]="(selectedTemplate$ | async | templateParcellationsDecorationPipe)?.extraButtons"
-    (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'template')"
-    (listItemButtonClicked)="handleExtraBtnClicked($event, 'template')">
-  </dropdown-component>
-
-  <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
-    <dropdown-component
-      *ngIf="selectedParcellation$ | async as selectedParcellation"
-      (itemSelected)="changeParcellation($event)"
-      [checkSelected]="compareParcellation"
-      [activeDisplay]="displayActiveParcellation"
-      [selectedItem]="selectedParcellation"
-      [inputArray]="selectedTemplate.parcellations | appendTooltipTextPipe"
-      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-      (extraBtnClicked)="handleExtraBtnClicked($event, 'parcellation')"
-      [activeDisplayBtns]="(selectedParcellation | templateParcellationsDecorationPipe)?.extraButtons"
-      (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'parcellation')"
-      (listItemButtonClicked)="handleExtraBtnClicked($event, 'parcellation')">
-
-    </dropdown-component>
-    <region-hierarchy
-      [selectedRegions]="selectedRegions$ | async | filterNull"
-      (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
-      (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
-      (clearAllRegions)="clearAllRegions()"
-      [isMobile] = "isMobile"
-      *ngIf="selectedParcellation$ | async as selectedParcellation"
-      class="h-0"
-      [selectedParcellation]="selectedParcellation"
-      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass">
-
-    </region-hierarchy>
-  </ng-container>
-
   <!-- help btn -->
   <div class="btnWrapper">
     <div
@@ -81,17 +39,3 @@
 
   </div>
 </div>
-
-<!-- TODO somehow, using async pipe here does not work -->
-<!-- maybe have something to do with bufferTime, and that it replays from the beginning?  -->
-<ng-template #publicationTemplate>
-  <single-dataset-view
-    *ngFor="let focusedDataset of focusedDatasets"
-    [name]="focusedDataset.name"
-    [description]="focusedDataset.description"
-    [publications]="focusedDataset.publications"
-    [kgSchema]="focusedDataset.kgSchema"
-    [kgId]="focusedDataset.kgId">
-    
-  </single-dataset-view>
-</ng-template>

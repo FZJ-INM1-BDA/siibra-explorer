@@ -2,17 +2,14 @@ import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryRe
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
-import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
-import { map, shareReplay } from "rxjs/operators";
-import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
-import { MatSnackBar } from "@angular/material";
+import { Observable, combineLatest, merge, of } from "rxjs";
+import { map, shareReplay, startWith } from "rxjs/operators";
 import { ToastService } from "src/services/toastService.service";
 
 @Component({
@@ -36,13 +33,6 @@ export class MenuIconsBar{
   dbWidget: ComponentRef<WidgetUnit> = null
 
   /**
-   * layerBrowser
-   */
-  lbcf: ComponentFactory<LayerBrowser>
-  layerBrowser: ComponentRef<LayerBrowser> = null
-  lbWidget: ComponentRef<WidgetUnit> = null
-
-  /**
    * pluginBrowser
    */
   pbcf: ComponentFactory<PluginBannerUI>
@@ -57,9 +47,6 @@ export class MenuIconsBar{
   public themedBtnClass$: Observable<string>
 
   public skeletonBtnClass$: Observable<string>
-  
-  private layerBrowserExists$: BehaviorSubject<boolean> = new BehaviorSubject(false)
-  public layerBrowserBtnClass$: Observable<string> 
 
   public toolBtnClass$: Observable<string>
   public getKgSearchBtnCls$: Observable<[Set<WidgetUnit>, string]>
@@ -88,7 +75,6 @@ export class MenuIconsBar{
     this.dbService.createDatabrowser = this.clickSearch.bind(this)
 
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
-    this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
 
     this.selectedTemplate$ = store.pipe(
@@ -96,13 +82,10 @@ export class MenuIconsBar{
       select('templateSelected')
     )
 
-    this.selectedRegions$ = merge(
-      of([]),
-      store.pipe(
-        select('viewerState'),
-        select('regionsSelected')
-      )
-    ).pipe(
+    this.selectedRegions$ = store.pipe(
+      select('viewerState'),
+      select('regionsSelected'),
+      startWith([]),
       shareReplay(1)
     )
 
@@ -114,13 +97,6 @@ export class MenuIconsBar{
     this.skeletonBtnClass$ = this.constantService.darktheme$.pipe(
       map(flag => `${this.mobileRespBtnClass} ${flag ? 'text-light' : 'text-dark'}`),
       shareReplay(1)
-    )
-
-    this.layerBrowserBtnClass$ = combineLatest(
-      this.layerBrowserExists$,
-      this.themedBtnClass$
-    ).pipe(
-      map(([flag,themedBtnClass]) => `${this.mobileRespBtnClass} ${flag ? 'btn-primary' : themedBtnClass}`)
     )
 
     this.launchedPlugins$ = this.pluginServices.launchedPlugins$.pipe(
@@ -170,37 +146,6 @@ export class MenuIconsBar{
   public catchError(e) {
     this.constantService.catchError(e)
   }
-
-  public clickLayer(event: MouseEvent){
-
-    if (this.lbWidget) {
-      this.lbWidget.destroy()
-      this.lbWidget = null
-      return
-    }
-    this.layerBrowser = this.lbcf.create(this.injector)
-    this.lbWidget = this.widgetServices.addNewWidget(this.layerBrowser, {
-      exitable: true,
-      persistency: true,
-      state: 'floating',
-      title: 'Layer Browser',
-      titleHTML: '<i class="fas fa-layer-group"></i> Layer Browser'
-    })
-
-    this.layerBrowserExists$.next(true)
-
-    this.lbWidget.onDestroy(() => {
-      this.layerBrowserExists$.next(false)
-      this.layerBrowser = null
-      this.lbWidget = null
-    })
-
-    const el = event.currentTarget as HTMLElement
-    const top = el.offsetTop
-    const left = el.offsetLeft + 50
-    this.lbWidget.instance.position = [left, top]
-  }
-
   public clickPlugins(event: MouseEvent){
     if(this.pbWidget) {
       this.pbWidget.destroy()
@@ -243,45 +188,6 @@ export class MenuIconsBar{
   public closeWidget(event: MouseEvent, wu:WidgetUnit){
     event.stopPropagation()
     this.widgetServices.exitWidget(wu)
-  }
-
-  public deselectRegion(event: MouseEvent, region: any){
-    event.stopPropagation()
-    
-    this.store.dispatch({
-      type: DESELECT_REGIONS,
-      deselectRegions: [region]
-    })
-  }
-
-  public deselectAllRegions(event: MouseEvent){
-    event.stopPropagation()
-    this.store.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: []
-    })
-  }
-
-  public gotoRegion(event: MouseEvent, region:any){
-    event.stopPropagation()
-
-    if (region.position) {
-      this.store.dispatch({
-        type: CHANGE_NAVIGATION,
-        navigation: {
-          position: region.position,
-          animation: {}
-        }
-      })
-    } else {
-      /**
-       * TODO convert to snack bar
-       */
-      this.toastService.showToast(`${region.name} does not have a position defined`, {
-        timeout: 5000,
-        dismissable: true
-      })
-    }
   }
 
   public renameKgSearchWidget(event:MouseEvent, wu: WidgetUnit) {

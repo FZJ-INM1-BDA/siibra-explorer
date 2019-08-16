@@ -1,10 +1,6 @@
-:host:not(:hover) > .sleight-of-hand-back
-{
-  opacity: 0;
-  pointer-events: none;
-}
-
-:host:hover > .sleight-of-hand-front
+:host:not(.do-not-close):not(:hover) > .sleight-of-hand-back,
+:host:not(.do-not-close):hover > .sleight-of-hand-front,
+:host-context(.do-not-close) > .sleight-of-hand-front
 {
   opacity: 0;
   pointer-events: none;

@@ -1,6 +1,6 @@
 import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, AfterViewInit } from "@angular/core";
 import {  Subscription, Subject, fromEvent } from "rxjs";
-import { buffer, debounceTime } from "rxjs/operators";
+import { buffer, debounceTime, tap } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 import { generateLabelIndexId } from "src/services/stateStore.service";
 

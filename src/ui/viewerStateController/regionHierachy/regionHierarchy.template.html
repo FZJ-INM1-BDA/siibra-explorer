@@ -1,24 +1,19 @@
-<div class="input-group regionSearch">
+<mat-form-field class="w-100">
   <input 
     #searchTermInput
-    tabindex="0"
+    matInput
     (keydown.esc)="escape($event)"
-    (focus)="showRegionTree = true && !isMobile"
+    (focus)="showRegionTree = true"
     [value]="searchTerm"
     class="form-control form-control-sm"
     type="text" 
     autocomplete="off"
-    [placeholder]="getInputPlaceholder(selectedParcellation)"/>
-
-</div>
+    [placeholder]="placeHolderText"/>
+</mat-form-field>
   
-<div
-  *ngIf="showRegionTree" 
-  hideScrollbarContainer>
-
+<div hideScrollbarContainer>
   <div
-    [ngStyle]="regionHierarchyHeight()"
-    class="d-flex flex-column"
+    class="d-flex flex-column h-100"
     treeContainer
     #treeContainer>
     <div class="tree-header d-inline-flex align-items-center">
@@ -34,7 +29,7 @@
     </div>
     
     <div
-      *ngIf="selectedParcellation && selectedParcellation.regions as regions"
+      *ngIf="parcellationSelected && parcellationSelected.regions as regions"
       class="tree-body">
       <flat-tree-component
         (treeNodeClick)="handleClickRegion($event)"

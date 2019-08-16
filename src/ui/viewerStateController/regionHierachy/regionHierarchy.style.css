@@ -26,7 +26,6 @@ div[treeContainer]
 
 div[hideScrollbarcontainer]
 {
-  width: 20em;
   overflow:hidden;
   margin-top:2px;
 }
@@ -62,4 +61,20 @@ input[type="text"]
 .tree-body
 {
   flex: 1 1 auto;
+}
+
+:host
+{
+  display: flex;
+  flex-direction: column;
+}
+
+:host > mat-form-field
+{
+  flex: 0 0 auto;
+}
+
+:host > [hideScrollbarContainer]
+{
+  flex: 1 1 0;
 }

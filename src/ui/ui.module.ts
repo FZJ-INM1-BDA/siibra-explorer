@@ -5,7 +5,7 @@ import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.co
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "../layouts/layout.module";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pipe";
 import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
@@ -17,7 +17,7 @@ import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.compon
 import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { CitationsContainer } from "./citation/citations.component";
-import { LayerBrowser } from "./layerbrowser/layerbrowser.component";
+import { LayerBrowser, LockedLayerBtnClsPipe } from "./layerbrowser/layerbrowser.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
@@ -38,10 +38,9 @@ import { PopoverModule } from 'ngx-bootstrap/popover'
 import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { SigninModal } from "./signinModal/signinModal.component";
-import { FilterNgLayer } from "src/util/pipes/filterNgLayer.pipe";
 import { UtilModule } from "src/util/util.module";
-import { RegionHierarchy } from "./regionHierachy/regionHierarchy.component";
-import { FilterNameBySearch } from "./regionHierachy/filterNameBySearch.pipe";
+import { RegionHierarchy } from "./viewerStateController/regionHierachy/regionHierarchy.component";
+import { FilterNameBySearch } from "./viewerStateController/regionHierachy/filterNameBySearch.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
@@ -51,10 +50,17 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { MenuIconPluginBtnClsPipe } from "src/util/pipes/menuIconPluginBtnCls.pipe";
 import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCls.pipe";
 import { ScrollingModule } from "@angular/cdk/scrolling"
+import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
+import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
+import { ViewerStateController } from "./viewerStateController/viewerState.component";
+import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
+import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
+
 
 @NgModule({
   imports : [
     FormsModule,
+    ReactiveFormsModule,
     LayoutModule,
     ComponentsModule,
     DatabrowserModule,
@@ -87,6 +93,8 @@ import { ScrollingModule } from "@angular/cdk/scrolling"
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    ViewerStateController,
+    RegionTextSearchAutocomplete,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -98,12 +106,16 @@ import { ScrollingModule } from "@angular/cdk/scrolling"
     SortDataEntriesToRegion,
     SpatialLandmarksToDataBrowserItemPipe,
     FilterNullPipe,
-    FilterNgLayer,
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
     MenuIconPluginBtnClsPipe,
     MenuIconKgSearchBtnClsPipe,
+    LockedLayerBtnClsPipe,
+    GetFilenamePipe,
+    GetFileExtension,
+    BinSavedRegionsSelectionPipe,
+    SavedRegionsSelectionBtnDisabledPipe,
 
     /* directive */
     DownloadDirective,
@@ -114,7 +126,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling"
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     LayerBrowser,
-    PluginBannerUI
+    PluginBannerUI,
   ],
   exports : [
     SubjectViewer,

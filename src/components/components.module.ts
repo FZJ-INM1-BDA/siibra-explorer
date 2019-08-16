@@ -30,6 +30,8 @@ import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
 import { SleightOfHand } from './sleightOfHand/soh.component';
+import { DialogComponent } from './dialog/dialog.component';
+import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
 
 
 @NgModule({
@@ -54,6 +56,8 @@ import { SleightOfHand } from './sleightOfHand/soh.component';
     PillComponent,
     RadioList,
     SleightOfHand,
+    DialogComponent,
+    ConfirmDialogComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -86,6 +90,8 @@ import { SleightOfHand } from './sleightOfHand/soh.component';
     PillComponent,
     RadioList,
     SleightOfHand,
+    DialogComponent,
+    ConfirmDialogComponent,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

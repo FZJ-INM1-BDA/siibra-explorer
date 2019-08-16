@@ -5,7 +5,7 @@ import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule, Store, select } from "@ngrx/store";
-import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState } from "./services/stateStore.service";
+import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
@@ -22,7 +22,6 @@ import { ModalModule } from 'ngx-bootstrap/modal'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
-import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathName.pipe";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
@@ -42,6 +41,10 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { DialogService } from "./services/dialogService.service";
+import { DialogComponent } from "./components/dialog/dialog.component";
+import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
+import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 
 @NgModule({
   imports : [
@@ -57,7 +60,9 @@ import { UseEffects } from "./services/effect/effect";
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
-      UseEffects
+      UseEffects,
+      UserConfigStateUseEffect,
+      ViewerStateControllerUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -67,6 +72,7 @@ import { UseEffects } from "./services/effect/effect";
       dataStore,
       spatialSearchState,
       uiState,
+      userConfigState
     }),
     HttpClientModule
   ],
@@ -96,7 +102,6 @@ import { UseEffects } from "./services/effect/effect";
     GetNamesPipe,
     GetNamePipe,
     TransformOnhoverSegmentPipe,
-    GetFilenameFromPathnamePipe,
     NewViewerDisctinctViewToLayer
   ],
   entryComponents : [
@@ -104,6 +109,8 @@ import { UseEffects } from "./services/effect/effect";
     ModalUnit,
     ToastComponent,
     PluginUnit,
+    DialogComponent,
+    ConfirmDialogComponent,
   ],
   providers : [
     AtlasViewerDataService,
@@ -113,6 +120,7 @@ import { UseEffects } from "./services/effect/effect";
     ToastService,
     AtlasWorkerService,
     AuthService,
+    DialogService,
     
     /**
      * TODO

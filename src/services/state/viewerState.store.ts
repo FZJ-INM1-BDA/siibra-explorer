@@ -107,7 +107,10 @@ export function viewerState(
       const { updatedParcellation } = action
       return {
         ...state,
-        parcellationSelected: updatedParcellation
+        parcellationSelected: {
+          ...updatedParcellation,
+          updated: true
+        }
       }
     }
     case SELECT_REGIONS:
@@ -134,6 +137,10 @@ export function viewerState(
         userLandmarks: action.landmarks
       } 
     }
+    /**
+     * TODO
+     * duplicated with ngViewerState.layers ?
+     */
     case NEHUBA_LAYER_CHANGED: {
       if (!window['viewer']) {
         return {
@@ -174,5 +181,7 @@ export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
+
+export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
 
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`

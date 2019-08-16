@@ -92,4 +92,10 @@ export class FlatTreeComponent implements AfterViewChecked {
       .some(id => this.isCollapsedById(id))
   }
 
+  handleTreeNodeClick(event:MouseEvent, inputItem: any){
+    this.treeNodeClick.emit({
+      event,
+      inputItem
+    })
+  }
 }

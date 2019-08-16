@@ -1,9 +1,9 @@
-import { Component,  OnDestroy } from "@angular/core";
+import { Component,  OnDestroy, Input, Pipe, PipeTransform } from "@angular/core";
 import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
-import { Subscription, Observable } from "rxjs";
-import { filter, map } from "rxjs/operators";
+import { Subscription, Observable, combineLatest } from "rxjs";
+import { filter, map, shareReplay, tap } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
@@ -20,13 +20,15 @@ export class LayerBrowser implements OnDestroy{
   /**
    * TODO make untangle nglayernames and its dependency on ng
    */
-  loadedNgLayers$: Observable<NgLayerInterface[]>
-  lockedLayers : string[] = []
+  public loadedNgLayers$: Observable<NgLayerInterface[]>
+  public lockedLayers : string[] = []
+
+  public nonBaseNgLayers$: Observable<NgLayerInterface[]>
 
   public forceShowSegmentCurrentState : boolean | null = null
   public forceShowSegment$ : Observable<boolean|null>
   
-  public ngLayers$: Observable<any>
+  public ngLayers$: Observable<string[]>
   public advancedMode: boolean = false
 
   private subscriptions : Subscription[] = []
@@ -34,6 +36,11 @@ export class LayerBrowser implements OnDestroy{
   
   /* TODO temporary measure. when datasetID can be used, will use  */
   public fetchedDataEntries$ : Observable<any>
+
+  @Input()
+  showPlaceholder: boolean = true
+
+  darktheme$: Observable<boolean>
 
   constructor(
     private store : Store<ViewerStateInterface>,
@@ -64,6 +71,22 @@ export class LayerBrowser implements OnDestroy{
        */
       map(arr => arr.filter(v => !!v))
     )
+
+    this.loadedNgLayers$ = this.store.pipe(
+      select('viewerState'),
+      select('loadedNgLayers')
+    )
+
+    this.nonBaseNgLayers$ = combineLatest(
+      this.ngLayers$,
+      this.loadedNgLayers$
+    ).pipe(
+      map(([baseNgLayerNames, loadedNgLayers]) => {
+        const baseNameSet = new Set(baseNgLayerNames)
+        return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
+      })
+    )
+
     /**
      * TODO
      * this is no longer populated
@@ -80,9 +103,9 @@ export class LayerBrowser implements OnDestroy{
       map(state => state.forceShowSegment)
     )
 
-    this.loadedNgLayers$ = this.store.pipe(
-      select('viewerState'),
-      select('loadedNgLayers')
+
+    this.darktheme$ = this.constantsService.darktheme$.pipe(
+      shareReplay(1)
     )
 
     this.subscriptions.push(
@@ -128,6 +151,9 @@ export class LayerBrowser implements OnDestroy{
       return
     }
 
+    /**
+     * TODO perhaps useEffects ?
+     */
     this.store.dispatch({
       type : FORCE_SHOW_SEGMENT,
       forceShowSegment : this.forceShowSegmentCurrentState === null
@@ -151,6 +177,9 @@ export class LayerBrowser implements OnDestroy{
     })
   }
 
+  /**
+   * TODO use observable and pipe to make this more perf
+   */
   segmentationTooltip(){
     return `toggle segments visibility: 
     ${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
@@ -168,5 +197,17 @@ export class LayerBrowser implements OnDestroy{
 
   get isMobile(){
     return this.constantsService.mobile
+  }
+
+  public matTooltipPosition: string = 'below'
+}
+
+@Pipe({
+  name: 'lockedLayerBtnClsPipe'
+})
+
+export class LockedLayerBtnClsPipe implements PipeTransform{
+  public transform(ngLayer:NgLayerInterface, lockedLayers?: string[]): boolean{
+    return (lockedLayers && new Set(lockedLayers).has(ngLayer.name)) || false
   }
 }
