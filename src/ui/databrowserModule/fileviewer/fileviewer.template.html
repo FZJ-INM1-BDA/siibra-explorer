@@ -85,28 +85,28 @@
 
 <div
   anchorContainer
-  *ngIf="downloadUrl">
+  *ngIf="downloadUrl"
+  class="mt-2">
   <a
-    class="btn btn-sm btn-outline-secondary rounded-circle"
-    tooltip="Download file"
+    class="btn btn-sm btn-outline-secondary"
     container="body"
     [href]="downloadUrl"
     target="_blank"
     download>
-    <i class="far fa-arrow-alt-circle-down"></i>
+    <i class="far fa-arrow-alt-circle-down"></i><span class="ml-2">Download file</span>
   </a>
 </div>
 
 <div
   anchorContainer
-  *ngIf="downloadPng">
+  *ngIf="downloadPng"
+  class="mt-2">
   <a
-    class="btn btn-sm btn-outline-secondary rounded-circle"
-    tooltip="Download chart as an image"
+    class="btn btn-sm btn-outline-secondary"
     container="body"
     [href]="downloadPng"
     target="_blank"
     download>
-    <i class="far fa-image"></i>
+    <i class="far fa-image"></i><span class="ml-2">Download chart as an image</span>
   </a>
 </div>

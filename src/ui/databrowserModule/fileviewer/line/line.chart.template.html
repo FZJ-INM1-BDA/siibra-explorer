@@ -14,11 +14,10 @@
 <a
   [download]="csvTitle"
   [href]="csvDataUrl"
-  tooltip="Download line graph as csv"
   container="body"
-  class="btn btn-sm btn-outline-secondary rounded-circle"
+  class="btn btn-sm btn-outline-secondary mt-2"
   *ngIf="shapedLineChartDatasets">
-  <i class="fas fa-file-csv"></i>
+  <i class="fas fa-file-csv"></i><span class="ml-2">Download line graph as csv</span>
 </a>
 <span
   *ngIf="!shapedLineChartDatasets">

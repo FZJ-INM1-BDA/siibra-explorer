@@ -4,10 +4,9 @@
 
 <a 
   href="#"
-  [tooltip]="tooltipText"
   container="body"
-  class="btn btn-sm rounded-circle"
+  class="btn btn-sm mt-2"
   [ngClass]="isShowing ? 'btn-primary' : 'btn-outline-secondary'"
   (click)="click($event)">
-  <i class="far fa-eye"></i>
+  <i class="far fa-eye"></i> <span class="ml-2">{{tooltipText}}</span>
 </a>

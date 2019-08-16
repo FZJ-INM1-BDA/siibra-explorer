@@ -10,6 +10,7 @@ import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
+import {filter} from "rxjs/operators";
 
 @Component({
   selector: 'menu-icons',
@@ -48,6 +49,7 @@ export class MenuIconsBar{
   }
 
   public selectedTemplate$: Observable<any>
+  public selectedParcellation$: Observable<any>
 
   constructor(
     private widgetServices:WidgetServices,
@@ -68,6 +70,10 @@ export class MenuIconsBar{
     this.selectedTemplate$ = store.pipe(
       select('viewerState'),
       select('templateSelected')
+    )
+    this.selectedParcellation$ = store.pipe(
+        select('viewerState'),
+        select('parcellationSelected'),
     )
   }
 

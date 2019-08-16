@@ -48,7 +48,8 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
-
+import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
+import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
 
 @NgModule({
   imports : [
@@ -84,6 +85,7 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    SearchPanel,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -102,7 +104,8 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 
     /* directive */
     DownloadDirective,
-    ShowToastDirective
+    ShowToastDirective,
+    ElementOutClickDirective
   ],
   entryComponents : [
 
@@ -129,7 +132,9 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    SearchPanel,
+    ElementOutClickDirective
   ]
 })
 

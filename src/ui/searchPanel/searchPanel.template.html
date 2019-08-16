@@ -1,0 +1,83 @@
+<div style=" min-height: 100px;" class="search-panel-container" (mouseleave)="showSelectionFilter=false" #SearchMenu id="SearchMenu">
+    <div class="w-100 search-header d-flex align-items-center justify-content-between pl-2 pr-4">
+        <div class="d-flex text-nowrap">
+            Region state:
+            <div class="cursorPointer ml-1">
+                <div elementOutClick (outsideClick)="($event && showSelectionFilter)? showSelectionFilter = false : null">
+                    <!--ToDo This code or next-->
+                    <span class="d-flex align-items-center overflow-hidden ellipsis">
+                        {{stateFilter}}
+                    </span>
+<!--                    <span class="d-flex align-items-center overflow-hidden ellipsis" (click)="showSelectionFilter = !showSelectionFilter">-->
+<!--                        {{stateFilter}}-->
+<!--                        <i *ngIf="(selectedRegions$ | async)?.length > 1" class="fas fa-sort-down ml-2"></i>-->
+<!--                    </span>-->
+<!--                    <div *ngIf="showSelectionFilter" class="position-absolute state-filter" [ngClass]="(selectedRegions$ | async)?.length && 'p-2'" (click)="showSelectionFilter = false">-->
+<!--                        <span (click)="stateFilter = 'Current selection'">Current selection</span>-->
+<!--                        <div class="d-flex flex-column" *ngFor="let selectedRegion of selectedRegions$ | async">-->
+<!--                            <span (click)="stateFilter=selectedRegion.name">{{selectedRegion.name}}</span>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                </div>
+            </div>
+        </div>
+        <div class="filter-container d-flex align-items-start">
+            <i class="fas fa-filter"></i>
+            <div class="filter-wrapper position-absolute search-preview-panel p-3 ml-3" >
+                <modality-picker
+                        (click)="$event.stopPropagation();"
+                        class="mw-100 modal-picker"
+                        [countedDataM]="countedDataM"
+                        (modalityFilterEmitter)="handleModalityFilterEvent($event)">
+                </modality-picker>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div *ngIf="fetchingFlag" class="spinnerAnimationCircleContainer">
+            <div class="spinnerAnimationCircle"></div>
+            <div>Fetching datasets...</div>
+        </div>
+
+        <div class="ml-2 mr-2 alert alert-danger" *ngIf="fetchError">
+            <i class="fas fa-exclamation-triangle"></i> Error fetching data. <a href="#" (click)="retryFetchData($event)" class="btn btn-link text-info">retry</a>
+        </div>
+
+        <div *ngIf="dataentries && dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry">
+            <div class="dataEntry">
+                <div class="ml-2 mr-2 mt-1">
+                    <i *ngIf="dataentries.length > 0">
+                        {{ dataentries.length }} total results.
+                        <span *ngIf="visibleCountedDataM.length > 0 ">
+                            {{ filteredDataEntry.length }} filtered results.
+                            <a href="#"
+                               class="btn btn-sm btn-link"
+                               (click)="resetFilters($event)">
+                                reset filters
+                            </a>
+                        </span>
+                    </i>
+                    <i *ngIf="dataentries.length === 0 && (selectedRegions$ | async)?.length">
+                        No results to show.
+                    </i>
+                </div>
+                <div class="overflow-auto search-body mt-2" #SearchBody>
+                    <div *ngFor="let dataset of filteredDataEntry; let i = index" class="search-item">
+                        <hr [color]="constantsService.darktheme? '#C6C6C6' : ''" class="m-0">
+                        <div class="ml-3 mr-3 pt-2 pb-2 text-wrap d-flex justify-content-between align-items-center">
+                            <div class="cursorPointer" (click)="openDatasetUrl(dataset.kgReference)">{{dataset.name}}</div>
+                            <div *ngIf="dataset.preview" class="d-flex align-items-start search-preview-container" (mouseenter)="setPreviewHeight($event); showPreview = i" (mouseleave)="showPreview = null">
+                                <i class="fas fa-eye ml-3 cursorPointer" ></i>
+                                <div class="position-absolute floating-container-mp" [ngStyle]="{'top': previewWindowTopPosition + 'px'}" *ngIf="showPreview === i" #SearchPreview>
+                                    <preview-component [datasetName]="dataset.name" class="search-preview-panel p-2" [ngStyle]="{'max-height': +windowInnerheight-40 + 'px'}">
+                                    </preview-component>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr [color]="constantsService.darktheme? '#C6C6C6' : ''" class="mt-0">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

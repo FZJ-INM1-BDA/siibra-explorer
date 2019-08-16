@@ -21,3 +21,11 @@
 {
   border-right-color: rgba(128, 128, 128, 0.5);
 }
+
+.search-menu-panel {
+  display: none;
+}
+
+.search-menu:hover .search-menu-panel {
+  display: block;
+}

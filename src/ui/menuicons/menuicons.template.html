@@ -3,21 +3,6 @@
 
 <!-- hide icons when templates has yet been selected -->
 <ng-template [ngIf]="selectedTemplate$ | async">
-  <div
-    *ngIf="false"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-    <div
-      [tooltip]="dataBrowserTitle"
-      placement="right"
-      (click)="clickSearch($event)"
-      [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-search">
-        
-      </i>
-    </div>
-  </div>
 
   <div
     [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
@@ -91,6 +76,22 @@
       [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
       class="shadow btn btn-sm rounded-circle">
       <i class="fas fa-search"></i>
+    </div>
+  </div>
+
+
+  <div class="d-flex align-items-start search-menu" style="z-index: 1" #SearchMenu>
+
+    <button mat-mini-fab style="outline: none;">
+      <i class="fas fa-search"></i>
+    </button>
+
+    <div class="search-menu-panel position-absolute" style="padding-left: 50px;" >
+      <search-panel
+              [selectedTemplate$]="selectedTemplate$"
+              [selectedParcellation$]="selectedParcellation$"
+              [searchPanelPositionTop]="SearchMenu.offsetTop">
+      </search-panel>
     </div>
   </div>
 </ng-template>

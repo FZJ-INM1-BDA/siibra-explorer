@@ -60,7 +60,10 @@ import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
   ],
   exports:[
     DataBrowser,
-    SingleDatasetView
+    SingleDatasetView,
+    PreviewComponent,
+    ModalityPicker,
+    FilterDataEntriesbyMethods
   ],
   entryComponents:[
     DataBrowser
