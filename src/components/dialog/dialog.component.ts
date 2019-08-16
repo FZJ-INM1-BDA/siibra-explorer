@@ -22,7 +22,7 @@ export class DialogComponent implements OnInit, OnDestroy {
   @Input() message: string = ''
   @ViewChild('inputField', {read: ElementRef}) private inputField: ElementRef
 
-  private value: string = ''
+  public value: string = ''
   private keyListener$: Observable<any>
 
   constructor(
