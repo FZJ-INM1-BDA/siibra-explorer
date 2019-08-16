@@ -12,8 +12,6 @@ import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 
-import '@angular/material/prebuilt-themes/indigo-pink.css'
-import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
@@ -320,6 +318,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.sidePanelView$.pipe(
         filter(() => typeof this.layoutMainSide !== 'undefined')
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
+    )
+
+    this.subscriptions.push(
+      this.constantsService.darktheme$.subscribe(flag => {
+        this.rd.setAttribute(document.body,'darktheme', flag.toString())
+      })
     )
   }
 

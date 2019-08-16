@@ -3,7 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface } from "../services/stateStore.service";
 import { Subject, Observable } from "rxjs";
 import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
-import { map, shareReplay } from "rxjs/operators";
+import { map, shareReplay, filter } from "rxjs/operators";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
@@ -252,6 +252,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     this.darktheme$ = this.store.pipe(
       select('viewerState'),
       select('templateSelected'),
+      filter(v => !!v),
       map(({useTheme}) => useTheme === 'dark'),
       shareReplay(1)
     )

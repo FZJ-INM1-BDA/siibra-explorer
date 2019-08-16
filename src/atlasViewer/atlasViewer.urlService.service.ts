@@ -60,6 +60,9 @@ export class AtlasViewerURLService{
         select('templateSelected'),
         filter(v => !!v)
       ),
+      /**
+       * TODO duplicated with viewerState.loadedNgLayers ?
+       */
       this.store.pipe(
         select('ngViewerState'),
         select('layers')
