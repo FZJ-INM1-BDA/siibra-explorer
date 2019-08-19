@@ -2,17 +2,17 @@
 
 @include  mat-core();
 
-$iv-theme-primary: mat-palette($mat-blue);
-$iv-theme-accent: mat-palette($mat-indigo);
+$iv-theme-primary: mat-palette($mat-indigo);
+$iv-theme-accent: mat-palette($mat-amber);
 $iv-theme-warn: mat-palette($mat-red);
 
 $iv-theme: mat-light-theme($iv-theme-primary, $iv-theme-accent, $iv-theme-warn);
 
 @include angular-material-theme($iv-theme);
 
-$iv-dark-theme-primary: mat-palette($mat-blue-grey);
+$iv-dark-theme-primary: mat-palette($mat-blue);
 $iv-dark-theme-accent:  mat-palette($mat-amber, A200, A100, A400);
-$iv-dark-theme-warn:    mat-palette($mat-deep-orange);
+$iv-dark-theme-warn:    mat-palette($mat-red);
 $iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, $iv-dark-theme-warn);
 
 [darktheme=true]

@@ -46,15 +46,15 @@ import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
-import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
-import { MenuIconPluginBtnClsPipe } from "src/util/pipes/menuIconPluginBtnCls.pipe";
-import { MenuIconKgSearchBtnClsPipe } from "src/util/pipes/menuIconKgSearchBtnCls.pipe";
+import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe"
 import { ScrollingModule } from "@angular/cdk/scrolling"
 import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
 import { ViewerStateController } from "./viewerStateController/viewerState.component";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
+import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
+import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 
 
 @NgModule({
@@ -109,8 +109,8 @@ import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSear
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
-    MenuIconPluginBtnClsPipe,
-    MenuIconKgSearchBtnClsPipe,
+    PluginBtnFabColorPipe,
+    KgSearchBtnColorPipe,
     LockedLayerBtnClsPipe,
     GetFilenamePipe,
     GetFileExtension,

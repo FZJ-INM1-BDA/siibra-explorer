@@ -7,16 +7,26 @@
   <!-- layer browser -->
   <sleight-of-hand>
     <div sleight-of-hand-front>
-      <div [ngClass]="(skeletonBtnClass$ | async) + ' btn'">
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
         <i class="fas fa-layer-group"></i>
-      </div>
+      </button>
     </div>
-    <div class="d-flex flex-row align-items-start soh-row pe-none"
+    <div class="d-flex flex-row align-items-center soh-row pe-none"
       sleight-of-hand-back>
 
-      <div [ngClass]="(skeletonBtnClass$ | async) + ' btn muted pe-all'">
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
         <i class="fas fa-layer-group"></i>
-      </div>
+      </button>
 
       <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' card pe-all'">
         <layer-browser #layerBrowser [showPlaceholder]="false">
@@ -34,12 +44,15 @@
   <sleight-of-hand>
 
     <!-- shown icon prior to mouse over -->
-    <div
-      [matBadgePosition]="badgetPosition"  
-      [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      sleight-of-hand-front>
-      <i class="fas fa-tools"></i>
+    <div sleight-of-hand-front>
+      <button
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-tools"></i>
+      </button>
     </div>
 
     <!-- shown after mouse over -->
@@ -48,45 +61,53 @@
       sleight-of-hand-back>
 
       <!-- placeholder icon -->
-      <div
+      <button
         [matBadgePosition]="badgetPosition"  
+        matBadgeColor="accent"
         [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-        [class]="(skeletonBtnClass$ | async) + ' btn muted'">
+        mat-icon-button
+        color="primary">
         <i class="fas fa-tools"></i>
-      </div>
+      </button>
 
       <!-- render all fetched tools -->
-      <div class="d-flex flex-column soh-column">
-        <div
-          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-          [matTooltip]="manifest.displayName || manifest.name"
-          matTooltipPosition="right"
-          (click)="clickPluginIcon(manifest)"
-          [class]="(getPluginBtnClass$ | async | menuIconPluginBtnClsPipe : manifest.name) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
-          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-        </div>
+      <div class="d-flex flex-row soh-row">
 
         <!-- add new tool btn -->
-        <div
+        <button
           matTooltip="Add new plugin"
-          [matTooltipShowDelay]="100"
-          matTooltipPosition="right"
-          [class]="(skeletonBtnClass$ | async)">
+          matTooltipPosition="below"
+          mat-icon-button
+          color="primary">
           <i class="fas fa-plus"></i>
-        </div>
+        </button>
+        
+        <button
+          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+          mat-mini-fab
+          matTooltipPosition="below"
+          [matTooltip]="manifest.displayName || manifest.name"
+          [color]="getPluginBtnClass$ | async | pluginBtnFabColorPipe : manifest.name"
+          (click)="clickPluginIcon(manifest)">
+          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+        </button>
       </div>
     </div>
   </sleight-of-hand>
 
   <!-- search kg -->
   <sleight-of-hand>
+    
     <!-- shown icon prior to mouse over -->
-    <div
-      sleight-of-hand-front
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      [matBadgePosition]="badgetPosition"
-      [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
-      <i class="fas fa-search"></i>
+    <div sleight-of-hand-front>
+      <button
+        mat-icon-button
+        color="primary"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
 
     <!-- shown after mouse over -->
@@ -95,12 +116,14 @@
       class="d-flex flex-row align-items-center soh-row pe-none">
 
       <!-- placeholder icon -->
-      <div
-        [ngClass]="(skeletonBtnClass$ | async) + ' btn muted pe-all'"
+      <button
+        mat-icon-button
+        color="primary"
+        matBadgeColor="accent"
         [matBadgePosition]="badgetPosition"
         [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
         <i class="fas fa-search"></i>
-      </div>
+      </button>
 
       <!-- only renders if there is at least one search result -->
       <div
@@ -115,17 +138,24 @@
             (click)="searchIconClickHandler(wu)">
 
             <!-- shown prior to mouseover -->
-            <div
-              [class]="(getKgSearchBtnCls$ | async | menuIconKgSearchBtnClsPipe : wu) + ' position-relative sleight-of-hand btn w-1em bs-content-box ' + mobileRespBtnClass"
-              sleight-of-hand-front>
-              <i class="fas fa-search"></i>
+            <div sleight-of-hand-front>
+              <button
+                mat-mini-fab
+                [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                <i class="fas fa-search"></i>  
+              </button>
             </div>
 
             <!-- shown on mouse over -->
             <!-- showing additional information. in this case, name of the kg search -->
             <div class="d-flex flex-row align-items-center" sleight-of-hand-back>
-              <div [class]="(getKgSearchBtnCls$ | async | menuIconKgSearchBtnClsPipe : wu) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
-                <i class="fas fa-search"></i>
+
+              <div sleight-of-hand-front>
+                <button
+                  mat-mini-fab
+                  [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                  <i class="fas fa-search"></i>  
+                </button>
               </div>
               
               <!-- on hover, show full name and action possible: rename, close -->
@@ -194,7 +224,9 @@
 
         <!-- invisible icon to keep height of the otherwise unstable flex block -->
         <div class="invisible pe-none">
-          <i class="fas fa-search"></i>
+          <button mat-icon-button>
+            <i class="fas fa-search"></i>
+          </button>
         </div>
       </div>
 
@@ -213,13 +245,15 @@
     [doNotClose]="viewerStateController.focused">
 
     <!-- shown prior to mouse over -->
-    <div
-      sleight-of-hand-front
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      [matBadgePosition]="badgetPosition"
-      matBadgeColor="warn"
-      [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null">
-      <i class="fas fa-brain"></i>
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
     </div>
 
     <!-- shown upon mouseover -->
@@ -228,13 +262,14 @@
       class="d-flex flex-row align-items-center soh-row">
 
       <!-- place holder icon -->
-      <div
-        [class]="(skeletonBtnClass$ | async) + ' btn muted'"
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
         [matBadgePosition]="badgetPosition"
-        matBadgeColor="warn"
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null">
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
         <i class="fas fa-brain"></i>
-      </div>
+      </button>
 
       <div class="position-relative">
 

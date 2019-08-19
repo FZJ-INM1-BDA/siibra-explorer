@@ -103,6 +103,9 @@ export class MenuIconsBar{
       map(set => Array.from(set))
     )
 
+    /**
+     * TODO remove dependency on themedBtnClass$
+     */
     this.getPluginBtnClass$ = combineLatest(
       this.pluginServices.launchedPlugins$,
       this.pluginServices.minimisedPlugins$,
@@ -111,6 +114,9 @@ export class MenuIconsBar{
 
     this.darktheme$ = this.constantService.darktheme$
 
+    /**
+     * TODO remove dependency on themedBtnClass$
+     */
     this.getKgSearchBtnCls$ = combineLatest(
       this.widgetServices.minimisedWindow$,
       this.themedBtnClass$
