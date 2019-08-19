@@ -1,4 +1,12 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import {
+  Component,
+  ComponentRef,
+  Injector,
+  ComponentFactory,
+  ComponentFactoryResolver,
+  AfterViewInit,
+  ViewChild, ElementRef
+} from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -50,6 +58,11 @@ export class MenuIconsBar{
 
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
+
+  searchCollapsed = 0
+  searchedItemsNumber = 0
+  searchLoading = false
+  @ViewChild ('collapsibleSearchPanel', {read: ElementRef}) collapsibleSearchPanel: ElementRef
 
   constructor(
     private widgetServices:WidgetServices,
@@ -158,6 +171,15 @@ export class MenuIconsBar{
     const top = el.offsetTop
     const left = el.offsetLeft + 50
     this.pbWidget.instance.position = [left, top]
+  }
+
+  collapseSearchBar() {
+    if (this.searchCollapsed === 2) {
+      this.searchCollapsed = 1
+      setTimeout(() => {this.searchCollapsed = 0}, 500)
+    } else {
+      this.searchCollapsed = 2
+    }
   }
 
   get databrowserIsShowing() {

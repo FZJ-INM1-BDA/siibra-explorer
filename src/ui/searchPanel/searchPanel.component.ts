@@ -1,4 +1,14 @@
-import {Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild
+} from "@angular/core";
 import {merge, Observable, Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
 import {DataEntry, safeFilter} from "src/services/stateStore.service";
@@ -19,6 +29,9 @@ export class SearchPanel implements OnInit, OnDestroy {
     selectedRegions$: Observable<any[]>
     selectedTemplate
     selectedParcellation
+
+    @Output() searchedItemsNumber: EventEmitter<number> = new EventEmitter()
+    @Output() searchLoading: EventEmitter<boolean> = new EventEmitter()
 
     showSelectionFilter = false
     stateFilter: string = 'Current selection'
@@ -112,6 +125,7 @@ export class SearchPanel implements OnInit, OnDestroy {
             })
         }
             this.fetchingFlag = true
+            this.searchLoading.emit(true)
             this.dbService.getDataByRegion({regions, parcellation, template})
                 .then(de => {
                     this.dataentries = de
@@ -127,7 +141,9 @@ export class SearchPanel implements OnInit, OnDestroy {
                 .finally(() => {
                     if (this.dataentries && this.dataentries.length)
                         this.fetchError = false
+                    this.searchedItemsNumber.emit(this.dataentries.length)
                     this.fetchingFlag = false
+                    this.searchLoading.emit(false)
                 })
 
             this.subscriptions.push(

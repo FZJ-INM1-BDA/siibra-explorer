@@ -94,4 +94,28 @@
       </search-panel>
     </div>
   </div>
+
+  <div style="z-index: 2;" class="d-flex align-items-start flex-wrap ml-n3">
+    <search-panel #collapsibleSearchPanel
+                  style="margin-left: -330px; z-index: 3;"
+                  [ngClass]="[searchCollapsed === 1? 'slide-left' : '', searchCollapsed === 2? 'slide-right' : '']"
+                  [hidden]="!searchCollapsed"
+                  [selectedTemplate$]="selectedTemplate$"
+            [selectedParcellation$]="selectedParcellation$"
+            [searchPanelPositionTop]="+SearchMenu.offsetTop+50"
+            (searchedItemsNumber)="searchedItemsNumber = $event"
+            (searchLoading)="searchLoading = true">
+    </search-panel>
+    <button class="mat-raised-button"
+            style="outline: none;"
+            color="primary"
+            (click)="collapseSearchBar()"
+            [matBadge]="searchLoading? searchedItemsNumber : null"
+            [ngClass]="[searchCollapsed === 1? 'slide-left' : '', searchCollapsed === 2? 'slide-right' : '']"
+            matBadgeColor="accent">
+      <i class="fas fa-search" *ngIf="!searchCollapsed"></i>
+      <i class="fas" [ngClass]="searchCollapsed === 2? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+    </button>
+  </div>
+
 </ng-template>
