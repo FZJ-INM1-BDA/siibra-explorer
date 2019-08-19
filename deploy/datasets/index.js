@@ -25,6 +25,15 @@ const noCacheMiddleWare = (_req, res, next) => {
   next()
 }
 
+const getVary = (headers) => (_req, res, next) => {
+  if (!headers instanceof Array) {
+    console.warn(`getVary arguments needs to be an Array of string`)
+    return next()
+  }
+  res.setHeader('Vary', headers.join(', '))
+  next()
+}
+
 datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter'))
 
 datasetsRouter.get('/templateName/:templateName', noCacheMiddleWare, (req, res, next) => {
@@ -59,7 +68,10 @@ datasetsRouter.get('/parcellationName/:parcellationName', noCacheMiddleWare, (re
     })
 })
 
-datasetsRouter.get('/preview/:datasetName', cacheMaxAge24Hr, (req, res, next) => {
+/**
+ * It appears that query param are not 
+ */
+datasetsRouter.get('/preview/:datasetName', getVary(['referer']), cacheMaxAge24Hr, (req, res, next) => {
   const { datasetName } = req.params
   const ref = url.parse(req.headers.referer)
   const { templateSelected, parcellationSelected } = qs.parse(ref.query)
