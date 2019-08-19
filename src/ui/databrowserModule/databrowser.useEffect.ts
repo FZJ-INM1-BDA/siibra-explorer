@@ -3,7 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { Actions, ofType, Effect } from "@ngrx/effects";
 import { DATASETS_ACTIONS_TYPES, DataEntry } from "src/services/state/dataStore.store";
 import { Observable, of, from, merge, Subscription } from "rxjs";
-import { withLatestFrom, map, catchError, filter, switchMap, scan, share, switchMapTo } from "rxjs/operators";
+import { withLatestFrom, map, catchError, filter, switchMap, scan, share, switchMapTo, shareReplay } from "rxjs/operators";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 
 @Injectable({
@@ -22,8 +22,7 @@ export class DataBrowserUseEffect implements OnDestroy{
   ){
     this.favDataEntries$ = this.store$.pipe(
       select('dataStore'),
-      select('favDataEntries'),
-      share()
+      select('favDataEntries')
     )
 
     this.unfavDataset$ = this.actions$.pipe(
