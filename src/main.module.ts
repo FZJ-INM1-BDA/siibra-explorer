@@ -42,6 +42,7 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
 
 @NgModule({
   imports : [
@@ -57,6 +58,7 @@ import { UseEffects } from "./services/effect/effect";
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
+      DataBrowserUseEffect,
       UseEffects
     ]),
     StoreModule.forRoot({

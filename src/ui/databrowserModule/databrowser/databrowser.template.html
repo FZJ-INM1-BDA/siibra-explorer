@@ -114,8 +114,11 @@
         <dataset-viewer
           class="mt-1"
           *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
+          (saveToFavourite)="saveToFavourite(dataset)"
+          (removeFromFavourite)="removeFromFavourite(dataset)"
           (showPreviewDataset)="onShowPreviewDataset($event)"
-          [dataset]="dataset">
+          [dataset]="dataset"
+          [isFaved]="favedDataentries$ | async | datasetIsFaved : dataset">
           <div regionTagsContainer>
 
             <!-- TODO may want to separate the region badge into a separate component -->

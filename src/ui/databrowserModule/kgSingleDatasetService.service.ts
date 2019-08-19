@@ -7,7 +7,7 @@ export class KgSingleDatasetService {
   constructor(private constantService: AtlasViewerConstantsServices) {
   }
 
-  public getInfoFromKg({ kgId, kgSchema }: KgQueryInterface) {
+  public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
     const _url = new URL(`${this.constantService.backendUrl}datasets/kgInfo`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
@@ -19,7 +19,7 @@ export class KgSingleDatasetService {
       })
   }
 
-  public downloadZipFromKg({ kgSchema, kgId } : KgQueryInterface, filename = 'download'){
+  public downloadZipFromKg({ kgSchema = 'minds/core/dataset/v1.0.0', kgId } : Partial<KgQueryInterface>, filename = 'download'){
     const _url = new URL(`${this.constantService.backendUrl}datasets/downloadKgFiles`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)

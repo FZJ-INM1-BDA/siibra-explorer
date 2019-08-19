@@ -70,6 +70,22 @@
 </div>
 
 <layout-floating-container *ngIf="viewerLoaded && !isMobile">
+  
+  <!-- tmp fab -->
+  <div class="m-3 load-fav-dataentries-fab position-absolute pe-all">
+    <button
+      (click)="bottomSheet.open(savedDatasets)"
+      [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
+      matBadgeColor="accent"
+      matBadgePosition="above before"
+      matTooltip="Favourite datasets"
+      matTooltipPosition="before"
+      mat-fab
+      color="primary">
+      <i class="fas fa-star"></i>
+    </button>
+  </div>
+
   <!-- StatusCard container-->
   <ui-status-card [selectedTemplate]="selectedTemplate" [isMobile]="isMobile"
     [onHoverSegmentName]="onHoverSegmentName$ | async" [nehubaViewer]="nehubaViewer">
@@ -101,3 +117,49 @@
     <i class="fas fa-globe"></i>
   </div>
 </mobile-overlay>
+
+<ng-template #savedDatasets>
+  <mat-list rol="list">
+    <h3 mat-subheader>Favourite Datasets</h3>
+
+    <!-- place holder when no fav data is available -->
+    <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">
+      <mat-card-content class="muted">
+        No dataset favourited... yet.
+      </mat-card-content>
+    </mat-card>
+
+    <!-- render all fav dataset as mat list -->
+    <mat-list-item
+      class="align-items-center"
+      *ngFor="let ds of (favDataEntries$ | async)"
+      role="listitem">
+      <span class="flex-grow-1 flex-shrink-1">
+        {{ ds.name }}
+      </span>
+
+      <!-- download -->
+      <button
+        #downloadBtn="matButton"
+        (click)="downloadDs($event, ds, downloadBtn)"
+        matTooltip="Download Dataset"
+        matTooltipPosition="after"
+        color="primary"
+        class="flex-grow-0 flex-shrink-0"
+        mat-icon-button>
+        <i class="fas fa-download"></i>
+      </button>
+
+      <!-- remove from fav -->
+      <button
+        (click)="removeFav($event, ds)"
+        matTooltip="Remove Favourite"
+        matTooltipPosition="after"
+        color="warn"
+        class="flex-grow-0 flex-shrink-0"
+        mat-icon-button>
+        <i class="fas fa-trash"></i>
+      </button>
+    </mat-list-item>
+  </mat-list>
+</ng-template>
