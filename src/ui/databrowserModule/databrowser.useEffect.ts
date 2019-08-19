@@ -5,6 +5,7 @@ import { DATASETS_ACTIONS_TYPES, DataEntry } from "src/services/state/dataStore.
 import { Observable, of, from, merge, Subscription } from "rxjs";
 import { withLatestFrom, map, catchError, filter, switchMap, scan, share, switchMapTo, shareReplay } from "rxjs/operators";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
+import { getIdFromDataEntry } from "./databrowser.service";
 
 @Injectable({
   providedIn: 'root'
@@ -73,10 +74,9 @@ export class DataBrowserUseEffect implements OnDestroy{
          * 
          * do not save anything else on localstorage. This could potentially be leaking sensitive information
          */
-        const serialisedFavDataentries = favDataEntries.map(({ id, fullId }) => {
-          const regex = /\/([a-zA-Z0-9\-]*?)$/.exec(fullId)
-          const tempId = (regex && regex[1]) || id
-          return { id: tempId }
+        const serialisedFavDataentries = favDataEntries.map(dataentry => {
+          const id = getIdFromDataEntry(dataentry)
+          return { id }
         })
         window.localStorage.setItem(LOCAL_STORAGE_CONST.FAV_DATASET, JSON.stringify(serialisedFavDataentries))
       })

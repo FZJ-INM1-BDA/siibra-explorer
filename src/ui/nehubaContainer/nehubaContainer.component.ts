@@ -15,6 +15,7 @@ import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED } from "src/services/state
 import { MatBottomSheet, MatButton } from "@angular/material";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
+import { getIdFromDataEntry } from "../databrowserModule/databrowser.service";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -1175,7 +1176,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   downloadDs(event: MouseEvent, ds: DataEntry, downloadBtn: MatButton){
     downloadBtn.disabled = true
-    this.kgSingleDataset.downloadZipFromKg({kgId: ds.id})
+    const id = getIdFromDataEntry(ds)
+    this.kgSingleDataset.downloadZipFromKg({kgId: id})
       .finally(() => downloadBtn.disabled = false)
   }
 }

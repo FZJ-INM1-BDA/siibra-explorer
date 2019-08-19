@@ -369,6 +369,12 @@ export function getModalityFromDE(dataentries:DataEntry[]):CountedDataModality[]
   return dataentries.reduce((acc, de) => reduceDataentry(acc, de), [])
 }
 
+export function getIdFromDataEntry(dataentry: DataEntry){
+  const { id, fullId } = dataentry
+  const regex = /\/([a-zA-Z0-9\-]*?)$/.exec(fullId)
+  return (regex && regex[1]) || id
+}
+
 
 export interface CountedDataModality{
   name: string
