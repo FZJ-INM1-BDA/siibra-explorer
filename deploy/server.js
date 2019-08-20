@@ -9,7 +9,7 @@ if (process.env.FLUENT_HOST) {
   const Logger = require('./logging')
 
   const name = process.env.IAV_NAME || 'IAV'
-  const stage = process.env.IAV_STAGE || 'dev'
+  const stage = process.env.IAV_STAGE || 'unnamed-stage'
 
   const protocol = process.env.FLUENT_PROTOCOL || 'http'
   const host = process.env.FLUENT_HOST || 'localhost'
