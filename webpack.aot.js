@@ -19,7 +19,7 @@ module.exports = merge(staticAssets, {
   module: {
     rules: [
       {
-        test : /export_nehuba.*?\.js$|worker\.js/,
+        test : /third_party.*?\.js$|worker\.js/,
         use : {
           loader : 'file-loader',
           options: {
@@ -30,7 +30,7 @@ module.exports = merge(staticAssets, {
       {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         loader: '@ngtools/webpack',
-        exclude : /export_nehuba|plugin_example/
+        exclude : /third_party|plugin_example/
       },
       {
         test : /\.(html|css)$/,
