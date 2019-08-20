@@ -62,6 +62,7 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
  */
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
+app.use(require('./compression'))
 app.use(express.static(PUBLIC_PATH))
 
 app.use((req, res, next) => {
