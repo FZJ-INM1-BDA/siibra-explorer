@@ -2,7 +2,7 @@ module.exports = ({code = 500, error = 'an error had occured', trace = 'undefine
   /**
    * probably use more elaborate logging?
    */
-  console.log('Catching error', {
+  console.error('Catching error', {
     code,
     error,
     trace
