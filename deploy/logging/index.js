@@ -20,9 +20,7 @@ class Logger {
       username,
       password
     } = this
-
     
-
     const auth = username !== '' ? `${username}:${password}@` : ''
     const url = `${protocol}://${auth}${host}:${port}/${name}.${qs.escape(logLevel)}`
     const formData = {

@@ -37,28 +37,22 @@ if (process.env.FLUENT_HOST) {
     }
   }
 
-  const emitInfo = message => log.emit('info', {
-    message
-  }, handleRequestCallback)
+  const emitInfo = message => log.emit('info', { message }, handleRequestCallback)
 
-  const emitWarn = message => log.emit('warn', {
-    message
-  }, handleRequestCallback)
+  const emitWarn = message => log.emit('warn', { message }, handleRequestCallback)
 
-  const emitError = message => log.emit('error', {
-    message
-  }, handleRequestCallback)
+  const emitError = message => log.emit('error', { message }, handleRequestCallback)
 
   console.log('starting fluentd logging')
-  
+
   console.log = function () {
-    emitInfo(arguments)
+    emitInfo([...arguments])
   }
   console.warn = function () {
-    emitWarn(arguments)
+    emitWarn([...arguments])
   }
   console.emitError = function () {
-    emitError(arguments)
+    emitError([...arguments])
   }
 }
 
