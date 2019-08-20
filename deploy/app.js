@@ -10,6 +10,19 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
 
+app.use((req, _, next) => {
+  if (/main\.bundle\.js$/.test(req.originalUrl)){
+    const xForwardedFor = req.headers['x-forwarded-for']
+    const ip = req.connection.remoteAddress
+    console.log({
+      type: 'visitorLog',
+      xForwardedFor,
+      ip
+    })
+  }
+  next()
+})
+
 /**
  * load env first, then load other modules
  */

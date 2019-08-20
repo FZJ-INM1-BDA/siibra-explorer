@@ -14,10 +14,8 @@ module.exports = async (app) => {
 
   passport.deserializeUser((id, done) => {
     const user = objStoreDb.get(id)
-    if (user) 
-      return done(null, user)
-    else
-      return done(null, false)
+    if (user) return done(null, user)
+    else return done(null, false)
   })
 
   await hbpOidc(app)
