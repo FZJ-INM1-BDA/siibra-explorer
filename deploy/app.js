@@ -57,6 +57,11 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
 
+/**
+ * well known path
+ */
+app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
+
 app.use(express.static(PUBLIC_PATH))
 
 app.use((req, res, next) => {
