@@ -18,7 +18,6 @@ import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
 import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { TabsModule } from 'ngx-bootstrap/tabs'
-import { ModalModule } from 'ngx-bootstrap/modal'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
@@ -42,6 +41,7 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { MatDialogModule, MatTabsModule } from "@angular/material";
 
 @NgModule({
   imports : [
@@ -52,8 +52,13 @@ import { UseEffects } from "./services/effect/effect";
     DragDropModule,
     UIModule,
     AngularMaterialModule,
+
+    /**
+     * move to angular material module
+     */
+    MatDialogModule,
+    MatTabsModule,
     
-    ModalModule.forRoot(),
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([

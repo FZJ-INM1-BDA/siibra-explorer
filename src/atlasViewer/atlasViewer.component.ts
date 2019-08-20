@@ -7,8 +7,6 @@ import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
-import { BsModalService } from "ngx-bootstrap/modal";
-import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 
@@ -20,7 +18,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
-import { ToastService } from "src/services/toastService.service";
+import { MatDialog, MatDialogRef } from "@angular/material";
 
 /**
  * TODO
@@ -106,10 +104,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
-    private modalService: BsModalService,
+    private matDialog: MatDialog,
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
-    private toastService: ToastService,
     private rd: Renderer2
   ) {
     this.ngLayerNames$ = this.store.pipe(
@@ -240,6 +237,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
 
+  private cookieDialogRef: MatDialogRef<any>
+  private kgTosDialogRef: MatDialogRef<any>
+  private helpDialogRef: MatDialogRef<any>
+  private loginDialogRef: MatDialogRef<any>
+
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
 
@@ -261,25 +263,19 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.showHelp$.subscribe(() => 
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: this.constantsService.showHelpTitle,
-            template: this.helpComponent
-          }
+      this.showHelp$.subscribe(() => {
+        this.helpDialogRef = this.matDialog.open(this.helpComponent, {
+          autoFocus: false
         })
-      )
+      })
     )
 
     this.subscriptions.push(
       this.constantsService.showSigninSubject$.pipe(
         debounceTime(160)
       ).subscribe(user => {
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: user ? 'Logout' : `Login`,
-            template: this.signinModalComponent
-          }
+        this.loginDialogRef = this.matDialog.open(this.signinModalComponent, {
+          autoFocus: false
         })
       })
     )
@@ -350,12 +346,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       filter(agreed => !agreed),
       delay(0)
     ).subscribe(() => {
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: 'Cookie Disclaimer',
-          template: this.cookieAgreementComponent
-        }
-      }) 
+      this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
     })
 
     this.dispatcher$.pipe(
@@ -368,12 +359,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       filter(flag => !flag),
       delay(0)
     ).subscribe(val => {
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: 'Knowldge Graph ToS',
-          template: this.kgTosComponent
-        }
-      })
+      this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
@@ -415,12 +401,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     if(this.constantsService.mobile){
-      this.modalService.show(ModalUnit,{
-        initialState: {
-          title: this.constantsService.mobileWarningHeader,
-          body: this.constantsService.mobileWarning
-        }
-      })
+      /**
+       * TODO change to snack bar in future
+       */
+      
+      // this.modalService.show(ModalUnit,{
+      //   initialState: {
+      //     title: this.constantsService.mobileWarningHeader,
+      //     body: this.constantsService.mobileWarning
+      //   }
+      // })
     }
     return true
   }
@@ -437,23 +427,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   kgTosClickedOk(){
-    this.modalService.hide(1)
+    this.kgTosDialogRef && this.kgTosDialogRef.close()
     this.store.dispatch({
       type: AGREE_KG_TOS
     })
   }
 
   cookieClickedOk(){
-    this.modalService.hide(1)
+    this.cookieDialogRef && this.cookieDialogRef.close()
     this.store.dispatch({
       type: AGREE_COOKIE
     })
   }
 
   panelAnimationEnd(){
-
-    if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
+    if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer ) {
       this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
+    }
   }
 
   nehubaClickHandler(event:MouseEvent){
@@ -508,6 +498,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
+  closeModal(mode){
+    if (mode === 'help') {
+      this.helpDialogRef && this.helpDialogRef.close()
+    }
+
+    if (mode === 'login') {
+      this.loginDialogRef && this.loginDialogRef.close()
+    }
+  }
 
   closeMenuWithSwipe(documentToSwipe: ElementRef) {
     if (documentToSwipe && documentToSwipe.nativeElement) {

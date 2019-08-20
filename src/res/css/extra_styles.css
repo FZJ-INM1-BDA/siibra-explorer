@@ -347,3 +347,13 @@ markdown-dom pre code
   background:none;
   border:none;
 }
+
+.h-90vh
+{
+  height: 90vh!important;
+}
+
+.w-50vw
+{
+  width: 50vw!important;
+}
