@@ -106,7 +106,7 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
 const RECEPTOR_PATH = path.join(PUBLIC_PATH, 'res', 'image')
 fs.readdir(RECEPTOR_PATH, (err, files) => {
   if (err) {
-    console.log('reading receptor error', err)
+    console.warn('reading receptor error', err)
     return
   }
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
@@ -144,7 +144,7 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, cacheMaxAge24Hr, async (req
     res.setHeader('Content-Type', 'application/zip')
     stream.pipe(res)
   } catch (e) {
-    console.log('datasets/index#downloadKgFiles', e)
+    console.warn('datasets/index#downloadKgFiles', e)
     res.status(400).send(e)
   }
 })
