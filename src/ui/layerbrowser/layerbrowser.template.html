@@ -1,9 +1,7 @@
 <ng-container *ngIf="nonBaseNgLayers$ | async as nonBaseNgLayers; else noLayerPlaceHolder">
-  <ng-container *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
-    <div
-      class="layerContainer overflow-hidden"
-      *ngFor = "let ngLayer of nonBaseNgLayers">
-    
+  <mat-list *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
+    <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers">
+
       <!-- toggle visibility -->
       
       <button
@@ -49,8 +47,8 @@
         [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate'">
         {{ ngLayer.name | getFilenamePipe | getFileExtension }}
       </div>
-    </div>
-  </ng-container>
+    </mat-list-item>
+  </mat-list>
 </ng-container>
 
 <!-- fall back when no layers are showing -->
