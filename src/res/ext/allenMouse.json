@@ -8,8 +8,11 @@
   "parcellations": [
     {
       "ngId": "atlas",
-      "name": "Allen adult mouse brain reference atlas V3 Brain Atlas",
-      "ngData": null,
+      "name": "Allen Mouse Common Coordinate Framework v3",
+      "mindsId": {
+        "kgSchema": "minds/core/parcellationatlas/v1.0.0",
+        "kgId":"39a1384b-8413-4d27-af8d-22432225401f"
+      },
       "type": "parcellation",
       "regions": [
         {

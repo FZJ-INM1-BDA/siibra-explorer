@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getDatasetsFromParcellationId, getDatasetsFromTemplateId } = require('./query')
 const url = require('url')
 const qs = require('querystring')
 
@@ -67,6 +67,27 @@ datasetsRouter.get('/parcellationName/:parcellationName', noCacheMiddleWare, (re
       })
     })
 })
+
+datasetsRouter.get('/templateId/:templateId', noCacheMiddleWare, (req, res, next) => {
+  const { user } = req
+  const { templateId } = req.params
+  const encodedTemplateId = qs.escape(templateId)
+  getDatasetsFromTemplateId({ templateId: encodedTemplateId, user })
+    .then(arr => res.status(200).json(arr))
+    .catch(err => res.status(500).send(err))
+})
+
+datasetsRouter.get('/parcellationId/:parcellationId', noCacheMiddleWare, (req, res, next) => {
+  const { parcellationId } = req.params
+  const { user } = req
+  const encodedparcellationId = qs.escape(parcellationId)
+
+  getDatasetsFromParcellationId({ parcellationId: encodedparcellationId, user })
+    .then(arr => res.status(200).json(arr))
+    .catch(err => res.status(500).send(err))
+})
+
+
 
 /**
  * It appears that query param are not 

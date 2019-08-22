@@ -8,7 +8,11 @@
     {
       "ngId": "whole",
       "type": "parcellation",
-      "name": "Waxholm Space rat brain atlas v.2.0",
+      "name": "Waxholm Space atlas of the Sprague Dawley rat brain v2",
+      "mindsId": {
+        "kgSchema": "minds/core/parcellationatlas/v1.0.0",
+        "kgId": "2449a7f0-6dd0-4b5a-8f1e-aec0db03679d"
+      },
       "regions": [
         {
           "name": "Whole Brain (V2.0)",

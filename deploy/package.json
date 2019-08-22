@@ -1,13 +1,13 @@
 {
-  "name": "deploy",
-  "version": "1.0.0",
+  "name": "interactive-viewer-server",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
     "test": "npm run testEnv && npm run testNoEnv",
-    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js",
-    "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js"
+    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha --timeout 30000 ./test/mocha.test.js",
+    "testNoEnv": "node ./node_modules/.bin/mocha --timeout 30000 ./test/mocha.test.noenv.js"
   },
   "keywords": [],
   "author": "",

@@ -26,6 +26,6 @@ exports.getTemplate = (template) => new Promise((resolve, reject) => {
   }
   fs.readFile(filepath, 'utf-8', (err, data) => {
     if (err) reject(err)
-    resolve(data)
+    resolve(JSON.parse(data))
   })
 })

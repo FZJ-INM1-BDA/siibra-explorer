@@ -13,6 +13,10 @@ let otherQueryResult = null
 
 const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
 const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_1`
+
+const KG_PATH_PARCELLATION_ID = process.env.KG_PATH_PARCELLATION_ID || '/query/minds/core/parcellationatlas/v1.0.0/interactiveViewerKgQuery-v0_2-searchByParcellation'
+const KG_PATH_TEMPLATE_ID = process.env.KG_PATH_TEMPLATE_ID || '/query/minds/core/referencespace/v1.0.0/interactiveViewerKgQuery-v0_2-searchByTemplate'
+
 const KG_PARAM = {
   size: process.env.KG_SEARCH_SIZE || '1000',
   vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
@@ -34,16 +38,29 @@ const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
 let getPublicAccessToken
 
+/**
+ * TODO
+ * 
+ * consolidate with getDsWithParam
+ */
 const fetchDatasetFromKg = async ({ user } = {}) => {
 
   const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   return await new Promise((resolve, reject) => {
     request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
-      if (err)
-        return reject(err)
-      if (resp.statusCode >= 400)
-        return reject(resp.statusCode)
+      if (err) return reject(err)
+      if (resp.statusCode >= 400) {
+        const { statusCode, body } = resp
+        console.warn({
+          source: `dataset/query.js#fetchDatasetFromKg`,
+          // only send login status, do not send actual user info
+          param: { user: !!user },
+          statusCode, 
+          body
+        })
+        return reject(statusCode)
+      }
       const json = JSON.parse(body)
       return resolve(json)
     })
@@ -229,6 +246,62 @@ exports.init = async () => {
 exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
   .then(json => filter(json, { templateName, parcellationName }))
 
+const getDsWithParam = async ({ user, searchParams, rootUrl }) => {
+
+  const { releasedOnly, option } = await getUserKGRequestParam({ user })
+  for (let key in KG_PARAM) { rootUrl.searchParams.set(key, KG_PARAM[key]) }
+  if (releasedOnly) rootUrl.searchParams.set('databaseScope', 'RELEASED')
+
+  for ( let key in searchParams ) { rootUrl.searchParams.set(key, searchParams[key]) }
+  
+  return await new Promise((resolve, reject) => {
+    request(rootUrl.toString(), option, (err, resp, body) => {
+      if (err) reject(err)
+      if (resp.statusCode >= 400) {
+        const { statusCode, body } = resp
+        // only show log in status, do not send user info 
+        console.warn({ source: `dataset/query.js#getDsWithParam`, param: { searchParams, user: !!user }, statusCode, body })
+        return reject(resp.statusCode)
+      }
+      const json = JSON.parse(body)
+      return resolve(json)
+    })
+  }).then(({ results }) => results)
+}
+
+exports.getDatasetsFromParcellationId = async ({ parcellationId, user }) => await getDsWithParam({
+  user,
+  searchParams: { parcellationId },
+  rootUrl: new URL.URL(`${KG_ROOT}${KG_PATH_PARCELLATION_ID}/instances`)
+}).then((arrOfParcellationAtlas) => {
+  if (arrOfParcellationAtlas.length !== 1) {
+    // only log user state, do not log user info
+    console.warn(`datasets/query.js#getDatasetsFromParcellationId`, { 
+      param: parcellationId,
+      user: !!user,
+      warning: `user searched for ${parcellationId}, expecting 1 and only 1 item returned, but instead, ${arrOfParcellationAtlas.length} items were returned`
+    })
+  }
+  return arrOfParcellationAtlas.reduce((acc, curr) => acc.concat(curr.datasets), [])
+})
+
+
+exports.getDatasetsFromTemplateId = async ({ templateId, user }) => await getDsWithParam({
+  user,
+  searchParams: { templateId },
+  rootUrl: new URL.URL(`${KG_ROOT}${KG_PATH_TEMPLATE_ID}/instances`)
+}).then((arrOfRefSpaces) => {
+  if (arrOfRefSpaces.length !== 1) {
+    // only log user state, do not log user info
+    console.warn(`datasets/query.js#getDatasetsFromTemplateId`, { 
+      param: templateId,
+      user: !!user,
+      warning: `user searched for ${templateId}, expecting 1 and only 1 item returned, but instead, ${arrOfRefSpaces.length} items were returned`
+    })
+  }
+  return arrOfRefSpaces.reduce((acc, curr) => acc.concat(curr.datasets), [])
+})
+
 exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
 /**
@@ -282,8 +355,7 @@ const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, u
   const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
-  const url = require('url')
-  const search = new url.URLSearchParams()
+  const search = new URL.URLSearchParams()
   
   for (let key in _) {
     search.append(key, _[key])  
@@ -334,27 +406,25 @@ exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, use
 let publicAccessToken
 
 async function getUserKGRequestParam({ user }) {
-    /**
-     * n.b. ACCESS_TOKEN env var is usually only set during dev
-     */
-    const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
-    const releasedOnly = !accessToken
-    if (!accessToken && !publicAccessToken && getPublicAccessToken) {
-        publicAccessToken = await getPublicAccessToken()
-    }
-    const option = accessToken || publicAccessToken
-        ? {
-            auth: {
-                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-            }
-        }
-        : {}
+  /**
+   * n.b. ACCESS_TOKEN env var is usually only set during dev
+   */
+  const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
+  const releasedOnly = !accessToken
+  if (!accessToken && !publicAccessToken && getPublicAccessToken) {
+    publicAccessToken = await getPublicAccessToken()
+  }
+  const option = accessToken || publicAccessToken
+    ? {
+        auth: { 'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN }
+      }
+    : {}
 
-    return {
-      option,
-      releasedOnly,
-      token: accessToken || publicAccessToken
-    }
+  return {
+    option,
+    releasedOnly,
+    token: accessToken || publicAccessToken
+  }
 }
 
 /**

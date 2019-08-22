@@ -30,8 +30,8 @@ router.get('/:template', (req, res, next) => {
       return query.getTemplate(template)
     })
     .then(data => {
-      if (data)
-        res.status(200).send(data)
+      if (data) res.status(200).json(data)
+      else throw new Error('data returned falsy')
     })
     .catch(error => next({
       code: 500,

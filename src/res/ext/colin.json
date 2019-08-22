@@ -3,11 +3,19 @@
   "type": "template",
   "species": "Human",
   "useTheme": "dark",
+  "mindsId":{
+    "kgSchema":"minds/core/referencespace/v1.0.0",
+    "kgId":"7f39f7be-445b-47c0-9791-e971c0b6d992"
+  },
   "ngId": "colin",
   "nehubaConfigURL": "nehubaConfig/colinNehubaConfig",
   "parcellations": [
     {
-      "name": "JuBrain Cytoarchitectonic Atlas",
+      "name": "Jülich Cytoarchitechtonic Brain Atlas (human)",
+      "mindsId":{
+        "kgSchema": "minds/core/parcellationatlas/v1.0.0",
+        "kgId":"94c1125b-b87e-45e4-901c-00daee7f2579"
+      },
       "ngId": "jubrain colin v17 left",
       "originDatasets":[{
         "kgSchema": "minds/core/dataset/v1.0.0",

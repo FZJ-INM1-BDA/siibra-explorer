@@ -23,12 +23,12 @@ describe('chai-as-promised.js', () => {
   })
 })
 
-describe('util.js with env', (done) => {
-
-  it('when client id and client secret and refresh token is set, util should not throw', async () => {
-    
+describe('util.js with env', () => {
+  it('when client id and client secret and refresh token is set, util should not throw', function (done) {
     const util = require('./util')
-    const { getPublicAccessToken } = await util()
-    return getPublicAccessToken().should.be.fulfilled
+    util()
+      .then(({ getPublicAccessToken }) => getPublicAccessToken())
+      .then(() => done())
+      .catch(done)
   })
 })
