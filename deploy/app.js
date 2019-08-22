@@ -67,9 +67,11 @@ app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
  * this allows locally built aot to be served without errors
  */
 if (process.env.NODE_ENV === 'production') {
-  app.use(require('./compression'))
+  const { compressionMiddleware } = require('./compression')
+  app.use(compressionMiddleware, express.static(PUBLIC_PATH))
+} else {
+  app.use(express.static(PUBLIC_PATH))
 }
-app.use(express.static(PUBLIC_PATH))
 
 app.use((req, res, next) => {
   res.set('Content-Type', 'application/json')

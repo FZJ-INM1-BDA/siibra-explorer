@@ -17,7 +17,13 @@ const mimeMap = new Map([
   ['.js', 'text/javascript']
 ])
 
-module.exports = (req, res, next) => {
+exports.BROTLI = BROTLI
+
+exports.GZIP = GZIP
+
+exports.detEncoding = detEncoding
+
+exports.compressionMiddleware = (req, res, next) => {
   const acceptEncoding = req.get('Accept-Encoding')
   const encoding = detEncoding(acceptEncoding)
   
