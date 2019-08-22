@@ -10,6 +10,19 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
 
+app.use((req, _, next) => {
+  if (/main\.bundle\.js$/.test(req.originalUrl)){
+    const xForwardedFor = req.headers['x-forwarded-for']
+    const ip = req.connection.remoteAddress
+    console.log({
+      type: 'visitorLog',
+      xForwardedFor,
+      ip
+    })
+  }
+  next()
+})
+
 /**
  * load env first, then load other modules
  */
@@ -43,6 +56,11 @@ configureAuth(app)
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
+
+/**
+ * well known path
+ */
+app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
 app.use(express.static(PUBLIC_PATH))
 
