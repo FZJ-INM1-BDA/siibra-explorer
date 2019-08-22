@@ -3,7 +3,7 @@ import { ComponentsModule } from "../components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
-import { SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
+import { SplashScreen, GetTemplateImageSrcPipe, ImgSrcSetPipe } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "../layouts/layout.module";
 import { FormsModule } from "@angular/forms";
 
@@ -48,6 +48,7 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import { MatRippleModule } from "@angular/material";
 
 
 @NgModule({
@@ -58,6 +59,12 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     DatabrowserModule,
     UtilModule,
     AngularMaterialModule,
+
+    /**
+     * TODO
+     * move to angular material module 
+     */
+    MatRippleModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -99,6 +106,8 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
+    GetTemplateImageSrcPipe,
+    ImgSrcSetPipe,
 
     /* directive */
     DownloadDirective,
