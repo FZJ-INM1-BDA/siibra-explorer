@@ -140,10 +140,6 @@ export class SigninBanner implements OnInit, OnDestroy{
     )
   }
 
-  ngAfterViewInit(){
-    this.settingBtn.nativeElement.click()
-  }
-
   ngOnDestroy(){
     this.subscriptions.forEach(s => s.unsubscribe())
   }
