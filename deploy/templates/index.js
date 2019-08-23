@@ -34,7 +34,7 @@ router.get('/:template', (req, res, next) => {
           error: 'template not in the list supported'
         })
 
-      res.set('Content-Encoding', acceptedEncoding)
+      if (acceptedEncoding) res.set('Content-Encoding', acceptedEncoding)
       query.getTemplate({ template, acceptedEncoding, returnAsStream:true }).pipe(res)
     })
     .catch(error => next({

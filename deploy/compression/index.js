@@ -1,11 +1,15 @@
 const BROTLI = `br`
 const GZIP = `gzip`
 
-const detEncoding = (acceptEncoding) => /br/i.test(acceptEncoding)
-  ? BROTLI
-  : /gzip/i.test(acceptEncoding)
-    ? GZP
-    : null
+const detEncoding = (acceptEncoding = '') => {
+  if (process.env.NODE_ENV !== 'production') return null
+
+  return /br/i.test(acceptEncoding)
+    ? BROTLI
+    : /gzip/i.test(acceptEncoding)
+      ? GZIP
+      : null
+}
 
 const mimeMap = new Map([
   ['.png', 'image/png'],

@@ -10,7 +10,7 @@ nehubaConfigRouter.get('/:configId', (req, res, next) => {
   const acceptedEncoding = detEncoding(header)
 
   const { configId } = req.params
-  res.set('Content-Encoding', acceptedEncoding)
+  if (acceptedEncoding) res.set('Content-Encoding', acceptedEncoding)
 
   getTemplateNehubaConfig({ configId, acceptedEncoding, returnAsStream:true}).pipe(res)
 })
