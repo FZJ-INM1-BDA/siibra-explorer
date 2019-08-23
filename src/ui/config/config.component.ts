@@ -36,7 +36,9 @@ export class ConfigComponent implements OnInit, OnDestroy{
   public gpuMax : number = 1000
 
   public panelMode$: Observable<string>
-  public panelOrder$: Observable<[number, number, number, number]>
+  
+  private panelOrder: string
+  private panelOrder$: Observable<string>
   public panelTexts$: Observable<[string, string, string, string]>
 
   constructor(private store: Store<ViewerConfiguration>) {
@@ -60,16 +62,19 @@ export class ConfigComponent implements OnInit, OnDestroy{
 
     this.panelOrder$ = this.store.pipe(
       select('ngViewerState'),
-      select('panelOrder'),
-      map(string => string.split('').map(s => Number(s)))
+      select('panelOrder')
     )
     
     this.panelTexts$ = this.panelOrder$.pipe(
+      map(string => string.split('').map(s => Number(s))),
       map(arr => arr.map(idx => ROOT_TEXT_ORDER[idx]) as [string, string, string, string])
     )
   }
 
   ngOnInit(){
+    this.subscriptions.push(
+      this.panelOrder$.subscribe(panelOrder => this.panelOrder = panelOrder)
+    )
   }
 
   ngOnDestroy(){
@@ -104,10 +109,23 @@ export class ConfigComponent implements OnInit, OnDestroy{
   handleDrop(event:DragEvent){
     const droppedAttri = (event.target as HTMLElement).getAttribute('panel-order')
     const draggedAttri = event.dataTransfer.getData('text/plain')
-    console.log({droppedAttri, draggedAttri})
+    if (droppedAttri === draggedAttri) return
+    const idx1 = Number(droppedAttri)
+    const idx2 = Number(draggedAttri)
+    const arr = this.panelOrder.split('');
+
+    [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]]
+    this.store.dispatch({
+      type: NG_VIEWER_ACTION_TYPES.SET_PANEL_ORDER,
+      payload: { panelOrder: arr.join('') }
+    })
   }
-  handleDragOver(event){
-    event.preventDefault()
+  handleDragOver(event:DragEvent){
+    event.preventDefault();
+    (event.target as HTMLElement).classList.add('onDragOver')
+  }
+  handleDragLeave(event:DragEvent){
+    (event.target as HTMLElement).classList.remove('onDragOver')
   }
   handleDragStart(event:DragEvent){
     const attri = (event.target as HTMLElement).getAttribute('panel-order')

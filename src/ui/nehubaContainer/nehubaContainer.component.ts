@@ -427,12 +427,19 @@ export class NehubaContainer implements OnInit, OnDestroy{
   ngOnInit(){
 
     this.subscriptions.push(
-      this.store.pipe(
-        select('ngViewerState'),
-        select('panelMode'),
-        distinctUntilChanged()
-      ).subscribe(mode => {
-
+      combineLatest(
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelMode'),
+          distinctUntilChanged()
+        ),
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelOrder'),
+          distinctUntilChanged()
+        )
+      ).subscribe(([mode, panelOrder]) => {
+        const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx])
         /**
          * TODO be smarter with event stream
          */
@@ -441,25 +448,25 @@ export class NehubaContainer implements OnInit, OnDestroy{
         switch (mode) {
           case H_ONE_THREE:{
             const element = this.removeExistingPanels()
-            const newEl = getHorizontalOneThree(this.viewPanels)
+            const newEl = getHorizontalOneThree(viewPanels)
             element.appendChild(newEl)
             break;
           }
           case V_ONE_THREE:{
             const element = this.removeExistingPanels()
-            const newEl = getVerticalOneThree(this.viewPanels)
+            const newEl = getVerticalOneThree(viewPanels)
             element.appendChild(newEl)
             break;
           }
           case FOUR_PANEL: {
             const element = this.removeExistingPanels()
-            const newEl = getFourPanel(this.viewPanels)
+            const newEl = getFourPanel(viewPanels)
             element.appendChild(newEl)
             break;
           }
           case SINGLE_PANEL: {
             const element = this.removeExistingPanels()
-            const newEl = getSinglePanel(this.viewPanels)
+            const newEl = getSinglePanel(viewPanels)
             element.appendChild(newEl)
             break;
           }

@@ -30,6 +30,14 @@ const defaultState:NgViewerStateInterface = {
 
 export function ngViewerState(prevState:NgViewerStateInterface = defaultState, action:NgViewerAction):NgViewerStateInterface{
   switch(action.type){
+    case ACTION_TYPES.SET_PANEL_ORDER: {
+      const { payload } = action
+      const { panelOrder } = payload
+      return {
+        ...prevState,
+        panelOrder
+      }
+    }
     case ACTION_TYPES.SWITCH_PANEL_MODE: {
       const { payload } = action
       const { panelMode } = payload
@@ -113,7 +121,8 @@ interface NgLayerInterface{
 }
 
 const ACTION_TYPES = {
-  SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE'
+  SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE',
+  SET_PANEL_ORDER: 'SET_PANEL_ORDER'
 }
 
 export const SUPPORTED_PANEL_MODES = [
