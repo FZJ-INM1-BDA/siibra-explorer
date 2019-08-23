@@ -56,6 +56,19 @@
     </button>
   </div>
 
+  <!-- setting btn -->
+  <div class="btnWrapper">
+    <button
+      #settingBtn
+      matTooltip="Settings"
+      matTooltipPosition="below"
+      (click)="showSetting(settingTemplate)" 
+      mat-icon-button
+      color="basic">
+      <i class="fas fa-cog"></i>
+    </button>
+  </div>
+
   <!-- signin -->
   <div class="btnWrapper">
     <button
@@ -84,4 +97,14 @@
     [kgId]="focusedDataset.kgId">
     
   </single-dataset-view>
+</ng-template>
+
+<ng-template #settingTemplate>
+  <h2 mat-dialog-title>Settings</h2>
+  <mat-dialog-content>
+    <!-- required to avoid showing an ugly vertical scroll bar -->
+    <!-- TODO investigate why, then remove the friller class -->
+    <config-component class="mb-4 d-block">
+    </config-component>
+  </mat-dialog-content>
 </ng-template>

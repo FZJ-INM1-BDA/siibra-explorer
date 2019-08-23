@@ -43,6 +43,8 @@ import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
 import { MatDialogModule, MatTabsModule } from "@angular/material";
 
+import 'hammerjs'
+
 @NgModule({
   imports : [
     FormsModule,

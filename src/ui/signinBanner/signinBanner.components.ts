@@ -1,4 +1,4 @@
-import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef } from "@angular/core";
+import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef, ElementRef } from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
 import { Store, select } from "@ngrx/store";
@@ -9,6 +9,7 @@ import { map, filter, distinctUntilChanged, bufferTime, delay, share, tap, withL
 import { regionFlattener } from "src/util/regionFlattener";
 import { ToastService } from "src/services/toastService.service";
 import { getSchemaIdFromName } from "src/util/pipes/templateParcellationDecoration.pipe";
+import { MatDialog } from "@angular/material";
 
 const compareParcellation = (o, n) => !o || !n
   ? false
@@ -40,6 +41,7 @@ export class SigninBanner implements OnInit, OnDestroy{
   @Input() darktheme: boolean
 
   @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
+  @ViewChild('settingBtn', {read: ElementRef}) settingBtn: ElementRef
 
   public focusedDatasets$: Observable<any[]>
   private userFocusedDataset$: Subject<any> = new Subject()
@@ -50,7 +52,8 @@ export class SigninBanner implements OnInit, OnDestroy{
     private constantService: AtlasViewerConstantsServices,
     private authService: AuthService,
     private store: Store<ViewerConfiguration>,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private dialog: MatDialog
   ){
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
@@ -137,6 +140,10 @@ export class SigninBanner implements OnInit, OnDestroy{
     )
   }
 
+  ngAfterViewInit(){
+    this.settingBtn.nativeElement.click()
+  }
+
   ngOnDestroy(){
     this.subscriptions.forEach(s => s.unsubscribe())
   }
@@ -216,10 +223,25 @@ export class SigninBanner implements OnInit, OnDestroy{
     return `<div class="d-flex"><small>Template</small> <small class = "flex-grow-1 mute-text">${template ? '(' + template.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
   }
 
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
   showHelp() {
     this.constantService.showHelpSubject$.next()
   }
 
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
+  showSetting(settingTemplate:TemplateRef<any>){
+    this.dialog.open(settingTemplate, {
+      autoFocus: false
+    })
+  }
+
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
   showSignin() {
     this.constantService.showSigninSubject$.next(this.user)
   }

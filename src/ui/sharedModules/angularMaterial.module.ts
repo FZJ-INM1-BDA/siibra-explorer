@@ -5,12 +5,13 @@ import {
   MatCardModule,
   MatTabsModule,
   MatTooltipModule,
-  MatSlideToggleModule
+  MatSlideToggleModule,
+  MatDialogModule, 
 } from '@angular/material';
 import { NgModule } from '@angular/core';
 
 @NgModule({
-  imports: [MatSlideToggleModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
-  exports: [MatSlideToggleModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
+  imports: [MatDialogModule, MatSlideToggleModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
+  exports: [MatDialogModule, MatSlideToggleModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
 })
 export class AngularMaterialModule { }

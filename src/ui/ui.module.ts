@@ -48,6 +48,12 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
+import { MatSliderModule, MatRippleModule } from "@angular/material";
+import { FourPanelLayout } from "./config/layouts/fourPanel/fourPanel.component";
+import { HorizontalOneThree } from "./config/layouts/h13/h13.component";
+import { VerticalOneThree } from "./config/layouts/v13/v13.component";
+import { SinglePanel } from "./config/layouts/single/single.component";
+import { DragDropModule } from "@angular/cdk/drag-drop";
 
 
 @NgModule({
@@ -58,6 +64,13 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     DatabrowserModule,
     UtilModule,
     AngularMaterialModule,
+
+    /**
+     * move to angular material module
+     */
+    MatSliderModule,
+    DragDropModule,
+    MatRippleModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -84,6 +97,10 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    FourPanelLayout,
+    HorizontalOneThree,
+    VerticalOneThree,
+    SinglePanel,
 
     /* pipes */
     GroupDatasetByRegion,

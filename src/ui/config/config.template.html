@@ -1,42 +1,182 @@
-<div class="input-group mb-2">
-  <span class="input-group-prepend">
-    <span class="input-group-text">
-      GPU Limit
-      <small tooltipClass="z-1060" [matTooltip]="GPU_TOOLTIP" class="ml-2 fas fa-question"></small>
-    </span>
-  </span>
-  <input
-    (wheel)="wheelEvent($event)"
-    type="number"
-    [min]="100"
-    [max]="1000"
-    [step]="0.1"
-    class="form-control"
-    (input)="keydown$.next($event)"
-    [value]="gpuLimit$ | async ">
+<mat-tab-group>
 
-  <div class="input-group-append">
+  <!-- viewer preference -->
+  <mat-tab label="Viewer Preference">
+    
+    <div [ngSwitch]="panelMode$ | async" class="d-flex flex-row p-2">
+      <layout-four-panel
+        *ngSwitchCase="supportedPanelModes[0]"
+        class="d-block w-20em h-15em cdk-drag-boundary">
+        <div
+          matRipple
+          (dragstart)="handleDragStart($event)"
+          (dragover)="handleDragOver($event)"
+          (drop)="handleDrop($event)"
+          class="w-100 h-100"
+          cell-i>
+          <div [attr.panel-order]="0" class="w-100 h-100 d-flex align-items-center justify-content-center border" draggable="true">
+            {{ (panelTexts$ | async)[0] }}
+          </div>
+        </div>
+        <div
+          matRipple
+          (dragstart)="handleDragStart($event)"
+          (dragover)="handleDragOver($event)"
+          (drop)="handleDrop($event)"
+          class="w-100 h-100"
+          cell-ii>
+          <div [attr.panel-order]="1" class="w-100 h-100 d-flex align-items-center justify-content-center border" draggable="true">
+            {{ (panelTexts$ | async)[1] }}
+          </div>
+        </div>
+        <div
+          matRipple
+          (dragstart)="handleDragStart($event)"
+          (dragover)="handleDragOver($event)"
+          (drop)="handleDrop($event)"
+          class="w-100 h-100"
+          cell-iii>
+          <div [attr.panel-order]="2" class="w-100 h-100 d-flex align-items-center justify-content-center border" draggable="true">
+            {{ (panelTexts$ | async)[2] }}
+          </div>
+        </div>
+        <div
+          matRipple
+          (dragstart)="handleDragStart($event)"
+          (dragover)="handleDragOver($event)"
+          (drop)="handleDrop($event)"
+          class="w-100 h-100"
+          cell-iv>
+          <div [attr.panel-order]="3" class="w-100 h-100 d-flex align-items-center justify-content-center border" draggable="true">
+            {{ (panelTexts$ | async)[3] }}
+          </div>
+        </div>
+      </layout-four-panel>
+      <layout-horizontal-one-three
+        *ngSwitchCase="supportedPanelModes[1]"
+        class="d-block w-20em h-15em">
+        <div cell-i>{{ (panelTexts$ | async)[0] }}</div>
+        <div cell-ii>{{ (panelTexts$ | async)[1] }}</div>
+        <div cell-iii>{{ (panelTexts$ | async)[2] }}</div>
+        <div cell-iv>{{ (panelTexts$ | async)[3] }}</div>
+      </layout-horizontal-one-three>
+      <layout-vertical-one-three
+        *ngSwitchCase="supportedPanelModes[2]"
+        class="d-block w-20em h-15em">
+        <div cell-i>{{ (panelTexts$ | async)[0] }}</div>
+        <div cell-ii>{{ (panelTexts$ | async)[1] }}</div>
+        <div cell-iii>{{ (panelTexts$ | async)[2] }}</div>
+        <div cell-iv>{{ (panelTexts$ | async)[3] }}</div>
+      </layout-vertical-one-three>
+      <layout-single-panel
+        *ngSwitchCase="supportedPanelModes[3]"
+        class="d-block w-20em h-15em">
+        <div cell-i>{{ (panelTexts$ | async)[0] }}</div>
+        <div cell-ii>{{ (panelTexts$ | async)[1] }}</div>
+        <div cell-iii>{{ (panelTexts$ | async)[2] }}</div>
+        <div cell-iv>{{ (panelTexts$ | async)[3] }}</div>
+      </layout-single-panel>
+      <div *ngSwitchDefault>
+        A panel mode which I have never seen before ...
+      </div>
+    </div>
 
-    <div (click)="setGpuPreset({ value: 100 })" class="btn btn-outline-secondary">
-      100
-    </div>
-    <div (click)="setGpuPreset({ value: 500 })" class="btn btn-outline-secondary">
-      500
-    </div>
-    <div (click)="setGpuPreset({ value: 1000 })" class="btn btn-outline-secondary">
-      1000
-    </div>
-    <span class="input-group-text">
-      MB
-    </span>
-  </div>
-</div>
+    <!-- scroll window -->
+    <div class="d-flex flex-row flex-nowrap p-2">
 
-<div class="d-flex align-items-center">
-  <mat-slide-toggle
-    [checked]="animationFlag$ | async"
-    (change)="toggleAnimationFlag($event)">
-    Enable Animation
-  </mat-slide-toggle>
-  <small [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
-</div>
+      <!-- Four Panel Card -->
+      <button
+        class="m-2 p-2"
+        mat-flat-button
+        (click)="usePanelMode(supportedPanelModes[0])"
+        [color]="(panelMode$ | async) === supportedPanelModes[0] ? 'primary' : null">
+        <layout-four-panel class="d-block w-10em h-7em">
+          <div cell-i></div>
+          <div cell-ii></div>
+          <div cell-iii></div>
+          <div cell-iv></div>
+        </layout-four-panel>
+      </button>
+
+      <!-- horizontal 1 3 card -->
+      <button
+        class="m-2 p-2"
+        mat-flat-button
+        (click)="usePanelMode(supportedPanelModes[1])"
+        [color]="(panelMode$ | async) === supportedPanelModes[1] ? 'primary' : null">
+        <layout-horizontal-one-three class="d-block w-10em h-7em">
+          <div cell-i></div>
+          <div cell-ii></div>
+          <div cell-iii></div>
+          <div cell-iv></div>
+        </layout-horizontal-one-three>
+      </button>
+  
+      <!-- vertical 1 3 card -->
+      <button
+        class="m-2 p-2"
+        mat-flat-button
+        (click)="usePanelMode(supportedPanelModes[2])"
+        [color]="(panelMode$ | async) === supportedPanelModes[2] ? 'primary' : null">
+        <layout-vertical-one-three class="d-block w-10em h-7em">
+          <div cell-i></div>
+          <div cell-ii></div>
+          <div cell-iii></div>
+          <div cell-iv></div>
+        </layout-vertical-one-three>
+      </button>
+
+      <!-- single -->
+      <button
+        class="m-2 p-2"
+        mat-flat-button
+        (click)="usePanelMode(supportedPanelModes[3])"
+        [color]="(panelMode$ | async) === supportedPanelModes[3] ? 'primary' : null">
+        <layout-single-panel class="d-block w-10em h-7em">
+          <div cell-i></div>
+          <div cell-ii></div>
+          <div cell-iii></div>
+          <div cell-iv></div>
+        </layout-single-panel>
+      </button>
+    </div>
+  </mat-tab>
+
+  <!-- hard ware -->
+  <mat-tab label="Hardware">
+    <div class="d-flex align-items-center">
+      <mat-slide-toggle
+        [checked]="animationFlag$ | async"
+        (change)="toggleAnimationFlag($event)">
+        Enable Animation
+      </mat-slide-toggle>
+      <small [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
+    </div>
+    <div class="d-flex flex-row align-items-center justify-content start">
+      <label
+        class="m-0 d-inline-block flex-grow-0 flex-shrink-0"
+        for="gpuLimitSlider">
+        GPU Limit
+        <small [matTooltip]="GPU_TOOLTIP" class="ml-2 fas fa-question"></small>
+      </label>
+      <mat-slider
+        class="flex-grow-1 flex-shrink-1 ml-2 mr-2"
+        id="gpuLimitSlider"
+        name="gpuLimitSlider"
+        thumbLabel="true"
+        min="100"
+        max="1000"
+        [step]="stepSize"
+        (change)="handleMatSliderChange($event)"
+        [value]="gpuLimit$ | async">
+      </mat-slider>
+      <span class="d-inline-block flex-grow-0 flex-shrink-0 w-10em">
+        {{ gpuLimit$ | async }} MB
+      </span>
+    </div>
+
+    
+  </mat-tab>
+
+</mat-tab-group>
+

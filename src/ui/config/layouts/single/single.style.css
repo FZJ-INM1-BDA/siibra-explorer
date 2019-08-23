@@ -1,0 +1,12 @@
+.major-column
+{
+  flex: 0 0 100%;
+}
+.minor-column
+{
+  flex: 0 0 0%;
+}
+.layout-31-cell
+{
+  flex: 0 0 33%;
+}

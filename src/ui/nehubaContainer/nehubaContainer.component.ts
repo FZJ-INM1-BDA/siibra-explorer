@@ -3,15 +3,16 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime, switchMapTo } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
+import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED } from "src/services/state/viewerState.store";
+import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -142,6 +143,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   public nanometersToOffsetPixelsFn : Function[] = []
   private viewerConfig : Partial<ViewerConfiguration> = {}
+
+  private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
 
   constructor(
     private constantService : AtlasViewerConstantsServices,
@@ -335,19 +338,25 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
     
     /* each time a new viewer is initialised, take the first event to get the translation function */
-    this.newViewer$.pipe(
-      // switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
-      //   .pipe(
-      //     ...takeOnePipe
-      //   )
-      // )
+    this.subscriptions.push(
+      this.newViewer$.pipe(
+        switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')))
+      ).subscribe((events)=>{
+        for (const idx in [0,1,2]) {
+          const ev = events[idx] as CustomEvent
+          this.viewPanels[idx] = ev.target as HTMLElement
+          this.nanometersToOffsetPixelsFn[idx] = ev.detail.nanometersToOffsetPixels
+        }
+      })
+    )
 
-      switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')))
-
-
-    ).subscribe((events)=>{
-      [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
-    })
+    this.subscriptions.push(
+      this.newViewer$.pipe(
+        switchMapTo(fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent').pipe(
+          take(1)
+        )),
+      ).subscribe(ev => this.viewPanels[3] = ((ev as CustomEvent).target) as HTMLElement)
+    )
 
     this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
       scan(scanFn, [null, null, null]),
@@ -407,7 +416,57 @@ export class NehubaContainer implements OnInit, OnDestroy{
     return this.constantService.mobile
   }
 
+  private removeExistingPanels() {
+    const element = this.nehubaViewer.nehubaViewer.ngviewer.layout.container.componentValue.element as HTMLElement
+    while (element.childElementCount > 0) {
+      element.removeChild(element.firstElementChild)
+    }
+    return element
+  }
+
   ngOnInit(){
+
+    this.subscriptions.push(
+      this.store.pipe(
+        select('ngViewerState'),
+        select('panelMode'),
+        distinctUntilChanged()
+      ).subscribe(mode => {
+
+        /**
+         * TODO be smarter with event stream
+         */
+        if (!this.nehubaViewer) return
+
+        switch (mode) {
+          case H_ONE_THREE:{
+            const element = this.removeExistingPanels()
+            const newEl = getHorizontalOneThree(this.viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case V_ONE_THREE:{
+            const element = this.removeExistingPanels()
+            const newEl = getVerticalOneThree(this.viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case FOUR_PANEL: {
+            const element = this.removeExistingPanels()
+            const newEl = getFourPanel(this.viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case SINGLE_PANEL: {
+            const element = this.removeExistingPanels()
+            const newEl = getSinglePanel(this.viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          default: 
+        }
+      })
+    )
 
     this.subscriptions.push(
       this.viewerPerformanceConfig$.subscribe(config => {
@@ -1181,7 +1240,6 @@ export const takeOnePipe = [
      * 4 ???
      */
     const key = identifySrcElement(target)
-
     const _ = {}
     _[key] = event
     return Object.assign({},acc,_)

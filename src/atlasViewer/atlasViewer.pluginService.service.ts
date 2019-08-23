@@ -1,5 +1,5 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
-import { PluginInitManifestInterface, ACTION_TYPES } from "src/services/state/pluginState.store";
+import { PluginInitManifestInterface, PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { isDefined } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
@@ -154,7 +154,7 @@ export class PluginServices{
           : null
 
         handler.setInitManifestUrl = (url) => this.store.dispatch({
-          type : ACTION_TYPES.SET_INIT_PLUGIN,
+          type : PLUGIN_STATE_ACTION_TYPES.SET_INIT_PLUGIN,
           manifest : {
             name : plugin.name,
             initManifestUrl : url
