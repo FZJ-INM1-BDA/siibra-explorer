@@ -38,7 +38,7 @@
 
 <!-- mobile nub, allowing for ooblique slicing in mobile -->
 <mobile-overlay
-  *ngIf="true || isMobile && viewerLoaded"
+  *ngIf="isMobile && viewerLoaded"
   [tunableProperties]="tunableMobileProperties"
   (deltaValue)="handleMobileOverlayEvent($event)">
   <div class="base" delta>
