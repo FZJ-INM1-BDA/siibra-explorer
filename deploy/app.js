@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session)
+const crypto = require('crypto')
 
 app.disable('x-powered-by')
 
@@ -10,14 +11,17 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
 
+const hash = string => crypto.createHash('sha256').update(string).digest('hex')
+
 app.use((req, _, next) => {
   if (/main\.bundle\.js$/.test(req.originalUrl)){
     const xForwardedFor = req.headers['x-forwarded-for']
     const ip = req.connection.remoteAddress
     console.log({
       type: 'visitorLog',
-      xForwardedFor,
-      ip
+      method: 'main.bundle.js',
+      xForwardedFor: xForwardedFor.replace(/\ /g, '').split(',').map(hash),
+      ip: hash(ip)
     })
   }
   next()
