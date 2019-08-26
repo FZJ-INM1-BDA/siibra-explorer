@@ -121,15 +121,22 @@ export class ConfigComponent implements OnInit, OnDestroy{
     })
   }
   handleDragOver(event:DragEvent){
-    event.preventDefault();
-    (event.target as HTMLElement).classList.add('onDragOver')
+    event.preventDefault()
+    const target = (event.target as HTMLElement)
+    target.classList.add('onDragOver')
   }
   handleDragLeave(event:DragEvent){
     (event.target as HTMLElement).classList.remove('onDragOver')
   }
   handleDragStart(event:DragEvent){
-    const attri = (event.target as HTMLElement).getAttribute('panel-order')
+    const target = (event.target as HTMLElement)
+    const attri = target.getAttribute('panel-order')
     event.dataTransfer.setData('text/plain', attri)
+    
+  }
+  handleDragend(event:DragEvent){
+    const target = (event.target as HTMLElement)
+    target.classList.remove('onDragOver')
   }
 
   public stepSize: number = 10

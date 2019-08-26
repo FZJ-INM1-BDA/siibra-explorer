@@ -4,27 +4,93 @@
 <ui-splashscreen (contextmenu)="$event.stopPropagation();" *ngIf="!viewerLoaded">
 </ui-splashscreen>
 
-<div landmarkMasterContainer>
+<!-- spatial landmarks overlay -->
+<!-- loading indicator -->
 
-  <div>
-    <layout-floating-container pos00 landmarkContainer>
-      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-        [highlight]="spatialData.highlight ? spatialData.highlight : false"
-        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-        [positionX]="getPositionX(0,spatialData)" [positionY]="getPositionY(0,spatialData)"
-        [positionZ]="getPositionZ(0,spatialData)">
-      </nehuba-2dlandmark-unit>
-
-      <div *ngIf="sliceViewLoading0$ | async" class="loadingIndicator">
-        <div class="spinnerAnimationCircle">
-
-        </div>
-      </div>
-    </layout-floating-container>
+<current-layout class="position-absolute w-100 h-100 d-block">
+  <div class="w-100 h-100 position-relative" cell-i>
+    <ng-content *ngTemplateOutlet="overlayi"></ng-content>
   </div>
-  <div>
-    <layout-floating-container pos01 landmarkContainer>
+  <div class="w-100 h-100 position-relative" cell-ii>
+    <ng-content *ngTemplateOutlet="overlayii"></ng-content>
+  </div>
+  <div class="w-100 h-100 position-relative" cell-iii>
+    <ng-content *ngTemplateOutlet="overlayiii"></ng-content>
+  </div>
+  <div class="w-100 h-100 position-relative" cell-iv>
+    <ng-content *ngTemplateOutlet="overlayiv"></ng-content>
+  </div>
+</current-layout>
+
+<layout-floating-container *ngIf="viewerLoaded && !isMobile">
+  <!-- StatusCard container-->
+  <ui-status-card
+    [selectedTemplate]="selectedTemplate"
+    [isMobile]="isMobile"
+    [onHoverSegmentName]="onHoverSegmentName$ | async"
+    [nehubaViewer]="nehubaViewer">
+  </ui-status-card>
+</layout-floating-container>
+
+<div id="scratch-pad">
+
+</div>
+
+<!-- mobile nub, allowing for ooblique slicing in mobile -->
+<mobile-overlay
+  *ngIf="true || isMobile && viewerLoaded"
+  [tunableProperties]="tunableMobileProperties"
+  (deltaValue)="handleMobileOverlayEvent($event)">
+  <div class="base" delta>
+    <div mobileObliqueGuide class="p-2 mb-4 shadow">
+      {{ selectedProp }}
+    </div>
+  </div>
+  <div class="base" guide>
+    <div
+      mobileObliqueGuide
+      class="p-2 mb-4 shadow">
+      <div>
+        <i class="fas fa-arrows-alt-v"></i> oblique mode
+      </div>
+      <div>
+        <i class="fas fa-arrows-alt-h"></i> rotate slice
+      </div>
+    </div>
+  </div>
+  <div
+    (contextmenu)="$event.stopPropagation(); $event.preventDefaul();"
+    [ngStyle]="panelMode$ | async | mobileControlNubStylePipe"
+    mobileObliqueCtrl
+    initiator>
+    <button mat-mini-fab color="primary">
+      <i class="fas fa-globe"></i>
+    </button>
+  </div>
+</mobile-overlay>
+
+<!-- overlay templates -->
+<!-- inserted using ngTemplateOutlet -->
+<ng-template #overlayi>
+  <layout-floating-container pos00 landmarkContainer>
+    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+      (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+      [highlight]="spatialData.highlight ? spatialData.highlight : false"
+      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+      [positionX]="getPositionX(0,spatialData)" [positionY]="getPositionY(0,spatialData)"
+      [positionZ]="getPositionZ(0,spatialData)">
+    </nehuba-2dlandmark-unit>
+
+    <div *ngIf="sliceViewLoading0$ | async" class="loadingIndicator">
+      <div class="spinnerAnimationCircle">
+
+      </div>
+    </div>
+  </layout-floating-container>
+</ng-template>
+
+<ng-template #overlayii>
+  <layout-floating-container pos01 landmarkContainer>
       <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
         (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
         [highlight]="spatialData.highlight ? spatialData.highlight : false"
@@ -39,65 +105,31 @@
         </div>
       </div>
     </layout-floating-container>
-  </div>
-  <div>
-    <layout-floating-container pos10 landmarkContainer>
-      <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-        (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-        [highlight]="spatialData.highlight ? spatialData.highlight : false"
-        [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-        [positionX]="getPositionX(2,spatialData)" [positionY]="getPositionY(2,spatialData)"
-        [positionZ]="getPositionZ(2,spatialData)">
-      </nehuba-2dlandmark-unit>
+</ng-template>
+<ng-template #overlayiii>
+  <layout-floating-container pos10 landmarkContainer>
+    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+      (mouseenter)="handleMouseEnterLandmark(spatialData)" (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+      [highlight]="spatialData.highlight ? spatialData.highlight : false"
+      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+      [positionX]="getPositionX(2,spatialData)" [positionY]="getPositionY(2,spatialData)"
+      [positionZ]="getPositionZ(2,spatialData)">
+    </nehuba-2dlandmark-unit>
 
-      <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
-        <div class="spinnerAnimationCircle">
+    <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
+      <div class="spinnerAnimationCircle">
 
-        </div>
-      </div>
-    </layout-floating-container>
-  </div>
-  <div>
-    <layout-floating-container pos11 landmarkContainer>
-      <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
-        <div class="spinnerAnimationCircle"></div>
-        <div perspectiveLoadingText>
-          {{ perspectiveViewLoading$ | async }}
-        </div>
-      </div>
-    </layout-floating-container>
-  </div>
-</div>
-
-<layout-floating-container *ngIf="viewerLoaded && !isMobile">
-  <!-- StatusCard container-->
-  <ui-status-card [selectedTemplate]="selectedTemplate" [isMobile]="isMobile"
-    [onHoverSegmentName]="onHoverSegmentName$ | async" [nehubaViewer]="nehubaViewer">
-  </ui-status-card>
-</layout-floating-container>
-
-<div id="scratch-pad">
-
-</div>
-
-<mobile-overlay *ngIf="isMobile && viewerLoaded" [tunableProperties]="tunableMobileProperties"
-  (deltaValue)="handleMobileOverlayEvent($event)">
-  <div class="base" delta>
-    <div mobileObliqueGuide class="p-2 mb-4 shadow">
-      {{ selectedProp }}
-    </div>
-  </div>
-  <div class="base" guide>
-    <div mobileObliqueGuide class="p-2 mb-4 shadow">
-      <div>
-        <i class="fas fa-arrows-alt-v"></i> oblique mode
-      </div>
-      <div>
-        <i class="fas fa-arrows-alt-h"></i> rotate slice
       </div>
     </div>
-  </div>
-  <div (contextmenu)="$event.stopPropagation(); $event.preventDefaul();" mobileObliqueCtrl initiator>
-    <i class="fas fa-globe"></i>
-  </div>
-</mobile-overlay>
+  </layout-floating-container>
+</ng-template>
+<ng-template #overlayiv>
+  <layout-floating-container pos11 landmarkContainer>
+    <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
+      <div class="spinnerAnimationCircle"></div>
+      <div perspectiveLoadingText>
+        {{ perspectiveViewLoading$ | async }}
+      </div>
+    </div>
+  </layout-floating-container>
+</ng-template>

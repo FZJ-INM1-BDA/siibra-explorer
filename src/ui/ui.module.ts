@@ -54,6 +54,8 @@ import { HorizontalOneThree } from "./config/layouts/h13/h13.component";
 import { VerticalOneThree } from "./config/layouts/v13/v13.component";
 import { SinglePanel } from "./config/layouts/single/single.component";
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { CurrentLayout } from "./config/currentLayout/currentLayout.component";
+import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 
 
 @NgModule({
@@ -101,6 +103,7 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
     HorizontalOneThree,
     VerticalOneThree,
     SinglePanel,
+    CurrentLayout,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -116,6 +119,7 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
+    MobileControlNubStylePipe,
 
     /* directive */
     DownloadDirective,

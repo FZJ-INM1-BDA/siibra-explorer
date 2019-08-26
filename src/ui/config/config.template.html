@@ -3,15 +3,20 @@
   <!-- viewer preference -->
   <mat-tab label="Viewer Preference">
     
-    <div [ngSwitch]="panelMode$ | async" class="d-flex flex-row p-2">
-      <layout-four-panel
-        *ngSwitchCase="supportedPanelModes[0]"
-        class="d-block w-20em h-15em cdk-drag-boundary">
+    <div class="m-2">
+      <div class="mat-h2">
+        Rearrange Viewports
+      </div>
+      <div class="mat-h4 text-muted">
+        Click and drag to rearrange viewport positions
+      </div>
+      <current-layout class="d-flex w-20em h-15em p-2">
         <div
           matRipple
           (dragstart)="handleDragStart($event)"
           (dragover)="handleDragOver($event)"
           (dragleave)="handleDragLeave($event)"
+          (dragend)="handleDragend($event)"
           (drop)="handleDrop($event)"
           class="w-100 h-100 config-transition"
           cell-i>
@@ -27,6 +32,7 @@
           (dragstart)="handleDragStart($event)"
           (dragover)="handleDragOver($event)"
           (dragleave)="handleDragLeave($event)"
+          (dragend)="handleDragend($event)"
           (drop)="handleDrop($event)"
           class="w-100 h-100 config-transition"
           cell-ii>
@@ -42,6 +48,7 @@
           (dragstart)="handleDragStart($event)"
           (dragover)="handleDragOver($event)"
           (dragleave)="handleDragLeave($event)"
+          (dragend)="handleDragend($event)"
           (drop)="handleDrop($event)"
           class="w-100 h-100 config-transition"
           cell-iii>
@@ -57,6 +64,7 @@
           (dragstart)="handleDragStart($event)"
           (dragover)="handleDragOver($event)"
           (dragleave)="handleDragLeave($event)"
+          (dragend)="handleDragend($event)"
           (drop)="handleDrop($event)"
           class="w-100 h-100 config-transition"
           cell-iv>
@@ -67,205 +75,21 @@
             {{ (panelTexts$ | async)[3] }}
           </div>
         </div>
-      </layout-four-panel>
-      <layout-horizontal-one-three
-        *ngSwitchCase="supportedPanelModes[1]"
-        class="d-block w-20em h-15em">
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-i>
-          <div
-            [attr.panel-order]="0"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[0] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-ii>
-          <div
-            [attr.panel-order]="1"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[1] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iii>
-          <div
-            [attr.panel-order]="2"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[2] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iv>
-          <div
-            [attr.panel-order]="3"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[3] }}
-          </div>
-        </div>
-      </layout-horizontal-one-three>
-      <layout-vertical-one-three
-        *ngSwitchCase="supportedPanelModes[2]"
-        class="d-block w-20em h-15em">
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-i>
-          <div
-            [attr.panel-order]="0"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[0] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-ii>
-          <div
-            [attr.panel-order]="1"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[1] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iii>
-          <div
-            [attr.panel-order]="2"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[2] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iv>
-          <div
-            [attr.panel-order]="3"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[3] }}
-          </div>
-        </div>
-      </layout-vertical-one-three>
-      <layout-single-panel
-        *ngSwitchCase="supportedPanelModes[3]"
-        class="d-block w-20em h-15em">
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-i>
-          <div
-            [attr.panel-order]="0"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[0] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-ii>
-          <div
-            [attr.panel-order]="1"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[1] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iii>
-          <div
-            [attr.panel-order]="2"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[2] }}
-          </div>
-        </div>
-        <div
-          matRipple
-          (dragstart)="handleDragStart($event)"
-          (dragover)="handleDragOver($event)"
-          (dragleave)="handleDragLeave($event)"
-          (drop)="handleDrop($event)"
-          class="w-100 h-100 config-transition"
-          cell-iv>
-          <div
-            [attr.panel-order]="3"
-            class="config-transition w-100 h-100 d-flex align-items-center justify-content-center border"
-            draggable="true">
-            {{ (panelTexts$ | async)[3] }}
-          </div>
-        </div>
-      </layout-single-panel>
-      <div *ngSwitchDefault>
-        A panel mode which I have never seen before ...
+      </current-layout>
+
+      <div class="mat-body text-muted font-italic">
+        Plane designation refers to default orientation (without oblique rotation).
       </div>
     </div>
 
     <!-- scroll window -->
+
+    <div class="m-2">
+      <div class="mat-h2">
+        Select a viewports configuration
+      </div>
+    </div>
+
     <div class="d-flex flex-row flex-nowrap p-2">
 
       <!-- Four Panel Card -->
@@ -275,10 +99,10 @@
         (click)="usePanelMode(supportedPanelModes[0])"
         [color]="(panelMode$ | async) === supportedPanelModes[0] ? 'primary' : null">
         <layout-four-panel class="d-block w-10em h-7em">
-          <div cell-i></div>
-          <div cell-ii></div>
-          <div cell-iii></div>
-          <div cell-iv></div>
+          <div class="border w-100 h-100" cell-i></div>
+          <div class="border w-100 h-100" cell-ii></div>
+          <div class="border w-100 h-100" cell-iii></div>
+          <div class="border w-100 h-100" cell-iv></div>
         </layout-four-panel>
       </button>
 
@@ -289,10 +113,10 @@
         (click)="usePanelMode(supportedPanelModes[1])"
         [color]="(panelMode$ | async) === supportedPanelModes[1] ? 'primary' : null">
         <layout-horizontal-one-three class="d-block w-10em h-7em">
-          <div cell-i></div>
-          <div cell-ii></div>
-          <div cell-iii></div>
-          <div cell-iv></div>
+          <div class="border w-100 h-100" cell-i></div>
+          <div class="border w-100 h-100" cell-ii></div>
+          <div class="border w-100 h-100" cell-iii></div>
+          <div class="border w-100 h-100" cell-iv></div>
         </layout-horizontal-one-three>
       </button>
   
@@ -303,10 +127,10 @@
         (click)="usePanelMode(supportedPanelModes[2])"
         [color]="(panelMode$ | async) === supportedPanelModes[2] ? 'primary' : null">
         <layout-vertical-one-three class="d-block w-10em h-7em">
-          <div cell-i></div>
-          <div cell-ii></div>
-          <div cell-iii></div>
-          <div cell-iv></div>
+          <div class="border w-100 h-100" cell-i></div>
+          <div class="border w-100 h-100" cell-ii></div>
+          <div class="border w-100 h-100" cell-iii></div>
+          <div class="border w-100 h-100" cell-iv></div>
         </layout-vertical-one-three>
       </button>
 
@@ -317,10 +141,10 @@
         (click)="usePanelMode(supportedPanelModes[3])"
         [color]="(panelMode$ | async) === supportedPanelModes[3] ? 'primary' : null">
         <layout-single-panel class="d-block w-10em h-7em">
-          <div cell-i></div>
-          <div cell-ii></div>
-          <div cell-iii></div>
-          <div cell-iv></div>
+          <div class="border w-100 h-100" cell-i></div>
+          <div class="border w-100 h-100" cell-ii></div>
+          <div class="border w-100 h-100" cell-iii></div>
+          <div class="border w-100 h-100" cell-iv></div>
         </layout-single-panel>
       </button>
     </div>
