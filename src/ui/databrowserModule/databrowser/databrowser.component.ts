@@ -155,10 +155,6 @@ export class DataBrowser implements OnDestroy,OnInit{
   resetFilters(event?:MouseEvent){
     this.clearAll()
   }
-
-  getBackgroundColorStyleFromRegion(region:any) {
-    return this.dbService.getBackgroundColorStyleFromRegion(region)
-  }
 }
 
 export interface DataEntryFilter{

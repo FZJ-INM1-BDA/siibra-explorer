@@ -306,12 +306,6 @@ export class DatabrowserService implements OnDestroy{
   }
 
   public getModalityFromDE = getModalityFromDE
-
-  public getBackgroundColorStyleFromRegion(region:any = null){
-    return region && region.rgb
-      ? `rgb(${region.rgb.join(',')})`
-      : `white`
-  }
 }
 
 

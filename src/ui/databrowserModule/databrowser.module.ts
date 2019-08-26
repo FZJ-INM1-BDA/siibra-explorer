@@ -25,6 +25,7 @@ import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
 import { SingleDatasetView } from './singleDataset/singleDataset.component'
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
+import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
 
 @NgModule({
   imports:[
@@ -56,7 +57,8 @@ import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
     FilterDataEntriesbyMethods,
     FilterDataEntriesByRegion,
     AggregateArrayIntoRootPipe,
-    DoiParserPipe
+    DoiParserPipe,
+    RegionBackgroundToRgbPipe
   ],
   exports:[
     DataBrowser,
