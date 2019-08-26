@@ -142,6 +142,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   public panelMode$: Observable<string>
+  private redrawLayout$: Observable<[string, string]>
 
   constructor(
     private constantService : AtlasViewerConstantsServices,
@@ -160,6 +161,25 @@ export class NehubaContainer implements OnInit, OnDestroy{
       debounceTime(200),
       tap(viewerConfig => this.viewerConfig = viewerConfig ),
       filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer))
+    )
+
+    this.redrawLayout$ = this.store.pipe(
+      select('ngViewerState'),
+      select('nehubaReady'),
+      distinctUntilChanged(),
+      filter(v => !!v),
+      switchMapTo(combineLatest(
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelMode'),
+          distinctUntilChanged()
+        ),
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelOrder'),
+          distinctUntilChanged()
+        )
+      ))
     )
 
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
@@ -431,19 +451,8 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.subscriptions.push(
-      combineLatest(
-        this.store.pipe(
-          select('ngViewerState'),
-          select('panelMode'),
-          distinctUntilChanged()
-        ),
-        this.store.pipe(
-          select('ngViewerState'),
-          select('panelOrder'),
-          distinctUntilChanged()
-        )
-      ).subscribe(([mode, panelOrder]) => {
-        const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx])
+      this.redrawLayout$.subscribe(([mode, panelOrder]) => {
+        const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
         /**
          * TODO be smarter with event stream
          */
