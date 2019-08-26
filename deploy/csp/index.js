@@ -20,8 +20,7 @@ try {
 const defaultAllowedSites = [
   "'self'",
   '*.apps.hbp.eu',
-  '*.apps-dev.hbp.eu',
-  ...ALLOWED_DEFAULT_SRC
+  '*.apps-dev.hbp.eu'
 ]
 
 const dataSource = [
@@ -48,6 +47,17 @@ module.exports = (app) => {
       connectSrc: [
         ...defaultAllowedSites,
         ...dataSource
+      ],
+      scriptSrc:[
+        "'self'",
+        '*.apps.hbp.eu',
+        '*.apps-dev.hbp.eu',
+        '*.jquery.com',
+        '*.cloudflare.com',
+        'unpkg.com',
+        '*.unpkg.com',
+        '*.jsdelivr.net',
+        ...ALLOWED_DEFAULT_SRC
       ],
       reportUri: '/report-violation'
     },
