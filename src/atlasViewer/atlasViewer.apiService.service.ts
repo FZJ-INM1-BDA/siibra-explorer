@@ -8,6 +8,7 @@ import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { PluginManifest } from "./atlasViewer.pluginService.service";
+import { DialogService } from "src/services/dialogService.service";
 
 declare var window
 
@@ -27,7 +28,8 @@ export class AtlasViewerAPIServices{
 
   constructor(
     private store : Store<ViewerStateInterface>,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private dialogService: DialogService
   ){
 
     this.loadedTemplates$ = this.store.pipe(
@@ -115,7 +117,10 @@ export class AtlasViewerAPIServices{
          */
         launchNewWidget: (manifest) => {
           return Promise.reject('Needs to be overwritted')
-        }
+        },
+
+        getUserInput: config => this.dialogService.getUserInput(config),
+        getUserConfirmation: config => this.dialogService.getUserConfirm(config)
       },
       pluginControl : {
         loadExternalLibraries : ()=>Promise.reject('load External Library method not over written')
@@ -184,6 +189,8 @@ export interface InteractiveViewerInterface{
     getModalHandler: () => ModalHandler
     getToastHandler: () => ToastHandler
     launchNewWidget: (manifest:PluginManifest) => Promise<any>
+    getUserInput: (config:GetUserInputConfig) => Promise<string>
+    getUserConfirmation: (config: GetUserConfirmation) => Promise<any>
   }
 
   pluginControl : {
@@ -191,6 +198,16 @@ export interface InteractiveViewerInterface{
     unloadExternalLibraries : (libraries:string[])=>void
     [key:string] : any
   }
+}
+
+interface GetUserConfirmation{
+  title?: string
+  message?: string
+}
+
+interface GetUserInputConfig extends GetUserConfirmation{
+  placeholder?: string
+  defaultValue?: string
 }
 
 export interface UserLandmark{
