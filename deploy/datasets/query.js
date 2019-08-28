@@ -406,12 +406,11 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   }
 
   const result = await getDatasetFromId({ user, kgId })
-  const { option } = await getUserKGRequestParam({ user })
   const { files } = result
   const zip = archiver('zip')
   for (let file of files) {
     const { name, absolutePath } = file
-    zip.append(request(absolutePath, option), { name })
+    zip.append(request(absolutePath), { name })
   }
 
   zip.finalize()
