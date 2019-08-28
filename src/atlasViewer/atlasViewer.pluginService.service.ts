@@ -1,4 +1,5 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
+import { HttpClient } from '@angular/common/http'
 import { PluginInitManifestInterface, ACTION_TYPES } from "src/services/state/pluginState.store";
 import { isDefined } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
@@ -23,13 +24,20 @@ export class PluginServices{
   public appendSrc : (script:HTMLElement)=>void
   public removeSrc: (script:HTMLElement) => void
   private pluginUnitFactory : ComponentFactory<PluginUnit>
+  public minimisedPlugins$ : Observable<Set<string>>
+
+  /**
+   * TODO remove polyfil and convert all calls to this.fetch to http client
+   */
+  public fetch: (url:string, httpOption?: any) => Promise<any> = (url, httpOption = {}) => this.http.get(url, httpOption).toPromise()
 
   constructor(
     private apiService : AtlasViewerAPIServices,
     private constantService : AtlasViewerConstantsServices,
     private widgetService : WidgetServices,
     private cfr : ComponentFactoryResolver,
-    private store : Store<PluginInitManifestInterface>
+    private store : Store<PluginInitManifestInterface>,
+    private http: HttpClient
   ){
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
@@ -44,30 +52,30 @@ export class PluginServices{
          * PLUGINDEV should return an array of 
          */
         PLUGINDEV
-          ? fetch(PLUGINDEV).then(res => res.json())
+          ? this.fetch(PLUGINDEV).then(res => res.json())
           : Promise.resolve([]),
         new Promise(resolve => {
-          fetch(`${this.constantService.backendUrl}plugins`)
-            .then(res => res.json())
+          this.fetch(`${this.constantService.backendUrl}plugins`)
             .then(arr => Promise.all(
               arr.map(url => new Promise(rs => 
                 /**
                  * instead of failing all promises when fetching manifests, only fail those that fails to fetch
                  */
-                fetch(url).then(res => res.json()).then(rs).catch(e => (console.log('fetching manifest error', e), rs(null))))
+                this.fetch(url).then(rs).catch(e => (this.constantService.catchError(`fetching manifest error: ${e.toString()}`), rs(null))))
               )
             ))
             .then(manifests => resolve(
               manifests.filter(m => !!m)
             ))
             .catch(e => {
+              this.constantService.catchError(e)
               resolve([])
             })
         }),
         Promise.all(
           BUNDLEDPLUGINS
             .filter(v => typeof v === 'string')
-            .map(v => fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
+            .map(v => this.fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
         )
           .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
       ])
@@ -112,15 +120,13 @@ export class PluginServices{
         isDefined(plugin.template) ?
           Promise.resolve('template already provided') :
           isDefined(plugin.templateURL) ?
-            fetch(plugin.templateURL)
-              .then(res=>res.text())
+            this.fetch(plugin.templateURL, {responseType: 'text'})
               .then(template=>plugin.template = template) :
             Promise.reject('both template and templateURL are not defined') ,
         isDefined(plugin.script) ?
           Promise.resolve('script already provided') :
           isDefined(plugin.scriptURL) ?
-            fetch(plugin.scriptURL)
-              .then(res=>res.text())
+            this.fetch(plugin.scriptURL, {responseType: 'text'})
               .then(script=>plugin.script = script) :
             Promise.reject('both script and scriptURL are not defined') 
       ])
@@ -135,9 +141,20 @@ export class PluginServices{
     this.launchedPlugins.add(pluginName)
     this.launchedPlugins$.next(this.launchedPlugins)
   }
-  removePluginToLaunchedSet(pluginName:string){
+  removePluginFromLaunchedSet(pluginName:string){
     this.launchedPlugins.delete(pluginName)
     this.launchedPlugins$.next(this.launchedPlugins)
+  }
+
+  
+  pluginIsLaunching(pluginName:string){
+    return this.launchingPlugins.has(pluginName)
+  }
+  addPluginToIsLaunchingSet(pluginName:string) {
+    this.launchingPlugins.add(pluginName)
+  }
+  removePluginFromIsLaunchingSet(pluginName:string){
+    this.launchedPlugins.delete(pluginName)
   }
 
   private mapPluginNameToWidgetUnit: Map<string, WidgetUnit> = new Map()
@@ -146,21 +163,31 @@ export class PluginServices{
     return this.widgetService.isMinimised( this.mapPluginNameToWidgetUnit.get(pluginName) )
   }
 
-  public minimisedPlugins$: Observable<Set<string>>
-
+  private launchingPlugins: Set<string> = new Set()
   public orphanPlugins: Set<PluginManifest> = new Set()
   launchPlugin(plugin:PluginManifest){
-    if(this.apiService.interactiveViewer.pluginControl[plugin.name]){
-      // if already launched, toggle minimise/restore
+    if (this.pluginIsLaunching(plugin.name)) {
+      // plugin launching please be patient
+      // TODO add visual feedback
+      return
+    }
+    if ( this.pluginHasLaunched(plugin.name)) {
+      // plugin launched
+      // TODO add visual feedback
 
+      // if widget window is minimized, maximize it
+      
       const wu = this.mapPluginNameToWidgetUnit.get(plugin.name)
       if (this.widgetService.isMinimised(wu)) {
         this.widgetService.unminimise(wu)
       } else {
         this.widgetService.minimise(wu)
       }
-      return Promise.reject('plugin already launched')
+      return
     }
+
+    this.addPluginToIsLaunchingSet(plugin.name)
+    
     return this.readyPlugin(plugin)
       .then(()=>{
         const pluginUnit = this.pluginViewContainerRef.createComponent( this.pluginUnitFactory )
@@ -199,7 +226,7 @@ export class PluginServices{
 
         const shutdownCB = [
           () => {
-            this.removePluginToLaunchedSet(plugin.name)
+            this.removePluginFromLaunchedSet(plugin.name)
           }
         ]
 
@@ -228,6 +255,8 @@ export class PluginServices{
         })
 
         this.addPluginToLaunchedSet(plugin.name)
+        this.removePluginFromIsLaunchingSet(plugin.name)
+
         this.mapPluginNameToWidgetUnit.set(plugin.name, widgetCompRef.instance)
 
         const unsubscribeOnPluginDestroy = []

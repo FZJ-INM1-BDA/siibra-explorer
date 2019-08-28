@@ -8,8 +8,9 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable, combineLatest, merge, of } from "rxjs";
+import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
 import { map, shareReplay, startWith } from "rxjs/operators";
+import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { ToastService } from "src/services/toastService.service";
 
 @Component({
@@ -100,7 +101,8 @@ export class MenuIconsBar{
     )
 
     this.launchedPlugins$ = this.pluginServices.launchedPlugins$.pipe(
-      map(set => Array.from(set))
+      map(set => Array.from(set)),
+      shareReplay(1)
     )
 
     /**

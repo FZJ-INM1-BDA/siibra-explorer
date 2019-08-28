@@ -48,6 +48,7 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe"
 import { ScrollingModule } from "@angular/cdk/scrolling"
+import { HttpClientModule } from "@angular/common/http";
 import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
 import { ViewerStateController } from "./viewerStateController/viewerState.component";
@@ -59,6 +60,7 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 
 @NgModule({
   imports : [
+    HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
