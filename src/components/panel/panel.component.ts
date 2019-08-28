@@ -7,9 +7,6 @@ import { ParseAttributeDirective } from "../parseAttribute.directive";
   styleUrls : [
     `./panel.style.css`
   ],
-  host: {
-    '[class]': 'getClassNames'
-  },
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
@@ -22,17 +19,11 @@ export class PanelComponent extends ParseAttributeDirective {
   @Input() collapseBody : boolean = false
   @Input() bodyCollapsable : boolean = false
 
-  @Input() containerClass : string = ''
-
   @ViewChild('panelBody',{ read : ElementRef }) efPanelBody : ElementRef
   @ViewChild('panelFooter',{ read : ElementRef }) efPanelFooter : ElementRef
 
   constructor(){
     super()
-  }
-
-  get getClassNames(){
-    return `panel ${this.containerClass === '' ? 'panel-default' : this.containerClass}`
   }
 
   toggleCollapseBody(_event:Event){

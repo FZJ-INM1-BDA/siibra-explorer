@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
+import { ProgressBar } from './progress/progress.component';
 import { SleightOfHand } from './sleightOfHand/soh.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
@@ -55,6 +56,7 @@ import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component'
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
     SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
@@ -89,6 +91,7 @@ import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component'
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
     SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
