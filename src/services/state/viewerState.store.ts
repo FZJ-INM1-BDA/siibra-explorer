@@ -47,7 +47,7 @@ export function viewerState(
     landmarksSelected : [],
     fetchedTemplates : [],
     loadedNgLayers: [],
-    regionsSelected: []
+    regionsSelected: [],
     userLandmarks: []
   },
   action:AtlasAction

@@ -44,7 +44,6 @@ import { DialogService } from "./services/dialogService.service";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
-import { MatDialogModule, MatTabsModule } from "@angular/material";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 
 @NgModule({
@@ -56,19 +55,13 @@ import { ViewerStateUseEffect } from "./services/state/viewerState.store";
     DragDropModule,
     UIModule,
     AngularMaterialModule,
-
-    /**
-     * move to angular material module
-     */
-    MatDialogModule,
-    MatTabsModule,
     
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
       UseEffects,
       UserConfigStateUseEffect,
-      ViewerStateControllerUseEffect
+      ViewerStateControllerUseEffect,
       ViewerStateUseEffect,
     ]),
     StoreModule.forRoot({
