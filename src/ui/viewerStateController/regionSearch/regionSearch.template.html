@@ -1,0 +1,45 @@
+<div class="d-flex flex-row align-items-center">
+
+  <form class="flex-grow-1 flex-shrink-1">
+    <mat-form-field class="w-100">
+      <input
+        placeholder="Regions"
+        #autoTrigger
+        #trigger="matAutocompleteTrigger"
+        type="text"
+        matInput
+        [formControl]="formControl"
+        [matAutocomplete]="auto">
+    </mat-form-field>
+    <mat-autocomplete
+      (opened)="focused = true"
+      (closed)="focused = false"
+      (optionSelected)="optionSelected($event)"
+      autoActiveFirstOption
+      #auto="matAutocomplete">
+      <mat-option
+        *ngFor="let region of autocompleteList$ | async"
+        [value]="region.labelIndexId">
+        {{ region.name }}
+      </mat-option>
+    </mat-autocomplete>
+  </form>
+    
+  <button
+    class="flex-grow-0 flex-shrink-0"
+    (click)="showHierarchy($event)"
+    mat-icon-button color="primary">
+    <i class="fas fa-sitemap"></i>
+  </button>
+</div>
+
+<ng-template #regionHierarchy>
+  <region-hierarchy
+    [selectedRegions]="regionsSelected$ | async | filterNull"
+    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+    (clearAllRegions)="deselectAllRegions($event)"
+    [parcellationSelected]="parcellationSelected$ | async">
+  
+  </region-hierarchy>
+</ng-template>

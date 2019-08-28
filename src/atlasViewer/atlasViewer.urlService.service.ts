@@ -57,8 +57,12 @@ export class AtlasViewerURLService{
      */
     this.additionalNgLayers$ = combineLatest(
       this.changeQueryObservable$.pipe(
-        map(state => state.templateSelected)
+        select('templateSelected'),
+        filter(v => !!v)
       ),
+      /**
+       * TODO duplicated with viewerState.loadedNgLayers ?
+       */
       this.store.pipe(
         select('ngViewerState'),
         select('layers')

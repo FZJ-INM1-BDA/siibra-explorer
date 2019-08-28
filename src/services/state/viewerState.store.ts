@@ -47,6 +47,7 @@ export function viewerState(
     landmarksSelected : [],
     fetchedTemplates : [],
     loadedNgLayers: [],
+    regionsSelected: []
     userLandmarks: []
   },
   action:AtlasAction
@@ -113,7 +114,10 @@ export function viewerState(
       const { updatedParcellation } = action
       return {
         ...state,
-        parcellationSelected: updatedParcellation
+        parcellationSelected: {
+          ...updatedParcellation,
+          updated: true
+        }
       }
     }
     case SELECT_REGIONS:
@@ -140,6 +144,10 @@ export function viewerState(
         userLandmarks: action.landmarks
       } 
     }
+    /**
+     * TODO
+     * duplicated with ngViewerState.layers ?
+     */
     case NEHUBA_LAYER_CHANGED: {
       if (!window['viewer']) {
         return {
@@ -174,11 +182,14 @@ export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 export const UPDATE_PARCELLATION = `UPDATE_PARCELLATION`
 
+export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
 export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
+
+export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
 
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 

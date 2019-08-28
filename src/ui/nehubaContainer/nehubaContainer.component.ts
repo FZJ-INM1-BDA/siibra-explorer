@@ -681,11 +681,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.subscriptions.push(
       this.selectedLandmarks$.pipe(
-        map(lms => lms.map(lm => this.landmarksNameMap.get(lm.name)))
+        map(lms => lms.map(lm => this.landmarksNameMap.get(lm.name))),
+        debounceTime(16)
       ).subscribe(indices => {
         const filteredIndices = indices.filter(v => typeof v !== 'undefined' && v !== null)
-        if(this.nehubaViewer)
+        if(this.nehubaViewer) {
           this.nehubaViewer.spatialLandmarkSelectionChanged(filteredIndices)
+        }
       })
     )
   }

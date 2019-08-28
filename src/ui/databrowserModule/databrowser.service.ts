@@ -130,6 +130,9 @@ export class DatabrowserService implements OnDestroy{
       return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`)
         .then(res => res.json()))
     }),
+    /**
+     * TODO pipe to constantService.catchError
+     */
     catchError((err) => (console.log(err), of([])))
   )
 
