@@ -27,7 +27,7 @@
       <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>
     </span>
     <span
-      (click)="treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
+      (click)="handleTreeNodeClick($event, flattenedItem)"
       class="render-node-text"
       [innerHtml]="flattenedItem | renderPipe : renderNode ">
     </span>
@@ -63,7 +63,7 @@
         <i [ngClass]="isCollapsed(flattenedItem) ? 'r-270' : ''" class="fas fa-chevron-down"></i>
       </span>
       <span
-        (click)="treeNodeClick.emit({event:$event,inputItem:flattenedItem})"
+        (click)="handleTreeNodeClick($event, flattenedItem)"
         class="render-node-text"
         [innerHtml]="flattenedItem | renderPipe : renderNode ">
       </span>

@@ -1,8 +1,9 @@
 import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import { ViewerStateInterface, Property } from "../services/stateStore.service";
-import { Subject } from "rxjs";
+import { Store, select } from "@ngrx/store";
+import { ViewerStateInterface } from "../services/stateStore.service";
+import { Subject, Observable } from "rxjs";
 import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
+import { map, shareReplay, filter } from "rxjs/operators";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
@@ -14,6 +15,7 @@ export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r 
 export class AtlasViewerConstantsServices{
 
   public darktheme: boolean = false
+  public darktheme$: Observable<boolean>
   public mobile: boolean
   public loadExportNehubaPromise : Promise<boolean>
 
@@ -246,6 +248,14 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     /* https://stackoverflow.com/a/25394023/6059235 */
     this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
 
+    this.darktheme$ = this.store.pipe(
+      select('viewerState'),
+      select('templateSelected'),
+      filter(v => !!v),
+      map(({useTheme}) => useTheme === 'dark'),
+      shareReplay(1)
+    )
+
     /**
      * set gpu limit if user is on mobile
      */
@@ -257,6 +267,14 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
         } as Partial<ViewerConfiguration>
       })  
     }
+  }
+
+  catchError(e: Error | string){
+    /**
+     * DO NOT REMOVE
+     * general catch all & reflect in UI
+     */
+    console.warn(e)
   }
 }
 
@@ -312,8 +330,7 @@ const negString = '~'
 
 const encodeInt = (number: number) => {
   if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
-  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY)
-    throw 'The input is not valid'
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) throw 'The input is not valid'
 
   let rixit // like 'digit', only in some non-decimal radix 
   let residual
@@ -370,7 +387,9 @@ const decodetoInt = (encodedString: string) => {
     _encodedString = encodedString
   }
   return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc,curr) => {
-    return acc * 64 + cipher.indexOf(curr)
+    const index = cipher.indexOf(curr)
+    if (index < 0) throw new Error(`Poisoned b64 encoding ${encodedString}`)
+    return acc * 64 + index
   }, 0)
 }
 

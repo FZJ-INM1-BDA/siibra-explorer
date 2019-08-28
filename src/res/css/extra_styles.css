@@ -137,8 +137,12 @@ span.regionSelected
 span.regionNotSelected,
 span.regionSelected
 {
-  cursor : default;
   user-select: none;
+}
+
+.cursor-default
+{
+  cursor: default;
 }
 
 markdown-dom pre code
@@ -302,9 +306,24 @@ markdown-dom pre code
   max-width: 60%!important;
 }
 
+.mw-20em
+{
+  max-width: 20em!important;
+}
+
+.w-20em
+{
+  width: 20em!important;
+}
+
 .mh-20em
 {
   max-height: 20em;
+}
+
+.mh-10em
+{
+  max-height: 10em;
 }
 
 .pe-all
@@ -334,7 +353,7 @@ markdown-dom pre code
 
 .overflow-x-hidden
 {
-  overflow-x:hidden;
+  overflow-x:hidden!important;
 }
 
 .muted
@@ -353,6 +372,21 @@ markdown-dom pre code
   border:none;
 }
 
+.w-1em
+{
+  width: 1em;
+}
+
+.bs-content-box
+{
+  box-sizing: content-box;
+}
+
+/* required to hide  */
+.cdk-global-scrollblock
+{
+  overflow-y:hidden !important;
+}
 .h-90vh
 {
   height: 90vh!important;

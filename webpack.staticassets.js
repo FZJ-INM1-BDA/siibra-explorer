@@ -1,8 +1,19 @@
 const webpack = require('webpack')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 module.exports = {
   module : {
     rules : [
+      {
+        test: /\.scss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          'css-loader',
+          'sass-loader'
+        ]
+      },
       {
         test : /jpg|png/,
         exclude : /export\_nehuba|index/,
@@ -49,6 +60,9 @@ module.exports = {
     ]
   },
   plugins : [
+    new MiniCssExtractPlugin({
+      filename: 'theme.css'
+    }),
     new webpack.DefinePlugin({
       PLUGINDEV : process.env.PLUGINDEV
         ? JSON.stringify(process.env.PLUGINDEV)
@@ -67,5 +81,10 @@ module.exports = {
       BACKEND_URL: JSON.stringify(process.env.BACKEND_URL || 'http://localhost:3000/')
     })
     // ...ignoreArr.map(dirname => new webpack.IgnorePlugin(/\.\/plugin_examples/))
-  ]
+  ],
+  resolve: {
+    extensions: [
+      '.scss'
+    ]
+  }
 }

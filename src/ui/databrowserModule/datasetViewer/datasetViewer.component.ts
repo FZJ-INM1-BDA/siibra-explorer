@@ -9,6 +9,7 @@ import { DataEntry } from "src/services/stateStore.service";
 
 export class DatasetViewerComponent{
   @Input() dataset : DataEntry
+  @Input() isFaved: boolean
   
   @Output() showPreviewDataset: EventEmitter<{datasetName:string, event:MouseEvent}> = new EventEmitter()
   @ViewChild('kgrRef', {read:ElementRef}) kgrRef: ElementRef
@@ -38,5 +39,22 @@ export class DatasetViewerComponent{
 
   get kgReference(): string[] {
     return this.dataset.kgReference.map(ref => `https://doi.org/${ref}`)
+  }
+
+  /**
+   * Dummy functions, the store.dispatch is the important function
+   */
+  @Output()
+  saveToFavourite: EventEmitter<boolean> = new EventEmitter()
+
+  @Output()
+  removeFromFavourite: EventEmitter<boolean> = new EventEmitter()
+
+  saveToFav(){
+    this.saveToFavourite.emit()
+  }
+
+  removeFromFav(){
+    this.removeFromFavourite.emit()
   }
 }

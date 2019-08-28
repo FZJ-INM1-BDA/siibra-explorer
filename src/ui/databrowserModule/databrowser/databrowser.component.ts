@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild, Input } from "@angular/core";
 import { DataEntry } from "src/services/stateStore.service";
-import { Subscription, merge } from "rxjs";
+import { Subscription, merge, Observable } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 
@@ -13,6 +13,8 @@ import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 })
 
 export class DataBrowser implements OnDestroy,OnInit{
+
+  public favedDataentries$: Observable<DataEntry[]>
 
   @Input()
   public regions: any[] = []
@@ -55,7 +57,7 @@ export class DataBrowser implements OnDestroy,OnInit{
   constructor(
     private dbService: DatabrowserService
   ){
-
+    this.favedDataentries$ = this.dbService.favedDataentries$
   }
 
   ngOnInit(){
@@ -136,6 +138,14 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.dbService.manualFetchDataset$.next(null)
   }
 
+  saveToFavourite(dataset: DataEntry){
+    this.dbService.saveToFav(dataset)
+  }
+
+  removeFromFavourite(dataset: DataEntry){
+    this.dbService.removeFromFav(dataset)
+  }
+
   public showParcellationList: boolean = false
   
   public filePreviewName: string
@@ -154,10 +164,6 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   resetFilters(event?:MouseEvent){
     this.clearAll()
-  }
-
-  getBackgroundColorStyleFromRegion(region:any) {
-    return this.dbService.getBackgroundColorStyleFromRegion(region)
   }
 }
 

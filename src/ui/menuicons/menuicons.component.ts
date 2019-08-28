@@ -1,15 +1,17 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver, AfterViewInit } from "@angular/core";
+import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
-import { LayerBrowser } from "src/ui/layerbrowser/layerbrowser.component";
 import { DataBrowser } from "src/ui/databrowserModule/databrowser/databrowser.component";
 import { PluginBannerUI } from "../pluginBanner/pluginBanner.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
-import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
+import { map, shareReplay, startWith } from "rxjs/operators";
+import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
+import { ToastService } from "src/services/toastService.service";
 
 @Component({
   selector: 'menu-icons',
@@ -22,6 +24,8 @@ import { Observable } from "rxjs";
 
 export class MenuIconsBar{
 
+  public badgetPosition: string = 'above before'
+
   /**
    * databrowser
    */
@@ -30,24 +34,30 @@ export class MenuIconsBar{
   dbWidget: ComponentRef<WidgetUnit> = null
 
   /**
-   * layerBrowser
-   */
-  lbcf: ComponentFactory<LayerBrowser>
-  layerBrowser: ComponentRef<LayerBrowser> = null
-  lbWidget: ComponentRef<WidgetUnit> = null
-
-  /**
    * pluginBrowser
    */
   pbcf: ComponentFactory<PluginBannerUI>
   pluginBanner: ComponentRef<PluginBannerUI> = null
   pbWidget: ComponentRef<WidgetUnit> = null
 
-  get isMobile(){
-    return this.constantService.mobile
+  isMobile: boolean = false
+  mobileRespBtnClass: string
+
+  public darktheme$: Observable<boolean>
+
+  public themedBtnClass$: Observable<string>
+
+  public skeletonBtnClass$: Observable<string>
+
+  public toolBtnClass$: Observable<string>
+  public getKgSearchBtnCls$: Observable<[Set<WidgetUnit>, string]>
+  
+  get darktheme(){
+    return this.constantService.darktheme
   }
 
   public selectedTemplate$: Observable<any>
+  public selectedRegions$: Observable<any[]>
 
   constructor(
     private widgetServices:WidgetServices,
@@ -56,18 +66,62 @@ export class MenuIconsBar{
     public dbService: DatabrowserService,
     cfr: ComponentFactoryResolver,
     public pluginServices:PluginServices,
-    store: Store<any>
+    private store: Store<any>,
+    private toastService: ToastService
   ){
+
+    this.isMobile = this.constantService.mobile
+    this.mobileRespBtnClass = this.constantService.mobile ? 'btn-lg' : 'btn-sm'
 
     this.dbService.createDatabrowser = this.clickSearch.bind(this)
 
     this.dbcf = cfr.resolveComponentFactory(DataBrowser)
-    this.lbcf = cfr.resolveComponentFactory(LayerBrowser)
     this.pbcf = cfr.resolveComponentFactory(PluginBannerUI)
 
     this.selectedTemplate$ = store.pipe(
       select('viewerState'),
       select('templateSelected')
+    )
+
+    this.selectedRegions$ = store.pipe(
+      select('viewerState'),
+      select('regionsSelected'),
+      startWith([]),
+      shareReplay(1)
+    )
+
+    this.themedBtnClass$ = this.constantService.darktheme$.pipe(
+      map(flag => flag ? 'btn-dark' : 'btn-light' ),
+      shareReplay(1)
+    )
+
+    this.skeletonBtnClass$ = this.constantService.darktheme$.pipe(
+      map(flag => `${this.mobileRespBtnClass} ${flag ? 'text-light' : 'text-dark'}`),
+      shareReplay(1)
+    )
+
+    this.launchedPlugins$ = this.pluginServices.launchedPlugins$.pipe(
+      map(set => Array.from(set)),
+      shareReplay(1)
+    )
+
+    /**
+     * TODO remove dependency on themedBtnClass$
+     */
+    this.getPluginBtnClass$ = combineLatest(
+      this.pluginServices.launchedPlugins$,
+      this.pluginServices.minimisedPlugins$,
+      this.themedBtnClass$
+    )
+
+    this.darktheme$ = this.constantService.darktheme$
+
+    /**
+     * TODO remove dependency on themedBtnClass$
+     */
+    this.getKgSearchBtnCls$ = combineLatest(
+      this.widgetServices.minimisedWindow$,
+      this.themedBtnClass$
     )
   }
 
@@ -98,36 +152,8 @@ export class MenuIconsBar{
   }
 
   public catchError(e) {
-    
+    this.constantService.catchError(e)
   }
-
-  public clickLayer(event: MouseEvent){
-
-    if (this.lbWidget) {
-      this.lbWidget.destroy()
-      this.lbWidget = null
-      return
-    }
-    this.layerBrowser = this.lbcf.create(this.injector)
-    this.lbWidget = this.widgetServices.addNewWidget(this.layerBrowser, {
-      exitable: true,
-      persistency: true,
-      state: 'floating',
-      title: 'Layer Browser',
-      titleHTML: '<i class="fas fa-layer-group"></i> Layer Browser'
-    })
-
-    this.lbWidget.onDestroy(() => {
-      this.layerBrowser = null
-      this.lbWidget = null
-    })
-
-    const el = event.currentTarget as HTMLElement
-    const top = el.offsetTop
-    const left = el.offsetLeft + 50
-    this.lbWidget.instance.position = [left, top]
-  }
-
   public clickPlugins(event: MouseEvent){
     if(this.pbWidget) {
       this.pbWidget.destroy()
@@ -154,19 +180,32 @@ export class MenuIconsBar{
     this.pbWidget.instance.position = [left, top]
   }
 
-  get databrowserIsShowing() {
-    return this.dataBrowser !== null
+  public clickPluginIcon(manifest: PluginManifest){
+    this.pluginServices.launchPlugin(manifest)
+      .catch(this.constantService.catchError)
   }
 
-  get layerbrowserIsShowing() {
-    return this.layerBrowser !== null
+  public searchIconClickHandler(wu: WidgetUnit){
+    if (this.widgetServices.isMinimised(wu)) {
+      this.widgetServices.unminimise(wu)
+    } else {
+      this.widgetServices.minimise(wu)
+    }
   }
 
-  get pluginbrowserIsShowing() {
-    return this.pluginBanner !== null
+  public closeWidget(event: MouseEvent, wu:WidgetUnit){
+    event.stopPropagation()
+    this.widgetServices.exitWidget(wu)
   }
 
-  get dataBrowserTitle() {
-    return `Browse`
+  public renameKgSearchWidget(event:MouseEvent, wu: WidgetUnit) {
+    event.stopPropagation()
   }
+
+  public favKgSearch(event: MouseEvent, wu: WidgetUnit) {
+    event.stopPropagation()
+  }
+
+  public getPluginBtnClass$: Observable<[Set<string>, Set<string>, string]>
+  public launchedPlugins$: Observable<string[]>
 }

@@ -136,7 +136,7 @@ datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) =>
   stream.pipe(res)
 })
 
-datasetsRouter.get('/downloadKgFiles', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
+datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
   const { kgId } = req.query
   const { user } = req
   try {
