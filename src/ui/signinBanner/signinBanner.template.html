@@ -42,3 +42,13 @@
     </button>
   </div>
 </div>
+
+<ng-template #settingTemplate>	
+  <h2 mat-dialog-title>Settings</h2>	
+  <mat-dialog-content>	
+    <!-- required to avoid showing an ugly vertical scroll bar -->	
+    <!-- TODO investigate why, then remove the friller class -->	
+    <config-component class="mb-4 d-block">	
+    </config-component>	
+  </mat-dialog-content>	
+</ng-template> 
