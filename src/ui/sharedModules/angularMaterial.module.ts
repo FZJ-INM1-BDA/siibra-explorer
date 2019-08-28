@@ -15,7 +15,8 @@ import {
   MatBottomSheetModule,
   MatListModule,
   MatSlideToggleModule,
-  MatRippleModule
+  MatRippleModule,
+  MatSliderModule
   
 } from '@angular/material';
 import { NgModule } from '@angular/core';
@@ -42,7 +43,8 @@ import { NgModule } from '@angular/core';
     MatBottomSheetModule,
     MatListModule,
     MatSlideToggleModule,
-    MatRippleModule
+    MatRippleModule,
+    MatSliderModule
   ],
   exports: [
     MatButtonModule,
@@ -61,7 +63,8 @@ import { NgModule } from '@angular/core';
     MatBottomSheetModule,
     MatListModule,
     MatSlideToggleModule,
-    MatRippleModule
+    MatRippleModule,
+    MatSliderModule
   ],
 })
 export class AngularMaterialModule { }
