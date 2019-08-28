@@ -41,7 +41,62 @@ panel-component[widgetUnitPanel]
   cursor : move;
 }
 
-[emptyspan]
+:host > panel-component
 {
-  opacity:0.01;
+  max-width: 100%;
+  width: 300px;
+  border-width: 1px !important;
+  border: solid;
+  border-color: rgba(0, 0, 0, 0);
+  box-sizing: border-box;
+}
+
+@keyframes blinkDark
+{
+  0% {
+    border-color: rgba(128, 128, 200, 0.0);
+  }
+
+  100% {
+    border-color: rgba(128, 128, 200, 1.0);
+  }
+}
+
+@keyframes blink
+{
+  0% {
+    border-color: rgba(128, 128, 255, 0.0);
+  }
+
+  100% {
+    border-color: rgba(128, 128, 255, 1.0);
+  }
+}
+
+:host-context([darktheme="true"]) .blinkOn
+{
+  animation: 0.5s blinkDark ease-in-out 9 alternate; 
+  border: 1px solid rgba(128, 128, 200, 1.0) !important;
+}
+
+:host-context([darktheme="false"]) .blinkOn
+{
+  animation: 0.5s blink ease-in-out 9 alternate; 
+  border: 1px solid rgba(128, 128, 255, 1.0) !important;
+}
+
+[heading]
+{
+  position:relative;
+}
+
+[heading] > [progressBar]
+{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  opacity: 0.4;
+  pointer-events: none;
 }

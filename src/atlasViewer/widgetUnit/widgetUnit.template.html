@@ -1,17 +1,13 @@
 <panel-component
-  [style.transform] = "transform"
-  [containerClass] = "containerClass"
   widgetUnitPanel
+  [ngClass]="{'blinkOn': blinkOn}"
   [bodyCollapsable] = "state === 'docked'"
   [cdkDragDisabled]="state === 'docked'"
-  cdkDrag
-  [ngStyle]="{'max-width': isMobile? '100%' : '300px',
-              'margin-bottom': isMobile? '5px': '0'}">
+  cdkDrag>
   <div 
     widgetUnitHeading
     heading
     cdkDragHandle>
-    <div #emptyspan emptyspan>.</div>
     <div title>
       <div *ngIf="!titleHTML">
         {{ title }}
@@ -41,6 +37,9 @@
         class = "fas fa-times" 
         [hoverable] ="{translateY: -1}"></i>
     </div>
+    <progress-bar [progress]="progressIndicator" *ngIf="showProgress" progressBar>
+
+    </progress-bar>
   </div>
   <div widgetUnitBody body>
     <ng-template #container>

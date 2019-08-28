@@ -172,3 +172,8 @@ div#scratch-pad
   pointer-events: none;
 }
 
+.load-fav-dataentries-fab
+{
+  right: 0;
+  bottom: 0;
+}

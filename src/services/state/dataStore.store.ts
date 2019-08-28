@@ -1,6 +1,22 @@
 import { Action } from '@ngrx/store'
 
-export function dataStore(state:any,action:DatasetAction){
+/**
+ * TODO merge with databrowser.usereffect.ts
+ */
+
+interface DataEntryState{
+  fetchedDataEntries: DataEntry[]
+  favDataEntries: DataEntry[]
+  fetchedSpatialData: DataEntry[]
+}
+
+const defaultState = {
+  fetchedDataEntries: [],
+  favDataEntries: [],
+  fetchedSpatialData: []
+}
+
+export function dataStore(state:DataEntryState = defaultState, action:Partial<DatasetAction>){
   switch (action.type){
     case FETCHED_DATAENTRIES: {
       return {
@@ -14,12 +30,19 @@ export function dataStore(state:any,action:DatasetAction){
         fetchedSpatialData : action.fetchedDataEntries
       }
     }
-    default:
-      return state
+    case ACTION_TYPES.UPDATE_FAV_DATASETS: {
+      const { favDataEntries = [] } = action
+      return {
+        ...state,
+        favDataEntries
+      }
+    }
+    default: return state
   }
 }
 
 export interface DatasetAction extends Action{
+  favDataEntries: DataEntry[]
   fetchedDataEntries : DataEntry[]
   fetchedSpatialData : DataEntry[]
 }
@@ -57,6 +80,9 @@ export interface DataEntry{
    * TODO typo, should be kgReferences
    */
   kgReference: string[]
+
+  id: string
+  fullId: string
 }
 
 export interface ParcellationRegion {
@@ -134,3 +160,11 @@ export interface ViewerPreviewFile{
 export interface FileSupplementData{
   data: any
 }
+
+const ACTION_TYPES = {
+  FAV_DATASET: `FAV_DATASET`,
+  UPDATE_FAV_DATASETS: `UPDATE_FAV_DATASETS`,
+  UNFAV_DATASET: 'UNFAV_DATASET'
+}
+
+export const DATASETS_ACTIONS_TYPES = ACTION_TYPES

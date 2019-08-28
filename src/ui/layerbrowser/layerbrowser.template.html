@@ -1,71 +1,59 @@
-<ng-container *ngIf="ngLayers$ | async | filterNgLayer : (loadedNgLayers$ | async) as filteredNgLayers; else noLayerPlaceHolder">
-  <ng-container *ngIf="filteredNgLayers.length > 0; else noLayerPlaceHolder">
-    <div
-      class="layerContainer overflow-hidden"
-      *ngFor = "let ngLayer of filteredNgLayers">
-    
+<ng-container *ngIf="nonBaseNgLayers$ | async as nonBaseNgLayers; else noLayerPlaceHolder">
+  <mat-list *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
+    <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers">
+
       <!-- toggle visibility -->
-      <div class="btnWrapper">
-        <div
-          container = "body"
-          placement = "bottom"
-          [tooltip] = "checkLocked(ngLayer) ? 'base layer cannot be hidden' : 'toggle visibility'"
-          (click) = "checkLocked(ngLayer) ? null : toggleVisibility(ngLayer)"
-          class="btn btn-sm btn-outline-secondary rounded-circle">
-          <i [ngClass] = "checkLocked(ngLayer) ? 'fas fa-lock muted' :ngLayer.visible ? 'far fa-eye' : 'far fa-eye-slash'">
-          </i>
-        </div>
-      </div>
+      
+      <button
+        [matTooltipPosition]="matTooltipPosition"
+        [matTooltip]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'base layer cannot be hidden' : 'toggle visibility'"
+        (click)="toggleVisibility(ngLayer)"
+        mat-icon-button
+        [disabled]="ngLayer | lockedLayerBtnClsPipe : lockedLayers"
+        [color]="ngLayer.visible ? 'primary' : null">
+        <i [ngClass]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'fas fa-lock muted' : ngLayer.visible ? 'far fa-eye' : 'far fa-eye-slash'">
+        </i>
+      </button>
 
       <!-- advanced mode only: toggle force show segmentation -->
-      <div class="btnWrapper">
-        <div
-          *ngIf="advancedMode"
-          container="body"
-          placement="bottom"
-          [tooltip]="ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
-          #forceSegment="bs-tooltip"
-          (click)="forceSegment.hide();toggleForceShowSegment(ngLayer)"
-          class="btn btn-sm btn-outline-secondary rounded-circle">
-          <i 
-            class="fas" 
-            [ngClass]="ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
-      
-          </i>
-        </div>
-      </div>
+      <button
+        *ngIf="advancedMode"
+        [matTooltipPosition]="matTooltipPosition"
+        [matTooltip]="ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
+        (click)="toggleForceShowSegment(ngLayer)"
+        mat-icon-button>
+        <i 
+          class="fas" 
+          [ngClass]="ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
+    
+        </i>
+      </button>
 
       <!-- remove layer -->
-      <div class="btnWrapper">
-        <div
-          container="body"
-          placement="bottom"
-          [tooltip]="checkLocked(ngLayer) ? 'base layers cannot be removed' : 'remove layer'"
-          (click)="removeLayer(ngLayer)"
-          class="btn btn-sm btn-outline-secondary rounded-circle">
-          <i [ngClass]="checkLocked(ngLayer) ? 'fas fa-lock muted' : 'far fa-times-circle'">
-          </i>
-        </div>
-      </div>
+      <button
+        color="warn"
+        mat-icon-button
+        (click)="removeLayer(ngLayer)"
+        [disabled]="ngLayer | lockedLayerBtnClsPipe : lockedLayers"
+        [matTooltip]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'base layers cannot be removed' : 'remove layer'">
+        <i [class]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'fas fa-lock muted' : 'fas fa-trash'">
+        </i>
+      </button>
 
       <!-- layer description -->
-      <panel-component [ngClass]="{'muted-text muted' : !classVisible(ngLayer)}">
-    
-        <div heading>
-          {{ ngLayer.name | getLayerNameFromDatasets : (fetchedDataEntries$ | async) }}
-        </div>
-    
-        <div bodyy>
-          {{ ngLayer.source }}
-        </div>
-      </panel-component>
-    </div>
-  </ng-container>
+      <div
+        [matTooltipPosition]="matTooltipPosition"
+        [matTooltip]="ngLayer.name | getFilenamePipe "
+        [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate'">
+        {{ ngLayer.name | getFilenamePipe | getFileExtension }}
+      </div>
+    </mat-list-item>
+  </mat-list>
 </ng-container>
 
 <!-- fall back when no layers are showing -->
 <ng-template #noLayerPlaceHolder>
-  <h5 class="noLayerPlaceHolder text-muted">
+  <small *ngIf="showPlaceholder" class="noLayerPlaceHolder text-muted">
     No additional layers added.
-  </h5>
+  </small>
 </ng-template>

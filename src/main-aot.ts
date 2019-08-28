@@ -4,6 +4,9 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 import { enableProdMode } from '@angular/core';
 
+import './theme.scss'
+import './res/css/extra_styles.css'
+
 const requireAll = (r:any) => {r.keys().forEach(r)}
 requireAll(require.context('./res/ext', false, /\.json$/))
 requireAll(require.context('./res/images', true, /\.jpg|\.png/))
