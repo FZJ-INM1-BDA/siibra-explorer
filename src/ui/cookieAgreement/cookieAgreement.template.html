@@ -11,11 +11,17 @@
   <p>To opt-out of being tracked by Google Analytics across all websites, visit
     <a href="http://tools.google.com/dlpage/gaoptout">http://tools.google.com/dlpage/gaoptout</a> .</p>
 
-  <button
-    class="btn btn-outline-info btn-block mb-2"
-    (click)="showMore = !showMore">
-    Show {{showMore? "less" : "more"}}
-  </button>
+  <div class="d-flex">
+
+    <button
+      mat-stroked-button
+      color="primary"
+      class="d-flex justify-content-center flex-grow-1"
+      (click)="showMore = !showMore">
+      Show {{showMore? "less" : "more"}}
+    </button>
+  
+  </div>
 
   <div *ngIf="showMore">
     <small>

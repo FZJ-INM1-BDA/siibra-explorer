@@ -25,6 +25,15 @@ const noCacheMiddleWare = (_req, res, next) => {
   next()
 }
 
+const getVary = (headers) => (_req, res, next) => {
+  if (!headers instanceof Array) {
+    console.warn(`getVary arguments needs to be an Array of string`)
+    return next()
+  }
+  res.setHeader('Vary', headers.join(', '))
+  next()
+}
+
 datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter'))
 
 datasetsRouter.get('/templateName/:templateName', noCacheMiddleWare, (req, res, next) => {
@@ -59,7 +68,10 @@ datasetsRouter.get('/parcellationName/:parcellationName', noCacheMiddleWare, (re
     })
 })
 
-datasetsRouter.get('/preview/:datasetName', cacheMaxAge24Hr, (req, res, next) => {
+/**
+ * It appears that query param are not 
+ */
+datasetsRouter.get('/preview/:datasetName', getVary(['referer']), cacheMaxAge24Hr, (req, res, next) => {
   const { datasetName } = req.params
   const ref = url.parse(req.headers.referer)
   const { templateSelected, parcellationSelected } = qs.parse(ref.query)
@@ -94,7 +106,7 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
 const RECEPTOR_PATH = path.join(PUBLIC_PATH, 'res', 'image')
 fs.readdir(RECEPTOR_PATH, (err, files) => {
   if (err) {
-    console.log('reading receptor error', err)
+    console.warn('reading receptor error', err)
     return
   }
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
@@ -124,7 +136,7 @@ datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) =>
   stream.pipe(res)
 })
 
-datasetsRouter.get('/downloadKgFiles', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
+datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
   const { kgId } = req.query
   const { user } = req
   try {
@@ -132,7 +144,7 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, cacheMaxAge24Hr, async (req
     res.setHeader('Content-Type', 'application/zip')
     stream.pipe(res)
   } catch (e) {
-    console.log('datasets/index#downloadKgFiles', e)
+    console.warn('datasets/index#downloadKgFiles', e)
     res.status(400).send(e)
   }
 })

@@ -1,5 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterContentChecked, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, SimpleChanges, HostBinding, ApplicationRef } from "@angular/core";
-import { panelAnimations } from "./panel.animation";
+import { Component, Input, ViewChild, ElementRef, ChangeDetectionStrategy } from "@angular/core";
 import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 @Component({

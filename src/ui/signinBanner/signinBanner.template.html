@@ -4,38 +4,28 @@
 
   <!-- help btn -->
   <div class="btnWrapper">
-    <div
-      *ngIf="!isMobile"
+    <button
+      matTooltip="About"
+      matTooltipPosition="below"
       (click)="showHelp()" 
-      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-      <i class="fas fa-question-circle"></i>
-    </div>
+      mat-icon-button
+      color="basic">
+      <i class="fas fa-question"></i>
+    </button>
   </div>
 
   <!-- signin -->
-
   <div class="btnWrapper">
-
-    <div 
-      *ngIf="!isMobile"
+    <button
+      [matTooltip]="user && user.name ? ('Logged in as ' + (user && user.name)) : 'Not logged in'"
+      matTooltipPosition="below"
       (click)="showSignin()"
-      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-      <i
-        [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-        class="fas"></i>
-    </div>
-  </div>
-
-  <div *ngIf="isMobile" class="login-button-panel-mobile">
-    <div
-      (click)="showSignin()"
-      class="login-button-mobile">
-      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
-    </div>
-
-    <div (click)="showHelp()" class="login-button-mobile">
-      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Help</button>
-    </div>
-
+      mat-icon-button
+      color="primary">
+      <i *ngIf="!user; else userInitialTempl" class="fas fa-user"></i>
+      <ng-template #userInitialTempl>
+        {{ (user && user.name || 'Unnamed User').slice(0,1) }}
+      </ng-template>
+    </button>
   </div>
 </div>

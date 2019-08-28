@@ -179,7 +179,6 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    * Observable for showing help modal
    */
   public showHelpSubject$: Subject<null> = new Subject()
-  public showHelpTitle: String = 'About'
 
   private showHelpGeneralMobile = [
     ['hold 🌏 + ↕', 'change oblique slice mode'],
@@ -330,8 +329,7 @@ const negString = '~'
 
 const encodeInt = (number: number) => {
   if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
-  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY)
-    throw 'The input is not valid'
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) throw 'The input is not valid'
 
   let rixit // like 'digit', only in some non-decimal radix 
   let residual
@@ -388,7 +386,9 @@ const decodetoInt = (encodedString: string) => {
     _encodedString = encodedString
   }
   return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc,curr) => {
-    return acc * 64 + cipher.indexOf(curr)
+    const index = cipher.indexOf(curr)
+    if (index < 0) throw new Error(`Poisoned b64 encoding ${encodedString}`)
+    return acc * 64 + index
   }, 0)
 }
 

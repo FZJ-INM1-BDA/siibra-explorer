@@ -3,8 +3,6 @@ import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, distinctUntilChanged, filter } from "rxjs/operators";
-import { BsModalService } from "ngx-bootstrap/modal";
-import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { PluginManifest } from "./atlasViewer.pluginService.service";
@@ -20,8 +18,6 @@ export class AtlasViewerAPIServices{
 
   private loadedTemplates$ : Observable<any>
   private selectParcellation$ : Observable<any>
-  private selectTemplate$ : Observable<any>
-  private darktheme : boolean
   public interactiveViewer : InteractiveViewerInterface
 
   public loadedLibraries : Map<string,{counter:number,src:HTMLElement|null}> = new Map()
@@ -29,20 +25,13 @@ export class AtlasViewerAPIServices{
   constructor(
     private store : Store<ViewerStateInterface>,
     private modalService: BsModalService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
   ){
 
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
       safeFilter('fetchedTemplates'),
       map(state=>state.fetchedTemplates)
-    )
-
-    this.selectTemplate$ = this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      map(state => state.templateSelected),
-      distinctUntilChanged((t1, t2) => t1.name === t2.name)
     )
 
     this.selectParcellation$ = this.store.pipe(
@@ -85,18 +74,22 @@ export class AtlasViewerAPIServices{
           const handler = new ModalHandler()
           let modalRef
           handler.show = () => {
-            modalRef = this.modalService.show(ModalUnit, {
-              initialState : {
-                title : handler.title,
-                body : handler.body
-                  ? handler.body
-                  : 'handler.body has yet been defined ...',
-                footer : handler.footer
-              },
-              class : this.darktheme ? 'darktheme' : 'not-darktheme',
-              backdrop : handler.dismissable ? true : 'static',
-              keyboard : handler.dismissable
-            })
+            /**
+             * TODO enable
+             * temporarily disabled
+             */
+            // modalRef = this.modalService.show(ModalUnit, {
+            //   initialState : {
+            //     title : handler.title,
+            //     body : handler.body
+            //       ? handler.body
+            //       : 'handler.body has yet been defined ...',
+            //     footer : handler.footer
+            //   },
+            //   class : this.darktheme ? 'darktheme' : 'not-darktheme',
+            //   backdrop : handler.dismissable ? true : 'static',
+            //   keyboard : handler.dismissable
+            // })
           }
           handler.hide = () => {
             if(modalRef){
@@ -142,7 +135,6 @@ export class AtlasViewerAPIServices{
   private init(){
     this.loadedTemplates$.subscribe(templates=>this.interactiveViewer.metadata.loadedTemplates = templates)
     this.selectParcellation$.subscribe(parcellation => this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions))
-    this.selectTemplate$.subscribe(template => this.darktheme = template.useTheme === 'dark')
   }
 }
 

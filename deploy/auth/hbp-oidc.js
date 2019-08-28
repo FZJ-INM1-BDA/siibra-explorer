@@ -17,23 +17,27 @@ const cb = (tokenset, {sub, given_name, family_name, ...rest}, done) => {
 }
 
 module.exports = async (app) => {
-  const { oidcStrategy } = await configureAuth({
-    clientId,
-    clientSecret,
-    discoveryUrl,
-    redirectUri,
-    cb,
-    scope: 'openid offline_access',
-    clientConfig: {
-      redirect_uris: [ redirectUri ],
-      response_types: [ 'code' ]
-    }
-  })
-  
-  passport.use('hbp-oidc', oidcStrategy)
-  app.get('/hbp-oidc/auth', passport.authenticate('hbp-oidc'))
-  app.get('/hbp-oidc/cb', passport.authenticate('hbp-oidc', {
-    successRedirect: '/',
-    failureRedirect: '/'
-  }))
+  try {
+    const { oidcStrategy } = await configureAuth({
+      clientId,
+      clientSecret,
+      discoveryUrl,
+      redirectUri,
+      cb,
+      scope: 'openid offline_access',
+      clientConfig: {
+        redirect_uris: [ redirectUri ],
+        response_types: [ 'code' ]
+      }
+    })
+    
+    passport.use('hbp-oidc', oidcStrategy)
+    app.get('/hbp-oidc/auth', passport.authenticate('hbp-oidc'))
+    app.get('/hbp-oidc/cb', passport.authenticate('hbp-oidc', {
+      successRedirect: '/',
+      failureRedirect: '/'
+    }))
+  } catch (e) {
+    console.error(e)
+  }
 }

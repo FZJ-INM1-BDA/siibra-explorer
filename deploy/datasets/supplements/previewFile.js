@@ -13,7 +13,7 @@ let previewMap = new Map(),
 const readFile = (filename) => new Promise((resolve) => {
   fs.readFile(path.join(__dirname, 'data', filename), 'utf-8', (err, data) => {
     if (err){
-      console.log('read file error', err)
+      console.warn('read file error', err)
       return resolve([])
     }
     resolve(JSON.parse(data))

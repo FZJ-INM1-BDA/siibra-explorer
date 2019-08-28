@@ -13,7 +13,8 @@ import {
   MatDialogModule,
   MatInputModule,
   MatBottomSheetModule,
-  MatListModule
+  MatListModule,
+  MatSlideToggleModule
 } from '@angular/material';
 import { NgModule } from '@angular/core';
 
@@ -37,7 +38,8 @@ import { NgModule } from '@angular/core';
     MatDialogModule,
     MatInputModule,
     MatBottomSheetModule,
-    MatListModule
+    MatListModule,
+    MatSlideToggleModule
   ],
   exports: [
     MatDividerModule,
@@ -54,7 +56,8 @@ import { NgModule } from '@angular/core';
     MatDialogModule,
     MatInputModule,
     MatBottomSheetModule,
-    MatListModule
+    MatListModule,
+    MatSlideToggleModule
   ],
 })
 export class AngularMaterialModule { }

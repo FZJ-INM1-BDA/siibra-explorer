@@ -21,16 +21,29 @@ export const CONFIG_CONSTANTS = {
 }
 
 export const ACTION_TYPES = {
+  SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
   CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`
 }
 
-const lsGpuLimit = localStorage.getItem('iv-gpulimit')
+export const LOCAL_STORAGE_CONST = {
+  GPU_LIMIT: 'iv-gpulimit',
+  ANIMATION: 'iv-animationFlag'
+}
+
+const lsGpuLimit = localStorage.getItem(LOCAL_STORAGE_CONST.GPU_LIMIT)
+const lsAnimationFlag = localStorage.getItem(LOCAL_STORAGE_CONST.ANIMATION)
 const gpuLimit = lsGpuLimit && !isNaN(Number(lsGpuLimit))
   ? Number(lsGpuLimit)
   : CONFIG_CONSTANTS.defaultGpuLimit
 
-export function viewerConfigState(prevState:ViewerConfiguration = {animation: CONFIG_CONSTANTS.defaultAnimation, gpuLimit}, action:ViewerConfigurationAction) {
+const animation = lsAnimationFlag && lsAnimationFlag === 'true'
+  ? true
+  : lsAnimationFlag === 'false'
+    ? false
+    : CONFIG_CONSTANTS.defaultAnimation
+
+export function viewerConfigState(prevState:ViewerConfiguration = {animation, gpuLimit}, action:ViewerConfigurationAction) {
   switch (action.type) {
     case ACTION_TYPES.UPDATE_CONFIG:
       return {

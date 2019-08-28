@@ -174,7 +174,16 @@ export class AtlasViewerURLService{
   
             for (let ngId in json) {
               const val = json[ngId]
-              const labelIndicies = val.split(separator).map(n =>decodeToNumber(n))
+              const labelIndicies = val.split(separator).map(n =>{
+                try{
+                  return decodeToNumber(n)
+                } catch (e) {
+                  /**
+                   * TODO poisonsed encoded char, send error message
+                   */
+                  return null
+                }
+              }).filter(v => !!v)
               for (let labelIndex of labelIndicies) {
                 selectRegionIds.push(`${ngId}#${labelIndex}`)
               }
@@ -212,22 +221,29 @@ export class AtlasViewerURLService{
 
       const cViewerState = searchparams.get('cNavigation')
       if (cViewerState) {
-        const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
-        const o = cO.split(separator).map(s => decodeToNumber(s, {float: true}))
-        const po = cPO.split(separator).map(s => decodeToNumber(s, {float: true}))
-        const pz = decodeToNumber(cPZ)
-        const p = cP.split(separator).map(s => decodeToNumber(s))
-        const z = decodeToNumber(cZ)
-        this.store.dispatch({
-          type : CHANGE_NAVIGATION,
-          navigation : {
-            orientation: o,
-            perspectiveOrientation: po,
-            perspectiveZoom: pz,
-            position: p,
-            zoom: z
-          }
-        })
+        try {
+          const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
+          const o = cO.split(separator).map(s => decodeToNumber(s, {float: true}))
+          const po = cPO.split(separator).map(s => decodeToNumber(s, {float: true}))
+          const pz = decodeToNumber(cPZ)
+          const p = cP.split(separator).map(s => decodeToNumber(s))
+          const z = decodeToNumber(cZ)
+          this.store.dispatch({
+            type : CHANGE_NAVIGATION,
+            navigation : {
+              orientation: o,
+              perspectiveOrientation: po,
+              perspectiveZoom: pz,
+              position: p,
+              zoom: z
+            }
+          })
+        } catch (e) {
+          /**
+           * TODO Poisoned encoded char
+           * send error message
+           */
+        }
       }
 
       const niftiLayers = searchparams.get('niftiLayers')
