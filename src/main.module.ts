@@ -42,6 +42,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
 import { MatDialogModule, MatTabsModule } from "@angular/material";
+import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 
 @NgModule({
   imports : [
@@ -62,6 +63,7 @@ import { MatDialogModule, MatTabsModule } from "@angular/material";
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
+      ViewerStateUseEffect,
       UseEffects
     ]),
     StoreModule.forRoot({
