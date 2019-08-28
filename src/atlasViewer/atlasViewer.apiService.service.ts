@@ -24,7 +24,6 @@ export class AtlasViewerAPIServices{
 
   constructor(
     private store : Store<ViewerStateInterface>,
-    private modalService: BsModalService,
     private dialogService: DialogService,
   ){
 
