@@ -149,7 +149,7 @@
 
 <!-- atlas template -->
 <ng-template #viewerBody>
-  <div class="atlas-container" helpdirective>
+  <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)" helpdirective>
 
     <ui-nehuba-container (contextmenu)="nehubaClickHandler($event)">
     </ui-nehuba-container>

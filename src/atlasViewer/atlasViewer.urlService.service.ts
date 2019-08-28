@@ -249,7 +249,7 @@ export class AtlasViewerURLService{
       const niftiLayers = searchparams.get('niftiLayers')
       if(niftiLayers){
         const layers = niftiLayers.split('__')
-        /*  */
+
         layers.forEach(layer => this.store.dispatch({
           type : ADD_NG_LAYER, 
           layer : {
@@ -346,7 +346,11 @@ export class AtlasViewerURLService{
           return _
         })
       ),
-      this.additionalNgLayers$,
+      this.additionalNgLayers$.pipe(
+        map(layers => layers
+          .map(layer => layer.name)
+          .filter(layername => !/^blob\:/.test(layername)))
+      ),
       this.pluginState$
     ).pipe(
       /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
@@ -357,7 +361,7 @@ export class AtlasViewerURLService{
             ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') 
             : null,
           niftiLayers : niftiLayers.length > 0
-            ? niftiLayers.map(layer => layer.name).join('__')
+            ? niftiLayers.join('__')
             : null
         }
       })

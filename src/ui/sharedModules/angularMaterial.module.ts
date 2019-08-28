@@ -5,6 +5,7 @@ import {
   MatCardModule,
   MatTabsModule,
   MatTooltipModule,
+  MatSnackBarModule,
   MatBadgeModule,
   MatDividerModule,
   MatSelectModule,
@@ -27,6 +28,7 @@ import { NgModule } from '@angular/core';
 @NgModule({
   imports: [
     MatButtonModule,
+    MatSnackBarModule,
     MatCheckboxModule,
     MatSidenavModule,
     MatCardModule,
@@ -47,6 +49,7 @@ import { NgModule } from '@angular/core';
   exports: [
     MatButtonModule,
     MatCheckboxModule,
+    MatSnackBarModule,
     MatSidenavModule,
     MatCardModule,
     MatTabsModule,

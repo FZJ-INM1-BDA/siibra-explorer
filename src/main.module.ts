@@ -40,6 +40,8 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { DragDropDirective } from "./util/directives/dragDrop.directive";
+import { LocalFileService } from "./services/localFile.service";
 import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
 import { DialogService } from "./services/dialogService.service";
 import { DialogComponent } from "./components/dialog/dialog.component";
@@ -101,6 +103,7 @@ import 'hammerjs'
     PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
     FixedMouseContextualContainerDirective,
+    DragDropDirective,
 
     /* pipes */
     GetNamesPipe,
@@ -124,6 +127,7 @@ import 'hammerjs'
     ToastService,
     AtlasWorkerService,
     AuthService,
+    LocalFileService,
     DialogService,
     
     /**

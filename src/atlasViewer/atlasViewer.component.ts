@@ -16,6 +16,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
+import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef } from "@angular/material";
 
 /**
@@ -81,6 +82,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   /* handlers for nglayer */
   /**
    * TODO make untangle nglayernames and its dependency on ng
+   * TODO deprecated
    */
   public ngLayerNames$ : Observable<any>
   public ngLayers : NgLayerInterface[]
@@ -105,8 +107,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private matDialog: MatDialog,
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
-    private rd: Renderer2
+    private rd: Renderer2,
+    public localFileService: LocalFileService
   ) {
+
+    /**
+     * TODO deprecated
+     */
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
@@ -278,6 +285,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       })
     )
 
+    /**
+     * TODO deprecated
+     */
     this.subscriptions.push(
       this.ngLayerNames$.pipe(
         concatMap(data => this.constantsService.loadExportNehubaPromise.then(data))
@@ -376,6 +386,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
     )
 
+    /**
+     * TODO clean up code
+     * do not do this imperatively
+     */
     this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
@@ -389,7 +403,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   /**
    * perhaps move this to constructor?
    */
-  meetsRequirements() {
+  meetsRequirements():boolean {
 
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
@@ -419,6 +433,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     return true
   }
 
+  /**
+   * TODO deprecated
+   */
   ngLayersChangeHandler(){
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
       // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
@@ -444,12 +461,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
-  panelAnimationEnd(){
-    if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer ) {
-      this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
-    }
-  }
-
   nehubaClickHandler(event:MouseEvent){
     if (!this.rClContextualMenu) return
     this.rClContextualMenu.mousePos = [
@@ -459,17 +470,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.rClContextualMenu.show()
   }
 
-  toggleSidePanel(panelName:string){
-    this.store.dispatch({
-      type : TOGGLE_SIDE_PANEL,
-      focusedSidePanel :panelName
-    })
-  }
-
   private selectedTemplate: any
   searchRegion(regions:any[]){
     this.rClContextualMenu.hide()
+
+    /**
+     * TODO move this to somewhere that makes sense, not in atlas viewer (? perhaps)
+     */
     this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
+
+    /**
+     * TODO clean up code. do not do this imperically 
+     */
     if (this.isMobile) {
       this.store.dispatch({
         type : OPEN_SIDE_PANEL
@@ -486,6 +498,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @HostBinding('attr.version')
   public _version : string = VERSION
 
+  /**
+   * TODO deprecated
+   */
   changeMenuState({open, close}:{open?:boolean, close?:boolean} = {}) {
     if (open) {
       return this.store.dispatch({
