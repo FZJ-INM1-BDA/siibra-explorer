@@ -137,8 +137,12 @@ span.regionSelected
 span.regionNotSelected,
 span.regionSelected
 {
-  cursor : default;
   user-select: none;
+}
+
+.cursor-default
+{
+  cursor: default;
 }
 
 markdown-dom pre code
@@ -282,6 +286,20 @@ markdown-dom pre code
   white-space: initial!important;
 }
 
+.w-5em
+{
+  width: 5em!important;
+}
+.w-10em
+{
+  width: 10em!important;
+}
+
+.mw-400px
+{
+  max-width: 400px!important;
+}
+
 .mw-100
 {
   max-width: 100%!important;
@@ -297,9 +315,24 @@ markdown-dom pre code
   max-width: 60%!important;
 }
 
+.mw-20em
+{
+  max-width: 20em!important;
+}
+
+.w-20em
+{
+  width: 20em!important;
+}
+
 .mh-20em
 {
   max-height: 20em;
+}
+
+.mh-10em
+{
+  max-height: 10em;
 }
 
 .pe-all
@@ -322,14 +355,31 @@ markdown-dom pre code
   pointer-events: none;
 }
 
-.h-100
+.h-5em
 {
-  height:100%;
+  height: 5em!important;
+}
+
+.h-7em
+{
+  height:7em!important;
+}
+.h-10em
+{
+  height:10em!important;
+}
+.h-15em
+{
+  height:15em!important;
+}
+.h-20em
+{
+  height:20em!important;
 }
 
 .overflow-x-hidden
 {
-  overflow-x:hidden;
+  overflow-x:hidden!important;
 }
 
 .muted
@@ -348,6 +398,30 @@ markdown-dom pre code
   border:none;
 }
 
+.w-1em
+{
+  width: 1em;
+}
+
+.bs-content-box
+{
+  box-sizing: content-box;
+}
+
+/* required to hide  */
+.cdk-global-scrollblock
+{
+  overflow-y:hidden !important;
+}
+.h-90vh
+{
+  height: 90vh!important;
+}
+
+.w-50vw
+{
+  width: 50vw!important;
+}
 /* TODO fix hack */
 /* ngx boostrap default z index for modal-container is 1050, which is higher than material tooltip 1000 */
 /* when migration away from ngx bootstrap is complete, remove these classes */

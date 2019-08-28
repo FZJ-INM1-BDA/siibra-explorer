@@ -107,4 +107,26 @@ describe('encodeNumber/decodeToNumber', () => {
 
     expect(floatNums.map(v => v.toFixed(FLOAT_PRECISION))).toEqual(decodedNumber.map(n => n.toFixed(FLOAT_PRECISION)))
   })
+
+  it('poisoned hash should throw', () => {
+    const illegialCharacters = './\\?#!@#^%&*()+={}[]\'"\n\t;:'
+    for (let char of illegialCharacters.split('')) {
+      expect(function (){
+        decodeToNumber(char)
+      }).toThrow()
+    }
+  })
+
+  it('poisoned hash can be caught', () => {
+
+    const testArray = ['abc', './\\', 'Cde']
+    const decodedNum = testArray.map(v => {
+      try {
+        return decodeToNumber(v)
+      } catch (e) {
+        return null
+      }
+    }).filter(v => !!v)
+    expect(decodedNum.length).toEqual(2)
+  })
 })

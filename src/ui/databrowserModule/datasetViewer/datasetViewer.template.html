@@ -30,6 +30,13 @@
     [hoverable]="{translateY:-3}">
     <i class="fas fa-eye"></i>
   </div>
+
+  <div
+    (click)="isFaved ? removeFromFav() : saveToFav()"
+    [class]="(isFaved ? 'text-primary' : 'text-muted') + ' ds-container ml-1 p-2 preview-container d-flex align-items-center'"
+    [hoverable]="{translateY:-3}">
+    <i class="fas fa-star"></i>
+  </div>
 </div>
 
 <ng-template #defaultDisplay>

@@ -51,7 +51,7 @@ if (process.env.FLUENT_HOST) {
   console.warn = function () {
     emitWarn([...arguments])
   }
-  console.emitError = function () {
+  console.error = function () {
     emitError([...arguments])
   }
 }

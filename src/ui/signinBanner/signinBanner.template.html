@@ -2,96 +2,53 @@
   class="d-flex"  
   [ngClass]="{ 'flex-column w-100 align-items-stretch' : isMobile}" >
 
-  <dropdown-component
-    (itemSelected)="changeTemplate($event)"
-    [checkSelected]="compareParcellation"
-    [activeDisplay]="displayActiveTemplate"
-    [selectedItem]="selectedTemplate$ | async"
-    [inputArray]="loadedTemplates$ | async | filterNull | appendTooltipTextPipe"
-    [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-    (extraBtnClicked)="handleExtraBtnClicked($event, 'template')"
-    [activeDisplayBtns]="(selectedTemplate$ | async | templateParcellationsDecorationPipe)?.extraButtons"
-    (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'template')"
-    (listItemButtonClicked)="handleExtraBtnClicked($event, 'template')">
-  </dropdown-component>
-
-  <ng-container *ngIf="selectedTemplate$ | async as selectedTemplate">
-    <dropdown-component
-      *ngIf="selectedParcellation$ | async as selectedParcellation"
-      (itemSelected)="changeParcellation($event)"
-      [checkSelected]="compareParcellation"
-      [activeDisplay]="displayActiveParcellation"
-      [selectedItem]="selectedParcellation"
-      [inputArray]="selectedTemplate.parcellations | appendTooltipTextPipe"
-      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass"
-      (extraBtnClicked)="handleExtraBtnClicked($event, 'parcellation')"
-      [activeDisplayBtns]="(selectedParcellation | templateParcellationsDecorationPipe)?.extraButtons"
-      (activeDisplayBtnClicked)="handleActiveDisplayBtnClicked($event, 'parcellation')"
-      (listItemButtonClicked)="handleExtraBtnClicked($event, 'parcellation')">
-
-    </dropdown-component>
-    <region-hierarchy
-      [selectedRegions]="selectedRegions$ | async | filterNull"
-      (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
-      (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
-      (clearAllRegions)="clearAllRegions()"
-      [isMobile] = "isMobile"
-      *ngIf="selectedParcellation$ | async as selectedParcellation"
-      class="h-0"
-      [selectedParcellation]="selectedParcellation"
-      [ngClass]="isMobile ? flexItemIsMobileClass : flexItemIsDesktopClass">
-
-    </region-hierarchy>
-  </ng-container>
-
   <!-- help btn -->
   <div class="btnWrapper">
-    <div
-      *ngIf="!isMobile"
+    <button
+      matTooltip="About"
+      matTooltipPosition="below"
       (click)="showHelp()" 
-      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-      <i class="fas fa-question-circle"></i>
-    </div>
+      mat-icon-button
+      color="basic">
+      <i class="fas fa-question"></i>
+    </button>
+  </div>
+
+  <!-- setting btn -->
+  <div class="btnWrapper">
+    <button
+      #settingBtn
+      matTooltip="Settings"
+      matTooltipPosition="below"
+      (click)="showSetting(settingTemplate)" 
+      mat-icon-button
+      color="basic">
+      <i class="fas fa-cog"></i>
+    </button>
   </div>
 
   <!-- signin -->
-
   <div class="btnWrapper">
-
-    <div 
-      *ngIf="!isMobile"
+    <button
+      [matTooltip]="user && user.name ? ('Logged in as ' + (user && user.name)) : 'Not logged in'"
+      matTooltipPosition="below"
       (click)="showSignin()"
-      class="btn btn-outline-secondary btn-sm rounded-circle login-icon">
-      <i
-        [ngClass]="user ? 'fa-user' : 'fa-sign-in-alt'"
-        class="fas"></i>
-    </div>
-  </div>
-
-  <div *ngIf="isMobile" class="login-button-panel-mobile">
-    <div
-      (click)="showSignin()"
-      class="login-button-mobile">
-      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Log In</button>
-    </div>
-
-    <div (click)="showHelp()" class="login-button-mobile">
-      <button mat-button [ngStyle]="{'color': darktheme? '#D7D7D7' : 'black'}">Help</button>
-    </div>
-
+      mat-icon-button
+      color="primary">
+      <i *ngIf="!user; else userInitialTempl" class="fas fa-user"></i>
+      <ng-template #userInitialTempl>
+        {{ (user && user.name || 'Unnamed User').slice(0,1) }}
+      </ng-template>
+    </button>
   </div>
 </div>
 
-<!-- TODO somehow, using async pipe here does not work -->
-<!-- maybe have something to do with bufferTime, and that it replays from the beginning?  -->
-<ng-template #publicationTemplate>
-  <single-dataset-view
-    *ngFor="let focusedDataset of focusedDatasets"
-    [name]="focusedDataset.name"
-    [description]="focusedDataset.description"
-    [publications]="focusedDataset.publications"
-    [kgSchema]="focusedDataset.kgSchema"
-    [kgId]="focusedDataset.kgId">
-    
-  </single-dataset-view>
-</ng-template>
+<ng-template #settingTemplate>	
+  <h2 mat-dialog-title>Settings</h2>	
+  <mat-dialog-content>	
+    <!-- required to avoid showing an ugly vertical scroll bar -->	
+    <!-- TODO investigate why, then remove the friller class -->	
+    <config-component class="mb-4 d-block">	
+    </config-component>	
+  </mat-dialog-content>	
+</ng-template> 
