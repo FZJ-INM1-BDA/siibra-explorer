@@ -1,14 +1,14 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
+import { PluginInitManifestInterface, PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { HttpClient } from '@angular/common/http'
-import { PluginInitManifestInterface, ACTION_TYPES } from "src/services/state/pluginState.store";
 import { isDefined } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import '../res/css/plugin_styles.css'
-import { interval, BehaviorSubject, Observable, merge, of } from "rxjs";
-import { take, takeUntil, map, shareReplay } from "rxjs/operators";
+import { BehaviorSubject, Observable, merge, of } from "rxjs";
+import { map, shareReplay } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
@@ -93,7 +93,7 @@ export class PluginServices{
       this.widgetService.minimisedWindow$
     ).pipe(
       map(set => {
-        const returnSet = new Set()
+        const returnSet = new Set<string>()
         for (let [pluginName, wu] of this.mapPluginNameToWidgetUnit) {
           if (set.has(wu)) {
             returnSet.add(pluginName)
@@ -217,7 +217,7 @@ export class PluginServices{
           : null
 
         handler.setInitManifestUrl = (url) => this.store.dispatch({
-          type : ACTION_TYPES.SET_INIT_PLUGIN,
+          type : PLUGIN_STATE_ACTION_TYPES.SET_INIT_PLUGIN,
           manifest : {
             name : plugin.name,
             initManifestUrl : url

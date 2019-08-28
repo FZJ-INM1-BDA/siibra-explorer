@@ -14,6 +14,19 @@
     </button>
   </div>
 
+  <!-- setting btn -->
+  <div class="btnWrapper">
+    <button
+      #settingBtn
+      matTooltip="Settings"
+      matTooltipPosition="below"
+      (click)="showSetting(settingTemplate)" 
+      mat-icon-button
+      color="basic">
+      <i class="fas fa-cog"></i>
+    </button>
+  </div>
+
   <!-- signin -->
   <div class="btnWrapper">
     <button

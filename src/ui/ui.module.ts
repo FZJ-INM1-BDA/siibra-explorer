@@ -47,8 +47,12 @@ import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
-import { MatRippleModule } from "@angular/material";
-import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe"
+import { FourPanelLayout } from "./config/layouts/fourPanel/fourPanel.component";
+import { HorizontalOneThree } from "./config/layouts/h13/h13.component";
+import { VerticalOneThree } from "./config/layouts/v13/v13.component";
+import { SinglePanel } from "./config/layouts/single/single.component";
+import { CurrentLayout } from "./config/currentLayout/currentLayout.component";
+import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
 import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
@@ -71,12 +75,6 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
-
-    /**
-     * TODO
-     * move to angular material module 
-     */
-    MatRippleModule,
 
     PopoverModule.forRoot(),
     TooltipModule.forRoot()
@@ -103,6 +101,11 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     StatusCardComponent,
     CookieAgreement,
     KGToS,
+    FourPanelLayout,
+    HorizontalOneThree,
+    VerticalOneThree,
+    SinglePanel,
+    CurrentLayout,
     ViewerStateController,
     RegionTextSearchAutocomplete,
 
@@ -119,6 +122,7 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     FilterNameBySearch,
     TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
+    MobileControlNubStylePipe,
     GetTemplateImageSrcPipe,
     ImgSrcSetPipe,
     PluginBtnFabColorPipe,

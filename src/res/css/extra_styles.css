@@ -286,6 +286,15 @@ markdown-dom pre code
   white-space: initial!important;
 }
 
+.w-5em
+{
+  width: 5em!important;
+}
+.w-10em
+{
+  width: 10em!important;
+}
+
 .mw-400px
 {
   max-width: 400px!important;
@@ -346,9 +355,26 @@ markdown-dom pre code
   pointer-events: none;
 }
 
-.h-100
+.h-5em
 {
-  height:100%;
+  height: 5em!important;
+}
+
+.h-7em
+{
+  height:7em!important;
+}
+.h-10em
+{
+  height:10em!important;
+}
+.h-15em
+{
+  height:15em!important;
+}
+.h-20em
+{
+  height:20em!important;
 }
 
 .overflow-x-hidden

@@ -1,9 +1,8 @@
-import {Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input, ViewChild, TemplateRef } from "@angular/core";
+import {Component, ChangeDetectionStrategy, Input, TemplateRef } from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
-import { Store} from "@ngrx/store";
-import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, CHANGE_NAVIGATION } from "src/services/stateStore.service";
+import { MatDialog } from "@angular/material";
+
 
 @Component({
   selector: 'signin-banner',
@@ -24,15 +23,30 @@ export class SigninBanner{
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private authService: AuthService,
-    private store: Store<ViewerConfiguration>
+    private dialog: MatDialog
   ){
     this.isMobile = this.constantService.mobile
   }
 
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
   showHelp() {
     this.constantService.showHelpSubject$.next()
   }
 
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
+  showSetting(settingTemplate:TemplateRef<any>){
+    this.dialog.open(settingTemplate, {
+      autoFocus: false
+    })
+  }
+
+  /**
+   * move the templates to signin banner when pluginprettify is merged
+   */
   showSignin() {
     this.constantService.showSigninSubject$.next(this.user)
   }

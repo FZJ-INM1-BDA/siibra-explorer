@@ -47,6 +47,8 @@ import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewe
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 
+import 'hammerjs'
+
 @NgModule({
   imports : [
     FormsModule,

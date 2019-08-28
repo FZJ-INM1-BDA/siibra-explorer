@@ -3,14 +3,15 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime, startWith } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, switchMapTo, shareReplay, throttleTime, bufferTime, startWith } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
+import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
+import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
 import { MatBottomSheet, MatButton } from "@angular/material";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
@@ -89,10 +90,6 @@ const scanFn : (acc:[boolean, boolean, boolean], curr: CustomEvent) => [boolean,
 export class NehubaContainer implements OnInit, OnDestroy{
 
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
-  @ViewChild('[pos00]',{read:ElementRef}) topleft : ElementRef
-  @ViewChild('[pos01]',{read:ElementRef}) topright : ElementRef
-  @ViewChild('[pos10]',{read:ElementRef}) bottomleft : ElementRef
-  @ViewChild('[pos11]',{read:ElementRef}) bottomright : ElementRef
 
   private nehubaViewerFactory : ComponentFactory<NehubaViewerUnit>
 
@@ -145,6 +142,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
   public nanometersToOffsetPixelsFn : Function[] = []
   private viewerConfig : Partial<ViewerConfiguration> = {}
 
+  private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
+  public panelMode$: Observable<string>
+  private redrawLayout$: Observable<[string, string]>
   public favDataEntries$: Observable<DataEntry[]>
 
   constructor(
@@ -171,6 +171,25 @@ export class NehubaContainer implements OnInit, OnDestroy{
       debounceTime(200),
       tap(viewerConfig => this.viewerConfig = viewerConfig ),
       filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer))
+    )
+
+    this.redrawLayout$ = this.store.pipe(
+      select('ngViewerState'),
+      select('nehubaReady'),
+      distinctUntilChanged(),
+      filter(v => !!v),
+      switchMapTo(combineLatest(
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelMode'),
+          distinctUntilChanged()
+        ),
+        this.store.pipe(
+          select('ngViewerState'),
+          select('panelOrder'),
+          distinctUntilChanged()
+        )
+      ))
     )
 
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
@@ -340,24 +359,10 @@ export class NehubaContainer implements OnInit, OnDestroy{
     ).pipe(
       map(results => results[1] === null ? results[0] : '')
     )
-    
-    /* each time a new viewer is initialised, take the first event to get the translation function */
-    this.newViewer$.pipe(
-      // switchMap(() => fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')
-      //   .pipe(
-      //     ...takeOnePipe
-      //   )
-      // )
-
-      switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')))
-
-
-    ).subscribe((events)=>{
-      [0,1,2].forEach(idx=>this.nanometersToOffsetPixelsFn[idx] = (events[idx] as any).detail.nanometersToOffsetPixels)
-    })
 
     this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
       scan(scanFn, [null, null, null]),
+      shareReplay(1)
     )
 
     this.sliceViewLoading0$ = this.sliceViewLoadingMain$
@@ -408,13 +413,89 @@ export class NehubaContainer implements OnInit, OnDestroy{
         ? state.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
         : false)
     )
+
+    this.panelMode$ = this.store.pipe(
+      select('ngViewerState'),
+      select('panelMode'),
+      distinctUntilChanged(),
+    )
   }
 
   get isMobile(){
     return this.constantService.mobile
   }
 
+  private removeExistingPanels() {
+    const element = this.nehubaViewer.nehubaViewer.ngviewer.layout.container.componentValue.element as HTMLElement
+    while (element.childElementCount > 0) {
+      element.removeChild(element.firstElementChild)
+    }
+    return element
+  }
+
   ngOnInit(){
+
+    /* each time a new viewer is initialised, take the first event to get the translation function */
+    this.subscriptions.push(
+      this.newViewer$.pipe(
+        switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent')))
+      ).subscribe((events)=>{
+        for (const idx in [0,1,2]) {
+          const ev = events[idx] as CustomEvent
+          this.viewPanels[idx] = ev.target as HTMLElement
+          this.nanometersToOffsetPixelsFn[idx] = ev.detail.nanometersToOffsetPixels
+        }
+      })
+    )
+
+    this.subscriptions.push(
+      this.newViewer$.pipe(
+        switchMapTo(fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent').pipe(
+          take(1)
+        )),
+      ).subscribe(ev => this.viewPanels[3] = ((ev as CustomEvent).target) as HTMLElement)
+    )
+
+    this.subscriptions.push(
+      this.redrawLayout$.subscribe(([mode, panelOrder]) => {
+        const viewPanels = panelOrder.split('').map(v => Number(v)).map(idx => this.viewPanels[idx]) as [HTMLElement, HTMLElement, HTMLElement, HTMLElement]
+        /**
+         * TODO be smarter with event stream
+         */
+        if (!this.nehubaViewer) return
+
+        switch (mode) {
+          case H_ONE_THREE:{
+            const element = this.removeExistingPanels()
+            const newEl = getHorizontalOneThree(viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case V_ONE_THREE:{
+            const element = this.removeExistingPanels()
+            const newEl = getVerticalOneThree(viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case FOUR_PANEL: {
+            const element = this.removeExistingPanels()
+            const newEl = getFourPanel(viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          case SINGLE_PANEL: {
+            const element = this.removeExistingPanels()
+            const newEl = getSinglePanel(viewPanels)
+            element.appendChild(newEl)
+            break;
+          }
+          default: 
+        }
+        for (const panel of viewPanels){
+          (panel as HTMLElement).classList.add('neuroglancer-panel')
+        }
+      })
+    )
 
     this.subscriptions.push(
       this.viewerPerformanceConfig$.subscribe(config => {
@@ -1202,7 +1283,6 @@ export const takeOnePipe = [
      * 4 ???
      */
     const key = identifySrcElement(target)
-
     const _ = {}
     _[key] = event
     return Object.assign({},acc,_)
