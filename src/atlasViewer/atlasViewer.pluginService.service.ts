@@ -6,6 +6,8 @@ import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import '../res/css/plugin_styles.css'
+import { interval, BehaviorSubject, Observable, merge, of } from "rxjs";
+import { take, takeUntil, map, shareReplay } from "rxjs/operators";
 import { Store } from "@ngrx/store";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
@@ -77,6 +79,24 @@ export class PluginServices{
       .then(arr=>
         this.fetchedPluginManifests = arr)
       .catch(console.error)
+
+    this.minimisedPlugins$ = merge(
+      of(new Set()),
+      this.widgetService.minimisedWindow$
+    ).pipe(
+      map(set => {
+        const returnSet = new Set()
+        for (let [pluginName, wu] of this.mapPluginNameToWidgetUnit) {
+          if (set.has(wu)) {
+            returnSet.add(pluginName)
+          }
+        }
+        return returnSet
+      }),
+      shareReplay(1)
+    )
+
+    this.launchedPlugins$ = new BehaviorSubject(new Set())
   }
 
   launchNewWidget = (manifest) => this.launchPlugin(manifest)
@@ -106,21 +126,39 @@ export class PluginServices{
       ])
   }
 
-  public launchedPlugins: Set<string> = new Set()
+  private launchedPlugins: Set<string> = new Set()
+  public launchedPlugins$: BehaviorSubject<Set<string>>
+  pluginHasLaunched(pluginName:string) {
+    return this.launchedPlugins.has(pluginName)
+  }
+  addPluginToLaunchedSet(pluginName:string){
+    this.launchedPlugins.add(pluginName)
+    this.launchedPlugins$.next(this.launchedPlugins)
+  }
+  removePluginToLaunchedSet(pluginName:string){
+    this.launchedPlugins.delete(pluginName)
+    this.launchedPlugins$.next(this.launchedPlugins)
+  }
+
   private mapPluginNameToWidgetUnit: Map<string, WidgetUnit> = new Map()
 
-  pluginMinimised(pluginManifest:PluginManifest){
-    return this.widgetService.minimisedWindow.has( this.mapPluginNameToWidgetUnit.get(pluginManifest.name) )
+  pluginIsMinimised(pluginName:string) {
+    return this.widgetService.isMinimised( this.mapPluginNameToWidgetUnit.get(pluginName) )
   }
+
+  public minimisedPlugins$: Observable<Set<string>>
 
   public orphanPlugins: Set<PluginManifest> = new Set()
   launchPlugin(plugin:PluginManifest){
-    if(this.apiService.interactiveViewer.pluginControl[plugin.name])
-    {
-      console.warn('plugin already launched. blinking for 10s.')
-      this.apiService.interactiveViewer.pluginControl[plugin.name].blink(10)
+    if(this.apiService.interactiveViewer.pluginControl[plugin.name]){
+      // if already launched, toggle minimise/restore
+
       const wu = this.mapPluginNameToWidgetUnit.get(plugin.name)
-      this.widgetService.minimisedWindow.delete(wu)
+      if (this.widgetService.isMinimised(wu)) {
+        this.widgetService.unminimise(wu)
+      } else {
+        this.widgetService.minimise(wu)
+      }
       return Promise.reject('plugin already launched')
     }
     return this.readyPlugin(plugin)
@@ -161,7 +199,7 @@ export class PluginServices{
 
         const shutdownCB = [
           () => {
-            this.launchedPlugins.delete(plugin.name)
+            this.removePluginToLaunchedSet(plugin.name)
           }
         ]
 
@@ -189,7 +227,7 @@ export class PluginServices{
           title : plugin.displayName || plugin.name
         })
 
-        this.launchedPlugins.add(plugin.name)
+        this.addPluginToLaunchedSet(plugin.name)
         this.mapPluginNameToWidgetUnit.set(plugin.name, widgetCompRef.instance)
 
         const unsubscribeOnPluginDestroy = []

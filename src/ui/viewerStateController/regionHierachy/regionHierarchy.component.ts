@@ -1,6 +1,6 @@
 import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, AfterViewInit } from "@angular/core";
 import {  Subscription, Subject, fromEvent } from "rxjs";
-import { buffer, debounceTime } from "rxjs/operators";
+import { buffer, debounceTime, tap } from "rxjs/operators";
 import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 import { generateLabelIndexId } from "src/services/stateStore.service";
 
@@ -17,8 +17,8 @@ const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:a
     && selectedRegions.findIndex(re =>
       generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex })
     ) >= 0
-      ? `<span class="regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
-      : `<span class="regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+      ? `<span class="cursor-default regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+      : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
 }
 
 const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name, node.status], searchTerm)
@@ -38,9 +38,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   public selectedRegions: any[] = []
 
   @Input()
-  public selectedParcellation: any
-
-  @Input() isMobile: boolean;
+  public parcellationSelected: any
 
   private _showRegionTree: boolean = false
 
@@ -54,13 +52,15 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   private doubleClickRegion: EventEmitter<any> = new EventEmitter()
 
   @Output()
-  private clearAllRegions: EventEmitter<null> = new EventEmitter()
+  private clearAllRegions: EventEmitter<MouseEvent> = new EventEmitter()
 
   public searchTerm: string = ''
   private subscriptions: Subscription[] = []
 
   @ViewChild('searchTermInput', {read: ElementRef})
   private searchTermInput: ElementRef
+
+  public placeHolderText: string = `Start by selecting a template and a parcellation.`
 
   /**
    * set the height to max, bound by max-height
@@ -95,17 +95,19 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnChanges(){
-    this.aggregatedRegionTree = {
-      name: this.selectedParcellation.name,
-      children: this.selectedParcellation.regions
+    if (this.parcellationSelected) {
+      this.placeHolderText = `Search region in ${this.parcellationSelected.name}`
+      this.aggregatedRegionTree = {
+        name: this.parcellationSelected.name,
+        children: this.parcellationSelected.regions
+      }
     }
     this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
   }
 
   clearRegions(event:MouseEvent){
-    event.stopPropagation()
-    this.clearAllRegions.emit()
+    this.clearAllRegions.emit(event)
   }
 
   get showRegionTree(){
@@ -133,20 +135,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngAfterViewInit(){
-    /**
-     * TODO
-     * bandaid fix on
-     * when region search loses focus, the searchTerm is cleared,
-     * but hierarchy filter does not reset
-     */
-    this.subscriptions.push(
-      fromEvent(this.searchTermInput.nativeElement, 'focus').pipe(
-        
-      ).subscribe(() => {
-        this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
-        this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
-      })
-    )
     this.subscriptions.push(
       fromEvent(this.searchTermInput.nativeElement, 'input').pipe(
         debounceTime(200)
@@ -154,13 +142,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
         this.changeSearchTerm(ev)
       })
     )
-  }
-
-  getInputPlaceholder(parcellation:any) {
-    if (parcellation)
-      return `Search region in ${parcellation.name}`
-    else
-      return `Start by selecting a template and a parcellation.`
   }
 
   escape(event:KeyboardEvent){
@@ -182,27 +163,12 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     })
   }
 
-  focusInput(event?:MouseEvent){
-    if (event) {
-      /**
-       * need to stop propagation, or @closeRegion will be triggered
-       */
-      event.stopPropagation()
-    }
-    this.searchTermInput.nativeElement.focus()
-    this.showRegionTree = true
-  }
-
   /* NB need to bind two way data binding like this. Or else, on searchInput blur, the flat tree will be rebuilt,
     resulting in first click to be ignored */
 
   changeSearchTerm(event: any) {
-    if (event.target.value === this.searchTerm)
-      return
+    if (event.target.value === this.searchTerm) return
     this.searchTerm = event.target.value
-    /**
-     * TODO maybe introduce debounce
-     */
     this.ngOnChanges()
     this.cdr.markForCheck()
   }
@@ -214,18 +180,17 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
     /**
      * TODO figure out why @closeRegion gets triggered, but also, contains returns false
      */
-    if (event)
+    if (event) {
       event.stopPropagation()
+    }
     this.handleRegionTreeClickSubject.next(obj)
   }
 
   /* single click selects/deselects region(s) */
   private singleClick(obj: any) {
-    if (!obj)
-      return
+    if (!obj) return
     const { inputItem : region } = obj
-    if (!region)
-      return
+    if (!region) return
     this.singleClickRegion.emit(region)
   }
 

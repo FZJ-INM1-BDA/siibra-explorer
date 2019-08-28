@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>
+  {{ title }}
+</h1>
+
+<mat-dialog-content>
+  <p>
+    {{ message }}
+  </p>
+</mat-dialog-content>
+
+<mat-divider></mat-divider>
+
+<mat-dialog-actions class="justify-content-start flex-row-reverse">
+    <button [mat-dialog-close]="true" mat-raised-button color="primary">OK</button>
+  <button [mat-dialog-close]="false" mat-button>Cancel</button>
+</mat-dialog-actions>

@@ -141,6 +141,23 @@ window.interactiveViewer
     - timeout : auto hide (in ms). set to 0 for not auto hide.
 
   - *launchNewWidget(manifest)* returns a Promise. expects a JSON object, with the same key value as a plugin manifest. the *name* key must be unique, or the promise will be rejected. 
+
+  - *getUserInput(config)* returns a Promise, resolves when user confirms, rejects when user cancels. expects config object object with the following structure:
+  ```javascript
+  const config = {
+    "title": "Title of the modal", // default: "Message"
+    "message":"Message to be seen by the user.", // default: ""
+    "placeholder": "Start typing here", // default: "Type your response here"
+    "defaultValue": "42" // default: ""
+  }
+  ```
+  - *getUserConfirmation(config)* returns a Promise, resolves when user confirms, rejects when user cancels. expects config object object with the following structure:
+  ```javascript
+  const config = {
+    "title": "Title of the modal", // default: "Message"
+    "message":"Message to be seen by the user." // default: ""
+  }
+  ```
   
 - pluginControl
 

@@ -130,6 +130,9 @@ export class DatabrowserService implements OnDestroy{
       return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`)
         .then(res => res.json()))
     }),
+    /**
+     * TODO pipe to constantService.catchError
+     */
     catchError((err) => (console.log(err), of([])))
   )
 
@@ -306,12 +309,6 @@ export class DatabrowserService implements OnDestroy{
   }
 
   public getModalityFromDE = getModalityFromDE
-
-  public getBackgroundColorStyleFromRegion(region:any = null){
-    return region && region.rgb
-      ? `rgb(${region.rgb.join(',')})`
-      : `white`
-  }
 }
 
 

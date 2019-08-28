@@ -1,6 +1,9 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, OnInit } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit, OnDestroy } from "@angular/core";
+
 import { WidgetServices } from "./widgetService.service";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
+import { Subscription, Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 
 @Component({
@@ -10,7 +13,7 @@ import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.ser
   ]
 })
 
-export class WidgetUnit implements OnInit{
+export class WidgetUnit implements OnInit, OnDestroy{
   @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
 
   @HostBinding('attr.state')
@@ -23,14 +26,9 @@ export class WidgetUnit implements OnInit{
   height : string = this.state === 'docked' ? null : '0px'
 
   @HostBinding('style.display')
-  get isMinimised(){
-    return this.widgetServices.minimisedWindow.has(this) ? 'none' : null
-  }
+  isMinimised: string
 
-  @HostBinding('style.transform')
-  get transform(){
-    return `translate(${this.position.map(v => v + 'px').join(',')})`
-  }
+  isMinimised$: Observable<boolean>
 
   /**
    * Timed alternates of blinkOn property should result in attention grabbing blink behaviour
@@ -95,6 +93,7 @@ export class WidgetUnit implements OnInit{
   public guestComponentRef : ComponentRef<any>
   public widgetServices:WidgetServices
   public cf : ComponentRef<WidgetUnit>
+  private subscriptions: Subscription[] = []
 
   public id: string 
   constructor(
@@ -105,6 +104,19 @@ export class WidgetUnit implements OnInit{
 
   ngOnInit(){
     this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'
+
+    this.isMinimised$ = this.widgetServices.minimisedWindow$.pipe(
+      map(set => set.has(this))
+    )
+    this.subscriptions.push(
+      this.isMinimised$.subscribe(flag => this.isMinimised = flag ? 'none' : null)
+    )
+  }
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0){
+      this.subscriptions.pop().unsubscribe()
+    }
   }
 
   /**

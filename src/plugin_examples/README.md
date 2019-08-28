@@ -1,5 +1,5 @@
-Plugin README
-======
+# Plugin README
+
 A plugin needs to contain three files. 
 - Manifest JSON
 - template HTML
@@ -9,8 +9,9 @@ A plugin needs to contain three files.
 These files need to be served by GET requests over HTTP with appropriate CORS header. If your application requires a backend, it is strongly recommended to host these three files with your backend. 
 
 ---
-Manifest JSON
-------
+
+## Manifest JSON
+
 The manifest JSON file describes the metadata associated with the plugin. 
 
 ```json
@@ -34,8 +35,9 @@ The manifest JSON file describes the metadata associated with the plugin.
 - the `initState` object and `initStateUrl` will be available prior to the evaluation of `script.js`, and will populate the objects `interactiveViewer.pluginControl[MANIFEST.name].initState` and `interactiveViewer.pluginControl[MANIFEST.name].initStateUrl` respectively. 
 
 ---
-Template HTML
-------
+
+## Template HTML
+
 The template HTML file describes the HTML view that will be rendered in the widget.
 
 
@@ -74,14 +76,17 @@ The template HTML file describes the HTML view that will be rendered in the widg
   </div>
 </form>
 ```
+
 *NB*
 - *bootstrap 3.3.6* css is already included for templating.
 - keep in mind of the widget width restriction (400px) when crafting the template
 - whilst there are no vertical limits on the widget, contents can be rendered outside the viewport. Consider setting the *max-height* attribute.
 - your template and script will interact with each other likely via *element id*. As a result, it is highly recommended that unique id's are used. Please adhere to the convention: **AFFILIATION.AUTHOR.PACKAGENAME.ELEMENTID** 
+
 ---
-Script JS
-------
+
+## Script JS
+
 The script will always be appended **after** the rendering of the template. 
 
 ```javascript

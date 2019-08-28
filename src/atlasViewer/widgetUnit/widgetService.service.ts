@@ -1,9 +1,7 @@
 import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver, Injector } from "@angular/core";
-
 import { WidgetUnit } from "./widgetUnit.component";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
-import { Subscription } from "rxjs";
-
+import { Subscription, BehaviorSubject } from "rxjs";
 
 @Injectable({
   providedIn : 'root'
@@ -20,7 +18,8 @@ export class WidgetServices{
 
   private clickedListener : Subscription[] = []
 
-  public minimisedWindow: Set<WidgetUnit> = new Set()
+  public minimisedWindow$: BehaviorSubject<Set<WidgetUnit>>
+  private minimisedWindow: Set<WidgetUnit> = new Set() 
 
   constructor(
     private cfr:ComponentFactoryResolver,
@@ -28,6 +27,7 @@ export class WidgetServices{
     private injector : Injector
     ){
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
+    this.minimisedWindow$ = new BehaviorSubject(this.minimisedWindow)
   }
 
   clearAllWidgets(){
@@ -38,8 +38,26 @@ export class WidgetServices{
     this.clickedListener.forEach(s=>s.unsubscribe())
   }
 
+  rename(wu:WidgetUnit, {title, titleHTML}: {title: string, titleHTML: string}){
+    /**
+     * WARNING: always sanitize before pass to rename fn!
+     */
+    wu.title = title
+    wu.titleHTML = titleHTML
+  }
+
   minimise(wu:WidgetUnit){
     this.minimisedWindow.add(wu)
+    this.minimisedWindow$.next(new Set(this.minimisedWindow))
+  }
+  
+  isMinimised(wu:WidgetUnit){
+    return this.minimisedWindow.has(wu)
+  }
+
+  unminimise(wu:WidgetUnit){
+    this.minimisedWindow.delete(wu)
+    this.minimisedWindow$.next(new Set(this.minimisedWindow))
   }
 
   addNewWidget(guestComponentRef:ComponentRef<any>,options?:Partial<WidgetOptionsInterface>):ComponentRef<WidgetUnit>{
@@ -93,9 +111,12 @@ export class WidgetServices{
 
       this.clickedListener.push(
         _component.instance.clickedEmitter.subscribe((widgetUnit:WidgetUnit)=>{
+          /**
+           * TODO this operation 
+           */
           if(widgetUnit.state !== 'floating')
             return
-          const widget = [...this.widgetComponentRefs].find(widget=>widget.instance===widgetUnit)
+          const widget = [...this.widgetComponentRefs].find(widget=>widget.instance === widgetUnit)
           if(!widget)
             return
           const idx = this.floatingContainer.indexOf(widget.hostView)
@@ -103,7 +124,6 @@ export class WidgetServices{
             return
           this.floatingContainer.detach(idx)
           this.floatingContainer.insert(widget.hostView)
-          
         })
       )
 
