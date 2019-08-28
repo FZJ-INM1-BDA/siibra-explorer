@@ -5,92 +5,148 @@
 <ng-template [ngIf]="selectedTemplate$ | async">
 
   <!-- layer browser -->
-  <div
-    matTooltip="Layer"
-    matTooltipPosition="right"
-    (click)="clickLayer($event)"
-    [class]="layerBrowserBtnClass$ | async"
-    class="btn">
-    <i class="fas fa-layer-group">
-    </i>
-  </div>
+  <sleight-of-hand>
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
+        <i class="fas fa-layer-group"></i>
+      </button>
+    </div>
+    <div
+      class="d-flex flex-row align-items-center soh-row"
+      sleight-of-hand-back>
 
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
+        <i class="fas fa-layer-group"></i>
+      </button>
+
+      <div class="position-relative">
+
+        <div [ngClass]="{'invisible pe-none': (layerBrowser.nonBaseNgLayers$ | async).length === 0}" class="position-absolute">
+          <mat-card>
+            <layer-browser #layerBrowser>
+            </layer-browser>
+          </mat-card>
+        </div>
+
+        <ng-container *ngIf="(layerBrowser.nonBaseNgLayers$ | async).length === 0" #noNonBaseNgLayerTemplate>
+          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+            No additional layers added
+          </small>
+        </ng-container>
+
+        <!-- invisible button to prop up the size of parent block -->
+        <!-- otherwise, sibling block position will be wonky -->
+        <button
+          color="primary"
+          class="invisible pe-none"
+          mat-icon-button>
+          <i class="fas fa-layer-group"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </sleight-of-hand>
+  
   <!-- tools -->
   <sleight-of-hand>
 
     <!-- shown icon prior to mouse over -->
-    <div
-      [matBadgePosition]="badgetPosition"  
-      [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      sleight-of-hand-front>
-      <i class="fas fa-tools"></i>
+    <div sleight-of-hand-front>
+      <button
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-tools"></i>
+      </button>
     </div>
 
     <!-- shown after mouse over -->
     <div
-      class="d-flex flex-row soh-row"
+      class="d-flex flex-row soh-row align-items-start"
       sleight-of-hand-back>
 
       <!-- placeholder icon -->
-      <div
+      <button
         [matBadgePosition]="badgetPosition"  
+        matBadgeColor="accent"
         [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-        [class]="(skeletonBtnClass$ | async) + ' btn muted'">
+        mat-icon-button
+        color="primary">
         <i class="fas fa-tools"></i>
-      </div>
+      </button>
 
       <!-- render all fetched tools -->
-      <div class="d-flex flex-column soh-column">
-        <div
-          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-          [matTooltip]="manifest.displayName || manifest.name"
-          matTooltipPosition="right"
-          (click)="clickPluginIcon(manifest)"
-          [class]="(getPluginBtnClass$ | async | menuIconPluginBtnClsPipe : manifest.name) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
-          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-        </div>
+      <div class="d-flex flex-row soh-row">
 
         <!-- add new tool btn -->
-        <div
+        <button
           matTooltip="Add new plugin"
-          [matTooltipShowDelay]="100"
-          matTooltipPosition="right"
-          [class]="(skeletonBtnClass$ | async)">
+          matTooltipPosition="below"
+          mat-icon-button
+          color="primary">
           <i class="fas fa-plus"></i>
-        </div>
+        </button>
+        
+        <button
+          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+          mat-mini-fab
+          matTooltipPosition="below"
+          [matTooltip]="manifest.displayName || manifest.name"
+          [color]="getPluginBtnClass$ | async | pluginBtnFabColorPipe : manifest.name"
+          (click)="clickPluginIcon(manifest)">
+          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+        </button>
       </div>
     </div>
   </sleight-of-hand>
 
   <!-- search kg -->
   <sleight-of-hand>
+    
     <!-- shown icon prior to mouse over -->
-    <div
-      sleight-of-hand-front
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      [matBadgePosition]="badgetPosition"
-      [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
-      <i class="fas fa-search"></i>
+    <div sleight-of-hand-front>
+      <button
+        mat-icon-button
+        color="primary"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
+        <i class="fas fa-search"></i>
+      </button>
     </div>
 
     <!-- shown after mouse over -->
     <div
       sleight-of-hand-back
-      class="d-flex flex-row align-items-center soh-row">
+      class="d-flex flex-row align-items-center soh-row pe-none">
 
       <!-- placeholder icon -->
-      <div
-        [ngClass]="(skeletonBtnClass$ | async) + ' btn muted'"
+      <button
+        mat-icon-button
+        color="primary"
+        matBadgeColor="accent"
         [matBadgePosition]="badgetPosition"
         [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
         <i class="fas fa-search"></i>
-      </div>
+      </button>
 
       <!-- only renders if there is at least one search result -->
       <div
         *ngIf="dbService.instantiatedWidgetUnits.length > 0; else noKgSearchTemplate"
-        class="position-relative">
+        class="position-relative pe-all">
 
         <div class="position-absolute d-flex flex-column soh-column">
 
@@ -100,17 +156,24 @@
             (click)="searchIconClickHandler(wu)">
 
             <!-- shown prior to mouseover -->
-            <div
-              [class]="(getKgSearchBtnCls$ | async | menuIconKgSearchBtnClsPipe : wu) + ' position-relative sleight-of-hand btn w-1em bs-content-box ' + mobileRespBtnClass"
-              sleight-of-hand-front>
-              <i class="fas fa-search"></i>
+            <div sleight-of-hand-front>
+              <button
+                mat-mini-fab
+                [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                <i class="fas fa-search"></i>  
+              </button>
             </div>
 
             <!-- shown on mouse over -->
             <!-- showing additional information. in this case, name of the kg search -->
             <div class="d-flex flex-row align-items-center" sleight-of-hand-back>
-              <div [class]="(getKgSearchBtnCls$ | async | menuIconKgSearchBtnClsPipe : wu) + ' btn w-1em bs-content-box ' + mobileRespBtnClass">
-                <i class="fas fa-search"></i>
+
+              <div sleight-of-hand-front>
+                <button
+                  mat-mini-fab
+                  [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                  <i class="fas fa-search"></i>  
+                </button>
               </div>
               
               <!-- on hover, show full name and action possible: rename, close -->
@@ -179,7 +242,9 @@
 
         <!-- invisible icon to keep height of the otherwise unstable flex block -->
         <div class="invisible pe-none">
-          <i class="fas fa-search"></i>
+          <button mat-icon-button>
+            <i class="fas fa-search"></i>
+          </button>
         </div>
       </div>
 
@@ -194,16 +259,19 @@
   </sleight-of-hand>
 
   <!-- selected regions -->
-  <sleight-of-hand>
+  <sleight-of-hand
+    [doNotClose]="viewerStateController.focused">
 
     <!-- shown prior to mouse over -->
-    <div
-      sleight-of-hand-front
-      [class]="(skeletonBtnClass$ | async) + ' btn'"
-      [matBadgePosition]="badgetPosition"
-      matBadgeColor="warn"
-      [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null">
-      <i class="fas fa-brain"></i>
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
     </div>
 
     <!-- shown upon mouseover -->
@@ -212,84 +280,21 @@
       class="d-flex flex-row align-items-center soh-row">
 
       <!-- place holder icon -->
-      <div
-        [class]="(skeletonBtnClass$ | async) + ' btn muted'"
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
         [matBadgePosition]="badgetPosition"
-        matBadgeColor="warn"
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null">
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
         <i class="fas fa-brain"></i>
-      </div>
+      </button>
 
-      <div
-        *ngIf="(selectedRegions$ | async).length > 0; else noBrainRegionSelected"
-        class="position-relative">
+      <div class="position-relative">
 
-        <!-- rendering all the selected regions -->
-        <div [class]="((darktheme$ | async) ? 'text-light bg-dark' : 'text-dark bg-light') + ' position-absolute'">
-          <div class="m-1 position-relative">
-            <button
-              mat-raised-button
-              (click)="deselectAllRegions($event)"
-              class="virtual-scroll-row"
-              color="warn">
-              <i class="fas fa-trash"></i>
-              Deselect all {{ (selectedRegions$ | async).length }} region{{ (selectedRegions$ | async).length > 1 ? 's' : '' }}
-            </button>
-          </div>
-          <mat-divider></mat-divider>
-          <div class="virtual-scroll-viewport-container">
-            <cdk-virtual-scroll-viewport
-              class="d-flex-flex-column soh-column"
-              itemSize="26">
-              <div
-                *cdkVirtualFor="let region of (selectedRegions$ | async)"
-                class="virtual-scroll-unit">
-                <sleight-of-hand>
-                  <!-- prior to mouseover -->
-                  <div
-                    [class]="((darktheme$ | async) ? 'text-light bg-dark' : 'text-dark bg-light') + ' d-flex flex-row align-items-center virtual-scroll-row'"
-                    sleight-of-hand-front>
-                    <div class="ml-2 cursor-default text-nowrap">
-                      {{ region.name }}
-                    </div>
-      
-                    <!-- place holder icon to support height  -->
-                    <div [class]="(skeletonBtnClass$ | async) + ' invisible w-0 pe-none'">
-                      <i class="fas fa-trash"></i>
-                    </div>
-                  </div>
-      
-                  <!-- on mouse over -->
-                  <div
-                    [class]="((darktheme$ | async) ? 'text-light bg-dark' : 'text-dark bg-light') + ' d-flex flex-row align-items-center virtual-scroll-row'"
-                    sleight-of-hand-back>
-                    <div class="text-truncate selected-region-container ml-2 cursor-default text-nowrap">
-                      {{ region.name }}
-                    </div>
-                    <div
-                      *ngIf="region.position"
-                      (click)="gotoRegion($event, region)"
-                      matTooltip="Goto"
-                      matTooltipPosition="below"
-                      [class]="(skeletonBtnClass$ | async) + ' selected-region-actionbtn'">
-                      <i class="fas fa-map-marked-alt"></i>
-                    </div>
-                    <div
-                      #trashBtn="matTooltip"
-                      (mousedown)="trashBtn.hide()"
-                      (click)="deselectRegion($event, region)"
-                      matTooltip="Deselect"
-                      matTooltipPosition="below"
-                      [class]="(skeletonBtnClass$ | async) + ' selected-region-actionbtn'">
-                      <i class="fas fa-trash"></i>
-                    </div>
-                  </div>
-                </sleight-of-hand>
-              </div>
-            </cdk-virtual-scroll-viewport>
-          </div>
+        <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
+          <viewer-state-controller #viewerStateController></viewer-state-controller>
         </div>
-
+        
         <!-- invisible icon to keep height of the otherwise unstable flex block -->
         <div class="invisible pe-none">
           <i class="fas fa-brain"></i>

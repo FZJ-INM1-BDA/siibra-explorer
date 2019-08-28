@@ -1,6 +1,6 @@
 {
   "name": "interactiveviewer",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
   "scripts": {
     "dev-server-export": "webpack-dev-server --config webpack.export.js",
@@ -10,12 +10,11 @@
     "build-aot": "PRODUCTION=true GIT_HASH=`git log --pretty=format:'%h' --invert-grep --grep=^.ignore -1` webpack --config webpack.aot.js",
     "build-min": "webpack --config webpack.prod.js",
     "build": "webpack --config webpack.dev.js",
-    "dev-plugin": "PLUGINDEV=http://localhost:10080/allPluginmanifests npm run dev-server & npm run plugin-server",
     "plugin-server": "node ./src/plugin_examples/server.js",
     "dev-server": "webpack-dev-server --config webpack.dev.js --mode development",
+    "dev": "npm run dev-server & (cd deploy; node server.js)",
     "dev-server-aot": "PRODUCTION=true GIT_HASH=`git log --pretty=format:'%h' --invert-grep --grep=^.ignore -1` webpack-dev-server --config webpack.aot.js",
     "dev-server-all-interfaces": "webpack-dev-server --config webpack.dev.js --mode development --hot --host 0.0.0.0",
-    "serve-plugins": "node src/plugin_examples/server.js",
     "test": "karma start spec/karma.conf.js",
     "e2e": "protractor e2e/protractor.conf"
   },
@@ -46,6 +45,7 @@
     "chart.js": "^2.7.2",
     "codelyzer": "^5.0.1",
     "core-js": "^3.0.1",
+    "css-loader": "^3.2.0",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
     "jasmine": "^3.1.0",
@@ -58,12 +58,15 @@
     "karma-typescript": "^3.0.13",
     "karma-webpack": "^3.0.0",
     "lodash.merge": "^4.6.1",
+    "mini-css-extract-plugin": "^0.8.0",
     "ng2-charts": "^1.6.0",
     "ngx-bootstrap": "3.0.1",
+    "node-sass": "^4.12.0",
     "protractor": "^5.4.2",
     "raw-loader": "^0.5.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "6.5.1",
+    "sass-loader": "^7.2.0",
     "showdown": "^1.8.6",
     "ts-loader": "^4.3.0",
     "ts-node": "^8.1.0",
@@ -74,12 +77,12 @@
     "webpack-cli": "^3.3.2",
     "webpack-closure-compiler": "^2.1.6",
     "webpack-dev-server": "^3.1.4",
-    "webpack-merge": "^4.1.2"
-  },
-  "dependencies": {
+    "webpack-merge": "^4.1.2",
     "@angular/cdk": "^7.3.7",
     "@angular/material": "^7.3.7",
     "@angular/router": "^7.2.15",
     "zone.js": "^0.9.1"
+  },
+  "dependencies": {
   }
 }
