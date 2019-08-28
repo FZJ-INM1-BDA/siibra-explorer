@@ -66,12 +66,18 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
  */
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
-app.use(express.static(PUBLIC_PATH))
+/**
+ * only use compression for production
+ * this allows locally built aot to be served without errors
+ */
 
-app.use((req, res, next) => {
+const { compressionMiddleware } = require('./compression')
+app.use(compressionMiddleware, express.static(PUBLIC_PATH))
+
+const jsonMiddleware = (req, res, next) => {
   res.set('Content-Type', 'application/json')
   next()
-})
+}
 
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
@@ -79,11 +85,11 @@ const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
-app.use('/templates', templateRouter)
-app.use('/nehubaConfig', nehubaConfigRouter)
-app.use('/datasets', datasetRouter)
-app.use('/plugins', pluginRouter)
-app.use('/preview', previewRouter)
+app.use('/templates', jsonMiddleware, templateRouter)
+app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
+app.use('/datasets', jsonMiddleware, datasetRouter)
+app.use('/plugins', jsonMiddleware, pluginRouter)
+app.use('/preview', jsonMiddleware, previewRouter)
 
 const catchError = require('./catchError')
 app.use(catchError)
