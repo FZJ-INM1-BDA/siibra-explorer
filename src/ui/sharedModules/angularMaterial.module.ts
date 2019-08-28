@@ -5,12 +5,66 @@ import {
   MatCardModule,
   MatTabsModule,
   MatTooltipModule,
-  MatSnackBarModule
+  MatSnackBarModule,
+  MatBadgeModule,
+  MatDividerModule,
+  MatSelectModule,
+  MatChipsModule,
+  MatAutocompleteModule,
+  MatDialogModule,
+  MatInputModule,
+  MatBottomSheetModule,
+  MatListModule,
+  MatSlideToggleModule,
+  MatRippleModule
+  
 } from '@angular/material';
 import { NgModule } from '@angular/core';
 
+/**
+ * TODO should probably be in src/util
+ */
+
 @NgModule({
-  imports: [MatSnackBarModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
-  exports: [MatSnackBarModule, MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule, MatTooltipModule],
+  imports: [
+    MatButtonModule,
+    MatSnackBarModule,
+    MatCheckboxModule,
+    MatSidenavModule,
+    MatCardModule,
+    MatTabsModule,
+    MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
+    MatBottomSheetModule,
+    MatListModule,
+    MatSlideToggleModule,
+    MatRippleModule
+  ],
+  exports: [
+    MatButtonModule,
+    MatCheckboxModule,
+    MatSnackBarModule,
+    MatSidenavModule,
+    MatCardModule,
+    MatTabsModule,
+    MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
+    MatBottomSheetModule,
+    MatListModule,
+    MatSlideToggleModule,
+    MatRippleModule
+  ],
 })
 export class AngularMaterialModule { }

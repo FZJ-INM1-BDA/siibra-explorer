@@ -16,7 +16,7 @@
           <span
             *ngFor="let region of regions"
             class="badge badge-secondary mr-1 mw-100">
-            <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+            <span [ngStyle]="{backgroundColor: (region | regionBackgroundToRgbPipe)}" class="dot">
               
             </span>
             <span class="d-inline-block mw-100 overflow-hidden text-truncate">
@@ -114,15 +114,18 @@
         <dataset-viewer
           class="mt-1"
           *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
+          (saveToFavourite)="saveToFavourite(dataset)"
+          (removeFromFavourite)="removeFromFavourite(dataset)"
           (showPreviewDataset)="onShowPreviewDataset($event)"
-          [dataset]="dataset">
+          [dataset]="dataset"
+          [isFaved]="favedDataentries$ | async | datasetIsFaved : dataset">
           <div regionTagsContainer>
 
             <!-- TODO may want to separate the region badge into a separate component -->
             <span
               *ngFor="let region of dataset.parcellationRegion"
               class="badge badge-secondary mr-1 mw-100">
-              <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+              <span [ngStyle]="{backgroundColor:(region | regionBackgroundToRgbPipe)}" class="dot">
                 
               </span>
               <span class="d-inline-block mw-100 overflow-hidden text-truncate">

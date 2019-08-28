@@ -21,3 +21,18 @@
 {
   border-right-color: rgba(128, 128, 128, 0.5);
 }
+
+.soh-row > *:not(:first-child)
+{
+  margin-left: 0.1em;
+}
+
+.soh-column > *:not(:first-child)
+{
+  margin-top: 0.1em;
+}
+
+layer-browser
+{
+  max-width: 20em;
+}

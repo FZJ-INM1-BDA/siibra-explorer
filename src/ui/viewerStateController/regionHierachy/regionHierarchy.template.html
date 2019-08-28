@@ -1,0 +1,43 @@
+<mat-form-field class="w-100">
+  <input 
+    #searchTermInput
+    matInput
+    (keydown.esc)="escape($event)"
+    (focus)="showRegionTree = true"
+    [value]="searchTerm"
+    type="text" 
+    autocomplete="off"
+    [placeholder]="placeHolderText"/>
+</mat-form-field>
+  
+<div hideScrollbarContainer>
+  <div
+    class="d-flex flex-column h-100"
+    treeContainer
+    #treeContainer>
+    <div class="tree-header d-inline-flex align-items-center">
+      <div>
+        {{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected
+      </div>
+      <div
+        (click)="clearRegions($event)"
+        [ngClass]="{ 'invisible': selectedRegions.length === 0 }"
+        class="btn btn-link">
+        clear all
+      </div>
+    </div>
+    
+    <div
+      *ngIf="parcellationSelected && parcellationSelected.regions as regions"
+      class="tree-body">
+      <flat-tree-component
+        (treeNodeClick)="handleClickRegion($event)"
+        (totalRenderedListChanged)="handleTotalRenderedListChanged($event)"
+        [inputItem]="aggregatedRegionTree"
+        [renderNode]="displayTreeNode"
+        [searchFilter]="filterTreeBySearch">
+        
+      </flat-tree-component>
+    </div> 
+  </div>
+</div>

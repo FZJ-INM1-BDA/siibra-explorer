@@ -48,6 +48,12 @@ export class FlatTreeComponent implements AfterViewChecked {
   uncollapsedLevels : Set<string> = new Set()
 
   ngAfterViewChecked(){
+    /**
+     * if useDefaultList is true, virtualscrollViewPort will be undefined
+     */
+    if (!this.virtualScrollViewPort) {
+      return
+    }
     const currentTotalDataLength = this.virtualScrollViewPort.getDataLength()
     const previousDataLength = this.totalDataLength
 
@@ -92,4 +98,10 @@ export class FlatTreeComponent implements AfterViewChecked {
       .some(id => this.isCollapsedById(id))
   }
 
+  handleTreeNodeClick(event:MouseEvent, inputItem: any){
+    this.treeNodeClick.emit({
+      event,
+      inputItem
+    })
+  }
 }
