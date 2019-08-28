@@ -107,6 +107,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
   }
 
   handleDrop(event:DragEvent){
+    event.preventDefault()
     const droppedAttri = (event.target as HTMLElement).getAttribute('panel-order')
     const draggedAttri = event.dataTransfer.getData('text/plain')
     if (droppedAttri === draggedAttri) return
