@@ -26,6 +26,7 @@ import { SingleDatasetView } from './singleDataset/singleDataset.component'
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
+import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
 
 @NgModule({
   imports:[
@@ -58,7 +59,8 @@ import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
     FilterDataEntriesByRegion,
     AggregateArrayIntoRootPipe,
     DoiParserPipe,
-    DatasetIsFavedPipe
+    DatasetIsFavedPipe,
+    RegionBackgroundToRgbPipe
   ],
   exports:[
     DataBrowser,

@@ -1,9 +1,9 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Effect, Actions, ofType } from "@ngrx/effects";
-import { Subscription, merge, fromEvent, combineLatest } from "rxjs";
-import { withLatestFrom, map, filter } from "rxjs/operators";
+import { Subscription, merge, fromEvent, combineLatest, Observable } from "rxjs";
+import { withLatestFrom, map, filter, shareReplay, tap, switchMap, take } from "rxjs/operators";
 import { Store, select } from "@ngrx/store";
-import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
+import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID, DESELECT_REGIONS, ADD_TO_REGIONS_SELECTION_WITH_IDS } from "../state/viewerState.store";
 import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
 import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
 
@@ -24,7 +24,50 @@ export class UseEffects implements OnDestroy{
         })
       })
     )
+
+    this.regionsSelected$ = this.store$.pipe(
+      select('viewerState'),
+      select('regionsSelected'),
+      shareReplay(1)
+    )
+
+    this.onDeselectRegions = this.actions$.pipe(
+      ofType(DESELECT_REGIONS),
+      withLatestFrom(this.regionsSelected$),
+      map(([action, regionsSelected]) => {
+        const { deselectRegions } = action
+        const deselectSet = new Set((deselectRegions as any[]).map(r => r.name))
+        const selectRegions = regionsSelected.filter(r => !deselectSet.has(r.name))
+        return {
+          type: SELECT_REGIONS,
+          selectRegions
+        }
+      })
+    )
+
+    this.addToSelectedRegions$ = this.actions$.pipe(
+      ofType(ADD_TO_REGIONS_SELECTION_WITH_IDS),
+      map(action => {
+        const { selectRegionIds } = action
+        return selectRegionIds
+      }),
+      switchMap(selectRegionIds => this.updatedParcellation$.pipe(
+        filter(p => !!p),
+        take(1),
+        map(p => [selectRegionIds, p])
+      )),
+      map(this.convertRegionIdsToRegion),
+      withLatestFrom(this.regionsSelected$),
+      map(([ selectedRegions, alreadySelectedRegions ]) => {
+        return {
+          type: SELECT_REGIONS,
+          selectRegions: this.removeDuplicatedRegions(selectedRegions, alreadySelectedRegions)
+        }
+      })
+    )
   }
+
+  private regionsSelected$: Observable<any[]>
 
   ngOnDestroy(){
     while(this.subscriptions.length > 0) {
@@ -53,45 +96,76 @@ export class UseEffects implements OnDestroy{
   private updatedParcellation$ = this.store$.pipe(
     select('viewerState'),
     select('parcellationSelected'),
-    filter(p => !!p && !!p.regions)
+    map(p => p.updated ? p : null),
+    shareReplay(1)
   )
+
+  @Effect()
+  onDeselectRegions: Observable<any> 
+
+  private convertRegionIdsToRegion = ([selectRegionIds, parcellation]) => {
+    const { ngId: defaultNgId } = parcellation
+    return (<any[]>selectRegionIds)
+      .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
+      .map(({ ngId, labelIndex }) => {
+        return {
+          labelIndexId: generateLabelIndexId({
+            ngId: ngId || defaultNgId,
+            labelIndex 
+          })
+        }
+      })
+      .map(({ labelIndexId }) => {
+        return recursiveFindRegionWithLabelIndexId({ 
+          regions: parcellation.regions,
+          labelIndexId,
+          inheritedNgId: defaultNgId
+        })
+      })
+      .filter(v => {
+        if (!v) {
+          console.log(`SELECT_REGIONS_WITH_ID, some ids cannot be parsed intto label index`)
+        }
+        return !!v
+      })
+  }
+
+  private removeDuplicatedRegions = (...args) => {
+    const set = new Set()
+    const returnArr = []
+    for (const regions of args){
+      for (const region of regions){
+        if (!set.has(region.name)) {
+          returnArr.push(region)
+          set.add(region.name)
+        }
+      }
+    }
+    return returnArr
+  }
+
+  @Effect()
+  addToSelectedRegions$: Observable<any>
+  
 
   /**
    * for backwards compatibility.
    * older versions of atlas viewer may only have labelIndex as region identifier
    */
   @Effect()
-  onSelectRegionWithId = combineLatest(
-    this.actions$.pipe(
-      ofType(SELECT_REGIONS_WITH_ID)
-    ),
-    this.updatedParcellation$
-  ).pipe(
-    map(([action, parcellation]) => {
+  onSelectRegionWithId = this.actions$.pipe(
+    ofType(SELECT_REGIONS_WITH_ID),
+    map(action => {
       const { selectRegionIds } = action
-      const { ngId: defaultNgId } = parcellation
-
-      const selectRegions = (<any[]>selectRegionIds)
-        .map(labelIndexId => getNgIdLabelIndexFromId({ labelIndexId }))
-        .map(({ ngId, labelIndex }) => {
-          return {
-            labelIndexId: generateLabelIndexId({
-              ngId: ngId || defaultNgId,
-              labelIndex 
-            })
-          }
-        })
-        .map(({ labelIndexId }) => {
-          return recursiveFindRegionWithLabelIndexId({ 
-            regions: parcellation.regions,
-            labelIndexId,
-            inheritedNgId: defaultNgId
-          })
-        })
-        .filter(v => {
-          if (!v) console.log(`SELECT_REGIONS_WITH_ID, some ids cannot be parsed intto label index`)
-          return !!v
-        })
+      return selectRegionIds
+    }),
+    switchMap(selectRegionIds => this.updatedParcellation$.pipe(
+      filter(p => !!p),
+      take(1),
+      map(parcellation => [selectRegionIds, parcellation])
+    )),
+    map(this.convertRegionIdsToRegion),
+    map(selectRegions => {
       return {
         type: SELECT_REGIONS,
         selectRegions
@@ -118,7 +192,14 @@ export class UseEffects implements OnDestroy{
     filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
     map(({data}) => data.parcellation),
     withLatestFrom(this.newParcellationSelected$),
-    filter(([ propagatedP, selectedP ] : [any, any]) => propagatedP.name === selectedP.name),
+    filter(([ propagatedP, selectedP ] : [any, any]) => {
+      /**
+       * TODO 
+       * use id
+       * but jubrain may have same id for different template spaces
+       */
+      return propagatedP.name === selectedP.name
+    }),
     map(([ propagatedP, _ ]) => propagatedP),
     map(parcellation => ({
       type: UPDATE_PARCELLATION,

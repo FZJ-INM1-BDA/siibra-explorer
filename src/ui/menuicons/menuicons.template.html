@@ -3,94 +3,309 @@
 
 <!-- hide icons when templates has yet been selected -->
 <ng-template [ngIf]="selectedTemplate$ | async">
-  <div
-    *ngIf="false"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
+
+  <!-- layer browser -->
+  <sleight-of-hand>
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
+        <i class="fas fa-layer-group"></i>
+      </button>
+    </div>
     <div
-      [tooltip]="dataBrowserTitle"
-      placement="right"
-      (click)="clickSearch($event)"
-      [ngClass]="databrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-search">
+      class="d-flex flex-row align-items-center soh-row"
+      sleight-of-hand-back>
+
+      <button
+        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        color="primary"
+        mat-icon-button>
+        <i class="fas fa-layer-group"></i>
+      </button>
+
+      <div class="position-relative">
+
+        <div [ngClass]="{'invisible pe-none': (layerBrowser.nonBaseNgLayers$ | async).length === 0}" class="position-absolute">
+          <mat-card>
+            <layer-browser #layerBrowser>
+            </layer-browser>
+          </mat-card>
+        </div>
+
+        <ng-container *ngIf="(layerBrowser.nonBaseNgLayers$ | async).length === 0" #noNonBaseNgLayerTemplate>
+          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+            No additional layers added
+          </small>
+        </ng-container>
+
+        <!-- invisible button to prop up the size of parent block -->
+        <!-- otherwise, sibling block position will be wonky -->
+        <button
+          color="primary"
+          class="invisible pe-none"
+          mat-icon-button>
+          <i class="fas fa-layer-group"></i>
+        </button>
+
+      </div>
+
+    </div>
+  </sleight-of-hand>
+  
+  <!-- tools -->
+  <sleight-of-hand>
+
+    <!-- shown icon prior to mouse over -->
+    <div sleight-of-hand-front>
+      <button
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-tools"></i>
+      </button>
+    </div>
+
+    <!-- shown after mouse over -->
+    <div
+      class="d-flex flex-row soh-row align-items-start"
+      sleight-of-hand-back>
+
+      <!-- placeholder icon -->
+      <button
+        [matBadgePosition]="badgetPosition"  
+        matBadgeColor="accent"
+        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-tools"></i>
+      </button>
+
+      <!-- render all fetched tools -->
+      <div class="d-flex flex-row soh-row">
+
+        <!-- add new tool btn -->
+        <button
+          matTooltip="Add new plugin"
+          matTooltipPosition="below"
+          mat-icon-button
+          color="primary">
+          <i class="fas fa-plus"></i>
+        </button>
         
-      </i>
+        <button
+          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+          mat-mini-fab
+          matTooltipPosition="below"
+          [matTooltip]="manifest.displayName || manifest.name"
+          [color]="getPluginBtnClass$ | async | pluginBtnFabColorPipe : manifest.name"
+          (click)="clickPluginIcon(manifest)">
+          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+        </button>
+      </div>
     </div>
-  </div>
+  </sleight-of-hand>
 
-  <div
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
+  <!-- search kg -->
+  <sleight-of-hand>
+    
+    <!-- shown icon prior to mouse over -->
+    <div sleight-of-hand-front>
+      <button
+        mat-icon-button
+        color="primary"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <!-- shown after mouse over -->
     <div
-      tooltip="Layer"
-      placement="right"
-      (click)="clickLayer($event)"
-      [ngClass]="layerbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-layer-group">
+      sleight-of-hand-back
+      class="d-flex flex-row align-items-center soh-row pe-none">
+
+      <!-- placeholder icon -->
+      <button
+        mat-icon-button
+        color="primary"
+        matBadgeColor="accent"
+        [matBadgePosition]="badgetPosition"
+        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
+        <i class="fas fa-search"></i>
+      </button>
+
+      <!-- only renders if there is at least one search result -->
+      <div
+        *ngIf="dbService.instantiatedWidgetUnits.length > 0; else noKgSearchTemplate"
+        class="position-relative pe-all">
+
+        <div class="position-absolute d-flex flex-column soh-column">
+
+          <!-- render all searched kg -->
+          <sleight-of-hand
+            *ngFor="let wu of dbService.instantiatedWidgetUnits"
+            (click)="searchIconClickHandler(wu)">
+
+            <!-- shown prior to mouseover -->
+            <div sleight-of-hand-front>
+              <button
+                mat-mini-fab
+                [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                <i class="fas fa-search"></i>  
+              </button>
+            </div>
+
+            <!-- shown on mouse over -->
+            <!-- showing additional information. in this case, name of the kg search -->
+            <div class="d-flex flex-row align-items-center" sleight-of-hand-back>
+
+              <div sleight-of-hand-front>
+                <button
+                  mat-mini-fab
+                  [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
+                  <i class="fas fa-search"></i>  
+                </button>
+              </div>
+              
+              <!-- on hover, show full name and action possible: rename, close -->
+              <div [class]="((darktheme$ | async) ? 'text-light' : 'text-dark' ) + ' h-0 d-flex flex-row align-items-center'">
+
+                <sleight-of-hand class="ml-1 h-0">
+                  <!-- prior mouse over -->
+                  <div class="h-0 d-flex align-items-center flex-row" sleight-of-hand-front>
+                    <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light' ) + ' muted d-flex flex-row align-items-center'">
+                  
+                      <small class="cursor-default ml-2 text-nowrap">
+                        {{ wu.title }}
+                      </small>
+  
+                      <!-- dummy class to keep height -->
+                      <div
+                        matTooltip="Rename"
+                        matTooltipPosition="below"
+                        [class]="(skeletonBtnClass$ | async) + ' invisible w-0 pe-none'">
+                        <i class="fas fa-edit"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- on mouse over -->
+                  <div class="h-0 d-flex align-items-center flex-row" sleight-of-hand-back>
+                    <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light' ) + ' d-flex flex-row align-items-center'">
+                      
+                      <small class="cursor-default ml-2 text-nowrap">
+                        {{ wu.title }}
+                      </small>
+  
+                      <!-- rename -->
+                      <div
+                        (click)="renameKgSearchWidget($event, wu)"
+                        matTooltip="Rename (NYI)"
+                        matTooltipPosition="below"
+                        [class]="(skeletonBtnClass$ | async) + ' text-muted'">
+                        <i class="fas fa-edit"></i>
+                      </div>
+
+                      <!-- star -->
+                      <div
+                        (click)="favKgSearch($event, wu)"
+                        matTooltip="Favourite (NYI)"
+                        matTooltipPosition="below"
+                        [class]="(skeletonBtnClass$ | async) + ' text-muted'">
+                        <i class="far fa-star"></i>
+                      </div>
+  
+                      <!-- close -->
+                      <div
+                        (click)="closeWidget($event, wu)"
+                        matTooltip="Close"
+                        matTooltipPosition="below"
+                        [class]="skeletonBtnClass$ | async">
+                        <i class="fas fa-times"></i>
+                      </div>
+                    </div>
+                  </div>
+                </sleight-of-hand> 
+              </div>
+            </div>
+          </sleight-of-hand>
+        </div>
+
+        <!-- invisible icon to keep height of the otherwise unstable flex block -->
+        <div class="invisible pe-none">
+          <button mat-icon-button>
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- displayed when no search is visible -->
+      <ng-template #noKgSearchTemplate>
+        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+          Right click any area to search
+        </small>
+      </ng-template>
+    </div>
+
+  </sleight-of-hand>
+
+  <!-- selected regions -->
+  <sleight-of-hand
+    [doNotClose]="viewerStateController.focused">
+
+    <!-- shown prior to mouse over -->
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
+    </div>
+
+    <!-- shown upon mouseover -->
+    <div
+      sleight-of-hand-back
+      class="d-flex flex-row align-items-center soh-row">
+
+      <!-- place holder icon -->
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
+
+      <div class="position-relative">
+
+        <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
+          <viewer-state-controller #viewerStateController></viewer-state-controller>
+        </div>
         
-      </i>
+        <!-- invisible icon to keep height of the otherwise unstable flex block -->
+        <div class="invisible pe-none">
+          <i class="fas fa-brain"></i>
+        </div>
+      </div>
+
+      <ng-template #noBrainRegionSelected>
+        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+          Double click any brain region to select it.
+        </small>
+      </ng-template>
     </div>
-  </div>
-
-  <div
-    *ngIf="false"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-    <div
-      tooltip="Plugins"
-      (click)="clickPlugins($event)"
-      placement="right"
-      [ngClass]="pluginbrowserIsShowing ? 'btn-primary' : 'btn-secondary'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-tools">
-        
-      </i>
-    </div>
-  </div>
-
-  <div
-    *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-    [tooltip]="manifest.displayName || manifest.name"
-    placement="right"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-
-    <div
-      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-      [ngClass]="!pluginServices.launchedPlugins.has(manifest.name) ? 'btn-outline-secondary' : pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
-      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-    </div>
-  </div>
-
-  <div
-    *ngFor="let manifest of pluginServices.orphanPlugins"
-    [tooltip]="manifest.displayName || manifest.name"
-    placement="right"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    class="btnWrapper">
-
-    <div
-      (click)="pluginServices.launchPlugin(manifest).catch(catchError)"
-      [ngClass]="pluginServices.pluginMinimised(manifest) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
-      {{ (manifest.displayName || manifest.name).slice(0, 1) }}
-    </div>
-  </div>
-
-  <div
-    *ngFor="let wu of dbService.instantiatedWidgetUnits"
-    [ngClass]="isMobile ? 'btnWrapper-lg' : ''"
-    placement="right"
-    [tooltip]="wu.title"
-    class="btnWrapper">
-    <div
-      (click)="widgetServices.minimisedWindow.delete(wu)"
-      [ngClass]="widgetServices.minimisedWindow.has(wu) ? 'btn-outline-info' : 'btn-info'"
-      class="shadow btn btn-sm rounded-circle">
-      <i class="fas fa-search"></i>
-    </div>
-  </div>
+  </sleight-of-hand>
 </ng-template>

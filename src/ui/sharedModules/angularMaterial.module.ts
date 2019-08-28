@@ -6,10 +6,22 @@ import {
   MatTabsModule,
   MatTooltipModule,
   MatBadgeModule,
+  MatDividerModule,
+  MatSelectModule,
+  MatChipsModule,
+  MatAutocompleteModule,
+  MatDialogModule,
+  MatInputModule,
   MatBottomSheetModule,
   MatListModule,
+  MatSlideToggleModule,
+  
 } from '@angular/material';
 import { NgModule } from '@angular/core';
+
+/**
+ * TODO should probably be in src/util
+ */
 
 @NgModule({
   imports: [
@@ -20,10 +32,16 @@ import { NgModule } from '@angular/core';
     MatTabsModule,
     MatTooltipModule,
     MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
     MatBottomSheetModule,
     MatListModule,
+    MatSlideToggleModule,
   ],
-
   exports: [
     MatButtonModule,
     MatCheckboxModule,
@@ -32,9 +50,15 @@ import { NgModule } from '@angular/core';
     MatTabsModule,
     MatTooltipModule,
     MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
     MatBottomSheetModule,
     MatListModule,
+    MatSlideToggleModule,
   ],
-
 })
 export class AngularMaterialModule { }

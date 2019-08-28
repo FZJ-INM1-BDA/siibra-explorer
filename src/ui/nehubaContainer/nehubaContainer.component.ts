@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime, startWith } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
@@ -11,7 +11,7 @@ import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
-import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED } from "src/services/state/viewerState.store";
+import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
 import { MatBottomSheet, MatButton } from "@angular/material";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
@@ -139,8 +139,6 @@ export class NehubaContainer implements OnInit, OnDestroy{
   private landmarksLabelIndexMap : Map<number, any> = new Map()
   private landmarksNameMap : Map<string,number> = new Map()
   
-  private userLandmarks : UserLandmark[] = []
-  
   private subscriptions : Subscription[] = []
   private nehubaViewerSubscriptions : Subscription[] = []
 
@@ -233,13 +231,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.userLandmarks$ = this.store.pipe(
-      /* TODO: distinct until changed */
       select('viewerState'),
-      // filter(state => isDefined(state) && isDefined(state.userLandmarks)),
-      map(state => isDefined(state) && isDefined(state.userLandmarks)
-        ? state.userLandmarks
-        : []),
-      distinctUntilChanged(userLmUnchanged)
+      select('userLandmarks'),
+      distinctUntilChanged()
     )
 
     this.onHoverSegments$ = this.store.pipe(
@@ -467,10 +461,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
 
     this.subscriptions.push(
-      this.userLandmarks$.pipe(
-        // distinctUntilChanged((old,new) => )
-      ).subscribe(landmarks => {
-        this.userLandmarks = landmarks
+      this.userLandmarks$.subscribe(landmarks => {
         if(this.nehubaViewer){
           this.nehubaViewer.updateUserLandmarks(landmarks)
         }
@@ -703,11 +694,13 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
     this.subscriptions.push(
       this.selectedLandmarks$.pipe(
-        map(lms => lms.map(lm => this.landmarksNameMap.get(lm.name)))
+        map(lms => lms.map(lm => this.landmarksNameMap.get(lm.name))),
+        debounceTime(16)
       ).subscribe(indices => {
         const filteredIndices = indices.filter(v => typeof v !== 'undefined' && v !== null)
-        if(this.nehubaViewer)
+        if(this.nehubaViewer) {
           this.nehubaViewer.spatialLandmarkSelectionChanged(filteredIndices)
+        }
       })
     )
   }
@@ -981,14 +974,16 @@ export class NehubaContainer implements OnInit, OnDestroy{
         if(!landmarks.every(l => l.position.constructor === Array) || !landmarks.every(l => l.position.every(v => !isNaN(v))) || !landmarks.every(l => l.position.length == 3))
           throw new Error('position needs to be a length 3 tuple of numbers ')
         this.store.dispatch({
-          type: USER_LANDMARKS,
+          type: VIEWERSTATE_ACTION_TYPES.ADD_USERLANDMARKS,
           landmarks : landmarks
         })
       },
-      remove3DLandmarks : ids => {
+      remove3DLandmarks : landmarkIds => {
         this.store.dispatch({
-          type : USER_LANDMARKS,
-          landmarks : this.userLandmarks.filter(l => ids.findIndex(id => id === l.id) < 0)
+          type: VIEWERSTATE_ACTION_TYPES.REMOVE_USER_LANDMARKS,
+          payload: {
+            landmarkIds
+          }
         })
       },
       hideSegment : (labelIndex) => {

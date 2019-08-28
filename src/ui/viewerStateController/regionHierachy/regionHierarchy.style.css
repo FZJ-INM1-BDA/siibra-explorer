@@ -1,0 +1,57 @@
+
+div[treeContainer]
+{
+  padding:1em;
+  z-index: 3;
+
+  height:20em;
+  width: calc(100% + 4em);
+  overflow-y:auto;
+  overflow-x:hidden;
+
+  /* color:white;
+  background-color:rgba(12,12,12,0.8); */
+}
+
+div[hideScrollbarcontainer]
+{
+  overflow:hidden;
+  margin-top:2px;
+}
+
+input[type="text"]
+{
+  border:none;
+}
+
+
+.regionSearch
+{
+  width:20em;
+}
+
+.tree-header
+{
+  flex: 0 0 auto;
+}
+
+.tree-body
+{
+  flex: 1 1 auto;
+}
+
+:host
+{
+  display: flex;
+  flex-direction: column;
+}
+
+:host > mat-form-field
+{
+  flex: 0 0 auto;
+}
+
+:host > [hideScrollbarContainer]
+{
+  flex: 1 1 0;
+}

@@ -16,7 +16,7 @@
           <span
             *ngFor="let region of regions"
             class="badge badge-secondary mr-1 mw-100">
-            <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+            <span [ngStyle]="{backgroundColor: (region | regionBackgroundToRgbPipe)}" class="dot">
               
             </span>
             <span class="d-inline-block mw-100 overflow-hidden text-truncate">
@@ -125,7 +125,7 @@
             <span
               *ngFor="let region of dataset.parcellationRegion"
               class="badge badge-secondary mr-1 mw-100">
-              <span [ngStyle]="{backgroundColor:getBackgroundColorStyleFromRegion(region)}" class="dot">
+              <span [ngStyle]="{backgroundColor:(region | regionBackgroundToRgbPipe)}" class="dot">
                 
               </span>
               <span class="d-inline-block mw-100 overflow-hidden text-truncate">

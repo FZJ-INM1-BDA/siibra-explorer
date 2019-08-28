@@ -141,6 +141,23 @@ window.interactiveViewer
     - timeout : auto hide (in ms). set to 0 for not auto hide.
 
   - *launchNewWidget(manifest)* returns a Promise. expects a JSON object, with the same key value as a plugin manifest. the *name* key must be unique, or the promise will be rejected. 
+
+  - *getUserInput(config)* returns a Promise, resolves when user confirms, rejects when user cancels. expects config object object with the following structure:
+  ```javascript
+  const config = {
+    "title": "Title of the modal", // default: "Message"
+    "message":"Message to be seen by the user.", // default: ""
+    "placeholder": "Start typing here", // default: "Type your response here"
+    "defaultValue": "42" // default: ""
+  }
+  ```
+  - *getUserConfirmation(config)* returns a Promise, resolves when user confirms, rejects when user cancels. expects config object object with the following structure:
+  ```javascript
+  const config = {
+    "title": "Title of the modal", // default: "Message"
+    "message":"Message to be seen by the user." // default: ""
+  }
+  ```
   
 - pluginControl
 
@@ -162,7 +179,8 @@ window.interactiveViewer
   - **[PLUGINNAME]** returns a plugin handler. This would be how to interface with the plugins.
 
     
-    - *blink(sec?:number)* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *blink()* : Function that causes the floating widget to blink, attempt to grab user attention (silently fails if called on startup).
+    - *setProgressIndicator(val:number|null)* : Set the progress of the plugin. Useful for giving user feedbacks on the progress of a long running process. Call the function with null to unset the progress.
     - *shutdown()* : Function that causes the widget to shutdown dynamically. (triggers onShutdown callback, silently fails if called on startup)
     - *onShutdown(callback)* : Attaches a callback function, which is called when the plugin is shutdown.
     - *initState* : passed from `manifest.json`. Useful for setting initial state of the plugin. Can be any JSON valid value (array, object, string).

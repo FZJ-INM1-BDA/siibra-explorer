@@ -5,7 +5,7 @@ import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule, Store, select } from "@ngrx/store";
-import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState } from "./services/stateStore.service";
+import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
@@ -18,11 +18,9 @@ import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
 import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { TabsModule } from 'ngx-bootstrap/tabs'
-import { ModalModule } from 'ngx-bootstrap/modal'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
-import { GetFilenameFromPathnamePipe } from "./util/pipes/getFileNameFromPathName.pipe";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
@@ -35,7 +33,7 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { AuthService } from "./services/auth.service";
-import { ViewerConfiguration } from "./services/state/viewerConfig.store";
+import { ViewerConfiguration, LOCAL_STORAGE_CONST } from "./services/state/viewerConfig.store";
 import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
@@ -43,6 +41,11 @@ import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
 import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
+import { DialogService } from "./services/dialogService.service";
+import { DialogComponent } from "./components/dialog/dialog.component";
+import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
+import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
+import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 
 @NgModule({
   imports : [
@@ -54,12 +57,14 @@ import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffe
     UIModule,
     AngularMaterialModule,
     
-    ModalModule.forRoot(),
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
       DataBrowserUseEffect,
-      UseEffects
+      UseEffects,
+      UserConfigStateUseEffect,
+      ViewerStateControllerUseEffect,
+      ViewerStateUseEffect,
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -69,6 +74,7 @@ import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffe
       dataStore,
       spatialSearchState,
       uiState,
+      userConfigState
     }),
     HttpClientModule
   ],
@@ -98,7 +104,6 @@ import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffe
     GetNamesPipe,
     GetNamePipe,
     TransformOnhoverSegmentPipe,
-    GetFilenameFromPathnamePipe,
     NewViewerDisctinctViewToLayer
   ],
   entryComponents : [
@@ -106,6 +111,8 @@ import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffe
     ModalUnit,
     ToastComponent,
     PluginUnit,
+    DialogComponent,
+    ConfirmDialogComponent,
   ],
   providers : [
     AtlasViewerDataService,
@@ -115,6 +122,7 @@ import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffe
     ToastService,
     AtlasWorkerService,
     AuthService,
+    DialogService,
     
     /**
      * TODO
@@ -143,9 +151,13 @@ export class MainModule{
     authServce.authReloadState()
     store.pipe(
       select('viewerConfigState')
-    ).subscribe(({ gpuLimit }) => {
-      if (gpuLimit)
-        window.localStorage.setItem('iv-gpulimit', gpuLimit.toString())
+    ).subscribe(({ gpuLimit, animation }) => {
+      if (gpuLimit) {
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.GPU_LIMIT, gpuLimit.toString())
+      }
+      if (typeof animation !== 'undefined' && animation !== null) {
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.ANIMATION, animation.toString())
+      }
     })
   }
 }
