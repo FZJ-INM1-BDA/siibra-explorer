@@ -40,6 +40,7 @@ import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
 import { UseEffects } from "./services/effect/effect";
+import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
 import { DialogService } from "./services/dialogService.service";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
@@ -59,6 +60,7 @@ import { ViewerStateUseEffect } from "./services/state/viewerState.store";
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
+      DataBrowserUseEffect,
       UseEffects,
       UserConfigStateUseEffect,
       ViewerStateControllerUseEffect,

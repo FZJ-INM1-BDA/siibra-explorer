@@ -4,7 +4,7 @@ import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
-import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError } from "rxjs/operators";
+import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
@@ -13,6 +13,7 @@ import { DataBrowser } from "./databrowser/databrowser.component";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { regionFlattener } from "src/util/regionFlattener";
+import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -44,6 +45,8 @@ function generateToken() {
   providedIn: 'root'
 })
 export class DatabrowserService implements OnDestroy{
+
+  public favedDataentries$: Observable<DataEntry[]>
 
   public darktheme: boolean = false
 
@@ -79,6 +82,12 @@ export class DatabrowserService implements OnDestroy{
     private constantService: AtlasViewerConstantsServices,
     private store: Store<ViewerConfiguration>
   ){
+
+    this.favedDataentries$ = this.store.pipe(
+      select('dataStore'),
+      select('favDataEntries'),
+      shareReplay(1)
+    )
 
     this.subscriptions.push(
       this.store.pipe(
@@ -195,6 +204,20 @@ export class DatabrowserService implements OnDestroy{
 
   ngOnDestroy(){
     this.subscriptions.forEach(s => s.unsubscribe())
+  }
+
+  public saveToFav(dataentry: DataEntry){
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
+      payload: dataentry
+    })
+  }
+
+  public removeFromFav(dataentry: DataEntry){
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
+      payload: dataentry
+    })
   }
 
   public fetchPreviewData(datasetName: string){
@@ -341,6 +364,12 @@ export function reduceDataentry(accumulator:{name:string, occurance:number}[], d
 
 export function getModalityFromDE(dataentries:DataEntry[]):CountedDataModality[] {
   return dataentries.reduce((acc, de) => reduceDataentry(acc, de), [])
+}
+
+export function getIdFromDataEntry(dataentry: DataEntry){
+  const { id, fullId } = dataentry
+  const regex = /\/([a-zA-Z0-9\-]*?)$/.exec(fullId)
+  return (regex && regex[1]) || id
 }
 
 

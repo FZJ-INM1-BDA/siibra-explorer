@@ -25,14 +25,14 @@ import { NgModule } from '@angular/core';
 
 @NgModule({
   imports: [
-    MatDividerModule,
-    MatBadgeModule,
     MatButtonModule,
     MatCheckboxModule,
     MatSidenavModule,
     MatCardModule,
     MatTabsModule,
     MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
     MatSelectModule,
     MatChipsModule,
     MatAutocompleteModule,
@@ -40,17 +40,17 @@ import { NgModule } from '@angular/core';
     MatInputModule,
     MatBottomSheetModule,
     MatListModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
   exports: [
-    MatDividerModule,
-    MatBadgeModule,
     MatButtonModule,
     MatCheckboxModule,
     MatSidenavModule,
     MatCardModule,
     MatTabsModule,
     MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
     MatSelectModule,
     MatChipsModule,
     MatAutocompleteModule,
@@ -58,7 +58,7 @@ import { NgModule } from '@angular/core';
     MatInputModule,
     MatBottomSheetModule,
     MatListModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
   ],
 })
 export class AngularMaterialModule { }

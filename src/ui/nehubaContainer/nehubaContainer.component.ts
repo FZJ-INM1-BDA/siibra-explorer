@@ -1,7 +1,7 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "../../services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, throttleTime, bufferTime, startWith } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
@@ -12,6 +12,10 @@ import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
+import { MatBottomSheet, MatButton } from "@angular/material";
+import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
+import { getIdFromDataEntry } from "../databrowserModule/databrowser.service";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -141,13 +145,22 @@ export class NehubaContainer implements OnInit, OnDestroy{
   public nanometersToOffsetPixelsFn : Function[] = []
   private viewerConfig : Partial<ViewerConfiguration> = {}
 
+  public favDataEntries$: Observable<DataEntry[]>
+
   constructor(
     private constantService : AtlasViewerConstantsServices,
     private apiService :AtlasViewerAPIServices,
     private csf:ComponentFactoryResolver,
     private store : Store<ViewerStateInterface>,
-    private elementRef : ElementRef
+    private elementRef : ElementRef,
+    public bottomSheet: MatBottomSheet,
+    private kgSingleDataset: KgSingleDatasetService
   ){
+    this.favDataEntries$ = this.store.pipe(
+      select('dataStore'),
+      select('favDataEntries')
+    )
+
     this.viewerPerformanceConfig$ = this.store.pipe(
       select('viewerConfigState'),
       /**
@@ -1149,6 +1162,19 @@ export class NehubaContainer implements OnInit, OnDestroy{
     }
   }
 
+  removeFav(event: MouseEvent, ds: DataEntry){
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
+      payload: ds
+    })
+  }
+
+  downloadDs(event: MouseEvent, ds: DataEntry, downloadBtn: MatButton){
+    downloadBtn.disabled = true
+    const id = getIdFromDataEntry(ds)
+    this.kgSingleDataset.downloadZipFromKg({kgId: id})
+      .finally(() => downloadBtn.disabled = false)
+  }
 }
 
 export const identifySrcElement = (element:HTMLElement) => {
