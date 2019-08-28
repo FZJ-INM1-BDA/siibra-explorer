@@ -50,6 +50,11 @@ app.use(session({
 }))
 
 /**
+ * configure CSP
+ */
+require('./csp')(app)
+
+/**
  * configure Auth
  * async function, but can start server without
  */
