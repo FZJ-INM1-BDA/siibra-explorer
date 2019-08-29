@@ -4,6 +4,57 @@
 <!-- hide icons when templates has yet been selected -->
 <ng-template [ngIf]="selectedTemplate$ | async">
 
+  <!-- selected regions -->
+  <sleight-of-hand
+    [doNotClose]="viewerStateController.focused">
+
+    <!-- shown prior to mouse over -->
+    <div sleight-of-hand-front>
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
+    </div>
+
+    <!-- shown upon mouseover -->
+    <div
+      sleight-of-hand-back
+      class="d-flex flex-row align-items-center soh-row">
+
+      <!-- place holder icon -->
+      <button
+        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+        [matBadgePosition]="badgetPosition"
+        matBadgeColor="accent"
+        mat-icon-button
+        color="primary">
+        <i class="fas fa-brain"></i>
+      </button>
+
+      <div class="position-relative">
+
+        <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
+          <viewer-state-controller #viewerStateController></viewer-state-controller>
+        </div>
+        
+        <!-- invisible icon to keep height of the otherwise unstable flex block -->
+        <div class="invisible pe-none">
+          <i class="fas fa-brain"></i>
+        </div>
+      </div>
+
+      <ng-template #noBrainRegionSelected>
+        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+          Double click any brain region to select it.
+        </small>
+      </ng-template>
+    </div>
+  </sleight-of-hand>
+  
   <!-- layer browser -->
   <sleight-of-hand>
     <div sleight-of-hand-front>
@@ -29,7 +80,7 @@
         <i class="fas fa-layer-group"></i>
       </button>
 
-      <div class="position-relative">
+      <div class="position-relative d-flex align-items-center">
 
         <div [ngClass]="{'invisible pe-none': (layerBrowser.nonBaseNgLayers$ | async).length === 0}" class="position-absolute">
           <mat-card>
@@ -39,7 +90,7 @@
         </div>
 
         <ng-container *ngIf="(layerBrowser.nonBaseNgLayers$ | async).length === 0" #noNonBaseNgLayerTemplate>
-          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap position-absolute'">
             No additional layers added
           </small>
         </ng-container>
@@ -258,54 +309,4 @@
 
   </sleight-of-hand>
 
-  <!-- selected regions -->
-  <sleight-of-hand
-    [doNotClose]="viewerStateController.focused">
-
-    <!-- shown prior to mouse over -->
-    <div sleight-of-hand-front>
-      <button
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-brain"></i>
-      </button>
-    </div>
-
-    <!-- shown upon mouseover -->
-    <div
-      sleight-of-hand-back
-      class="d-flex flex-row align-items-center soh-row">
-
-      <!-- place holder icon -->
-      <button
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-brain"></i>
-      </button>
-
-      <div class="position-relative">
-
-        <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
-          <viewer-state-controller #viewerStateController></viewer-state-controller>
-        </div>
-        
-        <!-- invisible icon to keep height of the otherwise unstable flex block -->
-        <div class="invisible pe-none">
-          <i class="fas fa-brain"></i>
-        </div>
-      </div>
-
-      <ng-template #noBrainRegionSelected>
-        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
-          Double click any brain region to select it.
-        </small>
-      </ng-template>
-    </div>
-  </sleight-of-hand>
 </ng-template>

@@ -20,7 +20,7 @@ app.use((req, _, next) => {
     console.log({
       type: 'visitorLog',
       method: 'main.bundle.js',
-      xForwardedFor: xForwardedFor.replace(/\ /g, '').split(',').map(hash),
+      xForwardedFor: xForwardedFor && xForwardedFor.replace(/\ /g, '').split(',').map(hash),
       ip: hash(ip)
     })
   }
