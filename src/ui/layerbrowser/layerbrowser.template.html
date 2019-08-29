@@ -1,3 +1,8 @@
+<!-- n.b. using mousedown for event trigger -->
+<!-- Chrome & FF exhibit different behaviours when using click/mouseup as a event handler -->
+<!-- in Chrome, it will complain that expression changed after change detection -->
+<!-- in FF, the element changes, and focusout event is never fired properly -->
+
 <ng-container *ngIf="nonBaseNgLayers$ | async as nonBaseNgLayers; else noLayerPlaceHolder">
   <mat-list *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
     <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers">
@@ -7,7 +12,7 @@
       <button
         [matTooltipPosition]="matTooltipPosition"
         [matTooltip]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'base layer cannot be hidden' : 'toggle visibility'"
-        (click)="toggleVisibility(ngLayer)"
+        (mousedown)="toggleVisibility(ngLayer)"
         mat-icon-button
         [disabled]="ngLayer | lockedLayerBtnClsPipe : lockedLayers"
         [color]="ngLayer.visible ? 'primary' : null">
@@ -20,7 +25,7 @@
         *ngIf="advancedMode"
         [matTooltipPosition]="matTooltipPosition"
         [matTooltip]="ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
-        (click)="toggleForceShowSegment(ngLayer)"
+        (mousedown)="toggleForceShowSegment(ngLayer)"
         mat-icon-button>
         <i 
           class="fas" 
@@ -33,7 +38,7 @@
       <button
         color="warn"
         mat-icon-button
-        (click)="removeLayer(ngLayer)"
+        (mousedown)="removeLayer(ngLayer)"
         [disabled]="ngLayer | lockedLayerBtnClsPipe : lockedLayers"
         [matTooltip]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'base layers cannot be removed' : 'remove layer'">
         <i [class]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'fas fa-lock muted' : 'fas fa-trash'">

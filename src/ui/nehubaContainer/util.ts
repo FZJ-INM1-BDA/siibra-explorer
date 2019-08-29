@@ -18,10 +18,37 @@ const makeCol = (...els:HTMLElement[]) => {
   return container
 }
 
-export const getHorizontalOneThree = (panels:[HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
-  for (let panel of panels){
-    panel.className = ''
+const washPanels = (panels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
+  for (const panel of panels) {
+    if (panel) panel.className = `position-relative`
   }
+  return panels
+}
+
+/**
+ * gives a clue of the approximate location of the panel, allowing position of checkboxes/scale bar to be placed in unobtrustive places
+ */
+const panelTouchSide = (panel: HTMLElement, { top, left, right, bottom }: any) => {
+  if (top) panel.classList.add(`touch-top`)
+  if (left) panel.classList.add(`touch-left`)
+  if (right) panel.classList.add(`touch-right`)
+  if (bottom) panel.classList.add(`touch-bottom`)
+  return panel
+}
+
+const top = true
+const left = true
+const right = true
+const bottom = true
+
+export const getHorizontalOneThree = (panels:[HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
+  washPanels(panels)
+
+  panelTouchSide(panels[0], { top, left, bottom })
+  panelTouchSide(panels[1], { top, right })
+  panelTouchSide(panels[2], { right })
+  panelTouchSide(panels[3], { right, bottom })
+  
   const majorContainer = makeCol(panels[0])
   const minorContainer = makeCol(panels[1], panels[2], panels[3])
 
@@ -32,9 +59,13 @@ export const getHorizontalOneThree = (panels:[HTMLElement, HTMLElement, HTMLElem
 }
 
 export const getVerticalOneThree = (panels:[HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
-  for (let panel of panels){
-    panel.className = ''
-  }
+  washPanels(panels)
+  
+  panelTouchSide(panels[0], { top, left, right })
+  panelTouchSide(panels[1], { bottom, left })
+  panelTouchSide(panels[2], { bottom })
+  panelTouchSide(panels[3], { right, bottom })
+
   const majorContainer = makeRow(panels[0])
   const minorContainer = makeRow(panels[1], panels[2], panels[3])
 
@@ -46,9 +77,13 @@ export const getVerticalOneThree = (panels:[HTMLElement, HTMLElement, HTMLElemen
 
 
 export const getFourPanel = (panels:[HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
-  for (let panel of panels){
-    panel.className = ''
-  }
+  washPanels(panels)
+  
+  panelTouchSide(panels[0], { top, left })
+  panelTouchSide(panels[1], { top, right })
+  panelTouchSide(panels[2], { bottom, left })
+  panelTouchSide(panels[3], { right, bottom })
+
   const majorContainer = makeRow(panels[0], panels[1])
   const minorContainer = makeRow(panels[2], panels[3])
 
@@ -59,9 +94,10 @@ export const getFourPanel = (panels:[HTMLElement, HTMLElement, HTMLElement, HTML
 }
 
 export const getSinglePanel = (panels:[HTMLElement, HTMLElement, HTMLElement, HTMLElement]) => {
-  for (let panel of panels){
-    panel.className = ''
-  }
+  washPanels(panels)
+  
+  panelTouchSide(panels[0], { top, left, bottom, right })
+
   const majorContainer = makeRow(panels[0])
   const minorContainer = makeRow(panels[1], panels[2], panels[3])
 

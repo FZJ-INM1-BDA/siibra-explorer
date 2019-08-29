@@ -93,7 +93,7 @@ export class DataBrowserUseEffect implements OnDestroy{
          * TODO emit proper error
          * possibly wipe corrupted local stoage here?
          */
-        return null
+        return of(null)
       })
     )
 
@@ -105,7 +105,7 @@ export class DataBrowserUseEffect implements OnDestroy{
             from( this.kgSingleDatasetService.getInfoFromKg({ kgId }))
               .pipe(catchError(err => {
                   console.log(`fetchInfoFromKg error`, err)
-                  return null
+                  return of(null)
               })))
         ).pipe(
           filter(v => !!v),

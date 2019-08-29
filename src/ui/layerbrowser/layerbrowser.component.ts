@@ -3,7 +3,7 @@ import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
 import { Subscription, Observable, combineLatest } from "rxjs";
-import { filter, map, shareReplay, tap } from "rxjs/operators";
+import { filter, map, shareReplay, distinctUntilChanged } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
@@ -84,7 +84,8 @@ export class LayerBrowser implements OnDestroy{
       map(([baseNgLayerNames, loadedNgLayers]) => {
         const baseNameSet = new Set(baseNgLayerNames)
         return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
-      })
+      }),
+      distinctUntilChanged()
     )
 
     /**
