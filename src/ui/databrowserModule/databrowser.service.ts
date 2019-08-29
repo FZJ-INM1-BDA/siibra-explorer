@@ -14,6 +14,7 @@ import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { regionFlattener } from "src/util/regionFlattener";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+import { HttpClient } from "@angular/common/http";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -46,8 +47,8 @@ function generateToken() {
 })
 export class DatabrowserService implements OnDestroy{
 
+  public kgTos$: Observable<any>
   public favedDataentries$: Observable<DataEntry[]>
-
   public darktheme: boolean = false
 
   public instantiatedWidgetUnits: WidgetUnit[] = []
@@ -80,8 +81,18 @@ export class DatabrowserService implements OnDestroy{
   constructor(
     private workerService: AtlasWorkerService,
     private constantService: AtlasViewerConstantsServices,
-    private store: Store<ViewerConfiguration>
+    private store: Store<ViewerConfiguration>,
+    private http: HttpClient
   ){
+    this.kgTos$ = this.http.get(`${this.constantService.backendUrl}datasets/tos`, {
+      responseType: 'text'
+    }).pipe(
+      catchError((err,obs) => {
+        console.warn(`fetching kgTos error`, err)
+        return of(null)
+      }),
+      shareReplay(1)
+    )
 
     this.favedDataentries$ = this.store.pipe(
       select('dataStore'),

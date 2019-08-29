@@ -5,8 +5,7 @@ const path = require('path')
 const archiver = require('archiver')
 const { commonSenseDsFilter } = require('./supplements/commonSense')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-
-const kgQueryUtil = require('./../auth/util')
+const { init: kgQueryUtilInit, getUserKGRequestParam } = require('./util')
 
 let cachedData = null
 let otherQueryResult = null
@@ -28,11 +27,6 @@ const getKgQuerySingleDatasetUrl = ({ kgId }) => {
   _newUrl.pathname = `${KG_PATH}/instances/${kgId}`
   return _newUrl
 }
-
-const timeout = process.env.TIMEOUT || 5000
-const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
-
-let getPublicAccessToken
 
 const fetchDatasetFromKg = async ({ user } = {}) => {
 
@@ -220,172 +214,16 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
 /**
  * on init, populate the cached data
  */
-exports.init = async () => {
-  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
-  getPublicAccessToken = getPublic
+const init = async () => {
+  await kgQueryUtilInit()
   return await getPublicDs()
 }
 
-exports.getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
+const getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
   .then(json => filter(json, { templateName, parcellationName }))
 
-exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
+const getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
-/**
- * TODO
- * change to real spatial query
- */
-const cachedMap = new Map()
-
-/**
- * TODO change to URL constructor to improve readability
- */
-const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinatesNG/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
-
-const getXformFn = (templateSpace) => {
-  const _ = {}
-  switch(templateSpace){
-    case 'Waxholm Space rat brain atlas v.2.0': 
-      _['nmToVoxel'] = transformWaxholmV2NmToVoxel
-      _['voxelToNm'] = transformWaxholmV2VoxelToNm
-      break;
-    default: {
-      _['nmToVoxel'] = defaultXform
-      _['voxelToNm'] = defaultXform
-    }
-  }
-  return _
-}
-
-const getSpatialSearcParam = ({ templateName, queryArg }) => {
-  let kgSpaceName
-  const { nmToVoxel } = getXformFn(templateName)
-
-  const coordsString = queryArg.split('__');
-  const boundingBoxCorners = coordsString.map(coordString => coordString.split('_'))
-  const bbInVoxelSpace = boundingBoxCorners.map(nmToVoxel)
-
-  switch (templateName){
-    case 'Waxholm Space rat brain atlas v.2.0':
-      kgSpaceName = 'waxholmV2'
-      break;
-    default: 
-      kgSpaceName = templateName
-  }
-  return {
-    boundingBox: `${kgSpaceName}:${bbInVoxelSpace.map(v => v.join(',')).join(',')}`
-  }
-}
-
-const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, user }) => {
-
-  const { releasedOnly, option } = await getUserKGRequestParam({ user })
-
-  const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
-  const url = require('url')
-  const search = new url.URLSearchParams()
-  
-  for (let key in _) {
-    search.append(key, _[key])  
-  }
-  if (releasedOnly) search.append('databaseScope', 'RELEASED')
-  
-  const _url = `${spatialQuery}&${search.toString()}`
-  return await new Promise((resolve, reject) => {
-    request(_url, option, (err, resp, body) => {
-      if (err)
-        return reject(err)
-      if (resp.statusCode >= 400) {
-        return reject(resp.statusCode)
-      }
-      const json = JSON.parse(body)
-
-      const { voxelToNm } = getXformFn(templateName)
-
-      const _ = json.results.map(({ name, coordinates, dataset}) => {
-        return {
-          name,
-          templateSpace: templateName,
-          dataset: dataset.map(ds => ds = {name: ds.name, externalLink: 'https://kg.humanbrainproject.eu/instances/Dataset/' + ds.identifier}),
-          geometry: {
-            type: 'point',
-            space: 'real',
-            position: voxelToNm([
-              coordinates[0].x,
-              coordinates[0].y,
-              coordinates[0].z
-            ])
-          }
-        }
-      })
-
-      return resolve(_)
-    })
-  })
-}
-
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg, user }) => {
-  /**
-   * Local data can be injected here
-   */
-  return await fetchSpatialDataFromKg({ templateName, queryGeometry, queryArg, user })
-}
-
-let publicAccessToken
-
-async function getUserKGRequestParam({ user }) {
-    /**
-     * n.b. ACCESS_TOKEN env var is usually only set during dev
-     */
-    const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
-    const releasedOnly = !accessToken
-    if (!accessToken && !publicAccessToken && getPublicAccessToken) {
-        publicAccessToken = await getPublicAccessToken()
-    }
-    const option = accessToken || publicAccessToken
-        ? {
-            auth: {
-                'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-            }
-        }
-        : {}
-
-    return {
-      option,
-      releasedOnly,
-      token: accessToken || publicAccessToken
-    }
-}
-
-/**
- * perhaps export the xform fns into a different module
- * ideally, in the future, KG can handle xform of voxel to nm
- */
-const transformWaxholmV2NmToVoxel = (coord) => {
-  /**
-   * as waxholm is already in RAS, does not need to swap axis
-   */
-
-  /**
-   * atlas viewer applies translation (below in nm) in order to center the brain
-   * query already translates nm to mm, so the unit of transl should be [mm, mm, mm]
-   */
-  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
-
-  /**
-   * mm/voxel
-   */
-  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
-  return coord.map((v, idx) => (v - transl[idx]) / voxelDim[idx])
-}
-
-const transformWaxholmV2VoxelToNm = (coord) => {
-  const transl = [-9550781, -24355468, -9707031].map(v => v / 1e6)
-  const voxelDim = [0.0390625, 0.0390625, 0.0390625]
-  return coord.map((v, idx) => (v * voxelDim[idx]) + transl[idx])
-}
-
-const defaultXform = (coord) => coord
 const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
   const { option, releasedOnly } = await getUserKGRequestParam({ user })
   const _url = getKgQuerySingleDatasetUrl({ kgId })
@@ -400,17 +238,63 @@ const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
   })
 }
 
+const renderPublication = ({ name, cite, doi }) => `${name}
+  ${cite}
+  https://doi.org/${doi}
+`
+
+const prepareDatasetMetadata = ({ name, kgReference, contributors, publications }) => {
+
+  return `${name}
+
+Contributors: ${contributors.join(', ')}
+
+Publications:
+${publications.map(renderPublication).join('\n')}
+`
+}
+
+let kgtos
+
+fs.readFile(path.join(__dirname, 'kgtos.md') , 'utf-8', (err, data) => {
+  if (err) console.warn(`reading kgtos Error`, err)
+  kgtos = data
+})
+
+const getTos = () => kgtos
+
 const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   if (!kgId) {
     throw new Error('kgId must be defined')
   }
 
-  const result = await getDatasetFromId({ user, kgId })
-  const { files } = result
+  const dataset = await getDatasetFromId({ user, kgId })
+  const { files, name: datasetName } = dataset
   const zip = archiver('zip')
+
+  /**
+   * append citation information
+   */
+  zip.append(prepareDatasetMetadata(dataset), {
+    name: `${datasetName}.txt`
+  })
+
+  /**
+   * append kg citation policy
+   */
+
+  zip.append(getTos(), {
+    name: `Terms Of Use.md`
+  })
+
+  /**
+   * append all of the files
+   */
   for (let file of files) {
     const { name, absolutePath } = file
-    zip.append(request(absolutePath), { name })
+    zip.append(request(absolutePath), { 
+      name: path.join(datasetName, name)
+    })
   }
 
   zip.finalize()
@@ -418,5 +302,12 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   return zip
 }
 
-exports.getDatasetFromId = getDatasetFromId
-exports.getDatasetFileAsZip = getDatasetFileAsZip
+module.exports = {
+  getDatasetFromId,
+  getDatasetFileAsZip,
+  init,
+  getDatasets,
+  getPreview,
+  getTos
+}
+
