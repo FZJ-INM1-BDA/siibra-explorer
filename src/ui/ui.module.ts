@@ -18,7 +18,6 @@ import { SafeStylePipe } from "../util/pipes/safeStyle.pipe";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 import { CitationsContainer } from "./citation/citations.component";
 import { LayerBrowser, LockedLayerBtnClsPipe } from "./layerbrowser/layerbrowser.component";
-import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
 import { GetLayerNameFromDatasets } from "../util/pipes/getLayerNamePipe.pipe";
@@ -34,7 +33,6 @@ import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
-import { PopoverModule } from 'ngx-bootstrap/popover'
 import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { SigninModal } from "./signinModal/signinModal.component";
@@ -75,9 +73,6 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
-
-    PopoverModule.forRoot(),
-    TooltipModule.forRoot()
   ],
   declarations : [
     NehubaContainer,

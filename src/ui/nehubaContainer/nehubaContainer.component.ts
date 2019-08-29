@@ -1253,7 +1253,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
   downloadDs(event: MouseEvent, ds: DataEntry, downloadBtn: MatButton){
     downloadBtn.disabled = true
     const id = getIdFromDataEntry(ds)
-    this.kgSingleDataset.downloadZipFromKg({kgId: id})
+    const { name } = ds
+    this.kgSingleDataset.downloadZipFromKg({kgId: id}, name)
+      .catch(err => this.constantService.catchError(err))
       .finally(() => downloadBtn.disabled = false)
   }
 }

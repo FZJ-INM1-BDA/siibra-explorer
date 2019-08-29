@@ -4,6 +4,7 @@ import { ViewerStateInterface } from "../services/stateStore.service";
 import { Subject, Observable } from "rxjs";
 import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 import { map, shareReplay, filter } from "rxjs/operators";
+import { MatSnackBar } from "@angular/material";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
@@ -239,7 +240,10 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   private supportEmailAddress = `x.gui@fz-juelich.de`
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
-  constructor(private store : Store<ViewerStateInterface>){
+  constructor(
+    private store : Store<ViewerStateInterface>,
+    private snackbar: MatSnackBar  
+  ){
 
     const ua = window && window.navigator && window.navigator.userAgent
       ? window.navigator.userAgent
@@ -270,11 +274,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   }
 
   catchError(e: Error | string){
-    /**
-     * DO NOT REMOVE
-     * general catch all & reflect in UI
-     */
-    console.warn(e)
+    this.snackbar.open(e.toString(), 'Dismiss', {
+      duration: 3000
+    })
   }
 }
 

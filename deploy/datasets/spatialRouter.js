@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { getSpatialDatasets } = require('./query')
+const { getSpatialDatasets } = require('./spatialQuery')
 
 const badRequestString = `spatialSearch endpoint uses param as follows:
 

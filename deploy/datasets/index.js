@@ -2,11 +2,12 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getTos } = require('./query')
 const url = require('url')
 const qs = require('querystring')
 
 const bodyParser = require('body-parser')
+
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
@@ -33,6 +34,17 @@ const getVary = (headers) => (_req, res, next) => {
   res.setHeader('Vary', headers.join(', '))
   next()
 }
+
+
+datasetsRouter.get('/tos', cacheMaxAge24Hr, async (req, res) => {
+  const tos = getTos()
+  if (tos) {
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8')
+    res.status(200).send(tos)
+  } else {
+    res.status(404).end()
+  }
+})
 
 datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter'))
 
@@ -145,48 +157,8 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
     stream.pipe(res)
   } catch (e) {
     console.warn('datasets/index#downloadKgFiles', e)
-    res.status(400).send(e)
+    res.status(400).send(e.toString())
   }
 })
-
-/**
- * TODO
- * deprecate jszip in favour of archiver
- */
-
-var JSZip = require("jszip");
-
-datasetsRouter.post("/downloadParcellationThemself", (req,res, next) => {
-
-
-  //ToDo We can add termsOfUse Text file somewhere - will be better
-  const termsOfUse = 'Access to the data and metadata provided through HBP Knowledge Graph Data Platform ' +
-      '("KG") requires that you cite and acknowledge said data and metadata according to the Terms and' +
-      ' Conditions of the Platform.\r\n## Citation requirements are outlined - https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use#citations' +
-      '\r\n## Acknowledgement requirements are outlined - https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use#acknowledgements' +
-      '\r\n## These outlines are based on the authoritative Terms and Conditions are found - https://www.humanbrainproject.eu/en/explore-the-brain/search-terms-of-use' +
-      '\r\n## If you do not accept the Terms & Conditions you are not permitted to access or use the KG to search for, to submit, to post, or to download any materials found there-in.'
-
-
-  var zip = new JSZip();
-
-  zip.file("credits.txt", req.body['publicationsText'])
-  zip.file("Terms of use.txt", termsOfUse)
-
-
-
-
-  //ToDo: Need to download files dynamically. Nii folder should be removed
-  if (req.body['niiFiles']) {
-    var nii = zip.folder("nifti")
-    const filepath = process.env.STORAGE_PATH || path.join(__dirname, 'nii')
-    req.body['niiFiles'].forEach(file => {
-      nii.file(file['file'], fs.readFileSync(path.join(filepath, file['file'])))
-    })
-  }
-
-  res.setHeader('Content-Type', 'application/zip')
-  zip.generateNodeStream().pipe(res)
-});
 
 module.exports = datasetsRouter

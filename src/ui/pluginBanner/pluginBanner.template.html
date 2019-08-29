@@ -1,6 +1,6 @@
 <div 
   placement = "bottom"
-  [tooltip] = "pluginEnabledFlag ? null : 'coming soon'"
+  [matTooltip] = "pluginEnabledFlag ? null : 'coming soon'"
   *ngFor = "let plugin of pluginServices.fetchedPluginManifests"
   (click) = "clickPlugin(plugin)"
   [ngClass] = "{'btn-disabled' : !pluginEnabledFlag}"

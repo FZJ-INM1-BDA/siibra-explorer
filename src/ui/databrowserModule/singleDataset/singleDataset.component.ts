@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { Publication, File } from 'src/services/state/dataStore.store'
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector: 'single-dataset-view',
@@ -41,7 +42,8 @@ export class SingleDatasetView implements OnInit {
 
   constructor(
     private singleDatasetService: KgSingleDatasetService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private constantService: AtlasViewerConstantsServices
   ){}
 
   ngOnInit() {
@@ -105,8 +107,8 @@ export class SingleDatasetView implements OnInit {
     this.singleDatasetService.downloadZipFromKg({
       kgId,
       kgSchema
-    })
-      .catch(console.error)
+    }, this.name)
+      .catch(err => this.constantService.catchError(err))
       .finally(() => this.downloadInProgress = false)
   }
 }
