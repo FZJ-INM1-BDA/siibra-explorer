@@ -182,7 +182,7 @@ export class MenuIconsBar{
 
   public clickPluginIcon(manifest: PluginManifest){
     this.pluginServices.launchPlugin(manifest)
-      .catch(this.constantService.catchError)
+      .catch(err => this.constantService.catchError(err))
   }
 
   public searchIconClickHandler(wu: WidgetUnit){

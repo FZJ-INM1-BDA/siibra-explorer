@@ -171,6 +171,11 @@ export class WidgetUnit implements OnInit, OnDestroy{
 
   /* floating widget specific functionalities */
 
+  @HostBinding('style.transform')
+  get styleTransform() {
+    return this.state === 'floating' ? `translate(${this.position.map(v => v + 'px').join(',')})` : null
+  }
+
   position : [number,number] = [400,100]
 
   get isMobile(){
