@@ -3,6 +3,8 @@ const bodyParser = require('body-parser')
 
 let ALLOWED_DEFAULT_SRC, DATA_SRC
 
+const reportOnly = process.env.NODE_ENV !== 'production'
+
 try {
   ALLOWED_DEFAULT_SRC = JSON.parse(process.env.ALLOWED_DEFAULT_SRC || '[]')
 } catch (e) {
@@ -61,7 +63,7 @@ module.exports = (app) => {
       ],
       reportUri: '/report-violation'
     },
-    reportOnly: true
+    reportOnly
   }))
 
   app.post('/report-violation', bodyParser.json({
