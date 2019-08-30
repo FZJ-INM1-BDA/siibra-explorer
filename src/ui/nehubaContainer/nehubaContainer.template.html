@@ -31,11 +31,11 @@
       [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
       matBadgeColor="accent"
       matBadgePosition="above before"
-      matTooltip="Favourite datasets"
+      matTooltip="Pinned datasets"
       matTooltipPosition="before"
       mat-fab
       color="primary">
-      <i class="fas fa-star"></i>
+      <i class="fas fa-thumbtack"></i>
     </button>
   </div>
 
@@ -154,12 +154,12 @@
 
 <ng-template #savedDatasets>
   <mat-list rol="list">
-    <h3 mat-subheader>Favourite Datasets</h3>
+    <h3 mat-subheader>Pinned Datasets</h3>
 
     <!-- place holder when no fav data is available -->
     <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">
       <mat-card-content class="muted">
-        No dataset favourited... yet.
+        No pinned dataset ... yet.
       </mat-card-content>
     </mat-card>
 
@@ -187,7 +187,7 @@
       <!-- remove from fav -->
       <button
         (click)="removeFav($event, ds)"
-        matTooltip="Remove Favourite"
+        matTooltip="Remove Pin"
         matTooltipPosition="after"
         color="warn"
         class="flex-grow-0 flex-shrink-0"
