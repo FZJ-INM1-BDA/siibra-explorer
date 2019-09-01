@@ -4,6 +4,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
+import { LineChart }  from './line/line.chart.component';
+
 
 @Component({
   selector : 'file-viewer',
@@ -83,6 +85,10 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
       URL.revokeObjectURL(this._pngDownloadUrl)
       this._pngDownloadUrl = null
     }
+  }
+
+  downloadFile(url) {
+    window.location.href = url;
   }
 
   get downloadName(){

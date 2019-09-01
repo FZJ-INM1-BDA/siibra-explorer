@@ -347,3 +347,51 @@ markdown-dom pre code
   background:none;
   border:none;
 }
+
+.outline-none {
+  outline: none
+}
+
+.dialog-dark-background-color .mat-dialog-container{
+  padding: 0 0 10px 0;
+  background-color: rgba(0,0,0,0.8);
+  color: rgba(255,255,255,1);
+  border: 1px solid rgba(255,255,255,0.8);
+}
+.dialog-dark-background-color input {
+  caret-color:rgba(255,255,255,1);
+}
+
+.dialog-dark-background-color .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(255,255,255,0.8);
+}
+
+.dialog-light-background-color .mat-dialog-container{
+  background-color: rgba(255,255,255,0.8);
+  color: rgba(0,0,0,1);
+  border: 1px solid rgba(0,0,0,0.8);
+}
+.dialog-light-background-color input {
+  caret-color: rgba(0, 0, 0, 1);
+}
+
+.dialog-light-background-color .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: rgba(0,0,0,0.8);
+}
+
+@supports ((-webkit-backdrop-filter: blur(2em)) or (backdrop-filter: blur(2em))) {
+  .dialog-dark-background-color .mat-dialog-container {
+    background-color: rgba(0,0,0,0.6);
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+  }
+  .dialog-light-background-color .mat-dialog-container {
+    background-color: rgba(255,255,255,0.6);
+    backdrop-filter: blur(11px);
+    -webkit-backdrop-filter: blur(11px);
+  }
+}
+
+.cursorPointer {
+  cursor: pointer;
+}

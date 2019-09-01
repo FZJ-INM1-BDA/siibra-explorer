@@ -18,7 +18,8 @@ import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
-import {filter} from "rxjs/operators";
+import {distinctUntilChanged, filter, map} from "rxjs/operators";
+import {safeFilter} from "src/services/stateStore.service";
 
 @Component({
   selector: 'menu-icons',
@@ -58,11 +59,13 @@ export class MenuIconsBar{
 
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
+  public selectedRegions$: Observable<any>
 
   searchCollapsed = 0
   searchedItemsNumber = 0
   searchLoading = false
-  @ViewChild ('collapsibleSearchPanel', {read: ElementRef}) collapsibleSearchPanel: ElementRef
+  searchMenuFrozen = false
+  filePreviewModalClosed = false
 
   constructor(
     private widgetServices:WidgetServices,
@@ -87,6 +90,12 @@ export class MenuIconsBar{
     this.selectedParcellation$ = store.pipe(
         select('viewerState'),
         select('parcellationSelected'),
+    )
+    this.selectedRegions$ = store.pipe(
+        select('viewerState'),
+        safeFilter('regionsSelected'),
+        map(state => state.regionsSelected),
+        distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
     )
   }
 
@@ -180,6 +189,11 @@ export class MenuIconsBar{
     } else {
       this.searchCollapsed = 2
     }
+  }
+
+  closeFrozenMenu() {
+    this.searchMenuFrozen = false
+    this.filePreviewModalClosed = false
   }
 
   get databrowserIsShowing() {

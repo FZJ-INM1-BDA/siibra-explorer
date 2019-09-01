@@ -50,6 +50,9 @@ import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParc
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
+import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
+import {PreviewFileDialogComponent} from "src/ui/searchItemPreview/previewFileDialog.component";
+import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
 
 @NgModule({
   imports : [
@@ -86,6 +89,9 @@ import {ElementOutClickDirective} from "src/util/directives/elementOutClick.dire
     CookieAgreement,
     KGToS,
     SearchPanel,
+    SearchItemPreviewComponent,
+    PreviewFileDialogComponent,
+    SelectedRegionsComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -112,7 +118,8 @@ import {ElementOutClickDirective} from "src/util/directives/elementOutClick.dire
     /* dynamically created components needs to be declared here */
     NehubaViewerUnit,
     LayerBrowser,
-    PluginBannerUI
+    PluginBannerUI,
+    PreviewFileDialogComponent
   ],
   exports : [
     SubjectViewer,

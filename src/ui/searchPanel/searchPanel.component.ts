@@ -25,16 +25,15 @@ import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constant
 export class SearchPanel implements OnInit, OnDestroy {
     @Input() selectedTemplate$: Observable<any>
     @Input() selectedParcellation$: Observable<any>
+    @Input() selectedRegions$: Observable<any>
     @Input() searchPanelPositionTop
-    selectedRegions$: Observable<any[]>
     selectedTemplate
     selectedParcellation
 
     @Output() searchedItemsNumber: EventEmitter<number> = new EventEmitter()
     @Output() searchLoading: EventEmitter<boolean> = new EventEmitter()
-
-    showSelectionFilter = false
-    stateFilter: string = 'Current selection'
+    @Output() freezeSearchMenu: EventEmitter<boolean> = new EventEmitter()
+    @Output() filePreviewModalClosed: EventEmitter<boolean> = new EventEmitter()
 
     public dataentries: DataEntry[] = []
     public countedDataM: CountedDataModality[] = []
@@ -47,22 +46,24 @@ export class SearchPanel implements OnInit, OnDestroy {
     previewWindowTopPosition
     windowInnerheight
 
+    filesMenuFrozen
+    filePreviewModalClosedValue = false
+    showSelectedRegions = false
+
     @HostListener('window:resize', ['$event'])
     onResize(event) {
         this.windowInnerheight = event.target.innerHeight
     }
 
-    setPreviewHeight(event: MouseEvent){
-        this.previewWindowTopPosition = event.clientY - this.searchPanelPositionTop-30
+    setPreviewHeight(searchBody, searchItem) {
+        this.previewWindowTopPosition = +searchItem.offsetTop - +searchBody.scrollTop - +this.searchPanelPositionTop + 132
         setTimeout(() => {
-
                 if (this.searchPreview) {
                     if ((+this.previewWindowTopPosition + +this.searchPreview.nativeElement.offsetHeight + +this.searchPanelPositionTop) > window.innerHeight) {
                         this.previewWindowTopPosition -= ((+this.previewWindowTopPosition + +this.searchPreview.nativeElement.offsetHeight + +this.searchPanelPositionTop)-window.innerHeight)+10
                     }
                 }
-            }, 500)
-
+            }, 100)
     }
 
     @ViewChild('SearchBody', {read: ElementRef}) searchBody: ElementRef
@@ -72,13 +73,6 @@ export class SearchPanel implements OnInit, OnDestroy {
                 private dbService: DatabrowserService,
                 private constantsService: AtlasViewerConstantsServices) {
         this.windowInnerheight = window.innerHeight
-        // ToDo Put saved selections instead of selected regions
-        this.selectedRegions$ = this.store.pipe(
-            select('viewerState'),
-            safeFilter('regionsSelected'),
-            map(state => state.regionsSelected),
-            distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
-        )
     }
 
     ngOnInit(): void {
@@ -89,9 +83,8 @@ export class SearchPanel implements OnInit, OnDestroy {
         )
         this.subscriptions.push(
             this.selectedParcellation$.subscribe(parcellation => {
+                this.clearSearchResults()
                 this.selectedParcellation = parcellation
-                if (this.selectedTemplate && this.selectedParcellation && this.selectedParcellation.regions)
-                    this.loadKGSearchData(this.selectedTemplate, this.selectedParcellation)
             })
         )
 
@@ -101,8 +94,10 @@ export class SearchPanel implements OnInit, OnDestroy {
                 if (this.searchBody && this.searchBody.nativeElement) {
                     this.searchBody.nativeElement.scrollTop = 0
                 }
-                if (r && this.selectedTemplate && this.selectedParcellation && this.selectedParcellation.regions) {
+                if (r && r.length && this.selectedTemplate && this.selectedParcellation && this.selectedParcellation.regions) {
                     this.loadKGSearchData(this.selectedTemplate, this.selectedParcellation, r)
+                } else {
+                    this.clearSearchResults()
                 }
             })
         )
@@ -146,6 +141,7 @@ export class SearchPanel implements OnInit, OnDestroy {
                     this.searchLoading.emit(false)
                 })
 
+
             this.subscriptions.push(
                 merge(
                     this.dbService.fetchDataObservable$
@@ -179,8 +175,32 @@ export class SearchPanel implements OnInit, OnDestroy {
         this.visibleCountedDataM = []
     }
 
+    clearSearchResults() {
+        this.dataentries = []
+        this.countedDataM = []
+        this.visibleCountedDataM = []
+        this.fetchingFlag = false
+        this.fetchError = false
+        this.searchedItemsNumber.emit(this.dataentries.length)
+    }
+
     handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
         this.countedDataM = modalityFilter
         this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
+    }
+
+    frozeSearchMenu() {
+        this.freezeSearchMenu.emit(true)
+        this.filesMenuFrozen = true
+    }
+
+    unfrozeSearchMenu() {
+        this.filesMenuFrozen = false
+        this.freezeSearchMenu.emit(false)
+    }
+    closeFrozenMenu() {
+        console.log('Close menu')
+        this.filePreviewModalClosedValue = false
+        this.filesMenuFrozen = false
     }
 }

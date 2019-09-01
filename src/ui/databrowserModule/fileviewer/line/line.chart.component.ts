@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ElementRef, ViewChild } from '@angular/core'
+import {Component, Input, OnChanges, ElementRef, ViewChild, Output, EventEmitter} from '@angular/core'
 import {  DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption } from '../chart.interface'
 
 import { ChartOptions, LinearTickOptions,ChartDataSets, ChartPoint } from 'chart.js';
@@ -14,6 +14,11 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 export class LineChart implements OnChanges{
 
   @ViewChild('canvas') canvas : ElementRef
+  @ViewChild('DownloadLineChartLink', {read: ElementRef}) downloadLineChartLink : ElementRef
+
+  public click() {
+    this.downloadLineChartLink.nativeElement.click()
+  }
 
   /**
    * labels of each of the columns, spider web edges
@@ -108,15 +113,15 @@ export class LineChart implements OnChanges{
     
   }
 
-  ngOnChanges(){
-    this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
+  async ngOnChanges(){
+    this.shapedLineChartDatasets = await this.lineDatasets.map(lineDataset=>({
       data : lineDataset.data.map((v,idx)=>({
         x : idx,
         y : v
       })),
       fill : 'origin'
     }))
-    
+
     this.maxY = this.chartDataset.datasets.reduce((max,dataset)=>{
       return Math.max(
         max,

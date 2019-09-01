@@ -1,0 +1,14 @@
+<div class="preview-panel-container">
+    <div class="overflow-auto selected-regions-panel-container p-2">
+        <mat-chip-list aria-label="Fish selection">
+            <mat-chip *ngFor="let selectedRegion of (selectedRegions$ | async) as sr"
+                      class="w-100 d-flex justify-content-between align-items-center"
+                      removable="true"
+                      (removed)="removeRegionFromSelectedList(selectedRegion, sr)"
+                      (click)="navigateToRegion(selectedRegion)">
+                {{selectedRegion.name}}
+                <i class="fas fa-times-circle ml-1" matChipRemove (click)="$event.stopPropagation()"></i>
+            </mat-chip>
+        </mat-chip-list>
+    </div>
+</div>
