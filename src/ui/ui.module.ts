@@ -60,6 +60,7 @@ import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSear
 import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
+import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 
 
 @NgModule({
@@ -127,6 +128,7 @@ import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcella
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
     TemplateParcellationHasMoreInfo,
+    HumanReadableFileSizePipe,
 
     /* directive */
     DownloadDirective,
