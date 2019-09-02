@@ -3,6 +3,7 @@
   "type": "template",
   "species": "Rat",
   "useTheme": "dark",
+  "ngId": "template",
   "nehubaConfigURL": "nehubaConfig/waxholmRatV2_0NehubaConfig",
   "parcellations": [
     {

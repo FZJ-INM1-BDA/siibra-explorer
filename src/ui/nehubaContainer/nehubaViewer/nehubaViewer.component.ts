@@ -686,6 +686,10 @@ export class NehubaViewerUnit implements OnDestroy{
      * TODO
      * ugh, ugly code. cleanify
      */
+    /**
+     * TODO 
+     * sometimes, ngId still happends to be undefined
+     */
     newMap.forEach((segs, ngId) => {
       this.nehubaViewer.hideSegment(0, {
         name: ngId

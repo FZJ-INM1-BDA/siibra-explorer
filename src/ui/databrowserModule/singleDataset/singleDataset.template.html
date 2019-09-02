@@ -1,59 +1,58 @@
-<div class="card">
-  <div class="card-body">
-
-    <!-- title -->
-    <h5 class="card-title">
+<mat-card>
+  
+  <!-- title -->
+  <mat-card-header>
+    <mat-card-title>
       {{ name }}
-    </h5>
+    </mat-card-title>
+  </mat-card-header>
+  
+  <!-- description -->
+  <mat-card-content>
+    <p>{{ description }}</p>
+  </mat-card-content>
 
-    <!-- description -->
-    <p class="card-text">
-      {{ description }}
-    </p>
+  <!-- publications -->
+  <mat-card-content>
+    <a *ngFor="let publication of publications"
+      [href]="publication.doi | doiParserPipe"
+      mat-button
+      target="_blank">
+      {{ publication.cite }}
+    </a>
+  </mat-card-content>
 
-    <hr *ngIf="showFooter">
-    <!-- publications -->
-    <div class="d-flex flex-column">
 
-      <a
-        *ngFor="let publication of publications"
-        [href]="publication.doi | doiParserPipe"
-        target="_blank">
-        {{ publication.cite }}
-      </a>
-    </div>
+  <!-- footer -->
+  <mat-card-actions>
 
-    <!-- footer -->
-    <div class="d-flex justify-content-end">
-
-      <!-- explore -->
-      <a
-        *ngFor="let kgRef of appendedKgReferences"
-        class="m-2"
-        mat-raised-button
-        color="primary"
-        [href]="kgRef"
-        target="_blank">
-        <span>
-          Explore
-        </span>
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-
-      <!-- download -->
-      <a
-        (click)="downloadZipFromKg()"
-        [disabled]="downloadInProgress"
-        class="m-2"
-        *ngIf="files.length > 0"
+    <!-- explore -->
+    <a *ngFor="let kgRef of appendedKgReferences"
+      class="m-2"
+      [href]="kgRef"
+      target="_blank">
+      <button 
         mat-raised-button
         color="primary">
-        <span>
-          Download Zip
-        </span>
-        <span>({{ numOfFiles }} files ~ {{ totalFileByteSize / 1e6 | number: '.1-2' }} MB)</span>
-        <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-      </a>
-    </div>
-  </div>
-</div>
+        Explore
+        <i class="fas fa-external-link-alt"></i>
+      </button>
+    </a>
+
+
+    <!-- download -->
+    <button
+      (click)="downloadZipFromKg()"
+      [disabled]="downloadInProgress"
+      [matTooltip]="tooltipText"
+      class="m-2"
+      *ngIf="files.length > 0"
+      mat-button
+      color="primary">
+      <span>
+        Download as Zip
+      </span>
+      <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+    </button>
+  </mat-card-actions>
+</mat-card>
