@@ -1,13 +1,11 @@
 import { Component, ViewChild, TemplateRef, OnInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, Subject, combineLatest, Subscription } from "rxjs";
-import { distinctUntilChanged, shareReplay, bufferTime, filter, map, withLatestFrom, delay, take, tap } from "rxjs/operators";
+import { Observable, Subscription } from "rxjs";
+import { distinctUntilChanged, shareReplay, filter } from "rxjs/operators";
 import { SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
 import { DESELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { ToastService } from "src/services/toastService.service";
-import { getSchemaIdFromName } from "src/util/pipes/templateParcellationDecoration.pipe";
-import { MatDialog, MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
-import { ExtraButton } from "src/components/radiolist/radiolist.component";
+import { MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 
@@ -25,7 +23,6 @@ const compareWith = (o, n) => !o || !n
 
 export class ViewerStateController implements OnInit{
 
-  @ViewChild('publicationTemplate', {read:TemplateRef}) publicationTemplate: TemplateRef<any>
   @ViewChild('savedRegionBottomSheetTemplate', {read:TemplateRef}) savedRegionBottomSheetTemplate: TemplateRef<any>
 
   public focused: boolean = false
@@ -41,8 +38,6 @@ export class ViewerStateController implements OnInit{
 
   public savedRegionsSelections$: Observable<any[]>
 
-  public focusedDatasets$: Observable<any[]>
-  private userFocusedDataset$: Subject<any> = new Subject()
   private dismissToastHandler: () => void
 
   public compareWith = compareWith
@@ -92,33 +87,6 @@ export class ViewerStateController implements OnInit{
       select('parcellations')
     )
     
-    this.focusedDatasets$ = this.userFocusedDataset$.pipe(
-      filter(v => !!v),
-      withLatestFrom(
-        combineLatest(this.templateSelected$, this.parcellationSelected$)
-      ),
-    ).pipe(
-      map(([userFocusedDataset, [selectedTemplate, selectedParcellation]]) => {
-        const { type, ...rest } = userFocusedDataset
-        if (type === 'template') return { ...selectedTemplate,  ...rest}
-        if (type === 'parcellation') return { ...selectedParcellation, ...rest }
-        return { ...rest }
-      }),
-      bufferTime(100),
-      filter(arr => arr.length > 0),
-      /**
-       * merge properties field with the root level
-       * with the prop in properties taking priority
-       */
-      map(arr => arr.map(item => {
-        const { properties } = item
-        return {
-          ...item,
-          ...properties
-        }
-      })),
-      shareReplay(1)
-    )
   }
 
   ngOnInit(){
@@ -127,30 +95,6 @@ export class ViewerStateController implements OnInit{
         filter(srs => srs.length === 0)
       ).subscribe(() => this.savedRegionBottomSheetRef && this.savedRegionBottomSheetRef.dismiss())
     )
-    this.subscriptions.push(
-      this.focusedDatasets$.subscribe(() => this.dismissToastHandler && this.dismissToastHandler())
-    )
-    this.subscriptions.push(
-      this.focusedDatasets$.pipe(
-        /**
-         * creates the illusion that the toast complete disappears before reappearing
-         */
-        delay(100)
-      ).subscribe(() => this.dismissToastHandler = this.toastService.showToast(this.publicationTemplate, {
-        dismissable: true,
-        timeout:7000
-      }))
-    )
-  }
-
-  handleActiveDisplayBtnClicked(event: MouseEvent, type: 'parcellation' | 'template', extraBtn: ExtraButton, inputItem:any = {}){
-    const { name } = extraBtn
-    const { kgSchema, kgId } = getSchemaIdFromName(name)
-    this.userFocusedDataset$.next({
-      ...inputItem,
-      kgSchema,
-      kgId
-    })
   }
 
   handleTemplateChange(event:MatSelectChange){

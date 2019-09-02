@@ -464,6 +464,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
          */
         if (!this.nehubaViewer) return
 
+        /**
+         * TODO smarter with event stream
+         */
+        if (!viewPanels.every(v => !!v)) return
+
         switch (mode) {
           case H_ONE_THREE:{
             const element = this.removeExistingPanels()
