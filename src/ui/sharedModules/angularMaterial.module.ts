@@ -17,14 +17,11 @@ import {
   MatListModule,
   MatSlideToggleModule,
   MatRippleModule,
-  MatSliderModule
-  
+  MatSliderModule,
+
 } from '@angular/material';
 import { NgModule } from '@angular/core';
-
-/**
- * TODO should probably be in src/util
- */
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
   imports: [
@@ -46,7 +43,8 @@ import { NgModule } from '@angular/core';
     MatListModule,
     MatSlideToggleModule,
     MatRippleModule,
-    MatSliderModule
+    MatSliderModule,
+    DragDropModule
   ],
   exports: [
     MatButtonModule,
@@ -67,7 +65,8 @@ import { NgModule } from '@angular/core';
     MatListModule,
     MatSlideToggleModule,
     MatRippleModule,
-    MatSliderModule
+    MatSliderModule,
+    DragDropModule
   ],
 })
 export class AngularMaterialModule { }

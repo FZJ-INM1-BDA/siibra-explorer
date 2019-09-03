@@ -5,10 +5,10 @@
 
 <ng-container *ngIf="nonBaseNgLayers$ | async as nonBaseNgLayers; else noLayerPlaceHolder">
   <mat-list *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
-    <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers">
+    <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers" class="matListItem">
 
       <!-- toggle visibility -->
-      
+
       <button
         [matTooltipPosition]="matTooltipPosition"
         [matTooltip]="(ngLayer | lockedLayerBtnClsPipe : lockedLayers) ? 'base layer cannot be hidden' : 'toggle visibility'"
@@ -27,10 +27,10 @@
         [matTooltip]="ngLayer.type === 'segmentation' ? segmentationTooltip() : 'only segmentation layer can hide/show segments'"
         (mousedown)="toggleForceShowSegment(ngLayer)"
         mat-icon-button>
-        <i 
-          class="fas" 
+        <i
+          class="fas"
           [ngClass]="ngLayer.type === 'segmentation' ? ('fa-th-large ' + segmentationAdditionalClass) : 'fa-lock muted' ">
-    
+
         </i>
       </button>
 
@@ -50,7 +50,7 @@
         [matTooltipPosition]="matTooltipPosition"
         [matTooltip]="ngLayer.name | getFilenamePipe "
         [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate'">
-        {{ ngLayer.name | getFilenamePipe | getFileExtension }}
+        {{ ngLayer.name | getFilenamePipe }}
       </div>
     </mat-list-item>
   </mat-list>

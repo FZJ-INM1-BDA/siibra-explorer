@@ -1,4 +1,10 @@
-import { Component, ComponentRef, Injector, ComponentFactory, ComponentFactoryResolver } from "@angular/core";
+import {
+  Component,
+  ComponentRef,
+  Injector,
+  ComponentFactory,
+  ComponentFactoryResolver,
+} from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
@@ -8,11 +14,9 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable, BehaviorSubject, combineLatest, merge, of } from "rxjs";
+import { Observable, combineLatest } from "rxjs";
 import { map, shareReplay, startWith } from "rxjs/operators";
-import { DESELECT_REGIONS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { ToastService } from "src/services/toastService.service";
-
 @Component({
   selector: 'menu-icons',
   templateUrl: './menuicons.template.html',
@@ -51,13 +55,22 @@ export class MenuIconsBar{
 
   public toolBtnClass$: Observable<string>
   public getKgSearchBtnCls$: Observable<[Set<WidgetUnit>, string]>
-  
+
   get darktheme(){
     return this.constantService.darktheme
   }
 
   public selectedTemplate$: Observable<any>
-  public selectedRegions$: Observable<any[]>
+  public selectedParcellation$: Observable<any>
+  public selectedRegions$: Observable<any>
+
+  searchCollapsed = 0
+  searchedItemsNumber = 0
+  searchLoading = false
+  searchMenuFrozen = false
+  filePreviewModalClosed = false
+  showSearchMenu = false
+  mouseHoversSearch = false
 
   constructor(
     private widgetServices:WidgetServices,
@@ -82,6 +95,11 @@ export class MenuIconsBar{
       select('viewerState'),
       select('templateSelected')
     )
+
+      this.selectedParcellation$ = store.pipe(
+          select('viewerState'),
+          select('parcellationSelected'),
+      )
 
     this.selectedRegions$ = store.pipe(
       select('viewerState'),
@@ -185,12 +203,38 @@ export class MenuIconsBar{
       .catch(err => this.constantService.catchError(err))
   }
 
-  public searchIconClickHandler(wu: WidgetUnit){
-    if (this.widgetServices.isMinimised(wu)) {
-      this.widgetServices.unminimise(wu)
+  public searchIconClickHandler(wu: WidgetUnit) {
+      if (this.widgetServices.isMinimised(wu)) {
+          this.widgetServices.unminimise(wu)
+      } else {
+          this.widgetServices.minimise(wu)
+      }
+  }
+  collapseSearchBar() {
+    if (this.searchCollapsed === 2) {
+      this.searchCollapsed = 1
+      setTimeout(() => {this.searchCollapsed = 0}, 500)
     } else {
-      this.widgetServices.minimise(wu)
+      this.searchCollapsed = 2
     }
+  }
+
+  closeFrozenMenu() {
+    this.searchMenuFrozen = false
+    this.filePreviewModalClosed = false
+  }
+
+  hideSearchMenu() {
+    if (this.showSearchMenu) {
+      setTimeout(() => {
+        if (!this.mouseHoversSearch && !this.searchMenuFrozen)
+          this.showSearchMenu = false
+      }, 600)
+    }
+  }
+
+  get databrowserIsShowing() {
+    return this.dataBrowser !== null
   }
 
   public closeWidget(event: MouseEvent, wu:WidgetUnit){

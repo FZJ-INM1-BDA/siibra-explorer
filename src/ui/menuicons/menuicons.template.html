@@ -40,7 +40,7 @@
         <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
           <viewer-state-controller #viewerStateController></viewer-state-controller>
         </div>
-        
+
         <!-- invisible icon to keep height of the otherwise unstable flex block -->
         <div class="invisible pe-none">
           <i class="fas fa-brain"></i>
@@ -54,7 +54,7 @@
       </ng-template>
     </div>
   </sleight-of-hand>
-  
+
   <!-- layer browser -->
   <sleight-of-hand>
     <div sleight-of-hand-front>
@@ -108,7 +108,7 @@
 
     </div>
   </sleight-of-hand>
-  
+
   <!-- tools -->
   <sleight-of-hand>
 
@@ -131,7 +131,7 @@
 
       <!-- placeholder icon -->
       <button
-        [matBadgePosition]="badgetPosition"  
+        [matBadgePosition]="badgetPosition"
         matBadgeColor="accent"
         [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
         mat-icon-button
@@ -150,7 +150,7 @@
           color="primary">
           <i class="fas fa-plus"></i>
         </button>
-        
+
         <button
           *ngFor="let manifest of pluginServices.fetchedPluginManifests"
           mat-mini-fab
@@ -165,148 +165,40 @@
   </sleight-of-hand>
 
   <!-- search kg -->
-  <sleight-of-hand>
-    
-    <!-- shown icon prior to mouse over -->
-    <div sleight-of-hand-front>
-      <button
-        mat-icon-button
-        color="primary"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
-        <i class="fas fa-search"></i>
-      </button>
-    </div>
+<!--  <sleight-of-hand>-->
+    <div class="d-flex align-items-start" (mouseenter)="mouseHoversSearch = true; showSearchMenu = true" (mouseleave)="mouseHoversSearch = false; hideSearchMenu()" style="z-index: 1" #SearchMenu>
+          <div sleight-of-hand-front>
+            <button
+              [matTooltip]="!searchedItemsNumber && 'Please select any region to get search results'"
+              matTooltipPosition="after"
+              mat-icon-button
+              color="primary"
+              [matBadgePosition]="badgetPosition"
+              matBadgeColor="accent"
+              [matBadge]="searchedItemsNumber? searchedItemsNumber : null">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
 
-    <!-- shown after mouse over -->
-    <div
-      sleight-of-hand-back
-      class="d-flex flex-row align-items-center soh-row pe-none">
-
-      <!-- placeholder icon -->
-      <button
-        mat-icon-button
-        color="primary"
-        matBadgeColor="accent"
-        [matBadgePosition]="badgetPosition"
-        [matBadge]="dbService.instantiatedWidgetUnits.length > 0 ? dbService.instantiatedWidgetUnits.length : null">
-        <i class="fas fa-search"></i>
-      </button>
-
-      <!-- only renders if there is at least one search result -->
-      <div
-        *ngIf="dbService.instantiatedWidgetUnits.length > 0; else noKgSearchTemplate"
-        class="position-relative pe-all">
-
-        <div class="position-absolute d-flex flex-column soh-column">
-
-          <!-- render all searched kg -->
-          <sleight-of-hand
-            *ngFor="let wu of dbService.instantiatedWidgetUnits"
-            (click)="searchIconClickHandler(wu)">
-
-            <!-- shown prior to mouseover -->
-            <div sleight-of-hand-front>
-              <button
-                mat-mini-fab
-                [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
-                <i class="fas fa-search"></i>  
-              </button>
-            </div>
-
-            <!-- shown on mouse over -->
-            <!-- showing additional information. in this case, name of the kg search -->
-            <div class="d-flex flex-row align-items-center" sleight-of-hand-back>
-
-              <div sleight-of-hand-front>
-                <button
-                  mat-mini-fab
-                  [color]="getKgSearchBtnCls$ | async | kgSearchBtnColorPipe : wu">
-                  <i class="fas fa-search"></i>  
-                </button>
-              </div>
-              
-              <!-- on hover, show full name and action possible: rename, close -->
-              <div [class]="((darktheme$ | async) ? 'text-light' : 'text-dark' ) + ' h-0 d-flex flex-row align-items-center'">
-
-                <sleight-of-hand class="ml-1 h-0">
-                  <!-- prior mouse over -->
-                  <div class="h-0 d-flex align-items-center flex-row" sleight-of-hand-front>
-                    <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light' ) + ' muted d-flex flex-row align-items-center'">
-                  
-                      <small class="cursor-default ml-2 text-nowrap">
-                        {{ wu.title }}
-                      </small>
-  
-                      <!-- dummy class to keep height -->
-                      <div
-                        matTooltip="Rename"
-                        matTooltipPosition="below"
-                        [class]="(skeletonBtnClass$ | async) + ' invisible w-0 pe-none'">
-                        <i class="fas fa-edit"></i>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- on mouse over -->
-                  <div class="h-0 d-flex align-items-center flex-row" sleight-of-hand-back>
-                    <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light' ) + ' d-flex flex-row align-items-center'">
-                      
-                      <small class="cursor-default ml-2 text-nowrap">
-                        {{ wu.title }}
-                      </small>
-  
-                      <!-- rename -->
-                      <div
-                        (click)="renameKgSearchWidget($event, wu)"
-                        matTooltip="Rename (NYI)"
-                        matTooltipPosition="below"
-                        [class]="(skeletonBtnClass$ | async) + ' text-muted'">
-                        <i class="fas fa-edit"></i>
-                      </div>
-
-                      <!-- star -->
-                      <div
-                        (click)="favKgSearch($event, wu)"
-                        matTooltip="Pin (NYI)"
-                        matTooltipPosition="below"
-                        [class]="(skeletonBtnClass$ | async) + ' text-muted'">
-                        <i class="fas fa-thumbtack"></i>
-                      </div>
-  
-                      <!-- close -->
-                      <div
-                        (click)="closeWidget($event, wu)"
-                        matTooltip="Close"
-                        matTooltipPosition="below"
-                        [class]="skeletonBtnClass$ | async">
-                        <i class="fas fa-times"></i>
-                      </div>
-                    </div>
-                  </div>
-                </sleight-of-hand> 
-              </div>
-            </div>
-          </sleight-of-hand>
-        </div>
-
-        <!-- invisible icon to keep height of the otherwise unstable flex block -->
-        <div class="invisible pe-none">
-          <button mat-icon-button>
-            <i class="fas fa-search"></i>
-          </button>
-        </div>
+      <div *ngIf="(selectedRegions$ | async)?.length"
+           [hidden] = "!showSearchMenu"
+           class="position-absolute"
+           style="padding-left: 50px;">
+        <mat-card class="p-0">
+          <search-panel
+                  elementOutClick
+                  (outsideClick)="filePreviewModalClosed && $event? closeFrozenMenu() : null"
+                  [selectedTemplate$]="selectedTemplate$"
+                  [selectedParcellation$]="selectedParcellation$"
+                  [selectedRegions$]="selectedRegions$"
+                  [searchPanelPositionTop]="SearchMenu.offsetTop"
+                  (searchedItemsNumber)="searchedItemsNumber = $event"
+                  (searchLoading)="searchLoading = true"
+                  (freezeSearchMenu)="searchMenuFrozen = $event"
+                  (filePreviewModalClosed)="filePreviewModalClosed = $event"
+                  (closeSearchMenu)="this.showSearchMenu = false">
+          </search-panel>
+        </mat-card>
       </div>
-
-      <!-- displayed when no search is visible -->
-      <ng-template #noKgSearchTemplate>
-        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
-          Right click any area to search
-        </small>
-      </ng-template>
     </div>
-
-  </sleight-of-hand>
-
 </ng-template>

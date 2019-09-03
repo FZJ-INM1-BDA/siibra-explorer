@@ -40,7 +40,7 @@ export class DedicatedViewer{
 
   get tooltipText(){
     return this.isShowing
-      ? 'Remove this file in the viewer'
-      : 'View this file in the viewer'
+      ? 'File is added to Atlas Viewer'
+      : 'Click to add file in Atlas Viewer'
   }
 }

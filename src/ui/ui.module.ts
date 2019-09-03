@@ -61,6 +61,12 @@ import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSear
 import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 
+import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
+import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
+import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
+import {PreviewFileDialogComponent} from "src/ui/searchItemPreview/previewFileDialog.component";
+import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
+import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 
 @NgModule({
   imports : [
@@ -103,6 +109,10 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     CurrentLayout,
     ViewerStateController,
     RegionTextSearchAutocomplete,
+    SearchPanel,
+    SearchItemPreviewComponent,
+    PreviewFileDialogComponent,
+    SelectedRegionsComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -127,10 +137,12 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     GetFileExtension,
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
+    FilterWithStringPipe,
 
     /* directive */
     DownloadDirective,
-    ShowToastDirective
+    ShowToastDirective,
+    ElementOutClickDirective
   ],
   entryComponents : [
 
@@ -138,6 +150,7 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     NehubaViewerUnit,
     LayerBrowser,
     PluginBannerUI,
+    PreviewFileDialogComponent
   ],
   exports : [
     SubjectViewer,
@@ -157,7 +170,9 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    SearchPanel,
+    ElementOutClickDirective
   ]
 })
 

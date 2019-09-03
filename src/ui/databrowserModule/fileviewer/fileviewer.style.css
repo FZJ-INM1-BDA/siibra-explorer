@@ -37,3 +37,8 @@ div[mimetypeTextContainer]
 {
   margin:1em;
 }
+
+.downloadButton {
+  color: #4595ec;
+  font-size: 20px;
+}

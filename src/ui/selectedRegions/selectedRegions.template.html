@@ -1,0 +1,34 @@
+<mat-card class="p-0 selected-regions-panel-container border"
+     *ngIf="(selectedRegions$ | async) as sr">
+    <div class="mr-2 ml-2">
+        <mat-form-field class="w-100" (click)="$event.stopPropagation()">
+            <input matInput
+                   placeholder="&nbsp;&nbsp; Click here to filter"
+                   [(ngModel)]="filterInput"
+                   class="pr-2 pl-2">
+            <button mat-button *ngIf="filterInput" matSuffix mat-icon-button aria-label="Clear"
+                    (click)="filterInput=''">
+                <i class="fas fa-times"></i>
+            </button>
+        </mat-form-field>
+    </div>
+    <div class="d-flex align-items-end flex-column mr-2">
+        <span (click)="deselectAllDisplayedRegions(sr, filterInput, true)">Deselect all {{filterInput && 'filtered'}} regions</span>
+        <span *ngIf="filterInput" (click)="deselectAllDisplayedRegions(sr, filterInput, false)">Deselect all regions instead of selected ones</span>
+    </div>
+    <div class="overflow-auto p-2 selectedRegionsList">
+        <mat-chip-list>
+            <mat-chip *ngFor="let selectedRegion of sr | filterWithString : filterInput"
+                      class="w-100 d-flex justify-content-between align-items-center"
+                      removable="true"
+                      (removed)="removeRegionFromSelectedList(selectedRegion, sr)"
+                      (click)="navigateToRegion(selectedRegion)">
+                <span class="d-flex align-items-center">
+                    <span class="dot mr-2 ml-n2" [style]="regionColorAsBackground(selectedRegion)"></span>
+                    {{selectedRegion.name}}
+                </span>
+                <i class="fas fa-times-circle ml-1" matChipRemove (click)="$event.stopPropagation()"></i>
+            </mat-chip>
+        </mat-chip-list>
+    </div>
+</mat-card>
