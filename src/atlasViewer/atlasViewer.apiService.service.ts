@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "src/services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined, getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, distinctUntilChanged, filter } from "rxjs/operators";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
@@ -60,7 +60,10 @@ export class AtlasViewerAPIServices{
 
         loadedTemplates : [],
 
+        // TODO deprecate
         regionsLabelIndexMap : new Map(),
+
+        layersRegionLabelIndexMap: new Map(), 
 
         datasetsBSubject : this.store.pipe(
           select('dataStore'),
@@ -133,7 +136,10 @@ export class AtlasViewerAPIServices{
 
   private init(){
     this.loadedTemplates$.subscribe(templates=>this.interactiveViewer.metadata.loadedTemplates = templates)
-    this.selectParcellation$.subscribe(parcellation => this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions))
+    this.selectParcellation$.subscribe(parcellation => {
+      this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
+      this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
+    })
   }
 }
 
@@ -145,6 +151,7 @@ export interface InteractiveViewerInterface{
     selectedRegionsBSubject : Observable<any[]|null>
     loadedTemplates : any[]
     regionsLabelIndexMap : Map<number,any> | null
+    layersRegionLabelIndexMap: Map<string, Map<number, any>>
     datasetsBSubject : Observable<any[]>
   },
 
@@ -157,8 +164,17 @@ export interface InteractiveViewerInterface{
     hideSegment : (labelIndex : number)=>void
     showAllSegments : ()=>void
     hideAllSegments : ()=>void
+
+    // TODO deprecate
     segmentColourMap : Map<number,{red:number,green:number,blue:number}>
+
+    getLayersSegmentColourMap: () => Map<string, Map<number, {red:number, green:number, blue: number}>>
+
+    // TODO deprecate
     applyColourMap : (newColourMap : Map<number,{red:number,green:number,blue:number}>)=>void
+
+    applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red:number, green: number, blue: number}>>) => void
+
     loadLayer : (layerobj:NGLayerObj)=>NGLayerObj
     removeLayer : (condition:{name : string | RegExp})=>string[]
     setLayerVisibility : (condition:{name : string|RegExp},visible:boolean)=>void
