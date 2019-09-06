@@ -7,7 +7,7 @@
 <!-- spatial landmarks overlay -->
 <!-- loading indicator -->
 
-<current-layout class="position-absolute w-100 h-100 d-block pe-none">
+<current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none">
   <div class="w-100 h-100 position-relative" cell-i>
     <ng-content *ngTemplateOutlet="overlayi"></ng-content>
   </div>
@@ -49,7 +49,6 @@
 </layout-floating-container>
 
 <div id="scratch-pad">
-
 </div>
 
 <!-- mobile nub, allowing for ooblique slicing in mobile -->
@@ -97,6 +96,13 @@
       [positionZ]="getPositionZ(0,spatialData)">
     </nehuba-2dlandmark-unit>
 
+    <!-- maximise/minimise button -->
+    <maximise-panel-button
+      (click)="toggleMaximiseMinimise(0)"
+      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 0 }"
+      [touch-side-class]="0 " class="pe-all">
+    </maximise-panel-button>
+    
     <div *ngIf="sliceViewLoading0$ | async" class="loadingIndicator">
       <div class="spinnerAnimationCircle">
 
@@ -114,6 +120,13 @@
         [positionX]="getPositionX(1,spatialData)" [positionY]="getPositionY(1,spatialData)"
         [positionZ]="getPositionZ(1,spatialData)">
       </nehuba-2dlandmark-unit>
+
+      <!-- maximise/minimise button -->
+      <maximise-panel-button
+        (click)="toggleMaximiseMinimise(1)"
+        [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 1 }"
+        [touch-side-class]="1 " class="pe-all">
+      </maximise-panel-button>
 
       <div *ngIf="sliceViewLoading1$ | async" class="loadingIndicator">
         <div class="spinnerAnimationCircle">
@@ -133,6 +146,13 @@
       [positionZ]="getPositionZ(2,spatialData)">
     </nehuba-2dlandmark-unit>
 
+    <!-- maximise/minimise button -->
+    <maximise-panel-button
+      (click)="toggleMaximiseMinimise(2)"
+      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 2 }"
+      [touch-side-class]="2 " class="pe-all">
+    </maximise-panel-button>
+
     <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
       <div class="spinnerAnimationCircle">
 
@@ -143,8 +163,17 @@
 
 <ng-template #overlayiv>
   <layout-floating-container pos11 landmarkContainer>
+
+    <!-- maximise/minimise button -->
+    <maximise-panel-button
+      (click)="toggleMaximiseMinimise(3)"
+      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }"
+      [touch-side-class]="3 " class="pe-all">
+    </maximise-panel-button>
+    
     <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
       <div class="spinnerAnimationCircle"></div>
+
       <div perspectiveLoadingText>
         {{ perspectiveViewLoading$ | async }}
       </div>

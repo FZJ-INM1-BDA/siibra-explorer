@@ -177,3 +177,36 @@ div#scratch-pad
   right: 0;
   bottom: 0;
 }
+
+maximise-panel-button
+{
+  transition: opacity 170ms ease-in-out,
+    transform 250ms ease-in-out;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* if not mobile, then show on hover */
+maximise-panel-button
+{
+  opacity: 0.0;
+  pointer-events: none;
+}
+
+maximise-panel-button.onHover,
+maximise-panel-button:hover,
+:host-context([ismobile="true"]) maximise-panel-button
+{
+  opacity: 1.0 !important;
+  pointer-events: all !important;
+}
+
+
+maximise-panel-button.touch-top.touch-right.onHover,
+maximise-panel-button.touch-top.touch-right:hover,
+:host-context(:not([ismobile="true"])) maximise-panel-button.touch-top.touch-right
+{
+  transform: translate(-3em, 3em)
+}

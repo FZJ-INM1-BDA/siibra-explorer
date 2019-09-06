@@ -1,14 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Store, select } from '@ngrx/store';
 import { ViewerConfiguration, ACTION_TYPES } from 'src/services/state/viewerConfig.store'
-import { Observable, Subscription } from 'rxjs';
-import { map, distinctUntilChanged, startWith, shareReplay } from 'rxjs/operators';
+import { Observable, Subscription, combineLatest } from 'rxjs';
+import { map, distinctUntilChanged, startWith, debounceTime } from 'rxjs/operators';
 import { MatSlideToggleChange, MatSliderChange } from '@angular/material';
 import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
+import { isIdentityQuat } from '../nehubaContainer/util';
 
 const GPU_TOOLTIP = `GPU TOOLTIP`
 const ANIMATION_TOOLTIP = `ANIMATION_TOOLTIP`
-const ROOT_TEXT_ORDER = ['Coronal', 'Sagittal', 'Axial', '3D']
+const ROOT_TEXT_ORDER : [string, string, string, string] = ['Coronal', 'Sagittal', 'Axial', '3D']
+const OBLIQUE_ROOT_TEXT_ORDER : [string, string, string, string] = ['Slice View 1', 'Slice View 2', 'Slice View 3', '3D']
 
 @Component({
   selector: 'config-component',
@@ -41,6 +43,8 @@ export class ConfigComponent implements OnInit, OnDestroy{
   private panelOrder$: Observable<string>
   public panelTexts$: Observable<[string, string, string, string]>
 
+  private viewerObliqueRotated$: Observable<boolean>
+
   constructor(private store: Store<ViewerConfiguration>) {
     this.gpuLimit$ = this.store.pipe(
       select('viewerConfigState'),
@@ -65,9 +69,24 @@ export class ConfigComponent implements OnInit, OnDestroy{
       select('panelOrder')
     )
     
-    this.panelTexts$ = this.panelOrder$.pipe(
-      map(string => string.split('').map(s => Number(s))),
-      map(arr => arr.map(idx => ROOT_TEXT_ORDER[idx]) as [string, string, string, string])
+    this.viewerObliqueRotated$ = this.store.pipe(
+      select('viewerState'),
+      select('navigation'),
+      map(navigation => (navigation && navigation.orientation) || [0, 0, 0, 1]),
+      debounceTime(100),
+      map(isIdentityQuat),
+      map(flag => !flag),
+      distinctUntilChanged(),
+    )
+
+    this.panelTexts$ = combineLatest(
+      this.panelOrder$.pipe(
+        map(string => string.split('').map(s => Number(s))),
+      ),
+      this.viewerObliqueRotated$
+    ).pipe(
+      map(([arr, isObliqueRotated]) => arr.map(idx => (isObliqueRotated ? OBLIQUE_ROOT_TEXT_ORDER : ROOT_TEXT_ORDER)[idx]) as [string, string, string, string]),
+      startWith(ROOT_TEXT_ORDER)
     )
   }
 

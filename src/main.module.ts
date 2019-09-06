@@ -48,6 +48,7 @@ import { DialogComponent } from "./components/dialog/dialog.component";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
+import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 
 import 'hammerjs'
 
@@ -69,6 +70,7 @@ import 'hammerjs'
       UserConfigStateUseEffect,
       ViewerStateControllerUseEffect,
       ViewerStateUseEffect,
+      NgViewerUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,

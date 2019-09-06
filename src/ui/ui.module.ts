@@ -61,6 +61,9 @@ import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
+import { MaximmisePanelButton } from "./nehubaContainer/maximisePanelButton/maximisePanelButton.component";
+import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
+import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
 
 @NgModule({
@@ -104,6 +107,7 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
     CurrentLayout,
     ViewerStateController,
     RegionTextSearchAutocomplete,
+    MaximmisePanelButton,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -129,10 +133,12 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
     SavedRegionsSelectionBtnDisabledPipe,
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
+    ReorderPanelIndexPipe,
 
     /* directive */
     DownloadDirective,
-    ShowToastDirective
+    ShowToastDirective,
+    TouchSideClass
   ],
   entryComponents : [
 

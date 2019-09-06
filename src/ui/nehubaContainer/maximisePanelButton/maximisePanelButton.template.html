@@ -1,0 +1,10 @@
+<button
+  [matTooltip]="(isMaximised$ | async) ? 'Restore four panel view' : 'Maximise this panel'"
+  mat-icon-button
+  color="primary">
+  <i *ngIf="isMaximised$ | async; else expandIconTemplate" class="fas fa-compress-arrows-alt"></i>
+</button>
+
+<ng-template #expandIconTemplate>
+  <i class="fas fa-expand-arrows-alt"></i>
+</ng-template>

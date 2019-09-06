@@ -1,4 +1,10 @@
-import { Action } from '@ngrx/store'
+import { Action, Store, select } from '@ngrx/store'
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, combineLatest, fromEvent, Subscription } from 'rxjs';
+import { Effect, Actions, ofType } from '@ngrx/effects';
+import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, tap, delay } from 'rxjs/operators';
+import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
+import { SNACKBAR_MESSAGE } from './uiState.store';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -104,6 +110,136 @@ export function ngViewerState(prevState:NgViewerStateInterface = defaultState, a
   }
 }
 
+@Injectable({
+  providedIn: 'root'
+})
+
+export class NgViewerUseEffect implements OnDestroy{
+  @Effect()
+  public toggleMaximiseMode$: Observable<any>
+
+  @Effect()
+  public toggleMaximiseOrder$: Observable<any>
+
+  @Effect()
+  public toggleMaximiseCycleMessage$: Observable<any>
+
+  @Effect()
+  public cycleViews$: Observable<any>
+
+  @Effect()
+  public spacebarListener$: Observable<any>
+
+  private panelOrder$: Observable<string>
+  private panelMode$: Observable<string>
+
+  private subscriptions: Subscription[] = []
+
+  constructor(
+    private actions: Actions,
+    private store$: Store<any>,
+    private constantService: AtlasViewerConstantsServices
+  ){
+    const toggleMaxmimise$ = this.actions.pipe(
+      ofType(ACTION_TYPES.TOGGLE_MAXIMISE),
+      shareReplay(1)
+    )
+
+    this.panelOrder$ = this.store$.pipe(
+      select('ngViewerState'),
+      select('panelOrder'),
+      distinctUntilChanged(),
+    )
+
+    this.panelMode$ = this.store$.pipe(
+      select('ngViewerState'),
+      select('panelMode'),
+      distinctUntilChanged(),
+    )
+
+    this.cycleViews$ = this.actions.pipe(
+      ofType(ACTION_TYPES.CYCLE_VIEWS),
+      withLatestFrom(this.panelOrder$),
+      map(([_, panelOrder]) => {
+        return {
+          type: ACTION_TYPES.SET_PANEL_ORDER,
+          payload: {
+            panelOrder: [...panelOrder.slice(1), ...panelOrder.slice(0,1)].join('')
+          }
+        }
+      })
+    )
+
+    this.toggleMaximiseOrder$ = toggleMaxmimise$.pipe(
+      withLatestFrom(
+        combineLatest(
+          this.panelOrder$.pipe(
+            scan((acc, curr: string) => [curr, ...acc.slice(0,1)], []),
+          ),
+          this.panelMode$
+        )
+      ),
+      map(([action, [panelOrders, panelMode]]) => {
+        const { payload } = action as NgViewerAction
+        const { index = 0 } = payload
+
+        const panelOrder = panelMode === SINGLE_PANEL && !!panelOrders[1]
+          ? panelOrders[1]
+          : [...panelOrders[0].slice(index), ...panelOrders[0].slice(0, index)].join('')
+        return {
+          type: ACTION_TYPES.SET_PANEL_ORDER,
+          payload: {
+            panelOrder
+          }
+        }
+      })
+    )
+
+    this.toggleMaximiseMode$ = toggleMaxmimise$.pipe(
+      withLatestFrom(this.panelMode$.pipe(
+        scan((acc, curr: string) => [curr, ...acc.slice(0,1)], [])
+      )),
+      map(([ _, panelModes ]) => {
+        return {
+          type: ACTION_TYPES.SWITCH_PANEL_MODE,
+          payload: {
+            panelMode: panelModes[0] === SINGLE_PANEL
+              ? (panelModes[1] || FOUR_PANEL)
+              : SINGLE_PANEL
+          }
+        }
+      })
+    )
+
+    this.toggleMaximiseCycleMessage$ = this.toggleMaximiseMode$.pipe(
+      filter(() => !this.constantService.mobile),
+      filter(({ payload }) => payload.panelMode && payload.panelMode === SINGLE_PANEL),
+      mapTo({
+        type: SNACKBAR_MESSAGE,
+        snackbarMessage: this.constantService.cyclePanelMessage
+      })
+    )
+
+    this.spacebarListener$ = combineLatest(
+      fromEvent(document.body, 'keydown', { capture: true }).pipe(
+        filter((ev: KeyboardEvent) => ev.key === ' ')
+      ),
+      this.panelMode$
+    ).pipe(
+      filter(([_ , panelMode]) => panelMode === SINGLE_PANEL),
+      mapTo({
+        type: ACTION_TYPES.CYCLE_VIEWS
+      })
+    )
+  }
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
+  }
+}
+
 export const ADD_NG_LAYER = 'ADD_NG_LAYER'
 export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
 export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
@@ -122,7 +258,10 @@ interface NgLayerInterface{
 
 const ACTION_TYPES = {
   SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE',
-  SET_PANEL_ORDER: 'SET_PANEL_ORDER'
+  SET_PANEL_ORDER: 'SET_PANEL_ORDER',
+
+  TOGGLE_MAXIMISE: 'TOGGLE_MAXIMISE',
+  CYCLE_VIEWS: 'CYCLE_VIEWS'
 }
 
 export const SUPPORTED_PANEL_MODES = [

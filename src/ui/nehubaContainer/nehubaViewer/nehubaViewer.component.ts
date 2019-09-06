@@ -77,8 +77,6 @@ export class NehubaViewerUnit implements OnDestroy{
 
   ondestroySubscriptions: Subscription[] = []
 
-  touchStart$ : Observable<any>
-
   constructor(
     private rd: Renderer2,
     public elementRef:ElementRef,
@@ -352,7 +350,7 @@ export class NehubaViewerUnit implements OnDestroy{
   public mouseOverSegment: number | null
   public mouseOverLayer: {name:string,url:string}| null
 
-  private viewportToDatas : [any, any, any] = [null, null, null]
+  public viewportToDatas : [any, any, any] = [null, null, null]
 
   public getNgHash : () => string = () => window['export_nehuba']
     ? window['export_nehuba'].getNgHash()
@@ -394,6 +392,11 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this.onDestroyCb.push(() => window['nehubaViewer'] = null)
 
+    /**
+     * TODO
+     * move this to nehubaContainer
+     * do NOT use position logic to determine idx
+     */
     this.ondestroySubscriptions.push(
       // fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
       //   ...takeOnePipe
@@ -404,89 +407,6 @@ export class NehubaViewerUnit implements OnDestroy{
       .subscribe((events:CustomEvent[]) => {
         [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       })
-    )
-
-    this.touchStart$ = fromEvent(this.elementRef.nativeElement, 'touchstart').pipe(
-      map((ev:TouchEvent) => {
-        const srcElement : HTMLElement = ev.srcElement || (ev as any).originalTarget
-        return {
-          startPos: [ev.touches[0].screenX, ev.touches[0].screenY],
-          elementId: identifySrcElement(srcElement),
-          srcElement,
-          event: ev
-        }
-      })
-    )
-
-    this.ondestroySubscriptions.push(
-
-      this.touchStart$.pipe(
-        switchMap(({startPos, elementId, srcElement}) => fromEvent(this.elementRef.nativeElement,'touchmove').pipe(
-          map((ev: TouchEvent) => (ev.stopPropagation(), ev.preventDefault(), ev)),
-          filter((ev:TouchEvent) => ev.touches.length === 1),
-          map((event:TouchEvent) => ({
-            startPos,
-            event,
-            elementId,
-            srcElement
-          })),
-          scan((acc,ev:any) => {
-            return acc.length < 2
-              ? acc.concat(ev)
-              : acc.slice(1).concat(ev)
-          },[]),
-          map(double => ({
-            elementId: double[0].elementId,
-            deltaX: double.length === 1
-              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenX
-              : double.length === 2
-                ? (double[0].event as TouchEvent).touches[0].screenX - (double[1].event as TouchEvent).touches[0].screenX 
-                : null,
-            deltaY: double.length === 1
-              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenY
-              : double.length === 2
-                ? (double[0].event as TouchEvent).touches[0].screenY - (double[1].event as TouchEvent).touches[0].screenY 
-                : null
-          })),
-          takeUntil(fromEvent(this.elementRef.nativeElement, 'touchend').pipe(filter((ev: TouchEvent) => ev.touches.length === 0)))
-        ))
-      ).subscribe(({ elementId, deltaX, deltaY }) => {
-        if(deltaX === null || deltaY === null){
-          console.warn('deltax/y is null')
-          return
-        }
-        if(elementId === 0 || elementId === 1 || elementId === 2){
-          const {position} = this.nehubaViewer.ngviewer.navigationState 
-          const pos = position.spatialCoordinates
-          window['export_nehuba'].vec3.set(pos, deltaX, deltaY, 0)
-          window['export_nehuba'].vec3.transformMat4(pos, pos, this.viewportToDatas[elementId])
-          position.changed.dispatch()
-        }else if(elementId === 3){
-          const {perspectiveNavigationState} = this.nehubaViewer.ngviewer
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0)
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0)
-          this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch()
-        }
-      })
-    )
-
-    this.ondestroySubscriptions.push(
-      this.touchStart$.pipe(
-        switchMap(() => 
-          fromEvent(this.elementRef.nativeElement, 'touchmove').pipe(
-            takeWhile((ev:TouchEvent) => ev.touches.length === 2),
-            map((ev:TouchEvent) => computeDistance(
-                [ev.touches[0].screenX, ev.touches[0].screenY],
-                [ev.touches[1].screenX, ev.touches[1].screenY]
-              )),
-            scan((acc, curr:number) => acc.length < 2
-              ? acc.concat(curr)
-              : acc.slice(1).concat(curr), []),
-            filter(dist => dist.length > 1),
-            map(dist => dist[0] / dist[1])
-          ))
-      ).subscribe(factor => 
-        this.nehubaViewer.ngviewer.navigationState.zoomBy(factor))
     )
   }
 
