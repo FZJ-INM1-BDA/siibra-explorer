@@ -37,10 +37,4 @@ export class DedicatedViewer{
       ? this.removeDedicatedView()
       : this.showDedicatedView()
   }
-
-  get tooltipText(){
-    return this.isShowing
-      ? 'File is added to Atlas Viewer'
-      : 'Click to add file in Atlas Viewer'
-  }
 }

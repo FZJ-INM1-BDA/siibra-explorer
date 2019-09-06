@@ -16,8 +16,9 @@ export class LineChart implements OnChanges{
   @ViewChild('canvas') canvas : ElementRef
   @ViewChild('DownloadLineChartLink', {read: ElementRef}) downloadLineChartLink : ElementRef
 
-  public click() {
-    this.downloadLineChartLink.nativeElement.click()
+  public downloadChartAsPng() {
+    if (this.downloadLineChartLink && this.downloadLineChartLink.nativeElement && this.downloadLineChartLink.nativeElement.click())
+      this.downloadLineChartLink.nativeElement.click()
   }
 
   /**
@@ -113,8 +114,8 @@ export class LineChart implements OnChanges{
     
   }
 
-  async ngOnChanges(){
-    this.shapedLineChartDatasets = await this.lineDatasets.map(lineDataset=>({
+  ngOnChanges(){
+    this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
       data : lineDataset.data.map((v,idx)=>({
         x : idx,
         y : v

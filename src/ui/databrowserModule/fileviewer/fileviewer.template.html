@@ -62,15 +62,15 @@
   </div>
 </div>
 
-<div anchorContainer class="mt-1 w-100 d-flex justify-content-end">
-  <a      href="JavaScript:void(0)"
-          (click)="childChart.click()"
-          class="outline-none mr-1 ml-1"
+<div class="mt-1 w-100 d-flex justify-content-end pl-1 pr-1 pt-2 pb-2">
+  <button
+          (click)="childChart.downloadChartAsPng()"
+          class="outline-none mr-1 ml-1 btn btn-link p-0"
           container="body"
           *ngIf="childChart && childChart.shapedLineChartDatasets"
           matTooltip="Download line graph as csv">
     <i class="fas fa-file-csv downloadButton"></i>
-  </a>
+  </button>
 
   <a      class="outline-none mr-1 ml-1"
           *ngIf="downloadUrl"

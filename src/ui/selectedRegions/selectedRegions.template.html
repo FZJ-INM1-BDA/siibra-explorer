@@ -1,4 +1,4 @@
-<mat-card class="p-0 selected-regions-panel-container border"
+<mat-card class="p-0 selected-regions-panel-container"
      *ngIf="(selectedRegions$ | async) as sr">
     <div class="mr-2 ml-2">
         <mat-form-field class="w-100" (click)="$event.stopPropagation()">
@@ -13,8 +13,8 @@
         </mat-form-field>
     </div>
     <div class="d-flex align-items-end flex-column mr-2">
-        <span (click)="deselectAllDisplayedRegions(sr, filterInput, true)">Deselect all {{filterInput && 'filtered'}} regions</span>
-        <span *ngIf="filterInput" (click)="deselectAllDisplayedRegions(sr, filterInput, false)">Deselect all regions instead of selected ones</span>
+        <button mat-button (click)="deselectAllDisplayedRegions(sr, filterInput, true)">Deselect all {{filterInput && 'filtered'}} regions</button>
+        <button mat-button *ngIf="filterInput" (click)="deselectAllDisplayedRegions(sr, filterInput, false)">Select only filtered regions</button>
     </div>
     <div class="overflow-auto p-2 selectedRegionsList">
         <mat-chip-list>

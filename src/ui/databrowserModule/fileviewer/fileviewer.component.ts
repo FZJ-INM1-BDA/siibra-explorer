@@ -4,7 +4,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
-import { LineChart }  from './line/line.chart.component';
 
 
 @Component({
@@ -87,10 +86,6 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
     }
   }
 
-  downloadFile(url) {
-    window.location.href = url;
-  }
-
   get downloadName(){
     return this.previewFile.name
   }
@@ -103,6 +98,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
 }
 
 interface ChartComponentInterface{
-  canvas : ElementRef
+  canvas : ElementRef,
+  shapedLineChartDatasets: any
 }
 

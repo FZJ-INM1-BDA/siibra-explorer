@@ -64,7 +64,6 @@ export class MenuIconsBar{
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any>
 
-  searchCollapsed = 0
   searchedItemsNumber = 0
   searchLoading = false
   searchMenuFrozen = false
@@ -203,25 +202,10 @@ export class MenuIconsBar{
       .catch(err => this.constantService.catchError(err))
   }
 
-  public searchIconClickHandler(wu: WidgetUnit) {
-      if (this.widgetServices.isMinimised(wu)) {
-          this.widgetServices.unminimise(wu)
-      } else {
-          this.widgetServices.minimise(wu)
-      }
-  }
-  collapseSearchBar() {
-    if (this.searchCollapsed === 2) {
-      this.searchCollapsed = 1
-      setTimeout(() => {this.searchCollapsed = 0}, 500)
-    } else {
-      this.searchCollapsed = 2
-    }
-  }
-
   closeFrozenMenu() {
     this.searchMenuFrozen = false
     this.filePreviewModalClosed = false
+    this.showSearchMenu = false
   }
 
   hideSearchMenu() {

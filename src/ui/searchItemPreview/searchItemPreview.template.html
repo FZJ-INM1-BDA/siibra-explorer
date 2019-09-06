@@ -1,13 +1,14 @@
-<div class="preview-panel-container border" (click)="$event.stopPropagation()">
-    <div class="w-100 d-flex justify-content-center p-2" [ngStyle]="{'border-bottom': constantsService.darktheme && '1px solid #C6C6C6'}">
+<div class="preview-panel-container" (click)="$event.stopPropagation()">
+    <div class="w-100 d-flex justify-content-center p-2">
         Files
     </div>
+    <mat-divider></mat-divider>
+
     <div class="mr-2 ml-2">
         <mat-form-field class="w-100" (click)="$event.stopPropagation()">
             <input matInput
-                   placeholder="&nbsp;&nbsp; Click here to filter"
-                   #filterInput
-                   class="pl-2 pr-2">
+                   placeholder="Click here to filter"
+                   #filterInput>
             <button mat-button *ngIf="filterInput.value" matSuffix mat-icon-button aria-label="Clear"
                     (click)="filterInput.value=''">
                 <i class="fas fa-times"></i>
@@ -26,3 +27,7 @@
         </div>
     </div>
 </div>
+
+<ng-template #previewFileModal let-previewFile>
+    <file-viewer [previewFile]="previewFile"></file-viewer>
+</ng-template>

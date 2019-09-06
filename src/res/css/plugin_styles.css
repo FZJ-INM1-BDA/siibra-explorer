@@ -33,16 +33,8 @@
 [darktheme="true"] [plugincontainer] .btn,
 [darktheme="true"] [plugincontainer] input[type="text"],
 [darktheme="true"] [plugincontainer] input[type="number"],
-[darktheme="true"] [plugincontainer] .list-group-item-dark,
 [darktheme="true"] [plugincontainer] .panel
 {
-  background-color:rgba(81,81,81,0.8);
-  color:rgba(255,255,255,0.8);
-}
-
-[darktheme="true"] [plugincontainer] .selected-region-chip
-{
-  border-radius: 10px;
   background-color:rgba(81,81,81,0.8);
   color:rgba(255,255,255,0.8);
 }

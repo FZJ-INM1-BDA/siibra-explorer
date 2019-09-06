@@ -5,14 +5,18 @@
 
 <div class="w-100 d-flex align-items-center flex-column">
 
-  <div class="d-flex align-items-center flex-column p-3" [ngClass]="!isShowing && 'showButton cursorPointer'" (click)="!isShowing && showDedicatedView()">
-    <i class="far fa-eye h3" [ngStyle]="isShowing && {'color' : '#04D924'}"></i>
-    <span class="ml-2">{{tooltipText}}</span>
-  </div>
+<div *ngIf="isShowing" class="d-flex flex-column align-items-center">
+  <i class="far fa-eye h3" [ngStyle]="isShowing && {'color' : '#04D924'}"></i>
+  <span>File is added</span>
+</div>
 
-  <span *ngIf="isShowing" class="showButton cursorPointer p-3" (click)="removeDedicatedView()">
+  <button *ngIf="!isShowing" mat-button class="p-3 outline-none mat-raised-button" [disabled]="isShowing" color="primary" (click)="!isShowing && showDedicatedView()">
+    <span class="ml-2">Click to add file in Atlas Viewer</span>
+  </button>
+
+  <button mat-button *ngIf="isShowing" class="mat-raised-button p-3 outline-none" color="primary" (click)="removeDedicatedView()">
     <i class="fas fa-eye-slash" style="color: #D93D04"></i>
     Remove file from <b>Atlas Viewer</b>
-  </span>
+  </button>
 
 </div>

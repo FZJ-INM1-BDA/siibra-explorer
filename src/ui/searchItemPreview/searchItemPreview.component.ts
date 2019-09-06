@@ -1,9 +1,8 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild} from "@angular/core";
 import {ViewerPreviewFile} from "src/services/state/dataStore.store";
 import {DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
 import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
 import {MatDialog} from "@angular/material";
-import {PreviewFileDialogComponent} from "src/ui/searchItemPreview/previewFileDialog.component";
 import {CHANGE_NAVIGATION} from "src/services/state/viewerState.store";
 import {Store} from "@ngrx/store";
 import {ToastService} from "src/services/toastService.service";
@@ -23,6 +22,9 @@ export class SearchItemPreviewComponent {
     @Output() filePreviewModalClosed: EventEmitter<boolean> = new EventEmitter()
     @Output() closeSearchMenu: EventEmitter<boolean> = new EventEmitter()
 
+    @ViewChild("previewFileModal") previewFileModal: TemplateRef<any>
+
+
     public previewFiles: ViewerPreviewFile[] = []
     public activeFile: ViewerPreviewFile
     private error: string
@@ -30,16 +32,12 @@ export class SearchItemPreviewComponent {
 
     constructor(
         private dbrService: DatabrowserService,
-        private constantsService: AtlasViewerConstantsServices,
+        public constantsService: AtlasViewerConstantsServices,
         private dbService: DatabrowserService,
         public dialog: MatDialog,
         private store: Store<any>,
         private toastService: ToastService,
-    ) {
-        this.renderNode = getRenderNodeFn()
-    }
-
-    public renderNode: (obj: any) => string
+    ) {}
 
     ngOnInit() {
         if (this.datasetName) {
@@ -48,7 +46,6 @@ export class SearchItemPreviewComponent {
                     this.previewFiles = json as ViewerPreviewFile[]
                     if (this.previewFiles.length > 0)
                         this.activeFile = this.previewFiles[0]
-                    this.renderNode = getRenderNodeFn(this.activeFile)
                 })
                 .catch(e => {
                     this.error = JSON.stringify(e)
@@ -60,10 +57,10 @@ export class SearchItemPreviewComponent {
         if (previewFile.mimetype !== 'application/nifti') {
             this.freezeFilesSubMenu.emit(true)
             this.filePreviewModalClosed.emit(false)
-            this.previewFileDialogRef = this.dialog.open(PreviewFileDialogComponent, {
+            this.previewFileDialogRef = this.dialog.open(this.previewFileModal, {
                 width: '400px',
-                data: {previewFile: previewFile},
-                panelClass: ['no-scrolls', this.constantsService.darktheme ? 'dialog-dark-background-color' : 'dialog-light-background-color'],
+                data: previewFile,
+                panelClass: ['no-scrolls'],
             })
             this.previewFileDialogRef.afterClosed().subscribe(result => {
                 this.filePreviewModalClosed.emit(true)
@@ -75,20 +72,21 @@ export class SearchItemPreviewComponent {
             else {
                 this.showDedicatedViewOnAtlasViewer(previewFile)
 
-                this.selectedRegions.forEach(sr => {
-                    if (sr.name.includes(' - left hemisphere')) {
-                        if (previewFile.filename.includes(sr.name.replace(' - left hemisphere', '')) && previewFile.filename.includes('left hemisphere')) {
-                            this.navigateToRegion(sr)
-                            this.closeSearchMenu.emit(true)
-                        }
-                    }
-                    if (sr.name.includes(' - right hemisphere')) {
-                        if (previewFile.filename.includes(sr.name.replace(' - right hemisphere', '')) && previewFile.filename.includes('right hemisphere')) {
-                            this.navigateToRegion(sr)
-                            this.closeSearchMenu.emit(true)
-                        }
-                    }
-                })
+                // this.selectedRegions.forEach(sr => {
+                //     if (sr.name.includes(' - left hemisphere')) {
+                //         if (previewFile.filename.includes(sr.name.replace(' - left hemisphere', '')) && previewFile.filename.includes('left hemisphere')) {
+                //             this.navigateToRegion(sr)
+                //             this.closeSearchMenu.emit(true)
+                //         }
+                //     }
+                //     if (sr.name.includes(' - right hemisphere')) {
+                //         if (previewFile.filename.includes(sr.name.replace(' - right hemisphere', '')) && previewFile.filename.includes('right hemisphere')) {
+                //             this.navigateToRegion(sr)
+                //             this.closeSearchMenu.emit(true)
+                //         }
+                //     }
+                // })
+                this.closeSearchMenu.emit(true)
             }
         }
     }
@@ -123,9 +121,3 @@ export class SearchItemPreviewComponent {
         }
     }
 }
-
-const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path = 'unpathed'}) => name
-    ? activeFileName === name
-        ? `<span class="text-warning">${name}</span>`
-        : name
-    : path

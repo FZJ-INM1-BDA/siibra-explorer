@@ -9,7 +9,6 @@ app.disable('x-powered-by')
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
-  console.log(process.env.HBP_CLIENTID)
 }
 
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')

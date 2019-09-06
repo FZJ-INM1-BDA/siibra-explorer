@@ -159,7 +159,6 @@ export interface InteractiveViewerInterface{
     hideAllSegments : ()=>void
     segmentColourMap : Map<number,{red:number,green:number,blue:number}>
     applyColourMap : (newColourMap : Map<number,{red:number,green:number,blue:number}>)=>void
-    // applyLayersColorMap: (map: Map<string, Map<number, {red, green, blue}>>)
     loadLayer : (layerobj:NGLayerObj)=>NGLayerObj
     removeLayer : (condition:{name : string | RegExp})=>string[]
     setLayerVisibility : (condition:{name : string|RegExp},visible:boolean)=>void

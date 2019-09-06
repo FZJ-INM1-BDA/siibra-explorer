@@ -9,7 +9,7 @@
         <div class="d-flex align-items-start" (mouseenter)="filterHovering = true; filterVisible = true; showSelectedRegions = false; showPreview = null;">
             <i class="fas fa-filter"></i>
             <div [hidden]="!filterVisible" class="position-absolute ml-3 ">
-                <mat-card class="border">
+                <mat-card>
                     <modality-picker
                             (click)="$event.stopPropagation();"
                             class="mw-100"

@@ -64,7 +64,6 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
 import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
-import {PreviewFileDialogComponent} from "src/ui/searchItemPreview/previewFileDialog.component";
 import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 
@@ -111,7 +110,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     RegionTextSearchAutocomplete,
     SearchPanel,
     SearchItemPreviewComponent,
-    PreviewFileDialogComponent,
     SelectedRegionsComponent,
 
     /* pipes */
@@ -150,7 +148,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     NehubaViewerUnit,
     LayerBrowser,
     PluginBannerUI,
-    PreviewFileDialogComponent
   ],
   exports : [
     SubjectViewer,
