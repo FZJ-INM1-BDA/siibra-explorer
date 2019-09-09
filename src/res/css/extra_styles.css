@@ -476,3 +476,8 @@ bs-modal-backdrop.modal-backdrop
 .cursorPointer {
     cursor: pointer;
 }
+
+cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
+{
+  width: 100%;
+}

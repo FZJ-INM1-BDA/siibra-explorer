@@ -1,179 +1,190 @@
 <mat-card>
 
   <!-- template selection -->
-  <mat-form-field>
-    <mat-label>
-      Template
-    </mat-label>
-    <mat-select
-      [value]="(templateSelected$ | async)?.name"
-      (selectionChange)="handleTemplateChange($event)"
-      (openedChange)="focused = $event">
-      <mat-option
-        *ngFor="let template of (availableTemplates$ | async)"
-        [value]="template.name">
-        {{ template.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <!-- padding so that info icon lines up -->
-  <button mat-icon-button class="pe-none invisible"></button>
-
-  <ng-container *ngIf="templateSelected$ | async as templateSelected">
-    <!-- show on hover component -->
-    <sleight-of-hand
-      class="d-inline-block"
-      *ngIf="templateSelected | templateParcellationHasMoreInfoPipe as moreInfo">
-
-      <!-- shown when off -->
-      <div sleight-of-hand-front>
-        <button
-          mat-icon-button>
-          <i class="fas fa-info"></i>
-        </button>
-      </div>
-
-      <!-- shown on hover -->
-      <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
-        <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
-          <i class="fas fa-info"></i>
-        </button>
-
-        <div class="position-relative">
-          <button class="position-relative invisible pe-none" mat-icon-button>
+  <mat-card-content class="d-inline-flex flex-nowrap">
+    <mat-form-field>
+      <mat-label>
+        Template
+      </mat-label>
+      <mat-select
+        [value]="(templateSelected$ | async)?.name"
+        (selectionChange)="handleTemplateChange($event)"
+        (openedChange)="focused = $event">
+        <mat-option
+          *ngFor="let template of (availableTemplates$ | async)"
+          [value]="template.name">
+          {{ template.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  
+    <!-- padding so that info icon lines up -->
+    <button mat-icon-button class="pe-none invisible"></button>
+  
+    <ng-container *ngIf="templateSelected$ | async as templateSelected">
+      <!-- show on hover component -->
+      <sleight-of-hand
+        class="d-inline-block"
+        *ngIf="templateSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+  
+        <!-- shown when off -->
+        <div sleight-of-hand-front>
+          <button
+            mat-icon-button>
             <i class="fas fa-info"></i>
           </button>
-
-          <single-dataset-view
-            *ngFor="let originDataset of moreInfo.originDatasets"
-            class="position-absolute left-0 top-0 w-40em"
-            [name]="moreInfo.name"
-            [description]="moreInfo.description"
-            [publications]="moreInfo.publications"
-            [kgSchema]="originDataset && originDataset.kgSchema"
-            [kgId]="originDataset && originDataset.kgId">
-          </single-dataset-view>
         </div>
-        
-      </div>
-    </sleight-of-hand>
-
-  </ng-container>
+  
+        <!-- shown on hover -->
+        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+          <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+            <i class="fas fa-info"></i>
+          </button>
+  
+          <div class="position-relative">
+            <button class="position-relative invisible pe-none" mat-icon-button>
+              <i class="fas fa-info"></i>
+            </button>
+  
+            <single-dataset-view
+              *ngFor="let originDataset of moreInfo.originDatasets"
+              class="position-absolute left-0 top-0 w-40em"
+              [name]="moreInfo.name"
+              [description]="moreInfo.description"
+              [publications]="moreInfo.publications"
+              [kgSchema]="originDataset && originDataset.kgSchema"
+              [kgId]="originDataset && originDataset.kgId">
+            </single-dataset-view>
+          </div>
+          
+        </div>
+      </sleight-of-hand>
+  
+    </ng-container>
+  </mat-card-content>
 
   <!-- parcellation selection -->
-  <mat-form-field *ngIf="templateSelected$ | async as templateSelected">
-    <mat-label>
-      Parcellation
-    </mat-label>
-    <mat-select
-      (selectionChange)="handleParcellationChange($event)"
-      [value]="(parcellationSelected$ | async)?.name"
-      (openedChange)="focused = $event">
-      <mat-option
-        *ngFor="let parcellation of (templateSelected.parcellations | appendTooltipTextPipe)"
-        [value]="parcellation.name">
-        {{ parcellation.name }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+  <mat-card-content class="d-inline-flex flex-nowrap">
 
-  <!-- selected regions -->
-  <region-text-search-autocomplete
-    [showAutoComplete]="false"
-    (focusedStateChanged)="focused = $event">
-  </region-text-search-autocomplete>
-
-  <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
-    <!-- show on hover component -->
-    <sleight-of-hand
-      class="d-inline-block"
-      *ngIf="parcellationSelected | templateParcellationHasMoreInfoPipe as moreInfo">
-
-      <!-- shown when off -->
-      <div sleight-of-hand-front>
-        <button
-          mat-icon-button>
-          <i class="fas fa-info"></i>
-        </button>
-      </div>
-
-      <!-- shown on hover -->
-      <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
-        <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
-          <i class="fas fa-info"></i>
-        </button>
-
-        <div class="position-relative">
-          <button class="position-relative invisible pe-none" mat-icon-button>
+      <mat-form-field
+      *ngIf="templateSelected$ | async as templateSelected"
+      class="d-inline-flex flex-nowrap">
+      <mat-label>
+        Parcellation
+      </mat-label>
+      <mat-select
+        (selectionChange)="handleParcellationChange($event)"
+        [value]="(parcellationSelected$ | async)?.name"
+        (openedChange)="focused = $event">
+        <mat-option
+          *ngFor="let parcellation of (templateSelected.parcellations | appendTooltipTextPipe)"
+          [value]="parcellation.name">
+          {{ parcellation.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  
+    <!-- selected regions -->
+    <region-text-search-autocomplete
+      [showAutoComplete]="false"
+      (focusedStateChanged)="focused = $event">
+    </region-text-search-autocomplete>
+  
+    <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
+      <!-- show on hover component -->
+      <sleight-of-hand
+        class="d-inline-block"
+        *ngIf="parcellationSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+  
+        <!-- shown when off -->
+        <div sleight-of-hand-front>
+          <button
+            mat-icon-button>
             <i class="fas fa-info"></i>
           </button>
-
-          <single-dataset-view
-            *ngFor="let originDataset of moreInfo.originDatasets"
-            class="position-absolute left-0 top-0 w-40em"
-            [name]="moreInfo.name"
-            [description]="moreInfo.description"
-            [publications]="moreInfo.publications"
-            [kgSchema]="originDataset && originDataset.kgSchema"
-            [kgId]="originDataset && originDataset.kgId">
-          </single-dataset-view>
         </div>
-        
-      </div>
-    </sleight-of-hand>  
+  
+        <!-- shown on hover -->
+        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+          <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+            <i class="fas fa-info"></i>
+          </button>
+  
+          <div class="position-relative">
+            <button class="position-relative invisible pe-none" mat-icon-button>
+              <i class="fas fa-info"></i>
+            </button>
+  
+            <single-dataset-view
+              *ngFor="let originDataset of moreInfo.originDatasets"
+              class="position-absolute left-0 top-0 w-40em"
+              [name]="moreInfo.name"
+              [description]="moreInfo.description"
+              [publications]="moreInfo.publications"
+              [kgSchema]="originDataset && originDataset.kgSchema"
+              [kgId]="originDataset && originDataset.kgId">
+            </single-dataset-view>
+          </div>
+          
+        </div>
+      </sleight-of-hand>  
+  
+    </ng-container>
+  
+  </mat-card-content>
 
-  </ng-container>
-
-  <!-- divider -->
-  <mat-divider></mat-divider>
-
-  <!-- chips -->
-  <mat-card class="w-20em mh-10em overflow-auto overflow-x-hidden">
-    <mat-chip-list class="mat-chip-list-stacked" #selectedRegionsChipList>
-      <mat-chip class="w-100" *ngFor="let region of (regionsSelected$ | async)">
-        <span class="flex-grow-1 flex-shrink-1 text-truncate">
-          {{ region.name }}
-        </span>
-        <button
-          *ngIf="region.position"
-          (click)="gotoRegion($event, region)"
-          mat-icon-button>
-          <i class="fas fa-map-marked-alt"></i>
-        </button>
-        <button
-          (click)="deselectRegion($event, region)"
-          mat-icon-button>
-          <i class="fas fa-trash"></i>
-        </button>
-      </mat-chip>
+  <!-- selected regions -->
+  <mat-card-content>
+    <mat-chip-list>
+      <cdk-virtual-scroll-viewport
+        class="w-100 h-10em overflow-x-hidden"
+        [itemSize]="32">
+        <mat-chip
+          *cdkVirtualFor="let region of (regionsSelected$ | async)"
+          class="w-100">
+          <span class="flex-grow-1 flex-shrink-1 text-truncate">
+            {{ region.name }}
+          </span>
+          <button
+            *ngIf="region.position"
+            (click)="gotoRegion($event, region)"
+            mat-icon-button>
+            <i class="fas fa-map-marked-alt"></i>
+          </button>
+          <button
+            (click)="deselectRegion($event, region)"
+            mat-icon-button>
+            <i class="fas fa-trash"></i>
+          </button>
+        </mat-chip>
+      </cdk-virtual-scroll-viewport>
     </mat-chip-list>
-
+  
     <!-- place holder when no regions has been selected -->
     <span class="muted"  *ngIf="(regionsSelected$ | async).length === 0">
       No regions selected. Double click on any regions in the viewer, or use the search tool to select regions of interest.
     </span>
-  </mat-card>
+  </mat-card-content>
 
   <!-- control btns -->
-  <div class="mt-2 mb-2 d-flex justify-content-between">
+  <mat-card-actions class="d-flex justify-content-between">
+    
     <div class="d-flex">
-
       <!-- save  -->
       <button
-        matTooltip="Save this selection of regions"
+        matTooltip="Bookmark this selection of regions"
         matTooltipPosition="below"
         mat-button
         (click)="saveSelection($event)"
         color="primary">
-        <i class="fas fa-save"></i>
+        <i class="far fa-bookmark"></i>
         
       </button>
 
       <!-- load -->
       <button
         (click)="loadSelection($event)"
-        matTooltip="Load a selection of regions"
+        matTooltip="Load a bookmarked region selection"
         matTooltipPosition="below"
         mat-button
         color="primary"
@@ -197,7 +208,11 @@
       [disabled]="(regionsSelected$ | async)?.length === 0">
       <i class="fas fa-trash"></i>
     </button>
-  </div>
+  </mat-card-actions>
+  
+  <mat-card-footer>
+
+  </mat-card-footer>
 </mat-card>
 
 <!-- bottom sheet for saved regions  -->
