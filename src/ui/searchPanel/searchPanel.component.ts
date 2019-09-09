@@ -11,8 +11,7 @@ import {
 } from "@angular/core";
 import {merge, Observable, Subscription} from "rxjs";
 import {select, Store} from "@ngrx/store";
-import {DataEntry, safeFilter} from "src/services/stateStore.service";
-import {distinctUntilChanged, filter, map} from "rxjs/operators";
+import {DataEntry} from "src/services/stateStore.service";
 import {CountedDataModality, DatabrowserService} from "src/ui/databrowserModule/databrowser.service";
 import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
 
@@ -42,6 +41,8 @@ export class SearchPanel implements OnInit, OnDestroy {
     public fetchingFlag: boolean = false
     public fetchError: boolean = false
     private subscriptions: Subscription[] = []
+    favDataEntries$: Observable<DataEntry[]>
+
 
     showPreview: number = null
     visiblePreview: number = null
@@ -55,6 +56,8 @@ export class SearchPanel implements OnInit, OnDestroy {
     showSelectedRegions = false
     selectedRegionsHovering
     mouseHoversFilesMenu
+    hoveringDataset: number
+
 
     @HostListener('window:resize', ['$event'])
     onResize(event) {
@@ -80,6 +83,10 @@ export class SearchPanel implements OnInit, OnDestroy {
                 private dbService: DatabrowserService,
                 private constantsService: AtlasViewerConstantsServices) {
         this.windowInnerheight = window.innerHeight
+        this.favDataEntries$ = this.store.pipe(
+            select('dataStore'),
+            select('favDataEntries')
+        )
     }
 
     ngOnInit(): void {
@@ -232,6 +239,18 @@ export class SearchPanel implements OnInit, OnDestroy {
                 this.showPreview = null
             }
         }, 500)
+    }
+
+    datasetIsAddedToFavorites(dataset, favDataEntries) {
+        if (favDataEntries.length)
+            return favDataEntries.length && favDataEntries.filter(fda => fda.id === dataset.id).length? true : false
+    }
+
+    pinDatasetToFavorites(dataset) {
+        this.dbService.saveToFav(dataset)
+    }
+    removeDatasetFromFavorites(dataset) {
+        this.dbService.removeFromFav(dataset)
     }
 
     get windowHeight() {

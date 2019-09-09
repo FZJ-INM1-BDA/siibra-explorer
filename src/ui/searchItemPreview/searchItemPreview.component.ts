@@ -15,7 +15,7 @@ import {ToastService} from "src/services/toastService.service";
 
 export class SearchItemPreviewComponent {
     @Input() datasetName: string
-    @Input() selectedRegions
+    @Input() parcellationRegions
 
 
     @Output() freezeFilesSubMenu: EventEmitter<boolean> = new EventEmitter()
@@ -29,6 +29,8 @@ export class SearchItemPreviewComponent {
     public activeFile: ViewerPreviewFile
     private error: string
     previewFileDialogRef
+
+    regionsofParcellation: any[] = []
 
     constructor(
         private dbrService: DatabrowserService,
@@ -71,18 +73,17 @@ export class SearchItemPreviewComponent {
             }
             else {
                 this.showDedicatedViewOnAtlasViewer(previewFile)
-
-                // this.selectedRegions.forEach(sr => {
+                this.regionsofParcellation = []
+                this.getRegionsFromParcellation(this.parcellationRegions)
+                // this.regionsofParcellation.forEach(sr => {
                 //     if (sr.name.includes(' - left hemisphere')) {
                 //         if (previewFile.filename.includes(sr.name.replace(' - left hemisphere', '')) && previewFile.filename.includes('left hemisphere')) {
                 //             this.navigateToRegion(sr)
-                //             this.closeSearchMenu.emit(true)
                 //         }
                 //     }
                 //     if (sr.name.includes(' - right hemisphere')) {
                 //         if (previewFile.filename.includes(sr.name.replace(' - right hemisphere', '')) && previewFile.filename.includes('right hemisphere')) {
                 //             this.navigateToRegion(sr)
-                //             this.closeSearchMenu.emit(true)
                 //         }
                 //     }
                 // })
@@ -91,6 +92,17 @@ export class SearchItemPreviewComponent {
         }
     }
 
+
+
+    getRegionsFromParcellation  = (regions) => {
+        for (let i = 0; i<regions.length; i ++) {
+            if (regions[i].children && regions[i].children.length) {
+                this.getRegionsFromParcellation(regions[i].children)
+            } else {
+                this.regionsofParcellation.push(regions[i])
+            }
+        }
+    }
 
     niftiLayerIsShowing(previewFile){
         return this.dbService.ngLayers.has(previewFile.url)

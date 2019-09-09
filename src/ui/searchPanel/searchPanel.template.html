@@ -76,23 +76,39 @@
                      [ngStyle]="{'max-height' : (+windowHeight - +searchPanelPositionTop -  150) + 'px'}"
                      elementOutClick
                      (outsideClick)="filePreviewModalClosedValue && closeFrozenMenu(); !filesMenuFrozen? showPreview = null : null">
-                    <div *ngFor="let dataset of filteredDataEntry; let i = index" class="search-item">
-                        <hr [color]="constantsService.darktheme? '#C6C6C6' : ''" class="m-0" style="margin: 0; padding: 0;">
+                    <div *ngFor="let dataset of filteredDataEntry; let i = index"
+                         class="search-item"
+                         (mouseenter)="hoveringDataset = i"
+                         (mouseleave)="hoveringDataset = null">
+                        <hr [color]="constantsService.darktheme? '#C6C6C6' : ''"
+                            class="m-0 p-0">
                         <div class="ml-3 mr-3 text-wrap d-flex justify-content-between align-items-center" #SearchItem (mouseenter)="showPreview = i; filterVisible = false; showSelectedRegions = false">
                             <div class="cursorPointer pt-2 pb-2" (click)="openDatasetUrl(dataset.kgReference)"  (mouseenter)="visiblePreview !== i && setPreviewHeight(SearchBody, SearchItem)">{{dataset.name}}</div>
-                            <div *ngIf="dataset.preview" class="d-flex align-items-start ">
-                                <i class="fas fa-chevron-right ml-3" (mouseenter)="visiblePreview !== i && setPreviewHeight(SearchBody, SearchItem)"></i>
-                                <div class="position-absolute floating-container-mp" [ngStyle]="{'top': previewWindowTopPosition + 'px'}" *ngIf="showPreview === i" #SearchPreview>
-                                    <mat-card class="p-0">
-                                        <search-item-preview-component
-                                                [datasetName]="dataset.name"
-                                                [ngStyle]="{'max-height': +windowInnerheight-100 + 'px'}"
-                                                [selectedRegions]="selectedRegions$ | async"
-                                                (freezeFilesSubMenu)="frozeSearchMenu()"
-                                                (filePreviewModalClosed)="filePreviewModalClosedValue = $event; this.filePreviewModalClosed.emit($event)"
-                                                (closeSearchMenu)="this.closeSearchMenu.emit(true)">
-                                        </search-item-preview-component>
-                                    </mat-card>
+                            <div class="d-flex align-items-center">
+                                <button mat-mini-fab [color]="datasetIsAddedToFavorites(dataset, favDataEntries) ? 'warn' : 'primary'"
+                                        *ngIf="hoveringDataset === i && (favDataEntries$ | async) as favDataEntries"
+                                        (click)="datasetIsAddedToFavorites(dataset, favDataEntries) ? removeDatasetFromFavorites(dataset) : pinDatasetToFavorites(dataset)"
+                                        class="outline-none">
+                                    <span [ngClass]="datasetIsAddedToFavorites(dataset, favDataEntries) && 'fa-stack fa-1x mb-2'">
+                                        <i class="fas fa-thumbtack" [ngClass]="datasetIsAddedToFavorites(dataset, favDataEntries) && 'fa-stack-1x'"></i>
+                                        <i *ngIf="datasetIsAddedToFavorites(dataset, favDataEntries)" class="fas fa-slash fa-stack-1x"></i>
+                                    </span>
+                                </button>
+
+                                <div *ngIf="dataset.preview" class="d-flex align-items-start ">
+                                    <i class="fas fa-chevron-right ml-3" (mouseenter)="visiblePreview !== i && setPreviewHeight(SearchBody, SearchItem)"></i>
+                                    <div class="position-absolute floating-container-mp" [ngStyle]="{'top': previewWindowTopPosition + 'px'}" *ngIf="showPreview === i" #SearchPreview>
+                                        <mat-card class="p-0">
+                                            <search-item-preview-component
+                                                    [datasetName]="dataset.name"
+                                                    [ngStyle]="{'max-height': +windowInnerheight-100 + 'px'}"
+                                                    [parcellationRegions]="(selectedParcellation$ | async)?.regions"
+                                                    (freezeFilesSubMenu)="frozeSearchMenu()"
+                                                    (filePreviewModalClosed)="filePreviewModalClosedValue = $event; this.filePreviewModalClosed.emit($event)"
+                                                    (closeSearchMenu)="this.closeSearchMenu.emit(true)">
+                                            </search-item-preview-component>
+                                        </mat-card>
+                                    </div>
                                 </div>
                             </div>
                         </div>

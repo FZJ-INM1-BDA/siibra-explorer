@@ -470,7 +470,7 @@ bs-modal-backdrop.modal-backdrop
 
 
 .outline-none {
-    outline: none;
+    outline: none !important;
 }
 
 .cursorPointer {
