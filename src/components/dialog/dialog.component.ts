@@ -15,6 +15,8 @@ import { filter, share } from "rxjs/operators";
 export class DialogComponent implements OnInit, OnDestroy {
 
   private subscrptions: Subscription[] = []
+
+  @Input() iconClass: string = `fas fa-save`
   
   @Input() title: string = 'Message'
   @Input() placeholder: string = "Type your response here"
@@ -29,11 +31,12 @@ export class DialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data:any,
     private dialogRef: MatDialogRef<DialogComponent>
   ){
-    const { title, placeholder, defaultValue, message } = this.data
+    const { title, placeholder, defaultValue, message, iconClass = null } = this.data
     if (title) this.title = title
     if (placeholder) this.placeholder = placeholder
     if (defaultValue) this.value = defaultValue
     if (message) this.message = message
+    if (typeof iconClass !== 'undefined') this.iconClass = iconClass
   }
 
   ngOnInit(){

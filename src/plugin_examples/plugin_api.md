@@ -155,6 +155,7 @@ window.interactiveViewer
     "message":"Message to be seen by the user.", // default: ""
     "placeholder": "Start typing here", // default: "Type your response here"
     "defaultValue": "42" // default: ""
+    "iconClass":"fas fa-save" // default fas fa-save, set to falsy value to disable
   }
   ```
   - *getUserConfirmation(config)* returns a Promise, resolves when user confirms, rejects when user cancels. expects config object object with the following structure:
