@@ -1,26 +1,30 @@
-<canvas 
-  *ngIf="shapedLineChartDatasets"
-  (mousewheel)="mousescroll($event)"
-  width='100%'
-  height='100%'
-  baseChart 
-  chartType="line"
-  [options]="chartOption"
-  [colors]="colors"
-  [datasets]="shapedLineChartDatasets"
-  [labels]="chartDataset.labels"
-  #canvas>
+<canvas
+        *ngIf="shapedLineChartDatasets"
+        (mousewheel)="mousescroll($event)"
+        width='100%'
+        height='100%'
+        baseChart
+        chartType="line"
+        [options]="chartOption"
+        [colors]="colors"
+        [datasets]="shapedLineChartDatasets"
+        [labels]="chartDataset.labels"
+        #canvas>
 </canvas>
-<a
-  [download]="csvTitle"
-  [href]="csvDataUrl"
-  tooltip="Download line graph as csv"
-  container="body"
-  class="btn btn-sm btn-outline-secondary rounded-circle"
-  *ngIf="shapedLineChartDatasets">
-  <i class="fas fa-file-csv"></i>
-</a>
-<span
-  *ngIf="!shapedLineChartDatasets">
+<div class="w-100 d-flex justify-content-end">
+    <a hidden
+       #DownloadLineChartLink
+       class="outline-none"
+       [download]="csvTitle"
+       [href]="csvDataUrl"
+       container="body"
+       *ngIf="shapedLineChartDatasets"
+       matTooltip="Download line graph as csv">
+        <i class="fas fa-file-csv"></i>
+        <!--  <i class="fas fa-file-csv"></i><span class="ml-2">Download line graph as csv</span>-->
+    </a>
+    <span
+            *ngIf="!shapedLineChartDatasets">
   datasets are required to display linear graph
 </span>
+</div>

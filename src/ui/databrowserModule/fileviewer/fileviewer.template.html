@@ -1,19 +1,10 @@
+<div class="w-100 d-flex justify-content-center mt-2 font-weight-bold">
+  {{previewFile.name}}
+</div>
+
 <div *ngIf = "!previewFile">
   previewFile as an input is required for this component to work...
 </div>
-
-<!-- KG Entry Viewer -->
-<!-- <kg-entry-viewer *ngIf = "previewFile.kgID && false" [dataset] = "previewFile">
-</kg-entry-viewer> -->
-
-<!-- citation -->
-<!-- <citations-component 
-  citationContainer
-  *ngIf = "previewFile && !previewFile.kgID"
-  [properties] = "previewFile.datasetProperties">
-</citations-component> -->
-
-<!-- file viewer -->
 <div 
   *ngIf = "previewFile"
   [ngSwitch]="previewFile.mimetype">
@@ -63,11 +54,6 @@
   </div>
   <div *ngSwitchCase = "'application/nehuba-layer'">
     APPLICATION NEHUBA LAYER - NOT YET IMPLEMENTED
-    <!-- <dedicated-view-controller
-      [dedicatedViewString]="'nehuba-layer://'+previewFile.url"
-      [dedicatedViewNehubaLayerObject]="previewFile.data">
-
-    </dedicated-view-controller> -->
   </div>
   <div *ngSwitchDefault>
     <div mimetypeTextContainer>
@@ -76,37 +62,34 @@
   </div>
 </div>
 
-<!-- caption -->
-<!-- <readmore-component *ngIf = "previewFile.properties && previewFile.properties.description">
-  <small id = "captions">
-    {{ previewFile.properties.description }}
-  </small>
-</readmore-component> -->
+<div class="mt-1 w-100 d-flex justify-content-end pl-1 pr-1 pt-2 pb-2">
+  <button
+          (click)="childChart.downloadChartAsPng()"
+          class="outline-none mr-1 ml-1 btn btn-link p-0"
+          container="body"
+          *ngIf="childChart && childChart.shapedLineChartDatasets"
+          matTooltip="Download line graph as csv">
+    <i class="fas fa-file-csv downloadButton"></i>
+  </button>
 
-<div
-  anchorContainer
-  *ngIf="downloadUrl">
-  <a
-    class="btn btn-sm btn-outline-secondary rounded-circle"
-    tooltip="Download file"
-    container="body"
-    [href]="downloadUrl"
-    target="_blank"
-    download>
-    <i class="far fa-arrow-alt-circle-down"></i>
+  <a      class="outline-none mr-1 ml-1"
+          *ngIf="downloadUrl"
+          [href]="downloadUrl"
+          target="_blank"
+          download
+          matTooltip="Download File"
+          color="#4595ec">
+    <i class="far fa-arrow-alt-circle-down downloadButton"></i>
   </a>
-</div>
 
-<div
-  anchorContainer
-  *ngIf="downloadPng">
-  <a
-    class="btn btn-sm btn-outline-secondary rounded-circle"
-    tooltip="Download chart as an image"
-    container="body"
-    [href]="downloadPng"
-    target="_blank"
-    download>
-    <i class="far fa-image"></i>
+  <a      class="outline-none mr-1 ml-1"
+          *ngIf="downloadPng"
+          container="body"
+          [href]="downloadPng"
+          target="_blank"
+          download
+          matTooltip="Download chart as an image"
+          color="#4595ec">
+    <i class="far fa-arrow-alt-circle-down downloadButton"></i>
   </a>
 </div>

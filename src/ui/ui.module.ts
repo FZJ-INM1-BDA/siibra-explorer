@@ -65,6 +65,11 @@ import { MaximmisePanelButton } from "./nehubaContainer/maximisePanelButton/maxi
 import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
+import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
+import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
+import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
+import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
+import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 
 @NgModule({
   imports : [
@@ -108,6 +113,9 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
     ViewerStateController,
     RegionTextSearchAutocomplete,
     MaximmisePanelButton,
+    SearchPanel,
+    SearchItemPreviewComponent,
+    SelectedRegionsComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -131,6 +139,7 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
     GetFileExtension,
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
+    FilterWithStringPipe,
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
@@ -138,7 +147,8 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
     /* directive */
     DownloadDirective,
     ShowToastDirective,
-    TouchSideClass
+    TouchSideClass,
+    ElementOutClickDirective
   ],
   entryComponents : [
 
@@ -165,7 +175,9 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    SearchPanel,
+    ElementOutClickDirective
   ]
 })
 

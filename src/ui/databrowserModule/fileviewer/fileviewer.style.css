@@ -28,12 +28,12 @@ kg-entry-viewer
   display: block;
 }
 
-div[anchorContainer]
-{
-  padding:0.2em 1em;
-}
-
 div[mimetypeTextContainer]
 {
   margin:1em;
+}
+
+.downloadButton {
+  color: #4595ec;
+  font-size: 20px;
 }
