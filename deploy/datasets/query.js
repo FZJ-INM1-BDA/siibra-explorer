@@ -240,16 +240,15 @@ const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
 
 const renderPublication = ({ name, cite, doi }) => `${name}
   ${cite}
-  https://doi.org/${doi}
+  DOI: ${doi}
 `
 
-const prepareDatasetMetadata = ({ name, kgReference, contributors, publications }) => {
+const prepareDatasetMetadata = ({ name, description, kgReference, contributors, publications }) => {
 
   return `${name}
 
-Contributors: ${contributors.join(', ')}
+${description}
 
-Publications:
 ${publications.map(renderPublication).join('\n')}
 `
 }
@@ -262,6 +261,10 @@ fs.readFile(path.join(__dirname, 'kgtos.md') , 'utf-8', (err, data) => {
 })
 
 const getTos = () => kgtos
+
+const getLicense = ({ licenseInfo }) => licenseInfo.map(({ name, url }) => `${name}
+<${url}>
+`).join('\n')
 
 const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
   if (!kgId) {
@@ -276,15 +279,15 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
    * append citation information
    */
   zip.append(prepareDatasetMetadata(dataset), {
-    name: `${datasetName}.txt`
+    name: `README.txt`
   })
 
   /**
    * append kg citation policy
    */
 
-  zip.append(getTos(), {
-    name: `Terms Of Use.md`
+  zip.append(getLicense(dataset), {
+    name: `LICENSE.md`
   })
 
   /**
