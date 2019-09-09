@@ -1,6 +1,6 @@
-<div class="d-flex flex-row align-items-center">
+<div class="d-inline-flex flex-row align-items-center">
 
-  <form class="flex-grow-1 flex-shrink-1">
+  <form *ngIf="showAutoComplete" class="flex-grow-1 flex-shrink-1">
     <mat-form-field class="w-100">
       <input
         placeholder="Regions"

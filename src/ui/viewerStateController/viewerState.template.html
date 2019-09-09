@@ -17,6 +17,9 @@
     </mat-select>
   </mat-form-field>
 
+  <!-- padding so that info icon lines up -->
+  <button mat-icon-button class="pe-none invisible"></button>
+
   <ng-container *ngIf="templateSelected$ | async as templateSelected">
     <!-- show on hover component -->
     <sleight-of-hand
@@ -75,6 +78,12 @@
     </mat-select>
   </mat-form-field>
 
+  <!-- selected regions -->
+  <region-text-search-autocomplete
+    [showAutoComplete]="false"
+    (focusedStateChanged)="focused = $event">
+  </region-text-search-autocomplete>
+
   <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
     <!-- show on hover component -->
     <sleight-of-hand
@@ -118,14 +127,6 @@
 
   <!-- divider -->
   <mat-divider></mat-divider>
-
-  <!-- selected regions -->
-
-  <div class="d-flex">
-    <region-text-search-autocomplete
-      (focusedStateChanged)="focused = $event">
-    </region-text-search-autocomplete>
-  </div>
 
   <!-- chips -->
   <mat-card class="w-20em mh-10em overflow-auto overflow-x-hidden">
