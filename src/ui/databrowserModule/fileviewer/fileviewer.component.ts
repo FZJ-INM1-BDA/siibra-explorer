@@ -5,6 +5,7 @@ import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
 
+
 @Component({
   selector : 'file-viewer',
   templateUrl : './fileviewer.template.html' ,
@@ -97,6 +98,7 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
 }
 
 interface ChartComponentInterface{
-  canvas : ElementRef
+  canvas : ElementRef,
+  shapedLineChartDatasets: any
 }
 

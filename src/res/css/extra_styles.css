@@ -467,3 +467,12 @@ bs-modal-backdrop.modal-backdrop
 {
   z-index: 940;
 }
+
+
+.outline-none {
+    outline: none;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}

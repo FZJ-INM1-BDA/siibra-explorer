@@ -37,10 +37,4 @@ export class DedicatedViewer{
       ? this.removeDedicatedView()
       : this.showDedicatedView()
   }
-
-  get tooltipText(){
-    return this.isShowing
-      ? 'Remove this file in the viewer'
-      : 'View this file in the viewer'
-  }
 }

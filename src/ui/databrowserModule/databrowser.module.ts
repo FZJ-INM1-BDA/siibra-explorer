@@ -64,7 +64,11 @@ import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
   ],
   exports:[
     DataBrowser,
-    SingleDatasetView
+    SingleDatasetView,
+    PreviewComponent,
+    ModalityPicker,
+    FilterDataEntriesbyMethods,
+      FileViewer
   ],
   entryComponents:[
     DataBrowser

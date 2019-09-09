@@ -62,6 +62,11 @@ import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 
+import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
+import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
+import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
+import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
+import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 
 @NgModule({
   imports : [
@@ -104,6 +109,9 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
     CurrentLayout,
     ViewerStateController,
     RegionTextSearchAutocomplete,
+    SearchPanel,
+    SearchItemPreviewComponent,
+    SelectedRegionsComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -127,12 +135,14 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
     GetFileExtension,
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
+    FilterWithStringPipe,
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
 
     /* directive */
     DownloadDirective,
-    ShowToastDirective
+    ShowToastDirective,
+    ElementOutClickDirective
   ],
   entryComponents : [
 
@@ -159,7 +169,9 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
     SigninModal,
     CookieAgreement,
     KGToS,
-    StatusCardComponent
+    StatusCardComponent,
+    SearchPanel,
+    ElementOutClickDirective
   ]
 })
 
