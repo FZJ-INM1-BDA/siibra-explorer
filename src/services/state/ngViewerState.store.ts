@@ -17,6 +17,9 @@ export interface NgViewerStateInterface{
   nehubaReady: boolean
   panelMode: string
   panelOrder: string
+
+  showSubstrate: boolean
+  showZoomlevel: boolean
 }
 
 export interface NgViewerAction extends Action{
@@ -31,7 +34,10 @@ const defaultState:NgViewerStateInterface = {
   forceShowSegment:null,
   nehubaReady: false,
   panelMode: FOUR_PANEL,
-  panelOrder: `0123`
+  panelOrder: `0123`,
+
+  showSubstrate: null,
+  showZoomlevel: null
 }
 
 export function ngViewerState(prevState:NgViewerStateInterface = defaultState, action:NgViewerAction):NgViewerStateInterface{
@@ -39,6 +45,7 @@ export function ngViewerState(prevState:NgViewerStateInterface = defaultState, a
     case ACTION_TYPES.SET_PANEL_ORDER: {
       const { payload } = action
       const { panelOrder } = payload
+
       return {
         ...prevState,
         panelOrder
@@ -119,7 +126,10 @@ export class NgViewerUseEffect implements OnDestroy{
   public toggleMaximiseMode$: Observable<any>
 
   @Effect()
-  public toggleMaximiseOrder$: Observable<any>
+  public unmaximiseOrder$: Observable<any>
+
+  @Effect()
+  public maximiseOrder$: Observable<any>
 
   @Effect()
   public toggleMaximiseCycleMessage$: Observable<any>
@@ -170,22 +180,61 @@ export class NgViewerUseEffect implements OnDestroy{
       })
     )
 
-    this.toggleMaximiseOrder$ = toggleMaxmimise$.pipe(
+    this.maximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
         combineLatest(
-          this.panelOrder$.pipe(
-            scan((acc, curr: string) => [curr, ...acc.slice(0,1)], []),
-          ),
+          this.panelOrder$,
           this.panelMode$
         )
       ),
-      map(([action, [panelOrders, panelMode]]) => {
+      filter(([_action, [_panelOrder, panelMode]]) => panelMode !== SINGLE_PANEL),
+      map(([ action, [ oldPanelOrder ] ]) => {
         const { payload } = action as NgViewerAction
         const { index = 0 } = payload
 
-        const panelOrder = panelMode === SINGLE_PANEL && !!panelOrders[1]
-          ? panelOrders[1]
-          : [...panelOrders[0].slice(index), ...panelOrders[0].slice(0, index)].join('')
+        const panelOrder = [...oldPanelOrder.slice(index), ...oldPanelOrder.slice(0, index)].join('')
+        return {
+          type: ACTION_TYPES.SET_PANEL_ORDER,
+          payload: {
+            panelOrder
+          }
+        }
+      })
+    )
+
+    this.unmaximiseOrder$ = toggleMaxmimise$.pipe(
+      withLatestFrom(
+        combineLatest(
+          this.panelOrder$,
+          this.panelMode$
+        )
+      ),
+      scan((acc, curr) => {
+        const [action, [panelOrders, panelMode]] = curr
+        return [{
+          action, 
+          panelOrders,
+          panelMode
+        }, ...acc.slice(0, 1)]
+      }, [] as any[]),
+      filter(([ { panelMode } ]) => panelMode === SINGLE_PANEL),
+      map(arr => {
+        const {
+          action,
+          panelOrders
+        } = arr[0]
+
+        const {
+          panelOrders: panelOrdersPrev = null,
+        } = arr[1] || {}
+
+        const { payload } = action as NgViewerAction
+        const { index = 0 } = payload
+
+        const panelOrder = !!panelOrdersPrev
+          ? panelOrdersPrev
+          : [...panelOrders.slice(index), ...panelOrders.slice(0, index)].join('')
+
         return {
           type: ACTION_TYPES.SET_PANEL_ORDER,
           payload: {
@@ -220,12 +269,9 @@ export class NgViewerUseEffect implements OnDestroy{
       })
     )
 
-    this.spacebarListener$ = combineLatest(
-      fromEvent(document.body, 'keydown', { capture: true }).pipe(
-        filter((ev: KeyboardEvent) => ev.key === ' ')
-      ),
-      this.panelMode$
-    ).pipe(
+    this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
+      filter((ev: KeyboardEvent) => ev.key === ' '),
+      withLatestFrom(this.panelMode$),
       filter(([_ , panelMode]) => panelMode === SINGLE_PANEL),
       mapTo({
         type: ACTION_TYPES.CYCLE_VIEWS
