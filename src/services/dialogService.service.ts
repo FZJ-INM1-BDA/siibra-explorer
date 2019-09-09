@@ -31,13 +31,20 @@ export class DialogService{
   }
 
   public getUserInput(config: Partial<DialogConfig> = {}):Promise<string>{
-    const { defaultValue = '', placeholder = 'Type your response here', title = 'Message', message = '' } = config
+    const {
+      defaultValue = '',
+      placeholder = 'Type your response here',
+      title = 'Message',
+      message = '',
+      iconClass
+    } = config
     this.dialogRef = this.dialog.open(DialogComponent, {
       data: {
         title,
         placeholder,
         defaultValue,
-        message
+        message,
+        iconClass
       }
     })
     return new Promise((resolve, reject) => {
@@ -59,4 +66,5 @@ export interface DialogConfig{
   placeholder: string
   defaultValue: string
   message: string
+  iconClass: string
 }

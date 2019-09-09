@@ -132,7 +132,8 @@ export class ViewerStateController implements OnInit{
     this.dialogService.getUserInput({
       defaultValue: savedRegionsSelection.name,
       placeholder: `Enter new name`,
-      title: 'Edit name'
+      title: 'Edit name',
+      iconClass: null
     }).then(name => {
       if (!name) throw new Error('user cancelled')
       this.store$.dispatch({
@@ -186,7 +187,8 @@ export class ViewerStateController implements OnInit{
     this.dialogService.getUserInput({
       defaultValue: `Saved Region`,
       placeholder: `Name the selection`,
-      title: 'Save region selection'
+      title: 'Save region selection',
+      iconClass: 'far fa-bookmark'
     })
       .then(name => {
         if (!name) throw new Error('User cancelled')

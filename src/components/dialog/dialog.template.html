@@ -32,7 +32,7 @@
     class="ml-1"
     mat-raised-button
     color="primary">
-    <i class="fas fa-save mr-1"></i>
+    <i *ngIf="iconClass" [ngClass]="iconClass" class="mr-1"></i>
     Confirm
   </button>
 </div>

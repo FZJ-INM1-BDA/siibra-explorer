@@ -135,7 +135,7 @@
 
   <!-- selected regions -->
   <mat-card-content>
-    <mat-chip-list>
+    <mat-chip-list *ngIf="(regionsSelected$ | async)?.length > 0 ">
       <cdk-virtual-scroll-viewport
         class="w-100 h-10em overflow-x-hidden"
         [itemSize]="32">
