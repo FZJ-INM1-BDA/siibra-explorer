@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef } from "@angular/core";
+import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { map, distinctUntilChanged, startWith, withLatestFrom, filter, debounceTime, tap, share, shareReplay, take } from "rxjs/operators";
+import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
-import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger, MatDialog } from "@angular/material";
+import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.component";
 
@@ -19,6 +19,9 @@ const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase(
 })
 
 export class RegionTextSearchAutocomplete{
+
+  @Input()
+  public showAutoComplete: boolean = true
 
   @ViewChild('autoTrigger', {read: ElementRef}) autoTrigger: ElementRef 
   @ViewChild('regionHierarchy', {read:TemplateRef}) regionHierarchyTemplate: TemplateRef<any>
