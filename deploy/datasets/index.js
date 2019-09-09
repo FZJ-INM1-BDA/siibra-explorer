@@ -11,9 +11,11 @@ const bodyParser = require('body-parser')
 datasetsRouter.use(bodyParser.urlencoded({ extended: false }))
 datasetsRouter.use(bodyParser.json())
 
-init().catch(e => {
-  console.warn(`dataset init failed`, e)
-})
+init()
+  .then(() => console.log(`dataset init success`))
+  .catch(e => {
+    console.warn(`dataset init failed`, e)
+  })
 
 const cacheMaxAge24Hr = (_req, res, next) => {
   const oneDay = 24 * 60 * 60
