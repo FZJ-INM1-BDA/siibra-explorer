@@ -14,12 +14,13 @@
 
   <!-- publications -->
   <mat-card-content>
-    <a *ngFor="let publication of publications"
-      [href]="publication.doi | doiParserPipe"
-      mat-button
-      target="_blank">
-      {{ publication.cite }}
-    </a>
+    <div class="d-inline-block mb-2"
+      *ngFor="let publication of publications">
+      <a [href]="publication.doi | doiParserPipe"
+        target="_blank">
+        {{ publication.cite }}
+      </a>
+    </div>
   </mat-card-content>
 
 
