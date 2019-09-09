@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } 
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { Publication, File } from 'src/services/state/dataStore.store'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 
 @Component({
   selector: 'single-dataset-view',
@@ -23,6 +24,8 @@ export class SingleDatasetView implements OnInit {
 
   @Input() kgSchema?: string
   @Input() kgId?: string
+
+  private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
 
   /**
    * sic!
@@ -93,6 +96,10 @@ export class SingleDatasetView implements OnInit {
     return this.files
       ? this.files.reduce((acc, curr) => acc + curr.byteSize, 0)
       : null
+  }
+
+  get tooltipText(){
+    return `${this.numOfFiles} files ~ ${this.humanReadableFileSizePipe.transform(this.totalFileByteSize)}`
   }
 
   get showFooter(){

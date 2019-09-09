@@ -340,7 +340,15 @@ export class NehubaViewerUnit implements OnDestroy{
 
   viewerState : ViewerState
 
-  private multiNgIdColorMap: Map<string, Map<number, {red: number, green:number, blue: number}>>
+  private _multiNgIdColorMap: Map<string, Map<number, {red: number, green:number, blue: number}>>
+  get multiNgIdColorMap(){
+    return this._multiNgIdColorMap
+  }
+
+  set multiNgIdColorMap(val) {
+    this._multiNgIdColorMap = val
+  }
+
   public mouseOverSegment: number | null
   public mouseOverLayer: {name:string,url:string}| null
 
@@ -349,6 +357,10 @@ export class NehubaViewerUnit implements OnDestroy{
   public getNgHash : () => string = () => window['export_nehuba']
     ? window['export_nehuba'].getNgHash()
     : null
+
+  redraw(){
+    this.nehubaViewer.redraw()
+  }
 
   loadNehuba(){
     this.nehubaViewer = window['export_nehuba'].createNehubaViewer(this.config, (err)=>{
@@ -367,7 +379,7 @@ export class NehubaViewerUnit implements OnDestroy{
       if (layer) layer.setVisible(true)
       else console.log('layer unavailable', ngId)
     })
-    this.nehubaViewer.redraw()
+    this.redraw()
 
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
@@ -686,6 +698,10 @@ export class NehubaViewerUnit implements OnDestroy{
      * TODO
      * ugh, ugly code. cleanify
      */
+    /**
+     * TODO 
+     * sometimes, ngId still happends to be undefined
+     */
     newMap.forEach((segs, ngId) => {
       this.nehubaViewer.hideSegment(0, {
         name: ngId
@@ -934,16 +950,11 @@ export class NehubaViewerUnit implements OnDestroy{
       ]
     }) as [string, Map<number, {red:number, green: number, blue: number}>][]
 
-    this.multiNgIdColorMap = new Map(obj)
+    const multiNgIdColorMap = new Map(obj)
 
     /* load colour maps */
-
-    Array.from(this.multiNgIdColorMap.entries()).forEach(([ngId, map]) => {
-
-      this.nehubaViewer.batchAddAndUpdateSegmentColors(
-        map,
-        { name : ngId })
-    })
+    
+    this.setColorMap(multiNgIdColorMap)
 
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
@@ -965,6 +976,17 @@ export class NehubaViewerUnit implements OnDestroy{
         }
       }
     }
+  }
+
+  public setColorMap(map: Map<string, Map<number,{red:number, green:number, blue:number}>>){
+    this.multiNgIdColorMap = map
+    
+    Array.from(map.entries()).forEach(([ngId, map]) => {
+
+      this.nehubaViewer.batchAddAndUpdateSegmentColors(
+        map,
+        { name : ngId })
+    })
   }
 
   private getRgb(labelIndex:number,rgb?:number[]):{red:number,green:number,blue:number}{

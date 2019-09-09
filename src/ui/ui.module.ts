@@ -43,7 +43,6 @@ import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.com
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
 import { KGToS } from "./kgtos/kgtos.component";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { TemplateParcellationsDecorationPipe } from "src/util/pipes/templateParcellationDecoration.pipe";
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { FourPanelLayout } from "./config/layouts/fourPanel/fourPanel.component";
 import { HorizontalOneThree } from "./config/layouts/h13/h13.component";
@@ -60,6 +59,8 @@ import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } fr
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
+import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
+import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 
 import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
@@ -123,7 +124,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     SpatialLandmarksToDataBrowserItemPipe,
     FilterNullPipe,
     FilterNameBySearch,
-    TemplateParcellationsDecorationPipe,
     AppendtooltipTextPipe,
     MobileControlNubStylePipe,
     GetTemplateImageSrcPipe,
@@ -136,6 +136,8 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
     FilterWithStringPipe,
+    TemplateParcellationHasMoreInfo,
+    HumanReadableFileSizePipe,
 
     /* directive */
     DownloadDirective,

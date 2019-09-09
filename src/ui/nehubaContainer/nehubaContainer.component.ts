@@ -464,6 +464,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
          */
         if (!this.nehubaViewer) return
 
+        /**
+         * TODO smarter with event stream
+         */
+        if (!viewPanels.every(v => !!v)) return
+
         switch (mode) {
           case H_ONE_THREE:{
             const element = this.removeExistingPanels()
@@ -1099,8 +1104,12 @@ export class NehubaContainer implements OnInit, OnDestroy{
         })
       },
       segmentColourMap : new Map(),
+      getLayersSegmentColourMap: () => this.nehubaViewer.multiNgIdColorMap,
       applyColourMap : (map)=>{
-        /* TODO to be implemented */
+        throw new Error(`apply color map has been deprecated. use applyLayersColourMap instead`)
+      },
+      applyLayersColourMap: (map) => {
+        this.nehubaViewer.setColorMap(map)
       },
       loadLayer : (layerObj)=>this.nehubaViewer.loadLayer(layerObj),
       removeLayer : (condition)=>this.nehubaViewer.removeLayer(condition),

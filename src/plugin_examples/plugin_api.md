@@ -15,7 +15,9 @@ window.interactiveViewer
 
   - *loadedTemplates* : Array of TemplateDescriptor objects. Loaded asynchronously onInit.
 
-  - *regionsLabelIndexMap* Map of labelIndex (used by neuroglancer and nehuba) to the corresponding RegionDescriptor object.
+  - **Deprecated** ~~*regionsLabelIndexMap* Map of labelIndex (used by neuroglancer and nehuba) to the corresponding RegionDescriptor object.~~
+
+  - *layersRegionLabelIndexMap* Map of layer name to Map of labelIndex (used by neuroglancer and nehuba) to the corresponding RegionDescriptor object.
 
 - viewerHandle
 
@@ -36,9 +38,13 @@ window.interactiveViewer
 
   - *hideAllSegments()* Function that hides all segments. Will trigger *selectRegionBSubject*
 
-  - *segmentColourMap* : Map of *labelIndex* to an object with the shape of `{red: number, green: number, blue: number}`.
+  - **Deprecated** ~~*segmentColourMap* : Map of *labelIndex* to an object with the shape of `{red: number, green: number, blue: number}`.~~
 
-  - *applyColourMap(colourMap)* Function that applies a custom colour map (Map of number to and object with the shape of `{red: number , green: number , blue: number}`)
+  - *getLayersSegmentColourMap* : Call to get Map of layer name to Map of label index to colour map
+
+  - **Deprecated**  ~~*applyColourMap(colourMap)* Function that applies a custom colour map (Map of number to and object with the shape of `{red: number , green: number , blue: number}`)~~
+
+  - *applyLayersColourMap* Function that applies a custom colour map.
 
   - *loadLayer(layerObject)* Function that loads *ManagedLayersWithSpecification* directly to neuroglancer. Returns the values of the object successfully added. **n.b.** advanced feature, will likely break other functionalities. **n.b.** if the layer name is already taken, the layer will not be added.
   

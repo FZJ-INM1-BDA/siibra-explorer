@@ -16,15 +16,46 @@
       </mat-option>
     </mat-select>
   </mat-form-field>
+
   <ng-container *ngIf="templateSelected$ | async as templateSelected">
-    <ng-container *ngIf="(templateSelected | templateParcellationsDecorationPipe)?.extraButtons as extraButtons">
-      <button
-        *ngFor="let extraBtn of extraButtons"
-        (click)="handleActiveDisplayBtnClicked($event, 'template', extraBtn, templateSelected)"
-        mat-icon-button>
-        <i [class]="extraBtn.faIcon"></i>
-      </button>
-    </ng-container>
+    <!-- show on hover component -->
+    <sleight-of-hand
+      class="d-inline-block"
+      *ngIf="templateSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+
+      <!-- shown when off -->
+      <div sleight-of-hand-front>
+        <button
+          mat-icon-button>
+          <i class="fas fa-info"></i>
+        </button>
+      </div>
+
+      <!-- shown on hover -->
+      <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+        <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+          <i class="fas fa-info"></i>
+        </button>
+
+        <div class="position-relative">
+          <button class="position-relative invisible pe-none" mat-icon-button>
+            <i class="fas fa-info"></i>
+          </button>
+
+          <single-dataset-view
+            *ngFor="let originDataset of moreInfo.originDatasets"
+            class="position-absolute left-0 top-0 w-40em"
+            [name]="moreInfo.name"
+            [description]="moreInfo.description"
+            [publications]="moreInfo.publications"
+            [kgSchema]="originDataset && originDataset.kgSchema"
+            [kgId]="originDataset && originDataset.kgId">
+          </single-dataset-view>
+        </div>
+        
+      </div>
+    </sleight-of-hand>
+
   </ng-container>
 
   <!-- parcellation selection -->
@@ -45,14 +76,44 @@
   </mat-form-field>
 
   <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
-    <ng-container *ngIf="(parcellationSelected | templateParcellationsDecorationPipe)?.extraButtons as extraButtons">
-      <button
-        *ngFor="let extraBtn of extraButtons"
-        (click)="handleActiveDisplayBtnClicked($event, 'parcellation', extraBtn, parcellationSelected)"
-        mat-icon-button>
-        <i [class]="extraBtn.faIcon"></i>
-      </button>
-    </ng-container>
+    <!-- show on hover component -->
+    <sleight-of-hand
+      class="d-inline-block"
+      *ngIf="parcellationSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+
+      <!-- shown when off -->
+      <div sleight-of-hand-front>
+        <button
+          mat-icon-button>
+          <i class="fas fa-info"></i>
+        </button>
+      </div>
+
+      <!-- shown on hover -->
+      <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+        <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+          <i class="fas fa-info"></i>
+        </button>
+
+        <div class="position-relative">
+          <button class="position-relative invisible pe-none" mat-icon-button>
+            <i class="fas fa-info"></i>
+          </button>
+
+          <single-dataset-view
+            *ngFor="let originDataset of moreInfo.originDatasets"
+            class="position-absolute left-0 top-0 w-40em"
+            [name]="moreInfo.name"
+            [description]="moreInfo.description"
+            [publications]="moreInfo.publications"
+            [kgSchema]="originDataset && originDataset.kgSchema"
+            [kgId]="originDataset && originDataset.kgId">
+          </single-dataset-view>
+        </div>
+        
+      </div>
+    </sleight-of-hand>  
+
   </ng-container>
 
   <!-- divider -->
@@ -137,18 +198,6 @@
     </button>
   </div>
 </mat-card>
-
-<ng-template #publicationTemplate>
-  <single-dataset-view
-    *ngFor="let focusedDataset of (focusedDatasets$ | async)"
-    [name]="focusedDataset.name"
-    [description]="focusedDataset.description"
-    [publications]="focusedDataset.publications"
-    [kgSchema]="focusedDataset.kgSchema"
-    [kgId]="focusedDataset.kgId">
-    
-  </single-dataset-view>
-</ng-template>
 
 <!-- bottom sheet for saved regions  -->
 <ng-template #savedRegionBottomSheetTemplate>
