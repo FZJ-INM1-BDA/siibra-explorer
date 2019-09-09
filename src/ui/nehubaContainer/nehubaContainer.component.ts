@@ -1,15 +1,15 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
-import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit, computeDistance } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "../../services/stateStore.service";
-import { Observable, Subscription, fromEvent, combineLatest, merge } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, switchMapTo, shareReplay, throttleTime, bufferTime, startWith } from "rxjs/operators";
+import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, switchMapTo, shareReplay, mapTo, takeUntil } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL } from "src/services/state/ngViewerState.store";
+import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL, NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
@@ -144,8 +144,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   public panelMode$: Observable<string>
+
+  private panelOrder: string
+  public panelOrder$: Observable<string>
   private redrawLayout$: Observable<[string, string]>
   public favDataEntries$: Observable<DataEntry[]>
+
+  public hoveredPanelIndices$: Observable<number>
+
+  private ngPanelTouchMove$: Observable<any>
 
   constructor(
     private constantService : AtlasViewerConstantsServices,
@@ -173,22 +180,29 @@ export class NehubaContainer implements OnInit, OnDestroy{
       filter(() => isDefined(this.nehubaViewer) && isDefined(this.nehubaViewer.nehubaViewer))
     )
 
+    this.panelMode$ = this.store.pipe(
+      select('ngViewerState'),
+      select('panelMode'),
+      distinctUntilChanged(),
+      shareReplay(1)
+    )
+
+    this.panelOrder$ = this.store.pipe(
+      select('ngViewerState'),
+      select('panelOrder'),
+      distinctUntilChanged(),
+      shareReplay(1),
+      tap(panelOrder => this.panelOrder = panelOrder)
+    )
+    
     this.redrawLayout$ = this.store.pipe(
       select('ngViewerState'),
       select('nehubaReady'),
       distinctUntilChanged(),
       filter(v => !!v),
       switchMapTo(combineLatest(
-        this.store.pipe(
-          select('ngViewerState'),
-          select('panelMode'),
-          distinctUntilChanged()
-        ),
-        this.store.pipe(
-          select('ngViewerState'),
-          select('panelOrder'),
-          distinctUntilChanged()
-        )
+        this.panelMode$,
+        this.panelOrder$
       ))
     )
 
@@ -414,10 +428,20 @@ export class NehubaContainer implements OnInit, OnDestroy{
         : false)
     )
 
-    this.panelMode$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
-      distinctUntilChanged(),
+    this.ngPanelTouchMove$ = fromEvent(this.elementRef.nativeElement, 'touchstart').pipe(
+      switchMap((touchStartEv:TouchEvent) => fromEvent(this.elementRef.nativeElement, 'touchmove').pipe(
+        tap((ev: TouchEvent) => ev.preventDefault()),
+        scan((acc, curr: TouchEvent) => [curr, ...acc.slice(0,1)], []),
+        map((touchMoveEvs:TouchEvent[]) => {
+          return {
+            touchStartEv,
+            touchMoveEvs
+          }
+        }),
+        takeUntil(fromEvent(this.elementRef.nativeElement, 'touchend').pipe(
+          filter((ev: TouchEvent) => ev.touches.length === 0))
+        )
+      ))
     )
   }
 
@@ -433,7 +457,99 @@ export class NehubaContainer implements OnInit, OnDestroy{
     return element
   }
 
+  private findPanelIndex = (panel: HTMLElement) => this.viewPanels.findIndex(p => p === panel)
+
   ngOnInit(){
+
+    // translation on mobile
+    this.subscriptions.push(
+      this.ngPanelTouchMove$.pipe(
+        filter(({ touchMoveEvs }) => touchMoveEvs.length > 1 && (touchMoveEvs as TouchEvent[]).every(ev => ev.touches.length === 1)),
+      ).subscribe(({ touchMoveEvs, touchStartEv }) => {
+
+        // get deltaX and deltaY of touchmove
+        const deltaX = touchMoveEvs[1].touches[0].screenX - touchMoveEvs[0].touches[0].screenX
+        const deltaY = touchMoveEvs[1].touches[0].screenY - touchMoveEvs[0].touches[0].screenY
+
+        // figure out the target of touch start
+        const panelIdx = this.findPanelIndex(touchStartEv.target as HTMLElement) 
+
+        // translate if panelIdx < 3
+        if (panelIdx >=0 && panelIdx < 3) {
+          const { position } = this.nehubaViewer.nehubaViewer.ngviewer.navigationState
+          const pos = position.spatialCoordinates
+          window['export_nehuba'].vec3.set(pos, deltaX, deltaY, 0)
+          window['export_nehuba'].vec3.transformMat4(pos, pos, this.nehubaViewer.viewportToDatas[panelIdx])
+          position.changed.dispatch()
+        } 
+
+        // rotate 3D if panelIdx === 3
+
+        else if (panelIdx === 3) {
+          const {perspectiveNavigationState} = this.nehubaViewer.nehubaViewer.ngviewer
+          const { vec3 } = window['export_nehuba']
+          perspectiveNavigationState.pose.rotateRelative(vec3.fromValues(0, 1, 0), -deltaX / 4.0 * Math.PI / 180.0)
+          perspectiveNavigationState.pose.rotateRelative(vec3.fromValues(1, 0, 0), deltaY / 4.0 * Math.PI / 180.0)
+          this.nehubaViewer.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch()
+        }
+
+        // this shoudn't happen?
+        else {
+          console.warn(`panelIdx not found`)
+        }
+      })
+    )
+
+    // perspective reorientation on mobile
+    this.subscriptions.push(
+      this.ngPanelTouchMove$.pipe(
+        filter(({ touchMoveEvs }) => touchMoveEvs.length > 1 && (touchMoveEvs as TouchEvent[]).every(ev => ev.touches.length === 2)),
+      ).subscribe(({ touchMoveEvs, touchStartEv }) => {
+
+        const d1 = computeDistance(
+          [touchMoveEvs[1].touches[0].screenX, touchMoveEvs[1].touches[0].screenY],
+          [touchMoveEvs[1].touches[1].screenX, touchMoveEvs[1].touches[1].screenY]
+        )
+        const d2 = computeDistance(
+          [touchMoveEvs[0].touches[0].screenX, touchMoveEvs[0].touches[0].screenY],
+          [touchMoveEvs[0].touches[1].screenX, touchMoveEvs[0].touches[1].screenY]
+        )
+        const factor = d1/d2
+
+        // figure out the target of touch start
+        const panelIdx = this.findPanelIndex(touchStartEv.target as HTMLElement) 
+
+        // zoom slice view if slice
+        if (panelIdx >=0 && panelIdx < 3) {
+          this.nehubaViewer.nehubaViewer.ngviewer.navigationState.zoomBy(factor)
+        }
+
+        // zoom perspective view if on perspective
+        else if (panelIdx === 3) {
+          const { minZoom = null, maxZoom = null } = (this.selectedTemplate.nehubaConfig
+            && this.selectedTemplate.nehubaConfig.layout
+            && this.selectedTemplate.nehubaConfig.layout.useNehubaPerspective
+            && this.selectedTemplate.nehubaConfig.layout.useNehubaPerspective.restrictZoomLevel)
+            || {}
+          
+          const { zoomFactor } = this.nehubaViewer.nehubaViewer.ngviewer.perspectiveNavigationState
+          if (!!minZoom && zoomFactor.value * factor < minZoom) return
+          if (!!maxZoom && zoomFactor.value * factor > maxZoom) return
+          zoomFactor.zoomBy(factor)
+        }
+      })
+    )
+
+    this.hoveredPanelIndices$ = fromEvent(this.elementRef.nativeElement, 'mouseover').pipe(
+      switchMap((ev:MouseEvent) => merge(
+        of(this.findPanelIndex(ev.target as HTMLElement)),
+        fromEvent(this.elementRef.nativeElement, 'mouseout').pipe(
+          mapTo(null)
+        )
+      )),
+      debounceTime(20),
+      shareReplay(1)
+    )
 
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.subscriptions.push(
@@ -801,6 +917,15 @@ export class NehubaContainer implements OnInit, OnDestroy{
 
   ngOnDestroy(){
     this.subscriptions.forEach(s=>s.unsubscribe())
+  }
+
+  toggleMaximiseMinimise(index: number){
+    this.store.dispatch({
+      type: NG_VIEWER_ACTION_TYPES.TOGGLE_MAXIMISE,
+      payload: {
+        index
+      }
+    })
   }
 
   public tunableMobileProperties = ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z']

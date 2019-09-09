@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { MatSnackBar } from "@angular/material";
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
+import { Store } from "@ngrx/store";
+import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 
 /**
  * experimental service handling local user files such as nifti and gifti
@@ -15,8 +17,8 @@ export class LocalFileService {
   private supportedExtSet = new Set(SUPPORTED_EXT)
 
   constructor(
-    private snackBar: MatSnackBar,
-    private dbService: DatabrowserService  
+    private dbService: DatabrowserService  ,
+    private store: Store<any>
   ){
 
   }
@@ -38,10 +40,10 @@ export class LocalFileService {
         }
       }
     } catch (e) {
-      this.snackBar.open(e, `Dismiss`, {
-        duration: 5000
+      this.store.dispatch({
+        type: SNACKBAR_MESSAGE,
+        snackbarMessage: `Opening local NIFTI error: ${e.toString()}`
       })
-      console.error(e)
     }
   }
 
@@ -76,8 +78,9 @@ export class LocalFileService {
   }
 
   private showLocalWarning() {
-    this.snackBar.open(`Warning: sharing URL will not share the loaded local file`, 'Dismiss', {
-      duration: 5000
+    this.store.dispatch({
+      type: SNACKBAR_MESSAGE,
+      snackbarMessage: `Warning: sharing URL will not share the loaded local file`
     })
   }
 }

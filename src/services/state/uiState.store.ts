@@ -10,6 +10,8 @@ const defaultState : UIStateInterface = {
   focusedSidePanel: null,
   sidePanelOpen: false,
 
+  snackbarMessage: null,
+
   /**
    * replace with server side logic (?)
    */
@@ -34,6 +36,15 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       return {
         ...state,
         mouseOverLandmark : action.landmark
+      }
+    case SNACKBAR_MESSAGE:
+      const { snackbarMessage } = action
+      /**
+       * Need to use symbol here, or repeated snackbarMessage will not trigger new event
+       */
+      return {
+        ...state,
+        snackbarMessage: Symbol(snackbarMessage)
       }
     /**
      * TODO deprecated
@@ -89,6 +100,8 @@ export interface UIStateInterface{
   mouseOverLandmark : any 
   focusedSidePanel : string | null
 
+  snackbarMessage: Symbol
+
   agreedCookies: boolean
   agreedKgTos: boolean
 }
@@ -102,7 +115,8 @@ export interface UIAction extends Action{
       name: string
     }
     segment: any | null
-  }[]
+  }[],
+  snackbarMessage: string
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
@@ -116,3 +130,5 @@ export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`
 export const SHOW_KG_TOS = `SHOW_KG_TOS`
+
+export const SNACKBAR_MESSAGE = `SNACKBAR_MESSAGE`

@@ -1,6 +1,6 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef, Renderer2 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
@@ -17,7 +17,7 @@ import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef } from "@angular/material";
 
 /**
  * TODO
@@ -71,6 +71,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
   private showHelp$: Observable<any>
+  
+  private snackbarRef: MatSnackBarRef<any>
+  public snackbarMessage$: Observable<string>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
@@ -108,8 +111,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
-    public localFileService: LocalFileService
+    public localFileService: LocalFileService,
+    private snackbar: MatSnackBar
   ) {
+
+    this.snackbarMessage$ = this.store.pipe(
+      select('uiState'),
+      select("snackbarMessage")
+    )
 
     /**
      * TODO deprecated
@@ -266,6 +275,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.unsupportedPreviewIdx = val
       })
     }
+
+    this.subscriptions.push(
+      this.snackbarMessage$.pipe(
+        // angular material issue
+        // see https://github.com/angular/angular/issues/15634
+        // and https://github.com/angular/components/issues/11357
+        delay(0),
+      ).subscribe(messageSymbol => {
+        this.snackbarRef && this.snackbarRef.dismiss()
+
+        if (!messageSymbol) return
+
+        // https://stackoverflow.com/a/48191056/6059235
+        const message = messageSymbol.toString().slice(7, -1)
+        this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
+          duration: 5000
+        })
+      })
+    )
 
     this.subscriptions.push(
       this.showHelp$.subscribe(() => {

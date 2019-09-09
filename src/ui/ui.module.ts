@@ -61,6 +61,9 @@ import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
+import { MaximmisePanelButton } from "./nehubaContainer/maximisePanelButton/maximisePanelButton.component";
+import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
+import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
 import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
@@ -109,6 +112,7 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     CurrentLayout,
     ViewerStateController,
     RegionTextSearchAutocomplete,
+    MaximmisePanelButton,
     SearchPanel,
     SearchItemPreviewComponent,
     SelectedRegionsComponent,
@@ -138,10 +142,12 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     FilterWithStringPipe,
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
+    ReorderPanelIndexPipe,
 
     /* directive */
     DownloadDirective,
     ShowToastDirective,
+    TouchSideClass,
     ElementOutClickDirective
   ],
   entryComponents : [
