@@ -4,6 +4,10 @@
   "species": "Human",
   "useTheme": "light",
   "ngId": " grey value: ",
+  "originDatasets":[{
+    "kgSchema": "minds/core/dataset/v1.0.0",
+    "kgId": "e32f9053-38c9-4911-b868-845c56828f4d"
+  }],
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {
