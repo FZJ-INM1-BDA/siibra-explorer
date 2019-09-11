@@ -13,7 +13,7 @@ const defaultXform = (coord) => coord
 const getXformFn = (templateSpace) => {
   const _ = {}
   switch(templateSpace){
-    case 'Waxholm Space rat brain atlas v.2.0': 
+    case 'Waxholm Space rat brain MRI/DTI': 
       _['nmToVoxel'] = transformWaxholmV2NmToVoxel
       _['voxelToNm'] = transformWaxholmV2VoxelToNm
       break;
@@ -34,7 +34,7 @@ const getSpatialSearcParam = ({ templateName, queryArg }) => {
   const bbInVoxelSpace = boundingBoxCorners.map(nmToVoxel)
 
   switch (templateName){
-    case 'Waxholm Space rat brain atlas v.2.0':
+    case 'Waxholm Space rat brain MRI/DTI':
       kgSpaceName = 'waxholmV2'
       break;
     default: 

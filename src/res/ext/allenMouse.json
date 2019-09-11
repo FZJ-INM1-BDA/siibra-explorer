@@ -8,7 +8,7 @@
   "parcellations": [
     {
       "ngId": "atlas",
-      "name": "Allen adult mouse brain reference atlas V3 Brain Atlas",
+      "name": "Allen Mouse Common Coordinate Framework v3 2015",
       "ngData": null,
       "type": "parcellation",
       "regions": [
@@ -48827,17 +48827,26 @@
         }
       ],
       "properties": {
-        "publications": [
-          {
-            "doi": "https://doi:10.1038/nature05453",
-            "citation": "Lein, E.S. et al. (2007) Genome-wide atlas of gene expression in the adult mouse brain, Nature 445: 168-176. "
-          }
-        ]
+        "publications": [{
+          "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+        },{
+          "doi": "10.1038/nature13186",
+          "citation": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214. "
+        }]
       }
     }
   ],
   "properties": {
-    "name": "Allen adult mouse brain reference atlas V3 Brain Atlas",
-    "description": "The Allen adult mouse brain reference atlas V3 Brain Atlas includes a full-color, high-resolution anatomical reference atlas accompanied by a systematic, hierarchically organized taxonomy of mouse brain structures. Anatomical annotations in classical histological atlas plates were extracted to create a comprehensive volumetric reference atlas of the mouse brain."
+    "name": "Allen Mouse Common Coordinate Framework v3 2015",
+    "description": "The Allen Mouse Common Coordinate Framework v3 2015 includes a full-color, high-resolution anatomical reference atlas accompanied by a systematic, hierarchically organized taxonomy of mouse brain structures. Anatomical annotations in classical histological atlas plates were extracted to create a comprehensive volumetric reference atlas of the mouse brain.",
+    "publications":[{
+      "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+    },{
+      "cite":"Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214.",
+      "doi": "10.1038/nature13186"
+    }, {
+      "cite": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/",
+      "doi": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/"
+    }]
   }
 }
