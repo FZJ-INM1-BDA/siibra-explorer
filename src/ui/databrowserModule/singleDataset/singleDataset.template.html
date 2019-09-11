@@ -14,12 +14,15 @@
 
   <!-- publications -->
   <mat-card-content>
-    <div class="d-inline-block mb-2"
+    <div class="d-block mb-2"
       *ngFor="let publication of publications">
-      <a [href]="publication.doi | doiParserPipe"
+      <a *ngIf="publication.doi; else plainText" [href]="publication.doi | doiParserPipe"
         target="_blank">
         {{ publication.cite }}
       </a>
+      <ng-template #plainText>
+        {{ publication.cite }}
+      </ng-template>
     </div>
   </mat-card-content>
 
