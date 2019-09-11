@@ -190,10 +190,10 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
         case 'Fibre Bundle Atlas - Long Bundle':
           useSet = longBundleSet
         break;
-        case 'Waxholm Space rat brain atlas v.2.0':
+        case 'Waxholm Space rat brain MRI/DTI':
           useSet = waxholmSet
         break;
-        case 'Allen adult mouse brain reference atlas V3 Brain Atlas':
+        case 'Allen Mouse Common Coordinate Framework v3 2015':
           useSet = allenSet
         break;
         default:

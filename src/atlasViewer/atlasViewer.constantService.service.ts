@@ -98,7 +98,7 @@ export class AtlasViewerConstantsServices{
       ]
     ],
     [
-      'Allen adult mouse brain reference atlas V3 Brain Atlas',
+      'Allen Mouse Common Coordinate Framework v3 2015',
       [
         'res/json/allenAggregated.json'
       ]
