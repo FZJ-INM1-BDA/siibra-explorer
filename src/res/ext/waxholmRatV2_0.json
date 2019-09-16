@@ -3241,7 +3241,11 @@
                 {
                   "name": "anterior commissure, anterior part",
                   "labelIndex": 36,
-                  "rgb": null,
+                  "rgb": [
+                    124,
+                    252,
+                    0
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "anterior commissure, anterior part",
@@ -3328,7 +3332,11 @@
                 {
                   "name": "ventral hippocampal commissure",
                   "labelIndex": 38,
-                  "rgb": null,
+                  "rgb": [
+                    174,
+                    0,
+                    232
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "ventral hippocampal commissure",
@@ -3397,7 +3405,11 @@
                 {
                   "name": "corticofugal pathways",
                   "labelIndex": 1,
-                  "rgb": null,
+                  "rgb": [
+                    255,
+                    52,
+                    39
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "corticofugal pathways",
@@ -3411,7 +3423,11 @@
                 {
                   "name": "pyramidal decussation",
                   "labelIndex": 85,
-                  "rgb": null,
+                  "rgb": [
+                    114,
+                    9,
+                    212
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "pyramidal decussation",
@@ -3462,7 +3478,11 @@
                 {
                   "name": "medial lemniscus decussation",
                   "labelIndex": 84,
-                  "rgb": null,
+                  "rgb": [
+                    65,
+                    150,
+                    255
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "medial lemniscus decussation",
@@ -3567,7 +3587,11 @@
                 {
                   "name": "stria terminalis",
                   "labelIndex": 62,
-                  "rgb": null,
+                  "rgb": [
+                    238,
+                    117,
+                    51
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "stria terminalis",
@@ -3672,7 +3696,11 @@
                 {
                   "name": "genu of the facial nerve",
                   "labelIndex": 57,
-                  "rgb": null,
+                  "rgb": [
+                    250,
+                    244,
+                    247
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "genu of the facial nerve",
@@ -3723,7 +3751,11 @@
                 {
                   "name": "optic tract and optic chiasm",
                   "labelIndex": 42,
-                  "rgb": null,
+                  "rgb": [
+                    38,
+                    126,
+                    255
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "optic tract and optic chiasm",
@@ -3757,7 +3789,11 @@
             {
               "name": "spinal trigeminal tract",
               "labelIndex": 76,
-              "rgb": null,
+              "rgb": [
+                250,
+                128,
+                114
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "spinal trigeminal tract",
@@ -3824,7 +3860,11 @@
                 {
                   "name": "commissure of the inferior colliculus",
                   "labelIndex": 69,
-                  "rgb": null,
+                  "rgb": [
+                    147,
+                    255,
+                    39
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "commissure of the inferior colliculus",
@@ -3875,7 +3915,11 @@
                 {
                   "name": "middle cerebellar peduncle",
                   "labelIndex": 78,
-                  "rgb": null,
+                  "rgb": [
+                    134,
+                    204,
+                    76
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "middle cerebellar peduncle",
@@ -3889,7 +3933,11 @@
                 {
                   "name": "transverse fibers of the pons",
                   "labelIndex": 79,
-                  "rgb": null,
+                  "rgb": [
+                    128,
+                    170,
+                    255
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "transverse fibers of the pons",
@@ -3907,7 +3955,11 @@
         {
           "name": "Gray matter",
           "labelIndex": 2,
-          "rgb": null,
+          "rgb": [
+            128,
+            128,
+            128
+          ],
           "ngId": "v1_01",
           "_": {
             "abbreviation": "Gray matter",
@@ -3920,7 +3972,11 @@
             {
               "name": "Olfactory system",
               "labelIndex": null,
-              "rgb": null,
+              "rgb": [
+                128,
+                128,
+                128
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "Olfactory system",
@@ -3969,7 +4025,11 @@
                 {
                   "name": "olfactory bulb",
                   "labelIndex": 66,
-                  "rgb": null,
+                  "rgb": [
+                    255,
+                    135,
+                    0
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "olfactory bulb",
@@ -3985,7 +4045,11 @@
             {
               "name": "Cerebral cortex including the neocortex and the hippocampus",
               "labelIndex": null,
-              "rgb": null,
+              "rgb": [
+                128,
+                128,
+                128
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "Cerebral cortex including the neocortex and the hippocampus",
@@ -3998,7 +4062,11 @@
                 {
                   "name": "frontal association cortex",
                   "labelIndex": 77,
-                  "rgb": null,
+                  "rgb": [
+                    206,
+                    211,
+                    7
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "frontal association cortex",
@@ -4012,7 +4080,11 @@
                 {
                   "name": "hippocampal formation",
                   "labelIndex": 86,
-                  "rgb": null,
+                  "rgb": [
+                    14,
+                    71,
+                    226
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "hippocampal formation",
@@ -4026,7 +4098,11 @@
                 {
                   "name": "subiculum",
                   "labelIndex": 87,
-                  "rgb": null,
+                  "rgb": [
+                    221,
+                    217,
+                    81
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "subiculum",
@@ -4040,7 +4116,11 @@
                 {
                   "name": "postrhinal cortex",
                   "labelIndex": 88,
-                  "rgb": null,
+                  "rgb": [
+                    137,
+                    211,
+                    85
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "postrhinal cortex",
@@ -4054,7 +4134,11 @@
                 {
                   "name": "ventral-intermediate entorhinal area",
                   "labelIndex": 89,
-                  "rgb": null,
+                  "rgb": [
+                    139,
+                    0,
+                    139
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "ventral-intermediate entorhinal area",
@@ -4068,7 +4152,11 @@
                 {
                   "name": "medial entorhinal field",
                   "labelIndex": 90,
-                  "rgb": null,
+                  "rgb": [
+                    65,
+                    255,
+                    39
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "medial entorhinal field",
@@ -4118,7 +4206,11 @@
                 {
                   "name": "cingulate cortex, area 2",
                   "labelIndex": 10,
-                  "rgb": null,
+                  "rgb": [
+                    29,
+                    104,
+                    235
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "cingulate cortex, area 2",
@@ -4132,7 +4224,11 @@
                 {
                   "name": "dorsal-lateral entorhinal area",
                   "labelIndex": 14,
-                  "rgb": null,
+                  "rgb": [
+                    46,
+                    139,
+                    87
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "dorsal-lateral entorhinal area",
@@ -4146,7 +4242,11 @@
                 {
                   "name": "dorsal-intermediate entorhinal area",
                   "labelIndex": 15,
-                  "rgb": null,
+                  "rgb": [
+                    127,
+                    129,
+                    255
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "dorsal-intermediate entorhinal area",
@@ -4160,7 +4260,11 @@
                 {
                   "name": "perirhinal cortex",
                   "labelIndex": 17,
-                  "rgb": null,
+                  "rgb": [
+                    221,
+                    100,
+                    121
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "perirhinal cortex",
@@ -4176,7 +4280,11 @@
             {
               "name": "striatum",
               "labelIndex": 30,
-              "rgb": null,
+              "rgb": [
+                129,
+                79,
+                255
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "striatum",
@@ -4190,7 +4298,11 @@
             {
               "name": "globus pallidus",
               "labelIndex": 31,
-              "rgb": null,
+              "rgb": [
+                255,
+                145,
+                186
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "globus pallidus",
@@ -4204,7 +4316,11 @@
             {
               "name": "entopeduncular nucleus",
               "labelIndex": 32,
-              "rgb": null,
+              "rgb": [
+                26,
+                231,
+                255
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "entopeduncular nucleus",
@@ -4254,7 +4370,11 @@
             {
               "name": "septal region",
               "labelIndex": 40,
-              "rgb": null,
+              "rgb": [
+                255,
+                8,
+                0
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "septal region",
@@ -4286,7 +4406,11 @@
             {
               "name": "bed nucleus of the stria terminalis",
               "labelIndex": 93,
-              "rgb": null,
+              "rgb": [
+                0,
+                8,
+                182
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "bed nucleus of the stria terminalis",
@@ -4300,7 +4424,11 @@
             {
               "name": "nucleus of the stria medullaris",
               "labelIndex": 81,
-              "rgb": null,
+              "rgb": [
+                222,
+                7,
+                237
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "nucleus of the stria medullaris",
@@ -4314,7 +4442,11 @@
             {
               "name": "hypothalamic region",
               "labelIndex": 48,
-              "rgb": null,
+              "rgb": [
+                226,
+                120,
+                161
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "hypothalamic region",
@@ -4346,7 +4478,11 @@
             {
               "name": "Tectum",
               "labelIndex": null,
-              "rgb": null,
+              "rgb": [
+                128,
+                128,
+                128
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "Tectum",
@@ -4377,7 +4513,11 @@
                 {
                   "name": "pretectal region",
                   "labelIndex": 94,
-                  "rgb": null,
+                  "rgb": [
+                    255,
+                    87,
+                    30
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "pretectal region",
@@ -4409,7 +4549,11 @@
                 {
                   "name": "deeper layers of the superior colliculus",
                   "labelIndex": 55,
-                  "rgb": null,
+                  "rgb": [
+                    225,
+                    151,
+                    15
+                  ],
                   "ngId": "v1_01",
                   "_": {
                     "abbreviation": "deeper layers of the superior colliculus",
@@ -4461,7 +4605,11 @@
             {
               "name": "periaqueductal gray",
               "labelIndex": 51,
-              "rgb": null,
+              "rgb": [
+                7,
+                255,
+                89
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "periaqueductal gray",
@@ -4475,7 +4623,11 @@
             {
               "name": "pontine nuclei",
               "labelIndex": 58,
-              "rgb": null,
+              "rgb": [
+                0,
+                215,
+                11
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "pontine nuclei",
@@ -4489,7 +4641,11 @@
             {
               "name": "Cerebellum",
               "labelIndex": null,
-              "rgb": null,
+              "rgb": [
+                128,
+                128,
+                128
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "Cerebellum",
@@ -4576,7 +4732,11 @@
             {
               "name": "periventricular gray",
               "labelIndex": 56,
-              "rgb": null,
+              "rgb": [
+                235,
+                87,
+                255
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "periventricular gray",
@@ -4590,7 +4750,11 @@
             {
               "name": "brain stem",
               "labelIndex": 47,
-              "rgb": null,
+              "rgb": [
+                153,
+                83,
+                255
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "brain stem",
@@ -4624,7 +4788,11 @@
         {
           "name": "Spinal cord",
           "labelIndex": null,
-          "rgb": null,
+          "rgb": [
+            134,
+            255,
+            90
+          ],
           "ngId": "v1_01",
           "_": {
             "abbreviation": "Spinal cord",
@@ -4637,7 +4805,11 @@
             {
               "name": "spinal cord",
               "labelIndex": 45,
-              "rgb": null,
+              "rgb": [
+                134,
+                255,
+                90
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "spinal cord",
@@ -4651,7 +4823,11 @@
             {
               "name": "central canal",
               "labelIndex": 70,
-              "rgb": null,
+              "rgb": [
+                39,
+                244,
+                253
+              ],
               "ngId": "v1_01",
               "_": {
                 "abbreviation": "central canal",
