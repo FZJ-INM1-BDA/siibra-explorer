@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
 import { DatabrowserService } from "../databrowser.service";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 
@@ -10,7 +10,7 @@ const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path
 
 @Component({
   selector: 'preview-component',
-  templateUrl: './preview.template.html',
+  templateUrl: './previewList.template.html',
   styleUrls: [
     './preview.style.css'
   ]
@@ -18,6 +18,9 @@ const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path
 
 export class PreviewComponent implements OnInit{
   @Input() datasetName: string
+  @Output() previewFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
+
+  public fetchCompleteFlag: boolean = false
 
   public previewFiles: ViewerPreviewFile[] = []
   public activeFile: ViewerPreviewFile
@@ -55,6 +58,9 @@ export class PreviewComponent implements OnInit{
         })
         .catch(e => {
           this.error = JSON.stringify(e)
+        })
+        .finally(() => {
+          this.fetchCompleteFlag = true
         })
     }
   }

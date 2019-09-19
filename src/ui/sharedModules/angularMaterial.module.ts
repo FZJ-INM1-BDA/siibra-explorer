@@ -18,6 +18,9 @@ import {
   MatSlideToggleModule,
   MatRippleModule,
   MatSliderModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule
 
 } from '@angular/material';
 import { NgModule } from '@angular/core';
@@ -44,7 +47,10 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     MatSlideToggleModule,
     MatRippleModule,
     MatSliderModule,
-    DragDropModule
+    DragDropModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule
   ],
   exports: [
     MatButtonModule,
@@ -66,7 +72,10 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     MatSlideToggleModule,
     MatRippleModule,
     MatSliderModule,
-    DragDropModule
+    DragDropModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule
   ],
 })
 export class AngularMaterialModule { }

@@ -4,6 +4,11 @@ import {
   Injector,
   ComponentFactory,
   ComponentFactoryResolver,
+  TemplateRef,
+  ViewChild,
+  OnInit,
+  OnDestroy,
+  AfterViewInit,
 } from "@angular/core";
 
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
@@ -14,9 +19,15 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { DatabrowserService } from "../databrowserModule/databrowser.service";
 import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
 import { Store, select } from "@ngrx/store";
-import { Observable, combineLatest } from "rxjs";
+import { Observable, combineLatest, Subscription } from "rxjs";
 import { map, shareReplay, startWith } from "rxjs/operators";
-import { ToastService } from "src/services/toastService.service";
+import { SHOW_SIDEBAR_TEMPLATE } from "src/services/state/uiState.store";
+import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
+import { MatDialogRef, MatDialog } from "@angular/material";
+import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
+import { DataEntry } from "src/services/stateStore.service";
+import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
 @Component({
   selector: 'menu-icons',
   templateUrl: './menuicons.template.html',
@@ -26,7 +37,10 @@ import { ToastService } from "src/services/toastService.service";
   ]
 })
 
-export class MenuIconsBar{
+export class MenuIconsBar implements OnInit, OnDestroy {
+
+  private layerBrowserDialogRef: MatDialogRef<any>
+  private subscriptions: Subscription[] = []
 
   public badgetPosition: string = 'above before'
 
@@ -56,13 +70,14 @@ export class MenuIconsBar{
   public toolBtnClass$: Observable<string>
   public getKgSearchBtnCls$: Observable<[Set<WidgetUnit>, string]>
 
-  get darktheme(){
-    return this.constantService.darktheme
-  }
+  public sidebarTemplate$: Observable<TemplateRef<any>>
 
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
   public selectedRegions$: Observable<any>
+
+  public getPluginBtnClass$: Observable<[Set<string>, Set<string>, string]>
+  public launchedPlugins$: Observable<string[]>
 
   searchedItemsNumber = 0
   searchLoading = false
@@ -70,6 +85,8 @@ export class MenuIconsBar{
   filePreviewModalClosed = false
   showSearchMenu = false
   mouseHoversSearch = false
+
+  public fetchedDatasets: DataEntry[] = []
 
   constructor(
     private widgetServices:WidgetServices,
@@ -79,7 +96,8 @@ export class MenuIconsBar{
     cfr: ComponentFactoryResolver,
     public pluginServices:PluginServices,
     private store: Store<any>,
-    private toastService: ToastService
+    private dialog: MatDialog,
+    private singleDatasetService: KgSingleDatasetService
   ){
 
     this.isMobile = this.constantService.mobile
@@ -95,10 +113,10 @@ export class MenuIconsBar{
       select('templateSelected')
     )
 
-      this.selectedParcellation$ = store.pipe(
-          select('viewerState'),
-          select('parcellationSelected'),
-      )
+    this.selectedParcellation$ = store.pipe(
+      select('viewerState'),
+      select('parcellationSelected'),
+    )
 
     this.selectedRegions$ = store.pipe(
       select('viewerState'),
@@ -140,6 +158,33 @@ export class MenuIconsBar{
       this.widgetServices.minimisedWindow$,
       this.themedBtnClass$
     )
+
+    this.sidebarTemplate$ = this.store.pipe(
+      select('uiState'),
+      select('sidebarTemplate')
+    )
+  }
+
+  ngOnInit(){
+    /**
+     * on opening nifti volume, collapse side bar
+     */
+    this.subscriptions.push(
+      this.singleDatasetService.previewingFile$.subscribe(({ file }) => {
+        if (determinePreviewFileType(file) === PREVIEW_FILE_TYPES.NIFTI) {
+          this.store.dispatch({
+            type: SHOW_SIDEBAR_TEMPLATE,
+            sidebarTemplate: null
+          })
+        }
+      })
+    )
+  }
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0){
+      this.subscriptions.pop().unsubscribe()
+    }
   }
 
   /**
@@ -217,23 +262,27 @@ export class MenuIconsBar{
     }
   }
 
-  get databrowserIsShowing() {
-    return this.dataBrowser !== null
+  public showKgSearchSideNav(kgSearchTemplate: TemplateRef<any> = null){
+    this.store.dispatch({
+      type: SHOW_SIDEBAR_TEMPLATE,
+      sidebarTemplate: kgSearchTemplate
+    })
   }
 
-  public closeWidget(event: MouseEvent, wu:WidgetUnit){
-    event.stopPropagation()
-    this.widgetServices.exitWidget(wu)
+  handleNonbaseLayerEvent(layers: NgLayerInterface[]){
+    if (layers.length  === 0) {
+      this.layerBrowserDialogRef && this.layerBrowserDialogRef.close()
+      this.layerBrowserDialogRef = null
+      return  
+    }
+    if (this.layerBrowserDialogRef) return
+    this.layerBrowserDialogRef = this.dialog.open(LayerBrowser, {
+      hasBackdrop: false,
+      autoFocus: false,
+      position: {
+        top: '1em'
+      },
+      disableClose: true
+    })
   }
-
-  public renameKgSearchWidget(event:MouseEvent, wu: WidgetUnit) {
-    event.stopPropagation()
-  }
-
-  public favKgSearch(event: MouseEvent, wu: WidgetUnit) {
-    event.stopPropagation()
-  }
-
-  public getPluginBtnClass$: Observable<[Set<string>, Set<string>, string]>
-  public launchedPlugins$: Observable<string[]>
 }

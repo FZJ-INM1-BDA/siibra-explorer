@@ -1,20 +1,26 @@
-import { Component, OnDestroy, OnInit, ViewChild, Input } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild, Input, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, Output,EventEmitter, TemplateRef } from "@angular/core";
 import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge, Observable } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
+import { MatDialog } from "@angular/material";
+import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
+import { scan, shareReplay } from "rxjs/operators";
+import { ViewerPreviewFile } from "src/services/state/dataStore.store";
+
+const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 
 @Component({
   selector : 'data-browser',
   templateUrl : './databrowser.template.html',
   styleUrls : [
     `./databrowser.style.css`
-  ]
+  ],
+  exportAs: 'dataBrowser',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DataBrowser implements OnDestroy,OnInit{
-
-  public favedDataentries$: Observable<DataEntry[]>
+export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   @Input()
   public regions: any[] = []
@@ -25,7 +31,11 @@ export class DataBrowser implements OnDestroy,OnInit{
   @Input()
   public parcellation: any
 
+  @Output()
+  dataentriesUpdated: EventEmitter<DataEntry[]> = new EventEmitter()
+
   public dataentries: DataEntry[] = []
+  public focusedDataset: DataEntry
 
   public currentPage: number = 0
   public hitsPerPage: number = 5
@@ -39,8 +49,15 @@ export class DataBrowser implements OnDestroy,OnInit{
   public countedDataM: CountedDataModality[] = []
   public visibleCountedDataM: CountedDataModality[] = []
 
+  public history$: Observable<{file:ViewerPreviewFile, dataset: DataEntry}[]>
+
   @ViewChild(ModalityPicker)
   modalityPicker: ModalityPicker
+
+  @ViewChild('detailDataset', {read: TemplateRef})
+  detailDatasetTemplateRef: TemplateRef<any>
+
+  public favDataentries$: Observable<DataEntry[]>
 
   get darktheme(){
     return this.dbService.darktheme
@@ -55,13 +72,20 @@ export class DataBrowser implements OnDestroy,OnInit{
   public gemoetryFilter: any
 
   constructor(
-    private dbService: DatabrowserService
+    private dbService: DatabrowserService,
+    private cdr:ChangeDetectorRef,
+    private dialog: MatDialog,
+    private singleDatasetSservice: KgSingleDatasetService
   ){
-    this.favedDataentries$ = this.dbService.favedDataentries$
+    this.favDataentries$ = this.dbService.favedDataentries$
+    this.history$ = this.singleDatasetSservice.previewingFile$.pipe(
+      scan(scanFn, []),
+      shareReplay(1)
+    )
   }
 
-  ngOnInit(){
-    this.dbService.dbComponentInit(this)
+  ngOnChanges(changes){
+
     this.regions = this.regions.map(r => {
       /**
        * TODO to be replaced with properly region UUIDs from KG
@@ -73,6 +97,14 @@ export class DataBrowser implements OnDestroy,OnInit{
     })
     const { regions, parcellation, template } = this
     this.fetchingFlag = true
+
+    /**
+     * reconstructing parcellation region is async (done on worker thread)
+     * if parcellation region is not yet defined, return. 
+     * parccellation will eventually be updated with the correct region
+     */
+    if (!parcellation.regions) return
+    
     this.dbService.getDataByRegion({ regions, parcellation, template })
       .then(de => {
         this.dataentries = de
@@ -88,8 +120,17 @@ export class DataBrowser implements OnDestroy,OnInit{
       })
       .finally(() => {
         this.fetchingFlag = false
+        this.dataentriesUpdated.emit(this.dataentries)
+        this.cdr.markForCheck()
       })
 
+  }
+
+  ngOnInit(){
+    /**
+     * TODO gets init'ed everytime when appends to ngtemplateoutlet 
+     */
+    this.dbService.dbComponentInit(this)
     this.subscriptions.push(
       merge(
         // this.dbService.selectedRegions$,
@@ -138,6 +179,10 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.dbService.manualFetchDataset$.next(null)
   }
 
+  toggleFavourite(dataset: DataEntry){
+    this.dbService.toggleFav(dataset)
+  }
+
   saveToFavourite(dataset: DataEntry){
     this.dbService.saveToFav(dataset)
   }
@@ -164,6 +209,11 @@ export class DataBrowser implements OnDestroy,OnInit{
 
   resetFilters(event?:MouseEvent){
     this.clearAll()
+  }
+
+  showFocusedDataset(dataset:DataEntry){
+    this.focusedDataset = dataset
+    this.dialog.open(this.detailDatasetTemplateRef)
   }
 }
 

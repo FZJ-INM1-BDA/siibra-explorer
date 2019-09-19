@@ -20,7 +20,6 @@ import { FlatTreeComponent } from './flatTree/flatTree.component';
 import { FlattenTreePipe } from './flatTree/flattener.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
 import { HighlightPipe } from './flatTree/highlight.pipe';
-import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pipe';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
@@ -33,6 +32,7 @@ import { ProgressBar } from './progress/progress.component';
 import { SleightOfHand } from './sleightOfHand/soh.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
+import { UtilModule } from 'src/util/util.module';
 
 
 @NgModule({
@@ -41,7 +41,8 @@ import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component'
     ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    UtilModule
   ],
   declarations : [
     /* components */
@@ -72,7 +73,6 @@ import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component'
     FlattenTreePipe,
     RenderPipe,
     HighlightPipe,
-    FitlerRowsByVisibilityPipe,
     AppendSiblingFlagPipe,
     ClusteringPipe,
     FilterCollapsePipe

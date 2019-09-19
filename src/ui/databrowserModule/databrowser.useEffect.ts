@@ -26,6 +26,23 @@ export class DataBrowserUseEffect implements OnDestroy{
       select('favDataEntries')
     )
 
+    this.toggleDataset$ = this.actions$.pipe(
+      ofType(DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET),
+      withLatestFrom(this.favDataEntries$),
+      map(([action, prevFavDataEntries]) => {
+        const { payload = {} } = action as any
+        const { id } = payload
+
+        const wasFav = prevFavDataEntries.findIndex(ds => ds.id === id) >= 0
+        return {
+          type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+          favDataEntries: wasFav 
+            ? prevFavDataEntries.filter(ds => ds.id !== id)
+            : prevFavDataEntries.concat(payload)
+        }
+      })
+    )
+
     this.unfavDataset$ = this.actions$.pipe(
       ofType(DATASETS_ACTIONS_TYPES.UNFAV_DATASET),
       withLatestFrom(this.favDataEntries$),
@@ -139,6 +156,9 @@ export class DataBrowserUseEffect implements OnDestroy{
 
   @Effect()
   public unfavDataset$: Observable<any>
+
+  @Effect()
+  public toggleDataset$: Observable<any>
 }
 
 const LOCAL_STORAGE_CONST = {

@@ -36,7 +36,7 @@
             </layout-floating-container>
           </tab>
           <tab heading="Containers">
-            <menu-icons iconWrapper hidden #MenuIcons>
+            <menu-icons hidden #MenuIcons>
             </menu-icons>
             <panel-component>
               <div class="m-2" heading>
@@ -154,10 +154,32 @@
     <ui-nehuba-container (contextmenu)="$event.stopPropagation(); $event.preventDefault();"> <!--nehubaClickHandler($event)-->
     </ui-nehuba-container>
   
-    <div *ngIf="!isMobile" bannerWrapper>
-      <menu-icons iconWrapper>
-      </menu-icons>
+    <div class="z-index-10 position-absolute pe-none w-100 h-100">
+      <mat-drawer-container
+        [hasBackdrop]="false"
+        class="w-100 h-100 bg-none">
+        <mat-drawer
+          mode="push"
+          class="pe-all col-sm-12 col-md-3"
+          [disableClose]="true"
+          [autoFocus]="false"
+          [opened]="sideNavTemplate$ | async">
+          
+          <!-- template outlet -->
+          <mat-card class="h-100">
+            <ng-container *ngTemplateOutlet="sideNavTemplate$ | async">
+            </ng-container>
+          </mat-card>
 
+        </mat-drawer>
+        <div class="d-flex h-100 justify-content-between align-items-start bg-none pe-none">
+          <menu-icons>
+          </menu-icons>
+        </div>
+      </mat-drawer-container>
+    </div>
+
+    <div class="d-flex flex-row justify-content-end z-index-10 position-absolute pe-none w-100 h-100">
       <signin-banner signinWrapper [ngStyle]="{'margin-right': !selectedTemplate? '20px': ''}">
       </signin-banner>
     </div>

@@ -1,0 +1,18 @@
+<mat-nav-list *ngIf="fetchCompleteFlag; else loadingPlaceholder">
+  <h3 mat-subheader>Available Preview Files</h3>
+  <mat-list-item
+    *ngFor="let file of previewFiles"
+    (click)="previewFile.emit(file)">
+    <mat-icon
+      [fontSet]="(file | previewFileIconPipe).fontSet"
+      [fontIcon]="(file | previewFileIconPipe).fontIcon"
+      matListIcon>
+    </mat-icon>
+    <h4 mat-line>{{ file.name }}</h4>
+    <p mat-line>mimetype: {{ file.mimetype }}</p>
+  </mat-list-item>
+</mat-nav-list>
+
+<ng-template #loadingPlaceholder>
+  <div class="d-inline-block spinnerAnimationCircle"></div> loading previews ...
+</ng-template>

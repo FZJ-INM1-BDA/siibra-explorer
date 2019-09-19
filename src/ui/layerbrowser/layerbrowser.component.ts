@@ -1,4 +1,4 @@
-import { Component,  OnDestroy, Input, Pipe, PipeTransform } from "@angular/core";
+import { Component,  OnDestroy, Input, Pipe, PipeTransform, Output, EventEmitter, OnInit } from "@angular/core";
 import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
@@ -15,7 +15,9 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
   ]
 })
 
-export class LayerBrowser implements OnDestroy{
+export class LayerBrowser implements OnInit, OnDestroy{
+
+  @Output() nonBaseLayersChanged: EventEmitter<NgLayerInterface[]> = new EventEmitter() 
 
   /**
    * TODO make untangle nglayernames and its dependency on ng
@@ -109,6 +111,12 @@ export class LayerBrowser implements OnDestroy{
       shareReplay(1)
     )
 
+  }
+
+  ngOnInit(){
+    this.subscriptions.push(
+      this.nonBaseNgLayers$.subscribe(layers => this.nonBaseLayersChanged.emit(layers))
+    )
     this.subscriptions.push(
       this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state)
     )

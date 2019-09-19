@@ -49,6 +49,7 @@ import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewe
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
+import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
 
 import 'hammerjs'
 
@@ -60,6 +61,7 @@ import 'hammerjs'
     ComponentsModule,
     DragDropModule,
     UIModule,
+    DatabrowserModule,
     AngularMaterialModule,
     
     TooltipModule.forRoot(),

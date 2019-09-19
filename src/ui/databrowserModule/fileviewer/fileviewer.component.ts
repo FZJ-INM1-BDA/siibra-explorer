@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, OnDestroy, ViewChild, ElementRef, OnInit, Output, EventEmitter } from '@angular/core'
+import { Component, Input, OnChanges, OnDestroy, ViewChild, ElementRef, OnInit, Output, EventEmitter, Inject, Optional } from '@angular/core'
 
 import { DomSanitizer } from '@angular/platform-browser';
 import { interval,from } from 'rxjs';
 import { switchMap,take,retry } from 'rxjs/operators'
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
+import { MAT_DIALOG_DATA } from '@angular/material';
 
 
 @Component({
@@ -23,8 +24,10 @@ export class FileViewer implements OnChanges,OnDestroy,OnInit{
   @ViewChild('childChart') childChart : ChartComponentInterface
 
   constructor(
+    @Optional() @Inject(MAT_DIALOG_DATA) data,
     private sanitizer:DomSanitizer
   ){
+    if (data) this.previewFile = data.previewFile
   }
 
   private _downloadUrl : string

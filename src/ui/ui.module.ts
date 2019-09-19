@@ -5,7 +5,7 @@ import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.co
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen, GetTemplateImageSrcPipe, ImgSrcSetPipe } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "../layouts/layout.module";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormsModule } from "@angular/forms";
 
 import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pipe";
 import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
@@ -28,7 +28,6 @@ import { DownloadDirective } from "../util/directives/download.directive";
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
-import { FilterNullPipe } from "../util/pipes/filterNull.pipe";
 import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
@@ -37,7 +36,6 @@ import { DatabrowserModule } from "./databrowserModule/databrowser.module";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { SigninModal } from "./signinModal/signinModal.component";
 import { UtilModule } from "src/util/util.module";
-import { RegionHierarchy } from "./viewerStateController/regionHierachy/regionHierarchy.component";
 import { FilterNameBySearch } from "./viewerStateController/regionHierachy/filterNameBySearch.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { CookieAgreement } from "./cookieAgreement/cookieAgreement.component";
@@ -56,7 +54,6 @@ import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
 import { ViewerStateController } from "./viewerStateController/viewerState.component";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
-import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
 import { TemplateParcellationHasMoreInfo } from "src/util/pipes/templateParcellationHasMoreInfo.pipe";
@@ -75,7 +72,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
   imports : [
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule,
     LayoutModule,
     ComponentsModule,
     DatabrowserModule,
@@ -101,7 +97,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     MenuIconsBar,
     SigninBanner,
     SigninModal,
-    RegionHierarchy,
     StatusCardComponent,
     CookieAgreement,
     KGToS,
@@ -111,7 +106,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     SinglePanel,
     CurrentLayout,
     ViewerStateController,
-    RegionTextSearchAutocomplete,
     MaximmisePanelButton,
     SearchPanel,
     SearchItemPreviewComponent,
@@ -126,7 +120,6 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     GetLayerNameFromDatasets,
     SortDataEntriesToRegion,
     SpatialLandmarksToDataBrowserItemPipe,
-    FilterNullPipe,
     FilterNameBySearch,
     AppendtooltipTextPipe,
     MobileControlNubStylePipe,

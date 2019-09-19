@@ -297,9 +297,10 @@ markdown-dom pre code
 {
   white-space: nowrap!important;
 }
-.ws-initial
+
+.w-0
 {
-  white-space: initial!important;
+  width: 0!important;
 }
 
 .w-5em
@@ -334,6 +335,11 @@ markdown-dom pre code
 .mw-20em
 {
   max-width: 20em!important;
+}
+
+.w-90
+{
+  width: 90%!important;
 }
 
 .w-20em
@@ -480,4 +486,29 @@ bs-modal-backdrop.modal-backdrop
 cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
 {
   width: 100%;
+}
+
+.z-index-10
+{
+  z-index: 10!important;
+}
+
+.bg-none
+{
+  background:none!important;
+}
+
+.dot
+{
+  width: 0.5rem;
+  height: 0.5rem;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* temp */
+/* https://github.com/angular/components/issues/4591#issuecomment-305046461 */
+.mat-tab-body-wrapper
+{
+  flex-grow:1;
 }

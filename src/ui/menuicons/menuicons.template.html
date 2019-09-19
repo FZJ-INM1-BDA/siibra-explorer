@@ -1,204 +1,260 @@
-<logo-container *ngIf="!isMobile">
-</logo-container>
-
-<!-- hide icons when templates has yet been selected -->
-<ng-template [ngIf]="selectedTemplate$ | async">
-
-  <!-- selected regions -->
-  <sleight-of-hand
-    [doNotClose]="viewerStateController.focused">
-
-    <!-- shown prior to mouse over -->
-    <div sleight-of-hand-front>
-      <button
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-brain"></i>
-      </button>
-    </div>
-
-    <!-- shown upon mouseover -->
-    <div
-      sleight-of-hand-back
-      class="d-flex flex-row align-items-center soh-row">
-
-      <!-- place holder icon -->
-      <button
-        [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-brain"></i>
-      </button>
-
-      <div class="position-relative">
-
-        <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
-          <viewer-state-controller #viewerStateController></viewer-state-controller>
-        </div>
-
-        <!-- invisible icon to keep height of the otherwise unstable flex block -->
-        <div class="invisible pe-none">
-          <i class="fas fa-brain"></i>
-        </div>
-      </div>
-
-      <ng-template #noBrainRegionSelected>
-        <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
-          Double click any brain region to select it.
-        </small>
-      </ng-template>
-    </div>
-  </sleight-of-hand>
-
-  <!-- layer browser -->
-  <sleight-of-hand>
-    <div sleight-of-hand-front>
-      <button
-        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        color="primary"
-        mat-icon-button>
-        <i class="fas fa-layer-group"></i>
-      </button>
-    </div>
-    <div
-      class="d-flex flex-row align-items-center soh-row"
-      sleight-of-hand-back>
-
-      <button
-        [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        color="primary"
-        mat-icon-button>
-        <i class="fas fa-layer-group"></i>
-      </button>
-
-      <div class="position-relative d-flex align-items-center">
-
-        <div [ngClass]="{'invisible pe-none': (layerBrowser.nonBaseNgLayers$ | async).length === 0}" class="position-absolute">
-          <mat-card>
-            <layer-browser #layerBrowser>
-            </layer-browser>
-          </mat-card>
-        </div>
-
-        <ng-container *ngIf="(layerBrowser.nonBaseNgLayers$ | async).length === 0" #noNonBaseNgLayerTemplate>
-          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap position-absolute'">
-            No additional layers added
-          </small>
-        </ng-container>
-
-        <!-- invisible button to prop up the size of parent block -->
-        <!-- otherwise, sibling block position will be wonky -->
+<div class="w-0 ml-4 d-flex flex-column align-items-start" root>
+  <logo-container *ngIf="!isMobile">
+  </logo-container>
+  
+  <!-- hide icons when templates has yet been selected -->
+  <ng-template [ngIf]="selectedTemplate$ | async">
+  
+    <!-- TODO do not close expression changed after view checked  -->
+    <!-- selected regions -->
+    <sleight-of-hand
+      [doNotClose]="viewerStateController.focused">
+  
+      <!-- shown prior to mouse over -->
+      <div sleight-of-hand-front>
         <button
+          [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          mat-icon-button
+          color="primary">
+          <i class="fas fa-brain"></i>
+        </button>
+      </div>
+  
+      <!-- shown upon mouseover -->
+      <div
+        sleight-of-hand-back
+        class="d-flex flex-row align-items-center soh-row">
+  
+        <!-- place holder icon -->
+        <button
+          [matBadge]="(selectedRegions$ | async).length > 0 ? (selectedRegions$ | async).length : null"
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          mat-icon-button
+          color="primary">
+          <i class="fas fa-brain"></i>
+        </button>
+  
+        <div class="position-relative">
+  
+          <div [class]="((darktheme$ | async) ? 'bg-dark' : 'bg-light') + ' position-absolute card'">
+            <viewer-state-controller #viewerStateController></viewer-state-controller>
+          </div>
+  
+          <!-- invisible icon to keep height of the otherwise unstable flex block -->
+          <div class="invisible pe-none">
+            <i class="fas fa-brain"></i>
+          </div>
+        </div>
+  
+        <ng-template #noBrainRegionSelected>
+          <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap'">
+            Double click any brain region to select it.
+          </small>
+        </ng-template>
+      </div>
+    </sleight-of-hand>
+  
+    <!-- layer browser -->
+    <sleight-of-hand>
+      <div sleight-of-hand-front>
+        <button
+          [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
           color="primary"
-          class="invisible pe-none"
           mat-icon-button>
           <i class="fas fa-layer-group"></i>
         </button>
-
       </div>
-
-    </div>
-  </sleight-of-hand>
-
-  <!-- tools -->
-  <sleight-of-hand>
-
-    <!-- shown icon prior to mouse over -->
-    <div sleight-of-hand-front>
-      <button
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-tools"></i>
-      </button>
-    </div>
-
-    <!-- shown after mouse over -->
-    <div
-      class="d-flex flex-row soh-row align-items-start"
-      sleight-of-hand-back>
-
-      <!-- placeholder icon -->
-      <button
-        [matBadgePosition]="badgetPosition"
-        matBadgeColor="accent"
-        [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
-        mat-icon-button
-        color="primary">
-        <i class="fas fa-tools"></i>
-      </button>
-
-      <!-- render all fetched tools -->
-      <div class="d-flex flex-row soh-row">
-
-        <!-- add new tool btn -->
+      <div
+        class="d-flex flex-row align-items-center soh-row"
+        sleight-of-hand-back>
+  
         <button
-          matTooltip="Add new plugin"
-          matTooltipPosition="below"
+          [matBadge]="layerBrowser && (layerBrowser.nonBaseNgLayers$ | async)?.length > 0 ? (layerBrowser.nonBaseNgLayers$ | async)?.length : null"
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          color="primary"
+          mat-icon-button>
+          <i class="fas fa-layer-group"></i>
+        </button>
+  
+        <div class="position-relative d-flex align-items-center">
+  
+          <div [ngClass]="{'invisible pe-none': (layerBrowser.nonBaseNgLayers$ | async).length === 0}" class="position-absolute">
+            <mat-card>
+              <layer-browser (nonBaseLayersChanged)="handleNonbaseLayerEvent($event)" #layerBrowser>
+              </layer-browser>
+            </mat-card>
+          </div>
+  
+          <ng-container *ngIf="(layerBrowser.nonBaseNgLayers$ | async).length === 0" #noNonBaseNgLayerTemplate>
+            <small [class]="((darktheme$ | async) ? 'bg-dark text-light' : 'bg-light text-dark') + ' muted pl-2 pr-2 p-1 text-nowrap position-absolute'">
+              No additional layers added
+            </small>
+          </ng-container>
+  
+          <!-- invisible button to prop up the size of parent block -->
+          <!-- otherwise, sibling block position will be wonky -->
+          <button
+            color="primary"
+            class="invisible pe-none"
+            mat-icon-button>
+            <i class="fas fa-layer-group"></i>
+          </button>
+  
+        </div>
+  
+      </div>
+    </sleight-of-hand>
+  
+    <!-- tools -->
+    <sleight-of-hand>
+  
+      <!-- shown icon prior to mouse over -->
+      <div sleight-of-hand-front>
+        <button
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
           mat-icon-button
           color="primary">
-          <i class="fas fa-plus"></i>
-        </button>
-
-        <button
-          *ngFor="let manifest of pluginServices.fetchedPluginManifests"
-          mat-mini-fab
-          matTooltipPosition="below"
-          [matTooltip]="manifest.displayName || manifest.name"
-          [color]="getPluginBtnClass$ | async | pluginBtnFabColorPipe : manifest.name"
-          (click)="clickPluginIcon(manifest)">
-          {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+          <i class="fas fa-tools"></i>
         </button>
       </div>
+  
+      <!-- shown after mouse over -->
+      <div
+        class="d-flex flex-row soh-row align-items-start"
+        sleight-of-hand-back>
+  
+        <!-- placeholder icon -->
+        <button
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          [matBadge]="(launchedPlugins$ | async)?.length > 0 ? (launchedPlugins$ | async)?.length : null"
+          mat-icon-button
+          color="primary">
+          <i class="fas fa-tools"></i>
+        </button>
+  
+        <!-- render all fetched tools -->
+        <div class="d-flex flex-row soh-row">
+  
+          <!-- add new tool btn -->
+          <button
+            matTooltip="Add new plugin"
+            matTooltipPosition="below"
+            mat-icon-button
+            color="primary">
+            <i class="fas fa-plus"></i>
+          </button>
+  
+          <button
+            *ngFor="let manifest of pluginServices.fetchedPluginManifests"
+            mat-mini-fab
+            matTooltipPosition="below"
+            [matTooltip]="manifest.displayName || manifest.name"
+            [color]="getPluginBtnClass$ | async | pluginBtnFabColorPipe : manifest.name"
+            (click)="clickPluginIcon(manifest)">
+            {{ (manifest.displayName || manifest.name).slice(0, 1) }}
+          </button>
+        </div>
+      </div>
+    </sleight-of-hand>
+  
+    <!-- kg search alt -->
+    <div class="d-flex align-item-start">
+      <div *ngIf="(sidebarTemplate$ | async) === kgSearchDatasets; then alreadyOpened; else notYetOpened">
+      </div>
+      <ng-template #alreadyOpened>
+        <button
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          [matBadge]="(fetchedDatasets && fetchedDatasets.length) ? fetchedDatasets.length : null"
+          matTooltip="Found datasets"
+          matTooltipPosition="after"
+          mat-mini-fab
+          (click)="showKgSearchSideNav()"
+          color="primary">
+          <i class="fas fa-book"></i>
+        </button>
+      </ng-template>
+      <ng-template #notYetOpened>
+        <button
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          [matBadge]="(fetchedDatasets && fetchedDatasets.length) ? fetchedDatasets.length : null"
+          matTooltip="Found datasets"
+          matTooltipPosition="after"
+          mat-icon-button
+          (click)="showKgSearchSideNav(kgSearchDatasets)"
+          color="primary">
+          <i class="fas fa-book"></i>
+        </button>
+      </ng-template>
     </div>
-  </sleight-of-hand>
 
-  <!-- search kg -->
-<!--  <sleight-of-hand>-->
-    <div class="d-flex align-items-start" (mouseenter)="mouseHoversSearch = true; showSearchMenu = true" (mouseleave)="mouseHoversSearch = false; hideSearchMenu()" style="z-index: 1" #SearchMenu>
-          <div sleight-of-hand-front>
-            <button
-              [matTooltip]="!searchedItemsNumber && 'Please select any region to get search results'"
-              matTooltipPosition="after"
-              mat-icon-button
-              color="primary"
-              [matBadgePosition]="badgetPosition"
-              matBadgeColor="accent"
-              [matBadge]="searchedItemsNumber? searchedItemsNumber : null">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-
+    <!-- search kg -->
+    <!--  <sleight-of-hand>-->
+    <div
+      class="d-flex align-items-start"
+      (mouseenter)="mouseHoversSearch = true; showSearchMenu = true"
+      (mouseleave)="mouseHoversSearch = false; hideSearchMenu()"
+      style="z-index: 1"
+      #SearchMenu>
+      <div sleight-of-hand-front>
+        <button
+          [matTooltip]="!searchedItemsNumber && 'Please select any region to get search results'"
+          matTooltipPosition="after"
+          mat-icon-button
+          color="primary"
+          [matBadgePosition]="badgetPosition"
+          matBadgeColor="accent"
+          [matBadge]="searchedItemsNumber? searchedItemsNumber : null">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+  
       <div *ngIf="(selectedRegions$ | async)?.length"
-           [hidden] = "!showSearchMenu"
-           class="position-absolute"
-           style="padding-left: 50px;">
+        [hidden] = "!showSearchMenu"
+        class="position-absolute"
+        style="padding-left: 50px;">
         <mat-card class="p-0">
           <search-panel
-                  elementOutClick
-                  (outsideClick)="filePreviewModalClosed && $event? closeFrozenMenu() : null"
-                  [selectedTemplate$]="selectedTemplate$"
-                  [selectedParcellation$]="selectedParcellation$"
-                  [selectedRegions$]="selectedRegions$"
-                  [searchPanelPositionTop]="SearchMenu.offsetTop"
-                  (searchedItemsNumber)="searchedItemsNumber = $event"
-                  (searchLoading)="searchLoading = true"
-                  (freezeSearchMenu)="searchMenuFrozen = $event"
-                  (filePreviewModalClosed)="filePreviewModalClosed = $event"
-                  (closeSearchMenu)="this.showSearchMenu = false">
+            elementOutClick
+            (outsideClick)="filePreviewModalClosed && $event? closeFrozenMenu() : null"
+            [selectedTemplate$]="selectedTemplate$"
+            [selectedParcellation$]="selectedParcellation$"
+            [selectedRegions$]="selectedRegions$"
+            [searchPanelPositionTop]="SearchMenu.offsetTop"
+            (searchedItemsNumber)="searchedItemsNumber = $event"
+            (searchLoading)="searchLoading = true"
+            (freezeSearchMenu)="searchMenuFrozen = $event"
+            (filePreviewModalClosed)="filePreviewModalClosed = $event"
+            (closeSearchMenu)="this.showSearchMenu = false">
           </search-panel>
         </mat-card>
       </div>
     </div>
-</ng-template>
+  
+  </ng-template>
+</div>
+
+<!-- needs the data browser to be rendered, but hidden, so that side templateref can be passed
+this also bypass the necessity of doing a query -->
+<div [hidden]="true">
+  <ng-template [ngIf]="(selectedTemplate$ | async) && (selectedParcellation$ | async)" #kgSearchDatasets>
+    <data-browser
+      (dataentriesUpdated)="fetchedDatasets = $event"
+      [template]="selectedTemplate$ | async"
+      [regions]="selectedRegions$ | async"
+      [parcellation]="selectedParcellation$ | async"
+      #dataBrowser>
+    
+    </data-browser>
+  </ng-template>
+</div>

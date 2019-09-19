@@ -211,4 +211,11 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
 
   public aggregatedRegionTree: any
 
+  public gotoRegion(region: any) {
+    this.doubleClickRegion.emit(region)
+  }
+
+  public deselectRegion(region: any) {
+    this.singleClickRegion.emit(region)
+  }
 }
