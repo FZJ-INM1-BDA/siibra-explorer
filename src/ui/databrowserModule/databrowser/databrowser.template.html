@@ -1,83 +1,112 @@
-<div class="overflow-container">
+<mat-tab-group [dynamicHeight]="false" class="h-100 w-100 overflow-hidden">
+  <mat-tab label="Search Criteria">
+    <ng-container *ngTemplateOutlet="searchPanel">
 
-  <div
-    [ngStyle]="filePreviewName ? {'transform': 'translateX(-50%)'} : {}"
-    class="dataEntryWrapper">
+    </ng-container>
+  </mat-tab>
+  <mat-tab label="History">
+    <ng-container *ngTemplateOutlet="history">
 
-    <!-- main window -->
-    <div
-      class="t-a-ease-500"
-      [style.height]="filePreviewName ? '0px' : 'auto'">
+    </ng-container>
+  </mat-tab>
+</mat-tab-group>
 
-      <!-- description -->
-      <readmore-component>
-        <div class="p-2 mh-20em overflow-auto">
-          Datasets relevant to
-          <span
-            *ngFor="let region of regions"
-            class="badge badge-secondary mr-1 mw-100">
-            <span [ngStyle]="{backgroundColor: (region | regionBackgroundToRgbPipe)}" class="dot">
-              
-            </span>
-            <span class="d-inline-block mw-100 overflow-hidden text-truncate">
-              {{ region.name }}
-            </span>
-          </span>
-        </div>
-      </readmore-component>
-      
-      <!-- modality picker -->
-      <!-- TODO use material for popover, then remove popover module and ngx/bootstrap -->
-      <div>
-        <span
-          placement="right"
-          container="body"
-          [popover]="countedDataM.length > 0 ? modalityPicker : null"
-          [outsideClick]="true"
-          [containerClass]="darktheme ? 'darktheme' : ''"
-          class="clickable btn-sm btn btn-secondary btn-block">
-          Filter by Modality <small *ngIf="visibleCountedDataM.length as visibleDMLength">({{ visibleDMLength }})</small>
-        </span>
-      </div>
+<ng-template #searchPanel>
+
+  <div class="h-100 w-100 d-flex flex-column overflow-hidden">
     
-      <!-- datasets container -->
-      <div
-        *ngIf="fetchingFlag; else fetched"
-        class="spinnerAnimationCircleContainer">
-        <div class="spinnerAnimationCircle"></div>
-        <div>Fetching datasets...</div>
-      </div>
+    <!-- search criterial -->
+    <mat-selection-list class="flex-grow-0 flex-shrink-0 mb-2" checkboxPosition="before">
+      <h3 mat-subheader>
+        Search criteria
+      </h3>
 
+      <!-- selected regions -->
+      <mat-list-option
+        selected="true"
+        checkboxPosition="before">
+        <h4 mat-line>
+          {{ regions.length }} selected region{{ regions.length !== 1 ? 's' : ''}}
+
+          <!-- stop mousedown propagation to avoid ripple from mat-list-option -->
+          <region-text-search-autocomplete (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()" [showAutoComplete]="false">
+          </region-text-search-autocomplete>
+        </h4>
+      </mat-list-option>
+
+      <mat-list-option
+        *ngIf="dbService.viewportBoundingBox$ | async as bbox"
+        checkboxPosition="before"
+        [selected]="true">
+        <h4 class="mat-line">
+          viewport bounding box 
+        </h4>
+
+        <!-- from -->
+        <p class="mat-line">
+          <small>
+            <span *ngFor="let v of bbox[0]; let lastval = last">
+              {{ v | number : '1.2-2' }}<span *ngIf="!lastval">, </span>
+            </span>
+            <span>
+              to
+            </span>
+            <span *ngFor="let v of bbox[1]; let lastval = last">
+              {{ v | number : '1.2-2' }}<span *ngIf="!lastval">, </span>
+            </span>
+          </small>
+        </p>
+        
+      </mat-list-option>
+    </mat-selection-list>
+
+    <mat-divider class="position-relative"></mat-divider>
+
+    <!-- modality picker / filter -->
+    <mat-accordion class="flex-grow-0 flex-shrink-0 mb-2">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Filter
+          </mat-panel-title>
+          <mat-panel-description>
+            <i *ngIf="dataentries.length > 0">
+              <span *ngIf="visibleCountedDataM && visibleCountedDataM.length > 0 "> 
+                {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} filtered /
+              </span>
+              {{ dataentries.length }} results
+            </i>
+            <i *ngIf="dataentries.length === 0">
+              No results to show.
+            </i>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngTemplateOutlet="modalityPicker">
+
+        </ng-container>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <!-- datasets container -->
+    <div *ngIf="fetchingFlag; else fetched"
+      class="spinnerAnimationCircleContainer">
+      <div class="spinnerAnimationCircle"></div>
+      <div>Fetching datasets...</div>
     </div>
 
-    <!-- file previewer -->
-    <div
-      class="filePreview">
-      <div class="filePreviewContainer">
-        <div (click)="filePreviewName=null" class="rounded-circle btn btn-sm btn-outline-secondary">
-          <i class="fas fa-arrow-left"></i>
-        </div>
-        <preview-component
-          *ngIf="filePreviewName"
-          [datasetName]="filePreviewName">
-
-        </preview-component>
-          
-      </div>
-    </div>
   </div>
-</div>
+
+</ng-template>
 
 <ng-template #modalityPicker>
-  <div class="filterWrapper">
-    <modality-picker
-      (click)="$event.stopPropagation();"
-      class="mw-100"
-      [countedDataM]="countedDataM"
-      (modalityFilterEmitter)="handleModalityFilterEvent($event)">
+  <modality-picker
+    (click)="$event.stopPropagation();"
+    class="w-100"
+    [countedDataM]="countedDataM"
+    (modalityFilterEmitter)="handleModalityFilterEvent($event)">
 
-    </modality-picker>
-  </div>
+  </modality-picker>
 </ng-template>
 
 <ng-template #fetched>
@@ -88,63 +117,50 @@
 
 <ng-template #showData>
   <!-- datawrapper -->
-  <div *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry"
->
+  <ng-container *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry">
 
     <!-- dataentries -->
-    <div class="dataEntry">
-      <div>
-        <i *ngIf="dataentries.length > 0">
-          {{ dataentries.length }} total results. 
-          <span
-            *ngIf="visibleCountedDataM.length > 0 "> 
-            {{ filteredDataEntry.length }} 
-            filtered results.
-            <a
-              href="#"
-              class="btn btn-sm btn-link"
-              (click)="resetFilters($event)">reset filters
-            </a>
-          </span>
-        </i>
-        <i *ngIf="dataentries.length === 0">
-          No results to show.
-        </i>
-      </div>
-      <div *ngIf="dataentries.length > 0">
-        <dataset-viewer
-          class="mt-1"
-          *ngFor="let dataset of filteredDataEntry | searchResultPagination : currentPage : hitsPerPage"
-          (saveToFavourite)="saveToFavourite(dataset)"
-          (removeFromFavourite)="removeFromFavourite(dataset)"
-          (showPreviewDataset)="onShowPreviewDataset($event)"
-          [dataset]="dataset"
-          [isFaved]="favedDataentries$ | async | datasetIsFaved : dataset">
-          <div regionTagsContainer>
+    <div class="h-100 w-100">
+      <cdk-virtual-scroll-viewport 
+        class="h-100"
+        itemSize="50">
+        <single-dataset-view
+          *cdkVirtualFor="let dataset of filteredDataEntry"
+          (click)="showFocusedDataset(dataset)"
+          class="m-2"
+          [kgSchema]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[0]"
+          [kgId]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[1]"
+          [prefetched]="dataset"
+          [simpleMode]="true"
+          [ripple]="true">
 
-            <!-- TODO may want to separate the region badge into a separate component -->
-            <span
-              *ngFor="let region of dataset.parcellationRegion"
-              class="badge badge-secondary mr-1 mw-100">
-              <span [ngStyle]="{backgroundColor:(region | regionBackgroundToRgbPipe)}" class="dot">
-                
-              </span>
-              <span class="d-inline-block mw-100 overflow-hidden text-truncate">
-                {{ region.name }}
-              </span>
-            </span>
-          </div>
-        </dataset-viewer>
-      </div>
-      
-      <pagination-component
-        (paginationChange)="currentPage = $event"
-        [hitsPerPage]="hitsPerPage"
-        [total]="filteredDataEntry.length"
-        [currentPage]="currentPage">
-      </pagination-component>
-    </div>
-
+        </single-dataset-view>
+    </cdk-virtual-scroll-viewport>
   </div>
+
+  </ng-container>
 </ng-template>
 
+<ng-template #filePreviewTemplate>
+  <preview-component
+    *ngIf="filePreviewName"
+    [datasetName]="filePreviewName">
+
+  </preview-component>
+</ng-template>
+
+<ng-template #detailDataset>
+
+  <single-dataset-view
+    [prefetched]="focusedDataset">
+
+  </single-dataset-view>
+</ng-template>
+  
+<ng-template #history>
+  <mat-list>
+    <mat-list-item *ngFor="let item of (history$ | async)">
+      Viewed {{ item.file.name }}
+    </mat-list-item>
+  </mat-list>
+</ng-template>

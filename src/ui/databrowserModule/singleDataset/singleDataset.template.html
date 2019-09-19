@@ -1,22 +1,82 @@
-<mat-card>
+<mat-card mat-ripple [matRippleDisabled]="!ripple">
   
   <!-- title -->
-  <mat-card-header>
+  <mat-card-header *ngIf="!simpleMode">
     <mat-card-title>
       {{ name }}
     </mat-card-title>
   </mat-card-header>
+
+  <mat-card-content *ngIf="simpleMode">
+    <p>
+      {{ name }}
+    </p>
+    <mat-grid-list [cols]="kgReference.length + (preview ? 1 : 0) + (downloadEnabled ? 2 : 0)" rowHeight="4em">
+
+      <!-- explore -->
+      <mat-grid-tile *ngFor="let kgRef of kgReference">
+        <a [href]="kgRef | doiParserPipe"
+          matTooltip="Explore"
+          (mousedown)="stop($event)"
+          (click)="stop($event)"
+          mat-icon-button
+          target="_blank">
+          <i class="fas fa-external-link-alt"></i>
+        </a>
+      </mat-grid-tile>
+
+      <!-- pin -->
+      <mat-grid-tile *ngIf="downloadEnabled">
+
+        <button
+          (mousedown)="stop($event)"
+          (click)="stop($event);toggleFav()"
+          matTooltip="Pin"
+          mat-icon-button
+          [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
+          <i class="fas fa-thumbtack"></i>
+        </button>
+      </mat-grid-tile>
+
+      <!-- preview -->
+      <mat-grid-tile *ngIf="preview">
+        <button
+          (mousedown)="stop($event)"
+          (click)="stop($event);showPreviewList(previewFilesListTemplate)"
+          matTooltip="Preview"
+          mat-icon-button>
+          <i class="far fa-eye"></i>
+        </button>
+      </mat-grid-tile>
+
+      <!-- download -->
+      <mat-grid-tile *ngIf="downloadEnabled">
+        <button
+          matTooltip="Download"
+          (mousedown)="stop($event)"
+          (click)="stop($event);downloadZipFromKg()"
+          [disabled]="downloadInProgress"
+          mat-icon-button>
+          <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+        </button>
+      </mat-grid-tile>
+    </mat-grid-list>
+  </mat-card-content>
   
   <!-- description -->
-  <mat-card-content>
+  <mat-card-content *ngIf="!simpleMode">
     <p>{{ description }}</p>
   </mat-card-content>
 
   <!-- publications -->
-  <mat-card-content>
+  <mat-card-content *ngIf="!simpleMode">
     <div class="d-block mb-2"
       *ngFor="let publication of publications">
-      <a *ngIf="publication.doi; else plainText" [href]="publication.doi | doiParserPipe"
+      <a
+        *ngIf="publication.doi; else plainText"
+        (mousedown)="stop($event)"
+        (click)="stop($event)"
+        [href]="publication.doi | doiParserPipe"
         target="_blank">
         {{ publication.cite }}
       </a>
@@ -28,12 +88,12 @@
 
 
   <!-- footer -->
-  <mat-card-actions>
+  <mat-card-actions *ngIf="!simpleMode">
 
     <!-- explore -->
-    <a *ngFor="let kgRef of appendedKgReferences"
+    <a *ngFor="let kgRef of kgReference"
       class="m-2"
-      [href]="kgRef"
+      [href]="kgRef | doiParserPipe"
       target="_blank">
       <button 
         mat-raised-button
@@ -42,6 +102,17 @@
         <i class="fas fa-external-link-alt"></i>
       </button>
     </a>
+
+    <!-- pin data -->
+    <button
+      (mousedown)="stop($event)"
+      (click)="stop($event);toggleFav()"
+      mat-button
+      color="primary"
+      [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
+      {{ (favedDataentries$ | async | datasetIsFaved : dataset) ? 'Unpin' : 'Pin' }} this dataset
+      <i class="fas fa-thumbtack"></i>
+    </button>
 
 
     <!-- download -->
@@ -59,4 +130,13 @@
       <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
     </button>
   </mat-card-actions>
+
+  <mat-card-footer></mat-card-footer>
 </mat-card>
+
+<ng-template #previewFilesListTemplate>
+  <preview-component
+    (previewFile)="handlePreviewFile($event)"
+    [datasetName]="name">
+  </preview-component>
+</ng-template>

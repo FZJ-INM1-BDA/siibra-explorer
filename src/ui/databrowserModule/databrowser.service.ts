@@ -4,7 +4,7 @@ import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
-import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay } from "rxjs/operators";
+import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay, withLatestFrom } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
@@ -69,14 +69,13 @@ export class DatabrowserService implements OnDestroy{
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
   private dataentries: DataEntry[] = []
-  private fetchDataStatus$: Observable<any>
 
   private subscriptions: Subscription[] = []
   public fetchDataObservable$: Observable<any>
   public manualFetchDataset$: BehaviorSubject<null> = new BehaviorSubject(null)
 
-  private fetchSpatialData$: Observable<any>
   public spatialDatasets$: Observable<any>
+  public viewportBoundingBox$: Observable<[Point, Point]>
 
   constructor(
     private workerService: AtlasWorkerService,
@@ -84,6 +83,7 @@ export class DatabrowserService implements OnDestroy{
     private store: Store<ViewerConfiguration>,
     private http: HttpClient
   ){
+
     this.kgTos$ = this.http.get(`${this.constantService.backendUrl}datasets/tos`, {
       responseType: 'text'
     }).pipe(
@@ -101,13 +101,6 @@ export class DatabrowserService implements OnDestroy{
     )
 
     this.subscriptions.push(
-      this.store.pipe(
-        select('ngViewerState')
-      ).subscribe(layersInterface => 
-        this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, ''))))
-    )
-
-    this.subscriptions.push(
       store.pipe(
         select('dataStore'),
         safeFilter('fetchedDataEntries'),
@@ -117,46 +110,45 @@ export class DatabrowserService implements OnDestroy{
       })
     )
 
-  this.fetchSpatialData$ = combineLatest(
-    this.store.pipe(
+    this.viewportBoundingBox$ = this.store.pipe(
       select('viewerState'),
-      select('navigation')
-    ),
-    this.store.pipe(
-      select('viewerState'),
-      select('templateSelected')
+      select('navigation'),
+      distinctUntilChanged(),
+      debounceTime(SPATIAL_SEARCH_DEBOUNCE),
+      filter(v => !!v),
+      map(navigation => {
+
+        // in mm
+        const center = navigation.position.map(n=>n/1e6)
+        const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
+        const pt1 = center.map(v => (v - searchWidth)) as [number, number, number]
+        const pt2 = center.map(v => (v + searchWidth)) as [number, number, number]
+
+        return [pt1, pt2] as [Point, Point]
+      })
     )
-  ).pipe(
-    debounceTime(SPATIAL_SEARCH_DEBOUNCE)
-  )
 
-  this.spatialDatasets$ = this.fetchSpatialData$.pipe(
-    filter(([navigation, templateSelected]) => !!navigation && !!navigation.position && !!templateSelected && !!templateSelected.name),
-    switchMap(([navigation, templateSelected]) => {
+    this.spatialDatasets$ = this.viewportBoundingBox$.pipe(
+      withLatestFrom(this.store.pipe(
+        select('viewerState'),
+        select('templateSelected'),
+        distinctUntilChanged(),
+        filter(v => !!v)
+      )),
+      switchMap(([ bbox, templateSelected ]) => {
 
+        const _bbox = bbox.map(pt => pt.map(v => v.toFixed(SPATIAL_SEARCH_PRECISION)))
         /**
-       * templateSelected and templateSelected.name must be defined for spatial search
-       */
-      if (!templateSelected || !templateSelected.name)
-        return from(Promise.reject('templateSelected must not be empty'))
-      const encodedTemplateName = encodeURI(templateSelected.name)
+         * templateSelected and templateSelected.name must be defined for spatial search
+         */
+        if (!templateSelected || !templateSelected.name) return from(Promise.reject('templateSelected must not be empty'))
+        const encodedTemplateName = encodeURI(templateSelected.name)
+        return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).then(res => res.json()))
+      }),
+      catchError((err) => (console.log(err), of([])))
+    )
 
-      // in mm
-      const center = navigation.position.map(n=>n/1e6)
-      const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
-      const pt1 = center.map(v => (v - searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
-      const pt2 = center.map(v => (v + searchWidth).toFixed(SPATIAL_SEARCH_PRECISION))
-      
-      return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${pt1.join('_')}__${pt2.join("_")}`)
-        .then(res => res.json()))
-    }),
-    /**
-     * TODO pipe to constantService.catchError
-     */
-    catchError((err) => (console.log(err), of([])))
-  )
-
-  this.fetchDataObservable$ = combineLatest(
+    this.fetchDataObservable$ = combineLatest(
       this.store.pipe(
         select('viewerState'),
         safeFilter('templateSelected'),
@@ -171,10 +163,6 @@ export class DatabrowserService implements OnDestroy{
         distinctUntilChanged()
       ),
       this.manualFetchDataset$
-    )
-
-    this.fetchDataStatus$ = combineLatest(
-      this.fetchDataObservable$
     )
 
     this.subscriptions.push(
@@ -217,6 +205,13 @@ export class DatabrowserService implements OnDestroy{
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
+  public toggleFav(dataentry: DataEntry){
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
+      payload: dataentry
+    })
+  }
+
   public saveToFav(dataentry: DataEntry){
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
@@ -238,21 +233,6 @@ export class DatabrowserService implements OnDestroy{
         .then(res => res.json())
         .then(resolve)
         .catch(reject)
-    })
-  }
-
-  public ngLayers : Set<string> = new Set()
-  public showNewNgLayer({ url }):void{
-
-    const layer = {
-      name : url,
-      source : `nifti://${url}`,
-      mixability : 'nonmixable',
-      shader : this.constantService.getActiveColorMapFragmentMain()
-    }
-    this.store.dispatch({
-      type: ADD_NG_LAYER,
-      layer
     })
   }
 
@@ -319,15 +299,6 @@ export class DatabrowserService implements OnDestroy{
       })
   }
 
-  removeNgLayer({ url }) {
-    this.store.dispatch({
-      type : REMOVE_NG_LAYER,
-      layer : {
-        name : url
-      }
-    })
-  }
-
   rebuildRegionTree(selectedRegions, regions){
     this.workerService.worker.postMessage({
       type: 'BUILD_REGION_SELECTION_TREE',
@@ -389,3 +360,5 @@ export interface CountedDataModality{
   occurance: number
   visible: boolean
 }
+
+type Point = [number, number, number]

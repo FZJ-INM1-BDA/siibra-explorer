@@ -66,7 +66,7 @@
   <!-- parcellation selection -->
   <mat-card-content class="d-inline-flex flex-nowrap">
 
-      <mat-form-field
+    <mat-form-field
       *ngIf="templateSelected$ | async as templateSelected"
       class="d-inline-flex flex-nowrap">
       <mat-label>
@@ -141,7 +141,7 @@
         [itemSize]="32">
         <mat-chip
           *cdkVirtualFor="let region of (regionsSelected$ | async)"
-          class="w-100">
+          class="w-90">
           <span class="flex-grow-1 flex-shrink-1 text-truncate">
             {{ region.name }}
           </span>

@@ -1,10 +1,42 @@
-import { Injectable } from "@angular/core";
+import { Injectable, TemplateRef, OnDestroy } from "@angular/core";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
+import { Store, select } from "@ngrx/store";
+import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
+import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store";
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
+import { MatDialog } from "@angular/material";
+import { FileViewer } from "./fileviewer/fileviewer.component";
+import { ADD_NG_LAYER, REMOVE_NG_LAYER } from "src/services/stateStore.service";
+import { Subscription, Subject } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
-export class KgSingleDatasetService {
+export class KgSingleDatasetService implements OnDestroy{
 
-  constructor(private constantService: AtlasViewerConstantsServices) {
+  public previewingFile$: Subject<{file:ViewerPreviewFile, dataset: DataEntry}> = new Subject()
+
+  private subscriptions: Subscription[] = []
+  public ngLayers : Set<string> = new Set()
+
+  constructor(
+    private constantService: AtlasViewerConstantsServices,
+    private store$: Store<any>,
+    private dialog: MatDialog
+  ) {
+
+    this.subscriptions.push(
+      this.store$.pipe(
+        select('ngViewerState')
+      ).subscribe(layersInterface => {
+        this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, '')))
+      })
+    )
+
+  }
+
+  ngOnDestroy(){
+    while (this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
   }
 
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
@@ -39,6 +71,58 @@ export class KgSingleDatasetService {
     anchor.download = filename + '.zip';
     anchor.href = url;
     anchor.click();
+  }
+
+  public showPreviewList(template: TemplateRef<any>){
+    this.store$.dispatch({
+      type: SHOW_BOTTOM_SHEET,
+      bottomSheetTemplate: template
+    })
+  }
+
+  public previewFile(file:ViewerPreviewFile, dataset: DataEntry) {
+    this.previewingFile$.next({
+      file,
+      dataset
+    })
+    const type = determinePreviewFileType(file)
+    if (type === PREVIEW_FILE_TYPES.NIFTI) {
+      this.store$.dispatch({
+        type: SHOW_BOTTOM_SHEET,
+        bottomSheetTemplate: null
+      })
+      const { url } = file
+      this.showNewNgLayer({ url })
+      return
+    }
+    this.dialog.open(FileViewer, {
+      data: {
+        previewFile: file
+      }
+    })
+  }
+
+  public showNewNgLayer({ url }):void{
+
+    const layer = {
+      name : url,
+      source : `nifti://${url}`,
+      mixability : 'nonmixable',
+      shader : this.constantService.getActiveColorMapFragmentMain()
+    }
+    this.store$.dispatch({
+      type: ADD_NG_LAYER,
+      layer
+    })
+  }
+
+  removeNgLayer({ url }) {
+    this.store$.dispatch({
+      type : REMOVE_NG_LAYER,
+      layer : {
+        name : url
+      }
+    })
   }
 }
 

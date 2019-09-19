@@ -1,18 +1,15 @@
-<div class="ws-initial">
-  <div
-    *ngIf="checkedModality.length > 0"
+<div>
+  <button
     (click)="clearAll()"
-    class="btn btn-sm btn-link ">
-    clear all
-  </div>
+    [disabled]="checkedModality.length === 0"
+    mat-raised-button>
+    Clear all
+  </button>  
 </div>
 
-<div
-  *ngFor="let datamodality of countedDataM"
-  (click)="toggleModality(datamodality)"
-  class="clickable">
-  <i [ngClass]="datamodality.visible ? 'far fa-check-square' : 'text-muted far fa-square'">
-
-  </i>
+<mat-checkbox
+  [checked]="datamodality.visible"
+  (change)="toggleModality(datamodality)"
+  *ngFor="let datamodality of countedDataM">
   {{ datamodality.name }} <span class="text-muted">({{ datamodality.occurance }})</span>
-</div>
+</mat-checkbox>

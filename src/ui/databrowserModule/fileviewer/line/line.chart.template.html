@@ -12,6 +12,7 @@
         #canvas>
 </canvas>
 <div class="w-100 d-flex justify-content-end">
+        <!-- TODO ngIF expression changed after checked -->
     <a hidden
        #DownloadLineChartLink
        class="outline-none"
@@ -19,7 +20,7 @@
        [href]="csvDataUrl"
        container="body"
        *ngIf="shapedLineChartDatasets"
-       matTooltip="Download line graph as csv">
+       matTooltip="Download as csv">
         <i class="fas fa-file-csv"></i>
         <!--  <i class="fas fa-file-csv"></i><span class="ml-2">Download line graph as csv</span>-->
     </a>

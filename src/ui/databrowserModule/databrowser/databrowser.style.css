@@ -111,11 +111,6 @@ div[noSelectedRegion]
   background-color: rgba(0,0,0,0.2);
 }
 
-dataset-viewer
-{
-  display: block;
-}
-
 div[regionsContainer]
 {
   background-color:rgba(0, 0, 0, 0.3);
@@ -131,14 +126,6 @@ modality-picker
 {
   font-size: 90%;
   display:inline-block;
-}
-
-.filterWrapper
-{
-  white-space:normal;
-  max-height: 15em;
-  overflow-y:auto;
-  overflow-x:hidden;
 }
 
 .spinnerAnimationCircleContainer
@@ -180,6 +167,12 @@ radio-list
   display: block;
 }
 
+:host
+{
+  height: 100%;
+  width: 100%;
+}
+
 /* datawrapper */
 :host .dataEntryWrapper
 {
@@ -196,7 +189,6 @@ radio-list
   white-space: initial;
   width: 50%;
   display:inline-block;
-  padding: 0.5em 1em;
 }
 
 .filePreviewContainer
@@ -205,23 +197,6 @@ radio-list
   overflow:auto;
 }
 
-.overflow-container
-{
-  overflow:hidden;
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-.dot
-{
-  width: 0.5rem;
-  height: 0.5rem;
-  display: inline-block;
-  border-radius: 50%;
-  background-color:white;
-}
 
 div[regionTagsContainer]
 {

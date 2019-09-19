@@ -1,10 +1,9 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { DataBrowser } from "./databrowser/databrowser.component";
-import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
 import { ComponentsModule } from "src/components/components.module";
 import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { PathToNestedChildren } from "./util/pathToNestedChildren.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
 import { FilterDataEntriesbyMethods } from "./util/filterDataEntriesByMethods.pipe";
@@ -27,12 +26,20 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
 import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
+import { RegionTextSearchAutocomplete } from "../viewerStateController/regionSearch/regionSearch.component";
+import { RegionHierarchy } from "../viewerStateController/regionHierachy/regionHierarchy.component";
+import { ScrollingModule } from "@angular/cdk/scrolling";
+import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
+import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 
 @NgModule({
   imports:[
     ChartsModule,
     CommonModule,
     ComponentsModule,
+    ReactiveFormsModule,
+    ScrollingModule,
     FormsModule,
     UtilModule,
     AngularMaterialModule,
@@ -41,7 +48,6 @@ import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
   ],
   declarations: [
     DataBrowser,
-    DatasetViewerComponent,
     ModalityPicker,
     PreviewComponent,
     FileViewer,
@@ -49,6 +55,8 @@ import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
     LineChart,
     DedicatedViewer,
     SingleDatasetView,
+    RegionTextSearchAutocomplete,
+    RegionHierarchy,
 
     /**
      * pipes
@@ -60,7 +68,10 @@ import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
     AggregateArrayIntoRootPipe,
     DoiParserPipe,
     DatasetIsFavedPipe,
-    RegionBackgroundToRgbPipe
+    RegionBackgroundToRgbPipe,
+    GetKgSchemaIdFromFullIdPipe,
+    PreviewFileIconPipe,
+    PreviewFileTypePipe
   ],
   exports:[
     DataBrowser,
@@ -68,10 +79,13 @@ import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
     PreviewComponent,
     ModalityPicker,
     FilterDataEntriesbyMethods,
-      FileViewer
+    FileViewer,
+    RegionTextSearchAutocomplete,
+    RegionHierarchy
   ],
   entryComponents:[
-    DataBrowser
+    DataBrowser,
+    FileViewer
   ],
   providers: [
     KgSingleDatasetService

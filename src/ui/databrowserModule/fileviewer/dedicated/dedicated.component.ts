@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { DatabrowserService } from "../../databrowser.service";
+import { KgSingleDatasetService } from "../../kgSingleDatasetService.service";
 
 @Component({
   selector : 'dedicated-viewer',
@@ -14,21 +15,21 @@ export class DedicatedViewer{
   @Input() previewFile : ViewerPreviewFile
 
   constructor(
-    private dbService:DatabrowserService,
+    private singleKgDsService:KgSingleDatasetService,
   ){
 
   }
 
   get isShowing(){
-    return this.dbService.ngLayers.has(this.previewFile.url)
+    return this.singleKgDsService.ngLayers.has(this.previewFile.url)
   }
 
   showDedicatedView(){
-    this.dbService.showNewNgLayer({ url: this.previewFile.url })
+    this.singleKgDsService.showNewNgLayer({ url: this.previewFile.url })
   }
 
   removeDedicatedView(){
-    this.dbService.removeNgLayer({ url: this.previewFile.url })
+    this.singleKgDsService.removeNgLayer({ url: this.previewFile.url })
   }
   
   click(event:MouseEvent){

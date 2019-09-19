@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { MatSnackBar } from "@angular/material";
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { Store } from "@ngrx/store";
 import { SNACKBAR_MESSAGE } from "./state/uiState.store";
+import { KgSingleDatasetService } from "src/ui/databrowserModule/kgSingleDatasetService.service";
 
 /**
  * experimental service handling local user files such as nifti and gifti
@@ -17,8 +17,8 @@ export class LocalFileService {
   private supportedExtSet = new Set(SUPPORTED_EXT)
 
   constructor(
-    private dbService: DatabrowserService  ,
-    private store: Store<any>
+    private store: Store<any>,
+    private singleDsService: KgSingleDatasetService
   ){
 
   }
@@ -70,7 +70,7 @@ export class LocalFileService {
       URL.revokeObjectURL(this.niiUrl)
     }
     this.niiUrl = URL.createObjectURL(file)
-    this.dbService.showNewNgLayer({
+    this.singleDsService.showNewNgLayer({
       url: this.niiUrl
     })
 

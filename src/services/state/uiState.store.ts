@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store'
+import { TemplateRef } from '@angular/core';
 
 const agreedCookieKey = 'agreed-cokies'
 const aggredKgTosKey = 'agreed-kg-tos'
@@ -11,6 +12,9 @@ const defaultState : UIStateInterface = {
   sidePanelOpen: false,
 
   snackbarMessage: null,
+
+  sidebarTemplate: null,
+  bottomSheetTemplate: null,
 
   /**
    * replace with server side logic (?)
@@ -83,6 +87,18 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
         ...state,
         agreedKgTos: true
       }
+    case SHOW_SIDEBAR_TEMPLATE:
+      const { sidebarTemplate } = action
+      return {
+        ...state,
+        sidebarTemplate
+      }
+    case SHOW_BOTTOM_SHEET:
+        const { bottomSheetTemplate } = action
+        return {
+          ...state,
+          bottomSheetTemplate
+        }
     default:
       return state
   }
@@ -104,6 +120,9 @@ export interface UIStateInterface{
 
   agreedCookies: boolean
   agreedKgTos: boolean
+
+  sidebarTemplate: TemplateRef<any>
+  bottomSheetTemplate: TemplateRef<any>
 }
 
 export interface UIAction extends Action{
@@ -117,6 +136,9 @@ export interface UIAction extends Action{
     segment: any | null
   }[],
   snackbarMessage: string
+
+  sidebarTemplate: TemplateRef<any>
+  bottomSheetTemplate: TemplateRef<any>
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
@@ -132,3 +154,5 @@ export const AGREE_KG_TOS = `AGREE_KG_TOS`
 export const SHOW_KG_TOS = `SHOW_KG_TOS`
 
 export const SNACKBAR_MESSAGE = `SNACKBAR_MESSAGE`
+export const SHOW_SIDEBAR_TEMPLATE = `SHOW_SIDEBAR_TEMPLATE`
+export const SHOW_BOTTOM_SHEET = `SHOW_BOTTOM_SHEET`

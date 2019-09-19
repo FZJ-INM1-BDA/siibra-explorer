@@ -21,7 +21,6 @@
   flex: 1 0 auto;
 }
 
-region-hierarchy,
 dropdown-component
 {
   font-size:80%;
@@ -69,4 +68,9 @@ dropdown-component
 .login-button-mobile > button {
   outline: none;
   background-color: transparent;
+}
+
+:host > *
+{
+  pointer-events: all;
 }

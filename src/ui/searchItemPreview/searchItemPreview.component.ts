@@ -6,6 +6,7 @@ import {MatDialog} from "@angular/material";
 import {CHANGE_NAVIGATION} from "src/services/state/viewerState.store";
 import {Store} from "@ngrx/store";
 import {ToastService} from "src/services/toastService.service";
+import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
 
 @Component({
     selector: 'search-item-preview-component',
@@ -33,7 +34,7 @@ export class SearchItemPreviewComponent {
     constructor(
         private dbrService: DatabrowserService,
         public constantsService: AtlasViewerConstantsServices,
-        private dbService: DatabrowserService,
+        private singleDsService: KgSingleDatasetService,
         public dialog: MatDialog,
         private store: Store<any>,
         private toastService: ToastService,
@@ -93,15 +94,15 @@ export class SearchItemPreviewComponent {
 
 
     niftiLayerIsShowing(previewFile){
-        return this.dbService.ngLayers.has(previewFile.url)
+        return this.singleDsService.ngLayers.has(previewFile.url)
     }
 
     showDedicatedViewOnAtlasViewer(previewFile){
-        this.dbService.showNewNgLayer({ url: previewFile.url })
+        this.singleDsService.showNewNgLayer({ url: previewFile.url })
     }
 
     removeDedicatedViewOnAtlasViewer(previewFile){
-        this.dbService.removeNgLayer({ url: previewFile.url })
+        this.singleDsService.removeNgLayer({ url: previewFile.url })
     }
 
     navigateToRegion(region) {

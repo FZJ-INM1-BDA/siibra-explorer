@@ -27,6 +27,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
   @Effect()
   selectParcellationWithName$: Observable<any>
 
+  @Effect()
   doubleClickOnHierarchy$: Observable<any>
 
   constructor(
@@ -120,7 +121,37 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
     )
 
     this.doubleClickOnHierarchy$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY)
+      ofType(VIEWERSTATE_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY),
+      map(action => {
+        const { payload = {} } = action as ViewerStateAction
+        const { region } = payload
+        if (!region) {
+          return {
+            type: GENERAL_ACTION_TYPES.ERROR,
+            payload: {
+              message: `Go to region: region not defined`
+            }
+          }
+        }
+
+        const { position } = region
+        if (!position) {
+          return {
+            type: GENERAL_ACTION_TYPES.ERROR,
+            payload: {
+              message: `${region.name} - does not have a position defined`
+            }
+          }
+        }
+
+        return {
+          type: CHANGE_NAVIGATION,
+          navigation: {
+            position,
+            animation: {}
+          }
+        }
+      })
     )
 
     this.singleClickOnHierarchy$ = this.actions$.pipe(
