@@ -25,6 +25,7 @@ const getUserKGRequestParam = async ({ user }) => {
 }
 
 const init = async () => {
+  if (process.env.ACCESS_TOKEN) console.warn(`ACCESS_TOKEN environmental variable is set! All queries will be made made with ACCESS_TOKEN!`)
   if (getPublicAccessToken) return
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
