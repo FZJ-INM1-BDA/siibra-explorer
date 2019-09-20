@@ -1,15 +1,14 @@
 import { NgModule } from "@angular/core";
-import { ComponentsModule } from "../components/components.module";
+import { ComponentsModule } from "src/components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen, GetTemplateImageSrcPipe, ImgSrcSetPipe } from "./nehubaContainer/splashScreen/splashScreen.component";
-import { LayoutModule } from "../layouts/layout.module";
+import { LayoutModule } from "src/layouts/layout.module";
 import { FormsModule } from "@angular/forms";
 
-import { GroupDatasetByRegion } from "../util/pipes/groupDataEntriesByRegion.pipe";
-import { filterRegionDataEntries } from "../util/pipes/filterRegionDataEntries.pipe";
-import { MenuIconsBar } from './menuicons/menuicons.component'
+import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
+import { filterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
 
 import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
 
@@ -62,10 +61,7 @@ import { MaximmisePanelButton } from "./nehubaContainer/maximisePanelButton/maxi
 import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe";
 
-import {SearchPanel} from "src/ui/searchPanel/searchPanel.component";
 import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
-import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
-import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
 
@@ -95,7 +91,6 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     MobileOverlay,
     HelpComponent,
     ConfigComponent,
-    MenuIconsBar,
     SigninBanner,
     SigninModal,
     StatusCardComponent,
@@ -109,9 +104,6 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     ViewerStateController,
 
     MaximmisePanelButton,
-    SearchPanel,
-    SearchItemPreviewComponent,
-    SelectedRegionsComponent,
     SearchSideNav,
 
     /* pipes */
@@ -166,13 +158,11 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     MobileOverlay,
     HelpComponent,
     ConfigComponent,
-    MenuIconsBar,
     SigninBanner,
     SigninModal,
     CookieAgreement,
     KGToS,
     StatusCardComponent,
-    SearchPanel,
     ElementOutClickDirective,
     SearchSideNav,
   ]

@@ -1,5 +1,5 @@
 <div class="d-flex flex-column h-100">
-  <viewer-state-controller class="pe-all mb-2" #viewerStateController>
+  <viewer-state-controller class="pe-all flex-grow-0 flex-shrink-0 mb-2" #viewerStateController>
 
     <!-- content append -->
     <ng-container card-content="append">
@@ -26,7 +26,7 @@
   </viewer-state-controller>
 
   <data-browser
-    class="pe-all"
+    class="pe-all flex-grow-1 flex-shrink-1"
     *ngIf="showDataset"
     [template]="viewerStateController.templateSelected$ | async"
     [parcellation]="viewerStateController.parcellationSelected$ | async"
