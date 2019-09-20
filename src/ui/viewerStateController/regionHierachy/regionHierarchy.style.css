@@ -25,7 +25,7 @@ div[treeContainer]
 
 [hideScrollbarcontainer] [hideScrollbarInnerContainer]
 {
-  width: calc(100% + 8em);
+  width: calc(100% + 2em);
 }
 
 input[type="text"]
@@ -53,10 +53,4 @@ input[type="text"]
 :host > mat-form-field
 {
   flex: 0 0 auto;
-}
-
-mat-chip-list >>> .mat-chip-list-wrapper
-{
-  height: 100%;
-  width:110%;
 }

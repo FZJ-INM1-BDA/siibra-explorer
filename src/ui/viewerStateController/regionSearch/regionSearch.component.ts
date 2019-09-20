@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take } from "rxjs/operators";
+import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, filter } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
@@ -20,8 +20,8 @@ const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase(
 
 export class RegionTextSearchAutocomplete{
 
-  @Input()
-  public showAutoComplete: boolean = true
+  @Input() public showBadge: boolean = false
+  @Input() public showAutoComplete: boolean = true
 
   @ViewChild('autoTrigger', {read: ElementRef}) autoTrigger: ElementRef 
   @ViewChild('regionHierarchy', {read:TemplateRef}) regionHierarchyTemplate: TemplateRef<any>
@@ -58,6 +58,7 @@ export class RegionTextSearchAutocomplete{
     this.autocompleteList$ = this.formControl.valueChanges.pipe(
       startWith(''),
       debounceTime(200),
+      filter(string => string.length > 0),
       withLatestFrom(this.regionsWithLabelIndex$.pipe(
         startWith([])
       )),

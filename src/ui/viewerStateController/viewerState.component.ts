@@ -3,7 +3,6 @@ import { Store, select } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, shareReplay, filter } from "rxjs/operators";
 import { SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
-import { DESELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { ToastService } from "src/services/toastService.service";
 import { MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
@@ -212,32 +211,6 @@ export class ViewerStateController implements OnInit{
     })
   }
 
-  public deselectRegion(event: MouseEvent, region: any){
-    this.store$.dispatch({
-      type: DESELECT_REGIONS,
-      deselectRegions: [region]
-    })
-  }
-
-  public gotoRegion(event: MouseEvent, region:any){
-    if (region.position) {
-      this.store$.dispatch({
-        type: CHANGE_NAVIGATION,
-        navigation: {
-          position: region.position,
-          animation: {}
-        }
-      })
-    } else {
-      /**
-       * TODO convert to snack bar
-       */
-      this.toastService.showToast(`${region.name} does not have a position defined`, {
-        timeout: 5000,
-        dismissable: true
-      })
-    }
-  }
 }
 
 const ACTION_TYPES = {

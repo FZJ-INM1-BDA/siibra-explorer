@@ -21,7 +21,7 @@ import { PopoverModule } from "ngx-bootstrap/popover";
 import { UtilModule } from "src/util/util.module";
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
-import { SingleDatasetView } from './singleDataset/singleDataset.component'
+import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
@@ -32,6 +32,8 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
+import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
+import { CurrentlySelectedRegions } from "../viewerStateController/currentlySelectedRegions/currentlySelectedRegions.component";
 
 @NgModule({
   imports:[
@@ -55,8 +57,10 @@ import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
     LineChart,
     DedicatedViewer,
     SingleDatasetView,
+    SingleDatasetListView,
     RegionTextSearchAutocomplete,
     RegionHierarchy,
+    CurrentlySelectedRegions,
 
     /**
      * pipes
@@ -76,12 +80,14 @@ import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
   exports:[
     DataBrowser,
     SingleDatasetView,
+    SingleDatasetListView,
     PreviewComponent,
     ModalityPicker,
     FilterDataEntriesbyMethods,
     FileViewer,
     RegionTextSearchAutocomplete,
-    RegionHierarchy
+    RegionHierarchy,
+    CurrentlySelectedRegions,
   ],
   entryComponents:[
     DataBrowser,

@@ -1,9 +1,9 @@
-<div class="d-inline-flex flex-row align-items-center">
+<div class="w-100 d-inline-flex flex-row align-items-center">
 
   <form *ngIf="showAutoComplete" class="flex-grow-1 flex-shrink-1">
     <mat-form-field class="w-100">
       <input
-        placeholder="Regions"
+        placeholder="Search for regions"
         #autoTrigger
         #trigger="matAutocompleteTrigger"
         type="text"
@@ -26,9 +26,12 @@
   </form>
     
   <button
+    matBadgeColor="accent"
+    [matBadge]="showBadge && (regionsSelected$ | async).length ? (regionsSelected$ | async).length : null"
     class="flex-grow-0 flex-shrink-0"
     (click)="showHierarchy($event)"
-    mat-icon-button color="primary">
+    mat-icon-button
+    color="primary">
     <i class="fas fa-sitemap"></i>
   </button>
 </div>

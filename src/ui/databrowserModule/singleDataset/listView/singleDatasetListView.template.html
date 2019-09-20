@@ -1,0 +1,55 @@
+<mat-list-item [matTooltip]="name">
+
+  <small mat-line>
+    {{ name }}
+  </small>
+
+  <!-- preview -->
+  <button mat-icon-button
+    *ngIf="preview"
+    iav-stop="click mousedown"
+    (click)="showPreviewList(previewFilesListTemplate)">
+    <i class="far fa-eye"></i>
+  </button>
+
+  <button mat-icon-button>
+    <i class="fas fa-info"></i>
+  </button>
+</mat-list-item>
+
+<ng-template #previewFilesListTemplate>
+  <preview-component
+    (previewFile)="handlePreviewFile($event)"
+    [datasetName]="name">
+  </preview-component>
+</ng-template>
+
+<ng-template #fullIcons>
+
+  <!-- references -->
+  <a *ngFor="let kgRef of kgReference"
+    [href]="kgRef | doiParserPipe"
+    target="_blank"
+    iav-stop="click mousedown"
+    mat-icon-button>
+    <mat-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+  </a>
+
+  <!-- pin dataset -->
+  <button mat-icon-button
+    *ngIf="downloadEnabled"
+    iav-stop="click mousedown"
+    (click)="toggleFav()"
+    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
+    <i class="fas fa-thumbtack"></i>
+  </button>
+
+  <!-- download dataset -->
+  <button mat-icon-button
+    *ngIf="downloadEnabled"
+    iav-stop="click mousedown"
+    (click)="downloadZipFromKg()"
+    [disabled]="downloadInProgress">
+    <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+  </button>
+</ng-template>

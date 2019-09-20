@@ -67,6 +67,7 @@ import {ElementOutClickDirective} from "src/util/directives/elementOutClick.dire
 import {SearchItemPreviewComponent} from "src/ui/searchItemPreview/searchItemPreview.component";
 import {SelectedRegionsComponent} from "src/ui/selectedRegions/selectedRegions.component";
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
+import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
 
 @NgModule({
   imports : [
@@ -106,10 +107,12 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     SinglePanel,
     CurrentLayout,
     ViewerStateController,
+
     MaximmisePanelButton,
     SearchPanel,
     SearchItemPreviewComponent,
     SelectedRegionsComponent,
+    SearchSideNav,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -170,7 +173,8 @@ import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
     KGToS,
     StatusCardComponent,
     SearchPanel,
-    ElementOutClickDirective
+    ElementOutClickDirective,
+    SearchSideNav,
   ]
 })
 

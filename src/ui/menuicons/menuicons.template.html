@@ -1,6 +1,4 @@
 <div class="w-0 ml-4 d-flex flex-column align-items-start" root>
-  <logo-container *ngIf="!isMobile">
-  </logo-container>
   
   <!-- hide icons when templates has yet been selected -->
   <ng-template [ngIf]="selectedTemplate$ | async">
