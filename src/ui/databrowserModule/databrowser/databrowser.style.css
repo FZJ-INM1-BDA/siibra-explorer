@@ -9,12 +9,6 @@ radio-list
   display: block;
 }
 
-:host
-{
-  height: 100%;
-  width: 100%;
-}
-
 cdk-virtual-scroll-viewport
 {
   width: calc(100% + 1em);
