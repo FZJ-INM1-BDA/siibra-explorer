@@ -1,0 +1,60 @@
+<div class="d-flex flex-column h-100">
+  <viewer-state-controller class="pe-all mb-2" #viewerStateController>
+
+    <!-- content append -->
+    <ng-container card-content="append">
+      <mat-card-content (focusin)="showDataset = true">
+        <region-text-search-autocomplete
+          [showBadge]="true"
+          class="d-block w-100">
+        </region-text-search-autocomplete>
+      </mat-card-content>
+    </ng-container>
+
+    <!-- footer content -->
+    <div class="d-flex flex-row justify-content-center" card-footer>
+      <button mat-stroked-button
+        *ngIf="!showDataset"
+        (click)="showDataset = true"
+        class="m-1 flex-grow-1 overflow-hidden" >
+        <i class="fas fa-chevron-down"></i>
+        <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
+          {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
+        </ng-container>
+      </button>
+    </div>
+  </viewer-state-controller>
+
+  <data-browser
+    class="pe-all"
+    *ngIf="showDataset"
+    [template]="viewerStateController.templateSelected$ | async"
+    [parcellation]="viewerStateController.parcellationSelected$ | async"
+    [regions]="viewerStateController.regionsSelected$ | async"
+    (dataentriesUpdated)="availableDatasets = $event.length">
+    
+
+    <!-- content prepend -->
+    <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected" card-content="prepend">
+      <mat-card-content>
+        <p class="font-weight-bold">
+          {{ regionsSelected.length === 0 ? 'In the current view' : regionsSelected.length === 1 ? regionsSelected[0].name : 'Multi-region selection' }}
+        </p>
+      </mat-card-content>
+    </ng-container>
+
+    <!-- footer content -->
+    <div class="d-flex flex-row justify-content-center" card-footer>
+      <button mat-stroked-button
+        class="m-1"
+        (click)="showDataset = false" >
+        <i class="fas fa-chevron-up"></i>
+      </button>
+    </div>
+  </data-browser>
+</div>
+
+<div [hidden]>
+  <layer-browser (nonBaseLayersChanged)="handleNonbaseLayerEvent($event)" #layerBrowser>
+  </layer-browser>
+</div>

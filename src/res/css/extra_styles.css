@@ -293,6 +293,11 @@ markdown-dom pre code
   transform: rotate(90deg)!important;
 }
 
+.r-270
+{
+  transform: rotate(270deg)!important;
+}
+
 .ws-no-wrap
 {
   white-space: nowrap!important;
@@ -511,4 +516,67 @@ cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
 .mat-tab-body-wrapper
 {
   flex-grow:1;
+}
+
+.transform-origin-left-center
+{
+  transform-origin: 0% 50%;
+}
+
+.transform-origin-center
+{
+  transform-origin: 50% 50%;
+}
+
+.box-shadow-none
+{
+  box-shadow: none!important;
+}
+
+.translate-x-2
+{
+  transform: translateX(1em);
+}
+
+.translate-x-3
+{
+  transform: translateX(1.5em);
+}
+
+.translate-x-4
+{
+  transform: translateX(2em);
+}
+
+.translate-x-6
+{
+  transform: translateX(3em);
+}
+
+.translate-x-6-n
+{
+  transform: translateX(-3em);
+}
+
+.translate-x-7-n
+{
+  transform: translateX(-3.5em);
+}
+
+.translate-x-8-n
+{
+  transform: translateX(-4em);
+}
+
+/* this is required to physically link label with side bar */
+.mat-drawer-content-overflow-visible > mat-drawer-content,
+/* this is required to show the popout info of template and parcellation */
+.mat-drawer-content-overflow-visible > mat-drawer > .mat-drawer-inner-container
+{
+  overflow: visible!important;
+}
+
+.overflow-visible
+{
+  overflow: visible!important;
 }

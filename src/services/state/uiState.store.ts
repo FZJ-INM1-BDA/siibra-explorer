@@ -13,7 +13,6 @@ const defaultState : UIStateInterface = {
 
   snackbarMessage: null,
 
-  sidebarTemplate: null,
   bottomSheetTemplate: null,
 
   /**
@@ -87,12 +86,6 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
         ...state,
         agreedKgTos: true
       }
-    case SHOW_SIDEBAR_TEMPLATE:
-      const { sidebarTemplate } = action
-      return {
-        ...state,
-        sidebarTemplate
-      }
     case SHOW_BOTTOM_SHEET:
         const { bottomSheetTemplate } = action
         return {
@@ -121,7 +114,6 @@ export interface UIStateInterface{
   agreedCookies: boolean
   agreedKgTos: boolean
 
-  sidebarTemplate: TemplateRef<any>
   bottomSheetTemplate: TemplateRef<any>
 }
 
@@ -137,7 +129,6 @@ export interface UIAction extends Action{
   }[],
   snackbarMessage: string
 
-  sidebarTemplate: TemplateRef<any>
   bottomSheetTemplate: TemplateRef<any>
 }
 
@@ -154,5 +145,4 @@ export const AGREE_KG_TOS = `AGREE_KG_TOS`
 export const SHOW_KG_TOS = `SHOW_KG_TOS`
 
 export const SNACKBAR_MESSAGE = `SNACKBAR_MESSAGE`
-export const SHOW_SIDEBAR_TEMPLATE = `SHOW_SIDEBAR_TEMPLATE`
 export const SHOW_BOTTOM_SHEET = `SHOW_BOTTOM_SHEET`

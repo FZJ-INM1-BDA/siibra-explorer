@@ -36,8 +36,9 @@ export class UseEffects implements OnDestroy{
       withLatestFrom(this.regionsSelected$),
       map(([action, regionsSelected]) => {
         const { deselectRegions } = action
-        const deselectSet = new Set((deselectRegions as any[]).map(r => r.name))
-        const selectRegions = regionsSelected.filter(r => !deselectSet.has(r.name))
+        const selectRegions = regionsSelected.filter(r => {
+          return !(deselectRegions as any[]).find(dr => compareRegions(dr, r))
+        })
         return {
           type: SELECT_REGIONS,
           selectRegions
@@ -206,4 +207,12 @@ export class UseEffects implements OnDestroy{
       updatedParcellation: parcellation
     }))
   )
+}
+
+export const compareRegions: (r1: any,r2: any) => boolean = (r1, r2) => {
+  if (!r1) return !r2
+  if (!r2) return !r1
+  return r1.ngId === r2.ngId
+    && r1.labelIndex === r2.labelIndex
+    && r1.name === r2.name
 }

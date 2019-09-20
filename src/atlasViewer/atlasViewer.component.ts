@@ -14,7 +14,7 @@ import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component
 import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_SIDEBAR_TEMPLATE, SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
@@ -97,7 +97,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
   public sidePanelOpen$: Observable<boolean>
-  public sideNavTemplate$: Observable<TemplateRef<any>>
 
   get toggleMessage(){
     return this.constantsService.toggleMessage
@@ -151,12 +150,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.sidePanelOpen)
-    )
-
-    this.sideNavTemplate$ = this.store.pipe(
-      select('uiState'),
-      select('sidebarTemplate'),
-      distinctUntilChanged()
     )
 
     this.showHelp$ = this.constantsService.showHelpSubject$.pipe(

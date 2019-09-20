@@ -21,7 +21,6 @@ import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.plug
 import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest, Subscription } from "rxjs";
 import { map, shareReplay, startWith } from "rxjs/operators";
-import { SHOW_SIDEBAR_TEMPLATE } from "src/services/state/uiState.store";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { MatDialogRef, MatDialog } from "@angular/material";
 import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
@@ -166,19 +165,6 @@ export class MenuIconsBar implements OnInit, OnDestroy {
   }
 
   ngOnInit(){
-    /**
-     * on opening nifti volume, collapse side bar
-     */
-    this.subscriptions.push(
-      this.singleDatasetService.previewingFile$.subscribe(({ file }) => {
-        if (determinePreviewFileType(file) === PREVIEW_FILE_TYPES.NIFTI) {
-          this.store.dispatch({
-            type: SHOW_SIDEBAR_TEMPLATE,
-            sidebarTemplate: null
-          })
-        }
-      })
-    )
   }
 
   ngOnDestroy(){
@@ -263,10 +249,7 @@ export class MenuIconsBar implements OnInit, OnDestroy {
   }
 
   public showKgSearchSideNav(kgSearchTemplate: TemplateRef<any> = null){
-    this.store.dispatch({
-      type: SHOW_SIDEBAR_TEMPLATE,
-      sidebarTemplate: kgSearchTemplate
-    })
+    
   }
 
   handleNonbaseLayerEvent(layers: NgLayerInterface[]){

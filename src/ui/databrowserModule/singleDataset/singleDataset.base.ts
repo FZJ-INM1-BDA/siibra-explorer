@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, TemplateRef, Output, EventEmitter } from "@angular/core";
+import { Input, OnInit, ChangeDetectorRef, TemplateRef, Output, EventEmitter } from "@angular/core";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { Publication, File, DataEntry, ViewerPreviewFile } from 'src/services/state/dataStore.store'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -6,15 +6,14 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
 import { DatabrowserService } from "../databrowser.service";
 import { Observable } from "rxjs";
 
-@Component({
-  selector: 'single-dataset-view',
-  templateUrl: './singleDataset.template.html',
-  styleUrls: [
-    `./singleDataset.style.css`
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class SingleDatasetView implements OnInit {
+export {
+  DatabrowserService,
+  KgSingleDatasetService,
+  ChangeDetectorRef,
+  AtlasViewerConstantsServices
+}
+
+export class SingleDatasetBase implements OnInit {
 
   @Input() ripple: boolean = false
 
@@ -29,7 +28,7 @@ export class SingleDatasetView implements OnInit {
   @Input() kgSchema?: string
   @Input() kgId?: string
 
-  @Input() prefetched: any = null
+  @Input() dataset: any = null
   @Input() simpleMode: boolean = false
 
   @Output() previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
@@ -54,8 +53,6 @@ export class SingleDatasetView implements OnInit {
   public downloadInProgress = false
 
   public favedDataentries$: Observable<DataEntry[]>
-  public dataset: any
-
   constructor(
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
@@ -66,9 +63,9 @@ export class SingleDatasetView implements OnInit {
   }
 
   ngOnInit() {
-    const { kgId, kgSchema, prefetched } = this
-    if ( prefetched ) {
-      const { name, description, kgReference, publications, files, preview, ...rest } = prefetched
+    const { kgId, kgSchema, dataset } = this
+    if ( dataset ) {
+      const { name, description, kgReference, publications, files, preview, ...rest } = dataset
       this.name = name
       this.description = description
       this.kgReference = kgReference
@@ -76,7 +73,6 @@ export class SingleDatasetView implements OnInit {
       this.files = files
       this.preview = preview
       
-      this.dataset = prefetched
       return
     }
     if (!kgSchema || !kgId) return

@@ -3,7 +3,7 @@ import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge, Observable } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
-import { MatDialog } from "@angular/material";
+import { MatDialog, MatExpansionPanel } from "@angular/material";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { scan, shareReplay } from "rxjs/operators";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
@@ -21,6 +21,8 @@ const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 })
 
 export class DataBrowser implements OnChanges, OnDestroy,OnInit{
+
+  @ViewChild('selectedRegionExpansionPanel') selectedRegionExpansionPanel: MatExpansionPanel
 
   @Input()
   public regions: any[] = []
@@ -86,6 +88,8 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   ngOnChanges(changes){
 
+    if (this.regions.length === 0) this.selectedRegionExpansionPanel && (this.selectedRegionExpansionPanel.expanded = false)
+
     this.regions = this.regions.map(r => {
       /**
        * TODO to be replaced with properly region UUIDs from KG
@@ -97,6 +101,9 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
     })
     const { regions, parcellation, template } = this
     this.fetchingFlag = true
+
+    // input may be undefined/null
+    if (!parcellation) return
 
     /**
      * reconstructing parcellation region is async (done on worker thread)
@@ -171,6 +178,7 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
+    this.cdr.markForCheck()
     this.resetCurrentPage()
   }
 
@@ -214,6 +222,10 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   showFocusedDataset(dataset:DataEntry){
     this.focusedDataset = dataset
     this.dialog.open(this.detailDatasetTemplateRef)
+  }
+
+  trackbyFn(index:number, dataset:DataEntry) {
+    return dataset.id
   }
 }
 

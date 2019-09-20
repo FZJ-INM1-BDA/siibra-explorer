@@ -26,34 +26,10 @@
     </div>
 
     <div hideScrollbarcontainer>
-      <mat-chip-list
-        class="w-100 flex-grow-1 flex-shrink-1">
-        <cdk-virtual-scroll-viewport
-          hideScrollbarInnerContainer
-          class="h-100 p-4 overflow-x-hidden"
-          [itemSize]="32">
-          <mat-chip
-            *cdkVirtualFor="let region of (selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch)"
-            class="w-90">
-
-            <span class="dot mr-1 flex-grow-0 flex-shrink-0" [ngStyle]="{backgroundColor: (region | regionBackgroundToRgbPipe)}"></span>
-            <span class="flex-grow-1 flex-shrink-1 text-truncate">
-              {{ region.name }}
-            </span>
-            <button
-              *ngIf="region.position"
-              (click)="gotoRegion(region)"
-              mat-icon-button>
-              <i class="fas fa-map-marked-alt"></i>
-            </button>
-            <button
-              (click)="deselectRegion(region)"
-              mat-icon-button>
-              <i class="fas fa-trash"></i>
-            </button>
-          </mat-chip>
-        </cdk-virtual-scroll-viewport>
-      </mat-chip-list>
+      <currently-selected-regions
+        class="d-block h-100"
+        hideScrollbarInnerContainer>
+      </currently-selected-regions>
     </div>
   </div>
 

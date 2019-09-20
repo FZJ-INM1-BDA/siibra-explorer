@@ -1,8 +1,8 @@
 <mat-card>
 
   <!-- template selection -->
-  <mat-card-content class="d-inline-flex flex-nowrap">
-    <mat-form-field>
+  <mat-card-content class="d-inline-flex flex-nowrap w-100">
+    <mat-form-field class="flex-grow-1">
       <mat-label>
         Template
       </mat-label>
@@ -17,9 +17,6 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-  
-    <!-- padding so that info icon lines up -->
-    <button mat-icon-button class="pe-none invisible"></button>
   
     <ng-container *ngIf="templateSelected$ | async as templateSelected">
       <!-- show on hover component -->
@@ -64,11 +61,11 @@
   </mat-card-content>
 
   <!-- parcellation selection -->
-  <mat-card-content class="d-inline-flex flex-nowrap">
+  <mat-card-content class="d-inline-flex flex-nowrap w-100">
 
     <mat-form-field
       *ngIf="templateSelected$ | async as templateSelected"
-      class="d-inline-flex flex-nowrap">
+      class="flex-grow-1">
       <mat-label>
         Parcellation
       </mat-label>
@@ -83,12 +80,6 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-  
-    <!-- selected regions -->
-    <region-text-search-autocomplete
-      [showAutoComplete]="false"
-      (focusedStateChanged)="focused = $event">
-    </region-text-search-autocomplete>
   
     <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
       <!-- show on hover component -->
@@ -125,93 +116,17 @@
               [kgId]="originDataset && originDataset.kgId">
             </single-dataset-view>
           </div>
-          
         </div>
-      </sleight-of-hand>  
-  
+      </sleight-of-hand>
     </ng-container>
-  
   </mat-card-content>
 
-  <!-- selected regions -->
-  <mat-card-content>
-    <mat-chip-list *ngIf="(regionsSelected$ | async)?.length > 0 ">
-      <cdk-virtual-scroll-viewport
-        class="w-100 h-10em overflow-x-hidden"
-        [itemSize]="32">
-        <mat-chip
-          *cdkVirtualFor="let region of (regionsSelected$ | async)"
-          class="w-90">
-          <span class="flex-grow-1 flex-shrink-1 text-truncate">
-            {{ region.name }}
-          </span>
-          <button
-            *ngIf="region.position"
-            (click)="gotoRegion($event, region)"
-            mat-icon-button>
-            <i class="fas fa-map-marked-alt"></i>
-          </button>
-          <button
-            (click)="deselectRegion($event, region)"
-            mat-icon-button>
-            <i class="fas fa-trash"></i>
-          </button>
-        </mat-chip>
-      </cdk-virtual-scroll-viewport>
-    </mat-chip-list>
-  
-    <!-- place holder when no regions has been selected -->
-    <span class="muted"  *ngIf="(regionsSelected$ | async).length === 0">
-      No regions selected. Double click on any regions in the viewer, or use the search tool to select regions of interest.
-    </span>
-  </mat-card-content>
+  <ng-content select="[card-content='append']">
+  </ng-content>
 
-  <!-- control btns -->
-  <mat-card-actions class="d-flex justify-content-between">
-    
-    <div class="d-flex">
-      <!-- save  -->
-      <button
-        matTooltip="Bookmark this selection of regions"
-        matTooltipPosition="below"
-        mat-button
-        (click)="saveSelection($event)"
-        color="primary">
-        <i class="far fa-bookmark"></i>
-        
-      </button>
-
-      <!-- load -->
-      <button
-        (click)="loadSelection($event)"
-        matTooltip="Load a bookmarked region selection"
-        matTooltipPosition="below"
-        mat-button
-        color="primary"
-        [disabled]="(savedRegionsSelections$ | async)?.length === 0">
-        <i
-          matBadgeColor="accent"
-          [matBadgeOverlap]="false"
-          [matBadge]="(savedRegionsSelections$ | async)?.length > 0 ? (savedRegionsSelections$ | async)?.length : null"
-          class="fas fa-folder-open"></i>
-        
-      </button>
-    </div>
-
-    <!-- deselect all  -->
-    <button
-      (click)="deselectAllRegions($event)"
-      matTooltip="Deselect all selected regions"
-      matTooltipPosition="below"
-      mat-raised-button
-      color="warn"
-      [disabled]="(regionsSelected$ | async)?.length === 0">
-      <i class="fas fa-trash"></i>
-    </button>
-  </mat-card-actions>
-  
   <mat-card-footer>
-
+    <ng-content select="[card-footer]">
+    </ng-content>
   </mat-card-footer>
 </mat-card>
 

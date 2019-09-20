@@ -1,102 +1,59 @@
-<mat-tab-group [dynamicHeight]="false" class="h-100 w-100 overflow-hidden">
-  <mat-tab label="Search Criteria">
-    <ng-container *ngTemplateOutlet="searchPanel">
+<mat-card
+  [ngClass]="{'h-100': (!fetchingFlag && !fetchError)}"
+  class="w-100 overflow-hidden d-block flex-grow-1 flex-shrink-1 d-flex flex-column">
 
+  <!-- transclusion header -->
+  <mat-card-header>
+    <ng-content select="[card-header]">
+
+    </ng-content>
+  </mat-card-header>
+  
+  <!-- transclusion header -->
+  <ng-content select="[card-content='prepend']">
+  </ng-content>
+
+  <!-- modality filter -->
+  <ng-container *ngTemplateOutlet="modalitySelector">
+  </ng-container>
+
+  <!-- if still loading, show spinner -->
+  <ng-template [ngIf]="fetchingFlag">
+    <ng-container *ngTemplateOutlet="loadingSpinner">
     </ng-container>
-  </mat-tab>
-  <mat-tab label="History">
-    <ng-container *ngTemplateOutlet="history">
+  </ng-template>
 
-    </ng-container>
-  </mat-tab>
-</mat-tab-group>
+  <!-- else, show fetched -->
+  <ng-template [ngIf]="!fetchingFlag">
 
-<ng-template #searchPanel>
+    <!-- if error, show error only -->
+    <ng-template [ngIf]="fetchError">
+      <ng-container *ngTemplateOutlet="errorTemplate">
+      </ng-container>
+    </ng-template>
 
-  <div class="h-100 w-100 d-flex flex-column overflow-hidden">
+    <!-- if not error, show dataset template -->
     
-    <!-- search criterial -->
-    <mat-selection-list class="flex-grow-0 flex-shrink-0 mb-2" checkboxPosition="before">
-      <h3 mat-subheader>
-        Search criteria
-      </h3>
+    <ng-template [ngIf]="!fetchError">
+      <ng-container *ngTemplateOutlet="datasetTemplate">
+      </ng-container>
+    </ng-template>
+  </ng-template>
 
-      <!-- selected regions -->
-      <mat-list-option
-        selected="true"
-        checkboxPosition="before">
-        <h4 mat-line>
-          {{ regions.length }} selected region{{ regions.length !== 1 ? 's' : ''}}
+  <!-- footer, populated by content transclusion -->
+  <mat-card-footer>
+    <ng-content select="[card-footer]">
+    </ng-content>
+  </mat-card-footer>
+</mat-card>
 
-          <!-- stop mousedown propagation to avoid ripple from mat-list-option -->
-          <region-text-search-autocomplete (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()" [showAutoComplete]="false">
-          </region-text-search-autocomplete>
-        </h4>
-      </mat-list-option>
-
-      <mat-list-option
-        *ngIf="dbService.viewportBoundingBox$ | async as bbox"
-        checkboxPosition="before"
-        [selected]="true">
-        <h4 class="mat-line">
-          viewport bounding box 
-        </h4>
-
-        <!-- from -->
-        <p class="mat-line">
-          <small>
-            <span *ngFor="let v of bbox[0]; let lastval = last">
-              {{ v | number : '1.2-2' }}<span *ngIf="!lastval">, </span>
-            </span>
-            <span>
-              to
-            </span>
-            <span *ngFor="let v of bbox[1]; let lastval = last">
-              {{ v | number : '1.2-2' }}<span *ngIf="!lastval">, </span>
-            </span>
-          </small>
-        </p>
-        
-      </mat-list-option>
-    </mat-selection-list>
-
-    <mat-divider class="position-relative"></mat-divider>
-
-    <!-- modality picker / filter -->
-    <mat-accordion class="flex-grow-0 flex-shrink-0 mb-2">
-      <mat-expansion-panel>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            Filter
-          </mat-panel-title>
-          <mat-panel-description>
-            <i *ngIf="dataentries.length > 0">
-              <span *ngIf="visibleCountedDataM && visibleCountedDataM.length > 0 "> 
-                {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} filtered /
-              </span>
-              {{ dataentries.length }} results
-            </i>
-            <i *ngIf="dataentries.length === 0">
-              No results to show.
-            </i>
-          </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <ng-container *ngTemplateOutlet="modalityPicker">
-
-        </ng-container>
-      </mat-expansion-panel>
-    </mat-accordion>
-
-    <!-- datasets container -->
-    <div *ngIf="fetchingFlag; else fetched"
-      class="spinnerAnimationCircleContainer">
-      <div class="spinnerAnimationCircle"></div>
-      <div>Fetching datasets...</div>
+<ng-template #loadingSpinner>
+  <mat-card-content>
+    <div class="m-2 d-flex flex-row align-items-center justify-content star">
+      <div class="d-inline-block mr-2 spinnerAnimationCircle"></div>
+      <span>Fetching datasets...</span>
     </div>
-
-  </div>
-
+  </mat-card-content>
 </ng-template>
 
 <ng-template #modalityPicker>
@@ -109,35 +66,35 @@
   </modality-picker>
 </ng-template>
 
-<ng-template #fetched>
-  <div class="ml-2 mr-2 alert alert-danger" *ngIf="fetchError; else showData">
-    <i class="fas fa-exclamation-triangle"></i> Error fetching data. <a href="#" (click)="retryFetchData($event)" class="btn btn-link text-info">retry</a>
-  </div>
+<ng-template #errorTemplate>
+  <mat-card-content>
+    <div class="ml-2 mr-2 alert alert-danger">
+      <i class="fas fa-exclamation-triangle"></i> Error fetching data. <a href="#" (click)="retryFetchData($event)" class="btn btn-link text-info">retry</a>    
+    </div>
+  </mat-card-content>
 </ng-template>
 
-<ng-template #showData>
+<ng-template #datasetTemplate>
   <!-- datawrapper -->
+
   <ng-container *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry">
-
-    <!-- dataentries -->
-    <div class="h-100 w-100">
-      <cdk-virtual-scroll-viewport 
+    <mat-card-content class="h-100 w-100 overflow-hidden">
+      <cdk-virtual-scroll-viewport
         class="h-100"
-        itemSize="50">
-        <single-dataset-view
-          *cdkVirtualFor="let dataset of filteredDataEntry"
-          (click)="showFocusedDataset(dataset)"
-          class="m-2"
-          [kgSchema]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[0]"
-          [kgId]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[1]"
-          [prefetched]="dataset"
-          [simpleMode]="true"
-          [ripple]="true">
-
-        </single-dataset-view>
-    </cdk-virtual-scroll-viewport>
-  </div>
-
+        itemSize="40">
+        <mat-nav-list dense>
+          <single-dataset-list-view
+            *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackbyFn; templateCacheSize: 0"
+            (click)="showFocusedDataset(dataset)"
+            [kgSchema]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[0]"
+            [kgId]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[1]"
+            [dataset]="dataset"
+            [ripple]="true">
+    
+          </single-dataset-list-view>
+        </mat-nav-list>
+      </cdk-virtual-scroll-viewport>
+    </mat-card-content>
   </ng-container>
 </ng-template>
 
@@ -150,13 +107,63 @@
 </ng-template>
 
 <ng-template #detailDataset>
-
-  <single-dataset-view
-    [prefetched]="focusedDataset">
-
+  <single-dataset-view [dataset]="focusedDataset">
   </single-dataset-view>
 </ng-template>
-  
+
+<!-- modality picker / filter -->
+<ng-template #modalitySelector>
+  <mat-accordion class="flex-grow-0 flex-shrink-0">
+
+    <!-- currently selected regions -->
+    <mat-expansion-panel
+      [disabled]="regions.length === 0"
+      #selectedRegionExpansionPanel
+      hideToggle>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          {{ regions.length > 0 ? regions.length : 'No' }} region{{ regions.length > 1 ? 's' : '' }} selected
+        </mat-panel-title>
+
+        <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
+          <i class="fas fa-brain"></i>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <div class="h-10em">
+        <currently-selected-regions class="h-100 d-block">
+        </currently-selected-regions>
+      </div>
+    </mat-expansion-panel>
+
+    <!-- Filters -->
+    <mat-expansion-panel hideToggle>
+
+      <mat-expansion-panel-header class="align-items-center">
+        <mat-panel-title>
+          <span *ngIf="visibleCountedDataM && visibleCountedDataM.length > 0; else defaultCount"> 
+            {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} filtered datasets
+          </span>
+          <ng-template #defaultCount>
+            {{ dataentries.length }} related datasets
+          </ng-template>
+        </mat-panel-title>
+
+        <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
+          <i class="fas fa-filter"></i>
+        </mat-panel-description>
+
+      </mat-expansion-panel-header>
+
+      <ng-container *ngTemplateOutlet="modalityPicker">
+      </ng-container>
+
+    </mat-expansion-panel>
+  </mat-accordion>
+
+</ng-template>
+
+<!-- currently unused -->
 <ng-template #history>
   <mat-list>
     <mat-list-item *ngFor="let item of (history$ | async)">
