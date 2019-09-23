@@ -27,7 +27,6 @@ import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctVie
 import { ToastService } from "./services/toastService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { HelpDirective } from "./util/directives/help.directive";
-import { ToastContainerDirective } from "./util/directives/toastContainer.directive";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
@@ -101,7 +100,6 @@ import 'hammerjs'
     fasTooltipRemoveDirective,
     fasTooltipRemoveSignDirective,
     HelpDirective,
-    ToastContainerDirective,
     DockedContainerDirective,
     FloatingContainerDirective,
     PluginFactoryDirective,

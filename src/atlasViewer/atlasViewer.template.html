@@ -1,71 +1,7 @@
 <ng-container *ngIf="meetsRequirement; else doesNotMeetReqTemplate">
 
-<!-- if not mobile -->
-  <ng-template [ngIf]="!isMobile" [ngIfElse]="mobileTemplate">
-    <ng-container *ngTemplateOutlet="viewerBody">
-    </ng-container>
-  </ng-template>
-  
-  <!-- if mobile -->
-  <ng-template #mobileTemplate>
-    <mat-sidenav-container
-      (backdropClick)="changeMenuState({close: true})"
-      class="w-100 h-100">
-      <mat-sidenav
-        #sidenav
-        [fixedInViewport]="true"
-        [disableClose]="true"
-        [opened]="sidePanelOpen$ | async" 
-        class="mobileNavigationPanel p-2"
-        [ngStyle]="{'background-color': darktheme? '#404040' : '#F2F2F2'}" >
-  
-        <!-- 'absorbs' the auto-focus behavior -->
-        <button mat-button style="height: 0; position: absolute;"></button>
-        <logo-container class="logoContainerMobile"></logo-container>
-  
-        <tabset #mobileMenuTabs [justified]="true" class="mobileMenuTabs" >
-          <tab heading="Template">
-            <signin-banner [darktheme] = "darktheme" signinWrapper></signin-banner>
-            <layout-floating-container *ngIf="this.nehubaContainer && this.nehubaContainer.nehubaViewer">
-              <ui-status-card 
-                [selectedTemplate]="selectedTemplate" 
-                [isMobile]="isMobile"
-                [onHoverSegmentName]="this.nehubaContainer.onHoverSegmentName$ | async"
-                [nehubaViewer]="this.nehubaContainer.nehubaViewer">
-              </ui-status-card>
-            </layout-floating-container>
-          </tab>
-          <tab heading="Containers">
-            <panel-component>
-              <div class="m-2" heading>
-                Layer Browser
-              </div>
-              <div class="m-2" body>
-                <layer-browser></layer-browser>
-              </div>
-            </panel-component>
-            <div dockedContainerDirective>
-            </div>
-          </tab>
-        </tabset>
-  
-      </mat-sidenav>
-      
-      <mat-sidenav-content>
-        <ng-container *ngTemplateOutlet="viewerBody">
-  
-        </ng-container>
-      </mat-sidenav-content>
-  
-    </mat-sidenav-container>
-  
-    <div class="btnWrapper btnWrapper-lg menuButtonMobile m-2" (click)="changeMenuState()">
-      <div
-        class="shadow btn btn-sm btn-secondary rounded-circle">
-        <i class="fas fa-bars"></i>
-      </div>
-    </div>
-  </ng-template>
+  <ng-container *ngTemplateOutlet="viewerBody">
+  </ng-container>
 </ng-container>
 
 <ng-template #helpComponent>
@@ -153,19 +89,19 @@
     </ui-nehuba-container>
   
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
+
+      <!-- dataset search side nav -->
       <mat-drawer-container
         *ngIf="newViewer$ | async"
         [hasBackdrop]="false"
         class="w-100 h-100 bg-none mat-drawer-content-overflow-visible">
         <mat-drawer
           mode="push"
-          class="col-sm-10 col-md-4 col-lg-3 col-xl-2 p-2 bg-none box-shadow-none overflow-visible"
+          class="col-10 col-sm-10 col-md-4 col-lg-3 col-xl-2 p-2 bg-none box-shadow-none overflow-visible"
           [disableClose]="true"
           [autoFocus]="false"
           [opened]="true"
           #sideNavDrawer>
-          
-          <!-- template outlet -->
           <search-side-nav
             (dismiss)="sideNavDrawer.close()"
             (open)="sideNavDrawer.open()"
@@ -174,6 +110,8 @@
           </search-side-nav>
 
         </mat-drawer>
+
+        <!-- tag for opening and closing side nav -->
         <div class="d-flex h-100 align-items-start bg-none pe-none">
 
           <button mat-flat-button
@@ -294,11 +232,7 @@
         </div>
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
-  
-      <div toastContainer>
-        <div toastDirective>
-        </div>
-      </div>
+
     </layout-floating-container>
   
     <div pluginFactoryDirective>

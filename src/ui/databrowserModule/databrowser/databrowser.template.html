@@ -9,13 +9,15 @@
     </ng-content>
   </mat-card-header>
   
-  <!-- transclusion header -->
+  <!-- transclusion content prepend -->
   <ng-content select="[card-content='prepend']">
   </ng-content>
 
   <!-- modality filter -->
-  <ng-container *ngTemplateOutlet="modalitySelector">
-  </ng-container>
+  <div class="mb-1" >
+    <ng-container *ngTemplateOutlet="modalitySelector">
+    </ng-container>
+  </div>
 
   <!-- if still loading, show spinner -->
   <ng-template [ngIf]="fetchingFlag">
@@ -58,7 +60,7 @@
 
 <ng-template #modalityPicker>
   <modality-picker
-    (click)="$event.stopPropagation();"
+    iav-stop="click"
     class="w-100"
     [countedDataM]="countedDataM"
     (modalityFilterEmitter)="handleModalityFilterEvent($event)">
@@ -81,18 +83,23 @@
     <mat-card-content class="h-100 w-100 overflow-hidden">
       <cdk-virtual-scroll-viewport
         class="h-100"
-        itemSize="40">
-        <mat-nav-list dense>
+        autosize>
+        <div class="virtual-scroll-element" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackbyFn; templateCacheSize: 0; let index = index">
+
+          <!-- divider, show if not first -->
+          <mat-divider *ngIf="index !== 0"></mat-divider>
+
           <single-dataset-list-view
-            *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackbyFn; templateCacheSize: 0"
-            (click)="showFocusedDataset(dataset)"
+            class="d-block pt-1 pb-1"
             [kgSchema]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[0]"
             [kgId]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[1]"
             [dataset]="dataset"
             [ripple]="true">
     
           </single-dataset-list-view>
-        </mat-nav-list>
+          
+
+        </div>
       </cdk-virtual-scroll-viewport>
     </mat-card-content>
   </ng-container>
@@ -106,26 +113,24 @@
   </preview-component>
 </ng-template>
 
-<ng-template #detailDataset>
-  <single-dataset-view [dataset]="focusedDataset">
-  </single-dataset-view>
-</ng-template>
-
 <!-- modality picker / filter -->
 <ng-template #modalitySelector>
   <mat-accordion class="flex-grow-0 flex-shrink-0">
 
     <!-- currently selected regions -->
     <mat-expansion-panel
-      [disabled]="regions.length === 0"
+      *ngIf="regions && regions.length > 1"
       #selectedRegionExpansionPanel
       hideToggle>
       <mat-expansion-panel-header>
         <mat-panel-title>
-          {{ regions.length > 0 ? regions.length : 'No' }} region{{ regions.length > 1 ? 's' : '' }} selected
+          Regions selected
         </mat-panel-title>
 
         <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
+          <small class="text-muted mr-2">
+            {{ regions && regions.length }}
+          </small>
           <i class="fas fa-brain"></i>
         </mat-panel-description>
       </mat-expansion-panel-header>
@@ -141,15 +146,15 @@
 
       <mat-expansion-panel-header class="align-items-center">
         <mat-panel-title>
-          <span *ngIf="visibleCountedDataM && visibleCountedDataM.length > 0; else defaultCount"> 
-            {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} filtered datasets
-          </span>
-          <ng-template #defaultCount>
-            {{ dataentries.length }} related datasets
-          </ng-template>
+          Filter
         </mat-panel-title>
 
         <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
+
+          <small *ngIf="dataentries.length > 0" class="text-muted mr-2">
+            {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} / {{ dataentries.length }}
+          </small>
+
           <i class="fas fa-filter"></i>
         </mat-panel-description>
 

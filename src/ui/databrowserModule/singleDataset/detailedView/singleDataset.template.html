@@ -17,8 +17,7 @@
       <mat-grid-tile *ngFor="let kgRef of kgReference">
         <a [href]="kgRef | doiParserPipe"
           matTooltip="Explore"
-          (mousedown)="stop($event)"
-          (click)="stop($event)"
+          iav-stop="click mousedown"
           mat-icon-button
           target="_blank">
           <i class="fas fa-external-link-alt"></i>
@@ -29,8 +28,8 @@
       <mat-grid-tile *ngIf="downloadEnabled">
 
         <button
-          (mousedown)="stop($event)"
-          (click)="stop($event);toggleFav()"
+          iav-stop="click mousedown"
+          (click)="toggleFav()"
           matTooltip="Pin"
           mat-icon-button
           [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
@@ -41,8 +40,8 @@
       <!-- preview -->
       <mat-grid-tile *ngIf="preview">
         <button
-          (mousedown)="stop($event)"
-          (click)="stop($event);showPreviewList(previewFilesListTemplate)"
+          iav-stop="click mousedown"
+          (click)="showPreviewList(previewFilesListTemplate)"
           matTooltip="Preview"
           mat-icon-button>
           <i class="far fa-eye"></i>
@@ -53,8 +52,8 @@
       <mat-grid-tile *ngIf="downloadEnabled">
         <button
           matTooltip="Download"
-          (mousedown)="stop($event)"
-          (click)="stop($event);downloadZipFromKg()"
+          iav-stop="click mousedown"
+          (click)="downloadZipFromKg()"
           [disabled]="downloadInProgress"
           mat-icon-button>
           <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
@@ -72,10 +71,8 @@
   <mat-card-content *ngIf="!simpleMode">
     <div class="d-block mb-2"
       *ngFor="let publication of publications">
-      <a
-        *ngIf="publication.doi; else plainText"
-        (mousedown)="stop($event)"
-        (click)="stop($event)"
+      <a *ngIf="publication.doi; else plainText"
+        iav-stop="click mousedown"
         [href]="publication.doi | doiParserPipe"
         target="_blank">
         {{ publication.cite }}
@@ -104,10 +101,9 @@
     </a>
 
     <!-- pin data -->
-    <button
-      (mousedown)="stop($event)"
-      (click)="stop($event);toggleFav()"
-      mat-button
+    <button mat-button
+      iav-stop="click mousedown"
+      (click)="toggleFav()"
       color="primary"
       [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
       {{ (favedDataentries$ | async | datasetIsFaved : dataset) ? 'Unpin' : 'Pin' }} this dataset

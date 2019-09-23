@@ -91,7 +91,8 @@ import { CurrentlySelectedRegions } from "../viewerStateController/currentlySele
   ],
   entryComponents:[
     DataBrowser,
-    FileViewer
+    FileViewer,
+    SingleDatasetView
   ],
   providers: [
     KgSingleDatasetService

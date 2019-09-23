@@ -8,8 +8,3 @@ radio-list
 {
   display: block;
 }
-
-cdk-virtual-scroll-viewport
-{
-  width: calc(100% + 1em);
-}

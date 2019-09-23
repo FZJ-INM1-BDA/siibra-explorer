@@ -20,9 +20,12 @@ import {
   MatSliderModule,
   MatExpansionModule,
   MatGridListModule,
-  MatIconModule
+  MatIconModule,
+  MatMenuModule
 
 } from '@angular/material';
+import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
+
 import { NgModule } from '@angular/core';
 import {DragDropModule} from "@angular/cdk/drag-drop";
 
@@ -50,7 +53,9 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     DragDropModule,
     MatExpansionModule,
     MatGridListModule,
-    MatIconModule
+    MatIconModule,
+    MatMenuModule,
+    ExperimentalScrollingModule
   ],
   exports: [
     MatButtonModule,
@@ -75,7 +80,9 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     DragDropModule,
     MatExpansionModule,
     MatGridListModule,
-    MatIconModule
+    MatIconModule,
+    MatMenuModule,
+    ExperimentalScrollingModule
   ],
 })
 export class AngularMaterialModule { }

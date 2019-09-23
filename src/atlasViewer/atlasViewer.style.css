@@ -50,22 +50,6 @@ layout-floating-container
   margin: 0.8em 0.4em;
 }
 
-[toastContainer]
-{
-  pointer-events: none;
-  position : absolute;
-  bottom: 1.7em;
-  width : 100%;
-
-  display: flex;
-  flex-direction: column;
-}
-
-[toastContainer] > *
-{
-  flex : 0 0 auto;
-}
-
 div[floatingMouseContextualContainer]
 {
   position : absolute;

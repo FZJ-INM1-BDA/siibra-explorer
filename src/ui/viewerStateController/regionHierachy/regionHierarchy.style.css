@@ -23,11 +23,6 @@ div[treeContainer]
   overflow:hidden;
 }
 
-[hideScrollbarcontainer] [hideScrollbarInnerContainer]
-{
-  width: calc(100% + 2em);
-}
-
 input[type="text"]
 {
   border:none;
