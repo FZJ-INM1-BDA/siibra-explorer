@@ -3,12 +3,10 @@
 
     <!-- content append -->
     <ng-container card-content="append">
-      <mat-card-content (focusin)="showDataset = true">
-        <region-text-search-autocomplete
-          [showBadge]="true"
-          class="d-block w-100">
-        </region-text-search-autocomplete>
-      </mat-card-content>
+      <region-text-search-autocomplete
+        [showBadge]="true"
+        class="d-block w-100">
+      </region-text-search-autocomplete>
     </ng-container>
 
     <!-- footer content -->
@@ -37,9 +35,15 @@
     <!-- content prepend -->
     <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected" card-content="prepend">
       <mat-card-content>
-        <p class="font-weight-bold">
-          {{ regionsSelected.length === 0 ? 'In the current view' : regionsSelected.length === 1 ? regionsSelected[0].name : 'Multi-region selection' }}
-        </p>
+        <div class="d-flex flex-row align-items-center flex-nowrap">
+          <i *ngIf="regionsSelected.length === 1"
+            class="fas fa-brain font-2x mr-2">
+          </i>
+
+          <span class="font-weight-bold">
+            {{ regionsSelected.length === 0 ? 'In the current view' : regionsSelected.length === 1 ? regionsSelected[0].name : 'Multi-region selection' }}
+          </span>
+        </div>
       </mat-card-content>
     </ng-container>
 

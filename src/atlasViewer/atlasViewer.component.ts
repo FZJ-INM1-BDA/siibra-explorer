@@ -436,8 +436,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.onhoverLandmarksForFixed$ = this.rClContextualMenu.onShow.pipe(
-        withLatestFrom(this.onhoverLandmark$),
-        map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
+      withLatestFrom(this.onhoverLandmark$),
+      map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
     )
 
     /**
@@ -525,24 +525,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   private selectedTemplate: any
-  searchRegion(regions:any[]){
-    this.rClContextualMenu.hide()
-
-    /**
-     * TODO move this to somewhere that makes sense, not in atlas viewer (? perhaps)
-     */
-    this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
-
-    /**
-     * TODO clean up code. do not do this imperically 
-     */
-    if (this.isMobile) {
-      this.store.dispatch({
-        type : OPEN_SIDE_PANEL
-      })
-      this.mobileMenuTabs.tabs[1].active = true
-    }
-  }
 
   openLandmarkUrl(dataset) {
     this.rClContextualMenu.hide()

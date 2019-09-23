@@ -57,9 +57,12 @@ export class SingleDatasetBase implements OnInit {
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
     private cdr: ChangeDetectorRef,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
+
+    dataset?: any
   ){
     this.favedDataentries$ = this.dbService.favedDataentries$
+    if (dataset) this.dataset = dataset
   }
 
   ngOnInit() {
@@ -142,10 +145,6 @@ export class SingleDatasetBase implements OnInit {
   handlePreviewFile(file: ViewerPreviewFile){
     this.previewingFile.emit(file)
     this.singleDatasetService.previewFile(file, this.dataset)
-  }
-
-  stop(event:Event){
-    event.stopPropagation()
   }
   
   downloadZipFromKg() {

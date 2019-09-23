@@ -2,3 +2,8 @@ mat-chip-list >>> .mat-chip-list-wrapper
 {
   height: 100%;
 }
+
+mat-chip-list
+{
+  padding: 0.5rem;
+}

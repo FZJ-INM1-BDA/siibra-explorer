@@ -37,8 +37,10 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   dataentriesUpdated: EventEmitter<DataEntry[]> = new EventEmitter()
 
   public dataentries: DataEntry[] = []
-  public focusedDataset: DataEntry
 
+  /**
+   * TODO deprecated
+   */
   public currentPage: number = 0
   public hitsPerPage: number = 5
 
@@ -55,9 +57,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   @ViewChild(ModalityPicker)
   modalityPicker: ModalityPicker
-
-  @ViewChild('detailDataset', {read: TemplateRef})
-  detailDatasetTemplateRef: TemplateRef<any>
 
   public favDataentries$: Observable<DataEntry[]>
 
@@ -217,11 +216,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   resetFilters(event?:MouseEvent){
     this.clearAll()
-  }
-
-  showFocusedDataset(dataset:DataEntry){
-    this.focusedDataset = dataset
-    this.dialog.open(this.detailDatasetTemplateRef)
   }
 
   trackbyFn(index:number, dataset:DataEntry) {

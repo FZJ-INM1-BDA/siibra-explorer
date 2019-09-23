@@ -580,3 +580,27 @@ cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
 {
   overflow: visible!important;
 }
+
+mat-icon[fontset="fas"],
+mat-icon[fontset="far"]
+{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* overwrite bootstrap adding underline to anchor on hover */
+.no-hover:hover
+{
+  text-decoration: none!important;
+}
+
+.no-focus:focus
+{
+  outline: none!important;
+}
+
+.font-2x
+{
+  font-size: 200%;
+}

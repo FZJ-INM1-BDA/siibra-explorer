@@ -1,21 +1,78 @@
-<mat-list-item [matTooltip]="name">
+<div class="d-flex flex-row flex-nowrap align-items-center">
 
-  <small mat-line>
+  <!-- title -->
+  <small class="flex-grow-1 flex-shrink-1">
     {{ name }}
   </small>
 
-  <!-- preview -->
+  <!-- pin -->
   <button mat-icon-button
-    *ngIf="preview"
-    iav-stop="click mousedown"
-    (click)="showPreviewList(previewFilesListTemplate)">
-    <i class="far fa-eye"></i>
+    *ngIf="downloadEnabled"
+    class="no-focus flex-grow-0 flex-shrink-0"
+    iav-stop="click"
+    (click)="toggleFav()"
+    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
+    <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
   </button>
 
-  <button mat-icon-button>
-    <i class="fas fa-info"></i>
+
+  <!-- more menu -->
+  <button mat-icon-button
+    [matMenuTriggerFor]="singleDatasetMenu"
+    class="flex-grow-0 flex-shrink-0 no-focus">
+    <i class="fas fa-ellipsis-v"></i>
   </button>
-</mat-list-item>
+</div>
+
+<mat-menu
+  xPosition="before"
+  #singleDatasetMenu>
+
+  <!-- lazy rendering mat menu -->
+  <ng-template matMenuContent>
+
+    <!-- need to conditional render all mat-menu-item, or keyboard navigation becomes borked -->
+    <!-- see https://github.com/angular/components/issues/11652 -->
+    <button mat-menu-item
+      *ngIf="true"
+      class="no-focus"
+      (click)="showDetailInfo()">
+      <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
+      Detail
+    </button>
+  
+    <!-- Explore -->
+    <a *ngFor="let kgRef of kgReference"
+      class="no-hover"
+      [href]="kgRef | doiParserPipe"
+      target="_blank"
+      mat-menu-item>
+      <mat-icon fontSet="fas" fontIcon="fa-globe-europe"></mat-icon>
+      Explore
+      <i class="fas fa-external-link-alt"></i>
+    </a>
+  
+    <!-- preview -->
+    <button mat-menu-item
+      *ngIf="true"
+      class="no-focus"
+      (click)="showPreviewList(previewFilesListTemplate)">
+      <mat-icon fontSet="far" fontIcon="fa-eye"></mat-icon>
+      Preview
+    </button>
+    
+    <!-- download -->
+    <button mat-menu-item
+      *ngIf="downloadEnabled"
+      class="no-focus"
+      iav-stop="click"
+      (click)="downloadZipFromKg()"
+      [disabled]="downloadInProgress">
+      <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
+      Download
+    </button>
+  </ng-template>
+</mat-menu>
 
 <ng-template #previewFilesListTemplate>
   <preview-component

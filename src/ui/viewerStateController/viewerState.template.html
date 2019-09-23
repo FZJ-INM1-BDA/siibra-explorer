@@ -1,128 +1,133 @@
 <mat-card>
 
   <!-- template selection -->
-  <mat-card-content class="d-inline-flex flex-nowrap w-100">
-    <mat-form-field class="flex-grow-1">
-      <mat-label>
-        Template
-      </mat-label>
-      <mat-select
-        [value]="(templateSelected$ | async)?.name"
-        (selectionChange)="handleTemplateChange($event)"
-        (openedChange)="focused = $event">
-        <mat-option
-          *ngFor="let template of (availableTemplates$ | async)"
-          [value]="template.name">
-          {{ template.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  
-    <ng-container *ngIf="templateSelected$ | async as templateSelected">
-      <!-- show on hover component -->
-      <sleight-of-hand
-        class="d-inline-block"
-        *ngIf="templateSelected | templateParcellationHasMoreInfoPipe as moreInfo">
-  
-        <!-- shown when off -->
-        <div sleight-of-hand-front>
-          <button
-            mat-icon-button>
-            <i class="fas fa-info"></i>
-          </button>
-        </div>
-  
-        <!-- shown on hover -->
-        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
-          <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
-            <i class="fas fa-info"></i>
-          </button>
-  
-          <div class="position-relative">
-            <button class="position-relative invisible pe-none" mat-icon-button>
+  <mat-card-content class="d-inline-flex flex-column flex-nowrap w-100">
+
+    <div class="flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+      <mat-form-field class="flex-grow-1 flex-shrink-1">
+        <mat-label>
+          Template
+        </mat-label>
+        <mat-select
+          [value]="(templateSelected$ | async)?.name"
+          (selectionChange)="handleTemplateChange($event)"
+          (openedChange)="focused = $event">
+          <mat-option
+            *ngFor="let template of (availableTemplates$ | async)"
+            [value]="template.name">
+            {{ template.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    
+      <ng-container *ngIf="templateSelected$ | async as templateSelected">
+        <!-- show on hover component -->
+        <sleight-of-hand
+          class="d-inline-block flex-grow-0 flex-shrink-0"
+          *ngIf="templateSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+    
+          <!-- shown when off -->
+          <div sleight-of-hand-front>
+            <button
+              mat-icon-button>
               <i class="fas fa-info"></i>
             </button>
-  
-            <single-dataset-view
-              *ngFor="let originDataset of moreInfo.originDatasets"
-              class="position-absolute left-0 top-0 w-40em"
-              [name]="moreInfo.name"
-              [description]="moreInfo.description"
-              [publications]="moreInfo.publications"
-              [kgSchema]="originDataset && originDataset.kgSchema"
-              [kgId]="originDataset && originDataset.kgId">
-            </single-dataset-view>
           </div>
-          
-        </div>
-      </sleight-of-hand>
-  
-    </ng-container>
-  </mat-card-content>
-
-  <!-- parcellation selection -->
-  <mat-card-content class="d-inline-flex flex-nowrap w-100">
-
-    <mat-form-field
-      *ngIf="templateSelected$ | async as templateSelected"
-      class="flex-grow-1">
-      <mat-label>
-        Parcellation
-      </mat-label>
-      <mat-select
-        (selectionChange)="handleParcellationChange($event)"
-        [value]="(parcellationSelected$ | async)?.name"
-        (openedChange)="focused = $event">
-        <mat-option
-          *ngFor="let parcellation of (templateSelected.parcellations | appendTooltipTextPipe)"
-          [value]="parcellation.name">
-          {{ parcellation.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  
-    <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
-      <!-- show on hover component -->
-      <sleight-of-hand
-        class="d-inline-block"
-        *ngIf="parcellationSelected | templateParcellationHasMoreInfoPipe as moreInfo">
-  
-        <!-- shown when off -->
-        <div sleight-of-hand-front>
-          <button
-            mat-icon-button>
-            <i class="fas fa-info"></i>
-          </button>
-        </div>
-  
-        <!-- shown on hover -->
-        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
-          <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
-            <i class="fas fa-info"></i>
-          </button>
-  
-          <div class="position-relative">
-            <button class="position-relative invisible pe-none" mat-icon-button>
+    
+          <!-- shown on hover -->
+          <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+            <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
               <i class="fas fa-info"></i>
             </button>
-  
-            <single-dataset-view
-              *ngFor="let originDataset of moreInfo.originDatasets"
-              class="position-absolute left-0 top-0 w-40em"
-              [name]="moreInfo.name"
-              [description]="moreInfo.description"
-              [publications]="moreInfo.publications"
-              [kgSchema]="originDataset && originDataset.kgSchema"
-              [kgId]="originDataset && originDataset.kgId">
-            </single-dataset-view>
+    
+            <div class="position-relative">
+              <button class="position-relative invisible pe-none" mat-icon-button>
+                <i class="fas fa-info"></i>
+              </button>
+    
+              <single-dataset-view
+                *ngFor="let originDataset of moreInfo.originDatasets"
+                class="position-absolute left-0 top-0 w-40em"
+                [name]="moreInfo.name"
+                [description]="moreInfo.description"
+                [publications]="moreInfo.publications"
+                [kgSchema]="originDataset && originDataset.kgSchema"
+                [kgId]="originDataset && originDataset.kgId">
+              </single-dataset-view>
+            </div>
+            
           </div>
-        </div>
-      </sleight-of-hand>
-    </ng-container>
+        </sleight-of-hand>
+    
+      </ng-container>
+    </div>
+
+    <!-- parcellation selection -->
+    <div class="flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+      <mat-form-field
+        *ngIf="templateSelected$ | async as templateSelected"
+        class="flex-grow-1 flex-shrink-1">
+        <mat-label>
+          Parcellation
+        </mat-label>
+        <mat-select
+          (selectionChange)="handleParcellationChange($event)"
+          [value]="(parcellationSelected$ | async)?.name"
+          (openedChange)="focused = $event">
+          <mat-option
+            *ngFor="let parcellation of (templateSelected.parcellations | appendTooltipTextPipe)"
+            [value]="parcellation.name">
+            {{ parcellation.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    
+      <ng-container *ngIf="parcellationSelected$ | async as parcellationSelected">
+        <!-- show on hover component -->
+        <sleight-of-hand
+          class="d-inline-block flex-grow-0 flex-shrink-0"
+          *ngIf="parcellationSelected | templateParcellationHasMoreInfoPipe as moreInfo">
+    
+          <!-- shown when off -->
+          <div sleight-of-hand-front>
+            <button
+              mat-icon-button>
+              <i class="fas fa-info"></i>
+            </button>
+          </div>
+    
+          <!-- shown on hover -->
+          <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+            <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+              <i class="fas fa-info"></i>
+            </button>
+    
+            <div class="position-relative">
+              <button class="position-relative invisible pe-none" mat-icon-button>
+                <i class="fas fa-info"></i>
+              </button>
+    
+              <single-dataset-view
+                *ngFor="let originDataset of moreInfo.originDatasets"
+                class="position-absolute left-0 top-0 w-40em"
+                [name]="moreInfo.name"
+                [description]="moreInfo.description"
+                [publications]="moreInfo.publications"
+                [kgSchema]="originDataset && originDataset.kgSchema"
+                [kgId]="originDataset && originDataset.kgId">
+              </single-dataset-view>
+            </div>
+          </div>
+        </sleight-of-hand>
+      </ng-container>
+    </div>
+
+    <div class="flex-grow-1 flex-shrink-0">
+      <ng-content select="[card-content='append']">
+      </ng-content>
+    </div>
   </mat-card-content>
 
-  <ng-content select="[card-content='append']">
-  </ng-content>
 
   <mat-card-footer>
     <ng-content select="[card-footer]">
