@@ -102,6 +102,7 @@
 
     <!-- pin data -->
     <button mat-button
+      *ngIf="downloadEnabled"
       iav-stop="click mousedown"
       (click)="toggleFav()"
       color="primary"

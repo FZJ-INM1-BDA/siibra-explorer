@@ -4,6 +4,9 @@
   "species": "Rat",
   "useTheme": "dark",
   "ngId": "template",
+  "otherNgIds":[
+    "templateUnMasked"
+  ],
   "nehubaConfigURL": "nehubaConfig/waxholmRatV2_0NehubaConfig",
   "parcellations": [
     {
