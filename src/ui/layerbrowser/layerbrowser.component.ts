@@ -54,8 +54,12 @@ export class LayerBrowser implements OnInit, OnDestroy{
       map(templateSelected => {
         if (!templateSelected) return []
         if (this.advancedMode) return []
+
+        const { ngId , otherNgIds = []} = templateSelected
+
         return [
-          templateSelected.ngId,
+          ngId,
+          ...otherNgIds,
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([
               curr.ngId,
