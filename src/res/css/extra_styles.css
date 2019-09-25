@@ -604,3 +604,8 @@ mat-icon[fontset="far"]
 {
   font-size: 200%;
 }
+
+.no-max-width
+{
+  max-width: none!important;
+}
