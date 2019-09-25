@@ -9,6 +9,7 @@
           Template
         </mat-label>
         <mat-select
+          panelClass="no-max-width"
           [value]="(templateSelected$ | async)?.name"
           (selectionChange)="handleTemplateChange($event)"
           (openedChange)="focused = $event">
@@ -71,6 +72,7 @@
           Parcellation
         </mat-label>
         <mat-select
+          panelClass="no-max-width"
           (selectionChange)="handleParcellationChange($event)"
           [value]="(parcellationSelected$ | async)?.name"
           (openedChange)="focused = $event">

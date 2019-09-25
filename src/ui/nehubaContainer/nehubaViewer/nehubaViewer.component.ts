@@ -1,14 +1,15 @@
 import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2 } from "@angular/core";
-import 'third_party/export_nehuba/main.bundle.js'
-import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import { fromEvent, interval, Observable, Subscription } from 'rxjs'
-import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, takeWhile } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
-import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
+import { fromEvent, interval, Subscription } from 'rxjs'
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { buffer, map, filter, debounceTime } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { takeOnePipe } from "../nehubaContainer.component";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
+
+import 'third_party/export_nehuba/main.bundle.js'
+import 'third_party/export_nehuba/chunk_worker.bundle.js'
 
 /**
  * no selector is needed, as currently, nehubaviewer is created dynamically
@@ -725,21 +726,13 @@ export class NehubaViewerUnit implements OnDestroy{
     this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer, ...rest})=>{
       
       const {name = 'unnamed'} = layer
-      if( segmentId && segmentId < 65500 ) {
-        const map = this.multiNgIdsLabelIndexMap.get(name)
-        const region = map && map.get(segmentId)
-        this.mouseoverSegmentEmitter.emit({
-          layer,
-          segment: region,
-          segmentId
-        })
-      }else{
-        this.mouseoverSegmentEmitter.emit({
-          layer,
-          segment: null,
-          segmentId
-        })
-      }
+      const map = this.multiNgIdsLabelIndexMap.get(name)
+      const region = map && map.get(segmentId)
+      this.mouseoverSegmentEmitter.emit({
+        layer,
+        segment: region,
+        segmentId
+      })
     })
 
     // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer

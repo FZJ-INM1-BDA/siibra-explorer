@@ -1,7 +1,7 @@
 import { Component, ViewChild, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, ElementRef } from "@angular/core";
 import { NehubaViewerUnit, computeDistance } from "./nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, USER_LANDMARKS, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "../../services/stateStore.service";
+import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, SELECT_LANDMARKS, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "src/services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
 import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, withLatestFrom, buffer, tap, switchMapTo, shareReplay, mapTo, takeUntil } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
@@ -656,8 +656,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
                     : null)
             )
         }else{
-          if (this.nehubaViewer && this.nehubaViewer.removeSpatialSearch3DLandmarks instanceof Function)
+          if (this.nehubaViewer && this.nehubaViewer.removeSpatialSearch3DLandmarks instanceof Function) {
             this.nehubaViewer.removeSpatialSearch3DLandmarks()
+          }
         }
       })
     )
