@@ -3,7 +3,6 @@ import { DataEntry } from "src/services/stateStore.service";
 import { Subscription, merge, Observable } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
-import { MatDialog, MatExpansionPanel } from "@angular/material";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { scan, shareReplay } from "rxjs/operators";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
@@ -22,8 +21,6 @@ const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 
 export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
-  @ViewChild('selectedRegionExpansionPanel') selectedRegionExpansionPanel: MatExpansionPanel
-
   @Input()
   public regions: any[] = []
 
@@ -37,12 +34,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   dataentriesUpdated: EventEmitter<DataEntry[]> = new EventEmitter()
 
   public dataentries: DataEntry[] = []
-
-  /**
-   * TODO deprecated
-   */
-  public currentPage: number = 0
-  public hitsPerPage: number = 5
 
   public fetchingFlag: boolean = false
   public fetchError: boolean = false
@@ -75,7 +66,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   constructor(
     private dbService: DatabrowserService,
     private cdr:ChangeDetectorRef,
-    private dialog: MatDialog,
     private singleDatasetSservice: KgSingleDatasetService
   ){
     this.favDataentries$ = this.dbService.favedDataentries$
@@ -86,8 +76,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   }
 
   ngOnChanges(changes){
-
-    if (this.regions.length === 0) this.selectedRegionExpansionPanel && (this.selectedRegionExpansionPanel.expanded = false)
 
     this.regions = this.regions.map(r => {
       /**
@@ -127,6 +115,7 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
       .finally(() => {
         this.fetchingFlag = false
         this.dataentriesUpdated.emit(this.dataentries)
+        this.resetFilters()
         this.cdr.markForCheck()
       })
 
@@ -142,7 +131,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
         // this.dbService.selectedRegions$,
         this.dbService.fetchDataObservable$
       ).subscribe(() => {
-        this.resetCurrentPage()
         /**
          * Only reset modality picker
          * resetting all creates infinite loop
@@ -171,14 +159,12 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
       }
     })
     this.visibleCountedDataM = []
-    this.resetCurrentPage()
   }
 
   handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
     this.cdr.markForCheck()
-    this.resetCurrentPage()
   }
 
   retryFetchData(event: MouseEvent){
@@ -204,14 +190,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
   onShowPreviewDataset(payload: {datasetName:string, event:MouseEvent}){
     const { datasetName, event } = payload
     this.filePreviewName = datasetName
-  }
-
-  /**
-   * when filter changes, it is necessary to set current page to 0,
-   * or one may overflow and see no dataset
-   */
-  resetCurrentPage(){
-    this.currentPage = 0
   }
 
   resetFilters(event?:MouseEvent){

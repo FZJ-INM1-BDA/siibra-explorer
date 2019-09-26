@@ -6,7 +6,7 @@ import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/ser
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS } from "src/services/state/viewerState.store";
-import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.component";
+import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.base";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
 

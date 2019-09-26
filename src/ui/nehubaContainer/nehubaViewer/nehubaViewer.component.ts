@@ -23,7 +23,6 @@ const scanFn : (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelInde
   const { layer } = curr
   const { name } = layer
   const foundIndex = acc.findIndex(({ layer }) => layer.name === name)
-  debugger
   if (foundIndex < 0) return acc.concat(curr)
   else return acc.map((item, idx) => idx === foundIndex
     ? {

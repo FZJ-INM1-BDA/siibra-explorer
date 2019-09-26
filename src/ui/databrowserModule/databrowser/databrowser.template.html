@@ -117,30 +117,6 @@
 <ng-template #modalitySelector>
   <mat-accordion class="flex-grow-0 flex-shrink-0">
 
-    <!-- currently selected regions -->
-    <mat-expansion-panel
-      *ngIf="regions && regions.length > 1"
-      #selectedRegionExpansionPanel
-      hideToggle>
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Regions selected
-        </mat-panel-title>
-
-        <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
-          <small class="text-muted mr-2">
-            {{ regions && regions.length }}
-          </small>
-          <i class="fas fa-brain"></i>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
-      <div class="h-10em">
-        <currently-selected-regions class="h-100 d-block">
-        </currently-selected-regions>
-      </div>
-    </mat-expansion-panel>
-
     <!-- Filters -->
     <mat-expansion-panel hideToggle>
 

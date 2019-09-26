@@ -553,6 +553,11 @@ cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
   transform: translateX(3em);
 }
 
+.translate-x-4-n
+{
+  transform: translateX(-2em);
+}
+
 .translate-x-6-n
 {
   transform: translateX(-3em);
