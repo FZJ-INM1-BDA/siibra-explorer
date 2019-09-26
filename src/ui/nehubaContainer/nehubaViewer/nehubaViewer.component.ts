@@ -1,7 +1,7 @@
-import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2 } from "@angular/core";
-import { fromEvent, interval, Subscription } from 'rxjs'
+import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2, OnInit } from "@angular/core";
+import { fromEvent, Subscription, Subject } from 'rxjs'
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter, debounceTime } from "rxjs/operators";
+import { map, filter, debounceTime, scan } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { takeOnePipe } from "../nehubaContainer.component";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
@@ -10,6 +10,28 @@ import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 import 'third_party/export_nehuba/main.bundle.js'
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
+
+interface LayerLabelIndex {
+  layer: { 
+    name: string
+  }
+
+  labelIndicies: number[]
+}
+
+const scanFn : (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex[] = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
+  const { layer } = curr
+  const { name } = layer
+  const foundIndex = acc.findIndex(({ layer }) => layer.name === name)
+  debugger
+  if (foundIndex < 0) return acc.concat(curr)
+  else return acc.map((item, idx) => idx === foundIndex
+    ? {
+        ...item,
+        labelIndicies: [...new Set([...item.labelIndicies, ...curr.labelIndicies])]
+      }
+    : item)
+}
 
 /**
  * no selector is needed, as currently, nehubaviewer is created dynamically
@@ -21,7 +43,9 @@ import 'third_party/export_nehuba/chunk_worker.bundle.js'
   ]
 })
 
-export class NehubaViewerUnit implements OnDestroy{
+export class NehubaViewerUnit implements OnInit, OnDestroy{
+
+  private subscriptions: Subscription[] = []
   
   @Output() nehubaReady: EventEmitter<null> = new EventEmitter()
   @Output() layersChanged: EventEmitter<null> = new EventEmitter()
@@ -193,78 +217,12 @@ export class NehubaViewerUnit implements OnDestroy{
         this.loadLayer(_)
       })
     )
-
-    this.ondestroySubscriptions.push(
-
-      fromEvent(this.workerService.worker,'message').pipe(
-        filter((message:any) => {
-  
-          if(!message){
-            // console.error('worker response message is undefined', message)
-            return false
-          }
-          if(!message.data){
-            // console.error('worker response message.data is undefined', message.data)
-            return false
-          }
-          if(message.data.type !== 'CHECKED_MESH'){
-            /* worker responded with not checked mesh, no need to act */
-            return false
-          }
-          return true
-        }),
-        map(e => e.data),
-        buffer(interval(1000)),
-        map(arr => arr.reduce((acc:Map<string,Set<number>>,curr)=> {
-          
-          const newMap = new Map(acc)
-          const set = newMap.get(curr.baseUrl)
-          if(set){
-            set.add(curr.checkedIndex)
-          }else{
-            newMap.set(curr.baseUrl,new Set([curr.checkedIndex]))
-          }
-          return newMap
-        }, new Map()))
-      ).subscribe(map => {
-        
-        Array.from(map).forEach(item => {
-          const baseUrl : string = item[0]
-          const set : Set<number> = item[1]
-  
-          /* validation passed, add to safeMeshSet */
-          const oldset = this.workerService.safeMeshSet.get(baseUrl)
-          if(oldset){
-            this.workerService.safeMeshSet.set(baseUrl, new Set([...oldset, ...set]))
-          }else{
-            this.workerService.safeMeshSet.set(baseUrl, new Set([...set]))
-          }
-  
-          /* if the active parcellation is the current parcellation, load the said mesh */
-          const baseUrlIsInLoadedBaseUrlList = new Set([...this._baseUrls]).has(baseUrl)
-          const baseUrlParcellationId = this._baseUrlToParcellationIdMap.get(baseUrl)
-          if( baseUrlIsInLoadedBaseUrlList && baseUrlParcellationId){
-            this.nehubaViewer.setMeshesToLoad([...this.workerService.safeMeshSet.get(baseUrl)], {
-              name : baseUrlParcellationId
-            })
-          }
-        })
-      })
-    )
   }
 
   private _baseUrlToParcellationIdMap:Map<string, string> = new Map()
   private _baseUrls: string[] = []
 
-  get numMeshesToBeLoaded():number{
-    if(!this._baseUrls || this._baseUrls.length === 0)
-      return 0
-
-    return this._baseUrls.reduce((acc, curr) => {
-      const mappedSet = this.workerService.safeMeshSet.get(curr)
-      return acc + ((mappedSet && mappedSet.size) || 0)
-    } ,0)
-  }
+  public numMeshesToBeLoaded: number = 0
 
   public applyPerformanceConfig ({ gpuLimit }: Partial<ViewerConfiguration>) {
     if (gpuLimit && this.nehubaViewer) {
@@ -348,6 +306,14 @@ export class NehubaViewerUnit implements OnDestroy{
     this._multiNgIdColorMap = val
   }
 
+  private loadMeshes$: Subject<{labelIndicies: number[], layer: { name: string }}> = new Subject()
+  private loadMeshes(labelIndicies: number[], { name }){
+    this.loadMeshes$.next({
+      labelIndicies,
+      layer: { name }
+    })
+  }
+
   public mouseOverSegment: number | null
   public mouseOverLayer: {name:string,url:string}| null
 
@@ -411,7 +377,28 @@ export class NehubaViewerUnit implements OnDestroy{
     )
   }
 
+  ngOnInit(){
+    this.subscriptions.push(
+      this.loadMeshes$.pipe(
+        scan(scanFn, [])
+      ).subscribe(layersLabelIndex => {
+        let totalMeshes = 0
+        for (const layerLayerIndex of layersLabelIndex){
+          const { layer, labelIndicies } = layerLayerIndex
+          totalMeshes += labelIndicies.length
+          this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
+        }
+        // TODO implement total mesh to be loaded and mesh loading UI
+        // this.numMeshesToBeLoaded = totalMeshes
+      })
+    )
+  }
+
   ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
+
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
     })
@@ -825,28 +812,12 @@ export class NehubaViewerUnit implements OnDestroy{
       this._baseUrls.push(baseUrl)
       this._baseUrlToParcellationIdMap.set(baseUrl, id)
 
-      /* load meshes */
-      /* TODO could be a bug where user loads new parcellation, but before the worker could completely populate the list */
-      const set = this.workerService.safeMeshSet.get(baseUrl)
-      if(set){
-        this.nehubaViewer.setMeshesToLoad([...set],{
-          name : id
-        })
-      }else{
-        if(newlayer){
-          this.zone.runOutsideAngular(() => 
-            this.workerService.worker.postMessage({
-              type : 'CHECK_MESHES',
-              parcellationId : id,
-              baseUrl,
-              indices : [
-                ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
-                ...getAuxilliaryLabelIndices()
-              ]
-            })
-          )
-        }
-      }
+      const indicies = [
+        ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
+        ...getAuxilliaryLabelIndices()
+      ]
+
+      this.loadMeshes(indicies, { name: id })
     })
 
     const obj = Array.from(this.multiNgIdsLabelIndexMap.keys()).map(ngId => {
