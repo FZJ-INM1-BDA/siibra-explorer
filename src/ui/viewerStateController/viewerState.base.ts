@@ -1,4 +1,4 @@
-import { Component, ViewChild, TemplateRef, OnInit } from "@angular/core";
+import { ViewChild, TemplateRef, OnInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, shareReplay, filter } from "rxjs/operators";
@@ -8,19 +8,12 @@ import { MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/mat
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 
+
 const compareWith = (o, n) => !o || !n
-  ? false
-  : o.name === n.name
+? false
+: o.name === n.name
 
-@Component({
-  selector: 'viewer-state-controller',
-  templateUrl: './viewerState.template.html',
-  styleUrls: [
-    './viewerState.style.css'
-  ]
-})
-
-export class ViewerStateController implements OnInit{
+export class ViewerStateBase implements OnInit{
 
   @ViewChild('savedRegionBottomSheetTemplate', {read:TemplateRef}) savedRegionBottomSheetTemplate: TemplateRef<any>
 

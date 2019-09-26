@@ -126,6 +126,17 @@
 
           </button>
 
+          <mat-card *ngIf="!sideNavDrawer.opened"
+            (click)="sideNavDrawer.open()"
+            mat-ripple
+            class="pe-all mt-4 muted translate-x-4-n">
+            <mat-card-content>
+              <viewer-state-mini>
+              </viewer-state-mini>
+            </mat-card-content>
+            <mat-card-footer></mat-card-footer>
+          </mat-card>
+
           <!-- TODO clean up menu icon -->
         </div>
       </mat-drawer-container>

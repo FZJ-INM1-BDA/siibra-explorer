@@ -51,7 +51,10 @@ import { ScrollingModule } from "@angular/cdk/scrolling"
 import { HttpClientModule } from "@angular/common/http";
 import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
-import { ViewerStateController } from "./viewerStateController/viewerState.component";
+
+import { ViewerStateController } from 'src/ui/viewerStateController/viewerStateCFull/viewerState.component'
+import { ViewerStateMini } from 'src/ui/viewerStateController/viewerStateCMini/viewerStateMini.component'
+
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 import { PluginBtnFabColorPipe } from "src/util/pipes/pluginBtnFabColor.pipe";
 import { KgSearchBtnColorPipe } from "src/util/pipes/kgSearchBtnColor.pipe";
@@ -102,6 +105,7 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     SinglePanel,
     CurrentLayout,
     ViewerStateController,
+    ViewerStateMini,
 
     MaximmisePanelButton,
     SearchSideNav,
@@ -165,6 +169,7 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     StatusCardComponent,
     ElementOutClickDirective,
     SearchSideNav,
+    ViewerStateMini,
   ]
 })
 

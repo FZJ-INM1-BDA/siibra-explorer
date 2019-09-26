@@ -30,20 +30,64 @@
     [parcellation]="viewerStateController.parcellationSelected$ | async"
     [regions]="viewerStateController.regionsSelected$ | async"
     (dataentriesUpdated)="availableDatasets = $event.length">
-    
 
     <!-- content prepend -->
     <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected" card-content="prepend">
-      <mat-card-content>
-        <div class="d-flex flex-row align-items-center flex-nowrap">
-          <i *ngIf="regionsSelected.length === 1"
-            class="fas fa-brain font-2x mr-2">
-          </i>
+      <mat-card-content [ngClass]="{'h-10em': regionsSelected.length > 1}">
 
-          <span class="font-weight-bold">
-            {{ regionsSelected.length === 0 ? 'In the current view' : regionsSelected.length === 1 ? regionsSelected[0].name : 'Multi-region selection' }}
-          </span>
-        </div>
+        <!-- show when no region is selected -->
+        <ng-template [ngIf]="regionsSelected.length === 0" [ngIfElse]="showBrainRegions">
+          <div class="d-flex flex-row align-items-center flex-nowrap">
+            <span class="font-weight-bold">
+              In the current view
+            </span>
+          </div>
+        </ng-template>
+
+        <!-- show when regions are selected -->
+        <ng-template #showBrainRegions>
+
+          <!-- single region -->
+          <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
+
+            <!-- selected brain region -->
+            <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+              <i class="fas fa-brain font-2x mr-2"></i>
+  
+              <span class="font-weight-bold">
+                {{ regionsSelected[0].name }}
+              </span>
+  
+              <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+
+          <!-- multi region -->
+          <ng-template #multiRegionTemplate>
+            <cdk-virtual-scroll-viewport class="h-100" autosize>
+              <div *cdkVirtualFor="let region of regionsSelected; let index = index">
+                <!-- divider if index !== 0 -->
+                <mat-divider *ngIf="index !== 0"></mat-divider>
+  
+                <!-- selected brain region -->
+                <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+                  <i class="fas fa-brain font-2x mr-2"></i>
+      
+                  <span class="font-weight-bold">
+                    {{ region.name }}
+                  </span>
+      
+                  <button (click)="removeRegion(region)" mat-icon-button>
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </cdk-virtual-scroll-viewport>
+          </ng-template>
+
+        </ng-template>
       </mat-card-content>
     </ng-container>
 

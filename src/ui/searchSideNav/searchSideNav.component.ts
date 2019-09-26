@@ -5,6 +5,7 @@ import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { Observable, Subscription } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
+import { VIEWERSTATE_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 
 @Component({
   selector: 'search-side-nav',
@@ -28,9 +29,9 @@ export class SearchSideNav implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    store$: Store<any>
+    private store$: Store<any>
   ){
-    this.autoOpenSideNav$ = store$.pipe(
+    this.autoOpenSideNav$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
       map(arr => arr.length),
@@ -72,6 +73,13 @@ export class SearchSideNav implements OnInit, OnDestroy {
         top: '1em'
       },
       disableClose: true
+    })
+  }
+
+  removeRegion(region: any){
+    this.store$.dispatch({
+      type: VIEWERSTATE_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY,
+      payload: { region }
     })
   }
 }

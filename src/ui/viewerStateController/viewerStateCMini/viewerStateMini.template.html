@@ -1,0 +1,7 @@
+<span *ngIf="templateSelected$ | async as templateSelected">
+  {{ templateSelected.name }}
+</span>
+<br>
+<span *ngIf="parcellationSelected$ | async as parcellationSelected">
+  {{ parcellationSelected.name }}
+</span>
