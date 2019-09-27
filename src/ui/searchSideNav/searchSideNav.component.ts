@@ -6,6 +6,7 @@ import { Observable, Subscription } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { VIEWERSTATE_ACTION_TYPES } from "../viewerStateController/viewerState.base";
+import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 
 @Component({
   selector: 'search-side-nav',
@@ -64,7 +65,7 @@ export class SearchSideNav implements OnInit, OnDestroy {
       return  
     }
     if (this.layerBrowserDialogRef) return
-
+    
     this.dismiss.emit(true)
     this.layerBrowserDialogRef = this.dialog.open(LayerBrowser, {
       hasBackdrop: false,
@@ -82,4 +83,6 @@ export class SearchSideNav implements OnInit, OnDestroy {
       payload: { region }
     })
   }
+
+  trackByFn = trackRegionBy
 }

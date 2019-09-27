@@ -196,7 +196,7 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
     this.clearAll()
   }
 
-  trackbyFn(index:number, dataset:DataEntry) {
+  trackByFn(index:number, dataset:DataEntry){
     return dataset.id
   }
 }

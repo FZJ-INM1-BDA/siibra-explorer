@@ -3,7 +3,7 @@ import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
 import { Subscription, Observable, combineLatest } from "rxjs";
-import { filter, map, shareReplay, distinctUntilChanged } from "rxjs/operators";
+import { filter, map, shareReplay, distinctUntilChanged, throttleTime, debounceTime } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
@@ -119,7 +119,11 @@ export class LayerBrowser implements OnInit, OnDestroy{
 
   ngOnInit(){
     this.subscriptions.push(
-      this.nonBaseNgLayers$.subscribe(layers => this.nonBaseLayersChanged.emit(layers))
+      this.nonBaseNgLayers$.pipe(
+        // on switching template, non base layer will fire 
+        // debounce to ensure that the non base layer is indeed an extra layer
+        debounceTime(160)
+      ).subscribe(layers => this.nonBaseLayersChanged.emit(layers))
     )
     this.subscriptions.push(
       this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state)
@@ -206,10 +210,6 @@ export class LayerBrowser implements OnInit, OnDestroy{
         : this.forceShowSegmentCurrentState === false
           ? 'muted'
           : 'red' 
-  }
-
-  get isMobile(){
-    return this.constantsService.mobile
   }
 
   public matTooltipPosition: string = 'below'

@@ -73,10 +73,6 @@ export class SplashScreen implements AfterViewInit{
   get totalTemplates(){
     return this.constanceService.templateUrls.length
   }
-
-  get isMobile(){
-    return this.constantsService.mobile
-  }
 }
 
 @Pipe({

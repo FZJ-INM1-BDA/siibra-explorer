@@ -1,8 +1,7 @@
 import { Action } from '@ngrx/store'
 import { TemplateRef } from '@angular/core';
 
-const agreedCookieKey = 'agreed-cokies'
-const aggredKgTosKey = 'agreed-kg-tos'
+import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
 
 const defaultState : UIStateInterface = {
   mouseOverSegments: [],
@@ -18,8 +17,8 @@ const defaultState : UIStateInterface = {
   /**
    * replace with server side logic (?)
    */
-  agreedCookies: localStorage.getItem(agreedCookieKey) === 'agreed',
-  agreedKgTos: localStorage.getItem(aggredKgTosKey) === 'agreed'
+  agreedCookies: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
+  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
 }
 
 export function uiState(state:UIStateInterface = defaultState,action:UIAction){
@@ -72,7 +71,7 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(agreedCookieKey, 'agreed')
+      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
       return {
         ...state,
         agreedCookies: true
@@ -81,7 +80,7 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(aggredKgTosKey, 'agreed')
+      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
       return {
         ...state,
         agreedKgTos: true

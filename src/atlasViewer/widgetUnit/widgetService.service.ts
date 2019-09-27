@@ -1,4 +1,4 @@
-import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver, Injector } from "@angular/core";
+import { ComponentRef, ComponentFactory, Injectable, ViewContainerRef, ComponentFactoryResolver, Injector, OnDestroy } from "@angular/core";
 import { WidgetUnit } from "./widgetUnit.component";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 import { Subscription, BehaviorSubject } from "rxjs";
@@ -7,7 +7,7 @@ import { Subscription, BehaviorSubject } from "rxjs";
   providedIn : 'root'
 })
 
-export class WidgetServices{
+export class WidgetServices implements OnDestroy{
 
   public floatingContainer : ViewContainerRef
   public dockedContainer : ViewContainerRef
@@ -28,6 +28,20 @@ export class WidgetServices{
     ){
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
     this.minimisedWindow$ = new BehaviorSubject(this.minimisedWindow)
+
+    this.subscriptions.push(
+      this.constantServce.useMobileUI$.subscribe(bool => this.useMobileUI = bool)
+    )
+  }
+
+  private subscriptions: Subscription[] = []
+
+  public useMobileUI: boolean = false
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
   }
 
   clearAllWidgets(){
@@ -64,7 +78,7 @@ export class WidgetServices{
     const component = this.widgetUnitFactory.create(this.injector)
     const _option = getOption(options)
 
-    if(this.constantServce.mobile){
+    if(this.useMobileUI){
       _option.state = 'docked'
     }
 

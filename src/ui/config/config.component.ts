@@ -1,14 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Store, select } from '@ngrx/store';
-import { ViewerConfiguration, ACTION_TYPES } from 'src/services/state/viewerConfig.store'
+import { ViewerConfiguration, VIEWER_CONFIG_ACTION_TYPES } from 'src/services/state/viewerConfig.store'
 import { Observable, Subscription, combineLatest } from 'rxjs';
-import { map, distinctUntilChanged, startWith, debounceTime } from 'rxjs/operators';
+import { map, distinctUntilChanged, startWith, debounceTime, tap } from 'rxjs/operators';
 import { MatSlideToggleChange, MatSliderChange } from '@angular/material';
 import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
 import { isIdentityQuat } from '../nehubaContainer/util';
+import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 
 const GPU_TOOLTIP = `GPU TOOLTIP`
 const ANIMATION_TOOLTIP = `ANIMATION_TOOLTIP`
+const MOBILE_UI_TOOLTIP = `MOBILE_UI_TOOLTIP`
 const ROOT_TEXT_ORDER : [string, string, string, string] = ['Coronal', 'Sagittal', 'Axial', '3D']
 const OBLIQUE_ROOT_TEXT_ORDER : [string, string, string, string] = ['Slice View 1', 'Slice View 2', 'Slice View 3', '3D']
 
@@ -24,6 +26,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
 
   public GPU_TOOLTIP = GPU_TOOLTIP
   public ANIMATION_TOOLTIP = ANIMATION_TOOLTIP
+  public MOBILE_UI_TOOLTIP = MOBILE_UI_TOOLTIP
   public supportedPanelModes = SUPPORTED_PANEL_MODES
 
   /**
@@ -31,6 +34,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
    */
   public gpuLimit$: Observable<number>
 
+  public useMobileUI$: Observable<boolean>
   public animationFlag$: Observable<boolean>
   private subscriptions: Subscription[] = []
 
@@ -45,7 +49,13 @@ export class ConfigComponent implements OnInit, OnDestroy{
 
   private viewerObliqueRotated$: Observable<boolean>
 
-  constructor(private store: Store<ViewerConfiguration>) {
+  constructor(
+    private store: Store<ViewerConfiguration>,
+    private constantService: AtlasViewerConstantsServices  
+  ) {
+
+    this.useMobileUI$ = this.constantService.useMobileUI$
+
     this.gpuLimit$ = this.store.pipe(
       select('viewerConfigState'),
       map((config:ViewerConfiguration) => config.gpuLimit),
@@ -100,10 +110,20 @@ export class ConfigComponent implements OnInit, OnDestroy{
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
+  public toggleMobileUI(ev: MatSlideToggleChange){
+    const { checked } = ev
+    this.store.dispatch({
+      type: VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI,
+      payload: {
+        useMobileUI: checked
+      }
+    })
+  }
+
   public toggleAnimationFlag(ev: MatSlideToggleChange ){
     const { checked } = ev
     this.store.dispatch({
-      type: ACTION_TYPES.UPDATE_CONFIG,
+      type: VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG,
       config: {
         animation: checked
       }
@@ -112,7 +132,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
 
   public handleMatSliderChange(ev:MatSliderChange){
     this.store.dispatch({
-      type: ACTION_TYPES.UPDATE_CONFIG,
+      type: VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG,
       config: {
         gpuLimit: ev.value * 1e6
       }

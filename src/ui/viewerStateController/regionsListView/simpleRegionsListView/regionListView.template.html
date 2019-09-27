@@ -1,0 +1,29 @@
+<mat-chip-list class="p-1 d-block h-100 w-100">
+  <cdk-virtual-scroll-viewport
+    [orientation]="horizontal ? 'horizontal' : 'vertical'"
+    class="w-100 h-100"
+    minBufferPx="1000"
+    maxBufferPx="1500"
+    itemSize="200">
+
+    <mat-chip *cdkVirtualFor="let region of regionsSelected"
+      [ngClass]="{'w-100': !horizontal }">
+      <span class="flex-grow-1 flex-shrink-1 text-truncate">
+        {{ region.name }}
+      </span>
+      <button
+        *ngIf="region.position"
+        iav-stop="mousedown click"
+        (click)="gotoRegion.emit(region)"
+        mat-icon-button>
+        <i class="fas fa-map-marked-alt"></i>
+      </button>
+      <button
+        iav-stop="mousedown click"
+        (click)="deselectRegion.emit(region)"
+        mat-icon-button>
+        <i class="fas fa-trash"></i>
+      </button>
+    </mat-chip>
+  </cdk-virtual-scroll-viewport>
+</mat-chip-list>

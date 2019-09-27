@@ -6,6 +6,8 @@ import { shareReplay, withLatestFrom, map, distinctUntilChanged, filter, take, t
 import { generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from "../stateStore.service";
 import { SELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION } from "./viewerState.store";
 import { DialogService } from "../dialogService.service";
+import { VIEWER_CONFIG_ACTION_TYPES } from "./viewerConfig.store";
+import { LOCAL_STORAGE_CONST } from "src/util//constants";
 
 interface UserConfigState{
   savedRegionsSelection: RegionSelection[]
@@ -257,6 +259,35 @@ export class UserConfigStateUseEffect implements OnDestroy{
     )
 
     this.subscriptions.push(
+      this.store$.pipe(
+        select('viewerConfigState')
+      ).subscribe(({ gpuLimit, animation }) => {
+
+        if (gpuLimit) {
+          window.localStorage.setItem(LOCAL_STORAGE_CONST.GPU_LIMIT, gpuLimit.toString())
+        }
+        if (typeof animation !== 'undefined' && animation !== null) {
+          window.localStorage.setItem(LOCAL_STORAGE_CONST.ANIMATION, animation.toString())
+        }
+      })
+    )
+
+    this.subscriptions.push(
+      this.actions$.pipe(
+
+        ofType(VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI),
+        map((action: any) => {
+          const { payload } = action
+          const { useMobileUI } = payload
+          return useMobileUI
+        }),
+        filter(bool => bool !== null)
+      ).subscribe((bool: boolean) => {
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.MOBILE_UI, JSON.stringify(bool))
+      })
+    )
+
+    this.subscriptions.push(
       this.actions$.pipe(
         ofType(ACTION_TYPES.UPDATE_REGIONS_SELECTIONS)
       ).subscribe(action => {
@@ -275,11 +306,11 @@ export class UserConfigStateUseEffect implements OnDestroy{
         /**
          * TODO save server side on per user basis
          */
-        window.localStorage.setItem(LOCAL_STORAGE_KEY.SAVED_REGION_SELECTIONS, JSON.stringify(simpleSRSs))
+        window.localStorage.setItem(LOCAL_STORAGE_CONST.SAVED_REGION_SELECTIONS, JSON.stringify(simpleSRSs))
       })
     )
 
-    const savedSRSsString = window.localStorage.getItem(LOCAL_STORAGE_KEY.SAVED_REGION_SELECTIONS)
+    const savedSRSsString = window.localStorage.getItem(LOCAL_STORAGE_CONST.SAVED_REGION_SELECTIONS)
     const savedSRSs:SimpleRegionSelection[] = savedSRSsString && JSON.parse(savedSRSsString)
 
     this.restoreSRSsFromStorage$ = viewerState$.pipe(
@@ -333,8 +364,4 @@ export class UserConfigStateUseEffect implements OnDestroy{
 
   @Effect()
   public restoreSRSsFromStorage$: Observable<any>
-}
-
-const LOCAL_STORAGE_KEY = {
-  SAVED_REGION_SELECTIONS: 'fzj.xg.iv.SAVED_REGION_SELECTIONS'
 }

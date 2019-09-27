@@ -5,7 +5,10 @@ const VALID_EVENTNAMES = new Set([
   'mouseup',
   'click',
   'mouseenter',
-  'mouseleave'
+  'mouseleave',
+  'touchstart',
+  'touchmove',
+  'touchend'
 ])
 
 const stopPropagation = ev => ev.stopPropagation()

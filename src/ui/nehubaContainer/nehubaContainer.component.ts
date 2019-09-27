@@ -163,6 +163,9 @@ export class NehubaContainer implements OnInit, OnDestroy{
     public bottomSheet: MatBottomSheet,
     private kgSingleDataset: KgSingleDatasetService
   ){
+
+    this.useMobileUI$ = this.constantService.useMobileUI$
+    
     this.favDataEntries$ = this.store.pipe(
       select('dataStore'),
       select('favDataEntries')
@@ -445,9 +448,7 @@ export class NehubaContainer implements OnInit, OnDestroy{
     )
   }
 
-  get isMobile(){
-    return this.constantService.mobile
-  }
+  public useMobileUI$: Observable<boolean>
 
   private removeExistingPanels() {
     const element = this.nehubaViewer.nehubaViewer.ngviewer.layout.container.componentValue.element as HTMLElement

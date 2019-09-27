@@ -36,8 +36,24 @@
   </button>
 </div>
 
+<ng-template #regionHierarchyDialog>
+  <div class="h-100 d-flex flex-column">
+    <mat-dialog-content class="flex-grow-1 flex-shrink-1">
+      <ng-container *ngTemplateOutlet="regionHierarchy">
+      </ng-container>
+    </mat-dialog-content>
+  
+    <mat-dialog-actions class="justify-content-center">
+      <button mat-dialog-close mat-flat-button>
+        close
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
 <ng-template #regionHierarchy>
   <region-hierarchy
+    [useMobileUI]="useMobileUI$ | async"
     [selectedRegions]="regionsSelected$ | async | filterNull"
     (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
     (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"

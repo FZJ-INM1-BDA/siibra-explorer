@@ -1,5 +1,4 @@
 <mat-tab-group>
-
   <!-- viewer preference -->
   <mat-tab label="Viewer Preference">
     
@@ -154,39 +153,53 @@
 
   <!-- hard ware -->
   <mat-tab label="Hardware">
-    <div class="d-flex align-items-center">
-      <mat-slide-toggle
-        [checked]="animationFlag$ | async"
-        (change)="toggleAnimationFlag($event)">
-        Enable Animation
-      </mat-slide-toggle>
-      <small [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
-    </div>
-    <div class="d-flex flex-row align-items-center justify-content start">
-      <label
-        class="m-0 d-inline-block flex-grow-0 flex-shrink-0"
-        for="gpuLimitSlider">
-        GPU Limit
-        <small [matTooltip]="GPU_TOOLTIP" class="ml-2 fas fa-question"></small>
-      </label>
-      <mat-slider
-        class="flex-grow-1 flex-shrink-1 ml-2 mr-2"
-        id="gpuLimitSlider"
-        name="gpuLimitSlider"
-        thumbLabel="true"
-        min="100"
-        max="1000"
-        [step]="stepSize"
-        (change)="handleMatSliderChange($event)"
-        [value]="gpuLimit$ | async">
-      </mat-slider>
-      <span class="d-inline-block flex-grow-0 flex-shrink-0 w-10em">
-        {{ gpuLimit$ | async }} MB
-      </span>
-    </div>
+    <!-- wrapper + margin control -->
+    <div class="m-4">
 
-    
+      <!-- use mobile UI -->
+      <div class="d-flex mb-2 align-items-center">
+        <mat-slide-toggle
+          [checked]="useMobileUI$ | async"
+          (change)="toggleMobileUI($event)">
+          Enable Mobile UI
+        </mat-slide-toggle>
+        <small iav-stop="click mousedown mouseup" [matTooltip]="MOBILE_UI_TOOLTIP" class="ml-2 fas fa-question"></small>
+      </div>
+
+      <!-- animation toggle -->
+      <div class="d-flex mb-2 align-items-center">
+        <mat-slide-toggle
+          [checked]="animationFlag$ | async"
+          (change)="toggleAnimationFlag($event)">
+          Enable Animation
+        </mat-slide-toggle>
+        <small iav-stop="click mousedown mouseup" [matTooltip]="ANIMATION_TOOLTIP" class="ml-2 fas fa-question"></small>
+      </div>
+
+      <!-- GPU limit -->
+      <div class="d-flex flex-row align-items-center justify-content start">
+        <label
+          class="m-0 d-inline-block flex-grow-0 flex-shrink-0"
+          for="gpuLimitSlider">
+          GPU Limit
+          <small iav-stop="click mousedown mouseup" [matTooltip]="GPU_TOOLTIP" class="ml-2 fas fa-question"></small>
+        </label>
+        <mat-slider
+          class="flex-grow-1 flex-shrink-1 ml-2 mr-2"
+          id="gpuLimitSlider"
+          name="gpuLimitSlider"
+          thumbLabel="true"
+          min="100"
+          max="1000"
+          [step]="stepSize"
+          (change)="handleMatSliderChange($event)"
+          [value]="gpuLimit$ | async">
+        </mat-slider>
+        <span class="d-inline-block flex-grow-0 flex-shrink-0 w-10em">
+          {{ gpuLimit$ | async }} MB
+        </span>
+      </div>
+    </div>
   </mat-tab>
-
 </mat-tab-group>
 

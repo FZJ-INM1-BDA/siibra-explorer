@@ -260,8 +260,12 @@ export class NgViewerUseEffect implements OnDestroy{
       })
     )
 
-    this.toggleMaximiseCycleMessage$ = this.toggleMaximiseMode$.pipe(
-      filter(() => !this.constantService.mobile),
+    this.toggleMaximiseCycleMessage$ = combineLatest(
+      this.toggleMaximiseMode$,
+      this.constantService.useMobileUI$
+    ).pipe(
+      filter(([_, useMobileUI]) => !useMobileUI),
+      map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === SINGLE_PANEL),
       mapTo({
         type: SNACKBAR_MESSAGE,

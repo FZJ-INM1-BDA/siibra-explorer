@@ -5,7 +5,7 @@ import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.co
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { SplashScreen, GetTemplateImageSrcPipe, ImgSrcSetPipe } from "./nehubaContainer/splashScreen/splashScreen.component";
 import { LayoutModule } from "src/layouts/layout.module";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
 import { filterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
@@ -68,10 +68,16 @@ import {ElementOutClickDirective} from "src/util/directives/elementOutClick.dire
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
 
+import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHierarchy.component'
+import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
+import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
+import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
+
 @NgModule({
   imports : [
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     LayoutModule,
     ComponentsModule,
     DatabrowserModule,
@@ -106,9 +112,12 @@ import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
     CurrentLayout,
     ViewerStateController,
     ViewerStateMini,
-
+    RegionHierarchy,
+    CurrentlySelectedRegions,
     MaximmisePanelButton,
     SearchSideNav,
+    RegionTextSearchAutocomplete,
+    RegionsListView,
 
     /* pipes */
     GroupDatasetByRegion,

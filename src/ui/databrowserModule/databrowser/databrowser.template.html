@@ -84,7 +84,8 @@
       <cdk-virtual-scroll-viewport
         class="h-100"
         autosize>
-        <div class="virtual-scroll-element" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackbyFn; templateCacheSize: 0; let index = index">
+        <div class="virtual-scroll-element"
+          *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 0; let index = index">
 
           <!-- divider, show if not first -->
           <mat-divider *ngIf="index !== 0"></mat-divider>

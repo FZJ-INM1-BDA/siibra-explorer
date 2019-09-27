@@ -59,9 +59,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   darktheme: boolean = false
 
   @HostBinding('attr.ismobile')
-  get isMobile(){
-    return this.constantsService.mobile
-  }
+  public ismobile: boolean = false
 
   meetsRequirement: boolean = true
 
@@ -303,6 +301,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
+      this.constantsService.useMobileUI$.subscribe(bool => this.ismobile = bool)
+    )
+
+    this.subscriptions.push(
       this.snackbarMessage$.pipe(
         // angular material issue
         // see https://github.com/angular/angular/issues/15634
@@ -324,7 +326,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.showHelp$.subscribe(() => {
         this.helpDialogRef = this.matDialog.open(this.helpComponent, {
-          autoFocus: false
+          autoFocus: false,
+          panelClass: ['col-12','col-sm-12','col-md-8','col-lg-6','col-xl-4']
         })
       })
     )
@@ -472,18 +475,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       return false
     }
 
-    if(this.constantsService.mobile){
-      /**
-       * TODO change to snack bar in future
-       */
-      
-      // this.modalService.show(ModalUnit,{
-      //   initialState: {
-      //     title: this.constantsService.mobileWarningHeader,
-      //     body: this.constantsService.mobileWarning
-      //   }
-      // })
-    }
     return true
   }
 
