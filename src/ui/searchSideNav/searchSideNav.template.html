@@ -74,13 +74,15 @@
   
                 <!-- selected brain region -->
                 <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-                  <i class="fas fa-brain font-2x mr-2"></i>
+                  <i class="flex-grow-0 flex-shrink-0 fas fa-brain font-2x mr-2"></i>
       
-                  <span class="font-weight-bold">
+                  <span class="flex-grow-1 flex-shrink-1 font-weight-bold">
                     {{ region.name }}
                   </span>
       
-                  <button (click)="removeRegion(region)" mat-icon-button>
+                  <button mat-icon-button
+                    class="flex-grow-0 flex-shrink-0"
+                    (click)="removeRegion(region)" >
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
