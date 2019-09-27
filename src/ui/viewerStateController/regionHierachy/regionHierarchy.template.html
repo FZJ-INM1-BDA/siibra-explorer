@@ -10,30 +10,58 @@
     [placeholder]="placeHolderText"/>
 </mat-form-field>
 
-<div class="d-flex flex-grow-1 flex-shrink-1">
+<ng-template #noRegionSelected>
+  No region selected
+</ng-template>
 
-  <div class="d-flex flex-column" selectedRegionsChipsContainer>
-    <div class="flex-grow-0 flex-shrink-0 d-flex align-items-center justify-content-between">
-      <div>
-        {{ selectedRegions.length }} {{ selectedRegions.length > 1 ? 'regions' : 'region' }} selected
-      </div>
-      <div
-        (click)="clearRegions($event)"
-        [ngClass]="{ 'invisible': selectedRegions.length === 0 }"
-        class="btn btn-link">
+<ng-template #regionSelectedText>
+  <span class="text-muted">
+    <ng-template [ngIf]="selectedRegions.length > 0" [ngIfElse]="noRegionSelected">
+      {{ (selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch).length }} / {{ selectedRegions.length }} 
+    </ng-template>
+  </span>
+</ng-template>
+
+<div
+  [ngClass]="{'flex-column': useMobileUI, 'flex-row': !useMobileUI}"
+  class="d-flex flex-grow-1 flex-shrink-1">
+
+  <!-- selected regions -->
+  <div
+    [ngClass]="{'flex-basis-20-pc': !useMobileUI, 'flex-basis-auto': useMobileUI}"
+    class="d-flex flex-column flex-grow-0 flex-shrink-0">
+
+    <div class="flex-grow-0 flex-shrink-0 d-flex flex-row align-items-center">
+
+      <button mat-button
+        *ngIf="selectedRegions.length > 0"
+        (click)="clearRegions($event)">
         clear all
-      </div>
+      </button>
+
+      <span class="m-1">
+        <ng-container *ngTemplateOutlet="regionSelectedText">
+        </ng-container>
+      </span>
     </div>
 
-    <div hideScrollbarcontainer>
-      <currently-selected-regions
-        class="d-block h-100"
-        hideScrollbarInnerContainer>
-      </currently-selected-regions>
+    <mat-divider></mat-divider>
+
+    <div *ngIf="(selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch).length > 0"
+      class="mt-2 min-h-8"
+      hideScrollbarcontainer>
+      <regions-list-view class="d-block h-100"
+        (gotoRegion)="gotoRegion($event)"
+        (deselectRegion)="deselectRegion($event)"
+        [horizontal]="useMobileUI"
+        [regionsSelected]="selectedRegions | filterRowsByVisbilityPipe : null : filterTreeBySearch">
+
+      </regions-list-view>
     </div>
   </div>
 
-  <div hideScrollbarContainer>
+  <!-- region tree -->
+  <div class="flex-grow-1 flex-shrink-1" hideScrollbarContainer>
     <div
       class="d-flex flex-column h-100"
       treeContainer

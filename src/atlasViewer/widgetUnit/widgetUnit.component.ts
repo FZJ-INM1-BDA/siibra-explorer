@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, ElementRef, OnInit, OnDestroy } from "@angular/core";
+import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, OnInit, OnDestroy } from "@angular/core";
 
 import { WidgetServices } from "./widgetService.service";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
@@ -29,6 +29,12 @@ export class WidgetUnit implements OnInit, OnDestroy{
   isMinimised: string
 
   isMinimised$: Observable<boolean>
+
+  public useMobileUI$: Observable<boolean>
+
+  public hoverableConfig = {
+    translateY: -1
+  }
 
   /**
    * Timed alternates of blinkOn property should result in attention grabbing blink behaviour
@@ -96,10 +102,10 @@ export class WidgetUnit implements OnInit, OnDestroy{
   private subscriptions: Subscription[] = []
 
   public id: string 
-  constructor(
-    private constantsService: AtlasViewerConstantsServices
-  ){
+  constructor(private constantsService: AtlasViewerConstantsServices){
     this.id = Date.now().toString()
+
+    this.useMobileUI$ = this.constantsService.useMobileUI$
   }
 
   ngOnInit(){
@@ -177,8 +183,4 @@ export class WidgetUnit implements OnInit, OnDestroy{
   }
 
   position : [number,number] = [400,100]
-
-  get isMobile(){
-    return this.constantsService.mobile
-  }
 }

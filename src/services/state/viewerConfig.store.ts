@@ -1,8 +1,10 @@
 import { Action } from "@ngrx/store";
+import { LOCAL_STORAGE_CONST } from "src/util/constants";
 
 export interface ViewerConfiguration{
   gpuLimit: number
   animation: boolean
+  useMobileUI: boolean
 }
 
 interface ViewerConfigurationAction extends Action{
@@ -20,31 +22,54 @@ export const CONFIG_CONSTANTS = {
   defaultAnimation: true
 }
 
-export const ACTION_TYPES = {
+const ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
-  CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`
+  CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`,
+  SET_MOBILE_UI: 'SET_MOBILE_UI'
 }
 
-export const LOCAL_STORAGE_CONST = {
-  GPU_LIMIT: 'iv-gpulimit',
-  ANIMATION: 'iv-animationFlag'
-}
-
+// get gpu limit
 const lsGpuLimit = localStorage.getItem(LOCAL_STORAGE_CONST.GPU_LIMIT)
 const lsAnimationFlag = localStorage.getItem(LOCAL_STORAGE_CONST.ANIMATION)
 const gpuLimit = lsGpuLimit && !isNaN(Number(lsGpuLimit))
   ? Number(lsGpuLimit)
   : CONFIG_CONSTANTS.defaultGpuLimit
 
+// get animation flag
 const animation = lsAnimationFlag && lsAnimationFlag === 'true'
   ? true
   : lsAnimationFlag === 'false'
     ? false
     : CONFIG_CONSTANTS.defaultAnimation
 
-export function viewerConfigState(prevState:ViewerConfiguration = {animation, gpuLimit}, action:ViewerConfigurationAction) {
+// get mobile ui setting
+// UA sniff only if not useMobileUI not explicitly set
+const getIsMobile = () => {
+  const ua = window && window.navigator && window.navigator.userAgent
+    ? window.navigator.userAgent
+    : ''
+
+  /* https://stackoverflow.com/a/25394023/6059235 */
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
+}
+const useMobileUIStroageValue = window.localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI) 
+
+const onLoadViewerconfig: ViewerConfiguration = {
+  animation,
+  gpuLimit,
+  useMobileUI: (useMobileUIStroageValue && useMobileUIStroageValue === 'true') || getIsMobile()
+}
+
+export function viewerConfigState(prevState:ViewerConfiguration = onLoadViewerconfig, action:ViewerConfigurationAction) {
   switch (action.type) {
+    case ACTION_TYPES.SET_MOBILE_UI:
+      const { payload } = action
+      const { useMobileUI } = payload
+      return {
+        ...prevState,
+        useMobileUI
+      }
     case ACTION_TYPES.UPDATE_CONFIG:
       return {
         ...prevState,
@@ -61,7 +86,8 @@ export function viewerConfigState(prevState:ViewerConfiguration = {animation, gp
         ...prevState,
         gpuLimit: newGpuLimit
       }
-    default:
-      return prevState
+    default: return prevState
   }
 }
+
+export const VIEWER_CONFIG_ACTION_TYPES = ACTION_TYPES

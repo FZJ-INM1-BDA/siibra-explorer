@@ -3,7 +3,7 @@ import { CommonModule } from "@angular/common";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { ComponentsModule } from "src/components/components.module";
 import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FormsModule } from "@angular/forms";
 import { PathToNestedChildren } from "./util/pathToNestedChildren.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
 import { FilterDataEntriesbyMethods } from "./util/filterDataEntriesByMethods.pipe";
@@ -26,21 +26,18 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
 import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
-import { RegionTextSearchAutocomplete } from "../viewerStateController/regionSearch/regionSearch.component";
-import { RegionHierarchy } from "../viewerStateController/regionHierachy/regionHierarchy.component";
+
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
-import { CurrentlySelectedRegions } from "../viewerStateController/currentlySelectedRegions/currentlySelectedRegions.component";
 
 @NgModule({
   imports:[
     ChartsModule,
     CommonModule,
     ComponentsModule,
-    ReactiveFormsModule,
     ScrollingModule,
     FormsModule,
     UtilModule,
@@ -58,9 +55,6 @@ import { CurrentlySelectedRegions } from "../viewerStateController/currentlySele
     DedicatedViewer,
     SingleDatasetView,
     SingleDatasetListView,
-    RegionTextSearchAutocomplete,
-    RegionHierarchy,
-    CurrentlySelectedRegions,
 
     /**
      * pipes
@@ -85,9 +79,6 @@ import { CurrentlySelectedRegions } from "../viewerStateController/currentlySele
     ModalityPicker,
     FilterDataEntriesbyMethods,
     FileViewer,
-    RegionTextSearchAutocomplete,
-    RegionHierarchy,
-    CurrentlySelectedRegions,
   ],
   entryComponents:[
     DataBrowser,

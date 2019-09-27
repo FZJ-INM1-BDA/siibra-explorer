@@ -6,7 +6,7 @@
 
 <ng-template #helpComponent>
   <h2 mat-dialog-title>About Interactive Viewer</h2>
-  <mat-dialog-content class="h-90vh w-50vw">
+  <mat-dialog-content>
     <mat-tab-group>
       <mat-tab label="Help">
         <help-component>
@@ -26,7 +26,7 @@
 
   <mat-dialog-actions class="justify-content-center">
     <button
-      mat-stroked-button
+      mat-flat-button
       (click)="closeModal('help')"
       cdkFocusInitial>
       close

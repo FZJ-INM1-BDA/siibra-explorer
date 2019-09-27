@@ -3,7 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { DESELECT_REGIONS } from "src/services/state/viewerState.store";
-import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.base";
+import { VIEWERSTATE_ACTION_TYPES } from "src/ui/viewerStateController/viewerState.base";
 
 @Component({
   selector: 'currently-selected-regions',

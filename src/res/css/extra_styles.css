@@ -488,7 +488,7 @@ bs-modal-backdrop.modal-backdrop
     cursor: pointer;
 }
 
-cdk-virtual-scroll-viewport > .cdk-virtual-scroll-content-wrapper
+cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .cdk-virtual-scroll-content-wrapper
 {
   width: 100%;
 }
@@ -613,4 +613,19 @@ mat-icon[fontset="far"]
 .no-max-width
 {
   max-width: none!important;
+}
+
+.min-h-2
+{
+  min-height: 1rem;
+}
+
+.min-h-4
+{
+  min-height: 2rem;
+}
+
+.min-h-8
+{
+  min-height: 4rem;
 }

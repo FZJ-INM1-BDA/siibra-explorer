@@ -7,6 +7,7 @@ import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.base";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
 
@@ -24,11 +25,17 @@ export class RegionTextSearchAutocomplete{
   @Input() public showAutoComplete: boolean = true
 
   @ViewChild('autoTrigger', {read: ElementRef}) autoTrigger: ElementRef 
-  @ViewChild('regionHierarchy', {read:TemplateRef}) regionHierarchyTemplate: TemplateRef<any>
+  @ViewChild('regionHierarchyDialog', {read:TemplateRef}) regionHierarchyDialogTemplate: TemplateRef<any>
+
+  public useMobileUI$: Observable<boolean>
+
   constructor(
     private store$: Store<any>,
     private dialog: MatDialog,
+    private constantService: AtlasViewerConstantsServices
   ){
+
+    this.useMobileUI$ = this.constantService.useMobileUI$
 
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -131,8 +138,9 @@ export class RegionTextSearchAutocomplete{
   }
 
   showHierarchy(event:MouseEvent){
-    const dialog = this.dialog.open(this.regionHierarchyTemplate, {
-      height: '90vh',
+    // mat-card-content has a max height of 65vh
+    const dialog = this.dialog.open(this.regionHierarchyDialogTemplate, {
+      height: '65vh',
       width: '90vw'
     })
 

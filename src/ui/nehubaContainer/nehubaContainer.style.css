@@ -184,7 +184,7 @@ maximise-panel-button
     transform 250ms ease-in-out;
 
   position: absolute;
-  top: 0;
+  bottom: 0;
   right: 0;
 }
 
@@ -201,12 +201,4 @@ maximise-panel-button:hover,
 {
   opacity: 1.0 !important;
   pointer-events: all !important;
-}
-
-
-maximise-panel-button.touch-top.touch-right.onHover,
-maximise-panel-button.touch-top.touch-right:hover,
-:host-context(:not([ismobile="true"])) maximise-panel-button.touch-top.touch-right
-{
-  transform: translate(-3em, 3em)
 }

@@ -12,14 +12,18 @@ div[treeContainer]
   background-color:rgba(12,12,12,0.8); */
 }
 
-[selectedRegionsChipsContainer]
+.flex-basis-20-pc
 {
-  flex: 0 0 20%;
+  flex-basis: 20%;
+}
+
+.flex-basis-auto
+{
+  flex-basis: auto;
 }
 
 [hideScrollbarcontainer]
 {
-  flex: 1 1 0;
   overflow:hidden;
 }
 

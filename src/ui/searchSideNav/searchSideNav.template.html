@@ -66,13 +66,14 @@
 
           <!-- multi region -->
           <ng-template #multiRegionTemplate>
-            <cdk-virtual-scroll-viewport class="h-100" autosize>
-              <div *cdkVirtualFor="let region of regionsSelected; let index = index">
+            <cdk-virtual-scroll-viewport class="h-100" itemSize="78">
+              <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
+                class="region-wrapper d-flex flex-column" >
                 <!-- divider if index !== 0 -->
-                <mat-divider *ngIf="index !== 0"></mat-divider>
+                <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="index !== 0"></mat-divider>
   
                 <!-- selected brain region -->
-                <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+                <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
                   <i class="fas fa-brain font-2x mr-2"></i>
       
                   <span class="font-weight-bold">

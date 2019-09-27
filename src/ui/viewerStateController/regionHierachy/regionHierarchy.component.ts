@@ -35,6 +35,9 @@ const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (n
 export class RegionHierarchy implements OnInit, AfterViewInit{
 
   @Input()
+  public useMobileUI: boolean = false
+
+  @Input()
   public selectedRegions: any[] = []
 
   @Input()
@@ -218,4 +221,8 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   public deselectRegion(region: any) {
     this.singleClickRegion.emit(region)
   }
+}
+
+export function trackRegionBy(index: number, region: any){
+  return region.labelIndex || region.id
 }

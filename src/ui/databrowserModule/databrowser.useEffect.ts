@@ -3,9 +3,25 @@ import { Store, select } from "@ngrx/store";
 import { Actions, ofType, Effect } from "@ngrx/effects";
 import { DATASETS_ACTIONS_TYPES, DataEntry } from "src/services/state/dataStore.store";
 import { Observable, of, from, merge, Subscription } from "rxjs";
-import { withLatestFrom, map, catchError, filter, switchMap, scan, share, switchMapTo, shareReplay } from "rxjs/operators";
+import { withLatestFrom, map, catchError, filter, switchMap, scan } from "rxjs/operators";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { getIdFromDataEntry } from "./databrowser.service";
+import { LOCAL_STORAGE_CONST } from "src/util/constants";
+
+const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
+  map(string => JSON.parse(string)),
+  map(arr => {
+    if (arr.every(item => item.id )) return arr
+    throw new Error('Not every item has id and/or name defined')
+  }),
+  catchError(err => {
+    /**
+     * TODO emit proper error
+     * possibly wipe corrupted local stoage here?
+     */
+    return of(null)
+  })
+)
 
 @Injectable({
   providedIn: 'root'
@@ -79,11 +95,8 @@ export class DataBrowserUseEffect implements OnDestroy{
 
 
     this.subscriptions.push(
-      merge(
-        this.favDataset$,
-        this.unfavDataset$
-      ).pipe(
-        switchMapTo(this.favDataEntries$)
+      this.favDataEntries$.pipe(
+        filter(v => !!v)
       ).subscribe(favDataEntries => {
         /**
          * only store the minimal data in localstorage/db, hydrate when needed
@@ -99,20 +112,7 @@ export class DataBrowserUseEffect implements OnDestroy{
       })
     )
 
-    this.savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
-      map(string => JSON.parse(string)),
-      map(arr => {
-        if (arr.every(item => item.id )) return arr
-        throw new Error('Not every item has id and/or name defined')
-      }),
-      catchError(err => {
-        /**
-         * TODO emit proper error
-         * possibly wipe corrupted local stoage here?
-         */
-        return of(null)
-      })
-    )
+    this.savedFav$ = savedFav$
 
     this.onInitGetFav$ = this.savedFav$.pipe(
       filter(v => !!v),
@@ -159,8 +159,4 @@ export class DataBrowserUseEffect implements OnDestroy{
 
   @Effect()
   public toggleDataset$: Observable<any>
-}
-
-const LOCAL_STORAGE_CONST = {
-  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET'
 }

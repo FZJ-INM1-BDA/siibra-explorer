@@ -1,7 +1,7 @@
 <ng-template #container>
 </ng-template>
 
-<ui-splashscreen (contextmenu)="$event.stopPropagation();" *ngIf="!viewerLoaded">
+<ui-splashscreen iav-stop="mousedown mouseup touchstart touchmove touchend" (contextmenu)="$event.stopPropagation();" *ngIf="!viewerLoaded">
 </ui-splashscreen>
 
 <!-- spatial landmarks overlay -->
@@ -22,10 +22,10 @@
   </div>
 </current-layout>
 
-<layout-floating-container *ngIf="viewerLoaded && !isMobile">
+<layout-floating-container *ngIf="viewerLoaded">
   
   <!-- tmp fab -->
-  <div class="m-3 load-fav-dataentries-fab position-absolute pe-all">
+  <div class="mb-5 mr-3 load-fav-dataentries-fab position-absolute pe-all">
     <button
       (click)="bottomSheet.open(savedDatasets)"
       [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
@@ -41,8 +41,9 @@
 
   <!-- StatusCard container-->
   <ui-status-card
+    *ngIf="!(useMobileUI$ | async)"
     [selectedTemplate]="selectedTemplate"
-    [isMobile]="isMobile"
+    [isMobile]="useMobileUI$ | async"
     [onHoverSegmentName]="onHoverSegmentName$ | async"
     [nehubaViewer]="nehubaViewer">
   </ui-status-card>
@@ -53,7 +54,7 @@
 
 <!-- mobile nub, allowing for ooblique slicing in mobile -->
 <mobile-overlay
-  *ngIf="isMobile && viewerLoaded"
+  *ngIf="(useMobileUI$ | async) && viewerLoaded"
   [tunableProperties]="tunableMobileProperties"
   (deltaValue)="handleMobileOverlayEvent($event)">
   <div class="base" delta>
@@ -76,6 +77,7 @@
   <div
     (contextmenu)="$event.stopPropagation(); $event.preventDefault();"
     [ngStyle]="panelMode$ | async | mobileControlNubStylePipe"
+    *ngIf="(panelMode$ | async) !== 'SINGLE_PANEL'"
     mobileObliqueCtrl
     initiator>
     <button mat-mini-fab color="primary">
@@ -193,7 +195,9 @@
     </mat-card>
 
     <!-- render all fav dataset as mat list -->
+    <!-- TODO maybe use virtual scroll here? -->
     <mat-list-item
+      mat-ripple
       class="align-items-center"
       *ngFor="let ds of (favDataEntries$ | async)"
       role="listitem">

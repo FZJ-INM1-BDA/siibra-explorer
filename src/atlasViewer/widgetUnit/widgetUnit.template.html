@@ -18,24 +18,28 @@
     </div>
     <div icons>
       <i
-        *ngIf="!isMobile"
+        *ngIf="useMobileUI$ | async"
         (click)="widgetServices.minimise(this)"
         class="fas fa-window-minimize"
-        [hoverable] ="{translateY: -1}">
+        [hoverable] ="hoverableConfig">
 
       </i>
-      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
-        (click) = "dock($event)" 
-        class = "fas fa-window-minimize" 
-        hoverable></i>
-      <i *ngIf = "state === 'docked' && !isMobile"
-        (click) = "undock($event)" 
-        class = "fas fa-window-restore"
-        hoverable></i>
-      <i *ngIf = "exitable"
-        (click) = "exit($event)" 
-        class = "fas fa-times" 
-        [hoverable] ="{translateY: -1}"></i>
+
+      <ng-container *ngIf="!(useMobileUI$ | async)">
+        <i *ngIf="canBeDocked && state === 'floating'"
+          (click)="dock($event)" 
+          class="fas fa-window-minimize" 
+          [hoverable]="hoverableConfig"></i>
+        <i *ngIf="state === 'docked'"
+          (click)="undock($event)" 
+          class="fas fa-window-restore"
+          [hoverable]="hoverableConfig"></i>
+      </ng-container>
+
+      <i *ngIf="exitable"
+        (click)="exit($event)" 
+        class="fas fa-times" 
+        [hoverable] ="hoverableConfig"></i>
     </div>
     <progress-bar [progress]="progressIndicator" *ngIf="showProgress" progressBar>
 

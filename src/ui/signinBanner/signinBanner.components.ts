@@ -18,14 +18,11 @@ export class SigninBanner{
 
   @Input() darktheme: boolean
 
-  public isMobile: boolean
-
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private authService: AuthService,
     private dialog: MatDialog
   ){
-    this.isMobile = this.constantService.mobile
   }
 
   /**

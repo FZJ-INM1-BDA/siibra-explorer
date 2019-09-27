@@ -1,9 +1,8 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface } from "../services/stateStore.service";
-import { Subject, Observable } from "rxjs";
-import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
-import { map, shareReplay, filter } from "rxjs/operators";
+import { Subject, Observable, Subscription } from "rxjs";
+import { map, shareReplay, filter, tap } from "rxjs/operators";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 
 export const CM_THRESHOLD = `0.05`
@@ -13,11 +12,12 @@ export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r 
   providedIn : 'root'
 })
 
-export class AtlasViewerConstantsServices{
+export class AtlasViewerConstantsServices implements OnDestroy {
 
   public darktheme: boolean = false
   public darktheme$: Observable<boolean>
-  public mobile: boolean
+
+  public useMobileUI$: Observable<boolean>
   public loadExportNehubaPromise : Promise<boolean>
 
   public getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
@@ -72,16 +72,6 @@ export class AtlasViewerConstantsServices{
   })
 
   public templateUrls = Array(100)
-
-  private _templateUrls = [
-    // 'res/json/infant.json',
-    'res/json/bigbrain.json',
-    'res/json/colin.json',
-    'res/json/MNI152.json',
-    'res/json/waxholmRatV2_0.json',
-    'res/json/allenMouse.json',
-    // 'res/json/test.json'
-  ]
 
   /* to be provided by KG in future */
   private _mapArray : [string,string[]][] = [
@@ -190,12 +180,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     ['h', 'show help'],
     ['?', 'show help'],
     ['o', 'toggle perspective/orthographic']
-  ] 
-  get showHelpGeneralMap() {
-    return this.mobile
-      ? this.showHelpGeneralMobile
-      : this.showHelpGeneralDesktop
-  }
+  ]
+
+  public showHelpGeneralMap = this.showHelpGeneralDesktop
 
   private showHelpSliceViewMobile = [
     ['drag', 'pan']
@@ -204,11 +191,8 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     ['drag', 'pan'],
     ['shift + drag', 'oblique slice']
   ]
-  get showHelpSliceViewMap() {
-    return this.mobile
-      ? this.showHelpSliceViewMobile
-      : this.showHelpSliceViewDesktop
-  }
+
+  public showHelpSliceViewMap = this.showHelpSliceViewDesktop
 
   private showHelpPerspectiveMobile = [
     ['drag', 'change perspective view']
@@ -217,11 +201,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   private showHelpPerspectiveDesktop = [
     ['drag', 'change perspective view']
   ]
-  get showHelpPerspectiveViewMap() {
-    return this.mobile
-      ? this.showHelpPerspectiveMobile
-      : this.showHelpPerspectiveDesktop
-  }
+  public showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
 
   get showHelpSupportText() {
     return `Did you encounter an issue? 
@@ -241,17 +221,10 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(
-    private store : Store<ViewerStateInterface>
+    private store$ : Store<ViewerStateInterface>
   ){
 
-    const ua = window && window.navigator && window.navigator.userAgent
-      ? window.navigator.userAgent
-      : ''
-
-    /* https://stackoverflow.com/a/25394023/6059235 */
-    this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
-
-    this.darktheme$ = this.store.pipe(
+    this.darktheme$ = this.store$.pipe(
       select('viewerState'),
       select('templateSelected'),
       filter(v => !!v),
@@ -259,21 +232,37 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
       shareReplay(1)
     )
 
-    /**
-     * set gpu limit if user is on mobile
-     */
-    if (this.mobile) {
-      this.store.dispatch({
-        type: ACTION_TYPES.UPDATE_CONFIG,
-        config: {
-          gpuLimit: 2e8
-        } as Partial<ViewerConfiguration>
-      })  
+    this.useMobileUI$ = this.store$.pipe(
+      select('viewerConfigState'),
+      select('useMobileUI'),
+      shareReplay(1)
+    )
+
+    this.subscriptions.push(
+      this.useMobileUI$.subscribe(bool => {
+        if (bool) {
+          this.showHelpSliceViewMap = this.showHelpSliceViewMobile
+          this.showHelpGeneralMap = this.showHelpGeneralMobile
+          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveMobile
+        } else {
+          this.showHelpSliceViewMap = this.showHelpSliceViewDesktop
+          this.showHelpGeneralMap = this.showHelpGeneralDesktop
+          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
+        }
+      })
+    )
+  }
+
+  private subscriptions: Subscription[] = []
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
     }
   }
 
   catchError(e: Error | string){
-    this.store.dispatch({
+    this.store$.dispatch({
       type: SNACKBAR_MESSAGE,
       snackbarMessage: e.toString()
     })
