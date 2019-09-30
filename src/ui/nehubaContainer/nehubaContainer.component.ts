@@ -616,6 +616,11 @@ export class NehubaContainer implements OnInit, OnDestroy{
         for (const panel of viewPanels){
           (panel as HTMLElement).classList.add('neuroglancer-panel')
         }
+
+        // TODO needed to redraw?
+        // see https://trello.com/c/oJOnlc6v/60-enlarge-panel-allow-user-rearrange-panel-position
+        // further investigaation required
+        this.nehubaViewer.redraw()
       })
     )
 
