@@ -7,8 +7,8 @@ const humanTemplateSet = new Set([
 
 const humanParcellationSet = new Set([
   'Grey/White matter',
-  'Area V1',
-  'Area V2',
+  'Cytoarchitectonic Maps',
+  'BigBrain Cortical Layers Segmentation',
   'JuBrain Cytoarchitectonic Atlas',
   'Fibre Bundle Atlas - Short Bundle',
   'Fibre Bundle Atlas - Long Bundle'
@@ -19,7 +19,9 @@ const ratTemplateSet = new Set([
 ])
 
 const ratParcellationSet = new Set([
-  'Waxholm Space rat brain MRI/DTI'
+  'Waxholm Space rat brain atlas v1',
+  'Waxholm Space rat brain atlas v2',
+  'Waxholm Space rat brain atlas v3'
 ])
 
 const mouseTemplateSet = new Set([
@@ -27,6 +29,7 @@ const mouseTemplateSet = new Set([
 ])
 
 const mouseParcellationSet = new Set([
+  'Allen Mouse Common Coordinate Framework v3 2017',
   'Allen Mouse Common Coordinate Framework v3 2015'
 ])
 
