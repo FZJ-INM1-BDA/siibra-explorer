@@ -154,7 +154,7 @@ export class PluginServices{
     this.launchingPlugins.add(pluginName)
   }
   removePluginFromIsLaunchingSet(pluginName:string){
-    this.launchedPlugins.delete(pluginName)
+    this.launchingPlugins.delete(pluginName)
   }
 
   private mapPluginNameToWidgetUnit: Map<string, WidgetUnit> = new Map()
