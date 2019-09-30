@@ -24,9 +24,7 @@ import { ToastComponent } from "./components/toast/toast.component";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { ToastService } from "./services/toastService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
-import { HelpDirective } from "./util/directives/help.directive";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
@@ -50,6 +48,7 @@ import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
 
 import 'hammerjs'
+import { UIService } from "./services/uiService.service";
 
 @NgModule({
   imports : [
@@ -98,7 +97,6 @@ import 'hammerjs'
     fasTooltipQuestionSignDirective,
     fasTooltipRemoveDirective,
     fasTooltipRemoveSignDirective,
-    HelpDirective,
     DockedContainerDirective,
     FloatingContainerDirective,
     PluginFactoryDirective,
@@ -125,11 +123,11 @@ import 'hammerjs'
     WidgetServices,
     AtlasViewerURLService,
     AtlasViewerAPIServices,
-    ToastService,
     AtlasWorkerService,
     AuthService,
     LocalFileService,
     DialogService,
+    UIService,
     
     /**
      * TODO

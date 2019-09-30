@@ -158,18 +158,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   public toggleMessage: string = 'double click to toggle select, right click to search'
 
   /**
-   * observable for showing login modal
-   */
-  public showSigninSubject$: Subject<any> = new Subject()
-
-  /**
    * Observable for showing config modal
    */
   public showConfigTitle: String = 'Settings'
-  /**
-   * Observable for showing help modal
-   */
-  public showHelpSubject$: Subject<null> = new Subject()
 
   private showHelpGeneralMobile = [
     ['hold 🌏 + ↕', 'change oblique slice mode'],

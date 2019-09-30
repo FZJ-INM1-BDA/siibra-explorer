@@ -27,7 +27,6 @@ import { DownloadDirective } from "../util/directives/download.directive";
 import { LogoContainer } from "./logoContainer/logoContainer.component";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.component";
-import { ShowToastDirective } from "../util/directives/showToast.directive";
 import { HelpComponent } from "./help/help.component";
 import { ConfigComponent } from './config/config.component'
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
@@ -72,6 +71,7 @@ import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHi
 import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
+import { HelpDirective } from "src/util/directives/help.directive";
 
 @NgModule({
   imports : [
@@ -147,9 +147,9 @@ import { RegionsListView } from "./viewerStateController/regionsListView/simpleR
 
     /* directive */
     DownloadDirective,
-    ShowToastDirective,
     TouchSideClass,
-    ElementOutClickDirective
+    ElementOutClickDirective,
+    HelpDirective
   ],
   entryComponents : [
 

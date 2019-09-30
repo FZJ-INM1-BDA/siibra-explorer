@@ -3,7 +3,6 @@ import { Store, select } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, shareReplay, filter } from "rxjs/operators";
 import { SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
-import { ToastService } from "src/services/toastService.service";
 import { MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
@@ -38,7 +37,6 @@ export class ViewerStateBase implements OnInit{
 
   constructor(
     private store$: Store<any>,
-    private toastService: ToastService,
     private dialogService: DialogService,
     private bottomSheet: MatBottomSheet
   ){

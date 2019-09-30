@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { ToastService } from "src/services/toastService.service";
 import { MatBottomSheet } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 
@@ -18,11 +17,9 @@ export class ViewerStateMini extends ViewerStateBase{
 
   constructor(
     store$: Store<any>,
-    toastService: ToastService,
     dialogService: DialogService,
     bottomSheet: MatBottomSheet
   ){
-    super(store$,toastService,dialogService,bottomSheet)
+    super(store$,dialogService,bottomSheet)
   }
-
 }

@@ -6,8 +6,8 @@ import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { PluginServices } from "./atlasViewer.pluginService.service";
 import { AtlasViewerConstantsServices, encodeNumber, separator, decodeToNumber } from "./atlasViewer.constantService.service";
-import { ToastService } from "src/services/toastService.service";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
+import { UIService } from "src/services/uiService.service";
 
 declare var window
 
@@ -24,7 +24,7 @@ export class AtlasViewerURLService{
     private store : Store<ViewerStateInterface>,
     private pluginService : PluginServices,
     private constantService:AtlasViewerConstantsServices,
-    private toastService: ToastService
+    private uiService:UIService
   ){
 
     this.pluginState$ = this.store.pipe(
@@ -113,10 +113,10 @@ export class AtlasViewerURLService{
       
       const templateToLoad = fetchedTemplates.find(template=>template.name === searchedTemplatename)
       if (!templateToLoad) {
-        this.toastService.showToast(
+        this.uiService.showMessage(
           this.constantService.incorrectTemplateNameSearchParam(searchedTemplatename),
           {
-            timeout: 5000
+            duration: 5000
           }
         )
         const urlString = window.location.href
@@ -133,10 +133,10 @@ export class AtlasViewerURLService{
       const parcellationToLoad = templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName)
 
       if (!parcellationToLoad) {
-        this.toastService.showToast(
+        this.uiService.showMessage(
           this.constantService.incorrectParcellationNameSearchParam(searchedParcellationName),
           {
-            timeout: 5000
+            duration: 5000
           }
         )
       }
