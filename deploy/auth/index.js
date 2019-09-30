@@ -24,7 +24,7 @@ module.exports = async (app) => {
     if (req.user) {
       return res.status(200).send(JSON.stringify(req.user))
     } else {
-      return res.sendStatus(401)
+      return res.status(401).end()
     }
   })
 
