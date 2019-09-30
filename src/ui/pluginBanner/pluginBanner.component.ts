@@ -6,8 +6,7 @@ import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.plug
   selector : 'plugin-banner',
   templateUrl : './pluginBanner.template.html',
   styleUrls : [
-    `./pluginBanner.style.css`,
-    '../../css/darkBtns.css'
+    `./pluginBanner.style.css`
   ]
 })
 

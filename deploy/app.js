@@ -72,6 +72,12 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
 /**
+ * show dev banner
+ * n.b., must be before express.static() call
+ */
+app.use(require('./devBanner'))
+
+/**
  * only use compression for production
  * this allows locally built aot to be served without errors
  */

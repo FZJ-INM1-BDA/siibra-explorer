@@ -4,8 +4,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core'
   selector : 'pagination-component',
   templateUrl : './pagination.template.html',
   styleUrls : [
-    './pagination.style.css',
-    '../../css/darkBtns.css'
+    './pagination.style.css'
   ]
 })
 
