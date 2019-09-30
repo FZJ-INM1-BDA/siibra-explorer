@@ -115,12 +115,12 @@ export class DatabrowserService implements OnDestroy{
       select('navigation'),
       distinctUntilChanged(),
       debounceTime(SPATIAL_SEARCH_DEBOUNCE),
-      filter(v => !!v),
-      map(navigation => {
+      filter(v => !!v && !!v.position && !!v.zoom),
+      map(({ position, zoom }) => {
 
         // in mm
-        const center = navigation.position.map(n=>n/1e6)
-        const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
+        const center = position.map(n=>n/1e6)
+        const searchWidth = this.constantService.spatialWidth / 4 * zoom / 1e6
         const pt1 = center.map(v => (v - searchWidth)) as [number, number, number]
         const pt2 = center.map(v => (v + searchWidth)) as [number, number, number]
 
@@ -142,10 +142,11 @@ export class DatabrowserService implements OnDestroy{
          * templateSelected and templateSelected.name must be defined for spatial search
          */
         if (!templateSelected || !templateSelected.name) return from(Promise.reject('templateSelected must not be empty'))
-        const encodedTemplateName = encodeURI(templateSelected.name)
-        return from(fetch(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).then(res => res.json()))
+        const encodedTemplateName = encodeURIComponent(templateSelected.name)
+        return this.http.get(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).pipe(
+          catchError((err) => (console.log(err), of([]))) 
+        )
       }),
-      catchError((err) => (console.log(err), of([])))
     )
 
     this.fetchDataObservable$ = combineLatest(
@@ -227,7 +228,7 @@ export class DatabrowserService implements OnDestroy{
   }
 
   public fetchPreviewData(datasetName: string){
-    const encodedDatasetName = encodeURI(datasetName)
+    const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
       fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`)
         .then(res => res.json())
@@ -249,8 +250,8 @@ export class DatabrowserService implements OnDestroy{
   private mostRecentFetchToken: any
 
   private lowLevelQuery(templateName: string, parcellationName: string){
-    const encodedTemplateName = encodeURI(templateName)
-    const encodedParcellationName = encodeURI(parcellationName)
+    const encodedTemplateName = encodeURIComponent(templateName)
+    const encodedParcellationName = encodeURIComponent(parcellationName)
     return Promise.all([
       fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`)
         .then(res => res.json()),
