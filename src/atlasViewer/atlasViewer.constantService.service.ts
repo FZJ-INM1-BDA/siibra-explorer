@@ -194,11 +194,15 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   ]
   public showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
 
-  get showHelpSupportText() {
-    return `Did you encounter an issue? 
-      Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>, 
-      raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>`
-  }
+  /**
+   * raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>
+   */
+
+  private supportEmailAddress = `inm1-bda@fz-juelich.de`
+
+  public showHelpSupportText:string = `Did you encounter an issue? 
+Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>`
+
 
   incorrectParcellationNameSearchParam(title) {
     return `The selected parcellation - ${title} - is not available. The the first parcellation of the template is selected instead.`
@@ -208,7 +212,6 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     return `The selected template - ${title} - is not available.`
   }
 
-  private supportEmailAddress = `inm1-bda@fz-juelich.de`
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(
