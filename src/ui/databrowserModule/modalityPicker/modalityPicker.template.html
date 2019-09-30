@@ -1,12 +1,3 @@
-<div>
-  <button
-    (click)="clearAll()"
-    [disabled]="checkedModality.length === 0"
-    mat-raised-button>
-    Clear all
-  </button>  
-</div>
-
 <mat-checkbox
   [checked]="datamodality.visible"
   (change)="toggleModality(datamodality)"

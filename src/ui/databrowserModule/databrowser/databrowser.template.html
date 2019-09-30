@@ -58,16 +58,6 @@
   </mat-card-content>
 </ng-template>
 
-<ng-template #modalityPicker>
-  <modality-picker
-    iav-stop="click"
-    class="w-100"
-    [countedDataM]="countedDataM"
-    (modalityFilterEmitter)="handleModalityFilterEvent($event)">
-
-  </modality-picker>
-</ng-template>
-
 <ng-template #errorTemplate>
   <mat-card-content>
     <div class="ml-2 mr-2 alert alert-danger">
@@ -122,23 +112,46 @@
     <mat-expansion-panel hideToggle>
 
       <mat-expansion-panel-header class="align-items-center">
-        <mat-panel-title>
+        <mat-panel-title class="d-inline-flex align-items-center">
           Filter
         </mat-panel-title>
 
         <mat-panel-description class="d-flex flex-row justify-content-end align-items-center">
 
           <small *ngIf="dataentries.length > 0" class="text-muted mr-2">
-            {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} / {{ dataentries.length }}
+            <ng-template [ngIf]="modalityPickerCmp && modalityPickerCmp.checkedModality.length > 0"
+              [ngIfElse]="noFilterTmpl">
+              {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} / {{ dataentries.length }}
+            </ng-template>
+            
+            <ng-template #noFilterTmpl>
+              {{ dataentries.length }} datasets
+            </ng-template>
           </small>
 
-          <i class="fas fa-filter"></i>
+          <button mat-icon-button
+            matTooltip="Clear filters"
+            iav-stop="mousedown click"
+            iav-delay-event="click"
+            (delayedEmit)="modalityPickerCmp && modalityPickerCmp.clearAll()"
+            *ngIf="modalityPickerCmp.checkedModality.length > 0"
+            color="primary">
+            <i class="fas fa-backspace"></i>
+          </button>
         </mat-panel-description>
 
       </mat-expansion-panel-header>
 
-      <ng-container *ngTemplateOutlet="modalityPicker">
-      </ng-container>
+      <div class="max-h-10em overflow-y-auto overflow-x-hidden">
+        <modality-picker
+          iav-stop="click"
+          class="w-100"
+          [countedDataM]="countedDataM"
+          (modalityFilterEmitter)="handleModalityFilterEvent($event)"
+          #modalityPickerCmp>
+      
+        </modality-picker>
+      </div>
 
     </mat-expansion-panel>
   </mat-accordion>
