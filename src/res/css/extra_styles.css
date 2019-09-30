@@ -362,9 +362,9 @@ markdown-dom pre code
   max-height: 20em;
 }
 
-.mh-10em
+.max-h-10em
 {
-  max-height: 10em;
+  max-height: 10em!important;
 }
 
 .pe-all
@@ -445,6 +445,12 @@ markdown-dom pre code
 {
   overflow-y:hidden !important;
 }
+
+.overflow-y-auto
+{
+  overflow-y: auto!important;
+}
+
 .h-90vh
 {
   height: 90vh!important;
