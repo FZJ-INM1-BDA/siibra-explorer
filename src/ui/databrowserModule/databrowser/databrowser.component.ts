@@ -51,10 +51,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   public favDataentries$: Observable<DataEntry[]>
 
-  get darktheme(){
-    return this.dbService.darktheme
-  }
-
   /**
    * TODO
    * viewport
