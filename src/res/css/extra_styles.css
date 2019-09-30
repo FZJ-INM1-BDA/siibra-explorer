@@ -635,3 +635,15 @@ mat-icon[fontset="far"]
 {
   outline: none!important;
 }
+
+body::after
+{
+  content: '';
+  position: fixed;
+  bottom: 1rem;
+  right: 2rem;
+  font-size: 200%;
+  color: rgba(128, 128, 128, 0.5);
+  pointer-events: none;
+  z-index: 99999;
+}

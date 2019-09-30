@@ -50,6 +50,10 @@ import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
 import 'hammerjs'
 import { UIService } from "./services/uiService.service";
 
+import 'src/res/css/version.css'
+import 'src/theme.scss'
+import 'src/res/css/extra_styles.css'
+
 @NgModule({
   imports : [
     FormsModule,

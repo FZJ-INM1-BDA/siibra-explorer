@@ -208,7 +208,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     return `The selected template - ${title} - is not available.`
   }
 
-  private supportEmailAddress = `x.gui@fz-juelich.de`
+  private supportEmailAddress = `inm1-bda@fz-juelich.de`
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(
