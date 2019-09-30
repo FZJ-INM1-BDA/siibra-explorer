@@ -124,8 +124,11 @@ const populateSet = (flattenedRegions, set = new Set()) => {
 let juBrainSet = new Set(),
   shortBundleSet = new Set(),
   longBundleSet = new Set(),
-  waxholmSet = new Set(),
-  allenSet = new Set()
+  waxholm1Set = new Set(),
+  waxholm2Set = new Set(),
+  waxholm3Set = new Set(),
+  allen2015Set = new Set(),
+  allen2017Set = new Set()
 
 readConfigFile('colin.json')
   .then(data => JSON.parse(data))
@@ -160,7 +163,10 @@ readConfigFile('allenMouse.json')
   .then(data => JSON.parse(data))
   .then(json => {
     const flattenedAllen = flattenArray(json.parcellations[0].regions)
-    allenSet = populateSet(flattenedAllen)
+    allen2017Set = populateSet(flattenedAllen)
+
+    const flattenedAllen2017 = flattenArray(json.parcellations[1].regions)
+    allen2017Set = populateSet(flattenedAllen2017)
   })
 
 const filterByPRSet = (prs, atlasPrSet = new Set()) => {
@@ -183,19 +189,28 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
       switch (parcellationName) {
         case 'JuBrain Cytoarchitectonic Atlas': 
           useSet = juBrainSet
-        break;
+          break;
         case 'Fibre Bundle Atlas - Short Bundle':
           useSet = shortBundleSet
-        break;
+          break;
         case 'Fibre Bundle Atlas - Long Bundle':
           useSet = longBundleSet
-        break;
-        case 'Waxholm Space rat brain MRI/DTI':
-          useSet = waxholmSet
-        break;
+          break;
+        case 'Waxholm Space rat brain atlas v1':
+          useSet = waxholm1Set
+          break;
+        case 'Waxholm Space rat brain atlas v2':
+          useSet = waxholm2Set
+          break;
+        case 'Waxholm Space rat brain atlas v3':
+          useSet = waxholm3Set
+          break;
         case 'Allen Mouse Common Coordinate Framework v3 2015':
-          useSet = allenSet
-        break;
+          useSet = allen2015Set
+          break;
+        case 'Allen Mouse Common Coordinate Framework v3 2017':
+          useSet = allen2017Set
+          break;
         default:
           useSet = new Set()
       }

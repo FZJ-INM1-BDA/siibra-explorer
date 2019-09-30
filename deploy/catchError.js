@@ -9,5 +9,5 @@ module.exports = (raw, req, res, next) => {
     trace,
     raw
   })
-  res.status(code).send()
+  res.status(code || 500).end()
 }
