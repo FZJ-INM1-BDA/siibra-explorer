@@ -39,8 +39,7 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -68,7 +67,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
-  private showHelp$: Observable<any>
   
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
@@ -148,10 +146,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.sidePanelOpen)
-    )
-
-    this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
-      debounceTime(170)
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -277,8 +271,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private cookieDialogRef: MatDialogRef<any>
   private kgTosDialogRef: MatDialogRef<any>
-  private helpDialogRef: MatDialogRef<any>
-  private loginDialogRef: MatDialogRef<any>
 
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
@@ -319,25 +311,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         const message = messageSymbol.toString().slice(7, -1)
         this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
           duration: 5000
-        })
-      })
-    )
-
-    this.subscriptions.push(
-      this.showHelp$.subscribe(() => {
-        this.helpDialogRef = this.matDialog.open(this.helpComponent, {
-          autoFocus: false,
-          panelClass: ['col-12','col-sm-12','col-md-8','col-lg-6','col-xl-4']
-        })
-      })
-    )
-
-    this.subscriptions.push(
-      this.constantsService.showSigninSubject$.pipe(
-        debounceTime(160)
-      ).subscribe(user => {
-        this.loginDialogRef = this.matDialog.open(this.signinModalComponent, {
-          autoFocus: false
         })
       })
     )
@@ -542,16 +515,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: TOGGLE_SIDE_PANEL
     })
-  }
-
-  closeModal(mode){
-    if (mode === 'help') {
-      this.helpDialogRef && this.helpDialogRef.close()
-    }
-
-    if (mode === 'login') {
-      this.loginDialogRef && this.loginDialogRef.close()
-    }
   }
 
   closeMenuWithSwipe(documentToSwipe: ElementRef) {

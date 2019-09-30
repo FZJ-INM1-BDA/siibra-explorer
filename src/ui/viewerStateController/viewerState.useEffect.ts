@@ -2,11 +2,11 @@ import { Subscription, Observable } from "rxjs";
 import { Injectable, OnInit, OnDestroy } from "@angular/core";
 import { Actions, ofType, Effect } from "@ngrx/effects";
 import { Store, select, Action } from "@ngrx/store";
-import { ToastService } from "src/services/toastService.service";
 import { shareReplay, distinctUntilChanged, map, withLatestFrom, filter } from "rxjs/operators";
 import { VIEWERSTATE_ACTION_TYPES } from "./viewerState.base";
 import { CHANGE_NAVIGATION, SELECT_REGIONS, NEWVIEWER, GENERAL_ACTION_TYPES, SELECT_PARCELLATION, isDefined } from "src/services/stateStore.service";
 import { regionFlattener } from "src/util/regionFlattener";
+import { UIService } from "src/services/uiService.service";
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +33,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
   constructor(
     private actions$: Actions,
     private store$: Store<any>,
-    private toastService: ToastService
+    private uiService: UIService
   ){
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -189,10 +189,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
             }
           })
         } else {
-          this.toastService.showToast(`${region.name} does not have a position defined`, {
-            timeout: 5000,
-            dismissable: true
-          })
+          this.uiService.showMessage(`${region.name} does not have a position defined`)
         }
       })
     )

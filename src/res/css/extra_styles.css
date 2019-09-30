@@ -629,3 +629,9 @@ mat-icon[fontset="far"]
 {
   min-height: 4rem;
 }
+
+/* overwrite bootstrap default focus styling */
+*:focus
+{
+  outline: none!important;
+}

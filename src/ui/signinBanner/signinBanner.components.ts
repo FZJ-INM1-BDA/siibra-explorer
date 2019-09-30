@@ -1,7 +1,8 @@
 import {Component, ChangeDetectionStrategy, Input, TemplateRef } from "@angular/core";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AuthService, User } from "src/services/auth.service";
-import { MatDialog } from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 
 
 @Component({
@@ -18,37 +19,30 @@ export class SigninBanner{
 
   @Input() darktheme: boolean
 
+  public user$: Observable<User>
+  public userBtnTooltip$: Observable<string>
+
   constructor(
-    private constantService: AtlasViewerConstantsServices,
     private authService: AuthService,
     private dialog: MatDialog
   ){
+    this.user$ = this.authService.user$
+
+    this.userBtnTooltip$ = this.user$.pipe(
+      map(user => user
+        ? `Logged in as ${(user && user.name) ? user.name : 'Unknown name'}`
+        : `Not logged in`)
+    )
   }
 
-  /**
-   * move the templates to signin banner when pluginprettify is merged
-   */
-  showHelp() {
-    this.constantService.showHelpSubject$.next()
-  }
+  private dialogRef: MatDialogRef<any>
 
-  /**
-   * move the templates to signin banner when pluginprettify is merged
-   */
-  showSetting(settingTemplate:TemplateRef<any>){
-    this.dialog.open(settingTemplate, {
-      autoFocus: false
+  openTmplWithDialog(tmpl: TemplateRef<any>){
+    this.dialogRef && this.dialogRef.close()
+
+    if (tmpl) this.dialogRef = this.dialog.open(tmpl, {
+      autoFocus: false,
+      panelClass: ['col-12','col-sm-12','col-md-8','col-lg-6','col-xl-4']
     })
-  }
-
-  /**
-   * move the templates to signin banner when pluginprettify is merged
-   */
-  showSignin() {
-    this.constantService.showSigninSubject$.next(this.user)
-  }
-
-  get user() : User | null {
-    return this.authService.user
   }
 }

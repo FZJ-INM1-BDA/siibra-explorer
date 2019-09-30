@@ -12,18 +12,16 @@
 </div>
 
 <ng-template #notLoggedIn>
-  <div>
-    Not logged in. Login via:
-
-    <a *ngFor="let m of loginMethods"
-      [href]="m.href">
-      <button 
-        (click)="loginBtnOnclick()"
-        mat-raised-button
-        color="primary">
-        <i class="fas fa-sign-in-alt"></i> {{ m.name }}
-      </button> 
-    </a>
-
-  </div>
+  <span>
+    Login via
+  </span>
+  <a *ngFor="let m of loginMethods"
+    [href]="m.href">
+    <button 
+      (click)="loginBtnOnclick()"
+      mat-raised-button
+      color="primary">
+      <i class="fas fa-sign-in-alt"></i> {{ m.name }}
+    </button> 
+  </a>
 </ng-template>

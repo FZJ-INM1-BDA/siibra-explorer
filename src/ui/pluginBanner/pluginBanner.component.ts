@@ -17,15 +17,6 @@ export class PluginBannerUI{
   }
 
   clickPlugin(plugin:PluginManifest){
-    if(this.pluginEnabledFlag)
-      this.pluginServices.launchPlugin(plugin)
-    else
-      return
-  }
-
-  get pluginEnabledFlag(){
-    return true || PLUGINDEV || BUNDLEDPLUGINS.length > 0
-      ? true
-      : false
+    this.pluginServices.launchPlugin(plugin)
   }
 }
