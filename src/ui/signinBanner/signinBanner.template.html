@@ -9,9 +9,12 @@
       mat-icon-button
       [matMenuTriggerFor]="dropdownMenu"
       color="primary">
-      <i *ngIf="!(user$ | async) as user; else userInitialTempl" class="fas fa-user"></i>
-      <ng-template #userInitialTempl>
+      <ng-template [ngIf]="user$ | async" [ngIfElse]="notLoggedInTmpl" let-user="ngIf">
         {{ (user && user.name || 'Unnamed User').slice(0,1) }}
+      </ng-template>
+      
+      <ng-template #notLoggedInTmpl>
+        <i class="fas fa-user"></i>
       </ng-template>
     </button>
   </div>

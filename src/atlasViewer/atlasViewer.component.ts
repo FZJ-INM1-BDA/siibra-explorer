@@ -94,9 +94,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  get toggleMessage(){
-    return this.constantsService.toggleMessage
-  }
+  public toggleMessage = this.constantsService.toggleMessage
 
   constructor(
     private store: Store<ViewerStateInterface>,
