@@ -98,7 +98,8 @@ export class KgSingleDatasetService implements OnDestroy{
     this.dialog.open(FileViewer, {
       data: {
         previewFile: file
-      }
+      },
+      autoFocus: false
     })
   }
 

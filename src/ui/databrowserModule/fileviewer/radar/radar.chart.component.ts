@@ -1,7 +1,10 @@
-import { Component, Input, OnChanges, ViewChild, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core'
+import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core'
 
 import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption } from '../chart.interface';
 import { Color } from 'ng2-charts';
+import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
+import { RadialChartOptions } from 'chart.js'
+
 @Component({
   selector : `radar-chart`,
   templateUrl : './radar.chart.template.html',
@@ -54,7 +57,8 @@ export class RadarChart implements OnChanges{
 
   maxY : number
 
-  chartOption : RadarChartOptionInterface = {
+  chartOption : Partial<RadialChartOptions> = {
+    responsive: true,
     scale : {
       gridLines : {
         color : 'rgba(128,128,128,0.5)'
@@ -81,10 +85,7 @@ export class RadarChart implements OnChanges{
       display : true,
       fontColor : 'rgba(255,255,255,1.0)'
     },
-    color : [{
-      backgroundColor : `rgba(255,255,255,0.2)`
-    }],
-    animation : false
+    animation: null
   }
 
   chartDataset : DatasetInterface = {
@@ -92,6 +93,9 @@ export class RadarChart implements OnChanges{
     datasets : []
   }
 
+  constructor(private sanitizer: DomSanitizer){
+
+  }
   
   ngOnChanges(){
     this.chartDataset = {
@@ -109,6 +113,32 @@ export class RadarChart implements OnChanges{
     },0)
 
     applyOption(this.chartOption,this.options)
+
+    this.generateDataUrl()
+  }
+
+  public csvDataUrl: SafeUrl
+  public csvTitle: string
+  public imageTitle: string
+
+  private generateDataUrl(){
+    const row0 = ['Receptors', ...this.chartDataset.datasets.map(ds => ds.label || 'no label')].join(',')
+    const otherRows = (this.chartDataset.labels as string[])
+      .map((label, index) => [ label, ...this.chartDataset.datasets.map(ds => ds.data[index]) ].join(',')).join('\n')
+    const csvData = `${row0}\n${otherRows}`
+
+    this.csvDataUrl = this.sanitizer.bypassSecurityTrustUrl(`data:text/csv;charset=utf-8,${csvData}`)
+    this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
+
+    this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`
+  }
+
+  private getGraphTitleAsString():string{
+    try{
+      return this.chartOption.title.text as string
+    }catch(e){
+      return `Untitled`
+    }
   }
 }
 

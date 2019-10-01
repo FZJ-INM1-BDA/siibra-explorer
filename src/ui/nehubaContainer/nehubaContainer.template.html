@@ -196,37 +196,21 @@
 
     <!-- render all fav dataset as mat list -->
     <!-- TODO maybe use virtual scroll here? -->
+
     <mat-list-item
       mat-ripple
       class="align-items-center"
       *ngFor="let ds of (favDataEntries$ | async)"
       role="listitem">
-      <span class="flex-grow-1 flex-shrink-1">
-        {{ ds.name }}
-      </span>
 
-      <!-- download -->
-      <button
-        #downloadBtn="matButton"
-        (click)="downloadDs($event, ds, downloadBtn)"
-        matTooltip="Download Dataset"
-        matTooltipPosition="after"
-        color="primary"
-        class="flex-grow-0 flex-shrink-0"
-        mat-icon-button>
-        <i class="fas fa-download"></i>
-      </button>
+      <single-dataset-list-view
+        class="d-block pt-1 pb-1 w-100"
+        [kgSchema]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[0]"
+        [kgId]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[1]"
+        [dataset]="ds">
 
-      <!-- remove from fav -->
-      <button
-        (click)="removeFav($event, ds)"
-        matTooltip="Remove Pin"
-        matTooltipPosition="after"
-        color="warn"
-        class="flex-grow-0 flex-shrink-0"
-        mat-icon-button>
-        <i class="fas fa-trash"></i>
-      </button>
+      </single-dataset-list-view>
+    
     </mat-list-item>
   </mat-list>
 </ng-template>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter } from "@angular/core";
+import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from "@angular/core";
 import { DatabrowserService } from "../databrowser.service";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 
@@ -13,7 +13,8 @@ const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path
   templateUrl: './previewList.template.html',
   styleUrls: [
     './preview.style.css'
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class PreviewComponent implements OnInit{
@@ -27,7 +28,8 @@ export class PreviewComponent implements OnInit{
   private error: string
 
   constructor(
-    private dbrService:DatabrowserService
+    private dbrService:DatabrowserService,
+    private cdr: ChangeDetectorRef
   ){
     this.renderNode = getRenderNodeFn()
   }
@@ -43,6 +45,8 @@ export class PreviewComponent implements OnInit{
       this.activeFile = ev.inputItem
       this.renderNode = getRenderNodeFn(this.activeFile)
     }
+
+    this.cdr.markForCheck()
   }
 
   public renderNode: (obj:any) => string
@@ -52,15 +56,17 @@ export class PreviewComponent implements OnInit{
       this.dbrService.fetchPreviewData(this.datasetName)
         .then(json => {
           this.previewFiles = json as ViewerPreviewFile[]
-          if (this.previewFiles.length > 0)
+          if (this.previewFiles.length > 0) {
             this.activeFile = this.previewFiles[0]
             this.renderNode = getRenderNodeFn(this.activeFile)
+          }
         })
         .catch(e => {
           this.error = JSON.stringify(e)
         })
         .finally(() => {
           this.fetchCompleteFlag = true
+          this.cdr.markForCheck()
         })
     }
   }

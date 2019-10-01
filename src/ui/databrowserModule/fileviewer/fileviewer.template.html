@@ -16,80 +16,94 @@
   <!-- image  -->
   <div *ngSwitchCase="'image/jpeg'" >
     <!-- TODO figure out a more elegant way of dealing with draggable img -->
-    <img draggable = "false" [src] = "previewFile.url" />
+    <img draggable="false" [src]="previewFile.url" />
   </div>
 
   <!-- data container -->
-  <div [ngSwitch]="previewFile.data.chartType" *ngSwitchCase="'application/json'">
+  <div [ngSwitch]="previewFile.data.chartType"
+    *ngSwitchCase="'application/json'">
     <radar-chart
       #childChart
-      [colors] = "previewFile.data.colors"
-      [options] = "previewFile.data.chartOptions"
+      [colors]="previewFile.data.colors"
+      [options]="previewFile.data.chartOptions"
       [labels]="previewFile.data.labels"
       [radarDatasets]="previewFile.data.datasets"
       *ngSwitchCase="'radar'">
 
     </radar-chart>
     <line-chart
-      #childChart
-      [colors] = "previewFile.data.colors"
-      [options] = "previewFile.data.chartOptions"
-      [lineDatasets] = "previewFile.data.datasets"
-      *ngSwitchCase = "'line'">
+      #childChart="iavLineChart"
+
+      [colors]="previewFile.data.colors"
+      [options]="previewFile.data.chartOptions"
+      [lineDatasets]="previewFile.data.datasets"
+      *ngSwitchCase="'line'">
 
     </line-chart>
     <div *ngSwitchDefault>
       The json file is not a chart. I mean, we could dump the json, but would it really help?
     </div>
   </div>
-  <div *ngSwitchCase = "'application/hibop'">
+
+  <div *ngSwitchCase="'application/hibop'">
     <div mimetypeTextContainer>
         You will need to install the HiBoP software on your computer, click the 'Download File' button and open the .hibop file.
     </div>
   </div>
-  <div *ngSwitchCase = "'application/nifti'">
+
+  <div *ngSwitchCase="'application/nifti'">
     <dedicated-viewer
-      [previewFile] = "previewFile">
+      [previewFile]="previewFile">
     </dedicated-viewer>
   </div>
-  <div *ngSwitchCase = "'application/nehuba-layer'">
+
+  <div *ngSwitchCase="'application/nehuba-layer'">
     APPLICATION NEHUBA LAYER - NOT YET IMPLEMENTED
   </div>
+
   <div *ngSwitchDefault>
     <div mimetypeTextContainer>
       The selected file with the mimetype {{ previewFile.mimetype }} could not be displayed.
     </div>
   </div>
+
 </div>
 
 <div class="mt-1 w-100 d-flex justify-content-end pl-1 pr-1 pt-2 pb-2">
-  <button
-          (click)="childChart.downloadChartAsPng()"
-          class="outline-none mr-1 ml-1 btn btn-link p-0"
-          container="body"
-          *ngIf="childChart && childChart.shapedLineChartDatasets"
-          matTooltip="Download line graph as csv">
-    <i class="fas fa-file-csv downloadButton"></i>
-  </button>
 
-  <a      class="outline-none mr-1 ml-1"
-          *ngIf="downloadUrl"
-          [href]="downloadUrl"
-          target="_blank"
-          download
-          matTooltip="Download File"
-          color="#4595ec">
-    <i class="far fa-arrow-alt-circle-down downloadButton"></i>
+  <a mat-icon-button
+    matTooltip="Download line graph as csv"
+    [hidden]="!(childChart && childChart.csvDataUrl)"
+
+    target="_blank"
+    [download]="childChart && childChart.csvTitle"
+    [href]="childChart && childChart.csvDataUrl">
+  
+    <i class="fas fa-file-csv"></i>
   </a>
 
-  <a      class="outline-none mr-1 ml-1"
-          *ngIf="downloadPng"
-          container="body"
-          [href]="downloadPng"
-          target="_blank"
-          download
-          matTooltip="Download chart as an image"
-          color="#4595ec">
-    <i class="far fa-arrow-alt-circle-down downloadButton"></i>
+  <a mat-icon-button
+    *ngIf="downloadUrl"
+    [href]="downloadUrl"
+    target="_blank"
+    download
+    matTooltip="Download File">
+    <i class="fas fa-download"></i>
   </a>
+
+
+  <a mat-icon-button
+    [hidden]="!iavBlobToUrlDirective.url"
+
+    [iav-blob-to-url]="(childChart && childChart.canvas && childChart.canvas.nativeElement) | canvasToBlobPipe | async"
+    #iavBlobToUrlDirective="iavBlobToUrl"
+
+    target="_blank"
+    [href]="iavBlobToUrlDirective.url"
+    [download]="childChart && childChart.imageTitle"
+
+    matTooltip="Download chart as an image">
+    <i class="fas fa-download "></i>
+  </a>
+
 </div>

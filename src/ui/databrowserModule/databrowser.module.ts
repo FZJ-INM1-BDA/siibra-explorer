@@ -32,6 +32,8 @@ import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
+import { CanvastoBlobPipe } from "./fileviewer/util/canvasToBlob.pipe";
+import { BlobToUrlDirective } from "./fileviewer/util/blobToUrl.direcive";
 
 @NgModule({
   imports:[
@@ -57,6 +59,11 @@ import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetLis
     SingleDatasetListView,
 
     /**
+     * directives
+     */
+    BlobToUrlDirective,
+
+    /**
      * pipes
      */
     PathToNestedChildren,
@@ -69,7 +76,8 @@ import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetLis
     RegionBackgroundToRgbPipe,
     GetKgSchemaIdFromFullIdPipe,
     PreviewFileIconPipe,
-    PreviewFileTypePipe
+    PreviewFileTypePipe,
+    CanvastoBlobPipe
   ],
   exports:[
     DataBrowser,
@@ -79,6 +87,7 @@ import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetLis
     ModalityPicker,
     FilterDataEntriesbyMethods,
     FileViewer,
+    GetKgSchemaIdFromFullIdPipe
   ],
   entryComponents:[
     DataBrowser,
