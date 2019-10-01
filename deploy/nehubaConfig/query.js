@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { BROTLI, GZIP } = require('../compression')
+const { BROTLI, GZIP } = require('nomiseco')
 
 const getFileAsPromise = filepath => new Promise((resolve, reject) => {
   fs.readFile(filepath, 'utf-8', (err, data) => {

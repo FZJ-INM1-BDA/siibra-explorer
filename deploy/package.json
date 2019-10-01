@@ -20,6 +20,7 @@
     "helmet-csp": "^2.8.0",
     "jwt-decode": "^2.2.0",
     "memorystore": "^1.6.1",
+    "nomiseco": "0.0.2",
     "openid-client": "^2.4.5",
     "passport": "^0.4.0",
     "request": "^2.88.0"

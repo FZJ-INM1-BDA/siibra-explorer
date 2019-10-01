@@ -1,6 +1,6 @@
 const express = require('express')
 const { getTemplateNehubaConfig } = require('./query')
-const { detEncoding } = require('../compression')
+const { detEncoding } = require('nomiseco')
 
 const nehubaConfigRouter = express.Router()
 

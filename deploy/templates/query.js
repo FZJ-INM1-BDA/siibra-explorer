@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const { BROTLI, GZIP } = require('../compression')
+const { BROTLI, GZIP } = require('nomiseco')
 
 exports.getAllTemplates = () => new Promise((resolve, reject) => {
   
