@@ -636,6 +636,16 @@ mat-icon[fontset="far"]
   min-height: 4rem;
 }
 
+.w-30vw
+{
+  width: 30vw!important;
+}
+
+.h-30vw
+{
+  height: 30vw!important;
+}
+
 /* overwrite bootstrap default focus styling */
 *:focus
 {

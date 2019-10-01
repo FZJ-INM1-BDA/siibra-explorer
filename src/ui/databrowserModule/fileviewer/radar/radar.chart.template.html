@@ -1,17 +1,22 @@
-<canvas 
-  #canvas
-  (mousewheel)="mousescroll($event)"
-  width = '100%'
-  height = '100%'
-  *ngIf = "chartDataset.datasets.length > 0 && chartDataset.labels.length > 0"
-  baseChart 
-  chartType="radar"
-  [options]="chartOption"
-  [colors]="colors"
-  [datasets]="chartDataset.datasets"
-  [labels]="chartDataset.labels">
-</canvas>
+<div *ngIf="chartDataset.datasets.length > 0 && chartDataset.labels.length > 0"
+  class="position-relative col-12">
+
+  <!-- baseChart directive is needed by ng2-chart -->
+  <canvas baseChart
+    (mousewheel)="mousescroll($event)"
+    class="h-100 w-100"
+    height="500"
+    width="500"
+    chartType="radar"
+    [options]="chartOption"
+    [colors]="colors"
+    [datasets]="chartDataset.datasets"
+    [labels]="chartDataset.labels"
+    #canvas>
+  </canvas>
+</div>
+
 <span
-  *ngIf = "chartDataset.datasets.length == 0 || chartDataset.labels.length == 0">
-  datasets and labels are required to display radar
+*ngIf="chartDataset.datasets.length === 0 || chartDataset.labels.length === 0">
+datasets and labels are required to display radar
 </span>
