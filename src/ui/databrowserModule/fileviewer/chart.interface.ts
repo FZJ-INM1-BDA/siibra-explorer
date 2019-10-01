@@ -1,6 +1,8 @@
 import { ChartOptions } from "chart.js";
 
 import merge from 'lodash.merge'
+import { SafeUrl } from "@angular/platform-browser";
+import { ElementRef } from "@angular/core";
 
 export interface ScaleOptionInterface{
   type? : string
@@ -67,6 +69,14 @@ export interface ScaleLabelInterface{
   labelString? : string
   fontColor? : string
   display? : boolean
+}
+
+export interface CommonChartInterface{
+  csvDataUrl: SafeUrl
+  csvTitle: string
+  imageTitle: string
+
+  canvas: ElementRef
 }
 
 export const applyOption = (defaultOption:ChartOptions,option?:Partial<ChartOptions>)=>{

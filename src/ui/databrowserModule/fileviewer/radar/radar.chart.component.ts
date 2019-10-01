@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core'
 
-import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption } from '../chart.interface';
+import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption, CommonChartInterface } from '../chart.interface';
 import { Color } from 'ng2-charts';
 import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
 import { RadialChartOptions } from 'chart.js'
@@ -11,8 +11,9 @@ import { RadialChartOptions } from 'chart.js'
   styleUrls : [ 
     `./radar.chart.style.css`
    ],
+   exportAs: 'iavRadarChart'
 })
-export class RadarChart implements OnChanges{
+export class RadarChart implements OnChanges, CommonChartInterface{
 
   @ViewChild('canvas') canvas : ElementRef
   /**

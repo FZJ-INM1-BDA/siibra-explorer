@@ -1,9 +1,10 @@
 import { Component, Input, OnChanges, ElementRef, ViewChild } from '@angular/core'
-import { DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption } from '../chart.interface'
+import { DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption, CommonChartInterface } from '../chart.interface'
 
 import { ChartOptions, LinearTickOptions,ChartDataSets } from 'chart.js';
 import { Color } from 'ng2-charts';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
 @Component({
   selector : `line-chart`,
   templateUrl : './line.chart.template.html',
@@ -12,7 +13,7 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
    ],
    exportAs: 'iavLineChart'
 })
-export class LineChart implements OnChanges{
+export class LineChart implements OnChanges, CommonChartInterface{
 
   @ViewChild('canvas') canvas: ElementRef
 
