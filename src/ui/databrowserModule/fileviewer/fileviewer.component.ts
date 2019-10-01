@@ -2,6 +2,7 @@ import { Component, Input, ViewChild, ElementRef, Inject, Optional, OnChanges } 
 
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
 import { MAT_DIALOG_DATA } from '@angular/material';
+import { CommonChartInterface } from './chart.interface';
 
 
 @Component({
@@ -18,7 +19,7 @@ export class FileViewer implements OnChanges{
    */
   @Input() previewFile : ViewerPreviewFile
   
-  @ViewChild('childChart') childChart : ChartComponentInterface
+  @ViewChild('childChart') childChart: CommonChartInterface
 
   constructor(
     @Optional() @Inject(MAT_DIALOG_DATA) data
@@ -31,9 +32,3 @@ export class FileViewer implements OnChanges{
     this.downloadUrl = this.previewFile.url
   }
 }
-
-interface ChartComponentInterface{
-  canvas : ElementRef,
-  shapedLineChartDatasets: any
-}
-

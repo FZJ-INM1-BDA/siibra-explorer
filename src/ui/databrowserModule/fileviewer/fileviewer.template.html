@@ -23,7 +23,7 @@
   <div [ngSwitch]="previewFile.data.chartType"
     *ngSwitchCase="'application/json'">
     <radar-chart
-      #childChart
+      #childChart="iavRadarChart"
       [colors]="previewFile.data.colors"
       [options]="previewFile.data.chartOptions"
       [labels]="previewFile.data.labels"
