@@ -129,6 +129,12 @@ fs.readdir(RECEPTOR_PATH, (err, files) => {
 datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   const { file } = req.query
   const filePath = previewFileMap.get(file)
+
+  // even though req.url is modified, req.query is not
+  // for now, just serve non encoded image
+
+  res.removeHeader('Content-Encoding')
+  
   if (filePath) {
     fs.createReadStream(filePath).pipe(res)
   } else {
