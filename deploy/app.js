@@ -82,7 +82,8 @@ app.use(require('./devBanner'))
  * this allows locally built aot to be served without errors
  */
 
-const { compressionMiddleware } = require('./compression')
+const { compressionMiddleware } = require('nomiseco')
+
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 
 const jsonMiddleware = (req, res, next) => {

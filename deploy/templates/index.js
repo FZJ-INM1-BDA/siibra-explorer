@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const query = require('./query')
 const path = require('path')
-const { detEncoding } = require('../compression')
+const { detEncoding } = require('nomiseco')
 
 /**
  * root path fetches all templates
