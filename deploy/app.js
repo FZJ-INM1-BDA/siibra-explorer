@@ -87,7 +87,7 @@ const { compressionMiddleware } = require('nomiseco')
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 
 const jsonMiddleware = (req, res, next) => {
-  res.set('Content-Type', 'application/json')
+  if (!res.get('Content-Type')) res.set('Content-Type', 'application/json')
   next()
 }
 
