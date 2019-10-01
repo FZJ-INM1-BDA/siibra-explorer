@@ -119,11 +119,27 @@ export class DataBrowserUseEffect implements OnDestroy{
       switchMap(arr => 
         merge(
           ...arr.map(({ id: kgId }) => 
-            from( this.kgSingleDatasetService.getInfoFromKg({ kgId }))
-              .pipe(catchError(err => {
-                  console.log(`fetchInfoFromKg error`, err)
-                  return of(null)
-              })))
+            from( this.kgSingleDatasetService.getInfoFromKg({ kgId })).pipe(
+              catchError(err => {
+                console.log(`fetchInfoFromKg error`, err)
+                return of(null)
+              }),
+              switchMap(dataset => 
+                this.kgSingleDatasetService.datasetHasPreview(dataset).pipe(
+                  catchError(err => {
+                    console.log(`fetching hasPreview error`, err)
+                    return of({})
+                  }),
+                  map(resp => {
+                    return {
+                      ...dataset,
+                      ...resp
+                    }
+                  })
+                )
+              )
+            )
+          )
         ).pipe(
           filter(v => !!v),
           scan((acc, curr) => acc.concat(curr), [])

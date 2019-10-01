@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getTos } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
 const url = require('url')
 const qs = require('querystring')
 
@@ -148,8 +148,15 @@ const checkKgQuery = (req, res, next) => {
   else return next()
 }
 
+datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
+  const { datasetName } = req.query
+  if (!datasetName || datasetName === '') return res.status(400).send(`datasetName as query param is required.`)
+  return res.status(200).json({
+    preview: hasPreview({ datasetName })
+  })
+})
+
 datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
-  
   const { kgId } = req.query
   const { user } = req
   const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
