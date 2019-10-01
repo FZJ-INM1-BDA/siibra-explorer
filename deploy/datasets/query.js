@@ -326,6 +326,7 @@ module.exports = {
   init,
   getDatasets,
   getPreview,
+  hasPreview,
   getTos
 }
 

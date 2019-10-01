@@ -8,6 +8,7 @@ import { MatDialog } from "@angular/material";
 import { FileViewer } from "./fileviewer/fileviewer.component";
 import { ADD_NG_LAYER, REMOVE_NG_LAYER } from "src/services/stateStore.service";
 import { Subscription, Subject } from "rxjs";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy{
@@ -20,7 +21,8 @@ export class KgSingleDatasetService implements OnDestroy{
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private store$: Store<any>,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private http: HttpClient
   ) {
 
     this.subscriptions.push(
@@ -37,6 +39,13 @@ export class KgSingleDatasetService implements OnDestroy{
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
+  }
+
+  public datasetHasPreview({ name } : { name: string }){
+    const _url = new URL(`${this.constantService.backendUrl}datasets/hasPreview`)
+    const searchParam = _url.searchParams
+    searchParam.set('datasetName', name)
+    return this.http.get(_url.toString())
   }
 
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
