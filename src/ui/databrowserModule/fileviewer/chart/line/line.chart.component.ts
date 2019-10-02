@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, ElementRef, ViewChild } from '@angular/core'
+import { Component, Input, OnChanges } from '@angular/core'
 import { DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption, CommonChartInterface } from '../chart.interface'
 
 import { ChartOptions, LinearTickOptions,ChartDataSets } from 'chart.js';
 import { Color } from 'ng2-charts';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ChartBase } from '../chart.base';
 
 @Component({
   selector : `line-chart`,
@@ -13,9 +14,8 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
    ],
    exportAs: 'iavLineChart'
 })
-export class LineChart implements OnChanges, CommonChartInterface{
+export class LineChart extends ChartBase implements OnChanges, CommonChartInterface{
 
-  @ViewChild('canvas') canvas: ElementRef
 
   /**
    * labels of each of the columns, spider web edges
@@ -107,8 +107,12 @@ export class LineChart implements OnChanges, CommonChartInterface{
 
   shapedLineChartDatasets: ChartDataSets[]
   
-  constructor(private sanitizer:DomSanitizer){
-    
+  constructor(sanitizer:DomSanitizer){
+    super(sanitizer)
+  }
+
+  ngOnInit(){
+    this.pngUrl$.subscribe(console.log)
   }
 
   ngOnChanges(){
@@ -139,33 +143,19 @@ export class LineChart implements OnChanges, CommonChartInterface{
       : this.getDataPointString(input.y)
   }
 
-  public csvDataUrl: SafeUrl
-  public csvTitle: string
-  public imageTitle: string
-
   private generateDataUrl(){
     const row0 = [this.chartOption.scales.xAxes[0].scaleLabel.labelString].concat(this.chartOption.scales.yAxes[0].scaleLabel.labelString).join(',')
     const maxRows = this.lineDatasets.reduce((acc, lds) => Math.max(acc, lds.data.length), 0)
     const rows = Array.from(Array(maxRows)).map((_,idx) => [idx.toString()].concat(this.shapedLineChartDatasets.map(v => v.data[idx] ? this.getDataPointString(v.data[idx]) : '').join(','))).join('\n')
     const csvData = `${row0}\n${rows}`
 
-    this.csvDataUrl = this.sanitizer.bypassSecurityTrustUrl(`data:text/csv;charset=utf-8,${csvData}`)
-    this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
+    this.generateNewCsv(csvData)
 
+    this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
     this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`
   }
 
   private getGraphTitleAsString():string{
-    try{
-      return this.chartOption.title.text.constructor === Array
-        ? (this.chartOption.title.text as string[]).join(' ')
-        : this.chartOption.title.text as string
-    }catch(e){
-      return `Untitled`
-    }
-  }
-
-  get graphTitleAsString():string{
     try{
       return this.chartOption.title.text.constructor === Array
         ? (this.chartOption.title.text as string[]).join(' ')

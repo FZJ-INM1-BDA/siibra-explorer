@@ -1,10 +1,10 @@
-import { Component, Input, OnChanges, ViewChild, ElementRef } from '@angular/core'
+import { Component, Input, OnChanges, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core'
 
 import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption, CommonChartInterface } from '../chart.interface';
 import { Color } from 'ng2-charts';
-import { SafeUrl, DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { RadialChartOptions } from 'chart.js'
-
+import { ChartBase } from '../chart.base';
 @Component({
   selector : `radar-chart`,
   templateUrl : './radar.chart.template.html',
@@ -13,9 +13,8 @@ import { RadialChartOptions } from 'chart.js'
    ],
    exportAs: 'iavRadarChart'
 })
-export class RadarChart implements OnChanges, CommonChartInterface{
+export class RadarChart extends ChartBase implements OnDestroy, OnChanges, CommonChartInterface {
 
-  @ViewChild('canvas') canvas : ElementRef
   /**
    * labels of each of the columns, spider web edges
    */
@@ -94,8 +93,12 @@ export class RadarChart implements OnChanges, CommonChartInterface{
     datasets : []
   }
 
-  constructor(private sanitizer: DomSanitizer){
+  constructor(sanitizer: DomSanitizer){
+    super(sanitizer)
+  }
 
+  ngOnDestroy(){
+    this.superOnDestroy()
   }
   
   ngOnChanges(){
@@ -118,20 +121,16 @@ export class RadarChart implements OnChanges, CommonChartInterface{
     this.generateDataUrl()
   }
 
-  public csvDataUrl: SafeUrl
-  public csvTitle: string
-  public imageTitle: string
-
   private generateDataUrl(){
     const row0 = ['Receptors', ...this.chartDataset.datasets.map(ds => ds.label || 'no label')].join(',')
     const otherRows = (this.chartDataset.labels as string[])
       .map((label, index) => [ label, ...this.chartDataset.datasets.map(ds => ds.data[index]) ].join(',')).join('\n')
     const csvData = `${row0}\n${otherRows}`
 
-    this.csvDataUrl = this.sanitizer.bypassSecurityTrustUrl(`data:text/csv;charset=utf-8,${csvData}`)
-    this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
+    this.generateNewCsv(csvData)
 
-    this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`
+    this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
+    this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`    
   }
 
   private getGraphTitleAsString():string{

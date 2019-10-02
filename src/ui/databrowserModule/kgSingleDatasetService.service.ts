@@ -41,7 +41,8 @@ export class KgSingleDatasetService implements OnDestroy{
     }
   }
 
-  public datasetHasPreview({ name } : { name: string }){
+  public datasetHasPreview({ name } : { name: string } = { name: null }){
+    if (!name) throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined')
     const _url = new URL(`${this.constantService.backendUrl}datasets/hasPreview`)
     const searchParam = _url.searchParams
     searchParam.set('datasetName', name)
