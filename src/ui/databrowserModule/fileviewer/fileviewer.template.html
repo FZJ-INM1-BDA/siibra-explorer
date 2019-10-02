@@ -22,24 +22,28 @@
   <!-- data container -->
   <div [ngSwitch]="previewFile.data.chartType"
     *ngSwitchCase="'application/json'">
-    <radar-chart
-      #childChart="iavRadarChart"
-      [colors]="previewFile.data.colors"
-      [options]="previewFile.data.chartOptions"
-      [labels]="previewFile.data.labels"
-      [radarDatasets]="previewFile.data.datasets"
-      *ngSwitchCase="'radar'">
 
-    </radar-chart>
-    <line-chart
-      #childChart="iavLineChart"
+    <ng-container *ngSwitchCase="'radar'">
+      <radar-chart
+        #childChart="iavRadarChart"
+        [colors]="previewFile.data.colors"
+        [options]="previewFile.data.chartOptions"
+        [labels]="previewFile.data.labels"
+        [radarDatasets]="previewFile.data.datasets">
+  
+      </radar-chart>
 
-      [colors]="previewFile.data.colors"
-      [options]="previewFile.data.chartOptions"
-      [lineDatasets]="previewFile.data.datasets"
-      *ngSwitchCase="'line'">
+    </ng-container>
 
-    </line-chart>
+    <ng-container *ngSwitchCase="'line'">
+      <line-chart
+        #childChart="iavLineChart"
+        [colors]="previewFile.data.colors"
+        [options]="previewFile.data.chartOptions"
+        [lineDatasets]="previewFile.data.datasets">
+  
+      </line-chart>
+    </ng-container>
     <div *ngSwitchDefault>
       The json file is not a chart. I mean, we could dump the json, but would it really help?
     </div>
@@ -93,13 +97,9 @@
 
 
   <a mat-icon-button
-    [hidden]="!iavBlobToUrlDirective.url"
-
-    [iav-blob-to-url]="(childChart && childChart.canvas && childChart.canvas.nativeElement) | canvasToBlobPipe | async"
-    #iavBlobToUrlDirective="iavBlobToUrl"
-
+    *ngIf="childChart"
     target="_blank"
-    [href]="iavBlobToUrlDirective.url"
+    [href]="childChart.pngUrl$ | async"
     [download]="childChart && childChart.imageTitle"
 
     matTooltip="Download chart as an image">

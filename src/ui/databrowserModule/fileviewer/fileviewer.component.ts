@@ -1,8 +1,8 @@
-import { Component, Input, ViewChild, ElementRef, Inject, Optional, OnChanges } from '@angular/core'
+import { Component, Input, Inject, Optional, OnChanges, ViewChild, ChangeDetectorRef } from '@angular/core'
 
 import { ViewerPreviewFile } from 'src/services/state/dataStore.store';
 import { MAT_DIALOG_DATA } from '@angular/material';
-import { CommonChartInterface } from './chart.interface';
+import { ChartBase } from './chart/chart.base';
 
 
 @Component({
@@ -14,14 +14,22 @@ import { CommonChartInterface } from './chart.interface';
 })
 
 export class FileViewer implements OnChanges{
+
+  childChart: ChartBase
+
+  @ViewChild('childChart') 
+  set setChildChart(childChart:ChartBase){
+    this.childChart = childChart
+    this.cdr.detectChanges()
+  } 
+
   /**
    * fetched directly from KG
    */
   @Input() previewFile : ViewerPreviewFile
-  
-  @ViewChild('childChart') childChart: CommonChartInterface
 
   constructor(
+    private cdr: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) data
   ){
     if (data) this.previewFile = data.previewFile

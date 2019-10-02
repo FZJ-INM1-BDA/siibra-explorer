@@ -11,9 +11,9 @@ import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { PreviewComponent } from "./preview/preview.component";
 import { FileViewer } from "./fileviewer/fileviewer.component";
-import { RadarChart } from "./fileviewer/radar/radar.chart.component";
+import { RadarChart } from "./fileviewer/chart/radar/radar.chart.component";
 import { ChartsModule } from "ng2-charts";
-import { LineChart } from "./fileviewer/line/line.chart.component";
+import { LineChart } from "./fileviewer/chart/line/line.chart.component";
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -32,8 +32,6 @@ import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
-import { CanvastoBlobPipe } from "./fileviewer/util/canvasToBlob.pipe";
-import { BlobToUrlDirective } from "./fileviewer/util/blobToUrl.direcive";
 
 @NgModule({
   imports:[
@@ -59,11 +57,6 @@ import { BlobToUrlDirective } from "./fileviewer/util/blobToUrl.direcive";
     SingleDatasetListView,
 
     /**
-     * directives
-     */
-    BlobToUrlDirective,
-
-    /**
      * pipes
      */
     PathToNestedChildren,
@@ -76,8 +69,7 @@ import { BlobToUrlDirective } from "./fileviewer/util/blobToUrl.direcive";
     RegionBackgroundToRgbPipe,
     GetKgSchemaIdFromFullIdPipe,
     PreviewFileIconPipe,
-    PreviewFileTypePipe,
-    CanvastoBlobPipe
+    PreviewFileTypePipe
   ],
   exports:[
     DataBrowser,
