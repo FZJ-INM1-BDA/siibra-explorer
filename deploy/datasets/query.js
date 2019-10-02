@@ -11,7 +11,7 @@ let cachedData = null
 let otherQueryResult = null
 
 const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
-const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_1`
+const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_2`
 const KG_PARAM = {
   size: process.env.KG_SEARCH_SIZE || '1000',
   vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
@@ -153,9 +153,13 @@ readConfigFile('MNI152.json')
 readConfigFile('waxholmRatV2_0.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    const waxholm = flattenArray(json.parcellations[0].regions)
+    const waxholm3 = flattenArray(json.parcellations[0].regions)
+    const waxholm2 = flattenArray(json.parcellations[1].regions)
+    const waxholm1 = flattenArray(json.parcellations[2].regions)
 
-    waxholmSet = populateSet(waxholm)
+    waxholm1Set = populateSet(waxholm1)
+    waxholm2Set = populateSet(waxholm2)
+    waxholm3Set = populateSet(waxholm3)
   })
   .catch(console.error)
 
@@ -171,7 +175,7 @@ readConfigFile('allenMouse.json')
 
 const filterByPRSet = (prs, atlasPrSet = new Set()) => {
   if (!(atlasPrSet instanceof Set)) throw `atlasPrSet needs to be a set!`
-  return prs.some(({ name }) => atlasPrSet.has(name))
+  return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
 }
 
 const filter = (datasets = [], { templateName, parcellationName }) => datasets
