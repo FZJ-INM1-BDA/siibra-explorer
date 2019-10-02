@@ -38,12 +38,13 @@ export class ChartBase{
         interval(500).pipe(
           map(() => this.canvas && this.canvas.nativeElement),
           filter(v => !!v),
-          take(1),
           switchMap(el => 
             from(
               new Promise(rs => el.toBlob(blob => rs(blob), 'image/png'))
             ) as Observable<Blob>
-          )
+          ),
+          filter(v => !!v),
+          take(1)
         )
       ),
       map(blob => {

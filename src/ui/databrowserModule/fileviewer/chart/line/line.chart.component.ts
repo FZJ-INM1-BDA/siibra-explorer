@@ -111,10 +111,6 @@ export class LineChart extends ChartBase implements OnChanges, CommonChartInterf
     super(sanitizer)
   }
 
-  ngOnInit(){
-    this.pngUrl$.subscribe(console.log)
-  }
-
   ngOnChanges(){
     this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
       data: lineDataset.data.map((v,idx)=>({
