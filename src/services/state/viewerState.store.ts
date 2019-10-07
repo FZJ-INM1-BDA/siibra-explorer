@@ -3,8 +3,10 @@ import { UserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { NgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, shareReplay, startWith, tap } from 'rxjs/operators';
+import { withLatestFrom, map, shareReplay, startWith, filter, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
+import { generateLabelIndexId } from '../stateStore.service';
 
 export interface ViewerStateInterface{
   fetchedTemplates : any[]
@@ -250,20 +252,132 @@ export class ViewerStateUseEffect{
         }
       })
     )
+
+    this.mouseoverUserLandmarks = this.actions$.pipe(
+      ofType(ACTION_TYPES.MOUSEOVER_USER_LANDMARK_LABEL),
+      withLatestFrom(this.currentLandmarks$),
+      map(([ action, currentLandmarks ]) => {
+        const { payload } = action as any
+        const { label } = payload
+        if (!label) return {
+          type: MOUSEOVER_USER_LANDMARK,
+          payload: {
+            userLandmark: null
+          }
+        }
+
+        const idx = Number(label.replace('label=', ''))
+        if (isNaN(idx)) {
+          console.warn(`Landmark index could not be parsed as a number: ${idx}`)
+          return {
+            type: MOUSEOVER_USER_LANDMARK,
+            payload: {
+              userLandmark: null
+            }
+          }
+        }
+
+        return {
+          type: MOUSEOVER_USER_LANDMARK,
+          payload: {
+            userLandmark: currentLandmarks[idx]
+          }
+        }
+      })
+
+    )
+
+    const doubleClickOnViewer$ = this.actions$.pipe(
+      ofType(ACTION_TYPES.DOUBLE_CLICK_ON_VIEWER),
+      map(action => {
+        const { payload } = action as any
+        const { segments, landmark, userLandmark } = payload
+        return { segments, landmark, userLandmark }
+      }),
+      shareReplay(1)
+    )
+
+    this.doubleClickOnViewerToggleRegions$ = doubleClickOnViewer$.pipe(
+      filter(({ segments }) => segments && segments.length > 0),
+      withLatestFrom(this.store$.pipe(
+        select('viewerState'),
+        select('regionsSelected'),
+        distinctUntilChanged(),
+        startWith([])
+      )),
+      map(([{ segments }, regionsSelected]) => {
+        const selectedSet = new Set(regionsSelected.map(generateLabelIndexId))
+        const toggleArr = segments.map(({ segment, layer }) => generateLabelIndexId({ ngId: layer.name, ...segment }))
+
+        const deleteFlag = toggleArr.some(id => selectedSet.has(id))
+
+        for (const id of toggleArr){
+          if (deleteFlag) selectedSet.delete(id)
+          else selectedSet.add(id)
+        }
+        
+        return {
+          type: SELECT_REGIONS_WITH_ID,
+          selectRegionIds: [...selectedSet]
+        }
+      })
+    )
+
+    this.doubleClickOnViewerToggleLandmark$ = doubleClickOnViewer$.pipe(
+      filter(({ landmark }) => !!landmark),
+      withLatestFrom(this.store$.pipe(
+        select('viewerState'),
+        select('landmarksSelected'),
+        startWith([])
+      )),
+      map(([{ landmark }, selectedSpatialDatas]) => {
+
+        const selectedIdx = selectedSpatialDatas.findIndex(data => data.name === landmark.name)
+
+        const newSelectedSpatialDatas = selectedIdx >= 0
+          ? selectedSpatialDatas.filter((_, idx) => idx !== selectedIdx)
+          : selectedSpatialDatas.concat(landmark)
+
+        return {
+          type: SELECT_LANDMARKS,
+          landmarks: newSelectedSpatialDatas
+        }
+      })
+    )
+
+    this.doubleClickOnViewerToogleUserLandmark$ = doubleClickOnViewer$.pipe(
+      filter(({ userLandmark }) => userLandmark)
+    )
   }
 
   private currentLandmarks$: Observable<any[]>
+
+  @Effect()
+  mouseoverUserLandmarks: Observable<any>
 
   @Effect()
   removeUserLandmarks: Observable<any>
 
   @Effect()
   addUserLandmarks$: Observable<any>
+
+  @Effect()
+  doubleClickOnViewerToggleRegions$: Observable<any>
+
+  @Effect()
+  doubleClickOnViewerToggleLandmark$: Observable<any>
+
+  // @Effect()
+  doubleClickOnViewerToogleUserLandmark$: Observable<any>
 }
 
 const ACTION_TYPES = {
   ADD_USERLANDMARKS: `ADD_USERLANDMARKS`,
-  REMOVE_USER_LANDMARKS: 'REMOVE_USER_LANDMARKS'
+  REMOVE_USER_LANDMARKS: 'REMOVE_USER_LANDMARKS',
+  MOUSEOVER_USER_LANDMARK_LABEL: 'MOUSEOVER_USER_LANDMARK_LABEL',
+
+  SINGLE_CLICK_ON_VIEWER: 'SINGLE_CLICK_ON_VIEWER',
+  DOUBLE_CLICK_ON_VIEWER: 'DOUBLE_CLICK_ON_VIEWER'
 }
 
 export const VIEWERSTATE_ACTION_TYPES = ACTION_TYPES

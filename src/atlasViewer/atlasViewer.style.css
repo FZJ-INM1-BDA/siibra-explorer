@@ -50,29 +50,14 @@ layout-floating-container
   margin: 0.8em 0.4em;
 }
 
-div[floatingMouseContextualContainer]
+[contextualBlock]
 {
-  position : absolute;
-  left: 0;
-  top : 0;
-  width : 0px;
-  height: 0px;
-}
-
-div[contextualBlock]
-{
-  margin-top: 1px;
-  white-space: nowrap;
-  display:inline-block;
-  width:auto;
-  padding: 0.3em 0.5em;
   background-color:rgba(200,200,200,0.8);
 }
 
-:host-context([darktheme="true"]) div[contextualBlock]
+:host-context([darktheme="true"]) [contextualBlock]
 {
   background-color : rgba(30,30,30,0.8);
-  color : rgba(250,250,250,0.8);
 }
 
 

@@ -1,8 +1,8 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef, Renderer2 } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
+import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -13,7 +13,6 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
-import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
@@ -37,8 +36,6 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 })
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
-
-  @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
   
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
@@ -49,7 +46,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
-  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components
@@ -76,7 +72,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
-  public onhoverLandmarksForFixed$: Observable<any>
+  
   public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
@@ -104,7 +100,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private matDialog: MatDialog,
-    private databrowserService: DatabrowserService,
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
@@ -194,13 +189,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         if(landmark === null)
           return landmark
         const idx = Number(landmark.replace('label=',''))
-        if(isNaN(idx))
-          return `Landmark index could not be parsed as a number: ${landmark}`
-        return  {
-                  landmarkName: spatialDatas[idx].name,
-                  datasets: (spatialDatas[idx].dataset
-                      && spatialDatas[idx].dataset.length)? spatialDatas[idx].dataset : null
-                }
+        if(isNaN(idx)) {
+          console.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+          return {
+            landmarkName: idx
+          }
+        } else {
+          return  {
+            landmarkName: spatialDatas[idx].name
+          }
+        }
       })
     )
 
@@ -218,8 +216,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     ).pipe(
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
-        if (!segments)
-          return null
+        if (!segments) return null
         const filteredSeg = segments.filter(filterFn)
         return filteredSeg.length > 0
           ? segments.map(s => s.segment) 
@@ -232,11 +229,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       safeFilter('parcellationSelected'),
       map(state=>state.parcellationSelected),
       distinctUntilChanged(),
-    )
-
-
-    this.subscriptions.push(
-      this.newViewer$.subscribe(template => this.selectedTemplate = template)
     )
 
     this.subscriptions.push(
@@ -408,17 +400,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
-
-    this.onhoverLandmarksForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverLandmark$),
-      map(([_flag, onhoverLandmark]) => onhoverLandmark || [])
-    )
-
-    /**
-     * TODO clean up code
-     * do not do this imperatively
-     */
-    this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
   /**
@@ -486,8 +467,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.rClContextualMenu.show()
   }
 
-  private selectedTemplate: any
-
   openLandmarkUrl(dataset) {
     this.rClContextualMenu.hide()
     window.open(dataset.externalLink, "_blank")
@@ -495,48 +474,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.version')
   public _version : string = VERSION
-
-  /**
-   * TODO deprecated
-   */
-  changeMenuState({open, close}:{open?:boolean, close?:boolean} = {}) {
-    if (open) {
-      return this.store.dispatch({
-        type: OPEN_SIDE_PANEL
-      })
-    }
-    if (close) {
-      return this.store.dispatch({
-        type: CLOSE_SIDE_PANEL
-      })
-    }
-    this.store.dispatch({
-      type: TOGGLE_SIDE_PANEL
-    })
-  }
-
-  closeMenuWithSwipe(documentToSwipe: ElementRef) {
-    if (documentToSwipe && documentToSwipe.nativeElement) {
-      const swipeDistance = 150; // swipe distance
-      const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, 'touchstart')
-          .pipe(
-              switchMap(startEvent =>
-                  fromEvent(documentToSwipe.nativeElement, 'touchmove')
-                      .pipe(
-                          takeUntil(fromEvent(documentToSwipe.nativeElement, 'touchend')),
-                          map(event => event['touches'][0].pageX),
-                          scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0),
-                          takeLast(1),
-                          filter(difference => difference >= swipeDistance)
-                      )))
-      this.subscriptions.push(
-        swipeLeft$.subscribe(() => {
-          this.changeMenuState({close: true})
-        })
-      )
-    }
-  }
-
 }
 
 export interface NgLayerInterface{

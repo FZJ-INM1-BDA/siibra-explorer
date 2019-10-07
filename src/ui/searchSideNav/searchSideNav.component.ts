@@ -5,7 +5,7 @@ import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { Observable, Subscription } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
-import { VIEWERSTATE_ACTION_TYPES } from "../viewerStateController/viewerState.base";
+import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 
 @Component({
@@ -79,7 +79,7 @@ export class SearchSideNav implements OnInit, OnDestroy {
 
   removeRegion(region: any){
     this.store$.dispatch({
-      type: VIEWERSTATE_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY,
+      type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY,
       payload: { region }
     })
   }

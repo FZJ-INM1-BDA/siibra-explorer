@@ -4,7 +4,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop'
 import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
-import { StoreModule, Store, select } from "@ngrx/store";
+import { StoreModule } from "@ngrx/store";
 import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
@@ -46,9 +46,10 @@ import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
+import { UIService } from "./services/uiService.service";
+import { UtilModule } from "./util/util.module";
 
 import 'hammerjs'
-import { UIService } from "./services/uiService.service";
 
 import 'src/res/css/version.css'
 import 'src/theme.scss'
@@ -64,6 +65,7 @@ import 'src/res/css/extra_styles.css'
     UIModule,
     DatabrowserModule,
     AngularMaterialModule,
+    UtilModule,
     
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
