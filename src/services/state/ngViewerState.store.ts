@@ -2,9 +2,10 @@ import { Action, Store, select } from '@ngrx/store'
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, combineLatest, fromEvent, Subscription } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, tap, delay } from 'rxjs/operators';
+import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, tap, delay, switchMapTo, take } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { SNACKBAR_MESSAGE } from './uiState.store';
+import { getNgIds } from '../stateStore.service';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -24,6 +25,7 @@ export interface NgViewerStateInterface{
 
 export interface NgViewerAction extends Action{
   layer : NgLayerInterface
+  layers : NgLayerInterface[]
   forceShowSegment : boolean
   nehubaReady: boolean
   payload: any
@@ -82,6 +84,13 @@ export function ngViewerState(prevState:NgViewerStateInterface = defaultState, a
                   : {})
           })
       } 
+    case REMOVE_NG_LAYERS:
+      const { layers } = action
+      const layerNameSet = new Set(layers.map(l => l.name))
+      return {
+        ...prevState,
+        layers: prevState.layers.filter(l => !layerNameSet.has(l.name))
+      }
     case REMOVE_NG_LAYER:
       return {
         ...prevState,
@@ -139,6 +148,9 @@ export class NgViewerUseEffect implements OnDestroy{
 
   @Effect()
   public spacebarListener$: Observable<any>
+
+  @Effect()
+  public removeAllNonBaseLayers$: Observable<any>
 
   private panelOrder$: Observable<string>
   private panelMode$: Observable<string>
@@ -281,6 +293,63 @@ export class NgViewerUseEffect implements OnDestroy{
         type: ACTION_TYPES.CYCLE_VIEWS
       })
     )
+
+    /**
+     * simplify with layer browser
+     */
+    const baseNgLayerName$ = this.store$.pipe(
+      select('viewerState'),
+      select('templateSelected'),
+      map(templateSelected => {
+        if (!templateSelected) return []
+
+        const { ngId , otherNgIds = []} = templateSelected
+
+        return [
+          ngId,
+          ...otherNgIds,
+          ...templateSelected.parcellations.reduce((acc, curr) => {
+            return acc.concat([
+              curr.ngId,
+              ...getNgIds(curr.regions)
+            ])
+          }, [])
+        ]
+      }),
+      /**
+       * get unique array
+       */
+      map(nonUniqueArray => Array.from(new Set(nonUniqueArray))),
+      /**
+       * remove falsy values
+       */
+      map(arr => arr.filter(v => !!v))
+    )
+
+    const allLoadedNgLayers$ = this.store$.pipe(
+      select('viewerState'),
+      select('loadedNgLayers')
+    )
+
+    this.removeAllNonBaseLayers$ = this.actions.pipe(
+      ofType(ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS),
+      withLatestFrom(
+        combineLatest(
+          baseNgLayerName$,
+          allLoadedNgLayers$
+        )
+      ),
+      map(([_, [baseNgLayerNames, loadedNgLayers] ]) => {
+        const baseNameSet = new Set(baseNgLayerNames)
+        return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
+      }),
+      map(layers => {
+        return {
+          type: REMOVE_NG_LAYERS,
+          layers
+        }
+      })
+    )
   }
 
   ngOnDestroy(){
@@ -292,6 +361,7 @@ export class NgViewerUseEffect implements OnDestroy{
 
 export const ADD_NG_LAYER = 'ADD_NG_LAYER'
 export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
+export const REMOVE_NG_LAYERS = 'REMOVE_NG_LAYERS'
 export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
 export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
 export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
@@ -311,7 +381,9 @@ const ACTION_TYPES = {
   SET_PANEL_ORDER: 'SET_PANEL_ORDER',
 
   TOGGLE_MAXIMISE: 'TOGGLE_MAXIMISE',
-  CYCLE_VIEWS: 'CYCLE_VIEWS'
+  CYCLE_VIEWS: 'CYCLE_VIEWS',
+
+  REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`
 }
 
 export const SUPPORTED_PANEL_MODES = [
