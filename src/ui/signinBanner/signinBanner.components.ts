@@ -45,4 +45,22 @@ export class SigninBanner{
       panelClass: ['col-12','col-sm-12','col-md-8','col-lg-6','col-xl-4']
     })
   }
+
+  private keyListenerConfigBase = {
+    type: 'keydown',
+    stop: true,
+    prevent: true,
+    target: 'document'
+  }
+
+  public keyListenerConfig = [{
+    key: 'h',
+    ...this.keyListenerConfigBase
+  },{
+    key: 'H',
+    ...this.keyListenerConfigBase
+  },{
+    key: '?',
+    ...this.keyListenerConfigBase
+  }]
 }

@@ -5,6 +5,7 @@ import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, s
 import { Subscription, Observable, combineLatest } from "rxjs";
 import { filter, map, shareReplay, distinctUntilChanged, throttleTime, debounceTime } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 
 @Component({
   selector : 'layer-browser',
@@ -178,6 +179,12 @@ export class LayerBrowser implements OnInit, OnDestroy{
         : this.forceShowSegmentCurrentState === true
           ? false
           : null
+    })
+  }
+
+  removeAllNonBasicLayer(){
+    this.store.dispatch({
+      type: NG_VIEWER_ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS
     })
   }
 

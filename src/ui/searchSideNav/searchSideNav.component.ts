@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy } from "@angular/core";
-import { MatDialogRef, MatDialog } from "@angular/material";
+import { Component, Output, EventEmitter, OnInit, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
+import { MatDialogRef, MatDialog, MatSnackBar } from "@angular/material";
 import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { Observable, Subscription } from "rxjs";
@@ -7,6 +7,7 @@ import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Component({
   selector: 'search-side-nav',
@@ -26,11 +27,15 @@ export class SearchSideNav implements OnInit, OnDestroy {
   @Output() dismiss: EventEmitter<any> = new EventEmitter()
   @Output() open: EventEmitter<any> = new EventEmitter()
 
+  @ViewChild('layerBrowserTmpl', {read: TemplateRef}) layerBrowserTmpl: TemplateRef<any>
+
   public autoOpenSideNav$: Observable<any>
 
   constructor(
-    private dialog: MatDialog,
-    private store$: Store<any>
+    public dialog: MatDialog,
+    private store$: Store<any>,
+    private snackBar: MatSnackBar,
+    private constantService: AtlasViewerConstantsServices
   ){
     this.autoOpenSideNav$ = this.store$.pipe(
       select('viewerState'),
@@ -67,7 +72,9 @@ export class SearchSideNav implements OnInit, OnDestroy {
     if (this.layerBrowserDialogRef) return
     
     this.dismiss.emit(true)
-    this.layerBrowserDialogRef = this.dialog.open(LayerBrowser, {
+    
+    const dialogToOpen = this.layerBrowserTmpl || LayerBrowser
+    this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
       autoFocus: false,
       position: {
@@ -75,6 +82,16 @@ export class SearchSideNav implements OnInit, OnDestroy {
       },
       disableClose: true
     })
+
+    this.layerBrowserDialogRef.afterClosed().subscribe(val => {
+      if (val === 'user action') this.snackBar.open(this.constantService.dissmissUserLayerSnackbarMessage, 'Dismiss', {
+        duration: 5000
+      })
+    })
+  }
+
+  extraLayersCanBeDismissed(): boolean{
+    return this.dialog.openDialogs.findIndex(dialog => dialog !== this.layerBrowserDialogRef) < 0
   }
 
   removeRegion(region: any){
@@ -85,4 +102,10 @@ export class SearchSideNav implements OnInit, OnDestroy {
   }
 
   trackByFn = trackRegionBy
+
+  public keyListenerConfig = [{
+    key: 'Escape',
+    type: 'keydown',
+    target: 'document'
+  }]
 }

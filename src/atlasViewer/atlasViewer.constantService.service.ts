@@ -238,10 +238,12 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
           this.showHelpSliceViewMap = this.showHelpSliceViewMobile
           this.showHelpGeneralMap = this.showHelpGeneralMobile
           this.showHelpPerspectiveViewMap = this.showHelpPerspectiveMobile
+          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageMobile
         } else {
           this.showHelpSliceViewMap = this.showHelpSliceViewDesktop
           this.showHelpGeneralMap = this.showHelpGeneralDesktop
           this.showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
+          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
         }
       })
     )
@@ -263,6 +265,10 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
   }
 
   public cyclePanelMessage: string = `[spacebar] to cycle through views`
+
+  private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]` 
+  private dissmissUserLayerSnackbarMessageMobile = `You can dismiss extra layers in the 🌏 menu`
+  public dissmissUserLayerSnackbarMessage: string = this.dissmissUserLayerSnackbarMessageDesktop
 }
 
 const parseURLToElement = (url:string):HTMLElement=>{

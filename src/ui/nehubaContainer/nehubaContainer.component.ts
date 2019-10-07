@@ -879,21 +879,25 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
     })
   }
 
-  public tunableMobileProperties = ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z']
+  public tunableMobileProperties = ['Oblique Rotate X', 'Oblique Rotate Y', 'Oblique Rotate Z', 'Remove extra layers']
   public selectedProp = null
+
+  handleMobileOverlayTouchEnd(focusItemIndex){
+    if (this.tunableMobileProperties[focusItemIndex] === 'Remove extra layers') {
+      this.store.dispatch({
+        type: NG_VIEWER_ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS
+      })
+    }
+  }
 
   handleMobileOverlayEvent(obj:any){
     const {delta, selectedProp} = obj
     this.selectedProp = selectedProp
 
     const idx = this.tunableMobileProperties.findIndex(p => p === selectedProp)
-    idx === 0
-      ? this.nehubaViewer.obliqueRotateX(delta)
-      : idx === 1
-        ? this.nehubaViewer.obliqueRotateY(delta)
-        : idx === 2
-          ? this.nehubaViewer.obliqueRotateZ(delta)
-          : console.warn('could not oblique rotate')
+    if (idx === 0) this.nehubaViewer.obliqueRotateX(delta)
+    if (idx === 1) this.nehubaViewer.obliqueRotateY(delta)
+    if (idx === 2) this.nehubaViewer.obliqueRotateZ(delta)
   }
 
   returnTruePos(quadrant:number,data:any){
@@ -1312,22 +1316,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
         positionReal : true
       }))
     }
-  }
-
-  removeFav(event: MouseEvent, ds: DataEntry){
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
-      payload: ds
-    })
-  }
-
-  downloadDs(event: MouseEvent, ds: DataEntry, downloadBtn: MatButton){
-    downloadBtn.disabled = true
-    const id = getIdFromDataEntry(ds)
-    const { name } = ds
-    this.kgSingleDataset.downloadZipFromKg({kgId: id}, name)
-      .catch(err => this.constantService.catchError(err))
-      .finally(() => downloadBtn.disabled = false)
   }
 }
 

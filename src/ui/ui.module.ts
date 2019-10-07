@@ -71,7 +71,6 @@ import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHi
 import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
-import { HelpDirective } from "src/util/directives/help.directive";
 
 @NgModule({
   imports : [
@@ -149,7 +148,6 @@ import { HelpDirective } from "src/util/directives/help.directive";
     DownloadDirective,
     TouchSideClass,
     ElementOutClickDirective,
-    HelpDirective
   ],
   entryComponents : [
 

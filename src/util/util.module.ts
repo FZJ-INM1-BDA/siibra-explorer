@@ -3,7 +3,8 @@ import { FilterNullPipe } from "./pipes/filterNull.pipe";
 import { FilterRowsByVisbilityPipe } from "src/components/flatTree/filterRowsByVisibility.pipe";
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
 import { DelayEventDirective } from "./directives/delayEvent.directive";
-import { MouseHoverDirective, MouseOverTextPipe, MouseOverIconPipe } from "./mouseOver.directive";
+import { MouseHoverDirective, MouseOverTextPipe, MouseOverIconPipe } from "./directives/mouseOver.directive";
+import { KeyListner } from "./directives/keyDownListener.directive";
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { MouseHoverDirective, MouseOverTextPipe, MouseOverIconPipe } from "./mou
     DelayEventDirective,
     MouseHoverDirective,
     MouseOverTextPipe,
-    MouseOverIconPipe
+    MouseOverIconPipe,
+    KeyListner
   ],
   exports: [
     FilterNullPipe,
@@ -22,7 +24,8 @@ import { MouseHoverDirective, MouseOverTextPipe, MouseOverIconPipe } from "./mou
     DelayEventDirective,
     MouseHoverDirective,
     MouseOverTextPipe,
-    MouseOverIconPipe
+    MouseOverIconPipe,
+    KeyListner
   ]
 })
 

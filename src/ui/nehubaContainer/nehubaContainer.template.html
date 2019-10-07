@@ -54,8 +54,10 @@
 <!-- mobile nub, allowing for ooblique slicing in mobile -->
 <mobile-overlay
   *ngIf="(useMobileUI$ | async) && viewerLoaded"
+  (touchend)="handleMobileOverlayTouchEnd(mobileOverlayEl.focusItemIndex)"
   [tunableProperties]="tunableMobileProperties"
-  (deltaValue)="handleMobileOverlayEvent($event)">
+  (deltaValue)="handleMobileOverlayEvent($event)"
+  #mobileOverlayEl>
   <div class="base" delta>
     <div mobileObliqueGuide class="p-2 mb-4 shadow">
       {{ selectedProp }}
