@@ -6,7 +6,7 @@ import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/ser
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS } from "src/services/state/viewerState.store";
-import { VIEWERSTATE_ACTION_TYPES } from "../viewerState.base";
+import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -127,9 +127,9 @@ export class RegionTextSearchAutocomplete{
   // TODO handle mobile
   handleRegionClick({ mode = null, region = null } = {}){
     const type = mode === 'single'
-      ? VIEWERSTATE_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY
+      ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY
       : mode === 'double'
-        ? VIEWERSTATE_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY
+        ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY
         : ''
     this.store$.dispatch({
       type,

@@ -44,7 +44,6 @@
     *ngIf="!(useMobileUI$ | async)"
     [selectedTemplate]="selectedTemplate"
     [isMobile]="useMobileUI$ | async"
-    [onHoverSegmentName]="onHoverSegmentName$ | async"
     [nehubaViewer]="nehubaViewer">
   </ui-status-card>
 </layout-floating-container>
@@ -190,7 +189,7 @@
     <!-- place holder when no fav data is available -->
     <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">
       <mat-card-content class="muted">
-        No pinned dataset ... yet.
+        No pinned datasets.
       </mat-card-content>
     </mat-card>
 

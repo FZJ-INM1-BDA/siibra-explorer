@@ -6,7 +6,10 @@ import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/co
 const defaultState : UIStateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
+  
   mouseOverLandmark: null,
+  mouseOverUserLandmark: null,
+
   focusedSidePanel: null,
   sidePanelOpen: false,
 
@@ -33,6 +36,13 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       return {
         ...state,
         mouseOverSegment : action.segment
+      }
+    case MOUSEOVER_USER_LANDMARK:
+      const { payload = {} } = action
+      const { userLandmark: mouseOverUserLandmark = null } = payload
+      return {
+        ...state,
+        mouseOverUserLandmark
       }
     case MOUSE_OVER_LANDMARK:
       return {
@@ -103,10 +113,13 @@ export interface UIStateInterface{
     }
     segment: any | null
   }[]
-  sidePanelOpen : boolean
-  mouseOverSegment : any | number
-  mouseOverLandmark : any 
-  focusedSidePanel : string | null
+  sidePanelOpen: boolean
+  mouseOverSegment: any | number
+
+  mouseOverLandmark: any
+  mouseOverUserLandmark: any
+
+  focusedSidePanel: string | null
 
   snackbarMessage: Symbol
 
@@ -119,7 +132,7 @@ export interface UIStateInterface{
 export interface UIAction extends Action{
   segment: any | number
   landmark: any
-  focusedSidePanel? : string
+  focusedSidePanel?: string
   segments?:{
     layer: {
       name: string
@@ -129,11 +142,14 @@ export interface UIAction extends Action{
   snackbarMessage: string
 
   bottomSheetTemplate: TemplateRef<any>
+
+  payload: any
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
+export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
 export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`

@@ -60,6 +60,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
       }
     }> = new EventEmitter()
   @Output() mouseoverLandmarkEmitter : EventEmitter<number | null> = new EventEmitter()
+  @Output() mouseoverUserlandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
   @Output() regionSelectionEmitter : EventEmitter<{segment:number, layer:{name?: string, url?: string}}> = new EventEmitter()
   @Output() errorEmitter : EventEmitter<any> = new EventEmitter()
 
@@ -368,9 +369,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
       //   [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       // })
       pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'viewportToData'))
-      .subscribe((events:CustomEvent[]) => {
-        [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-      })
+        .subscribe((events:CustomEvent[]) => {
+          [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
+        })
     )
   }
 
@@ -768,6 +769,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
       this.nehubaViewer.mouseOver.layer
         .filter(obj => obj.layer.name === this.constantService.ngLandmarkLayerName)
         .subscribe(obj => this.mouseoverLandmarkEmitter.emit(obj.value))
+    )
+
+    this.ondestroySubscriptions.push(
+      this.nehubaViewer.mouseOver.layer
+        .filter(obj => obj.layer.name === this.constantService.ngUserLandmarkLayerName)
+        .subscribe(obj => this.mouseoverUserlandmarkEmitter.emit(obj.value))
     )
 
     this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace

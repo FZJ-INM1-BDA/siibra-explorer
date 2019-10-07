@@ -3,7 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { DESELECT_REGIONS } from "src/services/state/viewerState.store";
-import { VIEWERSTATE_ACTION_TYPES } from "src/ui/viewerStateController/viewerState.base";
+import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "src/ui/viewerStateController/viewerState.base";
 
 @Component({
   selector: 'currently-selected-regions',
@@ -39,7 +39,7 @@ export class CurrentlySelectedRegions {
 
   public gotoRegion(event: MouseEvent, region:any){
     this.store$.dispatch({
-      type: VIEWERSTATE_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY,
+      type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY,
       payload: { region }
     })
   }
