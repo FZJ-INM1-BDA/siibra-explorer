@@ -663,3 +663,13 @@ body::after
   pointer-events: none;
   z-index: 99999;
 }
+
+.flex-grow-3
+{
+  flex-grow: 3!important;
+}
+
+.flex-grow-5
+{
+  flex-grow: 5!important;
+}

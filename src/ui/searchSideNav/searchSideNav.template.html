@@ -1,5 +1,5 @@
 <div class="d-flex flex-column h-100">
-  <viewer-state-controller class="pe-all flex-grow-0 flex-shrink-0 mb-2" #viewerStateController>
+  <viewer-state-controller class="pe-all flex-grow-0 flex-shrink-0 mb-1" #viewerStateController>
 
     <!-- content append -->
     <ng-container card-content="append">
@@ -23,86 +23,90 @@
     </div>
   </viewer-state-controller>
 
-  <data-browser
-    class="pe-all flex-grow-1 flex-shrink-1"
-    *ngIf="showDataset"
-    [template]="viewerStateController.templateSelected$ | async"
-    [parcellation]="viewerStateController.parcellationSelected$ | async"
-    [regions]="viewerStateController.regionsSelected$ | async"
-    (dataentriesUpdated)="availableDatasets = $event.length">
+  <ng-container *ngIf="showDataset">
 
-    <!-- content prepend -->
-    <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected" card-content="prepend">
-      <mat-card-content [ngClass]="{'h-10em': regionsSelected.length > 1}">
+    <!-- selected regions container -->
+    <mat-card *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected"
+      [ngClass]="{'h-117px flex-grow-1': regionsSelected.length > 1, 'flex-grow-0': regionsSelected.length < 2}"
+      class="flex-shrink-0 mb-1 pe-all">
 
-        <!-- show when no region is selected -->
-        <ng-template [ngIf]="regionsSelected.length === 0" [ngIfElse]="showBrainRegions">
-          <div class="d-flex flex-row align-items-center flex-nowrap">
+      <!-- show when no region is selected -->
+      <mat-card-subtitle *ngIf="regionsSelected.length === 0">
+        In the current view
+      </mat-card-subtitle>
+
+
+      <!-- show when regions are selected -->
+      <mat-card-content *ngIf="regionsSelected.length > 0" class="h-100">
+
+        <!-- single region -->
+        <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
+
+          <!-- selected brain region -->
+          <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+            <i class="fas fa-brain font-2x mr-2"></i>
+
             <span class="font-weight-bold">
-              In the current view
+              {{ regionsSelected[0].name }}
             </span>
+
+            <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
+              <i class="fas fa-trash"></i>
+            </button>
           </div>
         </ng-template>
 
-        <!-- show when regions are selected -->
-        <ng-template #showBrainRegions>
+        <!-- multi region -->
+        <ng-template #multiRegionTemplate>
+          <cdk-virtual-scroll-viewport class="h-100" itemSize="78">
+            <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
+              class="region-wrapper d-flex flex-column" >
+              <!-- divider if index !== 0 -->
+              <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="index !== 0"></mat-divider>
 
-          <!-- single region -->
-          <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
-
-            <!-- selected brain region -->
-            <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-              <i class="fas fa-brain font-2x mr-2"></i>
-  
-              <span class="font-weight-bold">
-                {{ regionsSelected[0].name }}
-              </span>
-  
-              <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </ng-template>
-
-          <!-- multi region -->
-          <ng-template #multiRegionTemplate>
-            <cdk-virtual-scroll-viewport class="h-100" itemSize="78">
-              <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
-                class="region-wrapper d-flex flex-column" >
-                <!-- divider if index !== 0 -->
-                <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="index !== 0"></mat-divider>
-  
-                <!-- selected brain region -->
-                <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-                  <i class="flex-grow-0 flex-shrink-0 fas fa-brain font-2x mr-2"></i>
-      
-                  <span class="flex-grow-1 flex-shrink-1 font-weight-bold">
-                    {{ region.name }}
-                  </span>
-      
-                  <button mat-icon-button
-                    class="flex-grow-0 flex-shrink-0"
-                    (click)="removeRegion(region)" >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
+              <!-- selected brain region -->
+              <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+                <i class="flex-grow-0 flex-shrink-0 fas fa-brain font-2x mr-2"></i>
+    
+                <span class="flex-grow-1 flex-shrink-1 font-weight-bold">
+                  {{ region.name }}
+                </span>
+    
+                <button mat-icon-button
+                  class="flex-grow-0 flex-shrink-0"
+                  (click)="removeRegion(region)" >
+                  <i class="fas fa-trash"></i>
+                </button>
               </div>
-            </cdk-virtual-scroll-viewport>
-          </ng-template>
-
+            </div>
+          </cdk-virtual-scroll-viewport>
         </ng-template>
-      </mat-card-content>
-    </ng-container>
 
-    <!-- footer content -->
-    <div class="d-flex flex-row justify-content-center" card-footer>
-      <button mat-stroked-button
-        class="m-1"
-        (click)="showDataset = false" >
-        <i class="fas fa-chevron-up"></i>
-      </button>
-    </div>
-  </data-browser>
+      </mat-card-content>
+    </mat-card>
+
+    <data-browser
+      class="pe-all flex-grow-5 flex-shrink-1"
+      [template]="viewerStateController.templateSelected$ | async"
+      [parcellation]="viewerStateController.parcellationSelected$ | async"
+      [regions]="viewerStateController.regionsSelected$ | async"
+      (dataentriesUpdated)="availableDatasets = $event.length">
+  
+      <mat-card-subtitle card-header>
+        Related datasets
+      </mat-card-subtitle>
+  
+      <!-- footer content -->
+      <div class="d-flex flex-row justify-content-center" card-footer>
+        <button mat-stroked-button
+          class="m-1"
+          (click)="showDataset = false" >
+          <i class="fas fa-chevron-up"></i>
+        </button>
+      </div>
+    </data-browser>
+  </ng-container>
+
 </div>
 
 <div [hidden]>

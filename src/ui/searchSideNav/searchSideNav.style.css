@@ -2,3 +2,10 @@
 {
   height:78px;
 }
+
+/* exactly 1.5 line height */
+
+.h-117px
+{
+  min-height:117px!important;
+}
