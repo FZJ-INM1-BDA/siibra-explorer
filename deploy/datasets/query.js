@@ -180,7 +180,7 @@ const filterByPRSet = (prs, atlasPrSet = new Set()) => {
 
 const filterByPRName = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
   ? true
-  : (dataset.parcellationAtlas || []).some(({ name }) => console.log(name) || name === parcellationName)
+  : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
 
 const filter = (datasets = [], { templateName, parcellationName }) => datasets
   .filter(ds => commonSenseDsFilter({ ds, templateName, parcellationName }))
