@@ -256,9 +256,11 @@ export class NgViewerUseEffect implements OnDestroy{
       })
     )
 
+    const scanFn = (acc: string[], curr: string):string[] => [curr, ...acc.slice(0,1)]
+
     this.toggleMaximiseMode$ = toggleMaxmimise$.pipe(
       withLatestFrom(this.panelMode$.pipe(
-        scan((acc, curr: string) => [curr, ...acc.slice(0,1)], [])
+        scan(scanFn, [])
       )),
       map(([ _, panelModes ]) => {
         return {

@@ -3,11 +3,8 @@
   class="w-100 overflow-hidden d-block flex-grow-1 flex-shrink-1 d-flex flex-column">
 
   <!-- transclusion header -->
-  <mat-card-header>
-    <ng-content select="[card-header]">
-
-    </ng-content>
-  </mat-card-header>
+  <ng-content select="[card-header]">
+  </ng-content>
   
   <!-- transclusion content prepend -->
   <ng-content select="[card-content='prepend']">
