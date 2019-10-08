@@ -194,9 +194,14 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
       if (ds.parcellationRegion.length === 0) return false
 
       let useSet
+
+      // temporary measure
+      // TODO ask curaion team re name of jubrain atlas
+      let overwriteParcellationName
       switch (parcellationName) {
         case 'JuBrain Cytoarchitectonic Atlas': 
           useSet = juBrainSet
+          overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
           break;
         case 'Fibre Bundle Atlas - Short Bundle':
           useSet = shortBundleSet
@@ -222,7 +227,7 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
         default:
           useSet = new Set()
       }
-      return filterByPRName({ dataset: ds, parcellationName }) && filterByPRSet(ds.parcellationRegion, useSet)
+      return filterByPRName({ dataset: ds, parcellationName: overwriteParcellationName || parcellationName }) && filterByPRSet(ds.parcellationRegion, useSet)
     }
 
     return false

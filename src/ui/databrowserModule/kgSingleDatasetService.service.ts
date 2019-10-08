@@ -6,9 +6,10 @@ import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
 import { MatDialog } from "@angular/material";
 import { FileViewer } from "./fileviewer/fileviewer.component";
-import { ADD_NG_LAYER, REMOVE_NG_LAYER } from "src/services/stateStore.service";
+import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
+import { DialogService } from "src/services/dialogService.service";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy{
@@ -22,7 +23,8 @@ export class KgSingleDatasetService implements OnDestroy{
     private constantService: AtlasViewerConstantsServices,
     private store$: Store<any>,
     private dialog: MatDialog,
-    private http: HttpClient
+    private http: HttpClient,
+    private dialogService: DialogService
   ) {
 
     this.subscriptions.push(
@@ -95,6 +97,25 @@ export class KgSingleDatasetService implements OnDestroy{
       file,
       dataset
     })
+
+    const { position, name } = file
+    if (position) {
+      this.dialogService.getUserConfirm({
+        message: `The file - ${name} - has a position of interest defined. Navigate to it?`,
+        title: `Navigate to ROI`,
+      })
+        .then(() => {
+          this.store$.dispatch({
+            type: CHANGE_NAVIGATION,
+            navigation: {
+              position,
+              animation: {}
+            }
+          })
+        })
+        .catch()
+    }
+
     const type = determinePreviewFileType(file)
     if (type === PREVIEW_FILE_TYPES.NIFTI) {
       this.store$.dispatch({
@@ -105,6 +126,8 @@ export class KgSingleDatasetService implements OnDestroy{
       this.showNewNgLayer({ url })
       return
     }
+
+
     this.dialog.open(FileViewer, {
       data: {
         previewFile: file

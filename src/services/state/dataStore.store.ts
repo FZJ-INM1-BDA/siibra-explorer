@@ -155,6 +155,7 @@ export interface ViewerPreviewFile{
   mimetype: string
   url?: string
   data?: any
+  position?: any
 }
 
 export interface FileSupplementData{
