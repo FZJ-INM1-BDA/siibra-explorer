@@ -11,7 +11,7 @@ let cachedData = null
 let otherQueryResult = null
 
 const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
-const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_2`
+const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_3`
 const KG_PARAM = {
   size: process.env.KG_SEARCH_SIZE || '1000',
   vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
@@ -178,6 +178,10 @@ const filterByPRSet = (prs, atlasPrSet = new Set()) => {
   return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
 }
 
+const filterByPRName = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
+  ? true
+  : (dataset.parcellationAtlas || []).some(({ name }) => console.log(name) || name === parcellationName)
+
 const filter = (datasets = [], { templateName, parcellationName }) => datasets
   .filter(ds => commonSenseDsFilter({ ds, templateName, parcellationName }))
   .filter(ds => {
@@ -218,7 +222,7 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
         default:
           useSet = new Set()
       }
-      return filterByPRSet(ds.parcellationRegion, useSet)
+      return filterByPRName({ dataset: ds, parcellationName }) && filterByPRSet(ds.parcellationRegion, useSet)
     }
 
     return false
