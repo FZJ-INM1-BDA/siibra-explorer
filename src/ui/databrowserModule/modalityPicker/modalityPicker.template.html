@@ -1,6 +1,7 @@
 <mat-checkbox
   [checked]="datamodality.visible"
   (change)="toggleModality(datamodality)"
+  [ngClass]="{'muted': datamodality.occurance === 0}"
   *ngFor="let datamodality of countedDataM">
   {{ datamodality.name }} <span class="text-muted">({{ datamodality.occurance }})</span>
 </mat-checkbox>

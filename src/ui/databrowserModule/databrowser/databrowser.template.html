@@ -143,7 +143,7 @@
         <modality-picker
           iav-stop="click"
           class="w-100"
-          [countedDataM]="countedDataM"
+          [countedDataM]="visibleCountedDataM | resetcounterModalityPipe | appendFilterModalityPipe : [countedDataM]"
           (modalityFilterEmitter)="handleModalityFilterEvent($event)"
           #modalityPickerCmp>
       
