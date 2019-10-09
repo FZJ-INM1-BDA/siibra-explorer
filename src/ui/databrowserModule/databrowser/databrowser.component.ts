@@ -71,7 +71,7 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
     )
   }
 
-  ngOnChanges(changes){
+  ngOnChanges(){
 
     this.regions = this.regions.map(r => {
       /**
@@ -111,7 +111,6 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
       .finally(() => {
         this.fetchingFlag = false
         this.dataentriesUpdated.emit(this.dataentries)
-        this.resetFilters()
         this.cdr.markForCheck()
       })
 

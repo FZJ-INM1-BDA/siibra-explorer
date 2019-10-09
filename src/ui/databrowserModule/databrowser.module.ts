@@ -32,6 +32,8 @@ import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe
 import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
+import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
+import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 
 @NgModule({
   imports:[
@@ -69,7 +71,9 @@ import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetLis
     RegionBackgroundToRgbPipe,
     GetKgSchemaIdFromFullIdPipe,
     PreviewFileIconPipe,
-    PreviewFileTypePipe
+    PreviewFileTypePipe,
+    AppendFilerModalityPipe,
+    ResetCounterModalityPipe
   ],
   exports:[
     DataBrowser,
