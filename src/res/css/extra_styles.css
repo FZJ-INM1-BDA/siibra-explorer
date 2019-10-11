@@ -606,11 +606,6 @@ mat-icon[fontset="far"]
   outline: none!important;
 }
 
-.font-2x
-{
-  font-size: 200%;
-}
-
 .no-max-width
 {
   max-width: none!important;

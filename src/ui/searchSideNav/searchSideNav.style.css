@@ -1,6 +1,6 @@
 .region-wrapper
 {
-  height:78px;
+  height: 55px;
 }
 
 /* exactly 1.5 line height */
@@ -8,4 +8,11 @@
 .h-117px
 {
   min-height:117px!important;
+}
+
+.mat-divider-full-width
+{
+  margin-right:-1.5rem;
+  margin-left:-1.5rem;
+  width: calc(100% + 3rem);
 }

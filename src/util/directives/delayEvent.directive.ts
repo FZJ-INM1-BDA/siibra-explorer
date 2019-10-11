@@ -31,7 +31,9 @@ export class DelayEventDirective implements OnChanges, OnDestroy {
 
   private destroyCb: (() => void)[] = []
   ngOnChanges(){
+    this.ngOnDestroy()
 
+    if (!this.delayEvent || this.delayEvent === '') return
     const el = this.el.nativeElement as HTMLElement
     for (const evName of this.delayEvent.split(' ')){
       if (VALID_EVENTNAMES.has(evName)) {

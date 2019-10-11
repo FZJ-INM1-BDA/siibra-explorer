@@ -13,10 +13,8 @@ import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL, NG_VI
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { MatBottomSheet, MatButton } from "@angular/material";
-import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+import { MatBottomSheet } from "@angular/material";
 import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
-import { getIdFromDataEntry } from "../databrowserModule/databrowser.service";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -952,6 +950,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
     this.multiNgIdsRegionsLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
 
     this.nehubaViewer.multiNgIdsLabelIndexMap = this.multiNgIdsRegionsLabelIndexMap
+    this.nehubaViewer.auxilaryMeshIndices = parcellation.auxillaryMeshIndices || [] 
 
     /* TODO replace with proper KG id */
     /**

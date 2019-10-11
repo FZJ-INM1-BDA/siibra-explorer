@@ -1,9 +1,10 @@
 import { Directive, Pipe, PipeTransform, SecurityContext } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { filter, distinctUntilChanged, map, shareReplay, scan, startWith } from "rxjs/operators";
+import { filter, distinctUntilChanged, map, shareReplay, scan, startWith, withLatestFrom, tap } from "rxjs/operators";
 import { merge, Observable, combineLatest } from "rxjs";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { SafeHtml, DomSanitizer } from "@angular/platform-browser";
+import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 
 /**
@@ -76,6 +77,21 @@ export class MouseHoverDirective{
       select('uiState'),
       select('mouseOverSegments'),
       filter(v => !!v),
+      withLatestFrom(
+        this.store$.pipe(
+          select('viewerState'),
+          select('parcellationSelected'),
+          startWith(null)
+        )
+      ),
+      map(([ arr, parcellationSelected ]) => parcellationSelected && parcellationSelected.auxillaryMeshIndices
+        ? arr.filter(({ segment }) => {
+            // if segment is not a string (i.e., not labelIndexId) return true
+            if (typeof segment !== 'string') return true
+            const { labelIndex } = getNgIdLabelIndexFromId({ labelIndexId: segment })
+            return parcellationSelected.auxillaryMeshIndices.indexOf(labelIndex) < 0
+          })
+        : arr),
       distinctUntilChanged((o, n) => o.length === n.length
         && n.every(segment =>
           o.find(oSegment => oSegment.layer.name === segment.layer.name

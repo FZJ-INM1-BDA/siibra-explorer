@@ -10,10 +10,11 @@ TODO check if this can be achieved with detach/attach -->
 
   <cdk-virtual-scroll-viewport
     orientation="vertical"
-    class="w-100 h-100"
+    class="w-100 h-100 overflow-hidden"
     itemSize="32">
 
     <mat-chip *cdkVirtualFor="let region of regionsSelected"
+      [matTooltip]="region.name"
       class="w-100" >
       <span class="flex-grow-1 flex-shrink-1 text-truncate">
         {{ region.name }}

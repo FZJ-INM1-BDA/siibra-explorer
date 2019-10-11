@@ -64,6 +64,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
   @Output() regionSelectionEmitter : EventEmitter<{segment:number, layer:{name?: string, url?: string}}> = new EventEmitter()
   @Output() errorEmitter : EventEmitter<any> = new EventEmitter()
 
+  public auxilaryMeshIndices: number[] = []
+
   /* only used to set initial navigation state */
   initNav : any
   initRegions : any[]
@@ -818,7 +820,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
 
       const indicies = [
         ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
-        ...getAuxilliaryLabelIndices()
+        ...this.auxilaryMeshIndices
       ]
 
       this.loadMeshes(indicies, { name: id })
@@ -830,8 +832,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy{
         new Map(Array.from(
           [
             ...this.multiNgIdsLabelIndexMap.get(ngId).entries(),
-            ...getAuxilliaryLabelIndices().map(i => {
-              return [i, {}]
+            ...this.auxilaryMeshIndices.map(val => {
+              return [val, {}]
             })
           ]
         ).map((val:[number,any])=>([val[0],this.getRgb(val[0],val[1].rgb)])) as any)
@@ -940,11 +942,6 @@ export interface ViewerState{
   position : [number,number,number]
   positionReal : boolean
   zoom : number
-}
-
-export function getAuxilliaryLabelIndices(){
-  return [65535]
-  // return Array.from(Array(36)).map((_,i)=>65500+i)
 }
 
 export const ICOSAHEDRON = `# vtk DataFile Version 2.0

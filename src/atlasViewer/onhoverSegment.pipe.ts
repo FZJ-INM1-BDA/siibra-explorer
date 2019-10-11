@@ -10,13 +10,17 @@ export class TransformOnhoverSegmentPipe implements PipeTransform{
 
   }
 
+  private sanitizeHtml(inc:string):SafeHtml{
+    return this.sanitizer.sanitize(SecurityContext.HTML, inc)
+  }
+
   private getStatus(text:string) {
-    return ` <span class="text-muted">(${this.sanitizer.sanitize(SecurityContext.HTML, text)})</span>`
+    return ` <span class="text-muted">(${this.sanitizeHtml(text)})</span>`
   }
 
   public transform(segment: any | number): SafeHtml{
     return this.sanitizer.bypassSecurityTrustHtml((
-      (segment.name || segment) +
+      ( this.sanitizeHtml(segment.name) || segment) +
       (segment.status
         ? this.getStatus(segment.status)
         : '')
