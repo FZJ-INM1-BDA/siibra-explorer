@@ -25,71 +25,6 @@
 
   <ng-container *ngIf="showDataset">
 
-    <!-- selected regions container -->
-    <mat-card *ngIf="false && viewerStateController.regionsSelected$ | async as regionsSelected"
-      [ngClass]="{'h-117px flex-grow-1': regionsSelected.length > 1, 'flex-grow-0': regionsSelected.length < 2}"
-      class="flex-shrink-0 mb-1 pe-all">
-
-      <!-- show when no region is selected -->
-      <mat-card-content *ngIf="regionsSelected.length === 0">
-        <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-          <i *ngIf="false" class="fas fa-brain font-2x mr-2"></i>
-
-          <span class="font-weight-bold">
-            In this parcellation atlas
-          </span>
-        </div>
-      </mat-card-content>
-
-      <!-- show when regions are selected -->
-      <mat-card-content *ngIf="regionsSelected.length > 0" class="h-100">
-
-        <!-- single region -->
-        <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
-
-          <!-- selected brain region -->
-          <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-            <i class="fas fa-brain font-2x mr-2"></i>
-
-            <span class="font-weight-bold">
-              {{ regionsSelected[0].name }}
-            </span>
-
-            <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </ng-template>
-
-        <!-- multi region -->
-        <ng-template #multiRegionTemplate>
-          <cdk-virtual-scroll-viewport class="h-100" itemSize="78">
-            <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
-              class="region-wrapper d-flex flex-column" >
-              <!-- divider if index !== 0 -->
-              <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="index !== 0"></mat-divider>
-
-              <!-- selected brain region -->
-              <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-                <i class="flex-grow-0 flex-shrink-0 fas fa-brain font-2x mr-2"></i>
-    
-                <span class="flex-grow-1 flex-shrink-1 font-weight-bold">
-                  {{ region.name }}
-                </span>
-    
-                <button mat-icon-button
-                  class="flex-grow-0 flex-shrink-0"
-                  (click)="removeRegion(region)" >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
-          </cdk-virtual-scroll-viewport>
-        </ng-template>
-
-      </mat-card-content>
-    </mat-card>
-
     <data-browser
       class="pe-all flex-grow-5 flex-shrink-1"
       [template]="viewerStateController.templateSelected$ | async"
@@ -102,12 +37,7 @@
 
         </ng-container>
 
-        <mat-divider class="mt-2 mb-4 position-relative"></mat-divider>
-
-        <mat-card-subtitle card-header>
-          Related datasets
-        </mat-card-subtitle>
-    
+        <mat-divider class="position-relative mt-2 mb-2 mat-divider-full-width"></mat-divider>
       </ng-container>
   
       <!-- footer content -->
@@ -154,13 +84,12 @@
       <!-- show when no region is selected -->
       <div *ngIf="regionsSelected.length === 0"
         class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-        <i *ngIf="false" class="fas fa-brain font-2x mr-2"></i>
+        <i *ngIf="false" class="fas fa-brain mr-2"></i>
 
-        <span class="font-weight-bold">
+        <small>
           In this parcellation atlas
-        </span>
+        </small>
       </div>
-
 
       <!-- show when regions are selected -->
       <div *ngIf="regionsSelected.length > 0" class="h-100">
@@ -170,11 +99,11 @@
 
           <!-- selected brain region -->
           <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-            <i class="fas fa-brain font-2x mr-2"></i>
+            <i class="fas fa-brain mr-2"></i>
 
-            <span class="font-weight-bold">
+            <small>
               {{ regionsSelected[0].name }}
-            </span>
+            </small>
 
             <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
               <i class="fas fa-trash"></i>
@@ -184,7 +113,7 @@
 
         <!-- multi region -->
         <ng-template #multiRegionTemplate>
-          <cdk-virtual-scroll-viewport class="h-100" itemSize="78">
+          <cdk-virtual-scroll-viewport class="h-100" itemSize="55">
             <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
               class="region-wrapper d-flex flex-column" >
               <!-- divider if index !== 0 -->
@@ -192,11 +121,11 @@
 
               <!-- selected brain region -->
               <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-                <i class="flex-grow-0 flex-shrink-0 fas fa-brain font-2x mr-2"></i>
+                <i class="flex-grow-0 flex-shrink-0 fas fa-brain mr-2"></i>
     
-                <span class="flex-grow-1 flex-shrink-1 font-weight-bold">
+                <small class="flex-grow-1 flex-shrink-1 ">
                   {{ region.name }}
-                </span>
+                </small>
     
                 <button mat-icon-button
                   class="flex-grow-0 flex-shrink-0"

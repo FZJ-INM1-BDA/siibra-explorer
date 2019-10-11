@@ -1,10 +1,10 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input } from "@angular/core";
+import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable, BehaviorSubject } from "rxjs";
-import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, filter, tap } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, tap } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
-import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
+import { MatAutocompleteSelectedEvent, MatDialog, AUTOCOMPLETE_OPTION_HEIGHT, AUTOCOMPLETE_PANEL_HEIGHT } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -17,7 +17,8 @@ const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase(
   templateUrl: './regionSearch.template.html',
   styleUrls: [
     './regionSearch.style.css'
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class RegionTextSearchAutocomplete{
@@ -29,9 +30,6 @@ export class RegionTextSearchAutocomplete{
   @ViewChild('regionHierarchyDialog', {read:TemplateRef}) regionHierarchyDialogTemplate: TemplateRef<any>
 
   public useMobileUI$: Observable<boolean>
-
-  private focusedRegionId$: BehaviorSubject<string> = new BehaviorSubject(null)
-  public focusedRegion$: Observable<any>
 
   public selectedRegionLabelIndexSet: Set<string> = new Set()
 
@@ -69,16 +67,9 @@ export class RegionTextSearchAutocomplete{
       shareReplay(1)
     )
 
-    this.focusedRegion$ = this.focusedRegionId$.pipe(
-      withLatestFrom(this.regionsWithLabelIndex$),
-      map(([ id, regions ]) => {
-        if (!id) return null
-        return regions.find(({ labelIndexId }) => labelIndexId === id)
-      })
-    )
-
     this.autocompleteList$ = this.formControl.valueChanges.pipe(
       startWith(''),
+      distinctUntilChanged(),
       debounceTime(200),
       withLatestFrom(this.regionsWithLabelIndex$.pipe(
         startWith([])
@@ -131,13 +122,6 @@ export class RegionTextSearchAutocomplete{
   public optionSelected(ev: MatAutocompleteSelectedEvent){
     const id = ev.option.value
     this.autoTrigger.nativeElement.value = ''
-    this.focusedRegionId$.next(id)
-  }
-
-  public openRegionFocusDialog(tmpl:TemplateRef<any>){
-    this.dialog.open(tmpl).afterClosed().subscribe(() => {
-      this.autoTrigger.nativeElement.focus()
-    })
   }
 
   private regionsWithLabelIndex$: Observable<any[]>
@@ -184,7 +168,13 @@ export class RegionTextSearchAutocomplete{
     // mat-card-content has a max height of 65vh
     const dialog = this.dialog.open(this.regionHierarchyDialogTemplate, {
       height: '65vh',
-      width: '90vw'
+      panelClass: [
+        'col-10',
+        'col-sm-10',
+        'col-md-8',
+        'col-lg-8',
+        'col-xl-6'
+      ]
     })
 
     /**

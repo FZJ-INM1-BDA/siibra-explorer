@@ -1,16 +1,14 @@
 <mat-card mat-ripple [matRippleDisabled]="!ripple">
   
   <!-- title -->
-  <mat-card-header *ngIf="!simpleMode">
-    <mat-card-title>
-      {{ name }}
-    </mat-card-title>
-  </mat-card-header>
+  <mat-card-subtitle *ngIf="!simpleMode">
+    {{ name }}
+  </mat-card-subtitle>
 
   <mat-card-content *ngIf="simpleMode">
-    <p>
+    <small>
       {{ name }}
-    </p>
+    </small>
     <mat-grid-list [cols]="kgReference.length + (preview ? 1 : 0) + (downloadEnabled ? 2 : 0)" rowHeight="4em">
 
       <!-- explore -->
@@ -64,7 +62,7 @@
   
   <!-- description -->
   <mat-card-content *ngIf="!simpleMode">
-    <p>{{ description }}</p>
+    <small>{{ description }}</small>
   </mat-card-content>
 
   <!-- publications -->

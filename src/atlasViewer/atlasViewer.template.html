@@ -182,7 +182,7 @@
           #iavMouseHoverConetxtualBlock="iavMouseHover"
           contextualBlock>
 
-          <ng-container *ngFor="let labelText of iavMouseHoverConetxtualBlock.currentOnHoverObs$ | async | mouseOverTextPipe">
+          <ng-container *ngFor="let labelText of iavMouseHoverConetxtualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
 
             <mat-list dense>
 

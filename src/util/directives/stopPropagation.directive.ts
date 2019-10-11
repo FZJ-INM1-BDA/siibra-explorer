@@ -29,6 +29,8 @@ export class StopPropagationDirective implements OnChanges, OnDestroy{
     
     this.ngOnDestroy()
 
+    if (!this.stopString || this.stopString === '') return
+
     const element = (this.el.nativeElement as HTMLElement)
     for (const evName of this.stopString.split(' ')){
       if(VALID_EVENTNAMES.has(evName)){

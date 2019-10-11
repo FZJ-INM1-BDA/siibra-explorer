@@ -9,6 +9,7 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain colin v17 left",
+      "auxillaryMeshIndices": [ 65535 ],
       "originDatasets":[{
         "kgSchema": "minds/core/dataset/v1.0.0",
         "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
