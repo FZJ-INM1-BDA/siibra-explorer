@@ -14,7 +14,7 @@
     <mat-autocomplete
       (opened)="focused = true"
       (closed)="focused = false"
-      (optionSelected)="optionSelected($event)"
+      (optionSelected)="optionSelected($event); openRegionFocusDialog(regionFocusDialog)"
       autoActiveFirstOption
       #auto="matAutocomplete">
       <mat-option
@@ -35,6 +35,41 @@
     <i class="fas fa-sitemap"></i>
   </button>
 </div>
+
+<ng-template #regionFocusDialog>
+  <ng-container *ngIf="focusedRegion$ | async as focusedRegion; else noRegionSelected">
+    <div mat-dialog-title>
+      {{ focusedRegion.name }}
+    </div>
+    <div class="justify-content-end" mat-dialog-actions>
+      <button mat-flat-button
+        *ngIf="focusedRegion.position"
+        (click)="navigateTo(focusedRegion.position)"
+        mat-dialog-close
+        class="ml-1"
+        color="primary">
+        Navigate
+      </button>
+      <button mat-flat-button
+        *ngIf="focusedRegion.labelIndexId"
+        mat-dialog-close
+        (click)="toggleRegionWithId(focusedRegion.labelIndexId, selectedRegionLabelIndexSet.has(focusedRegion.labelIndexId))"
+        class="ml-1"
+        [color]="selectedRegionLabelIndexSet.has(focusedRegion.labelIndexId) ? 'warn' : 'primary'">
+        {{ selectedRegionLabelIndexSet.has(focusedRegion.labelIndexId) ? 'Remove from selection' : 'Add to selection' }}
+      </button>
+      <button mat-button
+        [mat-dialog-close]="null"
+        class="ml-1">
+        Dismiss
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-template #noRegionSelected>
+    No region selected.
+  </ng-template>
+</ng-template>
 
 <ng-template #regionHierarchyDialog>
   <div class="h-100 d-flex flex-column">
