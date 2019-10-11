@@ -115,9 +115,8 @@ export class AtlasViewerURLService{
       if (!templateToLoad) {
         this.uiService.showMessage(
           this.constantService.incorrectTemplateNameSearchParam(searchedTemplatename),
-          {
-            duration: 5000
-          }
+          null,
+          { duration: 5000 }
         )
         const urlString = window.location.href
         /**
@@ -135,9 +134,8 @@ export class AtlasViewerURLService{
       if (!parcellationToLoad) {
         this.uiService.showMessage(
           this.constantService.incorrectParcellationNameSearchParam(searchedParcellationName),
-          {
-            duration: 5000
-          }
+          null,
+          { duration: 5000 }
         )
       }
       

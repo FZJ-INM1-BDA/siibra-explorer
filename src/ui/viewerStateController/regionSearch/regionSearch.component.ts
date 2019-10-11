@@ -1,13 +1,14 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, filter } from "rxjs/operators";
+import { Observable, BehaviorSubject } from "rxjs";
+import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, filter, tap } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS } from "src/services/state/viewerState.store";
+import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
 
@@ -28,6 +29,11 @@ export class RegionTextSearchAutocomplete{
   @ViewChild('regionHierarchyDialog', {read:TemplateRef}) regionHierarchyDialogTemplate: TemplateRef<any>
 
   public useMobileUI$: Observable<boolean>
+
+  private focusedRegionId$: BehaviorSubject<string> = new BehaviorSubject(null)
+  public focusedRegion$: Observable<any>
+
+  public selectedRegionLabelIndexSet: Set<string> = new Set()
 
   constructor(
     private store$: Store<any>,
@@ -59,13 +65,21 @@ export class RegionTextSearchAutocomplete{
           }
         }
         return returnArray
+      }),
+      shareReplay(1)
+    )
+
+    this.focusedRegion$ = this.focusedRegionId$.pipe(
+      withLatestFrom(this.regionsWithLabelIndex$),
+      map(([ id, regions ]) => {
+        if (!id) return null
+        return regions.find(({ labelIndexId }) => labelIndexId === id)
       })
-    ) 
+    )
 
     this.autocompleteList$ = this.formControl.valueChanges.pipe(
       startWith(''),
       debounceTime(200),
-      filter(string => string.length > 0),
       withLatestFrom(this.regionsWithLabelIndex$.pipe(
         startWith([])
       )),
@@ -76,6 +90,10 @@ export class RegionTextSearchAutocomplete{
     this.regionsSelected$ = viewerState$.pipe(
       select('regionsSelected'),
       distinctUntilChanged(),
+      tap(regions => {
+        const arrLabelIndexId = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
+        this.selectedRegionLabelIndexSet = new Set(arrLabelIndexId)
+      }),
       shareReplay(1)
     )
 
@@ -86,15 +104,40 @@ export class RegionTextSearchAutocomplete{
     )
   }
 
+  public toggleRegionWithId(id: string, removeFlag=false){
+    if (removeFlag) {
+      this.store$.dispatch({
+        type: VIEWER_STATE_ACTION_TYPES.DESELECT_REGIONS_WITH_ID,
+        deselecRegionIds: [id]
+      })
+    } else {
+      this.store$.dispatch({
+        type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
+        selectRegionIds : [id]
+      })
+    }
+  }
+
+  public navigateTo(position){
+    this.store$.dispatch({
+      type: CHANGE_NAVIGATION,
+      navigation: {
+        position,
+        animation: {}
+      }
+    })
+  }
+
   public optionSelected(ev: MatAutocompleteSelectedEvent){
     const id = ev.option.value
-    this.store$.dispatch({
-      type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
-      selectRegionIds : [id]
-    })
-
     this.autoTrigger.nativeElement.value = ''
-    this.autoTrigger.nativeElement.focus()
+    this.focusedRegionId$.next(id)
+  }
+
+  public openRegionFocusDialog(tmpl:TemplateRef<any>){
+    this.dialog.open(tmpl).afterClosed().subscribe(() => {
+      this.autoTrigger.nativeElement.focus()
+    })
   }
 
   private regionsWithLabelIndex$: Observable<any[]>

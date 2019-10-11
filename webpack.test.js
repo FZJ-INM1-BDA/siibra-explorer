@@ -3,7 +3,7 @@ module.exports = {
     rules : [{
       test: /spec\.ts$|test/,
       loaders : ['ts-loader'],
-      exclude : /node_modules/
+      exclude : /node_modules|third_party/
     }]
   },
   resolve:{

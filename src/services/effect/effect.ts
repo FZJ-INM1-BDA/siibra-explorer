@@ -46,6 +46,22 @@ export class UseEffects implements OnDestroy{
       })
     )
 
+    this.onDeselectRegionsWithId$ = this.actions$.pipe(
+      ofType(ACTION_TYPES.DESELECT_REGIONS_WITH_ID),
+      map(action => {
+        const { deselecRegionIds } = action as any
+        return deselecRegionIds
+      }),
+      withLatestFrom(this.regionsSelected$),
+      map(([ deselecRegionIds, alreadySelectedRegions ]) => {
+        const deselectSet = new Set(deselecRegionIds)
+        return {
+          type: SELECT_REGIONS,
+          selectRegions: alreadySelectedRegions.filter(({ ngId, labelIndex }) => !deselectSet.has(generateLabelIndexId({ ngId, labelIndex })))
+        }
+      })
+    )
+
     this.addToSelectedRegions$ = this.actions$.pipe(
       ofType(ADD_TO_REGIONS_SELECTION_WITH_IDS),
       map(action => {
@@ -103,6 +119,9 @@ export class UseEffects implements OnDestroy{
 
   @Effect()
   onDeselectRegions: Observable<any> 
+
+  @Effect()
+  onDeselectRegionsWithId$: Observable<any>
 
   private convertRegionIdsToRegion = ([selectRegionIds, parcellation]) => {
     const { ngId: defaultNgId } = parcellation
@@ -216,3 +235,9 @@ export const compareRegions: (r1: any,r2: any) => boolean = (r1, r2) => {
     && r1.labelIndex === r2.labelIndex
     && r1.name === r2.name
 }
+
+const ACTION_TYPES = {
+  DESELECT_REGIONS_WITH_ID: 'DESELECT_REGIONS_WITH_ID'
+}
+
+export const VIEWER_STATE_ACTION_TYPES = ACTION_TYPES

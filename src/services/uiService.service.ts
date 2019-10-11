@@ -16,7 +16,7 @@ export class UIService{
       const toasthandler = new ToastHandler()
       let handle
       toasthandler.show = () => {
-        handle = this.showMessage(toasthandler.message, {
+        handle = this.showMessage(toasthandler.message, null, {
           duration: toasthandler.timeout,
         })
         
@@ -31,7 +31,7 @@ export class UIService{
     } 
   }
 
-  showMessage(message: string, config?: Partial<MatSnackBarConfig>){
-    return this.snackbar.open(message, 'Dismiss', config)
+  showMessage(message: string, actionBtnTxt: string = 'Dismiss', config?: Partial<MatSnackBarConfig>){
+    return this.snackbar.open(message, actionBtnTxt, config)
   }
 }
