@@ -3,6 +3,7 @@ const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
 const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
+const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
 
@@ -15,6 +16,7 @@ init()
   .then(() => console.log(`dataset init success`))
   .catch(e => {
     console.warn(`dataset init failed`, e)
+    retry(() => init())
   })
 
 const cacheMaxAge24Hr = (_req, res, next) => {

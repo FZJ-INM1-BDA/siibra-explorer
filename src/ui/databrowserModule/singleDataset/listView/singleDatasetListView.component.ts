@@ -4,7 +4,7 @@ import { Component,ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/c
   KgSingleDatasetService,
   AtlasViewerConstantsServices
 } from "../singleDataset.base";
-import { MatDialog } from "@angular/material";
+import { MatDialog, MatSnackBar } from "@angular/material";
 import { SingleDatasetView } from "../detailedView/singleDataset.component";
 
 @Component({
@@ -19,18 +19,45 @@ import { SingleDatasetView } from "../detailedView/singleDataset.component";
 export class SingleDatasetListView extends SingleDatasetBase {
 
   constructor(
-    dbService: DatabrowserService,
+    private _dbService: DatabrowserService,
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
     constantService: AtlasViewerConstantsServices,
-    private dialog:MatDialog
+    private dialog:MatDialog,
+    private snackBar: MatSnackBar
   ){
-    super(dbService, singleDatasetService, cdr, constantService)
+    super(_dbService, singleDatasetService, cdr, constantService)
   }
 
   showDetailInfo(){
     this.dialog.open(SingleDatasetView, {
       data: this.dataset
     })
+  }
+
+  undoableRemoveFav(){
+    this.snackBar.open(`Unpinned dataset: ${this.dataset.name}`, 'Undo', {
+      duration: 5000
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this._dbService.saveToFav(this.dataset)
+        }
+      })
+    this._dbService.removeFromFav(this.dataset)
+  }
+
+  undoableAddFav(){
+    this.snackBar.open(`Pin dataset: ${this.dataset.name}`, 'Undo', {
+      duration: 5000
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this._dbService.saveToFav(this.dataset)
+        }
+      })
+    this._dbService.saveToFav(this.dataset)
   }
 }

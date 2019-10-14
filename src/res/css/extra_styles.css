@@ -446,6 +446,11 @@ markdown-dom pre code
   overflow-y: auto!important;
 }
 
+.h-auto
+{
+  height: auto!important;
+}
+
 .h-90vh
 {
   height: 90vh!important;
@@ -662,4 +667,16 @@ body::after
 .flex-grow-5
 {
   flex-grow: 5!important;
+}
+
+.layerBrowserContainer
+{
+  margin:-1em!important;
+}
+
+.layerBrowserContainer .mat-dialog-container
+{
+  padding: 0!important;
+  overflow: hidden;
+  margin-top: 0.25rem;
 }

@@ -4,12 +4,12 @@ import { Store, select } from "@ngrx/store";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store";
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
-import { MatDialog } from "@angular/material";
+import { MatDialog, MatSnackBar } from "@angular/material";
 import { FileViewer } from "./fileviewer/fileviewer.component";
 import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { DialogService } from "src/services/dialogService.service";
+import { UIService } from "src/services/uiService.service";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy{
@@ -24,7 +24,7 @@ export class KgSingleDatasetService implements OnDestroy{
     private store$: Store<any>,
     private dialog: MatDialog,
     private http: HttpClient,
-    private dialogService: DialogService
+    private snackBar: MatSnackBar
   ) {
 
     this.subscriptions.push(
@@ -34,7 +34,6 @@ export class KgSingleDatasetService implements OnDestroy{
         this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, '')))
       })
     )
-
   }
 
   ngOnDestroy(){
@@ -100,20 +99,21 @@ export class KgSingleDatasetService implements OnDestroy{
 
     const { position, name } = file
     if (position) {
-      this.dialogService.getUserConfirm({
-        message: `The file - ${name} - has a position of interest defined. Navigate to it?`,
-        title: `Navigate to ROI`,
+      this.snackBar.open(`Postion of interest found.`, 'Go there', {
+        duration: 5000
       })
-        .then(() => {
-          this.store$.dispatch({
-            type: CHANGE_NAVIGATION,
-            navigation: {
-              position,
-              animation: {}
-            }
-          })
+        .afterDismissed()
+        .subscribe(({ dismissedByAction }) => {
+          if (dismissedByAction) {
+            this.store$.dispatch({
+              type: CHANGE_NAVIGATION,
+              navigation: {
+                position,
+                animation: {}
+              }
+            })
+          }
         })
-        .catch()
     }
 
     const type = determinePreviewFileType(file)

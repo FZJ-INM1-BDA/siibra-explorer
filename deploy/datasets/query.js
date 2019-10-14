@@ -199,6 +199,7 @@ const filter = (datasets = [], { templateName, parcellationName }) => datasets
       // TODO ask curaion team re name of jubrain atlas
       let overwriteParcellationName
       switch (parcellationName) {
+        case 'Cytoarchitectonic Maps':
         case 'JuBrain Cytoarchitectonic Atlas': 
           useSet = juBrainSet
           overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
