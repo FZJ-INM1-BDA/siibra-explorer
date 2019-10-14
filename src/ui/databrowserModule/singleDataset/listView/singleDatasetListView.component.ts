@@ -55,7 +55,7 @@ export class SingleDatasetListView extends SingleDatasetBase {
       .afterDismissed()
       .subscribe(({ dismissedByAction }) => {
         if (dismissedByAction) {
-          this._dbService.saveToFav(this.dataset)
+          this._dbService.removeFromFav(this.dataset)
         }
       })
     this._dbService.saveToFav(this.dataset)
