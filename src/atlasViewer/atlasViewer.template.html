@@ -13,11 +13,7 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="justify-content-end">
-    <button
-      color="primary"
-      mat-raised-button
-      (click)="kgTosClickedOk()"
-      cdkFocusInitial>
+    <button color="primary" mat-raised-button (click)="kgTosClickedOk()" cdkFocusInitial>
       Ok
     </button>
   </mat-dialog-actions>
@@ -32,11 +28,7 @@
   </mat-dialog-content>
 
   <mat-dialog-actions class="justify-content-end">
-    <button
-      color="primary"
-      mat-raised-button
-      (click)="cookieClickedOk()"
-      cdkFocusInitial>
+    <button color="primary" mat-raised-button (click)="cookieClickedOk()" cdkFocusInitial>
       Ok
     </button>
   </mat-dialog-actions>
@@ -46,33 +38,22 @@
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
 
-    <ui-nehuba-container
-      iav-mouse-hover
-      #iavMouseHoverEl="iavMouseHover"
+    <ui-nehuba-container iav-mouse-hover #iavMouseHoverEl="iavMouseHover"
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       (contextmenu)="$event.stopPropagation(); $event.preventDefault();">
     </ui-nehuba-container>
-  
+
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
 
       <!-- dataset search side nav -->
-      <mat-drawer-container
-        *ngIf="newViewer$ | async"
-        [hasBackdrop]="false"
+      <mat-drawer-container *ngIf="newViewer$ | async" [hasBackdrop]="false"
         class="w-100 h-100 bg-none mat-drawer-content-overflow-visible">
-        <mat-drawer
-          mode="push"
+        <mat-drawer mode="push"
           class="col-10 col-sm-10 col-md-4 col-lg-3 col-xl-2 p-2 bg-none box-shadow-none overflow-visible"
-          [disableClose]="true"
-          [autoFocus]="false"
-          [opened]="true"
-          #sideNavDrawer>
-          <search-side-nav
-            (dismiss)="sideNavDrawer.close()"
-            (open)="sideNavDrawer.open()"
-            class="h-100 d-block overflow-visible"
-            #searchSideNav>
+          [disableClose]="true" [autoFocus]="false" [opened]="true" #sideNavDrawer>
+          <search-side-nav (dismiss)="sideNavDrawer.close()" (open)="sideNavDrawer.open()"
+            class="h-100 d-block overflow-visible" #searchSideNav>
           </search-side-nav>
 
         </mat-drawer>
@@ -80,21 +61,17 @@
         <!-- tag for opening and closing side nav -->
         <div class="d-flex h-100 align-items-start bg-none pe-none">
 
-          <button mat-flat-button
-            matBadgePosition="above after"
-            matBadgeColor="accent"
+          <button mat-flat-button matBadgePosition="above after" matBadgeColor="accent"
             [matBadge]="!sideNavDrawer.opened && (selectedRegions$ | async)?.length ? (selectedRegions$ | async)?.length : null"
             [matTooltip]="!sideNavDrawer.opened ? (selectedRegions$ | async)?.length ?  ('Explore ' + (selectedRegions$ | async)?.length + ' selected regions.') : 'Explore current view' : null"
             [ngClass]="{'translate-x-6-n': !sideNavDrawer.opened, 'translate-x-7-n': sideNavDrawer.opened}"
-            class="pe-all mt-5"
-            (click)="sideNavDrawer.toggle()">
-            <i [ngClass]="{'fa-chevron-left': sideNavDrawer.opened, 'fa-chevron-right': !sideNavDrawer.opened}" class="fas translate-x-3"></i>
+            class="pe-all mt-5" (click)="sideNavDrawer.toggle()">
+            <i [ngClass]="{'fa-chevron-left': sideNavDrawer.opened, 'fa-chevron-right': !sideNavDrawer.opened}"
+              class="fas translate-x-3"></i>
 
           </button>
 
-          <mat-card *ngIf="!sideNavDrawer.opened"
-            (click)="sideNavDrawer.open()"
-            mat-ripple
+          <mat-card *ngIf="!sideNavDrawer.opened" (click)="sideNavDrawer.open()" mat-ripple
             class="pe-all mt-4 muted translate-x-4-n">
             <mat-card-content>
               <viewer-state-mini>
@@ -112,14 +89,17 @@
       <signin-banner signinWrapper>
       </signin-banner>
     </div>
-  
-    <layout-floating-container
-      zIndex="13"
-      #floatingOverlayContainer>
+
+    <layout-floating-container zIndex="13" #floatingOverlayContainer>
       <div floatingContainerDirective>
-  
+
       </div>
-      
+
+      <div class="fixed-bottom pe-none d-flex justify-content-end m-4">
+        <ng-container *ngTemplateOutlet="logoTmpl">
+        </ng-container>
+      </div>
+
       <!-- TODO document fixedMouseContextualContainerDirective , then deprecate this -->
       <!-- TODO move to nehuba overlay container -->
       <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>
@@ -130,24 +110,19 @@
         </div>
         <div body>
 
-          <div
-            *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
+          <div *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"
             class="p-2">
             Search for data relating to:
           </div>
-          
-          <div
-            *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
+
+          <div *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"
             (click)="searchRegion([onhoverSegmentFixed])"
-            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0"
-            data-toggle="tooltip"
-            data-placement="top"
-            [title]="onhoverSegmentFixed.name">
+            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0" data-toggle="tooltip"
+            data-placement="top" [title]="onhoverSegmentFixed.name">
             <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}
           </div>
-  
-          <div
-            *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
+
+          <div *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"
             (click)="searchRegion(selectedRegions)"
             class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
             <ng-container *ngIf="selectedRegions.length > 1">
@@ -158,45 +133,37 @@
             </ng-container>
           </div>
 
-          <div
-            class="p-2 text-muted"
+          <div class="p-2 text-muted"
             *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0 && (onhoverLandmarksForFixed$ | async)?.length === 0">
             Right click on a parcellation region or select parcellation regions to search KG for associated datasets.
           </div>
-  
+
           <ng-template #noRegionSelected>
-            <div
-              (click)="searchRegion()"
-              class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
+            <div (click)="searchRegion()" class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">
               No region selected. Search KG for all datasets in this template space.
             </div>
           </ng-template>
-  
+
         </div>
       </panel-component>
-      
+
       <div floatingMouseContextualContainerDirective>
 
-        <div class="d-inline-block"
-          iav-mouse-hover
-          #iavMouseHoverConetxtualBlock="iavMouseHover"
-          contextualBlock>
+        <div class="d-inline-block" iav-mouse-hover #iavMouseHoverConetxtualBlock="iavMouseHover" contextualBlock>
 
-          <ng-container *ngFor="let labelText of iavMouseHoverConetxtualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
+          <ng-container
+            *ngFor="let labelText of iavMouseHoverConetxtualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
 
             <mat-list dense>
 
-              <mat-list-item>
+              <mat-list-item class="h-auto">
 
                 <mat-icon [fontSet]="(labelText.label | mouseOverIconPipe).fontSet"
-                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon"
-                  mat-list-icon>
+                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon" mat-list-icon>
 
                 </mat-icon>
-                
-                <div matLine
-                  *ngFor="let text of labelText.text"
-                  [innerHTML]="text">
+
+                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text">
                 </div>
               </mat-list-item>
             </mat-list>
@@ -206,7 +173,8 @@
       </div>
 
     </layout-floating-container>
-  
+
+    <!-- required for manufacturing plugin templates -->
     <div pluginFactoryDirective>
     </div>
   </div>
@@ -214,29 +182,31 @@
 
 <!-- does not meet req template -->
 <ng-template #doesNotMeetReqTemplate>
-  <div class="d-flex flex-column" minReq *ngIf="!meetsRequirement">
+  <div class="d-flex flex-column w-100 h-100" *ngIf="!meetsRequirement">
     <div class="jumbotron bg-light text-center mb-0">
       <div>
         <h1 class="mb-3">
           <i class="fas fa-exclamation-triangle"></i> Unsupported browser detected
         </h1>
         <p>
-          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google Chrome</a>
-          or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox)</a> for viewing the interactive viewer.
+          We recommend using the latest version of <a target="_blank" href="https://www.google.com/chrome/">Google
+            Chrome</a>
+          or <a target="_blank" href="https://www.mozilla.org/firefox/">Mozilla Firefox)</a> for viewing the interactive
+          viewer.
         </p>
         <div class="col-6 d-inline-block text-left">
-          <readmore-component
-            [collapsedHeight]="0">
+          <readmore-component [collapsedHeight]="0">
             <markdown-dom [markdown]="constantsService.minReqExplaner">
-  
+
             </markdown-dom>
           </readmore-component>
         </div>
-        
+
       </div>
     </div>
     <ng-container *ngFor="let preview of unsupportedPreviews; let idx = index">
-      <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer [style.backgroundImage]="'url(' + preview.previewSrc + ')'" >
+      <div [hidden]="idx !== unsupportedPreviewIdx" class="text-center mb-3" imageContainer
+        [style.backgroundImage]="'url(' + preview.previewSrc + ')'">
         <div class="mt-2 card d-inline-block displayCard">
           <div class="card-body">
             {{ preview.text }}
@@ -245,4 +215,9 @@
       </div>
     </ng-container>
   </div>
+</ng-template>
+
+<!-- logo tmpl -->
+<ng-template #logoTmpl>
+  <logo-container></logo-container>
 </ng-template>

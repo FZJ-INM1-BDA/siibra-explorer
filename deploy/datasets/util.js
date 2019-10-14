@@ -34,7 +34,21 @@ const init = async () => {
   getPublicAccessToken = getPublic
 }
 
+const retry = (fn) => {
+  let retryId
+  retryId = setInterval(() => {
+    fn()
+      .then(() => {
+        console.log(`retry succeeded, clearing retryId`)
+        clearTimeout(retryId)
+      }).catch(e => {
+        console.warn(`retry failed, retrying in 5sec`)
+      })
+  }, 5000)
+}
+
 module.exports = {
   init,
-  getUserKGRequestParam
+  getUserKGRequestParam,
+  retry
 }

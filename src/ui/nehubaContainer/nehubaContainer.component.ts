@@ -13,8 +13,6 @@ import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL, NG_VI
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { MatBottomSheet } from "@angular/material";
-import { KgSingleDatasetService } from "../databrowserModule/kgSingleDatasetService.service";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -152,7 +150,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
   private panelOrder: string
   public panelOrder$: Observable<string>
   private redrawLayout$: Observable<[string, string]>
-  public favDataEntries$: Observable<DataEntry[]>
 
   public hoveredPanelIndices$: Observable<number>
 
@@ -163,17 +160,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
     private apiService :AtlasViewerAPIServices,
     private csf:ComponentFactoryResolver,
     private store : Store<ViewerStateInterface>,
-    private elementRef : ElementRef,
-    public bottomSheet: MatBottomSheet,
-    private kgSingleDataset: KgSingleDatasetService
+    private elementRef : ElementRef
   ){
 
     this.useMobileUI$ = this.constantService.useMobileUI$
-    
-    this.favDataEntries$ = this.store.pipe(
-      select('dataStore'),
-      select('favDataEntries')
-    )
 
     this.viewerPerformanceConfig$ = this.store.pipe(
       select('viewerConfigState'),

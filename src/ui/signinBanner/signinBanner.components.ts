@@ -1,8 +1,10 @@
 import {Component, ChangeDetectionStrategy, Input, TemplateRef } from "@angular/core";
 import { AuthService, User } from "src/services/auth.service";
-import { MatDialog, MatDialogRef } from "@angular/material";
+import { MatDialog, MatDialogRef, MatBottomSheet } from "@angular/material";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { DataEntry } from "src/services/stateStore.service";
+import { Store, select } from "@ngrx/store";
 
 
 @Component({
@@ -21,10 +23,13 @@ export class SigninBanner{
 
   public user$: Observable<User>
   public userBtnTooltip$: Observable<string>
+  public favDataEntries$: Observable<DataEntry[]>
 
   constructor(
+    private store$: Store<any>,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    public bottomSheet: MatBottomSheet
   ){
     this.user$ = this.authService.user$
 
@@ -32,6 +37,11 @@ export class SigninBanner{
       map(user => user
         ? `Logged in as ${(user && user.name) ? user.name : 'Unknown name'}`
         : `Not logged in`)
+    )
+
+    this.favDataEntries$ = this.store$.pipe(
+      select('dataStore'),
+      select('favDataEntries')
     )
   }
 

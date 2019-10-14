@@ -55,8 +55,6 @@
 
 <div [hidden]>
   <layer-browser
-    [iav-key-listener]="(layerBrowser.nonBaseNgLayers$ | async).length > 0 ? keyListenerConfig : null"
-    (iav-key-event)="extraLayersCanBeDismissed() ? layerBrowser.removeAllNonBasicLayer() : null"
     (nonBaseLayersChanged)="handleNonbaseLayerEvent($event)"
     #layerBrowser>
   </layer-browser>
@@ -66,13 +64,6 @@
   <mat-dialog-content>
     <layer-browser></layer-browser>
   </mat-dialog-content>
-  <mat-dialog-actions class="justify-content-end">
-    <button matTooltip="Rmove layers with [Esc]"
-      mat-button
-      mat-dialog-close="user action">
-      Hide
-    </button>
-  </mat-dialog-actions>
 </ng-template>
 
 <!-- selected regions container -->

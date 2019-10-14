@@ -23,21 +23,6 @@
 </current-layout>
 
 <layout-floating-container *ngIf="viewerLoaded">
-  
-  <!-- tmp fab -->
-  <div class="mb-5 mr-3 load-fav-dataentries-fab position-absolute pe-all">
-    <button
-      (click)="bottomSheet.open(savedDatasets)"
-      [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
-      matBadgeColor="accent"
-      matBadgePosition="above before"
-      matTooltip="Pinned datasets"
-      matTooltipPosition="before"
-      mat-fab
-      color="primary">
-      <i class="fas fa-thumbtack"></i>
-    </button>
-  </div>
 
   <!-- StatusCard container-->
   <ui-status-card
@@ -182,36 +167,4 @@
       </div>
     </div>
   </layout-floating-container>
-</ng-template>
-
-<ng-template #savedDatasets>
-  <mat-list rol="list">
-    <h3 mat-subheader>Pinned Datasets</h3>
-
-    <!-- place holder when no fav data is available -->
-    <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">
-      <mat-card-content class="muted">
-        No pinned datasets.
-      </mat-card-content>
-    </mat-card>
-
-    <!-- render all fav dataset as mat list -->
-    <!-- TODO maybe use virtual scroll here? -->
-
-    <mat-list-item
-      mat-ripple
-      class="align-items-center"
-      *ngFor="let ds of (favDataEntries$ | async)"
-      role="listitem">
-
-      <single-dataset-list-view
-        class="d-block pt-1 pb-1 w-100"
-        [kgSchema]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[0]"
-        [kgId]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[1]"
-        [dataset]="ds">
-
-      </single-dataset-list-view>
-    
-    </mat-list-item>
-  </mat-list>
 </ng-template>

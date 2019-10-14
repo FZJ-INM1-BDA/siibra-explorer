@@ -77,8 +77,11 @@ export class SearchSideNav implements OnInit, OnDestroy {
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
       autoFocus: false,
+      panelClass: [
+        'layerBrowserContainer'
+      ],
       position: {
-        top: '1em'
+        top: '0'
       },
       disableClose: true
     })
@@ -90,10 +93,6 @@ export class SearchSideNav implements OnInit, OnDestroy {
     })
   }
 
-  extraLayersCanBeDismissed(): boolean{
-    return this.dialog.openDialogs.findIndex(dialog => dialog !== this.layerBrowserDialogRef) < 0
-  }
-
   removeRegion(region: any){
     this.store$.dispatch({
       type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY,
@@ -102,10 +101,4 @@ export class SearchSideNav implements OnInit, OnDestroy {
   }
 
   trackByFn = trackRegionBy
-
-  public keyListenerConfig = [{
-    key: 'Escape',
-    type: 'keydown',
-    target: 'document'
-  }]
 }

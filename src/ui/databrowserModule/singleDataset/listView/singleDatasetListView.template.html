@@ -5,16 +5,31 @@
     {{ name }}
   </small>
 
-  <!-- pin -->
-  <button mat-icon-button
-    *ngIf="downloadEnabled"
-    class="no-focus flex-grow-0 flex-shrink-0"
-    iav-stop="click"
-    (click)="toggleFav()"
-    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
-    <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
-  </button>
 
+  <ng-container *ngIf="downloadEnabled">
+
+    <!-- unpin -->
+    <button mat-icon-button
+      *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
+      (click)="undoableRemoveFav()"
+      iav-stop="click"
+      class="no-focus flex-grow-0 flex-shrink-0"
+      color="primary">
+      <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
+    </button>
+
+    <!-- pin -->
+    <ng-template #pinTmpl>
+      <button mat-icon-button
+        (click)="undoableAddFav()"
+        iav-stop="click"
+        class="no-focus flex-grow-0 flex-shrink-0"
+        color="basic">
+        <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
+      </button>
+    </ng-template>
+
+  </ng-container>
 
   <!-- more menu -->
   <button mat-icon-button
