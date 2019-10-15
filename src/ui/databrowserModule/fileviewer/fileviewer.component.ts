@@ -32,7 +32,10 @@ export class FileViewer implements OnChanges{
     private cdr: ChangeDetectorRef,
     @Optional() @Inject(MAT_DIALOG_DATA) data
   ){
-    if (data) this.previewFile = data.previewFile
+    if (data) {
+      this.previewFile = data.previewFile
+      this.downloadUrl = this.previewFile.url
+    }
   }
 
   public downloadUrl: string

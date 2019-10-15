@@ -132,6 +132,12 @@ datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   const { file } = req.query
   const filePath = previewFileMap.get(file)
 
+  // Set content type to give browser a hint for download
+  const ext = path.extname(filePath).slice(1)
+  const type = express.static.mime.types[ext]
+
+  if (type) res.setHeader('Content-Type', type)
+
   // even though req.url is modified, req.query is not
   // for now, just serve non encoded image
 
