@@ -9,7 +9,7 @@ import { FileViewer } from "./fileviewer/fileviewer.component";
 import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { UIService } from "src/services/uiService.service";
+import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy{
@@ -18,6 +18,8 @@ export class KgSingleDatasetService implements OnDestroy{
 
   private subscriptions: Subscription[] = []
   public ngLayers : Set<string> = new Set()
+
+  private getKgSchemaIdFromFullIdPipe: GetKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
@@ -157,6 +159,14 @@ export class KgSingleDatasetService implements OnDestroy{
         name : url
       }
     })
+  }
+
+  getKgSchemaKgIdFromFullId(fullId: string){
+    const match = this.getKgSchemaIdFromFullIdPipe.transform(fullId)
+    return match && {
+      kgSchema: match[0],
+      kgId: match[1]
+    }
   }
 }
 

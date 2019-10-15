@@ -86,6 +86,10 @@
     <i class="fas fa-file-csv"></i>
   </a>
 
+  <!-- nb -->
+  <!-- cross origin download attribute will be ignored -->
+  <!-- this effective means that when dev on localhost:8080, resource request to localhost:3000 will always open in a new window -->
+  <!-- link: https://developers.google.com/web/updates/2018/02/chrome-65-deprecations#block_cross-origin_wzxhzdk5a_download -->
   <a mat-icon-button
     *ngIf="downloadUrl"
     [href]="downloadUrl"
