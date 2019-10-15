@@ -1,4 +1,8 @@
-<div class="d-flex flex-row flex-nowrap align-items-center">
+<div mat-ripple
+  (click)="ripple ? showDetailInfo() : null"
+  [iav-stop]="ripple ? 'click' : null"
+  [matRippleDisabled]="!ripple"
+  class="d-flex flex-row flex-nowrap align-items-center">
 
   <!-- title -->
   <small class="flex-grow-1 flex-shrink-1">
@@ -12,7 +16,7 @@
     <button mat-icon-button
       *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
       (click)="undoableRemoveFav()"
-      iav-stop="click"
+      iav-stop="mousedown click"
       class="no-focus flex-grow-0 flex-shrink-0"
       color="primary">
       <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
@@ -22,7 +26,7 @@
     <ng-template #pinTmpl>
       <button mat-icon-button
         (click)="undoableAddFav()"
-        iav-stop="click"
+        iav-stop="mousedown click"
         class="no-focus flex-grow-0 flex-shrink-0"
         color="basic">
         <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
@@ -33,6 +37,7 @@
 
   <!-- more menu -->
   <button mat-icon-button
+    iav-stop="mousedown click"
     [matMenuTriggerFor]="singleDatasetMenu"
     class="flex-grow-0 flex-shrink-0 no-focus">
     <i class="fas fa-ellipsis-v"></i>
@@ -80,7 +85,7 @@
     <button mat-menu-item
       *ngIf="downloadEnabled"
       class="no-focus"
-      iav-stop="click"
+      iav-stop="mousedown click"
       (click)="downloadZipFromKg()"
       [disabled]="downloadInProgress">
       <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>

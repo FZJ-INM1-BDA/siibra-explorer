@@ -62,7 +62,16 @@ export class SingleDatasetBase implements OnInit {
     dataset?: any
   ){
     this.favedDataentries$ = this.dbService.favedDataentries$
-    if (dataset) this.dataset = dataset
+    if (dataset) {
+      this.dataset = dataset
+      const { fullId } = dataset
+      const obj = this.singleDatasetService.getKgSchemaKgIdFromFullId(fullId)
+      if (obj) {
+        const { kgSchema, kgId } = obj
+        this.kgSchema = kgSchema
+        this.kgId = kgId
+      }
+    }
   }
 
   ngOnInit() {

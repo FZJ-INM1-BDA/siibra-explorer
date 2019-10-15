@@ -46,15 +46,16 @@
                 <i class="fas fa-info"></i>
               </button>
     
-              <single-dataset-view
-                *ngFor="let originDataset of moreInfo.originDatasets"
-                class="position-absolute left-0 top-0 w-40em"
-                [name]="moreInfo.name"
-                [description]="moreInfo.description"
-                [publications]="moreInfo.publications"
-                [kgSchema]="originDataset && originDataset.kgSchema"
-                [kgId]="originDataset && originDataset.kgId">
-              </single-dataset-view>
+              <mat-card *ngFor="let originDataset of moreInfo.originDatasets"
+                class="position-absolute left-0 top-0 w-40em">
+                <single-dataset-view
+                  [name]="moreInfo.name"
+                  [description]="moreInfo.description"
+                  [publications]="moreInfo.publications"
+                  [kgSchema]="originDataset && originDataset.kgSchema"
+                  [kgId]="originDataset && originDataset.kgId">
+                </single-dataset-view>
+              </mat-card>
             </div>
             
           </div>
@@ -109,15 +110,17 @@
                 <i class="fas fa-info"></i>
               </button>
     
-              <single-dataset-view
-                *ngFor="let originDataset of moreInfo.originDatasets"
-                class="position-absolute left-0 top-0 w-40em"
-                [name]="moreInfo.name"
-                [description]="moreInfo.description"
-                [publications]="moreInfo.publications"
-                [kgSchema]="originDataset && originDataset.kgSchema"
-                [kgId]="originDataset && originDataset.kgId">
-              </single-dataset-view>
+              <mat-card *ngFor="let originDataset of moreInfo.originDatasets"
+                class="position-absolute left-0 top-0 w-40em">
+
+                <single-dataset-view
+                  [name]="moreInfo.name"
+                  [description]="moreInfo.description"
+                  [publications]="moreInfo.publications"
+                  [kgSchema]="originDataset && originDataset.kgSchema"
+                  [kgId]="originDataset && originDataset.kgId">
+                </single-dataset-view>
+              </mat-card>
             </div>
           </div>
         </sleight-of-hand>

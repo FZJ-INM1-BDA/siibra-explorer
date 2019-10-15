@@ -129,7 +129,6 @@
     <!-- TODO maybe use virtual scroll here? -->
 
     <mat-list-item
-      mat-ripple
       class="align-items-center"
       *ngFor="let ds of (favDataEntries$ | async)"
       role="listitem">
@@ -138,7 +137,8 @@
         class="d-block pt-1 pb-1 w-100"
         [kgSchema]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[0]"
         [kgId]="(ds.fullId | getKgSchemaIdFromFullIdPipe)[1]"
-        [dataset]="ds">
+        [dataset]="ds"
+        [ripple]="true">
 
       </single-dataset-list-view>
     
