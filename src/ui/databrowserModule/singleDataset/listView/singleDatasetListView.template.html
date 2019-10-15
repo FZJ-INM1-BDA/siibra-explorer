@@ -12,27 +12,28 @@
 
   <ng-container *ngIf="downloadEnabled">
 
-    <!-- unpin -->
-    <button mat-icon-button
-      *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
-      (click)="undoableRemoveFav()"
-      iav-stop="mousedown click"
-      class="no-focus flex-grow-0 flex-shrink-0"
-      color="primary">
-      <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
-    </button>
+    <div iav-stop="mousedown click">
 
-    <!-- pin -->
-    <ng-template #pinTmpl>
+      <!-- unpin -->
       <button mat-icon-button
-        (click)="undoableAddFav()"
-        iav-stop="mousedown click"
+        *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
+        (click)="undoableRemoveFav()"
         class="no-focus flex-grow-0 flex-shrink-0"
-        color="basic">
+        color="primary">
         <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
       </button>
-    </ng-template>
 
+      <!-- pin -->
+      <ng-template #pinTmpl>
+        <button mat-icon-button
+          (click)="undoableAddFav()"
+          class="no-focus flex-grow-0 flex-shrink-0"
+          color="basic">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
+        </button>
+      </ng-template>
+
+    </div>
   </ng-container>
 
   <!-- more menu -->
