@@ -8,6 +8,7 @@
 .h-117px
 {
   min-height:117px!important;
+  flex-basis: 117px!important;
 }
 
 .mat-divider-full-width
