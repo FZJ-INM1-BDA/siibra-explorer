@@ -1,0 +1,94 @@
+<div class="w-100 d-inline-flex flex-row align-items-center">
+
+  <form *ngIf="showAutoComplete" class="d-flex flex-row flex-nowrap flex-grow-1 flex-shrink-1">
+    <mat-form-field class="w-0 flex-grow-1 flex-shrink-1">
+      <input
+        placeholder="Search for regions"
+        #autoTrigger
+        #trigger="matAutocompleteTrigger"
+        type="text"
+        matInput
+        [formControl]="formControl"
+        [matAutocomplete]="auto">
+    </mat-form-field>
+    <mat-autocomplete
+      (opened)="focused = true"
+      (closed)="focused = false"
+      panelWidth="auto"
+      (optionSelected)="optionSelected($event)"
+      autoActiveFirstOption
+      #auto="matAutocomplete">
+      <mat-option
+        class="regionAutocompleteOption"
+        *ngFor="let region of autocompleteList$ | async"
+        [value]="region.labelIndexId">
+
+        <div class="d-flex flex-row">
+
+          <small class="text-truncate flex-shrink-1 flex-grow-1">
+            {{ region.name }}
+          </small>
+  
+          <div class="flex-grow-0 flex-shrink-0 d-flex flex-row">
+
+            <!-- if has position defined -->
+            <button *ngIf="region.position"
+              iav-stop="click"
+              (click)="navigateTo(region.position)"
+              mat-icon-button>
+              <i class="fas fa-map-marked-alt"></i>
+            </button>
+
+            <!-- region selected  -->
+            <button mat-icon-button
+              iav-stop="click"
+              (click)="toggleRegionWithId(region.labelIndexId, selectedRegionLabelIndexSet.has(region.labelIndexId))"
+              [color]="selectedRegionLabelIndexSet.has(region.labelIndexId) ? 'primary' : 'basic'">
+              <i class="far"
+                [ngClass]="{'fa-check-square': selectedRegionLabelIndexSet.has(region.labelIndexId), 'fa-square': !selectedRegionLabelIndexSet.has(region.labelIndexId)}">
+              </i>
+            </button>
+          </div>
+      
+        </div>
+      </mat-option>
+    </mat-autocomplete>
+  </form>
+    
+  <button
+    matBadgeColor="accent"
+    [matBadge]="showBadge && (regionsSelected$ | async).length ? (regionsSelected$ | async).length : null"
+    class="flex-grow-0 flex-shrink-0"
+    (click)="showHierarchy($event)"
+    mat-icon-button
+    color="primary">
+    <i class="fas fa-sitemap"></i>
+  </button>
+</div>
+
+<ng-template #regionHierarchyDialog>
+  <div class="h-100 d-flex flex-column">
+    <mat-dialog-content class="flex-grow-1 flex-shrink-1">
+      <ng-container *ngTemplateOutlet="regionHierarchy">
+      </ng-container>
+    </mat-dialog-content>
+  
+    <mat-dialog-actions class="justify-content-center">
+      <button mat-dialog-close mat-flat-button>
+        close
+      </button>
+    </mat-dialog-actions>
+  </div>
+</ng-template>
+
+<ng-template #regionHierarchy>
+  <region-hierarchy
+    [useMobileUI]="useMobileUI$ | async"
+    [selectedRegions]="regionsSelected$ | async | filterNull"
+    (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+    (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
+    (clearAllRegions)="deselectAllRegions($event)"
+    [parcellationSelected]="parcellationSelected$ | async">
+  
+  </region-hierarchy>
+</ng-template>

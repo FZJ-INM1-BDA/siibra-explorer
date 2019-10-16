@@ -28,11 +28,6 @@ kg-entry-viewer
   display: block;
 }
 
-div[anchorContainer]
-{
-  padding:0.2em 1em;
-}
-
 div[mimetypeTextContainer]
 {
   margin:1em;

@@ -1,0 +1,38 @@
+<h1 mat-dialog-title>
+  {{ title }}
+</h1>
+
+<div>
+  {{ message }}
+</div>
+
+<div mat-dialog-content>
+  <mat-form-field>
+    <input
+      tabindex="0"
+      [(ngModel)]="value"
+      matInput
+      [placeholder]="placeholder"
+      #inputField>
+  </mat-form-field>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="mt-2 d-flex flex-row justify-content-end">
+  <button 
+    (click)="cancel()"
+    color="primary"
+    mat-button>
+    Cancel
+  </button>
+  
+  <button
+    (click)="confirm()"
+    class="ml-1"
+    mat-raised-button
+    color="primary">
+    <i *ngIf="iconClass" [ngClass]="iconClass" class="mr-1"></i>
+    Confirm
+  </button>
+</div>

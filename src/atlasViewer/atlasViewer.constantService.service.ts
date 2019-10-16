@@ -1,8 +1,9 @@
-import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import { ViewerStateInterface, Property, FETCHED_METADATA } from "../services/stateStore.service";
-import { Subject } from "rxjs";
-import { ACTION_TYPES, ViewerConfiguration } from 'src/services/state/viewerConfig.store'
+import { Injectable, OnDestroy } from "@angular/core";
+import { Store, select } from "@ngrx/store";
+import { ViewerStateInterface } from "../services/stateStore.service";
+import { Subject, Observable, Subscription } from "rxjs";
+import { map, shareReplay, filter, tap } from "rxjs/operators";
+import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
@@ -11,10 +12,12 @@ export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r 
   providedIn : 'root'
 })
 
-export class AtlasViewerConstantsServices{
+export class AtlasViewerConstantsServices implements OnDestroy {
 
   public darktheme: boolean = false
-  public mobile: boolean
+  public darktheme$: Observable<boolean>
+
+  public useMobileUI$: Observable<boolean>
   public loadExportNehubaPromise : Promise<boolean>
 
   public getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
@@ -70,16 +73,6 @@ export class AtlasViewerConstantsServices{
 
   public templateUrls = Array(100)
 
-  private _templateUrls = [
-    // 'res/json/infant.json',
-    'res/json/bigbrain.json',
-    'res/json/colin.json',
-    'res/json/MNI152.json',
-    'res/json/waxholmRatV2_0.json',
-    'res/json/allenMouse.json',
-    // 'res/json/test.json'
-  ]
-
   /* to be provided by KG in future */
   private _mapArray : [string,string[]][] = [
     [ 'JuBrain Cytoarchitectonic Atlas' ,  
@@ -95,7 +88,7 @@ export class AtlasViewerConstantsServices{
       ]
     ],
     [
-      'Allen adult mouse brain reference atlas V3 Brain Atlas',
+      'Allen Mouse Common Coordinate Framework v3 2015',
       [
         'res/json/allenAggregated.json'
       ]
@@ -165,19 +158,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   public toggleMessage: string = 'double click to toggle select, right click to search'
 
   /**
-   * observable for showing login modal
-   */
-  public showSigninSubject$: Subject<any> = new Subject()
-
-  /**
    * Observable for showing config modal
    */
   public showConfigTitle: String = 'Settings'
-  /**
-   * Observable for showing help modal
-   */
-  public showHelpSubject$: Subject<null> = new Subject()
-  public showHelpTitle: String = 'About'
 
   private showHelpGeneralMobile = [
     ['hold 🌏 + ↕', 'change oblique slice mode'],
@@ -188,12 +171,9 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     ['h', 'show help'],
     ['?', 'show help'],
     ['o', 'toggle perspective/orthographic']
-  ] 
-  get showHelpGeneralMap() {
-    return this.mobile
-      ? this.showHelpGeneralMobile
-      : this.showHelpGeneralDesktop
-  }
+  ]
+
+  public showHelpGeneralMap = this.showHelpGeneralDesktop
 
   private showHelpSliceViewMobile = [
     ['drag', 'pan']
@@ -202,11 +182,8 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     ['drag', 'pan'],
     ['shift + drag', 'oblique slice']
   ]
-  get showHelpSliceViewMap() {
-    return this.mobile
-      ? this.showHelpSliceViewMobile
-      : this.showHelpSliceViewDesktop
-  }
+
+  public showHelpSliceViewMap = this.showHelpSliceViewDesktop
 
   private showHelpPerspectiveMobile = [
     ['drag', 'change perspective view']
@@ -215,17 +192,17 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   private showHelpPerspectiveDesktop = [
     ['drag', 'change perspective view']
   ]
-  get showHelpPerspectiveViewMap() {
-    return this.mobile
-      ? this.showHelpPerspectiveMobile
-      : this.showHelpPerspectiveDesktop
-  }
+  public showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
 
-  get showHelpSupportText() {
-    return `Did you encounter an issue? 
-      Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>, 
-      raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>`
-  }
+  /**
+   * raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>
+   */
+
+  private supportEmailAddress = `inm1-bda@fz-juelich.de`
+
+  public showHelpSupportText:string = `Did you encounter an issue? 
+Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>`
+
 
   incorrectParcellationNameSearchParam(title) {
     return `The selected parcellation - ${title} - is not available. The the first parcellation of the template is selected instead.`
@@ -235,55 +212,63 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     return `The selected template - ${title} - is not available.`
   }
 
-  private supportEmailAddress = `x.gui@fz-juelich.de`
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
-  constructor(private store : Store<ViewerStateInterface>){
+  constructor(
+    private store$ : Store<ViewerStateInterface>
+  ){
 
-    const ua = window && window.navigator && window.navigator.userAgent
-      ? window.navigator.userAgent
-      : ''
+    this.darktheme$ = this.store$.pipe(
+      select('viewerState'),
+      select('templateSelected'),
+      filter(v => !!v),
+      map(({useTheme}) => useTheme === 'dark'),
+      shareReplay(1)
+    )
 
-    /* https://stackoverflow.com/a/25394023/6059235 */
-    this.mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
+    this.useMobileUI$ = this.store$.pipe(
+      select('viewerConfigState'),
+      select('useMobileUI'),
+      shareReplay(1)
+    )
 
-    /**
-     * set gpu limit if user is on mobile
-     */
-    if (this.mobile) {
-      this.store.dispatch({
-        type: ACTION_TYPES.UPDATE_CONFIG,
-        config: {
-          gpuLimit: 2e8
-        } as Partial<ViewerConfiguration>
-      })  
-    }
-
-    /**
-     * TODO deprecate
-     */
-    const meta = 'res/json/allAggregatedData.json'
-  
-    fetch(meta)
-      .then(res=>res.json())
-      .then(metadata=>{
-        const data = metadata.reduce((acc:[string,Map<string,{properties:Property}>][],curr:any)=>{
-          const idx = acc.findIndex((it)=>it[0]===curr[0].targetParcellation)
-          return idx >= 0 ? 
-            acc.map((it,i)=> i === idx ? [it[0], it[1].set(curr[0].datasetName,curr[1])] : it ) :
-            acc.concat([[ curr[0].targetParcellation , new Map([[curr[0].datasetName , curr[1]]]) ]])
-              
-              /* [[ curr[0].targetParcellation , [ curr[0].datasetName , curr[1]] ]] */
-        },[] as [string,Map<string,{properties:Property}>][])
-        
-        this.store.dispatch({
-          type : FETCHED_METADATA,
-          fetchedMetadataMap : new Map(data)
-        })
-        
+    this.subscriptions.push(
+      this.useMobileUI$.subscribe(bool => {
+        if (bool) {
+          this.showHelpSliceViewMap = this.showHelpSliceViewMobile
+          this.showHelpGeneralMap = this.showHelpGeneralMobile
+          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveMobile
+          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageMobile
+        } else {
+          this.showHelpSliceViewMap = this.showHelpSliceViewDesktop
+          this.showHelpGeneralMap = this.showHelpGeneralDesktop
+          this.showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
+          this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
+        }
       })
-      .catch(console.error)
+    )
   }
+
+  private subscriptions: Subscription[] = []
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
+  }
+
+  catchError(e: Error | string){
+    this.store$.dispatch({
+      type: SNACKBAR_MESSAGE,
+      snackbarMessage: e.toString()
+    })
+  }
+
+  public cyclePanelMessage: string = `[spacebar] to cycle through views`
+
+  private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]` 
+  private dissmissUserLayerSnackbarMessageMobile = `You can dismiss extra layers in the 🌏 menu`
+  public dissmissUserLayerSnackbarMessage: string = this.dissmissUserLayerSnackbarMessageDesktop
 }
 
 const parseURLToElement = (url:string):HTMLElement=>{
@@ -307,8 +292,8 @@ export const UNSUPPORTED_PREVIEW = [{
 export const UNSUPPORTED_INTERVAL = 7000
 
 export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
-  ['jquery@3',parseURLToElement('http://code.jquery.com/jquery-3.3.1.min.js')],
-  ['jquery@2',parseURLToElement('http://code.jquery.com/jquery-2.2.4.min.js')],
+  ['jquery@3',parseURLToElement('https://code.jquery.com/jquery-3.3.1.min.js')],
+  ['jquery@2',parseURLToElement('https://code.jquery.com/jquery-2.2.4.min.js')],
   ['webcomponentsLite@1.1.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
   ['react@16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
   ['reactdom@16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
@@ -316,3 +301,98 @@ export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
   ['preact@8.4.2',parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
   ['d3@5.7.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')]
 ])
+
+/**
+ * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)
+ * The constraint is that the cipher needs to be commpatible with URI encoding
+ * and a URI compatible separator is required. 
+ * 
+ * The implementation below came from 
+ * https://stackoverflow.com/a/6573119/6059235
+ * 
+ * While a faster solution exist in the same post, this operation is expected to be done:
+ * - once per 1 sec frequency
+ * - on < 1000 numbers
+ * 
+ * So performance is not really that important (Also, need to learn bitwise operation)
+ */
+
+const cipher = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_-'
+export const separator = "."
+const negString = '~'
+
+const encodeInt = (number: number) => {
+  if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) throw 'The input is not valid'
+
+  let rixit // like 'digit', only in some non-decimal radix 
+  let residual
+  let result = ''
+
+  if (number < 0) {
+    result += negString
+    residual = Math.floor(number * -1)
+  } else {
+    residual = Math.floor(number)
+  }
+
+  while (true) {
+    rixit = residual % 64
+    // console.log("rixit : " + rixit)
+    // console.log("result before : " + result)
+    result = cipher.charAt(rixit) + result
+    // console.log("result after : " + result)
+    // console.log("residual before : " + residual)
+    residual = Math.floor(residual / 64)
+    // console.log("residual after : " + residual)
+
+    if (residual == 0)
+      break;
+    }
+  return result
+}
+
+interface B64EncodingOption {
+  float: boolean
+}
+
+const defaultB64EncodingOption = {
+  float: false
+}
+
+export const encodeNumber: (number:number, option?: B64EncodingOption) => string = (number: number, { float = false }: B64EncodingOption = defaultB64EncodingOption) => {
+  if (!float) return encodeInt(number)
+  else {
+    const floatArray = new Float32Array(1)
+    floatArray[0] = number
+    const intArray = new Uint32Array(floatArray.buffer)
+    const castedInt = intArray[0]
+    return encodeInt(castedInt)
+  }
+}
+
+const decodetoInt = (encodedString: string) => {
+  let _encodedString, negFlag = false
+  if (encodedString.slice(-1) === negString) {
+    negFlag = true
+    _encodedString = encodedString.slice(0, -1)
+  } else {
+    _encodedString = encodedString
+  }
+  return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc,curr) => {
+    const index = cipher.indexOf(curr)
+    if (index < 0) throw new Error(`Poisoned b64 encoding ${encodedString}`)
+    return acc * 64 + index
+  }, 0)
+}
+
+export const decodeToNumber: (encodedString:string, option?: B64EncodingOption) => number = (encodedString: string, {float = false} = defaultB64EncodingOption) => {
+  if (!float) return decodetoInt(encodedString)
+  else {
+    const _int = decodetoInt(encodedString)
+    const intArray = new Uint32Array(1)
+    intArray[0] = _int
+    const castedFloat = new Float32Array(intArray.buffer)
+    return castedFloat[0]
+  }
+}

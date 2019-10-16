@@ -12,9 +12,11 @@ export interface PluginInitManifestActionInterface extends Action{
   }
 }
 
-export const ACTION_TYPES = {
+const ACTION_TYPES = {
   SET_INIT_PLUGIN: `SET_INIT_PLUGIN`
 }
+
+export const PLUGIN_STATE_ACTION_TYPES = ACTION_TYPES
 
 export function pluginState(prevState:PluginInitManifestInterface = {initManifests : new Map()}, action:PluginInitManifestActionInterface):PluginInitManifestInterface{
   switch(action.type){

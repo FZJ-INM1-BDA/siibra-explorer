@@ -1,37 +1,39 @@
 const fs = require('fs')
 const request = require('request')
+const URL = require('url')
 const path = require('path')
+const archiver = require('archiver')
 const { commonSenseDsFilter } = require('./supplements/commonSense')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-const { manualFilter: manualFilterDWM, manualMap: manualMapDWM } = require('./supplements/util/mapDwm')
-
-const kgQueryUtil = require('./../auth/util')
+const { init: kgQueryUtilInit, getUserKGRequestParam } = require('./util')
 
 let cachedData = null
 let otherQueryResult = null
-const queryUrl = process.env.KG_DATASET_QUERY_URL || `https://kg.humanbrainproject.org/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery/instances?size=450&vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F`
-const timeout = process.env.TIMEOUT || 5000
-const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
 
-let getPublicAccessToken
+const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
+const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_3`
+const KG_PARAM = {
+  size: process.env.KG_SEARCH_SIZE || '1000',
+  vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
+}
 
-const fetchDatasetFromKg = async (arg) => {
+const KG_QUERY_DATASETS_URL = new URL.URL(`${KG_ROOT}${KG_PATH}/instances`)
+for (let key in KG_PARAM) {
+  KG_QUERY_DATASETS_URL.searchParams.set(key, KG_PARAM[key])
+}
 
-  const accessToken = arg && arg.user && arg.user.tokenset && arg.user.tokenset.access_token
-  const releasedOnly = !accessToken
-  let publicAccessToken
-  if (!accessToken && getPublicAccessToken) {
-    publicAccessToken = await getPublicAccessToken()
-  }
-  const option = accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-    ? {
-        auth: {
-          'bearer': accessToken || publicAccessToken || process.env.ACCESS_TOKEN
-        }
-      }
-    : {}
+const getKgQuerySingleDatasetUrl = ({ kgId }) => {
+  const _newUrl = new URL.URL(KG_QUERY_DATASETS_URL)
+  _newUrl.pathname = `${KG_PATH}/instances/${kgId}`
+  return _newUrl
+}
+
+const fetchDatasetFromKg = async ({ user } = {}) => {
+
+  const { releasedOnly, option } = await getUserKGRequestParam({ user })
+
   return await new Promise((resolve, reject) => {
-    request(`${queryUrl}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
+    request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
       if (err)
         return reject(err)
       if (resp.statusCode >= 400)
@@ -43,26 +45,40 @@ const fetchDatasetFromKg = async (arg) => {
 }
 
 
-const cacheData = ({results, ...rest}) => {
+const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
   return cachedData
 }
 
-const getPublicDs = () => Promise.race([
-  new Promise((rs, rj) => {
-    setTimeout(() => {
-      if (cachedData) {
-        rs(cachedData)
-      } else {
-        /**
-         * cached data not available, have to wait
-         */
-      }
-    }, timeout)
-  }),
-  fetchDatasetFromKg().then(cacheData)
-])
+let fetchingPublicDataInProgress = false
+let getPublicDsPr
+
+const getPublicDs = async () => {
+
+  /**
+   * every request to public ds will trigger a refresh pull from master KG (throttled pending on resolved request)
+   */
+  if (!fetchingPublicDataInProgress) {
+    fetchingPublicDataInProgress = true
+    getPublicDsPr = fetchDatasetFromKg()
+      .then(_ => {
+        fetchingPublicDataInProgress = false
+        getPublicDsPr = null
+        return _
+      })
+      .then(cacheData)
+  }
+
+  if (cachedData) return Promise.resolve(cachedData)
+  if (getPublicDsPr) return getPublicDsPr
+  throw `cached Data not yet resolved, neither is get public ds defined`
+} 
+
+
+const getDs = ({ user }) => user
+  ? fetchDatasetFromKg({ user }).then(({ results }) => results)
+  : getPublicDs()
 
 /**
  * Needed by filter by parcellation
@@ -84,77 +100,90 @@ const readConfigFile = (filename) => new Promise((resolve, reject) => {
     filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', filename)
   }
   fs.readFile(filepath, 'utf-8', (err, data) => {
-    if(err) reject(err)
+    if (err) reject(err)
     resolve(data)
   })
 })
 
-const parcellationNameToFlattenedRegion = new Map()
-
-const appendMap = (parcellation) => {
-  const { name, regions } = parcellation
-  parcellationNameToFlattenedRegion.set(name, flattenArray(regions))
+const populateSet = (flattenedRegions, set = new Set()) => {
+  if (!(set instanceof Set)) throw `set needs to be an instance of Set`
+  if (!(flattenedRegions instanceof Array)) throw `flattenedRegions needs to be an instance of Array`
+  for (const region of flattenedRegions) {
+    const { name, relatedAreas } = region
+    if (name) set.add(name)
+    if (relatedAreas && relatedAreas instanceof Array && relatedAreas.length > 0) {
+      for (const relatedArea of relatedAreas) {
+        if(typeof relatedArea === 'string') set.add(relatedArea)
+        else console.warn(`related area not an instance of String. skipping`, relatedArea)
+      }
+    }
+  }
+  return set
 }
 
-readConfigFile('bigbrain.json')
-  .then(data => JSON.parse(data))
-  .then(json => {
-    const p = json.parcellations.find(p => p.name === 'Cytoarchitectonic Maps')
-    if (p) {
-      appendMap(p)
-    }
-  })
-  .catch(console.error)
+let juBrainSet = new Set(),
+  shortBundleSet = new Set(),
+  longBundleSet = new Set(),
+  waxholm1Set = new Set(),
+  waxholm2Set = new Set(),
+  waxholm3Set = new Set(),
+  allen2015Set = new Set(),
+  allen2017Set = new Set()
 
 readConfigFile('colin.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    const p = json.parcellations.find(p => p.name === 'JuBrain Cytoarchitectonic Atlas')
-    if (p) {
-      appendMap(p)
-    }
+    const juBrain = flattenArray(json.parcellations[0].regions)
+    juBrainSet = populateSet(juBrain)
+    
   })
   .catch(console.error)
 
 readConfigFile('MNI152.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    const p1 = json.parcellations.find(p => p.name === 'fibre bundle long')
-    if (p1) {
-      appendMap(p1)
-    }
-    const p2 = json.parcellations.find(p => p.name === 'fibre bundle short')
-    if (p2) {
-      appendMap(p2)
-    }
+    const longBundle = flattenArray(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
+    const shortBundle = flattenArray(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
+
+    longBundleSet = populateSet(longBundle)
+    shortBundleSet = populateSet(shortBundle)
   })
   .catch(console.error)
 
 readConfigFile('waxholmRatV2_0.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    const p = json.parcellations.find(p => p.name === 'Waxholm Space rat brain atlas v.2.0')
-    if (p) {
-      appendMap(p)
-    }
+    const waxholm3 = flattenArray(json.parcellations[0].regions)
+    const waxholm2 = flattenArray(json.parcellations[1].regions)
+    const waxholm1 = flattenArray(json.parcellations[2].regions)
+
+    waxholm1Set = populateSet(waxholm1)
+    waxholm2Set = populateSet(waxholm2)
+    waxholm3Set = populateSet(waxholm3)
   })
   .catch(console.error)
 
-/**
- * deprecated
- */
-const filterByPRs = (prs, atlasPr) => atlasPr
-  ? prs.some(pr => {
-      const regex = new RegExp(pr.name.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'), 'i')
-      return atlasPr.some(aPr => regex.test(aPr.name))
-    })
-  : false
+readConfigFile('allenMouse.json')
+  .then(data => JSON.parse(data))
+  .then(json => {
+    const flattenedAllen = flattenArray(json.parcellations[0].regions)
+    allen2017Set = populateSet(flattenedAllen)
 
-const manualFilter = require('./supplements/parcellation')
+    const flattenedAllen2017 = flattenArray(json.parcellations[1].regions)
+    allen2017Set = populateSet(flattenedAllen2017)
+  })
 
+const filterByPRSet = (prs, atlasPrSet = new Set()) => {
+  if (!(atlasPrSet instanceof Set)) throw `atlasPrSet needs to be a set!`
+  return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
+}
 
-const filterDataset = (datasets = [], {templateName, parcellationName}) => datasets
-  .filter(ds => commonSenseDsFilter({ds, templateName, parcellationName }))
+const filterByPRName = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
+  ? true
+  : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
+
+const filter = (datasets = [], { templateName, parcellationName }) => datasets
+  .filter(ds => commonSenseDsFilter({ ds, templateName, parcellationName }))
   .filter(ds => {
     if (/infant/.test(ds.name))
       return false
@@ -162,30 +191,51 @@ const filterDataset = (datasets = [], {templateName, parcellationName}) => datas
       return ds.referenceSpaces.some(rs => rs.name === templateName)
     }
     if (parcellationName) {
-      if (parcellationName === 'Fibre Bundle Atlas - Long Bundle'){
-        return manualFilterDWM(ds)
+      if (ds.parcellationRegion.length === 0) return false
+
+      let useSet
+
+      // temporary measure
+      // TODO ask curaion team re name of jubrain atlas
+      let overwriteParcellationName
+      switch (parcellationName) {
+        case 'Cytoarchitectonic Maps':
+        case 'JuBrain Cytoarchitectonic Atlas': 
+          useSet = juBrainSet
+          overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+          break;
+        case 'Fibre Bundle Atlas - Short Bundle':
+          useSet = shortBundleSet
+          break;
+        case 'Fibre Bundle Atlas - Long Bundle':
+          useSet = longBundleSet
+          break;
+        case 'Waxholm Space rat brain atlas v1':
+          useSet = waxholm1Set
+          break;
+        case 'Waxholm Space rat brain atlas v2':
+          useSet = waxholm2Set
+          break;
+        case 'Waxholm Space rat brain atlas v3':
+          useSet = waxholm3Set
+          break;
+        case 'Allen Mouse Common Coordinate Framework v3 2015':
+          useSet = allen2015Set
+          break;
+        case 'Allen Mouse Common Coordinate Framework v3 2017':
+          useSet = allen2017Set
+          break;
+        default:
+          useSet = new Set()
       }
-      if (ds.parcellationRegion.length > 0) {
-        const flattenedRegions = parcellationNameToFlattenedRegion.get(parcellationName)
-        if (flattenedRegions) {
-          return filterByPRs(ds.parcellationRegion, flattenedRegions)
-        }
-      } else {
-        return false
-      }
+      return filterByPRName({ dataset: ds, parcellationName: overwriteParcellationName || parcellationName }) && filterByPRSet(ds.parcellationRegion, useSet)
     }
 
     return false
   })
   .map(ds => {
-    if (parcellationName && parcellationName === 'Fibre Bundle Atlas - Long Bundle') {
-      return manualMapDWM(ds)
-    }
     return {
       ...ds,
-      ...parcellationName && ds.parcellationRegion.length === 0
-        ? { parcellationRegion: [{ name: manualFilter({ parcellationName, dataset: ds }) }] }
-        : {},
       preview: hasPreview({ datasetName: ds.name })
     }
   })
@@ -193,69 +243,104 @@ const filterDataset = (datasets = [], {templateName, parcellationName}) => datas
 /**
  * on init, populate the cached data
  */
-exports.init = async () => {
-  const { getPublicAccessToken: getPublic } = await kgQueryUtil()
-  getPublicAccessToken = getPublic
-  const {results = []} = await fetchDatasetFromKg()
-  cachedData = results
+const init = async () => {
+  await kgQueryUtilInit()
+  return await getPublicDs()
 }
 
-exports.getDatasets = ({ templateName, parcellationName, user }) => (user
-  ? fetchDatasetFromKg({ user }).then(({results}) => results)
-  : getPublicDs())
-    .then(json => filterDataset(json, {templateName, parcellationName}))
+const getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
+  .then(json => filter(json, { templateName, parcellationName }))
 
-exports.getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
+const getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
-/**
- * TODO
- * change to real spatial query
- */
-const cachedMap = new Map()
-const fetchSpatialDataFromKg = async ({ templateName, queryArg }) => {
-  // const cachedResult = cachedMap.get(templateName)
-  // if (cachedResult) 
-  //   return cachedResult
-    
-  try {
-    const filename = path.join(STORAGE_PATH, templateName + '.json')
-    const exists = fs.existsSync(filename)
+const getDatasetFromId = async ({ user, kgId, returnAsStream = false }) => {
+  const { option, releasedOnly } = await getUserKGRequestParam({ user })
+  const _url = getKgQuerySingleDatasetUrl({ kgId })
+  if (releasedOnly) _url.searchParams.set('databaseScope', 'RELEASED')
+  if (returnAsStream) return request(_url, option)
+  else return new Promise((resolve, reject) => {
+    request(_url, option, (err, resp, body) => {
+      if (err) return reject(err)
+      if (resp.statusCode >= 400) return reject(resp.statusCode)
+      return resolve(JSON.parse(body))
+    })
+  })
+}
 
-    if (!exists)
-      return []
-    
-    const data = fs.readFileSync(filename, 'utf-8')
-    const json = JSON.parse(data)
-    var splitQueryArg = queryArg.split('__');
-    const cubeDots = []    
-    splitQueryArg.forEach(element => {
-      cubeDots.push(element.split('_'))
-    });
+const renderPublication = ({ name, cite, doi }) => `${name}
+  ${cite}
+  DOI: ${doi}
+`
 
-    // cachedMap.set(templateName, json.filter(filterByqueryArg(cubeDots)))
-    return json.filter(filterByqueryArg(cubeDots))
-  } catch (e) {
-    console.log('datasets#query.js#fetchSpatialDataFromKg', 'read file and parse json failed', e)
-    return []
+const prepareDatasetMetadata = ({ name, description, kgReference, contributors, publications }) => {
+
+  return `${name}
+
+${description}
+
+${publications.map(renderPublication).join('\n')}
+`
+}
+
+let kgtos
+
+fs.readFile(path.join(__dirname, 'kgtos.md') , 'utf-8', (err, data) => {
+  if (err) console.warn(`reading kgtos Error`, err)
+  kgtos = data
+})
+
+const getTos = () => kgtos
+
+const getLicense = ({ licenseInfo }) => licenseInfo.map(({ name, url }) => `${name}
+<${url}>
+`).join('\n')
+
+const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
+  if (!kgId) {
+    throw new Error('kgId must be defined')
   }
+
+  const dataset = await getDatasetFromId({ user, kgId })
+  const { files, name: datasetName } = dataset
+  const zip = archiver('zip')
+
+  /**
+   * append citation information
+   */
+  zip.append(prepareDatasetMetadata(dataset), {
+    name: `README.txt`
+  })
+
+  /**
+   * append kg citation policy
+   */
+
+  zip.append(getLicense(dataset), {
+    name: `LICENSE.md`
+  })
+
+  /**
+   * append all of the files
+   */
+  for (let file of files) {
+    const { name, absolutePath } = file
+    zip.append(request(absolutePath), { 
+      name: path.join(datasetName, name)
+    })
+  }
+
+  zip.finalize()
+
+  return zip
 }
 
-exports.getSpatialDatasets = async ({ templateName, queryGeometry, queryArg }) => {
-  return await fetchSpatialDataFromKg({ templateName, queryArg })
+module.exports = {
+  getDatasetFromId,
+  getDatasetFileAsZip,
+  init,
+  getDatasets,
+  getPreview,
+  hasPreview,
+  getTos
 }
 
-
-function filterByqueryArg(cubeDots) {
-  return function (item) {
-    const px = item.geometry.position[0]
-    const py = item.geometry.position[1]
-    const pz = item.geometry.position[2]
-    if (cubeDots[0][0] <= px && px <= cubeDots[1][0] 
-      && cubeDots[0][1] <= py && py <= cubeDots[1][1] 
-      && cubeDots[0][2] <= pz && pz <= cubeDots[1][2]) {
-      return true;
-    }
-  } 
-  return false;   
-}
-    

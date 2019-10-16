@@ -71,7 +71,7 @@ span[renderText]
   content: ' ';
   height:1.5em;
   width: 1.5em;
-  bottom: 0.75em;
+  bottom: 0.25em;
   left: -0.5em;
   position: absolute;
   border-left: rgba(128,128,128,0.6) 1px dashed;

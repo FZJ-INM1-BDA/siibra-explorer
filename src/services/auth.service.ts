@@ -1,4 +1,7 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
+import { Observable, of, Subscription } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { catchError, shareReplay } from "rxjs/operators";
 
 const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
 
@@ -6,9 +9,9 @@ const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
   providedIn: 'root'
 })
 
-export class AuthService{
+export class AuthService implements OnDestroy{
   public user: User | null
-
+  public user$: Observable<any>
   public logoutHref: String = 'logout'
 
   /**
@@ -19,14 +22,23 @@ export class AuthService{
     href: 'hbp-oidc/auth'
   }]
 
-  constructor() {
-    fetch('user')
-      .then(res => res.json())
-      .then(user => this.user = user)
-      .catch(e => {
-        if (!PRODUCTION)
-          console.log(`auth failed`, e)
-      })
+  constructor(private httpClient: HttpClient) {
+    this.user$ = this.httpClient.get('user').pipe(
+      catchError(err => {
+        return of(null)
+      }),
+      shareReplay(1)
+    )
+
+    this.subscription.push(
+      this.user$.subscribe(user => this.user = user)
+    )
+  }
+
+  private subscription: Subscription[] = []
+
+  ngOnDestroy(){
+    while (this.subscription.length > 0) this.subscription.pop().unsubscribe()
   }
 
   authSaveState() {

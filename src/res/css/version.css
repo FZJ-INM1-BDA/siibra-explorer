@@ -1,0 +1,5 @@
+/* fall back */
+body::after
+{
+  content: 'dev build';
+}

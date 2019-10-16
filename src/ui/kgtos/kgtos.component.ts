@@ -1,4 +1,6 @@
 import { Component } from "@angular/core";
+import { DatabrowserService } from "../databrowserModule/databrowser.service";
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'kgtos-component',
@@ -10,4 +12,11 @@ import { Component } from "@angular/core";
 
 export class KGToS{
 
+  public kgTos$: Observable<string>
+
+  constructor(
+    private dbService: DatabrowserService
+  ){
+    this.kgTos$ = this.dbService.kgTos$
+  }
 }

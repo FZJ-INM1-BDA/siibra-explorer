@@ -5,54 +5,7 @@
   display:inline-block;
 }
 
-.loginPopover
+:host > *
 {
-  width: 0;
-  overflow: visible;
-  display:flex;
-  flex-direction: column;
-
-  align-items: flex-end;
-}
-
-:host > dropdown-component
-{
-  min-width: 10em;
-  flex: 1 0 auto;
-}
-
-region-hierarchy,
-dropdown-component
-{
-  font-size:80%;
-
-}
-
-.whenMobile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 100%;
-}
-
-.whenNotMobile {
-  display: flex;
-}
-
-.login-icon {
-  height: 28px;
-  margin: 0 3px;
-}
-
-.login-button-panel-mobile {
-  order: -1;
-  align-self: flex-start; 
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-.login-button-mobile > button {
-  outline: none;
-  background-color: transparent;
+  pointer-events: all;
 }

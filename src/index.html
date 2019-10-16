@@ -6,47 +6,23 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-  <link rel = "stylesheet" href = "extra_styles.css">
-  <link rel = "stylesheet" href = "plugin_styles.css">
+  <link rel="stylesheet" href="extra_styles.css">
+  <link rel="stylesheet" href="plugin_styles.css">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="version.css">
+
   <title>Interactive Atlas Viewer</title>
 </head>
 <body>
   <atlas-viewer>
-    <h1 style = "text-align:center;">
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+    <h1 class="text-center">
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
     </h1>
   </atlas-viewer>
-  <script>
-    /**
-     * Catching Safari 10 bug:
-     * 
-     * https://bugs.webkit.org/show_bug.cgi?id=171041
-     * 
-     */
-    try{
-      eval('(()=>{\
-              let e = e => {\
-                console.log(e);\
-                for(let e of [1,2,3]){\
-                  console.log(e);\
-                }\
-              }\
-          })()')
-    }catch(e){
-      console.log(e)
-      const warning = 'Your browser cannot display the interactive viewer. Please use either Chrome >= 56 and/or Firefox >= 51'
-      console.log(warning)
-      const warningEl = document.createElement('h4')
-      warningEl.innerHTML = warning
-      const el = document.getElementsByTagName('atlas-viewer')
-      if(el.length > 0){
-        document.body.removeChild(el[0])
-      }
-      document.body.appendChild(warningEl)
-    }
 
+  <script src="testSafari.js">
   </script>
 </body>
 </html>

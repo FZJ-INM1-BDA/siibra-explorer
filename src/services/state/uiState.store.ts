@@ -1,20 +1,27 @@
 import { Action } from '@ngrx/store'
+import { TemplateRef } from '@angular/core';
 
-const agreedCookieKey = 'agreed-cokies'
-const aggredKgTosKey = 'agreed-kg-tos'
+import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
 
 const defaultState : UIStateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
+  
   mouseOverLandmark: null,
+  mouseOverUserLandmark: null,
+
   focusedSidePanel: null,
   sidePanelOpen: false,
+
+  snackbarMessage: null,
+
+  bottomSheetTemplate: null,
 
   /**
    * replace with server side logic (?)
    */
-  agreedCookies: localStorage.getItem(agreedCookieKey) === 'agreed',
-  agreedKgTos: localStorage.getItem(aggredKgTosKey) === 'agreed'
+  agreedCookies: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
+  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
 }
 
 export function uiState(state:UIStateInterface = defaultState,action:UIAction){
@@ -30,10 +37,26 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
         ...state,
         mouseOverSegment : action.segment
       }
+    case MOUSEOVER_USER_LANDMARK:
+      const { payload = {} } = action
+      const { userLandmark: mouseOverUserLandmark = null } = payload
+      return {
+        ...state,
+        mouseOverUserLandmark
+      }
     case MOUSE_OVER_LANDMARK:
       return {
         ...state,
         mouseOverLandmark : action.landmark
+      }
+    case SNACKBAR_MESSAGE:
+      const { snackbarMessage } = action
+      /**
+       * Need to use symbol here, or repeated snackbarMessage will not trigger new event
+       */
+      return {
+        ...state,
+        snackbarMessage: Symbol(snackbarMessage)
       }
     /**
      * TODO deprecated
@@ -58,7 +81,7 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(agreedCookieKey, 'agreed')
+      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
       return {
         ...state,
         agreedCookies: true
@@ -67,11 +90,17 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(aggredKgTosKey, 'agreed')
+      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
       return {
         ...state,
         agreedKgTos: true
       }
+    case SHOW_BOTTOM_SHEET:
+        const { bottomSheetTemplate } = action
+        return {
+          ...state,
+          bottomSheetTemplate
+        }
     default:
       return state
   }
@@ -84,30 +113,43 @@ export interface UIStateInterface{
     }
     segment: any | null
   }[]
-  sidePanelOpen : boolean
-  mouseOverSegment : any | number
-  mouseOverLandmark : any 
-  focusedSidePanel : string | null
+  sidePanelOpen: boolean
+  mouseOverSegment: any | number
+
+  mouseOverLandmark: any
+  mouseOverUserLandmark: any
+
+  focusedSidePanel: string | null
+
+  snackbarMessage: Symbol
 
   agreedCookies: boolean
   agreedKgTos: boolean
+
+  bottomSheetTemplate: TemplateRef<any>
 }
 
 export interface UIAction extends Action{
   segment: any | number
   landmark: any
-  focusedSidePanel? : string
+  focusedSidePanel?: string
   segments?:{
     layer: {
       name: string
     }
     segment: any | null
-  }[]
+  }[],
+  snackbarMessage: string
+
+  bottomSheetTemplate: TemplateRef<any>
+
+  payload: any
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
+export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
 export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
@@ -116,3 +158,6 @@ export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`
 export const SHOW_KG_TOS = `SHOW_KG_TOS`
+
+export const SNACKBAR_MESSAGE = `SNACKBAR_MESSAGE`
+export const SHOW_BOTTOM_SHEET = `SHOW_BOTTOM_SHEET`

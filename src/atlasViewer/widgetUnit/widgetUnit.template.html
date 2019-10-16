@@ -1,17 +1,13 @@
 <panel-component
-  [style.transform] = "transform"
-  [containerClass] = "containerClass"
   widgetUnitPanel
+  [ngClass]="{'blinkOn': blinkOn}"
   [bodyCollapsable] = "state === 'docked'"
   [cdkDragDisabled]="state === 'docked'"
-  cdkDrag
-  [ngStyle]="{'max-width': isMobile? '100%' : '300px',
-              'margin-bottom': isMobile? '5px': '0'}">
+  cdkDrag>
   <div 
     widgetUnitHeading
     heading
     cdkDragHandle>
-    <div #emptyspan emptyspan>.</div>
     <div title>
       <div *ngIf="!titleHTML">
         {{ title }}
@@ -22,25 +18,32 @@
     </div>
     <div icons>
       <i
-        *ngIf="!isMobile"
+        *ngIf="useMobileUI$ | async"
         (click)="widgetServices.minimise(this)"
         class="fas fa-window-minimize"
-        hoverable>
+        [hoverable] ="hoverableConfig">
 
       </i>
-      <i *ngIf = "canBeDocked && state === 'floating' && !isMobile"
-        (click) = "dock($event)" 
-        class = "fas fa-window-minimize" 
-        hoverable></i>
-      <i *ngIf = "state === 'docked' && !isMobile"
-        (click) = "undock($event)" 
-        class = "fas fa-window-restore" 
-        hoverable></i>
-      <i *ngIf = "exitable"
-        (click) = "exit($event)" 
-        class = "fas fa-times" 
-        hoverable></i>
+
+      <ng-container *ngIf="!(useMobileUI$ | async)">
+        <i *ngIf="canBeDocked && state === 'floating'"
+          (click)="dock($event)" 
+          class="fas fa-window-minimize" 
+          [hoverable]="hoverableConfig"></i>
+        <i *ngIf="state === 'docked'"
+          (click)="undock($event)" 
+          class="fas fa-window-restore"
+          [hoverable]="hoverableConfig"></i>
+      </ng-container>
+
+      <i *ngIf="exitable"
+        (click)="exit($event)" 
+        class="fas fa-times" 
+        [hoverable] ="hoverableConfig"></i>
     </div>
+    <progress-bar [progress]="progressIndicator" *ngIf="showProgress" progressBar>
+
+    </progress-bar>
   </div>
   <div widgetUnitBody body>
     <ng-template #container>

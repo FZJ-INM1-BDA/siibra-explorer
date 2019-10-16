@@ -5,39 +5,6 @@
   flex-direction: column-reverse;
 }
 
-div[heading]
-{
-  padding: 0.2em 1em;
-  /* white-space: nowrap; */
-}
-div[body]
-{
-  padding: 0.1em 1em;
-  background-color:rgba(0, 0, 0, 0.1);
-}
-
-.muted-text
-{
-  text-decoration: line-through;
-}
-
-.layerContainer
-{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.fas.blue
-{
-  color: #337ab7;
-}
-
-.fas.red
-{
-  color: red;
-}
-
 .noLayerPlaceHolder
 {
   padding: 0.5em 1em;

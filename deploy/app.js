@@ -3,12 +3,29 @@ const express = require('express')
 const app = express()
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session)
+const crypto = require('crypto')
 
 app.disable('x-powered-by')
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
+
+const hash = string => crypto.createHash('sha256').update(string).digest('hex')
+
+app.use((req, _, next) => {
+  if (/main\.bundle\.js$/.test(req.originalUrl)){
+    const xForwardedFor = req.headers['x-forwarded-for']
+    const ip = req.connection.remoteAddress
+    console.log({
+      type: 'visitorLog',
+      method: 'main.bundle.js',
+      xForwardedFor: xForwardedFor && xForwardedFor.replace(/\ /g, '').split(',').map(hash),
+      ip: hash(ip)
+    })
+  }
+  next()
+})
 
 /**
  * load env first, then load other modules
@@ -33,6 +50,11 @@ app.use(session({
 }))
 
 /**
+ * configure CSP
+ */
+require('./csp')(app)
+
+/**
  * configure Auth
  * async function, but can start server without
  */
@@ -44,12 +66,30 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
   : path.join(__dirname, '..', 'dist', 'aot')
 
-app.use(express.static(PUBLIC_PATH))
+/**
+ * well known path
+ */
+app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
-app.use((req, res, next) => {
-  res.set('Content-Type', 'application/json')
+/**
+ * show dev banner
+ * n.b., must be before express.static() call
+ */
+app.use(require('./devBanner'))
+
+/**
+ * only use compression for production
+ * this allows locally built aot to be served without errors
+ */
+
+const { compressionMiddleware } = require('nomiseco')
+
+app.use(compressionMiddleware, express.static(PUBLIC_PATH))
+
+const jsonMiddleware = (req, res, next) => {
+  if (!res.get('Content-Type')) res.set('Content-Type', 'application/json')
   next()
-})
+}
 
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
@@ -57,11 +97,11 @@ const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
-app.use('/templates', templateRouter)
-app.use('/nehubaConfig', nehubaConfigRouter)
-app.use('/datasets', datasetRouter)
-app.use('/plugins', pluginRouter)
-app.use('/preview', previewRouter)
+app.use('/templates', jsonMiddleware, templateRouter)
+app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
+app.use('/datasets', jsonMiddleware, datasetRouter)
+app.use('/plugins', jsonMiddleware, pluginRouter)
+app.use('/preview', jsonMiddleware, previewRouter)
 
 const catchError = require('./catchError')
 app.use(catchError)

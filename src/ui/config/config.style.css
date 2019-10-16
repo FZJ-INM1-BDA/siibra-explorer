@@ -1,0 +1,14 @@
+.config-transition
+{
+  transition: background-color ease-in-out 200ms;
+}
+
+.config-transition:hover
+{
+  background-color: rgba(128,128,128,0.1);
+}
+
+.onDragOver
+{
+  background-color: rgba(128,128,128,0.2);
+}

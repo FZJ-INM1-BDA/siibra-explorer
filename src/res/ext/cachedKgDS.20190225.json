@@ -2572,7 +2572,7 @@
       ],
       "referenceSpaces": [
         {
-          "name": "Waxholm Space rat brain atlas v.2.0"
+          "name": "Waxholm Space rat brain MRI/DTI"
         }
       ],
       "custodians": [
@@ -8550,7 +8550,7 @@
       "formats": [],
       "referenceSpaces": [
         {
-          "name": "Waxholm Space rat brain atlas v.2.0"
+          "name": "Waxholm Space rat brain MRI/DTI"
         }
       ],
       "custodians": [
@@ -11157,7 +11157,7 @@
       "formats": [],
       "referenceSpaces": [
         {
-          "name": "Waxholm Space rat brain atlas v.2.0"
+          "name": "Waxholm Space rat brain MRI/DTI"
         }
       ],
       "custodians": [
@@ -11458,7 +11458,7 @@
       ],
       "referenceSpaces": [
         {
-          "name": "Waxholm Space rat brain atlas v.2.0"
+          "name": "Waxholm Space rat brain MRI/DTI"
         }
       ],
       "custodians": [
@@ -19610,7 +19610,7 @@
       "formats": [],
       "referenceSpaces": [
         {
-          "name": "Waxholm Space rat brain atlas v.2.0"
+          "name": "Waxholm Space rat brain MRI/DTI"
         }
       ],
       "custodians": [

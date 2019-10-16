@@ -1,7 +1,6 @@
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { DataBrowser } from "./databrowser/databrowser.component";
-import { DatasetViewerComponent } from "./datasetViewer/datasetViewer.component";
 import { ComponentsModule } from "src/components/components.module";
 import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
 import { FormsModule } from "@angular/forms";
@@ -12,35 +11,52 @@ import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { PreviewComponent } from "./preview/preview.component";
 import { FileViewer } from "./fileviewer/fileviewer.component";
-import { RadarChart } from "./fileviewer/radar/radar.chart.component";
+import { RadarChart } from "./fileviewer/chart/radar/radar.chart.component";
 import { ChartsModule } from "ng2-charts";
-import { LineChart } from "./fileviewer/line/line.chart.component";
+import { LineChart } from "./fileviewer/chart/line/line.chart.component";
 import { DedicatedViewer } from "./fileviewer/dedicated/dedicated.component";
 import { Chart } from 'chart.js'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { PopoverModule } from "ngx-bootstrap/popover";
 import { UtilModule } from "src/util/util.module";
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
+import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
+import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
+import { DatasetIsFavedPipe } from "./util/datasetIsFaved.pipe";
+import { RegionBackgroundToRgbPipe } from "./util/regionBackgroundToRgb.pipe";
+
+import { ScrollingModule } from "@angular/cdk/scrolling";
+import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
+import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
+import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
+import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
+import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 
 @NgModule({
   imports:[
     ChartsModule,
     CommonModule,
     ComponentsModule,
+    ScrollingModule,
     FormsModule,
     UtilModule,
+    AngularMaterialModule,
     TooltipModule.forRoot(),
     PopoverModule.forRoot()
   ],
   declarations: [
     DataBrowser,
-    DatasetViewerComponent,
     ModalityPicker,
     PreviewComponent,
     FileViewer,
     RadarChart,
     LineChart,
     DedicatedViewer,
+    SingleDatasetView,
+    SingleDatasetListView,
 
     /**
      * pipes
@@ -49,13 +65,33 @@ import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
     CopyPropertyPipe,
     FilterDataEntriesbyMethods,
     FilterDataEntriesByRegion,
-    AggregateArrayIntoRootPipe
+    AggregateArrayIntoRootPipe,
+    DoiParserPipe,
+    DatasetIsFavedPipe,
+    RegionBackgroundToRgbPipe,
+    GetKgSchemaIdFromFullIdPipe,
+    PreviewFileIconPipe,
+    PreviewFileTypePipe,
+    AppendFilerModalityPipe,
+    ResetCounterModalityPipe
   ],
   exports:[
-    DataBrowser
+    DataBrowser,
+    SingleDatasetView,
+    SingleDatasetListView,
+    PreviewComponent,
+    ModalityPicker,
+    FilterDataEntriesbyMethods,
+    FileViewer,
+    GetKgSchemaIdFromFullIdPipe
   ],
   entryComponents:[
-    DataBrowser
+    DataBrowser,
+    FileViewer,
+    SingleDatasetView
+  ],
+  providers: [
+    KgSingleDatasetService
   ]
   /**
    * shouldn't need bootstrap, so no need for browser module

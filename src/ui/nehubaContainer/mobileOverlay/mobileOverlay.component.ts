@@ -62,14 +62,18 @@ export class MobileOverlay implements OnInit, OnDestroy{
   }
 
   ngOnInit(){
+
+    const itemCount = this.tunableProperties.length
+
     const config = {
       root: this.intersector.nativeElement,
-      threshold: [...Array(10)].map((_, k) => k / 10)
+      threshold: [...[...Array(itemCount)].map((_, k) => k / itemCount), 1]
     }
 
     this.intersectionObserver = new IntersectionObserver((arg) => {
       if (arg[0].isIntersecting) {
-        this.focusItemIndex = 2- Math.floor(arg[0].intersectionRatio * this.tunableProperties.length)
+        const ratio = arg[0].intersectionRatio - (1 / this.tunableProperties.length / 2)
+        this.focusItemIndex = this.tunableProperties.length - Math.round(ratio * this.tunableProperties.length) - 1
       }
     }, config)
 

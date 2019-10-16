@@ -1,18 +1,25 @@
-import { Component, OnDestroy, OnInit, ViewChild, Input } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild, Input, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, Output,EventEmitter, TemplateRef } from "@angular/core";
 import { DataEntry } from "src/services/stateStore.service";
-import { Subscription, merge } from "rxjs";
+import { Subscription, merge, Observable } from "rxjs";
 import { DatabrowserService, CountedDataModality } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
+import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
+import { scan, shareReplay } from "rxjs/operators";
+import { ViewerPreviewFile } from "src/services/state/dataStore.store";
+
+const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 
 @Component({
   selector : 'data-browser',
   templateUrl : './databrowser.template.html',
   styleUrls : [
     `./databrowser.style.css`
-  ]
+  ],
+  exportAs: 'dataBrowser',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class DataBrowser implements OnDestroy,OnInit{
+export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   @Input()
   public regions: any[] = []
@@ -23,10 +30,10 @@ export class DataBrowser implements OnDestroy,OnInit{
   @Input()
   public parcellation: any
 
-  public dataentries: DataEntry[] = []
+  @Output()
+  dataentriesUpdated: EventEmitter<DataEntry[]> = new EventEmitter()
 
-  public currentPage: number = 0
-  public hitsPerPage: number = 5
+  public dataentries: DataEntry[] = []
 
   public fetchingFlag: boolean = false
   public fetchError: boolean = false
@@ -37,12 +44,12 @@ export class DataBrowser implements OnDestroy,OnInit{
   public countedDataM: CountedDataModality[] = []
   public visibleCountedDataM: CountedDataModality[] = []
 
+  public history$: Observable<{file:ViewerPreviewFile, dataset: DataEntry}[]>
+
   @ViewChild(ModalityPicker)
   modalityPicker: ModalityPicker
 
-  get darktheme(){
-    return this.dbService.darktheme
-  }
+  public favDataentries$: Observable<DataEntry[]>
 
   /**
    * TODO
@@ -53,13 +60,19 @@ export class DataBrowser implements OnDestroy,OnInit{
   public gemoetryFilter: any
 
   constructor(
-    private dbService: DatabrowserService
+    private dbService: DatabrowserService,
+    private cdr:ChangeDetectorRef,
+    private singleDatasetSservice: KgSingleDatasetService
   ){
-
+    this.favDataentries$ = this.dbService.favedDataentries$
+    this.history$ = this.singleDatasetSservice.previewingFile$.pipe(
+      scan(scanFn, []),
+      shareReplay(1)
+    )
   }
 
-  ngOnInit(){
-    this.dbService.dbComponentInit(this)
+  ngOnChanges(){
+
     this.regions = this.regions.map(r => {
       /**
        * TODO to be replaced with properly region UUIDs from KG
@@ -71,10 +84,20 @@ export class DataBrowser implements OnDestroy,OnInit{
     })
     const { regions, parcellation, template } = this
     this.fetchingFlag = true
+
+    // input may be undefined/null
+    if (!parcellation) return
+
+    /**
+     * reconstructing parcellation region is async (done on worker thread)
+     * if parcellation region is not yet defined, return. 
+     * parccellation will eventually be updated with the correct region
+     */
+    if (!parcellation.regions) return
+    
     this.dbService.getDataByRegion({ regions, parcellation, template })
       .then(de => {
         this.dataentries = de
-        this.fetchingFlag = false
         return de
       })
       .then(this.dbService.getModalityFromDE)
@@ -83,16 +106,26 @@ export class DataBrowser implements OnDestroy,OnInit{
       })
       .catch(e => {
         console.error(e)
-        this.fetchingFlag = false
         this.fetchError = true
       })
+      .finally(() => {
+        this.fetchingFlag = false
+        this.dataentriesUpdated.emit(this.dataentries)
+        this.cdr.markForCheck()
+      })
 
+  }
+
+  ngOnInit(){
+    /**
+     * TODO gets init'ed everytime when appends to ngtemplateoutlet 
+     */
+    this.dbService.dbComponentInit(this)
     this.subscriptions.push(
       merge(
         // this.dbService.selectedRegions$,
         this.dbService.fetchDataObservable$
       ).subscribe(() => {
-        this.resetCurrentPage()
         /**
          * Only reset modality picker
          * resetting all creates infinite loop
@@ -121,18 +154,29 @@ export class DataBrowser implements OnDestroy,OnInit{
       }
     })
     this.visibleCountedDataM = []
-    this.resetCurrentPage()
   }
 
   handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
-    this.resetCurrentPage()
+    this.cdr.markForCheck()
   }
 
   retryFetchData(event: MouseEvent){
     event.preventDefault()
     this.dbService.manualFetchDataset$.next(null)
+  }
+
+  toggleFavourite(dataset: DataEntry){
+    this.dbService.toggleFav(dataset)
+  }
+
+  saveToFavourite(dataset: DataEntry){
+    this.dbService.saveToFav(dataset)
+  }
+
+  removeFromFavourite(dataset: DataEntry){
+    this.dbService.removeFromFav(dataset)
   }
 
   public showParcellationList: boolean = false
@@ -143,20 +187,12 @@ export class DataBrowser implements OnDestroy,OnInit{
     this.filePreviewName = datasetName
   }
 
-  /**
-   * when filter changes, it is necessary to set current page to 0,
-   * or one may overflow and see no dataset
-   */
-  resetCurrentPage(){
-    this.currentPage = 0
-  }
-
   resetFilters(event?:MouseEvent){
     this.clearAll()
   }
 
-  getBackgroundColorStyleFromRegion(region:any) {
-    return this.dbService.getBackgroundColorStyleFromRegion(region)
+  trackByFn(index:number, dataset:DataEntry){
+    return dataset.id
   }
 }
 

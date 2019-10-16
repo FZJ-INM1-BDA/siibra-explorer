@@ -991,6 +991,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/C3HS-8R7",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 7A"
+                          ],
                           "rgb": [
                             52,
                             20,
@@ -1352,6 +1355,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/2JK3-QXR",
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 3b"
+                          ],
                           "rgb": [
                             239,
                             246,
@@ -1499,6 +1505,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/C5QQ-EFB",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFm"
+                          ],
                           "rgb": [
                             187,
                             133,
@@ -1557,6 +1566,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F1TJ-54W",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFop"
+                          ],
                           "rgb": [
                             226,
                             211,
@@ -1606,6 +1618,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/8DP8-8HE",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGp"
+                          ],
                           "rgb": [
                             98,
                             128,
@@ -1655,6 +1670,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/V5HY-XTS",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PGa"
+                          ],
                           "rgb": [
                             42,
                             236,
@@ -1704,6 +1722,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/JGM9-ZET",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFt"
+                          ],
                           "rgb": [
                             120,
                             135,
@@ -1753,6 +1774,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/TB94-HRK",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area PFcm"
+                          ],
                           "rgb": [
                             53,
                             76,
@@ -2912,6 +2936,10 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F9P8-ZVW",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 44v",
+                            "Area 44d"
+                          ],
                           "rgb": [
                             54,
                             74,
@@ -2961,6 +2989,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/MR1V-BJ3",
                           "synonyms": [],
+                          "relatedAreas": [
+                            "Area 45"
+                          ],
                           "rgb": [
                             167,
                             103,
@@ -3349,6 +3380,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/5HSF-81J",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area 4p"
+                          ],
                           "rgb": [
                             116,
                             92,
@@ -4838,6 +4872,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/MV3G-RET",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area Te1"
+                          ],
                           "rgb": [
                             252,
                             84,
@@ -4896,6 +4933,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F2JH-KVV",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG1"
+                          ],
                           "rgb": [
                             67,
                             94,
@@ -5043,6 +5083,9 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/13RG-FYV",
                           "synonyms": [],
+                          "relatedAreas":[
+                            "Area FG2"
+                          ],
                           "rgb": [
                             170,
                             220,
@@ -6021,6 +6064,6 @@
   ],
   "properties": {
     "name": "MNI Colin 27",
-    "description": "This is a stereotaxic average of 27 T1-weighted MRI scans of the same individual. In 1998, a new atlas with much higher definition than MNI305s was created at the MNI. One individual (CJH) was scanned 27 times and the images linearly registered to create an average with high SNR and structure definition (Holmes et al., 1998). This average was linearly registered to the average 305. Ironically, this dataset was not originally intended for use as a stereotaxic template but as the sub- strate for an ROI parcellation scheme to be used with ANIMAL non-linear spatial normalization (Collins et al., 1995), i.e. it was intended for the purpose of segmentation, NOT stereotaxy. As a single brain atlas, it did not capture anatomical variability and was, to some degree, a reversion to the Talairach approach. However, the high definition proved too attractive to the community and, after non-linear mapping to fit the MNI305 space, it has been adopted by many groups as a stereotaxic template (e.g., AFNI, Cox,; Brainstorm, Tadel et al., 2011; SPM, Litvak et al., 2011; Fieldtrip, Oostenveld et al., 2011)."
+    "description": "A stereotaxic average of 27 T1-weighted MRI scans of the same individual. (Holmes et al., 1998), mapped to fit the MNI305 space.  Although not capturing brain variability, it is well established in neuroscience due to its high definition. HBP provides the JuBrain probabilistic cytoarchitectonic atlas (Amunts et al.) in this space."
   }
 }

@@ -15,6 +15,11 @@ input[navigateInput]
   box-shadow: inset 0px 2px 2px 2px rgba(0,0,0,0.05);
 }
 
+current-layout
+{
+  top: 0;
+  left: 0;
+}
 
 div[landmarkMasterContainer]
 {
@@ -66,7 +71,7 @@ hr
 }
 
 
-div[landmarkMasterContainer] > div > [landmarkContainer] > div.loadingIndicator
+div.loadingIndicator
 {
   left: auto;
   top: auto;
@@ -75,6 +80,7 @@ div[landmarkMasterContainer] > div > [landmarkContainer] > div.loadingIndicator
   margin-right: 0.2em;
   margin-bottom: 0.2em;
   width: 100%;
+  position:absolute;
   height:2em;
   display: flex;
   flex-direction: row-reverse;
@@ -166,3 +172,33 @@ div#scratch-pad
   pointer-events: none;
 }
 
+.load-fav-dataentries-fab
+{
+  right: 0;
+  bottom: 0;
+}
+
+maximise-panel-button
+{
+  transition: opacity 170ms ease-in-out,
+    transform 250ms ease-in-out;
+
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+/* if not mobile, then show on hover */
+maximise-panel-button
+{
+  opacity: 0.0;
+  pointer-events: none;
+}
+
+maximise-panel-button.onHover,
+maximise-panel-button:hover,
+:host-context([ismobile="true"]) maximise-panel-button
+{
+  opacity: 1.0 !important;
+  pointer-events: all !important;
+}
