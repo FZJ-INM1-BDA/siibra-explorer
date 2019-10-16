@@ -117,18 +117,12 @@ export class PluginServices{
 
   readyPlugin(plugin:PluginManifest):Promise<any>{
     return Promise.all([
-        isDefined(plugin.template) ?
-          Promise.resolve('template already provided') :
-          isDefined(plugin.templateURL) ?
-            this.fetch(plugin.templateURL, {responseType: 'text'})
-              .then(template=>plugin.template = template) :
-            Promise.reject('both template and templateURL are not defined') ,
-        isDefined(plugin.script) ?
-          Promise.resolve('script already provided') :
-          isDefined(plugin.scriptURL) ?
-            this.fetch(plugin.scriptURL, {responseType: 'text'})
-              .then(script=>plugin.script = script) :
-            Promise.reject('both script and scriptURL are not defined') 
+        isDefined(plugin.template)
+          ? Promise.resolve()
+          : isDefined(plugin.templateURL)
+            ? this.fetch(plugin.templateURL, {responseType: 'text'}).then(template=>plugin.template = template)
+            : Promise.reject('both template and templateURL are not defined') ,
+        isDefined(plugin.scriptURL) ? Promise.resolve() : Promise.reject(`inline script has been deprecated. use scriptURL instead`)
       ])
   }
 
@@ -239,7 +233,8 @@ export class PluginServices{
         }
 
         const script = document.createElement('script')
-        script.innerHTML = plugin.script
+        script.src = plugin.scriptURL
+
         this.appendSrc(script)
         handler.onShutdown(() => this.removeSrc(script))
 

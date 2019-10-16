@@ -1,15 +1,22 @@
 const csp = require('helmet-csp')
 const bodyParser = require('body-parser')
 
-let ALLOWED_DEFAULT_SRC, DATA_SRC
+let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 
 const reportOnly = process.env.NODE_ENV !== 'production'
 
 try {
-  ALLOWED_DEFAULT_SRC = JSON.parse(process.env.ALLOWED_DEFAULT_SRC || '[]')
+  WHITE_LIST_SRC = JSON.parse(process.env.WHITE_LIST_SRC || '[]')
 } catch (e) {
-  console.warn(`parsing ALLOWED_DEFAULT_SRC error ${process.env.ALLOWED_DEFAULT_SRC}`, e)
-  ALLOWED_DEFAULT_SRC = []
+  console.warn(`parsing WHITE_LIST_SRC error ${process.env.WHITE_LIST_SRC}`, e)
+  WHITE_LIST_SRC = []
+}
+
+try {
+  SCRIPT_SRC = JSON.parse(process.env.SCRIPT_SRC || '[]')
+} catch (e) {
+  console.warn(`parsing SCRIPT_SRC error ${process.env.SCRIPT_SRC}`, e)
+  SCRIPT_SRC = []
 }
 
 try {
@@ -37,18 +44,24 @@ module.exports = (app) => {
   app.use(csp({
     directives: {
       defaultSrc: [
-        ...defaultAllowedSites
+        ...defaultAllowedSites,
+        ...WHITE_LIST_SRC
       ],
       styleSrc: [
         ...defaultAllowedSites,
         '*.bootstrapcdn.com',
         '*.fontawesome.com',
-        "'unsafe-inline'" // required for angular [style.xxx] bindings
+        "'unsafe-inline'", // required for angular [style.xxx] bindings
+        ...WHITE_LIST_SRC
       ],
-      fontSrc: [ '*.fontawesome.com' ],
+      fontSrc: [
+        '*.fontawesome.com',
+        ...WHITE_LIST_SRC
+      ],
       connectSrc: [
         ...defaultAllowedSites,
-        ...dataSource
+        ...dataSource,
+        ...WHITE_LIST_SRC
       ],
       scriptSrc:[
         "'self'",
@@ -59,7 +72,8 @@ module.exports = (app) => {
         'unpkg.com',
         '*.unpkg.com',
         '*.jsdelivr.net',
-        ...ALLOWED_DEFAULT_SRC
+        ...SCRIPT_SRC,
+        ...WHITE_LIST_SRC
       ],
       reportUri: '/report-violation'
     },
