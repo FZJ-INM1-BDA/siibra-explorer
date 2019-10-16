@@ -70,15 +70,16 @@
     <mat-card-content class="dataset-container w-100 overflow-hidden">
       <cdk-virtual-scroll-viewport
         class="h-100"
-        autosize>
-        <div class="virtual-scroll-element"
-          *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 0; let index = index">
+        minBufferPx="200"
+        maxBufferPx="400"
+        itemSize="50">
+        <div class="virtual-scroll-element overflow-hidden" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 0; let index = index">
 
           <!-- divider, show if not first -->
           <mat-divider *ngIf="index !== 0"></mat-divider>
 
           <single-dataset-list-view
-            class="d-block pt-1 pb-1"
+            class="d-block pt-1 pb-1 h-100"
             [kgSchema]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[0]"
             [kgId]="(dataset.fullId | getKgSchemaIdFromFullIdPipe)[1]"
             [dataset]="dataset"
@@ -117,7 +118,7 @@
             <small *ngIf="dataentries.length > 0" class="text-muted">
               <ng-template [ngIf]="modalityPickerCmp && modalityPickerCmp.checkedModality.length > 0"
                 [ngIfElse]="noFilterTmpl">
-                {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} filtered / {{ dataentries.length }} datasets
+                {{ (dataentries | filterDataEntriesByMethods : visibleCountedDataM).length }} / {{ dataentries.length }}
               </ng-template>
               
               <ng-template #noFilterTmpl>
