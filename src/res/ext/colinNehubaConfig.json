@@ -87,10 +87,10 @@
             ]
           ]
         },
-        "jubrain colin v17 left": {
+        "jubrain colin v18 left": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/17/colin27/left",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/left",
           "transform": [
             [
               1,
@@ -118,10 +118,10 @@
             ]
           ]
         },
-        "jubrain colin v17 right": {
+        "jubrain colin v18 right": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/17/colin27/right",
+          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/right",
           "transform": [
             [
               1,
