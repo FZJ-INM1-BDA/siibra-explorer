@@ -8,3 +8,10 @@ radio-list
 {
   display: block;
 }
+
+
+/* grow 3x shrink 1x basis 2.5 x 50px (2.5 rows) */
+.dataset-container
+{
+  flex: 3 1 125px;
+}

@@ -8,9 +8,9 @@ import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/stat
 import { isIdentityQuat } from '../nehubaContainer/util';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 
-const GPU_TOOLTIP = `GPU TOOLTIP`
-const ANIMATION_TOOLTIP = `ANIMATION_TOOLTIP`
-const MOBILE_UI_TOOLTIP = `MOBILE_UI_TOOLTIP`
+const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
+const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
+const MOBILE_UI_TOOLTIP = `Mobile UI enables touch controls`
 const ROOT_TEXT_ORDER : [string, string, string, string] = ['Coronal', 'Sagittal', 'Axial', '3D']
 const OBLIQUE_ROOT_TEXT_ORDER : [string, string, string, string] = ['Slice View 1', 'Slice View 2', 'Slice View 3', '3D']
 
