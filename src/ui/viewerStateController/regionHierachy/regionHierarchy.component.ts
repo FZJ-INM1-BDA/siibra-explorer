@@ -11,11 +11,11 @@ const insertHighlight :(name:string, searchTerm:string) => string = (name:string
     name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
 }
 
-const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[], defaultNgId: string) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = [], defaultNgId) => ({ ngId = defaultNgId, name, status, labelIndex }) =>  {
+const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => ({ ngId, name, status, labelIndex }) =>  {
   return !!labelIndex
     && !!ngId
     && selectedRegions.findIndex(re =>
-      generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId || defaultNgId }) === generateLabelIndexId({ ngId, labelIndex })
+      generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex })
     ) >= 0
       ? `<span class="cursor-default regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
       : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
@@ -105,7 +105,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
         children: this.parcellationSelected.regions
       }
     }
-    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions, this.selectedParcellation.ngId)
+    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
   }
 
@@ -123,7 +123,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   ngOnInit(){
-    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions, this.selectedParcellation.ngId)
+    this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
 
     this.subscriptions.push(
