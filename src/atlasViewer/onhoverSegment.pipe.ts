@@ -1,5 +1,5 @@
 import { PipeTransform, Pipe, SecurityContext } from "@angular/core";
-import { DomSanitizer } from "@angular/platform-browser";
+import { DomSanitizer, SafeHtml } from "@angular/platform-browser";
 
 @Pipe({
   name: 'transformOnhoverSegment'
@@ -10,13 +10,17 @@ export class TransformOnhoverSegmentPipe implements PipeTransform{
 
   }
 
-  private getStatus(text:string) {
-    return ` <span class="text-muted">(${this.sanitizer.sanitize(SecurityContext.HTML, text)})</span>`
+  private sanitizeHtml(inc:string):SafeHtml{
+    return this.sanitizer.sanitize(SecurityContext.HTML, inc)
   }
 
-  public transform(segment: any | number){
+  private getStatus(text:string) {
+    return ` <span class="text-muted">(${this.sanitizeHtml(text)})</span>`
+  }
+
+  public transform(segment: any | number): SafeHtml{
     return this.sanitizer.bypassSecurityTrustHtml((
-      (segment.name || segment) +
+      ( this.sanitizeHtml(segment.name) || segment) +
       (segment.status
         ? this.getStatus(segment.status)
         : '')

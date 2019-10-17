@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER, generateLabelIndexId } from "../services/stateStore.service";
+import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER } from "../services/stateStore.service";
 import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { PluginServices } from "./atlasViewer.pluginService.service";
-import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
-import { ToastService } from "src/services/toastService.service";
+import { AtlasViewerConstantsServices, encodeNumber, separator, decodeToNumber } from "./atlasViewer.constantService.service";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
+import { UIService } from "src/services/uiService.service";
 
 declare var window
 
@@ -24,7 +24,7 @@ export class AtlasViewerURLService{
     private store : Store<ViewerStateInterface>,
     private pluginService : PluginServices,
     private constantService:AtlasViewerConstantsServices,
-    private toastService: ToastService
+    private uiService:UIService
   ){
 
     this.pluginState$ = this.store.pipe(
@@ -57,8 +57,12 @@ export class AtlasViewerURLService{
      */
     this.additionalNgLayers$ = combineLatest(
       this.changeQueryObservable$.pipe(
-        map(state => state.templateSelected)
+        select('templateSelected'),
+        filter(v => !!v)
       ),
+      /**
+       * TODO duplicated with viewerState.loadedNgLayers ?
+       */
       this.store.pipe(
         select('ngViewerState'),
         select('layers')
@@ -125,11 +129,10 @@ export class AtlasViewerURLService{
       
       const templateToLoad = fetchedTemplates.find(template=>template.name === searchedTemplatename)
       if (!templateToLoad) {
-        this.toastService.showToast(
+        this.uiService.showMessage(
           this.constantService.incorrectTemplateNameSearchParam(searchedTemplatename),
-          {
-            timeout: 5000
-          }
+          null,
+          { duration: 5000 }
         )
         const urlString = window.location.href
         /**
@@ -145,11 +148,10 @@ export class AtlasViewerURLService{
       const parcellationToLoad = templateToLoad.parcellations.find(parcellation=>parcellation.name === searchedParcellationName)
 
       if (!parcellationToLoad) {
-        this.toastService.showToast(
+        this.uiService.showMessage(
           this.constantService.incorrectParcellationNameSearchParam(searchedParcellationName),
-          {
-            timeout: 5000
-          }
+          null,
+          { duration: 5000 }
         )
       }
       
@@ -164,6 +166,9 @@ export class AtlasViewerURLService{
         /**
          * either or both parcellationToLoad and .regions maybe empty
          */
+        /**
+         * backwards compatibility
+         */
         const selectedRegionsParam = searchparams.get('regionsSelected')
         if(selectedRegionsParam){
           const ids = selectedRegionsParam.split('_')
@@ -172,6 +177,43 @@ export class AtlasViewerURLService{
             type : SELECT_REGIONS_WITH_ID,
             selectRegionIds: ids
           })
+        }
+
+        const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
+        if (cRegionsSelectedParam) {
+          try {
+            const json = JSON.parse(cRegionsSelectedParam)
+  
+            const selectRegionIds = []
+  
+            for (let ngId in json) {
+              const val = json[ngId]
+              const labelIndicies = val.split(separator).map(n =>{
+                try{
+                  return decodeToNumber(n)
+                } catch (e) {
+                  /**
+                   * TODO poisonsed encoded char, send error message
+                   */
+                  return null
+                }
+              }).filter(v => !!v)
+              for (let labelIndex of labelIndicies) {
+                selectRegionIds.push(`${ngId}#${labelIndex}`)
+              }
+            }
+  
+            this.store.dispatch({
+              type: SELECT_REGIONS_WITH_ID,
+              selectRegionIds
+            })
+  
+          } catch (e) {
+            /**
+             * parsing cRegionSelected error
+             */
+            console.log('parsing cRegionSelected error', e)
+          }
         }
       }
       
@@ -191,10 +233,37 @@ export class AtlasViewerURLService{
         })
       }
 
+      const cViewerState = searchparams.get('cNavigation')
+      if (cViewerState) {
+        try {
+          const [ cO, cPO, cPZ, cP, cZ ] = cViewerState.split(`${separator}${separator}`)
+          const o = cO.split(separator).map(s => decodeToNumber(s, {float: true}))
+          const po = cPO.split(separator).map(s => decodeToNumber(s, {float: true}))
+          const pz = decodeToNumber(cPZ)
+          const p = cP.split(separator).map(s => decodeToNumber(s))
+          const z = decodeToNumber(cZ)
+          this.store.dispatch({
+            type : CHANGE_NAVIGATION,
+            navigation : {
+              orientation: o,
+              perspectiveOrientation: po,
+              perspectiveZoom: pz,
+              position: p,
+              zoom: z
+            }
+          })
+        } catch (e) {
+          /**
+           * TODO Poisoned encoded char
+           * send error message
+           */
+        }
+      }
+
       const niftiLayers = searchparams.get('niftiLayers')
       if(niftiLayers){
         const layers = niftiLayers.split('__')
-        /*  */
+
         layers.forEach(layer => this.store.dispatch({
           type : ADD_NG_LAYER, 
           layer : {
@@ -235,18 +304,56 @@ export class AtlasViewerURLService{
                     isDefined(state[key].position) &&
                     isDefined(state[key].zoom)
                   ){
-                    _[key] = [
-                      state[key].orientation.join('_'),
-                      state[key].perspectiveOrientation.join('_'),
-                      state[key].perspectiveZoom,
-                      state[key].position.join('_'),
-                      state[key].zoom 
-                    ].join('__')
+                    const {
+                      orientation, 
+                      perspectiveOrientation, 
+                      perspectiveZoom, 
+                      position, 
+                      zoom
+                    } = state[key]
+
+                    _['cNavigation'] = [
+                      orientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      perspectiveOrientation.map(n => encodeNumber(n, {float: true})).join(separator),
+                      encodeNumber(Math.floor(perspectiveZoom)),
+                      Array.from(position).map((v:number) => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+                      encodeNumber(Math.floor(zoom)) 
+                    ].join(`${separator}${separator}`)
+                    
+                    _[key] = null
                   }
                   break;
-                case 'regionsSelected':
-                  _[key] = state[key].map(({ ngId = parcellationSelected && parcellationSelected.ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                case 'regionsSelected': {
+                  // _[key] = state[key].map(({ ngId, labelIndex })=> generateLabelIndexId({ ngId,labelIndex })).join('_')
+                  const ngIdLabelIndexMap : Map<string, number[]> = state[key].reduce((acc, curr) => {
+                    const returnMap = new Map(acc)
+                    const { ngId, labelIndex } = curr
+                    const existingArr = (returnMap as Map<string, number[]>).get(ngId)
+                    if (existingArr) {
+                      existingArr.push(labelIndex)
+                    } else {
+                      returnMap.set(ngId, [labelIndex])
+                    }
+                    return returnMap
+                  }, new Map())
+
+                  if (ngIdLabelIndexMap.size === 0) {
+                    _['cRegionsSelected'] = null
+                    _[key] = null
+                    break;
+                  }
+                  
+                  const returnObj = {}
+
+                  for (let entry of ngIdLabelIndexMap) {
+                    const [ ngId, labelIndicies ] = entry
+                    returnObj[ngId] = labelIndicies.map(n => encodeNumber(n)).join(separator)
+                  }
+                  
+                  _['cRegionsSelected'] = JSON.stringify(returnObj)
+                  _[key] = null
                   break;
+                }
                 case 'templateSelected':
                 case 'parcellationSelected':
                   _[key] = state[key].name
@@ -259,7 +366,11 @@ export class AtlasViewerURLService{
           return _
         })
       ),
-      this.additionalNgLayers$,
+      this.additionalNgLayers$.pipe(
+        map(layers => layers
+          .map(layer => layer.name)
+          .filter(layername => !/^blob\:/.test(layername)))
+      ),
       this.pluginState$
     ).pipe(
       /* TODO fix encoding of nifti path. if path has double underscore, this encoding will fail */
@@ -270,7 +381,7 @@ export class AtlasViewerURLService{
             ? Array.from(pluginState.initManifests.values()).filter(v => v !== null).join('__') 
             : null,
           niftiLayers : niftiLayers.length > 0
-            ? niftiLayers.map(layer => layer.name).join('__')
+            ? niftiLayers.join('__')
             : null
         }
       })

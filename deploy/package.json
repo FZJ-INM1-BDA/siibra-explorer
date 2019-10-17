@@ -13,12 +13,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "archiver": "^3.0.0",
     "body-parser": "^1.19.0",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
-    "jszip": "^3.2.1",
+    "helmet-csp": "^2.8.0",
     "jwt-decode": "^2.2.0",
     "memorystore": "^1.6.1",
+    "nomiseco": "0.0.2",
     "openid-client": "^2.4.5",
     "passport": "^0.4.0",
     "request": "^2.88.0"

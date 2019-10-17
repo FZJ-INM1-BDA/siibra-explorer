@@ -1,9 +1,8 @@
-<div 
-  placement = "bottom"
-  [tooltip] = "pluginEnabledFlag ? null : 'coming soon'"
-  *ngFor = "let plugin of pluginServices.fetchedPluginManifests"
-  (click) = "clickPlugin(plugin)"
-  [ngClass] = "{'btn-disabled' : !pluginEnabledFlag}"
-  class = "btn btn-default">
-  {{ plugin.displayName ? plugin.displayName : plugin.name }}
-</div>
+<mat-action-list>
+  <button mat-list-item
+    *ngFor="let plugin of pluginServices.fetchedPluginManifests"
+    (click)="clickPlugin(plugin)">
+
+    {{ plugin.displayName ? plugin.displayName : plugin.name }}
+  </button>
+</mat-action-list>

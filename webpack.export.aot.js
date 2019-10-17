@@ -18,7 +18,7 @@ module.exports = {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         // test : /\.ts$/,
         loader: '@ngtools/webpack',
-        exclude : /export_nehuba/
+        exclude : /third_party/
       },
       {
         test : /\.(html|css)$/,

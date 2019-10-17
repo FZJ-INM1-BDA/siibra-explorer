@@ -1,24 +1,27 @@
 <div *ngIf="user; else notLoggedIn">
-  Hi {{ user.name }}.
+  Logged in as {{ user && user.name || 'Unnamed User' }}.
   <a
     (click)="loginBtnOnclick()"
-    [href]="logoutHref"
-    class="btn btn-sm btn-outline-secondary">
-    <i class="fas fa-sign-out-alt"></i> Logout
+    [href]="logoutHref">
+    <button
+      mat-button
+      color="warn">
+      <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
   </a>
 </div>
 
 <ng-template #notLoggedIn>
-  <div>
-    Not logged in. Login via:
-    <div class="btn-group-vertical">
-      <a
-        *ngFor="let m of loginMethods"
-        (click)="loginBtnOnclick()"
-        [href]="m.href"
-        class="btn btn-sm btn-outline-secondary">
-        <i class="fas fa-sign-in-alt"></i> {{ m.name }}
-      </a>
-    </div>
-  </div>
+  <span>
+    Login via
+  </span>
+  <a *ngFor="let m of loginMethods"
+    [href]="m.href">
+    <button 
+      (click)="loginBtnOnclick()"
+      mat-raised-button
+      color="primary">
+      <i class="fas fa-sign-in-alt"></i> {{ m.name }}
+    </button> 
+  </a>
 </ng-template>

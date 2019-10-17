@@ -1,15 +1,11 @@
-import { Component, ChangeDetectionStrategy, OnDestroy, OnInit, Input } from "@angular/core";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import {Component, ChangeDetectionStrategy, Input, TemplateRef } from "@angular/core";
 import { AuthService, User } from "src/services/auth.service";
+import { MatDialog, MatDialogRef, MatBottomSheet } from "@angular/material";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+import { DataEntry } from "src/services/stateStore.service";
 import { Store, select } from "@ngrx/store";
-import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
-import { Subscription, Observable } from "rxjs";
-import { safeFilter, isDefined, NEWVIEWER, SELECT_REGIONS, SELECT_PARCELLATION, CHANGE_NAVIGATION } from "src/services/stateStore.service";
-import { map, filter, distinctUntilChanged } from "rxjs/operators";
-import { regionFlattener } from "src/util/regionFlattener";
-import { ToastService } from "src/services/toastService.service";
 
-const compareParcellation = (o, n) => o.name === n.name
 
 @Component({
   selector: 'signin-banner',
@@ -21,163 +17,60 @@ const compareParcellation = (o, n) => o.name === n.name
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SigninBanner implements OnInit, OnDestroy{
+export class SigninBanner{
 
-  public compareParcellation = compareParcellation
-
-  private subscriptions: Subscription[] = []
-  public loadedTemplates$: Observable<any[]>
-  public selectedTemplate$: Observable<any>
-  public selectedParcellation$: Observable<any>
-  public selectedRegions$: Observable<any[]>
-  private selectedRegions: any[] = []
   @Input() darktheme: boolean
 
+  public user$: Observable<User>
+  public userBtnTooltip$: Observable<string>
+  public favDataEntries$: Observable<DataEntry[]>
+
   constructor(
-    private constantService: AtlasViewerConstantsServices,
+    private store$: Store<any>,
     private authService: AuthService,
-    private store: Store<ViewerConfiguration>,
-    private toastService: ToastService
+    private dialog: MatDialog,
+    public bottomSheet: MatBottomSheet
   ){
-    this.loadedTemplates$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('fetchedTemplates'),
-      map(state => state.fetchedTemplates)
+    this.user$ = this.authService.user$
+
+    this.userBtnTooltip$ = this.user$.pipe(
+      map(user => user
+        ? `Logged in as ${(user && user.name) ? user.name : 'Unknown name'}`
+        : `Not logged in`)
     )
 
-    this.selectedTemplate$ = this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o, n) => o.templateSelected.name === n.templateSelected.name),
-      map(state => state.templateSelected)
-    )
-
-    this.selectedParcellation$ = this.store.pipe(
-      select('viewerState'),
-      select('parcellationSelected'),
-    )
-
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      safeFilter('regionsSelected'),
-      map(state => state.regionsSelected),
-      distinctUntilChanged((arr1, arr2) => arr1.length === arr2.length && (arr1 as any[]).every((item, index) => item.name === arr2[index].name))
+    this.favDataEntries$ = this.store$.pipe(
+      select('dataStore'),
+      select('favDataEntries')
     )
   }
 
-  ngOnInit(){
+  private dialogRef: MatDialogRef<any>
 
-    this.subscriptions.push(
-      this.selectedRegions$.subscribe(regions => {
-        this.selectedRegions = regions
-      })
-    )
-  }
+  openTmplWithDialog(tmpl: TemplateRef<any>){
+    this.dialogRef && this.dialogRef.close()
 
-  ngOnDestroy(){
-    this.subscriptions.forEach(s => s.unsubscribe())
-  }
-
-  changeTemplate({ current, previous }){
-    if (previous && current && current.name === previous.name)
-      return
-    this.store.dispatch({
-      type: NEWVIEWER,
-      selectTemplate: current,
-      selectParcellation: current.parcellations[0]
+    if (tmpl) this.dialogRef = this.dialog.open(tmpl, {
+      autoFocus: false,
+      panelClass: ['col-12','col-sm-12','col-md-8','col-lg-6','col-xl-4']
     })
   }
 
-  changeParcellation({ current, previous }){
-    const { ngId: prevNgId} = previous
-    const { ngId: currNgId} = current
-    if (prevNgId === currNgId)
-      return
-    this.store.dispatch({
-      type: SELECT_PARCELLATION,
-      selectParcellation: current
-    })
+  private keyListenerConfigBase = {
+    type: 'keydown',
+    stop: true,
+    prevent: true,
+    target: 'document'
   }
 
-  // TODO handle mobile
-  handleRegionClick({ mode = 'single', region }){
-    if (!region)
-      return
-    
-    /**
-     * single click on region hierarchy => toggle selection
-     */
-    if (mode === 'single') {
-      const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
-      const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
-      const selectedRegionNames = new Set(this.selectedRegions.map(r => r.name))
-      const selectAll = flattenedRegion.every(r => !selectedRegionNames.has(r.name))
-      this.store.dispatch({
-        type: SELECT_REGIONS,
-        selectRegions: selectAll
-          ? this.selectedRegions.concat(flattenedRegion)
-          : this.selectedRegions.filter(r => !flattenedRegionNames.has(r.name))
-      })
-    }
-
-    /**
-     * double click on region hierarchy => navigate to region area if it exists
-     */
-    if (mode === 'double') {
-
-      /**
-       * if position is defined, go to position (in nm)
-       * if not, show error messagea s toast
-       * 
-       * nb: currently, only supports a single triplet
-       */
-      if (region.position) {
-        this.store.dispatch({
-          type: CHANGE_NAVIGATION,
-          navigation: {
-            position: region.position
-          }
-        })
-      } else {
-        this.toastService.showToast(`${region.name} does not have a position defined`, {
-          timeout: 5000,
-          dismissable: true
-        })
-      }
-    }
-  }
-
-  displayActiveParcellation(parcellation:any){
-    return `<div class="d-flex"><small>Parcellation</small> <small class = "flex-grow-1 mute-text">${parcellation ? '(' + parcellation.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
-  }
-
-  displayActiveTemplate(template: any) {
-    return `<div class="d-flex"><small>Template</small> <small class = "flex-grow-1 mute-text">${template ? '(' + template.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
-  }
-
-  showHelp() {
-    this.constantService.showHelpSubject$.next()
-  }
-
-  showSignin() {
-    this.constantService.showSigninSubject$.next(this.user)
-  }
-
-  clearAllRegions(){
-    this.store.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: []
-    })
-  }
-
-  get isMobile(){
-    return this.constantService.mobile
-  }
-
-  get user() : User | null {
-    return this.authService.user
-  }
-
-  public flexItemIsMobileClass = 'mt-2'
-  public flexItemIsDesktopClass = 'mr-2'
+  public keyListenerConfig = [{
+    key: 'h',
+    ...this.keyListenerConfigBase
+  },{
+    key: 'H',
+    ...this.keyListenerConfigBase
+  },{
+    key: '?',
+    ...this.keyListenerConfigBase
+  }]
 }

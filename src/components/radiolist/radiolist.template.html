@@ -1,35 +1,28 @@
 <ul
   [ngClass]="ulClass"
-  [ngStyle]="{'opacity': isMobile? '1' : '0.8', 'border-color': darktheme? 'white' : 'black'}"
+  class="radioListMenu"
   role="menu">
-  <li 
-    *ngFor="let input of inputArray" 
+
+  <li
+    *ngFor="let input of inputArray; let i = index"
+    class="d-flex justify-content-between"
     [ngClass]="checkSelected(selectedItem, input) ? 'selected' : 'notselected'"
     role="menuitem"
-    (click)="itemSelected.emit({previous: selectedItem, current: input})">
+    (click)="itemSelected.emit({previous: selectedItem, current: input})"
+    [matTooltip]="input.tooltipText">
     
-    <span *ngIf="input['properties'] && input['properties']['publications']" class="infoIcon" (click)="showToast(input);$event.stopPropagation()">
-      i
+    <span class="dropdown-item-1 textSpan"
+      #DropDownText
+      [innerHTML]="listDisplay(input)"
+      [ngClass]="checkSelected(selectedItem, input) ? 'font-weight-bold' : ''">
     </span>
 
-    <span class="dropdown-item-1 textSpan" 
-      [innerHTML] = "listDisplay(input)">
-    </span>
-
-
-
-    
-<ng-template #publicationTemplate>
-    <div *ngIf="input['properties'] && input['properties']['publications']" class="timerToast">
-        <button mat-mini-fab color="primary" class="downloadPublications" (click)="downloadPublications(input)">↓</button>
-          <p>{{input['name']}} Publication(s)</p>
-          <div *ngFor="let p of input['properties']['publications']" class="textPartInPublications">
-            <a [href]="p['doi']" target="_blank">{{p['citation']}}</a>
-          </div>
-      </div>
-</ng-template>
-
-
-
+    <ng-container *ngIf="input.extraButtons as extraButtons">
+      <span *ngFor="let extraBtn of extraButtons"
+        [ngClass]="extraBtn.class"
+        (click)="handleExtraBtnClick(extraBtn, input, $event)">
+        <i [ngClass]="extraBtn.faIcon"></i>
+      </span>
+    </ng-container>
   </li>
 </ul>

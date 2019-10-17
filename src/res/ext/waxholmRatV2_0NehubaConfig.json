@@ -112,9 +112,71 @@
             ]
           ]
         },
-        "whole": {
+        "v1_01": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v1_01",
+          "selectedAlpha": 0.35,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -9550781
+            ],
+            [
+              0,
+              1,
+              0,
+              -24355468
+            ],
+            [
+              0,
+              0,
+              1,
+              -9707031
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "v2": {
           "type": "segmentation",
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/v2",
+          "selectedAlpha": 0.35,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -9550781
+            ],
+            [
+              0,
+              1,
+              0,
+              -24355468
+            ],
+            [
+              0,
+              0,
+              1,
+              -9707031
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "v3": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v3",
           "selectedAlpha": 0.35,
           "transform": [
             [

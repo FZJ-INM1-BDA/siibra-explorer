@@ -1,14 +1,28 @@
 <!-- TODO remove dependency on ismobile -->
-<span
-  class="btn btn-default"
-  [innerHTML]="activeDisplay(selectedItem)"
-  [hoverable]="{translateY:-2}"
-  #dropdownToggle
-  dropdownToggle
-              
-  [ngStyle]="{'border': isMobile? 'none' : 'none', 'border-color': darktheme? 'white' : 'black', 'border-width': openState? '1px 1px 0 1px' : ''}">
+<div class="d-flex flex-column">
+  <div class="d-flex">
 
-</span>
+    <span
+      class="btn btn-default dropdownTitle flex-grow-1 m-auto"
+      [innerHTML]="activeDisplay(selectedItem)"
+      [hoverable]="{translateY:-2}"
+      #dropdownToggle
+      dropdownToggle
+      [ngClass]="openState ? 'dropdownTitleOpen' : 'dropdownTitle'">
+    </span>
+    
+    <span
+      *ngFor="let btn of activeDisplayBtns"
+      class="btn btn-default"
+      (click)="handleActiveDisplayBtnClick(btn, $event)"
+      [hoverable]="{translateY:-1}"
+      dropdownToggle>
+      <div class="d-flex align-items-center">
+        <small [ngClass]="btn.faIcon"></small>
+      </div>
+    </span>
+  </div>
+</div>
 
 <!-- needed to ensure dropdown width matches  -->
 <ul class="m-0 h-0 overflow-hidden">
@@ -24,7 +38,5 @@
   [selectedItem]="selectedItem"
   [inputArray]="inputArray"
   [@showState]="openState ? 'show' : 'hide'"
-  [isMobile]="isMobile"
-  [darktheme]="darktheme">
-
+  (extraBtnClicked)="extraBtnClicked.emit($event)">
 </radio-list>

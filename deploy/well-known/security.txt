@@ -1,0 +1,2 @@
+# If you would like to report a security issue, please contact us via:
+Contact: inm1-bda@fz-juelich.de

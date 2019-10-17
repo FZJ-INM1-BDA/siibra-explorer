@@ -14,13 +14,22 @@ body
   /* required for fas tooltip directives */
   overflow:hidden;
 }
+
+.touch-bottom.touch-left > .scale-bar-container
+{
+  bottom: 0;
+  right: 0;
+  left: auto;
+}
+
 div.scale-bar-container
 {
   text-align: center;
   background-color: rgba(0,0,0,.3);
   position: absolute;
-  left: 1em;
-  bottom: 1em;
+  margin: 1em;
+  bottom: 0;
+  left: 0;
   padding: 2px;
   font-weight: 700;
   pointer-events: none;
@@ -84,9 +93,16 @@ div.scale-bar-container
   background-color:hsla(0,0%,80%,0.5);
 }
 
+.touch-top.touch-left > label.perspective-panel-show-slice-views
+{
+  bottom: 0;
+  right: 0;
+}
+
 label.perspective-panel-show-slice-views
 {
   visibility: hidden;
+  position: absolute;
 }
 
 label.perspective-panel-show-slice-views:hover
@@ -137,8 +153,12 @@ span.regionSelected
 span.regionNotSelected,
 span.regionSelected
 {
-  cursor : default;
   user-select: none;
+}
+
+.cursor-default
+{
+  cursor: default;
 }
 
 markdown-dom pre code
@@ -273,13 +293,33 @@ markdown-dom pre code
   transform: rotate(90deg)!important;
 }
 
+.r-270
+{
+  transform: rotate(270deg)!important;
+}
+
 .ws-no-wrap
 {
   white-space: nowrap!important;
 }
-.ws-initial
+
+.w-0
 {
-  white-space: initial!important;
+  width: 0!important;
+}
+
+.w-5em
+{
+  width: 5em!important;
+}
+.w-10em
+{
+  width: 10em!important;
+}
+
+.mw-400px
+{
+  max-width: 400px!important;
 }
 
 .mw-100
@@ -297,9 +337,34 @@ markdown-dom pre code
   max-width: 60%!important;
 }
 
+.mw-20em
+{
+  max-width: 20em!important;
+}
+
+.w-90
+{
+  width: 90%!important;
+}
+
+.w-20em
+{
+  width: 20em!important;
+}
+
+.w-40em
+{
+  width: 40em!important;
+}
+
 .mh-20em
 {
   max-height: 20em;
+}
+
+.max-h-10em
+{
+  max-height: 10em!important;
 }
 
 .pe-all
@@ -322,14 +387,31 @@ markdown-dom pre code
   pointer-events: none;
 }
 
-.h-100
+.h-5em
 {
-  height:100%;
+  height: 5em!important;
+}
+
+.h-7em
+{
+  height:7em!important;
+}
+.h-10em
+{
+  height:10em!important;
+}
+.h-15em
+{
+  height:15em!important;
+}
+.h-20em
+{
+  height:20em!important;
 }
 
 .overflow-x-hidden
 {
-  overflow-x:hidden;
+  overflow-x:hidden!important;
 }
 
 .muted
@@ -337,7 +419,264 @@ markdown-dom pre code
   opacity : 0.5!important;
 }
 
-.text-semi-transparent
+.card
 {
-  opacity: 0.5;
+  background:none;
+  border:none;
+}
+
+.w-1em
+{
+  width: 1em;
+}
+
+.bs-content-box
+{
+  box-sizing: content-box;
+}
+
+/* required to hide  */
+.cdk-global-scrollblock
+{
+  overflow-y:hidden !important;
+}
+
+.overflow-y-auto
+{
+  overflow-y: auto!important;
+}
+
+.h-auto
+{
+  height: auto!important;
+}
+
+.h-90vh
+{
+  height: 90vh!important;
+}
+
+.w-50vw
+{
+  width: 50vw!important;
+}
+
+.left-0 
+{
+  left: 0!important;
+}
+
+.top-0 
+{
+  top: 0!important;
+}
+
+/* TODO fix hack */
+/* ngx boostrap default z index for modal-container is 1050, which is higher than material tooltip 1000 */
+/* when migration away from ngx bootstrap is complete, remove these classes */
+
+modal-container.modal
+{
+  z-index: 950;
+}
+
+bs-modal-backdrop.modal-backdrop
+{
+  z-index: 940;
+}
+
+
+.outline-none {
+    outline: none;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}
+
+cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .cdk-virtual-scroll-content-wrapper
+{
+  width: 100%;
+}
+
+.z-index-10
+{
+  z-index: 10!important;
+}
+
+.bg-none
+{
+  background:none!important;
+}
+
+.dot
+{
+  width: 0.5rem;
+  height: 0.5rem;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+/* temp */
+/* https://github.com/angular/components/issues/4591#issuecomment-305046461 */
+.mat-tab-body-wrapper
+{
+  flex-grow:1;
+}
+
+.transform-origin-left-center
+{
+  transform-origin: 0% 50%;
+}
+
+.transform-origin-center
+{
+  transform-origin: 50% 50%;
+}
+
+.box-shadow-none
+{
+  box-shadow: none!important;
+}
+
+.translate-x-2
+{
+  transform: translateX(1em);
+}
+
+.translate-x-3
+{
+  transform: translateX(1.5em);
+}
+
+.translate-x-4
+{
+  transform: translateX(2em);
+}
+
+.translate-x-6
+{
+  transform: translateX(3em);
+}
+
+.translate-x-4-n
+{
+  transform: translateX(-2em);
+}
+
+.translate-x-6-n
+{
+  transform: translateX(-3em);
+}
+
+.translate-x-7-n
+{
+  transform: translateX(-3.5em);
+}
+
+.translate-x-8-n
+{
+  transform: translateX(-4em);
+}
+
+/* this is required to physically link label with side bar */
+.mat-drawer-content-overflow-visible > mat-drawer-content,
+/* this is required to show the popout info of template and parcellation */
+.mat-drawer-content-overflow-visible > mat-drawer > .mat-drawer-inner-container
+{
+  overflow: visible!important;
+}
+
+.overflow-visible
+{
+  overflow: visible!important;
+}
+
+mat-icon[fontset="fas"],
+mat-icon[fontset="far"]
+{
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* overwrite bootstrap adding underline to anchor on hover */
+.no-hover:hover
+{
+  text-decoration: none!important;
+}
+
+.no-focus:focus
+{
+  outline: none!important;
+}
+
+.no-max-width
+{
+  max-width: none!important;
+}
+
+.min-h-2
+{
+  min-height: 1rem;
+}
+
+.min-h-4
+{
+  min-height: 2rem;
+}
+
+.min-h-8
+{
+  min-height: 4rem;
+}
+
+.w-30vw
+{
+  width: 30vw!important;
+}
+
+.h-30vw
+{
+  height: 30vw!important;
+}
+
+/* overwrite bootstrap default focus styling */
+*:focus
+{
+  outline: none!important;
+}
+
+body::after
+{
+  content: '';
+  position: fixed;
+  bottom: 1rem;
+  right: 2rem;
+  font-size: 200%;
+  color: rgba(128, 128, 128, 0.5);
+  pointer-events: none;
+  z-index: 99999;
+}
+
+.flex-grow-3
+{
+  flex-grow: 3!important;
+}
+
+.flex-grow-5
+{
+  flex-grow: 5!important;
+}
+
+.layerBrowserContainer
+{
+  margin:-1em!important;
+}
+
+.layerBrowserContainer .mat-dialog-container
+{
+  padding: 0!important;
+  overflow: hidden;
+  margin-top: 0.25rem;
 }

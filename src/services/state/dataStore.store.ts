@@ -1,35 +1,53 @@
 import { Action } from '@ngrx/store'
 
-export function dataStore(state:any,action:DatasetAction){
+/**
+ * TODO merge with databrowser.usereffect.ts
+ */
+
+interface DataEntryState{
+  fetchedDataEntries: DataEntry[]
+  favDataEntries: DataEntry[]
+  fetchedSpatialData: DataEntry[]
+}
+
+const defaultState = {
+  fetchedDataEntries: [],
+  favDataEntries: [],
+  fetchedSpatialData: []
+}
+
+export function dataStore(state:DataEntryState = defaultState, action:Partial<DatasetAction>){
   switch (action.type){
     case FETCHED_DATAENTRIES: {
-      return Object.assign({},state,{
+      return {
+        ...state,
         fetchedDataEntries : action.fetchedDataEntries
-      })
+      }
     }
     case FETCHED_SPATIAL_DATA :{
-      return Object.assign({},state,{
+      return {
+        ...state,
         fetchedSpatialData : action.fetchedDataEntries
-      })
+      }
     }
-    case FETCHED_METADATA : {
-      return Object.assign({},state,{
-        fetchedMetadataMap : action.fetchedMetadataMap
-      })
+    case ACTION_TYPES.UPDATE_FAV_DATASETS: {
+      const { favDataEntries = [] } = action
+      return {
+        ...state,
+        favDataEntries
+      }
     }
-    default:
-      return state
+    default: return state
   }
 }
 
 export interface DatasetAction extends Action{
+  favDataEntries: DataEntry[]
   fetchedDataEntries : DataEntry[]
   fetchedSpatialData : DataEntry[]
-  fetchedMetadataMap : Map<string,Map<string,{properties:Property}>>
 }
 
 export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
-export const FETCHED_METADATA = 'FETCHED_METADATA'
 export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
 
 export interface Activity{
@@ -62,6 +80,9 @@ export interface DataEntry{
    * TODO typo, should be kgReferences
    */
   kgReference: string[]
+
+  id: string
+  fullId: string
 }
 
 export interface ParcellationRegion {
@@ -134,8 +155,18 @@ export interface ViewerPreviewFile{
   mimetype: string
   url?: string
   data?: any
+  position?: any
 }
 
 export interface FileSupplementData{
   data: any
 }
+
+const ACTION_TYPES = {
+  FAV_DATASET: `FAV_DATASET`,
+  UPDATE_FAV_DATASETS: `UPDATE_FAV_DATASETS`,
+  UNFAV_DATASET: 'UNFAV_DATASET',
+  TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET'
+}
+
+export const DATASETS_ACTIONS_TYPES = ACTION_TYPES

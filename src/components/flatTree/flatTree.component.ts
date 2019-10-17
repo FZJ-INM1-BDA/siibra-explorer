@@ -1,5 +1,6 @@
-import { EventEmitter, Component, Input, Output, ChangeDetectionStrategy } from "@angular/core";
+import {EventEmitter, Component, Input, Output, ChangeDetectionStrategy, ViewChild, AfterViewChecked} from "@angular/core";
 import { FlattenedTreeInterface } from "./flattener.pipe";
+import {CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 
 /**
  * TODO to be replaced by virtual scrolling when ivy is in stable
@@ -14,7 +15,7 @@ import { FlattenedTreeInterface } from "./flattener.pipe";
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 
-export class FlatTreeComponent{
+export class FlatTreeComponent implements AfterViewChecked {
   @Input() inputItem : any = {
     name : 'Untitled',
     children : []
@@ -33,6 +34,10 @@ export class FlatTreeComponent{
   @Input() findChildren : (item:any)=>any[] = (item)=>item.children ? item.children : [] 
   @Input() searchFilter : (item:any)=>boolean | null = ()=>true
 
+  @ViewChild('flatTreeVirtualScrollViewPort') virtualScrollViewPort: CdkVirtualScrollViewport
+  @Output() totalRenderedListChanged = new EventEmitter<{ previous: number, current: number }>()
+  private totalDataLength: number = null
+
   public flattenedItems : any[] = []
 
   getClass(level:number){
@@ -41,6 +46,23 @@ export class FlatTreeComponent{
 
   collapsedLevels: Set<string> = new Set()
   uncollapsedLevels : Set<string> = new Set()
+
+  ngAfterViewChecked(){
+    /**
+     * if useDefaultList is true, virtualscrollViewPort will be undefined
+     */
+    if (!this.virtualScrollViewPort) {
+      return
+    }
+    const currentTotalDataLength = this.virtualScrollViewPort.getDataLength()
+    const previousDataLength = this.totalDataLength
+
+    this.totalRenderedListChanged.emit({
+      current: currentTotalDataLength,
+      previous: previousDataLength
+    })
+    this.totalDataLength = currentTotalDataLength
+  }
 
   toggleCollapse(flattenedItem:FlattenedTreeInterface){
     if (this.isCollapsed(flattenedItem)) {
@@ -76,4 +98,10 @@ export class FlatTreeComponent{
       .some(id => this.isCollapsedById(id))
   }
 
+  handleTreeNodeClick(event:MouseEvent, inputItem: any){
+    this.treeNodeClick.emit({
+      event,
+      inputItem
+    })
+  }
 }

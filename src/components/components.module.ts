@@ -20,7 +20,6 @@ import { FlatTreeComponent } from './flatTree/flatTree.component';
 import { FlattenTreePipe } from './flatTree/flattener.pipe';
 import { RenderPipe } from './flatTree/render.pipe';
 import { HighlightPipe } from './flatTree/highlight.pipe';
-import { FitlerRowsByVisibilityPipe } from './flatTree/filterRowsByVisibility.pipe';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { TimerComponent } from './timer/timer.component';
@@ -29,6 +28,11 @@ import { CommonModule } from '@angular/common';
 import { RadioList } from './radiolist/radiolist.component';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
 import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
+import { ProgressBar } from './progress/progress.component';
+import { SleightOfHand } from './sleightOfHand/soh.component';
+import { DialogComponent } from './dialog/dialog.component';
+import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
+import { UtilModule } from 'src/util/util.module';
 
 
 @NgModule({
@@ -37,7 +41,8 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     ScrollingModule,
     FormsModule,
     BrowserAnimationsModule,
-    AngularMaterialModule
+    AngularMaterialModule,
+    UtilModule
   ],
   declarations : [
     /* components */
@@ -52,6 +57,10 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
+    SleightOfHand,
+    DialogComponent,
+    ConfirmDialogComponent,
 
     /* directive */
     HoverableBlockDirective,
@@ -64,7 +73,6 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     FlattenTreePipe,
     RenderPipe,
     HighlightPipe,
-    FitlerRowsByVisibilityPipe,
     AppendSiblingFlagPipe,
     ClusteringPipe,
     FilterCollapsePipe
@@ -83,6 +91,10 @@ import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
     TimerComponent,
     PillComponent,
     RadioList,
+    ProgressBar,
+    SleightOfHand,
+    DialogComponent,
+    ConfirmDialogComponent,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

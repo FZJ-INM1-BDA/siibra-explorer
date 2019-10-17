@@ -6,8 +6,7 @@ import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.plug
   selector : 'plugin-banner',
   templateUrl : './pluginBanner.template.html',
   styleUrls : [
-    `./pluginBanner.style.css`,
-    '../../css/darkBtns.css'
+    `./pluginBanner.style.css`
   ]
 })
 
@@ -17,15 +16,6 @@ export class PluginBannerUI{
   }
 
   clickPlugin(plugin:PluginManifest){
-    if(this.pluginEnabledFlag)
-      this.pluginServices.launchPlugin(plugin)
-    else
-      return
-  }
-
-  get pluginEnabledFlag(){
-    return true || PLUGINDEV || BUNDLEDPLUGINS.length > 0
-      ? true
-      : false
+    this.pluginServices.launchPlugin(plugin)
   }
 }

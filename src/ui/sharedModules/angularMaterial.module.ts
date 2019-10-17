@@ -1,8 +1,88 @@
-import {MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule} from '@angular/material';
+import {
+  MatButtonModule,
+  MatCheckboxModule,
+  MatSidenavModule,
+  MatCardModule,
+  MatTabsModule,
+  MatTooltipModule,
+  MatSnackBarModule,
+  MatBadgeModule,
+  MatDividerModule,
+  MatSelectModule,
+  MatChipsModule,
+  MatAutocompleteModule,
+  MatDialogModule,
+  MatInputModule,
+  MatBottomSheetModule,
+  MatListModule,
+  MatSlideToggleModule,
+  MatRippleModule,
+  MatSliderModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule,
+  MatMenuModule
+
+} from '@angular/material';
+import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
+
 import { NgModule } from '@angular/core';
+import {DragDropModule} from "@angular/cdk/drag-drop";
 
 @NgModule({
-  imports: [MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule],
-  exports: [MatButtonModule, MatCheckboxModule, MatSidenavModule, MatCardModule, MatTabsModule],
+  imports: [
+    MatButtonModule,
+    MatSnackBarModule,
+    MatCheckboxModule,
+    MatSidenavModule,
+    MatCardModule,
+    MatTabsModule,
+    MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
+    MatBottomSheetModule,
+    MatListModule,
+    MatSlideToggleModule,
+    MatRippleModule,
+    MatSliderModule,
+    DragDropModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
+    MatMenuModule,
+    ExperimentalScrollingModule
+  ],
+  exports: [
+    MatButtonModule,
+    MatCheckboxModule,
+    MatSnackBarModule,
+    MatSidenavModule,
+    MatCardModule,
+    MatTabsModule,
+    MatTooltipModule,
+    MatBadgeModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatDialogModule,
+    MatInputModule,
+    MatBottomSheetModule,
+    MatListModule,
+    MatSlideToggleModule,
+    MatRippleModule,
+    MatSliderModule,
+    DragDropModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
+    MatMenuModule,
+    ExperimentalScrollingModule
+  ],
 })
 export class AngularMaterialModule { }

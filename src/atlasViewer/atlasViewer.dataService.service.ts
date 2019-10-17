@@ -82,7 +82,7 @@ export class AtlasViewerDataService implements OnDestroy{
     /* TODO future for template space? */
     const filterTemplateSpace = templateSpace == 'MNI Colin 27' ? 
       'datapath:metadata/sEEG-sample.json' :
-        templateSpace == 'Waxholm Space rat brain atlas v.2.0' ?
+        templateSpace == 'Waxholm Space rat brain MRI/DTI' ?
         'datapath:metadata/OSLO_sp_data_rev.json' :
           null
     
@@ -128,7 +128,7 @@ export class AtlasViewerDataService implements OnDestroy{
           })
         })
         .catch(console.error)
-    }else if (templateSpace === 'Waxholm Space rat brain atlas v.2.0'){
+    }else if (templateSpace === 'Waxholm Space rat brain MRI/DTI'){
       return Promise.all([
         // fetch('res/json/waxholmPlaneAggregatedData.json').then(res => res.json()),
         fetch('res/json/camillaWaxholmPointsAggregatedData.json').then(res => res.json())

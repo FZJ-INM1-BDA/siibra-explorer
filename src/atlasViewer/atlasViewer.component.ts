@@ -1,26 +1,22 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, ElementRef } from "@angular/core";
+import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, TOGGLE_SIDE_PANEL, safeFilter, UIStateInterface, OPEN_SIDE_PANEL, CLOSE_SIDE_PANEL } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, debounceTime, withLatestFrom, switchMap, takeUntil, scan, takeLast } from "rxjs/operators";
+import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
+import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
-import { BsModalService } from "ngx-bootstrap/modal";
-import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 
-import '../res/css/extra_styles.css'
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
-import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
-import { ToastService } from "src/services/toastService.service";
-import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
+import { LocalFileService } from "src/services/localFile.service";
+import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 
 /**
  * TODO
@@ -40,10 +36,7 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 })
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
-
-  @ViewChild('floatingMouseContextualContainer', { read: ViewContainerRef }) floatingMouseContextualContainer: ViewContainerRef
-  @ViewChild('helpComponent', {read: TemplateRef}) helpComponent : TemplateRef<any>
-  @ViewChild('signinModalComponent', {read: TemplateRef}) signinModalComponent : TemplateRef<any>
+  
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -53,8 +46,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
-  @ViewChild('publications') publications: TemplateRef<any>
-  @ViewChild('sidenav', { read: ElementRef} ) mobileSideNav: ElementRef
 
   /**
    * required for styling of all child components
@@ -63,9 +54,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   darktheme: boolean = false
 
   @HostBinding('attr.ismobile')
-  get isMobile(){
-    return this.constantsService.mobile
-  }
+  public ismobile: boolean = false
 
   meetsRequirement: boolean = true
 
@@ -74,17 +63,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectedRegions$: Observable<any[]>
   public selectedPOI$ : Observable<any[]>
-  private showHelp$: Observable<any>
+  
+  private snackbarRef: MatSnackBarRef<any>
+  public snackbarMessage$: Observable<string>
+  private bottomSheetRef: MatBottomSheetRef
+  private bottomSheet$: Observable<TemplateRef<any>>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
   public onhoverSegmentsForFixed$: Observable<string[]>
-  public onhoverLandmark$ : Observable<string | null>
+  
+  public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
   /**
    * TODO make untangle nglayernames and its dependency on ng
+   * TODO deprecated
    */
   public ngLayerNames$ : Observable<any>
   public ngLayers : NgLayerInterface[]
@@ -95,13 +90,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  handleToast
-  tPublication
-  pPublication
-
-  get toggleMessage(){
-    return this.constantsService.toggleMessage
-  }
+  public toggleMessage = this.constantsService.toggleMessage
 
   constructor(
     private store: Store<ViewerStateInterface>,
@@ -110,12 +99,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private constantsService: AtlasViewerConstantsServices,
     public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
-    private modalService: BsModalService,
-    private databrowserService: DatabrowserService,
+    private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
-    private toastService: ToastService,
-    private zipFileDownloadService: ZipFileDownloadService,
+    private rd: Renderer2,
+    public localFileService: LocalFileService,
+    private snackbar: MatSnackBar,
+    private bottomSheet: MatBottomSheet
   ) {
+
+    this.snackbarMessage$ = this.store.pipe(
+      select('uiState'),
+      select("snackbarMessage")
+    )
+
+    this.bottomSheet$ = this.store.pipe(
+      select('uiState'),
+      select('bottomSheetTemplate'),
+      distinctUntilChanged()
+    )
+
+    /**
+     * TODO deprecated
+     */
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
@@ -134,10 +139,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.sidePanelOpen)
-    )
-
-    this.showHelp$ = this.constantsService.showHelpSubject$.pipe(
-      debounceTime(170)
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -188,9 +189,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         if(landmark === null)
           return landmark
         const idx = Number(landmark.replace('label=',''))
-        if(isNaN(idx))
-          return `Landmark index could not be parsed as a number: ${landmark}`
-        return spatialDatas[idx].name
+        if(isNaN(idx)) {
+          console.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+          return {
+            landmarkName: idx
+          }
+        } else {
+          return  {
+            landmarkName: spatialDatas[idx].name
+          }
+        }
       })
     )
 
@@ -208,8 +216,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     ).pipe(
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
-        if (!segments)
-          return null
+        if (!segments) return null
         const filteredSeg = segments.filter(filterFn)
         return filteredSeg.length > 0
           ? segments.map(s => s.segment) 
@@ -224,74 +231,36 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-
-    this.subscriptions.push(
-      this.newViewer$.subscribe(template => this.selectedTemplate = template)
-    )
-
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
-
-        if (this.selectedTemplate && this.selectedParcellation) {
-          if (this.selectedTemplate['properties'] && this.selectedTemplate['properties']['publications']) {
-            this.tPublication = this.selectedTemplate['properties']['publications']
-          } else {
-            this.tPublication = null
-          }
-          if (this.selectedParcellation['properties'] && this.selectedParcellation['properties']['publications']) {
-            this.pPublication = this.selectedParcellation['properties']['publications']
-          } else {
-            this.pPublication = null
-          }
-        } else {
-          this.tPublication = null
-          this.pPublication = null
-        }
-        
-        if (this.tPublication || this.pPublication) {
-
-          if (this.handleToast) {
-            this.handleToast()
-            this.handleToast = null
-          }
-          this.handleToast = this.toastService.showToast(this.publications, {
-              timeout: 7000
-          })
-          
-        }
       })
     )
 
-
-  }
-
-  downloadPublications() {
-    const fileName = this.selectedTemplate.name + ' - ' + this.selectedParcellation.name
-    let publicationsText = ''
-
-    if (this.tPublication) {
-      publicationsText += this.selectedTemplate.name + ' Publications:\r\n'
-      this.tPublication.forEach((tp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + tp['citation'] + ' - ' + tp['doi'] + '\r\n'
-      });
-    }
-
-    if (this.pPublication) {
-      if (this.tPublication) publicationsText += '\r\n\r\n'
-      publicationsText += this.selectedParcellation.name + ' Publications:\r\n'
-      this.pPublication.forEach((pp, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + pp['citation'] + ' - ' + pp['doi'] + '\r\n'
-      });
-    }
-    
-    this.zipFileDownloadService.downloadZip(publicationsText, fileName)
-    publicationsText = ''
+    this.subscriptions.push(
+      this.bottomSheet$.subscribe(templateRef => {
+        if (!templateRef) {
+          this.bottomSheetRef && this.bottomSheetRef.dismiss()
+        } else {
+          this.bottomSheetRef = this.bottomSheet.open(templateRef)
+          this.bottomSheetRef.afterDismissed().subscribe(() => {
+            this.store.dispatch({
+              type: SHOW_BOTTOM_SHEET,
+              bottomSheetTemplate: null
+            })
+            this.bottomSheetRef = null
+          })
+        }
+      })
+    )
   }
 
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
+
+  private cookieDialogRef: MatDialogRef<any>
+  private kgTosDialogRef: MatDialogRef<any>
 
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
@@ -314,29 +283,31 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.showHelp$.subscribe(() => 
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: this.constantsService.showHelpTitle,
-            template: this.helpComponent
-          }
-        })
-      )
+      this.constantsService.useMobileUI$.subscribe(bool => this.ismobile = bool)
     )
 
     this.subscriptions.push(
-      this.constantsService.showSigninSubject$.pipe(
-        debounceTime(160)
-      ).subscribe(user => {
-        this.modalService.show(ModalUnit, {
-          initialState: {
-            title: user ? 'Logout' : `Login`,
-            template: this.signinModalComponent
-          }
+      this.snackbarMessage$.pipe(
+        // angular material issue
+        // see https://github.com/angular/angular/issues/15634
+        // and https://github.com/angular/components/issues/11357
+        delay(0),
+      ).subscribe(messageSymbol => {
+        this.snackbarRef && this.snackbarRef.dismiss()
+
+        if (!messageSymbol) return
+
+        // https://stackoverflow.com/a/48191056/6059235
+        const message = messageSymbol.toString().slice(7, -1)
+        this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
+          duration: 5000
         })
       })
     )
 
+    /**
+     * TODO deprecated
+     */
     this.subscriptions.push(
       this.ngLayerNames$.pipe(
         concatMap(data => this.constantsService.loadExportNehubaPromise.then(data))
@@ -374,10 +345,29 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         filter(() => typeof this.layoutMainSide !== 'undefined')
       ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
     )
+
+    this.subscriptions.push(
+      this.constantsService.darktheme$.subscribe(flag => {
+        this.rd.setAttribute(document.body,'darktheme', flag.toString())
+      })
+    )
   }
 
   ngAfterViewInit() {
     
+    /**
+     * preload the main bundle after atlas viewer has been loaded. 
+     * This should speed up where user first navigate to the home page,
+     * and the main.bundle should be downloading after atlasviewer has been rendered
+     */
+    if (this.meetsRequirement) {
+      const prefecthMainBundle = this.rd.createElement('link')
+      prefecthMainBundle.rel = 'preload'
+      prefecthMainBundle.as = 'script'
+      prefecthMainBundle.href = 'main.bundle.js'
+      this.rd.appendChild(document.head, prefecthMainBundle)
+    }
+
     /**
      * Show Cookie disclaimer if not yet agreed
      */
@@ -390,12 +380,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       filter(agreed => !agreed),
       delay(0)
     ).subscribe(() => {
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: 'Cookie Disclaimer',
-          template: this.cookieAgreementComponent
-        }
-      }) 
+      this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
     })
 
     this.dispatcher$.pipe(
@@ -408,20 +393,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       filter(flag => !flag),
       delay(0)
     ).subscribe(val => {
-      this.modalService.show(ModalUnit, {
-        initialState: {
-          title: 'Knowldge Graph ToS',
-          template: this.kgTosComponent
-        }
-      })
+      this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
-
-    this.closeMenuWithSwipe(this.mobileSideNav)
   }
 
   /**
@@ -434,7 +412,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   /**
    * perhaps move this to constructor?
    */
-  meetsRequirements() {
+  meetsRequirements():boolean {
 
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
@@ -449,17 +427,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       return false
     }
 
-    if(this.constantsService.mobile){
-      this.modalService.show(ModalUnit,{
-        initialState: {
-          title: this.constantsService.mobileWarningHeader,
-          body: this.constantsService.mobileWarning
-        }
-      })
-    }
     return true
   }
 
+  /**
+   * TODO deprecated
+   */
   ngLayersChangeHandler(){
     this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
       // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
@@ -472,23 +445,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   kgTosClickedOk(){
-    this.modalService.hide(1)
+    this.kgTosDialogRef && this.kgTosDialogRef.close()
     this.store.dispatch({
       type: AGREE_KG_TOS
     })
   }
 
   cookieClickedOk(){
-    this.modalService.hide(1)
+    this.cookieDialogRef && this.cookieDialogRef.close()
     this.store.dispatch({
       type: AGREE_COOKIE
     })
-  }
-
-  panelAnimationEnd(){
-
-    if( this.nehubaContainer && this.nehubaContainer.nehubaViewer && this.nehubaContainer.nehubaViewer.nehubaViewer )
-      this.nehubaContainer.nehubaViewer.nehubaViewer.redraw()
   }
 
   nehubaClickHandler(event:MouseEvent){
@@ -500,64 +467,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.rClContextualMenu.show()
   }
 
-  toggleSidePanel(panelName:string){
-    this.store.dispatch({
-      type : TOGGLE_SIDE_PANEL,
-      focusedSidePanel :panelName
-    })
-  }
-
-  private selectedTemplate: any
-  searchRegion(regions:any[]){
+  openLandmarkUrl(dataset) {
     this.rClContextualMenu.hide()
-    this.databrowserService.queryData({ regions, parcellation: this.selectedParcellation, template: this.selectedTemplate })
-    if (this.isMobile) {
-      this.store.dispatch({
-        type : OPEN_SIDE_PANEL
-      })
-      this.mobileMenuTabs.tabs[1].active = true
-    }
+    window.open(dataset.externalLink, "_blank")
   }
 
   @HostBinding('attr.version')
   public _version : string = VERSION
-
-  changeMenuState({open, close}:{open?:boolean, close?:boolean} = {}) {
-    if (open) {
-      return this.store.dispatch({
-        type: OPEN_SIDE_PANEL
-      })
-    }
-    if (close) {
-      return this.store.dispatch({
-        type: CLOSE_SIDE_PANEL
-      })
-    }
-    this.store.dispatch({
-      type: TOGGLE_SIDE_PANEL
-    })
-  }
-
-
-  closeMenuWithSwipe(documentToSwipe: ElementRef) {
-    const swipeDistance = 150; // swipe distance
-    const swipeLeft$ = fromEvent(documentToSwipe.nativeElement, "touchstart")
-        .pipe(
-          switchMap(startEvent =>
-            fromEvent(documentToSwipe.nativeElement, "touchmove")
-                .pipe(
-                  takeUntil(fromEvent(documentToSwipe.nativeElement, "touchend"))
-                  ,map(event => event['touches'][0].pageX)
-                  ,scan((acc, pageX) => Math.round(startEvent['touches'][0].pageX - pageX), 0)
-                  ,takeLast(1)
-                  ,filter(difference => difference >= swipeDistance)
-                )))
-    // Subscription
-    swipeLeft$.subscribe(val => {
-      this.changeMenuState({close: true})
-    })
-  }
-
 }
 
 export interface NgLayerInterface{

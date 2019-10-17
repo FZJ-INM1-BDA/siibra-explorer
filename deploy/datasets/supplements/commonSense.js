@@ -7,8 +7,8 @@ const humanTemplateSet = new Set([
 
 const humanParcellationSet = new Set([
   'Grey/White matter',
-  'Area V1',
-  'Area V2',
+  'Cytoarchitectonic Maps',
+  'BigBrain Cortical Layers Segmentation',
   'JuBrain Cytoarchitectonic Atlas',
   'Fibre Bundle Atlas - Short Bundle',
   'Fibre Bundle Atlas - Long Bundle',
@@ -16,11 +16,13 @@ const humanParcellationSet = new Set([
 ])
 
 const ratTemplateSet = new Set([
-  'Waxholm Space rat brain atlas v.2.0'
+  'Waxholm Space rat brain MRI/DTI'
 ])
 
 const ratParcellationSet = new Set([
-  'Waxholm Space rat brain atlas v.2.0'
+  'Waxholm Space rat brain atlas v1',
+  'Waxholm Space rat brain atlas v2',
+  'Waxholm Space rat brain atlas v3'
 ])
 
 const mouseTemplateSet = new Set([
@@ -28,7 +30,8 @@ const mouseTemplateSet = new Set([
 ])
 
 const mouseParcellationSet = new Set([
-  'Allen adult mouse brain reference atlas V3 Brain Atlas'
+  'Allen Mouse Common Coordinate Framework v3 2017',
+  'Allen Mouse Common Coordinate Framework v3 2015'
 ])
 
 const dsIsHuman = ({ds}) => ds && ds.species.some(species => /homo\ sapiens/i.test(species))

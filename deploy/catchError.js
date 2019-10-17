@@ -1,11 +1,13 @@
-module.exports = ({code = 500, error = 'an error had occured', trace = 'undefined trace'}, req, res, next) => {
+module.exports = (raw, req, res, next) => {
   /**
    * probably use more elaborate logging?
    */
-  console.log('Catching error', {
+  const { code, error, trace } = raw
+  console.error('Catching error', {
     code,
     error,
-    trace
+    trace,
+    raw
   })
-  res.status(code).send()
+  res.status(code || 500).end()
 }

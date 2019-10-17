@@ -1,13 +1,12 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined } from "src/services/stateStore.service";
+import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined, getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
 import { map, distinctUntilChanged, filter } from "rxjs/operators";
-import { BsModalService } from "ngx-bootstrap/modal";
-import { ModalUnit } from "./modalUnit/modalUnit.component";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { PluginManifest } from "./atlasViewer.pluginService.service";
+import { DialogService } from "src/services/dialogService.service";
 
 declare var window
 
@@ -19,28 +18,19 @@ export class AtlasViewerAPIServices{
 
   private loadedTemplates$ : Observable<any>
   private selectParcellation$ : Observable<any>
-  private selectTemplate$ : Observable<any>
-  private darktheme : boolean
   public interactiveViewer : InteractiveViewerInterface
 
   public loadedLibraries : Map<string,{counter:number,src:HTMLElement|null}> = new Map()
 
   constructor(
     private store : Store<ViewerStateInterface>,
-    private modalService: BsModalService
+    private dialogService: DialogService,
   ){
 
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
       safeFilter('fetchedTemplates'),
       map(state=>state.fetchedTemplates)
-    )
-
-    this.selectTemplate$ = this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      map(state => state.templateSelected),
-      distinctUntilChanged((t1, t2) => t1.name === t2.name)
     )
 
     this.selectParcellation$ = this.store.pipe(
@@ -70,7 +60,10 @@ export class AtlasViewerAPIServices{
 
         loadedTemplates : [],
 
+        // TODO deprecate
         regionsLabelIndexMap : new Map(),
+
+        layersRegionLabelIndexMap: new Map(), 
 
         datasetsBSubject : this.store.pipe(
           select('dataStore'),
@@ -83,18 +76,22 @@ export class AtlasViewerAPIServices{
           const handler = new ModalHandler()
           let modalRef
           handler.show = () => {
-            modalRef = this.modalService.show(ModalUnit, {
-              initialState : {
-                title : handler.title,
-                body : handler.body
-                  ? handler.body
-                  : 'handler.body has yet been defined ...',
-                footer : handler.footer
-              },
-              class : this.darktheme ? 'darktheme' : 'not-darktheme',
-              backdrop : handler.dismissable ? true : 'static',
-              keyboard : handler.dismissable
-            })
+            /**
+             * TODO enable
+             * temporarily disabled
+             */
+            // modalRef = this.modalService.show(ModalUnit, {
+            //   initialState : {
+            //     title : handler.title,
+            //     body : handler.body
+            //       ? handler.body
+            //       : 'handler.body has yet been defined ...',
+            //     footer : handler.footer
+            //   },
+            //   class : this.darktheme ? 'darktheme' : 'not-darktheme',
+            //   backdrop : handler.dismissable ? true : 'static',
+            //   keyboard : handler.dismissable
+            // })
           }
           handler.hide = () => {
             if(modalRef){
@@ -115,7 +112,10 @@ export class AtlasViewerAPIServices{
          */
         launchNewWidget: (manifest) => {
           return Promise.reject('Needs to be overwritted')
-        }
+        },
+
+        getUserInput: config => this.dialogService.getUserInput(config),
+        getUserConfirmation: config => this.dialogService.getUserConfirm(config)
       },
       pluginControl : {
         loadExternalLibraries : ()=>Promise.reject('load External Library method not over written')
@@ -136,8 +136,10 @@ export class AtlasViewerAPIServices{
 
   private init(){
     this.loadedTemplates$.subscribe(templates=>this.interactiveViewer.metadata.loadedTemplates = templates)
-    this.selectParcellation$.subscribe(parcellation => this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions))
-    this.selectTemplate$.subscribe(template => this.darktheme = template.useTheme === 'dark')
+    this.selectParcellation$.subscribe(parcellation => {
+      this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
+      this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
+    })
   }
 }
 
@@ -149,6 +151,7 @@ export interface InteractiveViewerInterface{
     selectedRegionsBSubject : Observable<any[]|null>
     loadedTemplates : any[]
     regionsLabelIndexMap : Map<number,any> | null
+    layersRegionLabelIndexMap: Map<string, Map<number, any>>
     datasetsBSubject : Observable<any[]>
   },
 
@@ -161,8 +164,17 @@ export interface InteractiveViewerInterface{
     hideSegment : (labelIndex : number)=>void
     showAllSegments : ()=>void
     hideAllSegments : ()=>void
+
+    // TODO deprecate
     segmentColourMap : Map<number,{red:number,green:number,blue:number}>
+
+    getLayersSegmentColourMap: () => Map<string, Map<number, {red:number, green:number, blue: number}>>
+
+    // TODO deprecate
     applyColourMap : (newColourMap : Map<number,{red:number,green:number,blue:number}>)=>void
+
+    applyLayersColourMap: (newLayerColourMap: Map<string, Map<number, {red:number, green: number, blue: number}>>) => void
+
     loadLayer : (layerobj:NGLayerObj)=>NGLayerObj
     removeLayer : (condition:{name : string | RegExp})=>string[]
     setLayerVisibility : (condition:{name : string|RegExp},visible:boolean)=>void
@@ -172,6 +184,10 @@ export interface InteractiveViewerInterface{
 
     mouseEvent : Observable<{eventName:string,event:MouseEvent}>
     mouseOverNehuba : Observable<{labelIndex : number, foundRegion : any | null}>
+    /**
+     * TODO add to documentation
+     */
+    mouseOverNehubaLayers: Observable<{layer:{name:string}, segment: any | number }[]>
 
     getNgHash : () => string
   }
@@ -180,6 +196,8 @@ export interface InteractiveViewerInterface{
     getModalHandler: () => ModalHandler
     getToastHandler: () => ToastHandler
     launchNewWidget: (manifest:PluginManifest) => Promise<any>
+    getUserInput: (config:GetUserInputConfig) => Promise<string>
+    getUserConfirmation: (config: GetUserConfirmation) => Promise<any>
   }
 
   pluginControl : {
@@ -187,6 +205,16 @@ export interface InteractiveViewerInterface{
     unloadExternalLibraries : (libraries:string[])=>void
     [key:string] : any
   }
+}
+
+interface GetUserConfirmation{
+  title?: string
+  message?: string
+}
+
+interface GetUserInputConfig extends GetUserConfirmation{
+  placeholder?: string
+  defaultValue?: string
 }
 
 export interface UserLandmark{

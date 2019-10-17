@@ -14,10 +14,8 @@ module.exports = async (app) => {
 
   passport.deserializeUser((id, done) => {
     const user = objStoreDb.get(id)
-    if (user) 
-      return done(null, user)
-    else
-      return done(null, false)
+    if (user) return done(null, user)
+    else return done(null, false)
   })
 
   await hbpOidc(app)
@@ -26,7 +24,7 @@ module.exports = async (app) => {
     if (req.user) {
       return res.status(200).send(JSON.stringify(req.user))
     } else {
-      return res.sendStatus(401)
+      return res.status(401).end()
     }
   })
 

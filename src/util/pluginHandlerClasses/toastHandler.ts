@@ -1,5 +1,5 @@
 export class ToastHandler{
-  message : string = 'handler.body'
+  message : string = 'Toast message'
   timeout : number = 3000
   dismissable : boolean = true
   show : () => void

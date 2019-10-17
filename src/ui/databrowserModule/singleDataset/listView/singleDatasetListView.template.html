@@ -1,0 +1,137 @@
+<div mat-ripple
+  (click)="ripple ? showDetailInfo() : null"
+  [iav-stop]="ripple ? 'click' : null"
+  [matRippleDisabled]="!ripple"
+  class="d-flex flex-row flex-nowrap align-items-center h-100">
+
+  <!-- title -->
+  <div class="flex-grow-1 name-container d-flex align-items-start">
+    <small class="flex-grow-1 flex-shrink-1">
+      {{ name }}
+    </small>
+  </div>
+
+
+  <ng-container *ngIf="downloadEnabled">
+
+    <div iav-stop="mousedown click">
+
+      <!-- unpin -->
+      <button mat-icon-button
+        *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
+        (click)="undoableRemoveFav()"
+        class="no-focus flex-grow-0 flex-shrink-0"
+        color="primary">
+        <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
+      </button>
+
+      <!-- pin -->
+      <ng-template #pinTmpl>
+        <button mat-icon-button
+          (click)="undoableAddFav()"
+          class="no-focus flex-grow-0 flex-shrink-0"
+          color="basic">
+          <mat-icon fontSet="fas" fontIcon="fa-thumbtack"></mat-icon>
+        </button>
+      </ng-template>
+
+    </div>
+  </ng-container>
+
+  <!-- more menu -->
+  <!-- hidden for now -->
+  <button mat-icon-button
+    *ngIf="false"
+    iav-stop="mousedown click"
+    [matMenuTriggerFor]="singleDatasetMenu"
+    class="flex-grow-0 flex-shrink-0 no-focus">
+    <i class="fas fa-ellipsis-v"></i>
+  </button>
+</div>
+
+<mat-menu
+  xPosition="before"
+  #singleDatasetMenu>
+
+  <!-- lazy rendering mat menu -->
+  <ng-template matMenuContent>
+
+    <!-- need to conditional render all mat-menu-item, or keyboard navigation becomes borked -->
+    <!-- see https://github.com/angular/components/issues/11652 -->
+    <button mat-menu-item
+      *ngIf="true"
+      class="no-focus"
+      (click)="showDetailInfo()">
+      <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
+      Detail
+    </button>
+  
+    <!-- Explore -->
+    <a *ngFor="let kgRef of kgReference"
+      class="no-hover"
+      [href]="kgRef | doiParserPipe"
+      target="_blank"
+      mat-menu-item>
+      <mat-icon fontSet="fas" fontIcon="fa-globe-europe"></mat-icon>
+      Explore
+      <i class="fas fa-external-link-alt"></i>
+    </a>
+  
+    <!-- preview -->
+    <button mat-menu-item
+      *ngIf="preview"
+      class="no-focus"
+      (click)="showPreviewList(previewFilesListTemplate)">
+      <mat-icon fontSet="far" fontIcon="fa-eye"></mat-icon>
+      Preview
+    </button>
+    
+    <!-- download -->
+    <button mat-menu-item
+      *ngIf="downloadEnabled"
+      class="no-focus"
+      iav-stop="mousedown click"
+      (click)="downloadZipFromKg()"
+      [disabled]="downloadInProgress">
+      <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
+      Download
+    </button>
+  </ng-template>
+</mat-menu>
+
+<ng-template #previewFilesListTemplate>
+  <preview-component
+    (previewFile)="handlePreviewFile($event)"
+    [datasetName]="name">
+  </preview-component>
+</ng-template>
+
+<ng-template #fullIcons>
+
+  <!-- references -->
+  <a *ngFor="let kgRef of kgReference"
+    [href]="kgRef | doiParserPipe"
+    target="_blank"
+    iav-stop="click mousedown"
+    mat-icon-button>
+    <mat-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+  </a>
+
+  <!-- pin dataset -->
+  <button mat-icon-button
+    *ngIf="downloadEnabled"
+    iav-stop="click mousedown"
+    (click)="toggleFav()"
+    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
+    <i class="fas fa-thumbtack"></i>
+  </button>
+
+  <!-- download dataset -->
+  <button mat-icon-button
+    *ngIf="downloadEnabled"
+    iav-stop="click mousedown"
+    (click)="downloadZipFromKg()"
+    [disabled]="downloadInProgress">
+    <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+  </button>
+</ng-template>

@@ -1,0 +1,17 @@
+<span *ngIf="templateSelected$ | async as templateSelected">
+  {{ templateSelected.name }}
+</span>
+<br>
+<span *ngIf="parcellationSelected$ | async as parcellationSelected">
+  {{ parcellationSelected.name }}
+</span>
+
+<ng-container *ngIf="regionsSelected$ | async as regionsSelected">
+  <ng-container *ngIf="regionsSelected.length > 0">
+
+      <br>
+      <span>
+        {{ regionsSelected.length }} region{{ regionsSelected.length > 1 ? 's' : '' }} selected
+      </span>
+  </ng-container>
+</ng-container>

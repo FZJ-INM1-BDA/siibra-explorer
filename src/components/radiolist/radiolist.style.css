@@ -1,3 +1,4 @@
+/*@import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
 
 :host-context([darktheme="true"]) ul
 {
@@ -54,31 +55,21 @@ ul,span.dropdown-item-1
   border-radius:0px;
   white-space: nowrap;
   border:none;
+  overflow: hidden;
+  text-overflow: ellipsis
 }
 
-.infoIcon {
-  margin-right: 5px;
-  display: inline-block;
-  border: 1px solid gray;
-  border-radius: 15px;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  text-align: center;
+:host-context([darktheme="true"]) .radioListMenu {
+  border-color: white;
 }
-
-.timerToast {
-  max-width: 700px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+:host-context([darktheme="false"]) .radioListMenu {
+  border-color: black;
 }
-
-.downloadPublications {
-  align-self: flex-end;
-  outline: none;
+:host-context([isMobile="true"]) .radioListMenu {
+  opacity: 1;
+  border-style: solid;
+  border-width: 0px 1px 1px 1px;
 }
-
-.textPartInPublications {
-  text-align: left;
+:host-context([isMobile="false"]) .radioListMenu {
+  opacity: 0.8;
 }

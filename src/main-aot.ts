@@ -1,5 +1,7 @@
 import 'zone.js'
 
+import 'third_party/testSafari.js'
+
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 import { enableProdMode } from '@angular/core';
@@ -12,7 +14,6 @@ requireAll(require.context(`./plugin_examples`, true))
 /* aot === production mode */
 enableProdMode()
 
-if(PRODUCTION)
-  console.log(`Interactive Atlas Viewer: ${VERSION}`)
+if(PRODUCTION) console.log(`Interactive Atlas Viewer: ${VERSION}`)
 
 platformBrowserDynamic().bootstrapModule(MainModule)

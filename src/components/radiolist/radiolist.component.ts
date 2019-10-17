@@ -1,28 +1,10 @@
 import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit, ViewChild, TemplateRef } from "@angular/core";
-import { ToastService } from "src/services/toastService.service";
-import { ZipFileDownloadService } from "src/services/zipFileDownload.service";
 
 @Component({
   selector: 'radio-list',
   templateUrl: './radiolist.template.html',
   styleUrls: [
     './radiolist.style.css'
-  ],
-  styles: [
-    `
-    ul > li.selected > .textSpan:before
-    {
-      content: '\u2022';
-      width : 1em;
-      display:inline-block;
-    }
-    ul > li:not(.selected) > .textSpan:before
-    {
-      content: ' ';
-      width : 1em;
-      display:inline-block;
-    }  
-    `
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -38,42 +20,40 @@ export class RadioList{
   selectedItem: any | null = null
 
   @Input()
-  inputArray: any[] = []
+  inputArray: HasExtraButtons[] = []
 
   @Input()
   ulClass: string = ''
   
   @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
 
-  @Input() isMobile: boolean
-  @Input() darktheme: boolean
+  @Output() extraBtnClicked = new EventEmitter<ExraBtnClickEvent>()
 
-  @ViewChild('publicationTemplate') publicationTemplate: TemplateRef<any>
-
-  handleToast
-
-  constructor(private toastService: ToastService,
-              private zipFileDownloadService: ZipFileDownloadService) {}
-
-  showToast(item) {
-    if (this.handleToast) {
-      this.handleToast()
-      this.handleToast = null
-    }
-    this.handleToast = this.toastService.showToast(this.publicationTemplate, {
-        timeout: 7000
+  handleExtraBtnClick(extraBtn:ExtraButton, inputItem:any, event:MouseEvent){
+    this.extraBtnClicked.emit({
+      extraBtn,
+      inputItem,
+      event
     })
-
   }
 
-
-  downloadPublications(item) {
-    const filename = item['name']
-    let publicationsText = item['name'] + ' Publications:\r\n'
-      item['properties']['publications'].forEach((p, i) => {
-        publicationsText += '\t' + (i+1) + '. ' + p['citation'] + ' - ' + p['doi'] + '\r\n'
-      });
-    this.zipFileDownloadService.downloadZip(publicationsText, filename)
-    publicationsText = ''
+  overflowText(event) {
+    return (event.offsetWidth < event.scrollWidth)
   }
+}
+
+export interface ExtraButton{
+  name: string,
+  faIcon: string
+  class?: string
+}
+
+export interface HasExtraButtons{
+  extraButtons?: ExtraButton[]
+}
+
+export interface ExraBtnClickEvent{
+  extraBtn:ExtraButton
+  inputItem:any
+  event:MouseEvent
 }

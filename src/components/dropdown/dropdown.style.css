@@ -56,3 +56,21 @@ radio-list
   overflow-x:hidden;
   display:block;
 }
+
+
+:host-context([isMobile="true"]) .dropdownTitle {
+  border: 1px solid !important;
+}
+
+:host-context([isMobile="true"]) .dropdownTitleOpen {
+  border: solid !important;
+  border-width: 1px 1px 0 1px !important;
+}
+
+:host-context([darktheme="true"][isMobile="true"]) .dropdownTitle {
+  border-color: white !important;
+}
+
+:host-context([darktheme="false"][isMobile="true"]) .dropdownTitle {
+  border-color: black !important;
+}

@@ -1,14 +1,36 @@
-import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2 } from "@angular/core";
-import 'third_party/export_nehuba/main.bundle.js'
-import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import { fromEvent, interval, Observable } from 'rxjs'
-import { AtlasWorkerService } from "../../../atlasViewer/atlasViewer.workerService.service";
-import { buffer, map, filter, debounceTime, take, takeUntil, scan, switchMap, takeWhile } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
-import { takeOnePipe, identifySrcElement } from "../nehubaContainer.component";
+import { Component, OnDestroy, Output, EventEmitter, ElementRef, NgZone, Renderer2, OnInit } from "@angular/core";
+import { fromEvent, Subscription, Subject } from 'rxjs'
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { map, filter, debounceTime, scan } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { takeOnePipe } from "../nehubaContainer.component";
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
+
+import 'third_party/export_nehuba/main.bundle.js'
+import 'third_party/export_nehuba/chunk_worker.bundle.js'
+
+interface LayerLabelIndex {
+  layer: { 
+    name: string
+  }
+
+  labelIndicies: number[]
+}
+
+const scanFn : (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex[] = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
+  const { layer } = curr
+  const { name } = layer
+  const foundIndex = acc.findIndex(({ layer }) => layer.name === name)
+  if (foundIndex < 0) return acc.concat(curr)
+  else return acc.map((item, idx) => idx === foundIndex
+    ? {
+        ...item,
+        labelIndicies: [...new Set([...item.labelIndicies, ...curr.labelIndicies])]
+      }
+    : item)
+}
 
 /**
  * no selector is needed, as currently, nehubaviewer is created dynamically
@@ -20,9 +42,13 @@ import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
   ]
 })
 
-export class NehubaViewerUnit implements OnDestroy{
+export class NehubaViewerUnit implements OnInit, OnDestroy{
+
+  private subscriptions: Subscription[] = []
   
   @Output() nehubaReady: EventEmitter<null> = new EventEmitter()
+  @Output() layersChanged: EventEmitter<null> = new EventEmitter()
+  private layersChangedHandler: any
   @Output() debouncedViewerPositionChange : EventEmitter<any> = new EventEmitter()
   @Output() mouseoverSegmentEmitter: 
     EventEmitter<{
@@ -34,8 +60,11 @@ export class NehubaViewerUnit implements OnDestroy{
       }
     }> = new EventEmitter()
   @Output() mouseoverLandmarkEmitter : EventEmitter<number | null> = new EventEmitter()
+  @Output() mouseoverUserlandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
   @Output() regionSelectionEmitter : EventEmitter<{segment:number, layer:{name?: string, url?: string}}> = new EventEmitter()
   @Output() errorEmitter : EventEmitter<any> = new EventEmitter()
+
+  public auxilaryMeshIndices: number[] = []
 
   /* only used to set initial navigation state */
   initNav : any
@@ -73,9 +102,7 @@ export class NehubaViewerUnit implements OnDestroy{
     this._s9$
   ]
 
-  ondestroySubscriptions: any[] = []
-
-  touchStart$ : Observable<any>
+  ondestroySubscriptions: Subscription[] = []
 
   constructor(
     private rd: Renderer2,
@@ -105,6 +132,9 @@ export class NehubaViewerUnit implements OnDestroy{
         }
         this.patchNG()
         this.loadNehuba()
+
+        this.layersChangedHandler = this.nehubaViewer.ngviewer.layerManager.layersChanged.add(() => this.layersChanged.emit(null))
+        this.nehubaViewer.ngviewer.registerDisposer(this.layersChangedHandler)
       })
       .catch(e => this.errorEmitter.emit(e))
 
@@ -189,78 +219,12 @@ export class NehubaViewerUnit implements OnDestroy{
         this.loadLayer(_)
       })
     )
-
-    this.ondestroySubscriptions.push(
-
-      fromEvent(this.workerService.worker,'message').pipe(
-        filter((message:any) => {
-  
-          if(!message){
-            // console.error('worker response message is undefined', message)
-            return false
-          }
-          if(!message.data){
-            // console.error('worker response message.data is undefined', message.data)
-            return false
-          }
-          if(message.data.type !== 'CHECKED_MESH'){
-            /* worker responded with not checked mesh, no need to act */
-            return false
-          }
-          return true
-        }),
-        map(e => e.data),
-        buffer(interval(1000)),
-        map(arr => arr.reduce((acc:Map<string,Set<number>>,curr)=> {
-          
-          const newMap = new Map(acc)
-          const set = newMap.get(curr.baseUrl)
-          if(set){
-            set.add(curr.checkedIndex)
-          }else{
-            newMap.set(curr.baseUrl,new Set([curr.checkedIndex]))
-          }
-          return newMap
-        }, new Map()))
-      ).subscribe(map => {
-        
-        Array.from(map).forEach(item => {
-          const baseUrl : string = item[0]
-          const set : Set<number> = item[1]
-  
-          /* validation passed, add to safeMeshSet */
-          const oldset = this.workerService.safeMeshSet.get(baseUrl)
-          if(oldset){
-            this.workerService.safeMeshSet.set(baseUrl, new Set([...oldset, ...set]))
-          }else{
-            this.workerService.safeMeshSet.set(baseUrl, new Set([...set]))
-          }
-  
-          /* if the active parcellation is the current parcellation, load the said mesh */
-          const baseUrlIsInLoadedBaseUrlList = new Set([...this._baseUrls]).has(baseUrl)
-          const baseUrlParcellationId = this._baseUrlToParcellationIdMap.get(baseUrl)
-          if( baseUrlIsInLoadedBaseUrlList && baseUrlParcellationId){
-            this.nehubaViewer.setMeshesToLoad([...this.workerService.safeMeshSet.get(baseUrl)], {
-              name : baseUrlParcellationId
-            })
-          }
-        })
-      })
-    )
   }
 
   private _baseUrlToParcellationIdMap:Map<string, string> = new Map()
   private _baseUrls: string[] = []
 
-  get numMeshesToBeLoaded():number{
-    if(!this._baseUrls || this._baseUrls.length === 0)
-      return 0
-
-    return this._baseUrls.reduce((acc, curr) => {
-      const mappedSet = this.workerService.safeMeshSet.get(curr)
-      return acc + ((mappedSet && mappedSet.size) || 0)
-    } ,0)
-  }
+  public numMeshesToBeLoaded: number = 0
 
   public applyPerformanceConfig ({ gpuLimit }: Partial<ViewerConfiguration>) {
     if (gpuLimit && this.nehubaViewer) {
@@ -308,14 +272,12 @@ export class NehubaViewerUnit implements OnDestroy{
     const getCondition = (label:number) => `if(label > ${label - 0.1} && label < ${label + 0.1} ){${FRAGMENT_EMIT_RED}}`
     const newShader = `void main(){ ${labels.map(getCondition).join('else ')}else {${FRAGMENT_EMIT_WHITE}} }`
     if(!this.nehubaViewer){
-      if(!PRODUCTION || window['__debug__'])
-        console.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined')
+      if(!PRODUCTION || window['__debug__']) console.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined')
       return
     }
     const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.constantService.ngLandmarkLayerName)
     if(!landmarkLayer){
-      if(!PRODUCTION || window['__debug__'])
-        console.warn('landmark layer could not be found ... will not update colour map')
+      if(!PRODUCTION || window['__debug__']) console.warn('landmark layer could not be found ... will not update colour map')
       return
     }
     if(labels.length === 0){
@@ -335,15 +297,35 @@ export class NehubaViewerUnit implements OnDestroy{
 
   viewerState : ViewerState
 
-  private multiNgIdColorMap: Map<string, Map<number, {red: number, green:number, blue: number}>>
+  private _multiNgIdColorMap: Map<string, Map<number, {red: number, green:number, blue: number}>>
+  get multiNgIdColorMap(){
+    return this._multiNgIdColorMap
+  }
+
+  set multiNgIdColorMap(val) {
+    this._multiNgIdColorMap = val
+  }
+
+  private loadMeshes$: Subject<{labelIndicies: number[], layer: { name: string }}> = new Subject()
+  private loadMeshes(labelIndicies: number[], { name }){
+    this.loadMeshes$.next({
+      labelIndicies,
+      layer: { name }
+    })
+  }
+
   public mouseOverSegment: number | null
   public mouseOverLayer: {name:string,url:string}| null
 
-  private viewportToDatas : [any, any, any] = [null, null, null]
+  public viewportToDatas : [any, any, any] = [null, null, null]
 
   public getNgHash : () => string = () => window['export_nehuba']
     ? window['export_nehuba'].getNgHash()
     : null
+
+  redraw(){
+    this.nehubaViewer.redraw()
+  }
 
   loadNehuba(){
     this.nehubaViewer = window['export_nehuba'].createNehubaViewer(this.config, (err)=>{
@@ -362,7 +344,7 @@ export class NehubaViewerUnit implements OnDestroy{
       if (layer) layer.setVisible(true)
       else console.log('layer unavailable', ngId)
     })
-    this.nehubaViewer.redraw()
+    this.redraw()
 
     /* creation of the layout is done on next frame, hence the settimeout */
     setTimeout(() => {
@@ -377,6 +359,11 @@ export class NehubaViewerUnit implements OnDestroy{
 
     this.onDestroyCb.push(() => window['nehubaViewer'] = null)
 
+    /**
+     * TODO
+     * move this to nehubaContainer
+     * do NOT use position logic to determine idx
+     */
     this.ondestroySubscriptions.push(
       // fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
       //   ...takeOnePipe
@@ -384,96 +371,34 @@ export class NehubaViewerUnit implements OnDestroy{
       //   [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       // })
       pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'viewportToData'))
-      .subscribe((events:CustomEvent[]) => {
-        [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-      })
+        .subscribe((events:CustomEvent[]) => {
+          [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
+        })
     )
+  }
 
-    this.touchStart$ = fromEvent(this.elementRef.nativeElement, 'touchstart').pipe(
-      map((ev:TouchEvent) => {
-        const srcElement : HTMLElement = ev.srcElement || (ev as any).originalTarget
-        return {
-          startPos: [ev.touches[0].screenX, ev.touches[0].screenY],
-          elementId: identifySrcElement(srcElement),
-          srcElement,
-          event: ev
+  ngOnInit(){
+    this.subscriptions.push(
+      this.loadMeshes$.pipe(
+        scan(scanFn, [])
+      ).subscribe(layersLabelIndex => {
+        let totalMeshes = 0
+        for (const layerLayerIndex of layersLabelIndex){
+          const { layer, labelIndicies } = layerLayerIndex
+          totalMeshes += labelIndicies.length
+          this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
         }
+        // TODO implement total mesh to be loaded and mesh loading UI
+        // this.numMeshesToBeLoaded = totalMeshes
       })
-    )
-
-    this.ondestroySubscriptions.push(
-
-      this.touchStart$.pipe(
-        switchMap(({startPos, elementId, srcElement}) => fromEvent(this.elementRef.nativeElement,'touchmove').pipe(
-          map((ev: TouchEvent) => (ev.stopPropagation(), ev.preventDefault(), ev)),
-          filter((ev:TouchEvent) => ev.touches.length === 1),
-          map((event:TouchEvent) => ({
-            startPos,
-            event,
-            elementId,
-            srcElement
-          })),
-          scan((acc,ev:any) => {
-            return acc.length < 2
-              ? acc.concat(ev)
-              : acc.slice(1).concat(ev)
-          },[]),
-          map(double => ({
-            elementId: double[0].elementId,
-            deltaX: double.length === 1
-              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenX
-              : double.length === 2
-                ? (double[0].event as TouchEvent).touches[0].screenX - (double[1].event as TouchEvent).touches[0].screenX 
-                : null,
-            deltaY: double.length === 1
-              ? null // startPos[0] - (double[0].event as TouchEvent).touches[0].screenY
-              : double.length === 2
-                ? (double[0].event as TouchEvent).touches[0].screenY - (double[1].event as TouchEvent).touches[0].screenY 
-                : null
-          })),
-          takeUntil(fromEvent(this.elementRef.nativeElement, 'touchend').pipe(filter((ev: TouchEvent) => ev.touches.length === 0)))
-        ))
-      ).subscribe(({ elementId, deltaX, deltaY }) => {
-        if(deltaX === null || deltaY === null){
-          console.warn('deltax/y is null')
-          return
-        }
-        if(elementId === 0 || elementId === 1 || elementId === 2){
-          const {position} = this.nehubaViewer.ngviewer.navigationState 
-          const pos = position.spatialCoordinates
-          window['export_nehuba'].vec3.set(pos, deltaX, deltaY, 0)
-          window['export_nehuba'].vec3.transformMat4(pos, pos, this.viewportToDatas[elementId])
-          position.changed.dispatch()
-        }else if(elementId === 3){
-          const {perspectiveNavigationState} = this.nehubaViewer.ngviewer
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([0, 1, 0]), -deltaX / 4.0 * Math.PI / 180.0)
-          perspectiveNavigationState.pose.rotateRelative(this.vec3([1, 0, 0]), deltaY / 4.0 * Math.PI / 180.0)
-          this.nehubaViewer.ngviewer.perspectiveNavigationState.changed.dispatch()
-        }
-      })
-    )
-
-    this.ondestroySubscriptions.push(
-      this.touchStart$.pipe(
-        switchMap(() => 
-          fromEvent(this.elementRef.nativeElement, 'touchmove').pipe(
-            takeWhile((ev:TouchEvent) => ev.touches.length === 2),
-            map((ev:TouchEvent) => computeDistance(
-                [ev.touches[0].screenX, ev.touches[0].screenY],
-                [ev.touches[1].screenX, ev.touches[1].screenY]
-              )),
-            scan((acc, curr:number) => acc.length < 2
-              ? acc.concat(curr)
-              : acc.slice(1).concat(curr), []),
-            filter(dist => dist.length > 1),
-            map(dist => dist[0] / dist[1])
-          ))
-      ).subscribe(factor => 
-        this.nehubaViewer.ngviewer.navigationState.zoomBy(factor))
     )
   }
 
   ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
+
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
     })
@@ -681,6 +606,10 @@ export class NehubaViewerUnit implements OnDestroy{
      * TODO
      * ugh, ugly code. cleanify
      */
+    /**
+     * TODO 
+     * sometimes, ngId still happends to be undefined
+     */
     newMap.forEach((segs, ngId) => {
       this.nehubaViewer.hideSegment(0, {
         name: ngId
@@ -784,21 +713,13 @@ export class NehubaViewerUnit implements OnDestroy{
     this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer, ...rest})=>{
       
       const {name = 'unnamed'} = layer
-      if( segmentId && segmentId < 65500 ) {
-        const map = this.multiNgIdsLabelIndexMap.get(name)
-        const region = map && map.get(segmentId)
-        this.mouseoverSegmentEmitter.emit({
-          layer,
-          segment: region,
-          segmentId
-        })
-      }else{
-        this.mouseoverSegmentEmitter.emit({
-          layer,
-          segment: null,
-          segmentId
-        })
-      }
+      const map = this.multiNgIdsLabelIndexMap.get(name)
+      const region = map && map.get(segmentId)
+      this.mouseoverSegmentEmitter.emit({
+        layer,
+        segment: region,
+        segmentId
+      })
     })
 
     // nehubaViewer.navigationState.all emits every time a new layer is added or removed from the viewer
@@ -852,6 +773,12 @@ export class NehubaViewerUnit implements OnDestroy{
         .subscribe(obj => this.mouseoverLandmarkEmitter.emit(obj.value))
     )
 
+    this.ondestroySubscriptions.push(
+      this.nehubaViewer.mouseOver.layer
+        .filter(obj => obj.layer.name === this.constantService.ngUserLandmarkLayerName)
+        .subscribe(obj => this.mouseoverUserlandmarkEmitter.emit(obj.value))
+    )
+
     this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace
       .filter(v=>typeof v !== 'undefined' && v !== null)
       .subscribe(v=>this.navPosReal=v)
@@ -891,28 +818,12 @@ export class NehubaViewerUnit implements OnDestroy{
       this._baseUrls.push(baseUrl)
       this._baseUrlToParcellationIdMap.set(baseUrl, id)
 
-      /* load meshes */
-      /* TODO could be a bug where user loads new parcellation, but before the worker could completely populate the list */
-      const set = this.workerService.safeMeshSet.get(baseUrl)
-      if(set){
-        this.nehubaViewer.setMeshesToLoad([...set],{
-          name : id
-        })
-      }else{
-        if(newlayer){
-          this.zone.runOutsideAngular(() => 
-            this.workerService.worker.postMessage({
-              type : 'CHECK_MESHES',
-              parcellationId : id,
-              baseUrl,
-              indices : [
-                ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
-                ...getAuxilliaryLabelIndices()
-              ]
-            })
-          )
-        }
-      }
+      const indicies = [
+        ...Array.from(this.multiNgIdsLabelIndexMap.get(id).keys()),
+        ...this.auxilaryMeshIndices
+      ]
+
+      this.loadMeshes(indicies, { name: id })
     })
 
     const obj = Array.from(this.multiNgIdsLabelIndexMap.keys()).map(ngId => {
@@ -921,24 +832,19 @@ export class NehubaViewerUnit implements OnDestroy{
         new Map(Array.from(
           [
             ...this.multiNgIdsLabelIndexMap.get(ngId).entries(),
-            ...getAuxilliaryLabelIndices().map(i => {
-              return [i, {}]
+            ...this.auxilaryMeshIndices.map(val => {
+              return [val, {}]
             })
           ]
         ).map((val:[number,any])=>([val[0],this.getRgb(val[0],val[1].rgb)])) as any)
       ]
     }) as [string, Map<number, {red:number, green: number, blue: number}>][]
 
-    this.multiNgIdColorMap = new Map(obj)
+    const multiNgIdColorMap = new Map(obj)
 
     /* load colour maps */
-
-    Array.from(this.multiNgIdColorMap.entries()).forEach(([ngId, map]) => {
-
-      this.nehubaViewer.batchAddAndUpdateSegmentColors(
-        map,
-        { name : ngId })
-    })
+    
+    this.setColorMap(multiNgIdColorMap)
 
     this._s$.forEach(_s$=>{
       if(_s$) _s$.unsubscribe()
@@ -960,6 +866,17 @@ export class NehubaViewerUnit implements OnDestroy{
         }
       }
     }
+  }
+
+  public setColorMap(map: Map<string, Map<number,{red:number, green:number, blue:number}>>){
+    this.multiNgIdColorMap = map
+    
+    Array.from(map.entries()).forEach(([ngId, map]) => {
+
+      this.nehubaViewer.batchAddAndUpdateSegmentColors(
+        map,
+        { name : ngId })
+    })
   }
 
   private getRgb(labelIndex:number,rgb?:number[]):{red:number,green:number,blue:number}{
@@ -1025,11 +942,6 @@ export interface ViewerState{
   position : [number,number,number]
   positionReal : boolean
   zoom : number
-}
-
-export function getAuxilliaryLabelIndices(){
-  return [65535]
-  // return Array.from(Array(36)).map((_,i)=>65500+i)
 }
 
 export const ICOSAHEDRON = `# vtk DataFile Version 2.0

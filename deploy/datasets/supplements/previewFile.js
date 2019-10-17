@@ -13,7 +13,7 @@ let previewMap = new Map(),
 const readFile = (filename) => new Promise((resolve) => {
   fs.readFile(path.join(__dirname, 'data', filename), 'utf-8', (err, data) => {
     if (err){
-      console.log('read file error', err)
+      console.warn('read file error', err)
       return resolve([])
     }
     resolve(JSON.parse(data))
@@ -35,23 +35,26 @@ Promise.all([
     console.error('preview file error', e)
   })
 
-exports.getPreviewFile = ({ datasetName, templateSelected }) => Promise.resolve(
-  previewMap.get(datasetName)
-    .filter(({ templateSpace }) => {
-      if (!templateSpace) return true
-      if (!templateSelected) return true
-      return templateSpace === templateSelected
-    })
-    .map(file => {
-      return {
-        ...file,
-        ...(file.url && !/^http/.test(file.url)
-          ? {
-            url: `${HOSTNAME}/${file.url}`
+exports.getPreviewFile = ({ datasetName, templateSelected }) => previewMap.get(datasetName)
+  ? Promise.resolve(
+      previewMap.get(datasetName)
+        .filter(({ templateSpace }) => {
+          if (!templateSpace) return true
+          if (!templateSelected) return true
+          return templateSpace === templateSelected
+        })
+        .map(file => {
+          return {
+            ...file,
+            ...(file.url && !/^http/.test(file.url)
+              ? {
+                url: `${HOSTNAME}/${file.url}`
+              }
+              : {})
           }
-          : {})
-      }
-    })
-)
+        })
+    )
+  : Promise.reject(`Preview file cannot be found!`)
+
 exports.getAllPreviewDSNames = () => Array.from(previewMap.keys())
 exports.hasPreview = ({ datasetName }) => previewMapKeySet.has(datasetName)

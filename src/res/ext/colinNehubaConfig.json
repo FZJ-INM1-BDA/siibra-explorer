@@ -87,36 +87,6 @@
             ]
           ]
         },
-        "jubrain v2_2c": {
-          "type": "segmentation",
-          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/v2.2c/MPM",
-          "transform": [
-            [
-              1,
-              0,
-              0,
-              -75500000
-            ],
-            [
-              0,
-              1,
-              0,
-              -111500000
-            ],
-            [
-              0,
-              0,
-              1,
-              -67500000
-            ],
-            [
-              0,
-              0,
-              0,
-              1
-            ]
-          ]
-        },
         "jubrain colin v18 left": {
           "type": "segmentation",
           "visible": true,
