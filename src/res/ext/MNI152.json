@@ -9,6 +9,7 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain mni152 v18 left",
+      "auxillaryMeshIndices": [ 65535 ],
       "properties": {
         "version": "1.0",
         "description": "not yet",
