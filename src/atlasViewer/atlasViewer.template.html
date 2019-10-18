@@ -86,7 +86,9 @@
     </div>
 
     <div class="d-flex flex-row justify-content-end z-index-10 position-absolute pe-none w-100 h-100">
-      <signin-banner signinWrapper>
+      <signin-banner
+              signinWrapper
+              [parcellationIsSelected]="selectedParcellation? true : false">
       </signin-banner>
     </div>
 

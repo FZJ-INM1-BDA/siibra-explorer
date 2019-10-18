@@ -71,6 +71,7 @@ import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHi
 import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
+import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
 
 @NgModule({
   imports : [
@@ -117,6 +118,7 @@ import { RegionsListView } from "./viewerStateController/regionsListView/simpleR
     SearchSideNav,
     RegionTextSearchAutocomplete,
     RegionsListView,
+    TakeScreenshotComponent,
 
     /* pipes */
     GroupDatasetByRegion,

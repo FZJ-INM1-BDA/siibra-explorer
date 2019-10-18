@@ -1,0 +1,46 @@
+<div id="screenshot"
+     class="screenshotContainer overflow-hidden w-100 h-100"
+     (mousemove)="move($event)"
+     (mousedown)="mouseDown($event)"
+     (mouseup)="mouseUp($event)"
+     *ngIf="takingScreenshot"
+     [ngStyle]="{'cursor':takingScreenshot? 'crosshair' : 'auto'}">
+    <div class="overlay position-fixed fixed-top w-100 h-100" [ngClass]="{ 'highlighting' : mouseIsDown }" [ngStyle]="{ borderWidth: borderWidth }"></div>
+    <div class="position-absolute border border-light" *ngIf="isDragging" [ngStyle]="{ left: boxLeft + 'px', top: boxTop + 'px', width: boxEndWidth + 'px', height: boxEndHeight + 'px' }"></div>
+
+</div>
+
+<mat-card #screenshotPreviewCard
+          class="position-fixed screenshotPreviewCard"
+          (click)="$event.stopPropagation()"
+          *ngIf="previewingScreenshot || takingScreenshot || loadingScreenshot">
+    <i class="fas fa-times cursorPointer position-absolute cancelTimesPosition"
+       (click)="cancelTakingScreenshot()">
+    </i>
+
+    <div *ngIf="takingScreenshot || loadingScreenshot" class="smallSizeWindow">
+        <div class="d-flex flex-column w-100 h-100" *ngIf="takingScreenshot">
+            <span>Size: {{boxEndWidth}} x {{boxEndHeight}}px</span>
+        </div>
+        <div class="d-flex w-100 h-100 justify-content-center align-items-center" *ngIf="loadingScreenshot">
+            <i class="fas fa-spinner fa-pulse"></i>
+        </div>
+    </div>
+    <div *ngIf="previewingScreenshot" class="d-flex flex-column align-items-center previewScreenshot">
+        <img [src]="imageUrl" class="previewImage">
+        <div class="d-flex w-100 justify-content-end mt-2">
+            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="saveImage(); previewingScreenshot = false; takingScreenshot = false; croppedCanvas = null;">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="previewingScreenshot = false; takingScreenshot = true; croppedCanvas = null;">
+                <i class="fas fa-camera"></i> Try again
+            </button>
+            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="cancelTakingScreenshot()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
+    <div id="download" class="d-none">
+        <a #downloadLink></a>
+    </div>
+</mat-card>
