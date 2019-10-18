@@ -61,7 +61,11 @@
 
 <!-- description -->
 <mat-card-content *ngIf="!simpleMode">
-  <small>{{ description }}</small>
+  <small>
+    <markdown-dom [markdown]="description">
+
+    </markdown-dom>
+  </small>
 </mat-card-content>
 
 <!-- publications -->
