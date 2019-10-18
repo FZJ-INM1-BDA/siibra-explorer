@@ -48,20 +48,19 @@ export class PluginServices{
      */
     const promiseFetchedPluginManifests : Promise<PluginManifest[]> = new Promise((resolve, reject) => {
       Promise.all([
-        /**
-         * PLUGINDEV should return an array of 
-         */
+        // TODO convert to use this.fetch
         PLUGINDEV
-          ? this.fetch(PLUGINDEV).then(res => res.json())
+          ? fetch(PLUGINDEV, this.constantService.getFetchOption()).then(res => res.json())
           : Promise.resolve([]),
         new Promise(resolve => {
-          this.fetch(`${this.constantService.backendUrl}plugins`)
+          fetch(`${this.constantService.backendUrl}plugins`, this.constantService.getFetchOption())
+            .then(res => res.json())
             .then(arr => Promise.all(
               arr.map(url => new Promise(rs => 
                 /**
                  * instead of failing all promises when fetching manifests, only fail those that fails to fetch
                  */
-                this.fetch(url).then(rs).catch(e => (this.constantService.catchError(`fetching manifest error: ${e.toString()}`), rs(null))))
+                fetch(url, this.constantService.getFetchOption()).then(res => res.json()).then(rs).catch(e => (console.log('fetching manifest error', e), rs(null))))
               )
             ))
             .then(manifests => resolve(
@@ -75,7 +74,7 @@ export class PluginServices{
         Promise.all(
           BUNDLEDPLUGINS
             .filter(v => typeof v === 'string')
-            .map(v => this.fetch(`res/plugin_examples/${v}/manifest.json`).then(res => res.json()))
+            .map(v => fetch(`res/plugin_examples/${v}/manifest.json`, this.constantService.getFetchOption()).then(res => res.json()))
         )
           .then(arr => arr.reduce((acc,curr) => acc.concat(curr) ,[]))
       ])
@@ -120,13 +119,15 @@ export class PluginServices{
         isDefined(plugin.template) ?
           Promise.resolve('template already provided') :
           isDefined(plugin.templateURL) ?
-            this.fetch(plugin.templateURL, {responseType: 'text'})
+            fetch(plugin.templateURL, this.constantService.getFetchOption())
+              .then(res=>res.text())
               .then(template=>plugin.template = template) :
             Promise.reject('both template and templateURL are not defined') ,
         isDefined(plugin.script) ?
           Promise.resolve('script already provided') :
           isDefined(plugin.scriptURL) ?
-            this.fetch(plugin.scriptURL, {responseType: 'text'})
+            fetch(plugin.scriptURL, this.constantService.getFetchOption())
+              .then(res=>res.text())
               .then(script=>plugin.script = script) :
             Promise.reject('both script and scriptURL are not defined') 
       ])
