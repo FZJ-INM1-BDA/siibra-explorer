@@ -155,8 +155,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
 
   private ngPanelTouchMove$: Observable<any>
 
-  takingScreenshot = true
-
   constructor(
     private constantService : AtlasViewerConstantsServices,
     private apiService :AtlasViewerAPIServices,
