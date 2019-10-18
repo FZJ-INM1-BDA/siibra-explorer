@@ -1,7 +1,6 @@
 import {Component, ElementRef, HostListener, Inject, Input, OnInit, Renderer2, ViewChild} from "@angular/core";
 import html2canvas from "html2canvas";
 import {DOCUMENT} from "@angular/common";
-import {ESCAPE} from "@angular/cdk/keycodes";
 
 @Component({
     selector: 'take-screenshot',
@@ -10,7 +9,7 @@ import {ESCAPE} from "@angular/cdk/keycodes";
 })
 export class TakeScreenshotComponent implements OnInit {
 
-    @ViewChild('downloadLink', {read: ElementRef}) downloadLink: ElementRef;
+    @ViewChild('downloadLink', {read: ElementRef}) downloadLink: ElementRef
     @ViewChild('helpBody', {read: ElementRef}) helpBody: ElementRef
     @ViewChild('screenshotPreviewCard', {read: ElementRef}) screenshotPreviewCard: ElementRef
     takingScreenshot = false
@@ -163,7 +162,13 @@ export class TakeScreenshotComponent implements OnInit {
         this.loadingScreenshot = true
         this.takingScreenshot = false
 
-        this.takeScreenshot()
+        if (this.boxEndWidth * window.devicePixelRatio <= 1 && this.boxEndHeight * window.devicePixelRatio <= 1) {
+            console.log(1)
+            this.cancelTakingScreenshot()
+        } else {
+            console.log(2)
+            this.takeScreenshot()
+        }
 
     }
 
@@ -186,6 +191,7 @@ export class TakeScreenshotComponent implements OnInit {
             this.loadingScreenshot = false
             this.imageUrl = this.croppedCanvas.toDataURL()
             this.previewingScreenshot = true
+            this.clearStateAfterScreenshot()
         })
     }
 
@@ -196,10 +202,28 @@ export class TakeScreenshotComponent implements OnInit {
     }
 
     cancelTakingScreenshot() {
-        this.takingScreenshot = false;
-        this.previewingScreenshot = false;
-        this.loadingScreenshot = false;
-        this.croppedCanvas = null;
+        this.takingScreenshot = false
+        this.previewingScreenshot = false
+        this.loadingScreenshot = false
+        this.croppedCanvas = null
+    }
+    clearStateAfterScreenshot() {
+        this.mouseIsDown = false
+        this.isDragging = false
+        this.tookScreenShot = false
+        this.startX = 0
+        this.startY = 0
+        this.endX = 0
+        this.endY = 0
+        this.borderWidth = ''
+        this.boxTop = 0
+        this.boxLeft = 0
+        this.boxEndWidth = 0
+        this.boxEndHeight = 0
+        this.windowHeight = 0
+        this.windowWidth = 0
+        this.screenshotStartX = 0
+        this.screenshotStartY = 0
     }
 
 }
