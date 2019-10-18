@@ -1,0 +1,47 @@
+.overlay,
+.tooltip,
+.borderedBox {
+    user-select: none;
+}
+
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.overlay.highlighting {
+    background: none;
+    border-color: rgba(0, 0, 0, 0.5);
+    border-style: solid;
+}
+
+.screenshotContainer {
+    clear: both;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.smallSizeWindow {
+    width: 160px;
+    height: 40px;
+}
+
+.cancelTimesPosition {
+    top: 5px;
+    right: 5px;
+}
+
+.previewScreenshot {
+    max-width: 400px !important;
+    max-height: 400px !important;
+}
+
+.previewImage {
+    max-width:350px !important;
+    max-height:350px !important;
+}
+
+.screenshotPreviewCard {
+    bottom: 50px !important;
+    right: 150px !important;
+    z-index: 10520 !important;
+}
