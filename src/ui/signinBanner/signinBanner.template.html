@@ -2,6 +2,19 @@
   [iav-key-listener]="keyListenerConfig"
   (iav-key-event)="openTmplWithDialog(helpComponent)">
 
+  <!-- Take screenshot -->
+  <div class="btnWrapper" *ngIf="parcellationIsSelected">
+    <button mat-icon-button
+            (click)="takeScreenshotElement.takingScreenshot = true;
+                     takeScreenshotElement.previewingScreenshot = false;
+                     takeScreenshotElement.croppedCanvas = null;
+                     takeScreenshotElement.loadingScreenshot = null;"
+            matTooltip="Take screenshot"
+            color="primary">
+      <i class="fas fa-camera"></i>
+    </button>
+  </div>
+
   <!-- pinned datasets -->
 
   <div class="btnWrapper">
@@ -145,3 +158,4 @@
     </mat-list-item>
   </mat-list>
 </ng-template>
+<take-screenshot #takeScreenshotElement style="z-index: 1509;" class="position-fixed fixed-top"></take-screenshot>

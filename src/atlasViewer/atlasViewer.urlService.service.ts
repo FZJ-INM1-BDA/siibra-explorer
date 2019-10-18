@@ -98,9 +98,25 @@ export class AtlasViewerURLService{
        */
       const searchparams = new URLSearchParams(window.location.search)
  
+      /**
+       * TODO
+       * triage: change of template and parcellation names is breaking old links
+       * change back when camilla/oli updated the links to new versions
+       */
+
       /* first, check if any template and parcellations are to be loaded */
-      const searchedTemplatename = searchparams.get('templateSelected')
-      const searchedParcellationName = searchparams.get('parcellationSelected')
+      const searchedTemplatename = (() => {
+        const param = searchparams.get('templateSelected')
+        if (param === 'Allen Mouse') return `Allen adult mouse brain reference atlas V3`
+        if (param === 'Waxholm Rat V2.0') return 'Waxholm Space rat brain atlas v.2.0'
+        return param
+      })()
+      const searchedParcellationName = (() => {
+        const param = searchparams.get('parcellationSelected')
+        if (param === 'Allen Mouse Brain Atlas') return 'Allen adult mouse brain reference atlas V3 Brain Atlas'
+        if (param === 'Whole Brain (v2.0)') return 'Waxholm Space rat brain atlas v.2.0'
+        return param
+      })()
 
       if (!searchedTemplatename) {
         const urlString = window.location.href
@@ -263,14 +279,20 @@ export class AtlasViewerURLService{
       const pluginStates = searchparams.get('pluginStates')
       if(pluginStates){
         const arrPluginStates = pluginStates.split('__')
-        arrPluginStates.forEach(url => fetch(url).then(res => res.json()).then(json => this.pluginService.launchNewWidget(json)).catch(console.error))
+        arrPluginStates.forEach(url => fetch(url, this.constantService.getFetchOption()).then(res => res.json()).then(json => this.pluginService.launchNewWidget(json)).catch(console.error))
       }
     })
 
     /* pushing state to url */
     combineLatest(
-      this.changeQueryObservable$.pipe(
-        map(state=>{
+      combineLatest(
+        this.changeQueryObservable$,
+        this.store.pipe(
+          select('viewerState'),
+          select('parcellationSelected')
+        )
+      ).pipe(
+        map(([state, parcellationSelected])=>{
           let _ = {}
           for(const key in state){
             if(isDefined(state[key])){

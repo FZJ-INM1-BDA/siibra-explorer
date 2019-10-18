@@ -20,6 +20,7 @@ import { Store, select } from "@ngrx/store";
 export class SigninBanner{
 
   @Input() darktheme: boolean
+  @Input() parcellationIsSelected: boolean
 
   public user$: Observable<User>
   public userBtnTooltip$: Observable<string>

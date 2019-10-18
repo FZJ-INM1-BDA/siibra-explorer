@@ -2,12 +2,14 @@
   (click)="ripple ? showDetailInfo() : null"
   [iav-stop]="ripple ? 'click' : null"
   [matRippleDisabled]="!ripple"
-  class="d-flex flex-row flex-nowrap align-items-center">
+  class="d-flex flex-row flex-nowrap align-items-center h-100">
 
   <!-- title -->
-  <small class="flex-grow-1 flex-shrink-1">
-    {{ name }}
-  </small>
+  <div class="flex-grow-1 name-container d-flex align-items-start">
+    <small class="flex-grow-1 flex-shrink-1">
+      {{ name }}
+    </small>
+  </div>
 
 
   <ng-container *ngIf="downloadEnabled">

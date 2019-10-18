@@ -44,7 +44,7 @@ export class AtlasViewerConstantsServices implements OnDestroy {
    * raceFetch 
    */
    public raceFetch = (url) => Promise.race([
-     fetch(url),
+     fetch(url, this.getFetchOption()),
      new Promise((_, reject) => setTimeout(() => {
       reject(`fetch did not resolve under ${this.TIMEOUT} ms`)
      }, this.TIMEOUT)) as Promise<Response>
@@ -61,7 +61,7 @@ export class AtlasViewerConstantsServices implements OnDestroy {
 
   /* to be provided by KG in future */
   public templateUrlsPr : Promise<string[]> = new Promise((resolve, reject) => {
-    fetch(`${this.backendUrl}templates`)
+    fetch(`${this.backendUrl}templates`, this.getFetchOption())
       .then(res => res.json())
       .then(arr => {
         this.templateUrls = arr
@@ -147,6 +147,23 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
 
   public mobileWarningHeader = `Power and Network Usage warning`
   public mobileWarning = `It looks like you are on a mobile device. Please note that the atlas viewer is power and network usage intensive.`
+
+  /**
+   * When the selected regions becomes exceedingly many, referer header often gets too hard
+   * in nginx, it can result in 400 header to large
+   * as result, trim referer to only template and parcellation selected
+   */
+  private getScopedReferer(): string{
+    const url = new URL(window.location.href)
+    url.searchParams.delete('regionsSelected')
+    return url.toString()
+  }
+
+  public getFetchOption() : RequestInit{
+    return {
+      referrer: this.getScopedReferer()
+    }
+  }
 
   get floatingWidgetStartingPos() : [number,number]{
     return [400,100]

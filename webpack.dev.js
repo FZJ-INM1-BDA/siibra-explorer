@@ -20,5 +20,10 @@ module.exports = merge(common,ngAssets,staticAssets,{
     new HtmlWebpackPlugin({
       template : 'src/index.html'
     })
-  ]
+  ],
+  devServer: {
+    headers: {
+      'Referrer-Policy': 'origin-when-cross-origin'
+    }
+  }
 })

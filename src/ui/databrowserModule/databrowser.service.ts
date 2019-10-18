@@ -3,7 +3,7 @@ import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, fr
 import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { ADD_NG_LAYER, REMOVE_NG_LAYER, DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
+import { DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
 import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay, withLatestFrom } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
@@ -230,7 +230,7 @@ export class DatabrowserService implements OnDestroy{
   public fetchPreviewData(datasetName: string){
     const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
-      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`)
+      fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`, this.constantService.getFetchOption())
         .then(res => res.json())
         .then(resolve)
         .catch(reject)
@@ -253,9 +253,9 @@ export class DatabrowserService implements OnDestroy{
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
     return Promise.all([
-      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`)
+      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`, this.constantService.getFetchOption())
         .then(res => res.json()),
-      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`)
+      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`, this.constantService.getFetchOption())
         .then(res => res.json())
     ])
       .then(arr => [...arr[0], ...arr[1]])

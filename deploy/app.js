@@ -71,6 +71,11 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
  */
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
 
+app.use((_req, res, next) => {
+  res.setHeader('Referrer-Policy', 'origin-when-cross-origin')
+  next()
+})
+
 /**
  * show dev banner
  * n.b., must be before express.static() call

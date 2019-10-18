@@ -662,13 +662,16 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
         ),
         this.ngLayers$.pipe(
           map(state => state.forceShowSegment)
-        )
+        ),
+        this.selectedParcellation$
       )
-        .subscribe(([regions,hideSegmentFlag,forceShowSegment])=>{
+        .subscribe(([regions,hideSegmentFlag,forceShowSegment, selectedParcellation])=>{
           if(!this.nehubaViewer) return
 
+          const { ngId: defaultNgId } = selectedParcellation
+
           /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-          this.selectedRegionIndexSet = new Set(regions.map(({ngId, labelIndex})=>generateLabelIndexId({ ngId, labelIndex })))
+          this.selectedRegionIndexSet = new Set(regions.map(({ngId = defaultNgId, labelIndex})=>generateLabelIndexId({ ngId, labelIndex })))
 
           if( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ){
             this.nehubaViewer.hideAllSeg()
@@ -766,6 +769,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
         }
       })
     )
+
+    // To get WebGL content when taking screenshot
+    HTMLCanvasElement.prototype.getContext = function(origFn) {
+      return function(type, attribs) {
+        attribs = attribs || {}
+        attribs.preserveDrawingBuffer = true
+        return origFn.call(this, type, attribs)
+      }
+    }(HTMLCanvasElement.prototype.getContext)
   }
 
   // datasetViewerRegistry : Set<string> = new Set()
