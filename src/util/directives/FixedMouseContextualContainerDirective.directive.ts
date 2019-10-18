@@ -49,7 +49,7 @@ export class FixedMouseContextualContainerDirective {
 
   @HostListener('document:click', ['$event'])
   documentClick(event: MouseEvent){
-    if (event.button !== 2) {
+    if (event.button !== 0) {
       if (this.styleDisplay === 'none')
         return
       if (this.el.nativeElement.contains(event.target))

@@ -1,7 +1,18 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
+import {
+  Component,
+  HostBinding,
+  ViewChild,
+  ViewContainerRef,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  AfterViewInit,
+  Renderer2,
+  HostListener, ElementRef
+} from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -17,6 +28,7 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import {MatMenuTrigger} from "@angular/material/menu";
 
 /**
  * TODO
@@ -353,8 +365,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
+  @ViewChild('iavMouseHoverEl', {read: ElementRef}) iavMouseHoverEl: ElementRef
   ngAfterViewInit() {
-    
+    const obst = new Observable((observer: Observer<any>) => {
+      this.iavMouseHoverEl.nativeElement.addEventListener('mousedown', event => observer.next({eventName: 'mousedown', event}), true)
+    })  as Observable<{eventName: string, event: MouseEvent}>
+
+    obst.subscribe(e => {
+      this.mouseDownNehuba(e.event)
+    })
+
     /**
      * preload the main bundle after atlas viewer has been loaded. 
      * This should speed up where user first navigate to the home page,
@@ -470,6 +490,30 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   openLandmarkUrl(dataset) {
     this.rClContextualMenu.hide()
     window.open(dataset.externalLink, "_blank")
+  }
+
+  mouseUpLeftPosition
+  mouseUpTopPosition
+  regionToolsMenuVisible = false
+
+  mouseDownNehuba(event) {
+    this.regionToolsMenuVisible = false
+    this.mouseUpLeftPosition= event.pageX
+    this.mouseUpTopPosition= event.pageY
+  }
+
+  mouseUpNehuba(event) {
+    if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {
+      this.regionToolsMenuVisible = true
+      if (!this.rClContextualMenu) return
+      this.rClContextualMenu.mousePos = [
+        event.clientX,
+        event.clientY
+      ]
+      this.rClContextualMenu.show()
+      // alert(' Show Menu! ')
+
+    }
   }
 
   @HostBinding('attr.version')
