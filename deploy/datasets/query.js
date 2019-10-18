@@ -166,11 +166,11 @@ readConfigFile('waxholmRatV2_0.json')
 readConfigFile('allenMouse.json')
   .then(data => JSON.parse(data))
   .then(json => {
-    const flattenedAllen = flattenArray(json.parcellations[0].regions)
-    allen2017Set = populateSet(flattenedAllen)
-
-    const flattenedAllen2017 = flattenArray(json.parcellations[1].regions)
+    const flattenedAllen2017 = flattenArray(json.parcellations[0].regions)
     allen2017Set = populateSet(flattenedAllen2017)
+
+    const flattenedAllen2015 = flattenArray(json.parcellations[1].regions)
+    allen2015Set = populateSet(flattenedAllen2015)
   })
 
 const filterByPRSet = (prs, atlasPrSet = new Set()) => {
