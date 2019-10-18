@@ -13,6 +13,10 @@
       "ngId": "v3",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v3",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "e80f9946-1aa9-494b-b81a-9048ca9afdbe"
+      }],
       "regions": [{
         "ngId": "v3",
         "name": "Whole brain",
@@ -1544,6 +1548,10 @@
       "ngId": "v2",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v2",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "2c8ec4fb-45ca-4fe7-accf-c41b5e92c43d"
+      }],
       "regions": [
         {
           "name": "Whole brain",
@@ -3193,6 +3201,10 @@
       "ngId": "v1_01",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v1",
+      "originDatasets":[{
+        "kgSchema": "minds/core/dataset/v1.0.0",
+        "kgId": "f40e466b-8247-463a-a4cb-56dfe68e7059"
+      }],
       "regions": [
         {
           "ngId": "v1_01",
