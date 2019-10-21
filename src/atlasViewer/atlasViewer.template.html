@@ -176,22 +176,22 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
+      <panel-component class="shadow p-0 m-0" fixedMouseContextualContainerDirective>
 
-
-
-      <panel-component class="shadow" fixedMouseContextualContainerDirective>
-
-
-        <div body class="pe-all">
-          <mat-card *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 && regionToolsMenuVisible" class="p-0 m-0 d-flex flex-column">
-
+        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
+          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
+            <div *ngFor="let onHoverRegion of onHoverSegments" class="border rounded m-2">
+                <div class="text-nowrap text-ellipsis mt-2 ml-2 overflow-hidden" [matTooltip]="onHoverRegion.name" matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <button mat-button matTooltip="Select region" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"><i class="fas fa-hand-pointer"></i> Select</button>
+                  <button mat-button matTooltip="Navigate to region" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"> <i class="fas fa-crosshairs"></i> Navigate </button>
+                  <button mat-button matTooltip="Region Description" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"> <i class="fas fa-info-circle"></i> Description</button>
+                </div>
+            </div>
           </mat-card>
         </div>
 
-
       </panel-component>
-
-
 
     </layout-floating-container>
 

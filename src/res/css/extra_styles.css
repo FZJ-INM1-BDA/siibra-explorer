@@ -680,3 +680,7 @@ body::after
   overflow: hidden;
   margin-top: 0.25rem;
 }
+
+.text-ellipsis {
+  text-overflow: ellipsis;
+}
