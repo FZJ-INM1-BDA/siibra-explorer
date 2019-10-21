@@ -11,7 +11,14 @@ import {
   HostListener, ElementRef
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
+import {
+  ViewerStateInterface,
+  isDefined,
+  FETCHED_SPATIAL_DATA,
+  UPDATE_SPATIAL_DATA,
+  safeFilter,
+  CHANGE_NAVIGATION
+} from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
@@ -29,6 +36,7 @@ import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import {MatMenuTrigger} from "@angular/material/menu";
+import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
 
 /**
  * TODO
@@ -116,7 +124,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet
+    private bottomSheet: MatBottomSheet,
+    private store$: Store<any>
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -495,9 +504,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   mouseUpLeftPosition
   mouseUpTopPosition
   regionToolsMenuVisible = false
+  collapsedRegionId = -1
 
   mouseDownNehuba(event) {
     this.regionToolsMenuVisible = false
+    this.collapsedRegionId = -1
     this.mouseUpLeftPosition= event.pageX
     this.mouseUpTopPosition= event.pageY
   }
@@ -514,6 +525,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       // alert(' Show Menu! ')
 
     }
+  }
+
+  navigateTo(position){
+    this.store$.dispatch({
+      type: CHANGE_NAVIGATION,
+      navigation: {
+        position,
+        animation: {}
+      }
+    })
   }
 
   @HostBinding('attr.version')

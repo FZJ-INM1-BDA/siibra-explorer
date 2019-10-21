@@ -104,53 +104,6 @@
         </ng-container>
       </div>
 
-      <!-- TODO document fixedMouseContextualContainerDirective , then deprecate this -->
-      <!-- TODO move to nehuba overlay container -->
-<!--      <panel-component class="shadow" fixedMouseContextualContainerDirective #rClContextMenu>-->
-<!--        <div heading>-->
-<!--          <h5 class="pe-all p-2 m-0">-->
-<!--            What's here?-->
-<!--          </h5>-->
-<!--        </div>-->
-<!--        <div body>-->
-
-<!--          <div *ngIf="(onhoverSegmentsForFixed$ | async)?.length > 0 || (selectedRegions$ | async)?.length > 0"-->
-<!--            class="p-2">-->
-<!--            Search for data relating to:-->
-<!--          </div>-->
-
-<!--          <div *ngFor="let onhoverSegmentFixed of (onhoverSegmentsForFixed$ | async)"-->
-<!--            (click)="searchRegion([onhoverSegmentFixed])"-->
-<!--            class="ws-no-wrap text-left pe-all btn btn-sm btn-secondary btn-block mt-0" data-toggle="tooltip"-->
-<!--            data-placement="top" [title]="onhoverSegmentFixed.name">-->
-<!--            <small class="text-semi-transparent">(hovering)</small> {{ onhoverSegmentFixed.name }}-->
-<!--          </div>-->
-
-<!--          <div *ngIf="(selectedRegions$ | async)?.length > 0 && (selectedRegions$ | async); let selectedRegions"-->
-<!--            (click)="searchRegion(selectedRegions)"-->
-<!--            class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">-->
-<!--            <ng-container *ngIf="selectedRegions.length > 1">-->
-<!--              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions.length }} selected regions-->
-<!--            </ng-container>-->
-<!--            <ng-container *ngIf="selectedRegions.length === 1">-->
-<!--              <small class="text-semi-transparent">(selected)</small> {{ selectedRegions[0].name }}-->
-<!--            </ng-container>-->
-<!--          </div>-->
-
-<!--          <div class="p-2 text-muted"-->
-<!--            *ngIf="(onhoverSegmentsForFixed$ | async)?.length === 0 && (selectedRegions$ | async)?.length === 0 && (onhoverLandmarksForFixed$ | async)?.length === 0">-->
-<!--            Right click on a parcellation region or select parcellation regions to search KG for associated datasets.-->
-<!--          </div>-->
-
-<!--          <ng-template #noRegionSelected>-->
-<!--            <div (click)="searchRegion()" class="ws-no-wrap text-left pe-all mt-0 btn btn-sm btn-secondary btn-block">-->
-<!--              No region selected. Search KG for all datasets in this template space.-->
-<!--            </div>-->
-<!--          </ng-template>-->
-
-<!--        </div>-->
-<!--      </panel-component>-->
-
       <div floatingMouseContextualContainerDirective>
 
         <div class="d-inline-block" iav-mouse-hover #iavMouseHoverConetxtualBlock="iavMouseHover" contextualBlock>
@@ -180,13 +133,52 @@
 
         <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
           <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
-            <div *ngFor="let onHoverRegion of onHoverSegments" class="border rounded m-2">
-                <div class="text-nowrap text-ellipsis mt-2 ml-2 overflow-hidden" [matTooltip]="onHoverRegion.name" matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
-                <div class="d-flex align-items-center justify-content-between">
-                  <button mat-button matTooltip="Select region" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"><i class="fas fa-hand-pointer"></i> Select</button>
-                  <button mat-button matTooltip="Navigate to region" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"> <i class="fas fa-crosshairs"></i> Navigate </button>
-                  <button mat-button matTooltip="Region Description" matTooltipShowDelay="1000" style="font-size: 10px" class="p-1"> <i class="fas fa-info-circle"></i> Description</button>
-                </div>
+            <div *ngFor="let onHoverRegion of onHoverSegments; let i = index"
+                 class="border-dark rounded mt-2">
+              <div class="text-nowrap text-ellipsis mt-2 ml-2 mr-2 overflow-hidden" [matTooltip]="onHoverRegion.name"
+                   matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
+<!--              ToDo implement it with Descriptions-->
+<!--              <div>-->
+<!--                <div class="row m-2 position-relative overflow-hidden"-->
+<!--                     [ngClass]="[collapsedRegionId === i? 'regionDescriptionTextOpened overflow-y-auto' : 'regionDescriptionTextClass', (+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight) && collapsedRegionId !== i? 'regionDescriptionTextBefore' : '']"-->
+<!--                     #regionDescriptionText>-->
+<!--                  Description Text Here-->
+<!--                </div>-->
+<!--                <div (click)="collapsedRegionId = i"-->
+<!--                     *ngIf="+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight && collapsedRegionId !== i"-->
+<!--                     class="w-100 d-flex justify-content-center align-items-center mt-n2 cursorPointer"><i-->
+<!--                        class="fas fa-angle-down m-1"></i> Read More-->
+<!--                </div>-->
+<!--              </div>-->
+              <div class="d-flex align-items-center justify-content-between">
+                <button mat-button
+                        matTooltip="Select region"
+                        matTooltipShowDelay="1000"
+                        style="font-size: 12px"
+                        class="p-0 w-100"
+                        (click)="regionToolsMenuVisible = false; collapsedRegionId = -1">
+                  <i class="fas fa-hand-pointer"></i> Select
+                </button>
+                <button mat-button
+                        matTooltip="Navigate to region"
+                        matTooltipShowDelay="1000"
+                        style="font-size: 12px"
+                        class="p-0 w-100"
+                        (click)="navigateTo(onHoverRegion.position); regionToolsMenuVisible = false; collapsedRegionId = -1">
+                  <i class="fas fa-crosshairs"></i> Navigate
+                </button>
+
+<!-- ToDo Change other buttons font size to 10 if this button is available and remove w-100 classes-->
+<!--                <button mat-button-->
+<!--                        matTooltip="Navigate to region"-->
+<!--                        matTooltipShowDelay="1000"-->
+<!--                        style="font-size: 10px"-->
+<!--                        class="p-0 mr-1">-->
+<!--                  <i class="fab fa-connectdevelop"></i> Connectivity-->
+<!--                </button>-->
+              </div>
+              <mat-divider *ngIf="onHoverSegments.length > 1 && i !== onHoverSegments.length-1"
+                           class="mb-n2"></mat-divider>
             </div>
           </mat-card>
         </div>
