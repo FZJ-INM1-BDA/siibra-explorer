@@ -59,14 +59,5 @@ exports.getCommonSenseDsFilter = ({ templateName, parcellationName }) => {
         ? dsIsRat
         : null
 
-  const falseFilters = queryIsHuman({ templateName, parcellationName })
-    ? [dsIsMouse, dsIsRat]
-    : queryIsMouse({ templateName, parcellationName })
-      ? [dsIsHuman, dsIsRat]
-      : queryIsRat({ templateName, parcellationName })
-        ? [dsIsMouse, dsIsHuman]
-        : []
-  return ds => trueFilter
-    ? trueFilter({ ds }) || (falseFilters.every(filterFn => !filterFn({ ds })))
-    : false
+  return ds => trueFilter && trueFilter({ ds })
 }
