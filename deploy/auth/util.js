@@ -10,17 +10,19 @@ const redirectUri = `${HOSTNAME}/hbp-oidc/cb`
 let REFRESH_TOKEN = process.env.REFRESH_TOKEN || null
 const CLIENT_NOT_INIT = `Client is not initialised.`
 const REFRESH_TOKEN_MISSING = `refresh token is missing`
+const REFRESH_ACCESS_TOKEN_MISSING = `access token not defined upon refresh`
+const REFRESH_REFRESH_TOKEN_MISSING = `refresh token not defined upon refresh`
 
 let __client
 let __publicAccessToken
 
 const refreshToken = async () => {
-  if (!__client)
-    throw new Error(CLIENT_NOT_INIT)
-  if (!REFRESH_TOKEN)
-    throw new Error(REFRESH_TOKEN_MISSING)
+  if (!__client) throw new Error(CLIENT_NOT_INIT)
+  if (!REFRESH_TOKEN) throw new Error(REFRESH_TOKEN_MISSING)
   const tokenset = await __client.refresh(REFRESH_TOKEN)
   const {access_token: accessToken, refresh_token: refreshToken, id_token: idToken} = tokenset
+  if (!!accessToken) throw new Error(REFRESH_ACCESS_TOKEN_MISSING)
+  if (!!refreshToken) throw new Error(REFRESH_REFRESH_TOKEN_MISSING)
   if (refreshToken !== REFRESH_TOKEN) {
     REFRESH_TOKEN = refreshToken
   }
