@@ -137,7 +137,7 @@
                  class="border-dark rounded mt-2">
               <div class="text-nowrap text-ellipsis mt-2 ml-2 mr-2 overflow-hidden" [matTooltip]="onHoverRegion.name"
                    matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
-<!--              ToDo implement it with Descriptions-->
+<!-- ToDo implement it with Descriptions-->
 <!--              <div>-->
 <!--                <div class="row m-2 position-relative overflow-hidden"-->
 <!--                     [ngClass]="[collapsedRegionId === i? 'regionDescriptionTextOpened overflow-y-auto' : 'regionDescriptionTextClass', (+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight) && collapsedRegionId !== i? 'regionDescriptionTextBefore' : '']"-->
@@ -156,8 +156,13 @@
                         matTooltipShowDelay="1000"
                         style="font-size: 12px"
                         class="p-0 w-100"
-                        (click)="regionToolsMenuVisible = false; collapsedRegionId = -1">
-                  <i class="fas fa-hand-pointer"></i> Select
+                        *ngIf="(selectedRegions$ | async) as selectedRegions"
+                        (click)="toggleRegionWithId(onHoverRegion.ngId, onHoverRegion.labelIndex, regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)); regionToolsMenuVisible = false; collapsedRegionId = -1">
+                  <span class="fa-stack fa-1x" >
+                    <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                    <i class="fas fa-slash fa-stack-1x fa-inverse" *ngIf="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)"></i>
+                  </span>
+                  <span [innerText]="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)? 'Unselect' : 'Select'"></span>
                 </button>
                 <button mat-button
                         matTooltip="Navigate to region"

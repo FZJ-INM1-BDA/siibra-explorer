@@ -2,13 +2,12 @@ import {
   Component,
   HostBinding,
   ViewChild,
-  ViewContainerRef,
   OnDestroy,
   OnInit,
   TemplateRef,
   AfterViewInit,
   Renderer2,
-  HostListener, ElementRef
+  ElementRef
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
@@ -17,7 +16,7 @@ import {
   FETCHED_SPATIAL_DATA,
   UPDATE_SPATIAL_DATA,
   safeFilter,
-  CHANGE_NAVIGATION
+  CHANGE_NAVIGATION, generateLabelIndexId
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
 import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
@@ -35,8 +34,8 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
-import {MatMenuTrigger} from "@angular/material/menu";
 import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
+import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
 
 /**
  * TODO
@@ -525,6 +524,24 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       // alert(' Show Menu! ')
 
     }
+  }
+
+  public toggleRegionWithId(ngId, labelIndex, removeFlag: any){
+    if (removeFlag) {
+      this.store$.dispatch({
+        type: VIEWER_STATE_ACTION_TYPES.DESELECT_REGIONS_WITH_ID,
+        deselecRegionIds: [generateLabelIndexId({ ngId, labelIndex })]
+      })
+    } else {
+      this.store$.dispatch({
+        type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
+        selectRegionIds : [generateLabelIndexId({ ngId, labelIndex })]
+      })
+    }
+  }
+
+  regionIsSelected(selectedRegions, ngId, labelIndex) {
+    return selectedRegions.map(sr => generateLabelIndexId({ ngId: sr.ngId, labelIndex: sr.labelIndex })).includes(generateLabelIndexId({ ngId, labelIndex }))
   }
 
   navigateTo(position){
