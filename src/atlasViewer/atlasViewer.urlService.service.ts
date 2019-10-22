@@ -195,6 +195,7 @@ export class AtlasViewerURLService{
                   /**
                    * TODO poisonsed encoded char, send error message
                    */
+                  this.uiService.showMessage(`cRegionSelectionParam is malformed: cannot decode ${n}`)
                   return null
                 }
               }).filter(v => !!v)

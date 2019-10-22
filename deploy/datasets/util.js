@@ -36,13 +36,15 @@ const init = async () => {
 
 const retry = (fn) => {
   let retryId
-  retryId = setInterval(() => {
+  retryId = setTimeout(() => {
     fn()
       .then(() => {
         console.log(`retry succeeded, clearing retryId`)
         clearTimeout(retryId)
-      }).catch(e => {
+      })
+      .catch(e => {
         console.warn(`retry failed, retrying in 5sec`)
+        retry(fn)
       })
   }, 5000)
 }
