@@ -21,8 +21,8 @@ const refreshToken = async () => {
   if (!REFRESH_TOKEN) throw new Error(REFRESH_TOKEN_MISSING)
   const tokenset = await __client.refresh(REFRESH_TOKEN)
   const {access_token: accessToken, refresh_token: refreshToken, id_token: idToken} = tokenset
-  if (!!accessToken) throw new Error(REFRESH_ACCESS_TOKEN_MISSING)
-  if (!!refreshToken) throw new Error(REFRESH_REFRESH_TOKEN_MISSING)
+  if (!accessToken) throw new Error(REFRESH_ACCESS_TOKEN_MISSING)
+  if (!refreshToken) throw new Error(REFRESH_REFRESH_TOKEN_MISSING)
   if (refreshToken !== REFRESH_TOKEN) {
     REFRESH_TOKEN = refreshToken
   }
