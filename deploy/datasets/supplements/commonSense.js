@@ -34,7 +34,7 @@ const mouseParcellationSet = new Set([
   'Allen Mouse Common Coordinate Framework v3 2015'
 ])
 
-const dsIsHuman = ({ds}) => ds && ds.species.some(species => /homo\ sapiens/i.test(species))
+const dsIsHuman = ({ ds }) => ds && ds.species.some(species => /homo\ sapiens/i.test(species))
 const dsIsRat = ({ ds }) => ds && ds.species.some(species => /rattus\ norvegicus/i.test(species))
 const dsIsMouse = ({ ds }) => ds && ds.species.some(species => /mus\ musculus/i.test(species))
 
@@ -50,7 +50,23 @@ const queryIsHuman = ({ templateName, parcellationName }) =>
   (templateName && humanTemplateSet.has(templateName))
   || (parcellationName && humanParcellationSet.has(parcellationName))
 
-exports.commonSenseDsFilter = ({ ds , templateName, parcellationName}) => 
-  (queryIsHuman({ templateName, parcellationName }) && !dsIsRat({ ds }) && !dsIsMouse({ ds }))
-  || (queryIsMouse({ templateName, parcellationName }) && !dsIsRat({ ds }) && !dsIsHuman({ ds }))
-  || (queryIsRat({ templateName, parcellationName }) && !dsIsMouse({ ds }) && !dsIsHuman({ ds }))
+exports.getCommonSenseDsFilter = ({ templateName, parcellationName }) => {
+  const trueFilter = queryIsHuman({ templateName, parcellationName })
+    ? dsIsHuman
+    : queryIsMouse({ templateName, parcellationName })
+      ? dsIsMouse
+      : queryIsRat({ templateName, parcellationName })
+        ? dsIsRat
+        : null
+
+  const falseFilters = queryIsHuman({ templateName, parcellationName })
+    ? [dsIsMouse, dsIsRat]
+    : queryIsMouse({ templateName, parcellationName })
+      ? [dsIsHuman, dsIsRat]
+      : queryIsRat({ templateName, parcellationName })
+        ? [dsIsMouse, dsIsHuman]
+        : []
+  return ds => trueFilter
+    ? trueFilter({ ds }) || (falseFilters.every(filterFn => !filterFn({ ds })))
+    : false
+}

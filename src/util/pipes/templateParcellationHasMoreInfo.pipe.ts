@@ -31,6 +31,7 @@ export class TemplateParcellationHasMoreInfo implements PipeTransform{
       || notNullNotEmptyString(pDescriptions)
       || notEmptyArray(publications)
       || notEmptyArray(pPublications)
+      || notEmptyArray(originDatasets)
 
     return hasMoreInfo
       ? {
