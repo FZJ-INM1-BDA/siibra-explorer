@@ -10,7 +10,7 @@ const { init: kgQueryUtilInit, getUserKGRequestParam } = require('./util')
 let cachedData = null
 let otherQueryResult = null
 
-const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.org`
+const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.eu`
 const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_3`
 const KG_PARAM = {
   size: process.env.KG_SEARCH_SIZE || '1000',
