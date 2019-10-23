@@ -4,7 +4,7 @@ Interactive Atlas Viewer is an frontend module wrapping around [nehuba](https://
 
 ## Getting Started
 
-A live version of the Interactive Atlas Viewer is available at [https://kg.humanbrainproject.org/viewer/](https://kg.humanbrainproject.org/viewer/). This section is useful for developers who would like to develop this project.
+A live version of the Interactive Atlas Viewer is available at [https://interactive-viewer.apps.hbp.eu](https://interactive-viewer.apps.hbp.eu). This section is useful for developers who would like to develop this project.
 
 ### General information
 Interactive atlas viewer is built with [Angular (v6.0)](https://angular.io/), [Bootstrap (v4)](http://getbootstrap.com/), and [fontawesome icons](https://fontawesome.com/). Some other notable packages used are: [ng2-charts](https://valor-software.com/ng2-charts/) for charts visualisation, [ngx-bootstrap](https://valor-software.com/ngx-bootstrap/) for UI and [ngrx/store](https://github.com/ngrx/platform) for state management. 
