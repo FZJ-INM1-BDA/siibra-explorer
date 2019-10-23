@@ -30,7 +30,7 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { AuthService } from "./services/auth.service";
-import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
+// import { FixedMouseContextualContainerDirective } from "./util/directives/FixedMouseContextualContainerDirective.directive";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
@@ -54,6 +54,7 @@ import 'hammerjs'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
+import {SingleClickOnNehubaWithoutNavigateDirective} from "src/util/directives/singleClickOnNehubaWithoutNavigate.directive";
 
 @NgModule({
   imports : [
@@ -107,8 +108,9 @@ import 'src/res/css/extra_styles.css'
     FloatingContainerDirective,
     PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
-    FixedMouseContextualContainerDirective,
+    // FixedMouseContextualContainerDirective,
     DragDropDirective,
+    SingleClickOnNehubaWithoutNavigateDirective,
 
     /* pipes */
     GetNamesPipe,

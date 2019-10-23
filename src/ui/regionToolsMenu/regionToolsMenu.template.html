@@ -1,0 +1,53 @@
+<panel-component class="shadow p-0 m-0" fixedMouseContextualContainerDirective>
+    <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
+        <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
+            <div *ngFor="let onHoverRegion of onHoverSegments; let i = index"
+                 class="border-dark rounded mt-2">
+                <div class="text-nowrap text-truncate mt-2 ml-2 mr-2 overflow-hidden" [matTooltip]="onHoverRegion.name"
+                     matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
+                <!-- ToDo implement it with Descriptions-->
+                <!--              <div>-->
+                <!--                <div class="row m-2 position-relative overflow-hidden"-->
+                <!--                     [ngClass]="[collapsedRegionId === i? 'regionDescriptionTextOpened overflow-y-auto' : 'regionDescriptionTextClass', (+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight) && collapsedRegionId !== i? 'readMoreCollapseButton' : '']"-->
+                <!--                     #regionDescriptionText>-->
+                <!--                  Description Text Here-->
+                <!--                </div>-->
+                <!--                <div (click)="collapsedRegionId = i"-->
+                <!--                     *ngIf="+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight && collapsedRegionId !== i"-->
+                <!--                     class="w-100 d-flex justify-content-center align-items-center mt-n2 cursorPointer"><i-->
+                <!--                        class="fas fa-angle-down m-1"></i> Read More-->
+                <!--                </div>-->
+                <!--              </div>-->
+                <div class="d-flex align-items-center justify-content-between">
+                    <button mat-button
+                            style="font-size: 12px"
+                            class="p-0 w-100"
+                            *ngIf="(selectedRegions$ | async) as selectedRegions"
+                            (click)="toggleRegionWithId(onHoverRegion.ngId, onHoverRegion.labelIndex, regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)); regionToolsMenuVisible = false; collapsedRegionId = -1">
+                  <span class="fa-stack fa-1x" >
+                    <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                    <i class="fas fa-slash fa-stack-1x fa-inverse" *ngIf="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)"></i>
+                  </span>
+                        <span [innerText]="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)? 'Deselect' : 'Select'"></span>
+                    </button>
+                    <button mat-button
+                            style="font-size: 12px"
+                            class="p-0 w-100"
+                            (click)="navigateTo(onHoverRegion.position); regionToolsMenuVisible = false; collapsedRegionId = -1">
+                        <i class="fas fa-crosshairs"></i> Navigate
+                    </button>
+
+                    <!-- ToDo Change other buttons font size to 10 if this button is available and remove w-100 classes-->
+                    <!--                <button mat-button-->
+                    <!--                        style="font-size: 10px"-->
+                    <!--                        class="p-0 mr-1">-->
+                    <!--                  <i class="fab fa-connectdevelop"></i> Connectivity-->
+                    <!--                </button>-->
+                </div>
+                <mat-divider *ngIf="onHoverSegments.length > 1 && i !== onHoverSegments.length-1"
+                             class="mb-n2"></mat-divider>
+            </div>
+        </mat-card>
+    </div>
+
+</panel-component>

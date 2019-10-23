@@ -19,7 +19,16 @@ import {
   CHANGE_NAVIGATION, generateLabelIndexId
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
+import {
+  map,
+  filter,
+  distinctUntilChanged,
+  delay,
+  concatMap,
+  withLatestFrom,
+  switchMapTo,
+  takeUntil, take, tap, mapTo
+} from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -36,6 +45,7 @@ import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
 import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
+import {RegionToolsMenuComponent} from "src/ui/regionToolsMenu/regionToolsMenu.component";
 
 /**
  * TODO
@@ -90,8 +100,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
-  public onhoverSegmentsForFixed$: Observable<string[]>
-  
+
   public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
@@ -124,7 +133,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private bottomSheet: MatBottomSheet,
-    private store$: Store<any>
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -373,16 +381,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  @ViewChild('iavMouseHoverEl', {read: ElementRef}) iavMouseHoverEl: ElementRef
   ngAfterViewInit() {
-    const obst = new Observable((observer: Observer<any>) => {
-      this.iavMouseHoverEl.nativeElement.addEventListener('mousedown', event => observer.next({eventName: 'mousedown', event}), true)
-    })  as Observable<{eventName: string, event: MouseEvent}>
-
-    obst.subscribe(e => {
-      this.mouseDownNehuba(e.event)
-    })
-
     /**
      * preload the main bundle after atlas viewer has been loaded. 
      * This should speed up where user first navigate to the home page,
@@ -424,10 +423,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
-    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegments$),
-      map(([_flag, onhoverSegments]) => onhoverSegments || [])
-    )
   }
 
   /**
@@ -483,74 +478,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.cookieDialogRef && this.cookieDialogRef.close()
     this.store.dispatch({
       type: AGREE_COOKIE
-    })
-  }
-
-  nehubaClickHandler(event:MouseEvent){
-    if (!this.rClContextualMenu) return
-    this.rClContextualMenu.mousePos = [
-      event.clientX,
-      event.clientY
-    ]
-    this.rClContextualMenu.show()
-  }
-
-  openLandmarkUrl(dataset) {
-    this.rClContextualMenu.hide()
-    window.open(dataset.externalLink, "_blank")
-  }
-
-  mouseUpLeftPosition
-  mouseUpTopPosition
-  regionToolsMenuVisible = false
-  collapsedRegionId = -1
-
-  mouseDownNehuba(event) {
-    this.regionToolsMenuVisible = false
-    this.collapsedRegionId = -1
-    this.mouseUpLeftPosition= event.pageX
-    this.mouseUpTopPosition= event.pageY
-  }
-
-  mouseUpNehuba(event) {
-    if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {
-      this.regionToolsMenuVisible = true
-      if (!this.rClContextualMenu) return
-      this.rClContextualMenu.mousePos = [
-        event.clientX,
-        event.clientY
-      ]
-      this.rClContextualMenu.show()
-      // alert(' Show Menu! ')
-
-    }
-  }
-
-  public toggleRegionWithId(ngId, labelIndex, removeFlag: any){
-    if (removeFlag) {
-      this.store$.dispatch({
-        type: VIEWER_STATE_ACTION_TYPES.DESELECT_REGIONS_WITH_ID,
-        deselecRegionIds: [generateLabelIndexId({ ngId, labelIndex })]
-      })
-    } else {
-      this.store$.dispatch({
-        type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
-        selectRegionIds : [generateLabelIndexId({ ngId, labelIndex })]
-      })
-    }
-  }
-
-  regionIsSelected(selectedRegions, ngId, labelIndex) {
-    return selectedRegions.map(sr => generateLabelIndexId({ ngId: sr.ngId, labelIndex: sr.labelIndex })).includes(generateLabelIndexId({ ngId, labelIndex }))
-  }
-
-  navigateTo(position){
-    this.store$.dispatch({
-      type: CHANGE_NAVIGATION,
-      navigation: {
-        position,
-        animation: {}
-      }
     })
   }
 
