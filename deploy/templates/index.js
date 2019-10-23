@@ -2,16 +2,19 @@ const router = require('express').Router()
 const query = require('./query')
 const path = require('path')
 const { detEncoding } = require('nomiseco')
+const url = require('url')
 
 /**
  * root path fetches all templates
  */
 router.get('/', (req, res, next) => {
-  const baseUrl = req.baseUrl
   query.getAllTemplates()
     .then(templates => {
-      const templatesRes = templates.map(v => path.join(baseUrl.slice(1), v))
-      res.status(200).send(JSON.stringify(templatesRes))
+      
+      const templatesRes = templates.map(v => {
+        return url.resolve(`${res.locals.routePathname}/`, v)
+      })
+      res.status(200).json(templatesRes)
     })
     .catch(error => next({
       code: 500,
