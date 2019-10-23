@@ -1,14 +1,11 @@
 
 <!-- title -->
-<mat-card-subtitle *ngIf="!simpleMode">
+<mat-card-subtitle>
   {{ name }}
 </mat-card-subtitle>
 
-<mat-card-content *ngIf="simpleMode">
-  <small>
-    {{ name }}
-  </small>
-  <mat-grid-list [cols]="kgReference.length + (preview ? 1 : 0) + (downloadEnabled ? 2 : 0)" rowHeight="4em">
+<mat-card-content mat-dialog-content>
+  <mat-grid-list *ngIf="false" [cols]="kgReference.length + (preview ? 1 : 0) + (downloadEnabled ? 2 : 0)" rowHeight="4em">
 
     <!-- explore -->
     <mat-grid-tile *ngFor="let kgRef of kgReference">
@@ -57,19 +54,15 @@
       </button>
     </mat-grid-tile>
   </mat-grid-list>
-</mat-card-content>
 
-<!-- description -->
-<mat-card-content *ngIf="!simpleMode">
+  <!-- description -->
   <small>
-    <markdown-dom [markdown]="description">
+    <markdown-dom class="d-block" [markdown]="description">
 
     </markdown-dom>
   </small>
-</mat-card-content>
 
-<!-- publications -->
-<mat-card-content *ngIf="!simpleMode">
+  <!-- publications -->
   <small class="d-block mb-2"
     *ngFor="let publication of publications">
     <a *ngIf="publication.doi; else plainText"
@@ -86,7 +79,7 @@
 
 
 <!-- footer -->
-<mat-card-actions *ngIf="!simpleMode">
+<mat-card-actions>
 
   <!-- explore -->
   <a *ngFor="let kgRef of kgReference"

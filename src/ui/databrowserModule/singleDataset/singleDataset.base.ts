@@ -39,7 +39,7 @@ export class SingleDatasetBase implements OnInit {
   /**
    * sic!
    */
-  private kgReference: string[] = []
+  public kgReference: string[] = []
   public files: File[] = []
   private methods: string[] = []
   /**
