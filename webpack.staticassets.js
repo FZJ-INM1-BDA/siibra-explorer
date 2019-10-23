@@ -70,7 +70,7 @@ module.exports = {
         ? true
         : false,
       BACKEND_URL: JSON.stringify(process.env.BACKEND_URL || ''),
-      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'ebrains' || 'hbp')
+      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' )
     })
   ],
   resolve: {
