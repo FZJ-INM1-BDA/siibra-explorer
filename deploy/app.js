@@ -1,11 +1,9 @@
 const path = require('path')
 const express = require('express')
-const app = express()
+const app = express.Router()
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
-
-app.disable('x-powered-by')
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
@@ -102,7 +100,12 @@ const datasetRouter = require('./datasets')
 const pluginRouter = require('./plugins')
 const previewRouter = require('./preview')
 
-app.use('/templates', jsonMiddleware, templateRouter)
+const setResLocalMiddleWare = routePathname => (req, res, next) => {
+  res.locals.routePathname = routePathname
+  next()
+}
+
+app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
 app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
 app.use('/datasets', jsonMiddleware, datasetRouter)
 app.use('/plugins', jsonMiddleware, pluginRouter)
