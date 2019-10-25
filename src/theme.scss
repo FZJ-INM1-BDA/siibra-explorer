@@ -19,3 +19,29 @@ $iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, 
 {
   @include angular-material-theme($iv-dark-theme);
 }
+
+.iav-dialog-class
+{
+
+  @media (min-width: 576px) { 
+    
+  }
+
+  // Medium devices (tablets, 768px and up)
+  @media (min-width: 768px) { 
+    
+    max-width: 50vw!important;
+  }
+  
+  // Large devices (desktops, 992px and up)
+  @media (min-width: 992px) { 
+    
+    max-width: 50vw!important;
+  }
+  
+  // Extra large devices (large desktops, 1200px and up)
+  @media (min-width: 1200px) { 
+    
+    max-width: 50vw!important;
+  }
+}

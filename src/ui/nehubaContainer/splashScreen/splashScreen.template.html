@@ -29,8 +29,8 @@
           Parcellations available
         </mat-card-subtitle>
         <button
-          (mousedown)="$event.stopPropagation()"
-          (click)="$event.stopPropagation(); selectTemplateParcellation(template, parcellation)"
+          iav-stop="mousedown touchstart click"
+          (click)="selectTemplateParcellation(template, parcellation)"
           *ngFor="let parcellation of template.parcellations"
           mat-button
           color="primary">
