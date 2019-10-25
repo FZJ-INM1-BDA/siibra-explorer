@@ -6,6 +6,7 @@ const DISABLE_JUBRAIN_PMAP = process.env.DISABLE_JUBRAIN_PMAP
 const DISABLE_JUBRAIN_PMAP_V17 = process.env.DISABLE_JUBRAIN_PMAP_V17
 const DISABLE_DWM_PMAP = process.env.DISABLE_DWM_PMAP
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
+const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 
 let previewMap = new Map(),
   previewMapKeySet = new Set()
@@ -48,7 +49,7 @@ exports.getPreviewFile = ({ datasetName, templateSelected }) => previewMap.get(d
             ...file,
             ...(file.url && !/^http/.test(file.url)
               ? {
-                url: `${HOSTNAME}/${file.url}`
+                url: `${HOSTNAME}${HOST_PATHNAME}/${file.url}`
               }
               : {})
           }

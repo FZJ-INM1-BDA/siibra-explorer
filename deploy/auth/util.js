@@ -2,10 +2,11 @@ const { configureAuth } = require('./oidc')
 const jwtDecode = require('jwt-decode')
 
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
+const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 const clientId = process.env.HBP_CLIENTID || 'no hbp id'
 const clientSecret = process.env.HBP_CLIENTSECRET || 'no hbp client secret'
 const discoveryUrl = 'https://services.humanbrainproject.eu/oidc'
-const redirectUri = `${HOSTNAME}/hbp-oidc/cb`
+const redirectUri = `${HOSTNAME}${HOST_PATHNAME}/hbp-oidc/cb`
 
 let REFRESH_TOKEN = process.env.REFRESH_TOKEN || null
 const CLIENT_NOT_INIT = `Client is not initialised.`

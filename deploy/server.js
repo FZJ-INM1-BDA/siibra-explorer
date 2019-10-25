@@ -66,6 +66,11 @@ const PORT = process.env.PORT || 3000
 // n.b. no trailing slash is important
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 
+if(HOST_PATHNAME !== '') {
+  if (HOST_PATHNAME.slice(0,1) !== '/') throw new Error(`HOST_PATHNAME, if defined and non-empty, should start with a leading slash. HOST_PATHNAME: ${HOST_PATHNAME}`)
+  if (HOST_PATHNAME.slice(-1) === '/') throw new Error(`HOST_PATHNAME, if defined and non-emtpy, should NOT end with a slash. HOST_PATHNAME: ${HOST_PATHNAME}`)
+}
+
 server.disable('x-powered-by')
 
 server.use(HOST_PATHNAME, app)
