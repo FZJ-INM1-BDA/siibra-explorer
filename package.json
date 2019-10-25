@@ -11,7 +11,7 @@
     "build-min": "webpack --config webpack.prod.js",
     "build": "webpack --config webpack.dev.js",
     "plugin-server": "node ./src/plugin_examples/server.js",
-    "dev-server": "BACKEND_URL=http://localhost:3000/viewer/ webpack-dev-server --config webpack.dev.js --mode development",
+    "dev-server": "BACKEND_URL=http://localhost:3000/ webpack-dev-server --config webpack.dev.js --mode development",
     "dev": "npm run dev-server & (cd deploy; node server.js)",
     "dev-server-aot": "PRODUCTION=true GIT_HASH=`git log --pretty=format:'%h' --invert-grep --grep=^.ignore -1` webpack-dev-server --config webpack.aot.js",
     "dev-server-all-interfaces": "webpack-dev-server --config webpack.dev.js --mode development --hot --host 0.0.0.0",
