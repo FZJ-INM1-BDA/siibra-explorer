@@ -1,6 +1,7 @@
 const hbpOidc = require('./hbp-oidc')
 const passport = require('passport')
 const objStoreDb = new Map()
+const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 
 module.exports = async (app) => {
   app.use(passport.initialize())
@@ -29,9 +30,8 @@ module.exports = async (app) => {
   })
 
   app.get('/logout', (req, res) => {
-    if (req.user && req.user.id)
-      objStoreDb.delete(req.user.id)
+    if (req.user && req.user.id) objStoreDb.delete(req.user.id)
     req.logout()
-    res.redirect('/')
+    res.redirect(`${HOST_PATHNAME}/`)
   })
 }
