@@ -63,6 +63,7 @@ const PORT = process.env.PORT || 3000
 
 // e.g. HOST_PATHNAME=/viewer
 // n.b. leading slash is important
+// n.b. no trailing slash is important
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 
 server.disable('x-powered-by')
