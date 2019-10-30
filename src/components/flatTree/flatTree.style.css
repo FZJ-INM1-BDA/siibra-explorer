@@ -54,9 +54,14 @@ span[renderText]
   border-left:rgba(128,128,128,0.6) 1px dashed;
 }
 
+.render-node-text
+{
+  opacity: 0.8;
+}
+
 .render-node-text:hover
 {
-  color:rgba(219, 181, 86,1);
+  opacity: 1.0;
 }
 
 .render-node-level-1

@@ -4,6 +4,7 @@ const path = require('path')
 const DISABLE_RECEPTOR_PREVIEW = process.env.DISABLE_RECEPTOR_PREVIEW
 const DISABLE_JUBRAIN_PMAP = process.env.DISABLE_JUBRAIN_PMAP
 const DISABLE_JUBRAIN_PMAP_V17 = process.env.DISABLE_JUBRAIN_PMAP_V17
+const DISABLE_JUBRAIN_PMAP_EXTRA = process.env.DISABLE_JUBRAIN_PMAP_EXTRA
 const DISABLE_DWM_PMAP = process.env.DISABLE_DWM_PMAP
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
@@ -25,7 +26,8 @@ Promise.all([
   DISABLE_RECEPTOR_PREVIEW ? Promise.resolve([]) : readFile('receptorPreview.json'),
   DISABLE_JUBRAIN_PMAP ? Promise.resolve([]) : readFile('pmapJubrainPreview.json'),
   DISABLE_DWM_PMAP ? Promise.resolve([]) : readFile('pmapDWMPreview.json'),
-  DISABLE_JUBRAIN_PMAP_V17 ? Promise.resolve([]) : readFile('pmapJuBrainV17Preview.json')
+  DISABLE_JUBRAIN_PMAP_V17 ? Promise.resolve([]) : readFile('pmapJuBrainV17Preview.json'),
+  DISABLE_JUBRAIN_PMAP_EXTRA ? Promise.resolve([]) : readFile('pmapJuBrainExtraPreview.json')
 ])
   .then(arrOfA => arrOfA.reduce((acc, item) => acc.concat(item), []))
   .then(iterable => {
