@@ -9,11 +9,15 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain colin v18 left",
-      "auxillaryMeshIndices": [ 65535 ],
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
-      }],
+      "auxillaryMeshIndices": [
+        65535
+      ],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+        }
+      ],
       "properties": {
         "version": "1.0",
         "description": "This dataset contains the whole-brain parcellation of the JuBrain Cytoarchitectonic Atlas (Amunts and Zilles, 2015) in the MNI Colin 27 as well as the MNI ICBM 152 2009c nonlinear asymmetric reference space. The parcellation is derived from the individual probability maps (PMs) of the cytoarchitectonic regions released in the JuBrain Atlas, that are further combined into a Maximum Probability Map (MPM). The MPM is calculated by considering for each voxel the probability of all cytoarchitectonic areas released in the atlas, and determining the most probable assignment (Eickhoff 2005). Note that methodological improvements and integration of new brain structures may lead to small deviations in earlier released datasets.",
@@ -996,9 +1000,6 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/C3HS-8R7",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area 7A"
-                          ],
                           "rgb": [
                             52,
                             20,
@@ -1137,6 +1138,9 @@
                                 62944473
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            "Area 7A"
                           ]
                         }
                       ]
@@ -1510,9 +1514,6 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/C5QQ-EFB",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFm"
-                          ],
                           "rgb": [
                             187,
                             133,
@@ -1571,8 +1572,8 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F1TJ-54W",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFop"
+                          "relatedAreas": [
+                            "Area PF"
                           ],
                           "rgb": [
                             226,
@@ -1623,8 +1624,8 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/8DP8-8HE",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PGp"
+                          "relatedAreas": [
+                            "Area PFcm"
                           ],
                           "rgb": [
                             98,
@@ -1675,7 +1676,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/V5HY-XTS",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area PGa"
                           ],
                           "rgb": [
@@ -1727,7 +1728,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/JGM9-ZET",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area PFt"
                           ],
                           "rgb": [
@@ -1779,8 +1780,8 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/TB94-HRK",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFcm"
+                          "relatedAreas": [
+                            "Area PFm"
                           ],
                           "rgb": [
                             53,
@@ -1871,6 +1872,9 @@
                                 30721440
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            "Area PGp"
                           ]
                         },
                         {
@@ -1920,6 +1924,9 @@
                                 24917260
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            "Area PFop"
                           ]
                         }
                       ]
@@ -2758,6 +2765,9 @@
                                 1637838
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            "Area hOc1"
                           ]
                         }
                       ]
@@ -2941,7 +2951,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F9P8-ZVW",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area 44v",
                             "Area 44d"
                           ],
@@ -3385,7 +3395,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/5HSF-81J",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area 4p"
                           ],
                           "rgb": [
@@ -4877,7 +4887,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/MV3G-RET",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area Te1"
                           ],
                           "rgb": [
@@ -4938,8 +4948,8 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/F2JH-KVV",
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area FG1"
+                          "relatedAreas": [
+                            "Area FG2"
                           ],
                           "rgb": [
                             67,
@@ -5079,6 +5089,9 @@
                                 -12612536
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            "Area FG1"
                           ]
                         },
                         {
@@ -5088,7 +5101,7 @@
                           "labelIndex": null,
                           "doi": "https://doi.org/10.25493/13RG-FYV",
                           "synonyms": [],
-                          "relatedAreas":[
+                          "relatedAreas": [
                             "Area FG2"
                           ],
                           "rgb": [
