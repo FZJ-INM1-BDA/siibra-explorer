@@ -1,8 +1,26 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
+import {
+  Component,
+  HostBinding,
+  ViewChild,
+  ViewContainerRef,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  AfterViewInit,
+  Renderer2,
+  HostListener
+} from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
+import {
+  ViewerStateInterface,
+  isDefined,
+  FETCHED_SPATIAL_DATA,
+  UPDATE_SPATIAL_DATA,
+  safeFilter,
+  NgViewerStateInterface
+} from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
+import {map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom, scan, debounceTime} from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -92,8 +110,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public toggleMessage = this.constantsService.toggleMessage
 
+  viewerState$ : Observable<any>
+  nehubaReady$ : Observable<any>
+  nehubaReady : boolean
+
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<ViewerStateInterface | NgViewerStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -133,6 +155,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),  
       filter(state => isDefined(state)),
       map(state => state.focusedSidePanel)
+    )
+
+    this.viewerState$ = this.store.pipe(
+        select('viewerState'),
+        filter(state => isDefined(state))
+    )
+
+    this.nehubaReady$ = this.store.pipe(
+        select('ngViewerState'),
+        filter(state => isDefined(state)),
+        map(state => state.nehubaReady)
     )
 
     this.sidePanelOpen$ = this.store.pipe(
@@ -353,8 +386,39 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
+  backPressed = false
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(event) {
+    this.urlService.onPopState(event)
+    this.backPressed = true
+
+    const selectedTemplateParam = new URLSearchParams(window.location.search).get('templateSelected')
+    if (!selectedTemplateParam){
+      window.location.reload()
+    }
+  }
+
   ngAfterViewInit() {
-    
+    const viewerStateObservable = this.store.pipe(
+        select('viewerState'),
+        debounceTime(500),
+    )
+
+    this.subscriptions.push(
+        viewerStateObservable.subscribe(o => {
+          if (this.nehubaReady && !this.backPressed){
+            this.urlService.onStateUpdate()
+          } else if (this.backPressed) {
+            this.backPressed = false
+          }
+        }),
+        this.nehubaReady$.subscribe(nr => {
+          this.nehubaReady = nr
+        })
+    )
+
+
     /**
      * preload the main bundle after atlas viewer has been loaded. 
      * This should speed up where user first navigate to the home page,
