@@ -1,4 +1,4 @@
-import {HostListener, Injectable} from "@angular/core";
+import {Injectable} from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import {
   ViewerStateInterface,
@@ -15,7 +15,6 @@ import { PluginServices } from "./atlasViewer.pluginService.service";
 import { AtlasViewerConstantsServices, encodeNumber, separator, decodeToNumber } from "./atlasViewer.constantService.service";
 import { SELECT_REGIONS_WITH_ID } from "src/services/state/viewerState.store";
 import { UIService } from "src/services/uiService.service";
-import {NehubaContainer} from "src/ui/nehubaContainer/nehubaContainer.component";
 
 declare var window
 
@@ -233,8 +232,12 @@ export class AtlasViewerURLService{
     this.urlString = ''
   }
 
-  onPopState(event) {
+  parseStateFromSearchParam() {
     this.backPressed = true
+    const selectedTemplateParam = new URLSearchParams(window.location.search).get('templateSelected')
+    if (!selectedTemplateParam){
+      window.location.reload()
+    }
     this.urlSubscription()
   }
 

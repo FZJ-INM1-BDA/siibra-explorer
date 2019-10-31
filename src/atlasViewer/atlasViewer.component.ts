@@ -2,7 +2,6 @@ import {
   Component,
   HostBinding,
   ViewChild,
-  ViewContainerRef,
   OnDestroy,
   OnInit,
   TemplateRef,
@@ -20,7 +19,7 @@ import {
   NgViewerStateInterface
 } from "../services/stateStore.service";
 import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import {map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom, scan, debounceTime} from "rxjs/operators";
+import {map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom, debounceTime} from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -389,14 +388,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   backPressed = false
 
   @HostListener('window:popstate', ['$event'])
-  onPopState(event) {
-    this.urlService.onPopState(event)
+  parseStateFromSearchParam(event) {
+    this.urlService.parseStateFromSearchParam()
     this.backPressed = true
-
-    const selectedTemplateParam = new URLSearchParams(window.location.search).get('templateSelected')
-    if (!selectedTemplateParam){
-      window.location.reload()
-    }
   }
 
   ngAfterViewInit() {
