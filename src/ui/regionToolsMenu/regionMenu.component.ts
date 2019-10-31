@@ -8,13 +8,13 @@ import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.
 import {Store} from "@ngrx/store";
 
 @Component({
-    selector: 'region-tools-menu',
-    templateUrl: './regionToolsMenu.template.html',
-    styleUrls: ['./regionToolsMenu.style.css']
+    selector: 'region-menu',
+    templateUrl: './regionMenu.template.html',
+    styleUrls: ['./regionMenu.style.css']
 })
-export class RegionToolsMenuComponent {
+export class RegionMenuComponent {
     @Input() selectedRegions$: any
-    @Input() onHoverRegion: any
+    @Input() region: any
 
     regionToolsMenuVisible = false
     collapsedRegionDescription = false

@@ -72,7 +72,7 @@ import { CurrentlySelectedRegions } from './viewerStateController/regionsListVie
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
-import {RegionToolsMenuComponent} from "src/ui/regionToolsMenu/regionToolsMenu.component";
+import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 
 @NgModule({
@@ -121,7 +121,7 @@ import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedM
     RegionTextSearchAutocomplete,
     RegionsListView,
     TakeScreenshotComponent,
-    RegionToolsMenuComponent,
+    RegionMenuComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -184,7 +184,7 @@ import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedM
     ElementOutClickDirective,
     SearchSideNav,
     ViewerStateMini,
-    RegionToolsMenuComponent,
+    RegionMenuComponent,
     FixedMouseContextualContainerDirective
   ]
 })

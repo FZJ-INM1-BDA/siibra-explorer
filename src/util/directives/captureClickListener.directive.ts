@@ -1,13 +1,13 @@
 import {Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {Observable, Observer, Subscription} from "rxjs";
 import {switchMapTo, takeUntil} from "rxjs/operators";
-import {RegionToolsMenuComponent} from "src/ui/regionToolsMenu/regionToolsMenu.component";
+import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 
 @Directive({
-    selector: '[mapClickDirective]'
+    selector: '[iav-captureClickListenerDirective]'
 })
 
-export class MapClickDirective implements OnInit, OnDestroy {
+export class CaptureClickListenerDirective implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = []
     @Output() mapClicked: EventEmitter<any> = new EventEmitter()

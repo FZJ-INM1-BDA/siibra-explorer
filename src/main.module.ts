@@ -53,7 +53,7 @@ import 'hammerjs'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
-import {MapClickDirective} from "src/util/directives/mapClick.directive";
+import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
 
 @NgModule({
   imports : [
@@ -108,7 +108,7 @@ import {MapClickDirective} from "src/util/directives/mapClick.directive";
     PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
     DragDropDirective,
-    MapClickDirective,
+    CaptureClickListenerDirective,
 
     /* pipes */
     GetNamesPipe,

@@ -45,7 +45,7 @@ import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
 import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
-import {RegionToolsMenuComponent} from "src/ui/regionToolsMenu/regionToolsMenu.component";
+import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 
 /**
  * TODO
@@ -119,7 +119,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public sidePanelOpen$: Observable<boolean>
 
 
-  onhoverSegmentsForFixed$: Observable<any>
+  onhoverSegmentsForFixed$: Observable<string[]>
   regionToolsMenuVisible = false
 
   constructor(

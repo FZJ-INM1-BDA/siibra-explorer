@@ -1,14 +1,14 @@
-<div class="text-nowrap text-truncate mt-2 ml-2 mr-2 overflow-hidden" [matTooltip]="onHoverRegion.name"
-     matTooltipShowDelay="1000">{{onHoverRegion.name}}</div>
+<div class="text-nowrap text-truncate mt-2 ml-2 mr-2 overflow-hidden" [matTooltip]="region.name"
+     matTooltipShowDelay="1000">{{region.name}}</div>
 <!-- ToDo implement it with Descriptions-->
-<!--              <div > &lt;!&ndash;*ngIf="!onHoverRegion.description && !onHoverRegion.description.length"&ndash;&gt;-->
+<!--              <div > &lt;!&ndash;*ngIf="!region.description && !region.description.length"&ndash;&gt;-->
 <!--                <div class="row m-2 position-relative overflow-hidden"-->
 <!--                     [class.regionDescriptionTextOpened] = "collapsedRegionDescription"-->
 <!--                     [class.overflow-y-auto] = "collapsedRegionDescription"-->
 <!--                     [class.regionDescriptionTextClass] = "!collapsedRegionDescription"-->
 <!--                     [class.linear-gradient-fade] = "(+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight) && !collapsedRegionDescription"-->
 <!--                     #regionDescriptionText>-->
-<!--                    {{onHoverRegion.description}}-->
+<!--                    {{region.description}}-->
 <!--                </div>-->
 <!--                <div (click)="collapsedRegionDescription = true"-->
 <!--                     *ngIf="+regionDescriptionText.scrollHeight > +regionDescriptionText.clientHeight && !collapsedRegionDescription"-->
@@ -26,18 +26,18 @@
             style="font-size: 12px"
             class="p-0 w-100"
             *ngIf="(selectedRegions$ | async) as selectedRegions"
-            (click)="toggleRegionWithId(onHoverRegion.ngId, onHoverRegion.labelIndex, regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)); regionToolsMenuVisible = false; collapsedRegionDescription = false">
+            (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex)); regionToolsMenuVisible = false; collapsedRegionDescription = false">
                   <span class="fa-stack fa-1x">
                     <i class="fas fa-hand-pointer fa-stack-1x"></i>
                     <i class="fas fa-slash fa-stack-1x fa-inverse"
-                       *ngIf="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)"></i>
+                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>
                   </span>
-        <span [innerText]="regionIsSelected(selectedRegions, onHoverRegion.ngId, onHoverRegion.labelIndex)? 'Deselect' : 'Select'"></span>
+        <span [innerText]="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)? 'Deselect' : 'Select'"></span>
     </button>
     <button mat-button
             style="font-size: 12px"
             class="p-0 w-100"
-            (click)="navigateTo(onHoverRegion.position); regionToolsMenuVisible = false; collapsedRegionDescription = false">
+            (click)="navigateTo(region.position); regionToolsMenuVisible = false; collapsedRegionDescription = false">
         <i class="fas fa-crosshairs"></i> Navigate
     </button>
 
