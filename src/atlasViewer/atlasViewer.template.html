@@ -41,8 +41,9 @@
     <ui-nehuba-container iav-mouse-hover #iavMouseHoverEl="iavMouseHover"
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
-      singleClickOnNehubaWithoutNavigate
-      [regionToolsMenu]="regionToolsMenu">
+      mapClickDirective
+      (mouseDownEmitter)="mouseDownNehuba($event)"
+      (mapClicked)="mouseUpNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -128,11 +129,24 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
+      <panel-component class="shadow p-0 m-0" fixedMouseContextualContainerDirective>
+        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
+          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
+            <div *ngFor="let onHoverRegion of onHoverSegments; let i = index"
+                 class="border-dark rounded mt-2">
 
-      <region-tools-menu #regionToolsMenu
-              [selectedRegions$]="selectedRegions$"
-              [onhoverSegments$]="onhoverSegments$">
-      </region-tools-menu>
+              <region-tools-menu #regionToolsMenu
+                                 [selectedRegions$]="selectedRegions$"
+                                 [onHoverRegion]="onHoverRegion">
+              </region-tools-menu>
+
+              <mat-divider *ngIf="onHoverSegments.length > 1 && i !== onHoverSegments.length-1"
+                           class="mb-n2"></mat-divider>
+            </div>
+          </mat-card>
+        </div>
+
+      </panel-component>
 
     </layout-floating-container>
 

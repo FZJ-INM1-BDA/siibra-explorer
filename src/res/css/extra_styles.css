@@ -681,7 +681,7 @@ body::after
   margin-top: 0.25rem;
 }
 
-.readMoreCollapseButton:before {
+.linear-gradient-fade:before {
   content:'';
   width:100%;
   height:100%;

@@ -55,14 +55,4 @@ export class FixedMouseContextualContainerDirective {
   @HostBinding('style.transform')
   public transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
 
-  @HostListener('document:click', ['$event'])
-  documentClick(event: MouseEvent){
-    if (event.button !== 0) {
-      if (this.styleDisplay === 'none')
-        return
-      if (this.el.nativeElement.contains(event.target))
-        return
-      this.hide()
-    }
-  }
 }

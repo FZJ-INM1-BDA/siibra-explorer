@@ -3,7 +3,7 @@
     transition: max-height 0.15s ease-out;
 }
 .regionDescriptionTextOpened {
-    max-height: 300px;
+    max-height: 310px;
     transition: max-height 0.25s ease-in;
 }
 

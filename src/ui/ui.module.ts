@@ -184,7 +184,8 @@ import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedM
     ElementOutClickDirective,
     SearchSideNav,
     ViewerStateMini,
-    RegionToolsMenuComponent
+    RegionToolsMenuComponent,
+    FixedMouseContextualContainerDirective
   ]
 })
 

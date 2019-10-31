@@ -118,7 +118,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  public toggleMessage = this.constantsService.toggleMessage
+
+  onhoverSegmentsForFixed$: Observable<any>
+  regionToolsMenuVisible = false
 
   constructor(
     private store: Store<ViewerStateInterface>,
@@ -132,7 +134,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet,
+    private bottomSheet: MatBottomSheet
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -423,6 +425,27 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
+    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
+        withLatestFrom(this.onhoverSegments$),
+        map(([_flag, onhoverSegments]) => onhoverSegments || [])
+    )
+
+  }
+
+  mouseDownNehuba(event) {
+    this.regionToolsMenuVisible = false
+    this.rClContextualMenu.hide()
+  }
+
+  mouseUpNehuba(event) {
+    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+    this.regionToolsMenuVisible = true
+    if (!this.rClContextualMenu) return
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY
+    ]
+    this.rClContextualMenu.show()
   }
 
   /**

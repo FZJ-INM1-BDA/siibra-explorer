@@ -12,45 +12,15 @@ import {Store} from "@ngrx/store";
     templateUrl: './regionToolsMenu.template.html',
     styleUrls: ['./regionToolsMenu.style.css']
 })
-export class RegionToolsMenuComponent implements AfterViewInit {
-    @Input() mouseDownObs$: any
-    @Input() clickObs$: any
-    @Input() onhoverSegments$: any
+export class RegionToolsMenuComponent {
     @Input() selectedRegions$: any
-
-    @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
-
-    onhoverSegmentsForFixed$: Observable<any>
+    @Input() onHoverRegion: any
 
     regionToolsMenuVisible = false
-    collapsedRegionId = -1
+    collapsedRegionDescription = false
 
     constructor(private store$: Store<any>) {}
 
-    ngAfterViewInit(): void {
-        this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-            withLatestFrom(this.onhoverSegments$),
-            map(([_flag, onhoverSegments]) => onhoverSegments || [])
-        )
-    }
-
-
-    mouseDownNehuba(event) {
-        this.regionToolsMenuVisible = false
-        this.rClContextualMenu.hide()
-        this.collapsedRegionId = -1
-    }
-
-    mouseUpNehuba(event) {
-        // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
-        this.regionToolsMenuVisible = true
-        if (!this.rClContextualMenu) return
-        this.rClContextualMenu.mousePos = [
-            event.clientX,
-            event.clientY
-        ]
-        this.rClContextualMenu.show()
-    }
 
     toggleRegionWithId(ngId, labelIndex, removeFlag: any){
         if (removeFlag) {
