@@ -177,6 +177,7 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
   try {
     const stream = await getDatasetFileAsZip({ user, kgId })
     res.setHeader('Content-Type', 'application/zip')
+    res.setHeader('Content-Disposition', `attachment; filename="${kgId}.zip"`)
     stream.pipe(res)
   } catch (e) {
     console.warn('datasets/index#downloadKgFiles', e)

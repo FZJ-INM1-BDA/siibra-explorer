@@ -64,26 +64,12 @@ export class KgSingleDatasetService implements OnDestroy{
       })
   }
 
-  public downloadZipFromKg({ kgSchema = 'minds/core/dataset/v1.0.0', kgId } : Partial<KgQueryInterface>, filename = 'download'){
+  public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }){
     const _url = new URL(`${this.constantService.backendUrl}datasets/downloadKgFiles`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
-    return fetch(_url.toString())
-      .then(res => {
-        if (res.status >= 400) throw new Error(res.status.toString())
-        return res.blob()
-      })
-      .then(data => this.simpleDownload(data, filename))
-  }
-
-  public simpleDownload(data, filename) {
-    const blob = new Blob([data], { type: 'application/zip'})
-    const url= window.URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.download = filename + '.zip';
-    anchor.href = url;
-    anchor.click();
+    return _url.toString()
   }
 
   public showPreviewList(template: TemplateRef<any>){

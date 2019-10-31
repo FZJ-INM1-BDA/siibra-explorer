@@ -87,15 +87,17 @@
     </button>
     
     <!-- download -->
-    <button mat-menu-item
-      *ngIf="downloadEnabled"
-      class="no-focus"
-      iav-stop="mousedown click"
-      (click)="downloadZipFromKg()"
-      [disabled]="downloadInProgress">
-      <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
-      Download
-    </button>
+    <a *ngIf="downloadEnabled"
+      [href]="dlFromKgHref"
+      target="_blank"
+      iav-stop="mousedown click">
+      <button mat-menu-item
+        class="no-focus"
+        [disabled]="downloadInProgress">
+        <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
+        Download
+      </button>
+    </a>
   </ng-template>
 </mat-menu>
 
@@ -127,11 +129,13 @@
   </button>
 
   <!-- download dataset -->
-  <button mat-icon-button
-    *ngIf="downloadEnabled"
-    iav-stop="click mousedown"
-    (click)="downloadZipFromKg()"
-    [disabled]="downloadInProgress">
-    <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-  </button>
+  <a *ngIf="downloadEnabled"
+    [href]="dlFromKgHref"
+    target="_blank"
+    iav-stop="click mousedown">
+    <button mat-icon-button
+      [disabled]="downloadInProgress">
+      <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+    </button>
+  </a>
 </ng-template>
