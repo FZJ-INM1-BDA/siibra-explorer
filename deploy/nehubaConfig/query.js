@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { BROTLI, GZIP } = require('nomiseco')
-const { reconfigureUrl } = require('../util/reconfigPrecomputedServer')
+const { reconfigureUrl, PRECOMPUTED_SERVER } = require('../util/reconfigPrecomputedServer')
 const through2 = require('through2')
 
 const getFileAsPromise = filepath => new Promise((resolve, reject) => {
@@ -32,7 +32,7 @@ exports.getTemplateNehubaConfig = ({configId, acceptedEncoding, returnAsStream})
     if (returnAsStream) return fs.createReadStream(`${filepath}.gz`)
     else return getFileAsPromise(`${filepath}.gz`)
   }
-  
+
   if (returnAsStream) return fs.createReadStream(filepath).pipe(
     through2.obj(function(file, enc, cb){
       cb(null, reconfigureUrl(file.toString()))

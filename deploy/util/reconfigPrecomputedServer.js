@@ -10,5 +10,5 @@ exports.reconfigureFlag = reconfigureFlag
 
 exports.reconfigureUrl = (str) => {
   if (!reconfigureFlag) return str
-  return str.replace(/precomputed:\/\/https?:\/\/.*?\//g, `precomputed://${PRECOMPUTED_SERVER}`)
+  return str.replace(/https?:\/\/.*?\//g, PRECOMPUTED_SERVER)
 }
