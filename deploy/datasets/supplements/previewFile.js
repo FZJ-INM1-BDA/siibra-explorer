@@ -40,12 +40,12 @@ Promise.all([
   })
 
 const processFile = ({ url, ...rest }) => {
-  const processedUrl = (url && !/^http/.test(url)
+  if (!url) return { ...rest }
+  const processedUrl = !/^http/.test(url)
     ? `${HOSTNAME}/${url}`
     : reconfigureFlag
       ? reconfigureUrl(url)
-      : url)
-    || null
+      : url
   return {
     ...rest,
     url: processedUrl
