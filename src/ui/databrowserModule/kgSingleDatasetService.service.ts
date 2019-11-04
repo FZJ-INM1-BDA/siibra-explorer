@@ -46,14 +46,14 @@ export class KgSingleDatasetService implements OnDestroy{
 
   public datasetHasPreview({ name } : { name: string } = { name: null }){
     if (!name) throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined')
-    const _url = new URL(`${this.constantService.backendUrl}datasets/hasPreview`)
+    const _url = new URL(`datasets/hasPreview`, this.constantService.backendUrl )
     const searchParam = _url.searchParams
     searchParam.set('datasetName', name)
     return this.http.get(_url.toString())
   }
 
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
-    const _url = new URL(`${this.constantService.backendUrl}datasets/kgInfo`)
+    const _url = new URL(`datasets/kgInfo`, this.constantService.backendUrl )
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
@@ -65,7 +65,7 @@ export class KgSingleDatasetService implements OnDestroy{
   }
 
   public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }){
-    const _url = new URL(`${this.constantService.backendUrl}datasets/downloadKgFiles`)
+    const _url = new URL(`datasets/downloadKgFiles`, this.constantService.backendUrl)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
