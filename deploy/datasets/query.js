@@ -9,10 +9,9 @@ const { init: kgQueryUtilInit, getUserKGRequestParam } = require('./util')
 
 let cachedData = null
 
-const STORAGE_PATH = process.env.STORAGE_PATH || path.join(__dirname, 'data')
-const CACHE_DATASET_FILENAME = process.env.CACHE_DATASET_FILENAME || 'cachedKgDataset.json'
+const CACHE_DATASET_FILENAME = process.env.CACHE_DATASET_FILENAME || path.join(__dirname, 'cachedKgDataset.json')
 
-fs.readFile(path.join(STORAGE_PATH, CACHE_DATASET_FILENAME), 'utf-8', (err, data) => {
+fs.readFile(CACHE_DATASET_FILENAME, 'utf-8', (err, data) => {
   /**
    * the file may or may not be present on init
    */
@@ -66,7 +65,7 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
-  fs.writeFile(path.join(STORAGE_PATH, CACHE_DATASET_FILENAME), JSON.stringify(results), (err) => {
+  fs.writeFile(CACHE_DATASET_FILENAME, JSON.stringify(results), (err) => {
     if (err) console.error('writing cached data fail')
   })
   return cachedData
