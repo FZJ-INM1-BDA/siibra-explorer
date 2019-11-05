@@ -1,0 +1,63 @@
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent>
+    <hbp-connectivity-matrix-row
+            [region]="region"
+            theme="dark"
+            loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+            show-description="true"
+            show-export="true"
+            show-source="true"
+            show-title="true"
+            show-toolbar="true">
+        <div slot="header" class="w-100 d-flex justify-content-end mt-3"><span
+                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
+
+        <div slot="connectedRegionMenu">
+
+            <div class="d-flex flex-column" *ngIf="collapseMenu >= 0">
+                <mat-divider></mat-divider>
+                <span class="mt-2 mr-2 ml-2">
+                    <small>Region: {{connectedAreas[collapseMenu].name}}</small>
+                    <br>
+                    <small>Number of Connection: {{connectedAreas[collapseMenu].numberOfConnections}}</small>
+                    <br>
+                    <small>Log(123) = {{math.log10(connectedAreas[collapseMenu].numberOfConnections)}}</small>
+                </span>
+                <div class="d-flex align-items-center justify-content-around">
+                    <small class="d-flex flex-column align-items-center w-100">
+
+                        <!--                        *ngIf="(selectedRegions$ | async) as selectedRegions"-->
+                        <!--                        (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex))">-->
+
+                        <button mat-icon-button class="border">
+                            <!--                            <i class="fas fa-hand-pointer mt-n1"></i>-->
+                            <span class="fa-stack fa-1x ">
+                                <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                                <!--                    <i class="fas fa-slash fa-stack-1x fa-inverse"-->
+                                <!--                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>-->
+                            </span>
+                        </button>
+                        <!--                        <span [innerText]="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)? 'Deselect' : 'Select'"></span>-->
+                        <span>Select</span>
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border">
+                            <i class="fas fa-crosshairs  mt-n1"></i>
+                        </button>
+                        Navigate
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border" (click)="region = connectedAreas[collapseMenu].name">
+                            <!--(click)="changeConnectivityRegion('connection.name')"-->
+                            <i class="fab fa-connectdevelop  mt-n1"></i>
+                        </button>
+                        Connectivity
+                    </small>
+                </div>
+            </div>
+
+
+        </div>
+    </hbp-connectivity-matrix-row>
+</div>

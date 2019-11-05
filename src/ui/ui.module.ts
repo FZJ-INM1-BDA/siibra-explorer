@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
@@ -72,6 +72,9 @@ import { CurrentlySelectedRegions } from './viewerStateController/regionsListVie
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
+import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
+import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 
 @NgModule({
   imports : [
@@ -119,6 +122,8 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     RegionTextSearchAutocomplete,
     RegionsListView,
     TakeScreenshotComponent,
+    RegionMenuComponent,
+    ConnectivityBrowserComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -146,10 +151,12 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
 
+
     /* directive */
     DownloadDirective,
     TouchSideClass,
     ElementOutClickDirective,
+    FixedMouseContextualContainerDirective
   ],
   entryComponents : [
 
@@ -179,6 +186,11 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     ElementOutClickDirective,
     SearchSideNav,
     ViewerStateMini,
+    RegionMenuComponent,
+    FixedMouseContextualContainerDirective
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

@@ -1,8 +1,36 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
+import {
+  Component,
+  HostBinding,
+  ViewChild,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  AfterViewInit,
+  Renderer2,
+  ElementRef
+} from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
+import {
+  ViewerStateInterface,
+  isDefined,
+  FETCHED_SPATIAL_DATA,
+  UPDATE_SPATIAL_DATA,
+  safeFilter,
+  CHANGE_NAVIGATION,
+  generateLabelIndexId,
+  UIStateInterface,
+  SHOW_SIDE_PANEL_CONNECTIVITY,
+  EXPAND_SIDE_PANEL_CURRENT_VIEW
+} from "../services/stateStore.service";
+import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
+import {
+  map,
+  filter,
+  distinctUntilChanged,
+  delay,
+  concatMap,
+  withLatestFrom,
+} from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -17,6 +45,12 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
+import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
+import {
+  CLOSE_SIDE_PANEL,
+  OPEN_SIDE_PANEL
+} from "src/services/state/uiState.store";
 
 /**
  * TODO
@@ -44,8 +78,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild(CaptureClickListenerDirective) captureClickListenerDirective: CaptureClickListenerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
+  @ViewChild('searchSideNav') searchSideNav: SearchSideNav
 
   /**
    * required for styling of all child components
@@ -55,7 +92,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -71,8 +107,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
-  public onhoverSegmentsForFixed$: Observable<string[]>
-  
+
   public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
@@ -90,10 +125,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  public toggleMessage = this.constantsService.toggleMessage
+
+  onhoverSegmentsForFixed$: Observable<string[]>
+  regionToolsMenuVisible = false
 
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<ViewerStateInterface | UIStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -354,7 +391,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    
     /**
      * preload the main bundle after atlas viewer has been loaded. 
      * This should speed up where user first navigate to the home page,
@@ -397,9 +433,38 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegments$),
-      map(([_flag, onhoverSegments]) => onhoverSegments || [])
+        withLatestFrom(this.onhoverSegments$),
+        map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
+
+  }
+
+  mouseDownNehuba(event) {
+    this.regionToolsMenuVisible = false
+    this.rClContextualMenu.hide()
+  }
+
+  mouseUpNehuba(event) {
+    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+    this.regionToolsMenuVisible = true
+    if (!this.rClContextualMenu) return
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY
+    ]
+    this.rClContextualMenu.show()
+  }
+
+  toggleSideNavMenu(opened) {
+    this.store.dispatch({type: opened? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
+  }
+
+  showConnectivity(event) {
+    // setTimeout(() => )
+    this.toggleSideNavMenu(false)
+    this.store.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
+    this.store.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})
+    this.searchSideNav.connectivityActive.next(event)
   }
 
   /**
@@ -456,20 +521,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: AGREE_COOKIE
     })
-  }
-
-  nehubaClickHandler(event:MouseEvent){
-    if (!this.rClContextualMenu) return
-    this.rClContextualMenu.mousePos = [
-      event.clientX,
-      event.clientY
-    ]
-    this.rClContextualMenu.show()
-  }
-
-  openLandmarkUrl(dataset) {
-    this.rClContextualMenu.hide()
-    window.open(dataset.externalLink, "_blank")
   }
 
   @HostBinding('attr.version')

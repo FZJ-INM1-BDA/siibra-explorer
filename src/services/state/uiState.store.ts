@@ -11,7 +11,9 @@ const defaultState : UIStateInterface = {
   mouseOverUserLandmark: null,
 
   focusedSidePanel: null,
-  sidePanelOpen: false,
+  sidePanelOpen: true,
+  sidePanelManualCollapsibleView: '',
+  sidePanelCurrentViewOpened: false,
 
   snackbarMessage: null,
 
@@ -58,15 +60,6 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
         ...state,
         snackbarMessage: Symbol(snackbarMessage)
       }
-    /**
-     * TODO deprecated
-     * remove ASAP
-     */
-    case TOGGLE_SIDE_PANEL:
-      return {
-        ...state,
-        sidePanelOpen: !state.sidePanelOpen
-      }
     case OPEN_SIDE_PANEL:
       return {
         ...state,
@@ -76,6 +69,29 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
       return {
         ...state,
         sidePanelOpen: false
+      }
+
+    case EXPAND_SIDE_PANEL_CURRENT_VIEW:
+      return {
+        ...state,
+        sidePanelCurrentViewOpened: true
+      }
+    case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
+      return {
+        ...state,
+        sidePanelCurrentViewOpened: false
+      }
+
+    case SHOW_SIDE_PANEL_CONNECTIVITY:
+      return {
+        ...state,
+        sidePanelManualCollapsibleView: 'Connectivity'
+      }
+
+    case HIDE_SIDE_PANEL_CONNECTIVITY:
+      return {
+        ...state,
+        sidePanelManualCollapsibleView: ''
       }
     case AGREE_COOKIE:
       /**
@@ -114,6 +130,8 @@ export interface UIStateInterface{
     segment: any | null
   }[]
   sidePanelOpen: boolean
+  sidePanelManualCollapsibleView: 'Connectivity' | '' | null
+  sidePanelCurrentViewOpened: boolean
   mouseOverSegment: any | number
 
   mouseOverLandmark: any
@@ -151,9 +169,12 @@ export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
-export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
+export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
+export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
+export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
+export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`

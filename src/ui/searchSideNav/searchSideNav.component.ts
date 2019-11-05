@@ -2,12 +2,19 @@ import { Component, Output, EventEmitter, OnInit, OnDestroy, ViewChild, Template
 import { MatDialogRef, MatDialog, MatSnackBar } from "@angular/material";
 import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
-import { Observable, Subscription } from "rxjs";
+import {Observable, Subject, Subscription} from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import {
+  CLOSE_SIDE_PANEL,
+  COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
+  EXPAND_SIDE_PANEL_CURRENT_VIEW,
+  OPEN_SIDE_PANEL
+} from "src/services/state/uiState.store";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 
 @Component({
   selector: 'search-side-nav',
@@ -18,26 +25,31 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 })
 
 export class SearchSideNav implements OnInit, OnDestroy {
-  public showDataset: boolean = false
   public availableDatasets: number = 0
+
+  public connectivityActive = new Subject<string>()
+  public connectivityRegion = ''
 
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
 
   @Output() dismiss: EventEmitter<any> = new EventEmitter()
-  @Output() open: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('layerBrowserTmpl', {read: TemplateRef}) layerBrowserTmpl: TemplateRef<any>
+  @ViewChild('connectivityBrowser') connectivityBrowser: ConnectivityBrowserComponent
 
-  public autoOpenSideNav$: Observable<any>
+
+  public autoOpenSideNavDataset$: Observable<any>
+
+  sidebarMenuState$: Observable<any>
 
   constructor(
     public dialog: MatDialog,
     private store$: Store<any>,
     private snackBar: MatSnackBar,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
   ){
-    this.autoOpenSideNav$ = this.store$.pipe(
+    this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
       map(arr => arr.length),
@@ -46,16 +58,48 @@ export class SearchSideNav implements OnInit, OnDestroy {
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo(true)
     )
+
+    this.sidebarMenuState$ = this.store$.pipe(
+        select('uiState'),
+        map(state => {
+          return {
+            sidePanelOpen: state.sidePanelOpen,
+            sidePanelCurrentViewOpened: state.sidePanelCurrentViewOpened,
+            sidePanelManualCollapsibleView: state.sidePanelManualCollapsibleView
+          }
+        })
+    )
   }
 
   ngOnInit(){
     this.subscriptions.push(
-      this.autoOpenSideNav$.subscribe(() => {
-        this.open.emit(true)
-        this.showDataset = true
+        this.connectivityActive.asObservable().subscribe(r => {
+          // this.connectivityService.getConnectivityByRegion(r)
+          this.connectivityRegion = r
+        }),
+
+      this.autoOpenSideNavDataset$.subscribe(() => {
+        this.store$.dispatch({
+          type: OPEN_SIDE_PANEL,
+        })
+        this.expandSidePanelCurrentView()
       })
     )
   }
+
+  collapseSidePanelCurrentView() {
+    this.store$.dispatch({
+      type: COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
+    })
+  }
+
+  expandSidePanelCurrentView() {
+    this.store$.dispatch({
+      type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
+    })
+  }
+
+
 
   ngOnDestroy(){
     while(this.subscriptions.length > 0) {
@@ -70,9 +114,11 @@ export class SearchSideNav implements OnInit, OnDestroy {
       return  
     }
     if (this.layerBrowserDialogRef) return
-    
-    this.dismiss.emit(true)
-    
+
+    this.store$.dispatch({
+      type: CLOSE_SIDE_PANEL,
+    })
+
     const dialogToOpen = this.layerBrowserTmpl || LayerBrowser
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
