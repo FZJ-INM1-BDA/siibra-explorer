@@ -24,7 +24,7 @@
   </viewer-state-controller>
 
   <ng-container *ngIf="showDataset">
-
+    <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1" style="max-height: calc(100% - 220px)" *ngIf="1 == 2"></connectivity-browser>
     <data-browser
       class="pe-all flex-grow-5 flex-shrink-1"
       [template]="viewerStateController.templateSelected$ | async"

@@ -72,6 +72,8 @@ import { CurrentlySelectedRegions } from './viewerStateController/regionsListVie
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import {ChartsModule} from "ng2-charts";
 
 @NgModule({
   imports : [
@@ -84,6 +86,7 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
+    ChartsModule
   ],
   declarations : [
     NehubaContainer,
@@ -119,6 +122,7 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     RegionTextSearchAutocomplete,
     RegionsListView,
     TakeScreenshotComponent,
+    ConnectivityBrowserComponent,
 
     /* pipes */
     GroupDatasetByRegion,
