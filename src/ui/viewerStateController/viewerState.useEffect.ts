@@ -18,8 +18,6 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
 
   private selectedRegions$: Observable<any[]>
 
-  @Effect()
-  singleClickOnHierarchy$: Observable<any>
 
   @Effect()
   selectTemplateWithName$: Observable<any>
@@ -27,8 +25,23 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
   @Effect()
   selectParcellationWithName$: Observable<any>
 
+  /**
+   * Determines how single click on region hierarchy will affect view
+   */
+  @Effect()
+  singleClickOnHierarchy$: Observable<any>
+
+  /**
+   * Determines how double click on region hierarchy will effect view
+   */
   @Effect()
   doubleClickOnHierarchy$: Observable<any>
+
+  @Effect()
+  toggleRegionSelection$: Observable<any>
+
+  @Effect()
+  navigateToRegion$: Observable<any>
 
   constructor(
     private actions$: Actions,
@@ -123,6 +136,16 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
     this.doubleClickOnHierarchy$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY),
       map(action => {
+        return {
+          ...action,
+          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION
+        }
+      })
+    )
+
+    this.navigateToRegion$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION),
+      map(action => {
         const { payload = {} } = action as ViewerStateAction
         const { region } = payload
         if (!region) {
@@ -156,6 +179,16 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
 
     this.singleClickOnHierarchy$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY),
+      map(action => {
+        return {
+          ...action,
+          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT
+        }
+      })
+    )
+
+    this.toggleRegionSelection$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT),
       withLatestFrom(this.selectedRegions$),
       map(([action, regionsSelected]) => {
 

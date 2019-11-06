@@ -35,11 +35,13 @@ import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 
+
 /**
  * TODO
  * check against auxlillary mesh indicies, to only filter out aux indicies
  */
 const filterFn = (segment) => typeof segment.segment !== 'string'
+const compareFn = (it, item) => it.name === item.name
 
 @Component({
   selector: 'atlas-viewer',
@@ -53,6 +55,8 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 })
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
+
+  public compareFn = compareFn
   
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
@@ -88,8 +92,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
-  public onhoverSegmentsForFixed$: Observable<string[]>
-  
+
   public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
@@ -107,7 +110,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public sidePanelOpen$: Observable<boolean>
 
-  public toggleMessage = this.constantsService.toggleMessage
+
+  onhoverSegmentsForFixed$: Observable<string[]>
+  regionToolsMenuVisible = false
 
   viewerState$ : Observable<any>
   nehubaReady$ : Observable<any>
@@ -412,7 +417,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         })
     )
 
-
     /**
      * preload the main bundle after atlas viewer has been loaded. 
      * This should speed up where user first navigate to the home page,
@@ -455,9 +459,26 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegments$),
-      map(([_flag, onhoverSegments]) => onhoverSegments || [])
+        withLatestFrom(this.onhoverSegments$),
+        map(([_flag, onhoverSegments]) => onhoverSegments || [])
     )
+
+  }
+
+  mouseDownNehuba(event) {
+    this.regionToolsMenuVisible = false
+    this.rClContextualMenu.hide()
+  }
+
+  mouseUpNehuba(event) {
+    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+    this.regionToolsMenuVisible = true
+    if (!this.rClContextualMenu) return
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY
+    ]
+    this.rClContextualMenu.show()
   }
 
   /**
@@ -514,20 +535,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.store.dispatch({
       type: AGREE_COOKIE
     })
-  }
-
-  nehubaClickHandler(event:MouseEvent){
-    if (!this.rClContextualMenu) return
-    this.rClContextualMenu.mousePos = [
-      event.clientX,
-      event.clientY
-    ]
-    this.rClContextualMenu.show()
-  }
-
-  openLandmarkUrl(dataset) {
-    this.rClContextualMenu.hide()
-    window.open(dataset.externalLink, "_blank")
   }
 
   @HostBinding('attr.version')

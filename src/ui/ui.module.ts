@@ -72,6 +72,11 @@ import { CurrentlySelectedRegions } from './viewerStateController/regionsListVie
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
+import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+
+import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
+import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
+import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 
 @NgModule({
   imports : [
@@ -119,6 +124,9 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     RegionTextSearchAutocomplete,
     RegionsListView,
     TakeScreenshotComponent,
+    RegionMenuComponent,
+    SimpleRegionComponent,
+    RegionListSimpleViewComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -146,10 +154,12 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
 
+
     /* directive */
     DownloadDirective,
     TouchSideClass,
     ElementOutClickDirective,
+    FixedMouseContextualContainerDirective
   ],
   entryComponents : [
 
@@ -179,6 +189,8 @@ import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.comp
     ElementOutClickDirective,
     SearchSideNav,
     ViewerStateMini,
+    RegionMenuComponent,
+    FixedMouseContextualContainerDirective
   ]
 })
 

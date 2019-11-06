@@ -1,0 +1,24 @@
+<mat-card>
+  <mat-card-subtitle>
+    {{ region.name }}
+  </mat-card-subtitle>
+  <mat-card-content>
+    {{ region.description }}
+  </mat-card-content>
+  <mat-card-actions class="d-flex flex-row">
+    <button mat-button
+      (click)="toggleRegionSelected()"
+      [color]="isSelected ? 'primary': 'basic'">
+      <i class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
+      <span>
+        Selected
+      </span>
+    </button>
+    <button mat-button (click)="navigateToRegion()">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>
+        Navigate
+      </span>
+    </button>
+  </mat-card-actions>
+</mat-card>

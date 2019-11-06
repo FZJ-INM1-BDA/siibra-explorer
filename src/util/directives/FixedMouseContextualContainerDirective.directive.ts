@@ -25,13 +25,21 @@ export class FixedMouseContextualContainerDirective {
   }
 
   public show(){
-    if ((window.innerWidth - this.mousePos[0]) < 220) {
-      this.mousePos[0] = window.innerWidth-220
-    }
-    this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
-    this.styleDisplay = 'block'
-    this.isShown = true
-    this.onShow.emit()
+    setTimeout(() => {
+      if (window.innerHeight - this.mousePos[1] < this.el.nativeElement.clientHeight) {
+        this.mousePos[1] = window.innerHeight - this.el.nativeElement.clientHeight
+      }
+
+      if ((window.innerWidth - this.mousePos[0]) < this.el.nativeElement.clientWidth) {
+        this.mousePos[0] = window.innerWidth-this.el.nativeElement.clientWidth
+      }
+
+      this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
+      this.styleDisplay = 'block'
+      this.isShown = true
+      this.onShow.emit()
+
+    })
   }
 
   public hide(){
@@ -47,14 +55,4 @@ export class FixedMouseContextualContainerDirective {
   @HostBinding('style.transform')
   public transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
 
-  @HostListener('document:click', ['$event'])
-  documentClick(event: MouseEvent){
-    if (event.button !== 2) {
-      if (this.styleDisplay === 'none')
-        return
-      if (this.el.nativeElement.contains(event.target))
-        return
-      this.hide()
-    }
-  }
 }
