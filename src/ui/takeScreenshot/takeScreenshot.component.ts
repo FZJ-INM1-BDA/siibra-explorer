@@ -163,10 +163,8 @@ export class TakeScreenshotComponent implements OnInit {
         this.takingScreenshot = false
 
         if (this.boxEndWidth * window.devicePixelRatio <= 1 && this.boxEndHeight * window.devicePixelRatio <= 1) {
-            console.log(1)
             this.cancelTakingScreenshot()
         } else {
-            console.log(2)
             this.takeScreenshot()
         }
 
