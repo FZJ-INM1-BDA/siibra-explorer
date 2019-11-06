@@ -1,14 +1,14 @@
 import { Action } from "@ngrx/store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 
-export interface ViewerConfiguration{
+export interface StateInterface{
   gpuLimit: number
   animation: boolean
   useMobileUI: boolean
 }
 
 interface ViewerConfigurationAction extends Action{
-  config: Partial<ViewerConfiguration>,
+  config: Partial<StateInterface>,
   payload: any
 }
 
@@ -22,7 +22,7 @@ export const CONFIG_CONSTANTS = {
   defaultAnimation: true
 }
 
-const ACTION_TYPES = {
+export const ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
   CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`,
@@ -55,13 +55,13 @@ const getIsMobile = () => {
 }
 const useMobileUIStroageValue = window.localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI) 
 
-const onLoadViewerconfig: ViewerConfiguration = {
+const onLoadViewerconfig: StateInterface = {
   animation,
   gpuLimit,
   useMobileUI: (useMobileUIStroageValue && useMobileUIStroageValue === 'true') || getIsMobile()
 }
 
-export function viewerConfigState(prevState:ViewerConfiguration = onLoadViewerconfig, action:ViewerConfigurationAction) {
+export function stateStore(prevState:StateInterface = onLoadViewerconfig, action:ViewerConfigurationAction) {
   switch (action.type) {
     case ACTION_TYPES.SET_MOBILE_UI:
       const { payload } = action
@@ -89,5 +89,3 @@ export function viewerConfigState(prevState:ViewerConfiguration = onLoadViewerco
     default: return prevState
   }
 }
-
-export const VIEWER_CONFIG_ACTION_TYPES = ACTION_TYPES

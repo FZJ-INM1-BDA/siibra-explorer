@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, NEWVIEWER, CHANGE_NAVIGATION, ADD_NG_LAYER } from "../services/stateStore.service";
-import { PluginInitManifestInterface } from 'src/services/state/pluginState.store'
+import { StateInterface as PluginStateInterface } from 'src/services/state/pluginState.store'
 import { Observable,combineLatest } from "rxjs";
 import { filter, map, scan, distinctUntilChanged, skipWhile, take } from "rxjs/operators";
 import { PluginServices } from "./atlasViewer.pluginService.service";
@@ -11,6 +11,10 @@ import { UIService } from "src/services/uiService.service";
 
 declare var window
 
+const parseQueryString = (searchparams: URLSearchParams) => {
+
+}
+
 @Injectable({
   providedIn : 'root'
 })
@@ -18,7 +22,7 @@ declare var window
 export class AtlasViewerURLService{
   private changeQueryObservable$ : Observable<any>
   private additionalNgLayers$ : Observable<any>
-  private pluginState$ : Observable<PluginInitManifestInterface>
+  private pluginState$ : Observable<PluginStateInterface>
 
   constructor(
     private store : Store<ViewerStateInterface>,
@@ -84,8 +88,8 @@ export class AtlasViewerURLService{
     /* parse search url to state */
     this.store.pipe(
       select('viewerState'),
-      filter(state=>isDefined(state)&&isDefined(state.fetchedTemplates)),
-      map(state=>state.fetchedTemplates),
+      select('fetchedTemplates'),
+      filter(_=> !!_),
       skipWhile(fetchedTemplates => fetchedTemplates.length !== this.constantService.templateUrls.length),
       take(1),
       map(ft => ft.filter(t => t !== null))

@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { Store } from "@ngrx/store";
 
 import { RegionBase } from '../region.base'
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'region-menu',
@@ -10,7 +11,9 @@ import { RegionBase } from '../region.base'
 })
 export class RegionMenuComponent extends RegionBase {
 
-constructor(store$: Store<any>) {
+constructor(
+  store$: Store<IavRootStoreInterface>
+) {
   super(store$)
   }
 }

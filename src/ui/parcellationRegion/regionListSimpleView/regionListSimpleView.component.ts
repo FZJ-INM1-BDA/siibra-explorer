@@ -2,6 +2,7 @@ import { Component, Input } from "@angular/core";
 
 import { RegionBase } from '../region.base'
 import { Store } from "@ngrx/store";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'region-list-simple-view',
@@ -19,7 +20,9 @@ export class RegionListSimpleViewComponent extends RegionBase{
   @Input()
   showDesc: boolean = false
 
-  constructor(store$: Store<any>){
+  constructor(
+    store$: Store<IavRootStoreInterface>
+  ){
     super(store$)
   }
 }

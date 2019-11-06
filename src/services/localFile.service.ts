@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { DatabrowserService } from "src/ui/databrowserModule/databrowser.service";
 import { Store } from "@ngrx/store";
 import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 import { KgSingleDatasetService } from "src/ui/databrowserModule/kgSingleDatasetService.service";
+import { IavRootStoreInterface } from "./stateStore.service";
 
 /**
  * experimental service handling local user files such as nifti and gifti
@@ -17,7 +17,7 @@ export class LocalFileService {
   private supportedExtSet = new Set(SUPPORTED_EXT)
 
   constructor(
-    private store: Store<any>,
+    private store: Store<IavRootStoreInterface>,
     private singleDsService: KgSingleDatasetService
   ){
 

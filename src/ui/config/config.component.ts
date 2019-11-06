@@ -1,12 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { Store, select } from '@ngrx/store';
-import { ViewerConfiguration, VIEWER_CONFIG_ACTION_TYPES } from 'src/services/state/viewerConfig.store'
+import { StateInterface as ViewerConfiguration, ACTION_TYPES as VIEWER_CONFIG_ACTION_TYPES } from 'src/services/state/viewerConfig.store'
 import { Observable, Subscription, combineLatest } from 'rxjs';
 import { map, distinctUntilChanged, startWith, debounceTime, tap } from 'rxjs/operators';
 import { MatSlideToggleChange, MatSliderChange } from '@angular/material';
 import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
 import { isIdentityQuat } from '../nehubaContainer/util';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
+import { IavRootStoreInterface } from 'src/services/stateStore.service';
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -50,7 +51,7 @@ export class ConfigComponent implements OnInit, OnDestroy{
   private viewerObliqueRotated$: Observable<boolean>
 
   constructor(
-    private store: Store<ViewerConfiguration>,
+    private store: Store<IavRootStoreInterface>,
     private constantService: AtlasViewerConstantsServices  
   ) {
 

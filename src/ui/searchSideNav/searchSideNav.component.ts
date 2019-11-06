@@ -7,7 +7,7 @@ import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { SELECT_REGIONS } from "src/services/stateStore.service";
+import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'search-side-nav',
@@ -33,7 +33,7 @@ export class SearchSideNav implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private snackBar: MatSnackBar,
     private constantService: AtlasViewerConstantsServices
   ){

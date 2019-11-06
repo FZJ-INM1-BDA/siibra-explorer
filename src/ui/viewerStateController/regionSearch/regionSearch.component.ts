@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest } from "rxjs";
-import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, tap } from "rxjs/operators";
-import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
+import { map, distinctUntilChanged, startWith, debounceTime, shareReplay, take, tap } from "rxjs/operators";
+import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, IavRootStoreInterface } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
-import { MatAutocompleteSelectedEvent, MatDialog, AUTOCOMPLETE_OPTION_HEIGHT, AUTOCOMPLETE_PANEL_HEIGHT } from "@angular/material";
+import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -37,7 +37,7 @@ export class RegionTextSearchAutocomplete{
   public selectedRegionLabelIndexSet: Set<string> = new Set()
 
   constructor(
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
     private constantService: AtlasViewerConstantsServices
   ){

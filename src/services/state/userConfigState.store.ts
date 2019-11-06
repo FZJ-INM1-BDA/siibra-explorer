@@ -2,14 +2,14 @@ import { Action, Store, select } from "@ngrx/store";
 import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Observable, combineLatest, Subscription, from, of } from "rxjs";
-import { shareReplay, withLatestFrom, map, distinctUntilChanged, filter, take, tap, switchMap, catchError, share } from "rxjs/operators";
-import { generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from "../stateStore.service";
+import { shareReplay, withLatestFrom, map, distinctUntilChanged, filter, take, switchMap, catchError, share } from "rxjs/operators";
+import { generateLabelIndexId, recursiveFindRegionWithLabelIndexId, IavRootStoreInterface } from "../stateStore.service";
 import { SELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION } from "./viewerState.store";
 import { DialogService } from "../dialogService.service";
-import { VIEWER_CONFIG_ACTION_TYPES } from "./viewerConfig.store";
+import { ACTION_TYPES as VIEWER_CONFIG_ACTION_TYPES } from "./viewerConfig.store";
 import { LOCAL_STORAGE_CONST } from "src/util//constants";
 
-interface UserConfigState{
+export interface StateInterface{
   savedRegionsSelection: RegionSelection[]
 }
 
@@ -33,15 +33,15 @@ interface SimpleRegionSelection{
 }
 
 interface UserConfigAction extends Action{
-  config?: Partial<UserConfigState>
+  config?: Partial<StateInterface>
   payload?: any
 }
 
-const defaultUserConfigState: UserConfigState = {
+const defaultUserConfigState: StateInterface = {
   savedRegionsSelection: []
 }
 
-const ACTION_TYPES = {
+export const ACTION_TYPES = {
   UPDATE_REGIONS_SELECTIONS: `UPDATE_REGIONS_SELECTIONS`,
   UPDATE_REGIONS_SELECTION:'UPDATE_REGIONS_SELECTION',
   SAVE_REGIONS_SELECTION: `SAVE_REGIONS_SELECTIONN`,
@@ -50,9 +50,8 @@ const ACTION_TYPES = {
   LOAD_REGIONS_SELECTION: 'LOAD_REGIONS_SELECTION'
 }
 
-export const USER_CONFIG_ACTION_TYPES = ACTION_TYPES
 
-export function userConfigState(prevState: UserConfigState = defaultUserConfigState, action: UserConfigAction) {
+export function stateStore(prevState: StateInterface = defaultUserConfigState, action: UserConfigAction) {
   switch(action.type) {
     case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS:
       const { config = {} } = action
@@ -77,7 +76,7 @@ export class UserConfigStateUseEffect implements OnDestroy{
 
   constructor(
     private actions$: Actions,
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private dialogService: DialogService
   ){
     const viewerState$ = this.store$.pipe(

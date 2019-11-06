@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 
 import { RegionBase } from '../region.base'
 import { Store } from '@ngrx/store'
+import { IavRootStoreInterface } from 'src/services/stateStore.service'
 
 @Component({
   selector: 'simple-region',
@@ -12,7 +13,9 @@ import { Store } from '@ngrx/store'
 })
 
 export class SimpleRegionComponent extends RegionBase{
-  constructor(store$: Store<any>){
+  constructor(
+    store$: Store<IavRootStoreInterface>,
+  ){
     super(store$)
   }
 }

@@ -4,7 +4,7 @@ import { filter, distinctUntilChanged, map, shareReplay, scan, startWith, withLa
 import { merge, Observable, combineLatest } from "rxjs";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { SafeHtml, DomSanitizer } from "@angular/platform-browser";
-import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
+import { getNgIdLabelIndexFromId, IavRootStoreInterface } from "src/services/stateStore.service";
 
 
 /**
@@ -38,7 +38,7 @@ export class MouseHoverDirective{
   public onHoverObs$: Observable<{segments:any, landmark:any, userLandmark: any}>
   public currentOnHoverObs$: Observable<{segments:any, landmark:any, userLandmark: any}>
 
-  constructor(private store$: Store<any>){
+  constructor(private store$: Store<IavRootStoreInterface>){
 
     const onHoverUserLandmark$ = this.store$.pipe(
       select('uiState'),

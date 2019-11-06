@@ -2,17 +2,17 @@ import { Action, Store, select } from '@ngrx/store'
 import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, combineLatest, fromEvent, Subscription } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, tap, delay, switchMapTo, take } from 'rxjs/operators';
+import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { SNACKBAR_MESSAGE } from './uiState.store';
-import { getNgIds } from '../stateStore.service';
+import { getNgIds, IavRootStoreInterface } from '../stateStore.service';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
 export const H_ONE_THREE = 'H_ONE_THREE'
 export const SINGLE_PANEL = 'SINGLE_PANEL'
 
-export interface NgViewerStateInterface{
+export interface StateInterface{
   layers : NgLayerInterface[]
   forceShowSegment : boolean | null
   nehubaReady: boolean
@@ -23,7 +23,7 @@ export interface NgViewerStateInterface{
   showZoomlevel: boolean
 }
 
-export interface NgViewerAction extends Action{
+export interface ActionInterface extends Action{
   layer : NgLayerInterface
   layers : NgLayerInterface[]
   forceShowSegment : boolean
@@ -31,7 +31,7 @@ export interface NgViewerAction extends Action{
   payload: any
 }
 
-const defaultState:NgViewerStateInterface = {
+const defaultState:StateInterface = {
   layers:[],
   forceShowSegment:null,
   nehubaReady: false,
@@ -42,7 +42,7 @@ const defaultState:NgViewerStateInterface = {
   showZoomlevel: null
 }
 
-export function ngViewerState(prevState:NgViewerStateInterface = defaultState, action:NgViewerAction):NgViewerStateInterface{
+export function stateStore(prevState:StateInterface = defaultState, action:ActionInterface):StateInterface{
   switch(action.type){
     case ACTION_TYPES.SET_PANEL_ORDER: {
       const { payload } = action
@@ -159,7 +159,7 @@ export class NgViewerUseEffect implements OnDestroy{
 
   constructor(
     private actions: Actions,
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private constantService: AtlasViewerConstantsServices
   ){
     const toggleMaxmimise$ = this.actions.pipe(
@@ -201,7 +201,7 @@ export class NgViewerUseEffect implements OnDestroy{
       ),
       filter(([_action, [_panelOrder, panelMode]]) => panelMode !== SINGLE_PANEL),
       map(([ action, [ oldPanelOrder ] ]) => {
-        const { payload } = action as NgViewerAction
+        const { payload } = action as ActionInterface
         const { index = 0 } = payload
 
         const panelOrder = [...oldPanelOrder.slice(index), ...oldPanelOrder.slice(0, index)].join('')
@@ -240,7 +240,7 @@ export class NgViewerUseEffect implements OnDestroy{
           panelOrders: panelOrdersPrev = null,
         } = arr[1] || {}
 
-        const { payload } = action as NgViewerAction
+        const { payload } = action as ActionInterface
         const { index = 0 } = payload
 
         const panelOrder = !!panelOrdersPrev

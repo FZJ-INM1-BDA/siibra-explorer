@@ -7,7 +7,7 @@ import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, 
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
-import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
+import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL, NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
@@ -91,7 +91,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
 
   public viewerLoaded : boolean = false
 
-  private viewerPerformanceConfig$: Observable<ViewerConfiguration>
+  private viewerPerformanceConfig$: Observable<ViewerConfigStateInterface>
 
   private sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public sliceViewLoading0$: Observable<boolean>
@@ -142,7 +142,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
   private nehubaViewerSubscriptions : Subscription[] = []
 
   public nanometersToOffsetPixelsFn : Function[] = []
-  private viewerConfig : Partial<ViewerConfiguration> = {}
+  private viewerConfig : Partial<ViewerConfigStateInterface> = {}
 
   private viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   public panelMode$: Observable<string>
@@ -1020,14 +1020,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
         })
       })
     )
-
-    this.nehubaViewerSubscriptions.push(
-      this.nehubaViewer.debouncedViewerPositionChange.pipe(
-        distinctUntilChanged((a,b) => 
-          [0,1,2].every(idx => a.position[idx] === b.position[idx]) && a.zoom === b.zoom)
-      ).subscribe(this.handleNavigationPositionAndNavigationZoomChange.bind(this))
-    )
-
+    
     const accumulatorFn: (
       acc:Map<string, { segment: string | null, segmentId: number | null }>,
       arg: {layer: {name: string}, segmentId: number|null, segment: string | null}
@@ -1203,23 +1196,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
       mouseOverNehubaLayers: this.onHoverSegments$,
       getNgHash : this.nehubaViewer.getNgHash
     }
-  }
-
-  // TODO deprecate
-  handleNavigationPositionAndNavigationZoomChange(navigation){
-    if(!navigation.position){
-      return
-    }
-
-    const center = navigation.position.map(n=>n/1e6)
-    const searchWidth = this.constantService.spatialWidth / 4 * navigation.zoom / 1e6
-    const { selectedTemplate } = this
-    // this.atlasViewerDataService.spatialSearch({
-    //   center,
-    //   searchWidth,
-    //   selectedTemplate,
-    //   pageNo : 0
-    // })
   }
 
   /* because the navigation can be changed from two sources, 

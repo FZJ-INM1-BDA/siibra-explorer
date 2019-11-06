@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface } from "../services/stateStore.service";
-import { Subject, Observable, Subscription } from "rxjs";
-import { map, shareReplay, filter, tap } from "rxjs/operators";
+import { IavRootStoreInterface } from "../services/stateStore.service";
+import { Observable, Subscription } from "rxjs";
+import { map, shareReplay, filter } from "rxjs/operators";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 
 export const CM_THRESHOLD = `0.05`
@@ -232,7 +232,7 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(
-    private store$ : Store<ViewerStateInterface>
+    private store$: Store<IavRootStoreInterface>
   ){
 
     this.darktheme$ = this.store$.pipe(

@@ -7,6 +7,7 @@ import { withLatestFrom, map, catchError, filter, switchMap, scan } from "rxjs/o
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { getIdFromDataEntry } from "./databrowser.service";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
   map(string => JSON.parse(string)),
@@ -32,7 +33,7 @@ export class DataBrowserUseEffect implements OnDestroy{
   private subscriptions: Subscription[] = []
 
   constructor(
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private actions$: Actions<any>,
     private kgSingleDatasetService: KgSingleDatasetService
     

@@ -1,33 +1,62 @@
 import { filter } from 'rxjs/operators';
 
-export { viewerConfigState } from './state/viewerConfig.store'
-export { pluginState } from './state/pluginState.store'
-export { NgViewerAction, NgViewerStateInterface, ngViewerState, ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
-export { CHANGE_NAVIGATION, AtlasAction, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS, ViewerStateInterface, viewerState } from './state/viewerState.store'
-export { DataEntry, ParcellationRegion, DataStateInterface, DatasetAction, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, dataStore, File, FileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL, UIAction, UIStateInterface, uiState } from './state/uiState.store'
-export { SPATIAL_GOTO_PAGE, SpatialDataEntries, SpatialDataStateInterface, UPDATE_SPATIAL_DATA, spatialSearchState } from './state/spatialSearchState.store'
-export { userConfigState, UserConfigStateUseEffect, USER_CONFIG_ACTION_TYPES } from './state/userConfigState.store'
+import { 
+  StateInterface as PluginStateInterface,
+  stateStore as pluginState
+} from './state/pluginState.store'
+import { 
+  StateInterface as ViewerConfigStateInterface,
+  stateStore as viewerConfigState
+} from './state/viewerConfig.store'
+import { 
+  StateInterface as NgViewerStateInterface,
+  ActionInterface as NgViewerActionInterface,
+  stateStore as ngViewerState
+} from './state/ngViewerState.store'
+import {
+  StateInterface as ViewerStateInterface,
+  ActionInterface as ViewerActionInterface,
+  stateStore as viewerState
+} from './state/viewerState.store'
+import {
+  StateInterface as DataStateInterface,
+  ActionInterface as DatasetAction,
+  stateStore as dataStore
+} from './state/dataStore.store'
+import {
+  StateInterface as UIStateInterface,
+  ActionInterface as UIActionInterface,
+  stateStore as uiState
+} from './state/uiState.store'
+import{
+  stateStore as userConfigState,
+  ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
+  StateInterface as UserConfigStateInterface
+} from './state/userConfigState.store'
+
+export { pluginState }
+export { viewerConfigState }
+export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
+export { ViewerStateInterface, ViewerActionInterface, viewerState }
+export { DataStateInterface, DatasetAction, dataStore }
+export { UIStateInterface, UIActionInterface, uiState }
+export { userConfigState,  USER_CONFIG_ACTION_TYPES}
+
+export { ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
+export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
+export { DataEntry, ParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, File, FileSupplementData } from './state/dataStore.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL } from './state/uiState.store'
+export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export const GENERAL_ACTION_TYPES = {
   ERROR: 'ERROR'
 }
 
+// TODO deprecate
 export function safeFilter(key:string){
   return filter((state:any)=>
     (typeof state !== 'undefined' && state !== null) &&
     typeof state[key] !== 'undefined' && state[key] !== null) 
-}
-
-export function extractLabelIdx(region:any):number[]{
-  if(!region.children || region.children.constructor !== Array){
-    return isNaN(region.labelIndex) || region.labelIndex === null
-      ? []
-      : [Number(region.labelIndex)]
-  }
-  return region.children.reduce((acc,item)=>{
-    return acc.concat(extractLabelIdx(item))
-  },[]).concat( region.labelIndex ? Number(region.labelIndex) : [] )
 }
 
 const inheritNgId = (region:any) => {
@@ -86,6 +115,7 @@ export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}):Map<st
 
 /**
  * labelIndexMap maps label index to region
+ * @TODO deprecate
  */
 export function getLabelIndexMap(regions:any[]):Map<number,any>{
   const returnMap = new Map()
@@ -120,6 +150,8 @@ export interface DedicatedViewState{
   dedicatedView : string | null
 }
 
+
+// @TODO deprecate
 export function isDefined(obj){
   return typeof obj !== 'undefined' && obj !== null
 }
@@ -157,4 +189,14 @@ export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inh
   const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
   if (found) return found
   return null
+}
+
+export interface IavRootStoreInterface{
+  pluginState: PluginStateInterface
+  viewerConfigState: ViewerConfigStateInterface
+  ngViewerState: NgViewerStateInterface
+  viewerState: ViewerStateInterface
+  dataStore: DataStateInterface
+  uiState: UIStateInterface
+  userConfigState: UserConfigStateInterface
 }

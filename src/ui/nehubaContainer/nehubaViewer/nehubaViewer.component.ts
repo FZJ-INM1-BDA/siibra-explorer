@@ -4,7 +4,7 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { map, filter, debounceTime, scan } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { takeOnePipe } from "../nehubaContainer.component";
-import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
+import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 

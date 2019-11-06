@@ -6,7 +6,7 @@ import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
 import { MatDialog, MatSnackBar } from "@angular/material";
 import { FileViewer } from "./fileviewer/fileviewer.component";
-import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
+import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION, IavRootStoreInterface } from "src/services/stateStore.service";
 import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
@@ -23,7 +23,7 @@ export class KgSingleDatasetService implements OnDestroy{
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
     private http: HttpClient,
     private snackBar: MatSnackBar

@@ -4,6 +4,7 @@ import { MatBottomSheet } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 
 import { ViewerStateBase } from '../viewerState.base'
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'viewer-state-mini',
@@ -16,7 +17,7 @@ import { ViewerStateBase } from '../viewerState.base'
 export class ViewerStateMini extends ViewerStateBase{
 
   constructor(
-    store$: Store<any>,
+    store$: Store<IavRootStoreInterface>,
     dialogService: DialogService,
     bottomSheet: MatBottomSheet
   ){

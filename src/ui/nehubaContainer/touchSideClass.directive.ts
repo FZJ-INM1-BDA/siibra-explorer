@@ -3,6 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, tap } from "rxjs/operators";
 import { removeTouchSideClasses, addTouchSideClasses } from "./util";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Directive({
   selector: '[touch-side-class]',
@@ -19,7 +20,7 @@ export class TouchSideClass implements OnDestroy, OnInit{
   private subscriptions: Subscription[] = []
 
   constructor(
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private el: ElementRef
   ){
 
