@@ -6,8 +6,7 @@ import {
   OnInit,
   TemplateRef,
   AfterViewInit,
-  Renderer2,
-  ElementRef
+  Renderer2
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
@@ -15,10 +14,9 @@ import {
   isDefined,
   FETCHED_SPATIAL_DATA,
   UPDATE_SPATIAL_DATA,
-  safeFilter,
-  CHANGE_NAVIGATION, generateLabelIndexId
+  safeFilter
 } from "../services/stateStore.service";
-import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
+import {Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
 import {
   map,
   filter,
@@ -26,8 +24,6 @@ import {
   delay,
   concatMap,
   withLatestFrom,
-  switchMapTo,
-  takeUntil, take, tap, mapTo
 } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -43,15 +39,14 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
-import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
-import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
-import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
+
 
 /**
  * TODO
  * check against auxlillary mesh indicies, to only filter out aux indicies
  */
 const filterFn = (segment) => typeof segment.segment !== 'string'
+const compareFn = (it, item) => it.name === item.name
 
 @Component({
   selector: 'atlas-viewer',
@@ -65,6 +60,8 @@ const filterFn = (segment) => typeof segment.segment !== 'string'
 })
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
+
+  public compareFn = compareFn
   
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>

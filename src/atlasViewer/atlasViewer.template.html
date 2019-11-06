@@ -42,8 +42,8 @@
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
-      (mouseDownEmitter)="mouseDownNehuba($event)"
-      (mapClicked)="mouseUpNehuba($event)">
+      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
+      (iav-captureClickListenerDirective-onClick)="mouseUpNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -129,23 +129,19 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
-      <panel-component class="shadow p-0 m-0" fixedMouseContextualContainerDirective>
-        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
-          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
-            <div *ngFor="let onHoverRegion of onHoverSegments; let first = first"
-                 class="border-dark rounded">
-              <mat-divider *ngIf="!first"></mat-divider>
+      <div fixedMouseContextualContainerDirective>
+        <ng-container *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
+          <ng-container *ngFor="let onHoverRegion of onHoverSegments; let first = first">
 
-              <region-menu #regionToolsMenu
-                                 [selectedRegions$]="selectedRegions$"
-                                 [region]="onHoverRegion">
-              </region-menu>
+            <region-menu
+              class="pe-all"
+              [region]="onHoverRegion"
+              [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn">
+            </region-menu>
 
-            </div>
-          </mat-card>
-        </div>
-
-      </panel-component>
+          </ng-container>
+        </ng-container>
+      </div>
 
     </layout-floating-container>
 

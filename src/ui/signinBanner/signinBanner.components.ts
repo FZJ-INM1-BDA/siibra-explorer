@@ -26,6 +26,9 @@ export class SigninBanner{
   public userBtnTooltip$: Observable<string>
   public favDataEntries$: Observable<DataEntry[]>
 
+  public pluginTooltipText: string = `Plugins and Tools`
+  public screenshotTooltipText: string = 'Take screenshot'
+
   constructor(
     private store$: Store<any>,
     private authService: AuthService,

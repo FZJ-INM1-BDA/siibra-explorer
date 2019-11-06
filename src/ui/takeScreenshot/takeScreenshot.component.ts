@@ -60,6 +60,12 @@ export class TakeScreenshotComponent implements OnInit {
         }
     }
 
+    startScreenshot(){
+        this.takingScreenshot = true
+        this.previewingScreenshot = false
+        this.croppedCanvas = null
+        this.loadingScreenshot = null
+    }
 
     move = (e) => {
         if (this.mouseIsDown) {

@@ -83,65 +83,85 @@
       </div>
 
       <!-- show when regions are selected -->
-      <div *ngIf="regionsSelected.length > 0" class="h-100">
+      <div *ngIf="regionsSelected.length > 0" class="h-100 d-flex flex-column">
 
-        <!-- single region -->
-        <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
-          
-          <small class="text-muted">
-            Region selected
-          </small>
+        <!-- header -->
+        <div class="flex-grow-0 flex-shrink-0">
+          <ng-container *ngTemplateOutlet="header">
+          </ng-container>
+        </div>
 
-          <!-- selected brain region -->
-          <div class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-            <i class="fas fa-brain mr-2"></i>
-
-            <small>
-              {{ regionsSelected[0].name }}
-            </small>
-
-            <button (click)="removeRegion(regionsSelected[0])" mat-icon-button>
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        </ng-template>
-
-        <!-- multi region -->
-        <ng-template #multiRegionTemplate>
-          <div class="h-100 d-flex flex-column">
-            <small class="d-block text-muted flex-shrink-0 flex-grow-0">
-              {{ regionsSelected.length }} regions selected
-            </small>
-            <cdk-virtual-scroll-viewport
-              class="flex-grow-1 flex-shrink-1"
-              itemSize="55"
-              maxBufferPx="600"
-              minBufferPx="300">
-              <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let index = index"
-                class="region-wrapper d-flex flex-column" >
-                <!-- divider if index !== 0 -->
-                <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="index !== 0"></mat-divider>
-  
-                <!-- selected brain region -->
-                <div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-                  <i class="flex-grow-0 flex-shrink-0 fas fa-brain mr-2"></i>
-      
-                  <small class="flex-grow-1 flex-shrink-1 ">
-                    {{ region.name }}
-                  </small>
-      
-                  <button mat-icon-button
-                    class="flex-grow-0 flex-shrink-0"
-                    (click)="removeRegion(region)" >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </cdk-virtual-scroll-viewport>
-          </div>
-        </ng-template>
-
+        <!-- body (region descriptor or multi region list) -->
+        <div  class="flex-grow-1 flex-shrink-1">
+          <ng-container *ngTemplateOutlet="body">
+          </ng-container>
+        </div>
       </div>
     </div>
+
+    <ng-template #header>
+      <div class="d-flex flex-row align-items-center">
+        <small *ngIf="regionsSelected.length === 1" class="text-muted position-relative">
+          Region selected
+        </small>
+      
+        <small *ngIf="regionsSelected.length > 1" class="text-muted position-relative">
+          {{ regionsSelected.length }} regions selected
+        </small>
+        
+        <div class="position-relative d-flex align-items-center">
+          <button mat-icon-button
+            class="position-absolute"
+            (click)="deselectAllRegions()"
+            matTooltip="Clear all regions"
+            color="primary">
+            <i class="fas fa-times-circle"></i>
+          </button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template #body>
+      <!-- single region -->
+      <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
+      
+        <!-- selected brain region -->
+        <region-list-simple-view
+          class="position-relative"
+          [showBrainIcon]="true"
+          [region]="regionsSelected[0]"
+          [isSelected]="true"
+          [showDesc]="true">
+
+        </region-list-simple-view>
+      </ng-template>
+
+      <!-- multi region -->
+      <ng-template #multiRegionTemplate>
+        <div class="h-100 d-flex flex-column">
+
+          <cdk-virtual-scroll-viewport
+            class="flex-grow-1 flex-shrink-1"
+            itemSize="55"
+            maxBufferPx="600"
+            minBufferPx="300">
+            <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let first = first"
+              class="region-wrapper d-flex flex-column" >
+              <!-- divider if not first -->
+              <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="!first"></mat-divider>
+
+              <!-- selected brain region -->
+              <region-list-simple-view
+                class="d-block w-100 h-100"
+                [showBrainIcon]="true"
+                [region]="region"
+                [isSelected]="true">
+
+              </region-list-simple-view>
+            </div>
+          </cdk-virtual-scroll-viewport>
+        </div>
+      </ng-template>
+    </ng-template>
   </ng-container>
 </ng-template>

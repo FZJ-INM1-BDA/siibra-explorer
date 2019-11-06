@@ -5,9 +5,9 @@ import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { Observable, Subscription } from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { SELECT_REGIONS } from "src/services/stateStore.service";
 
 @Component({
   selector: 'search-side-nav',
@@ -93,10 +93,10 @@ export class SearchSideNav implements OnInit, OnDestroy {
     })
   }
 
-  removeRegion(region: any){
+  public deselectAllRegions(){
     this.store$.dispatch({
-      type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY,
-      payload: { region }
+      type: SELECT_REGIONS,
+      selectRegions: []
     })
   }
 
