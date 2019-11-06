@@ -6,9 +6,9 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, shareReplay, startWith, filter, distinctUntilChanged } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
-import { generateLabelIndexId } from '../stateStore.service';
+import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 
-export interface ViewerStateInterface{
+export interface StateInterface{
   fetchedTemplates : any[]
 
   templateSelected : any | null
@@ -24,7 +24,7 @@ export interface ViewerStateInterface{
   loadedNgLayers: NgLayerInterface[]
 }
 
-export interface AtlasAction extends Action{
+export interface ActionInterface extends Action{
   fetchedTemplate? : any[]
 
   selectTemplate? : any
@@ -44,15 +44,15 @@ export interface AtlasAction extends Action{
   payload: any
 }
 
-export function viewerState(
-  state:Partial<ViewerStateInterface> = {
+export function stateStore(
+  state:Partial<StateInterface> = {
     landmarksSelected : [],
     fetchedTemplates : [],
     loadedNgLayers: [],
     regionsSelected: [],
     userLandmarks: []
   },
-  action:AtlasAction
+  action:ActionInterface
 ){
   switch(action.type){
     /**
@@ -202,7 +202,7 @@ export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export class ViewerStateUseEffect{
   constructor(
     private actions$: Actions,
-    private store$: Store<any>
+    private store$: Store<IavRootStoreInterface>
   ){
     this.currentLandmarks$ = this.store$.pipe(
       select('viewerState'),
@@ -214,7 +214,7 @@ export class ViewerStateUseEffect{
       ofType(ACTION_TYPES.REMOVE_USER_LANDMARKS),
       withLatestFrom(this.currentLandmarks$),
       map(([action, currentLandmarks]) => {
-        const { landmarkIds } = (action as AtlasAction).payload
+        const { landmarkIds } = (action as ActionInterface).payload
         for ( const rmId of landmarkIds ){
           const idx = currentLandmarks.findIndex(({ id }) => id === rmId)
           if (idx < 0) console.warn(`remove userlandmark with id ${rmId} does not exist`)
@@ -231,7 +231,7 @@ export class ViewerStateUseEffect{
       ofType(ACTION_TYPES.ADD_USERLANDMARKS),
       withLatestFrom(this.currentLandmarks$),
       map(([action, currentLandmarks]) => {
-        const { landmarks } = action as AtlasAction
+        const { landmarks } = action as ActionInterface
         const landmarkMap = new Map()
         for (const landmark of currentLandmarks) {
           const { id } = landmark

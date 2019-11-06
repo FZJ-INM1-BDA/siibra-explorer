@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, safeFilter, getLabelIndexMap, isDefined, getMultiNgIdsRegionsLabelIndexMap } from "src/services/stateStore.service";
+import { safeFilter, getLabelIndexMap, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
-import { map, distinctUntilChanged, filter } from "rxjs/operators";
+import { map, distinctUntilChanged } from "rxjs/operators";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { PluginManifest } from "./atlasViewer.pluginService.service";
@@ -23,7 +23,7 @@ export class AtlasViewerAPIServices{
   public loadedLibraries : Map<string,{counter:number,src:HTMLElement|null}> = new Map()
 
   constructor(
-    private store : Store<ViewerStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
   ){
 

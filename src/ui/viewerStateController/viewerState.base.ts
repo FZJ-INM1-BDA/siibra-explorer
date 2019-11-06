@@ -2,7 +2,7 @@ import { ViewChild, TemplateRef, OnInit } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, shareReplay, filter } from "rxjs/operators";
-import { SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
+import { SELECT_REGIONS, USER_CONFIG_ACTION_TYPES, IavRootStoreInterface } from "src/services/stateStore.service";
 import { MatSelectChange, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
@@ -36,7 +36,7 @@ export class ViewerStateBase implements OnInit{
   private savedRegionBottomSheetRef: MatBottomSheetRef
 
   constructor(
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
     private bottomSheet: MatBottomSheet
   ){

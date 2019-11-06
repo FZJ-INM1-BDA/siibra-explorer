@@ -10,11 +10,10 @@ import {
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
-  ViewerStateInterface,
   isDefined,
   FETCHED_SPATIAL_DATA,
-  UPDATE_SPATIAL_DATA,
-  safeFilter
+  safeFilter,
+  IavRootStoreInterface
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
 import {
@@ -120,7 +119,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   regionToolsMenuVisible = false
 
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -357,10 +356,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.store.dispatch({
           type : FETCHED_SPATIAL_DATA,
           fetchedDataEntries : []
-        })
-        this.store.dispatch({
-          type : UPDATE_SPATIAL_DATA,
-          totalResults : 0
         })
 
         this.widgetServices.clearAllWidgets()

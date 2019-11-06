@@ -5,7 +5,7 @@ import { UIModule } from "./ui/ui.module";
 import { LayoutModule } from "./layouts/layout.module";
 import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
 import { StoreModule } from "@ngrx/store";
-import { viewerState, dataStore,spatialSearchState,uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
+import { viewerState, dataStore, uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
@@ -83,7 +83,6 @@ import {CaptureClickListenerDirective} from "src/util/directives/captureClickLis
       ngViewerState,
       viewerState,
       dataStore,
-      spatialSearchState,
       uiState,
       userConfigState
     }),

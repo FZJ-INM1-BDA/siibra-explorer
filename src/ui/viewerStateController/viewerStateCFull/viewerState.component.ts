@@ -4,6 +4,7 @@ import { MatBottomSheet } from "@angular/material";
 import { DialogService } from "src/services/dialogService.service";
 
 import { ViewerStateBase } from '../viewerState.base'
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 const compareWith = (o, n) => !o || !n
   ? false
@@ -20,7 +21,7 @@ const compareWith = (o, n) => !o || !n
 export class ViewerStateController extends ViewerStateBase{
 
   constructor(
-    store$: Store<any>,
+    store$: Store<IavRootStoreInterface>,
     dialogService: DialogService,
     bottomSheet: MatBottomSheet
   ){

@@ -1,11 +1,11 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Effect, Actions, ofType } from "@ngrx/effects";
-import { Subscription, merge, fromEvent, combineLatest, Observable } from "rxjs";
-import { withLatestFrom, map, filter, shareReplay, tap, switchMap, take } from "rxjs/operators";
+import { Subscription, merge, fromEvent, Observable } from "rxjs";
+import { withLatestFrom, map, filter, shareReplay, switchMap, take } from "rxjs/operators";
 import { Store, select } from "@ngrx/store";
 import { SELECT_PARCELLATION, SELECT_REGIONS, NEWVIEWER, UPDATE_PARCELLATION, SELECT_REGIONS_WITH_ID, DESELECT_REGIONS, ADD_TO_REGIONS_SELECTION_WITH_IDS } from "../state/viewerState.store";
 import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
-import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { getNgIdLabelIndexFromId, generateLabelIndexId, recursiveFindRegionWithLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class UseEffects implements OnDestroy{
 
   constructor(
     private actions$: Actions,
-    private store$: Store<any>
+    private store$: Store<IavRootStoreInterface>
   ){
     this.subscriptions.push(
       this.newParcellationSelected$.subscribe(parcellation => {

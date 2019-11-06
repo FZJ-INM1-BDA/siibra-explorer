@@ -3,7 +3,7 @@ import { TemplateRef } from '@angular/core';
 
 import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
 
-const defaultState : UIStateInterface = {
+const defaultState: StateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
   
@@ -24,7 +24,7 @@ const defaultState : UIStateInterface = {
   agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
 }
 
-export function uiState(state:UIStateInterface = defaultState,action:UIAction){
+export function stateStore(state:StateInterface = defaultState,action:ActionInterface){
   switch(action.type){
     case MOUSE_OVER_SEGMENTS:
       const { segments } = action
@@ -106,7 +106,7 @@ export function uiState(state:UIStateInterface = defaultState,action:UIAction){
   }
 }
 
-export interface UIStateInterface{
+export interface StateInterface{
   mouseOverSegments: {
     layer: {
       name: string
@@ -129,7 +129,7 @@ export interface UIStateInterface{
   bottomSheetTemplate: TemplateRef<any>
 }
 
-export interface UIAction extends Action{
+export interface ActionInterface extends Action{
   segment: any | number
   landmark: any
   focusedSidePanel?: string

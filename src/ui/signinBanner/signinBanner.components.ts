@@ -3,7 +3,7 @@ import { AuthService, User } from "src/services/auth.service";
 import { MatDialog, MatDialogRef, MatBottomSheet } from "@angular/material";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { DataEntry } from "src/services/stateStore.service";
+import { DataEntry, IavRootStoreInterface } from "src/services/stateStore.service";
 import { Store, select } from "@ngrx/store";
 
 
@@ -30,7 +30,7 @@ export class SigninBanner{
   public screenshotTooltipText: string = 'Take screenshot'
 
   constructor(
-    private store$: Store<any>,
+    private store$: Store<IavRootStoreInterface>,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet

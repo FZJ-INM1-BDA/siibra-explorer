@@ -1,7 +1,7 @@
 import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
-import { PluginInitManifestInterface, PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
+import { ACTION_TYPES as PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { HttpClient } from '@angular/common/http'
-import { isDefined } from 'src/services/stateStore.service'
+import { isDefined, IavRootStoreInterface } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -36,7 +36,7 @@ export class PluginServices{
     private constantService : AtlasViewerConstantsServices,
     private widgetService : WidgetServices,
     private cfr : ComponentFactoryResolver,
-    private store : Store<PluginInitManifestInterface>,
+    private store: Store<IavRootStoreInterface>,
     private http: HttpClient
   ){
 

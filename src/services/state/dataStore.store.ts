@@ -4,7 +4,7 @@ import { Action } from '@ngrx/store'
  * TODO merge with databrowser.usereffect.ts
  */
 
-interface DataEntryState{
+export interface StateInterface{
   fetchedDataEntries: DataEntry[]
   favDataEntries: DataEntry[]
   fetchedSpatialData: DataEntry[]
@@ -16,7 +16,7 @@ const defaultState = {
   fetchedSpatialData: []
 }
 
-export function dataStore(state:DataEntryState = defaultState, action:Partial<DatasetAction>){
+export function stateStore(state:StateInterface = defaultState, action:Partial<ActionInterface>){
   switch (action.type){
     case FETCHED_DATAENTRIES: {
       return {
@@ -41,7 +41,7 @@ export function dataStore(state:DataEntryState = defaultState, action:Partial<Da
   }
 }
 
-export interface DatasetAction extends Action{
+export interface ActionInterface extends Action{
   favDataEntries: DataEntry[]
   fetchedDataEntries : DataEntry[]
   fetchedSpatialData : DataEntry[]

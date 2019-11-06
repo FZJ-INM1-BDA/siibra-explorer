@@ -1,9 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, from, of } from "rxjs";
-import { ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { select, Store } from "@ngrx/store";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA } from "src/services/stateStore.service";
+import { DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface } from "src/services/stateStore.service";
 import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay, withLatestFrom } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
@@ -80,7 +79,7 @@ export class DatabrowserService implements OnDestroy{
   constructor(
     private workerService: AtlasWorkerService,
     private constantService: AtlasViewerConstantsServices,
-    private store: Store<ViewerConfiguration>,
+    private store: Store<IavRootStoreInterface>,
     private http: HttpClient
   ){
 
@@ -171,10 +170,6 @@ export class DatabrowserService implements OnDestroy{
         this.store.dispatch({
           type: FETCHED_SPATIAL_DATA,
           fetchedDataEntries: arr
-        })
-        this.store.dispatch({
-          type : UPDATE_SPATIAL_DATA,
-          totalResults : arr.length
         })
       })
     )

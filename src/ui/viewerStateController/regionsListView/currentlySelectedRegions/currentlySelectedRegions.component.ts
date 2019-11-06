@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { DESELECT_REGIONS } from "src/services/state/viewerState.store";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "src/ui/viewerStateController/viewerState.base";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector: 'currently-selected-regions',
@@ -19,7 +20,7 @@ export class CurrentlySelectedRegions {
   public regionSelected$: Observable<any[]>
   
   constructor(
-    private store$: Store<any>
+    private store$: Store<IavRootStoreInterface>
   ){
 
     this.regionSelected$ = this.store$.pipe(

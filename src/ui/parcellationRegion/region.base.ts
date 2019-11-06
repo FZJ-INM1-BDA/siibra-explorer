@@ -1,6 +1,7 @@
 import { Store } from "@ngrx/store";
 import { Input } from "@angular/core";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 
 export class RegionBase{
 
@@ -10,7 +11,9 @@ export class RegionBase{
   @Input()
   public isSelected: boolean = false
 
-  constructor(private store$: Store<any>){
+  constructor(
+    private store$: Store<IavRootStoreInterface>,
+  ){
     
   }
 
