@@ -1,0 +1,29 @@
+
+<!-- selected brain region -->
+<div class="flex-grow-1 flex-shrink-1 pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
+  <i *ngIf="showBrainIcon" class="flex-grow-0 flex-shrink-0 fas fa-brain mr-2"></i>
+
+  <small class="flex-grow-1 flex-shrink-1 ">
+    {{ region.name }}
+  </small>
+
+  <button mat-icon-button
+    *ngIf="region.position"
+    class="flex-grow-0 flex-shrink-0"
+    (click)="navigateToRegion()" >
+    <i *ngIf="isSelected" class="fas fa-map-marked-alt"></i>
+  </button>
+
+  <button mat-icon-button
+    class="flex-grow-0 flex-shrink-0"
+    (click)="toggleRegionSelected()" >
+    <i *ngIf="isSelected" class="fas fa-trash"></i>
+    <i *ngIf="!isSelected" class="fas fa-plus"></i>
+  </button>
+</div>
+
+<mat-divider *ngIf="showDesc && region.description"></mat-divider>
+
+<small *ngIf="showDesc && region.description">
+  {{ region.description }}
+</small>

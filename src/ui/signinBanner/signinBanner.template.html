@@ -2,19 +2,6 @@
   [iav-key-listener]="keyListenerConfig"
   (iav-key-event)="openTmplWithDialog(helpComponent)">
 
-  <!-- Take screenshot -->
-  <div class="btnWrapper" *ngIf="parcellationIsSelected">
-    <button mat-icon-button
-            (click)="takeScreenshotElement.takingScreenshot = true;
-                     takeScreenshotElement.previewingScreenshot = false;
-                     takeScreenshotElement.croppedCanvas = null;
-                     takeScreenshotElement.loadingScreenshot = null;"
-            matTooltip="Take screenshot"
-            color="primary">
-      <i class="fas fa-camera"></i>
-    </button>
-  </div>
-
   <!-- pinned datasets -->
 
   <div class="btnWrapper">
@@ -30,13 +17,24 @@
     </button>
   </div>
 
+  <!-- plugin and tools -->
+  <div class="btnWrapper">
+    <button mat-icon-button
+      matTooltipPosition="below"
+      [matTooltip]="pluginTooltipText"
+      [matMenuTriggerFor]="pluginDropdownMenu"
+      color="primary">
+      <i class="fas fa-th"></i>
+    </button>
+  </div>
+
   <!-- signin -->
   <div class="btnWrapper">
     <button
       [matTooltip]="userBtnTooltip$ | async"
       matTooltipPosition="below"
       mat-icon-button
-      [matMenuTriggerFor]="dropdownMenu"
+      [matMenuTriggerFor]="userDropdownMenu"
       color="primary">
       <ng-template [ngIf]="user$ | async" [ngIfElse]="notLoggedInTmpl" let-user="ngIf">
         {{ (user && user.name || 'Unnamed User').slice(0,1) }}
@@ -49,8 +47,21 @@
   </div>
 </div>
 
-<!-- drop downmenu -->
-<mat-menu #dropdownMenu>
+<!-- plugin dropdownmenu -->
+<mat-menu #pluginDropdownMenu>
+  <button mat-menu-item
+    [disabled]="!parcellationIsSelected"
+    (click)="takeScreenshotElement.startScreenshot()"
+    [matTooltip]="screenshotTooltipText">
+    <mat-icon fontSet="fas" fontIcon="fa-camera">
+    </mat-icon>
+    Screenshot
+  </button>
+  <plugin-banner></plugin-banner>
+</mat-menu>
+
+<!-- user dropdownmenu -->
+<mat-menu #userDropdownMenu>
   <mat-card>
     <mat-card-content>
       <signin-modal>

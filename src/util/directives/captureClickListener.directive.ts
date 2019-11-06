@@ -1,7 +1,6 @@
 import {Directive, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {Observable, Observer, Subscription} from "rxjs";
 import {switchMapTo, takeUntil} from "rxjs/operators";
-import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 
 @Directive({
     selector: '[iav-captureClickListenerDirective]'
@@ -10,13 +9,13 @@ import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 export class CaptureClickListenerDirective implements OnInit, OnDestroy {
 
     private subscriptions: Subscription[] = []
-    @Output() mapClicked: EventEmitter<any> = new EventEmitter()
-    @Output() mouseDownEmitter: EventEmitter<any> = new EventEmitter()
+    @Output('iav-captureClickListenerDirective-onClick') mapClicked: EventEmitter<any> = new EventEmitter()
+    @Output('iav-captureClickListenerDirective-onMousedown') mouseDownEmitter: EventEmitter<any> = new EventEmitter()
 
 
     constructor(private el: ElementRef){}
 
-    ngOnInit(): void {
+    ngOnInit(){
 
         // Listen click Events
         const mouseDownObs$ = new Observable((observer: Observer<any>) => {
@@ -45,7 +44,7 @@ export class CaptureClickListenerDirective implements OnInit, OnDestroy {
         )
     }
 
-    ngOnDestroy(): void {
+    ngOnDestroy(){
         this.subscriptions.forEach(s=> s.unsubscribe())
     }
 

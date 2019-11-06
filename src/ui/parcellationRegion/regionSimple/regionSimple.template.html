@@ -1,0 +1,28 @@
+<div class="d-flex flex-row">
+
+  <small class="text-truncate flex-shrink-1 flex-grow-1">
+    {{ region.name }}
+  </small>
+
+  <div class="flex-grow-0 flex-shrink-0 d-flex flex-row">
+
+    <!-- if has position defined -->
+    <button *ngIf="region.position"
+      iav-stop="click"
+      (click)="navigateToRegion()"
+      mat-icon-button>
+      <i class="fas fa-map-marked-alt"></i>
+    </button>
+
+    <!-- region selected  -->
+    <button mat-icon-button
+      iav-stop="click"
+      (click)="toggleRegionSelected()"
+      [color]="isSelected ? 'primary' : 'basic'">
+      <i class="far"
+        [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}">
+      </i>
+    </button>
+  </div>
+
+</div>

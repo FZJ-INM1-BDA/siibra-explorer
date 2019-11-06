@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
-import { Observable } from "rxjs";
+import { Observable, combineLatest } from "rxjs";
 import { map, distinctUntilChanged, startWith, withLatestFrom, debounceTime, shareReplay, take, tap } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
@@ -11,6 +11,7 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
+const compareFn = (it, item) => it.name === item.name
 
 @Component({
   selector: 'region-text-search-autocomplete',
@@ -22,6 +23,8 @@ const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase(
 })
 
 export class RegionTextSearchAutocomplete{
+
+  public compareFn = compareFn
 
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
@@ -67,13 +70,16 @@ export class RegionTextSearchAutocomplete{
       shareReplay(1)
     )
 
-    this.autocompleteList$ = this.formControl.valueChanges.pipe(
-      startWith(''),
-      distinctUntilChanged(),
-      debounceTime(200),
-      withLatestFrom(this.regionsWithLabelIndex$.pipe(
+    this.autocompleteList$ = combineLatest(
+      this.formControl.valueChanges.pipe(
+        startWith(''),
+        distinctUntilChanged(),
+        debounceTime(200),
+      ),
+      this.regionsWithLabelIndex$.pipe(
         startWith([])
-      )),
+      )
+    ).pipe(
       map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
       map(arr => arr.slice(0, 5))
     )
