@@ -15,7 +15,10 @@ fs.readFile(CACHE_DATASET_FILENAME, 'utf-8', (err, data) => {
   /**
    * the file may or may not be present on init
    */
-  if (err) return
+  if (err) {
+    console.warn(`read cache failed`, err)
+    return
+  }
 
   try {
     cachedData = JSON.parse(data)

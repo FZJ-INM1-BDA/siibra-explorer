@@ -3,12 +3,13 @@ FROM node:10 as builder
 ARG BACKEND_URL
 ENV BACKEND_URL=$BACKEND_URL
 
+ARG USE_LOGO
+ENV USE_LOGO=${USE_LOGO:-hbp}
+
 COPY . /iv
 WORKDIR /iv
 
 ENV VERSION=devNext
-
-RUN apt update && apt upgrade -y && apt install brotli
 
 RUN npm i
 RUN npm run build-aot

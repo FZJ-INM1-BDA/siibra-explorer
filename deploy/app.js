@@ -53,7 +53,12 @@ app.use(session({
 /**
  * configure CSP
  */
-require('./csp')(app)
+if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
+  console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
+} else {
+  require('./csp')(app)
+}
+
 
 /**
  * configure Auth
