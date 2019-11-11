@@ -168,8 +168,12 @@ datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
 datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
   const { kgId } = req.query
   const { user } = req
-  const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
-  stream.pipe(res).on('error', getHandleErrorFn(req, res))
+  try{
+    const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
+    stream.pipe(res).on('error', getHandleErrorFn(req, res))
+  }catch(e){
+    getHandleErrorFn(req, res)(e)
+  }
 })
 
 datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
