@@ -1,8 +1,8 @@
 import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
+import { Observable, Subscription, combineLatest, interval, merge, of, timer, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom, switchMapTo, take, tap, startWith } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
@@ -17,6 +17,7 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import { SlServiceService } from "src/spotlight/sl-service.service";
 
 /**
  * TODO
@@ -46,6 +47,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
+  @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
 
   /**
    * required for styling of all child components
@@ -104,7 +107,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet
+    private bottomSheet: MatBottomSheet,
+    private slService: SlServiceService
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -264,6 +268,26 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
+
+    this.subscriptions.push(
+      merge(
+        fromEvent(window.document, 'mouseup'),
+        this.slService.onClick
+      ).pipe(
+        startWith(true),
+        switchMapTo(timer(1000 * 5).pipe(
+          take(1)
+        ))
+      ).subscribe(() => {
+        this.slService.showBackdrop(this.idelTmpl)
+      })
+    )
+
+    this.subscriptions.push(
+      this.slService.onClick.subscribe(() => {
+        this.slService.hideBackdrop()
+      })  
+    )
 
     if (!this.meetsRequirement) {
       merge(

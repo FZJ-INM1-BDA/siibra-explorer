@@ -48,6 +48,8 @@ import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
 import { UIService } from "./services/uiService.service";
 import { UtilModule } from "./util/util.module";
+import { SpotLightModule } from 'src/spotlight/spot-light.module'
+import { TryMeComponent } from "./ui/tryme/tryme.component";
 
 import 'hammerjs'
 
@@ -66,6 +68,7 @@ import 'src/res/css/extra_styles.css'
     DatabrowserModule,
     AngularMaterialModule,
     UtilModule,
+    SpotLightModule,
     
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
@@ -94,6 +97,7 @@ import 'src/res/css/extra_styles.css'
     WidgetUnit,
     ModalUnit,
     PluginUnit,
+    TryMeComponent,
 
     /* directives */
     fasTooltipScreenshotDirective,
