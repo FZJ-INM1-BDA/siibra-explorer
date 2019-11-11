@@ -10,13 +10,13 @@ import {distinctUntilChanged, map, take} from "rxjs/operators";
 })
 export class ConnectivityBrowserService {
 
-    connectedAreas = []
-    overConnectedAreaIndex = -1
-    collapseMenu = -1
-    allRegions = []
-    hemisphere = ''
+    public connectedAreas = []
+    public overConnectedAreaIndex = -1
+    public collapseMenu = -1
+    public allRegions = []
+    public hemisphere = ''
 
-    defaultColorMap
+    public defaultColorMap
 
     private selectedParcellation$: Promise<unknown>
 
@@ -103,7 +103,7 @@ export class ConnectivityBrowserService {
         this.collapseMenu = -1
     }
 
-    closeConnectivityView() {
+    public closeConnectivityView() {
 
         this.allRegions.forEach(r => {
             if (r && r.ngId && r.rgb) {
