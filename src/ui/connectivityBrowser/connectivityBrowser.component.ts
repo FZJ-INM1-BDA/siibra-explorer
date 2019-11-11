@@ -24,7 +24,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit {
     private subscriptions: Subscription[] = []
     private selectedParcellation: any
 
-    constructor(private constantService: AtlasViewerConstantsServices, private store$: Store<any>, private connectivityService: ConnectivityBrowserService ){
+    constructor(private constantService: AtlasViewerConstantsServices, private store$: Store<any>, public connectivityService: ConnectivityBrowserService ){
         this.selectedParcellation$ = this.store$.pipe(
             select('viewerState'),
             safeFilter('parcellationSelected'),
