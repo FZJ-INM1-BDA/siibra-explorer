@@ -1,0 +1,146 @@
+<mat-card class="w-100 h-100 overflow-hidden d-block d-flex flex-column pb-2" >
+
+    <button mat-flat-button class="pl-0 d-flex flex-grow-0 align-items-center" (click)="connectivityService.closeConnectivityView()"><span class="align-self-start"><i
+            class="fas fa-chevron-left"></i> Back to dataset list</span></button>
+
+    <mat-divider class="position-relative mb-2"></mat-divider>
+
+    <div class="d-flex flex-column">
+        <span>Connectivity for</span>
+        <span>{{region}}</span>
+
+        <mat-checkbox
+                [checked]="logarithmSelected"
+                (change)="logarithmSelected = !logarithmSelected">
+            <small>Show Log10</small>
+        </mat-checkbox>
+
+    </div>
+
+
+    <div class="d-flex flex-column justify-content-start overflow-auto mt-2 pb-5 chart-background-for-screenshot" *ngIf="connectivityService.connectedAreas.length" #chartContent>
+
+        <div *ngFor="let connection of connectivityService.connectedAreas; let i = index; let last = last"
+             class="d-flex flex-column mr-1 position-relative"
+             [ngClass]="(connectivityService.overConnectedAreaIndex === i || connectivityService.collapseMenu === i) && 'border'"
+             (mouseover)="connectivityService.overConnectedAreaIndex = i" (mouseout)="connectivityService.overConnectedAreaIndex = -1">
+
+            <div class="d-flex align-items-center cursorPointer position-relative"
+                 [matTooltip]="connection.name + ': ' + numberToForChart(connection.numberOfConnections)"
+                 (click)="connectivityService.collapseMenu === i? connectivityService.collapseMenu = -1 : connectivityService.collapseMenu = i">
+
+                <small class="w-50 flex-1 no-wrap text-truncate chart-line-height">{{connection.name.includes('Area ') ? connection.name.replace('Area ', '') : connection.name}}</small>
+                <div class="w-100 flex-3 position-relative">
+
+
+                    <div class="d-flex chart-bar"
+                         [ngStyle]="{'width': +numberToForChart(connection.numberOfConnections)/numberToForChart(connectivityService.connectedAreas[0].numberOfConnections)*100 + '%'}"
+                         [style.backgroundColor]="'rgb(' + connection.color.r + ',' + connection.color.g + ',' + connection.color.b + ')'">
+                        <small class="mt-n1 ml-1 text-black text-shadow">
+                            {{connectivityService.overConnectedAreaIndex === i ? numberToForChart(connection.numberOfConnections) : ''}}
+                        </small>
+                    </div>
+
+                    <div *ngIf="connectivityService.collapseMenu !== i">
+                        <div class="vl border-left  border-dark position-absolute w-0 chart-line-1">
+
+                        </div>
+                        <div class="vl border-left  border-dark position-absolute w-0 chart-line-2">
+
+                        </div>
+                        <div class="vl border-left  border-dark position-absolute w-0 chart-line-3">
+                        </div>
+
+
+                        <div *ngIf="last">
+                            <div class="position-absolute"
+                                 [style.left]="'calc(33.33% - ' + math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections) * 1 / 3).toString().length*8 + 'px)'"
+                            >
+                                <small><i>{{math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections) * 1 / 3)}}</i></small>
+                            </div>
+
+                            <div class="position-absolute"
+                                 [style.left]="'calc(66.66% - ' + math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections) * 2 / 3).toString().length*8 + 'px)'">
+                                <small><i>{{math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections) * 2 / 3)}}</i></small>
+                            </div>
+
+                            <div class="position-absolute"
+                                 [style.left]="'calc(99.99% - ' + math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections)).toString().length*8 + 'px)'">
+                                <small><i>{{math.round(numberToForChart(connectivityService.connectedAreas[0].numberOfConnections))}}</i></small>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="d-flex flex-column" *ngIf="connectivityService.collapseMenu === i">
+                <mat-divider></mat-divider>
+                <span class="mt-2 mr-2 ml-2">
+                    <small>Region: {{connection.name}}</small>
+                    <br>
+                    <small>Number of Connection: {{connection.numberOfConnections}}</small>
+                    <br>
+                    <small>Log({{connection.numberOfConnections}}
+                        ) = {{math.log10(connection.numberOfConnections).toFixed(5)}}</small>
+                </span>
+                <div class="d-flex align-items-center justify-content-around">
+                    <small class="d-flex flex-column align-items-center w-100">
+
+                                                    <!--                        *ngIf="(selectedRegions$ | async) as selectedRegions"-->
+                                                    <!--                        (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex))">-->
+
+                        <button mat-icon-button class="border">
+<!--                            <i class="fas fa-hand-pointer mt-n1"></i>-->
+                            <span class="fa-stack fa-1x ">
+                                <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                                <!--                    <i class="fas fa-slash fa-stack-1x fa-inverse"-->
+                                <!--                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>-->
+                            </span>
+                        </button>
+<!--                        <span [innerText]="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)? 'Deselect' : 'Select'"></span>-->
+                        <span>Select</span>
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border">
+                            <i class="fas fa-crosshairs  mt-n1"></i>
+                        </button>
+                        Navigate
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border" (click)="changeConnectivityRegion(connection.name)">
+                            <i class="fab fa-connectdevelop  mt-n1"></i>
+                        </button>
+                        Connectivity
+                    </small>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="text-center m-2">
+        Export as
+    </div>
+    <div class="d-flex justify-content-center">
+        <small class="d-flex flex-column align-items-center mr-2 ml-2">
+            <a mat-icon-button class="border" (click)="downloadCSV()" >
+                <i class="fas fa-file-csv mt-n1"></i>
+            </a>
+            CSV
+        </small>
+
+        <small class="d-flex flex-column align-items-center mr-2 ml-2">
+            <a mat-icon-button class="border" (click)="downloadPNG()">
+                <i class="fas fa-file-image mt-n1"></i>
+            </a>
+            Image
+        </small>
+    </div>
+
+
+</mat-card>

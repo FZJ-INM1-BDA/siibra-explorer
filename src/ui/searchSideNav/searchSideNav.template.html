@@ -12,8 +12,8 @@
     <!-- footer content -->
     <div class="d-flex flex-row justify-content-center" card-footer>
       <button mat-stroked-button
-        *ngIf="!showDataset"
-        (click)="showDataset = true"
+        *ngIf="!(sidebarMenuState$ | async)?.sidePanelCurrentViewOpened"
+        (click)="expandSidePanelCurrentView()"
         class="m-1 flex-grow-1 overflow-hidden" >
         <i class="fas fa-chevron-down"></i>
         <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
@@ -23,9 +23,14 @@
     </div>
   </viewer-state-controller>
 
-  <ng-container *ngIf="showDataset">
+  <ng-container *ngIf="(sidebarMenuState$ | async) as sideBarMenu">
+    <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1" style="max-height: calc(100% - 220px)"
+                          [region]="connectivityRegion"
+                          #connectivityBrowser
+                          *ngIf="sideBarMenu.sidePanelCurrentViewOpened && sideBarMenu.sidePanelManualCollapsibleView === 'Connectivity' && connectivityService.connectedAreas">
 
-    <data-browser
+    </connectivity-browser>
+    <data-browser *ngIf="sideBarMenu.sidePanelCurrentViewOpened && !sideBarMenu.sidePanelManualCollapsibleView"
       class="pe-all flex-grow-5 flex-shrink-1"
       [template]="viewerStateController.templateSelected$ | async"
       [parcellation]="viewerStateController.parcellationSelected$ | async"
@@ -39,12 +44,12 @@
 
         <mat-divider class="position-relative mt-2 mb-2 mat-divider-full-width"></mat-divider>
       </ng-container>
-  
+
       <!-- footer content -->
       <div class="d-flex flex-row justify-content-center" card-footer>
         <button mat-stroked-button
           class="m-1"
-          (click)="showDataset = false" >
+          (click)="collapseSidePanelCurrentView()" >
           <i class="fas fa-chevron-up"></i>
         </button>
       </div>

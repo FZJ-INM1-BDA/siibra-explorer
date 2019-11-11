@@ -16,7 +16,11 @@ import {
   FETCHED_SPATIAL_DATA,
   UPDATE_SPATIAL_DATA,
   safeFilter,
-  CHANGE_NAVIGATION, generateLabelIndexId
+  CHANGE_NAVIGATION,
+  generateLabelIndexId,
+  UIStateInterface,
+  SHOW_SIDE_PANEL_CONNECTIVITY,
+  EXPAND_SIDE_PANEL_CURRENT_VIEW
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of, Observer} from "rxjs";
 import {
@@ -26,8 +30,6 @@ import {
   delay,
   concatMap,
   withLatestFrom,
-  switchMapTo,
-  takeUntil, take, tap, mapTo
 } from "rxjs/operators";
 import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
@@ -43,9 +45,12 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
-import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
-import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
-import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
+import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
+import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
+import {
+  CLOSE_SIDE_PANEL,
+  OPEN_SIDE_PANEL
+} from "src/services/state/uiState.store";
 
 /**
  * TODO
@@ -73,8 +78,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild(CaptureClickListenerDirective) captureClickListenerDirective: CaptureClickListenerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
+  @ViewChild('searchSideNav') searchSideNav: SearchSideNav
 
   /**
    * required for styling of all child components
@@ -84,7 +92,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-
+  public selectedTemplateName = ''
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -123,7 +131,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   regionToolsMenuVisible = false
 
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<ViewerStateInterface | UIStateInterface>,
     public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
@@ -350,6 +358,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscriptions.push(
       this.newViewer$.subscribe(template => {
+        this.selectedTemplateName = template.name
         this.darktheme = this.meetsRequirement ?
           template.useTheme === 'dark' :
           false
@@ -446,6 +455,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       event.clientY
     ]
     this.rClContextualMenu.show()
+  }
+
+  toggleSideNavMenu(opened) {
+    this.store.dispatch({type: opened? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
+  }
+
+  showConnectivity(event) {
+    // setTimeout(() => )
+    this.toggleSideNavMenu(false)
+    this.store.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
+    this.store.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})
+    this.searchSideNav.connectivityActive.next(event)
   }
 
   /**

@@ -24,7 +24,8 @@
 <div class="d-flex align-items-center justify-content-between">
     <button mat-button
             style="font-size: 12px"
-            class="p-0 w-100"
+            class="pt-0 pb-0 br-1 pl-1"
+            [ngClass]="!selectedTemplateName.includes('MNI Colin 27') && 'w-100'"
             *ngIf="(selectedRegions$ | async) as selectedRegions"
             (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex)); regionToolsMenuVisible = false; collapsedRegionDescription = false">
                   <span class="fa-stack fa-1x">
@@ -36,15 +37,17 @@
     </button>
     <button mat-button
             style="font-size: 12px"
-            class="p-0 w-100"
+            class="pt-0 pb-0 br-1 pl-1"
+            [ngClass]="!selectedTemplateName.includes('MNI Colin 27') && 'w-100'"
             (click)="navigateTo(region.position); regionToolsMenuVisible = false; collapsedRegionDescription = false">
         <i class="fas fa-crosshairs"></i> Navigate
     </button>
 
-    <!-- ToDo Change other buttons font size to 10 if this button is available and remove w-100 classes-->
-    <!--                <button mat-button-->
-    <!--                        style="font-size: 10px"-->
-    <!--                        class="p-0 mr-1">-->
-    <!--                  <i class="fab fa-connectdevelop"></i> Connectivity-->
-    <!--                </button>-->
+    <button mat-button
+            *ngIf="selectedTemplateName.includes('MNI Colin 27')"
+            style="font-size: 12px"
+            class="pt-0 pb-0 br-1 pl-1 mr-1"
+            (click)="exploreConnectivity.emit(region.name); regionToolsMenuVisible = false; collapsedRegionDescription = false">
+        <i class="fab fa-connectdevelop"></i> Connectivity
+    </button>
 </div>

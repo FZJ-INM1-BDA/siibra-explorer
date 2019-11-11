@@ -74,6 +74,7 @@ import { RegionsListView } from "./viewerStateController/regionsListView/simpleR
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
 import {RegionMenuComponent} from "src/ui/regionToolsMenu/regionMenu.component";
 import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 
 @NgModule({
   imports : [
@@ -122,6 +123,7 @@ import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedM
     RegionsListView,
     TakeScreenshotComponent,
     RegionMenuComponent,
+    ConnectivityBrowserComponent,
 
     /* pipes */
     GroupDatasetByRegion,

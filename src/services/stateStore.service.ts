@@ -5,7 +5,7 @@ export { pluginState } from './state/pluginState.store'
 export { NgViewerAction, NgViewerStateInterface, ngViewerState, ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
 export { CHANGE_NAVIGATION, AtlasAction, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS, ViewerStateInterface, viewerState } from './state/viewerState.store'
 export { DataEntry, ParcellationRegion, DataStateInterface, DatasetAction, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, dataStore, File, FileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL, UIAction, UIStateInterface, uiState } from './state/uiState.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, SHOW_SIDE_PANEL_CONNECTIVITY, HIDE_SIDE_PANEL_CONNECTIVITY, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW, UIAction, UIStateInterface, uiState } from './state/uiState.store'
 export { SPATIAL_GOTO_PAGE, SpatialDataEntries, SpatialDataStateInterface, UPDATE_SPATIAL_DATA, spatialSearchState } from './state/spatialSearchState.store'
 export { userConfigState, UserConfigStateUseEffect, USER_CONFIG_ACTION_TYPES } from './state/userConfigState.store'
 

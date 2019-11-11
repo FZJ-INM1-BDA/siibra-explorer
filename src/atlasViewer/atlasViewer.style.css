@@ -43,7 +43,7 @@ layout-floating-container
 
 [fixedMouseContextualContainerDirective]
 {
-  width: 15rem;
+  /*width: 17rem;*/
 }
 
 [fixedMouseContextualContainerDirective] div[body]

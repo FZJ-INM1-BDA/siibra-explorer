@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, Input, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
 import {Observable} from "rxjs";
 import {map, withLatestFrom} from "rxjs/operators";
 import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
@@ -6,6 +6,7 @@ import {VIEWER_STATE_ACTION_TYPES} from "src/services/effect/effect";
 import {CHANGE_NAVIGATION, generateLabelIndexId} from "src/services/stateStore.service";
 import {ADD_TO_REGIONS_SELECTION_WITH_IDS} from "src/services/state/viewerState.store";
 import {Store} from "@ngrx/store";
+import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
 
 @Component({
     selector: 'region-menu',
@@ -15,8 +16,13 @@ import {Store} from "@ngrx/store";
 export class RegionMenuComponent {
     @Input() selectedRegions$: any
     @Input() region: any
+    @Input() selectedTemplateName: string
 
-    regionToolsMenuVisible = false
+    @Output() exploreConnectivity: EventEmitter<string> = new EventEmitter()
+
+    @ViewChild('searchSideNav') searchSideNav: SearchSideNav
+
+    regionToolsMenuVisible = true
     collapsedRegionDescription = false
 
     constructor(private store$: Store<any>) {}

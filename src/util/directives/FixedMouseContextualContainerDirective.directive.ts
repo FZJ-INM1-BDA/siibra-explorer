@@ -29,17 +29,16 @@ export class FixedMouseContextualContainerDirective {
       if (window.innerHeight - this.mousePos[1] < this.el.nativeElement.clientHeight) {
         this.mousePos[1] = window.innerHeight - this.el.nativeElement.clientHeight
       }
-
       if ((window.innerWidth - this.mousePos[0]) < this.el.nativeElement.clientWidth) {
         this.mousePos[0] = window.innerWidth-this.el.nativeElement.clientWidth
       }
-
       this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
+
+    })
       this.styleDisplay = 'block'
       this.isShown = true
       this.onShow.emit()
 
-    })
   }
 
   public hide(){
