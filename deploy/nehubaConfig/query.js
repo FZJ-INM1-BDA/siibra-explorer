@@ -33,6 +33,7 @@ exports.getTemplateNehubaConfig = ({configId, acceptedEncoding, returnAsStream})
     else return getFileAsPromise(`${filepath}.gz`)
   }
 
+  // no need to handle error. handled downstream
   if (returnAsStream) return fs.createReadStream(filepath).pipe(
     through2.obj(function(file, enc, cb){
       cb(null, reconfigureUrl(file.toString()))

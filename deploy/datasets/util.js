@@ -35,17 +35,30 @@ const init = async () => {
   getPublicAccessToken = getPublic
 }
 
-const retry = (fn) => {
-  let retryId
+const defaultConfig = {
+  retries: 3,
+  timeout: 5000
+}
+
+const retry = (fn, config = {}) => {
+  let retryId, retriesAttempted = 0
+  const timeout = config.timeout || defaultConfig.timeout || 5000
+  const retries = config.retries || defaultConfig.retries || 3
   retryId = setInterval(() => {
+    retriesAttempted += 1
     fn()
       .then(() => {
         console.log(`retry succeeded, clearing retryId`)
-        clearTimeout(retryId)
+        clearInterval(retryId)
       }).catch(e => {
-        console.warn(`retry failed, retrying in 5sec`)
+        console.warn(`retry ${retriesAttempted}/${retries} failed.`)
+        if (retriesAttempted >= retries) {
+          console.warn(`maximum retires exceeded, terminating`)
+          clearInterval(retryId)
+        }
+        else console.warn(`retrying in ${timeout} seconds`)
       })
-  }, 5000)
+  }, timeout)
 }
 
 module.exports = {

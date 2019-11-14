@@ -6,6 +6,7 @@ const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, ge
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
+const { getHandleErrorFn } = require('../util/streamHandleError')
 
 const bodyParser = require('body-parser')
 
@@ -144,7 +145,7 @@ datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   res.removeHeader('Content-Encoding')
   
   if (filePath) {
-    fs.createReadStream(filePath).pipe(res)
+    fs.createReadStream(filePath).pipe(res).on('error', getHandleErrorFn(req, res))
   } else {
     res.status(404).send()
   }
@@ -167,8 +168,12 @@ datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
 datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
   const { kgId } = req.query
   const { user } = req
-  const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
-  stream.pipe(res)
+  try{
+    const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
+    stream.on('error', getHandleErrorFn(req, res)).pipe(res)
+  }catch(e){
+    getHandleErrorFn(req, res)(e)
+  }
 })
 
 datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
@@ -178,7 +183,7 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
     const stream = await getDatasetFileAsZip({ user, kgId })
     res.setHeader('Content-Type', 'application/zip')
     res.setHeader('Content-Disposition', `attachment; filename="${kgId}.zip"`)
-    stream.pipe(res)
+    stream.pipe(res).on('error', getHandleErrorFn(req, res))
   } catch (e) {
     console.warn('datasets/index#downloadKgFiles', e)
     res.status(400).send(e.toString())
