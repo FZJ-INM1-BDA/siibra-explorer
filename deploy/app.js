@@ -106,8 +106,6 @@ if (LOCAL_CDN_FLAG) {
   })
 }
 
-app.use(express.static(PUBLIC_PATH))
-
 app.use((_req, res, next) => {
   res.setHeader('Referrer-Policy', 'origin-when-cross-origin')
   next()
