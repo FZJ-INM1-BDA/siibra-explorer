@@ -67,15 +67,18 @@
     </button>
   
     <!-- Explore -->
-    <a *ngFor="let kgRef of kgReference"
-      class="no-hover"
-      [href]="kgRef | doiParserPipe"
-      target="_blank"
-      mat-menu-item>
-      <mat-icon fontSet="fas" fontIcon="fa-globe-europe"></mat-icon>
-      Explore
-      <i class="fas fa-external-link-alt"></i>
-    </a>
+    <ng-container *ngIf="!strictLocal">
+
+      <a *ngFor="let kgRef of kgReference"
+        class="no-hover"
+        [href]="kgRef | doiParserPipe"
+        target="_blank"
+        mat-menu-item>
+        <mat-icon fontSet="fas" fontIcon="fa-globe-europe"></mat-icon>
+        Explore
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+    </ng-container>
   
     <!-- preview -->
     <button mat-menu-item
@@ -87,17 +90,20 @@
     </button>
     
     <!-- download -->
-    <a *ngIf="downloadEnabled"
-      [href]="dlFromKgHref"
-      target="_blank"
-      iav-stop="mousedown click">
-      <button mat-menu-item
-        class="no-focus"
-        [disabled]="downloadInProgress">
-        <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
-        Download
-      </button>
-    </a>
+    <ng-container *ngIf="!strictLocal">
+
+      <a *ngIf="downloadEnabled"
+        [href]="dlFromKgHref"
+        target="_blank"
+        iav-stop="mousedown click">
+        <button mat-menu-item
+          class="no-focus"
+          [disabled]="downloadInProgress">
+          <mat-icon [ngClass]="{'fa-spinner': downloadInProgress}" fontSet="fas" [fontIcon]="!downloadInProgress? 'fa-download' :'fa-pulse'"></mat-icon>
+          Download
+        </button>
+      </a>
+    </ng-container>
   </ng-template>
 </mat-menu>
 
@@ -111,13 +117,16 @@
 <ng-template #fullIcons>
 
   <!-- references -->
-  <a *ngFor="let kgRef of kgReference"
-    [href]="kgRef | doiParserPipe"
-    target="_blank"
-    iav-stop="click mousedown"
-    mat-icon-button>
-    <mat-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
-  </a>
+  <ng-container *ngIf="!strictLocal">
+
+    <a *ngFor="let kgRef of kgReference"
+      [href]="kgRef | doiParserPipe"
+      target="_blank"
+      iav-stop="click mousedown"
+      mat-icon-button>
+      <mat-icon fontSet="fas" fontIcon="fa-external-link-alt"></mat-icon>
+    </a>
+  </ng-container>
 
   <!-- pin dataset -->
   <button mat-icon-button
@@ -129,13 +138,16 @@
   </button>
 
   <!-- download dataset -->
-  <a *ngIf="downloadEnabled"
-    [href]="dlFromKgHref"
-    target="_blank"
-    iav-stop="click mousedown">
-    <button mat-icon-button
-      [disabled]="downloadInProgress">
-      <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-    </button>
-  </a>
+  <ng-container *ngIf="!strictLocal">
+
+    <a *ngIf="downloadEnabled"
+      [href]="dlFromKgHref"
+      target="_blank"
+      iav-stop="click mousedown">
+      <button mat-icon-button
+        [disabled]="downloadInProgress">
+        <i class="fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+      </button>
+    </a>
+  </ng-container>
 </ng-template>

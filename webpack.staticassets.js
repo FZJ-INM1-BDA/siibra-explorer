@@ -70,7 +70,8 @@ module.exports = {
         ? true
         : false,
       BACKEND_URL: (process.env.BACKEND_URL && JSON.stringify(process.env.BACKEND_URL)) || 'null',
-      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' || 'fzj')
+      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' || 'fzj'),
+      STRIC_LOCAL: process.env.STRIC_LOCAL === 'true' ? 'true' : 'false'
     })
   ],
   resolve: {

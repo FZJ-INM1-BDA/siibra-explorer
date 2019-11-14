@@ -36,6 +36,8 @@ export class SingleDatasetBase implements OnInit {
   public preview: boolean = false
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
 
+  public strictLocal: boolean = STRIC_LOCAL
+
   /**
    * sic!
    */
