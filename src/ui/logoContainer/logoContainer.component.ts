@@ -14,7 +14,9 @@ export class LogoContainer{
     ? 'res/image/HBP_Primary_RGB_WhiteText.png'
     : USE_LOGO === 'ebrains'
       ? `res/image/ebrains-logo-light.svg`
-      : null
+      : USE_LOGO === 'fzj'
+        ? 'res/image/fzj_black_transparent_svg.svg'
+        : null
       
   public useLogo = USE_LOGO
 }

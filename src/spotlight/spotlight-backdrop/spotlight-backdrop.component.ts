@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, TemplateRef, HostBinding } from '@angular/core';
+import { Component, HostListener, TemplateRef, HostBinding } from '@angular/core';
 import { SlServiceService } from '../sl-service.service';
 import { transition, animate, state, style, trigger } from '@angular/animations';
 
@@ -23,7 +23,7 @@ import { transition, animate, state, style, trigger } from '@angular/animations'
     ])
   ]
 })
-export class SpotlightBackdropComponent implements OnInit {
+export class SpotlightBackdropComponent {
 
   // TODO use DI for service injection ?
   public slService: SlServiceService
@@ -32,18 +32,10 @@ export class SpotlightBackdropComponent implements OnInit {
   @HostBinding('@onShownOnDismiss')
   animation: string = 'attach'
 
-  ngOnInit() {
-    console.log('on init')
-  }
-
   @HostListener('click', ['$event'])
   clickHandler(ev:MouseEvent){
     this.slService && this.slService.onClick.next(ev)
   }
 
   insert:TemplateRef<any>
-
-  ngOnDestroy(){
-    console.log('on destroy')
-  }
 }

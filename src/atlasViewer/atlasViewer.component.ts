@@ -275,7 +275,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.slService.onClick
       ).pipe(
         startWith(true),
-        switchMapTo(timer(1000 * 5).pipe(
+        switchMapTo(timer(1000 * 5 * 60).pipe(
           take(1)
         ))
       ).subscribe(() => {
