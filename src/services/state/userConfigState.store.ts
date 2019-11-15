@@ -37,7 +37,7 @@ interface UserConfigAction extends Action{
   payload?: any
 }
 
-const defaultUserConfigState: StateInterface = {
+export const defaultState: StateInterface = {
   savedRegionsSelection: []
 }
 
@@ -50,8 +50,7 @@ export const ACTION_TYPES = {
   LOAD_REGIONS_SELECTION: 'LOAD_REGIONS_SELECTION'
 }
 
-
-export function stateStore(prevState: StateInterface = defaultUserConfigState, action: UserConfigAction) {
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: UserConfigAction) => {
   switch(action.type) {
     case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS:
       const { config = {} } = action
@@ -66,6 +65,9 @@ export function stateStore(prevState: StateInterface = defaultUserConfigState, a
       }
   }
 }
+
+export const stateStore = getStateStore()
+
 
 @Injectable({
   providedIn: 'root'

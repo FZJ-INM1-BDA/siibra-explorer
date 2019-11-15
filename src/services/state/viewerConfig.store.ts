@@ -53,15 +53,15 @@ const getIsMobile = () => {
   /* https://stackoverflow.com/a/25394023/6059235 */
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua)
 }
-const useMobileUIStroageValue = window.localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI) 
+const useMobileUIStroageValue = window && window.localStorage && window.localStorage.getItem(LOCAL_STORAGE_CONST.MOBILE_UI) 
 
-const onLoadViewerconfig: StateInterface = {
+export const defaultState: StateInterface = {
   animation,
   gpuLimit,
   useMobileUI: (useMobileUIStroageValue && useMobileUIStroageValue === 'true') || getIsMobile()
 }
 
-export function stateStore(prevState:StateInterface = onLoadViewerconfig, action:ViewerConfigurationAction) {
+export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state, action:ViewerConfigurationAction) => {
   switch (action.type) {
     case ACTION_TYPES.SET_MOBILE_UI:
       const { payload } = action
@@ -89,3 +89,5 @@ export function stateStore(prevState:StateInterface = onLoadViewerconfig, action
     default: return prevState
   }
 }
+
+export const stateStore = getStateStore()

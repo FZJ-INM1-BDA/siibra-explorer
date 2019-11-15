@@ -2,8 +2,9 @@ import { Action } from '@ngrx/store'
 import { TemplateRef } from '@angular/core';
 
 import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
-const defaultState: StateInterface = {
+export const defaultState: StateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
   
@@ -24,29 +25,29 @@ const defaultState: StateInterface = {
   agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
 }
 
-export function stateStore(state:StateInterface = defaultState,action:ActionInterface){
+export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state,action:ActionInterface) => {
   switch(action.type){
     case MOUSE_OVER_SEGMENTS:
       const { segments } = action
       return {
-        ...state,
+        ...prevState,
         mouseOverSegments: segments
       }
     case MOUSE_OVER_SEGMENT:
       return {
-        ...state,
+        ...prevState,
         mouseOverSegment : action.segment
       }
     case MOUSEOVER_USER_LANDMARK:
       const { payload = {} } = action
       const { userLandmark: mouseOverUserLandmark = null } = payload
       return {
-        ...state,
+        ...prevState,
         mouseOverUserLandmark
       }
     case MOUSE_OVER_LANDMARK:
       return {
-        ...state,
+        ...prevState,
         mouseOverLandmark : action.landmark
       }
     case SNACKBAR_MESSAGE:
@@ -55,7 +56,7 @@ export function stateStore(state:StateInterface = defaultState,action:ActionInte
        * Need to use symbol here, or repeated snackbarMessage will not trigger new event
        */
       return {
-        ...state,
+        ...prevState,
         snackbarMessage: Symbol(snackbarMessage)
       }
     /**
@@ -64,17 +65,17 @@ export function stateStore(state:StateInterface = defaultState,action:ActionInte
      */
     case TOGGLE_SIDE_PANEL:
       return {
-        ...state,
-        sidePanelOpen: !state.sidePanelOpen
+        ...prevState,
+        sidePanelOpen: !prevState.sidePanelOpen
       }
     case OPEN_SIDE_PANEL:
       return {
-        ...state,
+        ...prevState,
         sidePanelOpen: true
       }
     case CLOSE_SIDE_PANEL:
       return {
-        ...state,
+        ...prevState,
         sidePanelOpen: false
       }
     case AGREE_COOKIE:
@@ -83,7 +84,7 @@ export function stateStore(state:StateInterface = defaultState,action:ActionInte
        */
       localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
       return {
-        ...state,
+        ...prevState,
         agreedCookies: true
       }
     case AGREE_KG_TOS:
@@ -92,19 +93,21 @@ export function stateStore(state:StateInterface = defaultState,action:ActionInte
        */
       localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
       return {
-        ...state,
+        ...prevState,
         agreedKgTos: true
       }
     case SHOW_BOTTOM_SHEET:
         const { bottomSheetTemplate } = action
         return {
-          ...state,
+          ...prevState,
           bottomSheetTemplate
         }
     default:
-      return state
+      return prevState
   }
 }
+
+export const stateStore = getStateStore()
 
 export interface StateInterface{
   mouseOverSegments: {

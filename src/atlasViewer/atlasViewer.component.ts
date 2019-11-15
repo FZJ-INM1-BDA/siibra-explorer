@@ -24,11 +24,9 @@ import {
   concatMap,
   withLatestFrom,
 } from "rxjs/operators";
-import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
-import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
@@ -38,6 +36,7 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import { isSame } from "src/util/fn";
 
 
 /**
@@ -120,10 +119,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
-    public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
@@ -188,9 +185,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      map(state => state.templateSelected),
-      distinctUntilChanged((t1, t2) => t1.name === t2.name)
+      select('templateSelected'),
+      distinctUntilChanged(isSame)
     )
 
     this.dedicatedView$ = this.store.pipe(
@@ -345,19 +341,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.newViewer$.subscribe(template => {
-        this.darktheme = this.meetsRequirement ?
-          template.useTheme === 'dark' :
-          false
-
-        this.constantsService.darktheme = this.darktheme
-        
-        /* new viewer should reset the spatial data search */
-        this.store.dispatch({
-          type : FETCHED_SPATIAL_DATA,
-          fetchedDataEntries : []
-        })
-
+      this.newViewer$.subscribe(() => {
         this.widgetServices.clearAllWidgets()
       })
     )

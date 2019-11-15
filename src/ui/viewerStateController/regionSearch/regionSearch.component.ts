@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input, ChangeDetectionStrategy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest } from "rxjs";
-import { map, distinctUntilChanged, startWith, debounceTime, shareReplay, take, tap } from "rxjs/operators";
+import { map, distinctUntilChanged, startWith, debounceTime, shareReplay, take, tap, filter } from "rxjs/operators";
 import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, IavRootStoreInterface } from "src/services/stateStore.service";
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
@@ -52,6 +52,7 @@ export class RegionTextSearchAutocomplete{
     this.regionsWithLabelIndex$ = viewerState$.pipe(
       select('parcellationSelected'),
       distinctUntilChanged(),
+      filter(p => !!p),
       map(parcellationSelected => {
         const returnArray = []
         const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected)

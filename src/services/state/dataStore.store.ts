@@ -10,36 +10,39 @@ export interface StateInterface{
   fetchedSpatialData: DataEntry[]
 }
 
-const defaultState = {
+export const defaultState = {
   fetchedDataEntries: [],
   favDataEntries: [],
   fetchedSpatialData: []
 }
 
-export function stateStore(state:StateInterface = defaultState, action:Partial<ActionInterface>){
+export const getStateStore = ({ state: state = defaultState } = {}) => (prevState:StateInterface = state, action:Partial<ActionInterface>) => {
+
   switch (action.type){
     case FETCHED_DATAENTRIES: {
       return {
-        ...state,
+        ...prevState,
         fetchedDataEntries : action.fetchedDataEntries
       }
     }
     case FETCHED_SPATIAL_DATA :{
       return {
-        ...state,
+        ...prevState,
         fetchedSpatialData : action.fetchedDataEntries
       }
     }
     case ACTION_TYPES.UPDATE_FAV_DATASETS: {
       const { favDataEntries = [] } = action
       return {
-        ...state,
+        ...prevState,
         favDataEntries
       }
     }
-    default: return state
+    default: return prevState
   }
 }
+
+export const stateStore = getStateStore()
 
 export interface ActionInterface extends Action{
   favDataEntries: DataEntry[]

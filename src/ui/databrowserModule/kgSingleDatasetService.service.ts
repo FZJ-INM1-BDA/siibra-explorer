@@ -1,5 +1,5 @@
 import { Injectable, TemplateRef, OnDestroy } from "@angular/core";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
+import { AtlasViewerConstantsServices, GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service"
 import { Store, select } from "@ngrx/store";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store";
@@ -144,7 +144,7 @@ export class KgSingleDatasetService implements OnDestroy{
       name : url,
       source : `nifti://${url}`,
       mixability : 'nonmixable',
-      shader : this.constantService.getActiveColorMapFragmentMain()
+      shader : GLSL_COLORMAP_JET
     }
     this.store$.dispatch({
       type: ADD_NG_LAYER,

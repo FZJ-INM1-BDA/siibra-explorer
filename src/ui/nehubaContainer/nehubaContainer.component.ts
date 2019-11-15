@@ -3,7 +3,7 @@ import { NehubaViewerUnit, computeDistance } from "./nehubaViewer/nehubaViewer.c
 import { Store, select } from "@ngrx/store";
 import { ViewerStateInterface, safeFilter, CHANGE_NAVIGATION, isDefined, ADD_NG_LAYER, REMOVE_NG_LAYER, NgViewerStateInterface, MOUSE_OVER_LANDMARK, Landmark, PointLandmarkGeometry, PlaneLandmarkGeometry, OtherLandmarkGeometry, getNgIds, getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, DataEntry } from "src/services/stateStore.service";
 import { Observable, Subscription, fromEvent, combineLatest, merge, of } from "rxjs";
-import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, buffer, tap, switchMapTo, shareReplay, mapTo, takeUntil, throttleTime } from "rxjs/operators";
+import { filter,map, take, scan, debounceTime, distinctUntilChanged, switchMap, skip, buffer, tap, switchMapTo, shareReplay, mapTo, takeUntil, throttleTime, withLatestFrom, startWith } from "rxjs/operators";
 import { AtlasViewerAPIServices, UserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { timedValues } from "../../util/generator";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
@@ -13,6 +13,7 @@ import { NEHUBA_READY, H_ONE_THREE, V_ONE_THREE, FOUR_PANEL, SINGLE_PANEL, NG_VI
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
 import { getHorizontalOneThree, getVerticalOneThree, getFourPanel, getSinglePanel } from "./util";
 import { SELECT_REGIONS_WITH_ID, NEHUBA_LAYER_CHANGED, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
+import { isSame } from "src/util/fn";
 
 const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//,''))}`
 const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
@@ -99,6 +100,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
   public sliceViewLoading2$: Observable<boolean>
   public perspectiveViewLoading$: Observable<string|null>
 
+  private templateSelected$: Observable<any>
   private newViewer$ : Observable<any>
   private selectedParcellation$ : Observable<any>
   private selectedRegions$ : Observable<any[]>
@@ -205,12 +207,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
 
     this.nehubaViewerFactory = this.csf.resolveComponentFactory(NehubaViewerUnit)
 
-    this.newViewer$ = this.store.pipe(
+    this.templateSelected$ = this.store.pipe(
       select('viewerState'),
-      filter(state=>isDefined(state) && isDefined(state.templateSelected)),
-      filter(state=>
-        !isDefined(this.selectedTemplate) || 
-        state.templateSelected.name !== this.selectedTemplate.name)
+      select('templateSelected'),
+      distinctUntilChanged(isSame)
+    )
+
+    this.newViewer$ = this.templateSelected$.pipe(
+      filter(v => !!v)
     )
 
     this.selectedParcellation$ = this.store.pipe(
@@ -592,33 +596,40 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
       })
     )
 
+    this.subscriptions.push(
+      this.templateSelected$.subscribe(() => this.destroynehuba())
+    )
+
     /* order of subscription will determine the order of execution */
     this.subscriptions.push(
       this.newViewer$.pipe(
-        map(state => {
-          const deepCopiedState = JSON.parse(JSON.stringify(state))
-          const navigation = deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation
+        map(templateSelected => {
+          const deepCopiedState = JSON.parse(JSON.stringify(templateSelected))
+          const navigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
           if (!navigation) {
             return deepCopiedState
           }
           navigation.zoomFactor = calculateSliceZoomFactor(navigation.zoomFactor)
-          deepCopiedState.templateSelected.nehubaConfig.dataset.initialNgState.navigation = navigation
+          deepCopiedState.nehubaConfig.dataset.initialNgState.navigation = navigation
           return deepCopiedState
-        })
-      ).subscribe((state)=>{
+        }),
+        withLatestFrom(this.selectedParcellation$.pipe(
+          startWith(null)
+        ))
+      ).subscribe(([templateSelected, parcellationSelected])=>{
         this.store.dispatch({
           type: NEHUBA_READY,
           nehubaReady: false
         })
         this.nehubaViewerSubscriptions.forEach(s=>s.unsubscribe())
 
-        this.selectedTemplate = state.templateSelected
-        this.createNewNehuba(state.templateSelected)
-        const foundParcellation = state.templateSelected.parcellations.find(parcellation=>
-          state.parcellationSelected.name === parcellation.name)
-        this.handleParcellation(foundParcellation ? foundParcellation : state.templateSelected.parcellations[0])
+        this.selectedTemplate = templateSelected
+        this.createNewNehuba(templateSelected)
+        const foundParcellation = parcellationSelected
+          && templateSelected.parcellations.find(parcellation=> parcellationSelected.name === parcellation.name)
+        this.handleParcellation(foundParcellation || templateSelected.parcellations[0])
 
-        const nehubaConfig = state.templateSelected.nehubaConfig
+        const nehubaConfig = templateSelected.nehubaConfig
         const initialSpec = nehubaConfig.dataset.initialNgState
         const {layers} = initialSpec
         
@@ -725,6 +736,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
     combineLatest(
       this.navigationChanges$,
       this.selectedRegions$,
+    ).pipe(
+      filter(() => !!this.nehubaViewer)
     ).subscribe(([navigation,regions])=>{
       this.nehubaViewer.initNav = {
         ...navigation,
@@ -966,18 +979,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
   oldNavigation : any = {}
   spatialSearchPagination : number = 0
 
-  private createNewNehuba(template:any){
-
+  private destroynehuba(){
     /**
      * TODO if plugin subscribes to viewerHandle, and then new template is selected, changes willl not be be sent
      * could be considered as a bug. 
      */
     this.apiService.interactiveViewer.viewerHandle = null
+    if( this.cr ) this.cr.destroy()
+    this.container.clear()
+
+    this.viewerLoaded = false
+    this.nehubaViewer = null
+  }
+
+  private createNewNehuba(template:any){
 
     this.viewerLoaded = true
-    if( this.cr )
-      this.cr.destroy()
-    this.container.clear()
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
     this.nehubaViewer = this.cr.instance
 
@@ -986,6 +1003,21 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
      */
     const { gpuLimit = null } = this.viewerConfig
     const { nehubaConfig } = template
+    const { navigation = {}, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e7 } = nehubaConfig.dataset.initialNgState || {}
+    const { zoomFactor = 3e5, pose = {} } = navigation || {}
+    const { voxelSize = [1e6, 1e6, 1e6], voxelCoordinates = [0, 0, 0] } = (pose && pose.position) || {}
+
+    const initNavigation = {
+      orientation: [0, 0, 0, 1],
+      perspectiveOrientation,
+      perspectiveZoom,
+      position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
+      zoom: zoomFactor
+    }
+
+    this.handleEmittedNavigationChange(initNavigation)
+
+    this.oldNavigation = initNavigation
     
     if (gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState
@@ -1210,15 +1242,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
       As the viewer updates the dynamically changed navigation, it will emit the navigation state. 
       The emitted navigation state should be identical to this.oldnavigation */
 
-    const navigationChangedActively : boolean = Object.keys(this.oldNavigation).length === 0 || !Object.keys(this.oldNavigation).every(key=>{
+    const navigationChangedActively: boolean = Object.keys(this.oldNavigation).length === 0 || !Object.keys(this.oldNavigation).every(key=>{
       return this.oldNavigation[key].constructor === Number || this.oldNavigation[key].constructor === Boolean ?
         this.oldNavigation[key] === navigation[key] :
         this.oldNavigation[key].every((_,idx)=>this.oldNavigation[key][idx] === navigation[key][idx])
     })
 
     /* if navigation is changed dynamically (ie not actively), the state would have been propagated to the store already. Hence return */
-    if( !navigationChangedActively )
-      return
+    if( !navigationChangedActively ) return
     
     /* navigation changed actively (by user interaction with the viewer)
       probagate the changes to the store */
