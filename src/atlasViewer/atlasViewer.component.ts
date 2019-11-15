@@ -269,25 +269,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
 
-    this.subscriptions.push(
-      merge(
-        fromEvent(window.document, 'mouseup'),
-        this.slService.onClick
-      ).pipe(
-        startWith(true),
-        switchMapTo(timer(1000 * 5 * 60).pipe(
-          take(1)
-        ))
-      ).subscribe(() => {
-        this.slService.showBackdrop(this.idelTmpl)
-      })
-    )
+    if (KIOSK_MODE) {
 
-    this.subscriptions.push(
-      this.slService.onClick.subscribe(() => {
-        this.slService.hideBackdrop()
-      })  
-    )
+      this.subscriptions.push(
+        merge(
+          fromEvent(window.document, 'mouseup'),
+          this.slService.onClick
+        ).pipe(
+          startWith(true),
+          switchMapTo(timer(1000 * 5 * 60).pipe(
+            take(1)
+          ))
+        ).subscribe(() => {
+          this.slService.showBackdrop(this.idelTmpl)
+        })
+      )
+  
+      this.subscriptions.push(
+        this.slService.onClick.subscribe(() => {
+          this.slService.hideBackdrop()
+        })  
+      )
+    }
 
     if (!this.meetsRequirement) {
       merge(
