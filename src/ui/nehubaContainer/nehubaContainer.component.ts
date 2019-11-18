@@ -798,10 +798,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy{
           return name
         }
   
-        const newEntries = curr.filter(entry => {
+        const newEntries = (curr && curr.filter(entry => {
           const name = getLayerName(entry)
           return acc.map(getLayerName).indexOf(name) < 0
-        })
+        })) || []
   
         const entryChanged: (itemPrevState, newArr) => boolean = (itemPrevState, newArr) => {
           const layerName = getLayerName(itemPrevState)
