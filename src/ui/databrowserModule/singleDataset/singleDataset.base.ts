@@ -39,7 +39,7 @@ export class SingleDatasetBase implements OnInit {
   /**
    * sic!
    */
-  private kgReference: string[] = []
+  public kgReference: string[] = []
   public files: File[] = []
   private methods: string[] = []
   /**
@@ -51,6 +51,8 @@ export class SingleDatasetBase implements OnInit {
 
   public fetchingSingleInfoInProgress = false
   public downloadInProgress = false
+
+  public dlFromKgHref: string = null
 
   public favedDataentries$: Observable<DataEntry[]>
   constructor(
@@ -76,6 +78,7 @@ export class SingleDatasetBase implements OnInit {
 
   ngOnInit() {
     const { kgId, kgSchema, dataset } = this
+    this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
     if ( dataset ) {
       const { name, description, kgReference, publications, files, preview, ...rest } = dataset
       this.name = name
@@ -154,21 +157,5 @@ export class SingleDatasetBase implements OnInit {
   handlePreviewFile(file: ViewerPreviewFile){
     this.previewingFile.emit(file)
     this.singleDatasetService.previewFile(file, this.dataset)
-  }
-  
-  downloadZipFromKg() {
-    this.downloadInProgress = true
-    this.cdr.markForCheck()
-
-    const { kgId, kgSchema }  = this
-    this.singleDatasetService.downloadZipFromKg({
-      kgId,
-      kgSchema
-    }, this.name)
-      .catch(err => this.constantService.catchError(err))
-      .finally(() => {
-        this.downloadInProgress = false
-        this.cdr.markForCheck()
-      })
   }
 }

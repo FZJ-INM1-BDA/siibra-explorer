@@ -1,14 +1,15 @@
 const kgQueryUtil = require('./../auth/util')
 
-let getPublicAccessToken, publicAccessToken
+let getPublicAccessToken
 
 const getUserKGRequestParam = async ({ user }) => {
+  let publicAccessToken
   /**
    * n.b. ACCESS_TOKEN env var is usually only set during dev
    */
   const accessToken = (user && user.tokenset && user.tokenset.access_token) || process.env.ACCESS_TOKEN
   const releasedOnly = !accessToken
-  if (!accessToken && !publicAccessToken && getPublicAccessToken) {
+  if (!accessToken && getPublicAccessToken) {
     publicAccessToken = await getPublicAccessToken()
   }
   const option = accessToken || publicAccessToken

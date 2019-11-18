@@ -147,7 +147,7 @@ label.perspective-panel-show-slice-views:before
 
 span.regionSelected
 {
-  color : #dbb556
+  color : rgba(219, 181, 86,1);
 }
 
 span.regionNotSelected,
@@ -158,7 +158,7 @@ span.regionSelected
 
 .cursor-default
 {
-  cursor: default;
+  cursor: default!important;
 }
 
 markdown-dom pre code

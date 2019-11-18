@@ -57,7 +57,8 @@ export class AtlasViewerConstantsServices implements OnDestroy {
       prevLandmarks.length === newLandmarks.length
   }
 
-  public backendUrl = BACKEND_URL
+  // instead of using window.location.href, which includes query param etc
+  public backendUrl = BACKEND_URL || `${window.location.origin}${window.location.pathname}`
 
   /* to be provided by KG in future */
   public templateUrlsPr : Promise<string[]> = new Promise((resolve, reject) => {

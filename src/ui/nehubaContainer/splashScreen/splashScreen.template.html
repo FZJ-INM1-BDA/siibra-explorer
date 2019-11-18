@@ -1,43 +1,47 @@
-<div
-  #parentContainer
-  class="m-5 d-flex flex-row flex-wrap justify-content-center align-items-stretch pe-none">
-  <mat-card
-    (mousedown)="activatedTemplate$.next(template)"
-    matRipple
-    *ngFor="let template of loadedTemplate$ | async | filterNull"
-    class="m-3 col-md-12 col-lg-6 pe-all mw-400px">
-    <mat-card-header>
-      <mat-card-title class="text-nowrap font-stretch">
-        {{ template.properties.name }}
-      </mat-card-title>
-    </mat-card-header>
-    <img
-      [src]="template.properties.name | getTemplateImageSrcPipe"
-      [srcset]="template.properties.name | getTemplateImageSrcPipe | imgSrcSetPipe"
-      sizes="(max-width:576px) 90vw;(max-width: 768px) 50vw; 400px"
-      [alt]="'Screenshot of ' + template.properties.name"
-      mat-card-image />
-    <mat-card-content>
-      {{ template.properties.description }}
-    </mat-card-content>
+<!-- n.b. div wrapper is required for scrolling to work properly -->
+<div class="h-100 w-100 overflow-auto">
 
-    <mat-card-content>
-      <mat-card-subtitle class="text-nowrap">
-        Parcellations available
-      </mat-card-subtitle>
-      <button
-        (mousedown)="$event.stopPropagation()"
-        (click)="$event.stopPropagation(); selectTemplateParcellation(template, parcellation)"
-        *ngFor="let parcellation of template.parcellations"
-        mat-button
-        color="primary">
-        {{ parcellation.name }}
-      </button>
-    </mat-card-content>
+  <div
+    #parentContainer
+    class="p-5 w-100 d-flex flex-row flex-wrap justify-content-center align-items-stretch pe-all">
+    <mat-card
+      (mousedown)="activatedTemplate$.next(template)"
+      matRipple
+      *ngFor="let template of loadedTemplate$ | async | filterNull"
+      class="m-3 col-md-12 col-lg-6 pe-all mw-400px">
+      <mat-card-header>
+        <mat-card-title class="text-nowrap font-stretch">
+          {{ template.properties.name }}
+        </mat-card-title>
+      </mat-card-header>
+      <img
+        [src]="template.properties.name | getTemplateImageSrcPipe"
+        [srcset]="template.properties.name | getTemplateImageSrcPipe | imgSrcSetPipe"
+        sizes="(max-width:576px) 90vw;(max-width: 768px) 50vw; 400px"
+        [alt]="'Screenshot of ' + template.properties.name"
+        mat-card-image />
+      <mat-card-content>
+        {{ template.properties.description }}
+      </mat-card-content>
 
-    <!-- required... or on ripple, angular adds 16px margin to the bottom -->
-    <!-- see https://github.com/angular/components/issues/10898 -->
-    <mat-card-footer>
-    </mat-card-footer>
-  </mat-card>
+      <mat-card-content>
+        <mat-card-subtitle class="text-nowrap">
+          Parcellations available
+        </mat-card-subtitle>
+        <button
+          iav-stop="mousedown touchstart click"
+          (click)="selectTemplateParcellation(template, parcellation)"
+          *ngFor="let parcellation of template.parcellations"
+          mat-button
+          color="primary">
+          {{ parcellation.name }}
+        </button>
+      </mat-card-content>
+
+      <!-- required... or on ripple, angular adds 16px margin to the bottom -->
+      <!-- see https://github.com/angular/components/issues/10898 -->
+      <mat-card-footer>
+      </mat-card-footer>
+    </mat-card>
+  </div>
 </div>

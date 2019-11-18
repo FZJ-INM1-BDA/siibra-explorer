@@ -21,13 +21,17 @@ import {
   MatExpansionModule,
   MatGridListModule,
   MatIconModule,
-  MatMenuModule
-
+  MatMenuModule,
+  MAT_DIALOG_DEFAULT_OPTIONS,
+  MatDialogConfig
 } from '@angular/material';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
 
 import { NgModule } from '@angular/core';
 import {DragDropModule} from "@angular/cdk/drag-drop";
+
+
+const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
 @NgModule({
   imports: [
@@ -84,5 +88,12 @@ import {DragDropModule} from "@angular/cdk/drag-drop";
     MatMenuModule,
     ExperimentalScrollingModule
   ],
+  providers: [{
+    provide: MAT_DIALOG_DEFAULT_OPTIONS,
+    useValue: {
+      ...defaultDialogOption,
+      panelClass: 'iav-dialog-class'
+    }
+  }]
 })
 export class AngularMaterialModule { }

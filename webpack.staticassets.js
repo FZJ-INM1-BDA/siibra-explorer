@@ -15,7 +15,7 @@ module.exports = {
         ]
       },
       {
-        test : /jpg|png/,
+        test : /\.jpg$|\.png$|\.svg$/,
         exclude : /export\_nehuba|index/,
         use : {
           loader : 'file-loader',
@@ -47,15 +47,6 @@ module.exports = {
             context : 'src'
           }
         }]
-      },
-      {
-        test: /indigo-pink\.css/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            name: '[name].[ext]'
-          }
-        }
       }
     ]
   },
@@ -78,9 +69,9 @@ module.exports = {
       PRODUCTION: process.env.PRODUCTION
         ? true
         : false,
-      BACKEND_URL: JSON.stringify(process.env.BACKEND_URL || 'http://localhost:3000/')
+      BACKEND_URL: (process.env.BACKEND_URL && JSON.stringify(process.env.BACKEND_URL)) || 'null',
+      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' )
     })
-    // ...ignoreArr.map(dirname => new webpack.IgnorePlugin(/\.\/plugin_examples/))
   ],
   resolve: {
     extensions: [

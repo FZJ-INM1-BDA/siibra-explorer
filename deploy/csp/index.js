@@ -3,7 +3,10 @@ const bodyParser = require('body-parser')
 
 let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 
-const reportOnly = process.env.NODE_ENV !== 'production'
+// TODO bandaid solution
+// OKD/nginx reverse proxy seems to strip csp header
+// without it, testSafari.js will trigger no unsafe eval csp
+const reportOnly = true || process.env.NODE_ENV !== 'production'
 
 try {
   WHITE_LIST_SRC = JSON.parse(process.env.WHITE_LIST_SRC || '[]')

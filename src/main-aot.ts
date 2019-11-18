@@ -8,7 +8,7 @@ import { enableProdMode } from '@angular/core';
 
 const requireAll = (r:any) => {r.keys().forEach(r)}
 requireAll(require.context('./res/ext', false, /\.json$/))
-requireAll(require.context('./res/images', true, /\.jpg|\.png/))
+requireAll(require.context('./res/images', true, /\.jpg$|\.png$|\.svg$/))
 requireAll(require.context(`./plugin_examples`, true))
 
 /* aot === production mode */

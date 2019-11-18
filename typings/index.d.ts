@@ -13,3 +13,4 @@ declare var BUNDLEDPLUGINS : string[]
 declare var VERSION : string
 declare var PRODUCTION: boolean
 declare var BACKEND_URL: string
+declare var USE_LOGO: string
