@@ -6,8 +6,13 @@ import { shareReplay, withLatestFrom, map, distinctUntilChanged, filter, take, s
 import { generateLabelIndexId, recursiveFindRegionWithLabelIndexId, IavRootStoreInterface } from "../stateStore.service";
 import { SELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION } from "./viewerState.store";
 import { DialogService } from "../dialogService.service";
-import { ACTION_TYPES as VIEWER_CONFIG_ACTION_TYPES } from "./viewerConfig.store";
 import { LOCAL_STORAGE_CONST } from "src/util//constants";
+
+// Get around the problem of importing duplicated string (ACTION_TYPES), even using ES6 alias seems to trip up the compiler
+// TODO file bug and reverse
+import * as viewerConfigStore from './viewerConfig.store'
+
+const SET_MOBILE_UI = viewerConfigStore.ACTION_TYPES.SET_MOBILE_UI
 
 export interface StateInterface{
   savedRegionsSelection: RegionSelection[]
@@ -274,7 +279,7 @@ export class UserConfigStateUseEffect implements OnDestroy{
     this.subscriptions.push(
       this.actions$.pipe(
 
-        ofType(VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI),
+        ofType(SET_MOBILE_UI),
         map((action: any) => {
           const { payload } = action
           const { useMobileUI } = payload
