@@ -688,3 +688,13 @@ body::after
   position:absolute;
   background:linear-gradient(transparent 50px, #424242);
 }
+
+.o-1
+{
+  opacity: 1.0!important;
+}
+
+.o-0
+{
+  opacity: 0.0!important;
+}

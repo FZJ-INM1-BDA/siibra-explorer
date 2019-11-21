@@ -9,3 +9,8 @@
 {
   pointer-events: all;
 }
+
+take-screenshot
+{
+  z-index: 1509;
+}
