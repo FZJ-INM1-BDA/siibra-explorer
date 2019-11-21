@@ -8,10 +8,12 @@ import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import '../res/css/plugin_styles.css'
 import { BehaviorSubject, Observable, merge, of } from "rxjs";
-import { map, shareReplay } from "rxjs/operators";
-import { Store } from "@ngrx/store";
+import { map, shareReplay, filter, startWith } from "rxjs/operators";
+import { Store, select } from "@ngrx/store";
 import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
+import { ACTION_TYPES as PLUGINSTORE_ACTION_TYPES, CONSTANTS as PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
+import { Effect } from "@ngrx/effects";
 
 @Injectable({
   providedIn : 'root'
@@ -39,6 +41,13 @@ export class PluginServices{
     private store: Store<IavRootStoreInterface>,
     private http: HttpClient
   ){
+
+    // TODO implement 
+    this.store.pipe(
+      select('pluginState'),
+      select('initManifests'),
+      filter(v => !!v)
+    )
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
     this.apiService.interactiveViewer.uiHandle.launchNewWidget = this.launchNewWidget.bind(this) 
@@ -281,6 +290,49 @@ export class PluginServices{
       })
   }
 }
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class PluginServiceuseEffect{
+
+  @Effect()
+  public initManifests$: Observable<any>
+
+  constructor(
+    store$: Store<IavRootStoreInterface>,
+    constantService: AtlasViewerConstantsServices,
+    pluginService: PluginServices
+  ){
+    this.initManifests$ = store$.pipe(
+      select('pluginState'),
+      select('initManifests'),
+      filter(v => !!v),
+      startWith([]),
+      map(arr => {
+        // only launch plugins that has init manifest src label on it
+        return arr.filter(([ source ]) => source === PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
+      }),
+      filter(arr => arr.length > 0),
+      map((arr: [string, string|null][]) => {
+
+        for (const [source, url] of arr){
+          fetch(url, constantService.getFetchOption())
+            .then(res => res.json())
+            .then(json => pluginService.launchNewWidget(json))
+            .catch(console.error)
+        }
+
+        // clear init manifest
+        return {
+          type: PLUGINSTORE_ACTION_TYPES.CLEAR_INIT_PLUGIN
+        }
+      })
+    )
+  }
+}
+
 
 export class PluginHandler{
   onShutdown : (callback:()=>void)=>void = (_) => {}

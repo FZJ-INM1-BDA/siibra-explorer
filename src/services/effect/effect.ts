@@ -228,6 +228,12 @@ export class UseEffects implements OnDestroy{
   )
 }
 
+export const getGetRegionFromLabelIndexId = ({ parcellation }) => {
+  const { ngId: defaultNgId, regions } = parcellation
+  // if (!updated) throw new Error(`parcellation not yet updated`)
+  return ({ labelIndexId }) => recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId: defaultNgId })
+}
+
 export const compareRegions: (r1: any,r2: any) => boolean = (r1, r2) => {
   if (!r1) return !r2
   if (!r2) return !r1

@@ -4,9 +4,10 @@ import { Actions, ofType, Effect } from "@ngrx/effects";
 import { Store, select, Action } from "@ngrx/store";
 import { shareReplay, distinctUntilChanged, map, withLatestFrom, filter } from "rxjs/operators";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
-import { CHANGE_NAVIGATION, SELECT_REGIONS, NEWVIEWER, GENERAL_ACTION_TYPES, SELECT_PARCELLATION, isDefined, IavRootStoreInterface } from "src/services/stateStore.service";
+import { CHANGE_NAVIGATION, SELECT_REGIONS, NEWVIEWER, GENERAL_ACTION_TYPES, SELECT_PARCELLATION, isDefined, IavRootStoreInterface, FETCHED_TEMPLATE } from "src/services/stateStore.service";
 import { regionFlattener } from "src/util/regionFlattener";
 import { UIService } from "src/services/uiService.service";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,16 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
 
   private selectedRegions$: Observable<any[]>
 
+
+  @Effect()
+  init$ = this.constantSerivce.initFetchTemplate$.pipe(
+    map(fetchedTemplate => {
+      return {
+        type: FETCHED_TEMPLATE,
+        fetchedTemplate
+      }
+    })
+  )
 
   @Effect()
   selectTemplateWithName$: Observable<any>
@@ -46,7 +57,8 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private uiService: UIService
+    private uiService: UIService,
+    private constantSerivce: AtlasViewerConstantsServices
   ){
     const viewerState$ = this.store$.pipe(
       select('viewerState'),

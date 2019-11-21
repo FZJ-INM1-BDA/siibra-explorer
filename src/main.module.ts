@@ -12,14 +12,13 @@ import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { FormsModule } from "@angular/forms";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 
-import { AtlasViewerDataService } from "./atlasViewer/atlasViewer.dataService.service";
 import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
+// TODO deprecate
 import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
-import { AtlasViewerURLService } from "./atlasViewer/atlasViewer.urlService.service";
 import { ToastComponent } from "./components/toast/toast.component";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
@@ -47,13 +46,15 @@ import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
 import { UIService } from "./services/uiService.service";
 import { UtilModule } from "./util/util.module";
+import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
+import { PluginServiceuseEffect } from "./atlasViewer/atlasViewer.pluginService.service";
 
 import 'hammerjs'
 
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
-import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
+import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 
 @NgModule({
   imports : [
@@ -75,7 +76,9 @@ import {CaptureClickListenerDirective} from "src/util/directives/captureClickLis
       UserConfigStateUseEffect,
       ViewerStateControllerUseEffect,
       ViewerStateUseEffect,
-      NgViewerUseEffect
+      NgViewerUseEffect,
+      PluginServiceuseEffect,
+      AtlasViewerHistoryUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -124,9 +127,7 @@ import {CaptureClickListenerDirective} from "src/util/directives/captureClickLis
     ConfirmDialogComponent,
   ],
   providers : [
-    AtlasViewerDataService,
     WidgetServices,
-    AtlasViewerURLService,
     AtlasViewerAPIServices,
     AtlasWorkerService,
     AuthService,

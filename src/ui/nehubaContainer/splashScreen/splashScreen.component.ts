@@ -1,9 +1,9 @@
 import { Component, Pipe, PipeTransform, ElementRef, ViewChild, AfterViewInit } from "@angular/core";
 import { Observable, fromEvent, Subscription, Subject } from "rxjs";
 import { Store, select } from "@ngrx/store";
-import { switchMap, bufferTime, take, filter, withLatestFrom, map, tap } from 'rxjs/operators'
-import { ViewerStateInterface, NEWVIEWER } from "../../../services/stateStore.service";
-import { AtlasViewerConstantsServices } from "../../../atlasViewer/atlasViewer.constantService.service";
+import { switchMap, bufferTime, take, filter, withLatestFrom, map } from 'rxjs/operators'
+import { ViewerStateInterface, NEWVIEWER } from "src/services/stateStore.service";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 
 
 @Component({

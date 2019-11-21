@@ -7,6 +7,7 @@ import { withLatestFrom, map, shareReplay, startWith, filter, distinctUntilChang
 import { Observable } from 'rxjs';
 import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
 export interface StateInterface{
   fetchedTemplates : any[]
@@ -44,33 +45,37 @@ export interface ActionInterface extends Action{
   payload: any
 }
 
-export function stateStore(
-  state:Partial<StateInterface> = {
-    landmarksSelected : [],
-    fetchedTemplates : [],
-    loadedNgLayers: [],
-    regionsSelected: [],
-    userLandmarks: []
-  },
-  action:ActionInterface
-){
+export const defaultState:StateInterface = {
+
+  landmarksSelected : [],
+  fetchedTemplates : [],
+  loadedNgLayers: [],
+  regionsSelected: [],
+  userLandmarks: [],
+  dedicatedView: null,
+  navigation: null,
+  parcellationSelected: null,
+  templateSelected: null
+}
+
+export const getStateStore = ({ state = defaultState } = {}) => (prevState:Partial<StateInterface> = state, action:ActionInterface) => {
   switch(action.type){
     /**
      * TODO may be obsolete. test when nifti become available
      */
     case LOAD_DEDICATED_LAYER:
-      const dedicatedView = state.dedicatedView
-        ? state.dedicatedView.concat(action.dedicatedView)
+      const dedicatedView = prevState.dedicatedView
+        ? prevState.dedicatedView.concat(action.dedicatedView)
         : [action.dedicatedView]
       return {
-        ...state,
+        ...prevState,
         dedicatedView 
       }
     case UNLOAD_DEDICATED_LAYER:
       return {
-        ...state,
-        dedicatedView : state.dedicatedView
-          ? state.dedicatedView.filter(dv => dv !== action.dedicatedView)
+        ...prevState,
+        dedicatedView : prevState.dedicatedView
+          ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
           : []
       }
     case NEWVIEWER:
@@ -78,7 +83,7 @@ export function stateStore(
       // const parcellation = propagateNgId( selectParcellation ): parcellation
       const { regions, ...parcellationWORegions } = parcellation
       return {
-        ...state,
+        ...prevState,
         templateSelected : action.selectTemplate,
         parcellationSelected : {
           ...parcellationWORegions,
@@ -92,13 +97,13 @@ export function stateStore(
       }
     case FETCHED_TEMPLATE : {
       return {
-        ...state,
-        fetchedTemplates: state.fetchedTemplates.concat(action.fetchedTemplate)
+        ...prevState,
+        fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate)
       }
     }
     case CHANGE_NAVIGATION : {
       return {
-        ...state,
+        ...prevState,
         navigation : action.navigation
       }
     }
@@ -106,7 +111,7 @@ export function stateStore(
       const { selectParcellation:parcellation } = action
       const { regions, ...parcellationWORegions } = parcellation
       return {
-        ...state,
+        ...prevState,
         parcellationSelected: parcellationWORegions,
         // taken care of by effect.ts
         // regionsSelected: []
@@ -115,7 +120,7 @@ export function stateStore(
     case UPDATE_PARCELLATION: {
       const { updatedParcellation } = action
       return {
-        ...state,
+        ...prevState,
         parcellationSelected: {
           ...updatedParcellation,
           updated: true
@@ -125,24 +130,24 @@ export function stateStore(
     case SELECT_REGIONS:
       const { selectRegions } = action
       return {
-        ...state,
+        ...prevState,
         regionsSelected: selectRegions
       }
     case DESELECT_LANDMARKS : {
       return {
-        ...state,
-        landmarksSelected : state.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0)
+        ...prevState,
+        landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0)
       }
     }
     case SELECT_LANDMARKS : {
       return {
-        ...state,
+        ...prevState,
         landmarksSelected : action.landmarks
       }
     }
     case USER_LANDMARKS : {
       return {
-        ...state,
+        ...prevState,
         userLandmarks: action.landmarks
       } 
     }
@@ -153,12 +158,12 @@ export function stateStore(
     case NEHUBA_LAYER_CHANGED: {
       if (!window['viewer']) {
         return {
-          ...state,
+          ...prevState,
           loadedNgLayers: []
         }
       } else {
         return {
-          ...state,
+          ...prevState,
           loadedNgLayers: (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
             name : obj.name,
             type : obj.initialSpecification.type,
@@ -168,10 +173,15 @@ export function stateStore(
         }
       }
     }
+    case GENERAL_ACTION_TYPES.APPLY_STATE:
+      const { viewerState } = (action as any).state
+      return viewerState
     default :
-      return state
+      return prevState
   }
 }
+
+export const stateStore = getStateStore()
 
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'

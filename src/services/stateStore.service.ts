@@ -2,37 +2,52 @@ import { filter } from 'rxjs/operators';
 
 import { 
   StateInterface as PluginStateInterface,
-  stateStore as pluginState
+  stateStore as pluginState,
+  defaultState as pluginDefaultState,
+  getStateStore as pluginGetStateStore
 } from './state/pluginState.store'
 import { 
   StateInterface as ViewerConfigStateInterface,
-  stateStore as viewerConfigState
+  stateStore as viewerConfigState,
+  defaultState as viewerConfigDefaultState,
+  getStateStore as getViewerConfigStateStore
 } from './state/viewerConfig.store'
 import { 
   StateInterface as NgViewerStateInterface,
   ActionInterface as NgViewerActionInterface,
-  stateStore as ngViewerState
+  stateStore as ngViewerState,
+  defaultState as ngViewerDefaultState,
+  getStateStore as getNgViewerStateStore
 } from './state/ngViewerState.store'
 import {
   StateInterface as ViewerStateInterface,
   ActionInterface as ViewerActionInterface,
-  stateStore as viewerState
+  stateStore as viewerState,
+  defaultState as viewerDefaultState,
+  getStateStore as getViewerStateStore
 } from './state/viewerState.store'
 import {
   StateInterface as DataStateInterface,
   ActionInterface as DatasetAction,
-  stateStore as dataStore
+  stateStore as dataStore,
+  defaultState as dataStoreDefaultState,
+  getStateStore as getDatasetStateStore
 } from './state/dataStore.store'
 import {
   StateInterface as UIStateInterface,
   ActionInterface as UIActionInterface,
-  stateStore as uiState
+  stateStore as uiState,
+  defaultState as uiDefaultState,
+  getStateStore as getUiStateStore
 } from './state/uiState.store'
 import{
   stateStore as userConfigState,
   ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
-  StateInterface as UserConfigStateInterface
+  StateInterface as UserConfigStateInterface,
+  defaultState as userConfigDefaultState,
+  getStateStore as getuserConfigStateStore
 } from './state/userConfigState.store'
+import { cvtSearchParamToState } from 'src/atlasViewer/atlasViewer.urlUtil';
 
 export { pluginState }
 export { viewerConfigState }
@@ -49,7 +64,8 @@ export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PA
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export const GENERAL_ACTION_TYPES = {
-  ERROR: 'ERROR'
+  ERROR: 'ERROR',
+  APPLY_STATE: 'APPLY_STATE'
 }
 
 // TODO deprecate
@@ -73,6 +89,12 @@ const inheritNgId = (region:any) => {
       }
       : {})
   }
+}
+
+export function getNgIdLabelIndexFromRegion({ region }){
+  const { ngId, labelIndex } = region
+  if (ngId && labelIndex) return { ngId, labelIndex }
+  throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
 }
 
 export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}):Map<string,Map<number, any>>{
@@ -200,3 +222,19 @@ export interface IavRootStoreInterface{
   uiState: UIStateInterface
   userConfigState: UserConfigStateInterface
 }
+
+export const defaultRootState: IavRootStoreInterface = {
+  pluginState: pluginDefaultState,
+  dataStore: dataStoreDefaultState,
+  ngViewerState: ngViewerDefaultState,
+  uiState: uiDefaultState,
+  userConfigState: userConfigDefaultState,
+  viewerConfigState: viewerConfigDefaultState,
+  viewerState: viewerDefaultState
+}
+
+
+// export const getInitialState = (): IavRootStoreInterface => {
+//   const search = new URLSearchParams( window.location.search )
+//   cvtSearchParamToState(search, defaultRootState)
+// }

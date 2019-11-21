@@ -12,6 +12,19 @@ export const V_ONE_THREE = 'V_ONE_THREE'
 export const H_ONE_THREE = 'H_ONE_THREE'
 export const SINGLE_PANEL = 'SINGLE_PANEL'
 
+export function mixNgLayers(oldLayers:NgLayerInterface[], newLayers:NgLayerInterface|NgLayerInterface[]): NgLayerInterface[]{
+  if (newLayers instanceof Array) {
+    return oldLayers.concat(newLayers)
+  } else {
+    return oldLayers.concat({
+      ...newLayers,
+      ...( newLayers.mixability === 'nonmixable' && oldLayers.findIndex(l => l.mixability === 'nonmixable') >= 0
+            ? {visible: false}
+            : {})
+    })
+  }
+}
+
 export interface StateInterface{
   layers : NgLayerInterface[]
   forceShowSegment : boolean | null
@@ -31,7 +44,7 @@ export interface ActionInterface extends Action{
   payload: any
 }
 
-const defaultState:StateInterface = {
+export const defaultState:StateInterface = {
   layers:[],
   forceShowSegment:null,
   nehubaReady: false,
@@ -42,7 +55,7 @@ const defaultState:StateInterface = {
   showZoomlevel: null
 }
 
-export function stateStore(prevState:StateInterface = defaultState, action:ActionInterface):StateInterface{
+export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state, action:ActionInterface):StateInterface => {
   switch(action.type){
     case ACTION_TYPES.SET_PANEL_ORDER: {
       const { payload } = action
@@ -75,14 +88,16 @@ export function stateStore(prevState:StateInterface = defaultState, action:Actio
 
         /* this configuration allows the addition of multiple non mixables */
         // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
-        layers : action.layer.constructor === Array 
-          ? prevState.layers.concat(action.layer)
-          : prevState.layers.concat({
-            ...action.layer,
-            ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-                  ? {visible: false}
-                  : {})
-          })
+        layers : mixNgLayers(prevState.layers, action.layer) 
+        
+        // action.layer.constructor === Array 
+        //   ? prevState.layers.concat(action.layer)
+        //   : prevState.layers.concat({
+        //     ...action.layer,
+        //     ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+        //           ? {visible: false}
+        //           : {})
+        //   })
       } 
     case REMOVE_NG_LAYERS:
       const { layers } = action
@@ -125,6 +140,8 @@ export function stateStore(prevState:StateInterface = defaultState, action:Actio
     default: return prevState
   }
 }
+
+export const stateStore = getStateStore()
 
 @Injectable({
   providedIn: 'root'
@@ -369,11 +386,11 @@ export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
 export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
 export const NEHUBA_READY = `NEHUBA_READY`
 
-interface NgLayerInterface{
+export interface NgLayerInterface{
   name : string
   source : string
   mixability : string // base | mixable | nonmixable
-  visible : boolean
+  visible? : boolean
   shader? : string
   transform? : any
 }

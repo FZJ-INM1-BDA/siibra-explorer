@@ -1,12 +1,14 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
-import { Observable, Subscription } from "rxjs";
-import { map, shareReplay, filter } from "rxjs/operators";
+import { Observable, Subscription, throwError, of, merge } from "rxjs";
+import { map, shareReplay, filter, switchMap, catchError, tap } from "rxjs/operators";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
+import { HttpClient } from "@angular/common/http";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
+export const GLSL_COLORMAP_JET = `void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
 @Injectable({
   providedIn : 'root'
@@ -19,8 +21,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
 
   public useMobileUI$: Observable<boolean>
   public loadExportNehubaPromise : Promise<boolean>
-
-  public getActiveColorMapFragmentMain = ():string=>`void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
@@ -40,15 +40,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
    */
   private TIMEOUT = 16000
 
-  /**
-   * raceFetch 
-   */
-   public raceFetch = (url) => Promise.race([
-     fetch(url, this.getFetchOption()),
-     new Promise((_, reject) => setTimeout(() => {
-      reject(`fetch did not resolve under ${this.TIMEOUT} ms`)
-     }, this.TIMEOUT)) as Promise<Response>
-   ])
 
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
   public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {
@@ -59,6 +50,34 @@ export class AtlasViewerConstantsServices implements OnDestroy {
 
   // instead of using window.location.href, which includes query param etc
   public backendUrl = BACKEND_URL || `${window.location.origin}${window.location.pathname}`
+
+  private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
+    switchMap((template:any) => {
+      if (template.nehubaConfig) return of(template)
+      if (template.nehubaConfigURL) return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
+        map(nehubaConfig => {
+          return {
+            ...template,
+            nehubaConfig
+          }
+        })
+      )
+      throwError('neither nehubaConfig nor nehubaConfigURL defined')
+    })
+  )
+
+  public totalTemplates = null
+
+  public initFetchTemplate$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
+    tap((arr:any[]) => this.totalTemplates = arr.length),
+    switchMap((templates: string[]) => merge(
+      ...templates.map(this.fetchTemplate)
+    )),
+    catchError((err) => {
+      console.warn(`fetching templates error`, err)
+      return of(null)
+    })
+  )
 
   /* to be provided by KG in future */
   public templateUrlsPr : Promise<string[]> = new Promise((resolve, reject) => {
@@ -233,14 +252,17 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
   private repoUrl = `https://github.com/HumanBrainProject/interactive-viewer`
 
   constructor(
-    private store$: Store<IavRootStoreInterface>
+    private store$: Store<IavRootStoreInterface>,
+    private http: HttpClient,
   ){
 
     this.darktheme$ = this.store$.pipe(
       select('viewerState'),
       select('templateSelected'),
-      filter(v => !!v),
-      map(({useTheme}) => useTheme === 'dark'),
+      map(template => {
+        if (!template) return false
+        return template.useTheme === 'dark'
+      }),
       shareReplay(1)
     )
 
@@ -248,6 +270,10 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
       select('viewerConfigState'),
       select('useMobileUI'),
       shareReplay(1)
+    )
+
+    this.subscriptions.push(
+      this.darktheme$.subscribe(flag => this.darktheme = flag)
     )
 
     this.subscriptions.push(
