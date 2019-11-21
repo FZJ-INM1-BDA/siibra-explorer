@@ -11,31 +11,34 @@
 </div>
 
 <mat-card #screenshotPreviewCard
-          class="position-fixed screenshotPreviewCard"
+          class="position-fixed screenshotPreviewCard p-0 d-flex justify-content-center"
           (click)="$event.stopPropagation()"
-          *ngIf="previewingScreenshot || takingScreenshot || loadingScreenshot">
-    <i class="fas fa-times cursorPointer position-absolute cancelTimesPosition"
-       (click)="cancelTakingScreenshot()">
-    </i>
-
-    <div *ngIf="takingScreenshot || loadingScreenshot" class="smallSizeWindow">
-        <div class="d-flex flex-column w-100 h-100" *ngIf="takingScreenshot">
-            <span>Size: {{boxEndWidth}} x {{boxEndHeight}}px</span>
+          *ngIf="takingScreenshot || loadingScreenshot">
+    <div class="smallSizeWindow">
+        <div class="d-flex flex-column w-100 h-100 align-items-center position-relative" *ngIf="takingScreenshot">
+            <span class="h3 text-nowrap" *ngIf="!mouseIsDown">You are taking screenshot.</span>
+            <i *ngIf="!mouseIsDown" class="fas fa-times cursorPointer position-absolute cancelTimesPosition"
+               (click)="cancelTakingScreenshot()">
+            </i>
         </div>
         <div class="d-flex w-100 h-100 justify-content-center align-items-center" *ngIf="loadingScreenshot">
-            <i class="fas fa-spinner fa-pulse"></i>
+            <span class="h3 text-nowrap">Please wait to your screenshot.</span> <i class="fas fa-spinner fa-pulse ml-1"></i>
         </div>
+
     </div>
+</mat-card>
+
+<ng-template #previewImageDialog>
     <div *ngIf="previewingScreenshot" class="d-flex flex-column align-items-center previewScreenshot">
         <img [src]="imageUrl" class="previewImage">
-        <div class="d-flex w-100 justify-content-end mt-2">
-            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="saveImage(); previewingScreenshot = false; takingScreenshot = false; croppedCanvas = null;">
+        <div class="d-flex w-100 justify-content-center mt-2">
+            <button mat-stroked-button color="primary" class="mr-1 ml-1" mat-dialog-close="save">
                 <i class="fas fa-save"></i> Save
             </button>
-            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="previewingScreenshot = false; takingScreenshot = true; croppedCanvas = null;">
+            <button mat-stroked-button color="primary" class="mr-1 ml-1" mat-dialog-close="again">
                 <i class="fas fa-camera"></i> Try again
             </button>
-            <button mat-stroked-button color="primary" class="mr-1 ml-1" (click)="cancelTakingScreenshot()">
+            <button mat-stroked-button color="warn" class="mr-1 ml-1" mat-dialog-close="cancel">
                 <i class="fas fa-times"></i> Cancel
             </button>
         </div>
@@ -43,4 +46,4 @@
     <div id="download" class="d-none">
         <a #downloadLink></a>
     </div>
-</mat-card>
+</ng-template>

@@ -1,4 +1,4 @@
-<div class="d-flex"
+<div class="d-flex" #signInBanner
   [iav-key-listener]="keyListenerConfig"
   (iav-key-event)="openTmplWithDialog(helpComponent)">
 
@@ -18,7 +18,7 @@
   </div>
 
   <!-- plugin and tools -->
-  <div class="btnWrapper">
+  <div class="btnWrapper" #pluginsAndToolsDiv>
     <button mat-icon-button
       matTooltipPosition="below"
       [matTooltip]="pluginTooltipText"
@@ -169,4 +169,4 @@
     </mat-list-item>
   </mat-list>
 </ng-template>
-<take-screenshot #takeScreenshotElement style="z-index: 1509;" class="position-fixed fixed-top"></take-screenshot>
+<take-screenshot #takeScreenshotElement style="z-index: 1509;" class="position-fixed fixed-top" (focusSigninBaner)="signInBanner.focus()"></take-screenshot>

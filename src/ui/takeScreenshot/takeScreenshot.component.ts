@@ -1,6 +1,16 @@
-import {Component, ElementRef, HostListener, Inject, Input, OnInit, Renderer2, ViewChild} from "@angular/core";
+import {
+    Component,
+    ElementRef, EventEmitter,
+    HostListener,
+    Inject,
+    OnInit, Output,
+    Renderer2,
+    TemplateRef,
+    ViewChild
+} from "@angular/core";
 import html2canvas from "html2canvas";
 import {DOCUMENT} from "@angular/common";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
     selector: 'take-screenshot',
@@ -10,8 +20,12 @@ import {DOCUMENT} from "@angular/common";
 export class TakeScreenshotComponent implements OnInit {
 
     @ViewChild('downloadLink', {read: ElementRef}) downloadLink: ElementRef
-    @ViewChild('helpBody', {read: ElementRef}) helpBody: ElementRef
     @ViewChild('screenshotPreviewCard', {read: ElementRef}) screenshotPreviewCard: ElementRef
+    @ViewChild('previewImageDialog', {read: TemplateRef}) previewImageDialogTemplateRef : TemplateRef<any>
+    @Output() focusSigninBaner = new EventEmitter()
+
+    dialogRef
+
     takingScreenshot = false
     previewingScreenshot = false
     loadingScreenshot = false
@@ -37,9 +51,7 @@ export class TakeScreenshotComponent implements OnInit {
     screenshotStartY = 0
     imageUrl
 
-    constructor(private renderer: Renderer2, @Inject(DOCUMENT) private document: any) {
-
-    }
+    constructor(private renderer: Renderer2, @Inject(DOCUMENT) private document: any, private matDialog: MatDialog) {}
 
     ngOnInit(): void {
         this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
@@ -47,7 +59,7 @@ export class TakeScreenshotComponent implements OnInit {
     }
 
     @HostListener('window:resize', ['$event'])
-    onResize(event) {
+    onResize() {
         this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
         this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     }
@@ -60,10 +72,10 @@ export class TakeScreenshotComponent implements OnInit {
     }
 
     startScreenshot(){
-        this.takingScreenshot = true
         this.previewingScreenshot = false
         this.croppedCanvas = null
-        this.loadingScreenshot = null
+        this.loadingScreenshot = false
+        this.takingScreenshot = true
     }
 
     move = (e) => {
@@ -196,12 +208,33 @@ export class TakeScreenshotComponent implements OnInit {
             this.imageUrl = this.croppedCanvas.toDataURL()
             this.previewingScreenshot = true
             this.clearStateAfterScreenshot()
+
+            this.dialogRef = this.matDialog.open(this.previewImageDialogTemplateRef)
+            this.dialogRef.afterClosed().toPromise()
+                .then(result => {
+                switch (result) {
+                    case 'save': {
+                        this.saveImage()
+                        this.cancelTakingScreenshot()
+                        break
+                    }
+                    case 'again': {
+                        this.focusSigninBaner.emit()
+                        this.startScreenshot()
+                        break
+                    }
+                    case 'cancel': {
+                        this.cancelTakingScreenshot()
+                        break
+                    }
+                }
+            })
         })
     }
 
     saveImage() {
         this.downloadLink.nativeElement.href = this.croppedCanvas.toDataURL('image/png')
-        this.downloadLink.nativeElement.download = 'marble-diagram.png'
+        this.downloadLink.nativeElement.download = 'brain screenshot.png'
         this.downloadLink.nativeElement.click()
     }
 
@@ -229,5 +262,4 @@ export class TakeScreenshotComponent implements OnInit {
         this.screenshotStartX = 0
         this.screenshotStartY = 0
     }
-
 }
