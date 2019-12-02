@@ -181,7 +181,16 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
   }
 }
 
-export const stateStore = getStateStore()
+// must export a named function for aot compilation
+// see https://github.com/angular/angular/issues/15587
+// https://github.com/amcdnl/ngrx-actions/issues/23 
+// or just google for:
+//
+// angular function expressions are not supported in decorators
+
+export function stateStore() {
+  return getStateStore()
+}
 
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'

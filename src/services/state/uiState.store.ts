@@ -107,7 +107,16 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
   }
 }
 
-export const stateStore = getStateStore()
+// must export a named function for aot compilation
+// see https://github.com/angular/angular/issues/15587
+// https://github.com/amcdnl/ngrx-actions/issues/23 
+// or just google for:
+//
+// angular function expressions are not supported in decorators
+
+export function stateStore() {
+  return getStateStore()
+}
 
 export interface StateInterface{
   mouseOverSegments: {
