@@ -188,8 +188,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
 //
 // angular function expressions are not supported in decorators
 
-export function stateStore() {
-  return getStateStore()
+const defaultStateStore = getStateStore()
+
+export function stateStore(state, action){
+  return defaultStateStore(state, action)
 }
 
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'

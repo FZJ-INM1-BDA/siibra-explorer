@@ -148,8 +148,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 //
 // angular function expressions are not supported in decorators
 
-export function stateStore(){
-  return getStateStore()
+const defaultStateStore = getStateStore()
+
+export function stateStore(state, action){
+  return defaultStateStore(state, action)
 }
 
 @Injectable({

@@ -49,8 +49,10 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
 //
 // angular function expressions are not supported in decorators
 
-export function stateStore() {
-  return getStateStore()
+const defaultStateStore = getStateStore()
+
+export function stateStore(state, action){
+  return defaultStateStore(state, action)
 }
 
 export interface ActionInterface extends Action{

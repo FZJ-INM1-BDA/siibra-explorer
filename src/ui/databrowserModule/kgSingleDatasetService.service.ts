@@ -10,6 +10,7 @@ import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION, IavRootStoreInterface
 import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { filter } from "rxjs/operators";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy{
@@ -31,7 +32,8 @@ export class KgSingleDatasetService implements OnDestroy{
 
     this.subscriptions.push(
       this.store$.pipe(
-        select('ngViewerState')
+        select('ngViewerState'),
+        filter(v => !!v)
       ).subscribe(layersInterface => {
         this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, '')))
       })
