@@ -12,9 +12,6 @@
 </div>
 
 <ng-template #notLoggedIn>
-  <span>
-    Login via
-  </span>
   <a *ngFor="let m of loginMethods"
     [href]="m.href">
     <button 

@@ -1,4 +1,5 @@
 const hbpOidc = require('./hbp-oidc')
+const hbpOidc2 = require('./hbp-oidc-v2')
 const passport = require('passport')
 const objStoreDb = new Map()
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
@@ -20,6 +21,7 @@ module.exports = async (app) => {
   })
 
   await hbpOidc(app)
+  await hbpOidc2(app)
 
   app.get('/user', (req, res) => {
     if (req.user) {

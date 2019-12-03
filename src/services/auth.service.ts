@@ -20,6 +20,9 @@ export class AuthService implements OnDestroy{
   public loginMethods : AuthMethod[] = [{
     name: 'HBP OIDC',
     href: 'hbp-oidc/auth'
+  }, {
+    name: 'HBP OIDC v2 (beta)',
+    href: 'hbp-oidc-v2/auth'
   }]
 
   constructor(private httpClient: HttpClient) {
