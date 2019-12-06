@@ -23,14 +23,6 @@ module.exports = async (app) => {
   await hbpOidc(app)
   await hbpOidc2(app)
 
-  app.get('/user', (req, res) => {
-    if (req.user) {
-      return res.status(200).send(JSON.stringify(req.user))
-    } else {
-      return res.status(401).end()
-    }
-  })
-
   app.get('/logout', (req, res) => {
     if (req.user && req.user.id) objStoreDb.delete(req.user.id)
     req.logout()
