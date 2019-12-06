@@ -39,7 +39,6 @@ const saveUserData = async (user, data) => {
   rStream.push(null)
 
   if(!fileFound) {
-    console.log('>>> file not found, upload')
     return handle.uploadFile({ readStream: rStream, filename: `${IAV_FILENAME}` }, { dir: IAV_DIRECTORY })
   }
 
@@ -47,7 +46,6 @@ const saveUserData = async (user, data) => {
     return new Error('file permission cannot be written')
   }
 
-  console.log('>>> file found, udpate')
   return handle.updateFile({ dir: IAV_DIRECTORY, replaceFilepath: `${IAV_DIRECTORY}${IAV_FILENAME}` }, { readStream: rStream, filename: IAV_FILENAME })
 }
 
