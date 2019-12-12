@@ -1,0 +1,11 @@
+name: Test_Action
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v1
+    - name: works
+      run: echo hello world
