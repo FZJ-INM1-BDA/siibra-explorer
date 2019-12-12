@@ -5204,6 +5204,9 @@
                           "arealabel": "CA",
                           "status": "publicP",
                           "labelIndex": null,
+                          "relatedAreas":[
+                            "CA1 (Hippocampus)"
+                          ],
                           "synonyms": [],
                           "rgb": [
                             250,
