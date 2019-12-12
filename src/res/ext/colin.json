@@ -5619,6 +5619,9 @@
                           "arealabel": "CA",
                           "status": "publicP",
                           "labelIndex": null,
+                          "relatedAreas":[
+                            "CA1 (Hippocampus)"
+                          ],
                           "doi": "https://doi.org/10.25493/B85T-D88",
                           "synonyms": [],
                           "rgb": [
