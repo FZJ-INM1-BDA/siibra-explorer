@@ -1,4 +1,4 @@
-import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory } from "@angular/core";
+import { Injectable, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, NgZone } from "@angular/core";
 import { ACTION_TYPES as PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { HttpClient } from '@angular/common/http'
 import { isDefined, IavRootStoreInterface } from 'src/services/stateStore.service'
@@ -39,7 +39,8 @@ export class PluginServices{
     private widgetService : WidgetServices,
     private cfr : ComponentFactoryResolver,
     private store: Store<IavRootStoreInterface>,
-    private http: HttpClient
+    private http: HttpClient,
+    zone: NgZone
   ){
 
     // TODO implement 
@@ -50,7 +51,18 @@ export class PluginServices{
     )
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
-    this.apiService.interactiveViewer.uiHandle.launchNewWidget = this.launchNewWidget.bind(this) 
+    this.apiService.interactiveViewer.uiHandle.launchNewWidget = (arg) => {
+
+      return this.launchNewWidget(arg)
+        .then(arg2 => {
+          // trigger change detection in Angular
+          // otherwise, model won't be updated until user input
+          zone.run(() => {
+
+          })
+          return arg2
+        })
+    } 
     
     /**
      * TODO convert to rxjs streams, instead of Promise.all
