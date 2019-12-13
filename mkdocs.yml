@@ -1,0 +1,29 @@
+site_name: Interactive Atlas Viewer User Documentation
+
+theme:
+  name: 'material'
+
+extra_css:
+  - extra.css
+
+docs_dir: docs
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - mdx_truly_sane_lists
+
+pages:
+  - Home: 'index.md'
+  - User documentation:
+    - Getting Started: 'usage/gettingStarted.md'
+    - Selecting Template/Parcellation: 'usage/selecting.md'
+  - Release notes:
+    - v2.0.2: 'releases/v2.0.2.md'
+    - v2.0.1: 'releases/v2.0.1.md'
+    - v2.0.0: 'releases/v2.0.0.md'
+    - v0.3.0-beta: 'releases/v0.3.0-beta.md'
+    - v0.2.9: 'releases/v0.2.9.md'
+    - v0.2.0: 'releases/v0.2.0.md'
+    - v0.1.0: 'releases/v0.1.0.md'
+    - legacy: 'releases/legacy.md'
