@@ -12,7 +12,9 @@ export const defaultState: StateInterface = {
   mouseOverUserLandmark: null,
 
   focusedSidePanel: null,
-  sidePanelOpen: false,
+  sidePanelOpen: true,
+  sidePanelManualCollapsibleView: '',
+  sidePanelCurrentViewOpened: false,
 
   snackbarMessage: null,
 
@@ -59,15 +61,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
         ...prevState,
         snackbarMessage: Symbol(snackbarMessage)
       }
-    /**
-     * TODO deprecated
-     * remove ASAP
-     */
-    case TOGGLE_SIDE_PANEL:
-      return {
-        ...prevState,
-        sidePanelOpen: !prevState.sidePanelOpen
-      }
     case OPEN_SIDE_PANEL:
       return {
         ...prevState,
@@ -77,6 +70,29 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
       return {
         ...prevState,
         sidePanelOpen: false
+      }
+
+    case EXPAND_SIDE_PANEL_CURRENT_VIEW:
+      return {
+        ...state,
+        sidePanelCurrentViewOpened: true
+      }
+    case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
+      return {
+        ...state,
+        sidePanelCurrentViewOpened: false
+      }
+
+    case SHOW_SIDE_PANEL_CONNECTIVITY:
+      return {
+        ...state,
+        sidePanelManualCollapsibleView: 'Connectivity'
+      }
+
+    case HIDE_SIDE_PANEL_CONNECTIVITY:
+      return {
+        ...state,
+        sidePanelManualCollapsibleView: ''
       }
     case AGREE_COOKIE:
       /**
@@ -109,7 +125,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
-// https://github.com/amcdnl/ngrx-actions/issues/23 
+// https://github.com/amcdnl/ngrx-actions/issues/23
 // or just google for:
 //
 // angular function expressions are not supported in decorators
@@ -128,6 +144,8 @@ export interface StateInterface{
     segment: any | null
   }[]
   sidePanelOpen: boolean
+  sidePanelManualCollapsibleView: 'Connectivity' | '' | null
+  sidePanelCurrentViewOpened: boolean
   mouseOverSegment: any | number
 
   mouseOverLandmark: any
@@ -165,9 +183,12 @@ export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
 export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
-export const TOGGLE_SIDE_PANEL = 'TOGGLE_SIDE_PANEL'
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
+export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
+export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
+export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
+export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`

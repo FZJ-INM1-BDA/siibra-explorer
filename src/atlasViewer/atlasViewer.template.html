@@ -46,8 +46,8 @@
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
-      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
-      (iav-captureClickListenerDirective-onClick)="mouseUpNehuba($event)">
+      (mouseDownEmitter)="mouseDownNehuba($event)"
+      (mapClicked)="mouseUpNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -57,8 +57,8 @@
         class="w-100 h-100 bg-none mat-drawer-content-overflow-visible">
         <mat-drawer mode="push"
           class="col-10 col-sm-10 col-md-4 col-lg-3 col-xl-2 p-2 bg-none box-shadow-none overflow-visible"
-          [disableClose]="true" [autoFocus]="false" [opened]="true" #sideNavDrawer>
-          <search-side-nav (dismiss)="sideNavDrawer.close()" (open)="sideNavDrawer.open()"
+          [disableClose]="true" [autoFocus]="false" [opened]="sidePanelOpen$ | async" #sideNavDrawer>
+          <search-side-nav (dismiss)="toggleSideNavMenu(true)"
             class="h-100 d-block overflow-visible" #searchSideNav>
           </search-side-nav>
 
@@ -71,7 +71,7 @@
             [matBadge]="!sideNavDrawer.opened && (selectedRegions$ | async)?.length ? (selectedRegions$ | async)?.length : null"
             [matTooltip]="!sideNavDrawer.opened ? (selectedRegions$ | async)?.length ?  ('Explore ' + (selectedRegions$ | async)?.length + ' selected regions.') : 'Explore current view' : null"
             [ngClass]="{'translate-x-6-n': !sideNavDrawer.opened, 'translate-x-7-n': sideNavDrawer.opened}"
-            class="pe-all mt-5" (click)="sideNavDrawer.toggle()">
+            class="pe-all mt-5" (click)="toggleSideNavMenu(sideNavDrawer.opened)">
             <i [ngClass]="{'fa-chevron-left': sideNavDrawer.opened, 'fa-chevron-right': !sideNavDrawer.opened}"
               class="fas translate-x-3"></i>
 
@@ -150,6 +150,26 @@
           </ng-container>
         </ng-container>
       </div>
+
+      <panel-component  class="shadow p-0 m-0" fixedMouseContextualContainerDirective [style.width]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')? '18rem' : '15rem'">
+        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
+          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
+            <div *ngFor="let onHoverRegion of onHoverSegments; let first = first"
+                 class="border-dark rounded">
+              <mat-divider *ngIf="!first"></mat-divider>
+
+              <region-menu
+                                 [selectedRegions$]="selectedRegions$"
+                                 [region]="onHoverRegion"
+                                 [hasConnectivity]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')"
+                                 (exploreConnectivity) = "showConnectivity($event);">
+              </region-menu>
+
+            </div>
+          </mat-card>
+        </div>
+
+      </panel-component>
 
     </layout-floating-container>
 

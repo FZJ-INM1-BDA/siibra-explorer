@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { ComponentsModule } from "./components/components.module";
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { UIModule } from "./ui/ui.module";
@@ -143,6 +143,9 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
   ],
   bootstrap : [
     AtlasViewer
+  ],
+  schemas: [
+      CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

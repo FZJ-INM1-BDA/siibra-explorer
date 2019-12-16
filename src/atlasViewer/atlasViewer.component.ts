@@ -6,16 +6,18 @@ import {
   OnInit,
   TemplateRef,
   AfterViewInit,
-  Renderer2
+  Renderer2,
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
+  ViewerStateInterface,
   isDefined,
-  FETCHED_SPATIAL_DATA,
   safeFilter,
-  IavRootStoreInterface
+  UIStateInterface,
+  SHOW_SIDE_PANEL_CONNECTIVITY,
+  EXPAND_SIDE_PANEL_CURRENT_VIEW
 } from "../services/stateStore.service";
-import {Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import {Observable, Subscription, combineLatest, interval, merge, of} from "rxjs";
 import {
   map,
   filter,
@@ -36,6 +38,12 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
+import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
+import {
+  CLOSE_SIDE_PANEL,
+  OPEN_SIDE_PANEL
+} from "src/services/state/uiState.store";
 import { isSame } from "src/util/fn";
 
 
@@ -60,7 +68,7 @@ const compareFn = (it, item) => it.name === item.name
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public compareFn = compareFn
-  
+
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -68,8 +76,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild(CaptureClickListenerDirective) captureClickListenerDirective: CaptureClickListenerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+
+  @ViewChild('searchSideNav') searchSideNav: SearchSideNav
 
   /**
    * required for styling of all child components
@@ -79,7 +90,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -118,7 +128,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   regionToolsMenuVisible = false
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
+    private store: Store<ViewerStateInterface | UIStateInterface>,
+    public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
     public apiService: AtlasViewerAPIServices,
@@ -422,6 +433,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       event.clientY
     ]
     this.rClContextualMenu.show()
+  }
+
+  toggleSideNavMenu(opened) {
+    this.store.dispatch({type: opened? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
+  }
+
+  showConnectivity(event) {
+    // setTimeout(() => )
+    this.toggleSideNavMenu(false)
+    this.store.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
+    this.store.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})
+    this.searchSideNav.connectivityActive.next(event)
   }
 
   /**

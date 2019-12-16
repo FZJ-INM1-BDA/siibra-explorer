@@ -1,0 +1,19 @@
+.regionDescriptionTextClass{
+    max-height:100px;
+    transition: max-height 0.15s ease-out;
+}
+.regionDescriptionTextOpened {
+    max-height: 310px;
+    transition: max-height 0.25s ease-in;
+}
+
+[fixedMouseContextualContainerDirective]
+{
+    width: 15rem;
+}
+
+[fixedMouseContextualContainerDirective] div[body]
+{
+    overflow: hidden;
+}
+

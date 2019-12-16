@@ -1,18 +1,18 @@
 import { filter } from 'rxjs/operators';
 
-import { 
+import {
   StateInterface as PluginStateInterface,
   stateStore as pluginState,
   defaultState as pluginDefaultState,
   getStateStore as pluginGetStateStore
 } from './state/pluginState.store'
-import { 
+import {
   StateInterface as ViewerConfigStateInterface,
   stateStore as viewerConfigState,
   defaultState as viewerConfigDefaultState,
   getStateStore as getViewerConfigStateStore
 } from './state/viewerConfig.store'
-import { 
+import {
   StateInterface as NgViewerStateInterface,
   ActionInterface as NgViewerActionInterface,
   stateStore as ngViewerState,
@@ -60,7 +60,7 @@ export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 export { ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
 export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
 export { DataEntry, ParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, File, FileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL } from './state/uiState.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, SHOW_SIDE_PANEL_CONNECTIVITY, HIDE_SIDE_PANEL_CONNECTIVITY, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export const GENERAL_ACTION_TYPES = {
