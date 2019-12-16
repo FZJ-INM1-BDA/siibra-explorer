@@ -16,10 +16,14 @@ markdown_extensions:
 pages:
   - Home: 'index.md'
   - User documentation:
-    - Getting Started: 'usage/gettingStarted.md'
-    - Selecting Template/Parcellation: 'usage/selecting.md'
+    - Getting started: 'usage/gettingStarted.md'
+    - Selection: 'usage/selecting.md'
+    - Navigation: 'usage/navigating.md'
+    - Search KG: 'usage/search.md'
+  - Advanced usage:
+    - URL parsing: 'advanced/url.md'
   - Release notes:
-    - v2.0.2: 'releases/v2.0.2.md'
+    - v2.0.2 (latest): 'releases/v2.0.2.md'
     - v2.0.1: 'releases/v2.0.1.md'
     - v2.0.0: 'releases/v2.0.0.md'
     - v0.3.0-beta: 'releases/v0.3.0-beta.md'

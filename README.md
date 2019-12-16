@@ -13,8 +13,7 @@ Releases newer than [v0.2.9](https://github.com/HumanBrainProject/interactive-vi
 
 ### Prerequisites
 
-- node > 6
-- npm > 4
+- node >= 12
 
 ### Develop Interactive Viewer
 

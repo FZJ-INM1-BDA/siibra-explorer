@@ -9,7 +9,7 @@ div.autodoc-members {
   margin-bottom: 15px;
 }
 
-/* img {
+img {
   width: 50%;
-  display: block;
-} */
+  display: inline-block;
+}

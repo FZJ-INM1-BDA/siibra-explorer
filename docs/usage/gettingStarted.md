@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 ## Requirements
 
@@ -8,11 +8,18 @@ Interactive Atlas Viewer uses webgl 2.0 under the hood. While modern operating s
     To check if your device support webgl 2.0, you can visit <https://get.webgl.org/webgl2/>.
 
 ### Desktop
+
+!!! tip
+    If you have a touch enabled device, you can enable mobile UI via:
+
+    `Click on Portrait` > `Settings` > `Enable Mobile UI`
+
 - PC (Windows/Linux/MacOS)
 - Chrome/Firefox
 - Dedicated GPU (not required, but will greatly enhance the experience)
 
 ### Mobile
+
 - Android Smartphone
 - Chrome/Firefox
 
