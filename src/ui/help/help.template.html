@@ -1,17 +1,22 @@
-<div>
-  <h2>General</h2>
-  <div *ngFor = "let entry of generalHelp">
-    <b>{{ entry[0] }}</b>: {{ entry[1] }}
-  </div>
-  <h2>Slice View</h2>
-  <div *ngFor = "let entry of sliceviewHelp">
-    <b>{{ entry[0] }}</b>: {{ entry[1] }}
-  </div>
-  <h2>Perspective View</h2>
-  <div *ngFor = "let entry of perspectiveviewHelp">
-    <b>{{ entry[0] }}</b>: {{ entry[1] }}
-  </div>
-  <hr />
-  <div [innerHTML] = "supportText">
+<div class="container-fluid">
+  <div class="row mt-4 mb-4">
+
+    <a [href]="userDoc" target="_blank">
+      <button mat-raised-button color="primary">
+        <i class="fas fa-book-open"></i>
+        <span>
+          User documentation
+        </span>
+      </button>
+    </a>
+
+    <a [href]="contactEmailHref">
+      <button mat-flat-button>
+        <i class="fas fa-at"></i>
+        <span>
+        {{ contactEmail }}
+        </span>
+      </button>
+    </a>
   </div>
 </div>

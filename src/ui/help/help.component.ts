@@ -17,6 +17,11 @@ export class HelpComponent{
   public perspectiveviewHelp
   public supportText
 
+  public contactEmailHref: string
+  public contactEmail: string
+
+  public userDoc: string = `https://interactive-viewer-user-documentation.apps-dev.hbp.eu`
+
   constructor(
     private constantService:AtlasViewerConstantsServices,
     private sanitizer:DomSanitizer
@@ -25,5 +30,8 @@ export class HelpComponent{
     this.sliceviewHelp = this.constantService.showHelpSliceViewMap
     this.perspectiveviewHelp = this.constantService.showHelpPerspectiveViewMap
     this.supportText = this.sanitizer.bypassSecurityTrustHtml(this.constantService.showHelpSupportText)
+
+    this.contactEmailHref = `mailto:${this.constantService.supportEmailAddress}?Subject=[InteractiveAtlasViewer]%20Queries`
+    this.contactEmail = this.constantService.supportEmailAddress
   }
 }
