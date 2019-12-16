@@ -85,5 +85,7 @@
     "webpack-merge": "^4.1.2",
     "zone.js": "^0.9.1"
   },
-  "dependencies": {}
+  "dependencies": {
+    "hbp-connectivity-component": "0.0.17"
+  }
 }

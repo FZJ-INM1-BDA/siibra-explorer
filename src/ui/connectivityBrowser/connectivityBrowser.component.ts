@@ -1,30 +1,42 @@
-import {AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Inject,
+    Input,
+    OnDestroy,
+    Output,
+    ViewChild
+} from "@angular/core";
 import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
 import {Observable, Subject, Subscription} from "rxjs";
-import html2canvas from "html2canvas";
 import {select, Store} from "@ngrx/store";
-import {ConnectivityBrowserService} from "src/ui/connectivityBrowser/connectivityBrowser.service";
-import {safeFilter} from "src/services/stateStore.service";
+import {HIDE_SIDE_PANEL_CONNECTIVITY, safeFilter} from "src/services/stateStore.service";
 import {distinctUntilChanged, map} from "rxjs/operators";
 
 @Component({
     selector: 'connectivity-browser',
     templateUrl: './connectivityBrowser.template.html',
-    styleUrls: ['./connectivityBrowser.style.css']
 })
-export class ConnectivityBrowserComponent implements AfterViewInit {
+export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
     @Input() region: string = ''
-    @Input() areaNameObservable: Observable<string> = new Subject()
+    private connectedAreas = []
 
-    logarithmSelected = false
-    math = Math
 
     private selectedParcellation$: Observable<any>
     private subscriptions: Subscription[] = []
     private selectedParcellation: any
+    public collapseMenu = -1
+    public allRegions = []
+    public defaultColorMap
 
-    constructor(private constantService: AtlasViewerConstantsServices, private store$: Store<any>, public connectivityService: ConnectivityBrowserService ){
+    math = Math
+
+    @ViewChild('connectivityComponent', {read: ElementRef}) connectivityComponentElement: ElementRef
+
+    constructor(private constantService: AtlasViewerConstantsServices, private store$: Store<any> ){
         this.selectedParcellation$ = this.store$.pipe(
             select('viewerState'),
             safeFilter('parcellationSelected'),
@@ -37,56 +49,83 @@ export class ConnectivityBrowserComponent implements AfterViewInit {
         this.subscriptions.push(
             this.selectedParcellation$.subscribe(parcellation => {
                 this.selectedParcellation = parcellation
+                this.getAllRegionsFromParcellation(parcellation.regions)
             })
         )
+
+        this.connectivityComponentElement.nativeElement.addEventListener('connectivityDataReceived', e => {
+            this.connectedAreas = e.detail
+            if (this.connectedAreas.length > 0) this.saveAndDisableExistingColorTemplate()
+        })
+
+        this.connectivityComponentElement.nativeElement.addEventListener('collapsedMenuChanged', e => {
+            this.collapseMenu = e.detail
+        })
      }
 
+     ngOnDestroy(): void {
+        this.subscriptions.forEach(s => s.unsubscribe())
+     }
 
-    changeConnectivityRegion(regionName) {
-        this.region = regionName
-        this.connectivityService.getConnectivityByRegion(regionName)
-    }
+    public closeConnectivityView() {
 
-
-    downloadCSV() {
-
-        const rows = [['Name', 'Number', 'Log10']]
-
-        this.connectivityService.connectedAreas.forEach(ca => {
-            rows.push(['"' + ca.name+ '"',ca.numberOfConnections,Math.log10(ca.numberOfConnections)])
+        this.allRegions.forEach(r => {
+            if (r && r.ngId && r.rgb) {
+                // @ts-ignore
+                this.defaultColorMap.get(r.ngId).set(r.labelIndex, {red: r.rgb[0], green: r.rgb[1], blue: r.rgb[2]})
+            }
+            getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(this.defaultColorMap)
         })
 
-        let csvContent = "data:text/csv;charset=utf-8,"
-            + rows.map(e => e.join(",")).join("\n")
-        const encodedUri = encodeURI(csvContent)
-        const link = document.createElement("a")
-        link.setAttribute("href", encodedUri)
-        link.setAttribute("download", "my_data.csv")
-        document.body.appendChild(link)
-
-        link.click()
-    }
-
-    @ViewChild('chartContent', {read: ElementRef}) chartContent: ElementRef
-
-    canvasForScreenshotConnectivityChart
-    downloadPNG() {
-        this.chartContent.nativeElement.classList.remove('overflow-auto')
-        html2canvas(this.chartContent.nativeElement).then(canvas => {
-           this.canvasForScreenshotConnectivityChart = canvas
-           this.chartContent.nativeElement.classList.add('overflow-auto')
-        }).then(() => {
-            const encodedUri = encodeURI(this.canvasForScreenshotConnectivityChart.toDataURL())
-            const link = document.createElement("a")
-            link.setAttribute("href", encodedUri)
-            link.setAttribute("download", "connectivity.png")
-            document.body.appendChild(link)
-            link.click()
+        this.store$.dispatch({
+            type: HIDE_SIDE_PANEL_CONNECTIVITY,
         })
     }
 
-    numberToForChart(number) {
-        return this.logarithmSelected? Math.log10(number).toFixed(2) :  number
+    saveAndDisableExistingColorTemplate() {
+
+        const hemisphere = this.region.includes('left hemisphere')? ' - left hemisphere' : ' - right hemisphere'
+
+        this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
+
+        const existingMap = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
+
+        const map = new Map(existingMap)
+
+        this.allRegions.forEach(r => {
+
+            if (r.ngId) {
+                // @ts-ignore
+                map.get(r.ngId).set(r.labelIndex, {red: 255, green: 255, blue: 255})
+            }
+        })
+
+        this.connectedAreas.forEach(area => {
+            const areaAsRegion = this.allRegions
+                .filter(r => r.name === area.name + hemisphere)
+                .map(r => r)
+
+            if (areaAsRegion && areaAsRegion.length && areaAsRegion[0].ngId)
+                // @ts-ignore
+                map.get(areaAsRegion[0].ngId).set(areaAsRegion[0].labelIndex, {red: area.color.r, green: area.color.g, blue: area.color.b})
+
+            getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(map)
+        })
     }
 
+    getAllRegionsFromParcellation = (regions) => {
+        for (let i = 0; i<regions.length; i ++) {
+            if (regions[i].children && regions[i].children.length) {
+                this.getAllRegionsFromParcellation(regions[i].children)
+            } else {
+                this.allRegions.push(regions[i])
+            }
+        }
+    }
+
+
+}
+
+function getWindow (): any {
+    return window;
 }

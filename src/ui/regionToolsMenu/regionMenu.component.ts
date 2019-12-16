@@ -16,7 +16,7 @@ import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
 export class RegionMenuComponent {
     @Input() selectedRegions$: any
     @Input() region: any
-    @Input() selectedTemplateName: string
+    @Input() hasConnectivity: boolean
 
     @Output() exploreConnectivity: EventEmitter<string> = new EventEmitter()
 

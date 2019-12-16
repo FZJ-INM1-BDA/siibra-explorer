@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
@@ -188,6 +188,9 @@ import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectiv
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

@@ -92,7 +92,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-  public selectedTemplateName = ''
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -358,7 +357,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.subscriptions.push(
       this.newViewer$.subscribe(template => {
-        this.selectedTemplateName = template.name
         this.darktheme = this.meetsRequirement ?
           template.useTheme === 'dark' :
           false

@@ -15,7 +15,6 @@ import {
   OPEN_SIDE_PANEL
 } from "src/services/state/uiState.store";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
-import {ConnectivityBrowserService} from "src/ui/connectivityBrowser/connectivityBrowser.service";
 
 @Component({
   selector: 'search-side-nav',
@@ -49,7 +48,6 @@ export class SearchSideNav implements OnInit, OnDestroy {
     private store$: Store<any>,
     private snackBar: MatSnackBar,
     private constantService: AtlasViewerConstantsServices,
-    private connectivityService: ConnectivityBrowserService
   ){
     this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
@@ -76,7 +74,7 @@ export class SearchSideNav implements OnInit, OnDestroy {
   ngOnInit(){
     this.subscriptions.push(
         this.connectivityActive.asObservable().subscribe(r => {
-          this.connectivityService.getConnectivityByRegion(r)
+          // this.connectivityService.getConnectivityByRegion(r)
           this.connectivityRegion = r
         }),
 
