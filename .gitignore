@@ -7,3 +7,5 @@ src/plugin_examples/*/
 .idea
 deploy/datasets/data/
 .DS_Store
+venv/
+site
