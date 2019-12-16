@@ -235,7 +235,7 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    * raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}">${this.repoUrl}</a>
    */
 
-  private supportEmailAddress = `inm1-bda@fz-juelich.de`
+  public supportEmailAddress = `inm1-bda@fz-juelich.de`
 
   public showHelpSupportText:string = `Did you encounter an issue? 
 Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>`

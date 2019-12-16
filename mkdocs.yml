@@ -21,6 +21,7 @@ pages:
     - Navigation: 'usage/navigating.md'
     - Search KG: 'usage/search.md'
   - Advanced usage:
+    - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'
   - Release notes:
     - v2.0.2 (latest): 'releases/v2.0.2.md'
