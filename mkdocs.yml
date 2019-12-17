@@ -17,9 +17,9 @@ pages:
   - Home: 'index.md'
   - User documentation:
     - Getting started: 'usage/gettingStarted.md'
-    - Selection: 'usage/selecting.md'
-    - Navigation: 'usage/navigating.md'
-    - Search KG: 'usage/search.md'
+    - Selecting: 'usage/selecting.md'
+    - Navigating: 'usage/navigating.md'
+    - Searching: 'usage/search.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'

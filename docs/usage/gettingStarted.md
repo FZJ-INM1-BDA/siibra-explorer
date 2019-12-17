@@ -2,10 +2,10 @@
 
 ## Requirements
 
-Interactive Atlas Viewer uses webgl 2.0 under the hood. While modern operating system and browser supports webgl 2.0, specific hardware combinations may yield limited support for webgl 2.0. 
+At its core, the interactive atlas viewer uses webgl 2.0. Whilst modern operating systems and browsers support webgl 2.0, please note that specific software and hardware combinations may have limited support. 
 
 !!! info
-    To check if your device support webgl 2.0, you can visit <https://get.webgl.org/webgl2/>.
+    To check if your device and browser combination support webgl 2.0, visit <https://get.webgl.org/webgl2/>.
 
 ### Desktop
 

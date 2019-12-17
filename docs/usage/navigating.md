@@ -1,8 +1,8 @@
-# Navigation
+# Navigating
 
 ## Navigating the viewer
 
-The interactive atlas viewer can be accessed via either a desktop with a Chrome or Firefox browser or an Android phone or tablet. The navigation gestures vary slightly between the two platforms.
+The interactive atlas viewer can be accessed from either a desktop or an Android mobile device. The navigation scheme vary slightly between the two platforms.
 
 | | Desktop | Mobile |
 | --- | --- | --- |
@@ -12,16 +12,16 @@ The interactive atlas viewer can be accessed via either a desktop with a Chrome 
 | Next slice (_slice view_) | `ctrl` + `mouse wheel` | |
 | Next 10 slice (_slice view_) | `ctrl` + `shift` + `mouse wheel` | |
 
-## Navigate to region of interest
+## Navigating to a region of interest
 
 !!! warning
-    Not all regions have a position of interest defined. If absent, the UI would simply be missing.
+    Not all regions have a position of interest curated. If absent, the UI elements described below would be missing.
     
-    If you believe some regions should have a position of interest defined, or the position of interest was incorrectly defined, please let us know. 
+    If you believe some regions should have a position of interest curated, or the position of interest was incorrectly curated, please contact us. 
 
-### From viewer
+### From the viewer
 
-`click` on a segmented region will bring up a region specific dialog
+`click` on a segmented region to bring up a region specific dialog
 
 [![](images/bigbrain_region_specific_dialog.png)](images/bigbrain_region_specific_dialog.png)
 
@@ -41,8 +41,6 @@ From here, `click` on `Navigate`.
 
 ## Navigation status panel
 
-You can find navigation status of the viewer at the lower left corner. You can reset the `position`, `rotation` and/or `zoom`. 
-
-You can also change the units between `physical` (mm) and `voxel` from the image space.
+You can find the navigation status in the lower left corner of the interactive atlas viewer. You can reset the `position`, `rotation` and/or `zoom`, as well as toggling the units between `physical` (mm) and `voxel`.
 
 [![](images/navigation_status.png)](images/navigation_status.png)
