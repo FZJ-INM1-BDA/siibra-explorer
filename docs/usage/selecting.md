@@ -1,22 +1,22 @@
-# Selection
+# Selecting
 
-## Selecting a template / an atlas
+## Selecting a template / atlas
 
-Interactive Atlas Viewer supports a number of atlases.
+The interactive atlas viewer supports a number of atlases.
 
 ### From homepage
 
-At the home page, the atlases are categorised under the template space.
+On the home page, the atlases are categorised under their respective template spaces.
 
 [![](images/home.png)](images/home.png)
 
-Click on any of the parcellation listed, the interactive atlas viewer will load the parcellation in the corresponding template space
+Select any of the parcellations listed, the interactive atlas viewer will load the parcellation in the corresponding template space.
 
-Clicking on the template card will load the template and the first parcellation in the corresponding template space.
+Clicking on the template card will load the template and the first of the listed parcellation under the template space.
 
 ### From viewer
 
-If an atlas is already loaded, the list of available templates and parcellation can be accessed from the side bar.
+If an atlas is already loaded, the list of available templates and parcellations can be accessed from the side bar.
 
 [![](images/bigbrain_parcellation_selector_open.png)](images/bigbrain_parcellation_selector_open.png)
 
@@ -31,23 +31,23 @@ Information on the selected template or parcellation can be revealed by `hoverin
 
 ## Browsing regions
 
-An atlas will likely contain parcellated regions of interest. The interactive atlas viewer presents several ways of browsing the regions of interest.
+There exist several ways of browsing the parcellated regions in a selected parcellation in the interactive atlas viewer.
 
-### From viewer
+### From the viewer
 
-Each of the region is represented as a coloured segmentation in _slice views_ (and in most circumstances in _3d view_ as well). `mouse hover` on the segment will bring up a contextual menu, showing the name of the region.
+Each of the region is represented as a coloured segment in _slice views_ (and in most circumstances, in _3d view_ as well). `mouse hover` on the segment will bring up a contextual tooltip, showing the name of the region.
 
 [![](images/bigbrain_region_onhover.png)](images/bigbrain_region_onhover.png)
 
-### From quick search
+### Using the quick search box
 
-The interactive atlas viewer provides a quick search tool, which allow user to quickly find a region of interest by keyword
+Using the quick search box, regions of interest may be searched using keywords.
 
 [![](images/bigbrain_quicksearch.png)](images/bigbrain_quicksearch.png)
 
 [![](images/bigbrain_quicksearch_hoc.png)](images/bigbrain_quicksearch_hoc.png)
 
-### From hierarchy tree
+### Using the hierarchical tree
 
 To view the full hierarchy, `click` the _hierarchy tree_ button. 
 
@@ -57,23 +57,23 @@ To view the full hierarchy, `click` the _hierarchy tree_ button.
 
 ## Selecting / Deselecting region(s)
 
-Selecting region(s) indicate a certain level of interest of these regions. Additional information on the selected regions, such as region descriptions, semantically linked datasets and so on, will be [fetched and displayed](search.md).
+Region(s) of interest may also be selected, which will [fetch and display](search.md) additional information, such as descriptions and semantically linked datasets, about the region(s).
 
-### From viewer
+### From the viewer
 
-`click` on a segmented region will bring up a region specific dialog
+`click` on a region (coloured segment) to bring up a context specific menu.
 
 [![](images/bigbrain_region_specific_dialog.png)](images/bigbrain_region_specific_dialog.png)
 
 From here, `click` on `[] Selected` checkbox will select or deselect the region.
 
-### From quick search
+### From the quick search box
 
 `click` on the name or the checkbox will select or deselect the region.
 
 [![](images/bigbrain_quicksearch_hoc.png)](images/bigbrain_quicksearch_hoc.png)
 
-### From hierarchy tree
+### From the hierarchical tree
 
 `click` on any _region_ or _parent region_ will (mass) select / deselect the region(s). 
 

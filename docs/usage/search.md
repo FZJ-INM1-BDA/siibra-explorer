@@ -1,12 +1,12 @@
-# Search Knowldge Graph
+# Searching
 
 The interactive viewer fetches datasets semantically linked to [selected regions](selecting.md#selecting-deselecting-regions). If no regions are selected, all datasets associated with a parcellation will be returned.
 
 [![](images/bigbrain_search_interface.png)](images/bigbrain_search_interface.png)
 
-## Open / Close the search interface
+## Opening / Closing the search interface
 
-The search interface will opened by either:
+The search interface can be opened by either:
 
 - [selecting any region](selecting.md#selecting-deselecting-regions)
 - manually, `click` on `Explore`
@@ -16,28 +16,26 @@ The search interface will opened by either:
 The search interface can be closed by clicking the `Collapse` button
 [![](images/bigbrain_collapse_search.png)](images/bigbrain_collapse_search.png)
 
-## Browser dataset
+## Browsing dataset
 
-`click` on any dataset entry to get a detail view of the said dataset
+`click` on any dataset entry to display a detailed view.
 
 [![](images/bigbrain_click_dataset.png)](images/bigbrain_click_dataset.png)
 
 [![](images/area_te10_detail.png)](images/area_te10_detail.png)
 
-## Filter / Unfilter results
+## Filtering search results
 
-You can narrow down the search result by filtering. Currently, the only filter available is by methods.
-
-`click` the banner `Related Datasets` to reveal the filter options. select all methods of interest (selecting none will apply no filter). 
+You can filter the search result by `click`ing the banner `Related Datasets`. This reveals the filter options. Select/Deselect options to apply the filter.
 
 [![](images/bigbrain_search_filter.png)](images/bigbrain_search_filter.png)
 
 [![](images/bigbrain_search_filter_expanded.png)](images/bigbrain_search_filter_expanded.png)
 
 !!! warning
-    Selecting no filter option is not the same as selecting all options. 
+    Selecting no filter option is not the same as selecting all filter options. 
     
-    There may be datasets without any _methods_ defined. These datasets will be shown if no filter is applied (deselecting all options), but will not show up if all options are selected
+    There may be datasets without any _methods_ curated. These datasets will be shown if no filter is applied (i.e. deselecting all options), but will not show up if all options are selected.
 
 To reset all filters, `click` the `filter icon`
 
