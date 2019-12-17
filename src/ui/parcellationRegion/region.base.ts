@@ -1,5 +1,5 @@
 import { Store } from "@ngrx/store";
-import { Input } from "@angular/core";
+import {EventEmitter, Input, Output} from "@angular/core";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 
@@ -10,6 +10,9 @@ export class RegionBase{
 
   @Input()
   public isSelected: boolean = false
+
+  @Input() hasConnectivity: boolean
+  @Output() exploreConnectivity: EventEmitter<string> = new EventEmitter()
 
   constructor(
     private store$: Store<IavRootStoreInterface>,

@@ -74,24 +74,24 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
     case EXPAND_SIDE_PANEL_CURRENT_VIEW:
       return {
-        ...state,
+        ...prevState,
         sidePanelCurrentViewOpened: true
       }
     case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
       return {
-        ...state,
+        ...prevState,
         sidePanelCurrentViewOpened: false
       }
 
     case SHOW_SIDE_PANEL_CONNECTIVITY:
       return {
-        ...state,
+        ...prevState,
         sidePanelManualCollapsibleView: 'Connectivity'
       }
 
     case HIDE_SIDE_PANEL_CONNECTIVITY:
       return {
-        ...state,
+        ...prevState,
         sidePanelManualCollapsibleView: ''
       }
     case AGREE_COOKIE:

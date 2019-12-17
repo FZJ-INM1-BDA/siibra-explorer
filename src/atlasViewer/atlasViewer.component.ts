@@ -129,7 +129,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   constructor(
     private store: Store<ViewerStateInterface | UIStateInterface>,
-    public dataService: AtlasViewerDataService,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
     public apiService: AtlasViewerAPIServices,
@@ -440,7 +439,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   showConnectivity(event) {
-    // setTimeout(() => )
     this.toggleSideNavMenu(false)
     this.store.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
     this.store.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})

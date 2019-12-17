@@ -20,5 +20,11 @@
         Navigate
       </span>
     </button>
+    <button *ngIf="hasConnectivity" mat-button (click)="exploreConnectivity.emit(region.name)">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>
+        Connectivity
+      </span>
+    </button>
   </mat-card-actions>
 </mat-card>

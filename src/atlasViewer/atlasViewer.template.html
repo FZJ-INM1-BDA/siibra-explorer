@@ -144,32 +144,35 @@
             <region-menu
               class="pe-all"
               [region]="onHoverRegion"
-              [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn">
+              [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
+              [hasConnectivity]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')"
+              (exploreConnectivity) = "showConnectivity($event)"
+            >
             </region-menu>
 
           </ng-container>
         </ng-container>
       </div>
 
-      <panel-component  class="shadow p-0 m-0" fixedMouseContextualContainerDirective [style.width]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')? '18rem' : '15rem'">
-        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
-          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">
-            <div *ngFor="let onHoverRegion of onHoverSegments; let first = first"
-                 class="border-dark rounded">
-              <mat-divider *ngIf="!first"></mat-divider>
+<!--      <panel-component  class="shadow p-0 m-0" fixedMouseContextualContainerDirective>-->
+<!--        <div body class="pe-all" *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">-->
+<!--          <mat-card *ngIf="onHoverSegments.length > 0 && regionToolsMenuVisible" class="d-flex flex-column p-0">-->
+<!--            <div *ngFor="let onHoverRegion of onHoverSegments; let first = first"-->
+<!--                 class="border-dark rounded">-->
+<!--              <mat-divider *ngIf="!first"></mat-divider>-->
 
-              <region-menu
-                                 [selectedRegions$]="selectedRegions$"
-                                 [region]="onHoverRegion"
-                                 [hasConnectivity]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')"
-                                 (exploreConnectivity) = "showConnectivity($event);">
-              </region-menu>
+<!--              <region-menu-->
+<!--                                 [region]="onHoverRegion"-->
+<!--                                 [hasConnectivity]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')"-->
+<!--                                 [pn]="selectedParcellation && selectedParcellation.name && selectedParcellation.name.length? selectedParcellation.name : 'CY'"-->
+<!--                                 (exploreConnectivity) = "showConnectivity($event);">-->
+<!--              </region-menu>-->
 
-            </div>
-          </mat-card>
-        </div>
+<!--            </div>-->
+<!--          </mat-card>-->
+<!--        </div>-->
 
-      </panel-component>
+<!--      </panel-component>-->
 
     </layout-floating-container>
 

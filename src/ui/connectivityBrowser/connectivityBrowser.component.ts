@@ -49,7 +49,15 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         this.subscriptions.push(
             this.selectedParcellation$.subscribe(parcellation => {
                 this.selectedParcellation = parcellation
-                this.getAllRegionsFromParcellation(parcellation.regions)
+                if (parcellation.regions && parcellation.regions.length) {
+                    this.allRegions = []
+                    this.getAllRegionsFromParcellation(parcellation.regions)
+                    if (this.defaultColorMap) {
+                        this.saveAndDisableExistingColorTemplate()
+                    }
+                }
+
+
             })
         )
 
@@ -64,11 +72,20 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
      }
 
      ngOnDestroy(): void {
+        this.setDefaultMap()
         this.subscriptions.forEach(s => s.unsubscribe())
      }
 
     public closeConnectivityView() {
 
+        this.setDefaultMap()
+
+        this.store$.dispatch({
+            type: HIDE_SIDE_PANEL_CONNECTIVITY,
+        })
+    }
+
+    setDefaultMap() {
         this.allRegions.forEach(r => {
             if (r && r.ngId && r.rgb) {
                 // @ts-ignore
@@ -76,13 +93,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
             }
             getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(this.defaultColorMap)
         })
-
-        this.store$.dispatch({
-            type: HIDE_SIDE_PANEL_CONNECTIVITY,
-        })
     }
 
     saveAndDisableExistingColorTemplate() {
+
 
         const hemisphere = this.region.includes('left hemisphere')? ' - left hemisphere' : ' - right hemisphere'
 
