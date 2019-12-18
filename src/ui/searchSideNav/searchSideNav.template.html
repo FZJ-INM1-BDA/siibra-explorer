@@ -12,7 +12,7 @@
     <!-- footer content -->
     <div class="d-flex flex-row justify-content-center" card-footer>
       <button mat-stroked-button
-        *ngIf="!(sidebarMenuState$ | async)?.sidePanelCurrentViewOpened"
+        *ngIf="!(sidePanelExploreCurrentViewIsOpen$ | async)"
         (click)="expandSidePanelCurrentView()"
         class="m-1 flex-grow-1 overflow-hidden" >
         <i class="fas fa-chevron-down"></i>
@@ -23,14 +23,12 @@
     </div>
   </viewer-state-controller>
 
-  <ng-container *ngIf="(sidebarMenuState$ | async) as sideBarMenu">
+  <ng-container>
     <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1" style="max-height: calc(100% - 220px)"
-                          [region]="connectivityRegion"
-                          #connectivityBrowser
-                          *ngIf="sideBarMenu.sidePanelCurrentViewOpened && sideBarMenu.sidePanelManualCollapsibleView === 'Connectivity'">
+                          *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async) && (sidePanelManualCollapsibleView$ | async)">
 
     </connectivity-browser>
-    <data-browser *ngIf="sideBarMenu.sidePanelCurrentViewOpened && !sideBarMenu.sidePanelManualCollapsibleView"
+    <data-browser *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async) && !(sidePanelManualCollapsibleView$ | async)"
       class="pe-all flex-grow-5 flex-shrink-1"
       [template]="viewerStateController.templateSelected$ | async"
       [parcellation]="viewerStateController.parcellationSelected$ | async"

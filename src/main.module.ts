@@ -55,6 +55,7 @@ import 'src/res/css/version.css'
 import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
+import {UiStateUseEffect} from "src/services/state/uiState.store";
 
 @NgModule({
   imports : [
@@ -78,7 +79,8 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
       ViewerStateUseEffect,
       NgViewerUseEffect,
       PluginServiceuseEffect,
-      AtlasViewerHistoryUseEffect
+      AtlasViewerHistoryUseEffect,
+      UiStateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,

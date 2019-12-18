@@ -10,12 +10,10 @@ import {
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
-  ViewerStateInterface,
   isDefined,
   safeFilter,
-  UIStateInterface,
   SHOW_SIDE_PANEL_CONNECTIVITY,
-  EXPAND_SIDE_PANEL_CURRENT_VIEW
+  EXPAND_SIDE_PANEL_CURRENT_VIEW, IavRootStoreInterface
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of} from "rxjs";
 import {
@@ -39,7 +37,6 @@ import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
 import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
-import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL
@@ -76,7 +73,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
-  @ViewChild(CaptureClickListenerDirective) captureClickListenerDirective: CaptureClickListenerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
 
@@ -121,14 +117,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
-  public sidePanelOpen$: Observable<boolean>
+  public sidePanelIsOpen$: Observable<boolean>
 
 
   onhoverSegmentsForFixed$: Observable<string[]>
   regionToolsMenuVisible = false
 
   constructor(
-    private store: Store<ViewerStateInterface | UIStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
     public apiService: AtlasViewerAPIServices,
@@ -168,10 +164,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(state => state.focusedSidePanel)
     )
 
-    this.sidePanelOpen$ = this.store.pipe(
+    this.sidePanelIsOpen$ = this.store.pipe(
       select('uiState'),  
       filter(state => isDefined(state)),
-      map(state => state.sidePanelOpen)
+      map(state => state.sidePanelIsOpen)
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -436,13 +432,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   toggleSideNavMenu(opened) {
     this.store.dispatch({type: opened? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
-  }
-
-  showConnectivity(event) {
-    this.toggleSideNavMenu(false)
-    this.store.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
-    this.store.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})
-    this.searchSideNav.connectivityActive.next(event)
   }
 
   /**

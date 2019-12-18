@@ -1,8 +1,11 @@
-import { Action } from '@ngrx/store'
-import { TemplateRef } from '@angular/core';
+import {Action, select, Store} from '@ngrx/store'
+import {Injectable, TemplateRef} from '@angular/core';
 
 import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
-import { GENERAL_ACTION_TYPES } from '../stateStore.service'
+import {GENERAL_ACTION_TYPES, IavRootStoreInterface} from '../stateStore.service'
+import {Effect} from "@ngrx/effects";
+import {Observable} from "rxjs";
+import {filter, map, mapTo, scan, startWith} from "rxjs/operators";
 
 export const defaultState: StateInterface = {
   mouseOverSegments: [],
@@ -12,9 +15,9 @@ export const defaultState: StateInterface = {
   mouseOverUserLandmark: null,
 
   focusedSidePanel: null,
-  sidePanelOpen: true,
+  sidePanelIsOpen: true,
   sidePanelManualCollapsibleView: '',
-  sidePanelCurrentViewOpened: false,
+  sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
 
@@ -64,23 +67,23 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
     case OPEN_SIDE_PANEL:
       return {
         ...prevState,
-        sidePanelOpen: true
+        sidePanelIsOpen: true
       }
     case CLOSE_SIDE_PANEL:
       return {
         ...prevState,
-        sidePanelOpen: false
+        sidePanelIsOpen: false
       }
 
     case EXPAND_SIDE_PANEL_CURRENT_VIEW:
       return {
         ...prevState,
-        sidePanelCurrentViewOpened: true
+        sidePanelExploreCurrentViewIsOpen: true
       }
     case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
       return {
         ...prevState,
-        sidePanelCurrentViewOpened: false
+        sidePanelExploreCurrentViewIsOpen: false
       }
 
     case SHOW_SIDE_PANEL_CONNECTIVITY:
@@ -143,9 +146,9 @@ export interface StateInterface{
     }
     segment: any | null
   }[]
-  sidePanelOpen: boolean
+  sidePanelIsOpen: boolean
   sidePanelManualCollapsibleView: 'Connectivity' | '' | null
-  sidePanelCurrentViewOpened: boolean
+  sidePanelExploreCurrentViewIsOpen: boolean
   mouseOverSegment: any | number
 
   mouseOverLandmark: any
@@ -176,6 +179,45 @@ export interface ActionInterface extends Action{
   bottomSheetTemplate: TemplateRef<any>
 
   payload: any
+}
+
+@Injectable({
+  providedIn:'root'
+})
+
+export class UiStateUseEffect{
+
+  private numRegionSelectedWithHistory$: Observable<any[]>
+
+  @Effect()
+  public sidePanelOpen$: Observable<any>
+
+  @Effect()
+  public viewCurrentOpen$: Observable<any>
+
+  constructor(store$: Store<IavRootStoreInterface>) {
+    this.numRegionSelectedWithHistory$ = store$.pipe(
+      select('viewerState'),
+      select('regionsSelected'),
+      map(arr => arr.length),
+      startWith(0),
+      scan((acc, curr) => [curr, ...acc], [])
+    )
+
+    this.sidePanelOpen$ = this.numRegionSelectedWithHistory$.pipe(
+      filter(([curr, prev]) => prev === 0 && curr > 0),
+      mapTo({
+        type: OPEN_SIDE_PANEL
+      })
+    )
+
+    this.viewCurrentOpen$ = this.numRegionSelectedWithHistory$.pipe(
+      filter(([curr, prev]) => prev === 0 && curr > 0),
+      mapTo({
+        type: EXPAND_SIDE_PANEL_CURRENT_VIEW
+      })
+    )
+  }
 }
 
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`

@@ -1,9 +1,9 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent>
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="!noConnectivityForRegion; else noConnectivity">
+    <!--ToDo set show-description="true" when data will available-->
     <hbp-connectivity-matrix-row
             [region]="region"
             theme="dark"
             loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
-            show-description="true"
             show-export="true"
             show-source="true"
             show-title="true"
@@ -24,7 +24,7 @@
                 </span>
                 <div class="d-flex align-items-center justify-content-around">
                     <small class="d-flex flex-column align-items-center w-100">
-
+                        <!--ToDo Implement function when Hemisphere information will be available -->
                         <!--                        *ngIf="(selectedRegions$ | async) as selectedRegions"-->
                         <!--                        (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex))">-->
 
@@ -32,6 +32,7 @@
                             <!--                            <i class="fas fa-hand-pointer mt-n1"></i>-->
                             <span class="fa-stack fa-1x ">
                                 <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                                <!--ToDo Implement function when Hemisphere information will be available -->
                                 <!--                    <i class="fas fa-slash fa-stack-1x fa-inverse"-->
                                 <!--                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>-->
                             </span>
@@ -48,8 +49,7 @@
                     </small>
 
                     <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="region = connectedAreas[collapseMenu].name">
-                            <!--(click)="changeConnectivityRegion('connection.name')"-->
+                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[collapseMenu].name)">
                             <i class="fab fa-connectdevelop  mt-n1"></i>
                         </button>
                         Connectivity
@@ -61,3 +61,17 @@
         </div>
     </hbp-connectivity-matrix-row>
 </div>
+
+<ng-template #noConnectivity>
+    <mat-card class="p-2 w-100 h-100 overflow-auto d-block">
+        <div class="w-100 d-flex justify-content-end mt-3"><span
+                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
+        <h5>
+            Connectivity Matrix Browser
+        </h5>
+        <div>
+            No Connectivity for selected Parcellation!
+        </div>
+
+    </mat-card>
+</ng-template>

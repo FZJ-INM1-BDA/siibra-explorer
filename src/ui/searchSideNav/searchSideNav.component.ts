@@ -13,7 +13,6 @@ import {
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
   OPEN_SIDE_PANEL
 } from "src/services/state/uiState.store";
-import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
@@ -24,11 +23,8 @@ import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.s
   ]
 })
 
-export class SearchSideNav implements OnInit, OnDestroy {
+export class SearchSideNav implements OnDestroy {
   public availableDatasets: number = 0
-
-  public connectivityActive = new Subject<string>()
-  public connectivityRegion = ''
 
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
@@ -36,12 +32,11 @@ export class SearchSideNav implements OnInit, OnDestroy {
   @Output() dismiss: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('layerBrowserTmpl', {read: TemplateRef}) layerBrowserTmpl: TemplateRef<any>
-  @ViewChild('connectivityBrowser') connectivityBrowser: ConnectivityBrowserComponent
-
 
   public autoOpenSideNavDataset$: Observable<any>
 
-  sidebarMenuState$: Observable<any>
+  sidePanelExploreCurrentViewIsOpen$: Observable<any>
+  sidePanelManualCollapsibleView$: Observable<any>
 
   constructor(
     public dialog: MatDialog,
@@ -59,31 +54,14 @@ export class SearchSideNav implements OnInit, OnDestroy {
       mapTo(true)
     )
 
-    this.sidebarMenuState$ = this.store$.pipe(
+    this.sidePanelExploreCurrentViewIsOpen$ = this.store$.pipe(
         select('uiState'),
-        map(state => {
-          return {
-            sidePanelOpen: state.sidePanelOpen,
-            sidePanelCurrentViewOpened: state.sidePanelCurrentViewOpened,
-            sidePanelManualCollapsibleView: state.sidePanelManualCollapsibleView
-          }
-        })
+        select("sidePanelExploreCurrentViewIsOpen")
     )
-  }
 
-  ngOnInit(){
-    this.subscriptions.push(
-        this.connectivityActive.asObservable().subscribe(r => {
-          // this.connectivityService.getConnectivityByRegion(r)
-          this.connectivityRegion = r
-        }),
-
-      this.autoOpenSideNavDataset$.subscribe(() => {
-        this.store$.dispatch({
-          type: OPEN_SIDE_PANEL,
-        })
-        this.expandSidePanelCurrentView()
-      })
+    this.sidePanelManualCollapsibleView$ = this.store$.pipe(
+        select('uiState'),
+        select("sidePanelManualCollapsibleView")
     )
   }
 
