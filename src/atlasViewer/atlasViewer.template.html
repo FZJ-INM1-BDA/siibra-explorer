@@ -141,11 +141,12 @@
         <ng-container *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
           <ng-container *ngFor="let onHoverRegion of onHoverSegments; let first = first">
 
+            <!-- ToDo it should change - we should get information about connectivity existence from API-->
             <region-menu
               class="pe-all"
               [region]="onHoverRegion"
               [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
-              [hasConnectivity]="selectedParcellation && selectedParcellation.name.includes('JuBrain Cytoarchitectonic Atlas')"
+              [hasConnectivity]="selectedParcellation && selectedParcellation.hasAdditionalViewMode && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
             >
             </region-menu>
 

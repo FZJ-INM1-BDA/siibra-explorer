@@ -16,7 +16,7 @@ export const defaultState: StateInterface = {
 
   focusedSidePanel: null,
   sidePanelIsOpen: true,
-  sidePanelManualCollapsibleView: '',
+  sidePanelCurrentViewContent: 'Dataset',
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
@@ -86,16 +86,21 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
         sidePanelExploreCurrentViewIsOpen: false
       }
 
+    case SHOW_SIDE_PANEL_DATASET_LIST:
+      return {
+        ...prevState,
+        sidePanelCurrentViewContent: 'Dataset'
+      }
+
     case SHOW_SIDE_PANEL_CONNECTIVITY:
       return {
         ...prevState,
-        sidePanelManualCollapsibleView: 'Connectivity'
+        sidePanelCurrentViewContent: 'Connectivity'
       }
-
     case HIDE_SIDE_PANEL_CONNECTIVITY:
       return {
         ...prevState,
-        sidePanelManualCollapsibleView: ''
+        sidePanelCurrentViewContent: 'Dataset'
       }
     case AGREE_COOKIE:
       /**
@@ -147,7 +152,7 @@ export interface StateInterface{
     segment: any | null
   }[]
   sidePanelIsOpen: boolean
-  sidePanelManualCollapsibleView: 'Connectivity' | '' | null
+  sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
   sidePanelExploreCurrentViewIsOpen: boolean
   mouseOverSegment: any | number
 
@@ -227,6 +232,7 @@ export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
+export const SHOW_SIDE_PANEL_DATASET_LIST = `SHOW_SIDE_PANEL_DATASET_LIST`
 export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
 export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`

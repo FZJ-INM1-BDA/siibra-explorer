@@ -1,4 +1,4 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="!noConnectivityForRegion; else noConnectivity">
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="!noConnectivityForParcellation; else noConnectivity">
     <!--ToDo set show-description="true" when data will available-->
     <hbp-connectivity-matrix-row
             [region]="region"
@@ -13,14 +13,14 @@
 
         <div slot="connectedRegionMenu">
 
-            <div class="d-flex flex-column" *ngIf="collapseMenu >= 0">
+            <div class="d-flex flex-column" *ngIf="expandMenuIndex >= 0">
                 <mat-divider></mat-divider>
                 <span class="mt-2 mr-2 ml-2">
-                    <small>Region: {{connectedAreas[collapseMenu].name}}</small>
+                    <small>Region: {{connectedAreas[expandMenuIndex].name}}</small>
                     <br>
-                    <small>Number of Connection: {{connectedAreas[collapseMenu].numberOfConnections}}</small>
+                    <small>Number of Connection: {{connectedAreas[expandMenuIndex].numberOfConnections}}</small>
                     <br>
-                    <small>Log(123) = {{math.log10(connectedAreas[collapseMenu].numberOfConnections)}}</small>
+                    <small>Log(123) = {{math.log10(connectedAreas[expandMenuIndex].numberOfConnections)}}</small>
                 </span>
                 <div class="d-flex align-items-center justify-content-around">
                     <small class="d-flex flex-column align-items-center w-100">
@@ -49,7 +49,7 @@
                     </small>
 
                     <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[collapseMenu].name)">
+                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
                             <i class="fab fa-connectdevelop  mt-n1"></i>
                         </button>
                         Connectivity

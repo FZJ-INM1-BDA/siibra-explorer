@@ -23,12 +23,12 @@
     </div>
   </viewer-state-controller>
 
-  <ng-container>
-    <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1" style="max-height: calc(100% - 220px)"
-                          *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async) && (sidePanelManualCollapsibleView$ | async)">
+  <ng-container *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async)" [ngSwitch]="(sidePanelCurrentViewContent | async)">
+    <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1"
+                          *ngSwitchCase = "'Connectivity'">
 
     </connectivity-browser>
-    <data-browser *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async) && !(sidePanelManualCollapsibleView$ | async)"
+    <data-browser *ngSwitchCase = "'Dataset'"
       class="pe-all flex-grow-5 flex-shrink-1"
       [template]="viewerStateController.templateSelected$ | async"
       [parcellation]="viewerStateController.parcellationSelected$ | async"

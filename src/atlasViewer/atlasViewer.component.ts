@@ -12,8 +12,7 @@ import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
   isDefined,
   safeFilter,
-  SHOW_SIDE_PANEL_CONNECTIVITY,
-  EXPAND_SIDE_PANEL_CURRENT_VIEW, IavRootStoreInterface
+  IavRootStoreInterface
 } from "../services/stateStore.service";
 import {Observable, Subscription, combineLatest, interval, merge, of} from "rxjs";
 import {

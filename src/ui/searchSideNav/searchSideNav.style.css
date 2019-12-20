@@ -17,3 +17,7 @@
   margin-left:-1.5rem;
   width: calc(100% + 3rem);
 }
+
+connectivity-browser {
+  max-height: calc(100% - 220px);
+}

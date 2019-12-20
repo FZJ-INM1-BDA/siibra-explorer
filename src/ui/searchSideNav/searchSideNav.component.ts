@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
+import { Component, Output, EventEmitter, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
 import { MatDialogRef, MatDialog, MatSnackBar } from "@angular/material";
 import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
-import {Observable, Subject, Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
@@ -11,7 +11,6 @@ import {
   CLOSE_SIDE_PANEL,
   COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
-  OPEN_SIDE_PANEL
 } from "src/services/state/uiState.store";
 import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.service";
 
@@ -35,8 +34,8 @@ export class SearchSideNav implements OnDestroy {
 
   public autoOpenSideNavDataset$: Observable<any>
 
-  sidePanelExploreCurrentViewIsOpen$: Observable<any>
-  sidePanelManualCollapsibleView$: Observable<any>
+  public sidePanelExploreCurrentViewIsOpen$: Observable<any>
+  public sidePanelCurrentViewContent: Observable<any>
 
   constructor(
     public dialog: MatDialog,
@@ -59,9 +58,9 @@ export class SearchSideNav implements OnDestroy {
         select("sidePanelExploreCurrentViewIsOpen")
     )
 
-    this.sidePanelManualCollapsibleView$ = this.store$.pipe(
+    this.sidePanelCurrentViewContent = this.store$.pipe(
         select('uiState'),
-        select("sidePanelManualCollapsibleView")
+        select("sidePanelCurrentViewContent")
     )
   }
 

@@ -2,7 +2,6 @@ import { Store } from "@ngrx/store";
 import {EventEmitter, Input, Output} from "@angular/core";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import {
-  CLOSE_SIDE_PANEL,
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
   IavRootStoreInterface, OPEN_SIDE_PANEL,
   SHOW_SIDE_PANEL_CONNECTIVITY
@@ -42,7 +41,8 @@ export class RegionBase{
     })
   }
 
-  pushConnectivityRegion(regionName) {
+  showConnectivity(regionName) {
+    //ToDo trigger side panel opening with effect
     this.store$.dispatch({type: OPEN_SIDE_PANEL})
     this.store$.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})
     this.store$.dispatch({type: SHOW_SIDE_PANEL_CONNECTIVITY})
