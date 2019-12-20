@@ -6,16 +6,15 @@ import {
   OnInit,
   TemplateRef,
   AfterViewInit,
-  Renderer2
+  Renderer2,
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import {
   isDefined,
-  FETCHED_SPATIAL_DATA,
   safeFilter,
   IavRootStoreInterface
 } from "../services/stateStore.service";
-import {Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
+import {Observable, Subscription, combineLatest, interval, merge, of} from "rxjs";
 import {
   map,
   filter,
@@ -36,6 +35,10 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import {
+  CLOSE_SIDE_PANEL,
+  OPEN_SIDE_PANEL
+} from "src/services/state/uiState.store";
 import { isSame } from "src/util/fn";
 
 
@@ -60,7 +63,7 @@ const compareFn = (it, item) => it.name === item.name
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public compareFn = compareFn
-  
+
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
@@ -79,7 +82,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-
   meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
@@ -111,7 +113,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
-  public sidePanelOpen$: Observable<boolean>
+  public sidePanelIsOpen$: Observable<boolean>
 
 
   onhoverSegmentsForFixed$: Observable<string[]>
@@ -158,10 +160,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(state => state.focusedSidePanel)
     )
 
-    this.sidePanelOpen$ = this.store.pipe(
+    this.sidePanelIsOpen$ = this.store.pipe(
       select('uiState'),  
       filter(state => isDefined(state)),
-      map(state => state.sidePanelOpen)
+      map(state => state.sidePanelIsOpen)
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -422,6 +424,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       event.clientY
     ]
     this.rClContextualMenu.show()
+  }
+
+  toggleSideNavMenu(opened) {
+    this.store.dispatch({type: opened? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
   }
 
   /**

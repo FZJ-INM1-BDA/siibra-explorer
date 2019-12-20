@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
@@ -77,6 +77,7 @@ import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedM
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 
 @NgModule({
   imports : [
@@ -125,6 +126,7 @@ import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSi
     RegionsListView,
     TakeScreenshotComponent,
     RegionMenuComponent,
+    ConnectivityBrowserComponent,
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
 
@@ -191,6 +193,9 @@ import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSi
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective
+  ],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 
