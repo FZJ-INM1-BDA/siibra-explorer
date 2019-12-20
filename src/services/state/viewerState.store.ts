@@ -23,6 +23,7 @@ export interface StateInterface{
   dedicatedView : string[]
 
   loadedNgLayers: NgLayerInterface[]
+  connectivityRegion: string | null
 }
 
 export interface ActionInterface extends Action{
@@ -43,6 +44,8 @@ export interface ActionInterface extends Action{
   navigation? : any
 
   payload: any
+
+  connectivityRegion?: string
 }
 
 export const defaultState:StateInterface = {
@@ -55,7 +58,8 @@ export const defaultState:StateInterface = {
   dedicatedView: null,
   navigation: null,
   parcellationSelected: null,
-  templateSelected: null
+  templateSelected: null,
+  connectivityRegion: ''
 }
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState:Partial<StateInterface> = state, action:ActionInterface) => {
@@ -176,6 +180,16 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
     case GENERAL_ACTION_TYPES.APPLY_STATE:
       const { viewerState } = (action as any).state
       return viewerState
+    case SET_CONNECTIVITY_REGION:
+      return {
+        ...prevState,
+        connectivityRegion: action.connectivityRegion
+      }
+    case CLEAR_CONNECTIVITY_REGION:
+      return {
+        ...prevState,
+        connectivityRegion: ''
+      }
     default :
       return prevState
   }
@@ -215,6 +229,8 @@ export const USER_LANDMARKS = `USER_LANDMARKS`
 export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_IDS`
 
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
+export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
+export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
 
 @Injectable({
   providedIn: 'root'

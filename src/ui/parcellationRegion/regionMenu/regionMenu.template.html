@@ -5,7 +5,7 @@
   <mat-card-content>
     {{ region.description }}
   </mat-card-content>
-  <mat-card-actions class="d-flex flex-row">
+  <mat-card-actions class="d-flex flex-row flex-wrap">
     <button mat-button
       (click)="toggleRegionSelected()"
       [color]="isSelected ? 'primary': 'basic'">
@@ -18,6 +18,12 @@
       <i class="fas fa-map-marked-alt"></i>
       <span>
         Navigate
+      </span>
+    </button>
+    <button *ngIf="hasConnectivity" mat-button (click)="showConnectivity(region.name)">
+      <i class="fab fa-connectdevelop"></i>
+      <span>
+        Connectivity
       </span>
     </button>
   </mat-card-actions>

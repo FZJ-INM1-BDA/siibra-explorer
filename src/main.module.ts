@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { ComponentsModule } from "./components/components.module";
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { UIModule } from "./ui/ui.module";
@@ -55,6 +55,7 @@ import 'src/res/css/version.css'
 import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
+import {UiStateUseEffect} from "src/services/state/uiState.store";
 
 @NgModule({
   imports : [
@@ -78,7 +79,8 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
       ViewerStateUseEffect,
       NgViewerUseEffect,
       PluginServiceuseEffect,
-      AtlasViewerHistoryUseEffect
+      AtlasViewerHistoryUseEffect,
+      UiStateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -143,6 +145,9 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
   ],
   bootstrap : [
     AtlasViewer
+  ],
+  schemas: [
+      CUSTOM_ELEMENTS_SCHEMA
   ]
 })
 

@@ -1,0 +1,77 @@
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="parcellationHasConnectivityData; else noConnectivity">
+    <!--ToDo set show-description="true" when data will available-->
+    <hbp-connectivity-matrix-row
+            [region]="region"
+            theme="dark"
+            loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+            show-export="true"
+            show-source="true"
+            show-title="true"
+            show-toolbar="true">
+        <div slot="header" class="w-100 d-flex justify-content-end mt-3"><span
+                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
+
+        <div slot="connectedRegionMenu">
+
+            <div class="d-flex flex-column" *ngIf="expandMenuIndex >= 0">
+                <mat-divider></mat-divider>
+                <span class="mt-2 mr-2 ml-2">
+                    <small>Region: {{connectedAreas[expandMenuIndex].name}}</small>
+                    <br>
+                    <small>Number of Connection: {{connectedAreas[expandMenuIndex].numberOfConnections}}</small>
+                    <br>
+                    <small>Log(123) = {{math.log10(connectedAreas[expandMenuIndex].numberOfConnections)}}</small>
+                </span>
+                <div class="d-flex align-items-center justify-content-around">
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <!--ToDo Implement function when Hemisphere information will be available -->
+                        <!--                        *ngIf="(selectedRegions$ | async) as selectedRegions"-->
+                        <!--                        (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex))">-->
+
+                        <button mat-icon-button class="border">
+                            <!--                            <i class="fas fa-hand-pointer mt-n1"></i>-->
+                            <span class="fa-stack fa-1x ">
+                                <i class="fas fa-hand-pointer fa-stack-1x"></i>
+                                <!--ToDo Implement function when Hemisphere information will be available -->
+                                <!--                    <i class="fas fa-slash fa-stack-1x fa-inverse"-->
+                                <!--                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>-->
+                            </span>
+                        </button>
+                        <!--                        <span [innerText]="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)? 'Deselect' : 'Select'"></span>-->
+                        <span>Select</span>
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border">
+                            <i class="fas fa-crosshairs  mt-n1"></i>
+                        </button>
+                        Navigate
+                    </small>
+
+                    <small class="d-flex flex-column align-items-center w-100">
+                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
+                            <i class="fab fa-connectdevelop  mt-n1"></i>
+                        </button>
+                        Connectivity
+                    </small>
+                </div>
+            </div>
+
+
+        </div>
+    </hbp-connectivity-matrix-row>
+</div>
+
+<ng-template #noConnectivity>
+    <mat-card class="p-2 w-100 h-100 overflow-auto d-block">
+        <div class="w-100 d-flex justify-content-end mt-3"><span
+                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
+        <h5>
+            Connectivity Matrix Browser
+        </h5>
+        <div>
+            No Connectivity for selected Parcellation!
+        </div>
+
+    </mat-card>
+</ng-template>

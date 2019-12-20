@@ -1,12 +1,17 @@
-import { Component, Output, EventEmitter, OnInit, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
+import { Component, Output, EventEmitter, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
 import { MatDialogRef, MatDialog, MatSnackBar } from "@angular/material";
 import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
-import { Observable, Subscription } from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import { Store, select } from "@ngrx/store";
 import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import {
+  CLOSE_SIDE_PANEL,
+  COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
+  EXPAND_SIDE_PANEL_CURRENT_VIEW,
+} from "src/services/state/uiState.store";
 import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
@@ -17,27 +22,28 @@ import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.s
   ]
 })
 
-export class SearchSideNav implements OnInit, OnDestroy {
-  public showDataset: boolean = false
+export class SearchSideNav implements OnDestroy {
   public availableDatasets: number = 0
 
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
 
   @Output() dismiss: EventEmitter<any> = new EventEmitter()
-  @Output() open: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('layerBrowserTmpl', {read: TemplateRef}) layerBrowserTmpl: TemplateRef<any>
 
-  public autoOpenSideNav$: Observable<any>
+  public autoOpenSideNavDataset$: Observable<any>
+
+  public sidePanelExploreCurrentViewIsOpen$: Observable<any>
+  public sidePanelCurrentViewContent: Observable<any>
 
   constructor(
     public dialog: MatDialog,
     private store$: Store<IavRootStoreInterface>,
     private snackBar: MatSnackBar,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
   ){
-    this.autoOpenSideNav$ = this.store$.pipe(
+    this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
       map(arr => arr.length),
@@ -46,16 +52,31 @@ export class SearchSideNav implements OnInit, OnDestroy {
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo(true)
     )
-  }
 
-  ngOnInit(){
-    this.subscriptions.push(
-      this.autoOpenSideNav$.subscribe(() => {
-        this.open.emit(true)
-        this.showDataset = true
-      })
+    this.sidePanelExploreCurrentViewIsOpen$ = this.store$.pipe(
+        select('uiState'),
+        select("sidePanelExploreCurrentViewIsOpen")
+    )
+
+    this.sidePanelCurrentViewContent = this.store$.pipe(
+        select('uiState'),
+        select("sidePanelCurrentViewContent")
     )
   }
+
+  collapseSidePanelCurrentView() {
+    this.store$.dispatch({
+      type: COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
+    })
+  }
+
+  expandSidePanelCurrentView() {
+    this.store$.dispatch({
+      type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
+    })
+  }
+
+
 
   ngOnDestroy(){
     while(this.subscriptions.length > 0) {
@@ -70,9 +91,11 @@ export class SearchSideNav implements OnInit, OnDestroy {
       return  
     }
     if (this.layerBrowserDialogRef) return
-    
-    this.dismiss.emit(true)
-    
+
+    this.store$.dispatch({
+      type: CLOSE_SIDE_PANEL,
+    })
+
     const dialogToOpen = this.layerBrowserTmpl || LayerBrowser
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
