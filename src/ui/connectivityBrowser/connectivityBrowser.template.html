@@ -1,4 +1,4 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="!noConnectivityForParcellation; else noConnectivity">
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="parcellationHasConnectivityData; else noConnectivity">
     <!--ToDo set show-description="true" when data will available-->
     <hbp-connectivity-matrix-row
             [region]="region"

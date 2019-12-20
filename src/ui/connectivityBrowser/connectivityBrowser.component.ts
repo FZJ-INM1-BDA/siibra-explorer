@@ -18,7 +18,7 @@ import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_REGION} from "src/services/s
 })
 export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
-    private region: string
+    public region: string
     private connectedAreas = []
 
 
@@ -28,7 +28,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public expandMenuIndex = -1
     public allRegions = []
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
-    public noConnectivityForParcellation = false
+    public parcellationHasConnectivityData = true
     private areaHemisphere: string
 
     math = Math
@@ -56,7 +56,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         this.subscriptions.push(
             this.selectedParcellation$.subscribe(parcellation => {
                 if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
-                    this.noConnectivityForParcellation = false
+                    this.parcellationHasConnectivityData = true
                     if (parcellation.regions && parcellation.regions.length) {
                         this.allRegions = []
                         this.getAllRegionsFromParcellation(parcellation.regions)
@@ -65,7 +65,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
                         }
                     }
                 } else {
-                    this.noConnectivityForParcellation = true
+                    this.parcellationHasConnectivityData = false
                 }
             }),
             this.connectivityRegion$.subscribe(cr => {
@@ -75,15 +75,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
             })
         )
 
-        const connectivityData$ = fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived', { capture: true })
-        const collapsedMenuIndex$ = fromEvent(this.connectivityComponentElement.nativeElement, 'collapsedMenuChanged', { capture: true })
-
         this.subscriptions.push(
-            connectivityData$.subscribe((e: CustomEvent) => {
+            fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived', { capture: true })
+                .subscribe((e: CustomEvent) => {
                 this.connectedAreas = e.detail
                 if (this.connectedAreas.length > 0) this.addNewColorMap()
             }),
-            collapsedMenuIndex$.subscribe((e: CustomEvent) => {
+            fromEvent(this.connectivityComponentElement.nativeElement, 'collapsedMenuChanged', { capture: true })
+                .subscribe((e: CustomEvent) => {
                 this.expandMenuIndex = e.detail
             }),
 

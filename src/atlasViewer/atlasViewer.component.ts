@@ -35,7 +35,6 @@ import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
-import {SearchSideNav} from "src/ui/searchSideNav/searchSideNav.component";
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL
@@ -74,8 +73,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
 
   @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
-
-  @ViewChild('searchSideNav') searchSideNav: SearchSideNav
 
   /**
    * required for styling of all child components
