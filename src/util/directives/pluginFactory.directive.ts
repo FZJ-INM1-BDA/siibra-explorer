@@ -1,19 +1,21 @@
-import { Directive, ViewContainerRef, Renderer2 } from "@angular/core";
-import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { Directive, Renderer2, ViewContainerRef } from "@angular/core";
 import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
 import { SUPPORT_LIBRARY_MAP } from "src/atlasViewer/atlasViewer.constantService.service";
+import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { LoggingService } from "src/services/logging.service";
 
 @Directive({
-  selector: '[pluginFactoryDirective]'
+  selector: '[pluginFactoryDirective]',
 })
 
-export class PluginFactoryDirective{
+export class PluginFactoryDirective {
   constructor(
     pluginService: PluginServices,
     viewContainerRef: ViewContainerRef,
     rd2: Renderer2,
-    apiService:AtlasViewerAPIServices
-  ){
+    apiService: AtlasViewerAPIServices,
+    private log: LoggingService,
+  ) {
     pluginService.pluginViewContainerRef = viewContainerRef
     pluginService.appendSrc = (src: HTMLElement) => rd2.appendChild(document.head, src)
     pluginService.removeSrc = (src: HTMLElement) => rd2.removeChild(document.head, src)
@@ -21,18 +23,19 @@ export class PluginFactoryDirective{
     apiService.interactiveViewer.pluginControl.loadExternalLibraries = (libraries: string[]) => new Promise((resolve, reject) => {
       const srcHTMLElement = libraries.map(libraryName => ({
         name: libraryName,
-        srcEl: SUPPORT_LIBRARY_MAP.get(libraryName)
+        srcEl: SUPPORT_LIBRARY_MAP.get(libraryName),
       }))
 
       const rejected = srcHTMLElement.filter(scriptObj => scriptObj.srcEl === null)
-      if (rejected.length > 0)
+      if (rejected.length > 0) {
         return reject(`Some library names cannot be recognised. No libraries were loaded: ${rejected.map(srcObj => srcObj.name).join(', ')}`)
+      }
 
       Promise.all(srcHTMLElement.map(scriptObj => new Promise((rs, rj) => {
         /**
          * if browser already support customElements, do not append polyfill
          */
-        if('customElements' in window && scriptObj.name === 'webcomponentsLite'){
+        if ('customElements' in window && scriptObj.name === 'webcomponentsLite') {
           return rs()
         }
         const existingEntry = apiService.loadedLibraries.get(scriptObj.name)
@@ -48,7 +51,7 @@ export class PluginFactoryDirective{
         }
       })))
         .then(() => resolve())
-        .catch(e => (console.warn(e), reject(e)))
+        .catch(e => (this.log.warn(e), reject(e)))
     })
 
     apiService.interactiveViewer.pluginControl.unloadExternalLibraries = (libraries: string[]) =>
@@ -57,11 +60,11 @@ export class PluginFactoryDirective{
         .forEach(libname => {
           const ledger = apiService.loadedLibraries.get(libname!)
           if (!ledger) {
-            console.warn('unload external libraries error. cannot find ledger entry...', libname, apiService.loadedLibraries)
+            this.log.warn('unload external libraries error. cannot find ledger entry...', libname, apiService.loadedLibraries)
             return
           }
           if (ledger.src === null) {
-            console.log('webcomponents is native supported. no library needs to be unloaded')
+            this.log.log('webcomponents is native supported. no library needs to be unloaded')
             return
           }
 

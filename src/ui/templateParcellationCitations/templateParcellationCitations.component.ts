@@ -1,34 +1,34 @@
 import { Component } from "@angular/core";
+import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
-import { ViewerStateInterface, isDefined, safeFilter } from "../../services/stateStore.service";
-import { Store, select } from "@ngrx/store";
-import { switchMap, map } from "rxjs/operators";
+import { map, switchMap } from "rxjs/operators";
+import { isDefined, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
 
 @Component({
   selector : 'template-parcellation-citation-container',
   templateUrl : './templateParcellationCitations.template.html',
   styleUrls : [
-    './templateParcellationCitations.style.css'
-  ]
+    './templateParcellationCitations.style.css',
+  ],
 })
 
-export class TemplateParcellationCitationsContainer{
-  selectedTemplate$: Observable<any>
-  selectedParcellation$: Observable<any>
+export class TemplateParcellationCitationsContainer {
+  public selectedTemplate$: Observable<any>
+  public selectedParcellation$: Observable<any>
 
-  constructor(private store: Store<ViewerStateInterface>){
+  constructor(private store: Store<ViewerStateInterface>) {
     this.selectedTemplate$ = this.store.pipe(
       select('viewerState'),
       safeFilter('templateSelected'),
-      map(state => state.templateSelected)
+      map(state => state.templateSelected),
     )
 
     this.selectedParcellation$ = this.selectedTemplate$.pipe(
       switchMap(() => this.store.pipe(
         select('viewerState'),
         safeFilter('parcellationSelected'),
-        map(state => state.parcellationSelected)
-      ))
+        map(state => state.parcellationSelected),
+      )),
     )
   }
 }

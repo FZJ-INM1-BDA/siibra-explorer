@@ -2,30 +2,33 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 
 @Pipe({
-  name: 'previewFileIconPipe'
+  name: 'previewFileIconPipe',
 })
 
-export class PreviewFileIconPipe implements PipeTransform{
-  public transform(previewFile: ViewerPreviewFile):{fontSet: string, fontIcon:string}{
+export class PreviewFileIconPipe implements PipeTransform {
+  public transform(previewFile: ViewerPreviewFile): {fontSet: string, fontIcon: string} {
     const type = determinePreviewFileType(previewFile)
-    if (type === PREVIEW_FILE_TYPES.NIFTI) return {
+    if (type === PREVIEW_FILE_TYPES.NIFTI) { return {
       fontSet: 'fas',
-      fontIcon: 'fa-brain'
+      fontIcon: 'fa-brain',
+    }
     }
 
-    if (type === PREVIEW_FILE_TYPES.IMAGE) return {
+    if (type === PREVIEW_FILE_TYPES.IMAGE) { return {
       fontSet: 'fas',
-      fontIcon: 'fa-image'
+      fontIcon: 'fa-image',
+    }
     }
 
-    if (type === PREVIEW_FILE_TYPES.CHART) return {
+    if (type === PREVIEW_FILE_TYPES.CHART) { return {
       fontSet: 'far',
-      fontIcon: 'fa-chart-bar'
+      fontIcon: 'fa-chart-bar',
+    }
     }
 
     return {
       fontSet: 'fas',
-      fontIcon: 'fa-file'
+      fontIcon: 'fa-file',
     }
   }
 }
@@ -33,9 +36,9 @@ export class PreviewFileIconPipe implements PipeTransform{
 export const determinePreviewFileType = (previewFile: ViewerPreviewFile) => {
   const { mimetype, data } = previewFile
   const { chartType = null } = data || {}
-  if ( mimetype === 'application/nifti' ) return PREVIEW_FILE_TYPES.NIFTI
-  if ( /^image/.test(mimetype)) return PREVIEW_FILE_TYPES.IMAGE
-  if ( /application\/json/.test(mimetype) && (chartType === 'line' || chartType === 'radar')) return PREVIEW_FILE_TYPES.CHART
+  if ( mimetype === 'application/nifti' ) { return PREVIEW_FILE_TYPES.NIFTI }
+  if ( /^image/.test(mimetype)) { return PREVIEW_FILE_TYPES.IMAGE }
+  if ( /application\/json/.test(mimetype) && (chartType === 'line' || chartType === 'radar')) { return PREVIEW_FILE_TYPES.CHART }
   return PREVIEW_FILE_TYPES.OTHER
 }
 
@@ -43,5 +46,5 @@ export const PREVIEW_FILE_TYPES = {
   NIFTI: 'NIFTI',
   IMAGE: 'IMAGE',
   CHART: 'CHART',
-  OTHER: 'OTHER'
+  OTHER: 'OTHER',
 }

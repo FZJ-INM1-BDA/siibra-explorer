@@ -1,13 +1,14 @@
 import {Pipe, PipeTransform} from "@angular/core";
 
 @Pipe({
-    name: 'filterWithString'
+    name: 'filterWithString',
 })
 export class FilterWithStringPipe implements PipeTransform {
     public transform(value: any, ...args): any {
-        if (args[0])
+        if (args[0]) {
             return value.filter(pf => pf.name.toLowerCase().includes(args[0].toLowerCase()))
-        else
+        } else {
             return value
+        }
     }
 }

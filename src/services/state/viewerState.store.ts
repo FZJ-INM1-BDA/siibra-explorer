@@ -1,54 +1,56 @@
-import { Action, Store, select } from '@ngrx/store'
-import { UserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
-import { NgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, shareReplay, startWith, filter, distinctUntilChanged } from 'rxjs/operators';
+import { Action, select, Store } from '@ngrx/store'
 import { Observable } from 'rxjs';
-import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
+import { distinctUntilChanged, filter, map, shareReplay, startWith, withLatestFrom } from 'rxjs/operators';
+import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
+import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
+import { getViewer } from 'src/util/fn';
+import { LoggingService } from '../logging.service';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
+import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
 
-export interface StateInterface{
-  fetchedTemplates : any[]
+export interface StateInterface {
+  fetchedTemplates: any[]
 
-  templateSelected : any | null
-  parcellationSelected : any | null
-  regionsSelected : any[]
+  templateSelected: any | null
+  parcellationSelected: any | null
+  regionsSelected: any[]
 
-  landmarksSelected : any[]
-  userLandmarks : UserLandmark[]
+  landmarksSelected: any[]
+  userLandmarks: IUserLandmark[]
 
-  navigation : any | null
-  dedicatedView : string[]
+  navigation: any | null
+  dedicatedView: string[]
 
-  loadedNgLayers: NgLayerInterface[]
+  loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
 }
 
-export interface ActionInterface extends Action{
-  fetchedTemplate? : any[]
+export interface ActionInterface extends Action {
+  fetchedTemplate?: any[]
 
-  selectTemplate? : any
-  selectParcellation? : any
+  selectTemplate?: any
+  selectParcellation?: any
   selectRegions?: any[]
   selectRegionIds: string[]
-  deselectRegions? : any[]
-  dedicatedView? : string
+  deselectRegions?: any[]
+  dedicatedView?: string
 
-  updatedParcellation? : any
+  updatedParcellation?: any
 
-  landmarks : UserLandmark[]
-  deselectLandmarks : UserLandmark[]
+  landmarks: IUserLandmark[]
+  deselectLandmarks: IUserLandmark[]
 
-  navigation? : any
+  navigation?: any
 
   payload: any
 
   connectivityRegion?: string
 }
 
-export const defaultState:StateInterface = {
+export const defaultState: StateInterface = {
 
   landmarksSelected : [],
   fetchedTemplates : [],
@@ -59,11 +61,11 @@ export const defaultState:StateInterface = {
   navigation: null,
   parcellationSelected: null,
   templateSelected: null,
-  connectivityRegion: ''
+  connectivityRegion: '',
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState:Partial<StateInterface> = state, action:ActionInterface) => {
-  switch(action.type){
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: Partial<StateInterface> = state, action: ActionInterface) => {
+  switch (action.type) {
     /**
      * TODO may be obsolete. test when nifti become available
      */
@@ -73,14 +75,14 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
         : [action.dedicatedView]
       return {
         ...prevState,
-        dedicatedView 
+        dedicatedView,
       }
     case UNLOAD_DEDICATED_LAYER:
       return {
         ...prevState,
         dedicatedView : prevState.dedicatedView
           ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
-          : []
+          : [],
       }
     case NEWVIEWER:
       const { selectParcellation: parcellation } = action
@@ -91,32 +93,32 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
         templateSelected : action.selectTemplate,
         parcellationSelected : {
           ...parcellationWORegions,
-          regions: null
+          regions: null,
         },
         // taken care of by effect.ts
         // regionsSelected : [],
         landmarksSelected : [],
         navigation : {},
-        dedicatedView : null
+        dedicatedView : null,
       }
     case FETCHED_TEMPLATE : {
       return {
         ...prevState,
-        fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate)
+        fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate),
       }
     }
     case CHANGE_NAVIGATION : {
       return {
         ...prevState,
-        navigation : action.navigation
+        navigation : action.navigation,
       }
     }
     case SELECT_PARCELLATION : {
-      const { selectParcellation:parcellation } = action
-      const { regions, ...parcellationWORegions } = parcellation
+      const { selectParcellation: sParcellation } = action
+      const { regions, ...sParcellationWORegions } = sParcellation
       return {
         ...prevState,
-        parcellationSelected: parcellationWORegions,
+        parcellationSelected: sParcellationWORegions,
         // taken care of by effect.ts
         // regionsSelected: []
       }
@@ -127,53 +129,54 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
         ...prevState,
         parcellationSelected: {
           ...updatedParcellation,
-          updated: true
-        }
+          updated: true,
+        },
       }
     }
     case SELECT_REGIONS:
       const { selectRegions } = action
       return {
         ...prevState,
-        regionsSelected: selectRegions
+        regionsSelected: selectRegions,
       }
     case DESELECT_LANDMARKS : {
       return {
         ...prevState,
-        landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0)
+        landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0),
       }
     }
     case SELECT_LANDMARKS : {
       return {
         ...prevState,
-        landmarksSelected : action.landmarks
+        landmarksSelected : action.landmarks,
       }
     }
     case USER_LANDMARKS : {
       return {
         ...prevState,
-        userLandmarks: action.landmarks
-      } 
+        userLandmarks: action.landmarks,
+      }
     }
     /**
      * TODO
      * duplicated with ngViewerState.layers ?
      */
     case NEHUBA_LAYER_CHANGED: {
-      if (!window['viewer']) {
+      const viewer = getViewer()
+      if (!viewer) {
         return {
           ...prevState,
-          loadedNgLayers: []
+          loadedNgLayers: [],
         }
       } else {
         return {
           ...prevState,
-          loadedNgLayers: (window['viewer'].layerManager.managedLayers as any[]).map(obj => ({
+          loadedNgLayers: (viewer.layerManager.managedLayers as any[]).map(obj => ({
             name : obj.name,
             type : obj.initialSpecification.type,
             source : obj.sourceUrl,
-            visible : obj.visible
-          }) as NgLayerInterface)
+            visible : obj.visible,
+          }) as INgLayerInterface),
         }
       }
     }
@@ -183,12 +186,12 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
     case SET_CONNECTIVITY_REGION:
       return {
         ...prevState,
-        connectivityRegion: action.connectivityRegion
+        connectivityRegion: action.connectivityRegion,
       }
     case CLEAR_CONNECTIVITY_REGION:
       return {
         ...prevState,
-        connectivityRegion: ''
+        connectivityRegion: '',
       }
     default :
       return prevState
@@ -197,14 +200,14 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:Parti
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
-// https://github.com/amcdnl/ngrx-actions/issues/23 
+// https://github.com/amcdnl/ngrx-actions/issues/23
 // or just google for:
 //
 // angular function expressions are not supported in decorators
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
@@ -233,14 +236,15 @@ export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
-export class ViewerStateUseEffect{
+export class ViewerStateUseEffect {
   constructor(
     private actions$: Actions,
-    private store$: Store<IavRootStoreInterface>
-  ){
+    private store$: Store<IavRootStoreInterface>,
+    private log: LoggingService,
+  ) {
     this.currentLandmarks$ = this.store$.pipe(
       select('viewerState'),
       select('userLandmarks'),
@@ -252,16 +256,16 @@ export class ViewerStateUseEffect{
       withLatestFrom(this.currentLandmarks$),
       map(([action, currentLandmarks]) => {
         const { landmarkIds } = (action as ActionInterface).payload
-        for ( const rmId of landmarkIds ){
+        for ( const rmId of landmarkIds ) {
           const idx = currentLandmarks.findIndex(({ id }) => id === rmId)
-          if (idx < 0) console.warn(`remove userlandmark with id ${rmId} does not exist`)
+          if (idx < 0) { this.log.warn(`remove userlandmark with id ${rmId} does not exist`) }
         }
         const removeSet = new Set(landmarkIds)
         return {
           type: USER_LANDMARKS,
-          landmarks: currentLandmarks.filter(({ id }) => !removeSet.has(id))
+          landmarks: currentLandmarks.filter(({ id }) => !removeSet.has(id)),
         }
-      })
+      }),
     )
 
     this.addUserLandmarks$ = this.actions$.pipe(
@@ -277,7 +281,7 @@ export class ViewerStateUseEffect{
         for (const landmark of landmarks) {
           const { id } = landmark
           if (landmarkMap.has(id)) {
-            console.warn(`Attempting to add a landmark that already exists, id: ${id}`)
+            this.log.warn(`Attempting to add a landmark that already exists, id: ${id}`)
           } else {
             landmarkMap.set(id, landmark)
           }
@@ -285,9 +289,9 @@ export class ViewerStateUseEffect{
         const userLandmarks = Array.from(landmarkMap).map(([id, landmark]) => landmark)
         return {
           type: USER_LANDMARKS,
-          landmarks: userLandmarks
+          landmarks: userLandmarks,
         }
-      })
+      }),
     )
 
     this.mouseoverUserLandmarks = this.actions$.pipe(
@@ -296,31 +300,32 @@ export class ViewerStateUseEffect{
       map(([ action, currentLandmarks ]) => {
         const { payload } = action as any
         const { label } = payload
-        if (!label) return {
+        if (!label) { return {
           type: MOUSEOVER_USER_LANDMARK,
           payload: {
-            userLandmark: null
-          }
+            userLandmark: null,
+          },
+        }
         }
 
         const idx = Number(label.replace('label=', ''))
         if (isNaN(idx)) {
-          console.warn(`Landmark index could not be parsed as a number: ${idx}`)
+          this.log.warn(`Landmark index could not be parsed as a number: ${idx}`)
           return {
             type: MOUSEOVER_USER_LANDMARK,
             payload: {
-              userLandmark: null
-            }
+              userLandmark: null,
+            },
           }
         }
 
         return {
           type: MOUSEOVER_USER_LANDMARK,
           payload: {
-            userLandmark: currentLandmarks[idx]
-          }
+            userLandmark: currentLandmarks[idx],
+          },
         }
-      })
+      }),
 
     )
 
@@ -331,7 +336,7 @@ export class ViewerStateUseEffect{
         const { segments, landmark, userLandmark } = payload
         return { segments, landmark, userLandmark }
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.doubleClickOnViewerToggleRegions$ = doubleClickOnViewer$.pipe(
@@ -340,7 +345,7 @@ export class ViewerStateUseEffect{
         select('viewerState'),
         select('regionsSelected'),
         distinctUntilChanged(),
-        startWith([])
+        startWith([]),
       )),
       map(([{ segments }, regionsSelected]) => {
         const selectedSet = new Set(regionsSelected.map(generateLabelIndexId))
@@ -348,16 +353,15 @@ export class ViewerStateUseEffect{
 
         const deleteFlag = toggleArr.some(id => selectedSet.has(id))
 
-        for (const id of toggleArr){
-          if (deleteFlag) selectedSet.delete(id)
-          else selectedSet.add(id)
+        for (const id of toggleArr) {
+          if (deleteFlag) { selectedSet.delete(id) } else { selectedSet.add(id) }
         }
-        
+
         return {
           type: SELECT_REGIONS_WITH_ID,
-          selectRegionIds: [...selectedSet]
+          selectRegionIds: [...selectedSet],
         }
-      })
+      }),
     )
 
     this.doubleClickOnViewerToggleLandmark$ = doubleClickOnViewer$.pipe(
@@ -365,7 +369,7 @@ export class ViewerStateUseEffect{
       withLatestFrom(this.store$.pipe(
         select('viewerState'),
         select('landmarksSelected'),
-        startWith([])
+        startWith([]),
       )),
       map(([{ landmark }, selectedSpatialDatas]) => {
 
@@ -377,35 +381,35 @@ export class ViewerStateUseEffect{
 
         return {
           type: SELECT_LANDMARKS,
-          landmarks: newSelectedSpatialDatas
+          landmarks: newSelectedSpatialDatas,
         }
-      })
+      }),
     )
 
     this.doubleClickOnViewerToogleUserLandmark$ = doubleClickOnViewer$.pipe(
-      filter(({ userLandmark }) => userLandmark)
+      filter(({ userLandmark }) => userLandmark),
     )
   }
 
   private currentLandmarks$: Observable<any[]>
 
   @Effect()
-  mouseoverUserLandmarks: Observable<any>
+  public mouseoverUserLandmarks: Observable<any>
 
   @Effect()
-  removeUserLandmarks: Observable<any>
+  public removeUserLandmarks: Observable<any>
 
   @Effect()
-  addUserLandmarks$: Observable<any>
+  public addUserLandmarks$: Observable<any>
 
   @Effect()
-  doubleClickOnViewerToggleRegions$: Observable<any>
+  public doubleClickOnViewerToggleRegions$: Observable<any>
 
   @Effect()
-  doubleClickOnViewerToggleLandmark$: Observable<any>
+  public doubleClickOnViewerToggleLandmark$: Observable<any>
 
   // @Effect()
-  doubleClickOnViewerToogleUserLandmark$: Observable<any>
+  public doubleClickOnViewerToogleUserLandmark$: Observable<any>
 }
 
 const ACTION_TYPES = {
@@ -414,7 +418,7 @@ const ACTION_TYPES = {
   MOUSEOVER_USER_LANDMARK_LABEL: 'MOUSEOVER_USER_LANDMARK_LABEL',
 
   SINGLE_CLICK_ON_VIEWER: 'SINGLE_CLICK_ON_VIEWER',
-  DOUBLE_CLICK_ON_VIEWER: 'DOUBLE_CLICK_ON_VIEWER'
+  DOUBLE_CLICK_ON_VIEWER: 'DOUBLE_CLICK_ON_VIEWER',
 }
 
 export const VIEWERSTATE_ACTION_TYPES = ACTION_TYPES

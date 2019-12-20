@@ -7,32 +7,32 @@ import { KgSingleDatasetService } from "../../kgSingleDatasetService.service";
   selector : 'dedicated-viewer',
   templateUrl : './dedicated.template.html',
   styleUrls : [
-    `./dedicated.style.css`
-  ]
+    `./dedicated.style.css`,
+  ],
 })
 
-export class DedicatedViewer{
-  @Input() previewFile : ViewerPreviewFile
+export class DedicatedViewer {
+  @Input() public previewFile: ViewerPreviewFile
 
   constructor(
-    private singleKgDsService:KgSingleDatasetService,
-  ){
+    private singleKgDsService: KgSingleDatasetService,
+  ) {
 
   }
 
-  get isShowing(){
+  get isShowing() {
     return this.singleKgDsService.ngLayers.has(this.previewFile.url)
   }
 
-  showDedicatedView(){
+  public showDedicatedView() {
     this.singleKgDsService.showNewNgLayer({ url: this.previewFile.url })
   }
 
-  removeDedicatedView(){
+  public removeDedicatedView() {
     this.singleKgDsService.removeNgLayer({ url: this.previewFile.url })
   }
-  
-  click(event:MouseEvent){
+
+  public click(event: MouseEvent) {
     event.preventDefault()
     this.isShowing
       ? this.removeDedicatedView()

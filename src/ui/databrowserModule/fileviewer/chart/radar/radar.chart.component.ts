@@ -1,38 +1,38 @@
-import { Component, Input, OnChanges, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core'
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core'
 
-import { DatasetInterface, ChartColor, ScaleOptionInterface, TitleInterfacce, LegendInterface, applyOption, CommonChartInterface } from '../chart.interface';
-import { Color } from 'ng2-charts';
 import { DomSanitizer } from '@angular/platform-browser';
 import { RadialChartOptions } from 'chart.js'
+import { Color } from 'ng2-charts';
 import { ChartBase } from '../chart.base';
+import { applyOption, ChartColor, CommonChartInterface, DatasetInterface, LegendInterface, ScaleOptionInterface, TitleInterfacce } from '../chart.interface';
 @Component({
   selector : `radar-chart`,
   templateUrl : './radar.chart.template.html',
-  styleUrls : [ 
-    `./radar.chart.style.css`
+  styleUrls : [
+    `./radar.chart.style.css`,
    ],
-   exportAs: 'iavRadarChart'
+   exportAs: 'iavRadarChart',
 })
 export class RadarChart extends ChartBase implements OnDestroy, OnChanges, CommonChartInterface {
 
   /**
    * labels of each of the columns, spider web edges
    */
-  @Input() labels : string[] = []
+  @Input() public labels: string[] = []
 
   /**
    * shown on the legend, different lines
    */
-  @Input() radarDatasets : RadarDatasetInputInterface[] = []
+  @Input() public radarDatasets: RadarDatasetInputInterface[] = []
 
   /**
    * colors of the datasetes
   */
-  @Input() colors : ChartColor[] = []
+  @Input() public colors: ChartColor[] = []
 
-  @Input() options : any
+  @Input() public options: any
 
-  mousescroll(_ev:MouseWheelEvent){
+  public mousescroll(_ev: MouseWheelEvent) {
 
     /**
      * mouse wheel zooming disabled for now
@@ -55,73 +55,73 @@ export class RadarChart extends ChartBase implements OnDestroy, OnChanges, Commo
     // this.chartOption = Object.assign({},this.chartOption,{scale : combineScale,animation : false})
   }
 
-  maxY : number
+  public maxY: number
 
-  chartOption : Partial<RadialChartOptions> = {
+  public chartOption: Partial<RadialChartOptions> = {
     responsive: true,
     scale : {
       gridLines : {
-        color : 'rgba(128,128,128,0.5)'
+        color : 'rgba(128,128,128,0.5)',
       },
       ticks : {
         showLabelBackdrop : false,
-        fontColor : 'white'
+        fontColor : 'white',
       },
       angleLines : {
-        color : 'rgba(128,128,128,0.2)'
+        color : 'rgba(128,128,128,0.2)',
       },
       pointLabels : {
-        fontColor : 'white'
-      }
+        fontColor : 'white',
+      },
     },
     legend : {
       display: true,
       labels : {
-        fontColor : 'white'
-      }
+        fontColor : 'white',
+      },
     },
-    title :{
+    title : {
       text : 'Radar graph',
       display : true,
-      fontColor : 'rgba(255,255,255,1.0)'
+      fontColor : 'rgba(255,255,255,1.0)',
     },
-    animation: null
+    animation: null,
   }
 
-  chartDataset : DatasetInterface = {
+  public chartDataset: DatasetInterface = {
     labels : [],
-    datasets : []
+    datasets : [],
   }
 
-  constructor(sanitizer: DomSanitizer){
+  constructor(sanitizer: DomSanitizer) {
     super(sanitizer)
   }
 
-  ngOnDestroy(){
+  public ngOnDestroy() {
     this.superOnDestroy()
   }
-  
-  ngOnChanges(){
+
+  public ngOnChanges() {
     this.chartDataset = {
       labels : this.labels,
-      datasets : this.radarDatasets.map(ds=>Object.assign({},ds,{backgroundColor : 'rgba(255,255,255,0.2)'}))
+      datasets : this.radarDatasets.map(ds => Object.assign({}, ds, {backgroundColor : 'rgba(255,255,255,0.2)'})),
     }
     // this.chartDataset.datasets[0]
 
-    this.maxY = this.chartDataset.datasets.reduce((max,dataset)=>{
+    this.maxY = this.chartDataset.datasets.reduce((max, dataset) => {
       return Math.max(
         max,
-        dataset.data.reduce((max,number)=>{
-          return Math.max(number,max)
-        },0))
-    },0)
+        dataset.data.reduce((max, number) => {
+          return Math.max(number, max)
+        }, 0))
+    }, 0)
 
-    applyOption(this.chartOption,this.options)
+    applyOption(this.chartOption, this.options)
 
     this.generateDataUrl()
   }
 
-  private generateDataUrl(){
+  private generateDataUrl() {
     const row0 = ['Receptors', ...this.chartDataset.datasets.map(ds => ds.label || 'no label')].join(',')
     const otherRows = (this.chartDataset.labels as string[])
       .map((label, index) => [ label, ...this.chartDataset.datasets.map(ds => ds.data[index]) ].join(',')).join('\n')
@@ -130,42 +130,42 @@ export class RadarChart extends ChartBase implements OnDestroy, OnChanges, Commo
     this.generateNewCsv(csvData)
 
     this.csvTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.csv`
-    this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`    
+    this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`
   }
 
-  private getGraphTitleAsString():string{
-    try{
+  private getGraphTitleAsString(): string {
+    try {
       return this.chartOption.title.text as string
-    }catch(e){
+    } catch (e) {
       return `Untitled`
     }
   }
 }
 
-export interface RadarDatasetInputInterface{
-  label : string
-  data : number[]
+export interface RadarDatasetInputInterface {
+  label: string
+  data: number[]
 }
 
-export interface RadarChartOptionInterface{
-  scale? : ScaleOptionInterface&RadarScaleOptionAdditionalInterface
-  animation? : any
-  legend? : LegendInterface
-  title? : TitleInterfacce
-  color? :Color[]
+export interface RadarChartOptionInterface {
+  scale?: ScaleOptionInterface&RadarScaleOptionAdditionalInterface
+  animation?: any
+  legend?: LegendInterface
+  title?: TitleInterfacce
+  color?: Color[]
 }
 
-interface RadarScaleOptionAdditionalInterface{
-  angleLines? :AngleLineInterface
-  pointLabels?:PointLabelInterface
+interface RadarScaleOptionAdditionalInterface {
+  angleLines?: AngleLineInterface
+  pointLabels?: PointLabelInterface
 }
 
-interface AngleLineInterface{
-  display? : boolean
-  color? : string
-  lineWidth? : number
+interface AngleLineInterface {
+  display?: boolean
+  color?: string
+  lineWidth?: number
 }
 
-interface PointLabelInterface{
-  fontColor? : string
+interface PointLabelInterface {
+  fontColor?: string
 }

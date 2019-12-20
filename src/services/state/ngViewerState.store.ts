@@ -1,18 +1,18 @@
-import { Action, Store, select } from '@ngrx/store'
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, combineLatest, fromEvent, Subscription } from 'rxjs';
-import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo } from 'rxjs/operators';
+import { Actions, Effect, ofType } from '@ngrx/effects';
+import { Action, select, Store } from '@ngrx/store'
+import { combineLatest, fromEvent, Observable, Subscription } from 'rxjs';
+import { distinctUntilChanged, filter, map, mapTo, scan, shareReplay, withLatestFrom } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
-import { SNACKBAR_MESSAGE } from './uiState.store';
 import { getNgIds, IavRootStoreInterface } from '../stateStore.service';
+import { SNACKBAR_MESSAGE } from './uiState.store';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
 export const H_ONE_THREE = 'H_ONE_THREE'
 export const SINGLE_PANEL = 'SINGLE_PANEL'
 
-export function mixNgLayers(oldLayers:NgLayerInterface[], newLayers:NgLayerInterface|NgLayerInterface[]): NgLayerInterface[]{
+export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
     return oldLayers.concat(newLayers)
   } else {
@@ -20,14 +20,14 @@ export function mixNgLayers(oldLayers:NgLayerInterface[], newLayers:NgLayerInter
       ...newLayers,
       ...( newLayers.mixability === 'nonmixable' && oldLayers.findIndex(l => l.mixability === 'nonmixable') >= 0
             ? {visible: false}
-            : {})
+            : {}),
     })
   }
 }
 
-export interface StateInterface{
-  layers : NgLayerInterface[]
-  forceShowSegment : boolean | null
+export interface StateInterface {
+  layers: INgLayerInterface[]
+  forceShowSegment: boolean | null
   nehubaReady: boolean
   panelMode: string
   panelOrder: string
@@ -36,43 +36,43 @@ export interface StateInterface{
   showZoomlevel: boolean
 }
 
-export interface ActionInterface extends Action{
-  layer : NgLayerInterface
-  layers : NgLayerInterface[]
-  forceShowSegment : boolean
+export interface ActionInterface extends Action {
+  layer: INgLayerInterface
+  layers: INgLayerInterface[]
+  forceShowSegment: boolean
   nehubaReady: boolean
   payload: any
 }
 
-export const defaultState:StateInterface = {
-  layers:[],
-  forceShowSegment:null,
+export const defaultState: StateInterface = {
+  layers: [],
+  forceShowSegment: null,
   nehubaReady: false,
   panelMode: FOUR_PANEL,
   panelOrder: `0123`,
 
   showSubstrate: null,
-  showZoomlevel: null
+  showZoomlevel: null,
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state, action:ActionInterface):StateInterface => {
-  switch(action.type){
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
+  switch (action.type) {
     case ACTION_TYPES.SET_PANEL_ORDER: {
       const { payload } = action
       const { panelOrder } = payload
 
       return {
         ...prevState,
-        panelOrder
+        panelOrder,
       }
     }
     case ACTION_TYPES.SWITCH_PANEL_MODE: {
       const { payload } = action
       const { panelMode } = payload
-      if (SUPPORTED_PANEL_MODES.indexOf(panelMode) < 0) return prevState
+      if (SUPPORTED_PANEL_MODES.indexOf(panelMode) < 0) { return prevState }
       return {
         ...prevState,
-        panelMode
+        panelMode,
       }
     }
     case ADD_NG_LAYER:
@@ -88,9 +88,9 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
         /* this configuration allows the addition of multiple non mixables */
         // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
-        layers : mixNgLayers(prevState.layers, action.layer) 
-        
-        // action.layer.constructor === Array 
+        layers : mixNgLayers(prevState.layers, action.layer),
+
+        // action.layer.constructor === Array
         //   ? prevState.layers.concat(action.layer)
         //   : prevState.layers.concat({
         //     ...action.layer,
@@ -98,25 +98,25 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
         //           ? {visible: false}
         //           : {})
         //   })
-      } 
+      }
     case REMOVE_NG_LAYERS:
       const { layers } = action
       const layerNameSet = new Set(layers.map(l => l.name))
       return {
         ...prevState,
-        layers: prevState.layers.filter(l => !layerNameSet.has(l.name))
+        layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
       }
     case REMOVE_NG_LAYER:
       return {
         ...prevState,
-        layers : prevState.layers.filter(l => l.name !== action.layer.name)
+        layers : prevState.layers.filter(l => l.name !== action.layer.name),
       }
     case SHOW_NG_LAYER:
       return {
         ...prevState,
         layers : prevState.layers.map(l => l.name === action.layer.name
           ? { ...l, visible: true }
-          : l)
+          : l),
       }
     case HIDE_NG_LAYER:
       return {
@@ -124,18 +124,18 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
         layers : prevState.layers.map(l => l.name === action.layer.name
           ? { ...l, visible: false }
-          : l)
+          : l),
       }
     case FORCE_SHOW_SEGMENT:
       return {
         ...prevState,
-        forceShowSegment : action.forceShowSegment
+        forceShowSegment : action.forceShowSegment,
       }
-    case NEHUBA_READY: 
+    case NEHUBA_READY:
       const { nehubaReady } = action
       return {
         ...prevState,
-        nehubaReady
+        nehubaReady,
       }
     default: return prevState
   }
@@ -143,22 +143,22 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
-// https://github.com/amcdnl/ngrx-actions/issues/23 
+// https://github.com/amcdnl/ngrx-actions/issues/23
 // or just google for:
 //
 // angular function expressions are not supported in decorators
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
-export class NgViewerUseEffect implements OnDestroy{
+export class NgViewerUseEffect implements OnDestroy {
   @Effect()
   public toggleMaximiseMode$: Observable<any>
 
@@ -188,11 +188,11 @@ export class NgViewerUseEffect implements OnDestroy{
   constructor(
     private actions: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices
-  ){
+    private constantService: AtlasViewerConstantsServices,
+  ) {
     const toggleMaxmimise$ = this.actions.pipe(
       ofType(ACTION_TYPES.TOGGLE_MAXIMISE),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.panelOrder$ = this.store$.pipe(
@@ -214,18 +214,18 @@ export class NgViewerUseEffect implements OnDestroy{
         return {
           type: ACTION_TYPES.SET_PANEL_ORDER,
           payload: {
-            panelOrder: [...panelOrder.slice(1), ...panelOrder.slice(0,1)].join('')
-          }
+            panelOrder: [...panelOrder.slice(1), ...panelOrder.slice(0, 1)].join(''),
+          },
         }
-      })
+      }),
     )
 
     this.maximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
         combineLatest(
           this.panelOrder$,
-          this.panelMode$
-        )
+          this.panelMode$,
+        ),
       ),
       filter(([_action, [_panelOrder, panelMode]]) => panelMode !== SINGLE_PANEL),
       map(([ action, [ oldPanelOrder ] ]) => {
@@ -236,32 +236,32 @@ export class NgViewerUseEffect implements OnDestroy{
         return {
           type: ACTION_TYPES.SET_PANEL_ORDER,
           payload: {
-            panelOrder
-          }
+            panelOrder,
+          },
         }
-      })
+      }),
     )
 
     this.unmaximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
         combineLatest(
           this.panelOrder$,
-          this.panelMode$
-        )
+          this.panelMode$,
+        ),
       ),
       scan((acc, curr) => {
         const [action, [panelOrders, panelMode]] = curr
         return [{
-          action, 
+          action,
           panelOrders,
-          panelMode
+          panelMode,
         }, ...acc.slice(0, 1)]
       }, [] as any[]),
       filter(([ { panelMode } ]) => panelMode === SINGLE_PANEL),
       map(arr => {
         const {
           action,
-          panelOrders
+          panelOrders,
         } = arr[0]
 
         const {
@@ -278,17 +278,17 @@ export class NgViewerUseEffect implements OnDestroy{
         return {
           type: ACTION_TYPES.SET_PANEL_ORDER,
           payload: {
-            panelOrder
-          }
+            panelOrder,
+          },
         }
-      })
+      }),
     )
 
-    const scanFn = (acc: string[], curr: string):string[] => [curr, ...acc.slice(0,1)]
+    const scanFn = (acc: string[], curr: string): string[] => [curr, ...acc.slice(0, 1)]
 
     this.toggleMaximiseMode$ = toggleMaxmimise$.pipe(
       withLatestFrom(this.panelMode$.pipe(
-        scan(scanFn, [])
+        scan(scanFn, []),
       )),
       map(([ _, panelModes ]) => {
         return {
@@ -296,23 +296,23 @@ export class NgViewerUseEffect implements OnDestroy{
           payload: {
             panelMode: panelModes[0] === SINGLE_PANEL
               ? (panelModes[1] || FOUR_PANEL)
-              : SINGLE_PANEL
-          }
+              : SINGLE_PANEL,
+          },
         }
-      })
+      }),
     )
 
     this.toggleMaximiseCycleMessage$ = combineLatest(
       this.toggleMaximiseMode$,
-      this.constantService.useMobileUI$
+      this.constantService.useMobileUI$,
     ).pipe(
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === SINGLE_PANEL),
       mapTo({
         type: SNACKBAR_MESSAGE,
-        snackbarMessage: this.constantService.cyclePanelMessage
-      })
+        snackbarMessage: this.constantService.cyclePanelMessage,
+      }),
     )
 
     this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
@@ -320,8 +320,8 @@ export class NgViewerUseEffect implements OnDestroy{
       withLatestFrom(this.panelMode$),
       filter(([_ , panelMode]) => panelMode === SINGLE_PANEL),
       mapTo({
-        type: ACTION_TYPES.CYCLE_VIEWS
-      })
+        type: ACTION_TYPES.CYCLE_VIEWS,
+      }),
     )
 
     /**
@@ -331,7 +331,7 @@ export class NgViewerUseEffect implements OnDestroy{
       select('viewerState'),
       select('templateSelected'),
       map(templateSelected => {
-        if (!templateSelected) return []
+        if (!templateSelected) { return [] }
 
         const { ngId , otherNgIds = []} = templateSelected
 
@@ -341,9 +341,9 @@ export class NgViewerUseEffect implements OnDestroy{
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([
               curr.ngId,
-              ...getNgIds(curr.regions)
+              ...getNgIds(curr.regions),
             ])
-          }, [])
+          }, []),
         ]
       }),
       /**
@@ -353,12 +353,12 @@ export class NgViewerUseEffect implements OnDestroy{
       /**
        * remove falsy values
        */
-      map(arr => arr.filter(v => !!v))
+      map(arr => arr.filter(v => !!v)),
     )
 
     const allLoadedNgLayers$ = this.store$.pipe(
       select('viewerState'),
-      select('loadedNgLayers')
+      select('loadedNgLayers'),
     )
 
     this.removeAllNonBaseLayers$ = this.actions.pipe(
@@ -366,8 +366,8 @@ export class NgViewerUseEffect implements OnDestroy{
       withLatestFrom(
         combineLatest(
           baseNgLayerName$,
-          allLoadedNgLayers$
-        )
+          allLoadedNgLayers$,
+        ),
       ),
       map(([_, [baseNgLayerNames, loadedNgLayers] ]) => {
         const baseNameSet = new Set(baseNgLayerNames)
@@ -376,14 +376,14 @@ export class NgViewerUseEffect implements OnDestroy{
       map(layers => {
         return {
           type: REMOVE_NG_LAYERS,
-          layers
+          layers,
         }
-      })
+      }),
     )
   }
 
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0) {
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
@@ -397,13 +397,13 @@ export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
 export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
 export const NEHUBA_READY = `NEHUBA_READY`
 
-export interface NgLayerInterface{
-  name : string
-  source : string
-  mixability : string // base | mixable | nonmixable
-  visible? : boolean
-  shader? : string
-  transform? : any
+export interface INgLayerInterface {
+  name: string
+  source: string
+  mixability: string // base | mixable | nonmixable
+  visible?: boolean
+  shader?: string
+  transform?: any
 }
 
 const ACTION_TYPES = {
@@ -413,7 +413,7 @@ const ACTION_TYPES = {
   TOGGLE_MAXIMISE: 'TOGGLE_MAXIMISE',
   CYCLE_VIEWS: 'CYCLE_VIEWS',
 
-  REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`
+  REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,
 }
 
 export const SUPPORTED_PANEL_MODES = [
@@ -422,6 +422,5 @@ export const SUPPORTED_PANEL_MODES = [
   V_ONE_THREE,
   SINGLE_PANEL,
 ]
-
 
 export const NG_VIEWER_ACTION_TYPES = ACTION_TYPES

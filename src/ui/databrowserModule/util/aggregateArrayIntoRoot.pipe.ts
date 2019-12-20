@@ -1,14 +1,13 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
-
 @Pipe({
-  name: 'aggregateArrayIntoRootPipe'
+  name: 'aggregateArrayIntoRootPipe',
 })
 
-export class AggregateArrayIntoRootPipe implements PipeTransform{
-  public transform(array: any[], rootName: string = 'Root Element', childrenPropertyName: string = 'children'){
+export class AggregateArrayIntoRootPipe implements PipeTransform {
+  public transform(array: any[], rootName: string = 'Root Element', childrenPropertyName: string = 'children') {
     const returnObj = {
-      name: rootName
+      name: rootName,
     }
     returnObj[childrenPropertyName] = array
     return returnObj

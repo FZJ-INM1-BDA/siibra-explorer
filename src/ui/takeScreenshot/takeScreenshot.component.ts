@@ -1,94 +1,94 @@
+import {DOCUMENT} from "@angular/common";
 import {
+    ChangeDetectorRef,
     Component,
-    ElementRef, 
+    ElementRef,
     HostListener,
     Inject,
-    OnInit, 
+    OnInit,
     Renderer2,
     TemplateRef,
     ViewChild,
-    ChangeDetectorRef
 } from "@angular/core";
-import html2canvas from "html2canvas";
-import {DOCUMENT} from "@angular/common";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import html2canvas from "html2canvas";
 
 @Component({
     selector: 'take-screenshot',
     templateUrl: './takeScreenshot.template.html',
-    styleUrls: ['./takeScreenshot.style.css']
+    styleUrls: ['./takeScreenshot.style.css'],
 })
 export class TakeScreenshotComponent implements OnInit {
 
-    @ViewChild('screenshotPreviewCard', {read: ElementRef}) screenshotPreviewCard: ElementRef
-    @ViewChild('previewImageDialog', {read: TemplateRef}) previewImageDialogTemplateRef : TemplateRef<any>
+    @ViewChild('screenshotPreviewCard', {read: ElementRef}) public screenshotPreviewCard: ElementRef
+    @ViewChild('previewImageDialog', {read: TemplateRef}) public previewImageDialogTemplateRef: TemplateRef<any>
 
     private dialogRef: MatDialogRef<any>
 
-    public takingScreenshot:boolean = false
-    public previewingScreenshot:boolean = false
-    public loadingScreenshot:boolean = false
-    
-    public screenshotName:string = `screenshot.png`
+    public takingScreenshot: boolean = false
+    public previewingScreenshot: boolean = false
+    public loadingScreenshot: boolean = false
+
+    public screenshotName: string = `screenshot.png`
     private croppedCanvas = null
 
     public mouseIsDown = false
     public isDragging = false
-    
+
     // Used to calculate where to start showing the dragging area
-    private startX:number = 0
-    private startY:number = 0
-    private endX:number = 0
-    private endY:number = 0
-    
-    public borderWidth:string = ''
+    private startX: number = 0
+    private startY: number = 0
+    private endX: number = 0
+    private endY: number = 0
+
+    public borderWidth: string = ''
     // The box that contains the border and all required numbers.
     public boxTop: number = 0
     public boxLeft: number = 0
     public boxEndWidth: number = 0
     public boxEndHeight: number = 0
-    
+
     private windowHeight: number = 0
     private windowWidth: number = 0
-    
-    private screenshotStartX:number = 0
-    private screenshotStartY:number = 0
-    
-    public imageUrl:string
+
+    private screenshotStartX: number = 0
+    private screenshotStartY: number = 0
+
+    public imageUrl: string
 
     constructor(
         private renderer: Renderer2,
         @Inject(DOCUMENT) private document: any,
         private matDialog: MatDialog,
-        private cdr:ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
         this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     }
 
     @HostListener('window:resize', ['$event'])
-    onResize() {
+    public onResize() {
         this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
         this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     }
 
     @HostListener('window:keyup', ['$event'])
-    keyEvent(event: KeyboardEvent) {
+    public keyEvent(event: KeyboardEvent) {
         if (this.takingScreenshot && event.key === 'Escape') {
             this.cancelTakingScreenshot()
         }
     }
 
-    startScreenshot(){
+    public startScreenshot() {
         this.previewingScreenshot = false
         this.croppedCanvas = null
         this.loadingScreenshot = false
         this.takingScreenshot = true
     }
 
-    move(e:MouseEvent){
+    public move(e: MouseEvent) {
         if (this.mouseIsDown) {
             this.isDragging = true
 
@@ -165,7 +165,7 @@ export class TakeScreenshotComponent implements OnInit {
         }
     }
 
-    mouseDown(e:MouseEvent){
+    public mouseDown(e: MouseEvent) {
         this.borderWidth = this.windowWidth + 'px ' + this.windowHeight + 'px'
 
         this.startX = e.clientX
@@ -174,7 +174,7 @@ export class TakeScreenshotComponent implements OnInit {
         this.mouseIsDown = true
     }
 
-    mouseUp(e:MouseEvent){
+    public mouseUp(e: MouseEvent) {
         this.borderWidth = '0'
 
         this.isDragging = false
@@ -190,11 +190,11 @@ export class TakeScreenshotComponent implements OnInit {
 
     }
 
-    loadScreenshot() {
+    public loadScreenshot() {
 
         this.loadingScreenshot = true
         this.dialogRef = this.matDialog.open(this.previewImageDialogTemplateRef, {
-            autoFocus: false
+            autoFocus: false,
         })
         this.dialogRef.afterClosed().toPromise()
             .then(result => {
@@ -211,7 +211,7 @@ export class TakeScreenshotComponent implements OnInit {
                 default: this.cancelTakingScreenshot()
             }
         })
-        
+
         html2canvas(this.document.querySelector('#neuroglancer-container canvas')).then(canvas => {
             this.croppedCanvas = null
             this.croppedCanvas = this.renderer.createElement('canvas')
@@ -226,7 +226,7 @@ export class TakeScreenshotComponent implements OnInit {
                     0, 0,
                     this.boxEndWidth * window.devicePixelRatio, this.boxEndHeight * window.devicePixelRatio)
         }).then(() => {
-            
+
             const d = new Date()
             const n = `${d.getFullYear()}_${d.getMonth() + 1}_${d.getDate()}_${d.getHours()}_${d.getMinutes()}_${d.getSeconds()}`
             this.screenshotName = `${n}_IAV.png`
@@ -235,18 +235,18 @@ export class TakeScreenshotComponent implements OnInit {
             this.imageUrl = this.croppedCanvas.toDataURL('image/png')
             this.previewingScreenshot = true
             this.clearStateAfterScreenshot()
-            
+
             this.cdr.markForCheck()
         })
     }
 
-    cancelTakingScreenshot() {
+    public cancelTakingScreenshot() {
         this.takingScreenshot = false
         this.previewingScreenshot = false
         this.loadingScreenshot = false
         this.croppedCanvas = null
     }
-    clearStateAfterScreenshot() {
+    public clearStateAfterScreenshot() {
         this.mouseIsDown = false
         this.isDragging = false
         this.startX = 0

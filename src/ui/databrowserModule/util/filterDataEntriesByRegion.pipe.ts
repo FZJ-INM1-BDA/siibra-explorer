@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
+import { IDataEntry } from "src/services/stateStore.service";
 
 const isSubRegion = (high, low) => (high.id && low.id && high.id === low.id) || high.name === low.name
   ? true
@@ -7,15 +7,15 @@ const isSubRegion = (high, low) => (high.id && low.id && high.id === low.id) || 
     ? high.children.some(r => isSubRegion(r, low))
     : false
 
-const filterSubSelect = (dataEntry, selectedRegions) => 
-  dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr,sr)))
+const filterSubSelect = (dataEntry, selectedRegions) =>
+  dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr, sr)))
 
 @Pipe({
-  name: 'filterDataEntriesByRegion'
+  name: 'filterDataEntriesByRegion',
 })
 
-export class FilterDataEntriesByRegion implements PipeTransform{
-  public transform(dataentries: DataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
+export class FilterDataEntriesByRegion implements PipeTransform {
+  public transform(dataentries: IDataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
     return dataentries && selectedRegions && selectedRegions.length > 0
       ? dataentries
           .map(de => {
@@ -30,7 +30,7 @@ export class FilterDataEntriesByRegion implements PipeTransform{
                  */
                 return (r.id && id && r.id === id)
                   || r.name === name
-                  || r.relatedAreas && r.relatedAreas.length && r.relatedAreas.some(syn => syn === name) 
+                  || r.relatedAreas && r.relatedAreas.length && r.relatedAreas.some(syn => syn === name)
               })
               return found
                 ? { name, id, ...rest, ...found }
@@ -38,7 +38,7 @@ export class FilterDataEntriesByRegion implements PipeTransform{
             })
             return {
               ...de,
-              parcellationRegion: newParcellationRegion
+              parcellationRegion: newParcellationRegion,
             }
           })
           .filter(de => filterSubSelect(de, selectedRegions))

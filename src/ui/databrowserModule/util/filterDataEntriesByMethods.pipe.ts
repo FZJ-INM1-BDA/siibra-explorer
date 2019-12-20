@@ -1,15 +1,15 @@
-import { PipeTransform, Pipe } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
-import { temporaryFilterDataentryName, CountedDataModality } from '../databrowser.service'
+import { Pipe, PipeTransform } from "@angular/core";
+import { IDataEntry } from "src/services/stateStore.service";
+import { CountedDataModality, temporaryFilterDataentryName } from '../databrowser.service'
 
 export const NO_METHODS = `NO_METHODS`
 
 @Pipe({
-  name : 'filterDataEntriesByMethods'
+  name : 'filterDataEntriesByMethods',
 })
 
-export class FilterDataEntriesbyMethods implements PipeTransform{
-  public transform(dataEntries:DataEntry[],dataModalities:CountedDataModality[]):DataEntry[]{
+export class FilterDataEntriesbyMethods implements PipeTransform {
+  public transform(dataEntries: IDataEntry[], dataModalities: CountedDataModality[]): IDataEntry[] {
     const noMethodDisplayName = temporaryFilterDataentryName(NO_METHODS)
     const includeEmpty = dataModalities.some(d => d.name === noMethodDisplayName)
     return dataEntries && dataModalities && dataModalities.length > 0

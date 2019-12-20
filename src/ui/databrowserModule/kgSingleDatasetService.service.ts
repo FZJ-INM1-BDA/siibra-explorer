@@ -1,24 +1,24 @@
-import { Injectable, TemplateRef, OnDestroy } from "@angular/core";
-import { AtlasViewerConstantsServices, GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service"
-import { Store, select } from "@ngrx/store";
-import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
-import { ViewerPreviewFile, DataEntry } from "src/services/state/dataStore.store";
-import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
-import { MatDialog, MatSnackBar } from "@angular/material";
-import { FileViewer } from "./fileviewer/fileviewer.component";
-import { ADD_NG_LAYER, REMOVE_NG_LAYER, CHANGE_NAVIGATION, IavRootStoreInterface } from "src/services/stateStore.service";
-import { Subscription, Subject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
-import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
+import { MatDialog, MatSnackBar } from "@angular/material";
+import { select, Store } from "@ngrx/store";
+import { Subject, Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
+import { AtlasViewerConstantsServices, GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service"
+import { IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
+import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
+import { ADD_NG_LAYER, CHANGE_NAVIGATION, IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
+import { FileViewer } from "./fileviewer/fileviewer.component";
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
+import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 
 @Injectable({ providedIn: 'root' })
-export class KgSingleDatasetService implements OnDestroy{
+export class KgSingleDatasetService implements OnDestroy {
 
-  public previewingFile$: Subject<{file:ViewerPreviewFile, dataset: DataEntry}> = new Subject()
+  public previewingFile$: Subject<{file: ViewerPreviewFile, dataset: IDataEntry}> = new Subject()
 
   private subscriptions: Subscription[] = []
-  public ngLayers : Set<string> = new Set()
+  public ngLayers: Set<string> = new Set()
 
   private getKgSchemaIdFromFullIdPipe: GetKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
 
@@ -27,27 +27,27 @@ export class KgSingleDatasetService implements OnDestroy{
     private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
     private http: HttpClient,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {
 
     this.subscriptions.push(
       this.store$.pipe(
         select('ngViewerState'),
-        filter(v => !!v)
+        filter(v => !!v),
       ).subscribe(layersInterface => {
         this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, '')))
-      })
+      }),
     )
   }
 
-  ngOnDestroy(){
+  public ngOnDestroy() {
     while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
 
-  public datasetHasPreview({ name } : { name: string } = { name: null }){
-    if (!name) throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined')
+  public datasetHasPreview({ name }: { name: string } = { name: null }) {
+    if (!name) { throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined') }
     const _url = new URL(`datasets/hasPreview`, this.constantService.backendUrl )
     const searchParam = _url.searchParams
     searchParam.set('datasetName', name)
@@ -61,12 +61,12 @@ export class KgSingleDatasetService implements OnDestroy{
     searchParam.set('kgId', kgId)
     return fetch(_url.toString())
       .then(res => {
-        if (res.status >= 400) throw new Error(res.status.toString())
+        if (res.status >= 400) { throw new Error(res.status.toString()) }
         return res.json()
       })
   }
 
-  public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }){
+  public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }) {
     const _url = new URL(`datasets/downloadKgFiles`, this.constantService.backendUrl)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
@@ -74,23 +74,23 @@ export class KgSingleDatasetService implements OnDestroy{
     return _url.toString()
   }
 
-  public showPreviewList(template: TemplateRef<any>){
+  public showPreviewList(template: TemplateRef<any>) {
     this.store$.dispatch({
       type: SHOW_BOTTOM_SHEET,
-      bottomSheetTemplate: template
+      bottomSheetTemplate: template,
     })
   }
 
-  public previewFile(file:ViewerPreviewFile, dataset: DataEntry) {
+  public previewFile(file: ViewerPreviewFile, dataset: IDataEntry) {
     this.previewingFile$.next({
       file,
-      dataset
+      dataset,
     })
 
     const { position, name } = file
     if (position) {
       this.snackBar.open(`Postion of interest found.`, 'Go there', {
-        duration: 5000
+        duration: 5000,
       })
         .afterDismissed()
         .subscribe(({ dismissedByAction }) => {
@@ -99,8 +99,8 @@ export class KgSingleDatasetService implements OnDestroy{
               type: CHANGE_NAVIGATION,
               navigation: {
                 position,
-                animation: {}
-              }
+                animation: {},
+              },
             })
           }
         })
@@ -110,55 +110,54 @@ export class KgSingleDatasetService implements OnDestroy{
     if (type === PREVIEW_FILE_TYPES.NIFTI) {
       this.store$.dispatch({
         type: SHOW_BOTTOM_SHEET,
-        bottomSheetTemplate: null
+        bottomSheetTemplate: null,
       })
       const { url } = file
       this.showNewNgLayer({ url })
       return
     }
 
-
     this.dialog.open(FileViewer, {
       data: {
-        previewFile: file
+        previewFile: file,
       },
-      autoFocus: false
+      autoFocus: false,
     })
   }
 
-  public showNewNgLayer({ url }):void{
+  public showNewNgLayer({ url }): void {
 
     const layer = {
       name : url,
       source : `nifti://${url}`,
       mixability : 'nonmixable',
-      shader : GLSL_COLORMAP_JET
+      shader : GLSL_COLORMAP_JET,
     }
     this.store$.dispatch({
       type: ADD_NG_LAYER,
-      layer
+      layer,
     })
   }
 
-  removeNgLayer({ url }) {
+  public removeNgLayer({ url }) {
     this.store$.dispatch({
       type : REMOVE_NG_LAYER,
       layer : {
-        name : url
-      }
+        name : url,
+      },
     })
   }
 
-  getKgSchemaKgIdFromFullId(fullId: string){
+  public getKgSchemaKgIdFromFullId(fullId: string) {
     const match = this.getKgSchemaIdFromFullIdPipe.transform(fullId)
     return match && {
       kgSchema: match[0],
-      kgId: match[1]
+      kgId: match[1],
     }
   }
 }
 
-interface KgQueryInterface{
+interface KgQueryInterface {
   kgSchema: string
   kgId: string
 }

@@ -1,15 +1,15 @@
 import {Directive, ElementRef, EventEmitter, HostListener, Output} from "@angular/core";
 
 @Directive({
-    selector: '[elementOutClick]'
+    selector: '[elementOutClick]',
 })
 export class ElementOutClickDirective {
     constructor(private elRef: ElementRef) { }
 
-    @Output() outsideClick = new EventEmitter()
+    @Output() public outsideClick = new EventEmitter()
 
     @HostListener('document:click', ['$event', '$event.target'])
-    public onclick(event:MouseEvent, targetElement: HTMLElement): void{
+    public onclick(event: MouseEvent, targetElement: HTMLElement): void {
         if (!targetElement) {
             return
         }

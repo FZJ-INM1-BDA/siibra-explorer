@@ -1,8 +1,8 @@
-export class ToastHandler{
-  message : string = 'Toast message'
-  timeout : number = 3000
-  dismissable : boolean = true
-  show : () => void
-  hide : () => void
-  htmlMessage: string
+export class ToastHandler {
+  public message: string = 'Toast message'
+  public timeout: number = 3000
+  public dismissable: boolean = true
+  public show: () => void
+  public hide: () => void
+  public htmlMessage: string
 }

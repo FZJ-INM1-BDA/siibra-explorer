@@ -1,12 +1,11 @@
 import { Pipe, PipeTransform } from "@angular/core";
 
-
 @Pipe({
-  name: 'reorderPanelIndexPipe'
+  name: 'reorderPanelIndexPipe',
 })
 
-export class ReorderPanelIndexPipe implements PipeTransform{
-  public transform(panelOrder: string, uncorrectedIndex: number){
+export class ReorderPanelIndexPipe implements PipeTransform {
+  public transform(panelOrder: string, uncorrectedIndex: number) {
     return uncorrectedIndex === null
       ? null
       : panelOrder.indexOf(uncorrectedIndex.toString())

@@ -1,93 +1,93 @@
-import { Directive, Input, HostListener, Output, EventEmitter } from "@angular/core";
+import { Directive, EventEmitter, HostListener, Input, Output } from "@angular/core";
 
 const getFilterFn = (ev: KeyboardEvent, isDocument: boolean) => ({ type, key, target }: KeyListenerConfig): boolean => type === ev.type && ev.key === key && (target === 'document') === isDocument
 
 @Directive({
-  selector: '[iav-key-listener]'
+  selector: '[iav-key-listener]',
 })
 
-export class KeyListner{
+export class KeyListner {
 
   @Input('iav-key-listener')
-  keydownConfig: KeyListenerConfig[] = []
+  public keydownConfig: KeyListenerConfig[] = []
 
-  private isTextField(ev: KeyboardEvent):boolean{
+  private isTextField(ev: KeyboardEvent): boolean {
 
-    const target = <HTMLElement> ev.target
+    const target = ev.target as HTMLElement
     const tagName = target.tagName
 
-    return (tagName === 'SELECT' || tagName === 'INPUT' || tagName === 'TEXTAREA') 
+    return (tagName === 'SELECT' || tagName === 'INPUT' || tagName === 'TEXTAREA')
   }
 
   @HostListener('keydown', ['$event'])
-  keydown(ev: KeyboardEvent){
+  public keydown(ev: KeyboardEvent) {
     this.handleSelfListener(ev)
   }
 
   @HostListener('document:keydown', ['$event'])
-  documentKeydown(ev: KeyboardEvent){
+  public documentKeydown(ev: KeyboardEvent) {
     this.handleDocumentListener(ev)
   }
 
   @HostListener('keyup', ['$event'])
-  keyup(ev: KeyboardEvent){
+  public keyup(ev: KeyboardEvent) {
     this.handleSelfListener(ev)
   }
 
   @HostListener('document:keyup', ['$event'])
-  documentKeyup(ev: KeyboardEvent){
+  public documentKeyup(ev: KeyboardEvent) {
     this.handleDocumentListener(ev)
   }
 
   private handleSelfListener(ev: KeyboardEvent) {
-    if (!this.keydownConfig) return
-    if (this.isTextField(ev)) return
+    if (!this.keydownConfig) { return }
+    if (this.isTextField(ev)) { return }
 
     const filteredConfig = this.keydownConfig
       .filter(getFilterFn(ev, false))
       .map(config => {
         return {
           config,
-          ev
+          ev,
         }
       })
     this.emitEv(filteredConfig)
   }
 
-  private handleDocumentListener(ev:KeyboardEvent) {
-    if (!this.keydownConfig) return
-    if (this.isTextField(ev)) return
+  private handleDocumentListener(ev: KeyboardEvent) {
+    if (!this.keydownConfig) { return }
+    if (this.isTextField(ev)) { return }
 
     const filteredConfig = this.keydownConfig
       .filter(getFilterFn(ev, true))
       .map(config => {
         return {
           config,
-          ev
+          ev,
         }
       })
     this.emitEv(filteredConfig)
   }
 
-  private emitEv(items: {config:KeyListenerConfig, ev: KeyboardEvent}[]){
-    for (const item of items){
-      const { config, ev } = item as {config:KeyListenerConfig, ev: KeyboardEvent}
+  private emitEv(items: Array<{config: KeyListenerConfig, ev: KeyboardEvent}>) {
+    for (const item of items) {
+      const { config, ev } = item as {config: KeyListenerConfig, ev: KeyboardEvent}
 
       const { stop, prevent } = config
-      if (stop) ev.stopPropagation()
-      if (prevent) ev.preventDefault()
+      if (stop) { ev.stopPropagation() }
+      if (prevent) { ev.preventDefault() }
 
       this.keyEvent.emit({
-        config, ev
+        config, ev,
       })
     }
   }
 
-  @Output('iav-key-event') keyEvent = new EventEmitter<{ config: KeyListenerConfig, ev: KeyboardEvent }>()
+  @Output('iav-key-event') public keyEvent = new EventEmitter<{ config: KeyListenerConfig, ev: KeyboardEvent }>()
 
 }
 
-export interface KeyListenerConfig{
+export interface KeyListenerConfig {
   type: 'keydown' | 'keyup'
   key: string
   target?: 'document'

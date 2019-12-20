@@ -1,15 +1,14 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { DataEntry } from "../../services/stateStore.service";
-
+import { IDataEntry } from "../../services/stateStore.service";
 
 @Pipe({
-  name : 'filterRegionDataEntries'
+  name : 'filterRegionDataEntries',
 })
 
-export class filterRegionDataEntries implements PipeTransform{
-  public transform(arr:{region:any|null,searchResults:DataEntry[]}[],selectedRegions:any[]):{region:any|null,searchResults:DataEntry[]}[]{
-    return selectedRegions.length > 0 ? 
-      arr.filter(obj=> obj.region !== null && selectedRegions.findIndex(r=>obj.region.name === r.name) >= 0) :
+export class filterRegionDataEntries implements PipeTransform {
+  public transform(arr: Array<{region: any|null, searchResults: IDataEntry[]}>, selectedRegions: any[]): Array<{region: any|null, searchResults: IDataEntry[]}> {
+    return selectedRegions.length > 0 ?
+      arr.filter(obj => obj.region !== null && selectedRegions.findIndex(r => obj.region.name === r.name) >= 0) :
       arr
   }
 }

@@ -1,24 +1,15 @@
-import { Component, ElementRef, OnDestroy, HostBinding } from "@angular/core";
-
+import { Component, ElementRef, HostBinding } from "@angular/core";
 
 @Component({
-  templateUrl : `./pluginUnit.template.html`
+  templateUrl : `./pluginUnit.template.html`,
 })
 
-export class PluginUnit implements OnDestroy{
-  
-  elementRef:ElementRef
-  
+export class PluginUnit {
+
   @HostBinding('attr.pluginContainer')
-  pluginContainer = true
+  public pluginContainer = true
 
-  constructor(er:ElementRef){
-    this.elementRef = er
+  constructor(public elementRef: ElementRef) {
+
   }
-
-  ngOnDestroy(){
-    if (!PRODUCTION)
-      console.log('plugin being destroyed')
-  }
-
 }

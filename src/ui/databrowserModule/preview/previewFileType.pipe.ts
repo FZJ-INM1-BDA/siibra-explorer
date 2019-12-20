@@ -3,11 +3,11 @@ import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { determinePreviewFileType } from "./previewFileIcon.pipe";
 
 @Pipe({
-  name: 'previewFileTypePipe'
+  name: 'previewFileTypePipe',
 })
 
-export class PreviewFileTypePipe implements PipeTransform{
-  public transform(file: ViewerPreviewFile): string{
+export class PreviewFileTypePipe implements PipeTransform {
+  public transform(file: ViewerPreviewFile): string {
     return determinePreviewFileType(file)
   }
 }

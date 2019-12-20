@@ -1,60 +1,64 @@
-import { Component,  OnDestroy, Input, Pipe, PipeTransform, Output, EventEmitter, OnInit } from "@angular/core";
-import { NgLayerInterface } from "../../atlasViewer/atlasViewer.component";
-import { Store, select } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, REMOVE_NG_LAYER, FORCE_SHOW_SEGMENT, safeFilter, getNgIds } from "../../services/stateStore.service";
-import { Subscription, Observable, combineLatest } from "rxjs";
-import { filter, map, shareReplay, distinctUntilChanged, throttleTime, debounceTime } from "rxjs/operators";
+import { Component,  EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { combineLatest, Observable, Subscription } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, throttleTime } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { LoggingService } from "src/services/logging.service";
 import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
+import { getViewer } from "src/util/fn";
+import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
+import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
 
 @Component({
   selector : 'layer-browser',
   templateUrl : './layerbrowser.template.html',
-  styleUrls : [ 
+  styleUrls : [
     './layerbrowser.style.css',
-    '../btnShadow.style.css'
-  ]
+    '../btnShadow.style.css',
+  ],
 })
 
-export class LayerBrowser implements OnInit, OnDestroy{
+export class LayerBrowser implements OnInit, OnDestroy {
 
-  @Output() nonBaseLayersChanged: EventEmitter<NgLayerInterface[]> = new EventEmitter() 
+  @Output() public nonBaseLayersChanged: EventEmitter<INgLayerInterface[]> = new EventEmitter()
 
   /**
    * TODO make untangle nglayernames and its dependency on ng
    */
-  public loadedNgLayers$: Observable<NgLayerInterface[]>
-  public lockedLayers : string[] = []
+  public loadedNgLayers$: Observable<INgLayerInterface[]>
+  public lockedLayers: string[] = []
 
-  public nonBaseNgLayers$: Observable<NgLayerInterface[]>
+  public nonBaseNgLayers$: Observable<INgLayerInterface[]>
 
-  public forceShowSegmentCurrentState : boolean | null = null
-  public forceShowSegment$ : Observable<boolean|null>
-  
+  public forceShowSegmentCurrentState: boolean | null = null
+  public forceShowSegment$: Observable<boolean|null>
+
   public ngLayers$: Observable<string[]>
   public advancedMode: boolean = false
 
-  private subscriptions : Subscription[] = []
-  private disposeHandler : any
-  
+  private subscriptions: Subscription[] = []
+  private disposeHandler: any
+
   /* TODO temporary measure. when datasetID can be used, will use  */
-  public fetchedDataEntries$ : Observable<any>
+  public fetchedDataEntries$: Observable<any>
 
   @Input()
-  showPlaceholder: boolean = true
+  public showPlaceholder: boolean = true
 
-  darktheme$: Observable<boolean>
+  public darktheme$: Observable<boolean>
 
   constructor(
-    private store : Store<ViewerStateInterface>,
-    private constantsService: AtlasViewerConstantsServices){
+    private store: Store<ViewerStateInterface>,
+    private constantsService: AtlasViewerConstantsServices,
+    private log: LoggingService,
+  ) {
 
     this.ngLayers$ = store.pipe(
       select('viewerState'),
       select('templateSelected'),
       map(templateSelected => {
-        if (!templateSelected) return []
-        if (this.advancedMode) return []
+        if (!templateSelected) { return [] }
+        if (this.advancedMode) { return [] }
 
         const { ngId , otherNgIds = []} = templateSelected
 
@@ -64,9 +68,9 @@ export class LayerBrowser implements OnInit, OnDestroy{
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([
               curr.ngId,
-              ...getNgIds(curr.regions)
+              ...getNgIds(curr.regions),
             ])
-          }, [])
+          }, []),
         ]
       }),
       /**
@@ -76,23 +80,23 @@ export class LayerBrowser implements OnInit, OnDestroy{
       /**
        * remove falsy values
        */
-      map(arr => arr.filter(v => !!v))
+      map(arr => arr.filter(v => !!v)),
     )
 
     this.loadedNgLayers$ = this.store.pipe(
       select('viewerState'),
-      select('loadedNgLayers')
+      select('loadedNgLayers'),
     )
 
     this.nonBaseNgLayers$ = combineLatest(
       this.ngLayers$,
-      this.loadedNgLayers$
+      this.loadedNgLayers$,
     ).pipe(
       map(([baseNgLayerNames, loadedNgLayers]) => {
         const baseNameSet = new Set(baseNgLayerNames)
         return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
       }),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     )
 
     /**
@@ -102,69 +106,69 @@ export class LayerBrowser implements OnInit, OnDestroy{
     this.fetchedDataEntries$ = this.store.pipe(
       select('dataStore'),
       safeFilter('fetchedDataEntries'),
-      map(v=>v.fetchedDataEntries)
+      map(v => v.fetchedDataEntries),
     )
 
     this.forceShowSegment$ = this.store.pipe(
       select('ngViewerState'),
       filter(state => isDefined(state) && typeof state.forceShowSegment !== 'undefined'),
-      map(state => state.forceShowSegment)
+      map(state => state.forceShowSegment),
     )
-
 
     this.darktheme$ = this.constantsService.darktheme$.pipe(
-      shareReplay(1)
+      shareReplay(1),
     )
 
   }
 
-  ngOnInit(){
+  public ngOnInit() {
     this.subscriptions.push(
       this.nonBaseNgLayers$.pipe(
-        // on switching template, non base layer will fire 
+        // on switching template, non base layer will fire
         // debounce to ensure that the non base layer is indeed an extra layer
-        debounceTime(160)
-      ).subscribe(layers => this.nonBaseLayersChanged.emit(layers))
+        debounceTime(160),
+      ).subscribe(layers => this.nonBaseLayersChanged.emit(layers)),
     )
     this.subscriptions.push(
-      this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state)
+      this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state),
     )
   }
 
-  ngOnDestroy(){
+  public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public classVisible(layer:any):boolean{
+  public classVisible(layer: any): boolean {
     return typeof layer.visible === 'undefined'
       ? true
       : layer.visible
   }
 
-  checkLocked(ngLayer:NgLayerInterface):boolean{
-    if(!this.lockedLayers){
+  public checkLocked(ngLayer: INgLayerInterface): boolean {
+    if (!this.lockedLayers) {
       /* locked layer undefined. always return false */
       return false
-    }else{
+    } else {
       return this.lockedLayers.findIndex(l => l === ngLayer.name) >= 0
     }
   }
 
-  toggleVisibility(layer:any){
+  public toggleVisibility(layer: any) {
+    const viewer = getViewer()
     const layerName = layer.name
-    if(!layerName){
-      console.error('layer name not defined', layer)
+    if (!layerName) {
+      this.log.error('layer name not defined', layer)
       return
     }
-    const ngLayer = window['viewer'].layerManager.getLayerByName(layerName)
-    if(!ngLayer){
-      console.error('ngLayer could not be found', layerName, window['viewer'].layerManager.managedLayers)
+    const ngLayer = viewer.layerManager.getLayerByName(layerName)
+    if (!ngLayer) {
+      this.log.error('ngLayer could not be found', layerName, viewer.layerManager.managedLayers)
     }
     ngLayer.setVisible(!ngLayer.visible)
   }
 
-  toggleForceShowSegment(ngLayer:any){
-    if(!ngLayer || ngLayer.type !== 'segmentation'){
+  public toggleForceShowSegment(ngLayer: any) {
+    if (!ngLayer || ngLayer.type !== 'segmentation') {
       /* toggle only on segmentation layer */
       return
     }
@@ -178,56 +182,56 @@ export class LayerBrowser implements OnInit, OnDestroy{
         ? true
         : this.forceShowSegmentCurrentState === true
           ? false
-          : null
+          : null,
     })
   }
 
-  removeAllNonBasicLayer(){
+  public removeAllNonBasicLayer() {
     this.store.dispatch({
-      type: NG_VIEWER_ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS
+      type: NG_VIEWER_ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS,
     })
   }
 
-  removeLayer(layer:any){
-    if(this.checkLocked(layer)){
-      console.warn('this layer is locked and cannot be removed')
+  public removeLayer(layer: any) {
+    if (this.checkLocked(layer)) {
+      this.log.warn('this layer is locked and cannot be removed')
       return
     }
     this.store.dispatch({
       type : REMOVE_NG_LAYER,
       layer : {
-        name : layer.name
-      }
+        name : layer.name,
+      },
     })
   }
 
   /**
    * TODO use observable and pipe to make this more perf
    */
-  segmentationTooltip(){
-    return `toggle segments visibility: 
+  public segmentationTooltip() {
+    return `toggle segments visibility:
     ${this.forceShowSegmentCurrentState === true ? 'always show' : this.forceShowSegmentCurrentState === false ? 'always hide' : 'auto'}`
   }
 
-  get segmentationAdditionalClass(){
+  get segmentationAdditionalClass() {
     return this.forceShowSegmentCurrentState === null
       ? 'blue'
       : this.forceShowSegmentCurrentState === true
         ? 'normal'
         : this.forceShowSegmentCurrentState === false
           ? 'muted'
-          : 'red' 
+          : 'red'
   }
 
   public matTooltipPosition: string = 'below'
 }
 
 @Pipe({
-  name: 'lockedLayerBtnClsPipe'
+  name: 'lockedLayerBtnClsPipe',
 })
 
-export class LockedLayerBtnClsPipe implements PipeTransform{
-  public transform(ngLayer:NgLayerInterface, lockedLayers?: string[]): boolean{
+export class LockedLayerBtnClsPipe implements PipeTransform {
+  public transform(ngLayer: INgLayerInterface, lockedLayers?: string[]): boolean {
     return (lockedLayers && new Set(lockedLayers).has(ngLayer.name)) || false
   }
 }

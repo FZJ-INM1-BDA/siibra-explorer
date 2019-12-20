@@ -1,40 +1,39 @@
 import { Component, Input, OnChanges } from '@angular/core'
-import { DatasetInterface, ChartColor, ScaleOptionInterface, LegendInterface, TitleInterfacce, applyOption, CommonChartInterface } from '../chart.interface'
+import { applyOption, ChartColor, CommonChartInterface, DatasetInterface, LegendInterface, ScaleOptionInterface, TitleInterfacce } from '../chart.interface'
 
-import { ChartOptions, LinearTickOptions,ChartDataSets } from 'chart.js';
-import { Color } from 'ng2-charts';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ChartDataSets, ChartOptions, LinearTickOptions } from 'chart.js';
+import { Color } from 'ng2-charts';
 import { ChartBase } from '../chart.base';
 
 @Component({
   selector : `line-chart`,
   templateUrl : './line.chart.template.html',
-  styleUrls : [ 
-    `./line.chart.style.css`
+  styleUrls : [
+    `./line.chart.style.css`,
    ],
-   exportAs: 'iavLineChart'
+   exportAs: 'iavLineChart',
 })
-export class LineChart extends ChartBase implements OnChanges, CommonChartInterface{
-
+export class LineChart extends ChartBase implements OnChanges, CommonChartInterface {
 
   /**
    * labels of each of the columns, spider web edges
    */
-  @Input() labels: string[]
+  @Input() public labels: string[]
 
   /**
    * shown on the legend, different lines
    */
-  @Input() lineDatasets: LineDatasetInputInterface[] = []
+  @Input() public lineDatasets: LineDatasetInputInterface[] = []
 
   /**
    * colors of the datasetes
   */
-  @Input() colors: ChartColor[] = []
+  @Input() public colors: ChartColor[] = []
 
-  @Input() options: any
+  @Input() public options: any
 
-  mousescroll(_ev:MouseWheelEvent){
+  public mousescroll(_ev: MouseWheelEvent) {
 
     /**
      * temporarily disabled
@@ -42,30 +41,30 @@ export class LineChart extends ChartBase implements OnChanges, CommonChartInterf
 
   }
 
-  maxY: number
+  public maxY: number
 
-  xAxesTicks: LinearTickOptions = {
+  public xAxesTicks: LinearTickOptions = {
     stepSize: 20,
-    fontColor: 'white'
+    fontColor: 'white',
   }
-  chartOption: Partial<LineChartOption> = {
+  public chartOption: Partial<LineChartOption> = {
     responsive: true,
     scales: {
       xAxes: [{
         type: 'linear',
         gridLines: {
-          color: 'rgba(128,128,128,0.5)'
+          color: 'rgba(128,128,128,0.5)',
         },
         ticks: this.xAxesTicks,
         scaleLabel: {
           display: true,
           labelString: 'X Axes label',
-          fontColor: 'rgba(200,200,200,1.0)'
-        }
+          fontColor: 'rgba(200,200,200,1.0)',
+        },
       }],
       yAxes: [{
         gridLines: {
-          color: 'rgba(128,128,128,0.5)'
+          color: 'rgba(128,128,128,0.5)',
         },
         ticks: {
           fontColor: 'white',
@@ -73,76 +72,76 @@ export class LineChart extends ChartBase implements OnChanges, CommonChartInterf
         scaleLabel: {
           display: true,
           labelString: 'Y Axes label',
-          fontColor: 'rgba(200,200,200,1.0)'
-        }
+          fontColor: 'rgba(200,200,200,1.0)',
+        },
       }],
     },
     legend: {
-      display: true
+      display: true,
     },
     title: {
       display: true,
       text: 'Title',
-      fontColor: 'rgba(255,255,255,1.0)'
+      fontColor: 'rgba(255,255,255,1.0)',
     },
     color: [{
-      backgroundColor: `rgba(255,255,255,0.2)`
+      backgroundColor: `rgba(255,255,255,0.2)`,
     }],
-    animation :undefined,
-    elements: 
+    animation : undefined,
+    elements:
     {
       point: {
         radius: 0,
         hoverRadius: 8,
-        hitRadius: 4
-      }
-    }
-    
+        hitRadius: 4,
+      },
+    },
+
   }
 
-  chartDataset: DatasetInterface = {
+  public chartDataset: DatasetInterface = {
     labels: [],
-    datasets: []
+    datasets: [],
   }
 
-  shapedLineChartDatasets: ChartDataSets[]
-  
-  constructor(sanitizer:DomSanitizer){
+  public shapedLineChartDatasets: ChartDataSets[]
+
+  constructor(sanitizer: DomSanitizer) {
     super(sanitizer)
   }
 
-  ngOnChanges(){
-    this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset=>({
-      data: lineDataset.data.map((v,idx)=>({
+  public ngOnChanges() {
+    this.shapedLineChartDatasets = this.lineDatasets.map(lineDataset => ({
+      data: lineDataset.data.map((v, idx) => ({
         x: idx,
-        y: v
+        y: v,
       })),
-      fill: 'origin'
+      fill: 'origin',
     }))
 
-    this.maxY = this.chartDataset.datasets.reduce((max,dataset)=>{
+    this.maxY = this.chartDataset.datasets.reduce((max, dataset) => {
       return Math.max(
         max,
-        dataset.data.reduce((max,number)=>{
-          return Math.max(number,max)
-        },0))
-    },0)
+        dataset.data.reduce((max, number) => {
+          return Math.max(number, max)
+        }, 0))
+    }, 0)
 
-    applyOption(this.chartOption,this.options)
+    applyOption(this.chartOption, this.options)
 
     this.generateDataUrl()
   }
 
-  getDataPointString(input:any):string{
+  public getDataPointString(input: any): string {
     return typeof input === 'number' || typeof input === 'string'
       ? input.toString()
       : this.getDataPointString(input.y)
   }
 
-  private generateDataUrl(){
+  private generateDataUrl() {
     const row0 = [this.chartOption.scales.xAxes[0].scaleLabel.labelString].concat(this.chartOption.scales.yAxes[0].scaleLabel.labelString).join(',')
     const maxRows = this.lineDatasets.reduce((acc, lds) => Math.max(acc, lds.data.length), 0)
-    const rows = Array.from(Array(maxRows)).map((_,idx) => [idx.toString()].concat(this.shapedLineChartDatasets.map(v => v.data[idx] ? this.getDataPointString(v.data[idx]) : '').join(','))).join('\n')
+    const rows = Array.from(Array(maxRows)).map((_, idx) => [idx.toString()].concat(this.shapedLineChartDatasets.map(v => v.data[idx] ? this.getDataPointString(v.data[idx]) : '').join(','))).join('\n')
     const csvData = `${row0}\n${rows}`
 
     this.generateNewCsv(csvData)
@@ -151,33 +150,32 @@ export class LineChart extends ChartBase implements OnChanges, CommonChartInterf
     this.imageTitle = `${this.getGraphTitleAsString().replace(/\s/g, '_')}.png`
   }
 
-  private getGraphTitleAsString():string{
-    try{
+  private getGraphTitleAsString(): string {
+    try {
       return this.chartOption.title.text.constructor === Array
         ? (this.chartOption.title.text as string[]).join(' ')
         : this.chartOption.title.text as string
-    }catch(e){
+    } catch (e) {
       return `Untitled`
     }
   }
 }
 
-
-export interface LineDatasetInputInterface{
+export interface LineDatasetInputInterface {
   label?: string
   data: number[]
 }
 
-export interface LinearChartOptionInterface{
+export interface LinearChartOptionInterface {
   scales?: {
     xAxes?: ScaleOptionInterface[]
-    yAxes?: ScaleOptionInterface[]
+    yAxes?: ScaleOptionInterface[],
   }
   legend?: LegendInterface
   title?: TitleInterfacce
   color?: Color[]
 }
 
-interface LineChartOption extends ChartOptions{
+interface LineChartOption extends ChartOptions {
   color?: Color[]
 }

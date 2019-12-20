@@ -1,31 +1,30 @@
 import { NgModule } from "@angular/core";
-import { LayoutMainSide } from "./mainside/mainside.component";
-import { LayoutsExample } from "./layoutsExample/layoutsExample.component";
 import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ComponentsModule } from "../components/components.module";
 import { FloatingLayoutContainer } from "./floating/floating.component";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-
+import { LayoutsExample } from "./layoutsExample/layoutsExample.component";
+import { LayoutMainSide } from "./mainside/mainside.component";
 
 @NgModule({
   imports : [
     BrowserAnimationsModule,
     BrowserModule,
-    ComponentsModule
+    ComponentsModule,
   ],
   declarations : [
     LayoutMainSide,
     FloatingLayoutContainer,
 
-    LayoutsExample
+    LayoutsExample,
   ],
   exports : [
     BrowserAnimationsModule,
     LayoutMainSide,
     FloatingLayoutContainer,
 
-    LayoutsExample
-  ]
+    LayoutsExample,
+  ],
 })
 
-export class LayoutModule{}
+export class LayoutModule {}

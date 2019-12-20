@@ -1,61 +1,60 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
-import { ComponentsModule } from "./components/components.module";
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { UIModule } from "./ui/ui.module";
-import { LayoutModule } from "./layouts/layout.module";
-import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
-import { StoreModule } from "@ngrx/store";
-import { viewerState, dataStore, uiState, ngViewerState, pluginState, viewerConfigState, userConfigState, UserConfigStateUseEffect } from "./services/stateStore.service";
-import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 import { CommonModule } from "@angular/common";
-import { GetNamePipe } from "./util/pipes/getName.pipe";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { StoreModule } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
+import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
+import { ComponentsModule } from "./components/components.module";
+import { LayoutModule } from "./layouts/layout.module";
+import { dataStore, ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
+import { UIModule } from "./ui/ui.module";
+import { GetNamePipe } from "./util/pipes/getName.pipe";
+import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
-import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
-import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
-// TODO deprecate
-import { fasTooltipScreenshotDirective,fasTooltipInfoSignDirective,fasTooltipLogInDirective,fasTooltipNewWindowDirective,fasTooltipQuestionSignDirective,fasTooltipRemoveDirective,fasTooltipRemoveSignDirective } from "./util/directives/glyphiconTooltip.directive";
-import { TooltipModule } from "ngx-bootstrap/tooltip";
-import { TabsModule } from 'ngx-bootstrap/tabs'
-import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
-import { ToastComponent } from "./components/toast/toast.component";
-import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
-import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
-import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
-import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
-import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
-import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
-import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
-import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
-import { AuthService } from "./services/auth.service";
-import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
-import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { UseEffects } from "./services/effect/effect";
-import { DragDropDirective } from "./util/directives/dragDrop.directive";
-import { LocalFileService } from "./services/localFile.service";
-import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
-import { DialogService } from "./services/dialogService.service";
-import { DialogComponent } from "./components/dialog/dialog.component";
-import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
-import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
-import { ViewerStateUseEffect } from "./services/state/viewerState.store";
-import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
-import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
-import { UIService } from "./services/uiService.service";
-import { UtilModule } from "./util/util.module";
+import { TabsModule } from 'ngx-bootstrap/tabs'
+import { TooltipModule } from "ngx-bootstrap/tooltip";
 import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
-import { PluginServiceuseEffect } from "./atlasViewer/atlasViewer.pluginService.service";
+import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
+import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
+import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
+import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
+import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
+import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
+import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
+import { DialogComponent } from "./components/dialog/dialog.component";
+import { ToastComponent } from "./components/toast/toast.component";
+import { AuthService } from "./services/auth.service";
+import { DialogService } from "./services/dialogService.service";
+import { UseEffects } from "./services/effect/effect";
+import { LocalFileService } from "./services/localFile.service";
+import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
+import { ViewerStateUseEffect } from "./services/state/viewerState.store";
+import { UIService } from "./services/uiService.service";
+import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
+import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
+import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
+import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
+import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
+import { DragDropDirective } from "./util/directives/dragDrop.directive";
+import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
+import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
+import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
+import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
+import { UtilModule } from "./util/util.module";
 
 import 'hammerjs'
 
-import 'src/res/css/version.css'
-import 'src/theme.scss'
 import 'src/res/css/extra_styles.css'
-import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
+import 'src/res/css/version.css'
 import {UiStateUseEffect} from "src/services/state/uiState.store";
+import 'src/theme.scss'
+import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
+import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
+import { LoggingService } from "./services/logging.service";
 
 @NgModule({
   imports : [
@@ -68,7 +67,7 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
     DatabrowserModule,
     AngularMaterialModule,
     UtilModule,
-    
+
     TooltipModule.forRoot(),
     TabsModule.forRoot(),
     EffectsModule.forRoot([
@@ -78,9 +77,9 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
       ViewerStateControllerUseEffect,
       ViewerStateUseEffect,
       NgViewerUseEffect,
-      PluginServiceuseEffect,
+      PluginServiceUseEffect,
       AtlasViewerHistoryUseEffect,
-      UiStateUseEffect
+      UiStateUseEffect,
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -89,9 +88,9 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
       viewerState,
       dataStore,
       uiState,
-      userConfigState
+      userConfigState,
     }),
-    HttpClientModule
+    HttpClientModule,
   ],
   declarations : [
     AtlasViewer,
@@ -100,13 +99,6 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
     PluginUnit,
 
     /* directives */
-    fasTooltipScreenshotDirective,
-    fasTooltipInfoSignDirective,
-    fasTooltipLogInDirective,
-    fasTooltipNewWindowDirective,
-    fasTooltipQuestionSignDirective,
-    fasTooltipRemoveDirective,
-    fasTooltipRemoveSignDirective,
     DockedContainerDirective,
     FloatingContainerDirective,
     PluginFactoryDirective,
@@ -118,7 +110,7 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
     GetNamesPipe,
     GetNamePipe,
     TransformOnhoverSegmentPipe,
-    NewViewerDisctinctViewToLayer
+    NewViewerDisctinctViewToLayer,
   ],
   entryComponents : [
     WidgetUnit,
@@ -136,23 +128,24 @@ import {UiStateUseEffect} from "src/services/state/uiState.store";
     LocalFileService,
     DialogService,
     UIService,
-    
+    LoggingService,
+
     /**
      * TODO
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
      */
-    DatabrowserService
+    DatabrowserService,
   ],
   bootstrap : [
-    AtlasViewer
+    AtlasViewer,
   ],
   schemas: [
-      CUSTOM_ELEMENTS_SCHEMA
-  ]
+      CUSTOM_ELEMENTS_SCHEMA,
+  ],
 })
 
-export class MainModule{
-  
+export class MainModule {
+
   constructor(
     authServce: AuthService,
 
@@ -161,8 +154,8 @@ export class MainModule{
      * allow for pre fetching of dataentry
      * TODO only fetch when traffic is idle
      */
-    dbSerivce: DatabrowserService
-  ){
+    dbSerivce: DatabrowserService,
+  ) {
     authServce.authReloadState()
   }
 }

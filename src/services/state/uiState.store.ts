@@ -1,16 +1,16 @@
-import {Action, select, Store} from '@ngrx/store'
 import {Injectable, TemplateRef} from '@angular/core';
+import {Action, select, Store} from '@ngrx/store'
 
-import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
-import {GENERAL_ACTION_TYPES, IavRootStoreInterface} from '../stateStore.service'
 import {Effect} from "@ngrx/effects";
 import {Observable} from "rxjs";
 import {filter, map, mapTo, scan, startWith} from "rxjs/operators";
+import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
+import {GENERAL_ACTION_TYPES, IavRootStoreInterface} from '../stateStore.service'
 
 export const defaultState: StateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
-  
+
   mouseOverLandmark: null,
   mouseOverUserLandmark: null,
 
@@ -27,33 +27,33 @@ export const defaultState: StateInterface = {
    * replace with server side logic (?)
    */
   agreedCookies: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
-  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
+  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state,action:ActionInterface) => {
-  switch(action.type){
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
+  switch (action.type) {
     case MOUSE_OVER_SEGMENTS:
       const { segments } = action
       return {
         ...prevState,
-        mouseOverSegments: segments
+        mouseOverSegments: segments,
       }
     case MOUSE_OVER_SEGMENT:
       return {
         ...prevState,
-        mouseOverSegment : action.segment
+        mouseOverSegment : action.segment,
       }
     case MOUSEOVER_USER_LANDMARK:
       const { payload = {} } = action
       const { userLandmark: mouseOverUserLandmark = null } = payload
       return {
         ...prevState,
-        mouseOverUserLandmark
+        mouseOverUserLandmark,
       }
     case MOUSE_OVER_LANDMARK:
       return {
         ...prevState,
-        mouseOverLandmark : action.landmark
+        mouseOverLandmark : action.landmark,
       }
     case SNACKBAR_MESSAGE:
       const { snackbarMessage } = action
@@ -62,45 +62,45 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
        */
       return {
         ...prevState,
-        snackbarMessage: Symbol(snackbarMessage)
+        snackbarMessage: Symbol(snackbarMessage),
       }
     case OPEN_SIDE_PANEL:
       return {
         ...prevState,
-        sidePanelIsOpen: true
+        sidePanelIsOpen: true,
       }
     case CLOSE_SIDE_PANEL:
       return {
         ...prevState,
-        sidePanelIsOpen: false
+        sidePanelIsOpen: false,
       }
 
     case EXPAND_SIDE_PANEL_CURRENT_VIEW:
       return {
         ...prevState,
-        sidePanelExploreCurrentViewIsOpen: true
+        sidePanelExploreCurrentViewIsOpen: true,
       }
     case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
       return {
         ...prevState,
-        sidePanelExploreCurrentViewIsOpen: false
+        sidePanelExploreCurrentViewIsOpen: false,
       }
 
     case SHOW_SIDE_PANEL_DATASET_LIST:
       return {
         ...prevState,
-        sidePanelCurrentViewContent: 'Dataset'
+        sidePanelCurrentViewContent: 'Dataset',
       }
 
     case SHOW_SIDE_PANEL_CONNECTIVITY:
       return {
         ...prevState,
-        sidePanelCurrentViewContent: 'Connectivity'
+        sidePanelCurrentViewContent: 'Connectivity',
       }
     case HIDE_SIDE_PANEL_CONNECTIVITY:
       return {
         ...prevState,
-        sidePanelCurrentViewContent: 'Dataset'
+        sidePanelCurrentViewContent: 'Dataset',
       }
     case AGREE_COOKIE:
       /**
@@ -109,7 +109,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
       localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
       return {
         ...prevState,
-        agreedCookies: true
+        agreedCookies: true,
       }
     case AGREE_KG_TOS:
       /**
@@ -118,13 +118,13 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
       localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
       return {
         ...prevState,
-        agreedKgTos: true
+        agreedKgTos: true,
       }
     case SHOW_BOTTOM_SHEET:
         const { bottomSheetTemplate } = action
         return {
           ...prevState,
-          bottomSheetTemplate
+          bottomSheetTemplate,
         }
     default:
       return prevState
@@ -140,17 +140,17 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
-export interface StateInterface{
-  mouseOverSegments: {
+export interface StateInterface {
+  mouseOverSegments: Array<{
     layer: {
-      name: string
+      name: string,
     }
-    segment: any | null
-  }[]
+    segment: any | null,
+  }>
   sidePanelIsOpen: boolean
   sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
   sidePanelExploreCurrentViewIsOpen: boolean
@@ -169,16 +169,16 @@ export interface StateInterface{
   bottomSheetTemplate: TemplateRef<any>
 }
 
-export interface ActionInterface extends Action{
+export interface ActionInterface extends Action {
   segment: any | number
   landmark: any
   focusedSidePanel?: string
-  segments?:{
+  segments?: Array<{
     layer: {
-      name: string
+      name: string,
     }
-    segment: any | null
-  }[],
+    segment: any | null,
+  }>,
   snackbarMessage: string
 
   bottomSheetTemplate: TemplateRef<any>
@@ -187,10 +187,10 @@ export interface ActionInterface extends Action{
 }
 
 @Injectable({
-  providedIn:'root'
+  providedIn: 'root',
 })
 
-export class UiStateUseEffect{
+export class UiStateUseEffect {
 
   private numRegionSelectedWithHistory$: Observable<any[]>
 
@@ -206,21 +206,21 @@ export class UiStateUseEffect{
       select('regionsSelected'),
       map(arr => arr.length),
       startWith(0),
-      scan((acc, curr) => [curr, ...acc], [])
+      scan((acc, curr) => [curr, ...acc], []),
     )
 
     this.sidePanelOpen$ = this.numRegionSelectedWithHistory$.pipe(
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo({
-        type: OPEN_SIDE_PANEL
-      })
+        type: OPEN_SIDE_PANEL,
+      }),
     )
 
     this.viewCurrentOpen$ = this.numRegionSelectedWithHistory$.pipe(
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo({
-        type: EXPAND_SIDE_PANEL_CURRENT_VIEW
-      })
+        type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
+      }),
     )
   }
 }

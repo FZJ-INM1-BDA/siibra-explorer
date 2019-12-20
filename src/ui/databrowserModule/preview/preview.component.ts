@@ -1,6 +1,6 @@
-import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectorRef, ChangeDetectionStrategy } from "@angular/core";
-import { DatabrowserService } from "../databrowser.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
+import { DatabrowserService } from "../databrowser.service";
 
 const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path = 'unpathed'}) => name
 ? activeFileName === name
@@ -12,14 +12,14 @@ const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path
   selector: 'preview-component',
   templateUrl: './previewList.template.html',
   styleUrls: [
-    './preview.style.css'
+    './preview.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class PreviewComponent implements OnInit{
-  @Input() datasetName: string
-  @Output() previewFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
+export class PreviewComponent implements OnInit {
+  @Input() public datasetName: string
+  @Output() public previewFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
 
   public fetchCompleteFlag: boolean = false
 
@@ -28,20 +28,20 @@ export class PreviewComponent implements OnInit{
   private error: string
 
   constructor(
-    private dbrService:DatabrowserService,
-    private cdr: ChangeDetectorRef
-  ){
+    private dbrService: DatabrowserService,
+    private cdr: ChangeDetectorRef,
+  ) {
     this.renderNode = getRenderNodeFn()
   }
 
-  previewFileClick(ev, el){
-    
+  public previewFileClick(ev, el) {
+
     ev.event.preventDefault()
     ev.event.stopPropagation()
 
-    if(ev.inputItem.children.length > 0){
+    if (ev.inputItem.children.length > 0) {
       el.toggleCollapse(ev.inputItem)
-    }else{
+    } else {
       this.activeFile = ev.inputItem
       this.renderNode = getRenderNodeFn(this.activeFile)
     }
@@ -49,9 +49,9 @@ export class PreviewComponent implements OnInit{
     this.cdr.markForCheck()
   }
 
-  public renderNode: (obj:any) => string
+  public renderNode: (obj: any) => string
 
-  ngOnInit(){
+  public ngOnInit() {
     if (this.datasetName) {
       this.dbrService.fetchPreviewData(this.datasetName)
         .then(json => {
