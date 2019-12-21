@@ -39,6 +39,7 @@ jobs:
 
   test:
     runs-on: self-hosted
+    needs: bulid
     steps:
     - name: Download docker image artefact
       uses: actions/upload-artifact@v1
