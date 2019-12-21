@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
 import { merge, Observable, Subscription } from "rxjs";
 import { scan, shareReplay } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
@@ -185,11 +185,11 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
   public filePreviewName: string
   public onShowPreviewDataset(payload: {datasetName: string, event: MouseEvent}) {
-    const { datasetName, event } = payload
+    const { datasetName } = payload
     this.filePreviewName = datasetName
   }
 
-  public resetFilters(event?: MouseEvent) {
+  public resetFilters(_event?: MouseEvent) {
     this.clearAll()
   }
 

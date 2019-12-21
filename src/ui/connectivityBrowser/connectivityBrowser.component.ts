@@ -141,7 +141,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
                 .map(r => r)
 
             if (areaAsRegion && areaAsRegion.length && areaAsRegion[0].ngId) {
-                // @ts-ignore
                 colorMap.get(areaAsRegion[0].ngId).set(areaAsRegion[0].labelIndex, {red: area.color.r, green: area.color.g, blue: area.color.b})
             }
         })

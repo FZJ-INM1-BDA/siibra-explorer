@@ -10,5 +10,5 @@ export class ModalHandler {
   public body: string
   public footer: string
 
-  public dismissable: boolean = true
+  public dismissable = true
 }

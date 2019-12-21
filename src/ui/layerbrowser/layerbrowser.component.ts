@@ -1,7 +1,7 @@
 import { Component,  EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, throttleTime } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { LoggingService } from "src/services/logging.service";
 import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";

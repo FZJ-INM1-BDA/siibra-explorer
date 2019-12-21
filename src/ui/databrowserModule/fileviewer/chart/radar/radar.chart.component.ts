@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { Component, Input, OnChanges, OnDestroy } from '@angular/core'
 
 import { DomSanitizer } from '@angular/platform-browser';
 import { RadialChartOptions } from 'chart.js'

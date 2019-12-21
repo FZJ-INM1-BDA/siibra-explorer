@@ -1,7 +1,7 @@
 export class ToastHandler {
-  public message: string = 'Toast message'
-  public timeout: number = 3000
-  public dismissable: boolean = true
+  public message = 'Toast message'
+  public timeout = 3000
+  public dismissable = true
   public show: () => void
   public hide: () => void
   public htmlMessage: string

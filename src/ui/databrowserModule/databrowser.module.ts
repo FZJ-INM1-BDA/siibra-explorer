@@ -137,8 +137,8 @@ export class DatabrowserModule {
         if (chart.data.datasets) {
           chart.data.datasets = chart.data.datasets
             .map(dataset => {
-              if (dataset.label && /\_sd$/.test(dataset.label)) {
-                const originalDS = chart.data.datasets!.find(baseDS => typeof baseDS.label !== 'undefined' && (baseDS.label == dataset.label!.replace(/_sd$/, '')))
+              if (dataset.label && /_sd$/.test(dataset.label)) {
+                const originalDS = chart.data.datasets.find(baseDS => typeof baseDS.label !== 'undefined' && (baseDS.label == dataset.label.replace(/_sd$/, '')))
                 if (originalDS) {
                   return Object.assign({}, dataset, {
                     data: (originalDS.data as number[]).map((datapoint, idx) => (Number(datapoint) + Number((dataset.data as number[])[idx]))),
@@ -148,7 +148,7 @@ export class DatabrowserModule {
                   return dataset
                 }
               } else if (dataset.label) {
-                const sdDS = chart.data.datasets!.find(sdDS => typeof sdDS.label !== 'undefined' && (sdDS.label == dataset.label + '_sd'))
+                const sdDS = chart.data.datasets.find(sdDS => typeof sdDS.label !== 'undefined' && (sdDS.label == dataset.label + '_sd'))
                 if (sdDS) {
                   return Object.assign({}, dataset, {
                     ...constantsService.chartBaseStyle,

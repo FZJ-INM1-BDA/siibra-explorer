@@ -35,7 +35,7 @@ export class KgSingleDatasetService implements OnDestroy {
         select('ngViewerState'),
         filter(v => !!v),
       ).subscribe(layersInterface => {
-        this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti\:\/\//, '')))
+        this.ngLayers = new Set(layersInterface.layers.map(l => l.source.replace(/^nifti:\/\//, '')))
       }),
     )
   }
@@ -87,7 +87,7 @@ export class KgSingleDatasetService implements OnDestroy {
       dataset,
     })
 
-    const { position, name } = file
+    const { position } = file
     if (position) {
       this.snackBar.open(`Postion of interest found.`, 'Go there', {
         duration: 5000,

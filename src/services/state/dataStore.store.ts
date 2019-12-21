@@ -160,7 +160,7 @@ export interface IFile {
   name: string
   absolutePath: string
   byteSize: number
-  contentType: string,
+  contentType: string
 }
 
 export interface ViewerPreviewFile {

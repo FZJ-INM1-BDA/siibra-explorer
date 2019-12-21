@@ -4,6 +4,8 @@ import { Pipe, PipeTransform } from "@angular/core";
  * The pipe transforms a flat array to a nested array, based on the path property, following Unix file path rule
  */
 
+// TODO check what the hell prop should do
+
 @Pipe({
   name : 'pathToNestedChildren',
 })

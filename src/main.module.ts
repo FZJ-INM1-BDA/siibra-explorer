@@ -26,7 +26,6 @@ import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
 import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
-import { ToastComponent } from "./components/toast/toast.component";
 import { AuthService } from "./services/auth.service";
 import { DialogService } from "./services/dialogService.service";
 import { UseEffects } from "./services/effect/effect";
@@ -115,7 +114,6 @@ import { LoggingService } from "./services/logging.service";
   entryComponents : [
     WidgetUnit,
     ModalUnit,
-    ToastComponent,
     PluginUnit,
     DialogComponent,
     ConfirmDialogComponent,
@@ -148,13 +146,6 @@ export class MainModule {
 
   constructor(
     authServce: AuthService,
-
-    /**
-     * instantiate singleton
-     * allow for pre fetching of dataentry
-     * TODO only fetch when traffic is idle
-     */
-    dbSerivce: DatabrowserService,
   ) {
     authServce.authReloadState()
   }

@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges } from '@angular/core'
 import { applyOption, ChartColor, CommonChartInterface, DatasetInterface, LegendInterface, ScaleOptionInterface, TitleInterfacce } from '../chart.interface'
 
-import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { ChartDataSets, ChartOptions, LinearTickOptions } from 'chart.js';
 import { Color } from 'ng2-charts';
 import { ChartBase } from '../chart.base';
@@ -169,7 +169,7 @@ export interface LineDatasetInputInterface {
 export interface LinearChartOptionInterface {
   scales?: {
     xAxes?: ScaleOptionInterface[]
-    yAxes?: ScaleOptionInterface[],
+    yAxes?: ScaleOptionInterface[]
   }
   legend?: LegendInterface
   title?: TitleInterfacce

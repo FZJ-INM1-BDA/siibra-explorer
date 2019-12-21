@@ -69,7 +69,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     /**
      * TODO may be obsolete. test when nifti become available
      */
-    case LOAD_DEDICATED_LAYER:
+    case LOAD_DEDICATED_LAYER: {
       const dedicatedView = prevState.dedicatedView
         ? prevState.dedicatedView.concat(action.dedicatedView)
         : [action.dedicatedView]
@@ -77,6 +77,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
         ...prevState,
         dedicatedView,
       }
+    }
     case UNLOAD_DEDICATED_LAYER:
       return {
         ...prevState,
@@ -84,7 +85,8 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
           ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
           : [],
       }
-    case NEWVIEWER:
+    case NEWVIEWER: {
+
       const { selectParcellation: parcellation } = action
       // const parcellation = propagateNgId( selectParcellation ): parcellation
       const { regions, ...parcellationWORegions } = parcellation
@@ -101,6 +103,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
         navigation : {},
         dedicatedView : null,
       }
+    }
     case FETCHED_TEMPLATE : {
       return {
         ...prevState,
@@ -133,12 +136,13 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
         },
       }
     }
-    case SELECT_REGIONS:
+    case SELECT_REGIONS: {
       const { selectRegions } = action
       return {
         ...prevState,
         regionsSelected: selectRegions,
       }
+    }
     case DESELECT_LANDMARKS : {
       return {
         ...prevState,
@@ -180,9 +184,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
         }
       }
     }
-    case GENERAL_ACTION_TYPES.APPLY_STATE:
+    case GENERAL_ACTION_TYPES.APPLY_STATE: {
       const { viewerState } = (action as any).state
       return viewerState
+    }
     case SET_CONNECTIVITY_REGION:
       return {
         ...prevState,
@@ -286,7 +291,7 @@ export class ViewerStateUseEffect {
             landmarkMap.set(id, landmark)
           }
         }
-        const userLandmarks = Array.from(landmarkMap).map(([id, landmark]) => landmark)
+        const userLandmarks = Array.from(landmarkMap).map(([_id, landmark]) => landmark)
         return {
           type: USER_LANDMARKS,
           landmarks: userLandmarks,

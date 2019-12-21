@@ -156,7 +156,7 @@ export class WidgetServices implements OnDestroy {
       this.widgetComponentRefs.delete(widgetRef)
       widgetRef.instance.container.detach( 0 )
       const guestComopnent = widgetRef.instance.guestComponentRef
-      const cr = this.addNewWidget(guestComopnent, options)
+      this.addNewWidget(guestComopnent, options)
 
       widgetRef.destroy()
     } else {

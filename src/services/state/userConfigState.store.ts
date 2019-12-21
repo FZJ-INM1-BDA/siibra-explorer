@@ -30,10 +30,10 @@ export interface RegionSelection {
  * for serialisation into local storage/database
  */
 interface SimpleRegionSelection {
-  id: string,
-  name: string,
-  tName: string,
-  pName: string,
+  id: string
+  name: string
+  tName: string
+  pName: string
   rSelected: string[]
 }
 
@@ -43,7 +43,7 @@ interface UserConfigAction extends Action {
 }
 
 export const defaultState: StateInterface = {
-  savedRegionsSelection: [],
+  savedRegionsSelection: []
 }
 
 export const ACTION_TYPES = {
@@ -57,17 +57,15 @@ export const ACTION_TYPES = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: UserConfigAction) => {
   switch (action.type) {
-    case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS:
+    case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS: {
       const { config = {} } = action
       const { savedRegionsSelection } = config
       return {
         ...prevState,
         savedRegionsSelection,
       }
-    default:
-      return {
-        ...prevState,
-      }
+    }
+    default: return prevState
   }
 }
 

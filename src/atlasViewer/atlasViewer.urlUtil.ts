@@ -58,17 +58,17 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
   const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
   const { layers } = ngViewerState
   const additionalLayers = layers.filter(layer =>
-    /^blob\:/.test(layer.name) &&
+    /^blob:/.test(layer.name) &&
     Object.keys(initialNgState.layers).findIndex(layerName => layerName === layer.name) < 0,
   )
-  const niftiLayers = additionalLayers.filter(layer => /^nifti\:\/\//.test(layer.source))
+  const niftiLayers = additionalLayers.filter(layer => /^nifti:\/\//.test(layer.source))
   if (niftiLayers.length > 0) { searchParam.set('niftiLayers', niftiLayers.join('__')) }
 
   // plugin state
   const { initManifests } = pluginState
   const pluginStateParam = initManifests
     .filter(([ src ]) => src !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
-    .map(([ src, url]) => url)
+    .map(([ _src, url]) => url)
     .join('__')
 
   if (initManifests.length > 0) { searchParam.set('pluginState', pluginStateParam) }
@@ -80,7 +80,7 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
 
   const returnState = JSON.parse(JSON.stringify(state)) as IavRootStoreInterface
 
-  // tslint:disable-next-line:no-empty
+  /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   const warningCb = callback || (() => {})
 
   const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR

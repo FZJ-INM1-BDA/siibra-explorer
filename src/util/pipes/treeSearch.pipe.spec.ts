@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import { TreeSearchPipe } from './treeSearch.pipe'
 
 describe('TreeSearchPipe works as intended', () => {

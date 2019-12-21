@@ -6,10 +6,6 @@ import { DialogService } from "src/services/dialogService.service";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { ViewerStateBase } from '../viewerState.base'
 
-const compareWith = (o, n) => !o || !n
-  ? false
-  : o.name === n.name
-
 @Component({
   selector: 'viewer-state-controller',
   templateUrl: './viewerState.template.html',

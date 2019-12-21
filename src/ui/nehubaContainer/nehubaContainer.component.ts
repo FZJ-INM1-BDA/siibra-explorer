@@ -16,36 +16,6 @@ import { timedValues } from "../../util/generator";
 import { computeDistance, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "./util";
 
-const getProxyUrl = (ngUrl) => `nifti://${BACKEND_URL}preview/file?fileUrl=${encodeURIComponent(ngUrl.replace(/^nifti:\/\//, ''))}`
-const getProxyOther = ({source}) => /AUTH_227176556f3c4bb38df9feea4b91200c/.test(source)
-? {
-  transform: [
-    [
-      1e6,
-      0,
-      0,
-      0,
-    ],
-    [
-      0,
-      1e6,
-      0,
-      0,
-    ],
-    [
-      0,
-      0,
-      1e6,
-      0,
-    ],
-    [
-      0,
-      0,
-      0,
-      1,
-    ],
-  ],
-} : {}
 const isFirstRow = (cell: HTMLElement) => {
   const { parentElement: row } = cell
   const { parentElement: container } = row
@@ -1126,7 +1096,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       moveToNavigationOri : (quat) => this.nehubaViewer.setNavigationState({
         orientation : quat,
       }),
-      showSegment : (labelIndex) => {
+      showSegment : (_labelIndex) => {
         /**
          * TODO reenable with updated select_regions api
          */
@@ -1162,7 +1132,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           },
         })
       },
-      hideSegment : (labelIndex) => {
+      hideSegment : (_labelIndex) => {
         /**
          * TODO reenable with updated select_regions api
          */
@@ -1195,7 +1165,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       },
       segmentColourMap : new Map(),
       getLayersSegmentColourMap: () => this.nehubaViewer.multiNgIdColorMap,
-      applyColourMap : (map) => {
+      applyColourMap : (_map) => {
         throw new Error(`apply color map has been deprecated. use applyLayersColourMap instead`)
       },
       applyLayersColourMap: (map) => {

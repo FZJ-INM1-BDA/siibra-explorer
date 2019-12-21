@@ -84,7 +84,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         if (parcellationSelected && parcellationSelected.name === name) { return false }
         return true
       }),
-      map(([name,  _]) => name),
+      map(([name]) => name),
       withLatestFrom(viewerState$.pipe(
         select('templateSelected'),
       )),
@@ -122,7 +122,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         if (templateSelected && templateSelected.name === name) { return false }
         return true
       }),
-      map(([name,  templateSelected]) => name),
+      map(([name]) => name),
       withLatestFrom(viewerState$.pipe(
         select('fetchedTemplates'),
       )),

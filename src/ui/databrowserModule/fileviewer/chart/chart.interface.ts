@@ -55,7 +55,7 @@ export interface Dataset {
 export interface LegendInterface {
   display?: boolean
   labels?: {
-    fontColor?: string,
+    fontColor?: string
   }
 }
 

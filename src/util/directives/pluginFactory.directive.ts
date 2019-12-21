@@ -58,7 +58,7 @@ export class PluginFactoryDirective {
       libraries
         .filter((stringname) => SUPPORT_LIBRARY_MAP.get(stringname) !== null)
         .forEach(libname => {
-          const ledger = apiService.loadedLibraries.get(libname!)
+          const ledger = apiService.loadedLibraries.get(libname)
           if (!ledger) {
             this.log.warn('unload external libraries error. cannot find ledger entry...', libname, apiService.loadedLibraries)
             return
@@ -70,9 +70,9 @@ export class PluginFactoryDirective {
 
           if (ledger.counter - 1 == 0) {
             rd2.removeChild(document.head, ledger.src)
-            apiService.loadedLibraries.delete(libname!)
+            apiService.loadedLibraries.delete(libname)
           } else {
-            apiService.loadedLibraries.set(libname!, { counter: ledger.counter - 1, src: ledger.src })
+            apiService.loadedLibraries.set(libname, { counter: ledger.counter - 1, src: ledger.src })
           }
         })
   }

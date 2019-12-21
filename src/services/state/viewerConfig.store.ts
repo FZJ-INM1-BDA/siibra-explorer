@@ -8,7 +8,7 @@ export interface StateInterface {
 }
 
 interface ViewerConfigurationAction extends Action {
-  config: Partial<StateInterface>,
+  config: Partial<StateInterface>
   payload: any
 }
 
@@ -63,19 +63,20 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ViewerConfigurationAction) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_MOBILE_UI:
+    case ACTION_TYPES.SET_MOBILE_UI: {
       const { payload } = action
       const { useMobileUI } = payload
       return {
         ...prevState,
         useMobileUI,
       }
+    }
     case ACTION_TYPES.UPDATE_CONFIG:
       return {
         ...prevState,
         ...action.config,
       }
-    case ACTION_TYPES.CHANGE_GPU_LIMIT:
+    case ACTION_TYPES.CHANGE_GPU_LIMIT: {
       const newGpuLimit = Math.min(
         CONFIG_CONSTANTS.gpuLimitMax,
         Math.max(
@@ -86,6 +87,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         gpuLimit: newGpuLimit,
       }
+    }
     default: return prevState
   }
 }

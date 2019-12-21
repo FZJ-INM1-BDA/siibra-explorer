@@ -24,7 +24,7 @@ export class AuthService implements OnDestroy {
 
   constructor(private httpClient: HttpClient) {
     this.user$ = this.httpClient.get('user').pipe(
-      catchError(err => {
+      catchError(_err => {
         return of(null)
       }),
       shareReplay(1),

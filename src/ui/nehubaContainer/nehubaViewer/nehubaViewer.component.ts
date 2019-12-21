@@ -15,7 +15,7 @@ import 'third_party/export_nehuba/main.bundle.js'
 
 interface LayerLabelIndex {
   layer: {
-    name: string,
+    name: string
   }
 
   labelIndicies: number[]
@@ -57,12 +57,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   @Output() public debouncedViewerPositionChange: EventEmitter<any> = new EventEmitter()
   @Output() public mouseoverSegmentEmitter:
     EventEmitter<{
-      segmentId: number | null,
-      segment: string | null,
+      segmentId: number | null
+      segment: string | null
       layer: {
-        name?: string,
-        url?: string,
-      },
+        name?: string
+        url?: string
+      }
     }> = new EventEmitter()
   @Output() public mouseoverLandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
   @Output() public mouseoverUserlandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
@@ -444,7 +444,8 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       }
     }
 
-    this.onDestroyCb.push(() => LayerManager.prototype.invokeAction = (arg) => {})
+    /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+    this.onDestroyCb.push(() => LayerManager.prototype.invokeAction = (_arg) => { /** in default neuroglancer, this function is invoked when selection occurs */ })
   }
 
   private filterLayers(l: any, layerObj: any): boolean {
@@ -576,7 +577,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     })
   }
 
-  public showSegs(array: number[] | string[]) {
+  public showSegs(array: (number|string)[]) {
 
     if (!this.nehubaViewer) { return }
 
@@ -602,11 +603,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       return newMap
     }
 
-    /**
-     * TODO
-     * AAAAAAARG TYPESCRIPT WHY YOU SO MAD
-     */
-    // @ts-ignore
     const newMap: Map<string, number[]> = array.reduce(reduceFn, new Map())
 
     /**
@@ -723,7 +719,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.hideAllSeg()
     }
 
-    this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer, ...rest}) => {
+    this._s8$ = this.nehubaViewer.mouseOver.segment.subscribe(({segment: segmentId, layer }) => {
 
       const {name = 'unnamed'} = layer
       const map = this.multiNgIdsLabelIndexMap.get(name)
@@ -815,7 +811,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       const newlayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(id)
       if (newlayer) {newlayer.setVisible(true) } else { this.log.warn('could not find new layer', id) }
 
-      const regex = /^(\S.*?)\:\/\/(.*?)$/.exec(newlayer.sourceUrl)
+      const regex = /^(\S.*?):\/\/(.*?)$/.exec(newlayer.sourceUrl)
 
       if (!regex || !regex[2]) {
         this.log.error('could not parse baseUrl')

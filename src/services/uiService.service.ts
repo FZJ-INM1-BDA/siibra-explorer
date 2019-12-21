@@ -22,7 +22,7 @@ export class UIService {
       }
 
       toasthandler.hide = () => {
-        if (!!handle) { handle.dismiss() }
+        if (handle) { handle.dismiss() }
         handle = null
       }
       return toasthandler

@@ -5,7 +5,7 @@ import { IDataEntry } from "../../services/stateStore.service";
   name : 'filterRegionDataEntries',
 })
 
-export class filterRegionDataEntries implements PipeTransform {
+export class FilterRegionDataEntries implements PipeTransform {
   public transform(arr: Array<{region: any|null, searchResults: IDataEntry[]}>, selectedRegions: any[]): Array<{region: any|null, searchResults: IDataEntry[]}> {
     return selectedRegions.length > 0 ?
       arr.filter(obj => obj.region !== null && selectedRegions.findIndex(r => obj.region.name === r.name) >= 0) :

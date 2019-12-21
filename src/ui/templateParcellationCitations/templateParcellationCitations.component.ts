@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { isDefined, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
+import { safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
 
 @Component({
   selector : 'template-parcellation-citation-container',

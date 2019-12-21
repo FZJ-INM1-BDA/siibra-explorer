@@ -1,7 +1,7 @@
 import { Action } from '@ngrx/store'
 
 export const defaultState: StateInterface = {
-  initManifests: [],
+  initManifests: []
 }
 
 export interface StateInterface {
@@ -10,8 +10,8 @@ export interface StateInterface {
 
 export interface ActionInterface extends Action {
   manifest: {
-    name: string,
-    initManifestUrl: string | null,
+    name: string
+    initManifestUrl?: string
   }
 }
 
@@ -26,7 +26,7 @@ export const CONSTANTS = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
-    case ACTION_TYPES.SET_INIT_PLUGIN:
+    case ACTION_TYPES.SET_INIT_PLUGIN: {
       const newMap = new Map(prevState.initManifests )
 
       // reserved source label for init manifest
@@ -35,15 +35,16 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         initManifests: Array.from(newMap),
       }
-    case ACTION_TYPES.CLEAR_INIT_PLUGIN:
+    }
+    case ACTION_TYPES.CLEAR_INIT_PLUGIN: {
       const { initManifests } = prevState
       const newManifests = initManifests.filter(([source]) => source !== CONSTANTS.INIT_MANIFEST_SRC)
       return {
         ...prevState,
         initManifests: newManifests,
       }
-    default:
-      return prevState
+    }
+    default: return prevState
   }
 }
 

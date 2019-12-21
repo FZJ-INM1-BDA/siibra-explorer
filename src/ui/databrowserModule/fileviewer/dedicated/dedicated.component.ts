@@ -1,6 +1,5 @@
 import { Component, Input } from "@angular/core";
 import { ViewerPreviewFile } from "src/services/state/dataStore.store";
-import { DatabrowserService } from "../../databrowser.service";
 import { KgSingleDatasetService } from "../../kgSingleDatasetService.service";
 
 @Component({

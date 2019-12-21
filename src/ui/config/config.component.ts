@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { MatSliderChange, MatSlideToggleChange } from '@angular/material';
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map, startWith, tap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
 import { ACTION_TYPES as VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'

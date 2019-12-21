@@ -1,23 +1,24 @@
 import {DOCUMENT} from "@angular/common";
 import {
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    HostListener,
-    Inject,
-    OnInit,
-    Renderer2,
-    TemplateRef,
-    ViewChild,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Inject,
+  OnInit,
+  Renderer2,
+  TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import html2canvas from "html2canvas";
 
 @Component({
-    selector: 'take-screenshot',
-    templateUrl: './takeScreenshot.template.html',
-    styleUrls: ['./takeScreenshot.style.css'],
+  selector: 'take-screenshot',
+  templateUrl: './takeScreenshot.template.html',
+  styleUrls: ['./takeScreenshot.style.css'],
 })
+
 export class TakeScreenshotComponent implements OnInit {
 
     @ViewChild('screenshotPreviewCard', {read: ElementRef}) public screenshotPreviewCard: ElementRef
@@ -64,203 +65,203 @@ export class TakeScreenshotComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-        this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+      this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     }
 
     @HostListener('window:resize', ['$event'])
     public onResize() {
-        this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
-        this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+      this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+      this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
     }
 
     @HostListener('window:keyup', ['$event'])
     public keyEvent(event: KeyboardEvent) {
-        if (this.takingScreenshot && event.key === 'Escape') {
-            this.cancelTakingScreenshot()
-        }
+      if (this.takingScreenshot && event.key === 'Escape') {
+        this.cancelTakingScreenshot()
+      }
     }
 
     public startScreenshot() {
-        this.previewingScreenshot = false
-        this.croppedCanvas = null
-        this.loadingScreenshot = false
-        this.takingScreenshot = true
+      this.previewingScreenshot = false
+      this.croppedCanvas = null
+      this.loadingScreenshot = false
+      this.takingScreenshot = true
     }
 
     public move(e: MouseEvent) {
-        if (this.mouseIsDown) {
-            this.isDragging = true
+      if (this.mouseIsDown) {
+        this.isDragging = true
 
-            this.endY = e.clientY
-            this.endX = e.clientX
+        this.endY = e.clientY
+        this.endX = e.clientX
 
-            if (this.endX >= this.startX && this.endY >= this.startY) {
-                // III quadrant
-                this.borderWidth = this.startY + 'px '
+        if (this.endX >= this.startX && this.endY >= this.startY) {
+          // III quadrant
+          this.borderWidth = this.startY + 'px '
                     + (this.windowWidth - this.endX) + 'px '
                     + (this.windowHeight - this.endY) + 'px '
                     + this.startX + 'px'
-                this.boxTop = this.startY
-                this.boxLeft = this.startX
-                this.boxEndWidth = this.endX - this.startX
-                this.boxEndHeight = this.endY - this.startY
+          this.boxTop = this.startY
+          this.boxLeft = this.startX
+          this.boxEndWidth = this.endX - this.startX
+          this.boxEndHeight = this.endY - this.startY
 
-                this.screenshotStartX = this.startX
-                this.screenshotStartY = this.startY
+          this.screenshotStartX = this.startX
+          this.screenshotStartY = this.startY
 
-            } else if (this.endX <= this.startX && this.endY >= this.startY) {
-                // IV quadrant
+        } else if (this.endX <= this.startX && this.endY >= this.startY) {
+          // IV quadrant
 
-                this.borderWidth = this.startY + 'px '
+          this.borderWidth = this.startY + 'px '
                     + (this.windowWidth - this.startX) + 'px '
                     + (this.windowHeight - this.endY) + 'px '
                     + this.endX + 'px'
 
-                this.boxLeft = this.endX
-                this.boxTop = this.startY
-                this.boxEndWidth = this.startX - this.endX
-                this.boxEndHeight = this.endY - this.startY
+          this.boxLeft = this.endX
+          this.boxTop = this.startY
+          this.boxEndWidth = this.startX - this.endX
+          this.boxEndHeight = this.endY - this.startY
 
-                this.screenshotStartX = this.endX
-                this.screenshotStartY = this.startY
+          this.screenshotStartX = this.endX
+          this.screenshotStartY = this.startY
 
-            } else if (this.endX >= this.startX && this.endY <= this.startY) {
+        } else if (this.endX >= this.startX && this.endY <= this.startY) {
 
-                // II quadrant
+          // II quadrant
 
-                this.borderWidth = this.endY + 'px '
+          this.borderWidth = this.endY + 'px '
                     + (this.windowWidth - this.endX) + 'px '
                     + (this.windowHeight - this.startY) + 'px '
                     + this.startX + 'px'
 
-                this.boxLeft = this.startX
-                this.boxTop = this.endY
-                this.boxEndWidth = this.endX - this.startX
-                this.boxEndHeight = this.startY - this.endY
+          this.boxLeft = this.startX
+          this.boxTop = this.endY
+          this.boxEndWidth = this.endX - this.startX
+          this.boxEndHeight = this.startY - this.endY
 
-                this.screenshotStartX = this.startX
-                this.screenshotStartY = this.endY
+          this.screenshotStartX = this.startX
+          this.screenshotStartY = this.endY
 
-            } else if (this.endX <= this.startX && this.endY <= this.startY) {
-                // I quadrant
+        } else if (this.endX <= this.startX && this.endY <= this.startY) {
+          // I quadrant
 
-                this.boxLeft = this.endX
-                this.boxTop = this.endY
-                this.boxEndWidth = this.startX - this.endX
-                this.boxEndHeight = this.startY - this.endY
+          this.boxLeft = this.endX
+          this.boxTop = this.endY
+          this.boxEndWidth = this.startX - this.endX
+          this.boxEndHeight = this.startY - this.endY
 
-                this.borderWidth = this.endY + 'px '
+          this.borderWidth = this.endY + 'px '
                     + (this.windowWidth - this.startX) + 'px '
                     + (this.windowHeight - this.startY) + 'px '
                     + this.endX + 'px'
 
-                this.screenshotStartX = this.endX
-                this.screenshotStartY = this.endY
+          this.screenshotStartX = this.endX
+          this.screenshotStartY = this.endY
 
-            } else {
-                this.isDragging = false
-            }
-
-        }
-    }
-
-    public mouseDown(e: MouseEvent) {
-        this.borderWidth = this.windowWidth + 'px ' + this.windowHeight + 'px'
-
-        this.startX = e.clientX
-        this.startY = e.clientY
-
-        this.mouseIsDown = true
-    }
-
-    public mouseUp(e: MouseEvent) {
-        this.borderWidth = '0'
-
-        this.isDragging = false
-        this.mouseIsDown = false
-
-        this.takingScreenshot = false
-
-        if (this.boxEndWidth * window.devicePixelRatio <= 1 && this.boxEndHeight * window.devicePixelRatio <= 1) {
-            this.cancelTakingScreenshot()
         } else {
-            this.loadScreenshot()
+          this.isDragging = false
         }
+
+      }
+    }
+
+    public mouseDown(event: MouseEvent) {
+      this.borderWidth = this.windowWidth + 'px ' + this.windowHeight + 'px'
+
+      this.startX = event.clientX
+      this.startY = event.clientY
+
+      this.mouseIsDown = true
+    }
+
+    public mouseUp(_event: MouseEvent) {
+      this.borderWidth = '0'
+
+      this.isDragging = false
+      this.mouseIsDown = false
+
+      this.takingScreenshot = false
+
+      if (this.boxEndWidth * window.devicePixelRatio <= 1 && this.boxEndHeight * window.devicePixelRatio <= 1) {
+        this.cancelTakingScreenshot()
+      } else {
+        this.loadScreenshot()
+      }
 
     }
 
     public loadScreenshot() {
 
-        this.loadingScreenshot = true
-        this.dialogRef = this.matDialog.open(this.previewImageDialogTemplateRef, {
-            autoFocus: false,
-        })
-        this.dialogRef.afterClosed().toPromise()
-            .then(result => {
-            switch (result) {
-                case 'again': {
-                    this.startScreenshot()
-                    this.cdr.markForCheck()
-                    break
-                }
-                case 'cancel': {
-                    this.cancelTakingScreenshot()
-                    break
-                }
-                default: this.cancelTakingScreenshot()
-            }
-        })
-
-        html2canvas(this.document.querySelector('#neuroglancer-container canvas')).then(canvas => {
-            this.croppedCanvas = null
-            this.croppedCanvas = this.renderer.createElement('canvas')
-
-            this.croppedCanvas.width = this.boxEndWidth * window.devicePixelRatio
-            this.croppedCanvas.height = this.boxEndHeight * window.devicePixelRatio
-
-            this.croppedCanvas.getContext('2d')
-                .drawImage(canvas,
-                    this.screenshotStartX * window.devicePixelRatio, this.screenshotStartY * window.devicePixelRatio,
-                    this.boxEndWidth * window.devicePixelRatio, this.boxEndHeight * window.devicePixelRatio,
-                    0, 0,
-                    this.boxEndWidth * window.devicePixelRatio, this.boxEndHeight * window.devicePixelRatio)
-        }).then(() => {
-
-            const d = new Date()
-            const n = `${d.getFullYear()}_${d.getMonth() + 1}_${d.getDate()}_${d.getHours()}_${d.getMinutes()}_${d.getSeconds()}`
-            this.screenshotName = `${n}_IAV.png`
-
-            this.loadingScreenshot = false
-            this.imageUrl = this.croppedCanvas.toDataURL('image/png')
-            this.previewingScreenshot = true
-            this.clearStateAfterScreenshot()
-
+      this.loadingScreenshot = true
+      this.dialogRef = this.matDialog.open(this.previewImageDialogTemplateRef, {
+        autoFocus: false,
+      })
+      this.dialogRef.afterClosed().toPromise()
+        .then(result => {
+          switch (result) {
+          case 'again': {
+            this.startScreenshot()
             this.cdr.markForCheck()
+            break
+          }
+          case 'cancel': {
+            this.cancelTakingScreenshot()
+            break
+          }
+          default: this.cancelTakingScreenshot()
+          }
         })
+
+      html2canvas(this.document.querySelector('#neuroglancer-container canvas')).then(canvas => {
+        this.croppedCanvas = null
+        this.croppedCanvas = this.renderer.createElement('canvas')
+
+        this.croppedCanvas.width = this.boxEndWidth * window.devicePixelRatio
+        this.croppedCanvas.height = this.boxEndHeight * window.devicePixelRatio
+
+        this.croppedCanvas.getContext('2d')
+          .drawImage(canvas,
+            this.screenshotStartX * window.devicePixelRatio, this.screenshotStartY * window.devicePixelRatio,
+            this.boxEndWidth * window.devicePixelRatio, this.boxEndHeight * window.devicePixelRatio,
+            0, 0,
+            this.boxEndWidth * window.devicePixelRatio, this.boxEndHeight * window.devicePixelRatio)
+      }).then(() => {
+
+        const d = new Date()
+        const n = `${d.getFullYear()}_${d.getMonth() + 1}_${d.getDate()}_${d.getHours()}_${d.getMinutes()}_${d.getSeconds()}`
+        this.screenshotName = `${n}_IAV.png`
+
+        this.loadingScreenshot = false
+        this.imageUrl = this.croppedCanvas.toDataURL('image/png')
+        this.previewingScreenshot = true
+        this.clearStateAfterScreenshot()
+
+        this.cdr.markForCheck()
+      })
     }
 
     public cancelTakingScreenshot() {
-        this.takingScreenshot = false
-        this.previewingScreenshot = false
-        this.loadingScreenshot = false
-        this.croppedCanvas = null
+      this.takingScreenshot = false
+      this.previewingScreenshot = false
+      this.loadingScreenshot = false
+      this.croppedCanvas = null
     }
     public clearStateAfterScreenshot() {
-        this.mouseIsDown = false
-        this.isDragging = false
-        this.startX = 0
-        this.startY = 0
-        this.endX = 0
-        this.endY = 0
-        this.borderWidth = ''
-        this.boxTop = 0
-        this.boxLeft = 0
-        this.boxEndWidth = 0
-        this.boxEndHeight = 0
-        this.windowHeight = 0
-        this.windowWidth = 0
-        this.screenshotStartX = 0
-        this.screenshotStartY = 0
+      this.mouseIsDown = false
+      this.isDragging = false
+      this.startX = 0
+      this.startY = 0
+      this.endX = 0
+      this.endY = 0
+      this.borderWidth = ''
+      this.boxTop = 0
+      this.boxLeft = 0
+      this.boxEndWidth = 0
+      this.boxEndHeight = 0
+      this.windowHeight = 0
+      this.windowWidth = 0
+      this.screenshotStartX = 0
+      this.screenshotStartY = 0
     }
 }

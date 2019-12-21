@@ -53,7 +53,7 @@ export class DatabrowserService implements OnDestroy {
 
   public instantiatedWidgetUnits: WidgetUnit[] = []
   public queryData: (arg: {regions: any[], template: any, parcellation: any}) => void = (arg) => {
-    const { dataBrowser, widgetUnit } = this.createDatabrowser(arg)
+    const { widgetUnit } = this.createDatabrowser(arg)
     this.instantiatedWidgetUnits.push(widgetUnit.instance)
     widgetUnit.onDestroy(() => {
       this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
@@ -88,7 +88,7 @@ export class DatabrowserService implements OnDestroy {
     this.kgTos$ = this.http.get(`${this.constantService.backendUrl}datasets/tos`, {
       responseType: 'text',
     }).pipe(
-      catchError((err, obs) => {
+      catchError((err, _obs) => {
         this.log.warn(`fetching kgTos error`, err)
         return of(null)
       }),
@@ -305,7 +305,7 @@ export class DatabrowserService implements OnDestroy {
     })
   }
 
-  public dbComponentInit(db: DataBrowser) {
+  public dbComponentInit(_db: DataBrowser) {
     this.store.dispatch({
       type: SHOW_KG_TOS,
     })
@@ -347,7 +347,7 @@ export function getModalityFromDE(dataentries: IDataEntry[]): CountedDataModalit
 
 export function getIdFromDataEntry(dataentry: IDataEntry) {
   const { id, fullId } = dataentry
-  const regex = /\/([a-zA-Z0-9\-]*?)$/.exec(fullId)
+  const regex = /\/([a-zA-Z0-9-]*?)$/.exec(fullId)
   return (regex && regex[1]) || id
 }
 

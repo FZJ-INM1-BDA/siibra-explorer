@@ -1,6 +1,6 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
 import { combineLatest, concat, fromEvent, merge, Observable, of, Subject } from "rxjs";
-import { filter, map, scan, switchMap, take, takeUntil, tap } from "rxjs/operators";
+import { filter, map, scan, switchMap, takeUntil } from "rxjs/operators";
 import { clamp } from "src/util/generator";
 
 @Component({

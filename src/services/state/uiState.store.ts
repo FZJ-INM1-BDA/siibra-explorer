@@ -1,11 +1,11 @@
-import {Injectable, TemplateRef} from '@angular/core';
-import {Action, select, Store} from '@ngrx/store'
+import { Injectable, TemplateRef } from '@angular/core';
+import { Action, select, Store } from '@ngrx/store'
 
-import {Effect} from "@ngrx/effects";
-import {Observable} from "rxjs";
-import {filter, map, mapTo, scan, startWith} from "rxjs/operators";
+import { Effect } from "@ngrx/effects";
+import { Observable } from "rxjs";
+import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
-import {GENERAL_ACTION_TYPES, IavRootStoreInterface} from '../stateStore.service'
+import { IavRootStoreInterface } from '../stateStore.service'
 
 export const defaultState: StateInterface = {
   mouseOverSegments: [],
@@ -32,30 +32,32 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
   switch (action.type) {
-    case MOUSE_OVER_SEGMENTS:
+    case MOUSE_OVER_SEGMENTS: {
       const { segments } = action
       return {
         ...prevState,
         mouseOverSegments: segments,
       }
-    case MOUSE_OVER_SEGMENT:
+    }
+    case MOUSE_OVER_SEGMENT: 
       return {
         ...prevState,
         mouseOverSegment : action.segment,
       }
-    case MOUSEOVER_USER_LANDMARK:
+    case MOUSEOVER_USER_LANDMARK: {
       const { payload = {} } = action
       const { userLandmark: mouseOverUserLandmark = null } = payload
       return {
         ...prevState,
         mouseOverUserLandmark,
       }
+    }
     case MOUSE_OVER_LANDMARK:
       return {
         ...prevState,
         mouseOverLandmark : action.landmark,
       }
-    case SNACKBAR_MESSAGE:
+    case SNACKBAR_MESSAGE: {
       const { snackbarMessage } = action
       /**
        * Need to use symbol here, or repeated snackbarMessage will not trigger new event
@@ -64,6 +66,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         snackbarMessage: Symbol(snackbarMessage),
       }
+    }
     case OPEN_SIDE_PANEL:
       return {
         ...prevState,
@@ -102,7 +105,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         sidePanelCurrentViewContent: 'Dataset',
       }
-    case AGREE_COOKIE:
+    case AGREE_COOKIE: {
       /**
        * TODO replace with server side logic
        */
@@ -111,7 +114,8 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         agreedCookies: true,
       }
-    case AGREE_KG_TOS:
+    }
+    case AGREE_KG_TOS: {
       /**
        * TODO replace with server side logic
        */
@@ -120,14 +124,15 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         agreedKgTos: true,
       }
-    case SHOW_BOTTOM_SHEET:
-        const { bottomSheetTemplate } = action
-        return {
-          ...prevState,
-          bottomSheetTemplate,
-        }
-    default:
-      return prevState
+    }
+    case SHOW_BOTTOM_SHEET: {
+      const { bottomSheetTemplate } = action
+      return {
+        ...prevState,
+        bottomSheetTemplate,
+      }
+    }
+    default: return prevState
   }
 }
 
@@ -147,9 +152,9 @@ export function stateStore(state, action) {
 export interface StateInterface {
   mouseOverSegments: Array<{
     layer: {
-      name: string,
+      name: string
     }
-    segment: any | null,
+    segment: any | null
   }>
   sidePanelIsOpen: boolean
   sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
@@ -161,7 +166,7 @@ export interface StateInterface {
 
   focusedSidePanel: string | null
 
-  snackbarMessage: Symbol
+  snackbarMessage: symbol
 
   agreedCookies: boolean
   agreedKgTos: boolean
@@ -175,10 +180,10 @@ export interface ActionInterface extends Action {
   focusedSidePanel?: string
   segments?: Array<{
     layer: {
-      name: string,
+      name: string
     }
-    segment: any | null,
-  }>,
+    segment: any | null
+  }>
   snackbarMessage: string
 
   bottomSheetTemplate: TemplateRef<any>

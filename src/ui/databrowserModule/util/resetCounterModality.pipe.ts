@@ -7,7 +7,7 @@ import { CountedDataModality } from "../databrowser.service";
 
 export class ResetCounterModalityPipe implements PipeTransform {
   public transform(inc: CountedDataModality[]): CountedDataModality[] {
-    return inc.map(({ occurance, ...rest }) => {
+    return inc.map(({ occurance:_occurance, ...rest }) => {
       return {
         occurance: 0,
         ...rest,

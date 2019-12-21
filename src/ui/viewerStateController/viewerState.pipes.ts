@@ -14,7 +14,7 @@ export class BinSavedRegionsSelectionPipe implements PipeTransform {
       if (existing) { existing.push(regionSelection) } else { returnMap.set(key, [regionSelection]) }
     }
     return Array.from(returnMap)
-      .map(([_, regionSelections]) => {
+      .map(([_unused, regionSelections]) => {
         const {parcellationSelected = null, templateSelected = null} = regionSelections[0] || {}
         return {
           regionSelections,

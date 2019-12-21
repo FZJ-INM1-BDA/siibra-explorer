@@ -30,7 +30,6 @@ import { RadioList } from './radiolist/radiolist.component';
 import { ReadmoreComponent } from './readmoore/readmore.component';
 import { SleightOfHand } from './sleightOfHand/soh.component';
 import { TimerComponent } from './timer/timer.component';
-import { ToastComponent } from './toast/toast.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
 
@@ -51,7 +50,6 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     TreeComponent,
     PanelComponent,
     PaginationComponent,
-    ToastComponent,
     FlatTreeComponent,
     TimerComponent,
     PillComponent,
@@ -85,7 +83,6 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     TreeComponent,
     PanelComponent,
     PaginationComponent,
-    ToastComponent,
     FlatTreeComponent,
     TimerComponent,
     PillComponent,

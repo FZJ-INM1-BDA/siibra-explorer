@@ -5,7 +5,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 })
 
 export class PluginBtnFabColorPipe implements PipeTransform {
-  public transform([launchedSet, minimisedSet, themedBtnCls], pluginName) {
+  public transform([launchedSet, minimisedSet], pluginName) {
     return minimisedSet.has(pluginName)
       ? 'primary'
       : launchedSet.has(pluginName)

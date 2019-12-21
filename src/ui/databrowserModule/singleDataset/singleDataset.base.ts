@@ -80,7 +80,7 @@ export class SingleDatasetBase implements OnInit {
     const { kgId, kgSchema, dataset } = this
     this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
     if ( dataset ) {
-      const { name, description, kgReference, publications, files, preview, ...rest } = dataset
+      const { name, description, kgReference, publications, files, preview } = dataset
       this.name = name
       this.description = description
       this.kgReference = kgReference

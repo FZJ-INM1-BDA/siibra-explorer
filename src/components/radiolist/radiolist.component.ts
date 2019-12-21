@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
   selector: 'radio-list',
@@ -43,7 +43,7 @@ export class RadioList {
 }
 
 export interface IExtraButton {
-  name: string,
+  name: string
   faIcon: string
   class?: string
 }

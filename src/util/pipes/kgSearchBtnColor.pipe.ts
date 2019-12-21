@@ -6,7 +6,7 @@ import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
 })
 
 export class KgSearchBtnColorPipe implements PipeTransform {
-  public transform([minimisedWidgetUnit, themedBtnCls]: [Set<WidgetUnit>, string], wu: WidgetUnit ) {
+  public transform([minimisedWidgetUnit]: [Set<WidgetUnit>, string], wu: WidgetUnit ) {
     return minimisedWidgetUnit.has(wu)
       ? 'primary'
       : 'accent'

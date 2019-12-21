@@ -36,7 +36,7 @@ export class PluginServiceUseEffect {
       filter(arr => arr.length > 0),
       map((arr: Array<[string, string|null]>) => {
 
-        for (const [source, url] of arr) {
+        for (const [_source, url] of arr) {
           fetch(url, constantService.getFetchOption())
             .then(res => res.json())
             .then(json => pluginService.launchNewWidget(json))

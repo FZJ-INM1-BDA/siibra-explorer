@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnChanges, Output } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output } from "@angular/core";
 
 @Directive({
   selector: '[fixedMouseContextualContainerDirective]',

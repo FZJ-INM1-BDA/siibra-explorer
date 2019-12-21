@@ -126,8 +126,7 @@ export class RegionTextSearchAutocomplete {
     })
   }
 
-  public optionSelected(ev: MatAutocompleteSelectedEvent) {
-    const id = ev.option.value
+  public optionSelected(_ev: MatAutocompleteSelectedEvent) {
     this.autoTrigger.nativeElement.value = ''
   }
 
@@ -150,7 +149,7 @@ export class RegionTextSearchAutocomplete {
     return this._focused
   }
 
-  public deselectAllRegions(event: MouseEvent) {
+  public deselectAllRegions(_event: MouseEvent) {
     this.store$.dispatch({
       type: SELECT_REGIONS,
       selectRegions: [],
@@ -170,7 +169,7 @@ export class RegionTextSearchAutocomplete {
     })
   }
 
-  public showHierarchy(event: MouseEvent) {
+  public showHierarchy(_event: MouseEvent) {
     // mat-card-content has a max height of 65vh
     const dialog = this.dialog.open(this.regionHierarchyDialogTemplate, {
       height: '65vh',

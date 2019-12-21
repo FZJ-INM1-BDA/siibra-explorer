@@ -1,5 +1,6 @@
 import { Directive, OnChanges, SimpleChanges } from "@angular/core";
 
+// TODO deprecate this directive
 function parseAttribute(arg: any, expectedType: string) {
 
   // if(

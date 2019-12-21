@@ -1,9 +1,7 @@
 import { filter } from 'rxjs/operators';
 
-import { cvtSearchParamToState } from 'src/atlasViewer/atlasViewer.urlUtil';
 import {
   defaultState as dataStoreDefaultState,
-  getStateStore as getDatasetStateStore,
   IActionInterface as DatasetAction,
   IStateInterface as DataStateInterface,
   stateStore as dataStore,
@@ -11,40 +9,34 @@ import {
 import {
   ActionInterface as NgViewerActionInterface,
   defaultState as ngViewerDefaultState,
-  getStateStore as getNgViewerStateStore,
   StateInterface as NgViewerStateInterface,
   stateStore as ngViewerState,
 } from './state/ngViewerState.store'
 import {
   defaultState as pluginDefaultState,
-  getStateStore as pluginGetStateStore,
   StateInterface as PluginStateInterface,
   stateStore as pluginState,
 } from './state/pluginState.store'
 import {
   ActionInterface as UIActionInterface,
   defaultState as uiDefaultState,
-  getStateStore as getUiStateStore,
   StateInterface as UIStateInterface,
   stateStore as uiState,
 } from './state/uiState.store'
 import {
   ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
   defaultState as userConfigDefaultState,
-  getStateStore as getuserConfigStateStore,
   StateInterface as UserConfigStateInterface,
   stateStore as userConfigState,
 } from './state/userConfigState.store'
 import {
   defaultState as viewerConfigDefaultState,
-  getStateStore as getViewerConfigStateStore,
   StateInterface as ViewerConfigStateInterface,
   stateStore as viewerConfigState,
 } from './state/viewerConfig.store'
 import {
   ActionInterface as ViewerActionInterface,
   defaultState as viewerDefaultState,
-  getStateStore as getViewerStateStore,
   StateInterface as ViewerStateInterface,
   stateStore as viewerState,
 } from './state/viewerState.store'
@@ -73,22 +65,6 @@ export function safeFilter(key: string) {
   return filter((state: any) =>
     (typeof state !== 'undefined' && state !== null) &&
     typeof state[key] !== 'undefined' && state[key] !== null)
-}
-
-const inheritNgId = (region: any) => {
-  const {ngId = 'root', children = []} = region
-  return {
-    ngId,
-    ...region,
-    ...(children && children.map
-      ? {
-        children: children.map(c => inheritNgId({
-          ngId,
-          ...c,
-        })),
-      }
-      : {}),
-  }
 }
 
 export function getNgIdLabelIndexFromRegion({ region }) {

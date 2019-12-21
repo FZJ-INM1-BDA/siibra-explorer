@@ -99,13 +99,14 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         //           : {})
         //   })
       }
-    case REMOVE_NG_LAYERS:
+    case REMOVE_NG_LAYERS: {
       const { layers } = action
       const layerNameSet = new Set(layers.map(l => l.name))
       return {
         ...prevState,
         layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
       }
+    }
     case REMOVE_NG_LAYER:
       return {
         ...prevState,
@@ -131,12 +132,13 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
         ...prevState,
         forceShowSegment : action.forceShowSegment,
       }
-    case NEHUBA_READY:
+    case NEHUBA_READY: {
       const { nehubaReady } = action
       return {
         ...prevState,
         nehubaReady,
       }
+    }
     default: return prevState
   }
 }
@@ -271,9 +273,7 @@ export class NgViewerUseEffect implements OnDestroy {
         const { payload } = action as ActionInterface
         const { index = 0 } = payload
 
-        const panelOrder = !!panelOrdersPrev
-          ? panelOrdersPrev
-          : [...panelOrders.slice(index), ...panelOrders.slice(0, index)].join('')
+        const panelOrder = panelOrdersPrev || [...panelOrders.slice(index), ...panelOrders.slice(0, index)].join('')
 
         return {
           type: ACTION_TYPES.SET_PANEL_ORDER,

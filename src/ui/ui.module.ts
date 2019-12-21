@@ -7,7 +7,7 @@ import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
 import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 
-import { filterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
+import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
 import { GroupDatasetByRegion } from "src/util/pipes/groupDataEntriesByRegion.pipe";
 
 import { GetUniquePipe } from "src/util/pipes/getUnique.pipe";
@@ -132,7 +132,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
 
     /* pipes */
     GroupDatasetByRegion,
-    filterRegionDataEntries,
+    FilterRegionDataEntries,
     GetUniquePipe,
     FlatmapArrayPipe,
     SafeStylePipe,

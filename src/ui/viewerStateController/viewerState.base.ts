@@ -7,6 +7,16 @@ import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
 
+const ACTION_TYPES = {
+  SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',
+  DOUBLE_CLICK_ON_REGIONHIERARCHY: 'DOUBLE_CLICK_ON_REGIONHIERARCHY',
+  SELECT_TEMPLATE_WITH_NAME: 'SELECT_TEMPLATE_WITH_NAME',
+  SELECT_PARCELLATION_WITH_NAME: 'SELECT_PARCELLATION_WITH_NAME',
+
+  TOGGLE_REGION_SELECT: 'TOGGLE_REGION_SELECT',
+  NAVIGATETO_REGION: 'NAVIGATETO_REGION',
+}
+
 const compareWith = (o, n) => !o || !n
 ? false
 : o.name === n.name
@@ -27,8 +37,6 @@ export class ViewerStateBase implements OnInit {
   public regionsSelected$: Observable<any>
 
   public savedRegionsSelections$: Observable<any[]>
-
-  private dismissToastHandler: () => void
 
   public compareWith = compareWith
 
@@ -155,7 +163,7 @@ export class ViewerStateBase implements OnInit {
     return `<div class="d-flex"><small>Template</small> <small class = "flex-grow-1 mute-text">${template ? '(' + template.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
   }
 
-  public loadSelection(event: MouseEvent) {
+  public loadSelection(_event: MouseEvent) {
     this.focused = true
 
     this.savedRegionBottomSheetRef = this.bottomSheet.open(this.savedRegionBottomSheetTemplate)
@@ -166,7 +174,7 @@ export class ViewerStateBase implements OnInit {
       })
   }
 
-  public saveSelection(event: MouseEvent) {
+  public saveSelection(_event: MouseEvent) {
     this.focused = true
     this.dialogService.getUserInput({
       defaultValue: `Saved Region`,
@@ -183,29 +191,19 @@ export class ViewerStateBase implements OnInit {
       })
       .catch(e => {
         /**
-         * USER CANCELLED, HANDLE
+         * TODO USER CANCELLED, HANDLE
          */
       })
       .finally(() => this.focused = false)
   }
 
-  public deselectAllRegions(event: MouseEvent) {
+  public deselectAllRegions(_event: MouseEvent) {
     this.store$.dispatch({
       type: SELECT_REGIONS,
       selectRegions: [],
     })
   }
 
-}
-
-const ACTION_TYPES = {
-  SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',
-  DOUBLE_CLICK_ON_REGIONHIERARCHY: 'DOUBLE_CLICK_ON_REGIONHIERARCHY',
-  SELECT_TEMPLATE_WITH_NAME: 'SELECT_TEMPLATE_WITH_NAME',
-  SELECT_PARCELLATION_WITH_NAME: 'SELECT_PARCELLATION_WITH_NAME',
-
-  TOGGLE_REGION_SELECT: 'TOGGLE_REGION_SELECT',
-  NAVIGATETO_REGION: 'NAVIGATETO_REGION',
 }
 
 export const VIEWERSTATE_CONTROLLER_ACTION_TYPES = ACTION_TYPES
