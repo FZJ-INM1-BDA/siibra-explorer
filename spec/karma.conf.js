@@ -6,6 +6,11 @@ const webpackTest = require('../webpack.test')
 const webpackConfig = require('../webpack.dev')
 const fullWebpack = merge(webpackTest, webpackConfig)
 
+const singleRun = process.env.NODE_ENV === 'test'
+const browsers = process.env.NODE_ENV === 'test'
+  ? ['ChromeHeadless']
+  : ['Chrome']
+
 module.exports = function(config) {
   config.set({
 
@@ -62,12 +67,12 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers,
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: true,
+    singleRun,
 
     // Concurrency level
     // how many browser should be started simultaneous
