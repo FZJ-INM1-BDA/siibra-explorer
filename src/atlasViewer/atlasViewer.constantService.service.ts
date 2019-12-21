@@ -1,17 +1,18 @@
-import { Injectable, OnDestroy } from "@angular/core";
-import { Store, select } from "@ngrx/store";
-import { IavRootStoreInterface } from "../services/stateStore.service";
-import { Observable, Subscription, throwError, of, merge } from "rxjs";
-import { map, shareReplay, filter, switchMap, catchError, tap } from "rxjs/operators";
-import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { HttpClient } from "@angular/common/http";
+import { Injectable, OnDestroy } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { merge, Observable, of, Subscription, throwError } from "rxjs";
+import { catchError, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { LoggingService } from "src/services/logging.service";
+import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
+import { IavRootStoreInterface } from "../services/stateStore.service";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
 export const GLSL_COLORMAP_JET = `void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
 @Injectable({
-  providedIn : 'root'
+  providedIn : 'root',
 })
 
 export class AtlasViewerConstantsServices implements OnDestroy {
@@ -20,7 +21,7 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public darktheme$: Observable<boolean>
 
   public useMobileUI$: Observable<boolean>
-  public loadExportNehubaPromise : Promise<boolean>
+  public loadExportNehubaPromise: Promise<boolean>
 
   public ngLandmarkLayerName = 'spatial landmark layer'
   public ngUserLandmarkLayerName = 'user landmark layer'
@@ -40,11 +41,10 @@ export class AtlasViewerConstantsServices implements OnDestroy {
    */
   private TIMEOUT = 16000
 
-
   /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
-  public testLandmarksChanged : (prevLandmarks : any[], newLandmarks : any[]) => boolean = (prevLandmarks:any[], newLandmarks:any[]) => {
-    return prevLandmarks.every(lm => typeof lm.name !== 'undefined') && 
-      newLandmarks.every(lm => typeof lm.name !== 'undefined') && 
+  public testLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]) => boolean = (prevLandmarks: any[], newLandmarks: any[]) => {
+    return prevLandmarks.every(lm => typeof lm.name !== 'undefined') &&
+      newLandmarks.every(lm => typeof lm.name !== 'undefined') &&
       prevLandmarks.length === newLandmarks.length
   }
 
@@ -52,35 +52,36 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public backendUrl = BACKEND_URL || `${window.location.origin}${window.location.pathname}`
 
   private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
-    switchMap((template:any) => {
-      if (template.nehubaConfig) return of(template)
-      if (template.nehubaConfigURL) return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
+    switchMap((template: any) => {
+      if (template.nehubaConfig) { return of(template) }
+      if (template.nehubaConfigURL) { return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
         map(nehubaConfig => {
           return {
             ...template,
-            nehubaConfig
+            nehubaConfig,
           }
-        })
+        }),
       )
+      }
       throwError('neither nehubaConfig nor nehubaConfigURL defined')
-    })
+    }),
   )
 
   public totalTemplates = null
 
   public initFetchTemplate$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
-    tap((arr:any[]) => this.totalTemplates = arr.length),
+    tap((arr: any[]) => this.totalTemplates = arr.length),
     switchMap((templates: string[]) => merge(
-      ...templates.map(this.fetchTemplate)
+      ...templates.map(this.fetchTemplate),
     )),
     catchError((err) => {
-      console.warn(`fetching templates error`, err)
+      this.log.warn(`fetching templates error`, err)
       return of(null)
-    })
+    }),
   )
 
   /* to be provided by KG in future */
-  public templateUrlsPr : Promise<string[]> = new Promise((resolve, reject) => {
+  public templateUrlsPr: Promise<string[]> = new Promise((resolve, reject) => {
     fetch(`${this.backendUrl}templates`, this.getFetchOption())
       .then(res => res.json())
       .then(arr => {
@@ -94,54 +95,54 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public templateUrls = Array(100)
 
   /* to be provided by KG in future */
-  private _mapArray : [string,string[]][] = [
-    [ 'JuBrain Cytoarchitectonic Atlas' ,  
+  private _mapArray: Array<[string, string[]]> = [
+    [ 'JuBrain Cytoarchitectonic Atlas' ,
       [
         'res/json/pmapsAggregatedData.json',
-        'res/json/receptorAggregatedData.json'
-      ]
+        'res/json/receptorAggregatedData.json',
+      ],
     ],
     [
       'Fibre Bundle Atlas - Short Bundle',
       [
-        'res/json/swmAggregatedData.json'
-      ]
+        'res/json/swmAggregatedData.json',
+      ],
     ],
     [
       'Allen Mouse Common Coordinate Framework v3 2015',
       [
-        'res/json/allenAggregated.json'
-      ]
+        'res/json/allenAggregated.json',
+      ],
     ],
     [
       'Fibre Bundle Atlas - Long Bundle',
       [
-        'res/json/dwmAggregatedData.json'
-      ]
+        'res/json/dwmAggregatedData.json',
+      ],
     ],
     [
       'Whole Brain (v2.0)',
       [
-        'res/json/waxholmAggregated.json'
-      ]
-    ]
+        'res/json/waxholmAggregated.json',
+      ],
+    ],
   ]
 
-  public mapParcellationNameToFetchUrl : Map<string,string[]> = new Map(this._mapArray)
+  public mapParcellationNameToFetchUrl: Map<string, string[]> = new Map(this._mapArray)
   public spatialSearchUrl = 'https://kg-int.humanbrainproject.org/solr/'
   public spatialResultsPerPage = 10
   public spatialWidth = 600
 
-  public landmarkFlatProjection : boolean = false
+  public landmarkFlatProjection: boolean = false
 
   public chartBaseStyle = {
-    fill : 'origin'
+    fill : 'origin',
   }
 
   public chartSdStyle = {
     fill : false,
     backgroundColor : 'rgba(0,0,0,0)',
-    borderDash : [10,3],
+    borderDash : [10, 3],
     pointRadius : 0,
     pointHitRadius : 0,
   }
@@ -154,11 +155,11 @@ export class AtlasViewerConstantsServices implements OnDestroy {
 
   public minReqMD = `
 # Hmm... it seems like we hit a snag
-It seems your browser has trouble loading interactive atlas viewer. 
-Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled. 
+It seems your browser has trouble loading interactive atlas viewer.
+Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
 - We recommend using _Chrome >= 56_ or _Firefox >= 51_. You can check your browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
 - If you are on _Chrome < 56_ or _Firefox < 51_, you may be able to enable **webgl2.0** by turning on experimental flag <https://get.webgl.org/webgl2/enable.html>.
-- If you are on an Android device we recommend _Chrome for Android_ or _Firefox for Android_. 
+- If you are on an Android device we recommend _Chrome for Android_ or _Firefox for Android_.
 - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
 `
   public minReqModalHeader = `Hmm... it seems your browser and is having trouble loading interactive atlas viewer`
@@ -173,21 +174,21 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
    * in nginx, it can result in 400 header to large
    * as result, trim referer to only template and parcellation selected
    */
-  private getScopedReferer(): string{
+  private getScopedReferer(): string {
     const url = new URL(window.location.href)
     url.searchParams.delete('regionsSelected')
     return url.toString()
   }
 
-  public getFetchOption() : RequestInit{
+  public getFetchOption(): RequestInit {
     return {
-      referrer: this.getScopedReferer()
+      referrer: this.getScopedReferer(),
     }
   }
 
-  get floatingWidgetStartingPos() : [number,number]{
-    return [400,100]
-  } 
+  get floatingWidgetStartingPos(): [number, number] {
+    return [400, 100]
+  }
 
   /**
    * message when user on hover a segment or landmark
@@ -197,37 +198,37 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
   /**
    * Observable for showing config modal
    */
-  public showConfigTitle: String = 'Settings'
+  public showConfigTitle: string = 'Settings'
 
   private showHelpGeneralMobile = [
     ['hold 🌏 + ↕', 'change oblique slice mode'],
-    ['hold 🌏 + ↔', 'oblique slice']
+    ['hold 🌏 + ↔', 'oblique slice'],
   ]
   private showHelpGeneralDesktop = [
     ['num keys [0-9]', 'toggle layer visibility [0-9]'],
     ['h', 'show help'],
     ['?', 'show help'],
-    ['o', 'toggle perspective/orthographic']
+    ['o', 'toggle perspective/orthographic'],
   ]
 
   public showHelpGeneralMap = this.showHelpGeneralDesktop
 
   private showHelpSliceViewMobile = [
-    ['drag', 'pan']
+    ['drag', 'pan'],
   ]
   private showHelpSliceViewDesktop = [
     ['drag', 'pan'],
-    ['shift + drag', 'oblique slice']
+    ['shift + drag', 'oblique slice'],
   ]
 
   public showHelpSliceViewMap = this.showHelpSliceViewDesktop
 
   private showHelpPerspectiveMobile = [
-    ['drag', 'change perspective view']
+    ['drag', 'change perspective view'],
   ]
-  
+
   private showHelpPerspectiveDesktop = [
-    ['drag', 'change perspective view']
+    ['drag', 'change perspective view'],
   ]
   public showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
 
@@ -237,15 +238,14 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
 
   public supportEmailAddress = `inm1-bda@fz-juelich.de`
 
-  public showHelpSupportText:string = `Did you encounter an issue? 
+  public showHelpSupportText: string = `Did you encounter an issue?
 Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress}">${this.supportEmailAddress}</a>`
 
-
-  incorrectParcellationNameSearchParam(title) {
+  public incorrectParcellationNameSearchParam(title) {
     return `The selected parcellation - ${title} - is not available. The the first parcellation of the template is selected instead.`
   }
 
-  incorrectTemplateNameSearchParam(title) {
+  public incorrectTemplateNameSearchParam(title) {
     return `The selected template - ${title} - is not available.`
   }
 
@@ -254,26 +254,27 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private http: HttpClient,
-  ){
+    private log: LoggingService,
+  ) {
 
     this.darktheme$ = this.store$.pipe(
       select('viewerState'),
       select('templateSelected'),
       map(template => {
-        if (!template) return false
+        if (!template) { return false }
         return template.useTheme === 'dark'
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.useMobileUI$ = this.store$.pipe(
       select('viewerConfigState'),
       select('useMobileUI'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.subscriptions.push(
-      this.darktheme$.subscribe(flag => this.darktheme = flag)
+      this.darktheme$.subscribe(flag => this.darktheme = flag),
     )
 
     this.subscriptions.push(
@@ -289,75 +290,75 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
           this.showHelpPerspectiveViewMap = this.showHelpPerspectiveDesktop
           this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
         }
-      })
+      }),
     )
   }
 
   private subscriptions: Subscription[] = []
 
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0) {
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
 
-  catchError(e: Error | string){
+  public catchError(e: Error | string) {
     this.store$.dispatch({
       type: SNACKBAR_MESSAGE,
-      snackbarMessage: e.toString()
+      snackbarMessage: e.toString(),
     })
   }
 
   public cyclePanelMessage: string = `[spacebar] to cycle through views`
 
-  private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]` 
+  private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]`
   private dissmissUserLayerSnackbarMessageMobile = `You can dismiss extra layers in the 🌏 menu`
   public dissmissUserLayerSnackbarMessage: string = this.dissmissUserLayerSnackbarMessageDesktop
 }
 
-const parseURLToElement = (url:string):HTMLElement=>{
+const parseURLToElement = (url: string): HTMLElement => {
   const el = document.createElement('script')
-  el.setAttribute('crossorigin','true')
+  el.setAttribute('crossorigin', 'true')
   el.src = url
   return el
 }
 
 export const UNSUPPORTED_PREVIEW = [{
   text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',
-  previewSrc: './res/image/1.png'
-},{
+  previewSrc: './res/image/1.png',
+}, {
   text: 'Preview of Big Brain 2015 Release',
-  previewSrc: './res/image/2.png'
-},{
+  previewSrc: './res/image/2.png',
+}, {
   text: 'Preview of Waxholm Rat V2.0',
-  previewSrc: './res/image/3.png'
+  previewSrc: './res/image/3.png',
 }]
 
 export const UNSUPPORTED_INTERVAL = 7000
 
-export const SUPPORT_LIBRARY_MAP : Map<string,HTMLElement> = new Map([
-  ['jquery@3',parseURLToElement('https://code.jquery.com/jquery-3.3.1.min.js')],
-  ['jquery@2',parseURLToElement('https://code.jquery.com/jquery-2.2.4.min.js')],
-  ['webcomponentsLite@1.1.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
-  ['react@16',parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
-  ['reactdom@16',parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
-  ['vue@2.5.16',parseURLToElement('https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js')],
-  ['preact@8.4.2',parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
-  ['d3@5.7.0',parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')]
+export const SUPPORT_LIBRARY_MAP: Map<string, HTMLElement> = new Map([
+  ['jquery@3', parseURLToElement('https://code.jquery.com/jquery-3.3.1.min.js')],
+  ['jquery@2', parseURLToElement('https://code.jquery.com/jquery-2.2.4.min.js')],
+  ['webcomponentsLite@1.1.0', parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
+  ['react@16', parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
+  ['reactdom@16', parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
+  ['vue@2.5.16', parseURLToElement('https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js')],
+  ['preact@8.4.2', parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
+  ['d3@5.7.0', parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')],
 ])
 
 /**
  * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)
  * The constraint is that the cipher needs to be commpatible with URI encoding
- * and a URI compatible separator is required. 
- * 
- * The implementation below came from 
+ * and a URI compatible separator is required.
+ *
+ * The implementation below came from
  * https://stackoverflow.com/a/6573119/6059235
- * 
+ *
  * While a faster solution exist in the same post, this operation is expected to be done:
  * - once per 1 sec frequency
  * - on < 1000 numbers
- * 
+ *
  * So performance is not really that important (Also, need to learn bitwise operation)
  */
 
@@ -366,10 +367,10 @@ export const separator = "."
 const negString = '~'
 
 const encodeInt = (number: number) => {
-  if (number % 1 !== 0) throw 'cannot encodeInt on a float. Ensure float flag is set'
-  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) throw 'The input is not valid'
+  if (number % 1 !== 0) { throw new Error('cannot encodeInt on a float. Ensure float flag is set') }
+  if (isNaN(Number(number)) || number === null || number === Number.POSITIVE_INFINITY) { throw new Error('The input is not valid') }
 
-  let rixit // like 'digit', only in some non-decimal radix 
+  let rixit // like 'digit', only in some non-decimal radix
   let residual
   let result = ''
 
@@ -380,63 +381,68 @@ const encodeInt = (number: number) => {
     residual = Math.floor(number)
   }
 
+  /* eslint-disable-next-line no-constant-condition */
   while (true) {
     rixit = residual % 64
-    // console.log("rixit : " + rixit)
-    // console.log("result before : " + result)
+    // this.log.log("rixit : " + rixit)
+    // this.log.log("result before : " + result)
     result = cipher.charAt(rixit) + result
-    // console.log("result after : " + result)
-    // console.log("residual before : " + residual)
+    // this.log.log("result after : " + result)
+    // this.log.log("residual before : " + residual)
     residual = Math.floor(residual / 64)
-    // console.log("residual after : " + residual)
+    // this.log.log("residual after : " + residual)
 
-    if (residual == 0)
+    if (residual === 0) {
       break;
     }
+  }
   return result
 }
 
-interface B64EncodingOption {
+interface IB64EncodingOption {
   float: boolean
 }
 
 const defaultB64EncodingOption = {
-  float: false
+  float: false,
 }
 
-export const encodeNumber: (number:number, option?: B64EncodingOption) => string = (number: number, { float = false }: B64EncodingOption = defaultB64EncodingOption) => {
-  if (!float) return encodeInt(number)
-  else {
-    const floatArray = new Float32Array(1)
-    floatArray[0] = number
-    const intArray = new Uint32Array(floatArray.buffer)
-    const castedInt = intArray[0]
-    return encodeInt(castedInt)
+export const encodeNumber:
+  (number: number, option?: IB64EncodingOption) => string =
+  (number: number, { float = false }: IB64EncodingOption = defaultB64EncodingOption) => {
+    if (!float) { return encodeInt(number) } else {
+      const floatArray = new Float32Array(1)
+      floatArray[0] = number
+      const intArray = new Uint32Array(floatArray.buffer)
+      const castedInt = intArray[0]
+      return encodeInt(castedInt)
+    }
   }
-}
 
 const decodetoInt = (encodedString: string) => {
-  let _encodedString, negFlag = false
+  let _encodedString
+  let negFlag = false
   if (encodedString.slice(-1) === negString) {
     negFlag = true
     _encodedString = encodedString.slice(0, -1)
   } else {
     _encodedString = encodedString
   }
-  return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc,curr) => {
+  return (negFlag ? -1 : 1) * [..._encodedString].reduce((acc, curr) => {
     const index = cipher.indexOf(curr)
-    if (index < 0) throw new Error(`Poisoned b64 encoding ${encodedString}`)
+    if (index < 0) { throw new Error(`Poisoned b64 encoding ${encodedString}`) }
     return acc * 64 + index
   }, 0)
 }
 
-export const decodeToNumber: (encodedString:string, option?: B64EncodingOption) => number = (encodedString: string, {float = false} = defaultB64EncodingOption) => {
-  if (!float) return decodetoInt(encodedString)
-  else {
-    const _int = decodetoInt(encodedString)
-    const intArray = new Uint32Array(1)
-    intArray[0] = _int
-    const castedFloat = new Float32Array(intArray.buffer)
-    return castedFloat[0]
+export const decodeToNumber:
+  (encodedString: string, option?: IB64EncodingOption) => number =
+  (encodedString: string, {float = false} = defaultB64EncodingOption) => {
+    if (!float) { return decodetoInt(encodedString) } else {
+      const _int = decodetoInt(encodedString)
+      const intArray = new Uint32Array(1)
+      intArray[0] = _int
+      const castedFloat = new Float32Array(intArray.buffer)
+      return castedFloat[0]
+    }
   }
-}

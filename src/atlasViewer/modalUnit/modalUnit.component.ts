@@ -1,25 +1,25 @@
-import { Component, Input, ViewContainerRef, TemplateRef, ViewChild } from '@angular/core'
+import { Component, Input, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core'
 
 @Component({
   templateUrl : './modalUnit.template.html',
   styleUrls : [
-    './modalUnit.style.css'
-  ]
+    './modalUnit.style.css',
+  ],
 })
 
-export class ModalUnit{
-  @Input() title : string
-  @Input() body : string = 'Modal Body Text'
-  @Input() template: TemplateRef<any>
-  @Input() footer: string 
+export class ModalUnit {
+  @Input() public title: string
+  @Input() public body: string = 'Modal Body Text'
+  @Input() public template: TemplateRef<any>
+  @Input() public footer: string
 
-  @ViewChild('templateContainer', {read:ViewContainerRef}) templateContainer : ViewContainerRef
+  @ViewChild('templateContainer', {read: ViewContainerRef}) public templateContainer: ViewContainerRef
 
-  constructor(public viewContainerRef : ViewContainerRef){
-    
+  constructor(public viewContainerRef: ViewContainerRef) {
+
   }
 
-  ngAfterViewInit(){
+  public ngAfterViewInit() {
     if (this.templateContainer) {
       this.templateContainer.createEmbeddedView(this.template)
     }

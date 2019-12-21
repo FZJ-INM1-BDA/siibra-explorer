@@ -1,18 +1,18 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
   selector: 'regions-list-view',
   templateUrl: './regionListView.template.html',
   styleUrls: [
-    './regionListView.style.css'
+    './regionListView.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class RegionsListView{
-  @Input() horizontal: boolean = false
+export class RegionsListView {
+  @Input() public horizontal: boolean = false
 
-  @Input() regionsSelected: any[] = []
-  @Output() deselectRegion: EventEmitter<any> = new EventEmitter()
-  @Output() gotoRegion: EventEmitter<any> = new EventEmitter()
+  @Input() public regionsSelected: any[] = []
+  @Output() public deselectRegion: EventEmitter<any> = new EventEmitter()
+  @Output() public gotoRegion: EventEmitter<any> = new EventEmitter()
 }

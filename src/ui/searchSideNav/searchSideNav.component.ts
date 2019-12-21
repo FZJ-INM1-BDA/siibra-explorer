@@ -1,25 +1,25 @@
-import { Component, Output, EventEmitter, OnDestroy, ViewChild, TemplateRef } from "@angular/core";
-import { MatDialogRef, MatDialog, MatSnackBar } from "@angular/material";
-import { NgLayerInterface } from "src/atlasViewer/atlasViewer.component";
-import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
+import { Component, EventEmitter, OnDestroy, Output, TemplateRef, ViewChild } from "@angular/core";
+import { MatDialog, MatDialogRef, MatSnackBar } from "@angular/material";
+import { select, Store } from "@ngrx/store";
 import {Observable, Subscription} from "rxjs";
-import { Store, select } from "@ngrx/store";
-import { map, startWith, scan, filter, mapTo } from "rxjs/operators";
-import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
+import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
+import { INgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import {
   CLOSE_SIDE_PANEL,
   COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
 } from "src/services/state/uiState.store";
-import { SELECT_REGIONS, IavRootStoreInterface } from "src/services/stateStore.service";
+import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
+import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
+import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 
 @Component({
   selector: 'search-side-nav',
   templateUrl: './searchSideNav.template.html',
-  styleUrls:[
-    './searchSideNav.style.css'
-  ]
+  styleUrls: [
+    './searchSideNav.style.css',
+  ],
 })
 
 export class SearchSideNav implements OnDestroy {
@@ -28,9 +28,9 @@ export class SearchSideNav implements OnDestroy {
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
 
-  @Output() dismiss: EventEmitter<any> = new EventEmitter()
+  @Output() public dismiss: EventEmitter<any> = new EventEmitter()
 
-  @ViewChild('layerBrowserTmpl', {read: TemplateRef}) layerBrowserTmpl: TemplateRef<any>
+  @ViewChild('layerBrowserTmpl', {read: TemplateRef}) public layerBrowserTmpl: TemplateRef<any>
 
   public autoOpenSideNavDataset$: Observable<any>
 
@@ -42,7 +42,7 @@ export class SearchSideNav implements OnDestroy {
     private store$: Store<IavRootStoreInterface>,
     private snackBar: MatSnackBar,
     private constantService: AtlasViewerConstantsServices,
-  ){
+  ) {
     this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
@@ -50,47 +50,45 @@ export class SearchSideNav implements OnDestroy {
       startWith(0),
       scan((acc, curr) => [curr, ...acc], []),
       filter(([curr, prev]) => prev === 0 && curr > 0),
-      mapTo(true)
+      mapTo(true),
     )
 
     this.sidePanelExploreCurrentViewIsOpen$ = this.store$.pipe(
-        select('uiState'),
-        select("sidePanelExploreCurrentViewIsOpen")
+      select('uiState'),
+      select("sidePanelExploreCurrentViewIsOpen"),
     )
 
     this.sidePanelCurrentViewContent = this.store$.pipe(
-        select('uiState'),
-        select("sidePanelCurrentViewContent")
+      select('uiState'),
+      select("sidePanelCurrentViewContent"),
     )
   }
 
-  collapseSidePanelCurrentView() {
+  public collapseSidePanelCurrentView() {
     this.store$.dispatch({
       type: COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
     })
   }
 
-  expandSidePanelCurrentView() {
+  public expandSidePanelCurrentView() {
     this.store$.dispatch({
       type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
     })
   }
 
-
-
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0) {
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
 
-  handleNonbaseLayerEvent(layers: NgLayerInterface[]){
+  public handleNonbaseLayerEvent(layers: INgLayerInterface[]) {
     if (layers.length  === 0) {
       this.layerBrowserDialogRef && this.layerBrowserDialogRef.close()
       this.layerBrowserDialogRef = null
-      return  
+      return
     }
-    if (this.layerBrowserDialogRef) return
+    if (this.layerBrowserDialogRef) { return }
 
     this.store$.dispatch({
       type: CLOSE_SIDE_PANEL,
@@ -101,27 +99,28 @@ export class SearchSideNav implements OnDestroy {
       hasBackdrop: false,
       autoFocus: false,
       panelClass: [
-        'layerBrowserContainer'
+        'layerBrowserContainer',
       ],
       position: {
-        top: '0'
+        top: '0',
       },
-      disableClose: true
+      disableClose: true,
     })
 
     this.layerBrowserDialogRef.afterClosed().subscribe(val => {
-      if (val === 'user action') this.snackBar.open(this.constantService.dissmissUserLayerSnackbarMessage, 'Dismiss', {
-        duration: 5000
+      if (val === 'user action') { this.snackBar.open(this.constantService.dissmissUserLayerSnackbarMessage, 'Dismiss', {
+        duration: 5000,
       })
+      }
     })
   }
 
-  public deselectAllRegions(){
+  public deselectAllRegions() {
     this.store$.dispatch({
       type: SELECT_REGIONS,
-      selectRegions: []
+      selectRegions: [],
     })
   }
 
-  trackByFn = trackRegionBy
+  public trackByFn = trackRegionBy
 }

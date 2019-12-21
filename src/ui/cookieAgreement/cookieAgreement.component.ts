@@ -1,13 +1,13 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectionStrategy, Component } from '@angular/core'
 
 @Component({
   selector: 'cookie-agreement',
   templateUrl: './cookieAgreement.template.html',
   styleUrls: [
-    './cookieAgreement.style.css'
+    './cookieAgreement.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CookieAgreement {
-  public showMore:boolean = false
+  public showMore: boolean = false
 }

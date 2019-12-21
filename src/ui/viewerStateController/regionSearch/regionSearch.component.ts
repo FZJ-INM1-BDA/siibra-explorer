@@ -1,14 +1,14 @@
-import { Component, EventEmitter, Output, ViewChild, ElementRef, TemplateRef, Input, ChangeDetectionStrategy } from "@angular/core";
-import { Store, select } from "@ngrx/store";
-import { Observable, combineLatest } from "rxjs";
-import { map, distinctUntilChanged, startWith, debounceTime, shareReplay, take, tap, filter } from "rxjs/operators";
-import { getMultiNgIdsRegionsLabelIndexMap, generateLabelIndexId, IavRootStoreInterface } from "src/services/stateStore.service";
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, SELECT_REGIONS, CHANGE_NAVIGATION } from "src/services/state/viewerState.store";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
+import { select, Store } from "@ngrx/store";
+import { combineLatest, Observable } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
+import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
+import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
+import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
 const compareFn = (it, item) => it.name === item.name
@@ -17,20 +17,20 @@ const compareFn = (it, item) => it.name === item.name
   selector: 'region-text-search-autocomplete',
   templateUrl: './regionSearch.template.html',
   styleUrls: [
-    './regionSearch.style.css'
+    './regionSearch.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class RegionTextSearchAutocomplete{
+export class RegionTextSearchAutocomplete {
 
   public compareFn = compareFn
 
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
 
-  @ViewChild('autoTrigger', {read: ElementRef}) autoTrigger: ElementRef 
-  @ViewChild('regionHierarchyDialog', {read:TemplateRef}) regionHierarchyDialogTemplate: TemplateRef<any>
+  @ViewChild('autoTrigger', {read: ElementRef}) public autoTrigger: ElementRef
+  @ViewChild('regionHierarchyDialog', {read: TemplateRef}) public regionHierarchyDialogTemplate: TemplateRef<any>
 
   public useMobileUI$: Observable<boolean>
 
@@ -39,14 +39,14 @@ export class RegionTextSearchAutocomplete{
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
-    private constantService: AtlasViewerConstantsServices
-  ){
+    private constantService: AtlasViewerConstantsServices,
+  ) {
 
     this.useMobileUI$ = this.constantService.useMobileUI$
 
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.regionsWithLabelIndex$ = viewerState$.pipe(
@@ -57,18 +57,18 @@ export class RegionTextSearchAutocomplete{
         const returnArray = []
         const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected)
         for (const [ngId, labelIndexMap] of ngIdMap) {
-          for (const [labelIndex, region] of labelIndexMap){
+          for (const [labelIndex, region] of labelIndexMap) {
             returnArray.push({
               ...region,
               ngId,
               labelIndex,
-              labelIndexId: generateLabelIndexId({ ngId, labelIndex })
+              labelIndexId: generateLabelIndexId({ ngId, labelIndex }),
             })
           }
         }
         return returnArray
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.autocompleteList$ = combineLatest(
@@ -78,11 +78,11 @@ export class RegionTextSearchAutocomplete{
         debounceTime(200),
       ),
       this.regionsWithLabelIndex$.pipe(
-        startWith([])
-      )
+        startWith([]),
+      ),
     ).pipe(
       map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
-      map(arr => arr.slice(0, 5))
+      map(arr => arr.slice(0, 5)),
     )
 
     this.regionsSelected$ = viewerState$.pipe(
@@ -92,42 +92,41 @@ export class RegionTextSearchAutocomplete{
         const arrLabelIndexId = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
         this.selectedRegionLabelIndexSet = new Set(arrLabelIndexId)
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.parcellationSelected$ = viewerState$.pipe(
       select('parcellationSelected'),
       distinctUntilChanged(),
-      shareReplay(1)
+      shareReplay(1),
     )
   }
 
-  public toggleRegionWithId(id: string, removeFlag=false){
+  public toggleRegionWithId(id: string, removeFlag= false) {
     if (removeFlag) {
       this.store$.dispatch({
         type: VIEWER_STATE_ACTION_TYPES.DESELECT_REGIONS_WITH_ID,
-        deselecRegionIds: [id]
+        deselecRegionIds: [id],
       })
     } else {
       this.store$.dispatch({
         type: ADD_TO_REGIONS_SELECTION_WITH_IDS,
-        selectRegionIds : [id]
+        selectRegionIds : [id],
       })
     }
   }
 
-  public navigateTo(position){
+  public navigateTo(position) {
     this.store$.dispatch({
       type: CHANGE_NAVIGATION,
       navigation: {
         position,
-        animation: {}
-      }
+        animation: {},
+      },
     })
   }
 
-  public optionSelected(ev: MatAutocompleteSelectedEvent){
-    const id = ev.option.value
+  public optionSelected(_ev: MatAutocompleteSelectedEvent) {
     this.autoTrigger.nativeElement.value = ''
   }
 
@@ -138,28 +137,27 @@ export class RegionTextSearchAutocomplete{
   public regionsSelected$: Observable<any>
   public parcellationSelected$: Observable<any>
 
-
   @Output()
   public focusedStateChanged: EventEmitter<boolean> = new EventEmitter()
 
   private _focused: boolean = false
-  set focused(val: boolean){
+  set focused(val: boolean) {
     this._focused = val
     this.focusedStateChanged.emit(val)
   }
-  get focused(){
+  get focused() {
     return this._focused
   }
 
-  public deselectAllRegions(event: MouseEvent){
+  public deselectAllRegions(_event: MouseEvent) {
     this.store$.dispatch({
       type: SELECT_REGIONS,
-      selectRegions: []
+      selectRegions: [],
     })
   }
 
   // TODO handle mobile
-  handleRegionClick({ mode = null, region = null } = {}){
+  public handleRegionClick({ mode = null, region = null } = {}) {
     const type = mode === 'single'
       ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY
       : mode === 'double'
@@ -167,11 +165,11 @@ export class RegionTextSearchAutocomplete{
         : ''
     this.store$.dispatch({
       type,
-      payload: { region }
+      payload: { region },
     })
   }
 
-  showHierarchy(event:MouseEvent){
+  public showHierarchy(_event: MouseEvent) {
     // mat-card-content has a max height of 65vh
     const dialog = this.dialog.open(this.regionHierarchyDialogTemplate, {
       height: '65vh',
@@ -180,21 +178,21 @@ export class RegionTextSearchAutocomplete{
         'col-sm-10',
         'col-md-8',
         'col-lg-8',
-        'col-xl-6'
-      ]
+        'col-xl-6',
+      ],
     })
 
     /**
      * keep sleight of hand shown while modal is shown
-     * 
+     *
      */
     this.focused = true
-    
+
     /**
      * take 1 to avoid memory leak
      */
     dialog.afterClosed().pipe(
-      take(1)
+      take(1),
     ).subscribe(() => this.focused = false)
   }
 

@@ -1,8 +1,8 @@
-import { Component,ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core";import { 
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/core"; import {
   SingleDatasetBase,
   DatabrowserService,
   KgSingleDatasetService,
-  AtlasViewerConstantsServices
+  AtlasViewerConstantsServices,
 } from "../singleDataset.base";
 import { MatDialog, MatSnackBar } from "@angular/material";
 import { SingleDatasetView } from "../detailedView/singleDataset.component";
@@ -11,9 +11,9 @@ import { SingleDatasetView } from "../detailedView/singleDataset.component";
   selector: 'single-dataset-list-view',
   templateUrl: './singleDatasetListView.template.html',
   styleUrls: [
-    './singleDatasetListView.style.css'
+    './singleDatasetListView.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class SingleDatasetListView extends SingleDatasetBase {
@@ -23,21 +23,21 @@ export class SingleDatasetListView extends SingleDatasetBase {
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
     constantService: AtlasViewerConstantsServices,
-    private dialog:MatDialog,
-    private snackBar: MatSnackBar
-  ){
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+  ) {
     super(_dbService, singleDatasetService, cdr, constantService)
   }
 
-  showDetailInfo(){
+  public showDetailInfo() {
     this.dialog.open(SingleDatasetView, {
-      data: this.dataset
+      data: this.dataset,
     })
   }
 
-  undoableRemoveFav(){
+  public undoableRemoveFav() {
     this.snackBar.open(`Unpinned dataset: ${this.dataset.name}`, 'Undo', {
-      duration: 5000
+      duration: 5000,
     })
       .afterDismissed()
       .subscribe(({ dismissedByAction }) => {
@@ -48,9 +48,9 @@ export class SingleDatasetListView extends SingleDatasetBase {
     this._dbService.removeFromFav(this.dataset)
   }
 
-  undoableAddFav(){
+  public undoableAddFav() {
     this.snackBar.open(`Pin dataset: ${this.dataset.name}`, 'Undo', {
-      duration: 5000
+      duration: 5000,
     })
       .afterDismissed()
       .subscribe(({ dismissedByAction }) => {

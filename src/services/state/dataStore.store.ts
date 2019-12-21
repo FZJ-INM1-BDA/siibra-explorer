@@ -4,85 +4,85 @@ import { Action } from '@ngrx/store'
  * TODO merge with databrowser.usereffect.ts
  */
 
-export interface StateInterface{
-  fetchedDataEntries: DataEntry[]
-  favDataEntries: DataEntry[]
-  fetchedSpatialData: DataEntry[]
+export interface IStateInterface {
+  fetchedDataEntries: IDataEntry[]
+  favDataEntries: IDataEntry[]
+  fetchedSpatialData: IDataEntry[]
 }
 
 export const defaultState = {
   fetchedDataEntries: [],
   favDataEntries: [],
-  fetchedSpatialData: []
+  fetchedSpatialData: [],
 }
 
-export const getStateStore = ({ state: state = defaultState } = {}) => (prevState:StateInterface = state, action:Partial<ActionInterface>) => {
+export const getStateStore = ({ state: state = defaultState } = {}) => (prevState: IStateInterface = state, action: Partial<IActionInterface>) => {
 
-  switch (action.type){
-    case FETCHED_DATAENTRIES: {
-      return {
-        ...prevState,
-        fetchedDataEntries : action.fetchedDataEntries
-      }
+  switch (action.type) {
+  case FETCHED_DATAENTRIES: {
+    return {
+      ...prevState,
+      fetchedDataEntries : action.fetchedDataEntries,
     }
-    case FETCHED_SPATIAL_DATA :{
-      return {
-        ...prevState,
-        fetchedSpatialData : action.fetchedDataEntries
-      }
+  }
+  case FETCHED_SPATIAL_DATA : {
+    return {
+      ...prevState,
+      fetchedSpatialData : action.fetchedDataEntries,
     }
-    case ACTION_TYPES.UPDATE_FAV_DATASETS: {
-      const { favDataEntries = [] } = action
-      return {
-        ...prevState,
-        favDataEntries
-      }
+  }
+  case ACTION_TYPES.UPDATE_FAV_DATASETS: {
+    const { favDataEntries = [] } = action
+    return {
+      ...prevState,
+      favDataEntries,
     }
-    default: return prevState
+  }
+  default: return prevState
   }
 }
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
-// https://github.com/amcdnl/ngrx-actions/issues/23 
+// https://github.com/amcdnl/ngrx-actions/issues/23
 // or just google for:
 //
 // angular function expressions are not supported in decorators
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
-export interface ActionInterface extends Action{
-  favDataEntries: DataEntry[]
-  fetchedDataEntries : DataEntry[]
-  fetchedSpatialData : DataEntry[]
+export interface IActionInterface extends Action {
+  favDataEntries: IDataEntry[]
+  fetchedDataEntries: IDataEntry[]
+  fetchedSpatialData: IDataEntry[]
 }
 
 export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
 export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
 
-export interface Activity{
+export interface IActivity {
   methods: string[]
   preparation: string[]
   protocols: string[  ]
 }
 
-export interface DataEntry{
-  activity: Activity[]
+export interface IDataEntry {
+  activity: IActivity[]
   name: string
   description: string
   license: string[]
   licenseInfo: string[]
-  parcellationRegion: ParcellationRegion[]
+  parcellationRegion: IParcellationRegion[]
   formats: string[]
   custodians: string[]
   contributors: string[]
-  referenceSpaces: ReferenceSpace[]
-  files : File[]
-  publications: Publication[]
+  referenceSpaces: IReferenceSpace[]
+  files: File[]
+  publications: IPublication[]
   embargoStatus: string[]
 
   methods: string[]
@@ -99,71 +99,71 @@ export interface DataEntry{
   fullId: string
 }
 
-export interface ParcellationRegion {
+export interface IParcellationRegion {
   id?: string
   name: string
 }
 
-export interface ReferenceSpace {
+export interface IReferenceSpace {
   name: string
 }
 
-export interface Publication{
+export interface IPublication {
   name: string
-  doi : string
-  cite : string
+  doi: string
+  cite: string
 }
 
-export interface Property{
-  description : string
-  publications : Publication[]
+export interface IProperty {
+  description: string
+  publications: IPublication[]
 }
 
-export interface Landmark{
-  type : string //e.g. sEEG recording site, etc
-  name : string
-  templateSpace : string // possibily inherited from LandmarkBundle (?)
-  geometry : PointLandmarkGeometry | PlaneLandmarkGeometry | OtherLandmarkGeometry
-  properties : Property
-  files : File[]
+export interface ILandmark {
+  type: string // e.g. sEEG recording site, etc
+  name: string
+  templateSpace: string // possibily inherited from LandmarkBundle (?)
+  geometry: IPointLandmarkGeometry | IPlaneLandmarkGeometry | IOtherLandmarkGeometry
+  properties: IProperty
+  files: File[]
 }
 
-export interface DataStateInterface{
-  fetchedDataEntries : DataEntry[]
+export interface IDataStateInterface {
+  fetchedDataEntries: IDataEntry[]
 
   /**
    * Map that maps parcellation name to a Map, which maps datasetname to Property Object
    */
-  fetchedMetadataMap : Map<string,Map<string,{properties:Property}>>
+  fetchedMetadataMap: Map<string, Map<string, {properties: IProperty}>>
 }
 
-export interface PointLandmarkGeometry extends LandmarkGeometry{
-  position : [number, number, number]
+export interface IPointLandmarkGeometry extends ILandmarkGeometry {
+  position: [number, number, number]
 }
 
-export interface PlaneLandmarkGeometry extends LandmarkGeometry{
+export interface IPlaneLandmarkGeometry extends ILandmarkGeometry {
   // corners have to be CW or CCW (no zigzag)
-  corners : [[number, number, number],[number, number, number],[number, number, number],[number, number, number]]
+  corners: [[number, number, number], [number, number, number], [number, number, number], [number, number, number]]
 }
 
-export interface OtherLandmarkGeometry extends LandmarkGeometry{
-  vertices: [number, number, number][]
-  meshIdx: [number,number,number][]
+export interface IOtherLandmarkGeometry extends ILandmarkGeometry {
+  vertices: Array<[number, number, number]>
+  meshIdx: Array<[number, number, number]>
 }
 
-interface LandmarkGeometry{
-  type : 'point' | 'plane'
-  space? : 'voxel' | 'real'
+interface ILandmarkGeometry {
+  type: 'point' | 'plane'
+  space?: 'voxel' | 'real'
 }
 
-export interface File{
+export interface IFile {
   name: string
   absolutePath: string
   byteSize: number
-  contentType: string,
+  contentType: string
 }
 
-export interface ViewerPreviewFile{
+export interface ViewerPreviewFile {
   name: string
   filename: string
   mimetype: string
@@ -172,7 +172,7 @@ export interface ViewerPreviewFile{
   position?: any
 }
 
-export interface FileSupplementData{
+export interface IFileSupplementData {
   data: any
 }
 
@@ -180,7 +180,7 @@ const ACTION_TYPES = {
   FAV_DATASET: `FAV_DATASET`,
   UPDATE_FAV_DATASETS: `UPDATE_FAV_DATASETS`,
   UNFAV_DATASET: 'UNFAV_DATASET',
-  TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET'
+  TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET',
 }
 
 export const DATASETS_ACTIONS_TYPES = ACTION_TYPES

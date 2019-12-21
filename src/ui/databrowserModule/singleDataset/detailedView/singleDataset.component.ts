@@ -1,22 +1,22 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional, Inject} from "@angular/core";
-import { 
-  SingleDatasetBase,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
+import { MAT_DIALOG_DATA } from "@angular/material";
+import {
+  AtlasViewerConstantsServices,
   DatabrowserService,
   KgSingleDatasetService,
-  AtlasViewerConstantsServices
+  SingleDatasetBase,
 } from "../singleDataset.base";
-import { MAT_DIALOG_DATA } from "@angular/material";
 
 @Component({
   selector: 'single-dataset-view',
   templateUrl: './singleDataset.template.html',
   styleUrls: [
-    `./singleDataset.style.css`
+    `./singleDataset.style.css`,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class SingleDatasetView extends SingleDatasetBase{
+export class SingleDatasetView extends SingleDatasetBase {
 
   constructor(
     dbService: DatabrowserService,
@@ -24,8 +24,8 @@ export class SingleDatasetView extends SingleDatasetBase{
     cdr: ChangeDetectorRef,
     constantService: AtlasViewerConstantsServices,
 
-    @Optional() @Inject(MAT_DIALOG_DATA) data: any
-  ){
+    @Optional() @Inject(MAT_DIALOG_DATA) data: any,
+  ) {
     super(dbService, singleDatasetService, cdr, constantService, data)
   }
 }

@@ -8,74 +8,74 @@ import {} from 'jasmine'
 
 const array1 = [{
   pizza : 'pineapple',
-  path : 'root1'
-},{
-  path: 'root2'
+  path : 'root1',
+}, {
+  path: 'root2',
 }]
 
 const expectedArray1 = [{
   pizza : 'pineapple',
   path : 'root1',
-  children : []
-},{
+  children : [],
+}, {
   path : 'root2',
-  children : []
+  children : [],
 }]
 
 const array2 = [{
-  path : 'root'
-},{
-  path : 'root/dir'
+  path : 'root',
+}, {
+  path : 'root/dir',
 }]
 const expectedArray2 = [{
   path : 'root',
   children : [{
     path : 'dir',
-    children : []
-  }]
+    children : [],
+  }],
 }]
 
 const array3 = [{
   name : 'eagle',
-  path : 'root1/dir1'
-},{
-  path : 'root1/dir2'
-},{
-  path : 'root2/dir3'
-},{
-  path : 'root2/dir4'
+  path : 'root1/dir1',
+}, {
+  path : 'root1/dir2',
+}, {
+  path : 'root2/dir3',
+}, {
+  path : 'root2/dir4',
 }]
 const expectedArray3 = [{
   path : 'root1',
   children : [{
     name : 'eagle',
     path : 'dir1',
-    children : []
-  },{
+    children : [],
+  }, {
     path : 'dir2',
-    children : []
-  }]
-},{
-  path :'root2',
-  children :[{
+    children : [],
+  }],
+}, {
+  path : 'root2',
+  children : [{
     path : 'dir3',
-    children : []
-  },{
+    children : [],
+  }, {
     path : 'dir4',
-    children : []
-  }]
+    children : [],
+  }],
 }]
 
 const array4 = [{
-  path : 'root1/3\\/4'
+  path : 'root1/3\\/4',
 }]
 
 const expectedArray4 = [{
   path : 'root1',
   children : [{
     path : '3\\/4',
-    children : []
-  }]
+    children : [],
+  }],
 }]
 
 const pipe = new PathToNestedChildren()
@@ -91,7 +91,7 @@ describe('path to nested children', () => {
   })
 
   it('transforms nested hierachy correctly', () => {
-    
+
     const transformed2 = pipe.transform(array2)
     expect(transformed2).toEqual(expectedArray2)
 

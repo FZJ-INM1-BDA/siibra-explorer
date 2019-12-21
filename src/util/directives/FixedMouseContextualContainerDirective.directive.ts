@@ -1,7 +1,7 @@
-import { Directive, Input, HostBinding, HostListener, ElementRef, OnChanges, Output, EventEmitter } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output } from "@angular/core";
 
 @Directive({
-  selector: '[fixedMouseContextualContainerDirective]'
+  selector: '[fixedMouseContextualContainerDirective]',
 })
 
 export class FixedMouseContextualContainerDirective {
@@ -19,29 +19,29 @@ export class FixedMouseContextualContainerDirective {
   public onHide: EventEmitter<null> = new EventEmitter()
 
   constructor(
-    private el: ElementRef
-  ){
-    
+    private el: ElementRef,
+  ) {
+
   }
 
-  public show(){
+  public show() {
     setTimeout(() => {
       if (window.innerHeight - this.mousePos[1] < this.el.nativeElement.clientHeight) {
         this.mousePos[1] = window.innerHeight - this.el.nativeElement.clientHeight
       }
 
       if ((window.innerWidth - this.mousePos[0]) < this.el.nativeElement.clientWidth) {
-        this.mousePos[0] = window.innerWidth-this.el.nativeElement.clientWidth
+        this.mousePos[0] = window.innerWidth - this.el.nativeElement.clientWidth
       }
 
       this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
     })
-    this.styleDisplay = 'block'
+    this.styleDisplay = 'inline-block'
     this.isShown = true
     this.onShow.emit()
   }
 
-  public hide(){
+  public hide() {
     this.transform = `translate(${this.defaultPos.map(v => v.toString() + 'px').join(', ')})`
     this.styleDisplay = 'none'
     this.isShown = false

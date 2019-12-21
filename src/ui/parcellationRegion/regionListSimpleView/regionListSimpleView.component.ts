@@ -1,28 +1,28 @@
 import { Component, Input } from "@angular/core";
 
-import { RegionBase } from '../region.base'
 import { Store } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
+import { RegionBase } from '../region.base'
 
 @Component({
   selector: 'region-list-simple-view',
   templateUrl: './regionListSimpleView.template.html',
   styleUrls: [
-    './regionListSimpleView.style.css'
-  ]
+    './regionListSimpleView.style.css',
+  ],
 })
 
-export class RegionListSimpleViewComponent extends RegionBase{
-  
-  @Input()
-  showBrainIcon: boolean = false
+export class RegionListSimpleViewComponent extends RegionBase {
 
   @Input()
-  showDesc: boolean = false
+  public showBrainIcon: boolean = false
+
+  @Input()
+  public showDesc: boolean = false
 
   constructor(
-    store$: Store<IavRootStoreInterface>
-  ){
+    store$: Store<IavRootStoreInterface>,
+  ) {
     super(store$)
   }
 }

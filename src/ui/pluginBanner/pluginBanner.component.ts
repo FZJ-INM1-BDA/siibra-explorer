@@ -1,21 +1,20 @@
 import { Component } from "@angular/core";
-import { PluginServices, PluginManifest } from "src/atlasViewer/atlasViewer.pluginService.service";
-
+import { IPluginManifest, PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
 
 @Component({
   selector : 'plugin-banner',
   templateUrl : './pluginBanner.template.html',
   styleUrls : [
-    `./pluginBanner.style.css`
-  ]
+    `./pluginBanner.style.css`,
+  ],
 })
 
-export class PluginBannerUI{
-  
-  constructor(public pluginServices:PluginServices){
+export class PluginBannerUI {
+
+  constructor(public pluginServices: PluginServices) {
   }
 
-  clickPlugin(plugin:PluginManifest){
+  public clickPlugin(plugin: IPluginManifest) {
     this.pluginServices.launchPlugin(plugin)
   }
 }

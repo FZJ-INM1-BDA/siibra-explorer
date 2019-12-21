@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import { Store, select } from "@ngrx/store";
+import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { SINGLE_PANEL } from "src/services/state/ngViewerState.store";
@@ -9,13 +9,13 @@ import { IavRootStoreInterface } from "src/services/stateStore.service";
   selector: 'maximise-panel-button',
   templateUrl: './maximisePanelButton.template.html',
   styleUrls: [
-    './maximisePanelButton.style.css'
-  ]
+    './maximisePanelButton.style.css',
+  ],
 })
 
-export class MaximmisePanelButton{
-  
-  @Input() panelIndex: number
+export class MaximmisePanelButton {
+
+  @Input() public panelIndex: number
 
   private panelMode$: Observable<string>
   private panelOrder$: Observable<string>
@@ -24,21 +24,21 @@ export class MaximmisePanelButton{
 
   constructor(
     private store$: Store<IavRootStoreInterface>,
-  ){
+  ) {
     this.panelMode$ = this.store$.pipe(
       select('ngViewerState'),
       select('panelMode'),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     )
 
     this.panelOrder$ = this.store$.pipe(
       select('ngViewerState'),
       select('panelOrder'),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     )
 
     this.isMaximised$ = this.panelMode$.pipe(
-      map(panelMode => panelMode === SINGLE_PANEL)
+      map(panelMode => panelMode === SINGLE_PANEL),
     )
   }
 }

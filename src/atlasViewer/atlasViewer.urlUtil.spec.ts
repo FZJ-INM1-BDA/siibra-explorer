@@ -1,6 +1,8 @@
+// tslint:disable:no-empty
+
 import {} from 'jasmine'
-import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR } from './atlasViewer.urlUtil'
 import { defaultRootState } from 'src/services/stateStore.service'
+import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR } from './atlasViewer.urlUtil'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colin = require('!json-loader!src/res/ext/colin.json')
@@ -13,8 +15,8 @@ const fetchedTemplateRootState = {
   ...rest,
   viewerState: {
     ...viewerState,
-    fetchedTemplates: [ bigbrainJson, colin, mni152, allen, waxholm ]
-  }
+    fetchedTemplates: [ bigbrainJson, colin, mni152, allen, waxholm ],
+  },
 }
 
 describe('atlasViewer.urlService.service.ts', () => {
@@ -64,6 +66,6 @@ describe('atlasViewer.urlService.service.ts', () => {
   })
 
   describe('cvtStateToSearchParam', () => {
-    
+
   })
 })

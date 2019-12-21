@@ -1,4 +1,4 @@
-import { Directive, Input, OnChanges, OnDestroy, ElementRef, Output, EventEmitter } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output } from "@angular/core";
 
 const VALID_EVENTNAMES = new Set([
   'mousedown',
@@ -8,44 +8,47 @@ const VALID_EVENTNAMES = new Set([
   'mouseleave',
   'touchstart',
   'touchmove',
-  'touchend'
+  'touchend',
 ])
 
 @Directive({
-  selector: '[iav-delay-event]'
+  selector: '[iav-delay-event]',
 })
 
 export class DelayEventDirective implements OnChanges, OnDestroy {
 
-  private evListener = (ev:Event) => setTimeout(() => this.delayedEmit.emit(ev))
+  private evListener = (ev: Event) => setTimeout(() => this.delayedEmit.emit(ev))
 
   @Input('iav-delay-event')
-  delayEvent: string = ''
+  public delayEvent: string = ''
 
   @Output()
-  delayedEmit: EventEmitter<any> = new EventEmitter()
+  public delayedEmit: EventEmitter<any> = new EventEmitter()
 
-  constructor(private el: ElementRef){
+  constructor(
+    private el: ElementRef,
+  ) {
 
   }
 
-  private destroyCb: (() => void)[] = []
-  ngOnChanges(){
+  private destroyCb: Array<() => void> = []
+  public ngOnChanges() {
     this.ngOnDestroy()
 
-    if (!this.delayEvent || this.delayEvent === '') return
+    if (!this.delayEvent || this.delayEvent === '') { return }
     const el = this.el.nativeElement as HTMLElement
-    for (const evName of this.delayEvent.split(' ')){
+    for (const evName of this.delayEvent.split(' ')) {
       if (VALID_EVENTNAMES.has(evName)) {
         el.addEventListener(evName, this.evListener)
         this.destroyCb.push(() => el.removeEventListener(evName, this.evListener))
       } else {
+        // tslint:disable-next-line
         console.warn(`${evName} is not a valid event name in the supported set`, VALID_EVENTNAMES)
       }
     }
   }
 
-  ngOnDestroy(){
-    while(this.destroyCb.length > 0) this.destroyCb.pop()()
+  public ngOnDestroy() {
+    while (this.destroyCb.length > 0) { this.destroyCb.pop()() }
   }
 }

@@ -18,11 +18,11 @@ describe(`util/fn.ts`, () => {
     it('should return true with obj with name attribute', () => {
 
       const obj = {
-        name: 'hello'
+        name: 'hello',
       }
       const obj2 = {
         name: 'hello',
-        world: 'world'
+        world: 'world',
       }
       expect(isSame(obj, obj2)).toBe(true)
       expect(obj).not.toEqual(obj2)

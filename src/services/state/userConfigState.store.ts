@@ -1,12 +1,12 @@
-import { Action, Store, select } from "@ngrx/store";
 import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
-import { Observable, combineLatest, Subscription, from, of } from "rxjs";
-import { shareReplay, withLatestFrom, map, distinctUntilChanged, filter, take, switchMap, catchError, share } from "rxjs/operators";
-import { generateLabelIndexId, recursiveFindRegionWithLabelIndexId, IavRootStoreInterface } from "../stateStore.service";
-import { SELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION } from "./viewerState.store";
-import { DialogService } from "../dialogService.service";
+import { Action, select, Store } from "@ngrx/store";
+import { combineLatest, from, Observable, of, Subscription } from "rxjs";
+import { catchError, distinctUntilChanged, filter, map, share, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
 import { LOCAL_STORAGE_CONST } from "src/util//constants";
+import { DialogService } from "../dialogService.service";
+import { generateLabelIndexId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from "../stateStore.service";
+import { NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "./viewerState.store";
 
 // Get around the problem of importing duplicated string (ACTION_TYPES), even using ES6 alias seems to trip up the compiler
 // TODO file bug and reverse
@@ -14,11 +14,11 @@ import * as viewerConfigStore from './viewerConfig.store'
 
 const SET_MOBILE_UI = viewerConfigStore.ACTION_TYPES.SET_MOBILE_UI
 
-export interface StateInterface{
+export interface StateInterface {
   savedRegionsSelection: RegionSelection[]
 }
 
-export interface RegionSelection{
+export interface RegionSelection {
   templateSelected: any
   parcellationSelected: any
   regionsSelected: any[]
@@ -29,15 +29,15 @@ export interface RegionSelection{
 /**
  * for serialisation into local storage/database
  */
-interface SimpleRegionSelection{
-  id: string,
-  name: string,
-  tName: string,
-  pName: string,
+interface SimpleRegionSelection {
+  id: string
+  name: string
+  tName: string
+  pName: string
   rSelected: string[]
 }
 
-interface UserConfigAction extends Action{
+interface UserConfigAction extends Action {
   config?: Partial<StateInterface>
   payload?: any
 }
@@ -48,69 +48,67 @@ export const defaultState: StateInterface = {
 
 export const ACTION_TYPES = {
   UPDATE_REGIONS_SELECTIONS: `UPDATE_REGIONS_SELECTIONS`,
-  UPDATE_REGIONS_SELECTION:'UPDATE_REGIONS_SELECTION',
+  UPDATE_REGIONS_SELECTION: 'UPDATE_REGIONS_SELECTION',
   SAVE_REGIONS_SELECTION: `SAVE_REGIONS_SELECTIONN`,
   DELETE_REGIONS_SELECTION: 'DELETE_REGIONS_SELECTION',
 
-  LOAD_REGIONS_SELECTION: 'LOAD_REGIONS_SELECTION'
+  LOAD_REGIONS_SELECTION: 'LOAD_REGIONS_SELECTION',
 }
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: UserConfigAction) => {
-  switch(action.type) {
-    case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS:
-      const { config = {} } = action
-      const { savedRegionsSelection } = config
-      return {
-        ...prevState,
-        savedRegionsSelection
-      }
-    default:
-      return {
-        ...prevState
-      }
+  switch (action.type) {
+  case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS: {
+    const { config = {} } = action
+    const { savedRegionsSelection } = config
+    return {
+      ...prevState,
+      savedRegionsSelection,
+    }
+  }
+  default: return prevState
   }
 }
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
-// https://github.com/amcdnl/ngrx-actions/issues/23 
+// https://github.com/amcdnl/ngrx-actions/issues/23
 // or just google for:
 //
 // angular function expressions are not supported in decorators
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class UserConfigStateUseEffect implements OnDestroy{
+export class UserConfigStateUseEffect implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private dialogService: DialogService
-  ){
+    private dialogService: DialogService,
+  ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.parcellationSelected$ = viewerState$.pipe(
       select('parcellationSelected'),
       distinctUntilChanged(),
-      share()
+      share(),
     )
 
     this.tprSelected$ = combineLatest(
       viewerState$.pipe(
         select('templateSelected'),
-        distinctUntilChanged()
+        distinctUntilChanged(),
       ),
       this.parcellationSelected$,
       viewerState$.pipe(
@@ -119,27 +117,27 @@ export class UserConfigStateUseEffect implements OnDestroy{
          * TODO
          * distinct selectedRegions
          */
-      )
+      ),
     ).pipe(
       map(([ templateSelected, parcellationSelected, regionsSelected ]) => {
         return {
-          templateSelected, parcellationSelected, regionsSelected
+          templateSelected, parcellationSelected, regionsSelected,
         }
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.savedRegionsSelections$ = this.store$.pipe(
       select('userConfigState'),
       select('savedRegionsSelection'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.onSaveRegionsSelection$ = this.actions$.pipe(
       ofType(ACTION_TYPES.SAVE_REGIONS_SELECTION),
       withLatestFrom(this.tprSelected$),
       withLatestFrom(this.savedRegionsSelections$),
-      
+
       map(([[action, tprSelected], savedRegionsSelection]) => {
         const { payload = {} } = action as UserConfigAction
         const { name = 'Untitled' } = payload
@@ -150,15 +148,15 @@ export class UserConfigStateUseEffect implements OnDestroy{
           name,
           templateSelected,
           parcellationSelected,
-          regionsSelected
+          regionsSelected,
         }
         return {
           type: ACTION_TYPES.UPDATE_REGIONS_SELECTIONS,
           config: {
-            savedRegionsSelection: savedRegionsSelection.concat([newSavedRegionSelection])
-          }
+            savedRegionsSelection: savedRegionsSelection.concat([newSavedRegionSelection]),
+          },
         } as UserConfigAction
-      })
+      }),
     )
 
     this.onDeleteRegionsSelection$ = this.actions$.pipe(
@@ -170,10 +168,10 @@ export class UserConfigStateUseEffect implements OnDestroy{
         return {
           type: ACTION_TYPES.UPDATE_REGIONS_SELECTIONS,
           config: {
-            savedRegionsSelection: savedRegionsSelection.filter(srs => srs.id !== id)
-          }
+            savedRegionsSelection: savedRegionsSelection.filter(srs => srs.id !== id),
+          },
         }
-      })
+      }),
     )
 
     this.onUpdateRegionsSelection$ = this.actions$.pipe(
@@ -188,10 +186,10 @@ export class UserConfigStateUseEffect implements OnDestroy{
             savedRegionsSelection: savedRegionsSelection
               .map(srs => srs.id === id
                 ? { ...srs, ...rest }
-                : { ...srs })
-          }
+                : { ...srs }),
+          },
         }
-      })
+      }),
     )
 
     this.subscriptions.push(
@@ -199,15 +197,15 @@ export class UserConfigStateUseEffect implements OnDestroy{
         ofType(ACTION_TYPES.LOAD_REGIONS_SELECTION),
         map(action => {
           const { payload = {}} = action as UserConfigAction
-          const { savedRegionsSelection } : {savedRegionsSelection : RegionSelection} = payload
+          const { savedRegionsSelection }: {savedRegionsSelection: RegionSelection} = payload
           return savedRegionsSelection
         }),
         filter(val => !!val),
         withLatestFrom(this.tprSelected$),
-        switchMap(([savedRegionsSelection, { parcellationSelected, templateSelected, regionsSelected }]) => 
+        switchMap(([savedRegionsSelection, { parcellationSelected, templateSelected, regionsSelected }]) =>
           from(this.dialogService.getUserConfirm({
             title: `Load region selection: ${savedRegionsSelection.name}`,
-            message: `This action would cause the viewer to navigate away from the current view. Proceed?`
+            message: `This action would cause the viewer to navigate away from the current view. Proceed?`,
           })).pipe(
             catchError((e, obs) => of(null)),
             map(() => {
@@ -215,11 +213,11 @@ export class UserConfigStateUseEffect implements OnDestroy{
                 savedRegionsSelection,
                 parcellationSelected,
                 templateSelected,
-                regionsSelected
+                regionsSelected,
               }
             }),
-            filter(val => !!val)
-          )
+            filter(val => !!val),
+          ),
         ),
         switchMap(({ savedRegionsSelection, parcellationSelected, templateSelected, regionsSelected }) => {
           if (templateSelected.name !== savedRegionsSelection.templateSelected.name ) {
@@ -229,54 +227,54 @@ export class UserConfigStateUseEffect implements OnDestroy{
             this.store$.dispatch({
               type: NEWVIEWER,
               selectParcellation: savedRegionsSelection.parcellationSelected,
-              selectTemplate: savedRegionsSelection.templateSelected
+              selectTemplate: savedRegionsSelection.templateSelected,
             })
             return this.parcellationSelected$.pipe(
               filter(p => p.updated),
               take(1),
               map(() => {
                 return {
-                  regionsSelected: savedRegionsSelection.regionsSelected
+                  regionsSelected: savedRegionsSelection.regionsSelected,
                 }
-              })
+              }),
             )
           }
-  
+
           if (parcellationSelected.name !== savedRegionsSelection.parcellationSelected.name) {
             /**
              * parcellation different, dispatch SELECT_PARCELLATION
              */
-  
-             this.store$.dispatch({
-               type: SELECT_PARCELLATION,
-               selectParcellation: savedRegionsSelection.parcellationSelected
-             })
+
+            this.store$.dispatch({
+              type: SELECT_PARCELLATION,
+              selectParcellation: savedRegionsSelection.parcellationSelected,
+            })
             return this.parcellationSelected$.pipe(
               filter(p => p.updated),
               take(1),
               map(() => {
                 return {
-                  regionsSelected: savedRegionsSelection.regionsSelected
+                  regionsSelected: savedRegionsSelection.regionsSelected,
                 }
-              })
+              }),
             )
           }
 
-          return of({ 
-            regionsSelected: savedRegionsSelection.regionsSelected
+          return of({
+            regionsSelected: savedRegionsSelection.regionsSelected,
           })
-        })
+        }),
       ).subscribe(({ regionsSelected }) => {
         this.store$.dispatch({
           type: SELECT_REGIONS,
-          selectRegions: regionsSelected
+          selectRegions: regionsSelected,
         })
-      })
+      }),
     )
 
     this.subscriptions.push(
       this.store$.pipe(
-        select('viewerConfigState')
+        select('viewerConfigState'),
       ).subscribe(({ gpuLimit, animation }) => {
 
         if (gpuLimit) {
@@ -285,7 +283,7 @@ export class UserConfigStateUseEffect implements OnDestroy{
         if (typeof animation !== 'undefined' && animation !== null) {
           window.localStorage.setItem(LOCAL_STORAGE_CONST.ANIMATION, animation.toString())
         }
-      })
+      }),
     )
 
     this.subscriptions.push(
@@ -297,15 +295,15 @@ export class UserConfigStateUseEffect implements OnDestroy{
           const { useMobileUI } = payload
           return useMobileUI
         }),
-        filter(bool => bool !== null)
+        filter(bool => bool !== null),
       ).subscribe((bool: boolean) => {
         window.localStorage.setItem(LOCAL_STORAGE_CONST.MOBILE_UI, JSON.stringify(bool))
-      })
+      }),
     )
 
     this.subscriptions.push(
       this.actions$.pipe(
-        ofType(ACTION_TYPES.UPDATE_REGIONS_SELECTIONS)
+        ofType(ACTION_TYPES.UPDATE_REGIONS_SELECTIONS),
       ).subscribe(action => {
         const { config = {} } = action as UserConfigAction
         const { savedRegionsSelection } = config
@@ -315,7 +313,7 @@ export class UserConfigStateUseEffect implements OnDestroy{
             name,
             tName: templateSelected.name,
             pName: parcellationSelected.name,
-            rSelected: regionsSelected.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
+            rSelected: regionsSelected.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex })),
           } as SimpleRegionSelection
         })
 
@@ -323,11 +321,11 @@ export class UserConfigStateUseEffect implements OnDestroy{
          * TODO save server side on per user basis
          */
         window.localStorage.setItem(LOCAL_STORAGE_CONST.SAVED_REGION_SELECTIONS, JSON.stringify(simpleSRSs))
-      })
+      }),
     )
 
     const savedSRSsString = window.localStorage.getItem(LOCAL_STORAGE_CONST.SAVED_REGION_SELECTIONS)
-    const savedSRSs:SimpleRegionSelection[] = savedSRSsString && JSON.parse(savedSRSsString)
+    const savedSRSs: SimpleRegionSelection[] = savedSRSsString && JSON.parse(savedSRSsString)
 
     this.restoreSRSsFromStorage$ = viewerState$.pipe(
       filter(() => !!savedSRSs),
@@ -342,22 +340,22 @@ export class UserConfigStateUseEffect implements OnDestroy{
           parcellationSelected,
           id,
           name,
-          regionsSelected
+          regionsSelected,
         } as RegionSelection
       })),
-      filter(RSs => RSs.every(rs => rs.regionsSelected && rs.regionsSelected.every(r => !!r))),
+      filter(restoredSavedRegions => restoredSavedRegions.every(rs => rs.regionsSelected && rs.regionsSelected.every(r => !!r))),
       take(1),
       map(savedRegionsSelection => {
         return {
           type: ACTION_TYPES.UPDATE_REGIONS_SELECTIONS,
-          config: { savedRegionsSelection }
+          config: { savedRegionsSelection },
         }
-      })
+      }),
     )
   }
 
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0) {
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
@@ -365,7 +363,7 @@ export class UserConfigStateUseEffect implements OnDestroy{
   /**
    * Temmplate Parcellation Regions selected
    */
-  private tprSelected$: Observable<{templateSelected:any, parcellationSelected: any, regionsSelected: any[]}>
+  private tprSelected$: Observable<{templateSelected: any, parcellationSelected: any, regionsSelected: any[]}>
   private savedRegionsSelections$: Observable<any[]>
   private parcellationSelected$: Observable<any>
 
