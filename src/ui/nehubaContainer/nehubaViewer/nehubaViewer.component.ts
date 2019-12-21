@@ -118,8 +118,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     private log: LoggingService,
   ) {
 
-    this.exportNehuba = getExportNehuba()
-
     if (!this.constantService.loadExportNehubaPromise) {
       this.constantService.loadExportNehubaPromise = new Promise((resolve, reject) => {
         const scriptEl = this.rd.createElement('script')
@@ -132,6 +130,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
     this.constantService.loadExportNehubaPromise
       .then(() => {
+        this.exportNehuba = getExportNehuba()
         const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
         if (fixedZoomPerspectiveSlices) {
           const { sliceZoom, sliceViewportWidth, sliceViewportHeight } = fixedZoomPerspectiveSlices

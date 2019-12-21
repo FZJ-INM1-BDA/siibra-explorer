@@ -36,7 +36,7 @@ export class FixedMouseContextualContainerDirective {
 
       this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
     })
-    this.styleDisplay = 'block'
+    this.styleDisplay = 'inline-block'
     this.isShown = true
     this.onShow.emit()
   }
