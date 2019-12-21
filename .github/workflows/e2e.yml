@@ -14,7 +14,7 @@ env:
   DOCKER_CONTAINER_NAME: github-actions-iav-dkr-container
 
 jobs:
-  build:
+  buildimage:
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   test:
     runs-on: self-hosted
-    needs: bulid
+    needs: buildimage
     steps:
     - name: Download docker image artefact
       uses: actions/upload-artifact@v1
