@@ -44,6 +44,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: ${{ env.ARTEFACT_NAME }}
+    - name: Load artefact as docker image
       run: |
         docker load -i ${ARTEFACT_NAME}/${DOCKER_SAVE_FILENAME}
     - uses: actions/checkout@v2
