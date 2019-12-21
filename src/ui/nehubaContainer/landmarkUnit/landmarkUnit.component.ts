@@ -39,9 +39,9 @@ export class LandmarkUnit implements OnChanges {
   public calcOpacity(): number {
     return this.flatProjection ?
       this.calcOpacityFlatMode() :
-        this.positionZ >= 0 ?
-          1 :
-          0.4
+      this.positionZ >= 0 ?
+        1 :
+        0.4
   }
 
   public calcOpacityFlatMode(): number {

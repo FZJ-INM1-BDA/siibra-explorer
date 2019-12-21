@@ -18,30 +18,30 @@ export class FilterDataEntriesByRegion implements PipeTransform {
   public transform(dataentries: IDataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
     return dataentries && selectedRegions && selectedRegions.length > 0
       ? dataentries
-          .map(de => {
-            /**
+        .map(de => {
+          /**
              * translate parcellationRegion to region representation
              */
-            const newParcellationRegion = de.parcellationRegion.map(({name, id, ...rest}) => {
+          const newParcellationRegion = de.parcellationRegion.map(({name, id, ...rest}) => {
 
-              const found = flattenedAllRegions.find(r => {
-                /**
+            const found = flattenedAllRegions.find(r => {
+              /**
                  * TODO replace pseudo id with real uuid
                  */
-                return (r.id && id && r.id === id)
+              return (r.id && id && r.id === id)
                   || r.name === name
                   || r.relatedAreas && r.relatedAreas.length && r.relatedAreas.some(syn => syn === name)
-              })
-              return found
-                ? { name, id, ...rest, ...found }
-                : { name, id, ...rest }
             })
-            return {
-              ...de,
-              parcellationRegion: newParcellationRegion,
-            }
+            return found
+              ? { name, id, ...rest, ...found }
+              : { name, id, ...rest }
           })
-          .filter(de => filterSubSelect(de, selectedRegions))
+          return {
+            ...de,
+            parcellationRegion: newParcellationRegion,
+          }
+        })
+        .filter(de => filterSubSelect(de, selectedRegions))
       : dataentries
   }
 }

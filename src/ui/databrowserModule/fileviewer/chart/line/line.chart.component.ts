@@ -11,8 +11,8 @@ import { ChartBase } from '../chart.base';
   templateUrl : './line.chart.template.html',
   styleUrls : [
     `./line.chart.style.css`,
-   ],
-   exportAs: 'iavLineChart',
+  ],
+  exportAs: 'iavLineChart',
 })
 export class LineChart extends ChartBase implements OnChanges, CommonChartInterface {
 

@@ -11,9 +11,9 @@ import { RegionBase } from '../region.base'
 })
 export class RegionMenuComponent extends RegionBase {
 
-constructor(
-  store$: Store<IavRootStoreInterface>,
-) {
-  super(store$)
+  constructor(
+    store$: Store<IavRootStoreInterface>,
+  ) {
+    super(store$)
   }
 }

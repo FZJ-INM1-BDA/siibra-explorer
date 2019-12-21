@@ -13,14 +13,13 @@ module.exports = {
     "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/interface-name-prefix":[0],
     // "no-unused-vars": "off",
-    // "@typescript-eslint/no-unused-var": [2],
     "semi": "off",
-    // "indent":["error", 2, {
-    //   "FunctionDeclaration":{
-    //     "body":1,
-    //     "parameters":2
-    //   }
-    // }],
+    "indent":["error", 2, {
+      "FunctionDeclaration":{
+        "body":1,
+        "parameters":2
+      }
+    }],
     "@typescript-eslint/member-delimiter-style": [2, {
       "multiline": {
           "delimiter": "none",

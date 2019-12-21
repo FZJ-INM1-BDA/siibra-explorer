@@ -138,7 +138,7 @@ import { LoggingService } from "./services/logging.service";
     AtlasViewer,
   ],
   schemas: [
-      CUSTOM_ELEMENTS_SCHEMA,
+    CUSTOM_ELEMENTS_SCHEMA,
   ],
 })
 

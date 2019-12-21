@@ -9,10 +9,10 @@ export class FilterCollapsePipe implements PipeTransform {
     const isCollapsedById = (id) => {
 
       return collapsedLevels.has(id)
-      ? true
-      : uncollapsedLevels.has(id)
-        ? false
-        : !defaultCollapse
+        ? true
+        : uncollapsedLevels.has(id)
+          ? false
+          : !defaultCollapse
     }
     const returnArray =  array.filter(item => {
       return !item.lvlId.split('_')

@@ -35,14 +35,14 @@ export class TemplateParcellationHasMoreInfo implements PipeTransform {
 
     return hasMoreInfo
       ? {
-          name: pName || name,
-          description: pDescriptions || description,
-          publications: pPublications || publications,
-          originDatasets: notEmptyArray(originDatasets)
-            ? originDatasets
-            : [{ kgSchema: null, kgId: null }],
-          mindsId: pMindsId || mindsId,
-        }
+        name: pName || name,
+        description: pDescriptions || description,
+        publications: pPublications || publications,
+        originDatasets: notEmptyArray(originDatasets)
+          ? originDatasets
+          : [{ kgSchema: null, kgId: null }],
+        mindsId: pMindsId || mindsId,
+      }
       : null
   }
 }

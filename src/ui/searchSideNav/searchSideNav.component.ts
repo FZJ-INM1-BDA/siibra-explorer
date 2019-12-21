@@ -54,13 +54,13 @@ export class SearchSideNav implements OnDestroy {
     )
 
     this.sidePanelExploreCurrentViewIsOpen$ = this.store$.pipe(
-        select('uiState'),
-        select("sidePanelExploreCurrentViewIsOpen"),
+      select('uiState'),
+      select("sidePanelExploreCurrentViewIsOpen"),
     )
 
     this.sidePanelCurrentViewContent = this.store$.pipe(
-        select('uiState'),
-        select("sidePanelCurrentViewContent"),
+      select('uiState'),
+      select("sidePanelCurrentViewContent"),
     )
   }
 

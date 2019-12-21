@@ -27,7 +27,7 @@ export class WidgetServices implements OnDestroy {
     private constantServce: AtlasViewerConstantsServices,
     private injector: Injector,
     private log: LoggingService,
-    ) {
+  ) {
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
     this.minimisedWindow$ = new BehaviorSubject(this.minimisedWindow)
 

@@ -142,23 +142,20 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
       const selectRegionIds = []
 
       for (const ngId in json) {
-        // see https://palantir.github.io/tslint/rules/forin/
-        if (json.hasOwnProperty(ngId)) {
-          const val = json[ngId]
-          const labelIndicies = val.split(separator).map(n => {
-            try {
-              return decodeToNumber(n)
-            } catch (e) {
-              /**
-               * TODO poisonsed encoded char, send error message
-               */
-              warningCb({ type: DECODE_CIPHER_ERROR, message: `cRegionSelectionParam is malformed: cannot decode ${n}` })
-              return null
-            }
-          }).filter(v => !!v)
-          for (const labelIndex of labelIndicies) {
-            selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
+        const val = json[ngId]
+        const labelIndicies = val.split(separator).map(n => {
+          try {
+            return decodeToNumber(n)
+          } catch (e) {
+            /**
+             * TODO poisonsed encoded char, send error message
+             */
+            warningCb({ type: DECODE_CIPHER_ERROR, message: `cRegionSelectionParam is malformed: cannot decode ${n}` })
+            return null
           }
+        }).filter(v => !!v)
+        for (const labelIndex of labelIndicies) {
+          selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
         }
       }
       viewerState.regionsSelected = selectRegionIds.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))

@@ -6,10 +6,9 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
-import { Effect } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, merge, Observable, of } from "rxjs";
-import { filter, map, shareReplay, startWith } from "rxjs/operators";
+import { filter, map, shareReplay } from "rxjs/operators";
 import { LoggingService } from 'src/services/logging.service';
 import { PluginHandler } from 'src/util/pluginHandler';
 import '../res/css/plugin_styles.css'
@@ -60,7 +59,7 @@ export class PluginServices {
           // trigger change detection in Angular
           // otherwise, model won't be updated until user input
 
-          // tslint:disable-next-line
+          /* eslint-disable-next-line @typescript-eslint/no-empty-function */
           zone.run(() => {  })
           return arg2
         })
@@ -277,7 +276,8 @@ export class PluginServices {
 
         const unsubscribeOnPluginDestroy = []
 
-        handler.blink = (sec?: number) => {
+        // TODO deprecate sec
+        handler.blink = (_sec?: number) => {
           widgetCompRef.instance.blinkOn = true
         }
 

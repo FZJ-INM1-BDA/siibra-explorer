@@ -11,12 +11,12 @@ export class FlattenTreePipe implements PipeTransform {
 
   private recursiveFlatten(obj, findChildren, flattenedTreeLevel, lvlId) {
     return [
-        this.attachLvlAndLvlIdAndSiblingFlag(
-          obj,
-          flattenedTreeLevel,
-          lvlId,
-        ),
-      ].concat(
+      this.attachLvlAndLvlIdAndSiblingFlag(
+        obj,
+        flattenedTreeLevel,
+        lvlId,
+      ),
+    ].concat(
       ...findChildren(obj)
         .map((c, idx) => this.recursiveFlatten(c, findChildren, flattenedTreeLevel + 1, `${lvlId}_${idx}` )),
     )

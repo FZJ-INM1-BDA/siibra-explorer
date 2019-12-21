@@ -5,10 +5,10 @@ import { CHANGE_NAVIGATION, ViewerStateInterface } from "src/services/stateStore
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 
 @Component({
-    selector : 'ui-status-card',
-    templateUrl : './statusCard.template.html',
-    styleUrls : ['./statusCard.style.css'],
-  })
+  selector : 'ui-status-card',
+  templateUrl : './statusCard.template.html',
+  styleUrls : ['./statusCard.style.css'],
+})
 export class StatusCardComponent {
 
   @Input() public selectedTemplate: any;

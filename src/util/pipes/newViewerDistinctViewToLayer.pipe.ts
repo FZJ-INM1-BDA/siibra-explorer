@@ -15,17 +15,17 @@ export class NewViewerDisctinctViewToLayer implements PipeTransform {
       return []
         .concat(newViewer
           ? Object.keys(newViewer.nehubaConfig.dataset.initialNgState.layers).map(key => ({
-              name : key,
-              url : newViewer.nehubaConfig.dataset.initialNgState.layers[key].source,
-              type : newViewer.nehubaConfig.dataset.initialNgState.layers[key].type === 'image'
-                ? 'base'
-                : newViewer.nehubaConfig.dataset.initialNgState.layers[key].type === 'segmentation'
-                  ? 'mixable'
-                  : 'nonmixable',
-              transform : newViewer.nehubaConfig.dataset.initialNgState.layers[key].transform
-                ? newViewer.nehubaConfig.dataset.initialNgState.layers[key].transform.map(quat => Array.from(quat))
-                : null,
-            }))
+            name : key,
+            url : newViewer.nehubaConfig.dataset.initialNgState.layers[key].source,
+            type : newViewer.nehubaConfig.dataset.initialNgState.layers[key].type === 'image'
+              ? 'base'
+              : newViewer.nehubaConfig.dataset.initialNgState.layers[key].type === 'segmentation'
+                ? 'mixable'
+                : 'nonmixable',
+            transform : newViewer.nehubaConfig.dataset.initialNgState.layers[key].transform
+              ? newViewer.nehubaConfig.dataset.initialNgState.layers[key].transform.map(quat => Array.from(quat))
+              : null,
+          }))
           : [])
         .concat(dedicatedViewer
           ? { name : 'dedicated view', url : dedicatedViewer, type : 'nonmixable' }

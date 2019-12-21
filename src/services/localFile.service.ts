@@ -31,12 +31,12 @@ export class LocalFileService {
       for (const file of files) {
         const ext = this.getExtension(file.name)
         switch (ext) {
-          case NII: {
-            this.handleNiiFile(file)
-            break;
-          }
-          default:
-            throw new Error(`File ${file.name} does not have a file handler`)
+        case NII: {
+          this.handleNiiFile(file)
+          break;
+        }
+        default:
+          throw new Error(`File ${file.name} does not have a file handler`)
         }
       }
     } catch (e) {

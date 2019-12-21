@@ -89,11 +89,11 @@ export class MouseHoverDirective {
       ),
       map(([ arr, parcellationSelected ]) => parcellationSelected && parcellationSelected.auxillaryMeshIndices
         ? arr.filter(({ segment }) => {
-            // if segment is not a string (i.e., not labelIndexId) return true
-            if (typeof segment !== 'string') { return true }
-            const { labelIndex } = getNgIdLabelIndexFromId({ labelIndexId: segment })
-            return parcellationSelected.auxillaryMeshIndices.indexOf(labelIndex) < 0
-          })
+          // if segment is not a string (i.e., not labelIndexId) return true
+          if (typeof segment !== 'string') { return true }
+          const { labelIndex } = getNgIdLabelIndexFromId({ labelIndexId: segment })
+          return parcellationSelected.auxillaryMeshIndices.indexOf(labelIndex) < 0
+        })
         : arr),
       distinctUntilChanged((o, n) => o.length === n.length
         && n.every(segment =>
@@ -163,16 +163,16 @@ export class MouseOverTextPipe implements PipeTransform {
 
   private renderText = ({ label, obj }): SafeHtml[] => {
     switch (label) {
-      case 'landmark':
-        return [this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName)]
-      case 'segments':
-        return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
-      case 'userLandmark':
-        return [this.sanitizer.sanitize(SecurityContext.HTML, obj.id)]
-      default:
-        // ts-lint:disable-next-line
-        console.warn(`mouseOver.directive.ts#mouseOverTextPipe: Cannot be displayed: label: ${label}`)
-        return [this.sanitizer.bypassSecurityTrustHtml(`Cannot be displayed: label: ${label}`)]
+    case 'landmark':
+      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName)]
+    case 'segments':
+      return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
+    case 'userLandmark':
+      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.id)]
+    default:
+      // ts-lint:disable-next-line
+      console.warn(`mouseOver.directive.ts#mouseOverTextPipe: Cannot be displayed: label: ${label}`)
+      return [this.sanitizer.bypassSecurityTrustHtml(`Cannot be displayed: label: ${label}`)]
     }
   }
 
@@ -201,26 +201,26 @@ export class MouseOverIconPipe implements PipeTransform {
   public transform(type: string): {fontSet: string, fontIcon: string} {
 
     switch (type) {
-      case 'landmark':
-        return {
-          fontSet: 'fas',
-          fontIcon: 'fa-map-marker-alt',
-        }
-      case 'segments':
-        return {
-          fontSet: 'fas',
-          fontIcon: 'fa-brain',
-        }
-      case 'userLandmark':
-        return {
-          fontSet: 'fas',
-          fontIcon: 'fa-map-marker-alt',
-        }
-      default:
-        return {
-          fontSet: 'fas',
-          fontIcon: 'fa-file',
-        }
+    case 'landmark':
+      return {
+        fontSet: 'fas',
+        fontIcon: 'fa-map-marker-alt',
+      }
+    case 'segments':
+      return {
+        fontSet: 'fas',
+        fontIcon: 'fa-brain',
+      }
+    case 'userLandmark':
+      return {
+        fontSet: 'fas',
+        fontIcon: 'fa-map-marker-alt',
+      }
+    default:
+      return {
+        fontSet: 'fas',
+        fontIcon: 'fa-file',
+      }
     }
   }
 }

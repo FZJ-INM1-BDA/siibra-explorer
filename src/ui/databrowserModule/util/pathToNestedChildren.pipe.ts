@@ -37,13 +37,13 @@ export class PathToNestedChildren implements PipeTransform {
       finalPath ?
         curr :
         {}, {
-          path : this.getCurrentPath(curr),
-          children : finalPath ?
-            [] :
-            this.constructDoubleHeirachy(
-              [ this.getNextLevelHeirachy(curr) ],
-            ),
-        })
+        path : this.getCurrentPath(curr),
+        children : finalPath ?
+          [] :
+          this.constructDoubleHeirachy(
+            [ this.getNextLevelHeirachy(curr) ],
+          ),
+      })
   }
 
   private concatItem(item: NestedChildren, curr: HasPathProperty): NestedChildren {

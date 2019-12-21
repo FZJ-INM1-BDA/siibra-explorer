@@ -27,9 +27,9 @@ const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex
   const foundIndex = acc.findIndex(({ layer }) => layer.name === name)
   if (foundIndex < 0) { return acc.concat(curr) } else { return acc.map((item, idx) => idx === foundIndex
     ? {
-        ...item,
-        labelIndicies: [...new Set([...item.labelIndicies, ...curr.labelIndicies])],
-      }
+      ...item,
+      labelIndicies: [...new Set([...item.labelIndicies, ...curr.labelIndicies])],
+    }
     : item)
   }
 }
@@ -472,7 +472,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
              */
             : false
         ),
-      )
+    )
   }
 
   // TODO single landmark for user landmark

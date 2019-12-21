@@ -63,32 +63,32 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ViewerConfigurationAction) => {
   switch (action.type) {
-    case ACTION_TYPES.SET_MOBILE_UI: {
-      const { payload } = action
-      const { useMobileUI } = payload
-      return {
-        ...prevState,
-        useMobileUI,
-      }
+  case ACTION_TYPES.SET_MOBILE_UI: {
+    const { payload } = action
+    const { useMobileUI } = payload
+    return {
+      ...prevState,
+      useMobileUI,
     }
-    case ACTION_TYPES.UPDATE_CONFIG:
-      return {
-        ...prevState,
-        ...action.config,
-      }
-    case ACTION_TYPES.CHANGE_GPU_LIMIT: {
-      const newGpuLimit = Math.min(
-        CONFIG_CONSTANTS.gpuLimitMax,
-        Math.max(
-          (prevState.gpuLimit || CONFIG_CONSTANTS.defaultGpuLimit) + action.payload.delta,
-          CONFIG_CONSTANTS.gpuLimitMin,
-        ))
-      return {
-        ...prevState,
-        gpuLimit: newGpuLimit,
-      }
+  }
+  case ACTION_TYPES.UPDATE_CONFIG:
+    return {
+      ...prevState,
+      ...action.config,
     }
-    default: return prevState
+  case ACTION_TYPES.CHANGE_GPU_LIMIT: {
+    const newGpuLimit = Math.min(
+      CONFIG_CONSTANTS.gpuLimitMax,
+      Math.max(
+        (prevState.gpuLimit || CONFIG_CONSTANTS.defaultGpuLimit) + action.payload.delta,
+        CONFIG_CONSTANTS.gpuLimitMin,
+      ))
+    return {
+      ...prevState,
+      gpuLimit: newGpuLimit,
+    }
+  }
+  default: return prevState
   }
 }
 

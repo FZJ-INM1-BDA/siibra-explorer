@@ -32,107 +32,107 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
   switch (action.type) {
-    case MOUSE_OVER_SEGMENTS: {
-      const { segments } = action
-      return {
-        ...prevState,
-        mouseOverSegments: segments,
-      }
+  case MOUSE_OVER_SEGMENTS: {
+    const { segments } = action
+    return {
+      ...prevState,
+      mouseOverSegments: segments,
     }
-    case MOUSE_OVER_SEGMENT: 
-      return {
-        ...prevState,
-        mouseOverSegment : action.segment,
-      }
-    case MOUSEOVER_USER_LANDMARK: {
-      const { payload = {} } = action
-      const { userLandmark: mouseOverUserLandmark = null } = payload
-      return {
-        ...prevState,
-        mouseOverUserLandmark,
-      }
+  }
+  case MOUSE_OVER_SEGMENT: 
+    return {
+      ...prevState,
+      mouseOverSegment : action.segment,
     }
-    case MOUSE_OVER_LANDMARK:
-      return {
-        ...prevState,
-        mouseOverLandmark : action.landmark,
-      }
-    case SNACKBAR_MESSAGE: {
-      const { snackbarMessage } = action
-      /**
+  case MOUSEOVER_USER_LANDMARK: {
+    const { payload = {} } = action
+    const { userLandmark: mouseOverUserLandmark = null } = payload
+    return {
+      ...prevState,
+      mouseOverUserLandmark,
+    }
+  }
+  case MOUSE_OVER_LANDMARK:
+    return {
+      ...prevState,
+      mouseOverLandmark : action.landmark,
+    }
+  case SNACKBAR_MESSAGE: {
+    const { snackbarMessage } = action
+    /**
        * Need to use symbol here, or repeated snackbarMessage will not trigger new event
        */
-      return {
-        ...prevState,
-        snackbarMessage: Symbol(snackbarMessage),
-      }
+    return {
+      ...prevState,
+      snackbarMessage: Symbol(snackbarMessage),
     }
-    case OPEN_SIDE_PANEL:
-      return {
-        ...prevState,
-        sidePanelIsOpen: true,
-      }
-    case CLOSE_SIDE_PANEL:
-      return {
-        ...prevState,
-        sidePanelIsOpen: false,
-      }
+  }
+  case OPEN_SIDE_PANEL:
+    return {
+      ...prevState,
+      sidePanelIsOpen: true,
+    }
+  case CLOSE_SIDE_PANEL:
+    return {
+      ...prevState,
+      sidePanelIsOpen: false,
+    }
 
-    case EXPAND_SIDE_PANEL_CURRENT_VIEW:
-      return {
-        ...prevState,
-        sidePanelExploreCurrentViewIsOpen: true,
-      }
-    case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
-      return {
-        ...prevState,
-        sidePanelExploreCurrentViewIsOpen: false,
-      }
+  case EXPAND_SIDE_PANEL_CURRENT_VIEW:
+    return {
+      ...prevState,
+      sidePanelExploreCurrentViewIsOpen: true,
+    }
+  case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
+    return {
+      ...prevState,
+      sidePanelExploreCurrentViewIsOpen: false,
+    }
 
-    case SHOW_SIDE_PANEL_DATASET_LIST:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Dataset',
-      }
+  case SHOW_SIDE_PANEL_DATASET_LIST:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Dataset',
+    }
 
-    case SHOW_SIDE_PANEL_CONNECTIVITY:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Connectivity',
-      }
-    case HIDE_SIDE_PANEL_CONNECTIVITY:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Dataset',
-      }
-    case AGREE_COOKIE: {
-      /**
+  case SHOW_SIDE_PANEL_CONNECTIVITY:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Connectivity',
+    }
+  case HIDE_SIDE_PANEL_CONNECTIVITY:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Dataset',
+    }
+  case AGREE_COOKIE: {
+    /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
-      return {
-        ...prevState,
-        agreedCookies: true,
-      }
+    localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
+    return {
+      ...prevState,
+      agreedCookies: true,
     }
-    case AGREE_KG_TOS: {
-      /**
+  }
+  case AGREE_KG_TOS: {
+    /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
-      return {
-        ...prevState,
-        agreedKgTos: true,
-      }
+    localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
+    return {
+      ...prevState,
+      agreedKgTos: true,
     }
-    case SHOW_BOTTOM_SHEET: {
-      const { bottomSheetTemplate } = action
-      return {
-        ...prevState,
-        bottomSheetTemplate,
-      }
+  }
+  case SHOW_BOTTOM_SHEET: {
+    const { bottomSheetTemplate } = action
+    return {
+      ...prevState,
+      bottomSheetTemplate,
     }
-    default: return prevState
+  }
+  default: return prevState
   }
 }
 

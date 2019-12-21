@@ -18,8 +18,8 @@ const ACTION_TYPES = {
 }
 
 const compareWith = (o, n) => !o || !n
-? false
-: o.name === n.name
+  ? false
+  : o.name === n.name
 
 export class ViewerStateBase implements OnInit {
 

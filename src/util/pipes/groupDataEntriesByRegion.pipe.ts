@@ -19,18 +19,18 @@ export class GroupDatasetByRegion implements PipeTransform {
               ? Object.assign({}, v, {searchResults : v.searchResults.concat(curr)})
               : v )
             : acc2.concat({
-                region : this.getRegionFromRegionName(reName.name, regions),
-                searchResults : [ curr ],
-              })
-          }, acc)
+              region : this.getRegionFromRegionName(reName.name, regions),
+              searchResults : [ curr ],
+            })
+        }, acc)
         : acc.findIndex(it => it.region == null) >= 0
           ? acc.map(it => it.region === null
             ? Object.assign({}, it, {searchResults: it.searchResults.concat(curr)})
             : it)
           : acc.concat({
-              region : null,
-              searchResults : [curr],
-            })
+            region : null,
+            searchResults : [curr],
+          })
     }, [] as Array<{region: any|null, searchResults: IDataEntry[]}>)
   }
 

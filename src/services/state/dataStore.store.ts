@@ -19,26 +19,26 @@ export const defaultState = {
 export const getStateStore = ({ state: state = defaultState } = {}) => (prevState: IStateInterface = state, action: Partial<IActionInterface>) => {
 
   switch (action.type) {
-    case FETCHED_DATAENTRIES: {
-      return {
-        ...prevState,
-        fetchedDataEntries : action.fetchedDataEntries,
-      }
+  case FETCHED_DATAENTRIES: {
+    return {
+      ...prevState,
+      fetchedDataEntries : action.fetchedDataEntries,
     }
-    case FETCHED_SPATIAL_DATA : {
-      return {
-        ...prevState,
-        fetchedSpatialData : action.fetchedDataEntries,
-      }
+  }
+  case FETCHED_SPATIAL_DATA : {
+    return {
+      ...prevState,
+      fetchedSpatialData : action.fetchedDataEntries,
     }
-    case ACTION_TYPES.UPDATE_FAV_DATASETS: {
-      const { favDataEntries = [] } = action
-      return {
-        ...prevState,
-        favDataEntries,
-      }
+  }
+  case ACTION_TYPES.UPDATE_FAV_DATASETS: {
+    const { favDataEntries = [] } = action
+    return {
+      ...prevState,
+      favDataEntries,
     }
-    default: return prevState
+  }
+  default: return prevState
   }
 }
 

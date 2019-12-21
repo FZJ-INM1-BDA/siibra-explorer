@@ -26,25 +26,25 @@ export const CONSTANTS = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
-    case ACTION_TYPES.SET_INIT_PLUGIN: {
-      const newMap = new Map(prevState.initManifests )
+  case ACTION_TYPES.SET_INIT_PLUGIN: {
+    const newMap = new Map(prevState.initManifests )
 
-      // reserved source label for init manifest
-      if (action.manifest.name !== CONSTANTS.INIT_MANIFEST_SRC) { newMap.set(action.manifest.name, action.manifest.initManifestUrl) }
-      return {
-        ...prevState,
-        initManifests: Array.from(newMap),
-      }
+    // reserved source label for init manifest
+    if (action.manifest.name !== CONSTANTS.INIT_MANIFEST_SRC) { newMap.set(action.manifest.name, action.manifest.initManifestUrl) }
+    return {
+      ...prevState,
+      initManifests: Array.from(newMap),
     }
-    case ACTION_TYPES.CLEAR_INIT_PLUGIN: {
-      const { initManifests } = prevState
-      const newManifests = initManifests.filter(([source]) => source !== CONSTANTS.INIT_MANIFEST_SRC)
-      return {
-        ...prevState,
-        initManifests: newManifests,
-      }
+  }
+  case ACTION_TYPES.CLEAR_INIT_PLUGIN: {
+    const { initManifests } = prevState
+    const newManifests = initManifests.filter(([source]) => source !== CONSTANTS.INIT_MANIFEST_SRC)
+    return {
+      ...prevState,
+      initManifests: newManifests,
     }
-    default: return prevState
+  }
+  default: return prevState
   }
 }
 

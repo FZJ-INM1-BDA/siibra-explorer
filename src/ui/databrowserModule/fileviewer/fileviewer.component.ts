@@ -9,7 +9,7 @@ import { ChartBase } from './chart/chart.base';
   templateUrl : './fileviewer.template.html' ,
   styleUrls : [
     './fileviewer.style.css',
-   ],
+  ],
 })
 
 export class FileViewer implements OnChanges {

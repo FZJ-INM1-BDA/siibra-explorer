@@ -66,140 +66,140 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: Partial<StateInterface> = state, action: ActionInterface) => {
   switch (action.type) {
-    /**
+  /**
      * TODO may be obsolete. test when nifti become available
      */
-    case LOAD_DEDICATED_LAYER: {
-      const dedicatedView = prevState.dedicatedView
-        ? prevState.dedicatedView.concat(action.dedicatedView)
-        : [action.dedicatedView]
-      return {
-        ...prevState,
-        dedicatedView,
-      }
+  case LOAD_DEDICATED_LAYER: {
+    const dedicatedView = prevState.dedicatedView
+      ? prevState.dedicatedView.concat(action.dedicatedView)
+      : [action.dedicatedView]
+    return {
+      ...prevState,
+      dedicatedView,
     }
-    case UNLOAD_DEDICATED_LAYER:
-      return {
-        ...prevState,
-        dedicatedView : prevState.dedicatedView
-          ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
-          : [],
-      }
-    case NEWVIEWER: {
+  }
+  case UNLOAD_DEDICATED_LAYER:
+    return {
+      ...prevState,
+      dedicatedView : prevState.dedicatedView
+        ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
+        : [],
+    }
+  case NEWVIEWER: {
 
-      const { selectParcellation: parcellation } = action
-      // const parcellation = propagateNgId( selectParcellation ): parcellation
-      const { regions, ...parcellationWORegions } = parcellation
-      return {
-        ...prevState,
-        templateSelected : action.selectTemplate,
-        parcellationSelected : {
-          ...parcellationWORegions,
-          regions: null,
-        },
-        // taken care of by effect.ts
-        // regionsSelected : [],
-        landmarksSelected : [],
-        navigation : {},
-        dedicatedView : null,
-      }
+    const { selectParcellation: parcellation } = action
+    // const parcellation = propagateNgId( selectParcellation ): parcellation
+    const { regions, ...parcellationWORegions } = parcellation
+    return {
+      ...prevState,
+      templateSelected : action.selectTemplate,
+      parcellationSelected : {
+        ...parcellationWORegions,
+        regions: null,
+      },
+      // taken care of by effect.ts
+      // regionsSelected : [],
+      landmarksSelected : [],
+      navigation : {},
+      dedicatedView : null,
     }
-    case FETCHED_TEMPLATE : {
-      return {
-        ...prevState,
-        fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate),
-      }
+  }
+  case FETCHED_TEMPLATE : {
+    return {
+      ...prevState,
+      fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate),
     }
-    case CHANGE_NAVIGATION : {
-      return {
-        ...prevState,
-        navigation : action.navigation,
-      }
+  }
+  case CHANGE_NAVIGATION : {
+    return {
+      ...prevState,
+      navigation : action.navigation,
     }
-    case SELECT_PARCELLATION : {
-      const { selectParcellation: sParcellation } = action
-      const { regions, ...sParcellationWORegions } = sParcellation
-      return {
-        ...prevState,
-        parcellationSelected: sParcellationWORegions,
-        // taken care of by effect.ts
-        // regionsSelected: []
-      }
+  }
+  case SELECT_PARCELLATION : {
+    const { selectParcellation: sParcellation } = action
+    const { regions, ...sParcellationWORegions } = sParcellation
+    return {
+      ...prevState,
+      parcellationSelected: sParcellationWORegions,
+      // taken care of by effect.ts
+      // regionsSelected: []
     }
-    case UPDATE_PARCELLATION: {
-      const { updatedParcellation } = action
-      return {
-        ...prevState,
-        parcellationSelected: {
-          ...updatedParcellation,
-          updated: true,
-        },
-      }
+  }
+  case UPDATE_PARCELLATION: {
+    const { updatedParcellation } = action
+    return {
+      ...prevState,
+      parcellationSelected: {
+        ...updatedParcellation,
+        updated: true,
+      },
     }
-    case SELECT_REGIONS: {
-      const { selectRegions } = action
-      return {
-        ...prevState,
-        regionsSelected: selectRegions,
-      }
+  }
+  case SELECT_REGIONS: {
+    const { selectRegions } = action
+    return {
+      ...prevState,
+      regionsSelected: selectRegions,
     }
-    case DESELECT_LANDMARKS : {
-      return {
-        ...prevState,
-        landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0),
-      }
+  }
+  case DESELECT_LANDMARKS : {
+    return {
+      ...prevState,
+      landmarksSelected : prevState.landmarksSelected.filter(lm => action.deselectLandmarks.findIndex(dLm => dLm.name === lm.name) < 0),
     }
-    case SELECT_LANDMARKS : {
-      return {
-        ...prevState,
-        landmarksSelected : action.landmarks,
-      }
+  }
+  case SELECT_LANDMARKS : {
+    return {
+      ...prevState,
+      landmarksSelected : action.landmarks,
     }
-    case USER_LANDMARKS : {
-      return {
-        ...prevState,
-        userLandmarks: action.landmarks,
-      }
+  }
+  case USER_LANDMARKS : {
+    return {
+      ...prevState,
+      userLandmarks: action.landmarks,
     }
-    /**
+  }
+  /**
      * TODO
      * duplicated with ngViewerState.layers ?
      */
-    case NEHUBA_LAYER_CHANGED: {
-      const viewer = getViewer()
-      if (!viewer) {
-        return {
-          ...prevState,
-          loadedNgLayers: [],
-        }
-      } else {
-        return {
-          ...prevState,
-          loadedNgLayers: (viewer.layerManager.managedLayers as any[]).map(obj => ({
-            name : obj.name,
-            type : obj.initialSpecification.type,
-            source : obj.sourceUrl,
-            visible : obj.visible,
-          }) as INgLayerInterface),
-        }
-      }
-    }
-    case GENERAL_ACTION_TYPES.APPLY_STATE: {
-      const { viewerState } = (action as any).state
-      return viewerState
-    }
-    case SET_CONNECTIVITY_REGION:
+  case NEHUBA_LAYER_CHANGED: {
+    const viewer = getViewer()
+    if (!viewer) {
       return {
         ...prevState,
-        connectivityRegion: action.connectivityRegion,
+        loadedNgLayers: [],
       }
-    case CLEAR_CONNECTIVITY_REGION:
+    } else {
       return {
         ...prevState,
-        connectivityRegion: '',
+        loadedNgLayers: (viewer.layerManager.managedLayers as any[]).map(obj => ({
+          name : obj.name,
+          type : obj.initialSpecification.type,
+          source : obj.sourceUrl,
+          visible : obj.visible,
+        }) as INgLayerInterface),
       }
-    default :
-      return prevState
+    }
+  }
+  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+    const { viewerState } = (action as any).state
+    return viewerState
+  }
+  case SET_CONNECTIVITY_REGION:
+    return {
+      ...prevState,
+      connectivityRegion: action.connectivityRegion,
+    }
+  case CLEAR_CONNECTIVITY_REGION:
+    return {
+      ...prevState,
+      connectivityRegion: '',
+    }
+  default :
+    return prevState
   }
 }
 

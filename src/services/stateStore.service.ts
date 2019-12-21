@@ -139,9 +139,9 @@ export function getLabelIndexMap(regions: any[]): Map<number, any> {
 export function getNgIds(regions: any[]): string[] {
   return regions && regions.map
     ? regions
-        .map(r => [r.ngId, ...getNgIds(r.children)])
-        .reduce((acc, item) => acc.concat(item), [])
-        .filter(ngId => !!ngId)
+      .map(r => [r.ngId, ...getNgIds(r.children)])
+      .reduce((acc, item) => acc.concat(item), [])
+      .filter(ngId => !!ngId)
     : []
 }
 

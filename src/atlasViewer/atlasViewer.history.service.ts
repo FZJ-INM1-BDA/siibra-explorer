@@ -80,7 +80,10 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
 
   private currentStateSearchParam$ = this.store$.pipe(
     map(getSearchParamStringFromState),
-    catchError((err, obs) => of(null)),
+    catchError((err, _obs) => {
+      // TODO error parsing current state search param. let user know
+      return of(null)
+    }),
     filter(v => v !==  null),
   )
 

@@ -3,10 +3,10 @@ import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { DatabrowserService } from "../databrowser.service";
 
 const getRenderNodeFn = ({name : activeFileName = ''} = {}) => ({name = '', path = 'unpathed'}) => name
-? activeFileName === name
-  ? `<span class="text-warning">${name}</span>`
-  : name
-: path
+  ? activeFileName === name
+    ? `<span class="text-warning">${name}</span>`
+    : name
+  : path
 
 @Component({
   selector: 'preview-component',

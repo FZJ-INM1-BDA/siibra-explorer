@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, of, Subscription, throwError } from "rxjs";
-import { catchError, filter, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { catchError, map, shareReplay, switchMap, tap } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
@@ -381,6 +381,7 @@ const encodeInt = (number: number) => {
     residual = Math.floor(number)
   }
 
+  /* eslint-disable-next-line no-constant-condition */
   while (true) {
     rixit = residual % 64
     // this.log.log("rixit : " + rixit)
@@ -409,14 +410,14 @@ const defaultB64EncodingOption = {
 export const encodeNumber:
   (number: number, option?: IB64EncodingOption) => string =
   (number: number, { float = false }: IB64EncodingOption = defaultB64EncodingOption) => {
-  if (!float) { return encodeInt(number) } else {
-    const floatArray = new Float32Array(1)
-    floatArray[0] = number
-    const intArray = new Uint32Array(floatArray.buffer)
-    const castedInt = intArray[0]
-    return encodeInt(castedInt)
+    if (!float) { return encodeInt(number) } else {
+      const floatArray = new Float32Array(1)
+      floatArray[0] = number
+      const intArray = new Uint32Array(floatArray.buffer)
+      const castedInt = intArray[0]
+      return encodeInt(castedInt)
+    }
   }
-}
 
 const decodetoInt = (encodedString: string) => {
   let _encodedString
@@ -437,11 +438,11 @@ const decodetoInt = (encodedString: string) => {
 export const decodeToNumber:
   (encodedString: string, option?: IB64EncodingOption) => number =
   (encodedString: string, {float = false} = defaultB64EncodingOption) => {
-  if (!float) { return decodetoInt(encodedString) } else {
-    const _int = decodetoInt(encodedString)
-    const intArray = new Uint32Array(1)
-    intArray[0] = _int
-    const castedFloat = new Float32Array(intArray.buffer)
-    return castedFloat[0]
+    if (!float) { return decodetoInt(encodedString) } else {
+      const _int = decodetoInt(encodedString)
+      const intArray = new Uint32Array(1)
+      intArray[0] = _int
+      const castedFloat = new Float32Array(intArray.buffer)
+      return castedFloat[0]
+    }
   }
-}

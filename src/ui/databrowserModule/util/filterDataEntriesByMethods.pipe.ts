@@ -14,10 +14,10 @@ export class FilterDataEntriesbyMethods implements PipeTransform {
     const includeEmpty = dataModalities.some(d => d.name === noMethodDisplayName)
     return dataEntries && dataModalities && dataModalities.length > 0
       ? dataEntries.filter(dataEntry => {
-          return includeEmpty && dataEntry.methods.length === 0
+        return includeEmpty && dataEntry.methods.length === 0
             || dataEntry.methods.some(m =>
-                dataModalities.findIndex(dm => dm.name === temporaryFilterDataentryName(m)) >= 0)
-        })
+              dataModalities.findIndex(dm => dm.name === temporaryFilterDataentryName(m)) >= 0)
+      })
       : dataEntries
   }
 }

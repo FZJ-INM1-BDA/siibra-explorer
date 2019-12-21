@@ -57,15 +57,15 @@ export const ACTION_TYPES = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: UserConfigAction) => {
   switch (action.type) {
-    case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS: {
-      const { config = {} } = action
-      const { savedRegionsSelection } = config
-      return {
-        ...prevState,
-        savedRegionsSelection,
-      }
+  case ACTION_TYPES.UPDATE_REGIONS_SELECTIONS: {
+    const { config = {} } = action
+    const { savedRegionsSelection } = config
+    return {
+      ...prevState,
+      savedRegionsSelection,
     }
-    default: return prevState
+  }
+  default: return prevState
   }
 }
 
@@ -245,11 +245,11 @@ export class UserConfigStateUseEffect implements OnDestroy {
              * parcellation different, dispatch SELECT_PARCELLATION
              */
 
-             this.store$.dispatch({
-               type: SELECT_PARCELLATION,
-               selectParcellation: savedRegionsSelection.parcellationSelected,
-             })
-             return this.parcellationSelected$.pipe(
+            this.store$.dispatch({
+              type: SELECT_PARCELLATION,
+              selectParcellation: savedRegionsSelection.parcellationSelected,
+            })
+            return this.parcellationSelected$.pipe(
               filter(p => p.updated),
               take(1),
               map(() => {

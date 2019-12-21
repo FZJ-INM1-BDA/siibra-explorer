@@ -246,7 +246,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         return filteredSeg.length > 0
           ? segments.map(s => s.segment)
           : null
-        }),
+      }),
     )
 
     this.selectedParcellation$ = this.store.pipe(
@@ -265,7 +265,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.bottomSheet$.subscribe(templateRef => {
         if (!templateRef) {
-          if (!!this.bottomSheetRef) {
+          if (this.bottomSheetRef) {
             this.bottomSheetRef.dismiss()
           }
         } else {
@@ -319,7 +319,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         // and https://github.com/angular/components/issues/11357
         delay(0),
       ).subscribe(messageSymbol => {
-        if (!!this.snackbarRef) { this.snackbarRef.dismiss() }
+        if (this.snackbarRef) { this.snackbarRef.dismiss() }
 
         if (!messageSymbol) { return }
 
@@ -402,18 +402,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       map(([_, agreed]) => agreed),
       filter(flag => !flag),
       delay(0),
-    ).subscribe(val => {
+    ).subscribe(() => {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-        withLatestFrom(this.onhoverSegments$),
-        map(([_flag, onhoverSegments]) => onhoverSegments || []),
+      withLatestFrom(this.onhoverSegments$),
+      map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
 
   }
 
-  public mouseDownNehuba(event) {
+  public mouseDownNehuba(_event) {
     this.regionToolsMenuVisible = false
     this.rClContextualMenu.hide()
   }

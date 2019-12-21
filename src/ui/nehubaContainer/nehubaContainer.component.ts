@@ -284,7 +284,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
                 ? 'Loading auxiliary chunk'
                 // : this.regionsLabelIndexMap.get(lastLoadedIdNum)
                 //   ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
-                  : 'Loading meshes ...'
+                : 'Loading meshes ...'
         }),
       )
 
@@ -447,31 +447,31 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         if (!viewPanels.every(v => !!v)) { return }
 
         switch (mode) {
-          case H_ONE_THREE: {
-            const element = this.removeExistingPanels()
-            const newEl = getHorizontalOneThree(viewPanels)
-            element.appendChild(newEl)
-            break;
-          }
-          case V_ONE_THREE: {
-            const element = this.removeExistingPanels()
-            const newEl = getVerticalOneThree(viewPanels)
-            element.appendChild(newEl)
-            break;
-          }
-          case FOUR_PANEL: {
-            const element = this.removeExistingPanels()
-            const newEl = getFourPanel(viewPanels)
-            element.appendChild(newEl)
-            break;
-          }
-          case SINGLE_PANEL: {
-            const element = this.removeExistingPanels()
-            const newEl = getSinglePanel(viewPanels)
-            element.appendChild(newEl)
-            break;
-          }
-          default:
+        case H_ONE_THREE: {
+          const element = this.removeExistingPanels()
+          const newEl = getHorizontalOneThree(viewPanels)
+          element.appendChild(newEl)
+          break;
+        }
+        case V_ONE_THREE: {
+          const element = this.removeExistingPanels()
+          const newEl = getVerticalOneThree(viewPanels)
+          element.appendChild(newEl)
+          break;
+        }
+        case FOUR_PANEL: {
+          const element = this.removeExistingPanels()
+          const newEl = getFourPanel(viewPanels)
+          element.appendChild(newEl)
+          break;
+        }
+        case SINGLE_PANEL: {
+          const element = this.removeExistingPanels()
+          const newEl = getSinglePanel(viewPanels)
+          element.appendChild(newEl)
+          break;
+        }
+        default:
         }
         for (const panel of viewPanels) {
           (panel as HTMLElement).classList.add('neuroglancer-panel')
@@ -511,16 +511,16 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
                 ? (data.geometry as IPointLandmarkGeometry).position
                 : data.geometry.type === 'plane'
                   ? [
-                      (data.geometry as IPlaneLandmarkGeometry).corners,
-                      [[0, 1, 2], [0, 2, 3]],
-                    ]
+                    (data.geometry as IPlaneLandmarkGeometry).corners,
+                    [[0, 1, 2], [0, 2, 3]],
+                  ]
                   : data.geometry.type === 'mesh'
                     ? [
-                        (data.geometry as IOtherLandmarkGeometry).vertices,
-                        (data.geometry as IOtherLandmarkGeometry).meshIdx,
-                      ]
+                      (data.geometry as IOtherLandmarkGeometry).vertices,
+                      (data.geometry as IOtherLandmarkGeometry).meshIdx,
+                    ]
                     : null),
-            )
+          )
         } else {
           if (this.nehubaViewer && this.nehubaViewer.removeSpatialSearch3DLandmarks instanceof Function) {
             this.nehubaViewer.removeSpatialSearch3DLandmarks()
@@ -658,7 +658,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           this.selectedRegionIndexSet.size > 0 ?
             this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
             this.nehubaViewer.showAllSeg()
-          },
+        },
         ),
     )
 
@@ -691,7 +691,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
             if (this.nehubaViewer.removeLayer({
               name : l.name,
             })) {
-            this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
+              this.ngLayersRegister.layers = this.ngLayersRegister.layers.filter(rl => rl.name !== l.name)
             }
           })
         }
@@ -1303,12 +1303,12 @@ export const identifySrcElement = (element: HTMLElement) => {
   return elementIsFirstCell && elementIsFirstRow
     ? 0
     : !elementIsFirstCell && elementIsFirstRow
-    ? 1
-    : elementIsFirstCell && !elementIsFirstRow
-      ? 2
-      : !elementIsFirstCell && !elementIsFirstRow
-        ? 3
-        : 4
+      ? 1
+      : elementIsFirstCell && !elementIsFirstRow
+        ? 2
+        : !elementIsFirstCell && !elementIsFirstRow
+          ? 3
+          : 4
 }
 
 export const takeOnePipe = [

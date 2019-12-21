@@ -27,9 +27,9 @@ export class SubjectViewer {
   get groupBySex() {
     return this.isSingle
       ? [{
-          name : this.subjects.children.sex.value,
-          count : 1,
-        }]
+        name : this.subjects.children.sex.value,
+        count : 1,
+      }]
       : this.subjects.reduce((acc: any[], curr) =>
         acc.findIndex(item => item.name === curr.children.sex.value) >= 0
           ? acc.map(item => item.name === curr.children.sex.value

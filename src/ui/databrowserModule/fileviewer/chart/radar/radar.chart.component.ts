@@ -10,8 +10,8 @@ import { applyOption, ChartColor, CommonChartInterface, DatasetInterface, Legend
   templateUrl : './radar.chart.template.html',
   styleUrls : [
     `./radar.chart.style.css`,
-   ],
-   exportAs: 'iavRadarChart',
+  ],
+  exportAs: 'iavRadarChart',
 })
 export class RadarChart extends ChartBase implements OnDestroy, OnChanges, CommonChartInterface {
 

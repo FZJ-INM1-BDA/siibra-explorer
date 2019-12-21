@@ -19,8 +19,8 @@ export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerI
     return oldLayers.concat({
       ...newLayers,
       ...( newLayers.mixability === 'nonmixable' && oldLayers.findIndex(l => l.mixability === 'nonmixable') >= 0
-            ? {visible: false}
-            : {}),
+        ? {visible: false}
+        : {}),
     })
   }
 }
@@ -57,89 +57,89 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
-    case ACTION_TYPES.SET_PANEL_ORDER: {
-      const { payload } = action
-      const { panelOrder } = payload
+  case ACTION_TYPES.SET_PANEL_ORDER: {
+    const { payload } = action
+    const { panelOrder } = payload
 
-      return {
-        ...prevState,
-        panelOrder,
-      }
+    return {
+      ...prevState,
+      panelOrder,
     }
-    case ACTION_TYPES.SWITCH_PANEL_MODE: {
-      const { payload } = action
-      const { panelMode } = payload
-      if (SUPPORTED_PANEL_MODES.indexOf(panelMode) < 0) { return prevState }
-      return {
-        ...prevState,
-        panelMode,
-      }
+  }
+  case ACTION_TYPES.SWITCH_PANEL_MODE: {
+    const { payload } = action
+    const { panelMode } = payload
+    if (SUPPORTED_PANEL_MODES.indexOf(panelMode) < 0) { return prevState }
+    return {
+      ...prevState,
+      panelMode,
     }
-    case ADD_NG_LAYER:
-      return {
-        ...prevState,
+  }
+  case ADD_NG_LAYER:
+    return {
+      ...prevState,
 
-        /* this configration hides the layer if a non mixable layer already present */
+      /* this configration hides the layer if a non mixable layer already present */
 
-        /* this configuration does not the addition of multiple non mixable layers */
-        // layers : action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-        //   ? prevState.layers
-        //   : prevState.layers.concat(action.layer)
+      /* this configuration does not the addition of multiple non mixable layers */
+      // layers : action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+      //   ? prevState.layers
+      //   : prevState.layers.concat(action.layer)
 
-        /* this configuration allows the addition of multiple non mixables */
-        // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
-        layers : mixNgLayers(prevState.layers, action.layer),
+      /* this configuration allows the addition of multiple non mixables */
+      // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
+      layers : mixNgLayers(prevState.layers, action.layer),
 
-        // action.layer.constructor === Array
-        //   ? prevState.layers.concat(action.layer)
-        //   : prevState.layers.concat({
-        //     ...action.layer,
-        //     ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-        //           ? {visible: false}
-        //           : {})
-        //   })
-      }
-    case REMOVE_NG_LAYERS: {
-      const { layers } = action
-      const layerNameSet = new Set(layers.map(l => l.name))
-      return {
-        ...prevState,
-        layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
-      }
+      // action.layer.constructor === Array
+      //   ? prevState.layers.concat(action.layer)
+      //   : prevState.layers.concat({
+      //     ...action.layer,
+      //     ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+      //           ? {visible: false}
+      //           : {})
+      //   })
     }
-    case REMOVE_NG_LAYER:
-      return {
-        ...prevState,
-        layers : prevState.layers.filter(l => l.name !== action.layer.name),
-      }
-    case SHOW_NG_LAYER:
-      return {
-        ...prevState,
-        layers : prevState.layers.map(l => l.name === action.layer.name
-          ? { ...l, visible: true }
-          : l),
-      }
-    case HIDE_NG_LAYER:
-      return {
-        ...prevState,
-
-        layers : prevState.layers.map(l => l.name === action.layer.name
-          ? { ...l, visible: false }
-          : l),
-      }
-    case FORCE_SHOW_SEGMENT:
-      return {
-        ...prevState,
-        forceShowSegment : action.forceShowSegment,
-      }
-    case NEHUBA_READY: {
-      const { nehubaReady } = action
-      return {
-        ...prevState,
-        nehubaReady,
-      }
+  case REMOVE_NG_LAYERS: {
+    const { layers } = action
+    const layerNameSet = new Set(layers.map(l => l.name))
+    return {
+      ...prevState,
+      layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
     }
-    default: return prevState
+  }
+  case REMOVE_NG_LAYER:
+    return {
+      ...prevState,
+      layers : prevState.layers.filter(l => l.name !== action.layer.name),
+    }
+  case SHOW_NG_LAYER:
+    return {
+      ...prevState,
+      layers : prevState.layers.map(l => l.name === action.layer.name
+        ? { ...l, visible: true }
+        : l),
+    }
+  case HIDE_NG_LAYER:
+    return {
+      ...prevState,
+
+      layers : prevState.layers.map(l => l.name === action.layer.name
+        ? { ...l, visible: false }
+        : l),
+    }
+  case FORCE_SHOW_SEGMENT:
+    return {
+      ...prevState,
+      forceShowSegment : action.forceShowSegment,
+    }
+  case NEHUBA_READY: {
+    const { nehubaReady } = action
+    return {
+      ...prevState,
+      nehubaReady,
+    }
+  }
+  default: return prevState
   }
 }
 

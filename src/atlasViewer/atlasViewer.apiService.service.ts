@@ -9,7 +9,7 @@ import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest } from "./atlasViewer.pluginService.service";
 
-declare var window
+declare let window
 
 @Injectable({
   providedIn : 'root',
@@ -114,7 +114,7 @@ export class AtlasViewerAPIServices {
         /**
          * to be overwritten by atlas
          */
-        launchNewWidget: (manifest) => {
+        launchNewWidget: (_manifest) => {
           return Promise.reject('Needs to be overwritted')
         },
 
@@ -156,8 +156,8 @@ export interface IInteractiveViewerInterface {
     loadedTemplates: any[]
     regionsLabelIndexMap: Map<number, any> | null
     layersRegionLabelIndexMap: Map<string, Map<number, any>>
-    datasetsBSubject: Observable<any[]>,
-  },
+    datasetsBSubject: Observable<any[]>
+  }
 
   viewerHandle?: {
     setNavigationLoc: (coordinates: [number, number, number], realSpace?: boolean) => void
@@ -193,7 +193,7 @@ export interface IInteractiveViewerInterface {
      */
     mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
 
-    getNgHash: () => string,
+    getNgHash: () => string
   }
 
   uiHandle: {
@@ -201,13 +201,13 @@ export interface IInteractiveViewerInterface {
     getToastHandler: () => ToastHandler
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
-    getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>,
+    getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
   }
 
   pluginControl: {
     loadExternalLibraries: (libraries: string[]) => Promise<void>
     unloadExternalLibraries: (libraries: string[]) => void
-    [key: string]: any,
+    [key: string]: any
   }
 }
 
