@@ -58,7 +58,7 @@ jobs:
       run: |
         npm i
     - name: run docker container 
-      run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} ${DOCKER_IMAGE_NAME} -dit
+      run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}
     - name: run pptr tests
       run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
     - name: cleanup
