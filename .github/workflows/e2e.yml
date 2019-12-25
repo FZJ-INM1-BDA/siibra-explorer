@@ -9,7 +9,7 @@ on: [push]
 
 env:
   DOCKER_IMAGE_NAME: interactive-viewer
-  DOCKER_IMAGE_TAG: ${{ env.GITHUB_SHA }}
+  DOCKER_IMAGE_TAG: ${{ github.sha }}
   DOCKER_SAVE_FILENAME: iav.tar.gz
   ARTEFACT_NAME: iav_docker_image
   DOCKER_CONTAINER_NAME: github-actions-iav-dkr-container
