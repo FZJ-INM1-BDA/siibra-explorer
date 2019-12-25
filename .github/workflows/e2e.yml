@@ -9,13 +9,14 @@ on: [push]
 
 env:
   DOCKER_IMAGE_NAME: interactive-viewer
+  DOCKER_IMAGE_TAG: ${{ env.GITHUB_SHA }}
   DOCKER_SAVE_FILENAME: iav.tar.gz
   ARTEFACT_NAME: iav_docker_image
   DOCKER_CONTAINER_NAME: github-actions-iav-dkr-container
 
 jobs:
   buildimage:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v1
@@ -23,33 +24,16 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: build docker container
+    - name: build docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
       run: |
-        docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME} .
+        docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
       env:
         BACKEND_URL: http://localhost:3001
-    - name: export docker image as an artefact
-      run: |
-        docker save ${DOCKER_IMAGE_NAME} -o ${DOCKER_SAVE_FILENAME}
-    - name: Upload docker image
-      uses: actions/upload-artifact@v1
-      with:
-        name: ${{ env.ARTEFACT_NAME }}
-        path: ${{ env.DOCKER_SAVE_FILENAME }}
 
   test:
     runs-on: self-hosted
     needs: buildimage
     steps:
-    - name: Download docker image artefact
-      uses: actions/download-artifact@v1
-      with:
-        name: ${{ env.ARTEFACT_NAME }}
-    - name: Load artefact as docker image
-      run: |
-        docker load -i ${ARTEFACT_NAME}/${DOCKER_SAVE_FILENAME}
-    # delete artefact, track issue: https://github.community/t5/GitHub-Actions/Delete-artifacts/td-p/38188
-    # - name: Remove artefact 
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
@@ -57,9 +41,10 @@ jobs:
     - name: Install dependencies
       run: |
         npm i
-    - name: run docker container 
-      run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}
+    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+      run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     - name: run pptr tests
       run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
     - name: cleanup
-      run: docker stop ${DOCKER_CONTAINER_NAME}
+      if: always()
+      run: docker stop ${DOCKER_CONTAINER_NAME} && docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
