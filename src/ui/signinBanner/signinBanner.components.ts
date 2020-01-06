@@ -1,4 +1,12 @@
-import {ChangeDetectionStrategy, Component, Input, TemplateRef } from "@angular/core";
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  TemplateRef,
+  ViewChild
+} from "@angular/core";
 import { MatBottomSheet, MatDialog, MatDialogRef } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
@@ -21,18 +29,22 @@ export class SigninBanner {
   @Input() public darktheme: boolean
   @Input() public parcellationIsSelected: boolean
 
+  @ViewChild('takeScreenshotElement', {read: ElementRef}) takeScreenshotElement: ElementRef
+
   public user$: Observable<IUser>
   public userBtnTooltip$: Observable<string>
   public favDataEntries$: Observable<IDataEntry[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'
+  public takingScreenshot: boolean = false
 
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private authService: AuthService,
     private dialog: MatDialog,
     public bottomSheet: MatBottomSheet,
+    private changeDetectionRef: ChangeDetectorRef,
   ) {
     this.user$ = this.authService.user$
 
@@ -58,6 +70,11 @@ export class SigninBanner {
       panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
     })
     }
+  }
+
+  disableScreenshotTaking() {
+    this.takingScreenshot = false
+    this.changeDetectionRef.detectChanges()
   }
 
   private keyListenerConfigBase = {
