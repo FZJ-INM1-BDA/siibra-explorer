@@ -17,7 +17,8 @@ export class RegionBase {
   public isSelected: boolean = false
 
   @Input() public hasConnectivity: boolean
-  @Output() public exploreConnectivity: EventEmitter<string> = new EventEmitter()
+
+  @Output() public closeRegionMenu: EventEmitter<boolean> = new EventEmitter()
 
   constructor(
     private store$: Store<IavRootStoreInterface>,
@@ -26,6 +27,7 @@ export class RegionBase {
   }
 
   public navigateToRegion() {
+    this.closeRegionMenu.emit()
     const { region } = this
     this.store$.dispatch({
       type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION,
@@ -34,6 +36,7 @@ export class RegionBase {
   }
 
   public toggleRegionSelected() {
+    this.closeRegionMenu.emit()
     const { region } = this
     this.store$.dispatch({
       type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT,
@@ -42,6 +45,7 @@ export class RegionBase {
   }
 
   public showConnectivity(regionName) {
+    this.closeRegionMenu.emit()
     // ToDo trigger side panel opening with effect
     this.store$.dispatch({type: OPEN_SIDE_PANEL})
     this.store$.dispatch({type: EXPAND_SIDE_PANEL_CURRENT_VIEW})

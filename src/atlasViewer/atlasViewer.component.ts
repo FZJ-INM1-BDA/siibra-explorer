@@ -116,7 +116,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public sidePanelIsOpen$: Observable<boolean>
 
   public onhoverSegmentsForFixed$: Observable<string[]>
-  public regionToolsMenuVisible = false
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -414,13 +413,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   public mouseDownNehuba(_event) {
-    this.regionToolsMenuVisible = false
     this.rClContextualMenu.hide()
   }
 
   public mouseUpNehuba(event) {
     // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
-    this.regionToolsMenuVisible = true
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
