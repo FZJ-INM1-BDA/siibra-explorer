@@ -1,4 +1,8 @@
 const kgQueryUtil = require('./../auth/util')
+const { getCommonSenseDsFilter } = require('./supplements/commonSense')
+const { hasPreview } = require('./supplements/previewFile')
+const path = require('path')
+const fs = require('fs')
 
 let getPublicAccessToken
 
@@ -25,6 +29,185 @@ const getUserKGRequestParam = async ({ user }) => {
   }
 }
 
+/**
+ * Needed by filter by parcellation
+ */
+
+const flattenArray = (array) => {
+  return array.concat(
+    ...array.map(item => item.children && item.children instanceof Array
+      ? flattenArray(item.children)
+      : [])
+  )
+}
+
+const readConfigFile = (filename) => new Promise((resolve, reject) => {
+  let filepath
+  if (process.env.NODE_ENV === 'production') {
+    filepath = path.join(__dirname, '..', 'res', filename)
+  } else {
+    filepath = path.join(__dirname, '..', '..', 'src', 'res', 'ext', filename)
+  }
+  fs.readFile(filepath, 'utf-8', (err, data) => {
+    if (err) reject(err)
+    resolve(data)
+  })
+})
+
+const populateSet = (flattenedRegions, set = new Set()) => {
+  if (!(set instanceof Set)) throw `set needs to be an instance of Set`
+  if (!(flattenedRegions instanceof Array)) throw `flattenedRegions needs to be an instance of Array`
+  for (const region of flattenedRegions) {
+    const { name, relatedAreas } = region
+    if (name) set.add(name)
+    if (relatedAreas && relatedAreas instanceof Array && relatedAreas.length > 0) {
+      for (const relatedArea of relatedAreas) {
+        if(typeof relatedArea === 'string') set.add(relatedArea)
+        else console.warn(`related area not an instance of String. skipping`, relatedArea)
+      }
+    }
+  }
+  return set
+}
+
+const initPrArray = []
+
+let juBrainSet = new Set(),
+  shortBundleSet = new Set(),
+  longBundleSet = new Set(),
+  waxholm1Set = new Set(),
+  waxholm2Set = new Set(),
+  waxholm3Set = new Set(),
+  allen2015Set = new Set(),
+  allen2017Set = new Set()
+
+initPrArray.push(
+  readConfigFile('MNI152.json')
+    .then(data => JSON.parse(data))
+    .then(json => {
+      const longBundle = flattenArray(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
+      const shortBundle = flattenArray(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
+      const jubrain = flattenArray(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
+      longBundleSet = populateSet(longBundle)
+      shortBundleSet = populateSet(shortBundle)
+      juBrainSet = populateSet(jubrain)
+    })
+    .catch(console.error)
+)
+
+initPrArray.push(
+  readConfigFile('waxholmRatV2_0.json')
+    .then(data => JSON.parse(data))
+    .then(json => {
+      const waxholm3 = flattenArray(json.parcellations[0].regions)
+      const waxholm2 = flattenArray(json.parcellations[1].regions)
+      const waxholm1 = flattenArray(json.parcellations[2].regions)
+
+      waxholm1Set = populateSet(waxholm1)
+      waxholm2Set = populateSet(waxholm2)
+      waxholm3Set = populateSet(waxholm3)
+    })
+    .catch(console.error)
+)
+
+initPrArray.push(
+  readConfigFile('allenMouse.json')
+    .then(data => JSON.parse(data))
+    .then(json => {
+      const flattenedAllen2017 = flattenArray(json.parcellations[0].regions)
+      allen2017Set = populateSet(flattenedAllen2017)
+
+      const flattenedAllen2015 = flattenArray(json.parcellations[1].regions)
+      allen2015Set = populateSet(flattenedAllen2015)
+    })
+    .catch(console.error)
+)
+
+const datasetRegionExistsInParcellationRegion = async (prs, atlasPrSet = new Set()) => {
+  if (!(atlasPrSet instanceof Set)) throw `atlasPrSet needs to be a set!`
+  await Promise.all(initPrArray)
+  return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
+}
+
+const datasetBelongToParcellation = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
+  ? true
+  : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
+
+const filterDataset = async (dataset = null, { templateName, parcellationName }) => {
+
+  if (/infant/.test(dataset.name)) return false
+  if (templateName) {
+    return dataset.referenceSpaces.some(rs => rs.name === templateName)
+  }
+  if (parcellationName) {
+    if (dataset.parcellationRegion.length === 0) return false
+
+    let useSet
+
+    // temporary measure
+    // TODO ask curaion team re name of jubrain atlas
+    let overwriteParcellationName
+    switch (parcellationName) {
+      case 'Cytoarchitectonic Maps':
+      case 'JuBrain Cytoarchitectonic Atlas': 
+        useSet = juBrainSet
+        overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+        break;
+      case 'Fibre Bundle Atlas - Short Bundle':
+        useSet = shortBundleSet
+        break;
+      case 'Fibre Bundle Atlas - Long Bundle':
+        useSet = longBundleSet
+        break;
+      case 'Waxholm Space rat brain atlas v1':
+        useSet = waxholm1Set
+        break;
+      case 'Waxholm Space rat brain atlas v2':
+        useSet = waxholm2Set
+        break;
+      case 'Waxholm Space rat brain atlas v3':
+        useSet = waxholm3Set
+        break;
+      case 'Allen Mouse Common Coordinate Framework v3 2015':
+        useSet = allen2015Set
+        break;
+      case 'Allen Mouse Common Coordinate Framework v3 2017':
+        useSet = allen2017Set
+        break;
+      default:
+        useSet = new Set()
+    }
+    return datasetBelongToParcellation({ dataset, parcellationName: overwriteParcellationName || parcellationName })
+      && await datasetRegionExistsInParcellationRegion(dataset.parcellationRegion, useSet)
+  }
+
+  return false
+}
+
+const filterDatasets = async (datasets = [], { templateName, parcellationName }) => {
+
+  // filter by commonsense first (species)
+  const commonSenseFilteredDatasets = datasets.filter(getCommonSenseDsFilter({ templateName, parcellationName }))
+  
+  // filter by parcellation name and if region is in parcellation
+  const filteredDatasets = []
+  for (const dataset of commonSenseFilteredDatasets) {
+    if (await filterDataset(dataset, { templateName, parcellationName })) {
+      filteredDatasets.push(dataset)
+    }
+  }
+
+  // append if preview is available
+  const filteredDatasetsAppendingPreview = filteredDatasets.map(ds => {
+    return {
+      ...ds,
+      preview: hasPreview({ datasetName: ds.name })
+    }
+  })
+
+  return filteredDatasetsAppendingPreview
+}
+
 const init = async () => {
   if (process.env.ACCESS_TOKEN) {
     if (process.env.NODE_ENV === 'production') console.error(`ACCESS_TOKEN set in production!`)
@@ -35,23 +218,45 @@ const init = async () => {
   getPublicAccessToken = getPublic
 }
 
-const retry = (fn) => {
-  let retryId
-  retryId = setTimeout(() => {
-    fn()
-      .then(() => {
-        console.log(`retry succeeded, clearing retryId`)
-        clearTimeout(retryId)
-      })
-      .catch(e => {
-        console.warn(`retry failed, retrying in 5sec`)
-        retry(fn)
-      })
-  }, 5000)
+const defaultConfig = {
+  timeout: 5000,
+  retries: 3
+}
+
+const retry = async (fn, { timeout = defaultConfig.timeout, retries = defaultConfig.retries } = defaultConfig) => {
+  let retryNo = 0
+  while (retryNo < retries) {
+    retryNo ++
+    try {
+      const result = await fn()
+      return result
+    } catch (e) {
+      console.warn(`fn failed, retry after ${timeout} milliseconds`)
+      await (() => new Promise(rs => setTimeout(rs, timeout)))()
+    }
+  }
+
+  throw new Error(`fn failed ${retires} times. Aborting.`)
 }
 
 module.exports = {
   init,
   getUserKGRequestParam,
-  retry
+  retry,
+  filterDatasets,
+  datasetBelongToParcellation,
+  datasetRegionExistsInParcellationRegion,
+  _getParcellations: async () => {
+    await Promise.all(initPrArray)
+    return {
+      juBrainSet,
+      shortBundleSet,
+      longBundleSet,
+      waxholm1Set,
+      waxholm2Set,
+      waxholm3Set,
+      allen2015Set,
+      allen2017Set
+    }
+  }
 }
