@@ -21,10 +21,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: cd into deploy
-      run: cd deploy
-    - name: npm install and test
+    - name: cd into deploy, npm install and npm test
       run: |
+        cd deploy
         npm i
         npm test
       env:
