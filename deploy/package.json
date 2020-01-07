@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "npm run testEnv && npm run testNoEnv",
-    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js",
-    "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js",
+    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js --timeout 10000",
+    "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js --timeout 10000",
     "mocha": "mocha"
   },
   "keywords": [],

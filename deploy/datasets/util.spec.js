@@ -2,6 +2,7 @@ const { retry, filterDatasets, datasetRegionExistsInParcellationRegion, _getParc
 const { fake } = require('sinon')
 const { assert, expect } = require('chai')
 const waxholmv2 = require('./testData/waxholmv2')
+const allen2015 = require('./testData/allen2015')
 
 describe('datasets/util.js', () => {
 
@@ -64,9 +65,20 @@ describe('datasets/util.js', () => {
   })
   
   describe('filterDatasets', () => {
+    it('should filter waxholm v1 properly', async () => {
+      const filteredResult = await filterDatasets(waxholmv2, { parcellationName: 'Waxholm Space rat brain atlas v1' })
+      expect(filteredResult).to.have.length(0)
+    })
+
     it('should filter waxholm v2 properly', async () => {
       const filteredResult = await filterDatasets(waxholmv2, { parcellationName: 'Waxholm Space rat brain atlas v2' })
-      expect(filteredResult).to.have.length(1)
+      expect(filteredResult).to.have.length(2)
+    })
+
+    it('should filter allen 2015 properly', async () => {
+
+      const filteredResult = await filterDatasets(allen2015, { parcellationName: 'Allen Mouse Common Coordinate Framework v3 2015' })
+      expect(filteredResult).to.have.length(2)
     })
   })
   

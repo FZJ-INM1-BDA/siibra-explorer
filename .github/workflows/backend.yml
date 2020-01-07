@@ -1,10 +1,14 @@
-name: Frontend Tests (Karma + Mocha + Chai)
+name: Backend tests
 
 on: [push]
 
+env:
+  REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+  HBP_CLIENTID: ${{ secrets.HBP_CLIENTID }}
+  HBP_CLIENTSECRET: ${{ secrets.HBP_CLIENTSECRET }}
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -17,10 +21,11 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+    - name: cd into deploy
+      run: cd deploy
     - name: npm install and test
       run: |
         npm i
-        npm run lint
         npm test
       env:
         NODE_ENV: test
