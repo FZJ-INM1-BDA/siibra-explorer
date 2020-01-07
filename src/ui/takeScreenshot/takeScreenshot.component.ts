@@ -1,14 +1,14 @@
 import {DOCUMENT} from "@angular/common";
 import {
-    ChangeDetectorRef,
-    Component,
-    ElementRef, EventEmitter,
-    HostListener,
-    Inject, OnDestroy,
-    OnInit, Output,
-    Renderer2,
-    TemplateRef,
-    ViewChild,
+  ChangeDetectorRef,
+  Component,
+  ElementRef, EventEmitter,
+  HostListener,
+  Inject, OnDestroy,
+  OnInit, Output,
+  Renderer2,
+  TemplateRef,
+  ViewChild,
 } from "@angular/core";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import html2canvas from "html2canvas";
@@ -21,10 +21,10 @@ import html2canvas from "html2canvas";
 
 export class TakeScreenshotComponent implements OnInit, OnDestroy {
 
-    ngOnDestroy(): void {
-        if (this.resettingScreenshotTaking) this.resetScreenshot.emit(true)
-        this.resettingScreenshotTaking = false
-    }
+  ngOnDestroy(): void {
+    if (this.resettingScreenshotTaking) this.resetScreenshot.emit(true)
+    this.resettingScreenshotTaking = false
+  }
 
     @ViewChild('screenshotPreviewCard', {read: ElementRef}) public screenshotPreviewCard: ElementRef
     @ViewChild('previewImageDialog', {read: TemplateRef}) public previewImageDialogTemplateRef: TemplateRef<any>
@@ -78,7 +78,7 @@ export class TakeScreenshotComponent implements OnInit, OnDestroy {
       this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
       this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
 
-        this.startScreenshot()
+      this.startScreenshot()
 
     }
 
@@ -256,8 +256,8 @@ export class TakeScreenshotComponent implements OnInit, OnDestroy {
     }
 
     public restartScreenshot() {
-        this.resettingScreenshotTaking = true
-        this.resetScreenshot.emit(false)
+      this.resettingScreenshotTaking = true
+      this.resetScreenshot.emit(false)
     }
 
     public cancelTakingScreenshot() {
