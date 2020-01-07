@@ -639,7 +639,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         ),
         this.ngLayers$.pipe(
           map(state => state.forceShowSegment),
-            distinctUntilChanged(),
+          distinctUntilChanged(),
         ),
         this.selectedParcellation$,
       )
