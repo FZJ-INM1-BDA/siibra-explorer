@@ -2,10 +2,10 @@ import {DOCUMENT} from "@angular/common";
 import {
   ChangeDetectorRef,
   Component,
-  ElementRef,
+  ElementRef, EventEmitter,
   HostListener,
-  Inject,
-  OnInit,
+  Inject, OnDestroy,
+  OnInit, Output,
   Renderer2,
   TemplateRef,
   ViewChild,
@@ -19,10 +19,20 @@ import html2canvas from "html2canvas";
   styleUrls: ['./takeScreenshot.style.css'],
 })
 
-export class TakeScreenshotComponent implements OnInit {
+export class TakeScreenshotComponent implements OnInit, OnDestroy {
+
+  ngOnDestroy(): void {
+    if (this.resettingScreenshotTaking) this.resetScreenshot.emit(true)
+    this.resettingScreenshotTaking = false
+  }
 
     @ViewChild('screenshotPreviewCard', {read: ElementRef}) public screenshotPreviewCard: ElementRef
     @ViewChild('previewImageDialog', {read: TemplateRef}) public previewImageDialogTemplateRef: TemplateRef<any>
+
+    @Output() screenshotTaking: EventEmitter<boolean> = new EventEmitter<boolean>()
+    @Output() resetScreenshot: EventEmitter<boolean> = new EventEmitter<boolean>()
+
+    private resettingScreenshotTaking: boolean = false
 
     private dialogRef: MatDialogRef<any>
 
@@ -67,6 +77,9 @@ export class TakeScreenshotComponent implements OnInit {
     public ngOnInit(): void {
       this.windowWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
       this.windowHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+
+      this.startScreenshot()
+
     }
 
     @HostListener('window:resize', ['$event'])
@@ -201,6 +214,7 @@ export class TakeScreenshotComponent implements OnInit {
         .then(result => {
           switch (result) {
           case 'again': {
+            this.restartScreenshot()
             this.startScreenshot()
             this.cdr.markForCheck()
             break
@@ -241,12 +255,15 @@ export class TakeScreenshotComponent implements OnInit {
       })
     }
 
-    public cancelTakingScreenshot() {
-      this.takingScreenshot = false
-      this.previewingScreenshot = false
-      this.loadingScreenshot = false
-      this.croppedCanvas = null
+    public restartScreenshot() {
+      this.resettingScreenshotTaking = true
+      this.resetScreenshot.emit(false)
     }
+
+    public cancelTakingScreenshot() {
+      this.screenshotTaking.emit(false)
+    }
+
     public clearStateAfterScreenshot() {
       this.mouseIsDown = false
       this.isDragging = false
