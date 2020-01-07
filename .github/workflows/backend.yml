@@ -3,12 +3,10 @@ name: Backend tests
 on: [push]
 
 env:
-  REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-  HBP_CLIENTID: ${{ secrets.HBP_CLIENTID }}
-  HBP_CLIENTSECRET: ${{ secrets.HBP_CLIENTSECRET }}
+  NODE_ENV: test
 
 jobs:
-  build:
+  install_dep:
     runs-on: ubuntu-latest
 
     strategy:
@@ -17,14 +15,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: cd into deploy, npm install and npm test
+
+    - name: cd into deploy, npm install
       run: |
         cd deploy
         npm i
-        npm test
+
+    - name: test no env
+      run: |
+        cd deploy
+        npm run testNoEnv
+
+    - name: test with env
       env:
-        NODE_ENV: test
+        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+        HBP_CLIENTID: ${{ secrets.HBP_CLIENTID }}
+        HBP_CLIENTSECRET: ${{ secrets.HBP_CLIENTSECRET }}
+      run: |
+        cd deploy
+        npm run testEnv
