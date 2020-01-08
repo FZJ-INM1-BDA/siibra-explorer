@@ -2,7 +2,7 @@
 
 import {} from 'jasmine'
 import { defaultRootState } from 'src/services/stateStore.service'
-import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR } from './atlasViewer.urlUtil'
+import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR, cvtStateToSearchParam } from './atlasViewer.urlUtil'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colin = require('!json-loader!src/res/ext/colin.json')
@@ -19,6 +19,7 @@ const fetchedTemplateRootState = {
   },
 }
 
+// TODO finish writing tests
 describe('atlasViewer.urlService.service.ts', () => {
   describe('cvtSearchParamToState', () => {
     it('convert empty search param to empty state', () => {
@@ -67,5 +68,34 @@ describe('atlasViewer.urlService.service.ts', () => {
 
   describe('cvtStateToSearchParam', () => {
 
+    it('should convert template selected', () => {
+      const { viewerState } = defaultRootState
+      const searchParam = cvtStateToSearchParam({
+        ...defaultRootState,
+        viewerState: {
+          ...viewerState,
+          templateSelected: bigbrainJson,
+        }
+      })
+
+      const stringified = searchParam.toString()
+      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29')
+    })
+  })
+
+  it('should convert template selected and parcellation selected', () => {
+
+    const { viewerState } = defaultRootState
+    const searchParam = cvtStateToSearchParam({
+      ...defaultRootState,
+      viewerState: {
+        ...viewerState,
+        templateSelected: bigbrainJson,
+        parcellationSelected: bigbrainJson.parcellations[0]
+      }
+    })
+
+    const stringified = searchParam.toString()
+    expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
   })
 })

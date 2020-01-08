@@ -28,7 +28,7 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
 
   // encoding states
   searchParam.set('templateSelected', templateSelected.name)
-  searchParam.set('parcellationSelected', parcellationSelected.name)
+  if (!!parcellationSelected) searchParam.set('parcellationSelected', parcellationSelected.name)
 
   // encoding selected regions
   const accumulatorMap = new Map<string, number[]>()
@@ -41,28 +41,34 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
   for (const [key, arr] of accumulatorMap) {
     cRegionObj[key] = arr.map(n => encodeNumber(n)).join(separator)
   }
-  searchParam.set('cRegionsSelected', JSON.stringify(cRegionObj))
+  if (Object.keys(cRegionObj).length > 0) searchParam.set('cRegionsSelected', JSON.stringify(cRegionObj))
 
   // encoding navigation
-  const { orientation, perspectiveOrientation, perspectiveZoom, position, zoom } = navigation
-  const cNavString = [
-    orientation.map(n => encodeNumber(n, {float: true})).join(separator),
-    perspectiveOrientation.map(n => encodeNumber(n, {float: true})).join(separator),
-    encodeNumber(Math.floor(perspectiveZoom)),
-    Array.from(position).map((v: number) => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
-    encodeNumber(Math.floor(zoom)),
-  ].join(`${separator}${separator}`)
-  searchParam.set('cNavigation', cNavString)
+  if (navigation) {
+    const { orientation, perspectiveOrientation, perspectiveZoom, position, zoom } = navigation
+    if (orientation && perspectiveOrientation && perspectiveZoom && position && zoom) {
+      const cNavString = [
+        orientation.map(n => encodeNumber(n, {float: true})).join(separator),
+        perspectiveOrientation.map(n => encodeNumber(n, {float: true})).join(separator),
+        encodeNumber(Math.floor(perspectiveZoom)),
+        Array.from(position).map((v: number) => Math.floor(v)).map(n => encodeNumber(n)).join(separator),
+        encodeNumber(Math.floor(zoom)),
+      ].join(`${separator}${separator}`)
+      searchParam.set('cNavigation', cNavString)
+    }
+  }
 
   // encode nifti layers
-  const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
-  const { layers } = ngViewerState
-  const additionalLayers = layers.filter(layer =>
-    /^blob:/.test(layer.name) &&
-    Object.keys(initialNgState.layers).findIndex(layerName => layerName === layer.name) < 0,
-  )
-  const niftiLayers = additionalLayers.filter(layer => /^nifti:\/\//.test(layer.source))
-  if (niftiLayers.length > 0) { searchParam.set('niftiLayers', niftiLayers.join('__')) }
+  if (!!templateSelected.nehubaConfig) {
+    const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
+    const { layers } = ngViewerState
+    const additionalLayers = layers.filter(layer =>
+      /^blob:/.test(layer.name) &&
+      Object.keys(initialNgState.layers).findIndex(layerName => layerName === layer.name) < 0,
+    )
+    const niftiLayers = additionalLayers.filter(layer => /^nifti:\/\//.test(layer.source))
+    if (niftiLayers.length > 0) { searchParam.set('niftiLayers', niftiLayers.join('__')) }
+  }
 
   // plugin state
   const { initManifests } = pluginState
