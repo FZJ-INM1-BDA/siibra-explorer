@@ -50,7 +50,7 @@ const queryIsHuman = ({ templateName, parcellationName }) =>
   (templateName && humanTemplateSet.has(templateName))
   || (parcellationName && humanParcellationSet.has(parcellationName))
 
-exports.getCommonSenseDsFilter = ({ templateName, parcellationName }) => {
+const getCommonSenseDsFilter = ({ templateName, parcellationName }) => {
   const trueFilter = queryIsHuman({ templateName, parcellationName })
     ? dsIsHuman
     : queryIsMouse({ templateName, parcellationName })
@@ -60,4 +60,11 @@ exports.getCommonSenseDsFilter = ({ templateName, parcellationName }) => {
         : null
 
   return ds => trueFilter && trueFilter({ ds })
+}
+
+module.exports = {
+  getCommonSenseDsFilter,
+  dsIsHuman,
+  dsIsRat,
+  dsIsMouse
 }

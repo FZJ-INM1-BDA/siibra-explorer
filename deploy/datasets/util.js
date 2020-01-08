@@ -129,61 +129,117 @@ const datasetRegionExistsInParcellationRegion = async (prs, atlasPrSet = new Set
   return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
 }
 
+const templateNameToIdMap = new Map([
+  ['Big Brain (Histology)', {
+    kg: {
+      kgId: 'a1655b99-82f1-420f-a3c2-fe80fd4c8588',
+      kgSchema: 'minds/core/referencespace/v1.0.0'
+    }
+  }],
+  ['MNI 152 ICBM 2009c Nonlinear Asymmetric', {
+    kg: {
+      kgId: 'dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2',
+      kgSchema: 'minds/core/referencespace/v1.0.0'
+    }
+  }],
+  ['MNI Colin 27', {
+    kg: {
+      kgId: '7f39f7be-445b-47c0-9791-e971c0b6d992',
+      kgSchema: 'minds/core/referencespace/v1.0.0'
+    }
+  }]
+])
+
+const getKgId = ({ templateName }) => {
+  const out = templateNameToIdMap.get(templateName)
+  if (!out) return null
+  const { kg } = out
+  const { kgSchema, kgId } = kg
+  return `${kgSchema}/${kgId}`
+}
+
+
+/**
+ * NB: if changed, also change ~/docs/advanced/datasets.md
+ * @param { templateName } template to be queried 
+ */
+const datasetBelongsInTemplate = ({ templateName }) => ({ referenceSpaces }) => {
+  if (referenceSpaces.length === 0) return true
+  else return referenceSpaces.some(({ name, fullId }) =>
+    name === templateName
+    || fullId && fullId.includes(getKgId({ templateName })))
+}
+
+/**
+ * NB: if changed, also change ~/docs/advanced/dataset.md
+ * @param {parcellationName, dataset} param0 
+ */
 const datasetBelongToParcellation = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
   ? true
   : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
 
+/**
+ * NB: if changed, also change ~/docs/advanced/dataset.md
+ * @param {*} dataset 
+ * @param {*} param1 
+ */
 const filterDataset = async (dataset = null, { templateName, parcellationName }) => {
 
   if (/infant/.test(dataset.name)) return false
-  if (templateName) {
-    return dataset.referenceSpaces.some(rs => rs.name === templateName)
+  
+  // check if dataset belongs to template selected
+  const flagDatasetBelongToTemplate = datasetBelongsInTemplate({ templateName })(dataset)
+
+  // check that dataset belongs to template selected
+  
+  // if (dataset.parcellationRegion.length === 0) return false
+
+  let useSet
+
+  // temporary measure
+  // TODO ask curaion team re name of jubrain atlas
+  let overwriteParcellationName
+  switch (parcellationName) {
+    case 'Cytoarchitectonic Maps':
+    case 'JuBrain Cytoarchitectonic Atlas': 
+      useSet = juBrainSet
+      overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+      break;
+    case 'Fibre Bundle Atlas - Short Bundle':
+      useSet = shortBundleSet
+      break;
+    case 'Fibre Bundle Atlas - Long Bundle':
+      useSet = longBundleSet
+      break;
+    case 'Waxholm Space rat brain atlas v1':
+      useSet = waxholm1Set
+      break;
+    case 'Waxholm Space rat brain atlas v2':
+      useSet = waxholm2Set
+      break;
+    case 'Waxholm Space rat brain atlas v3':
+      useSet = waxholm3Set
+      break;
+    case 'Allen Mouse Common Coordinate Framework v3 2015':
+      useSet = allen2015Set
+      break;
+    case 'Allen Mouse Common Coordinate Framework v3 2017':
+      useSet = allen2017Set
+      break;
+    default:
+      useSet = new Set()
   }
-  if (parcellationName) {
-    if (dataset.parcellationRegion.length === 0) return false
+  const flagDatasetBelongToParcellation =  datasetBelongToParcellation({ dataset, parcellationName: overwriteParcellationName || parcellationName })
+    && await datasetRegionExistsInParcellationRegion(dataset.parcellationRegion, useSet)
 
-    let useSet
-
-    // temporary measure
-    // TODO ask curaion team re name of jubrain atlas
-    let overwriteParcellationName
-    switch (parcellationName) {
-      case 'Cytoarchitectonic Maps':
-      case 'JuBrain Cytoarchitectonic Atlas': 
-        useSet = juBrainSet
-        overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
-        break;
-      case 'Fibre Bundle Atlas - Short Bundle':
-        useSet = shortBundleSet
-        break;
-      case 'Fibre Bundle Atlas - Long Bundle':
-        useSet = longBundleSet
-        break;
-      case 'Waxholm Space rat brain atlas v1':
-        useSet = waxholm1Set
-        break;
-      case 'Waxholm Space rat brain atlas v2':
-        useSet = waxholm2Set
-        break;
-      case 'Waxholm Space rat brain atlas v3':
-        useSet = waxholm3Set
-        break;
-      case 'Allen Mouse Common Coordinate Framework v3 2015':
-        useSet = allen2015Set
-        break;
-      case 'Allen Mouse Common Coordinate Framework v3 2017':
-        useSet = allen2017Set
-        break;
-      default:
-        useSet = new Set()
-    }
-    return datasetBelongToParcellation({ dataset, parcellationName: overwriteParcellationName || parcellationName })
-      && await datasetRegionExistsInParcellationRegion(dataset.parcellationRegion, useSet)
-  }
-
-  return false
+  return flagDatasetBelongToTemplate && flagDatasetBelongToParcellation
 }
 
+/**
+ * NB: if changed, also change ~/docs/advanced/dataset.md
+ * @param {*} datasets 
+ * @param {*} param1 
+ */
 const filterDatasets = async (datasets = [], { templateName, parcellationName }) => {
 
   // filter by commonsense first (species)
@@ -246,6 +302,7 @@ module.exports = {
   filterDatasets,
   datasetBelongToParcellation,
   datasetRegionExistsInParcellationRegion,
+  datasetBelongsInTemplate,
   _getParcellations: async () => {
     await Promise.all(initPrArray)
     return {

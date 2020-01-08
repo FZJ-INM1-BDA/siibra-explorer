@@ -52,10 +52,11 @@ datasetsRouter.get('/tos', cacheMaxAge24Hr, async (req, res) => {
 
 datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter'))
 
-datasetsRouter.get('/templateName/:templateName', noCacheMiddleWare, (req, res, next) => {
-  const { templateName } = req.params
+datasetsRouter.get('/templateNameParcellationName/:templateName/:parcellationName', noCacheMiddleWare, (req, res, next) => {
+  const { templateName, parcellationName } = req.params
+  
   const { user } = req
-  getDatasets({ templateName, user })
+  getDatasets({ templateName, parcellationName, user })
     .then(ds => {
       res.status(200).json(ds)
     })
@@ -68,21 +69,13 @@ datasetsRouter.get('/templateName/:templateName', noCacheMiddleWare, (req, res, 
     })
 })
 
-datasetsRouter.get('/parcellationName/:parcellationName', noCacheMiddleWare, (req, res, next) => {
-  const { parcellationName } = req.params
-  const { user } = req
-  getDatasets({ parcellationName, user })
-    .then(ds => {
-      res.status(200).json(ds)
-    })
-    .catch(error => {
-      next({
-        code: 500,
-        error,
-        trace: 'parcellationName'
-      })
-    })
-})
+const deprecatedNotice = (_req, res) => {
+  res.status(400).send(`querying datasets with /templateName or /parcellationName separately have been deprecated. Please use /templateNameParcellationName/:templateName/:parcellationName instead`)
+}
+
+datasetsRouter.get('/templateName/:templateName', deprecatedNotice)
+
+datasetsRouter.get('/parcellationName/:parcellationName', deprecatedNotice)
 
 /**
  * It appears that query param are not 
