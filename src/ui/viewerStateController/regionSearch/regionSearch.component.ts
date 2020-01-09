@@ -11,6 +11,8 @@ import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreIn
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
+  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.toLowerCase().includes(searchTerm.toLowerCase())))
+
 const compareFn = (it, item) => it.name === item.name
 
 @Component({
@@ -55,7 +57,7 @@ export class RegionTextSearchAutocomplete {
       filter(p => !!p),
       map(parcellationSelected => {
         const returnArray = []
-        const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected)
+        const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected, { ngId: 'root', relatedAreas: [] })
         for (const [ngId, labelIndexMap] of ngIdMap) {
           for (const [labelIndex, region] of labelIndexMap) {
             returnArray.push({
