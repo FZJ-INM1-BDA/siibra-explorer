@@ -9,8 +9,11 @@ import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
+import { LoggingService } from "src/services/logging.service";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
+  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.toLowerCase().includes(searchTerm.toLowerCase())))
+
 const compareFn = (it, item) => it.name === item.name
 
 @Component({
@@ -40,6 +43,7 @@ export class RegionTextSearchAutocomplete {
     private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
     private constantService: AtlasViewerConstantsServices,
+    private log: LoggingService
   ) {
 
     this.useMobileUI$ = this.constantService.useMobileUI$
@@ -52,21 +56,26 @@ export class RegionTextSearchAutocomplete {
     this.regionsWithLabelIndex$ = viewerState$.pipe(
       select('parcellationSelected'),
       distinctUntilChanged(),
-      filter(p => !!p),
+      filter(p => !!p && p.regions),
       map(parcellationSelected => {
-        const returnArray = []
-        const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected)
-        for (const [ngId, labelIndexMap] of ngIdMap) {
-          for (const [labelIndex, region] of labelIndexMap) {
-            returnArray.push({
-              ...region,
-              ngId,
-              labelIndex,
-              labelIndexId: generateLabelIndexId({ ngId, labelIndex }),
-            })
+        try {
+          const returnArray = []
+          const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected, { ngId: 'root', relatedAreas: [] })
+          for (const [ngId, labelIndexMap] of ngIdMap) {
+            for (const [labelIndex, region] of labelIndexMap) {
+              returnArray.push({
+                ...region,
+                ngId,
+                labelIndex,
+                labelIndexId: generateLabelIndexId({ ngId, labelIndex }),
+              })
+            }
           }
+          return returnArray
+        } catch (e) {
+          this.log.warn(`getMultiNgIdsRegionsLabelIndexMap error`, e)
+          return []
         }
-        return returnArray
       }),
       shareReplay(1),
     )
