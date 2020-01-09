@@ -249,13 +249,8 @@ export class DatabrowserService implements OnDestroy {
   private lowLevelQuery(templateName: string, parcellationName: string) {
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
-    return Promise.all([
-      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`, this.constantService.getFetchOption())
-        .then(res => res.json()),
-      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`, this.constantService.getFetchOption())
-        .then(res => res.json()),
-    ])
-      .then(arr => [...arr[0], ...arr[1]])
+    return fetch(`${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`, this.constantService.getFetchOption())
+      .then(res => res.json())
       /**
        * remove duplicates
        */
