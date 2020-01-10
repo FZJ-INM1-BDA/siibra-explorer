@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
+import {Observable, Subject} from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
@@ -33,6 +33,8 @@ export class AtlasViewerAPIServices {
 
   public getUserToSelectARegionResolve
   public getUserToSelectARegionReject
+
+  public getUserToSelectARegionSubject = new Subject<any>()
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -132,15 +134,13 @@ export class AtlasViewerAPIServices {
         getUserInput: config => this.dialogService.getUserInput(config),
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
-        getUserToSelectARegion: () => new Promise((resolve, reject) => {
+        getUserToSelectARegion: () => {
           this.store.dispatch({type: ENABLE_PLUGIN_REGION_SELECTION})
-          this.getUserToSelectARegionResolve = resolve
-          this.getUserToSelectARegionReject = reject
-        }),
+          return this.getUserToSelectARegionSubject.asObservable()
+        },
 
         cancelPromise: (pr) => {
           if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
-            if (this.getUserToSelectARegionReject) this.getUserToSelectARegionReject()
             this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
           }
         }
@@ -227,7 +227,7 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
-    getUserToSelectARegion: () => Promise<any>
+    getUserToSelectARegion: () => Observable<any>
     cancelPromise: (pr) => void
   }
 

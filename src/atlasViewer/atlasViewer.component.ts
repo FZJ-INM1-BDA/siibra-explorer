@@ -20,7 +20,6 @@ import {
 } from "rxjs/operators";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
-  DISABLE_PLUGIN_REGION_SELECTION,
   IavRootStoreInterface,
   isDefined,
   safeFilter,
@@ -118,7 +117,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
-  private $pluginRegionSelectionEnabled: Observable<boolean>
+  private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
 
   constructor(
@@ -140,7 +139,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select("snackbarMessage"),
     )
 
-    this.$pluginRegionSelectionEnabled = this.store.pipe(
+    this.pluginRegionSelectionEnabled$ = this.store.pipe(
       select('uiState'),
       select("pluginRegionSelectionEnabled"),
       distinctUntilChanged(),
@@ -373,7 +372,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.$pluginRegionSelectionEnabled.subscribe(PRSE => {
+      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
         this.pluginRegionSelectionEnabled = PRSE
       })
     )
@@ -441,6 +440,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     ]
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
+    } else {
+      this.apiService.getUserToSelectARegionSubject.next()
     }
   }
 
