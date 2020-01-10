@@ -108,18 +108,18 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       sidePanelCurrentViewContent: 'Dataset',
     }
 
-    case ENABLE_PLUGIN_REGION_SELECTION: {
-      return {
-        ...prevState,
-        pluginRegionSelectionEnabled: true
-      }
+  case ENABLE_PLUGIN_REGION_SELECTION: {
+    return {
+      ...prevState,
+      pluginRegionSelectionEnabled: true
     }
-    case DISABLE_PLUGIN_REGION_SELECTION: {
-      return {
-        ...prevState,
-        pluginRegionSelectionEnabled: false
-      }
+  }
+  case DISABLE_PLUGIN_REGION_SELECTION: {
+    return {
+      ...prevState,
+      pluginRegionSelectionEnabled: false
     }
+  }
 
   case AGREE_COOKIE: {
     /**

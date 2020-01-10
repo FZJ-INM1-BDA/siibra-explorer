@@ -373,9 +373,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-        this.$pluginRegionSelectionEnabled.subscribe(PRSE => {
-          this.pluginRegionSelectionEnabled = PRSE
-        })
+      this.$pluginRegionSelectionEnabled.subscribe(PRSE => {
+        this.pluginRegionSelectionEnabled = PRSE
+      })
     )
   }
 
