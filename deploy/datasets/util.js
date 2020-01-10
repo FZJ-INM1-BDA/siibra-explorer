@@ -73,6 +73,7 @@ const populateSet = (flattenedRegions, set = new Set()) => {
 const initPrArray = []
 
 let juBrainSet = new Set(),
+  bigbrainCytoSet = new Set()
   shortBundleSet = new Set(),
   longBundleSet = new Set(),
   waxholm1Set = new Set(),
@@ -80,6 +81,16 @@ let juBrainSet = new Set(),
   waxholm3Set = new Set(),
   allen2015Set = new Set(),
   allen2017Set = new Set()
+
+initPrArray.push(
+  readConfigFile('bigbrain.json')
+    .then(data => JSON.parse(data))
+    .then(json => {
+      const bigbrainCyto = flattenArray(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
+      bigbrainCytoSet = populateSet(bigbrainCyto)
+    })
+    .catch(console.error)
+)
 
 initPrArray.push(
   readConfigFile('MNI152.json')
@@ -200,6 +211,9 @@ const filterDataset = async (dataset = null, { templateName, parcellationName })
   let overwriteParcellationName
   switch (parcellationName) {
     case 'Cytoarchitectonic Maps':
+      useSet = bigbrainCytoSet
+      overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
+      break;
     case 'JuBrain Cytoarchitectonic Atlas': 
       useSet = juBrainSet
       overwriteParcellationName = 'Jülich Cytoarchitechtonic Brain Atlas (human)'
