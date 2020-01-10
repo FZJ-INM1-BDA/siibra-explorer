@@ -4,10 +4,18 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
-import { getLabelIndexMap, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface, safeFilter } from "src/services/stateStore.service";
+import {
+  DISABLE_PLUGIN_REGION_SELECTION,
+  getLabelIndexMap,
+  getMultiNgIdsRegionsLabelIndexMap,
+  IavRootStoreInterface,
+  safeFilter
+} from "src/services/stateStore.service";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest } from "./atlasViewer.pluginService.service";
+import {resolve} from "dns";
+import {ENABLE_PLUGIN_REGION_SELECTION} from "src/services/state/uiState.store";
 
 declare let window
 
@@ -22,6 +30,9 @@ export class AtlasViewerAPIServices {
   public interactiveViewer: IInteractiveViewerInterface
 
   public loadedLibraries: Map<string, {counter: number, src: HTMLElement|null}> = new Map()
+
+  public getUserToSelectARegionResolve
+  public getUserToSelectARegionReject
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -120,6 +131,20 @@ export class AtlasViewerAPIServices {
 
         getUserInput: config => this.dialogService.getUserInput(config),
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
+
+        getUserToSelectARegion: () => new Promise((resolve, reject) => {
+          this.store.dispatch({type: ENABLE_PLUGIN_REGION_SELECTION})
+          this.getUserToSelectARegionResolve = resolve
+          this.getUserToSelectARegionReject = reject
+        }),
+
+        cancelPromise: (pr) => {
+          if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
+            if (this.getUserToSelectARegionReject) this.getUserToSelectARegionReject()
+            this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
+          }
+        }
+
       },
       pluginControl : {
         loadExternalLibraries : () => Promise.reject('load External Library method not over written')
@@ -202,6 +227,8 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
+    getUserToSelectARegion: () => Promise<any>
+    cancelPromise: (pr) => void
   }
 
   pluginControl: {

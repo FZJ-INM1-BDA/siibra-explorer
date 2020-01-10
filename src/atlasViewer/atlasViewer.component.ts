@@ -20,6 +20,7 @@ import {
 } from "rxjs/operators";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
+  DISABLE_PLUGIN_REGION_SELECTION,
   IavRootStoreInterface,
   isDefined,
   safeFilter,
@@ -117,6 +118,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
+  private $pluginRegionSelectionEnabled: Observable<boolean>
+  private pluginRegionSelectionEnabled: boolean = false
+
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
@@ -134,6 +138,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.snackbarMessage$ = this.store.pipe(
       select('uiState'),
       select("snackbarMessage"),
+    )
+
+    this.$pluginRegionSelectionEnabled = this.store.pipe(
+      select('uiState'),
+      select("pluginRegionSelectionEnabled"),
+      distinctUntilChanged(),
     )
 
     this.bottomSheet$ = this.store.pipe(
@@ -361,6 +371,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.rd.setAttribute(document.body, 'darktheme', flag.toString())
       }),
     )
+
+    this.subscriptions.push(
+        this.$pluginRegionSelectionEnabled.subscribe(PRSE => {
+          this.pluginRegionSelectionEnabled = PRSE
+        })
+    )
   }
 
   public ngAfterViewInit() {
@@ -423,7 +439,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       event.clientX,
       event.clientY,
     ]
-    this.rClContextualMenu.show()
+    if (!this.pluginRegionSelectionEnabled) {
+      this.rClContextualMenu.show()
+    }
   }
 
   public toggleSideNavMenu(opened) {

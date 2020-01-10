@@ -23,6 +23,8 @@ export const defaultState: StateInterface = {
 
   bottomSheetTemplate: null,
 
+  pluginRegionSelectionEnabled: false,
+
   /**
    * replace with server side logic (?)
    */
@@ -105,6 +107,20 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       sidePanelCurrentViewContent: 'Dataset',
     }
+
+    case ENABLE_PLUGIN_REGION_SELECTION: {
+      return {
+        ...prevState,
+        pluginRegionSelectionEnabled: true
+      }
+    }
+    case DISABLE_PLUGIN_REGION_SELECTION: {
+      return {
+        ...prevState,
+        pluginRegionSelectionEnabled: false
+      }
+    }
+
   case AGREE_COOKIE: {
     /**
        * TODO replace with server side logic
@@ -167,6 +183,8 @@ export interface StateInterface {
   focusedSidePanel: string | null
 
   snackbarMessage: symbol
+
+  pluginRegionSelectionEnabled: boolean
 
   agreedCookies: boolean
   agreedKgTos: boolean
@@ -242,6 +260,9 @@ export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
 export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
+
+export const ENABLE_PLUGIN_REGION_SELECTION = `ENABLE_PLUGIN_REGION_SELECTION`
+export const DISABLE_PLUGIN_REGION_SELECTION = `DISABLE_PLUGIN_REGION_SELECTION`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`
