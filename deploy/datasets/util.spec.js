@@ -72,11 +72,11 @@ describe('datasets/util.js', () => {
       }
     })
 
-    it('should include datasets without any reference space defined', () => {
+    it('should NOT include datasets without any reference space defined', () => {
       for (const ds of humanReceptor) {
 
         const belong = datasetBelongsInTemplate({ templateName: 'Big Brain (Histology)' })(ds)
-        expect(belong).to.be.true
+        expect(belong).to.be.false
       }
     })
 

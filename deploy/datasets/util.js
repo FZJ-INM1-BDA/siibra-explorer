@@ -164,8 +164,7 @@ const getKgId = ({ templateName }) => {
  * @param { templateName } template to be queried 
  */
 const datasetBelongsInTemplate = ({ templateName }) => ({ referenceSpaces }) => {
-  if (referenceSpaces.length === 0) return true
-  else return referenceSpaces.some(({ name, fullId }) =>
+  return referenceSpaces.some(({ name, fullId }) =>
     name === templateName
     || fullId && fullId.includes(getKgId({ templateName })))
 }
@@ -232,7 +231,7 @@ const filterDataset = async (dataset = null, { templateName, parcellationName })
   const flagDatasetBelongToParcellation =  datasetBelongToParcellation({ dataset, parcellationName: overwriteParcellationName || parcellationName })
     && await datasetRegionExistsInParcellationRegion(dataset.parcellationRegion, useSet)
 
-  return flagDatasetBelongToTemplate && flagDatasetBelongToParcellation
+  return flagDatasetBelongToTemplate || flagDatasetBelongToParcellation
 }
 
 /**
