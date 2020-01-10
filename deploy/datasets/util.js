@@ -292,7 +292,7 @@ const retry = async (fn, { timeout = defaultConfig.timeout, retries = defaultCon
     }
   }
 
-  throw new Error(`fn failed ${retires} times. Aborting.`)
+  throw new Error(`fn failed ${retries} times. Aborting.`)
 }
 
 module.exports = {
