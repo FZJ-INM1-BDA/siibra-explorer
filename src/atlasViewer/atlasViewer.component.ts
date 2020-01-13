@@ -1,5 +1,5 @@
 import {
-  AfterViewInit,
+  AfterViewInit, ChangeDetectorRef,
   Component,
   HostBinding,
   OnDestroy,
@@ -119,6 +119,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
+  private persistentStateNotifierTemplate$: Observable<string>
+  // private pluginRegionSelectionEnabled: boolean = false
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -132,6 +134,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private snackbar: MatSnackBar,
     private bottomSheet: MatBottomSheet,
     private log: LoggingService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -142,6 +145,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.pluginRegionSelectionEnabled$ = this.store.pipe(
       select('uiState'),
       select("pluginRegionSelectionEnabled"),
+      distinctUntilChanged(),
+    )
+    this.persistentStateNotifierTemplate$ = this.store.pipe(
+      select('uiState'),
+      select("persistentStateNotifierTemplate"),
       distinctUntilChanged(),
     )
 
@@ -374,6 +382,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
         this.pluginRegionSelectionEnabled = PRSE
+        this.changeDetectorRef.detectChanges()
       })
     )
   }

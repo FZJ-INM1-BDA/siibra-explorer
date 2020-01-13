@@ -108,6 +108,11 @@
         </ng-container>
       </div>
 
+      <div class="fixed-top pe-none d-flex justify-content-center m-4" *ngIf="pluginRegionSelectionEnabled">
+        <ng-container *ngTemplateOutlet="persistentStateNotifierTemplate">
+        </ng-container>
+      </div>
+
       <div floatingMouseContextualContainerDirective>
 
         <div *ngIf="!ismobile"
@@ -205,3 +210,8 @@
 <ng-template #logoTmpl>
   <logo-container></logo-container>
 </ng-template>
+
+<ng-template #persistentStateNotifierTemplate>
+  <mat-card>{{persistentStateNotifierTemplate$ | async}}</mat-card>
+</ng-template>
+

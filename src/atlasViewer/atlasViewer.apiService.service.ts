@@ -131,11 +131,14 @@ export class AtlasViewerAPIServices {
           return Promise.reject('Needs to be overwritted')
         },
 
-        getUserInput: config => this.dialogService.getUserInput(config),
+        getUserInput: config => this.dialogService.getUserInput(config) ,
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
-        getUserToSelectARegion: () => {
-          this.store.dispatch({type: ENABLE_PLUGIN_REGION_SELECTION})
+        getUserToSelectARegion: (selectingMessage) => {
+          this.store.dispatch({
+            type: ENABLE_PLUGIN_REGION_SELECTION,
+            payload: selectingMessage
+          })
           return this.getUserToSelectARegionSubject.asObservable()
         },
 
@@ -227,7 +230,7 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
-    getUserToSelectARegion: () => Observable<any>
+    getUserToSelectARegion: (selectingMessage: String) => Observable<any>
     cancelPromise: (pr) => void
   }
 

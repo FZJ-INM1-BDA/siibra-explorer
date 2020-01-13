@@ -24,6 +24,7 @@ export const defaultState: StateInterface = {
   bottomSheetTemplate: null,
 
   pluginRegionSelectionEnabled: false,
+  persistentStateNotifierTemplate: null,
 
   /**
    * replace with server side logic (?)
@@ -111,13 +112,15 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
   case ENABLE_PLUGIN_REGION_SELECTION: {
     return {
       ...prevState,
-      pluginRegionSelectionEnabled: true
+      pluginRegionSelectionEnabled: true,
+      persistentStateNotifierTemplate: action.payload
     }
   }
   case DISABLE_PLUGIN_REGION_SELECTION: {
     return {
       ...prevState,
-      pluginRegionSelectionEnabled: false
+      pluginRegionSelectionEnabled: false,
+      persistentStateNotifierTemplate: null
     }
   }
 
@@ -185,6 +188,7 @@ export interface StateInterface {
   snackbarMessage: symbol
 
   pluginRegionSelectionEnabled: boolean
+  persistentStateNotifierTemplate: TemplateRef<any>,
 
   agreedCookies: boolean
   agreedKgTos: boolean
