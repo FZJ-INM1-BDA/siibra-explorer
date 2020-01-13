@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {Observable, Subject} from "rxjs";
+import {Observable} from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
@@ -14,7 +14,6 @@ import {
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest } from "./atlasViewer.pluginService.service";
-import {resolve} from "dns";
 import {ENABLE_PLUGIN_REGION_SELECTION} from "src/services/state/uiState.store";
 
 declare let window
@@ -33,8 +32,6 @@ export class AtlasViewerAPIServices {
 
   public getUserToSelectARegionResolve
   public getUserToSelectARegionReject
-
-  public getUserToSelectARegionSubject = new Subject<any>()
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -134,16 +131,20 @@ export class AtlasViewerAPIServices {
         getUserInput: config => this.dialogService.getUserInput(config) ,
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
-        getUserToSelectARegion: (selectingMessage) => {
+        getUserToSelectARegion: (selectingMessage) => new Promise((resolve, reject) => {
           this.store.dispatch({
             type: ENABLE_PLUGIN_REGION_SELECTION,
             payload: selectingMessage
           })
-          return this.getUserToSelectARegionSubject.asObservable()
-        },
 
+          this.getUserToSelectARegionResolve = resolve
+          this.getUserToSelectARegionReject = reject
+        }),
+
+        // ToDo Method should be able to cancel any pending promise.
         cancelPromise: (pr) => {
           if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
+            if (this.getUserToSelectARegionReject) this.getUserToSelectARegionReject('Rej')
             this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
           }
         }
@@ -230,7 +231,7 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
-    getUserToSelectARegion: (selectingMessage: string) => Observable<any>
+    getUserToSelectARegion: (selectingMessage: any) => Promise<any>
     cancelPromise: (pr) => void
   }
 

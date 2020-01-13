@@ -296,6 +296,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       }),
     )
+
+    this.onhoverSegments$.subscribe(hr => {
+      this.hoveringRegions = hr
+    })
   }
 
   private selectedParcellation$: Observable<any>
@@ -433,8 +437,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
-
   }
+
+  private hoveringRegions = []
 
   public mouseDownNehuba(_event) {
     this.rClContextualMenu.hide()
@@ -450,7 +455,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
     } else {
-      this.apiService.getUserToSelectARegionSubject.next()
+      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions.map(hr => hr.name))
     }
   }
 
