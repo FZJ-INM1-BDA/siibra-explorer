@@ -230,7 +230,7 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
-    getUserToSelectARegion: (selectingMessage: String) => Observable<any>
+    getUserToSelectARegion: (selectingMessage: string) => Observable<any>
     cancelPromise: (pr) => void
   }
 

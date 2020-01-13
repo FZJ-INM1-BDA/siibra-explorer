@@ -188,7 +188,7 @@ export interface StateInterface {
   snackbarMessage: symbol
 
   pluginRegionSelectionEnabled: boolean
-  persistentStateNotifierTemplate: TemplateRef<any>,
+  persistentStateNotifierTemplate: TemplateRef<any>
 
   agreedCookies: boolean
   agreedKgTos: boolean
