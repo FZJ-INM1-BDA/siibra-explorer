@@ -445,7 +445,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.rClContextualMenu.hide()
   }
 
-  public mouseUpNehuba(event) {
+  public mouseClickNehuba(event) {
     // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
@@ -455,7 +455,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
     } else {
-      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions.map(hr => hr.name))
+      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions)
     }
   }
 
