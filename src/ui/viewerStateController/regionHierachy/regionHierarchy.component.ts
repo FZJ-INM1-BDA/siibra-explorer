@@ -21,7 +21,15 @@ const getDisplayTreeNode: (searchTerm: string, selectedRegions: any[]) => (item:
     : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
 }
 
-const getFilterTreeBySearch = (pipe: FilterNameBySearch, searchTerm: string) => (node: any) => pipe.transform([node.name, node.status], searchTerm)
+const getFilterTreeBySearch = (pipe: FilterNameBySearch, searchTerm: string) =>
+  (node: any) => {
+    const searchFields = [
+      node.name,
+      node.status,
+      ...(node.relatedAreas ? node.relatedAreas : [])
+    ]
+    return pipe.transform(searchFields, searchTerm)
+  }
 
 @Component({
   selector: 'region-hierarchy',

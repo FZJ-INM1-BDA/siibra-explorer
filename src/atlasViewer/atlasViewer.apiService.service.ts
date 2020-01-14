@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import {Observable} from "rxjs";
-import { distinctUntilChanged, map } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { distinctUntilChanged, map, filter } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
 import {
@@ -169,7 +169,10 @@ export class AtlasViewerAPIServices {
 
   private init() {
     this.loadedTemplates$.subscribe(templates => this.interactiveViewer.metadata.loadedTemplates = templates)
-    this.selectParcellation$.subscribe(parcellation => {
+    this.selectParcellation$.pipe(
+      filter(p => !!p && p.regions),
+      distinctUntilChanged()
+    ).subscribe(parcellation => {
       this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
       this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
     })

@@ -73,9 +73,11 @@ export function getNgIdLabelIndexFromRegion({ region }) {
   throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
 }
 
-export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}): Map<string, Map<number, any>> {
+export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
   const map: Map<string, Map<number, any>> = new Map()
-  const { ngId = 'root'} = parcellation
+  
+  const inheritAttrs = Object.keys(inheritAttrsOpt)
+  if (inheritAttrs.indexOf('children') >=0 ) throw new Error(`children attr cannot be inherited`)
 
   const processRegion = (region: any) => {
     const { ngId: rNgId } = region
@@ -91,21 +93,27 @@ export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}): Map<s
       }
     }
 
-    if (region.children && region.children.forEach) {
-      region.children.forEach(child => {
-        processRegion({
-          ngId: rNgId,
-          ...child,
-        })
-      })
+    if (region.children && Array.isArray(region.children)) {
+      for (const r of region.children) {
+        const copiedRegion = { ...r }
+        for (const attr of inheritAttrs){
+          copiedRegion[attr] = copiedRegion[attr] || region[attr] || parcellation[attr]
+        }
+        processRegion(copiedRegion)
+      }
     }
   }
 
-  if (parcellation && parcellation.regions && parcellation.regions.forEach) {
-    parcellation.regions.forEach(r => processRegion({
-      ngId,
-      ...r,
-    }))
+  if (!parcellation) throw new Error(`parcellation needs to be defined`)
+  if (!parcellation.regions) throw new Error(`parcellation.regions needs to be defined`)
+  if (!Array.isArray(parcellation.regions)) throw new Error(`parcellation.regions needs to be an array`)
+
+  for (const region of parcellation.regions){
+    const copiedregion = { ...region }
+    for (const attr of inheritAttrs){
+      copiedregion[attr] = copiedregion[attr] || parcellation[attr]
+    }
+    processRegion(copiedregion)
   }
 
   return map

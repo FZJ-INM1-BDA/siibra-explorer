@@ -66,7 +66,7 @@ Then datasets which have *`Mus musculus`* as one of its species described above 
 
 The datasets are then filtered based on the selected template space and parcellation atlas. 
 
-The dataset must satisfy both conditionals.
+The dataset may satisfy either conditionals to be presented to the user.
 
 ### Template space
 
@@ -100,7 +100,7 @@ The dataset is considered relevant (returns true for this conditional) if the st
 | MNI Colin 27 | minds/core/dataset/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992 |
 
 !!! important
-    If the dataset does not have any reference spaces defined, it is considered relevant for any template space, and will return `true` for this conditional.
+    If the dataset does not have any reference spaces defined, it is considered NOT relevant for any template space, and will return `false` for this conditional.
 
 ### Parcellation atlas
 
