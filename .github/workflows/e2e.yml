@@ -57,6 +57,6 @@ jobs:
     - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
       if: always()
       run: docker stop ${DOCKER_CONTAINER_NAME}
-    -name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+    - name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
       if: success()
       run: docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
