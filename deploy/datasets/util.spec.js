@@ -10,47 +10,47 @@ const colin27 = require('./testData/colin27')
 
 describe('datasets/util.js', () => {
 
-  describe('retry', () => {
+  // describe('retry', () => {
 
-    let val = 0
+  //   let val = 0
   
-    const failCall = fake()
-    const succeedCall = fake()
+  //   const failCall = fake()
+  //   const succeedCall = fake()
   
-    const prFn = () => {
-      val++
-      return val >=3
-        ? (succeedCall(), Promise.resolve())
-        : (failCall(), Promise.reject())
-    }
+  //   const prFn = () => {
+  //     val++
+  //     return val >=3
+  //       ? (succeedCall(), Promise.resolve())
+  //       : (failCall(), Promise.reject())
+  //   }
   
-    beforeEach(() => {
-      val = 0
-      succeedCall.resetHistory()
-      failCall.resetHistory()
-    })
+  //   beforeEach(() => {
+  //     val = 0
+  //     succeedCall.resetHistory()
+  //     failCall.resetHistory()
+  //   })
   
-    it('retry until succeed', async () => {
-      await retry(prFn)
-      assert(succeedCall.called)
-      assert(failCall.calledTwice)
-    })
+  //   it('retry until succeed', async () => {
+  //     await retry(prFn)
+  //     assert(succeedCall.called)
+  //     assert(failCall.calledTwice)
+  //   })
   
-    it('retry with shorter timeouts', async () => {
-      await retry(prFn, { timeout: 100 })
-      assert(succeedCall.called)
-      assert(failCall.calledTwice)
-    })
+  //   it('retry with shorter timeouts', async () => {
+  //     await retry(prFn, { timeout: 100 })
+  //     assert(succeedCall.called)
+  //     assert(failCall.calledTwice)
+  //   })
   
-    it('when retries excceeded, retry fn throws', async () => {
-      try {
-        await retry(prFn, { timeout: 100, retries: 2 })
-        assert(false, 'retry fn should throw if retries exceed')
-      } catch (e) {
-        assert(true)
-      }
-    })
-  })
+  //   it('when retries excceeded, retry fn throws', async () => {
+  //     try {
+  //       await retry(prFn, { timeout: 100, retries: 2 })
+  //       assert(false, 'retry fn should throw if retries exceed')
+  //     } catch (e) {
+  //       assert(true)
+  //     }
+  //   })
+  // })
 
   describe('datasetBelongsInTemplate', () => {
     it('should filter datasets with template defined', () => {
@@ -113,6 +113,31 @@ describe('datasets/util.js', () => {
         expect(flag).to.be.true
       }
     })
+
+    it('should filter allen2015 properly', async () => {
+      const { allen2015Set } = await _getParcellations()
+      for (const ds of allen2015){
+        
+        const flag2015 = await datasetRegionExistsInParcellationRegion(ds.parcellationRegion, allen2015Set)
+        expect(
+          flag2015
+        ).to.be.true
+
+      }
+    })
+
+    it('should filterout allen2015 datasets in allen2017', async () => {
+
+      const { allen2017Set } = await _getParcellations()
+      for (const ds of allen2015){
+        
+        const flag2017 = await datasetRegionExistsInParcellationRegion(ds.parcellationRegion, allen2017Set)
+        expect(
+          flag2017
+        ).to.be.false
+      }
+    })
+    
   })
   
   describe('filterDatasets', () => {
@@ -129,7 +154,7 @@ describe('datasets/util.js', () => {
     it('should filter allen 2015 properly', async () => {
 
       const filteredResult = await filterDatasets(allen2015, { parcellationName: 'Allen Mouse Common Coordinate Framework v3 2015' })
-      expect(filteredResult).to.have.length(2)
+      expect(filteredResult).to.have.length(1)
     })
   })
 
@@ -177,6 +202,18 @@ describe('datasets/util.js', () => {
           parcellationName
         })
       ).to.be.true
+    })
+
+    it('allen2015 belong to parcellation', () => {
+      for (const ds of allen2015){
+
+        expect(
+          datasetBelongToParcellation({
+            dataset: ds,
+            parcellationName: 'Allen Mouse Common Coordinate Framework v3 2015'
+          })
+        ).to.be.true
+      }
     })
   })
 
