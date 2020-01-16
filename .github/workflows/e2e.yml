@@ -39,10 +39,15 @@ jobs:
     - name: Install dependencies
       run: |
         npm i
-    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} as ${{ env.DOCKER_CONTAINER_NAME }}
       run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     - name: run pptr tests
       run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
-    - name: cleanup
+    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
       if: always()
-      run: docker stop ${DOCKER_CONTAINER_NAME} && docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+      run: |
+        docker ps | grep ${{ env.DOCKER_CONTAINER_NAME }}
+        docker stop ${DOCKER_CONTAINER_NAME}
+    - name: cleanup, rm image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+      if: always()
+      run: docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
