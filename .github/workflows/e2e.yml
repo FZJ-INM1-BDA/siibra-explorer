@@ -40,7 +40,16 @@ jobs:
       run: |
         npm i
     - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-      run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+      run: |
+        docker run -p 3001:3000 \
+          --rm \
+          --name ${DOCKER_CONTAINER_NAME} \
+          --env HBP_CLIENTID=${{ env.HBP_CLIENTID }} \
+          --env HBP_CLIENTSECRET=${{ env.HBP_CLIENTSECRET }} \
+          -dit \
+          ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+    - name: sleep for 60s
+      run: sleep 60s
     - name: run pptr tests - ${{ env.TEST_URL }}
       run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
       env:
