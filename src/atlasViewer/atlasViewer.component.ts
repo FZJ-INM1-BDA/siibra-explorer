@@ -1,5 +1,5 @@
 import {
-  AfterViewInit,
+  AfterViewInit, ChangeDetectorRef,
   Component,
   HostBinding,
   OnDestroy,
@@ -117,6 +117,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
+  private pluginRegionSelectionEnabled$: Observable<boolean>
+  private pluginRegionSelectionEnabled: boolean = false
+  private persistentStateNotifierTemplate$: Observable<string>
+  // private pluginRegionSelectionEnabled: boolean = false
+
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
@@ -129,11 +134,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private snackbar: MatSnackBar,
     private bottomSheet: MatBottomSheet,
     private log: LoggingService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
       select('uiState'),
       select("snackbarMessage"),
+    )
+
+    this.pluginRegionSelectionEnabled$ = this.store.pipe(
+      select('uiState'),
+      select("pluginRegionSelectionEnabled"),
+      distinctUntilChanged(),
+    )
+    this.persistentStateNotifierTemplate$ = this.store.pipe(
+      select('uiState'),
+      select("persistentStateNotifierTemplate"),
+      distinctUntilChanged(),
     )
 
     this.bottomSheet$ = this.store.pipe(
@@ -279,6 +296,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       }),
     )
+
+    this.onhoverSegments$.subscribe(hr => {
+      this.hoveringRegions = hr
+    })
   }
 
   private selectedParcellation$: Observable<any>
@@ -361,6 +382,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.rd.setAttribute(document.body, 'darktheme', flag.toString())
       }),
     )
+
+    this.subscriptions.push(
+      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
+        this.pluginRegionSelectionEnabled = PRSE
+        this.changeDetectorRef.detectChanges()
+      })
+    )
   }
 
   public ngAfterViewInit() {
@@ -409,21 +437,26 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
-
   }
+
+  private hoveringRegions = []
 
   public mouseDownNehuba(_event) {
     this.rClContextualMenu.hide()
   }
 
-  public mouseUpNehuba(event) {
+  public mouseClickNehuba(event) {
     // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
       event.clientY,
     ]
-    this.rClContextualMenu.show()
+    if (!this.pluginRegionSelectionEnabled) {
+      this.rClContextualMenu.show()
+    } else {
+      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions)
+    }
   }
 
   public toggleSideNavMenu(opened) {
