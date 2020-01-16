@@ -3,6 +3,7 @@ const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
+const { getIdFromFullId } = require('../../common/util')
 
 let getPublicAccessToken
 
@@ -58,12 +59,18 @@ const populateSet = (flattenedRegions, set = new Set()) => {
   if (!(set instanceof Set)) throw `set needs to be an instance of Set`
   if (!(flattenedRegions instanceof Array)) throw `flattenedRegions needs to be an instance of Array`
   for (const region of flattenedRegions) {
-    const { name, relatedAreas } = region
-    if (name) set.add(name)
-    if (relatedAreas && relatedAreas instanceof Array && relatedAreas.length > 0) {
+    const { name, relatedAreas, fullId } = region
+    if (fullId) {
+      set.add(
+        getIdFromFullId(fullId)
+      )
+    }
+    if (relatedAreas && Array.isArray(relatedAreas)) {
       for (const relatedArea of relatedAreas) {
-        if(typeof relatedArea === 'string') set.add(relatedArea)
-        else console.warn(`related area not an instance of String. skipping`, relatedArea)
+        const { fullId } = relatedArea
+        set.add(
+          getIdFromFullId(fullId)
+        )
       }
     }
   }
@@ -137,7 +144,9 @@ initPrArray.push(
 const datasetRegionExistsInParcellationRegion = async (prs, atlasPrSet = new Set()) => {
   if (!(atlasPrSet instanceof Set)) throw `atlasPrSet needs to be a set!`
   await Promise.all(initPrArray)
-  return prs.some(({ name, alias }) => atlasPrSet.has(alias) || atlasPrSet.has(name))
+  return prs.some(({ fullId }) => atlasPrSet.has(
+    getIdFromFullId(fullId)
+  ))
 }
 
 const templateNameToIdMap = new Map([
@@ -309,6 +318,8 @@ const retry = async (fn, { timeout = defaultConfig.timeout, retries = defaultCon
 }
 
 module.exports = {
+  getIdFromFullId,
+  populateSet,
   init,
   getUserKGRequestParam,
   retry,

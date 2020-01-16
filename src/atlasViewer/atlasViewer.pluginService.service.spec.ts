@@ -56,7 +56,6 @@
 //           expect(mockScript).toBeTruthy()
 //         })
 //       )
-
 //       it(
 //         'template overrides templateURL',
 //         inject([HttpTestingController], (httpMock: HttpTestingController) => {

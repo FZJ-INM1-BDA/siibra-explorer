@@ -1,12 +1,5 @@
-const {URLSearchParams} = require('url')
-
-exports.getSearchParam = (browser) => {
-  const script = `
-  const search = window.location.search;
-  return search
-  `
-  return browser.executeScript(script)
-    .then(search => new URLSearchParams(search))
+exports.getSearchParam = page => {
+  return page.evaluate(`window.location.search`)
 }
 
 exports.wait = (browser) => new Promise(resolve => {

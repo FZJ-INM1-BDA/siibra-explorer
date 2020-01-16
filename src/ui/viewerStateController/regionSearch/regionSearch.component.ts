@@ -12,7 +12,7 @@ import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/services/logging.service";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
-  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.toLowerCase().includes(searchTerm.toLowerCase())))
+  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
 
 const compareFn = (it, item) => it.name === item.name
 

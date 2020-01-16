@@ -4,10 +4,12 @@
   "species": "Human",
   "useTheme": "light",
   "ngId": " grey value: ",
-  "originDatasets":[{
-    "kgSchema": "minds/core/dataset/v1.0.0",
-    "kgId": "e32f9053-38c9-4911-b868-845c56828f4d"
-  }],
+  "originDatasets": [
+    {
+      "kgSchema": "minds/core/dataset/v1.0.0",
+      "kgId": "e32f9053-38c9-4911-b868-845c56828f4d"
+    }
+  ],
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {
@@ -43,7 +45,14 @@
                             4363384,
                             836825,
                             4887117
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area TE 1.1 (HESCHL)",
@@ -60,7 +69,14 @@
                             -11860944,
                             -3841071,
                             6062770
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area TE 1.2 (HESCHL)",
@@ -77,7 +93,14 @@
                             19474750,
                             7932494,
                             3511322
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -99,7 +122,14 @@
                             3479937,
                             2702958,
                             3819372
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -116,7 +146,14 @@
                             -3185950,
                             3919067,
                             -8346900
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area STS2 (STS)",
@@ -128,7 +165,14 @@
                             8584703,
                             6170348,
                             -11790982
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -150,7 +194,14 @@
                             -10496194,
                             13643679,
                             42286812
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 6d2 (PreCG)",
@@ -162,7 +213,14 @@
                             -9255504,
                             27432072,
                             43445689
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 6ma (preSMA, mesial SFG)",
@@ -174,7 +232,14 @@
                             -9349145,
                             27783957,
                             38734627
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 6mp (SMA, mesial SFG)",
@@ -186,7 +251,14 @@
                             -11566856,
                             15797100,
                             42172031
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -203,7 +275,14 @@
                             -8973604,
                             28973429,
                             35691250
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -220,7 +299,14 @@
                             -7394436,
                             33562602,
                             19086364
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a6a83284-829b-4385-9f83-7f1bc832c5a5"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifj2 (IFS/PreCS)",
@@ -244,7 +330,14 @@
                             -4044465,
                             40212624,
                             17596493
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d687d385-98d9-4b31-85db-4bc682cd0a31"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifs2 (IFS)",
@@ -256,7 +349,14 @@
                             6807265,
                             40114241,
                             18114896
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "658a67d8-60c2-4bb4-8eaf-e54725eda261"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifs3 (IFS)",
@@ -268,7 +368,14 @@
                             -2260366,
                             37593844,
                             19960703
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e555881e-7082-4ac0-b6cc-cd096f30d3dc"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifs4 (IFS)",
@@ -280,7 +387,14 @@
                             -3440565,
                             37895181,
                             17378851
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "472dacc9-c27d-49c2-9e6f-a1cc3309c4ab"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -307,7 +421,14 @@
                             4800238,
                             8859989,
                             -24872710
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -329,7 +450,14 @@
                             -5671181,
                             -44793673,
                             21692004
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP5 (IPS)",
@@ -341,7 +469,14 @@
                             -13546343,
                             -38230309,
                             26252296
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP6 (IPS)",
@@ -353,7 +488,14 @@
                             -3723403,
                             -33064127,
                             32569712
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP7 (IPS)",
@@ -365,7 +507,14 @@
                             -5344588,
                             -43655931,
                             24702722
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -382,7 +531,14 @@
                             -4455614,
                             -44097379,
                             28855803
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -409,7 +565,14 @@
                             30,
                             250
                           ],
-                          "children": []
+                          "children": [],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc2 (V2, 18)",
@@ -426,7 +589,14 @@
                             100,
                             250
                           ],
-                          "children": []
+                          "children": [],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "dorsal occipital cortex",
@@ -441,7 +611,14 @@
                                 -4399437,
                                 -36706104,
                                 15113374
-                              ]
+                              ],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
+                                }
+                              },
+                              "relatedAreas": []
                             }
                           ]
                         }

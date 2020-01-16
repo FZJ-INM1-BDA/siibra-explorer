@@ -2,11 +2,11 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { fromEvent, merge, Observable, Subscription } from "rxjs";
-import { filter, map, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { filter, map, shareReplay, switchMap, take, withLatestFrom, startWith, tap, distinctUntilChanged, mapTo } from "rxjs/operators";
 import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
 import { LoggingService } from "../logging.service";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, UPDATE_PARCELLATION } from "../state/viewerState.store";
-import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, GENERAL_ACTION_TYPES } from '../stateStore.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,8 +21,12 @@ export class UseEffects implements OnDestroy {
     this.subscriptions.push(
       this.newParcellationSelected$.subscribe(parcellation => {
         worker.postMessage({
-          type: `PROPAGATE_NG_ID`,
+          type: `PROPAGATE_PARC_REGION_ATTR`,
           parcellation,
+          inheritAttrsOpts: {
+            ngId: (parcellation as any ).ngId,
+            relatedAreas: []
+          }
         })
       }),
     )
@@ -85,6 +89,19 @@ export class UseEffects implements OnDestroy {
         }
       }),
     )
+
+    this.updateSelectedRegion$ = this.actions$.pipe(
+      ofType(UPDATE_PARCELLATION),
+      withLatestFrom(this.regionsSelected$),
+      map(([{ updatedParcellation }, regionsSelected]) => {
+        const map = getMultiNgIdsRegionsLabelIndexMap(updatedParcellation)
+        const newRS = regionsSelected.map(({ ngId, labelIndex }) => map.get(ngId).get(labelIndex))
+        return {
+          type: SELECT_REGIONS,
+          selectRegions: newRS
+        }
+      })
+    )
   }
 
   private regionsSelected$: Observable<any[]>
@@ -105,11 +122,24 @@ export class UseEffects implements OnDestroy {
     ofType(NEWVIEWER),
   )
 
+  // trigger for rebuilding the parcellation
   private newParcellationSelected$ = merge(
-    this.newViewer$,
-    this.parcellationSelected$,
+    this.actions$.pipe(
+      ofType(NEWVIEWER)
+    ),
+    this.actions$.pipe(
+      ofType(SELECT_PARCELLATION)
+    ),
+    this.actions$.pipe(
+      ofType(GENERAL_ACTION_TYPES.APPLY_STATE)
+    )
   ).pipe(
-    map(({selectParcellation}) => selectParcellation),
+    withLatestFrom(this.store$.pipe(
+      select('viewerState'),
+      select('parcellationSelected')
+    )),
+    map(([_, parcellation]) => parcellation),
+    filter(v => !!v)
   )
 
   private updatedParcellation$ = this.store$.pipe(
@@ -118,6 +148,9 @@ export class UseEffects implements OnDestroy {
     map(p => p.updated ? p : null),
     shareReplay(1),
   )
+
+  @Effect()
+  public updateSelectedRegion$: Observable<any>
 
   @Effect()
   public onDeselectRegions: Observable<any>
@@ -198,7 +231,7 @@ export class UseEffects implements OnDestroy {
    * side effect of selecting a parcellation means deselecting all regions
    */
   @Effect()
-  public onParcellationSelected$ = this.newParcellationSelected$.pipe(
+  public onParcellationSelected$ = this.parcellationSelected$.pipe(
     map(() => ({
       type: SELECT_REGIONS,
       selectRegions: [],

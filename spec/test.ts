@@ -20,3 +20,5 @@ getTestBed().initTestEnvironment(
 
 const testContext = require.context('../src', true, /\.spec\.ts$/)
 testContext.keys().map(testContext)
+
+require('../common/util.spec.js')
