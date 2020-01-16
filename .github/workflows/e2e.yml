@@ -41,8 +41,10 @@ jobs:
         npm i
     - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
       run: docker run -p 3001:3000 --rm --name ${DOCKER_CONTAINER_NAME} -dit ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-    - name: run pptr tests
+    - name: run pptr tests - ${{ env.TEST_URL }}
       run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
-    - name: cleanup
+      env:
+        TEST_URL: http://localhost:3001
+    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
       if: always()
       run: docker stop ${DOCKER_CONTAINER_NAME} && docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
