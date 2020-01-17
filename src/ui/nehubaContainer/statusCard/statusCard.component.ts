@@ -1,25 +1,49 @@
-import { Component, Input } from "@angular/core";
-import { Store } from "@ngrx/store";
+import {Component, Input, OnInit} from "@angular/core";
+import {select, Store} from "@ngrx/store";
 import { LoggingService } from "src/services/logging.service";
-import { CHANGE_NAVIGATION, ViewerStateInterface } from "src/services/stateStore.service";
+import {CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface} from "src/services/stateStore.service";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
+import {Observable, Subscription} from "rxjs";
+import {distinctUntilChanged, shareReplay} from "rxjs/operators";
 
 @Component({
   selector : 'ui-status-card',
   templateUrl : './statusCard.template.html',
   styleUrls : ['./statusCard.style.css'],
 })
-export class StatusCardComponent {
+export class StatusCardComponent implements OnInit{
 
-  @Input() public selectedTemplate: any;
+  @Input() public selectedTemplateName: string;
   @Input() public isMobile: boolean;
   @Input() public nehubaViewer: NehubaViewerUnit;
   @Input() public onHoverSegmentName: string;
 
+  private selectedTemplateRoot$: Observable<any>
+  private selectedTemplateRoot: any
+  private subscriptions: Subscription[] = []
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private log: LoggingService,
-  ) {}
+    private store$: Store<IavRootStoreInterface>,
+  ) {
+    const viewerState$ = this.store$.pipe(
+        select('viewerState'),
+        shareReplay(1),
+    )
+    this.selectedTemplateRoot$ = viewerState$.pipe(
+        select('fetchedTemplates'),
+        distinctUntilChanged(),
+    )
+  }
+
+  ngOnInit(): void {
+    this.subscriptions.push(
+        this.selectedTemplateRoot$.subscribe(template => {
+          this.selectedTemplateRoot = template.find(t => t.name === this.selectedTemplateName)
+        })
+    )
+  }
 
   public statusPanelRealSpace: boolean = true
 
@@ -69,7 +93,7 @@ export class StatusCardComponent {
    * the info re: nehubaViewer can stay there, too
    */
   public resetNavigation({rotation: rotationFlag = false, position: positionFlag = false, zoom : zoomFlag = false}: {rotation?: boolean, position?: boolean, zoom?: boolean}) {
-    const initialNgState = this.selectedTemplate.nehubaConfig.dataset.initialNgState
+    const initialNgState = this.selectedTemplateRoot.nehubaConfig.dataset.initialNgState // d sa dsa
 
     const perspectiveZoom = initialNgState ? initialNgState.perspectiveZoom : undefined
     const perspectiveOrientation = initialNgState ? initialNgState.perspectiveOrientation : undefined

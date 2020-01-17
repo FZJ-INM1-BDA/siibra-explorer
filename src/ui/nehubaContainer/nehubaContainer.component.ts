@@ -2,7 +2,25 @@ import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, El
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, merge, Observable, of, Subscription } from "rxjs";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, takeUntil, tap, throttleTime, withLatestFrom } from "rxjs/operators";
+import {
+  buffer,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  mapTo,
+  scan,
+  shareReplay,
+  skip,
+  startWith,
+  switchMap,
+  switchMapTo,
+  take,
+  takeUntil,
+  tap,
+  throttleTime,
+  withLatestFrom
+} from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { FOUR_PANEL, H_ONE_THREE, NEHUBA_READY, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
@@ -569,18 +587,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     /* order of subscription will determine the order of execution */
     this.subscriptions.push(
       this.newViewer$.pipe(
-        map(templateSelected => {
-          const deepCopiedState = JSON.parse(JSON.stringify(templateSelected))
-          const navigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
-          if (!navigation) {
-            return deepCopiedState
-          }
-          navigation.zoomFactor = calculateSliceZoomFactor(navigation.zoomFactor)
-          deepCopiedState.nehubaConfig.dataset.initialNgState.navigation = navigation
-          return deepCopiedState
-        }),
         withLatestFrom(this.selectedParcellation$.pipe(
-          startWith(null),
+            startWith(<object> null),
         )),
       ).subscribe(([templateSelected, parcellationSelected]) => {
         this.store.dispatch({
@@ -973,9 +981,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     const { navigation = {}, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e7 } = nehubaConfig.dataset.initialNgState || {}
     const { zoomFactor = 3e5, pose = {} } = navigation || {}
     const { voxelSize = [1e6, 1e6, 1e6], voxelCoordinates = [0, 0, 0] } = (pose && pose.position) || {}
+    const { orientation = [0, 0, 0, 1] } = pose || {}
 
-    const initNavigation = {
-      orientation: [0, 0, 0, 1],
+    let initNavigation = {
+      orientation: orientation,
       perspectiveOrientation,
       perspectiveZoom,
       position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
