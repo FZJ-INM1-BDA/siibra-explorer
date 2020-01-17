@@ -124,35 +124,35 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         if (templateSelected && templateSelected.name === name) { return false }
         return true
       }),
-        withLatestFrom(
-            viewerState$.pipe(
-                select('fetchedTemplates'),
-            ),
-            viewerState$.pipe(
-                select('navigation'),
-            ),
+      withLatestFrom(
+        viewerState$.pipe(
+          select('fetchedTemplates'),
         ),
+        viewerState$.pipe(
+          select('navigation'),
+        ),
+      ),
       mergeMap(([[name, templateSelected], availableTemplates, navigation]) =>
-          this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, name, navigation.position)
-              .then(res => {
-                  navigation.position = res
-                  return {
-                      name: name,
-                      templateSelected: templateSelected,
-                      availableTemplates: availableTemplates,
-                      coordinates: res,
-                      navigation: navigation
-                  }
-              })
-              .catch(() => {
-                  return {
-                      name: name,
-                      templateSelected: templateSelected,
-                      availableTemplates: availableTemplates,
-                      coordinates: null,
-                      navigation: null
-                  }
-              })
+        this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, name, navigation.position)
+          .then(res => {
+            navigation.position = res
+            return {
+              name: name,
+              templateSelected: templateSelected,
+              availableTemplates: availableTemplates,
+              coordinates: res,
+              navigation: navigation
+            }
+          })
+          .catch(() => {
+            return {
+              name: name,
+              templateSelected: templateSelected,
+              availableTemplates: availableTemplates,
+              coordinates: null,
+              navigation: null
+            }
+          })
       ),
       map(({name, templateSelected, availableTemplates, coordinates, navigation}) => {
         const newTemplateTobeSelected = availableTemplates.find(t => t.name === name)
@@ -166,20 +166,20 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         }
 
         if (!coordinates && !navigation)
-            return {
-                type: NEWVIEWER,
-                selectTemplate: newTemplateTobeSelected,
-                selectParcellation: newTemplateTobeSelected.parcellations[0],
-            }
-
-          const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
-          const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
-
-          initNavigation.zoomFactor = navigation.zoom
-          initNavigation.pose.position.voxelCoordinates = coordinates.map((c, i) => c/initNavigation.pose.position.voxelSize[i])
-          initNavigation.pose.orientation = navigation.orientation
-
           return {
+            type: NEWVIEWER,
+            selectTemplate: newTemplateTobeSelected,
+            selectParcellation: newTemplateTobeSelected.parcellations[0],
+          }
+
+        const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
+        const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
+
+        initNavigation.zoomFactor = navigation.zoom
+        initNavigation.pose.position.voxelCoordinates = coordinates.map((c, i) => c/initNavigation.pose.position.voxelSize[i])
+        initNavigation.pose.orientation = navigation.orientation
+
+        return {
           type: NEWVIEWER,
           selectTemplate: deepCopiedState,
           selectParcellation: newTemplateTobeSelected.parcellations[0],

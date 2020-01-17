@@ -28,20 +28,20 @@ export class StatusCardComponent implements OnInit{
     private store$: Store<IavRootStoreInterface>,
   ) {
     const viewerState$ = this.store$.pipe(
-        select('viewerState'),
-        shareReplay(1),
+      select('viewerState'),
+      shareReplay(1),
     )
     this.selectedTemplateRoot$ = viewerState$.pipe(
-        select('fetchedTemplates'),
-        distinctUntilChanged(),
+      select('fetchedTemplates'),
+      distinctUntilChanged(),
     )
   }
 
   ngOnInit(): void {
     this.subscriptions.push(
-        this.selectedTemplateRoot$.subscribe(template => {
-          this.selectedTemplateRoot = template.find(t => t.name === this.selectedTemplateName)
-        })
+      this.selectedTemplateRoot$.subscribe(template => {
+        this.selectedTemplateRoot = template.find(t => t.name === this.selectedTemplateName)
+      })
     )
   }
 

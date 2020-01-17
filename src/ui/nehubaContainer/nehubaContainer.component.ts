@@ -588,7 +588,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.push(
       this.newViewer$.pipe(
         withLatestFrom(this.selectedParcellation$.pipe(
-            startWith(<object> null),
+          startWith(null as object),
         )),
       ).subscribe(([templateSelected, parcellationSelected]) => {
         this.store.dispatch({
@@ -983,7 +983,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     const { voxelSize = [1e6, 1e6, 1e6], voxelCoordinates = [0, 0, 0] } = (pose && pose.position) || {}
     const { orientation = [0, 0, 0, 1] } = pose || {}
 
-    let initNavigation = {
+    const initNavigation = {
       orientation: orientation,
       perspectiveOrientation,
       perspectiveZoom,
