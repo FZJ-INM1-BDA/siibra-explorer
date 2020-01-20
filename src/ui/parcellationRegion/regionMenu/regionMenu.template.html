@@ -5,7 +5,7 @@
   <mat-card-content>
     {{ region.description }}
   </mat-card-content>
-  <mat-card-actions class="d-flex flex-row flex-wrap">
+  <div class="d-flex flex-row flex-wrap" #actionCard>
     <button mat-button
       (click)="toggleRegionSelected()"
       [color]="isSelected ? 'primary': 'basic'">
@@ -20,11 +20,34 @@
         Navigate
       </span>
     </button>
+
     <button *ngIf="hasConnectivity" mat-button (click)="showConnectivity(region.name)">
       <i class="fab fa-connectdevelop"></i>
       <span>
-        Connectivity
-      </span>
+          Connectivity
+        </span>
     </button>
-  </mat-card-actions>
+
+    <!-- Menu to navigate between template spaces to explore same region -->
+    <div #additionalActions>
+      <button mat-icon-button
+              *ngIf="sameRegionTemplate.length"
+              [matMenuTriggerFor]="additionalActions"
+              #additionalActionsMenuButton="matMenuTrigger"
+              (mouseenter)="$event.stopPropagation(); actionsMenuTriggerButton.openMenu()">
+        <i class="fas fa-angle-right"></i>
+      </button>
+    </div>
+
+    <mat-menu #additionalActions="matMenu" xPosition="before" (click)="$event.stopPropagation()" hasBackdrop="false">
+      <div>
+        <button mat-menu-item *ngFor="let templateName of sameRegionTemplate" (click)="selectTemplate(templateName)">
+          <span>
+            Explore in {{templateName}}
+          </span>
+        </button>
+      </div>
+    </mat-menu>
+
+  </div>
 </mat-card>
