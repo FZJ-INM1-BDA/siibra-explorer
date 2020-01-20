@@ -30,11 +30,14 @@
 
     <!-- Menu to navigate between template spaces to explore same region -->
     <div #additionalActions>
-      <button mat-icon-button
+      <button mat-button
               *ngIf="sameRegionTemplate.length"
               [matMenuTriggerFor]="additionalActions"
-              #additionalActionsMenuButton="matMenuTrigger"
-              (mouseenter)="$event.stopPropagation(); actionsMenuTriggerButton.openMenu()">
+              #additionalActionsMenuButton="matMenuTrigger">
+        <i class="fas fa-brain"></i>
+        <span>
+          Explore in
+        </span>
         <i class="fas fa-angle-right"></i>
       </button>
     </div>
@@ -43,7 +46,7 @@
       <div>
         <button mat-menu-item *ngFor="let templateName of sameRegionTemplate" (click)="selectTemplate(templateName)">
           <span>
-            Explore in {{templateName}}
+            {{templateName}}
           </span>
         </button>
       </div>
