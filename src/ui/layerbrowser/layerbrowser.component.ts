@@ -47,6 +47,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
   public darktheme$: Observable<boolean>
 
+  private customNgLayers: string[] = ['spatial landmark layer']
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private constantsService: AtlasViewerConstantsServices,
@@ -64,6 +66,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
         return [
           ngId,
+          ...this.customNgLayers,
           ...otherNgIds,
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([
