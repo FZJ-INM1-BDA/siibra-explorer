@@ -2,8 +2,8 @@ import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} 
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 @Component({
-    selector: 'landmark-menu',
-    templateUrl: './landmarkMenu.template.html'
+  selector: 'landmark-menu',
+  templateUrl: './landmarkMenu.template.html'
 })
 export class LandmarkMenuComponent {
     @Input() landmark: any
@@ -16,7 +16,7 @@ export class LandmarkMenuComponent {
     constructor(private matDialog: MatDialog,) {}
 
     exploreDataset() {
-        this.spatialLandmarkDatasetDialog = this.matDialog.open(this.spatialDatasetPreview)
-        this.closeLandmarkMenu.emit()
+      this.spatialLandmarkDatasetDialog = this.matDialog.open(this.spatialDatasetPreview)
+      this.closeLandmarkMenu.emit()
     }
 }
