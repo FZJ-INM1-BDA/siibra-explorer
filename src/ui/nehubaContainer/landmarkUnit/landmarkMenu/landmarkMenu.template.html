@@ -1,0 +1,23 @@
+<mat-card>
+    <mat-card-subtitle>
+        {{ landmark.landmarkName }}
+    </mat-card-subtitle>
+    <mat-card-actions class="d-flex flex-row flex-wrap">
+        <button (click)="exploreDataset()"
+                *ngFor="let dataset of landmark.landmarkDataset"
+                [matTooltip]="dataset.name.length>12 && dataset.name"
+                mat-menu-item>
+            Explore dataset {{ (dataset.name.length > 12) ? (dataset.name | slice:0:12) + '..' : (dataset.name) }}
+        </button>
+    </mat-card-actions>
+</mat-card>
+
+<ng-template #spatialDatasetPreview>
+    <div *ngFor="let dataset of landmark.landmarkDataset">
+        <single-dataset-view
+                [name]="dataset.name"
+                [description]="dataset.description"
+                [kgExternalLink]="dataset.externalLink">
+        </single-dataset-view>
+    </div>
+</ng-template>

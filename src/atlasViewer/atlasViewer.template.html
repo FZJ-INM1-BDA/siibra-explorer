@@ -160,7 +160,20 @@
             </div>
           </ng-container>
         </ng-container>
+
+        <ng-container *ngIf="(onhoverLandmarkForFixed$ | async) as onHoverLandmark">
+          <ng-container *ngIf="onHoverLandmark.landmarkName">
+            <landmark-menu class="pe-all"
+                           [landmark]="onHoverLandmark"
+                           (closeLandmarkMenu)="rClContextualMenu.hide()">
+
+            </landmark-menu>
+          </ng-container>
+        </ng-container>
+
       </div>
+
+
     </layout-floating-container>
 
     <!-- required for manufacturing plugin templates -->

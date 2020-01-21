@@ -96,6 +96,19 @@
     </button>
   </a>
 
+  <!-- explore with direct external link -->
+  <a *ngIf="kgExternalLink"
+    class="m-2"
+    [href]="kgExternalLink"
+    target="_blank">
+    <button
+      mat-raised-button
+      color="primary">
+      Explore
+      <i class="fas fa-external-link-alt"></i>
+    </button>
+  </a>
+
   <!-- pin data -->
   <button mat-button
     *ngIf="downloadEnabled"

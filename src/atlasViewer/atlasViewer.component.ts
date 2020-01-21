@@ -99,6 +99,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public onhoverSegments$: Observable<string[]>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
+  public onhoverLandmarkForFixed$: Observable<any>
+
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -238,6 +240,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         } else {
           return  {
             landmarkName: spatialDatas[idx].name,
+            landmarkDataset: spatialDatas[idx].dataset
           }
         }
       }),
@@ -436,6 +439,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || []),
+    )
+
+    this.onhoverLandmarkForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(this.onhoverLandmark$),
+      map(([_flag, onhoverLandmark]) => onhoverLandmark || []),
     )
   }
 

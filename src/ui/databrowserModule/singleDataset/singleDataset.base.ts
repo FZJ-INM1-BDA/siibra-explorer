@@ -31,6 +31,8 @@ export class SingleDatasetBase implements OnInit {
   @Input() public dataset: any = null
   @Input() public simpleMode: boolean = false
 
+  @Input() public kgExternalLink: string = ''
+
   @Output() public previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
 
   public preview: boolean = false
