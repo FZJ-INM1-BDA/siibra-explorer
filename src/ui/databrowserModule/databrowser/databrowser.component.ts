@@ -45,8 +45,6 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   public countedDataM: CountedDataModality[] = []
   public visibleCountedDataM: CountedDataModality[] = []
 
-  public history$: Observable<Array<{file: ViewerPreviewFile, dataset: IDataEntry}>>
-
   @ViewChild(ModalityPicker)
   public modalityPicker: ModalityPicker
 
@@ -67,10 +65,9 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
     private log: LoggingService,
   ) {
     this.favDataentries$ = this.dbService.favedDataentries$
-    this.history$ = this.singleDatasetSservice.previewingFile$.pipe(
-      scan(scanFn, []),
-      shareReplay(1),
-    )
+
+    const structuredData = window.document.querySelector('script[type="application/ld+json"]')
+    if (structuredData) console.log(JSON.parse(structuredData.textContent))
   }
 
   public ngOnChanges() {

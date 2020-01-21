@@ -28,4 +28,5 @@ export class SingleDatasetView extends SingleDatasetBase {
   ) {
     super(dbService, singleDatasetService, cdr, constantService, data)
   }
+
 }

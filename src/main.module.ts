@@ -78,7 +78,7 @@ import { LoggingService } from "./services/logging.service";
       NgViewerUseEffect,
       PluginServiceUseEffect,
       AtlasViewerHistoryUseEffect,
-      UiStateUseEffect,
+      UiStateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,

@@ -20,7 +20,6 @@ export const defaultState: StateInterface = {
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
-
   bottomSheetTemplate: null,
 
   pluginRegionSelectionEnabled: false,

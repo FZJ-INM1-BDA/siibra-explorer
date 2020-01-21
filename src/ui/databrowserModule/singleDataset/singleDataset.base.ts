@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import { ChangeDetectorRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
 import { Observable } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
@@ -15,6 +15,7 @@ export {
 
 export class SingleDatasetBase implements OnInit {
 
+  @ViewChild('kg-dataset-list') kgDatasetList: any
   @Input() public ripple: boolean = false
 
   /**
@@ -157,5 +158,18 @@ export class SingleDatasetBase implements OnInit {
   public handlePreviewFile(file: ViewerPreviewFile) {
     this.previewingFile.emit(file)
     this.singleDatasetService.previewFile(file, this.dataset)
+  }
+  
+  public datasetPreviewList: any[] = []
+  public loadingDatasetPreviewList: boolean = false
+
+  handleKgDsPrvUpdated(event: CustomEvent){
+    const { detail } = event
+    const { datasetFiles, loadingFlag } = detail
+
+    this.loadingDatasetPreviewList = loadingFlag
+    this.datasetPreviewList = datasetFiles
+
+    this.cdr.markForCheck()
   }
 }
