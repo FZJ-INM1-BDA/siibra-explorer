@@ -8,8 +8,6 @@ on:
 env:
   DOCKER_IMAGE_NAME: interactive-viewer
   DOCKER_IMAGE_TAG: ${{ github.sha }}
-  DOCKER_SAVE_FILENAME: iav.tar.gz
-  ARTEFACT_NAME: iav_docker_image
   DOCKER_CONTAINER_NAME: github-actions-iav-dkr-container
 
 jobs:
@@ -44,8 +42,8 @@ jobs:
         docker run -p 3001:3000 \
           --rm \
           --name ${DOCKER_CONTAINER_NAME} \
-          --env HBP_CLIENTID=${{ env.HBP_CLIENTID }} \
-          --env HBP_CLIENTSECRET=${{ env.HBP_CLIENTSECRET }} \
+          --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
+          --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     - name: sleep for 60s
