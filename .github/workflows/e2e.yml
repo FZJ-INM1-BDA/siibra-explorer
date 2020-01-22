@@ -44,6 +44,7 @@ jobs:
           --name ${DOCKER_CONTAINER_NAME} \
           --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
           --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
+          --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     - name: sleep for 60s
