@@ -47,7 +47,7 @@
                          [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
                          iav-captureClickListenerDirective
                          (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
-                         (iav-captureClickListenerDirective-onClick)="mouseUpNehuba($event)">
+                         (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -105,6 +105,11 @@
 
       <div class="fixed-bottom pe-none d-flex justify-content-end m-4">
         <ng-container *ngTemplateOutlet="logoTmpl">
+        </ng-container>
+      </div>
+
+      <div class="fixed-top pe-none d-flex justify-content-center m-4" *ngIf="pluginRegionSelectionEnabled">
+        <ng-container *ngTemplateOutlet="persistentStateNotifierTemplate">
         </ng-container>
       </div>
 
@@ -205,3 +210,8 @@
 <ng-template #logoTmpl>
   <logo-container></logo-container>
 </ng-template>
+
+<ng-template #persistentStateNotifierTemplate>
+  <mat-card>{{persistentStateNotifierTemplate$ | async}}</mat-card>
+</ng-template>
+

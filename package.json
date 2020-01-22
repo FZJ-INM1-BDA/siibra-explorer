@@ -92,6 +92,6 @@
     "zone.js": "^0.9.1"
   },
   "dependencies": {
-    "hbp-connectivity-component": "0.0.17"
+    "hbp-connectivity-component": "0.0.23"
   }
 }
