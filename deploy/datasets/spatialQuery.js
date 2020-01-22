@@ -74,7 +74,7 @@ const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, u
         return {
           name,
           templateSpace: templateName,
-          dataset: dataset.map(ds => ds = {name: ds.name, description: ds.description, externalLink: 'https://kg.ebrains.eu/instances/Dataset/' + ds.identifier}),
+          dataset: dataset.map(ds => ds = {name: ds.name, description: ds.description, externalLink: 'https://kg.ebrains.eu/instances/Dataset/' + ds.identifier, embargoStatus: ds['embargo_status']}),
           geometry: {
             type: 'point',
             space: 'real',

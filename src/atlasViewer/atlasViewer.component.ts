@@ -127,6 +127,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private hoveringRegions = []
   private hoveringLandmark: any
+  public presentDatasetDialogRef: MatDialogRef<any>
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -462,15 +463,20 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public mouseClickNehuba(event) {
     // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
     if (this.hoveringLandmark) {
-      this.matDialog.open(SingleDatasetView, {
+      const hoveringLandmark = this.hoveringLandmark
+      this.hoveringLandmark = null
+      //ToDo it should be ported into different component with ability to view detailed dataset files
+      this.presentDatasetDialogRef = this.matDialog.open(SingleDatasetView, {
         data: {
-          name: this.hoveringLandmark.landmarkDataset[0].name,
-          sourceTitle: this.hoveringLandmark.landmarkName,
-          description: this.hoveringLandmark.landmarkDataset[0].description,
-          kgExternalLink: this.hoveringLandmark.landmarkDataset[0].externalLink,
-          //ToDo change to dynamic
-          underEmbargo: true
+          name: hoveringLandmark.landmarkDataset[0].name,
+          title: hoveringLandmark.landmarkName,
+          description: hoveringLandmark.landmarkDataset[0].description,
+          kgExternalLink: hoveringLandmark.landmarkDataset[0].externalLink,
+          underEmbargo: hoveringLandmark.landmarkDataset[0].embargoStatus[0].name === 'Embargoed'? true : false
         },
+      })
+      this.presentDatasetDialogRef.afterClosed().subscribe(() => {
+        this.presentDatasetDialogRef = null
       })
     }
     if (!this.rClContextualMenu) { return }
