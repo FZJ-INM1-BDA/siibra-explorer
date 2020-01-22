@@ -24,7 +24,7 @@ jobs:
       run: |
         docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
       env:
-        BACKEND_URL: http://localhost:3001
+        BACKEND_URL: http://localhost:3001/
 
   test:
     runs-on: self-hosted
