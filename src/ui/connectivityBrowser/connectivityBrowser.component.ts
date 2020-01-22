@@ -12,8 +12,6 @@ import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_REGION} from "src/services/s
 import {HIDE_SIDE_PANEL_CONNECTIVITY, isDefined, safeFilter} from "src/services/stateStore.service";
 import {VIEWERSTATE_CONTROLLER_ACTION_TYPES} from "src/ui/viewerStateController/viewerState.base";
 
-const compareFn = (it, item) => it.name === item.name
-
 @Component({
   selector: 'connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
@@ -31,10 +29,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public expandMenuIndex = -1
     public allRegions = []
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
-    public parcellationHasConnectivityData = true
     private areaHemisphere: string
     public math = Math
-    public compareFn = compareFn
 
 
 
@@ -69,7 +65,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(parcellation => {
           if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
-            this.parcellationHasConnectivityData = true
             if (parcellation.regions && parcellation.regions.length) {
               this.allRegions = []
               this.getAllRegionsFromParcellation(parcellation.regions)
@@ -78,7 +73,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
               }
             }
           } else {
-            this.parcellationHasConnectivityData = false
+            this.closeConnectivityView()
           }
         }),
         this.connectivityRegion$.subscribe(cr => {
@@ -103,7 +98,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     }
 
     public ngOnDestroy(): void {
-      this.setDefaultMap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
@@ -121,20 +115,11 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       })
     }
 
-    toggleRegionSelection(region) {
-      this.store$.dispatch({
-        type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT,
-        payload: { region: this.getRegionWithName(region) },
-      })
-    }
-
     getRegionWithName(region) {
       return this.allRegions.find(ar => ar.name === region)
     }
 
     public closeConnectivityView() {
-      this.setDefaultMap()
-
       this.store$.dispatch({
         type: HIDE_SIDE_PANEL_CONNECTIVITY,
       })

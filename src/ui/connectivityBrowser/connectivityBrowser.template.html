@@ -1,4 +1,4 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="parcellationHasConnectivityData; else noConnectivity">
+<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent>
     <!--ToDo set show-description="true" when data will available-->
     <hbp-connectivity-matrix-row
             [region]="region"
@@ -11,63 +11,30 @@
             show-description="true">
         <div slot="header" class="w-100 d-flex justify-content-between mt-3">
             <span>Connectivity Browser</span>
-            <i (click)="closeConnectivityView()" class="far fa-times-circle cursorPointer"></i>
+            <i (click)="closeConnectivityView(); setDefaultMap()" class="far fa-times-circle cursorPointer"></i>
         </div>
 
         <div slot="connectedRegionMenu">
-
-            <div class="d-flex flex-column" *ngIf="expandMenuIndex >= 0">
+            <div class="d-flex flex-column p-0 m-0" *ngIf="expandMenuIndex >= 0">
                 <mat-divider></mat-divider>
-                <span class="mt-2 mr-2 ml-2">
-                    <small>Region: {{connectedAreas[expandMenuIndex].name}}</small>
-                    <br>
-                    <small>Number of Connection: {{connectedAreas[expandMenuIndex].numberOfConnections}}</small>
-                    <br>
-                    <small>Log(123) = {{math.log10(connectedAreas[expandMenuIndex].numberOfConnections)}}</small>
-                </span>
+                <mat-card-subtitle class="pt-2 pr-2 pl-2 pb-0">
+                    {{connectedAreas[expandMenuIndex].name}}
+                </mat-card-subtitle>
                 <div class="d-flex align-items-center justify-content-around">
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="toggleRegionSelection(connectedAreas[expandMenuIndex].name)">
-                            <span class="fa-stack fa-1x ">
-                                <i class="fas fa-hand-pointer fa-stack-1x"></i>
-                                <i class="fas fa-slash fa-stack-1x fa-inverse"
-                                   *ngIf="(selectedRegions$ | async | includes : getRegionWithName(connectedAreas[expandMenuIndex].name) : compareFn)"></i>
-                            </span>
-                        </button>
-                        <span [innerText]="(selectedRegions$ | async | includes : getRegionWithName(connectedAreas[expandMenuIndex].name) : compareFn) ? 'Deselect' : 'Select'"></span>
-                    </small>
-
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="navigateToRegion(connectedAreas[expandMenuIndex].name)">
-                            <i class="fas fa-crosshairs  mt-n1"></i>
-                        </button>
-                        Go To
-                    </small>
-
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
-                            <i class="fab fa-connectdevelop  mt-n1"></i>
-                        </button>
-                        Set as Source
-                    </small>
+                    <button mat-button (click)="navigateToRegion(navigateToRegion(connectedAreas[expandMenuIndex].name))">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>
+                            Navigate
+                        </span>
+                    </button>
+                    <button mat-button (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
+                        <i class="fab fa-connectdevelop"></i>
+                        <span>
+                            Connectivity
+                        </span>
+                    </button>
                 </div>
             </div>
-
-
         </div>
     </hbp-connectivity-matrix-row>
 </div>
-
-<ng-template #noConnectivity>
-    <mat-card class="p-2 w-100 h-100 overflow-auto d-block">
-        <div class="w-100 d-flex justify-content-end mt-3"><span
-                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
-        <h5>
-            Connectivity Matrix Browser
-        </h5>
-        <div>
-            No Connectivity for selected Parcellation!
-        </div>
-
-    </mat-card>
-</ng-template>
