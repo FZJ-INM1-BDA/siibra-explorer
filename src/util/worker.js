@@ -258,7 +258,9 @@ const recursivePropagateAttri = (region, inheritAttrsOpts) => {
     returnRegion[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
     newInhAttrsOpts[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
   }
-  returnRegion.children = returnRegion.children.map(c => recursivePropagateAttri(c, newInhAttrsOpts))
+  returnRegion.children = returnRegion.children && Array.isArray(returnRegion.children)
+    ? returnRegion.children.map(c => recursivePropagateAttri(c, newInhAttrsOpts))
+    : null
   return returnRegion
 }
 
@@ -280,6 +282,7 @@ const processParcRegionAttr = (payload) => {
   const { parcellation, inheritAttrsOpts } = payload
   const p = propagateAttri(parcellation, inheritAttrsOpts)
   postMessage({
+    ...payload,
     type: 'UPDATE_PARCELLATION_REGIONS',
     parcellation: p
   })

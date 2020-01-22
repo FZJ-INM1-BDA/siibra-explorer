@@ -12,7 +12,7 @@ import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/services/logging.service";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
-  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
+  || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
 
 const compareFn = (it, item) => it.name === item.name
 
@@ -60,7 +60,7 @@ export class RegionTextSearchAutocomplete {
       map(parcellationSelected => {
         try {
           const returnArray = []
-          const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected, { ngId: 'root', relatedAreas: [] })
+          const ngIdMap = getMultiNgIdsRegionsLabelIndexMap(parcellationSelected, { ngId: 'root', relatedAreas: [], fullId: null })
           for (const [ngId, labelIndexMap] of ngIdMap) {
             for (const [labelIndex, region] of labelIndexMap) {
               returnArray.push({

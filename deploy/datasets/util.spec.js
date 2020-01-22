@@ -7,6 +7,7 @@ const bigbrain = require('./testData/bigbrain')
 const humanReceptor = require('./testData/humanReceptor')
 const mni152JuBrain = require('./testData/mni152JuBrain')
 const colin27 = require('./testData/colin27')
+const hoc1Pmap = require('./testData/hoc1pmap')
 
 describe('datasets/util.js', () => {
 
@@ -215,6 +216,23 @@ describe('datasets/util.js', () => {
         ).to.be.true
       }
     })
+
+    it('hoc1pmap should not belong to bundle parcellation', () => {
+      for (const ds of hoc1Pmap){
+        expect(
+          datasetBelongToParcellation({
+            dataset: ds,
+            parcellationName: 'Fibre Bundle Atlas - Long Bundle'
+          })
+        ).to.be.false
+        expect(
+          datasetBelongToParcellation({
+            dataset: ds,
+            parcellationName: 'Fibre Bundle Atlas - Short Bundle'
+          })
+        ).to.be.false
+      }
+    })
   })
 
   describe('populateSet', () => {
@@ -266,7 +284,5 @@ describe('datasets/util.js', () => {
         'minds/core/parcellationregion/v1.0.0/8a6be82c-5947-4fff-8348-cf9bf73e4f40',
       ])
     })
-
   })
-  
 })

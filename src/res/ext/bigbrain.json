@@ -52,7 +52,17 @@
                               "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [
+                            {
+                              "name": "Area Te1",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f424643e-9baf-4c50-9417-db1ac33dcd3e"
+                                }
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area TE 1.1 (HESCHL)",
@@ -200,8 +210,7 @@
                               "kgSchema": "minds/core/parcellationregion/v1.0.0",
                               "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
                             }
-                          },
-                          "relatedAreas": []
+                          }
                         },
                         {
                           "name": "Area 6d2 (PreCG)",
@@ -219,8 +228,7 @@
                               "kgSchema": "minds/core/parcellationregion/v1.0.0",
                               "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
                             }
-                          },
-                          "relatedAreas": []
+                          }
                         },
                         {
                           "name": "Area 6ma (preSMA, mesial SFG)",
@@ -572,7 +580,17 @@
                               "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
                             }
                           },
-                          "relatedAreas": []
+                          "relatedAreas": [
+                            {
+                              "name": "Area hOc1",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b851eb9d-9502-45e9-8dd8-2861f0e6da3f"
+                                }
+                              }
+                            }
+                          ]
                         },
                         {
                           "name": "Area hOc2 (V2, 18)",

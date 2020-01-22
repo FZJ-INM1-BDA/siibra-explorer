@@ -9,14 +9,18 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain mni152 v18 left",
-      "auxillaryMeshIndices": [ 65535 ],
+      "auxillaryMeshIndices": [
+        65535
+      ],
       "hasAdditionalViewMode": [
         "connectivity"
       ],
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
-      }],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+        }
+      ],
       "properties": {
         "version": "1.0",
         "description": "This dataset contains the whole-brain parcellation of the JuBrain Cytoarchitectonic Atlas (Amunts and Zilles, 2015) in the MNI Colin 27 as well as the MNI ICBM 152 2009c nonlinear asymmetric reference space. The parcellation is derived from the individual probability maps (PMs) of the cytoarchitectonic regions released in the JuBrain Atlas, that are further combined into a Maximum Probability Map (MPM). The MPM is calculated by considering for each voxel the probability of all cytoarchitectonic areas released in the atlas, and determining the most probable assignment (Eickhoff 2005). Note that methodological improvements and integration of new brain structures may lead to small deviations in earlier released datasets.",
@@ -3476,7 +3480,7 @@
                       "rgb": null,
                       "children": [
                         {
-                          "name": "Area 6d1 (PreG)",
+                          "name": "Area 6d1 (PreCG)",
                           "arealabel": "Area-6d1",
                           "status": "publicDOI",
                           "labelIndex": null,
@@ -3486,9 +3490,15 @@
                             33,
                             27
                           ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId":"a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                            }
+                          },
                           "children": [
                             {
-                              "name": "Area 6d1 (PreG) - left hemisphere",
+                              "name": "Area 6d1 (PreCG) - left hemisphere",
                               "rgb": [
                                 45,
                                 33,
@@ -3504,7 +3514,7 @@
                               ]
                             },
                             {
-                              "name": "Area 6d1 (PreG) - right hemisphere",
+                              "name": "Area 6d1 (PreCG) - right hemisphere",
                               "rgb": [
                                 45,
                                 33,
@@ -3522,7 +3532,7 @@
                           ]
                         },
                         {
-                          "name": "Area 6d2 (PreG)",
+                          "name": "Area 6d2 (PreCG)",
                           "arealabel": "Area-6d2",
                           "status": "publicDOI",
                           "labelIndex": null,
@@ -3532,9 +3542,15 @@
                             151,
                             180
                           ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId":"963c5281-67df-4d41-9b91-60b31cf150c0"
+                            }
+                          },
                           "children": [
                             {
-                              "name": "Area 6d2 (PreG) - left hemisphere",
+                              "name": "Area 6d2 (PreCG) - left hemisphere",
                               "rgb": [
                                 170,
                                 151,
@@ -3550,7 +3566,7 @@
                               ]
                             },
                             {
-                              "name": "Area 6d2 (PreG) - right hemisphere",
+                              "name": "Area 6d2 (PreCG) - right hemisphere",
                               "rgb": [
                                 170,
                                 151,
@@ -6589,97 +6605,145 @@
           "name": "Arcuate - Left",
           "children": [],
           "labelIndex": "1",
-          "relatedAreas": [
-            "Direct segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "7de080e0-fa5e-492f-9cbc-a4d7e498b1d5"
+            }
+          }
         },
         {
           "name": "Arcuate - Right",
           "children": [],
           "labelIndex": "31",
-          "relatedAreas": [
-            "Direct segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "17cbf31c-f68b-4753-9014-44aa38e1cdcf"
+            }
+          }
         },
         {
           "name": "Arcuate_Anterior - Left",
           "children": [],
           "labelIndex": "2",
-          "relatedAreas": [
-            "Anterior segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "1ed86a08-d720-427c-9796-ade24e34a36b"
+            }
+          }
         },
         {
           "name": "Arcuate_Anterior - Right",
           "children": [],
           "labelIndex": "32",
-          "relatedAreas": [
-            "Anterior segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "9f625fad-9329-4824-8751-8b27dc197d3e"
+            }
+          }
         },
         {
           "name": "Arcuate_Posterior - Left",
           "children": [],
           "labelIndex": "3",
-          "relatedAreas": [
-            "Posterior segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f13ba46b-09ad-48bd-9301-282b0ee74d8d"
+            }
+          }
         },
         {
           "name": "Arcuate_Posterior - Right",
           "children": [],
           "labelIndex": "33",
-          "relatedAreas": [
-            "Posterior segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2a6ea612-46c1-4a0f-a6f4-5ffc7ff09548"
+            }
+          }
         },
         {
           "name": "Cingulum_Long - Left",
           "children": [],
           "labelIndex": "4",
-          "relatedAreas": [
-            "Left long cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "6fa27cc1-2efe-4fd3-83d7-973667a0b925"
+            }
+          }
         },
         {
           "name": "Cingulum_Long - Right",
           "children": [],
           "labelIndex": "34",
-          "relatedAreas": [
-            "Right long cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f5ae1188-8a10-4e17-9fa9-47b1dc4e50cd"
+            }
+          }
         },
         {
           "name": "Cingulum_Short - Left",
           "children": [],
           "labelIndex": "5",
-          "relatedAreas": [
-            "Left short cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "882d13c0-ffe4-4fd8-95a1-ba714cd25fbb"
+            }
+          }
         },
         {
           "name": "Cingulum_Short - Right",
           "children": [],
           "labelIndex": "35",
-          "relatedAreas": [
-            "Right short cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "4c5ecae5-17b4-4a65-8b66-c4d0882a2bca"
+            }
+          }
         },
         {
           "name": "Cingulum_Temporal - Left",
           "children": [],
           "labelIndex": "6",
-          "relatedAreas": [
-            "Left temporal cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2c71b329-5a32-4ba0-aacb-0fac99c46aca"
+            }
+          }
         },
         {
           "name": "Cingulum_Temporal - Right",
           "children": [],
           "labelIndex": "36",
-          "relatedAreas": [
-            "Right temporal cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "7e965e21-1d9b-4b8d-b77d-4a7ca17603e6"
+            }
+          }
         },
         {
           "name": "CorpusCallosum_Body",
@@ -6705,17 +6769,25 @@
           "name": "CorticoSpinalTract - Left",
           "children": [],
           "labelIndex": "11",
-          "relatedAreas": [
-            "Left corticospinal tract"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "afbb2642-5e90-412f-9847-3d7a831f8f07"
+            }
+          }
         },
         {
           "name": "CorticoSpinalTract - Right",
           "children": [],
           "labelIndex": "41",
-          "relatedAreas": [
-            "Right corticospinal tract"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2f398c6e-6264-4615-8a28-18b3573d0732"
+            }
+          }
         },
         {
           "name": "ExternalCapsule - Left",
@@ -6731,49 +6803,73 @@
           "name": "Fornix - Left",
           "children": [],
           "labelIndex": "13",
-          "relatedAreas": [
-            "Left fornix"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "c8d1e4a0-d0c2-4101-a971-3ffb1ba65ef8"
+            }
+          }
         },
         {
           "name": "Fornix - Right",
           "children": [],
           "labelIndex": "43",
-          "relatedAreas": [
-            "Right fornix"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "e7e8fd6d-aa43-452e-9fc3-635aa0333910"
+            }
+          }
         },
         {
           "name": "InferiorFrontoOccipital - Left",
           "children": [],
           "labelIndex": "14",
-          "relatedAreas": [
-            "Left inferior fronto-occipital fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "524cd5a0-7066-4149-83b8-c0c4aaa12820"
+            }
+          }
         },
         {
           "name": "InferiorFrontoOccipital - Right",
           "children": [],
           "labelIndex": "44",
-          "relatedAreas": [
-            "Right inferior fronto-occipital fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "34e8f68d-0b00-4e9e-bd43-ccaf10deef6d"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal - Left",
           "children": [],
           "labelIndex": "15",
-          "relatedAreas": [
-            "Left inferior longitudinal fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "d3a458e1-6dbf-418d-bb52-c0b0c6acb920"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal - Right",
           "children": [],
           "labelIndex": "45",
-          "relatedAreas": [
-            "Right inferior longitudinal fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "25326bc6-2b87-4483-9738-89ca249faccd"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal_Lateral - Left",
@@ -6829,17 +6925,25 @@
           "name": "Uncinate - Left",
           "children": [],
           "labelIndex": "21",
-          "relatedAreas": [
-            "Left uncinate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f36707b5-d4f3-480b-a1c9-651bf8cc49d5"
+            }
+          }
         },
         {
           "name": "Uncinate - Right",
           "children": [],
           "labelIndex": "51",
-          "relatedAreas": [
-            "Right uncinate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "84ea1a64-03a6-4a7e-9f64-a3d2127ebf3f"
+            }
+          }
         }
       ]
     },

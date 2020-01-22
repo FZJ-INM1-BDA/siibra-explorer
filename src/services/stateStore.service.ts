@@ -216,8 +216,3 @@ export const defaultRootState: IavRootStoreInterface = {
   viewerConfigState: viewerConfigDefaultState,
   viewerState: viewerDefaultState,
 }
-
-// export const getInitialState = (): IavRootStoreInterface => {
-//   const search = new URLSearchParams( window.location.search )
-//   cvtSearchParamToState(search, defaultRootState)
-// }
