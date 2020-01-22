@@ -22,6 +22,7 @@ export class SingleDatasetBase implements OnInit {
    * while the actual data is being loaded from KG with kgSchema and kgId
    */
   @Input() public name?: string
+  @Input() public sourceTitle?: string
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
@@ -32,6 +33,7 @@ export class SingleDatasetBase implements OnInit {
   @Input() public simpleMode: boolean = false
 
   @Input() public kgExternalLink: string = ''
+  @Input() public underEmbargo: boolean = false
 
   @Output() public previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
 
@@ -82,13 +84,16 @@ export class SingleDatasetBase implements OnInit {
     const { kgId, kgSchema, dataset } = this
     this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
     if ( dataset ) {
-      const { name, description, kgReference, publications, files, preview } = dataset
+      const { name, sourceTitle, description, kgReference, publications, files, preview, kgExternalLink, underEmbargo } = dataset
       this.name = name
+      this.sourceTitle = sourceTitle
       this.description = description
       this.kgReference = kgReference
       this.publications = publications
       this.files = files
       this.preview = preview
+      this.kgExternalLink = kgExternalLink
+      this.underEmbargo = underEmbargo
 
       return
     }

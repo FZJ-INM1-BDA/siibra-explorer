@@ -176,6 +176,15 @@ export class MouseOverTextPipe implements PipeTransform {
     }
   }
 
+  private renderDatasetTitle = ({ label, obj }): SafeHtml[] => {
+    switch (label) {
+    case 'landmark':
+      return obj.dataset.map(d => this.sanitizer.sanitize(SecurityContext.HTML, d.name))
+    default:
+      return null
+    }
+  }
+
   public transform(inc: {segments: any, landmark: any, userLandmark: any}): Array<{label: string, text: SafeHtml[]}> {
     const keys = Object.keys(inc)
     return keys
@@ -187,6 +196,7 @@ export class MouseOverTextPipe implements PipeTransform {
         return {
           label: key,
           text: this.renderText({ label: key, obj: inc[key] }),
+          dataset: this.renderDatasetTitle({ label: key, obj: inc[key] })
         }
       })
   }

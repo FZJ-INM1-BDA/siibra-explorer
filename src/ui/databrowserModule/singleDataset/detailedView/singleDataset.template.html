@@ -1,4 +1,7 @@
 
+<mat-card-title *ngIf="sourceTitle">
+  {{ sourceTitle }}
+</mat-card-title>
 <!-- title -->
 <mat-card-subtitle>
   {{ name }}
@@ -122,7 +125,7 @@
 
 
   <!-- download -->
-  <a *ngIf="files.length > 0"
+  <a *ngIf="files && files.length > 0"
     [href]="dlFromKgHref"
     target="_blank">
     <button
@@ -148,6 +151,8 @@
     </span>
     <i class="ml-1 far fa-eye"></i>
   </button>
+
+  <button *ngIf="underEmbargo" mat-button disabled>Under embargo</button>
 </mat-card-actions>
 
 <mat-card-footer></mat-card-footer>

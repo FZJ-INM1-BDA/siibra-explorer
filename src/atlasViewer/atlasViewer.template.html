@@ -133,7 +133,12 @@
 
                 </mat-icon>
 
-                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text">
+                <div class="d-flex flex-column">
+                  <div *ngIf="labelText.dataset && labelText.dataset.length">
+                    <span matLine *ngFor="let dataset of labelText.dataset" [innerHTML]="dataset"></span>
+                  </div>
+                  <div matLine *ngFor="let text of labelText.text" [innerHTML]="text">
+                  </div>
                 </div>
               </mat-list-item>
             </mat-list>
@@ -160,19 +165,7 @@
             </div>
           </ng-container>
         </ng-container>
-
-        <ng-container *ngIf="(onhoverLandmarkForFixed$ | async) as onHoverLandmark">
-          <ng-container *ngIf="onHoverLandmark.landmarkName">
-            <landmark-menu class="pe-all"
-                           [landmark]="onHoverLandmark"
-                           (closeLandmarkMenu)="rClContextualMenu.hide()">
-
-            </landmark-menu>
-          </ng-container>
-        </ng-container>
-
       </div>
-
 
     </layout-floating-container>
 

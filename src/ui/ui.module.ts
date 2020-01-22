@@ -78,7 +78,6 @@ import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectiv
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
-import {LandmarkMenuComponent} from "src/ui/nehubaContainer/landmarkUnit/landmarkMenu/landmarkMenu.component";
 
 @NgModule({
   imports : [
@@ -130,7 +129,6 @@ import {LandmarkMenuComponent} from "src/ui/nehubaContainer/landmarkUnit/landmar
     ConnectivityBrowserComponent,
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
-    LandmarkMenuComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -194,7 +192,6 @@ import {LandmarkMenuComponent} from "src/ui/nehubaContainer/landmarkUnit/landmar
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,
-    LandmarkMenuComponent,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

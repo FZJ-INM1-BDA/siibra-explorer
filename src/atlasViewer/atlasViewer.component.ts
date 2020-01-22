@@ -41,6 +41,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
+import {SingleDatasetView} from "src/ui/databrowserModule/singleDataset/detailedView/singleDataset.component";
 
 /**
  * TODO
@@ -123,6 +124,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private pluginRegionSelectionEnabled: boolean = false
   private persistentStateNotifierTemplate$: Observable<string>
   // private pluginRegionSelectionEnabled: boolean = false
+
+  private hoveringRegions = []
+  private hoveringLandmark: any
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -299,10 +303,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       }),
     )
-
-    this.onhoverSegments$.subscribe(hr => {
-      this.hoveringRegions = hr
-    })
+    this.subscriptions.push(
+      this.onhoverSegments$.subscribe(hr => {
+        this.hoveringRegions = hr
+      }),
+      this.onhoverLandmark$.subscribe(hl => {
+        this.hoveringLandmark = hl
+      })
+    )
   }
 
   private selectedParcellation$: Observable<any>
@@ -447,14 +455,24 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  private hoveringRegions = []
-
   public mouseDownNehuba(_event) {
     this.rClContextualMenu.hide()
   }
 
   public mouseClickNehuba(event) {
     // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+    if (this.hoveringLandmark) {
+      this.matDialog.open(SingleDatasetView, {
+        data: {
+          name: this.hoveringLandmark.landmarkDataset[0].name,
+          sourceTitle: this.hoveringLandmark.landmarkName,
+          description: this.hoveringLandmark.landmarkDataset[0].description,
+          kgExternalLink: this.hoveringLandmark.landmarkDataset[0].externalLink,
+          //ToDo change to dynamic
+          underEmbargo: true
+        },
+      })
+    }
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
