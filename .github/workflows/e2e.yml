@@ -8,7 +8,10 @@ on:
 env:
   DOCKER_IMAGE_NAME: interactive-viewer
   DOCKER_IMAGE_TAG: ${{ github.sha }}
-  DOCKER_CONTAINER_NAME: github-actions-iav-dkr-container
+  DOCKER_CONTAINER_NAME: gha-iav-built-${{ github.sha }}
+  DOCKER_E2E_PPTR: gha-iav-e2e-pptr-${{ github.sha }}
+  DOCKER_E2E_NETWORK: gha-dkr-network-${{ github.sha }}
+  ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000
 
 jobs:
   buildimage:
@@ -24,22 +27,15 @@ jobs:
       run: |
         docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
       env:
-        BACKEND_URL: http://localhost:3001/
+        BACKEND_URL: ${{ env.ATLAS_URL }}
 
   test:
     runs-on: self-hosted
     needs: buildimage
     steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 2
-        repository: 'FZJ-INM1-BDA/iv-automated-tests'
-    - name: Install dependencies
+    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} as container ${{ env.DOCKER_CONTAINER_NAME }}
       run: |
-        npm i
-    - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-      run: |
-        docker run -p 3001:3000 \
+        docker run \
           --rm \
           --name ${DOCKER_CONTAINER_NAME} \
           --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
@@ -47,15 +43,31 @@ jobs:
           --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-    - name: sleep for 60s
-      run: sleep 60s
-    - name: run pptr tests - ${{ env.TEST_URL }}
-      run: node ./node_modules/.bin/mocha ./test/databrowser.spec.js --timeout 1800000 
-      env:
-        TEST_URL: http://localhost:3001
+
+    - uses: actions/checkout@v1
+    - name: Start pptr docker container with name ${{ env.DOCKER_E2E_PPTR }}
+      run: |
+        docker run --rm \
+          --name ${DOCKER_E2E_PPTR} \
+          -dt \
+          puppeteer
+        docker cp . ${DOCKER_E2E_PPTR}:/iav
+        docker exec -u root ${DOCKER_E2E_PPTR} chown -R pptruser:pptruser /iav
+        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm i
+        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome latest
+        docker exec -t ${DOCKER_E2E_PPTR} npm i puppeteer
+    - name: Setup docker network
+      run: |
+        docker network create ${{ env.DOCKER_E2E_NETWORK }}
+        docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_E2E_PPTR }}
+        docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_CONTAINER_NAME }}
+    - name: run pptr tests - ${{ env.ATLAS_URL }}
+      run: |
+        docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
     - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
-      if: always()
-      run: docker stop ${DOCKER_CONTAINER_NAME}
-    - name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
       if: success()
-      run: docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
+      run: |
+        docker stop ${DOCKER_CONTAINER_NAME}
+        docker stop ${DOCKER_E2E_PPTR}
+        docker network rm ${DOCKER_E2E_NETWORK}
+        docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}

@@ -1,5 +1,4 @@
-const url = 'http://localhost:3000/'
-
+const chromeOpts = require('../chromeOpts')
 const noErrorLog = require('./noErrorLog')
 const { getSelectedTemplate, getSelectedParcellation, getSelectedRegions } = require('./ivApi')
 const { getSearchParam, wait } = require('./util')
@@ -19,7 +18,16 @@ if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should n
 let browser
 describe('IAV', () => {
   beforeAll(async () => {
-    browser = await pptr.launch()
+    browser = await pptr.launch({
+      ...(
+        chromeOpts.indexOf('--headless') >= 0
+          ? { headless: true }
+          : {}
+      ),
+      args: [
+        ...chromeOpts
+      ]
+    })
   })
 
   // TODO figure out how to get jasmine to compare array members
