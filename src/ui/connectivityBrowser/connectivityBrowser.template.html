@@ -1,17 +1,78 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent>
-    <!--ToDo set show-description="true" when data will available-->
+<div class="w-100 h-100 d-block d-flex flex-column pb-2" #connectivityComponent>
     <hbp-connectivity-matrix-row
             [region]="region"
             theme="dark"
             loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+            dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies"
             show-export="true"
             show-source="true"
             show-title="false"
-            show-toolbar="true"
-            show-description="true">
+            show-toolbar="false"
+            show-description="false"
+            show-dataset-name="false"
+            custom-dataset-selector="true"
+            [customHeight]="componentHeight + 'px'">
         <div slot="header" class="w-100 d-flex justify-content-between mt-3">
             <span>Connectivity Browser</span>
             <i (click)="closeConnectivityView(); setDefaultMap()" class="far fa-times-circle cursorPointer"></i>
+        </div>
+
+        <div slot="dataset">
+            <div *ngIf="datasetList.length && selectedDataset"  class=" flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+                    <mat-form-field class="flex-grow-1 flex-shrink-1 w-0">
+                        <mat-label>
+                            Dataset
+                        </mat-label>
+
+                        <mat-select
+                                panelClass="no-max-width"
+                                [value]="selectedDataset"
+                                (selectionChange)="changeDataset($event)">
+                            <mat-option
+                                    *ngFor="let dataset of datasetList"
+                                    [value]="dataset"
+                            >
+                                {{ dataset.title }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                <ng-container *ngIf="selectedDataset && selectedDataset.description" >
+                    <!-- show on hover component -->
+                    <sleight-of-hand class="d-inline-block flex-grow-0 flex-shrink-0 pe-all">
+
+                        <!-- shown when off -->
+                        <div sleight-of-hand-front>
+                            <button
+                                    mat-icon-button>
+                                <i class="fas fa-info"></i>
+                            </button>
+                        </div>
+
+                        <!-- shown on hover -->
+                        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+                            <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+                                <i class="fas fa-info"></i>
+                            </button>
+
+                            <div class="position-relative">
+                                <button class="position-relative invisible pe-none" mat-icon-button>
+                                    <i class="fas fa-info"></i>
+                                </button>
+
+                                <mat-card class="position-absolute left-0 top-0 w-40em">
+                                    <single-dataset-view
+                                            [name]="selectedDataset.title"
+                                            [description]="selectedDataset.description">
+                                    </single-dataset-view>
+                                </mat-card>
+                            </div>
+
+                        </div>
+                    </sleight-of-hand>
+
+                </ng-container>
+
+                </div>
         </div>
 
         <div slot="connectedRegionMenu">

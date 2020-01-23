@@ -1,9 +1,11 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
-  Component,
-  ElementRef,
-  OnDestroy,
-  ViewChild,
+    AfterContentChecked,
+    AfterContentInit, AfterViewChecked,
+    AfterViewInit, ChangeDetectorRef,
+    Component,
+    ElementRef,
+    OnDestroy,
+    ViewChild,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription} from "rxjs";
@@ -16,10 +18,13 @@ import {VIEWERSTATE_CONTROLLER_ACTION_TYPES} from "src/ui/viewerStateController/
   selector: 'connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
 })
-export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
+export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, AfterContentChecked {
 
     public region: string
+    public datasetList: any[] = []
+    public selectedDataset: any
     private connectedAreas = []
+    public componentHeight: any
 
     private connectivityRegion$: Observable<any>
     private selectedParcellation$: Observable<any>
@@ -29,10 +34,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
     public expandMenuIndex = -1
     public allRegions = []
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
-    private areaHemisphere: string
     public math = Math
-
-
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef
 
@@ -61,6 +63,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       )
     }
 
+    public ngAfterContentChecked(): void {
+        this.componentHeight = this.connectivityComponentElement.nativeElement.clientHeight
+    }
+
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(parcellation => {
@@ -78,7 +84,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         }),
         this.connectivityRegion$.subscribe(cr => {
           this.region = cr
-          this.areaHemisphere = cr.includes('left hemisphere') ? ' - left hemisphere' : ' - right hemisphere'
           this.changeDetectionRef.detectChanges()
         }),
       )
@@ -93,8 +98,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
           }),
+          fromEvent(this.connectivityComponentElement.nativeElement, 'datasetDataReceived', { capture: true })
+          .subscribe((e: CustomEvent) => {
+              this.datasetList = e.detail
+              this.selectedDataset = this.datasetList[0]
+          }),
 
       )
+    }
+
+    // ToDo Affect on component
+    changeDataset(event) {
+        this.selectedDataset = event.value
     }
 
     public ngOnDestroy(): void {
