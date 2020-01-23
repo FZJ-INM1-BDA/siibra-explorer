@@ -1,8 +1,10 @@
 const chromeOpts = require('../chromeOpts')
 const noErrorLog = require('./noErrorLog')
-const { getSelectedTemplate, getSelectedParcellation, getSelectedRegions, getCurrentNavigationState } = require('./ivApi')
+const { getSelectedTemplate, getSelectedParcellation, getSelectedRegions, getCurrentNavigationState, awaitNehubaViewer } = require('./ivApi')
 const { getSearchParam, wait } = require('./util')
 const { URLSearchParams } = require('url')
+
+const { waitMultiple } = require('./util')
 
 describe('protractor works', () => {
   it('protractor works', () => {
@@ -94,7 +96,8 @@ describe('IAV', () => {
 
       const page = await browser.newPage()
       await page.goto(`${ATLAS_URL}${searchParam}`, { waitUntil: 'networkidle2' })
-      await page.waitFor(500)
+      await awaitNehubaViewer(page)
+      await page.waitFor(500 * waitMultiple)
 
       const actualNav = await getCurrentNavigationState(page)
       expect(expectedNav).toEqual(actualNav)

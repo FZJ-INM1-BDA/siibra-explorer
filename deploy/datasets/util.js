@@ -3,7 +3,7 @@ const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
-const { getIdFromFullId } = require('../../common/util')
+const { getIdFromFullId, retry } = require('../../common/util')
 
 let getPublicAccessToken
 
@@ -294,27 +294,6 @@ const init = async () => {
   if (getPublicAccessToken) return
   const { getPublicAccessToken: getPublic } = await kgQueryUtil()
   getPublicAccessToken = getPublic
-}
-
-const defaultConfig = {
-  timeout: 5000,
-  retries: 3
-}
-
-const retry = async (fn, { timeout = defaultConfig.timeout, retries = defaultConfig.retries } = defaultConfig) => {
-  let retryNo = 0
-  while (retryNo < retries) {
-    retryNo ++
-    try {
-      const result = await fn()
-      return result
-    } catch (e) {
-      console.warn(`fn failed, retry after ${timeout} milliseconds`)
-      await (() => new Promise(rs => setTimeout(rs, timeout)))()
-    }
-  }
-
-  throw new Error(`fn failed ${retries} times. Aborting.`)
 }
 
 module.exports = {

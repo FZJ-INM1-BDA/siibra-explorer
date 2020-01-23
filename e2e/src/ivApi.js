@@ -1,3 +1,6 @@
+const { retry } = require('../../common/datasets/util')
+const { waitMultiple } = require('./util')
+
 exports.getSelectedTemplate = (browser) => new Promise((resolve, reject) => {
   browser.executeAsyncScript('let sub = window.interactiveViewer.metadata.selectedTemplateBSubject.subscribe(obj => arguments[arguments.length - 1](obj));sub.unsubscribe()')
     .then(resolve)
@@ -46,4 +49,15 @@ exports.getCurrentNavigationState = async (page) => {
 
     return returnObj
   })
+}
+
+exports.awaitNehubaViewer = async (page) => {
+  const getNVAvailable = () => new Promise((rs, rj) => {
+    page.evaluate(() => {
+      if (nehubaViewer) rs()
+      else rj()
+    })
+  })
+
+  await retry(getNVAvailable, { timeout: 500 * waitMultiple, retries: 10 })
 }
