@@ -16,7 +16,8 @@
     "test": "karma start spec/karma.conf.js",
     "e2e": "protractor e2e/protractor.conf",
     "lint": "eslint src --ext .ts",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "wd": "webdriver-manager"
   },
   "keywords": [],
   "author": "",

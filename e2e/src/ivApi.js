@@ -9,3 +9,16 @@ exports.getSelectedParcellation = (browser) => new Promise((resolve, reject) => 
     .then(resolve)
     .catch(reject)
 })
+
+exports.getSelectedRegions = async (page) => {
+  return await page.evaluate(async () => {
+    let region, sub
+    const getRegion = () => new Promise(rs => {
+      sub = interactiveViewer.metadata.selectedRegionsBSubject.subscribe(rs)
+    })
+
+    region = await getRegion()
+    sub.unsubscribe()
+    return region
+  })
+}

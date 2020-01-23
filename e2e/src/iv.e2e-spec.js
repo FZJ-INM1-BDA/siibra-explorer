@@ -1,8 +1,8 @@
-const url = 'http://localhost:8081/'
-
+const chromeOpts = require('../chromeOpts')
 const noErrorLog = require('./noErrorLog')
-const { getSelectedTemplate, getSelectedParcellation } = require('./ivApi')
+const { getSelectedTemplate, getSelectedParcellation, getSelectedRegions } = require('./ivApi')
 const { getSearchParam, wait } = require('./util')
+const { URLSearchParams } = require('url')
 
 describe('protractor works', () => {
   it('protractor works', () => {
@@ -10,89 +10,61 @@ describe('protractor works', () => {
   })
 })
 
-describe('Home screen', () => {
-  beforeEach(() => {
-    browser.waitForAngularEnabled(false)
-    browser.get(url)
+const pptr = require('puppeteer')
+const ATLAS_URL = process.env.ATLAS_URL || 'http://localhost:3000'
+if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
+if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
+
+let browser
+describe('IAV', () => {
+  beforeAll(async () => {
+    browser = await pptr.launch({
+      ...(
+        chromeOpts.indexOf('--headless') >= 0
+          ? { headless: true }
+          : {}
+      ),
+      args: [
+        ...chromeOpts
+      ]
+    })
   })
 
-  it('get title works', () => {
-    browser.getTitle()
-      .then(title => {
-        expect(title).toEqual('Interactive Atlas Viewer')
+  // TODO figure out how to get jasmine to compare array members
+  describe('api', () => {
+    const urlMni152JuBrain = `${ATLAS_URL}/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&cRegionsSelected=%7B%22jubrain+mni152+v18+left%22%3A%222%22%2C%22jubrain+mni152+v18+right%22%3A%222%22%7D&cNavigation=0.0.0.-W000..2_ZG29.-ASCS.2-8jM2._aAY3..BSR0..70hl~.1w4W0~.70hk..1Pl9`
+    describe('selectRegion obs', () => {
+      it('should populate selected region with inherited properties', async () => {
+        const page = await browser.newPage()
+        await page.goto(urlMni152JuBrain, {waitUntil: 'networkidle2'})
+        const regions = await getSelectedRegions(page)
+        for (const region of regions){
+          expect(region.relatedAreas).toBeDefined()
+          expect(
+            region.relatedAreas.map(({ name }) => name).sort()
+          ).toEqual(
+            [
+              'Area 44v',
+              'Area 44d'
+            ].sort()
+          )
+        }
       })
-      .catch(error => {
-        console.error('error', error)
-      })
-
-    browser.executeScript('window.interactiveViewer')
-      .then(result => expect(result).toBeDefined())
-    browser.executeScript('window.viewer')
-      .then(result => expect(result).toBeNull())
-
-    noErrorLog(browser)
+    })
   })
-})
-
-describe('Query param: ', () => {
-
-  it('correctly defined templateSelected and selectedParcellation works', async () => {
-
-    const searchParam = '?templateSelected=MNI+Colin+27&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas'
-    browser.get(url + searchParam)
-    browser.executeScript('window.interactiveViewer').then(result => expect(result).toBeDefined())
-    browser.executeScript('window.viewer').then(result => expect(result).toBeDefined())
+  
+  // tracking issue: https://github.com/HumanBrainProject/interactive-viewer/issues/455
+  // reenable when fixed
+  // describe('Url parsing', () => {
     
-    await wait(browser)
-
-    getSelectedTemplate(browser)
-      .then(template => {
-        expect(template.name).toBe('MNI Colin 27')
-      })
-
-    getSelectedParcellation(browser)
-      .then(parcellation => {
-        expect(parcellation.name).toBe('JuBrain Cytoarchitectonic Atlas')
-      })
-
-    noErrorLog(browser)
-  })
-
-  it('correctly defined templateSelected but incorrectly defined selectedParcellation work', async () => {
-    const searchParam = '?templateSelected=MNI+Colin+27&parcellationSelected=NoName'
-    browser.get(url + searchParam)
-
-    await wait(browser)
-
-    getSelectedTemplate(browser)
-      .then(template => {
-        expect(template.name).toBe('MNI Colin 27')
-      })
-      .catch(fail)
-
-    Promise.all([
-      getSelectedTemplate(browser),
-      getSelectedParcellation(browser)  
-    ])
-      .then(([template, parcellation]) => {
-        expect(parcellation.name).toBe(template.parcellations[0].name)
-      })
-      .catch(fail)
-      
-    noErrorLog(browser)
-  })
-
-  it('incorrectly defined templateSelected should clear searchparam', async () => {
-    const searchParam = '?templateSelected=NoName2&parcellationSelected=NoName'
-    browser.get(url + searchParam)
-
-    await wait(browser)
-
-    getSearchParam(browser)
-      .then(searchParam => {
-        const templateSelected = searchParam.get('templateSelected')
-        expect(templateSelected).toBeNull()
-      })
-      .catch(fail)
-  })
+  //   it('incorrectly defined templateSelected should clear searchparam', async () => {
+  //     const search = '/?templateSelected=NoName2&parcellationSelected=NoName'
+  //     const page = await browser.newPage()
+  //     await page.goto(`${ATLAS_URL}${search}`, {waitUntil: 'networkidle2'})
+  //     await page.waitFor(500)
+  //     const searchParam = await getSearchParam(page)
+  //     const searchParamObj = new URLSearchParams(searchParam)
+  //     expect(searchParamObj.get('templateSelected')).toBeNull()
+  //   })
+  // })
 })

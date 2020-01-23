@@ -3,7 +3,9 @@
   "type": "template",
   "species": "Mouse",
   "ngId": "stpt",
-  "otherNgIds": ["nissl"],
+  "otherNgIds": [
+    "nissl"
+  ],
   "useTheme": "dark",
   "nehubaConfigURL": "nehubaConfig/allenMouseNehubaConfig",
   "parcellations": [
@@ -19106,9 +19108,11 @@
       "properties": {
         "name": "Allen Mouse Common Coordinate Framework v3 2017",
         "description": "Allen Mouse Common Coordinate Framework v3, downloaded on 19/09/2019, 2017 (662 newly drawn structures, 1522 structures total)",
-        "publications": [{
-          "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-        }]
+        "publications": [
+          {
+            "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+          }
+        ]
       }
     },
     {
@@ -19851,7 +19855,14 @@
                                           2337500,
                                           1677500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "368c29b4-affd-46cf-ac89-ce6d520759b1"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Secondary motor area",
@@ -20128,7 +20139,14 @@
                                           3027500,
                                           1927500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "af019af1-3b69-42ac-be17-f1c2a1058329"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     }
                                   ],
                                   "ontologyMetadata": {
@@ -20771,7 +20789,14 @@
                                               967500,
                                               1577500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "6321aaf1-e663-48ac-a2e4-a0b53b2a4941"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         },
                                         {
                                           "name": "Primary somatosensory area, barrel field",
@@ -21249,7 +21274,14 @@
                                               -102500,
                                               2287500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "a2c0a613-0507-4878-a305-0b8455121e3a"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         },
                                         {
                                           "name": "Primary somatosensory area, lower limb",
@@ -21572,7 +21604,14 @@
                                               667500,
                                               2807500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "2442b0a6-5a4b-433f-b24c-24973831f4f4"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         },
                                         {
                                           "name": "Primary somatosensory area, mouth",
@@ -22218,7 +22257,14 @@
                                               1187500,
                                               2297500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "0b260c14-c381-4260-a958-505bfd6672d1"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         },
                                         {
                                           "name": "Primary somatosensory area, trunk",
@@ -22541,7 +22587,14 @@
                                               -42500,
                                               3097500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "4b9e5151-bf65-4d3c-9926-9f8e92061889"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         },
                                         {
                                           "name": "Primary somatosensory area, unassigned",
@@ -22864,7 +22917,14 @@
                                               777500,
                                               2317500
                                             ]
-                                          ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "ac8f6062-6014-437d-b24a-715b211f2096"
+                                            }
+                                          },
+                                          "relatedAreas": []
                                         }
                                       ],
                                       "ontologyMetadata": {
@@ -22902,7 +22962,14 @@
                                           897500,
                                           1977500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6ffdfed4-d9bf-4c92-b6f7-e7de76dee881"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Supplemental somatosensory area",
@@ -25867,7 +25934,14 @@
                                           -1622500,
                                           2357500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6f17fd2c-94d7-4807-be28-12eb2b870e6d"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Anteromedial visual area",
@@ -26190,7 +26264,14 @@
                                           -1022500,
                                           3317500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "f9925036-2394-48df-813e-150dce63aee4"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Lateral visual area",
@@ -26836,7 +26917,14 @@
                                           -2432500,
                                           2837500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "f9d426ec-d6b2-4370-8fa2-8e85d30168c6"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Posterolateral visual area",
@@ -28562,7 +28650,14 @@
                                           2197500,
                                           2097500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6f9e275f-e4b1-4b73-ab3c-61f3d386ed00"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Anterior cingulate area, ventral part",
@@ -29176,7 +29271,14 @@
                                       3527500,
                                       1257500
                                     ]
-                                  ]
+                                  ],
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "157f0525-03ae-434b-8856-bac7abb0a2a3"
+                                    }
+                                  },
+                                  "relatedAreas": []
                                 },
                                 {
                                   "name": "Infralimbic area",
@@ -32136,7 +32238,14 @@
                                           -1492500,
                                           3217500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "a43fe448-5035-4fb2-b141-3af62baf7c02"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Retrosplenial area, dorsal part",
@@ -32459,7 +32568,14 @@
                                           -1382500,
                                           3237500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "30517d4d-668e-40eb-a7a8-7112058ca906"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Retrosplenial area, ventral part",
@@ -32758,7 +32874,14 @@
                                           -1152500,
                                           2777500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "fc465f87-b153-4418-a526-52874591f64a"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     }
                                   ],
                                   "ontologyMetadata": {
@@ -33260,7 +33383,14 @@
                                           -612500,
                                           3177500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "cf5c7194-fe25-4828-8225-8a8125c30133"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     },
                                     {
                                       "name": "Rostrolateral visual area",
@@ -33583,7 +33713,14 @@
                                           -1162500,
                                           2797500
                                         ]
-                                      ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "d5ffb9fa-04e2-44dc-bcee-ab4a1467fa99"
+                                        }
+                                      },
+                                      "relatedAreas": []
                                     }
                                   ],
                                   "ontologyMetadata": {
@@ -37851,7 +37988,14 @@
                                       -1332500,
                                       797500
                                     ]
-                                  ]
+                                  ],
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "fc429031-1632-49a4-b9c6-00ab72100c85"
+                                    }
+                                  },
+                                  "relatedAreas": []
                                 },
                                 {
                                   "name": "Retrohippocampal region",
@@ -40539,7 +40683,14 @@
                           997500,
                           1107500
                         ]
-                      ]
+                      ],
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "b4747984-ae71-4de2-bf18-e5965a27b490"
+                        }
+                      },
+                      "relatedAreas": []
                     },
                     {
                       "name": "Cerebral nuclei",
@@ -43051,7 +43202,14 @@
                       867500,
                       297500
                     ]
-                  ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "2f520589-1a89-427d-ac6b-3a561e0fa0f3"
+                    }
+                  },
+                  "relatedAreas": []
                 },
                 {
                   "name": "Brain stem",
@@ -57486,7 +57644,14 @@
                       -2602500,
                       -722500
                     ]
-                  ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "a470f51b-bf1f-4c63-a18f-df2ea2c65f3f"
+                    }
+                  },
+                  "relatedAreas": []
                 },
                 {
                   "name": "Cerebellum",
@@ -58840,7 +59005,14 @@
                               -5122500,
                               1147500
                             ]
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8b7490d6-bde7-438a-aee9-34820860fe12"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Hemispheric regions",
@@ -60098,7 +60270,14 @@
                       -4942500,
                       777500
                     ]
-                  ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "caa2c52c-0d6c-4eba-b2b6-5414cc241553"
+                    }
+                  },
+                  "relatedAreas": []
                 }
               ],
               "ontologyMetadata": {
@@ -67952,28 +68131,35 @@
         }
       ],
       "properties": {
-        "name":"Allen Mouse Common Coordinate Framework v3 2015",
-        "description":"Allen Mouse Common Coordinate Framework v3, downloaded on 01/07/2017  2015 (178 newly drawn structures, 1045 structures total)",
-        "publications": [{
-          "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-        },{
-          "doi": "10.1038/nature13186",
-          "citation": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214. "
-        }]
+        "name": "Allen Mouse Common Coordinate Framework v3 2015",
+        "description": "Allen Mouse Common Coordinate Framework v3, downloaded on 01/07/2017  2015 (178 newly drawn structures, 1045 structures total)",
+        "publications": [
+          {
+            "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+          },
+          {
+            "doi": "10.1038/nature13186",
+            "citation": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214. "
+          }
+        ]
       }
     }
   ],
   "properties": {
     "name": "Allen Mouse Common Coordinate Framework v3 2015",
     "description": "The Allen Mouse Common Coordinate Framework v3 2015 includes a full-color, high-resolution anatomical reference atlas accompanied by a systematic, hierarchically organized taxonomy of mouse brain structures. Anatomical annotations in classical histological atlas plates were extracted to create a comprehensive volumetric reference atlas of the mouse brain.",
-    "publications":[{
-      "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-    },{
-      "cite":"Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214.",
-      "doi": "10.1038/nature13186"
-    }, {
-      "cite": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/",
-      "doi": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/"
-    }]
+    "publications": [
+      {
+        "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+      },
+      {
+        "cite": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214.",
+        "doi": "10.1038/nature13186"
+      },
+      {
+        "cite": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/",
+        "doi": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/"
+      }
+    ]
   }
 }
