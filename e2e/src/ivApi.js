@@ -1,4 +1,4 @@
-const { retry } = require('../../common/datasets/util')
+const { retry } = require('../../common/util')
 const { waitMultiple } = require('./util')
 
 exports.getSelectedTemplate = (browser) => new Promise((resolve, reject) => {
