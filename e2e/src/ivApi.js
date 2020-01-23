@@ -22,3 +22,28 @@ exports.getSelectedRegions = async (page) => {
     return region
   })
 }
+
+exports.getCurrentNavigationState = async (page) => {
+  return await page.evaluate(async () => {
+    let returnObj, sub
+    const getPr = () =>  new Promise(rs => {
+
+      sub = nehubaViewer.navigationState.all
+        .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
+          returnObj = {
+            orientation: Array.from(orientation),
+            perspectiveOrientation: Array.from(perspectiveOrientation),
+            perspectiveZoom,
+            zoom,
+            position: Array.from(position)
+          }
+          rs()
+        })
+    })
+
+    await getPr()
+    sub.unsubscribe()
+
+    return returnObj
+  })
+}
