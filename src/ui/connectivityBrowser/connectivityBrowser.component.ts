@@ -1,11 +1,11 @@
 import {
-    AfterContentChecked,
-    AfterContentInit, AfterViewChecked,
-    AfterViewInit, ChangeDetectorRef,
-    Component,
-    ElementRef,
-    OnDestroy,
-    ViewChild,
+  AfterContentChecked,
+  AfterContentInit, AfterViewChecked,
+  AfterViewInit, ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription} from "rxjs";
@@ -64,7 +64,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     public ngAfterContentChecked(): void {
-        this.componentHeight = this.connectivityComponentElement.nativeElement.clientHeight
+      this.componentHeight = this.connectivityComponentElement.nativeElement.clientHeight
     }
 
     public ngAfterViewInit(): void {
@@ -98,10 +98,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
           }),
-          fromEvent(this.connectivityComponentElement.nativeElement, 'datasetDataReceived', { capture: true })
+        fromEvent(this.connectivityComponentElement.nativeElement, 'datasetDataReceived', { capture: true })
           .subscribe((e: CustomEvent) => {
-              this.datasetList = e.detail
-              this.selectedDataset = this.datasetList[0]
+            this.datasetList = e.detail
+            this.selectedDataset = this.datasetList[0]
           }),
 
       )
@@ -109,7 +109,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     // ToDo Affect on component
     changeDataset(event) {
-        this.selectedDataset = event.value
+      this.selectedDataset = event.value
     }
 
     public ngOnDestroy(): void {
