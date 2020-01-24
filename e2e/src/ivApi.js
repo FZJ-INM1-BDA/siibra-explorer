@@ -62,5 +62,5 @@ exports.awaitNehubaViewer = async (page) => {
     else return rj()
   })
 
-  await retry(getNVAvailable, { timeout: 500 * waitMultiple, retries: 10 })
+  await retry(getNVAvailable, { timeout: 2000 * waitMultiple, retries: 10 })
 }

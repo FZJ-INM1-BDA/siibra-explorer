@@ -38,6 +38,7 @@ jobs:
         docker run \
           --rm \
           --name ${DOCKER_CONTAINER_NAME} \
+          -p 13000:3000 \
           --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
           --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
           --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
