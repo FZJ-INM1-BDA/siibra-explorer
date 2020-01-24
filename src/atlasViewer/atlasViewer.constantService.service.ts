@@ -52,7 +52,7 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   }
 
   // instead of using window.location.href, which includes query param etc
-  public backendUrl = `${BACKEND_URL}/`.replace(/\/\/$/, '\/') || `${window.location.origin}${window.location.pathname}`
+  public backendUrl = `${BACKEND_URL}/`.replace(/\/\/$/, '/') || `${window.location.origin}${window.location.pathname}`
 
   private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
     switchMap((template: any) => {
