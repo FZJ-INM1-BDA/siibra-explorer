@@ -13,7 +13,7 @@ describe('protractor works', () => {
 })
 
 const pptr = require('puppeteer')
-const ATLAS_URL = process.env.ATLAS_URL || 'http://localhost:3000'
+const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/$/, '')
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
 
