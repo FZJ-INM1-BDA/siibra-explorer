@@ -2,7 +2,7 @@ import { OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { MatBottomSheet, MatBottomSheetRef, MatSelectChange } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, shareReplay, tap } from "rxjs/operators";
+import { distinctUntilChanged, filter, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
@@ -77,8 +77,7 @@ export class ViewerStateBase implements OnInit {
 
     this.availableTemplates$ = viewerState$.pipe(
       select('fetchedTemplates'),
-      distinctUntilChanged(),
-      tap(() => console.log('available templates'))
+      distinctUntilChanged()
     )
 
     this.availableParcellations$ = this.templateSelected$.pipe(

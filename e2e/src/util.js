@@ -11,3 +11,5 @@ exports.wait = (browser) => new Promise(resolve => {
   browser.sleep(1000)
     .then(resolve)
 })
+
+exports.waitMultiple = process.env.WAIT_ULTIPLE || 1

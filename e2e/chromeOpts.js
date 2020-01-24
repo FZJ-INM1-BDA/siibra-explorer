@@ -1,7 +1,8 @@
 module.exports = [
   '--headless',
   '--no-sandbox',
+  '--disable-gpu',
   '--disable-setuid-sandbox',
   "--disable-extensions",
-  '--window-size=800,600'
+  '--window-size=1600,800'
 ]

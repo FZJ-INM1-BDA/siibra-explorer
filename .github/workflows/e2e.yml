@@ -11,7 +11,7 @@ env:
   DOCKER_CONTAINER_NAME: gha-iav-built-${{ github.sha }}
   DOCKER_E2E_PPTR: gha-iav-e2e-pptr-${{ github.sha }}
   DOCKER_E2E_NETWORK: gha-dkr-network-${{ github.sha }}
-  ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000
+  ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000/
 
 jobs:
   buildimage:
