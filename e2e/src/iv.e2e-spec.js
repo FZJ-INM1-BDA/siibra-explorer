@@ -97,7 +97,7 @@ describe('IAV', () => {
       const page = await browser.newPage()
       await page.goto(`${ATLAS_URL}${searchParam}`, { waitUntil: 'networkidle2' })
       await awaitNehubaViewer(page)
-      await page.waitFor(500 * waitMultiple)
+      await page.waitFor(1000 * waitMultiple)
 
       const actualNav = await getCurrentNavigationState(page)
       expect(expectedNav).toEqual(actualNav)

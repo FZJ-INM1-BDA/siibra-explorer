@@ -26,8 +26,9 @@ exports.getSelectedRegions = async (page) => {
   })
 }
 
-exports.getCurrentNavigationState = async (page) => {
-  return await page.evaluate(async () => {
+exports.getCurrentNavigationState = page => new Promise(async rs => {
+  const rObj = await page.evaluate(async () => {
+
     let returnObj, sub
     const getPr = () =>  new Promise(rs => {
 
@@ -49,14 +50,16 @@ exports.getCurrentNavigationState = async (page) => {
 
     return returnObj
   })
-}
+  rs(rObj)
+})
 
 exports.awaitNehubaViewer = async (page) => {
-  const getNVAvailable = () => new Promise((rs, rj) => {
-    page.evaluate(() => {
-      if (nehubaViewer) rs()
-      else rj()
+  const getNVAvailable = () => new Promise(async (rs, rj) => {
+    const result = await page.evaluate(() => {
+      return !!window.nehubaViewer
     })
+    if (result) return rs()
+    else return rj()
   })
 
   await retry(getNVAvailable, { timeout: 500 * waitMultiple, retries: 10 })
