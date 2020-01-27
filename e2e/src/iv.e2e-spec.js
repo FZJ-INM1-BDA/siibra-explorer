@@ -120,8 +120,8 @@ describe('IAV', () => {
 
     it('pluginStates should result in call to fetch pluginManifest', async () => {
       const searchParam = new URLSearchParams()
-      searchParam.set('templateSelected', 'Big Brain (Histology)')
-      searchParam.set('parcellationSelected', 'Grey/White matter')
+      searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+      searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
       searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
       
       const page = await browser.newPage()
