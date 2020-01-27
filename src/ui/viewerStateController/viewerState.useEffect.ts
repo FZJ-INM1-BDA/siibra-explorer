@@ -2,12 +2,13 @@ import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
-import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom } from "rxjs/operators";
+import {distinctUntilChanged, filter, map, mergeMap, shareReplay, withLatestFrom} from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
 import { UIService } from "src/services/uiService.service";
 import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
+import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 
 @Injectable({
   providedIn: 'root',
@@ -58,6 +59,7 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
     private store$: Store<IavRootStoreInterface>,
     private uiService: UIService,
     private constantSerivce: AtlasViewerConstantsServices,
+    private coordinatesTransformation: TemplateCoordinatesTransformation
   ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -122,11 +124,37 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         if (templateSelected && templateSelected.name === name) { return false }
         return true
       }),
-      map(([name]) => name),
-      withLatestFrom(viewerState$.pipe(
-        select('fetchedTemplates'),
-      )),
-      map(([name, availableTemplates]) => {
+      withLatestFrom(
+        viewerState$.pipe(
+          select('fetchedTemplates'),
+        ),
+        viewerState$.pipe(
+          select('navigation'),
+        ),
+      ),
+      mergeMap(([[name, templateSelected], availableTemplates, navigation]) =>
+        this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, name, navigation.position)
+          .then(res => {
+            navigation.position = res
+            return {
+              name: name,
+              templateSelected: templateSelected,
+              availableTemplates: availableTemplates,
+              coordinates: res,
+              navigation: navigation
+            }
+          })
+          .catch(() => {
+            return {
+              name: name,
+              templateSelected: templateSelected,
+              availableTemplates: availableTemplates,
+              coordinates: null,
+              navigation: null
+            }
+          })
+      ),
+      map(({name, templateSelected, availableTemplates, coordinates, navigation}) => {
         const newTemplateTobeSelected = availableTemplates.find(t => t.name === name)
         if (!newTemplateTobeSelected) {
           return {
@@ -136,9 +164,24 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
             },
           }
         }
+
+        if (!coordinates && !navigation)
+          return {
+            type: NEWVIEWER,
+            selectTemplate: newTemplateTobeSelected,
+            selectParcellation: newTemplateTobeSelected.parcellations[0],
+          }
+
+        const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
+        const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
+
+        initNavigation.zoomFactor = navigation.zoom
+        initNavigation.pose.position.voxelCoordinates = coordinates.map((c, i) => c/initNavigation.pose.position.voxelSize[i])
+        initNavigation.pose.orientation = navigation.orientation
+
         return {
           type: NEWVIEWER,
-          selectTemplate: newTemplateTobeSelected,
+          selectTemplate: deepCopiedState,
           selectParcellation: newTemplateTobeSelected.parcellations[0],
         }
       }),

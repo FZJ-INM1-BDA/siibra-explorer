@@ -54,6 +54,7 @@ import 'src/theme.scss'
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { LoggingService } from "./services/logging.service";
+import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 
 @NgModule({
   imports : [
@@ -127,6 +128,7 @@ import { LoggingService } from "./services/logging.service";
     DialogService,
     UIService,
     LoggingService,
+    TemplateCoordinatesTransformation,
 
     /**
      * TODO
