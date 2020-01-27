@@ -40,7 +40,7 @@ export class PluginServiceUseEffect {
           fetch(url, constantService.getFetchOption())
             .then(res => res.json())
             .then(json => pluginService.launchNewWidget(json))
-            .catch(this.log.error)
+            .catch(e => this.log.error(e))
         }
 
         // clear init manifest

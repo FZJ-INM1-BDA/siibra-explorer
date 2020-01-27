@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store'
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
 export const defaultState: StateInterface = {
   initManifests: []
@@ -44,6 +45,9 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       initManifests: newManifests,
     }
   }
+  case GENERAL_ACTION_TYPES.APPLY_STATE:
+    const { pluginState } = (action as any).state
+    return pluginState
   default: return prevState
   }
 }
