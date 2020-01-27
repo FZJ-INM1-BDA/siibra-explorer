@@ -16,7 +16,8 @@
     "test": "karma start spec/karma.conf.js",
     "e2e": "protractor e2e/protractor.conf",
     "lint": "eslint src --ext .ts",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "wd": "webdriver-manager"
   },
   "keywords": [],
   "author": "",
@@ -91,6 +92,6 @@
     "zone.js": "^0.9.1"
   },
   "dependencies": {
-    "hbp-connectivity-component": "0.0.17"
+    "hbp-connectivity-component": "^0.1.0"
   }
 }

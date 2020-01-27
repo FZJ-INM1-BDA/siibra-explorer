@@ -1,4 +1,6 @@
 import {
+  AfterContentChecked,
+  AfterContentInit, AfterViewChecked,
   AfterViewInit, ChangeDetectorRef,
   Component,
   ElementRef,
@@ -8,28 +10,30 @@ import {
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription} from "rxjs";
 import {distinctUntilChanged, filter, map} from "rxjs/operators";
-import {AtlasViewerConstantsServices} from "src/atlasViewer/atlasViewer.constantService.service";
 import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
 import {HIDE_SIDE_PANEL_CONNECTIVITY, isDefined, safeFilter} from "src/services/stateStore.service";
+import {VIEWERSTATE_CONTROLLER_ACTION_TYPES} from "src/ui/viewerStateController/viewerState.base";
 
 @Component({
   selector: 'connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
 })
-export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
+export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, AfterContentChecked {
 
     public region: string
+    public datasetList: any[] = []
+    public selectedDataset: any
     private connectedAreas = []
+    public componentHeight: any
 
     private connectivityRegion$: Observable<any>
     private selectedParcellation$: Observable<any>
+    public selectedRegions$: Observable<any[]>
+
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
     public allRegions = []
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
-    public parcellationHasConnectivityData = true
-    private areaHemisphere: string
-
     public math = Math
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef
@@ -51,13 +55,22 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
         map(state => state.connectivityRegion),
       )
 
+      this.selectedRegions$ = this.store$.pipe(
+        select('viewerState'),
+        filter(state => isDefined(state) && isDefined(state.regionsSelected)),
+        map(state => state.regionsSelected),
+        distinctUntilChanged(),
+      )
+    }
+
+    public ngAfterContentChecked(): void {
+      this.componentHeight = this.connectivityComponentElement.nativeElement.clientHeight
     }
 
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(parcellation => {
           if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
-            this.parcellationHasConnectivityData = true
             if (parcellation.regions && parcellation.regions.length) {
               this.allRegions = []
               this.getAllRegionsFromParcellation(parcellation.regions)
@@ -66,12 +79,11 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
               }
             }
           } else {
-            this.parcellationHasConnectivityData = false
+            this.closeConnectivityView()
           }
         }),
         this.connectivityRegion$.subscribe(cr => {
           this.region = cr
-          this.areaHemisphere = cr.includes('left hemisphere') ? ' - left hemisphere' : ' - right hemisphere'
           this.changeDetectionRef.detectChanges()
         }),
       )
@@ -86,12 +98,21 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
           }),
+        fromEvent(this.connectivityComponentElement.nativeElement, 'datasetDataReceived', { capture: true })
+          .subscribe((e: CustomEvent) => {
+            this.datasetList = e.detail
+            this.selectedDataset = this.datasetList[0]
+          }),
 
       )
     }
 
+    // ToDo Affect on component
+    changeDataset(event) {
+      this.selectedDataset = event.value
+    }
+
     public ngOnDestroy(): void {
-      this.setDefaultMap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
@@ -102,9 +123,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       })
     }
 
-    public closeConnectivityView() {
-      this.setDefaultMap()
+    navigateToRegion(region) {
+      this.store$.dispatch({
+        type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION,
+        payload: { region: this.getRegionWithName(region) },
+      })
+    }
 
+    getRegionWithName(region) {
+      return this.allRegions.find(ar => ar.name === region)
+    }
+
+    public closeConnectivityView() {
       this.store$.dispatch({
         type: HIDE_SIDE_PANEL_CONNECTIVITY,
       })
@@ -127,11 +157,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
       this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
 
       const existingMap: Map<string, Map<number, {red: number, green: number, blue: number}>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
-
       const colorMap = new Map(existingMap)
 
       this.allRegions.forEach(r => {
-
         if (r.ngId) {
           colorMap.get(r.ngId).set(r.labelIndex, {red: 255, green: 255, blue: 255})
         }
@@ -139,7 +167,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy {
 
       this.connectedAreas.forEach(area => {
         const areaAsRegion = this.allRegions
-          .filter(r => r.name === area.name + this.areaHemisphere)
+          .filter(r => r.name === area.name)
           .map(r => r)
 
         if (areaAsRegion && areaAsRegion.length && areaAsRegion[0].ngId) {

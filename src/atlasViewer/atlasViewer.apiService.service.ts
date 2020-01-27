@@ -1,13 +1,20 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { distinctUntilChanged, map, filter } from "rxjs/operators";
+import { Observable, Subscribable } from "rxjs";
+import { distinctUntilChanged, map, filter, startWith } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
-import { getLabelIndexMap, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface, safeFilter } from "src/services/stateStore.service";
+import {
+  DISABLE_PLUGIN_REGION_SELECTION,
+  getLabelIndexMap,
+  getMultiNgIdsRegionsLabelIndexMap,
+  IavRootStoreInterface,
+  safeFilter
+} from "src/services/stateStore.service";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest } from "./atlasViewer.pluginService.service";
+import {ENABLE_PLUGIN_REGION_SELECTION} from "src/services/state/uiState.store";
 
 declare let window
 
@@ -22,6 +29,9 @@ export class AtlasViewerAPIServices {
   public interactiveViewer: IInteractiveViewerInterface
 
   public loadedLibraries: Map<string, {counter: number, src: HTMLElement|null}> = new Map()
+
+  public getUserToSelectARegionResolve
+  public getUserToSelectARegionReject
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -71,8 +81,8 @@ export class AtlasViewerAPIServices {
 
         datasetsBSubject : this.store.pipe(
           select('dataStore'),
-          safeFilter('fetchedDataEntries'),
-          map(state => state.fetchedDataEntries),
+          select('fetchedDataEntries'),
+          startWith([])
         ),
       },
       uiHandle : {
@@ -118,8 +128,27 @@ export class AtlasViewerAPIServices {
           return Promise.reject('Needs to be overwritted')
         },
 
-        getUserInput: config => this.dialogService.getUserInput(config),
+        getUserInput: config => this.dialogService.getUserInput(config) ,
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
+
+        getUserToSelectARegion: (selectingMessage) => new Promise((resolve, reject) => {
+          this.store.dispatch({
+            type: ENABLE_PLUGIN_REGION_SELECTION,
+            payload: selectingMessage
+          })
+
+          this.getUserToSelectARegionResolve = resolve
+          this.getUserToSelectARegionReject = reject
+        }),
+
+        // ToDo Method should be able to cancel any pending promise.
+        cancelPromise: (pr) => {
+          if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
+            if (this.getUserToSelectARegionReject) this.getUserToSelectARegionReject('Rej')
+            this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
+          }
+        }
+
       },
       pluginControl : {
         loadExternalLibraries : () => Promise.reject('load External Library method not over written')
@@ -131,11 +160,6 @@ export class AtlasViewerAPIServices {
     }
     window.interactiveViewer = this.interactiveViewer
     this.init()
-
-    /**
-     * TODO debugger debug
-     */
-    window.uiHandle = this.interactiveViewer.uiHandle
   }
 
   private init() {
@@ -205,6 +229,8 @@ export interface IInteractiveViewerInterface {
     launchNewWidget: (manifest: IPluginManifest) => Promise<any>
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
+    getUserToSelectARegion: (selectingMessage: any) => Promise<any>
+    cancelPromise: (pr) => void
   }
 
   pluginControl: {

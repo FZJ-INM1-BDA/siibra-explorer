@@ -1,15 +1,18 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, Observable, of, Subscription, throwError } from "rxjs";
-import { catchError, map, shareReplay, switchMap, tap } from "rxjs/operators";
+import { merge, Observable, of, Subscription, throwError, fromEvent, forkJoin } from "rxjs";
+import { catchError, map, shareReplay, switchMap, tap, filter, take } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
+import { AtlasWorkerService } from "./atlasViewer.workerService.service";
 
 export const CM_THRESHOLD = `0.05`
 export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
 export const GLSL_COLORMAP_JET = `void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
+
+const getUniqueId = () => Math.round(Math.random() * 1e16).toString(16)
 
 @Injectable({
   providedIn : 'root',
@@ -49,7 +52,7 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   }
 
   // instead of using window.location.href, which includes query param etc
-  public backendUrl = BACKEND_URL || `${window.location.origin}${window.location.pathname}`
+  public backendUrl = `${BACKEND_URL}/`.replace(/\/\/$/, '/') || `${window.location.origin}${window.location.pathname}`
 
   private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
     switchMap((template: any) => {
@@ -69,10 +72,48 @@ export class AtlasViewerConstantsServices implements OnDestroy {
 
   public totalTemplates = null
 
+  private workerUpdateParcellation$ = fromEvent(this.workerService.worker, 'message').pipe(
+    filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
+    map(({ data }) => data)
+  )
+
+  private processTemplate = template => forkJoin(
+    ...template.parcellations.map(parcellation => {
+
+      const id = getUniqueId()
+
+      this.workerService.worker.postMessage({
+        type: 'PROPAGATE_PARC_REGION_ATTR',
+        parcellation,
+        inheritAttrsOpts: {
+          ngId: (parcellation as any ).ngId,
+          relatedAreas: [],
+          fullId: null
+        },
+        id
+      })
+
+      return this.workerUpdateParcellation$.pipe(
+        filter(({ id: returnedId }) => id === returnedId),
+        take(1),
+        map(({ parcellation }) => parcellation)
+      )
+    })
+  )
+
   public initFetchTemplate$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
     tap((arr: any[]) => this.totalTemplates = arr.length),
     switchMap((templates: string[]) => merge(
-      ...templates.map(this.fetchTemplate),
+      ...templates.map(templateName => this.fetchTemplate(templateName).pipe(
+        switchMap(template => this.processTemplate(template).pipe(
+          map(parcellations => {
+            return {
+              ...template,
+              parcellations
+            }
+          })
+        ))
+      )),
     )),
     catchError((err) => {
       this.log.warn(`fetching templates error`, err)
@@ -255,6 +296,7 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
     private store$: Store<IavRootStoreInterface>,
     private http: HttpClient,
     private log: LoggingService,
+    private workerService: AtlasWorkerService
   ) {
 
     this.darktheme$ = this.store$.pipe(

@@ -88,15 +88,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
   case NEWVIEWER: {
 
     const { selectParcellation: parcellation } = action
-    // const parcellation = propagateNgId( selectParcellation ): parcellation
-    const { regions, ...parcellationWORegions } = parcellation
     return {
       ...prevState,
       templateSelected : action.selectTemplate,
-      parcellationSelected : {
-        ...parcellationWORegions,
-        regions: null,
-      },
+      parcellationSelected : parcellation,
       // taken care of by effect.ts
       // regionsSelected : [],
       landmarksSelected : [],
@@ -117,23 +112,12 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     }
   }
   case SELECT_PARCELLATION : {
-    const { selectParcellation: sParcellation } = action
-    const { regions, ...sParcellationWORegions } = sParcellation
+    const { selectParcellation } = action
     return {
       ...prevState,
-      parcellationSelected: sParcellationWORegions,
+      parcellationSelected: selectParcellation,
       // taken care of by effect.ts
       // regionsSelected: []
-    }
-  }
-  case UPDATE_PARCELLATION: {
-    const { updatedParcellation } = action
-    return {
-      ...prevState,
-      parcellationSelected: {
-        ...updatedParcellation,
-        updated: true,
-      },
     }
   }
   case SELECT_REGIONS: {
@@ -225,7 +209,6 @@ export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
 
 export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
-export const UPDATE_PARCELLATION = `UPDATE_PARCELLATION`
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
