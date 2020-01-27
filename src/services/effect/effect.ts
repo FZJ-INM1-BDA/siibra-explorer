@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, Subscription } from "rxjs";
-import { filter, map, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
+import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo } from "rxjs/operators";
 import { LoggingService } from "../logging.service";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
 import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, GENERAL_ACTION_TYPES } from '../stateStore.service';
@@ -91,29 +91,6 @@ export class UseEffects implements OnDestroy {
     ofType(SELECT_PARCELLATION),
   )
 
-  private newViewer$ = this.actions$.pipe(
-    ofType(NEWVIEWER),
-  )
-
-  // trigger for rebuilding the parcellation
-  private newParcellationSelected$ = merge(
-    this.actions$.pipe(
-      ofType(NEWVIEWER)
-    ),
-    this.actions$.pipe(
-      ofType(SELECT_PARCELLATION)
-    ),
-    this.actions$.pipe(
-      ofType(GENERAL_ACTION_TYPES.APPLY_STATE)
-    )
-  ).pipe(
-    withLatestFrom(this.store$.pipe(
-      select('viewerState'),
-      select('parcellationSelected')
-    )),
-    map(([_, parcellation]) => parcellation),
-    filter(v => !!v)
-  )
 
   private updatedParcellation$ = this.store$.pipe(
     select('viewerState'),
@@ -201,11 +178,16 @@ export class UseEffects implements OnDestroy {
    * side effect of selecting a parcellation means deselecting all regions
    */
   @Effect()
-  public onParcellationSelected$ = this.parcellationSelected$.pipe(
-    map(() => ({
+  public onParcellationSelected$ = merge(
+    this.parcellationSelected$,
+    this.actions$.pipe(
+      ofType(NEWVIEWER)
+    )
+  ).pipe(
+    mapTo({
       type: SELECT_REGIONS,
       selectRegions: [],
-    })),
+    })
   )
 }
 
