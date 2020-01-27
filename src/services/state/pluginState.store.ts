@@ -1,4 +1,5 @@
 import { Action } from '@ngrx/store'
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
 export const defaultState: StateInterface = {
   initManifests: []
@@ -20,7 +21,7 @@ export const ACTION_TYPES = {
   CLEAR_INIT_PLUGIN: 'CLEAR_INIT_PLUGIN',
 }
 
-export const CONSTANTS = {
+export const PLUGINSTORE_CONSTANTS = {
   INIT_MANIFEST_SRC: 'INIT_MANIFEST_SRC',
 }
 
@@ -30,7 +31,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
     const newMap = new Map(prevState.initManifests )
 
     // reserved source label for init manifest
-    if (action.manifest.name !== CONSTANTS.INIT_MANIFEST_SRC) { newMap.set(action.manifest.name, action.manifest.initManifestUrl) }
+    if (action.manifest.name !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC) { newMap.set(action.manifest.name, action.manifest.initManifestUrl) }
     return {
       ...prevState,
       initManifests: Array.from(newMap),
@@ -38,11 +39,15 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
   }
   case ACTION_TYPES.CLEAR_INIT_PLUGIN: {
     const { initManifests } = prevState
-    const newManifests = initManifests.filter(([source]) => source !== CONSTANTS.INIT_MANIFEST_SRC)
+    const newManifests = initManifests.filter(([source]) => source !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
     return {
       ...prevState,
       initManifests: newManifests,
     }
+  }
+  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+    const { pluginState } = (action as any).state
+    return pluginState
   }
   default: return prevState
   }
