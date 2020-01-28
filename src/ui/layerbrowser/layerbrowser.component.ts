@@ -209,7 +209,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
     })
   }
 
-  public changeOpacity(layerName:string, event:MatSliderChange){
+  public changeOpacity(layerName: string, event: MatSliderChange){
     const { value } = event
     const l = this.viewer.layerManager.getLayerByName(layerName)
     if (!l) return
@@ -263,7 +263,7 @@ export class LockedLayerBtnClsPipe implements PipeTransform {
 })
 
 export class GetInitialLayerOpacityPipe implements PipeTransform{
-  public transform(viewer: any, layerName: string):number{
+  public transform(viewer: any, layerName: string): number{
     if (!viewer) return 0
     const l = viewer.layerManager.getLayerByName(layerName)
     if (!l || !l.layer) return 0
