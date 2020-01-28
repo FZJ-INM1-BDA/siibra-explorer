@@ -7,6 +7,20 @@
   <mat-list *ngIf="nonBaseNgLayers.length > 0; else noLayerPlaceHolder">
     <mat-list-item *ngFor="let ngLayer of nonBaseNgLayers" class="matListItem">
 
+      <!-- toggle opacity -->
+      <div matTooltip="opacity">
+
+        <mat-slider
+          [disabled]="!ngLayer.visible"
+          min="0"
+          max="1"
+          (input)="changeOpacity(ngLayer.name, $event)"
+          [value]="viewer | getInitialLayerOpacityPipe: ngLayer.name"
+          step="0.01">
+
+        </mat-slider>
+      </div>
+
       <!-- toggle visibility -->
 
       <button
