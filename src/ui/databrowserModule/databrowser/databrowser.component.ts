@@ -67,7 +67,7 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
     this.favDataentries$ = this.dbService.favedDataentries$
 
     const structuredData = window.document.querySelector('script[type="application/ld+json"]')
-    if (structuredData) console.log(JSON.parse(structuredData.textContent))
+    
   }
 
   public ngOnChanges() {

@@ -39,6 +39,7 @@ export class KgSingleDatasetService implements OnDestroy {
     }
   }
 
+  // TODO deprecate, in favour of web component
   public datasetHasPreview({ name }: { name: string } = { name: null }) {
     if (!name) { throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined') }
     const _url = new URL(`datasets/hasPreview`, this.constantService.backendUrl )

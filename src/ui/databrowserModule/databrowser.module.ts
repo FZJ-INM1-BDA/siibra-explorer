@@ -26,6 +26,8 @@ import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetLis
 import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
+import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
+import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 
 @NgModule({
   imports: [
@@ -43,6 +45,7 @@ import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
     ModalityPicker,
     SingleDatasetView,
     SingleDatasetListView,
+    DatasetPreviewList,
 
     /**
      * pipes
@@ -60,6 +63,8 @@ import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
     PreviewFileTypePipe,
     AppendFilerModalityPipe,
     ResetCounterModalityPipe,
+    PreviewFileVisibleInSelectedReferenceTemplatePipe,
+    UnavailableTooltip,
   ],
   exports: [
     DataBrowser,

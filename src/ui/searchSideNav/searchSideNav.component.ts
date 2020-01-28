@@ -13,6 +13,7 @@ import {
 import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
 
 @Component({
   selector: 'search-side-nav',
@@ -74,7 +75,8 @@ export class SearchSideNav implements OnDestroy {
         select('dataStore'),
         select('datasetPreviews'),
         filter(datasetPreviews => datasetPreviews.length > 0),
-        map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1])
+        map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
+        filter(({ file }) => determinePreviewFileType(file) !== PREVIEW_FILE_TYPES.NIFTI)
       ).subscribe(({ dataset, file }) => {
         
         const { fullId } = dataset

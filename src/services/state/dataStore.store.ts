@@ -187,6 +187,10 @@ export interface ViewerPreviewFile {
   name: string
   filename: string
   mimetype: string
+  referenceSpaces: { 
+    name: string, 
+    fullId: string
+  }[]
   url?: string
   data?: any
   position?: any
