@@ -217,7 +217,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
     if (typeof l.layer.opacity === 'object') {
       l.layer.opacity.value = value
     } else if (typeof l.layer.displayState === 'object') {
-      l.layer.displayState.selectedAlpha = value
+      l.layer.displayState.selectedAlpha.value = value
     } else {
       this.log.warn({
         msg: `layer does not belong anywhere`,
