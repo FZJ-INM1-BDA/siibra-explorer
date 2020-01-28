@@ -1,14 +1,9 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
 import { merge, Observable, Subscription } from "rxjs";
-import { scan, shareReplay } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
-import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IDataEntry } from "src/services/stateStore.service";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
-import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
-
-const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 
 @Component({
   selector : 'data-browser',
@@ -61,13 +56,9 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   constructor(
     private dbService: DatabrowserService,
     private cdr: ChangeDetectorRef,
-    private singleDatasetSservice: KgSingleDatasetService,
     private log: LoggingService,
   ) {
     this.favDataentries$ = this.dbService.favedDataentries$
-
-    const structuredData = window.document.querySelector('script[type="application/ld+json"]')
-    
   }
 
   public ngOnChanges() {
