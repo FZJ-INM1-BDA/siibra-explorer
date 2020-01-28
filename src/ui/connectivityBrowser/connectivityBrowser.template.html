@@ -1,77 +1,101 @@
-<div class="w-100 h-100 overflow-auto d-block d-flex flex-column pb-2" #connectivityComponent *ngIf="parcellationHasConnectivityData; else noConnectivity">
-    <!--ToDo set show-description="true" when data will available-->
+<div class="w-100 h-100 d-block d-flex flex-column pb-2" #connectivityComponent>
     <hbp-connectivity-matrix-row
             [region]="region"
             theme="dark"
             loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+            dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies"
             show-export="true"
             show-source="true"
-            show-title="true"
-            show-toolbar="true">
-        <div slot="header" class="w-100 d-flex justify-content-end mt-3"><span
-                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
+            show-title="false"
+            show-toolbar="false"
+            show-description="false"
+            show-dataset-name="false"
+            custom-dataset-selector="true"
+            [customHeight]="componentHeight + 'px'">
+        <div slot="header" class="w-100 d-flex justify-content-between mt-3">
+            <span>Connectivity Browser</span>
+            <i (click)="closeConnectivityView(); setDefaultMap()" class="far fa-times-circle cursorPointer"></i>
+        </div>
+
+        <div slot="dataset">
+            <div *ngIf="datasetList.length && selectedDataset"  class=" flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
+                    <mat-form-field class="flex-grow-1 flex-shrink-1 w-0">
+                        <mat-label>
+                            Dataset
+                        </mat-label>
+
+                        <mat-select
+                                panelClass="no-max-width"
+                                [value]="selectedDataset"
+                                (selectionChange)="changeDataset($event)">
+                            <mat-option
+                                    *ngFor="let dataset of datasetList"
+                                    [value]="dataset"
+                            >
+                                {{ dataset.title }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                <ng-container *ngIf="selectedDataset && selectedDataset.description" >
+                    <!-- show on hover component -->
+                    <sleight-of-hand class="d-inline-block flex-grow-0 flex-shrink-0 pe-all">
+
+                        <!-- shown when off -->
+                        <div sleight-of-hand-front>
+                            <button
+                                    mat-icon-button>
+                                <i class="fas fa-info"></i>
+                            </button>
+                        </div>
+
+                        <!-- shown on hover -->
+                        <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
+                            <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+                                <i class="fas fa-info"></i>
+                            </button>
+
+                            <div class="position-relative">
+                                <button class="position-relative invisible pe-none" mat-icon-button>
+                                    <i class="fas fa-info"></i>
+                                </button>
+
+                                <mat-card class="position-absolute left-0 top-0 w-40em">
+                                    <single-dataset-view
+                                            [name]="selectedDataset.title"
+                                            [description]="selectedDataset.description">
+                                    </single-dataset-view>
+                                </mat-card>
+                            </div>
+
+                        </div>
+                    </sleight-of-hand>
+
+                </ng-container>
+
+                </div>
+        </div>
 
         <div slot="connectedRegionMenu">
-
-            <div class="d-flex flex-column" *ngIf="expandMenuIndex >= 0">
+            <div class="d-flex flex-column p-0 m-0" *ngIf="expandMenuIndex >= 0">
                 <mat-divider></mat-divider>
-                <span class="mt-2 mr-2 ml-2">
-                    <small>Region: {{connectedAreas[expandMenuIndex].name}}</small>
-                    <br>
-                    <small>Number of Connection: {{connectedAreas[expandMenuIndex].numberOfConnections}}</small>
-                    <br>
-                    <small>Log(123) = {{math.log10(connectedAreas[expandMenuIndex].numberOfConnections)}}</small>
-                </span>
+                <mat-card-subtitle class="pt-2 pr-2 pl-2 pb-0">
+                    {{connectedAreas[expandMenuIndex].name}}
+                </mat-card-subtitle>
                 <div class="d-flex align-items-center justify-content-around">
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <!--ToDo Implement function when Hemisphere information will be available -->
-                        <!--                        *ngIf="(selectedRegions$ | async) as selectedRegions"-->
-                        <!--                        (click)="toggleRegionWithId(region.ngId, region.labelIndex, regionIsSelected(selectedRegions, region.ngId, region.labelIndex))">-->
-
-                        <button mat-icon-button class="border">
-                            <!--                            <i class="fas fa-hand-pointer mt-n1"></i>-->
-                            <span class="fa-stack fa-1x ">
-                                <i class="fas fa-hand-pointer fa-stack-1x"></i>
-                                <!--ToDo Implement function when Hemisphere information will be available -->
-                                <!--                    <i class="fas fa-slash fa-stack-1x fa-inverse"-->
-                                <!--                       *ngIf="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)"></i>-->
-                            </span>
-                        </button>
-                        <!--                        <span [innerText]="regionIsSelected(selectedRegions, region.ngId, region.labelIndex)? 'Deselect' : 'Select'"></span>-->
-                        <span>Select</span>
-                    </small>
-
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border">
-                            <i class="fas fa-crosshairs  mt-n1"></i>
-                        </button>
-                        Navigate
-                    </small>
-
-                    <small class="d-flex flex-column align-items-center w-100">
-                        <button mat-icon-button class="border" (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
-                            <i class="fab fa-connectdevelop  mt-n1"></i>
-                        </button>
-                        Connectivity
-                    </small>
+                    <button mat-button (click)="navigateToRegion(navigateToRegion(connectedAreas[expandMenuIndex].name))">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>
+                            Navigate
+                        </span>
+                    </button>
+                    <button mat-button (click)="updateConnevtivityRegion(connectedAreas[expandMenuIndex].name)">
+                        <i class="fab fa-connectdevelop"></i>
+                        <span>
+                            Connectivity
+                        </span>
+                    </button>
                 </div>
             </div>
-
-
         </div>
     </hbp-connectivity-matrix-row>
 </div>
-
-<ng-template #noConnectivity>
-    <mat-card class="p-2 w-100 h-100 overflow-auto d-block">
-        <div class="w-100 d-flex justify-content-end mt-3"><span
-                class="cursorPointer" (click)="closeConnectivityView()">X</span></div>
-        <h5>
-            Connectivity Matrix Browser
-        </h5>
-        <div>
-            No Connectivity for selected Parcellation!
-        </div>
-
-    </mat-card>
-</ng-template>

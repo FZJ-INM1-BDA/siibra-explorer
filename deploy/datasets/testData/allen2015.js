@@ -1,23 +1,10 @@
 module.exports = [
   {
     "formats": [],
-    "datasetDOI": [
-      {
-        "cite": "Holmseth, S., Scott, H. A., Real, K., Lehre, K. P., Leergaard, T. B., Bjaalie, J. G., & Danbolt, N. C. (2009). The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation. Neuroscience, 162(4), 1055–1071. ",
-        "doi": "10.1016/j.neuroscience.2009.03.048"
-      }
-    ],
+    "datasetDOI": [],
     "activity": [
       {
-        "protocols": [
-          "Immunohistochemistry",
-          "Atlas",
-          "Brain-wide",
-          "Synaptic transmission",
-          "Neurtransmitter transport",
-          "Glutamate uptake",
-          "GLT1"
-        ],
+        "protocols": [],
         "preparation": [
           "Ex vivo"
         ]
@@ -25,200 +12,72 @@ module.exports = [
     ],
     "referenceSpaces": [],
     "methods": [
-      "Immunohistochemistry"
+      "Patch clamp techniques",
+      "Voltage clamp recording",
+      "Single electrode recording",
+      "Knockin"
     ],
     "custodians": [
-      "Danbolt,  Niels C."
+      "Cherubini, Enrico"
     ],
     "project": [
-      "Rodent brain neurotransporter atlas: GLT1"
+      "STDP"
     ],
-    "description": "Glutamate is the major excitatory transmitter in the central nervous system (Danbolt, Prog. Neurobiol. 65:1-105, 2001). It is inactivated by cellular uptake, mostly catalyzed by the glutamate transporters GLT1 (slc1a2, excitatory amino acid transporter [EAAT2]) subtype expressed at high levels in brain astrocytes and at lower levels in neurons. Three C-terminal variants of EAAT2 exist: GLT1a (Pines et al., Nature 360:464-467, 1992), GLT1b (Utsunomiya-Tate et al., FEBS Lett 416:312-326,1997), and GLT1c (Rauen et al., Neurochem. Int. 45:1095-1106, 2004). This dataset is brain-wide collection of microscopic images showing the brain-wide distribution of GLT1 in the mouse and rat brain, visualized by immunohistochemistry using antibodies against GLT1a and GLT1b. To facilitate identification of anatomical location adjacent section were stained to reveal cyto- and myeloarchitecture.",
+    "description": "Spike-time dependent plasticity (STDP is a particular form of Hebbian type of learning which consists in bidirectional modifications of synaptic strength according to the temporal order of pre- and postsynaptic spiking (*Dan Y1, Poo MM (2006) Spike timing-dependent plasticity: from synapse to perception. Physiol Rev 86:1033-1048*). Thus, positively correlated pre- and postsynaptic spiking (pre before post) within a critical window leads to long term potentiation (LTP), whereas a negative correlation (post before pre) leads to long term depression (LTD).  \nAt the neonatal stage, the hippocampal mossy fiber (MF)-CA3 is GABAergic and exhibits STDP. Our data demonstrate that, at the same age, positive pairing fails to induce STD-LTP at MF-CA3 synapses in hippocampal slices obtained from neuroligin-3 (NL3) knock-in (NL3<sup>R451C</sup> KI) and NL3 knock-out (KO) mice. Similarly, in NLR<sup>451C</sup> KI mice, negative pairing failed to cause STD-LTD. In contrast, STD-LTP and STD-LTD can be readily produced in control age-matched WT littermates. In NLR<sup>451C</sup> KI  mice, the impairment in STD-LTP is maintained in adulthood when MF are glutamatergic. This set of data refers to the neonate, NLR<sup>451C</sup> KI, positive pairing condition.",
     "parcellationAtlas": [
       {
         "name": "Allen Mouse Common Coordinate Framework v3 2015",
         "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f",
         "id": "39a1384b-8413-4d27-af8d-22432225401f"
-      },
-      {
-        "name": "Waxholm Space rat brain atlas v2",
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/2449a7f0-6dd0-4b5a-8f1e-aec0db03679d",
-        "id": "2449a7f0-6dd0-4b5a-8f1e-aec0db03679d"
       }
     ],
     "licenseInfo": [
       {
-        "name": "Creative Commons Attribution-ShareAlike 4.0 International",
-        "url": "https://creativecommons.org/licenses/by-sa/4.0"
+        "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+        "url": "https://creativecommons.org/licenses/by-nc-sa/4.0/"
       }
     ],
     "embargoStatus": [
-      "Free"
+      "Embargoed"
     ],
     "license": [
       {
-        "name": "Creative Commons Attribution-ShareAlike 4.0 International",
-        "relativeUrl": "minds/core/licensetype/v1.0.0/78a3bfb2-f4b9-40f0-869c-34b5e48a45bd"
+        "name": "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International",
+        "relativeUrl": "minds/core/licensetype/v1.0.0/88e71f2d-4fcc-4cb1-bc9f-cbab9ab2058b"
       }
     ],
     "parcellationRegion": [
       {
-        "species": [],
-        "name": "Mouse Whole brain (v3 2015)",
-        "alias": "Whole brain"
-      },
-      {
         "species": [
           {
             "identifier": [
-              "e9a384ea8a4edf817710b6edef5f2940",
-              "5401fdb1d638c2bc5b68241560cddac0"
+              "899694120d41aab8054900b51d369ef8",
+              "e07b81dd7bbdf2727f6df2f4013ed025"
             ],
-            "name": "Rattus norvegicus",
-            "@id": "https://nexus.humanbrainproject.org/v0/data/minds/core/species/v1.0.0/f3490d7f-8f7f-4b40-b238-963dcac84412"
+            "name": "Mus musculus",
+            "@id": "https://nexus.humanbrainproject.org/v0/data/minds/core/species/v1.0.0/cfc1656c-67d1-4d2c-a17e-efd7ce0df88c"
           }
         ],
-        "name": "Whole Brain ",
-        "alias": "Whole brain"
+        "name": "Mouse Hippocampal region (v3 2015)",
+        "alias": "Hippocampal region",
+        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/fc429031-1632-49a4-b9c6-00ab72100c85"
       }
     ],
     "species": [
-      "Rattus norvegicus",
       "Mus musculus"
     ],
-    "name": "Brain-wide distribution of glutamate type 1 transporter protein (GLT1)",
+    "name": "Spike time dependent plasticity (STDP) data from neonate neuroligin-3 knock-in mice, positive pairing",
     "files": [],
-    "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/dataset/v1.0.0/f7a7d460-8724-4cd1-a06e-457eb8954fbd",
+    "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/dataset/v1.0.0/88e4e64e-b053-48b3-828b-306e386621e0",
     "contributors": [
-      "Danbolt, Nils C.",
-      "Bjaalie, Jan G.",
-      "Leergaard, Trygve B.",
-      "Lehre, K.P.",
-      "Real, Katia",
-      "Scott, Heather A.",
-      "Holmseth, Silvia"
+      "Cherubini, Enrico",
+      "Sgritta, Martina",
+      "Marchetti, Cristina"
     ],
-    "id": "63bbb845ac6d2f1839f919c2ef0455bc",
+    "id": "1a6cbd0b55a13e7b8775d3417281a83f",
     "kgReference": [
-      "10.25493/Y147-2CE"
+      "10.25493/PF1P-YSE"
     ],
-    "publications": [
-      {
-        "name": "The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation",
-        "cite": "Holmseth, S., Scott, H. A., Real, K., Lehre, K. P., Leergaard, T. B., Bjaalie, J. G., & Danbolt, N. C. (2009). The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation. Neuroscience, 162(4), 1055–1071. ",
-        "doi": "10.1016/j.neuroscience.2009.03.048"
-      }
-    ]
-  },
-  {
-    "formats": [],
-    "datasetDOI": [
-      {
-        "cite": "Holmseth, S., Scott, H. A., Real, K., Lehre, K. P., Leergaard, T. B., Bjaalie, J. G., & Danbolt, N. C. (2009). The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation. Neuroscience, 162(4), 1055–1071. ",
-        "doi": "10.1016/j.neuroscience.2009.03.048"
-      }
-    ],
-    "activity": [
-      {
-        "protocols": [
-          "Immunohistochemistry",
-          "Atlas",
-          "Brain-wide",
-          "Synaptic transmission",
-          "Neurtransmitter transport",
-          "Glutamate uptake",
-          "GLT1"
-        ],
-        "preparation": [
-          "Ex vivo"
-        ]
-      }
-    ],
-    "referenceSpaces": [],
-    "methods": [
-      "Immunohistochemistry"
-    ],
-    "custodians": [
-      "Danbolt,  Niels C."
-    ],
-    "project": [
-      "Rodent brain neurotransporter atlas: GLT1"
-    ],
-    "description": "Glutamate is the major excitatory transmitter in the central nervous system (Danbolt, Prog. Neurobiol. 65:1-105, 2001). It is inactivated by cellular uptake, mostly catalyzed by the glutamate transporters GLT1 (slc1a2, excitatory amino acid transporter [EAAT2]) subtype expressed at high levels in brain astrocytes and at lower levels in neurons. Three C-terminal variants of EAAT2 exist: GLT1a (Pines et al., Nature 360:464-467, 1992), GLT1b (Utsunomiya-Tate et al., FEBS Lett 416:312-326,1997), and GLT1c (Rauen et al., Neurochem. Int. 45:1095-1106, 2004). This dataset is brain-wide collection of microscopic images showing the brain-wide distribution of GLT1 in the mouse and rat brain, visualized by immunohistochemistry using antibodies against GLT1a and GLT1b. To facilitate identification of anatomical location adjacent section were stained to reveal cyto- and myeloarchitecture.",
-    "parcellationAtlas": [
-      {
-        "name": "Allen Mouse Common Coordinate Framework v3 2015",
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f",
-        "id": "39a1384b-8413-4d27-af8d-22432225401f"
-      },
-      {
-        "name": "Waxholm Space rat brain atlas v2",
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/2449a7f0-6dd0-4b5a-8f1e-aec0db03679d",
-        "id": "2449a7f0-6dd0-4b5a-8f1e-aec0db03679d"
-      }
-    ],
-    "licenseInfo": [
-      {
-        "name": "Creative Commons Attribution-ShareAlike 4.0 International",
-        "url": "https://creativecommons.org/licenses/by-sa/4.0"
-      }
-    ],
-    "embargoStatus": [
-      "Free"
-    ],
-    "license": [
-      {
-        "name": "Creative Commons Attribution-ShareAlike 4.0 International",
-        "relativeUrl": "minds/core/licensetype/v1.0.0/78a3bfb2-f4b9-40f0-869c-34b5e48a45bd"
-      }
-    ],
-    "parcellationRegion": [
-      {
-        "species": [],
-        "name": "Mouse Whole brain (v3 2015)",
-        "alias": "Whole brain"
-      },
-      {
-        "species": [
-          {
-            "identifier": [
-              "e9a384ea8a4edf817710b6edef5f2940",
-              "5401fdb1d638c2bc5b68241560cddac0"
-            ],
-            "name": "Rattus norvegicus",
-            "@id": "https://nexus.humanbrainproject.org/v0/data/minds/core/species/v1.0.0/f3490d7f-8f7f-4b40-b238-963dcac84412"
-          }
-        ],
-        "name": "Whole Brain ",
-        "alias": "Whole brain"
-      }
-    ],
-    "species": [
-      "Rattus norvegicus",
-      "Mus musculus"
-    ],
-    "name": "Brain-wide distribution of glutamate type 1 transporter protein (GLT1)",
-    "files": [],
-    "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/dataset/v1.0.0/f7a7d460-8724-4cd1-a06e-457eb8954fbd",
-    "contributors": [
-      "Danbolt, Nils C.",
-      "Bjaalie, Jan G.",
-      "Leergaard, Trygve B.",
-      "Lehre, K.P.",
-      "Real, Katia",
-      "Scott, Heather A.",
-      "Holmseth, Silvia"
-    ],
-    "id": "63bbb845ac6d2f1839f919c2ef0455bc",
-    "kgReference": [
-      "10.25493/Y147-2CE"
-    ],
-    "publications": [
-      {
-        "name": "The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation",
-        "cite": "Holmseth, S., Scott, H. A., Real, K., Lehre, K. P., Leergaard, T. B., Bjaalie, J. G., & Danbolt, N. C. (2009). The concentrations and distributions of three C-terminal variants of the GLT1 (EAAT2; slc1a2) glutamate transporter protein in rat brain tissue suggest differential regulation. Neuroscience, 162(4), 1055–1071. ",
-        "doi": "10.1016/j.neuroscience.2009.03.048"
-      }
-    ]
+    "publications": []
   }
 ]

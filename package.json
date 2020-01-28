@@ -9,14 +9,15 @@
     "build-export-aot": "webpack --config webpack.export.aot.js",
     "build-aot": "PRODUCTION=true GIT_HASH=`git rev-parse --short HEAD` webpack --config webpack.aot.js",
     "plugin-server": "node ./src/plugin_examples/server.js",
-    "dev-server": "BACKEND_URL=http://localhost:3000/ webpack-dev-server --config webpack.dev.js --mode development",
+    "dev-server": "BACKEND_URL=${BACKEND_URL:-http://localhost:3000/} webpack-dev-server --config webpack.dev.js --mode development",
     "dev": "npm run dev-server & (cd deploy; node server.js)",
     "dev-server-aot": "PRODUCTION=true GIT_HASH=`git log --pretty=format:'%h' --invert-grep --grep=^.ignore -1` webpack-dev-server --config webpack.aot.js",
     "dev-server-all-interfaces": "webpack-dev-server --config webpack.dev.js --mode development --hot --host 0.0.0.0",
     "test": "karma start spec/karma.conf.js",
     "e2e": "protractor e2e/protractor.conf",
     "lint": "eslint src --ext .ts",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "wd": "webdriver-manager"
   },
   "keywords": [],
   "author": "",
@@ -89,6 +90,6 @@
     "zone.js": "^0.9.1"
   },
   "dependencies": {
-    "hbp-connectivity-component": "0.0.17"
+    "hbp-connectivity-component": "^0.1.0"
   }
 }

@@ -80,9 +80,8 @@ export class WidgetServices implements OnDestroy {
     const component = this.widgetUnitFactory.create(this.injector)
     const _option = getOption(options)
 
-    if (this.useMobileUI) {
-      _option.state = 'docked'
-    }
+    // TODO bring back docked state?
+    _option.state = 'floating'
 
     _option.state === 'floating'
       ? this.floatingContainer.insert(component.hostView)

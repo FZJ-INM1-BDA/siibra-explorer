@@ -22,7 +22,7 @@ export const CONFIG_CONSTANTS = {
   defaultAnimation: true,
 }
 
-export const ACTION_TYPES = {
+export const VIEWER_CONFIG_ACTION_TYPES = {
   SET_ANIMATION: `SET_ANIMATION`,
   UPDATE_CONFIG: `UPDATE_CONFIG`,
   CHANGE_GPU_LIMIT: `CHANGE_GPU_LIMIT`,
@@ -63,7 +63,7 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ViewerConfigurationAction) => {
   switch (action.type) {
-  case ACTION_TYPES.SET_MOBILE_UI: {
+  case VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI: {
     const { payload } = action
     const { useMobileUI } = payload
     return {
@@ -71,12 +71,12 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       useMobileUI,
     }
   }
-  case ACTION_TYPES.UPDATE_CONFIG:
+  case VIEWER_CONFIG_ACTION_TYPES.UPDATE_CONFIG:
     return {
       ...prevState,
       ...action.config,
     }
-  case ACTION_TYPES.CHANGE_GPU_LIMIT: {
+  case VIEWER_CONFIG_ACTION_TYPES.CHANGE_GPU_LIMIT: {
     const newGpuLimit = Math.min(
       CONFIG_CONSTANTS.gpuLimitMax,
       Math.max(

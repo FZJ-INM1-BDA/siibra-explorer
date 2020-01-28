@@ -77,7 +77,7 @@ export class ViewerStateBase implements OnInit {
 
     this.availableTemplates$ = viewerState$.pipe(
       select('fetchedTemplates'),
-      distinctUntilChanged(),
+      distinctUntilChanged()
     )
 
     this.availableParcellations$ = this.templateSelected$.pipe(
@@ -155,13 +155,7 @@ export class ViewerStateBase implements OnInit {
     })
   }
 
-  public displayActiveParcellation(parcellation: any) {
-    return `<div class="d-flex"><small>Parcellation</small> <small class = "flex-grow-1 mute-text">${parcellation ? '(' + parcellation.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
-  }
-
-  public displayActiveTemplate(template: any) {
-    return `<div class="d-flex"><small>Template</small> <small class = "flex-grow-1 mute-text">${template ? '(' + template.name + ')' : ''}</small> <span class = "fas fa-caret-down"></span></div>`
-  }
+  public trackByFn = ({ name }) => name
 
   public loadSelection(_event: MouseEvent) {
     this.focused = true

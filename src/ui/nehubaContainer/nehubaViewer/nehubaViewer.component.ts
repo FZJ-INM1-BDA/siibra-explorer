@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
-import { fromEvent, Subject, Subscription } from 'rxjs'
+import { fromEvent, Subscription, ReplaySubject } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -109,6 +109,11 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
   public ondestroySubscriptions: Subscription[] = []
 
+  private createNehubaPromiseRs: Function
+  private createNehubaPromise = new Promise(rs => {
+    this.createNehubaPromiseRs = rs
+  })
+
   constructor(
     private rd: Renderer2,
     public elementRef: ElementRef,
@@ -142,6 +147,10 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
         this.layersChangedHandler = this.nehubaViewer.ngviewer.layerManager.layersChanged.add(() => this.layersChanged.emit(null))
         this.nehubaViewer.ngviewer.registerDisposer(this.layersChangedHandler)
+      })
+      .then(() => {
+        // all mutation to this.nehubaViewer should await createNehubaPromise
+        this.createNehubaPromiseRs()
       })
       .catch(e => this.errorEmitter.emit(e))
 
@@ -258,20 +267,16 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   set ngIds(val: string[]) {
-
-    if (this.nehubaViewer) {
-      this._ngIds.forEach(id => {
-        const oldlayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(id)
-        if (oldlayer) {oldlayer.setVisible(false) } else { this.log.warn('could not find old layer', id) }
+    this.createNehubaPromise
+      .then(() => {
+        this._ngIds.forEach(id => {
+          const oldlayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(id)
+          if (oldlayer) {oldlayer.setVisible(false) } else { this.log.warn('could not find old layer', id) }
+        })
+        this._ngIds = val
+        this.loadNewParcellation()
+        this.showAllSeg()
       })
-    }
-
-    this._ngIds = val
-
-    if (this.nehubaViewer) {
-      this.loadNewParcellation()
-      this.showAllSeg()
-    }
   }
 
   public spatialLandmarkSelectionChanged(labels: number[]) {
@@ -312,7 +317,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this._multiNgIdColorMap = val
   }
 
-  private loadMeshes$: Subject<{labelIndicies: number[], layer: { name: string }}> = new Subject()
+  private loadMeshes$: ReplaySubject<{labelIndicies: number[], layer: { name: string }}> = new ReplaySubject()
   private loadMeshes(labelIndicies: number[], { name }) {
     this.loadMeshes$.next({
       labelIndicies,
@@ -386,6 +391,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.loadMeshes$.pipe(
         scan(scanFn, []),
+        debounceTime(100)
       ).subscribe(layersLabelIndex => {
         let totalMeshes = 0
         for (const layerLayerIndex of layersLabelIndex) {
@@ -708,7 +714,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       this.setNavigationState(this.initNav)
     }
 
-    if (this.initRegions) {
+    if (this.initRegions && this.initRegions.length > 0) {
       this.hideAllSeg()
       this.showSegs(this.initRegions)
     }
