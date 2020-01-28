@@ -5,7 +5,7 @@ import { Observable } from "rxjs"
 import { filter, map, startWith } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service"
-import { ACTION_TYPES as PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
+import { PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { LoggingService } from "../logging.service"
 import { IavRootStoreInterface } from "../stateStore.service"
 
