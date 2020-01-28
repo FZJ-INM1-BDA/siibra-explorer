@@ -7,7 +7,7 @@ import { getIdFromFullId } from "common/util"
 })
 
 export class PreviewFileVisibleInSelectedReferenceTemplatePipe implements PipeTransform{
-  public transform(selectedReferenceSpace: any, file: ViewerPreviewFile):boolean{
+  public transform(selectedReferenceSpace: any, file: ViewerPreviewFile): boolean{
     const { referenceSpaces = [] } = file
     if (referenceSpaces.some(({ name, fullId }) => name === '*' && fullId === '*')) return true
     const { fullId } = selectedReferenceSpace

@@ -6,7 +6,7 @@ import { Action } from '@ngrx/store'
 
 interface DatasetPreview {
   dataset?: IDataEntry
-  file: Partial<ViewerPreviewFile>&{filename:string}
+  file: Partial<ViewerPreviewFile>&{filename: string}
 }
 
 export interface IStateInterface {
@@ -188,7 +188,7 @@ export interface ViewerPreviewFile {
   filename: string
   mimetype: string
   referenceSpaces: { 
-    name: string, 
+    name: string 
     fullId: string
   }[]
   url?: string

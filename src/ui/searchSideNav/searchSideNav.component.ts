@@ -94,7 +94,7 @@ export class SearchSideNav implements OnDestroy {
   }
 
   public previewKgId: string 
-  public previewFilename:string
+  public previewFilename: string
 
   public collapseSidePanelCurrentView() {
     this.store$.dispatch({

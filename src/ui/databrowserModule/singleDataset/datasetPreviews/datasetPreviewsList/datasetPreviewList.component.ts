@@ -50,7 +50,7 @@ export class DatasetPreviewList{
 })
 
 export class UnavailableTooltip implements PipeTransform{
-  public transform(file:ViewerPreviewFile):string{
+  public transform(file: ViewerPreviewFile): string{
     if (file.referenceSpaces.length === 0) return `This preview is not available to be viewed in any reference space.`
     else return `This preview is available in the following reference space: ${file.referenceSpaces.map(({ name }) => name).join(', ')}`
   }
