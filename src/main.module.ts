@@ -79,7 +79,7 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
       NgViewerUseEffect,
       PluginServiceUseEffect,
       AtlasViewerHistoryUseEffect,
-      UiStateUseEffect,
+      UiStateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,

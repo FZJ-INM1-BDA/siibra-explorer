@@ -2,7 +2,8 @@ import 'zone.js'
 import 'third_party/testSafari.js'
 import { enableProdMode } from '@angular/core';
 
-import { defineCustomElements } from 'hbp-connectivity-component/dist/loader'
+import { defineCustomElements as defineConnectivityComponent } from 'hbp-connectivity-component/dist/loader'
+import { defineCustomElements as definePreviewComponent } from 'kg-dataset-previewer/loader'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 
@@ -16,4 +17,5 @@ requireAll(require.context(`./plugin_examples`, true))
 
 platformBrowserDynamic().bootstrapModule(MainModule)
 
-defineCustomElements(window)
+defineConnectivityComponent(window)
+definePreviewComponent(window)

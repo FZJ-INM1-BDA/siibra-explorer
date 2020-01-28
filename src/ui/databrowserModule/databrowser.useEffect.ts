@@ -1,14 +1,18 @@
-import { Injectable, OnDestroy } from "@angular/core";
+import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription } from "rxjs";
-import { catchError, filter, map, scan, switchMap, withLatestFrom } from "rxjs/operators";
+import { catchError, filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
-import { DATASETS_ACTIONS_TYPES, IDataEntry } from "src/services/state/dataStore.store";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
+import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
+import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 import { getIdFromDataEntry } from "./databrowser.service";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
+import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
+import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
+import { MatSnackBar, MatDialog } from "@angular/material";
 
 const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
   map(string => JSON.parse(string)),
@@ -33,12 +37,80 @@ export class DataBrowserUseEffect implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
+  // ng layer (currently only nifti file) needs to be previewed
+  @Effect()
+  previewNgLayer$: Observable<any>
+
+  // when bottom sheet should be hidden (currently only when ng layer is visualised)
+  @Effect()
+  hideBottomSheet$: Observable<any>
+
+  // when the preview effect has a ROI defined
+  @Effect()
+  navigateToPreviewPosition$: Observable<any>
+
+  public previewDatasetFile$: Observable<ViewerPreviewFile>
+
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private actions$: Actions<any>,
     private kgSingleDatasetService: KgSingleDatasetService,
     private log: LoggingService,
+    private snackbar: MatSnackBar
   ) {
+
+    this.previewDatasetFile$ = actions$.pipe(
+      ofType(DATASETS_ACTIONS_TYPES.PREVIEW_DATASET),
+      map(actionBody => {
+        const { payload = {} } = actionBody as any
+        const { file = null } = payload as { file: ViewerPreviewFile, dataset: IDataEntry }
+        return file
+      }),
+      shareReplay(1)
+    )
+
+    this.navigateToPreviewPosition$ = this.previewDatasetFile$.pipe(
+      filter(({ position }) => !!position),
+      switchMap(({ position }) => 
+        this.snackbar.open(`Postion of interest found.`, 'Go there', {
+          duration: 5000,
+        }).afterDismissed().pipe(
+          filter(({ dismissedByAction }) => dismissedByAction),
+          mapTo({
+            type: CHANGE_NAVIGATION,
+            navigation: {
+              position,
+              animation: {}
+            }
+          })
+        )
+      )
+    )
+    
+    this.previewNgLayer$ = this.previewDatasetFile$.pipe(
+      filter(file => 
+        determinePreviewFileType(file) === PREVIEW_FILE_TYPES.NIFTI
+      ),
+      map(({ url }) => {
+        const layer = {
+          name: url,
+          source : `nifti://${url}`,
+          mixability : 'nonmixable',
+          shader : GLSL_COLORMAP_JET,
+        }
+        return {
+          type: ADD_NG_LAYER,
+          layer
+        }
+      })
+    )
+
+    this.hideBottomSheet$ = this.previewNgLayer$.pipe(
+      mapTo({
+        type: SHOW_BOTTOM_SHEET,
+        bottomSheetTemplate: null
+      })
+    )
     this.favDataEntries$ = this.store$.pipe(
       select('dataStore'),
       select('favDataEntries'),
