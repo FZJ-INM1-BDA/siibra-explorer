@@ -4,16 +4,23 @@ import { Action } from '@ngrx/store'
  * TODO merge with databrowser.usereffect.ts
  */
 
+interface DatasetPreview {
+  dataset?: IDataEntry
+  file: Partial<ViewerPreviewFile>&{filename: string}
+}
+
 export interface IStateInterface {
   fetchedDataEntries: IDataEntry[]
   favDataEntries: IDataEntry[]
   fetchedSpatialData: IDataEntry[]
+  datasetPreviews: DatasetPreview[]
 }
 
 export const defaultState = {
   fetchedDataEntries: [],
   favDataEntries: [],
   fetchedSpatialData: [],
+  datasetPreviews: [],
 }
 
 export const getStateStore = ({ state: state = defaultState } = {}) => (prevState: IStateInterface = state, action: Partial<IActionInterface>) => {
@@ -38,6 +45,18 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
       favDataEntries,
     }
   }
+  case ACTION_TYPES.PREVIEW_DATASET: {
+
+    const { payload = {}} = action
+    const { file , dataset } = payload
+    return {
+      ...prevState,
+      datasetPreviews: prevState.datasetPreviews.concat({
+        dataset,
+        file
+      })
+    }
+  }
   default: return prevState
   }
 }
@@ -59,6 +78,7 @@ export interface IActionInterface extends Action {
   favDataEntries: IDataEntry[]
   fetchedDataEntries: IDataEntry[]
   fetchedSpatialData: IDataEntry[]
+  payload?: any
 }
 
 export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
@@ -167,6 +187,10 @@ export interface ViewerPreviewFile {
   name: string
   filename: string
   mimetype: string
+  referenceSpaces: { 
+    name: string 
+    fullId: string
+  }[]
   url?: string
   data?: any
   position?: any
@@ -181,6 +205,7 @@ const ACTION_TYPES = {
   UPDATE_FAV_DATASETS: `UPDATE_FAV_DATASETS`,
   UNFAV_DATASET: 'UNFAV_DATASET',
   TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET',
+  PREVIEW_DATASET: 'PREVIEW_DATASET',
 }
 
 export const DATASETS_ACTIONS_TYPES = ACTION_TYPES

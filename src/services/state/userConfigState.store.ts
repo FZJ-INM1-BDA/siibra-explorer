@@ -12,7 +12,7 @@ import { NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "./viewerState.st
 // TODO file bug and reverse
 import * as viewerConfigStore from './viewerConfig.store'
 
-const SET_MOBILE_UI = viewerConfigStore.ACTION_TYPES.SET_MOBILE_UI
+const SET_MOBILE_UI = viewerConfigStore.VIEWER_CONFIG_ACTION_TYPES.SET_MOBILE_UI
 
 export interface StateInterface {
   savedRegionsSelection: RegionSelection[]

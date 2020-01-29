@@ -1,21 +1,16 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
-import { MatDialog, MatSnackBar } from "@angular/material";
 import { select, Store } from "@ngrx/store";
-import { Subject, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
-import { AtlasViewerConstantsServices, GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service"
-import { IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
+import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
-import { ADD_NG_LAYER, CHANGE_NAVIGATION, IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
-import { FileViewer } from "./fileviewer/fileviewer.component";
-import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
+import { IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
 import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy {
-
-  public previewingFile$: Subject<{file: ViewerPreviewFile, dataset: IDataEntry}> = new Subject()
 
   private subscriptions: Subscription[] = []
   public ngLayers: Set<string> = new Set()
@@ -25,9 +20,7 @@ export class KgSingleDatasetService implements OnDestroy {
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private store$: Store<IavRootStoreInterface>,
-    private dialog: MatDialog,
     private http: HttpClient,
-    private snackBar: MatSnackBar,
   ) {
 
     this.subscriptions.push(
@@ -46,6 +39,7 @@ export class KgSingleDatasetService implements OnDestroy {
     }
   }
 
+  // TODO deprecate, in favour of web component
   public datasetHasPreview({ name }: { name: string } = { name: null }) {
     if (!name) { throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined') }
     const _url = new URL(`datasets/hasPreview`, this.constantService.backendUrl )
@@ -82,60 +76,12 @@ export class KgSingleDatasetService implements OnDestroy {
   }
 
   public previewFile(file: ViewerPreviewFile, dataset: IDataEntry) {
-    this.previewingFile$.next({
-      file,
-      dataset,
-    })
-
-    const { position } = file
-    if (position) {
-      this.snackBar.open(`Postion of interest found.`, 'Go there', {
-        duration: 5000,
-      })
-        .afterDismissed()
-        .subscribe(({ dismissedByAction }) => {
-          if (dismissedByAction) {
-            this.store$.dispatch({
-              type: CHANGE_NAVIGATION,
-              navigation: {
-                position,
-                animation: {},
-              },
-            })
-          }
-        })
-    }
-
-    const type = determinePreviewFileType(file)
-    if (type === PREVIEW_FILE_TYPES.NIFTI) {
-      this.store$.dispatch({
-        type: SHOW_BOTTOM_SHEET,
-        bottomSheetTemplate: null,
-      })
-      const { url } = file
-      this.showNewNgLayer({ url })
-      return
-    }
-
-    this.dialog.open(FileViewer, {
-      data: {
-        previewFile: file,
-      },
-      autoFocus: false,
-    })
-  }
-
-  public showNewNgLayer({ url }): void {
-
-    const layer = {
-      name : url,
-      source : `nifti://${url}`,
-      mixability : 'nonmixable',
-      shader : GLSL_COLORMAP_JET,
-    }
     this.store$.dispatch({
-      type: ADD_NG_LAYER,
-      layer,
+      type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
+      payload: {
+        file,
+        dataset
+      }
     })
   }
 

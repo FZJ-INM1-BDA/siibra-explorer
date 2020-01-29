@@ -1,6 +1,6 @@
 import { getGetRegionFromLabelIndexId } from "src/services/effect/effect";
 import { mixNgLayers } from "src/services/state/ngViewerState.store";
-import { CONSTANTS as PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
+import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, GLSL_COLORMAP_JET, separator } from "./atlasViewer.constantService.service";
 

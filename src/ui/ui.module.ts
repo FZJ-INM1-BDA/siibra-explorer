@@ -18,7 +18,7 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
 import { CitationsContainer } from "./citation/citations.component";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
-import { LayerBrowser, LockedLayerBtnClsPipe } from "./layerbrowser/layerbrowser.component";
+import { LayerBrowser, LockedLayerBtnClsPipe, GetInitialLayerOpacityPipe } from "./layerbrowser/layerbrowser.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 
@@ -155,6 +155,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
+    GetInitialLayerOpacityPipe,
 
     /* directive */
     DownloadDirective,
