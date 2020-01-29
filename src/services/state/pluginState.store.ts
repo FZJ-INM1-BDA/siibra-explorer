@@ -16,7 +16,7 @@ export interface ActionInterface extends Action {
   }
 }
 
-export const ACTION_TYPES = {
+export const PLUGINSTORE_ACTION_TYPES = {
   SET_INIT_PLUGIN: `SET_INIT_PLUGIN`,
   CLEAR_INIT_PLUGIN: 'CLEAR_INIT_PLUGIN',
 }
@@ -27,7 +27,7 @@ export const PLUGINSTORE_CONSTANTS = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
-  case ACTION_TYPES.SET_INIT_PLUGIN: {
+  case PLUGINSTORE_ACTION_TYPES.SET_INIT_PLUGIN: {
     const newMap = new Map(prevState.initManifests )
 
     // reserved source label for init manifest
@@ -37,7 +37,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       initManifests: Array.from(newMap),
     }
   }
-  case ACTION_TYPES.CLEAR_INIT_PLUGIN: {
+  case PLUGINSTORE_ACTION_TYPES.CLEAR_INIT_PLUGIN: {
     const { initManifests } = prevState
     const newManifests = initManifests.filter(([source]) => source !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
     return {
