@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http'
 import { ComponentFactory, ComponentFactoryResolver, Injectable, NgZone, ViewContainerRef } from "@angular/core";
-import { ACTION_TYPES as PLUGIN_STATE_ACTION_TYPES } from "src/services/state/pluginState.store";
+import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
@@ -231,7 +231,7 @@ export class PluginServices {
           : null
 
         handler.setInitManifestUrl = (url) => this.store.dispatch({
-          type : PLUGIN_STATE_ACTION_TYPES.SET_INIT_PLUGIN,
+          type : PLUGINSTORE_ACTION_TYPES.SET_INIT_PLUGIN,
           manifest : {
             name : plugin.name,
             initManifestUrl : url,
