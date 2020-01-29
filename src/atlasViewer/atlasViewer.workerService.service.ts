@@ -9,9 +9,9 @@ import '../util/worker.js'
 export const worker = new Worker('worker.js')
 
 @Injectable({
-  providedIn:'root'
+  providedIn: 'root',
 })
 
-export class AtlasWorkerService{
+export class AtlasWorkerService {
   public worker = worker
 }

@@ -1,84 +1,119 @@
 import { filter } from 'rxjs/operators';
 
-export { viewerConfigState } from './state/viewerConfig.store'
-export { pluginState } from './state/pluginState.store'
-export { NgViewerAction, NgViewerStateInterface, ngViewerState, ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
-export { CHANGE_NAVIGATION, AtlasAction, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS, ViewerStateInterface, viewerState } from './state/viewerState.store'
-export { DataEntry, ParcellationRegion, DataStateInterface, DatasetAction, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, Landmark, OtherLandmarkGeometry, PlaneLandmarkGeometry, PointLandmarkGeometry, Property, Publication, ReferenceSpace, dataStore, File, FileSupplementData } from './state/dataStore.store'
-export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, TOGGLE_SIDE_PANEL, UIAction, UIStateInterface, uiState } from './state/uiState.store'
-export { SPATIAL_GOTO_PAGE, SpatialDataEntries, SpatialDataStateInterface, UPDATE_SPATIAL_DATA, spatialSearchState } from './state/spatialSearchState.store'
-export { userConfigState, UserConfigStateUseEffect, USER_CONFIG_ACTION_TYPES } from './state/userConfigState.store'
+import {
+  defaultState as dataStoreDefaultState,
+  IActionInterface as DatasetAction,
+  IStateInterface as DataStateInterface,
+  stateStore as dataStore,
+} from './state/dataStore.store'
+import {
+  ActionInterface as NgViewerActionInterface,
+  defaultState as ngViewerDefaultState,
+  StateInterface as NgViewerStateInterface,
+  stateStore as ngViewerState,
+} from './state/ngViewerState.store'
+import {
+  defaultState as pluginDefaultState,
+  StateInterface as PluginStateInterface,
+  stateStore as pluginState,
+} from './state/pluginState.store'
+import {
+  ActionInterface as UIActionInterface,
+  defaultState as uiDefaultState,
+  StateInterface as UIStateInterface,
+  stateStore as uiState,
+} from './state/uiState.store'
+import {
+  ACTION_TYPES as USER_CONFIG_ACTION_TYPES,
+  defaultState as userConfigDefaultState,
+  StateInterface as UserConfigStateInterface,
+  stateStore as userConfigState,
+} from './state/userConfigState.store'
+import {
+  defaultState as viewerConfigDefaultState,
+  StateInterface as ViewerConfigStateInterface,
+  stateStore as viewerConfigState,
+} from './state/viewerConfig.store'
+import {
+  ActionInterface as ViewerActionInterface,
+  defaultState as viewerDefaultState,
+  StateInterface as ViewerStateInterface,
+  stateStore as viewerState,
+} from './state/viewerState.store'
+
+export { pluginState }
+export { viewerConfigState }
+export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
+export { ViewerStateInterface, ViewerActionInterface, viewerState }
+export { DataStateInterface, DatasetAction, dataStore }
+export { UIStateInterface, UIActionInterface, uiState }
+export { userConfigState,  USER_CONFIG_ACTION_TYPES}
+
+export { ADD_NG_LAYER, FORCE_SHOW_SEGMENT, HIDE_NG_LAYER, REMOVE_NG_LAYER, SHOW_NG_LAYER } from './state/ngViewerState.store'
+export { CHANGE_NAVIGATION, DESELECT_LANDMARKS, FETCHED_TEMPLATE, NEWVIEWER, SELECT_LANDMARKS, SELECT_PARCELLATION, SELECT_REGIONS, USER_LANDMARKS } from './state/viewerState.store'
+export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, IProperty, IPublication, IReferenceSpace, IFile, IFileSupplementData } from './state/dataStore.store'
+export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, SHOW_SIDE_PANEL_CONNECTIVITY, HIDE_SIDE_PANEL_CONNECTIVITY, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW, ENABLE_PLUGIN_REGION_SELECTION, DISABLE_PLUGIN_REGION_SELECTION } from './state/uiState.store'
+export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
 export const GENERAL_ACTION_TYPES = {
-  ERROR: 'ERROR'
+  ERROR: 'ERROR',
+  APPLY_STATE: 'APPLY_STATE',
 }
 
-export function safeFilter(key:string){
-  return filter((state:any)=>
+// TODO deprecate
+export function safeFilter(key: string) {
+  return filter((state: any) =>
     (typeof state !== 'undefined' && state !== null) &&
-    typeof state[key] !== 'undefined' && state[key] !== null) 
+    typeof state[key] !== 'undefined' && state[key] !== null)
 }
 
-export function extractLabelIdx(region:any):number[]{
-  if(!region.children || region.children.constructor !== Array){
-    return isNaN(region.labelIndex) || region.labelIndex === null
-      ? []
-      : [Number(region.labelIndex)]
-  }
-  return region.children.reduce((acc,item)=>{
-    return acc.concat(extractLabelIdx(item))
-  },[]).concat( region.labelIndex ? Number(region.labelIndex) : [] )
+export function getNgIdLabelIndexFromRegion({ region }) {
+  const { ngId, labelIndex } = region
+  if (ngId && labelIndex) { return { ngId, labelIndex } }
+  throw new Error(`ngId: ${ngId} or labelIndex: ${labelIndex} not defined`)
 }
 
-const inheritNgId = (region:any) => {
-  const {ngId = 'root', children = []} = region
-  return {
-    ngId,
-    ...region,
-    ...(children && children.map
-      ? {
-        children: children.map(c => inheritNgId({
-          ngId,
-          ...c
-        }))
-      }
-      : {})
-  }
-}
+export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}, inheritAttrsOpt: any = { ngId: 'root' }): Map<string, Map<number, any>> {
+  const map: Map<string, Map<number, any>> = new Map()
+  
+  const inheritAttrs = Object.keys(inheritAttrsOpt)
+  if (inheritAttrs.indexOf('children') >=0 ) throw new Error(`children attr cannot be inherited`)
 
-export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}):Map<string,Map<number, any>>{
-  const map:Map<string,Map<number, any>> = new Map()
-  const { ngId = 'root'} = parcellation
-
-  const processRegion = (region:any) => {
-    const { ngId } = region
-    const existingMap = map.get(ngId)
+  const processRegion = (region: any) => {
+    const { ngId: rNgId } = region
+    const existingMap = map.get(rNgId)
     const labelIndex = Number(region.labelIndex)
     if (labelIndex) {
       if (!existingMap) {
         const newMap = new Map()
         newMap.set(labelIndex, region)
-        map.set(ngId, newMap)
+        map.set(rNgId, newMap)
       } else {
         existingMap.set(labelIndex, region)
       }
     }
 
-    if (region.children && region.children.forEach) {
-      region.children.forEach(child => {
-        processRegion({
-          ngId,
-          ...child
-        })
-      })
+    if (region.children && Array.isArray(region.children)) {
+      for (const r of region.children) {
+        const copiedRegion = { ...r }
+        for (const attr of inheritAttrs){
+          copiedRegion[attr] = copiedRegion[attr] || region[attr] || parcellation[attr]
+        }
+        processRegion(copiedRegion)
+      }
     }
   }
 
-  if (parcellation && parcellation.regions && parcellation.regions.forEach) {
-    parcellation.regions.forEach(r => processRegion({
-      ngId,
-      ...r
-    }))
+  if (!parcellation) throw new Error(`parcellation needs to be defined`)
+  if (!parcellation.regions) throw new Error(`parcellation.regions needs to be defined`)
+  if (!Array.isArray(parcellation.regions)) throw new Error(`parcellation.regions needs to be an array`)
+
+  for (const region of parcellation.regions){
+    const copiedregion = { ...region }
+    for (const attr of inheritAttrs){
+      copiedregion[attr] = copiedregion[attr] || parcellation[attr]
+    }
+    processRegion(copiedregion)
   }
 
   return map
@@ -86,41 +121,44 @@ export function getMultiNgIdsRegionsLabelIndexMap(parcellation: any = {}):Map<st
 
 /**
  * labelIndexMap maps label index to region
+ * @TODO deprecate
  */
-export function getLabelIndexMap(regions:any[]):Map<number,any>{
+export function getLabelIndexMap(regions: any[]): Map<number, any> {
   const returnMap = new Map()
 
-  const reduceRegions = (regions:any[]) => {
-    regions.forEach(region=>{
-      if( region.labelIndex ) returnMap.set(Number(region.labelIndex),
-        Object.assign({},region,{labelIndex : Number(region.labelIndex)}))
-      if( region.children && region.children.constructor === Array ) reduceRegions(region.children)
+  const reduceRegions = (rs: any[]) => {
+    rs.forEach(region => {
+      if ( region.labelIndex ) { returnMap.set(Number(region.labelIndex),
+        Object.assign({}, region, {labelIndex : Number(region.labelIndex)}))
+      }
+      if ( region.children && region.children.constructor === Array ) { reduceRegions(region.children) }
     })
   }
 
-  if (regions && regions.forEach) reduceRegions(regions)
+  if (regions && regions.forEach) { reduceRegions(regions) }
   return returnMap
 }
 
 /**
- * 
+ *
  * @param regions regions to deep iterate to find all ngId 's, filtering out falsy values
  * n.b. returns non unique list
  */
-export function getNgIds(regions: any[]): string[]{
+export function getNgIds(regions: any[]): string[] {
   return regions && regions.map
     ? regions
-        .map(r => [r.ngId, ...getNgIds(r.children)])
-        .reduce((acc, item) => acc.concat(item), [])
-        .filter(ngId => !!ngId)
+      .map(r => [r.ngId, ...getNgIds(r.children)])
+      .reduce((acc, item) => acc.concat(item), [])
+      .filter(ngId => !!ngId)
     : []
 }
 
-export interface DedicatedViewState{
-  dedicatedView : string | null
+export interface DedicatedViewState {
+  dedicatedView: string | null
 }
 
-export function isDefined(obj){
+// @TODO deprecate
+export function isDefined(obj) {
   return typeof obj !== 'undefined' && obj !== null
 }
 
@@ -144,17 +182,37 @@ export function getNgIdLabelIndexFromId({ labelIndexId } = {labelIndexId: ''}) {
 const recursiveFlatten = (region, {ngId}) => {
   return [{
     ngId,
-    ...region
+    ...region,
   }].concat(
-    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) )|| [])
+    ...((region.children && region.children.map && region.children.map(c => recursiveFlatten(c, { ngId : region.ngId || ngId })) ) || []),
   )
 }
 
-export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId:string}) {
+export function recursiveFindRegionWithLabelIndexId({ regions, labelIndexId, inheritedNgId = 'root' }: {regions: any[], labelIndexId: string, inheritedNgId: string}) {
   const { ngId, labelIndex } = getNgIdLabelIndexFromId({ labelIndexId })
-  const fr1 = regions.map(r => recursiveFlatten(r,{ ngId: inheritedNgId }))
+  const fr1 = regions.map(r => recursiveFlatten(r, { ngId: inheritedNgId }))
   const fr2 = fr1.reduce((acc, curr) => acc.concat(...curr), [])
   const found = fr2.find(r => r.ngId === ngId && Number(r.labelIndex) === Number(labelIndex))
-  if (found) return found
+  if (found) { return found }
   return null
+}
+
+export interface IavRootStoreInterface {
+  pluginState: PluginStateInterface
+  viewerConfigState: ViewerConfigStateInterface
+  ngViewerState: NgViewerStateInterface
+  viewerState: ViewerStateInterface
+  dataStore: DataStateInterface
+  uiState: UIStateInterface
+  userConfigState: UserConfigStateInterface
+}
+
+export const defaultRootState: IavRootStoreInterface = {
+  pluginState: pluginDefaultState,
+  dataStore: dataStoreDefaultState,
+  ngViewerState: ngViewerDefaultState,
+  uiState: uiDefaultState,
+  userConfigState: userConfigDefaultState,
+  viewerConfigState: viewerConfigDefaultState,
+  viewerState: viewerDefaultState,
 }

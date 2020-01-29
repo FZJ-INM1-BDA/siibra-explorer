@@ -1,0 +1,62 @@
+<div class="screenshotContainer overflow-hidden w-50 h-50"
+    (mousemove)="move($event)"
+    (mousedown)="mouseDown($event)"
+    (mouseup)="mouseUp($event)"
+    [ngClass]="{'pe-none o-0':!takingScreenshot, 'o-1': takingScreenshot}"
+    [ngStyle]="{'cursor':takingScreenshot? 'crosshair' : 'auto'}">
+
+    <div class="overlay position-fixed fixed-top w-100 h-100 d-flex align-items-center justify-content-center"
+        [ngClass]="{ 'highlighting' : mouseIsDown }"
+        [ngStyle]="{ borderWidth: borderWidth }">
+
+        <!-- instruction text -->
+        <mat-card *ngIf="!isDragging" class="screenshotPreviewCard pe-none">
+            <mat-card-title>
+                Drag a box to take a screenshot
+            </mat-card-title>
+            <mat-card-subtitle class="text-muted d-flex justify-content-center">
+                cancel with Esc
+            </mat-card-subtitle>
+        </mat-card>
+    </div>
+    <div class="position-absolute border border-light"
+        *ngIf="isDragging"
+        [ngStyle]="{ left: boxLeft + 'px', top: boxTop + 'px', width: boxEndWidth + 'px', height: boxEndHeight + 'px' }">
+    </div>
+</div>
+
+<ng-template #previewImageDialog>
+    <mat-dialog-content>
+
+        <div class="d-flex w-100 h-100 justify-content-center align-items-center" *ngIf="loadingScreenshot">
+            <span class="text-nowrap">Generating screenshot </span> <i class="fas fa-spinner fa-pulse ml-1"></i>
+        </div>
+        <ng-template [ngIf]="!loadingScreenshot">
+            <img [src]="imageUrl" class="w-100 h-100">
+        </ng-template>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+
+        <a *ngIf="imageUrl"
+            [href]="imageUrl"
+            [download]="screenshotName">
+
+            <button mat-raised-button
+                color="primary"
+                class="mr-2">
+                <i class="fas fa-save"></i> Save
+            </button>
+        </a>
+        <button mat-stroked-button
+            color="default"
+            class="mr-2"
+            mat-dialog-close="again">
+            <i class="fas fa-camera"></i> Try again
+        </button>
+        <button mat-button
+            color="default"
+            mat-dialog-close="cancel">
+            Cancel
+        </button>
+    </mat-dialog-actions>
+</ng-template>

@@ -4,10 +4,10 @@ import { Component } from "@angular/core";
   selector: 'layout-horizontal-one-three',
   templateUrl: './h13.template.html',
   styleUrls: [
-    './h13.style.css'
-  ]
+    './h13.style.css',
+  ],
 })
 
-export class HorizontalOneThree{
-  
+export class HorizontalOneThree {
+
 }

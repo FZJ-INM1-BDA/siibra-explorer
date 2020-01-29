@@ -2,7 +2,7 @@ const validTypes = [
   'GET_LANDMARKS_VTK',
   'GET_USERLANDMARKS_VTK',
   'BUILD_REGION_SELECTION_TREE',
-  'PROPAGATE_NG_ID'
+  'PROPAGATE_PARC_REGION_ATTR'
 ]
 
 const validOutType = [
@@ -246,21 +246,30 @@ const rebuildSelectedRegion = (payload) => {
     rebuiltSomeSelectedRegions: someActiveTreeBranch
   })
 }
+const recursivePropagateAttri = (region, inheritAttrsOpts) => {
 
-const propagateNgId = (parcellation) => {
-  const recursivePropagateNgId = (region, {ngId}) => {
-    return {
-      ngId,
-      ...region,
-      ...( region.children && region.children.map
-        ? {
-          children: region.children.map(c => recursivePropagateNgId(c, { ngId: region.ngId || ngId }))
-        }
-        : {} )
-    }
+  const inheritAttrs = Object.keys(inheritAttrsOpts)
+
+  const returnRegion = {
+    ...region
   }
-  const regions = parcellation.regions && parcellation.regions.map
-    ? parcellation.regions.map(r => recursivePropagateNgId(r, { ngId: parcellation.ngId }))
+  const newInhAttrsOpts = {}
+  for (const attr of inheritAttrs){
+    returnRegion[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
+    newInhAttrsOpts[attr] = returnRegion[attr] || inheritAttrsOpts[attr]
+  }
+  returnRegion.children = returnRegion.children && Array.isArray(returnRegion.children)
+    ? returnRegion.children.map(c => recursivePropagateAttri(c, newInhAttrsOpts))
+    : null
+  return returnRegion
+}
+
+const propagateAttri = (parcellation, inheritAttrsOpts) => {
+  const inheritAttrs = Object.keys(inheritAttrsOpts)
+  if (inheritAttrs.indexOf('children') >= 0) throw new Error(`children attr cannot be inherited`)
+
+  const regions = Array.isArray(parcellation.regions)
+    ? parcellation.regions.map(r => recursivePropagateAttri(r, inheritAttrsOpts))
     : []
 
   return {
@@ -269,12 +278,11 @@ const propagateNgId = (parcellation) => {
   }
 }
 
-const processPropagateNgId = (payload) => {
-  const { parcellation } = payload
-  const p = parcellation.ngId
-    ? parcellation
-    : propagateNgId(parcellation)
+const processParcRegionAttr = (payload) => {
+  const { parcellation, inheritAttrsOpts } = payload
+  const p = propagateAttri(parcellation, inheritAttrsOpts)
   postMessage({
+    ...payload,
     type: 'UPDATE_PARCELLATION_REGIONS',
     parcellation: p
   })
@@ -293,8 +301,8 @@ onmessage = (message) => {
       case 'BUILD_REGION_SELECTION_TREE':
         rebuildSelectedRegion(message.data)
         return
-      case 'PROPAGATE_NG_ID':
-        processPropagateNgId(message.data)
+      case 'PROPAGATE_PARC_REGION_ATTR':
+        processParcRegionAttr(message.data)
         return
       default:
         console.warn('unhandled worker action', message)

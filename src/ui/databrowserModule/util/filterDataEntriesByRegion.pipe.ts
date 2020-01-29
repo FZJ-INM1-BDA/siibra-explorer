@@ -1,47 +1,34 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
+import { IDataEntry } from "src/services/stateStore.service";
+import { getIdFromFullId } from "common/util"
 
-const isSubRegion = (high, low) => (high.id && low.id && high.id === low.id) || high.name === low.name
+export const regionsEqual = (r1, r2) => {
+  const { fullId: r1FId, relatedAreas: rA1 = [] } = r1
+  const { fullId: r2FId, relatedAreas: rA2 = [] } = r2
+  const region2Aliases = new Set([getIdFromFullId(r2FId), ...rA2.map(({ fullId }) => getIdFromFullId(fullId))])
+  const region1Aliases = new Set([getIdFromFullId(r1FId), ...rA1.map(({ fullId }) => getIdFromFullId(fullId))])
+  return region1Aliases.has(getIdFromFullId(r2FId))
+    || region2Aliases.has(getIdFromFullId(r1FId))
+}
+
+const isSubRegion = (high, low) => regionsEqual(high, low)
   ? true
-  : high.children && high.children.some
+  : high.children && Array.isArray(high.children)
     ? high.children.some(r => isSubRegion(r, low))
     : false
 
-const filterSubSelect = (dataEntry, selectedRegions) => 
-  dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr,sr)))
+const filterSubSelect = (dataEntry, selectedRegions) =>
+  dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr, sr)))
 
 @Pipe({
-  name: 'filterDataEntriesByRegion'
+  name: 'filterDataEntriesByRegion',
 })
 
-export class FilterDataEntriesByRegion implements PipeTransform{
-  public transform(dataentries: DataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
+export class FilterDataEntriesByRegion implements PipeTransform {
+  public transform(dataentries: IDataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
     return dataentries && selectedRegions && selectedRegions.length > 0
       ? dataentries
-          .map(de => {
-            /**
-             * translate parcellationRegion to region representation
-             */
-            const newParcellationRegion = de.parcellationRegion.map(({name, id, ...rest}) => {
-
-              const found = flattenedAllRegions.find(r => {
-                /**
-                 * TODO replace pseudo id with real uuid
-                 */
-                return (r.id && id && r.id === id)
-                  || r.name === name
-                  || r.relatedAreas && r.relatedAreas.length && r.relatedAreas.some(syn => syn === name) 
-              })
-              return found
-                ? { name, id, ...rest, ...found }
-                : { name, id, ...rest }
-            })
-            return {
-              ...de,
-              parcellationRegion: newParcellationRegion
-            }
-          })
-          .filter(de => filterSubSelect(de, selectedRegions))
+        .filter(de => filterSubSelect(de, selectedRegions))
       : dataentries
   }
 }

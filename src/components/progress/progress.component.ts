@@ -1,23 +1,22 @@
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
-
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
 @Component({
   selector: 'progress-bar',
   templateUrl: './progress.template.html',
   styleUrls: [
-    './progress.style.css'
+    './progress.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class ProgressBar{
-  @Input() progressStyle: any
+export class ProgressBar {
+  @Input() public progressStyle: any
 
   private _progress: number = 0
   /**
    * between 0 and 1
    */
-  @Input() 
+  @Input()
   set progress(val: number) {
     if (isNaN(val)) {
       this._progress = 0
@@ -34,11 +33,11 @@ export class ProgressBar{
     this._progress = val
   }
 
-  get progress(){
+  get progress() {
     return this._progress
   }
 
-  get progressPercent(){
+  get progressPercent() {
     return `${this.progress * 100}%`
   }
 }

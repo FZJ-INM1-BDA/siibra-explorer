@@ -414,6 +414,11 @@ markdown-dom pre code
   overflow-x:hidden!important;
 }
 
+.overflow-y-hidden
+{
+  overflow-y:hidden!important;
+}
+
 .muted
 {
   opacity : 0.5!important;
@@ -626,11 +631,6 @@ mat-icon[fontset="far"]
   min-height: 2rem;
 }
 
-.min-h-8
-{
-  min-height: 4rem;
-}
-
 .w-30vw
 {
   width: 30vw!important;
@@ -679,4 +679,22 @@ body::after
   padding: 0!important;
   overflow: hidden;
   margin-top: 0.25rem;
+}
+
+.linear-gradient-fade:before {
+  content:'';
+  width:100%;
+  height:100%;
+  position:absolute;
+  background:linear-gradient(transparent 50px, #424242);
+}
+
+.o-1
+{
+  opacity: 1.0!important;
+}
+
+.o-0
+{
+  opacity: 0.0!important;
 }

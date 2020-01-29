@@ -1,35 +1,34 @@
+import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
 import {
-  MatButtonModule,
-  MatCheckboxModule,
-  MatSidenavModule,
-  MatCardModule,
-  MatTabsModule,
-  MatTooltipModule,
-  MatSnackBarModule,
-  MatBadgeModule,
-  MatDividerModule,
-  MatSelectModule,
-  MatChipsModule,
+  MAT_DIALOG_DEFAULT_OPTIONS,
   MatAutocompleteModule,
-  MatDialogModule,
-  MatInputModule,
+  MatBadgeModule,
   MatBottomSheetModule,
-  MatListModule,
-  MatSlideToggleModule,
-  MatRippleModule,
-  MatSliderModule,
+  MatButtonModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatChipsModule,
+  MatDialogConfig,
+  MatDialogModule,
+  MatDividerModule,
   MatExpansionModule,
   MatGridListModule,
   MatIconModule,
+  MatInputModule,
+  MatListModule,
   MatMenuModule,
-  MAT_DIALOG_DEFAULT_OPTIONS,
-  MatDialogConfig
+  MatRippleModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatTabsModule,
+  MatTooltipModule,
 } from '@angular/material';
-import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
 
-import { NgModule } from '@angular/core';
 import {DragDropModule} from "@angular/cdk/drag-drop";
-
+import { NgModule } from '@angular/core';
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -59,7 +58,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatGridListModule,
     MatIconModule,
     MatMenuModule,
-    ExperimentalScrollingModule
+    ExperimentalScrollingModule,
   ],
   exports: [
     MatButtonModule,
@@ -86,14 +85,14 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatGridListModule,
     MatIconModule,
     MatMenuModule,
-    ExperimentalScrollingModule
+    ExperimentalScrollingModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,
     useValue: {
       ...defaultDialogOption,
-      panelClass: 'iav-dialog-class'
-    }
-  }]
+      panelClass: 'iav-dialog-class',
+    },
+  }],
 })
 export class AngularMaterialModule { }

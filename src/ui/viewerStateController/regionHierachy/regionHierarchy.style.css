@@ -12,19 +12,14 @@ div[treeContainer]
   background-color:rgba(12,12,12,0.8); */
 }
 
-.flex-basis-20-pc
+.flex-basis-33-pc
 {
-  flex-basis: 20%;
+  flex-basis: 33%;
 }
 
 .flex-basis-auto
 {
   flex-basis: auto;
-}
-
-[hideScrollbarcontainer]
-{
-  overflow:hidden;
 }
 
 input[type="text"]
@@ -52,4 +47,28 @@ input[type="text"]
 :host > mat-form-field
 {
   flex: 0 0 auto;
+}
+
+.horizontal-mode .cdk-viewport-wrapper
+{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+
+  height:4rem;
+}
+
+.horizontal-mode .cdk-viewport-wrapper region-list-simple-view
+{
+  width: 200px;
+}
+
+.cdk-viewport-wrapper region-list-simple-view
+{
+  width: 100%;
+}
+
+.cdk-virtual-scroll-viewport-container.horizontal-mode
+{
+  height: 6rem;
 }

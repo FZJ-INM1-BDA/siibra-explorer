@@ -1,7 +1,7 @@
-import { Directive, Input, HostBinding, HostListener, ElementRef, OnChanges, Output, EventEmitter } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output } from "@angular/core";
 
 @Directive({
-  selector: '[fixedMouseContextualContainerDirective]'
+  selector: '[fixedMouseContextualContainerDirective]',
 })
 
 export class FixedMouseContextualContainerDirective {
@@ -19,22 +19,29 @@ export class FixedMouseContextualContainerDirective {
   public onHide: EventEmitter<null> = new EventEmitter()
 
   constructor(
-    private el: ElementRef
-  ){
-    
+    private el: ElementRef,
+  ) {
+
   }
 
-  public show(){
-    if ((window.innerWidth - this.mousePos[0]) < 220) {
-      this.mousePos[0] = window.innerWidth-220
-    }
-    this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
-    this.styleDisplay = 'block'
+  public show() {
+    setTimeout(() => {
+      if (window.innerHeight - this.mousePos[1] < this.el.nativeElement.clientHeight) {
+        this.mousePos[1] = window.innerHeight - this.el.nativeElement.clientHeight
+      }
+
+      if ((window.innerWidth - this.mousePos[0]) < this.el.nativeElement.clientWidth) {
+        this.mousePos[0] = window.innerWidth - this.el.nativeElement.clientWidth
+      }
+
+      this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
+    })
+    this.styleDisplay = 'inline-block'
     this.isShown = true
     this.onShow.emit()
   }
 
-  public hide(){
+  public hide() {
     this.transform = `translate(${this.defaultPos.map(v => v.toString() + 'px').join(', ')})`
     this.styleDisplay = 'none'
     this.isShown = false
@@ -47,14 +54,4 @@ export class FixedMouseContextualContainerDirective {
   @HostBinding('style.transform')
   public transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
 
-  @HostListener('document:click', ['$event'])
-  documentClick(event: MouseEvent){
-    if (event.button !== 2) {
-      if (this.styleDisplay === 'none')
-        return
-      if (this.el.nativeElement.contains(event.target))
-        return
-      this.hide()
-    }
-  }
 }

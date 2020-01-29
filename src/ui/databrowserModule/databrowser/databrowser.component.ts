@@ -1,55 +1,49 @@
-import { Component, OnDestroy, OnInit, ViewChild, Input, ChangeDetectionStrategy, ChangeDetectorRef, OnChanges, Output,EventEmitter, TemplateRef } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
-import { Subscription, merge, Observable } from "rxjs";
-import { DatabrowserService, CountedDataModality } from "../databrowser.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
+import { merge, Observable, Subscription } from "rxjs";
+import { LoggingService } from "src/services/logging.service";
+import { IDataEntry } from "src/services/stateStore.service";
+import { CountedDataModality, DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
-import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
-import { scan, shareReplay } from "rxjs/operators";
-import { ViewerPreviewFile } from "src/services/state/dataStore.store";
-
-const scanFn: (acc: any[], curr: any) => any[] = (acc, curr) => [curr, ...acc]
 
 @Component({
   selector : 'data-browser',
   templateUrl : './databrowser.template.html',
   styleUrls : [
-    `./databrowser.style.css`
+    `./databrowser.style.css`,
   ],
   exportAs: 'dataBrowser',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DataBrowser implements OnChanges, OnDestroy,OnInit{
+export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
   @Input()
   public regions: any[] = []
 
   @Input()
   public template: any
-  
+
   @Input()
   public parcellation: any
 
   @Output()
-  dataentriesUpdated: EventEmitter<DataEntry[]> = new EventEmitter()
+  public dataentriesUpdated: EventEmitter<IDataEntry[]> = new EventEmitter()
 
-  public dataentries: DataEntry[] = []
+  public dataentries: IDataEntry[] = []
 
   public fetchingFlag: boolean = false
   public fetchError: boolean = false
   /**
    * TODO filter types
    */
-  private subscriptions : Subscription[] = []
+  private subscriptions: Subscription[] = []
   public countedDataM: CountedDataModality[] = []
   public visibleCountedDataM: CountedDataModality[] = []
 
-  public history$: Observable<{file:ViewerPreviewFile, dataset: DataEntry}[]>
-
   @ViewChild(ModalityPicker)
-  modalityPicker: ModalityPicker
+  public modalityPicker: ModalityPicker
 
-  public favDataentries$: Observable<DataEntry[]>
+  public favDataentries$: Observable<IDataEntry[]>
 
   /**
    * TODO
@@ -61,17 +55,13 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   constructor(
     private dbService: DatabrowserService,
-    private cdr:ChangeDetectorRef,
-    private singleDatasetSservice: KgSingleDatasetService
-  ){
+    private cdr: ChangeDetectorRef,
+    private log: LoggingService,
+  ) {
     this.favDataentries$ = this.dbService.favedDataentries$
-    this.history$ = this.singleDatasetSservice.previewingFile$.pipe(
-      scan(scanFn, []),
-      shareReplay(1)
-    )
   }
 
-  ngOnChanges(){
+  public ngOnChanges() {
 
     this.regions = this.regions.map(r => {
       /**
@@ -79,22 +69,22 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
        */
       return {
         id: `${this.parcellation.name}/${r.name}`,
-        ...r
+        ...r,
       }
     })
     const { regions, parcellation, template } = this
     this.fetchingFlag = true
 
     // input may be undefined/null
-    if (!parcellation) return
+    if (!parcellation) { return }
 
     /**
      * reconstructing parcellation region is async (done on worker thread)
-     * if parcellation region is not yet defined, return. 
+     * if parcellation region is not yet defined, return.
      * parccellation will eventually be updated with the correct region
      */
-    if (!parcellation.regions) return
-    
+    if (!parcellation.regions) { return }
+
     this.dbService.getDataByRegion({ regions, parcellation, template })
       .then(de => {
         this.dataentries = de
@@ -105,7 +95,7 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
         this.countedDataM = modalities
       })
       .catch(e => {
-        console.error(e)
+        this.log.error(e)
         this.fetchError = true
       })
       .finally(() => {
@@ -116,24 +106,24 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
 
   }
 
-  ngOnInit(){
+  public ngOnInit() {
     /**
-     * TODO gets init'ed everytime when appends to ngtemplateoutlet 
+     * TODO gets init'ed everytime when appends to ngtemplateoutlet
      */
     this.dbService.dbComponentInit(this)
     this.subscriptions.push(
       merge(
         // this.dbService.selectedRegions$,
-        this.dbService.fetchDataObservable$
+        this.dbService.fetchDataObservable$,
       ).subscribe(() => {
         /**
          * Only reset modality picker
          * resetting all creates infinite loop
          */
         this.clearAll()
-      })
+      }),
     )
-    
+
     /**
      * TODO fix
      */
@@ -142,60 +132,60 @@ export class DataBrowser implements OnChanges, OnDestroy,OnInit{
     // )
   }
 
-  ngOnDestroy(){
-    this.subscriptions.forEach(s=>s.unsubscribe())
+  public ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  clearAll(){
+  public clearAll() {
     this.countedDataM = this.countedDataM.map(cdm => {
       return {
         ...cdm,
-        visible: false
+        visible: false,
       }
     })
     this.visibleCountedDataM = []
   }
 
-  handleModalityFilterEvent(modalityFilter:CountedDataModality[]){
+  public handleModalityFilterEvent(modalityFilter: CountedDataModality[]) {
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
     this.cdr.markForCheck()
   }
 
-  retryFetchData(event: MouseEvent){
+  public retryFetchData(event: MouseEvent) {
     event.preventDefault()
     this.dbService.manualFetchDataset$.next(null)
   }
 
-  toggleFavourite(dataset: DataEntry){
+  public toggleFavourite(dataset: IDataEntry) {
     this.dbService.toggleFav(dataset)
   }
 
-  saveToFavourite(dataset: DataEntry){
+  public saveToFavourite(dataset: IDataEntry) {
     this.dbService.saveToFav(dataset)
   }
 
-  removeFromFavourite(dataset: DataEntry){
+  public removeFromFavourite(dataset: IDataEntry) {
     this.dbService.removeFromFav(dataset)
   }
 
   public showParcellationList: boolean = false
-  
+
   public filePreviewName: string
-  onShowPreviewDataset(payload: {datasetName:string, event:MouseEvent}){
-    const { datasetName, event } = payload
+  public onShowPreviewDataset(payload: {datasetName: string, event: MouseEvent}) {
+    const { datasetName } = payload
     this.filePreviewName = datasetName
   }
 
-  resetFilters(event?:MouseEvent){
+  public resetFilters(_event?: MouseEvent) {
     this.clearAll()
   }
 
-  trackByFn(index:number, dataset:DataEntry){
+  public trackByFn(index: number, dataset: IDataEntry) {
     return dataset.id
   }
 }
 
-export interface DataEntryFilter{
-  filter: (dataentries:DataEntry[]) => DataEntry[]
+export interface IDataEntryFilter {
+  filter: (dataentries: IDataEntry[]) => IDataEntry[]
 }

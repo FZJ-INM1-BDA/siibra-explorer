@@ -1,0 +1,53 @@
+<kg-dataset-list
+  (kgDsPrvUpdated)="handleKgDsPrvUpdated($event)"
+  class="d-none"
+  [kgId]="kgId">
+
+</kg-dataset-list>
+
+<div *ngIf="loadingDatasetPreviewList; else datasetList" class="spinnerAnimationCircle"></div>
+
+<ng-template #datasetList>
+
+  <mat-nav-list>
+    <h3 mat-subheader>Available Preview Files</h3>
+
+    <ng-container *ngFor="let file of datasetPreviewList">
+
+      <!-- preview available -->
+      <ng-template [ngIf]="(selectedTemplateSpace$ | async | previewFileVisibleInSelectedReferenceTemplatePipe : file)" [ngIfElse]="notAvailalbePreview" >
+        <mat-list-item (click)=" handlePreviewFile(file)">
+          <mat-icon
+            [fontSet]="(file | previewFileIconPipe).fontSet"
+            [fontIcon]="(file | previewFileIconPipe).fontIcon"
+            matListIcon>
+          </mat-icon>
+          <h4 mat-line>{{ file.name }}</h4>
+          <p mat-line>mimetype: {{ file.mimetype }}</p>
+        </mat-list-item>
+      </ng-template>
+
+      <!-- preview not available in this reference space -->
+      <ng-template #notAvailalbePreview>
+        <mat-list-item
+          [matTooltip]="file | unavailableTooltip"
+          [matTooltipDisabled]="selectedTemplateSpace$ | async | previewFileVisibleInSelectedReferenceTemplatePipe : file"
+          [ngClass]="{'text-muted': !(selectedTemplateSpace$ | async | previewFileVisibleInSelectedReferenceTemplatePipe : file)}">
+          <mat-icon
+            [fontSet]="(file | previewFileIconPipe).fontSet"
+            [fontIcon]="(file | previewFileIconPipe).fontIcon"
+            matListIcon>
+          </mat-icon>
+          <h4 mat-line>{{ file.name }}</h4>
+          <p mat-line>mimetype: {{ file.mimetype }}</p>
+        </mat-list-item>
+      </ng-template>
+
+    </ng-container>
+    <small *ngIf="datasetPreviewList.length === 0"
+      class="text-muted">
+      There are no preview files in this parcellation/template space.
+    </small>
+    
+  </mat-nav-list>
+</ng-template>

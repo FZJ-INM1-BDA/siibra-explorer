@@ -1,69 +1,95 @@
-import { Component, HostBinding, ViewChild, ViewContainerRef, OnDestroy, OnInit, TemplateRef, AfterViewInit, Renderer2 } from "@angular/core";
-import { Store, select, ActionsSubject } from "@ngrx/store";
-import { ViewerStateInterface, isDefined, FETCHED_SPATIAL_DATA, UPDATE_SPATIAL_DATA, safeFilter } from "../services/stateStore.service";
-import { Observable, Subscription, combineLatest, interval, merge, of } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, concatMap, withLatestFrom } from "rxjs/operators";
-import { AtlasViewerDataService } from "./atlasViewer.dataService.service";
-import { WidgetServices } from "./widgetUnit/widgetService.service";
+import {
+  AfterViewInit, ChangeDetectorRef,
+  Component,
+  HostBinding,
+  OnDestroy,
+  OnInit,
+  Renderer2,
+  TemplateRef,
+  ViewChild,
+} from "@angular/core";
+import { ActionsSubject, select, Store } from "@ngrx/store";
+import {combineLatest, interval, merge, Observable, of, Subscription} from "rxjs";
+import {
+  concatMap,
+  delay,
+  distinctUntilChanged,
+  filter,
+  map,
+  withLatestFrom,
+} from "rxjs/operators";
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
-import { AtlasViewerConstantsServices, UNSUPPORTED_PREVIEW, UNSUPPORTED_INTERVAL } from "./atlasViewer.constantService.service";
-import { AtlasViewerURLService } from "./atlasViewer.urlService.service";
+import {
+  IavRootStoreInterface,
+  isDefined,
+  safeFilter,
+} from "../services/stateStore.service";
 import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
+import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
+import { WidgetServices } from "./widgetUnit/widgetService.service";
 
-import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
-import { colorAnimation } from "./atlasViewer.animation"
-import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS, SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
+import { MatBottomSheet, MatBottomSheetRef, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef } from "@angular/material";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
-import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef, MatBottomSheet, MatBottomSheetRef } from "@angular/material";
+import { LoggingService } from "src/services/logging.service";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import {
+  CLOSE_SIDE_PANEL,
+  OPEN_SIDE_PANEL,
+} from "src/services/state/uiState.store";
+import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import { getViewer, isSame } from "src/util/fn";
+import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
+import { colorAnimation } from "./atlasViewer.animation"
 
 /**
  * TODO
  * check against auxlillary mesh indicies, to only filter out aux indicies
  */
 const filterFn = (segment) => typeof segment.segment !== 'string'
+const compareFn = (it, item) => it.name === item.name
 
 @Component({
   selector: 'atlas-viewer',
   templateUrl: './atlasViewer.template.html',
   styleUrls: [
-    `./atlasViewer.style.css`
+    `./atlasViewer.style.css`,
   ],
   animations : [
-    colorAnimation
-  ]
+    colorAnimation,
+  ],
 })
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
-  
-  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) cookieAgreementComponent : TemplateRef<any>
-  @ViewChild('kgToS', {read: TemplateRef}) kgTosComponent: TemplateRef<any>
-  @ViewChild(LayoutMainSide) layoutMainSide: LayoutMainSide
 
-  @ViewChild(NehubaContainer) nehubaContainer: NehubaContainer
+  public compareFn = compareFn
 
-  @ViewChild(FixedMouseContextualContainerDirective) rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
+  @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
+  @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
-  @ViewChild('mobileMenuTabs') mobileMenuTabs: TabsetComponent
+  @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
+
+  @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
+
+  @ViewChild('mobileMenuTabs') public mobileMenuTabs: TabsetComponent
 
   /**
    * required for styling of all child components
    */
   @HostBinding('attr.darktheme')
-  darktheme: boolean = false
+  public darktheme: boolean = false
 
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
-
-  meetsRequirement: boolean = true
+  public meetsRequirement: boolean = true
 
   public sidePanelView$: Observable<string|null>
   private newViewer$: Observable<any>
 
   public selectedRegions$: Observable<any[]>
-  public selectedPOI$ : Observable<any[]>
-  
+  public selectedPOI$: Observable<any[]>
+
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
   private bottomSheetRef: MatBottomSheetRef
@@ -71,9 +97,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
-  public onhoverSegmentsForFixed$: Observable<string[]>
-  
-  public onhoverLandmark$ : Observable<{landmarkName: string, datasets: any} | null>
+
+  public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -81,41 +106,57 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
    * TODO make untangle nglayernames and its dependency on ng
    * TODO deprecated
    */
-  public ngLayerNames$ : Observable<any>
-  public ngLayers : NgLayerInterface[]
-  private disposeHandler : any
+  public ngLayerNames$: Observable<any>
+  public ngLayers: INgLayerInterface[]
+  private disposeHandler: any
 
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
-  public sidePanelOpen$: Observable<boolean>
+  public sidePanelIsOpen$: Observable<boolean>
 
-  public toggleMessage = this.constantsService.toggleMessage
+  public onhoverSegmentsForFixed$: Observable<string[]>
+
+  private pluginRegionSelectionEnabled$: Observable<boolean>
+  private pluginRegionSelectionEnabled: boolean = false
+  private persistentStateNotifierTemplate$: Observable<string>
+  // private pluginRegionSelectionEnabled: boolean = false
 
   constructor(
-    private store: Store<ViewerStateInterface>,
-    public dataService: AtlasViewerDataService,
+    private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
-    public urlService: AtlasViewerURLService,
     public apiService: AtlasViewerAPIServices,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet
+    private bottomSheet: MatBottomSheet,
+    private log: LoggingService,
+    private changeDetectorRef: ChangeDetectorRef,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
       select('uiState'),
-      select("snackbarMessage")
+      select("snackbarMessage"),
+    )
+
+    this.pluginRegionSelectionEnabled$ = this.store.pipe(
+      select('uiState'),
+      select("pluginRegionSelectionEnabled"),
+      distinctUntilChanged(),
+    )
+    this.persistentStateNotifierTemplate$ = this.store.pipe(
+      select('uiState'),
+      select("persistentStateNotifierTemplate"),
+      distinctUntilChanged(),
     )
 
     this.bottomSheet$ = this.store.pipe(
       select('uiState'),
       select('bottomSheetTemplate'),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     )
 
     /**
@@ -124,28 +165,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.ngLayerNames$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o,n) => o.templateSelected.name === n.templateSelected.name),
+      distinctUntilChanged((o, n) => o.templateSelected.name === n.templateSelected.name),
       map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
-      delay(0)
+      delay(0),
     )
 
     this.sidePanelView$ = this.store.pipe(
-      select('uiState'),  
+      select('uiState'),
       filter(state => isDefined(state)),
-      map(state => state.focusedSidePanel)
+      map(state => state.focusedSidePanel),
     )
 
-    this.sidePanelOpen$ = this.store.pipe(
-      select('uiState'),  
+    this.sidePanelIsOpen$ = this.store.pipe(
+      select('uiState'),
       filter(state => isDefined(state)),
-      map(state => state.sidePanelOpen)
+      map(state => state.sidePanelIsOpen),
     )
 
     this.selectedRegions$ = this.store.pipe(
       select('viewerState'),
-      filter(state=>isDefined(state)&&isDefined(state.regionsSelected)),
-      map(state=>state.regionsSelected),
-      distinctUntilChanged()
+      filter(state => isDefined(state) && isDefined(state.regionsSelected)),
+      map(state => state.regionsSelected),
+      distinctUntilChanged(),
     )
 
     this.selectedPOI$ = combineLatest(
@@ -154,52 +195,52 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         select('viewerState'),
         filter(state => isDefined(state) && isDefined(state.landmarksSelected)),
         map(state => state.landmarksSelected),
-        distinctUntilChanged()
-      )
+        distinctUntilChanged(),
+      ),
     ).pipe(
-      map(results => [...results[0], ...results[1]])
+      map(results => [...results[0], ...results[1]]),
     )
 
     this.newViewer$ = this.store.pipe(
       select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      map(state => state.templateSelected),
-      distinctUntilChanged((t1, t2) => t1.name === t2.name)
+      select('templateSelected'),
+      distinctUntilChanged(isSame),
     )
 
     this.dedicatedView$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && typeof state.dedicatedView !== 'undefined'),
       map(state => state.dedicatedView),
-      distinctUntilChanged()
+      distinctUntilChanged(),
     )
 
     this.onhoverLandmark$ = combineLatest(
       this.store.pipe(
         select('uiState'),
-        map(state => state.mouseOverLandmark)
+        map(state => state.mouseOverLandmark),
       ),
       this.store.pipe(
         select('dataStore'),
         safeFilter('fetchedSpatialData'),
-        map(state=>state.fetchedSpatialData)
-      )
+        map(state => state.fetchedSpatialData),
+      ),
     ).pipe(
       map(([landmark, spatialDatas]) => {
-        if(landmark === null)
+        if (landmark === null) {
           return landmark
-        const idx = Number(landmark.replace('label=',''))
-        if(isNaN(idx)) {
-          console.warn(`Landmark index could not be parsed as a number: ${landmark}`)
+        }
+        const idx = Number(landmark.replace('label=', ''))
+        if (isNaN(idx)) {
+          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
           return {
-            landmarkName: idx
+            landmarkName: idx,
           }
         } else {
           return  {
-            landmarkName: spatialDatas[idx].name
+            landmarkName: spatialDatas[idx].name,
           }
         }
-      })
+      }),
     )
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
@@ -208,53 +249,58 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         select('uiState'),
         select('mouseOverSegments'),
         filter(v => !!v),
-        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) )
+        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
         /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
 
       ),
-      this.onhoverLandmark$
+      this.onhoverLandmark$,
     ).pipe(
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
-        if (!segments) return null
+        if (!segments) { return null }
         const filteredSeg = segments.filter(filterFn)
         return filteredSeg.length > 0
-          ? segments.map(s => s.segment) 
+          ? segments.map(s => s.segment)
           : null
-        })
+      }),
     )
 
     this.selectedParcellation$ = this.store.pipe(
       select('viewerState'),
       safeFilter('parcellationSelected'),
-      map(state=>state.parcellationSelected),
+      map(state => state.parcellationSelected),
       distinctUntilChanged(),
     )
 
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
-      })
+      }),
     )
 
     this.subscriptions.push(
       this.bottomSheet$.subscribe(templateRef => {
         if (!templateRef) {
-          this.bottomSheetRef && this.bottomSheetRef.dismiss()
+          if (this.bottomSheetRef) {
+            this.bottomSheetRef.dismiss()
+          }
         } else {
           this.bottomSheetRef = this.bottomSheet.open(templateRef)
           this.bottomSheetRef.afterDismissed().subscribe(() => {
             this.store.dispatch({
               type: SHOW_BOTTOM_SHEET,
-              bottomSheetTemplate: null
+              bottomSheetTemplate: null,
             })
             this.bottomSheetRef = null
           })
         }
-      })
+      }),
     )
-  }
 
+    this.onhoverSegments$.subscribe(hr => {
+      this.hoveringRegions = hr
+    })
+  }
 
   private selectedParcellation$: Observable<any>
   private selectedParcellation: any
@@ -262,13 +308,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   private cookieDialogRef: MatDialogRef<any>
   private kgTosDialogRef: MatDialogRef<any>
 
-  ngOnInit() {
+  public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
 
     if (!this.meetsRequirement) {
       merge(
         of(-1),
-        interval(UNSUPPORTED_INTERVAL)
+        interval(UNSUPPORTED_INTERVAL),
       ).pipe(
         map(v => {
           let idx = v
@@ -276,14 +322,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
             idx = v + this.unsupportedPreviews.length
           }
           return idx % this.unsupportedPreviews.length
-        })
+        }),
       ).subscribe(val => {
         this.unsupportedPreviewIdx = val
       })
     }
 
     this.subscriptions.push(
-      this.constantsService.useMobileUI$.subscribe(bool => this.ismobile = bool)
+      this.constantsService.useMobileUI$.subscribe(bool => this.ismobile = bool),
     )
 
     this.subscriptions.push(
@@ -293,16 +339,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         // and https://github.com/angular/components/issues/11357
         delay(0),
       ).subscribe(messageSymbol => {
-        this.snackbarRef && this.snackbarRef.dismiss()
+        if (this.snackbarRef) { this.snackbarRef.dismiss() }
 
-        if (!messageSymbol) return
+        if (!messageSymbol) { return }
 
         // https://stackoverflow.com/a/48191056/6059235
         const message = messageSymbol.toString().slice(7, -1)
         this.snackbarRef = this.snackbar.open(message, 'Dismiss', {
-          duration: 5000
+          duration: 5000,
         })
-      })
+      }),
     )
 
     /**
@@ -310,53 +356,44 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
      */
     this.subscriptions.push(
       this.ngLayerNames$.pipe(
-        concatMap(data => this.constantsService.loadExportNehubaPromise.then(data))
+        concatMap(data => this.constantsService.loadExportNehubaPromise.then(data)),
       ).subscribe(() => {
         this.ngLayersChangeHandler()
-        this.disposeHandler = window['viewer'].layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
-        window['viewer'].registerDisposer(this.disposeHandler)
-      })
+        const viewer = getViewer()
+        this.disposeHandler = viewer.layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
+        viewer.registerDisposer(this.disposeHandler)
+      }),
     )
 
     this.subscriptions.push(
-      this.newViewer$.subscribe(template => {
-        this.darktheme = this.meetsRequirement ?
-          template.useTheme === 'dark' :
-          false
-
-        this.constantsService.darktheme = this.darktheme
-        
-        /* new viewer should reset the spatial data search */
-        this.store.dispatch({
-          type : FETCHED_SPATIAL_DATA,
-          fetchedDataEntries : []
-        })
-        this.store.dispatch({
-          type : UPDATE_SPATIAL_DATA,
-          totalResults : 0
-        })
-
+      this.newViewer$.subscribe(() => {
         this.widgetServices.clearAllWidgets()
-      })
+      }),
     )
 
     this.subscriptions.push(
       this.sidePanelView$.pipe(
-        filter(() => typeof this.layoutMainSide !== 'undefined')
-      ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v))
+        filter(() => typeof this.layoutMainSide !== 'undefined'),
+      ).subscribe(v => this.layoutMainSide.showSide =  isDefined(v)),
     )
 
     this.subscriptions.push(
       this.constantsService.darktheme$.subscribe(flag => {
-        this.rd.setAttribute(document.body,'darktheme', flag.toString())
+        this.rd.setAttribute(document.body, 'darktheme', flag.toString())
+      }),
+    )
+
+    this.subscriptions.push(
+      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
+        this.pluginRegionSelectionEnabled = PRSE
+        this.changeDetectorRef.detectChanges()
       })
     )
   }
 
-  ngAfterViewInit() {
-    
+  public ngAfterViewInit() {
     /**
-     * preload the main bundle after atlas viewer has been loaded. 
+     * preload the main bundle after atlas viewer has been loaded.
      * This should speed up where user first navigate to the home page,
      * and the main.bundle should be downloading after atlasviewer has been rendered
      */
@@ -378,7 +415,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),
       select('agreedCookies'),
       filter(agreed => !agreed),
-      delay(0)
+      delay(0),
     ).subscribe(() => {
       this.cookieDialogRef = this.matDialog.open(this.cookieAgreementComponent)
     })
@@ -387,32 +424,56 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       filter(({type}) => type === SHOW_KG_TOS),
       withLatestFrom(this.store.pipe(
         select('uiState'),
-        select('agreedKgTos')
+        select('agreedKgTos'),
       )),
       map(([_, agreed]) => agreed),
       filter(flag => !flag),
-      delay(0)
-    ).subscribe(val => {
+      delay(0),
+    ).subscribe(() => {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
 
     this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
       withLatestFrom(this.onhoverSegments$),
-      map(([_flag, onhoverSegments]) => onhoverSegments || [])
+      map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
   }
 
+  private hoveringRegions = []
+
+  public mouseDownNehuba(_event) {
+    this.rClContextualMenu.hide()
+  }
+
+  public mouseClickNehuba(event) {
+    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+    if (!this.rClContextualMenu) { return }
+    this.rClContextualMenu.mousePos = [
+      event.clientX,
+      event.clientY,
+    ]
+    if (!this.pluginRegionSelectionEnabled) {
+      this.rClContextualMenu.show()
+    } else {
+      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions)
+    }
+  }
+
+  public toggleSideNavMenu(opened) {
+    this.store.dispatch({type: opened ? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
+  }
+
   /**
-   * For completeness sake. Root element should never be destroyed. 
+   * For completeness sake. Root element should never be destroyed.
    */
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   /**
    * perhaps move this to constructor?
    */
-  meetsRequirements():boolean {
+  public meetsRequirements(): boolean {
 
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2') as WebGLRenderingContext
@@ -422,7 +483,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     const colorBufferFloat = gl.getExtension('EXT_color_buffer_float')
-    
+
     if (!colorBufferFloat) {
       return false
     }
@@ -433,54 +494,41 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   /**
    * TODO deprecated
    */
-  ngLayersChangeHandler(){
-    this.ngLayers = (window['viewer'].layerManager.managedLayers as any[])
+  public ngLayersChangeHandler() {
+    const viewer = getViewer()
+    this.ngLayers = (viewer.layerManager.managedLayers as any[])
       // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
       .map(obj => ({
         name : obj.name,
         type : obj.initialSpecification.type,
         source : obj.sourceUrl,
-        visible : obj.visible
-      }) as NgLayerInterface)
+        visible : obj.visible,
+      }) as INgLayerInterface)
   }
 
-  kgTosClickedOk(){
-    this.kgTosDialogRef && this.kgTosDialogRef.close()
+  public kgTosClickedOk() {
+    if (this.kgTosDialogRef) { this.kgTosDialogRef.close() }
     this.store.dispatch({
-      type: AGREE_KG_TOS
+      type: AGREE_KG_TOS,
     })
   }
 
-  cookieClickedOk(){
-    this.cookieDialogRef && this.cookieDialogRef.close()
+  public cookieClickedOk() {
+    if (this.cookieDialogRef) { this.cookieDialogRef.close() }
     this.store.dispatch({
-      type: AGREE_COOKIE
+      type: AGREE_COOKIE,
     })
-  }
-
-  nehubaClickHandler(event:MouseEvent){
-    if (!this.rClContextualMenu) return
-    this.rClContextualMenu.mousePos = [
-      event.clientX,
-      event.clientY
-    ]
-    this.rClContextualMenu.show()
-  }
-
-  openLandmarkUrl(dataset) {
-    this.rClContextualMenu.hide()
-    window.open(dataset.externalLink, "_blank")
   }
 
   @HostBinding('attr.version')
-  public _version : string = VERSION
+  public _version: string = VERSION
 }
 
-export interface NgLayerInterface{
-  name : string
-  visible : boolean
-  source : string
-  type : string // image | segmentation | etc ...
-  transform? : [[number, number, number, number],[number, number, number, number],[number, number, number, number],[number, number, number, number]] | null
+export interface INgLayerInterface {
+  name: string
+  visible: boolean
+  source: string
+  type: string // image | segmentation | etc ...
+  transform?: [[number, number, number, number], [number, number, number, number], [number, number, number, number], [number, number, number, number]] | null
   // colormap : string
 }

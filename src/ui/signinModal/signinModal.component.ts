@@ -1,34 +1,34 @@
 import { Component } from "@angular/core";
-import { AuthService, User, AuthMethod } from "src/services/auth.service";
+import { AuthService, IAuthMethod, IUser } from "src/services/auth.service";
 
 @Component({
   selector: 'signin-modal',
   templateUrl: './signinModal.template.html',
   styleUrls: [
-    './signinModal.style.css'
-  ]
+    './signinModal.style.css',
+  ],
 })
 
-export class SigninModal{
+export class SigninModal {
   constructor(
-    private authService: AuthService
-  ){
+    private authService: AuthService,
+  ) {
 
   }
 
-  get user() : User | null {
+  get user(): IUser | null {
     return this.authService.user
   }
-  
-  get loginMethods(): AuthMethod[] {
+
+  get loginMethods(): IAuthMethod[] {
     return this.authService.loginMethods
   }
-  
-  get logoutHref(): String {
+
+  get logoutHref(): string {
     return this.authService.logoutHref
   }
 
-  loginBtnOnclick() {
+  public loginBtnOnclick() {
     this.authService.authSaveState()
     return true
   }

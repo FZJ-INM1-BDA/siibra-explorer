@@ -43,12 +43,7 @@ layout-floating-container
 
 [fixedMouseContextualContainerDirective]
 {
-  width: 15rem;
-}
-
-[fixedMouseContextualContainerDirective] div[body]
-{
-  overflow: hidden;
+  max-width: 100%;
 }
 
 div[imageContainer]
@@ -68,4 +63,9 @@ mat-sidenav {
 
 .mobileMenuTabs {
   margin: 40px 0 0 5px;
+}
+
+region-menu
+{
+  display:inline-block;
 }
