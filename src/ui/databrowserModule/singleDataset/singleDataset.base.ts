@@ -22,7 +22,6 @@ export class SingleDatasetBase implements OnInit {
    * while the actual data is being loaded from KG with kgSchema and kgId
    */
   @Input() public name?: string
-  @Input() public title?: string
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
@@ -78,9 +77,8 @@ export class SingleDatasetBase implements OnInit {
     const { kgId, kgSchema, dataset } = this
     this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
     if ( dataset ) {
-      const { name, title, description, kgReference, publications, files, preview, kgExternalLink, underEmbargo } = dataset
+      const { name, description, kgReference, publications, files, preview } = dataset
       this.name = name
-      this.title = title
       this.description = description
       this.kgReference = kgReference
       this.publications = publications
