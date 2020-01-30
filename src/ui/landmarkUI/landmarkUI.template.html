@@ -1,0 +1,35 @@
+<mat-card>
+  <mat-card-title>
+
+    {{ name }}
+  </mat-card-title>
+  <mat-card-subtitle>
+
+    <i class="fas fa-map-marker-alt"></i>
+    <span>
+      spatial landmark
+    </span>
+  </mat-card-subtitle>
+  <mat-card-content>
+
+    <hr class="text-muted">
+    <!-- associated datasets -->
+    <div>
+      <small class="text-muted">
+        Associated datasets
+      </small>
+      <div>
+        <ng-container *ngFor="let dataset of datasets">
+
+          <single-dataset-list-view
+            *ngIf="dataset.fullId | getKgSchemaIdFromFullIdPipe as kgSchemaId"
+            [ripple]="true"
+            [kgSchema]="kgSchemaId[0]"
+            [kgId]="kgSchemaId[1]">
+
+          </single-dataset-list-view>
+        </ng-container>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

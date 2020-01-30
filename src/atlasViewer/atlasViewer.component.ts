@@ -41,7 +41,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
-import {SingleDatasetView} from "src/ui/databrowserModule/singleDataset/detailedView/singleDataset.component";
+import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
 
 /**
  * TODO
@@ -72,6 +72,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   @ViewChild('mobileMenuTabs') public mobileMenuTabs: TabsetComponent
 
@@ -122,11 +123,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
-  private persistentStateNotifierTemplate$: Observable<string>
-  // private pluginRegionSelectionEnabled: boolean = false
+  public persistentStateNotifierTemplate$: Observable<string>
 
   private hoveringRegions = []
-  private hoveringLandmark: any
   public presentDatasetDialogRef: MatDialogRef<any>
 
   constructor(
@@ -214,6 +213,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(isSame),
     )
 
+    // TODO deprecate
     this.dedicatedView$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && typeof state.dedicatedView !== 'undefined'),
@@ -221,48 +221,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.onhoverLandmark$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        map(state => state.mouseOverLandmark),
-      ),
-      this.store.pipe(
-        select('dataStore'),
-        safeFilter('fetchedSpatialData'),
-        map(state => state.fetchedSpatialData),
-      ),
-    ).pipe(
-      map(([landmark, spatialDatas]) => {
-        if (landmark === null) {
-          return landmark
-        }
-        const idx = Number(landmark.replace('label=', ''))
-        if (isNaN(idx)) {
-          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
-          return {
-            landmarkName: idx,
-          }
-        } else {
-          return  {
-            landmarkName: spatialDatas[idx].name,
-            landmarkDataset: spatialDatas[idx].dataset
-          }
-        }
-      }),
-    )
-
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegments$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        select('mouseOverSegments'),
-        filter(v => !!v),
-        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
-        /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
+    this.onhoverSegments$ = this.store.pipe(
+      select('uiState'),
+      select('mouseOverSegments'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
+      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
 
-      ),
-      this.onhoverLandmark$,
     ).pipe(
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
         if (!segments) { return null }
@@ -307,9 +277,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.onhoverSegments$.subscribe(hr => {
         this.hoveringRegions = hr
-      }),
-      this.onhoverLandmark$.subscribe(hl => {
-        this.hoveringLandmark = hl
       })
     )
   }
@@ -417,6 +384,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.rd.appendChild(document.head, prefecthMainBundle)
     }
 
+    this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
+      select('landmark')
+    )
+
     /**
      * Show Cookie disclaimer if not yet agreed
      */
@@ -451,8 +422,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.onhoverLandmarkForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverLandmark$),
-      map(([_flag, onhoverLandmark]) => onhoverLandmark || []),
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
+      map(([_flag, onhoverLandmark]) => onhoverLandmark)
     )
   }
 
@@ -461,29 +434,14 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   public mouseClickNehuba(event) {
-    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
-    if (this.hoveringLandmark) {
-      const hoveringLandmark = this.hoveringLandmark
-      this.hoveringLandmark = null
-      //ToDo it should be ported into different component with ability to view detailed dataset files
-      this.presentDatasetDialogRef = this.matDialog.open(SingleDatasetView, {
-        data: {
-          name: hoveringLandmark.landmarkDataset[0].name,
-          title: hoveringLandmark.landmarkName,
-          description: hoveringLandmark.landmarkDataset[0].description,
-          kgExternalLink: hoveringLandmark.landmarkDataset[0].externalLink,
-          underEmbargo: hoveringLandmark.landmarkDataset[0].embargoStatus[0].name === 'Embargoed'? true : false
-        },
-      })
-      this.presentDatasetDialogRef.afterClosed().subscribe(() => {
-        this.presentDatasetDialogRef = null
-      })
-    }
+
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
       event.clientY,
     ]
+
+    // TODO what if user is hovering a landmark?
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
     } else {

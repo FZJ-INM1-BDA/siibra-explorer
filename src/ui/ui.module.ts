@@ -78,6 +78,7 @@ import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectiv
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
+import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 
 @NgModule({
   imports : [
@@ -129,6 +130,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     ConnectivityBrowserComponent,
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
+    LandmarkUIComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -192,6 +194,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,
+    LandmarkUIComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

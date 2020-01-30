@@ -1,12 +1,24 @@
 const url = require('url')
 const request = require('request')
-const { getUserKGRequestParam } = require('./util')
+const { getUserKGRequestParam, constants } = require('./util')
 const { transformWaxholmV2NmToVoxel, transformWaxholmV2VoxelToNm } = require('./spatialXform/waxholmRat')
 
 /**
  * TODO change to URL constructor to improve readability
  */
-const spatialQuery = 'https://kg.humanbrainproject.eu/query/neuroglancer/seeg/coordinate/v1.0.0/spatialWithCoordinatesNG/instances?vocab=https%3A%2F%2Fschema.hbp.eu%2FmyQuery%2F'
+
+const { KG_ROOT, KG_SEARCH_VOCAB } = constants
+
+const kgParams = {
+  vocab: KG_SEARCH_VOCAB
+}
+
+const KG_SPATIAL_DATASET_SEARCH_QUERY_NAME = process.env.KG_SPATIAL_DATASET_SEARCH_QUERY_NAME || 'iav-spatial-query-v2'
+const KG_SPATIAL_DATASET_SEARCH_PATH = process.env.KG_SPATIAL_DATASET_SEARCH_PATH || '/neuroglancer/seeg/coordinate/v1.0.0'
+
+const kgSpatialDatasetSearchFullString = `${KG_SPATIAL_DATASET_SEARCH_PATH}/${KG_SPATIAL_DATASET_SEARCH_QUERY_NAME}`
+
+const kgQuerySpatialDatasetUrl = new url.URL(`${KG_ROOT}${kgSpatialDatasetSearchFullString}/instances`)
 
 const defaultXform = (coord) => coord
 
@@ -51,30 +63,29 @@ const fetchSpatialDataFromKg = async ({ templateName, queryGeometry, queryArg, u
   const { releasedOnly, option } = await getUserKGRequestParam({ user })
 
   const _ = getSpatialSearcParam({ templateName, queryGeometry, queryArg })
-  const search = new url.URLSearchParams()
+  const _url = new url.URL(kgQuerySpatialDatasetUrl)
+
+  for (const key in kgParams){
+    _url.searchParams.append(key, kgParams[key])
+  }
   
   for (let key in _) {
-    search.append(key, _[key])  
+    _url.searchParams.append(key, _[key])
   }
-  if (releasedOnly) search.append('databaseScope', 'RELEASED')
-  
-  const _url = `${spatialQuery}&${search.toString()}`
+  if (releasedOnly) _url.searchParams.append('databaseScope', 'RELEASED')
+
   return await new Promise((resolve, reject) => {
     request(_url, option, (err, resp, body) => {
-      if (err)
-        return reject(err)
+      if (err) return reject(err)
       if (resp.statusCode >= 400) {
         return reject(resp.statusCode)
       }
       const json = JSON.parse(body)
 
       const { voxelToNm } = getXformFn(templateName)
-
-      const _ = json.results.map(({ name, coordinates, dataset}) => {
+      const _ = json.results.map(({ coordinates, ...rest}) => {
         return {
-          name,
-          templateSpace: templateName,
-          dataset: dataset.map(ds => ds = {name: ds.name, description: ds.description, externalLink: 'https://kg.ebrains.eu/instances/Dataset/' + ds.identifier, embargoStatus: ds['embargo_status']}),
+          ...rest,
           geometry: {
             type: 'point',
             space: 'real',

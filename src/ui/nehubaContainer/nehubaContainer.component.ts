@@ -1054,7 +1054,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.mouseoverLandmarkEmitter.pipe(
-        throttleTime(100),
+        distinctUntilChanged()
       ).subscribe(label => {
         this.store.dispatch({
           type : MOUSE_OVER_LANDMARK,

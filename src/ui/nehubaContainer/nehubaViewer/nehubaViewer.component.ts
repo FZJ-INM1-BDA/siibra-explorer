@@ -775,6 +775,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         })
       })
 
+    // TODO bug: mouseoverlandmarkemitter does not emit empty for VTK layer when user mouse click
     this.ondestroySubscriptions.push(
       this.nehubaViewer.mouseOver.layer
         .filter(obj => obj.layer.name === this.constantService.ngLandmarkLayerName)
