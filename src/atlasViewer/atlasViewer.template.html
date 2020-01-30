@@ -79,7 +79,7 @@
 
           </button>
 
-          <mat-card *ngIf="!sideNavDrawer.opened" (click)="sideNavDrawer.open()" mat-ripple
+          <mat-card *ngIf="!sideNavDrawer.opened" (click)="toggleSideNavMenu(false)" mat-ripple
             class="pe-all mt-4 muted translate-x-4-n">
             <mat-card-content>
               <viewer-state-mini>

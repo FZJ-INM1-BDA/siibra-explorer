@@ -3,6 +3,7 @@ import { Store } from "@ngrx/store";
 import { KgSingleDatasetService } from "src/ui/databrowserModule/kgSingleDatasetService.service";
 import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 import { IavRootStoreInterface } from "./stateStore.service";
+import { DATASETS_ACTIONS_TYPES } from "./state/dataStore.store";
 
 /**
  * experimental service handling local user files such as nifti and gifti
@@ -70,8 +71,15 @@ export class LocalFileService {
       URL.revokeObjectURL(this.niiUrl)
     }
     this.niiUrl = URL.createObjectURL(file)
-    this.singleDsService.showNewNgLayer({
-      url: this.niiUrl,
+    
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
+      payload: {
+        file: {
+          mimetype: 'application/json',
+          url: this.niiUrl
+        }
+      }
     })
 
     this.showLocalWarning()

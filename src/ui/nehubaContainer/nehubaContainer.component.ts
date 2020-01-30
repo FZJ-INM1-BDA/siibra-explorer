@@ -1,8 +1,26 @@
 import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ViewContainerRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription } from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, from } from "rxjs";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, takeUntil, tap, throttleTime, withLatestFrom } from "rxjs/operators";
+import {
+  buffer,
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
+  mapTo,
+  scan,
+  shareReplay,
+  skip,
+  startWith,
+  switchMap,
+  switchMapTo,
+  take,
+  takeUntil,
+  tap,
+  throttleTime,
+  withLatestFrom
+} from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { FOUR_PANEL, H_ONE_THREE, NEHUBA_READY, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
 import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
@@ -137,8 +155,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     private log: LoggingService,
   ) {
 
-    this.exportNehuba = getExportNehuba()
-
     this.useMobileUI$ = this.constantService.useMobileUI$
 
     this.viewerPerformanceConfig$ = this.store.pipe(
@@ -224,8 +240,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.navigationChanges$ = this.store.pipe(
       select('viewerState'),
-      safeFilter('navigation'),
-      map(state => state.navigation),
+      select('navigation'),
+      filter(v => !!v)
     )
 
     this.spatialResultsVisible$ = this.store.pipe(
@@ -327,7 +343,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   private findPanelIndex = (panel: HTMLElement) => this.viewPanels.findIndex(p => p === panel)
 
-  private exportNehuba: any
+  private _exportNehuba: any
+  get exportNehuba() {
+    if (!this._exportNehuba) {
+      this._exportNehuba = getExportNehuba()
+    }
+    return this._exportNehuba
+  }
 
   public ngOnInit() {
 
@@ -579,10 +601,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           deepCopiedState.nehubaConfig.dataset.initialNgState.navigation = navigation
           return deepCopiedState
         }),
-        withLatestFrom(this.selectedParcellation$.pipe(
-          startWith(null),
-        )),
-      ).subscribe(([templateSelected, parcellationSelected]) => {
+        withLatestFrom(
+          this.selectedParcellation$.pipe(
+            startWith(null),
+          ),
+          this.navigationChanges$.pipe(
+            startWith({})
+          )
+        ),
+      ).subscribe(([templateSelected, parcellationSelected, navigation]) => {
         this.store.dispatch({
           type: NEHUBA_READY,
           nehubaReady: false,
@@ -590,7 +617,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         this.nehubaViewerSubscriptions.forEach(s => s.unsubscribe())
 
         this.selectedTemplate = templateSelected
-        this.createNewNehuba(templateSelected)
+        this.createNewNehuba(templateSelected, navigation)
         const foundParcellation = parcellationSelected
           && templateSelected.parcellations.find(parcellation => parcellationSelected.name === parcellation.name)
         this.handleParcellation(foundParcellation || templateSelected.parcellations[0])
@@ -959,7 +986,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.nehubaViewer = null
   }
 
-  private createNewNehuba(template: any) {
+  private createNewNehuba(template: any, overwriteInitNavigation: any) {
 
     this.viewerLoaded = true
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
@@ -973,13 +1000,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     const { navigation = {}, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e7 } = nehubaConfig.dataset.initialNgState || {}
     const { zoomFactor = 3e5, pose = {} } = navigation || {}
     const { voxelSize = [1e6, 1e6, 1e6], voxelCoordinates = [0, 0, 0] } = (pose && pose.position) || {}
+    const { orientation = [0, 0, 0, 1] } = pose || {}
+
+    const {
+      orientation: owOrientation,
+      perspectiveOrientation: owPerspectiveOrientation,
+      perspectiveZoom: owPerspectiveZoom,
+      position: owPosition,
+      zoom: owZoom
+    } = overwriteInitNavigation
 
     const initNavigation = {
-      orientation: [0, 0, 0, 1],
-      perspectiveOrientation,
-      perspectiveZoom,
-      position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
-      zoom: zoomFactor,
+      orientation: owOrientation || [0, 0, 0, 1],
+      perspectiveOrientation: owPerspectiveOrientation || perspectiveOrientation,
+      perspectiveZoom: owPerspectiveZoom || perspectiveZoom,
+      position: owPosition ||  [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
+      zoom: owZoom || zoomFactor,
     }
 
     this.handleEmittedNavigationChange(initNavigation)

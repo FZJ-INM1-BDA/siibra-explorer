@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import { ChangeDetectorRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
 import { Observable } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
@@ -32,11 +32,6 @@ export class SingleDatasetBase implements OnInit {
   @Input() public dataset: any = null
   @Input() public simpleMode: boolean = false
 
-  @Input() public kgExternalLink: string = ''
-  @Input() public underEmbargo: boolean = false
-
-  @Output() public previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
-
   public preview: boolean = false
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
 
@@ -46,10 +41,6 @@ export class SingleDatasetBase implements OnInit {
   public kgReference: string[] = []
   public files: IFile[] = []
   private methods: string[] = []
-  /**
-   * sic!
-   */
-  private parcellationRegion: Array<{ name: string }>
 
   private error: string = null
 
@@ -57,6 +48,8 @@ export class SingleDatasetBase implements OnInit {
   public downloadInProgress = false
 
   public dlFromKgHref: string = null
+
+  public selectedTemplateSpace$: Observable<any>
 
   public favedDataentries$: Observable<IDataEntry[]>
   constructor(
@@ -67,6 +60,7 @@ export class SingleDatasetBase implements OnInit {
 
     dataset?: any,
   ) {
+
     this.favedDataentries$ = this.dbService.favedDataentries$
     if (dataset) {
       this.dataset = dataset
@@ -92,8 +86,6 @@ export class SingleDatasetBase implements OnInit {
       this.publications = publications
       this.files = files
       this.preview = preview
-      this.kgExternalLink = kgExternalLink
-      this.underEmbargo = underEmbargo
 
       return
     }
@@ -162,7 +154,6 @@ export class SingleDatasetBase implements OnInit {
   }
 
   public handlePreviewFile(file: ViewerPreviewFile) {
-    this.previewingFile.emit(file)
     this.singleDatasetService.previewFile(file, this.dataset)
   }
 }

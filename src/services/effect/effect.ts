@@ -1,12 +1,11 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { fromEvent, merge, Observable, Subscription } from "rxjs";
-import { filter, map, shareReplay, switchMap, take, withLatestFrom } from "rxjs/operators";
-import { worker } from 'src/atlasViewer/atlasViewer.workerService.service'
+import { merge, Observable, Subscription } from "rxjs";
+import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo } from "rxjs/operators";
 import { LoggingService } from "../logging.service";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, UPDATE_PARCELLATION } from "../state/viewerState.store";
-import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
+import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
+import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, GENERAL_ACTION_TYPES } from '../stateStore.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,15 +17,6 @@ export class UseEffects implements OnDestroy {
     private store$: Store<IavRootStoreInterface>,
     private log: LoggingService,
   ) {
-    this.subscriptions.push(
-      this.newParcellationSelected$.subscribe(parcellation => {
-        worker.postMessage({
-          type: `PROPAGATE_NG_ID`,
-          parcellation,
-        })
-      }),
-    )
-
     this.regionsSelected$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
@@ -101,16 +91,6 @@ export class UseEffects implements OnDestroy {
     ofType(SELECT_PARCELLATION),
   )
 
-  private newViewer$ = this.actions$.pipe(
-    ofType(NEWVIEWER),
-  )
-
-  private newParcellationSelected$ = merge(
-    this.newViewer$,
-    this.parcellationSelected$,
-  ).pipe(
-    map(({selectParcellation}) => selectParcellation),
-  )
 
   private updatedParcellation$ = this.store$.pipe(
     select('viewerState'),
@@ -198,34 +178,16 @@ export class UseEffects implements OnDestroy {
    * side effect of selecting a parcellation means deselecting all regions
    */
   @Effect()
-  public onParcellationSelected$ = this.newParcellationSelected$.pipe(
-    map(() => ({
+  public onParcellationSelected$ = merge(
+    this.parcellationSelected$,
+    this.actions$.pipe(
+      ofType(NEWVIEWER)
+    )
+  ).pipe(
+    mapTo({
       type: SELECT_REGIONS,
       selectRegions: [],
-    })),
-  )
-
-  /**
-   * calculating propagating ngId from worker thread
-   */
-  @Effect()
-  public updateParcellation$ = fromEvent(worker, 'message').pipe(
-    filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
-    map(({data}) => data.parcellation),
-    withLatestFrom(this.newParcellationSelected$),
-    filter(([ propagatedP, selectedP ]: [any, any]) => {
-      /**
-       * TODO
-       * use id
-       * but jubrain may have same id for different template spaces
-       */
-      return propagatedP.name === selectedP.name
-    }),
-    map(([ propagatedP, _ ]) => propagatedP),
-    map(parcellation => ({
-      type: UPDATE_PARCELLATION,
-      updatedParcellation: parcellation,
-    })),
+    })
   )
 }
 

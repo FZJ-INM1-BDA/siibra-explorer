@@ -31,7 +31,8 @@ module.exports = {
     ],
     alias : {
       "third_party" : path.resolve(__dirname,'third_party'),
-      "src" : path.resolve(__dirname,'src')
+      "src" : path.resolve(__dirname,'src'),
+      "common": path.resolve(__dirname, 'common')
     }
   },
 }

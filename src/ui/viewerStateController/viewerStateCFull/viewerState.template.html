@@ -14,7 +14,7 @@
           (selectionChange)="handleTemplateChange($event)"
           (openedChange)="focused = $event">
           <mat-option
-            *ngFor="let template of (availableTemplates$ | async)"
+            *ngFor="let template of (availableTemplates$ | async); trackBy: trackByFn"
             [value]="template.name">
             {{ template.name }}
           </mat-option>

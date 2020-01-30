@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { distinctUntilChanged, map, filter } from "rxjs/operators";
+import { Observable, Subscribable } from "rxjs";
+import { distinctUntilChanged, map, filter, startWith } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { LoggingService } from "src/services/logging.service";
 import {
@@ -81,8 +81,8 @@ export class AtlasViewerAPIServices {
 
         datasetsBSubject : this.store.pipe(
           select('dataStore'),
-          safeFilter('fetchedDataEntries'),
-          map(state => state.fetchedDataEntries),
+          select('fetchedDataEntries'),
+          startWith([])
         ),
       },
       uiHandle : {
@@ -160,11 +160,6 @@ export class AtlasViewerAPIServices {
     }
     window.interactiveViewer = this.interactiveViewer
     this.init()
-
-    /**
-     * TODO debugger debug
-     */
-    window.uiHandle = this.interactiveViewer.uiHandle
   }
 
   private init() {

@@ -168,3 +168,14 @@
     </ng-template>
   </ng-container>
 </ng-template>
+
+
+<ng-template #kgDatasetPreviewer>
+  <kg-dataset-previewer
+    [darkmode]="darktheme$ | async"
+    [filename]="previewFilename"
+    [kgId]="previewKgId"
+    kg-ds-prv-backend-url="https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview">
+
+  </kg-dataset-previewer>
+</ng-template>

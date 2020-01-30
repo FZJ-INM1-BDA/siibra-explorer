@@ -21,3 +21,13 @@
 connectivity-browser {
   max-height: calc(100% - 220px);
 }
+
+.min-w-50vw
+{
+  min-width: 50vw!important;
+}
+
+.min-h-50vh
+{
+  min-height: 50vh!important;
+}
