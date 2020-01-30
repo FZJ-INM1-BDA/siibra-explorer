@@ -137,13 +137,8 @@
 
                 </mat-icon>
 
-                <div class="d-flex flex-column">
-                  <div *ngIf="labelText.dataset && labelText.dataset.length">
-                    <span matLine *ngFor="let dataset of labelText.dataset" [innerHTML]="dataset"></span>
-                  </div>
-                  <div matLine *ngFor="let text of labelText.text" [innerHTML]="text">
-                  </div>
-                </div>
+                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text"></div>
+
               </mat-list-item>
             </mat-list>
           </ng-container>

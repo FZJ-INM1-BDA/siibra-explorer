@@ -172,7 +172,15 @@ export class MouseOverTextPipe implements PipeTransform {
   private renderText = ({ label, obj }): SafeHtml[] => {
     switch (label) {
     case 'landmark':
-      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName)]
+      const { dataset = [] } = obj
+      return [
+        this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName),
+        ...(dataset.map(ds => this.sanitizer.bypassSecurityTrustHtml(`
+<span class="text-muted">
+  ${this.sanitizer.sanitize(SecurityContext.HTML, ds.name)}
+</span>
+`)))
+      ]
     case 'segments':
       return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
     case 'userLandmark':
@@ -181,15 +189,6 @@ export class MouseOverTextPipe implements PipeTransform {
       // ts-lint:disable-next-line
       console.warn(`mouseOver.directive.ts#mouseOverTextPipe: Cannot be displayed: label: ${label}`)
       return [this.sanitizer.bypassSecurityTrustHtml(`Cannot be displayed: label: ${label}`)]
-    }
-  }
-
-  private renderDatasetTitle = ({ label, obj }): SafeHtml[] => {
-    switch (label) {
-    case 'landmark':
-      return obj.dataset.map(d => this.sanitizer.sanitize(SecurityContext.HTML, d.name))
-    default:
-      return null
     }
   }
 
@@ -203,8 +202,7 @@ export class MouseOverTextPipe implements PipeTransform {
       .map(key => {
         return {
           label: key,
-          text: this.renderText({ label: key, obj: inc[key] }),
-          dataset: this.renderDatasetTitle({ label: key, obj: inc[key] })
+          text: this.renderText({ label: key, obj: inc[key] })
         }
       })
   }

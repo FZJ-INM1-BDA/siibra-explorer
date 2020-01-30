@@ -99,19 +99,6 @@
     </button>
   </a>
 
-  <!-- explore with direct external link -->
-  <a *ngIf="kgExternalLink"
-    class="m-2"
-    [href]="kgExternalLink"
-    target="_blank">
-    <button
-      mat-raised-button
-      color="primary">
-      Explore
-      <i class="fas fa-external-link-alt"></i>
-    </button>
-  </a>
-
   <!-- pin data -->
   <button mat-button
     *ngIf="downloadEnabled"
@@ -152,7 +139,6 @@
     <i class="ml-1 far fa-eye"></i>
   </button>
 
-  <button *ngIf="underEmbargo" mat-button disabled>Under embargo</button>
 </mat-card-actions>
 
 <mat-card-footer></mat-card-footer>
