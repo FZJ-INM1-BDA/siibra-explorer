@@ -171,7 +171,7 @@ export class MouseOverTextPipe implements PipeTransform {
 
   private renderText = ({ label, obj }): SafeHtml[] => {
     switch (label) {
-    case 'landmark':
+    case 'landmark': {
       const { dataset = [] } = obj
       return [
         this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName),
@@ -181,6 +181,7 @@ export class MouseOverTextPipe implements PipeTransform {
 </span>
 `)))
       ]
+    }
     case 'segments':
       return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
     case 'userLandmark':
