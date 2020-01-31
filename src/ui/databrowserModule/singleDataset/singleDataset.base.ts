@@ -76,7 +76,7 @@ export class SingleDatasetBase implements OnInit {
   public hasPreview = false
   public previewFiles = []
 
-  handleKgDsPrvUpdate(event:CustomEvent){
+  handleKgDsPrvUpdate(event: CustomEvent){
     this.hasPreview = false
     this.previewFiles = []
     const { detail } = event
