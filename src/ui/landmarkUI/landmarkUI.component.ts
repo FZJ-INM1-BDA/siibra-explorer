@@ -28,7 +28,7 @@ export class LandmarkUIComponent implements OnChanges, AfterContentChecked{
   public previewFilesMap: Map<string, any[]> = new Map()
   public previewFiles: any[] = []
 
-  handleKgDsPrvUpdate(event:CustomEvent, datasetKgId: string){
+  handleKgDsPrvUpdate(event: CustomEvent, datasetKgId: string){
     const { detail } = event
     const { datasetFiles } = detail
 
