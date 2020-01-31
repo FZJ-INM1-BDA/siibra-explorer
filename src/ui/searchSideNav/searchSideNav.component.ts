@@ -14,6 +14,7 @@ import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.s
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
+import { DS_PREVIEW_URL } from 'src/util/constants'
 
 @Component({
   selector: 'search-side-nav',
@@ -40,6 +41,8 @@ export class SearchSideNav implements OnDestroy {
   public sidePanelCurrentViewContent: Observable<any>
 
   public darktheme$: Observable<boolean>
+
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
 
   constructor(
     public dialog: MatDialog,

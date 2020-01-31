@@ -67,7 +67,7 @@
     "karma-jasmine": "^2.0.1",
     "karma-typescript": "^4.1.1",
     "karma-webpack": "^3.0.0",
-    "kg-dataset-previewer": "0.0.8",
+    "kg-dataset-previewer": "0.0.10",
     "lodash.merge": "^4.6.2",
     "mini-css-extract-plugin": "^0.8.0",
     "ngx-bootstrap": "3.0.1",

@@ -3,6 +3,7 @@ import { ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { Observable } from "rxjs";
+import { DS_PREVIEW_URL } from 'src/util/constants'
 
 @Component({
   selector: 'dataset-preview-list',
@@ -29,6 +30,8 @@ export class DatasetPreviewList{
 
   @Input()
   kgId: string
+
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
 
   handleKgDsPrvUpdated(event: CustomEvent){
     const { detail } = event

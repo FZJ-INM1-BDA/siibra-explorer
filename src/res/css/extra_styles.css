@@ -698,3 +698,9 @@ body::after
 {
   opacity: 0.0!important;
 }
+
+kg-dataset-previewer > img
+{
+  width: inherit;
+  height: inherit;
+}

@@ -146,7 +146,8 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
-      <div fixedMouseContextualContainerDirective>
+      <div fixedMouseContextualContainerDirective
+        #fixedContainer="iavFixedMouseCtxContainer">
 
         <!-- on click segment menu -->
         <ng-container *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
@@ -172,6 +173,8 @@
           
           <landmark-ui
             class="pe-all"
+            (relayout)="fixedContainer.recalculatePosition()"
+            [fullId]="onHoverLandmark.fullId"
             [name]="onHoverLandmark.name"
             [datasets]="onHoverLandmark.dataset">
 
