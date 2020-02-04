@@ -224,6 +224,7 @@ export class DatabrowserService implements OnDestroy {
     })
   }
 
+  // TODO deprecate
   public fetchPreviewData(datasetName: string) {
     const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
@@ -246,19 +247,25 @@ export class DatabrowserService implements OnDestroy {
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
-  private lowLevelQuery(templateName: string, parcellationName: string) {
+  private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
-    return fetch(`${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`, this.constantService.getFetchOption())
-      .then(res => res.json())
-      /**
-       * remove duplicates
-       */
-      .then(arr => arr.reduce((acc, item) => {
-        const newMap = new Map(acc)
-        return newMap.set(item.name, item)
-      }, new Map()))
-      .then(map => Array.from(map.values() as IDataEntry[]))
+
+    return this.http.get(
+      `${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`,
+      {
+        headers: this.constantService.getHttpHeader(),
+        responseType: 'json'
+      }
+    ).pipe(
+      map((arr: any[]) => {
+        const map = arr.reduce((acc, item) => {
+          const newMap = new Map(acc)
+          return newMap.set(item.name, item)
+        }, new Map())
+        return Array.from(map.values() as IDataEntry[])
+      })
+    ).toPromise()
   }
 
   private fetchData(templateName: string, parcellationName: string) {

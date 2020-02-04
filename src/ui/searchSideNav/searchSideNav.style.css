@@ -3,14 +3,6 @@
   height: 55px;
 }
 
-/* exactly 1.5 line height */
-
-.h-117px
-{
-  min-height:117px!important;
-  flex-basis: 117px!important;
-}
-
 .mat-divider-full-width
 {
   margin-right:-1.5rem;
