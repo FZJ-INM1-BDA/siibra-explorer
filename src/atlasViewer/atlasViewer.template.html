@@ -42,12 +42,14 @@
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
 
-    <ui-nehuba-container iav-mouse-hover #iavMouseHoverEl="iavMouseHover"
-                         [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
-                         [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
-                         iav-captureClickListenerDirective
-                         (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
-                         (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
+    <ui-nehuba-container
+      iav-mouse-hover 
+      #iavMouseHoverEl="iavMouseHover"
+      [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
+      [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
+      iav-captureClickListenerDirective
+      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
+      (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -115,26 +117,28 @@
 
       <div floatingMouseContextualContainerDirective>
 
-        <div *ngIf="!ismobile"
+        <div *ngIf="!ismobile && !presentDatasetDialogRef"
           class="d-inline-block"
           iav-mouse-hover
-          #iavMouseHoverConetxtualBlock="iavMouseHover"
+          #iavMouseHoverContextualBlock="iavMouseHover"
           contextualBlock>
 
           <ng-container
-            *ngFor="let labelText of iavMouseHoverConetxtualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
+            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
 
             <mat-list dense>
 
               <mat-list-item class="h-auto">
 
-                <mat-icon [fontSet]="(labelText.label | mouseOverIconPipe).fontSet"
-                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon" mat-list-icon>
+                <mat-icon
+                  [fontSet]="(labelText.label | mouseOverIconPipe).fontSet"
+                  [fontIcon]="(labelText.label | mouseOverIconPipe).fontIcon"
+                  mat-list-icon>
 
                 </mat-icon>
 
-                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text">
-                </div>
+                <div matLine *ngFor="let text of labelText.text" [innerHTML]="text"></div>
+
               </mat-list-item>
             </mat-list>
           </ng-container>
@@ -142,25 +146,42 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
-      <div fixedMouseContextualContainerDirective>
+      <div fixedMouseContextualContainerDirective
+        #fixedContainer="iavFixedMouseCtxContainer">
+
+        <!-- on click segment menu -->
         <ng-container *ngIf="(onhoverSegmentsForFixed$ | async) as onHoverSegments">
           <ng-container *ngFor="let onHoverRegion of onHoverSegments; let first = first">
 
             <!-- ToDo it should change - we should get information about connectivity existence from API-->
             <div class="d-flex flex-column">
               <region-menu
-                      class="pe-all"
-                      [region]="onHoverRegion"
-                      [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
-                      [hasConnectivity]="selectedParcellation
-                      && selectedParcellation.hasAdditionalViewMode
-                      && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
-                      (closeRegionMenu)="rClContextualMenu.hide()">
+                class="pe-all"
+                [region]="onHoverRegion"
+                [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
+                [hasConnectivity]="selectedParcellation
+                  && selectedParcellation.hasAdditionalViewMode
+                  && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
+                (closeRegionMenu)="rClContextualMenu.hide()">
               </region-menu>
             </div>
           </ng-container>
         </ng-container>
+
+        <!-- on click landmark menu -->
+        <ng-container *ngIf="onhoverLandmarkForFixed$ | async as onHoverLandmark">
+          
+          <landmark-ui
+            class="pe-all"
+            (relayout)="fixedContainer.recalculatePosition()"
+            [fullId]="onHoverLandmark.fullId"
+            [name]="onHoverLandmark.name"
+            [datasets]="onHoverLandmark.dataset">
+
+          </landmark-ui>
+        </ng-container>
       </div>
+
     </layout-floating-container>
 
     <!-- required for manufacturing plugin templates -->

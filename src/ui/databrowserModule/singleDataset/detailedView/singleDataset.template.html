@@ -109,7 +109,7 @@
 
 
   <!-- download -->
-  <a *ngIf="files.length > 0"
+  <a *ngIf="files && files.length > 0"
     [href]="dlFromKgHref"
     target="_blank">
     <button
@@ -135,6 +135,7 @@
     </span>
     <i class="ml-1 far fa-eye"></i>
   </button>
+
 </mat-card-actions>
 
 <mat-card-footer></mat-card-footer>

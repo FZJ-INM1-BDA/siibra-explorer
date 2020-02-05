@@ -25,7 +25,27 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './spec/test.ts'
+      './spec/test.ts',
+      {
+        pattern: 'node_modules/bootstrap/dist/css/bootstrap.min.css',
+        served: true,
+        included: true
+      },
+      {
+        pattern: 'node_modules/@angular/material/prebuilt-themes/indigo-pink.css',
+        served: true,
+        included: true
+      },
+      {
+        pattern: './src/util/worker.js',
+        served: true,
+        included: false
+      },
+      {
+        pattern: './src/res/css/extra_styles.css',
+        served: true,
+        included: true
+      }
     ],
 
 

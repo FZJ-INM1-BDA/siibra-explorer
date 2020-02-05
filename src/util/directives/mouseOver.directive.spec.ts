@@ -4,7 +4,7 @@ import { scan, skip, take } from 'rxjs/operators';
 import { temporalPositveScanFn } from './mouseOver.directive'
 
 const segmentsPositive = { segments: [{ hello: 'world' }] } as {segments: any}
-const segmentsNegative = { segments: null }
+const segmentsNegative = { segments: [] }
 
 const userLandmarkPostive = { userLandmark: true }
 const userLandmarkNegative = { userLandmark: null }

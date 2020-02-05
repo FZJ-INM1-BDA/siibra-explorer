@@ -6,6 +6,8 @@ import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.
 import { DatabrowserService } from "../databrowser.service";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 
+import { DS_PREVIEW_URL } from 'src/util/constants'
+
 export {
   DatabrowserService,
   KgSingleDatasetService,
@@ -33,6 +35,8 @@ export class SingleDatasetBase implements OnInit {
 
   public preview: boolean = false
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
+
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
 
   /**
    * sic!

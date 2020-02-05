@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, of, Subscription, throwError, fromEvent, forkJoin } from "rxjs";
@@ -121,18 +121,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
     }),
   )
 
-  /* to be provided by KG in future */
-  public templateUrlsPr: Promise<string[]> = new Promise((resolve, reject) => {
-    fetch(`${this.backendUrl}templates`, this.getFetchOption())
-      .then(res => res.json())
-      .then(arr => {
-        this.templateUrls = arr
-        return arr
-      })
-      .then(resolve)
-      .catch(reject)
-  })
-
   public templateUrls = Array(100)
 
   /* to be provided by KG in future */
@@ -219,6 +207,12 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     const url = new URL(window.location.href)
     url.searchParams.delete('regionsSelected')
     return url.toString()
+  }
+
+  public getHttpHeader(): HttpHeaders {
+    const header = new HttpHeaders()
+    header.set('referrer', this.getScopedReferer())
+    return header
   }
 
   public getFetchOption(): RequestInit {

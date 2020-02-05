@@ -4,26 +4,31 @@ const URL = require('url')
 const path = require('path')
 const archiver = require('archiver')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-const { init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
+const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
 
 let cachedData = null
 let otherQueryResult = null
 
-const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.eu`
-const KG_PATH = process.env.KG_PATH || `/query/minds/core/dataset/v1.0.0/interactiveViewerKgQuery-v0_3`
+const { KG_ROOT, KG_SEARCH_VOCAB } = constants
+
+const KG_DATASET_SEARCH_QUERY_NAME = process.env.KG_DATASET_SEARCH_QUERY_NAME || 'interactiveViewerKgQuery-v0_3'
+const KG_DATASET_SEARCH_PATH = process.env.KG_DATASET_SEARCH_PATH || '/minds/core/dataset/v1.0.0'
+
+const kgDatasetSearchFullString = `${KG_DATASET_SEARCH_PATH}/${KG_DATASET_SEARCH_QUERY_NAME}`
+
 const KG_PARAM = {
   size: process.env.KG_SEARCH_SIZE || '1000',
-  vocab: process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
+  vocab: KG_SEARCH_VOCAB
 }
 
-const KG_QUERY_DATASETS_URL = new URL.URL(`${KG_ROOT}${KG_PATH}/instances`)
+const KG_QUERY_DATASETS_URL = new URL.URL(`${KG_ROOT}${kgDatasetSearchFullString}/instances`)
 for (let key in KG_PARAM) {
   KG_QUERY_DATASETS_URL.searchParams.set(key, KG_PARAM[key])
 }
 
 const getKgQuerySingleDatasetUrl = ({ kgId }) => {
   const _newUrl = new URL.URL(KG_QUERY_DATASETS_URL)
-  _newUrl.pathname = `${KG_PATH}/instances/${kgId}`
+  _newUrl.pathname = `${_newUrl.pathname}/${kgId}`
   return _newUrl
 }
 

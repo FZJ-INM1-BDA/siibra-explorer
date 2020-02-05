@@ -698,3 +698,21 @@ body::after
 {
   opacity: 0.0!important;
 }
+
+kg-dataset-previewer > img
+{
+  max-width: 100%;
+  width: 100%;
+}
+
+/*
+  TODO, this really should be in searchSideNav.style.css. But karma tests does not seem to like to include style.css
+  figure out why
+*/
+/* exactly 1.5 line height */
+
+.h-117px
+{
+  min-height:117px!important;
+  flex-basis: 117px!important;
+}
