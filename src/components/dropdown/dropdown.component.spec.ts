@@ -6,9 +6,6 @@ import { RadioList } from '../radiolist/radiolist.component'
 import { DropdownComponent } from './dropdown.component';
 
 describe('dropdown component', () => {
-  it('jasmine works', () => {
-    expect(1).toBe(1)
-  })
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
