@@ -41,6 +41,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
+import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
 
 /**
  * TODO
@@ -71,6 +72,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
+  @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   @ViewChild('mobileMenuTabs') public mobileMenuTabs: TabsetComponent
 
@@ -99,6 +101,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public onhoverSegments$: Observable<string[]>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
+  public onhoverLandmarkForFixed$: Observable<any>
+
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -119,8 +123,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
-  private persistentStateNotifierTemplate$: Observable<string>
-  // private pluginRegionSelectionEnabled: boolean = false
+  public persistentStateNotifierTemplate$: Observable<string>
+
+  private hoveringRegions = []
+  public presentDatasetDialogRef: MatDialogRef<any>
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -207,6 +213,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(isSame),
     )
 
+    // TODO deprecate
     this.dedicatedView$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && typeof state.dedicatedView !== 'undefined'),
@@ -214,47 +221,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.onhoverLandmark$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        map(state => state.mouseOverLandmark),
-      ),
-      this.store.pipe(
-        select('dataStore'),
-        safeFilter('fetchedSpatialData'),
-        map(state => state.fetchedSpatialData),
-      ),
-    ).pipe(
-      map(([landmark, spatialDatas]) => {
-        if (landmark === null) {
-          return landmark
-        }
-        const idx = Number(landmark.replace('label=', ''))
-        if (isNaN(idx)) {
-          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
-          return {
-            landmarkName: idx,
-          }
-        } else {
-          return  {
-            landmarkName: spatialDatas[idx].name,
-          }
-        }
-      }),
-    )
-
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegments$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        select('mouseOverSegments'),
-        filter(v => !!v),
-        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
-        /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
+    this.onhoverSegments$ = this.store.pipe(
+      select('uiState'),
+      select('mouseOverSegments'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
+      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
 
-      ),
-      this.onhoverLandmark$,
     ).pipe(
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
         if (!segments) { return null }
@@ -296,10 +274,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         }
       }),
     )
-
-    this.onhoverSegments$.subscribe(hr => {
-      this.hoveringRegions = hr
-    })
+    this.subscriptions.push(
+      this.onhoverSegments$.subscribe(hr => {
+        this.hoveringRegions = hr
+      })
+    )
   }
 
   private selectedParcellation$: Observable<any>
@@ -405,6 +384,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.rd.appendChild(document.head, prefecthMainBundle)
     }
 
+    this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
+      select('landmark')
+    )
+
     /**
      * Show Cookie disclaimer if not yet agreed
      */
@@ -437,21 +420,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
-  }
 
-  private hoveringRegions = []
+    this.onhoverLandmarkForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
+      map(([_flag, onhoverLandmark]) => onhoverLandmark)
+    )
+  }
 
   public mouseDownNehuba(_event) {
     this.rClContextualMenu.hide()
   }
 
   public mouseClickNehuba(event) {
-    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
       event.clientY,
     ]
+
+    // TODO what if user is hovering a landmark?
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
     } else {

@@ -13,6 +13,8 @@ import {
 import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
+import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
+import { DS_PREVIEW_URL } from 'src/util/constants'
 
 @Component({
   selector: 'search-side-nav',
@@ -31,11 +33,16 @@ export class SearchSideNav implements OnDestroy {
   @Output() public dismiss: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('layerBrowserTmpl', {read: TemplateRef}) public layerBrowserTmpl: TemplateRef<any>
+  @ViewChild('kgDatasetPreviewer', {read: TemplateRef}) private kgDatasetPreview: TemplateRef<any>
 
   public autoOpenSideNavDataset$: Observable<any>
 
   public sidePanelExploreCurrentViewIsOpen$: Observable<any>
   public sidePanelCurrentViewContent: Observable<any>
+
+  public darktheme$: Observable<boolean>
+
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
 
   constructor(
     public dialog: MatDialog,
@@ -43,6 +50,9 @@ export class SearchSideNav implements OnDestroy {
     private snackBar: MatSnackBar,
     private constantService: AtlasViewerConstantsServices,
   ) {
+
+    this.darktheme$ = this.constantService.darktheme$
+    
     this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
@@ -62,7 +72,32 @@ export class SearchSideNav implements OnDestroy {
       select('uiState'),
       select("sidePanelCurrentViewContent"),
     )
+
+    this.subscriptions.push(
+      this.store$.pipe(
+        select('dataStore'),
+        select('datasetPreviews'),
+        filter(datasetPreviews => datasetPreviews.length > 0),
+        map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
+        filter(({ file }) => determinePreviewFileType(file) !== PREVIEW_FILE_TYPES.NIFTI)
+      ).subscribe(({ dataset, file }) => {
+        
+        const { fullId } = dataset
+        const { filename } = file
+        
+        // TODO replace with common/util/getIdFromFullId
+        this.previewKgId = /\/([a-f0-9-]{1,})$/.exec(fullId)[1]
+        this.previewFilename = filename
+        this.dialog.open(this.kgDatasetPreview, {
+          minWidth: '50vw',
+          minHeight: '50vh'
+        })
+      })
+    )
   }
+
+  public previewKgId: string 
+  public previewFilename: string
 
   public collapseSidePanelCurrentView() {
     this.store$.dispatch({

@@ -8,6 +8,7 @@ import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { getViewer } from "src/util/fn";
 import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
+import { MatSliderChange } from "@angular/material";
 
 @Component({
   selector : 'layer-browser',
@@ -47,6 +48,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
   public darktheme$: Observable<boolean>
 
+  private customNgLayers: string[] = ['spatial landmark layer']
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private constantsService: AtlasViewerConstantsServices,
@@ -64,6 +67,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
         return [
           ngId,
+          ...this.customNgLayers,
           ...otherNgIds,
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([
@@ -96,7 +100,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
         const baseNameSet = new Set(baseNgLayerNames)
         return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
       }),
-      distinctUntilChanged(),
+      distinctUntilChanged()
     )
 
     /**
@@ -132,6 +136,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.forceShowSegment$.subscribe(state => this.forceShowSegmentCurrentState = state),
     )
+
+    this.viewer = getViewer()
   }
 
   public ngOnDestroy() {
@@ -153,16 +159,17 @@ export class LayerBrowser implements OnInit, OnDestroy {
     }
   }
 
+  public viewer: any
+
   public toggleVisibility(layer: any) {
-    const viewer = getViewer()
     const layerName = layer.name
     if (!layerName) {
       this.log.error('layer name not defined', layer)
       return
     }
-    const ngLayer = viewer.layerManager.getLayerByName(layerName)
+    const ngLayer = this.viewer.layerManager.getLayerByName(layerName)
     if (!ngLayer) {
-      this.log.error('ngLayer could not be found', layerName, viewer.layerManager.managedLayers)
+      this.log.error('ngLayer could not be found', layerName, this.viewer.layerManager.managedLayers)
     }
     ngLayer.setVisible(!ngLayer.visible)
   }
@@ -205,6 +212,24 @@ export class LayerBrowser implements OnInit, OnDestroy {
     })
   }
 
+  public changeOpacity(layerName: string, event: MatSliderChange){
+    const { value } = event
+    const l = this.viewer.layerManager.getLayerByName(layerName)
+    if (!l) return
+
+    if (typeof l.layer.opacity === 'object') {
+      l.layer.opacity.value = value
+    } else if (typeof l.layer.displayState === 'object') {
+      l.layer.displayState.selectedAlpha.value = value
+    } else {
+      this.log.warn({
+        msg: `layer does not belong anywhere`,
+        layerName,
+        layer: l
+      })
+    }
+  }
+
   /**
    * TODO use observable and pipe to make this more perf
    */
@@ -233,5 +258,20 @@ export class LayerBrowser implements OnInit, OnDestroy {
 export class LockedLayerBtnClsPipe implements PipeTransform {
   public transform(ngLayer: INgLayerInterface, lockedLayers?: string[]): boolean {
     return (lockedLayers && new Set(lockedLayers).has(ngLayer.name)) || false
+  }
+}
+
+@Pipe({
+  name: 'getInitialLayerOpacityPipe'
+})
+
+export class GetInitialLayerOpacityPipe implements PipeTransform{
+  public transform(viewer: any, layerName: string): number{
+    if (!viewer) return 0
+    const l = viewer.layerManager.getLayerByName(layerName)
+    if (!l || !l.layer) return 0
+    if (typeof l.layer.opacity === 'object') return l.layer.opacity.value
+    else if (typeof l.layer.displayState === 'object') return l.layer.displayState.selectedAlpha.value
+    else return 0
   }
 }

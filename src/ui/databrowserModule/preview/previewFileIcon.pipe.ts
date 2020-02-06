@@ -34,8 +34,9 @@ export class PreviewFileIconPipe implements PipeTransform {
 }
 
 export const determinePreviewFileType = (previewFile: ViewerPreviewFile) => {
+  if (!previewFile) return null
   const { mimetype, data } = previewFile
-  const { chartType = null } = data || {}
+  const chartType = data && data['chart.js'] && data['chart.js'].type
   if ( mimetype === 'application/nifti' ) { return PREVIEW_FILE_TYPES.NIFTI }
   if ( /^image/.test(mimetype)) { return PREVIEW_FILE_TYPES.IMAGE }
   if ( /application\/json/.test(mimetype) && (chartType === 'line' || chartType === 'radar')) { return PREVIEW_FILE_TYPES.CHART }

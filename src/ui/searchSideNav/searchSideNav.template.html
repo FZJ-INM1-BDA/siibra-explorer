@@ -86,7 +86,7 @@
       </div>
 
       <!-- show when regions are selected -->
-      <div *ngIf="regionsSelected.length > 0" class="h-100 d-flex flex-column">
+      <div *ngIf="regionsSelected.length > 0" class="flex-grow-1 d-flex flex-column">
 
         <!-- header -->
         <div class="flex-grow-0 flex-shrink-0">
@@ -95,7 +95,7 @@
         </div>
 
         <!-- body (region descriptor or multi region list) -->
-        <div  class="flex-grow-1 flex-shrink-1">
+        <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
           <ng-container *ngTemplateOutlet="body">
           </ng-container>
         </div>
@@ -125,6 +125,9 @@
     </ng-template>
 
     <ng-template #body>
+
+      <!-- TODO bug in browser? unless using d-flex here and flex-grow-1 in child, child cannot fille parent, even with h-100 -->
+
       <!-- single region -->
       <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
       
@@ -139,9 +142,10 @@
         </region-list-simple-view>
       </ng-template>
 
+
       <!-- multi region -->
       <ng-template #multiRegionTemplate>
-        <div class="h-100 d-flex flex-column">
+        <div class="flex-grow-1 d-flex flex-row">
 
           <cdk-virtual-scroll-viewport
             class="flex-grow-1 flex-shrink-1"
@@ -167,4 +171,15 @@
       </ng-template>
     </ng-template>
   </ng-container>
+</ng-template>
+
+
+<ng-template #kgDatasetPreviewer>
+  <kg-dataset-previewer
+    [darkmode]="darktheme$ | async"
+    [filename]="previewFilename"
+    [kgId]="previewKgId"
+    [backendUrl]="DS_PREVIEW_URL">
+
+  </kg-dataset-previewer>
 </ng-template>

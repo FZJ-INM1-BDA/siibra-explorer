@@ -21,7 +21,12 @@ import { getNgIdLabelIndexFromId, IavRootStoreInterface } from "src/services/sta
 export const temporalPositveScanFn = (acc: Array<{segments: any, landmark: any, userLandmark: any}>, curr: {segments: any, landmark: any, userLandmark: any}) => {
 
   const keys = Object.keys(curr)
-  const isPositive = keys.some(key => !!curr[key])
+
+  // empty array is truthy
+  const isPositive = keys.some(key => Array.isArray(curr[key])
+    ? curr[key].length > 0
+    : !!curr[key]
+  )
 
   return isPositive
     ? [curr, ...(acc.filter(item => !keys.some(key => !!item[key])))] as Array<{segments?: any, landmark?: any, userLandmark?: any}>
@@ -43,15 +48,18 @@ export class MouseHoverDirective {
     private log: LoggingService,
   ) {
 
+    // TODO consider moving these into a single obs serviced by a DI service
+    // can potentially net better performance
+
     const onHoverUserLandmark$ = this.store$.pipe(
       select('uiState'),
-      map(state => state.mouseOverUserLandmark),
+      select('mouseOverUserLandmark'),
     )
 
     const onHoverLandmark$ = combineLatest(
       this.store$.pipe(
         select('uiState'),
-        map(state => state.mouseOverLandmark),
+        select('mouseOverLandmark'),
       ),
       this.store$.pipe(
         select('dataStore'),
@@ -163,8 +171,17 @@ export class MouseOverTextPipe implements PipeTransform {
 
   private renderText = ({ label, obj }): SafeHtml[] => {
     switch (label) {
-    case 'landmark':
-      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName)]
+    case 'landmark': {
+      const { dataset = [] } = obj
+      return [
+        this.sanitizer.sanitize(SecurityContext.HTML, obj.landmarkName),
+        ...(dataset.map(ds => this.sanitizer.bypassSecurityTrustHtml(`
+<span class="text-muted">
+  ${this.sanitizer.sanitize(SecurityContext.HTML, ds.name)}
+</span>
+`)))
+      ]
+    }
     case 'segments':
       return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
     case 'userLandmark':
@@ -186,7 +203,7 @@ export class MouseOverTextPipe implements PipeTransform {
       .map(key => {
         return {
           label: key,
-          text: this.renderText({ label: key, obj: inc[key] }),
+          text: this.renderText({ label: key, obj: inc[key] })
         }
       })
   }

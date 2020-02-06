@@ -18,7 +18,7 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
 import { CitationsContainer } from "./citation/citations.component";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
-import { LayerBrowser, LockedLayerBtnClsPipe } from "./layerbrowser/layerbrowser.component";
+import { LayerBrowser, LockedLayerBtnClsPipe, GetInitialLayerOpacityPipe } from "./layerbrowser/layerbrowser.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 
@@ -78,6 +78,7 @@ import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectiv
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
+import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 
 @NgModule({
   imports : [
@@ -129,6 +130,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     ConnectivityBrowserComponent,
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
+    LandmarkUIComponent,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -155,6 +157,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
+    GetInitialLayerOpacityPipe,
 
     /* directive */
     DownloadDirective,
@@ -192,6 +195,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,
+    LandmarkUIComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

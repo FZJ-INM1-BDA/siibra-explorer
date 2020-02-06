@@ -155,8 +155,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     private log: LoggingService,
   ) {
 
-    this.exportNehuba = getExportNehuba()
-
     this.useMobileUI$ = this.constantService.useMobileUI$
 
     this.viewerPerformanceConfig$ = this.store.pipe(
@@ -345,7 +343,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   private findPanelIndex = (panel: HTMLElement) => this.viewPanels.findIndex(p => p === panel)
 
-  private exportNehuba: any
+  private _exportNehuba: any
+  get exportNehuba() {
+    if (!this._exportNehuba) {
+      this._exportNehuba = getExportNehuba()
+    }
+    return this._exportNehuba
+  }
 
   public ngOnInit() {
 
@@ -1086,7 +1090,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.nehubaViewerSubscriptions.push(
       this.nehubaViewer.mouseoverLandmarkEmitter.pipe(
-        throttleTime(100),
+        distinctUntilChanged()
       ).subscribe(label => {
         this.store.dispatch({
           type : MOUSE_OVER_LANDMARK,
