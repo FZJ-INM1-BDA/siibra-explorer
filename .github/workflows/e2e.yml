@@ -35,7 +35,8 @@ jobs:
     steps:
     - name: clean up previous 
       run: |
-        docker ps -a | grep gha | xargs docker stop
+        GHA_CONTAINERS=$( docker ps | grep gha )
+        if [ -z "$GHA_CONTAINERS" ]; then for f in $GHA_CONTAINERS; do docker stop $f; done; fi
     - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} as container ${{ env.DOCKER_CONTAINER_NAME }}
       run: |
         docker run \
