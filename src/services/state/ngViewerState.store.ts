@@ -1,11 +1,11 @@
 import { Action, Store, select } from '@ngrx/store'
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, combineLatest, fromEvent, Subscription } from 'rxjs';
+import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo } from 'rxjs/operators';
+import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { SNACKBAR_MESSAGE } from './uiState.store';
-import { getNgIds, IavRootStoreInterface } from '../stateStore.service';
+import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -137,6 +137,9 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
         ...prevState,
         nehubaReady
       }
+    case GENERAL_ACTION_TYPES.APPLY_STATE:
+      const { ngViewerState } = (action as any).state
+      return ngViewerState
     default: return prevState
   }
 }
@@ -185,11 +188,54 @@ export class NgViewerUseEffect implements OnDestroy{
 
   private subscriptions: Subscription[] = []
 
+  @Effect()
+  public applySavedUserConfig$: Observable<any>
+
   constructor(
     private actions: Actions,
     private store$: Store<IavRootStoreInterface>,
     private constantService: AtlasViewerConstantsServices
   ){
+
+    // TODO either split backend user to be more granular, or combine the user config into a single subscription
+    this.subscriptions.push(
+      this.store$.pipe(
+        select('ngViewerState'),
+        distinctUntilChanged(),
+        debounceTime(200),
+        skip(1),
+        // Max frequency save once every second
+        throttleTime(1000)
+      ).subscribe(({panelMode, panelOrder}) => {
+        fetch(`${this.constantService.backendUrl}user/config`, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({ ngViewerState: { panelMode, panelOrder } })
+        })
+      })
+    )
+
+    this.applySavedUserConfig$ = from(fetch(`${this.constantService.backendUrl}user/config`).then(r => r.json())).pipe(
+      catchError((err,caught) => of(null)),
+      filter(v => !!v),
+      withLatestFrom(this.store$),
+      map(([{ngViewerState: fetchedNgViewerState}, state]) => {
+        const { ngViewerState } = state
+        return {
+          type: GENERAL_ACTION_TYPES.APPLY_STATE,
+          state: {
+            ...state,
+            ngViewerState: {
+              ...ngViewerState,
+              ...fetchedNgViewerState
+            }
+          }
+        }
+      })
+    )
+
     const toggleMaxmimise$ = this.actions.pipe(
       ofType(ACTION_TYPES.TOGGLE_MAXIMISE),
       shareReplay(1)

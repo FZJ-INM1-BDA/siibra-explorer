@@ -81,6 +81,11 @@ app.use((_req, res, next) => {
 app.use(require('./devBanner'))
 
 /**
+ * User route, for user profile/management
+ */
+app.use('/user', require('./user'))
+
+/**
  * only use compression for production
  * this allows locally built aot to be served without errors
  */
