@@ -23,7 +23,7 @@ describe('chai-as-promised.js', () => {
   })
 })
 
-describe('util.js with env', (done) => {
+describe('util.js with env', async () => {
 
   it('when client id and client secret and refresh token is set, util should not throw', async () => {
     

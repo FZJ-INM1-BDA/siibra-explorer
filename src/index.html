@@ -13,6 +13,23 @@
   <link rel="stylesheet" href="version.css">
 
   <title>Interactive Atlas Viewer</title>
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Map",
+      "url": "https://interactive-viewer.apps.hbp.eu",
+      "name": "Human Brain Project Interactive Atlas Viewer",
+      "reference space": {
+        "@type": "Place",
+        "parcellation atlas": {
+          "@type": "Place",
+          "regions": [{
+            "@type": "Place"
+          }]
+        }
+      }
+    }
+  </script>
 </head>
 <body>
   <atlas-viewer>

@@ -27,7 +27,7 @@
   <!-- StatusCard container-->
   <ui-status-card
     *ngIf="!(useMobileUI$ | async)"
-    [selectedTemplate]="selectedTemplate"
+    [selectedTemplateName]="selectedTemplate.name"
     [isMobile]="useMobileUI$ | async"
     [nehubaViewer]="nehubaViewer">
   </ui-status-card>

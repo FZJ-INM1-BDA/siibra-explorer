@@ -5,10 +5,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
   selector: 'confirm-dialog-component',
   templateUrl: './confirmDialog.template.html',
   styleUrls: [
-    './confirmDialog.style.css'
-  ]
+    './confirmDialog.style.css',
+  ],
 })
-export class ConfirmDialogComponent{
+export class ConfirmDialogComponent {
 
   @Input()
   public title: string = 'Confirm'
@@ -16,9 +16,9 @@ export class ConfirmDialogComponent{
   @Input()
   public message: string = 'Would you like to proceed?'
 
-  constructor(@Inject(MAT_DIALOG_DATA) data: any){
+  constructor(@Inject(MAT_DIALOG_DATA) data: any) {
     const { title = null, message  = null} = data || {}
-    if (title) this.title = title
-    if (message) this.message = message
+    if (title) { this.title = title }
+    if (message) { this.message = message }
   }
 }

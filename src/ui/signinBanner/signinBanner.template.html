@@ -51,7 +51,7 @@
 <mat-menu #pluginDropdownMenu>
   <button mat-menu-item
     [disabled]="!parcellationIsSelected"
-    (click)="takeScreenshotElement.startScreenshot()"
+    (click)="takingScreenshot = true;"
     [matTooltip]="screenshotTooltipText">
     <mat-icon fontSet="fas" fontIcon="fa-camera">
     </mat-icon>
@@ -126,15 +126,15 @@
   </mat-dialog-actions>
 </ng-template>
 
-<ng-template #settingTemplate>	
-  <h2 mat-dialog-title>Settings</h2>	
-  <mat-dialog-content>	
-    <!-- required to avoid showing an ugly vertical scroll bar -->	
-    <!-- TODO investigate why, then remove the friller class -->	
-    <config-component class="mb-4 d-block">	
-    </config-component>	
-  </mat-dialog-content>	
-</ng-template> 
+<ng-template #settingTemplate>
+  <h2 mat-dialog-title>Settings</h2>
+  <mat-dialog-content>
+    <!-- required to avoid showing an ugly vertical scroll bar -->
+    <!-- TODO investigate why, then remove the friller class -->
+    <config-component class="mb-4 d-block">
+    </config-component>
+  </mat-dialog-content>
+</ng-template>
 
 <!-- saved dataset tmpl -->
 
@@ -172,5 +172,8 @@
 
 <take-screenshot
   #takeScreenshotElement
-  class="position-fixed fixed-top">
+  *ngIf="takingScreenshot"
+  class="position-fixed fixed-top"
+  (screenshotTaking)="disableScreenshotTaking()"
+  (resetScreenshot)="$event? takingScreenshot = true : disableScreenshotTaking()">
 </take-screenshot>

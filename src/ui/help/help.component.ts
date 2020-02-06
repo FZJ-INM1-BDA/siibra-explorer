@@ -1,16 +1,16 @@
 import { Component } from '@angular/core'
-import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { DomSanitizer } from '@angular/platform-browser';
+import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 
 @Component({
   selector: 'help-component',
   templateUrl: './help.template.html',
   styleUrls: [
-    './help.style.css'
-  ]
+    './help.style.css',
+  ],
 })
 
-export class HelpComponent{
+export class HelpComponent {
 
   public generalHelp
   public sliceviewHelp
@@ -23,9 +23,9 @@ export class HelpComponent{
   public userDoc: string = `https://interactive-viewer-user-documentation.apps-dev.hbp.eu`
 
   constructor(
-    private constantService:AtlasViewerConstantsServices,
-    private sanitizer:DomSanitizer
-  ){
+    private constantService: AtlasViewerConstantsServices,
+    private sanitizer: DomSanitizer,
+  ) {
     this.generalHelp = this.constantService.showHelpGeneralMap
     this.sliceviewHelp = this.constantService.showHelpSliceViewMap
     this.perspectiveviewHelp = this.constantService.showHelpPerspectiveViewMap

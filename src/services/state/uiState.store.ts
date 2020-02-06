@@ -1,16 +1,16 @@
-import {Action, select, Store} from '@ngrx/store'
-import {Injectable, TemplateRef} from '@angular/core';
+import { Injectable, TemplateRef } from '@angular/core';
+import { Action, select, Store } from '@ngrx/store'
 
-import { LOCAL_STORAGE_CONST, COOKIE_VERSION, KG_TOS_VERSION } from 'src/util/constants'
-import {GENERAL_ACTION_TYPES, IavRootStoreInterface} from '../stateStore.service'
-import {Effect} from "@ngrx/effects";
-import {Observable} from "rxjs";
-import {filter, map, mapTo, scan, startWith} from "rxjs/operators";
+import { Effect } from "@ngrx/effects";
+import { Observable } from "rxjs";
+import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
+import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
+import { IavRootStoreInterface } from '../stateStore.service'
 
 export const defaultState: StateInterface = {
   mouseOverSegments: [],
   mouseOverSegment: null,
-  
+
   mouseOverLandmark: null,
   mouseOverUserLandmark: null,
 
@@ -20,114 +20,137 @@ export const defaultState: StateInterface = {
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
-
   bottomSheetTemplate: null,
+
+  pluginRegionSelectionEnabled: false,
+  persistentStateNotifierTemplate: null,
 
   /**
    * replace with server side logic (?)
    */
   agreedCookies: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_COOKIE) === COOKIE_VERSION,
-  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION
+  agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState:StateInterface = state,action:ActionInterface) => {
-  switch(action.type){
-    case MOUSE_OVER_SEGMENTS:
-      const { segments } = action
-      return {
-        ...prevState,
-        mouseOverSegments: segments
-      }
-    case MOUSE_OVER_SEGMENT:
-      return {
-        ...prevState,
-        mouseOverSegment : action.segment
-      }
-    case MOUSEOVER_USER_LANDMARK:
-      const { payload = {} } = action
-      const { userLandmark: mouseOverUserLandmark = null } = payload
-      return {
-        ...prevState,
-        mouseOverUserLandmark
-      }
-    case MOUSE_OVER_LANDMARK:
-      return {
-        ...prevState,
-        mouseOverLandmark : action.landmark
-      }
-    case SNACKBAR_MESSAGE:
-      const { snackbarMessage } = action
-      /**
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
+  switch (action.type) {
+  case MOUSE_OVER_SEGMENTS: {
+    const { segments } = action
+    return {
+      ...prevState,
+      mouseOverSegments: segments,
+    }
+  }
+  case MOUSE_OVER_SEGMENT: 
+    return {
+      ...prevState,
+      mouseOverSegment : action.segment,
+    }
+  case MOUSEOVER_USER_LANDMARK: {
+    const { payload = {} } = action
+    const { userLandmark: mouseOverUserLandmark = null } = payload
+    return {
+      ...prevState,
+      mouseOverUserLandmark,
+    }
+  }
+  case MOUSE_OVER_LANDMARK:
+    return {
+      ...prevState,
+      mouseOverLandmark : action.landmark,
+    }
+  case SNACKBAR_MESSAGE: {
+    const { snackbarMessage } = action
+    /**
        * Need to use symbol here, or repeated snackbarMessage will not trigger new event
        */
-      return {
-        ...prevState,
-        snackbarMessage: Symbol(snackbarMessage)
-      }
-    case OPEN_SIDE_PANEL:
-      return {
-        ...prevState,
-        sidePanelIsOpen: true
-      }
-    case CLOSE_SIDE_PANEL:
-      return {
-        ...prevState,
-        sidePanelIsOpen: false
-      }
+    return {
+      ...prevState,
+      snackbarMessage: Symbol(snackbarMessage),
+    }
+  }
+  case OPEN_SIDE_PANEL:
+    return {
+      ...prevState,
+      sidePanelIsOpen: true,
+    }
+  case CLOSE_SIDE_PANEL:
+    return {
+      ...prevState,
+      sidePanelIsOpen: false,
+    }
 
-    case EXPAND_SIDE_PANEL_CURRENT_VIEW:
-      return {
-        ...prevState,
-        sidePanelExploreCurrentViewIsOpen: true
-      }
-    case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
-      return {
-        ...prevState,
-        sidePanelExploreCurrentViewIsOpen: false
-      }
+  case EXPAND_SIDE_PANEL_CURRENT_VIEW:
+    return {
+      ...prevState,
+      sidePanelExploreCurrentViewIsOpen: true,
+    }
+  case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
+    return {
+      ...prevState,
+      sidePanelExploreCurrentViewIsOpen: false,
+    }
 
-    case SHOW_SIDE_PANEL_DATASET_LIST:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Dataset'
-      }
+  case SHOW_SIDE_PANEL_DATASET_LIST:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Dataset',
+    }
 
-    case SHOW_SIDE_PANEL_CONNECTIVITY:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Connectivity'
-      }
-    case HIDE_SIDE_PANEL_CONNECTIVITY:
-      return {
-        ...prevState,
-        sidePanelCurrentViewContent: 'Dataset'
-      }
-    case AGREE_COOKIE:
-      /**
+  case SHOW_SIDE_PANEL_CONNECTIVITY:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Connectivity',
+    }
+  case HIDE_SIDE_PANEL_CONNECTIVITY:
+    return {
+      ...prevState,
+      sidePanelCurrentViewContent: 'Dataset',
+    }
+
+  case ENABLE_PLUGIN_REGION_SELECTION: {
+    return {
+      ...prevState,
+      pluginRegionSelectionEnabled: true,
+      persistentStateNotifierTemplate: action.payload
+    }
+  }
+  case DISABLE_PLUGIN_REGION_SELECTION: {
+    return {
+      ...prevState,
+      pluginRegionSelectionEnabled: false,
+      persistentStateNotifierTemplate: null
+    }
+  }
+
+  case AGREE_COOKIE: {
+    /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
-      return {
-        ...prevState,
-        agreedCookies: true
-      }
-    case AGREE_KG_TOS:
-      /**
+    localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_COOKIE, COOKIE_VERSION)
+    return {
+      ...prevState,
+      agreedCookies: true,
+    }
+  }
+  case AGREE_KG_TOS: {
+    /**
        * TODO replace with server side logic
        */
-      localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
-      return {
-        ...prevState,
-        agreedKgTos: true
-      }
-    case SHOW_BOTTOM_SHEET:
-        const { bottomSheetTemplate } = action
-        return {
-          ...prevState,
-          bottomSheetTemplate
-        }
-    default:
-      return prevState
+    localStorage.setItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS, KG_TOS_VERSION)
+    return {
+      ...prevState,
+      agreedKgTos: true,
+    }
+  }
+  case SHOW_BOTTOM_SHEET: {
+    const { bottomSheetTemplate } = action
+    return {
+      ...prevState,
+      bottomSheetTemplate,
+    }
+  }
+  default: return prevState
   }
 }
 
@@ -140,17 +163,17 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState:State
 
 const defaultStateStore = getStateStore()
 
-export function stateStore(state, action){
+export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
-export interface StateInterface{
-  mouseOverSegments: {
+export interface StateInterface {
+  mouseOverSegments: Array<{
     layer: {
       name: string
     }
     segment: any | null
-  }[]
+  }>
   sidePanelIsOpen: boolean
   sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
   sidePanelExploreCurrentViewIsOpen: boolean
@@ -161,7 +184,10 @@ export interface StateInterface{
 
   focusedSidePanel: string | null
 
-  snackbarMessage: Symbol
+  snackbarMessage: symbol
+
+  pluginRegionSelectionEnabled: boolean
+  persistentStateNotifierTemplate: TemplateRef<any>
 
   agreedCookies: boolean
   agreedKgTos: boolean
@@ -169,16 +195,16 @@ export interface StateInterface{
   bottomSheetTemplate: TemplateRef<any>
 }
 
-export interface ActionInterface extends Action{
+export interface ActionInterface extends Action {
   segment: any | number
   landmark: any
   focusedSidePanel?: string
-  segments?:{
+  segments?: Array<{
     layer: {
       name: string
     }
     segment: any | null
-  }[],
+  }>
   snackbarMessage: string
 
   bottomSheetTemplate: TemplateRef<any>
@@ -187,10 +213,10 @@ export interface ActionInterface extends Action{
 }
 
 @Injectable({
-  providedIn:'root'
+  providedIn: 'root',
 })
 
-export class UiStateUseEffect{
+export class UiStateUseEffect {
 
   private numRegionSelectedWithHistory$: Observable<any[]>
 
@@ -206,21 +232,21 @@ export class UiStateUseEffect{
       select('regionsSelected'),
       map(arr => arr.length),
       startWith(0),
-      scan((acc, curr) => [curr, ...acc], [])
+      scan((acc, curr) => [curr, ...acc], []),
     )
 
     this.sidePanelOpen$ = this.numRegionSelectedWithHistory$.pipe(
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo({
-        type: OPEN_SIDE_PANEL
-      })
+        type: OPEN_SIDE_PANEL,
+      }),
     )
 
     this.viewCurrentOpen$ = this.numRegionSelectedWithHistory$.pipe(
       filter(([curr, prev]) => prev === 0 && curr > 0),
       mapTo({
-        type: EXPAND_SIDE_PANEL_CURRENT_VIEW
-      })
+        type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
+      }),
     )
   }
 }
@@ -237,6 +263,9 @@ export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
 export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
+
+export const ENABLE_PLUGIN_REGION_SELECTION = `ENABLE_PLUGIN_REGION_SELECTION`
+export const DISABLE_PLUGIN_REGION_SELECTION = `DISABLE_PLUGIN_REGION_SELECTION`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`

@@ -1,5 +1,6 @@
 {
   "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+  "fullId": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
   "type": "template",
   "species": "Human",
   "useTheme": "dark",
@@ -9,14 +10,18 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "jubrain mni152 v18 left",
-      "auxillaryMeshIndices": [ 65535 ],
+      "auxillaryMeshIndices": [
+        65535
+      ],
       "hasAdditionalViewMode": [
         "connectivity"
       ],
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
-      }],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+        }
+      ],
       "properties": {
         "version": "1.0",
         "description": "This dataset contains the whole-brain parcellation of the JuBrain Cytoarchitectonic Atlas (Amunts and Zilles, 2015) in the MNI Colin 27 as well as the MNI ICBM 152 2009c nonlinear asymmetric reference space. The parcellation is derived from the individual probability maps (PMs) of the cytoarchitectonic regions released in the JuBrain Atlas, that are further combined into a Maximum Probability Map (MPM). The MPM is calculated by considering for each voxel the probability of all cytoarchitectonic areas released in the atlas, and determining the most probable assignment (Eickhoff 2005). Note that methodological improvements and integration of new brain structures may lead to small deviations in earlier released datasets.",
@@ -108,7 +113,14 @@
                                 -8461290
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -163,7 +175,14 @@
                                 -12582822
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -218,7 +237,14 @@
                                 -8461290
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -272,7 +298,14 @@
                               "labelIndex": 187,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -317,7 +350,14 @@
                               "labelIndex": 22,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "SF (Amygdala)",
@@ -353,7 +393,14 @@
                               "labelIndex": 186,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -408,7 +455,14 @@
                                 -15985714
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "VTM (Amygdala)",
@@ -454,7 +508,14 @@
                                 -17326733
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "IF (Amygdala)",
@@ -500,7 +561,14 @@
                                 -17973684
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -545,7 +613,14 @@
                               "labelIndex": 16,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "CM (Amygdala)",
@@ -591,7 +666,14 @@
                                 -13743499
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -664,7 +746,14 @@
                                 55690476
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 5M (SPL)",
@@ -710,7 +799,14 @@
                                 59763933
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 7PC (SPL)",
@@ -756,7 +852,14 @@
                                 62336656
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 5L (SPL)",
@@ -802,7 +905,14 @@
                                 69561773
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 7M (SPL)",
@@ -848,7 +958,14 @@
                                 38515152
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0aacea5c-bc9e-483f-8376-25f176ada158"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 7A (SPL)",
@@ -856,8 +973,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area 7A"
+                          "relatedAreas": [
+                            {
+                              "name": "Area 7A",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "811f4adb-4a7c-45c1-8034-4afa9edf586a"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             38,
@@ -897,7 +1022,13 @@
                                 62051683
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
+                            }
+                          }
                         },
                         {
                           "name": "Area 5Ci (SPL)",
@@ -943,7 +1074,14 @@
                                 45477854
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -998,7 +1136,14 @@
                                 18500000
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area OP4 (POperc)",
@@ -1044,7 +1189,14 @@
                                 12300125
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area OP3 (POperc)",
@@ -1090,7 +1242,14 @@
                                 18514977
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area OP1 (POperc)",
@@ -1136,7 +1295,14 @@
                                 18151001
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -1191,7 +1357,14 @@
                                 56291435
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 3b (PostCG)",
@@ -1200,7 +1373,15 @@
                           "labelIndex": null,
                           "synonyms": [],
                           "relatedAreas": [
-                            "Area 3b"
+                            {
+                              "name": "Area 3b",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "74304fe9-452e-4ca3-97a3-8cf3459bb1a0"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             239,
@@ -1240,7 +1421,13 @@
                                 47310887
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
+                            }
+                          }
                         },
                         {
                           "name": "Area 3a (PostCG)",
@@ -1286,7 +1473,14 @@
                                 36367169
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 2 (PostCS)",
@@ -1332,7 +1526,14 @@
                                 52910085
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -1349,8 +1550,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFm"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PFm",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3455ada4-48c3-4748-ae38-2fe3f376f0fc"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             53,
@@ -1390,7 +1599,13 @@
                                 39537196
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFop (IPL)",
@@ -1398,8 +1613,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFop"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PFop",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b4397c40-82e1-4d62-b97a-44e8d04b428b"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             146,
@@ -1439,7 +1662,13 @@
                                 26279323
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
+                            }
+                          }
                         },
                         {
                           "name": "Area PF (IPL)",
@@ -1447,8 +1676,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PF"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PF",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f4e177a6-1b2c-48d5-a62c-91949ba636e4"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             226,
@@ -1488,7 +1725,13 @@
                                 31797118
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
+                            }
+                          }
                         },
                         {
                           "name": "Area PGp (IPL)",
@@ -1496,8 +1739,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PGp"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PGp",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "1b00a0e4-9493-43ff-bfbd-b02119064813"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             92,
@@ -1537,7 +1788,13 @@
                                 31755974
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
+                            }
+                          }
                         },
                         {
                           "name": "Area PGa (IPL)",
@@ -1545,8 +1802,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PGa"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PGa",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d5b168a3-a92e-4ab3-8b4d-61e58e5b7a1c"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             42,
@@ -1586,7 +1851,13 @@
                                 31733304
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFt (IPL)",
@@ -1594,8 +1865,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFt"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PFt",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9ff7fcc4-a88b-4bf8-be07-1386a3760a96"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             120,
@@ -1635,7 +1914,13 @@
                                 39924515
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFcm (IPL)",
@@ -1643,8 +1928,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area PFcm"
+                          "relatedAreas": [
+                            {
+                              "name": "Area PFcm",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f07d441f-452f-471b-ac7c-0d3c2ae16fb2"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             98,
@@ -1684,7 +1977,13 @@
                                 24592525
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1739,7 +2038,14 @@
                                 37156498
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -1794,7 +2100,14 @@
                                 34275566
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP3 (IPS)",
@@ -1840,7 +2153,14 @@
                                 50509215
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP8 (IPS)",
@@ -1886,7 +2206,14 @@
                                 41158435
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP4 (IPS)",
@@ -1932,7 +2259,14 @@
                                 22440217
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP7 (IPS)",
@@ -1978,7 +2312,14 @@
                                 27718516
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP1 (IPS)",
@@ -2024,7 +2365,14 @@
                                 39221848
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP6 (IPS)",
@@ -2070,7 +2418,14 @@
                                 45176974
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hIP2 (IPS)",
@@ -2116,7 +2471,14 @@
                                 45742512
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -2180,7 +2542,14 @@
                                 27567915
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc3d (Cuneus)",
@@ -2226,7 +2595,14 @@
                                 24647659
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc6 (POS)",
@@ -2272,7 +2648,14 @@
                                 18144838
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -2327,7 +2710,14 @@
                                 -12568268
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc3v (LingG)",
@@ -2373,7 +2763,14 @@
                                 -10415129
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -2428,7 +2825,14 @@
                                 3658074
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc1 (V1, 17, CalcS)",
@@ -2436,8 +2840,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area hOc1"
+                          "relatedAreas": [
+                            {
+                              "name": "Area hOc1",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b851eb9d-9502-45e9-8dd8-2861f0e6da3f"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             190,
@@ -2477,7 +2889,13 @@
                                 2052487
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
+                            }
+                          }
                         }
                       ]
                     },
@@ -2532,7 +2950,14 @@
                                 4126719
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc4la (LOC)",
@@ -2578,7 +3003,14 @@
                                 251812
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "94365b82-6204-4937-8b86-fe0433287938"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area hOc4lp (LOC)",
@@ -2624,7 +3056,14 @@
                                 4946882
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -2714,7 +3153,14 @@
                               "labelIndex": 247,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "472dacc9-c27d-49c2-9e6f-a1cc3309c4ab"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifs1 (IFS)",
@@ -2750,7 +3196,14 @@
                               "labelIndex": 244,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d687d385-98d9-4b31-85db-4bc682cd0a31"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifj2 (IFS/PreS)",
@@ -2822,7 +3275,14 @@
                               "labelIndex": 245,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "658a67d8-60c2-4bb4-8eaf-e54725eda261"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area ifs3 (IFS)",
@@ -2858,7 +3318,14 @@
                               "labelIndex": 246,
                               "children": []
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e555881e-7082-4ac0-b6cc-cd096f30d3dc"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -2875,9 +3342,25 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area 44v",
-                            "Area 44d"
+                          "relatedAreas": [
+                            {
+                              "name": "Area 44v",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7e5e7aa8-28b8-445b-8980-2a6f3fa645b3"
+                                }
+                              }
+                            },
+                            {
+                              "name": "Area 44d",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8aeae833-81c8-4e27-a8d6-deee339d6052"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             54,
@@ -2917,7 +3400,13 @@
                                 11532612
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
+                            }
+                          }
                         },
                         {
                           "name": "Area 45 (IFG)",
@@ -2926,7 +3415,15 @@
                           "labelIndex": null,
                           "synonyms": [],
                           "relatedAreas": [
-                            "Area 45"
+                            {
+                              "name": "Area 45",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "131e6de8-b073-4f01-8f60-1bdb5a6c9a9a"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             167,
@@ -2966,7 +3463,13 @@
                                 11201622
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
+                            }
+                          }
                         }
                       ]
                     },
@@ -2978,7 +3481,7 @@
                       "rgb": null,
                       "children": [
                         {
-                          "name": "Area 6d1 (PreG)",
+                          "name": "Area 6d1 (PreCG)",
                           "arealabel": "Area-6d1",
                           "status": "publicDOI",
                           "labelIndex": null,
@@ -2988,9 +3491,15 @@
                             33,
                             27
                           ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId":"a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                            }
+                          },
                           "children": [
                             {
-                              "name": "Area 6d1 (PreG) - left hemisphere",
+                              "name": "Area 6d1 (PreCG) - left hemisphere",
                               "rgb": [
                                 45,
                                 33,
@@ -3006,7 +3515,7 @@
                               ]
                             },
                             {
-                              "name": "Area 6d1 (PreG) - right hemisphere",
+                              "name": "Area 6d1 (PreCG) - right hemisphere",
                               "rgb": [
                                 45,
                                 33,
@@ -3024,7 +3533,7 @@
                           ]
                         },
                         {
-                          "name": "Area 6d2 (PreG)",
+                          "name": "Area 6d2 (PreCG)",
                           "arealabel": "Area-6d2",
                           "status": "publicDOI",
                           "labelIndex": null,
@@ -3034,9 +3543,15 @@
                             151,
                             180
                           ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId":"963c5281-67df-4d41-9b91-60b31cf150c0"
+                            }
+                          },
                           "children": [
                             {
-                              "name": "Area 6d2 (PreG) - left hemisphere",
+                              "name": "Area 6d2 (PreCG) - left hemisphere",
                               "rgb": [
                                 170,
                                 151,
@@ -3052,7 +3567,7 @@
                               ]
                             },
                             {
-                              "name": "Area 6d2 (PreG) - right hemisphere",
+                              "name": "Area 6d2 (PreCG) - right hemisphere",
                               "rgb": [
                                 170,
                                 151,
@@ -3122,7 +3637,14 @@
                                 57073758
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3177,7 +3699,14 @@
                                 53205165
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3232,7 +3761,14 @@
                                 -2304434
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fp2 (FPole)",
@@ -3278,7 +3814,14 @@
                                 -3022228
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3295,8 +3838,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area 4p"
+                          "relatedAreas": [
+                            {
+                              "name": "Area 4p",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "861ab96a-c4b5-4ba6-bd40-1e80d4680f89"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             116,
@@ -3336,7 +3887,13 @@
                                 46248351
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
+                            }
+                          }
                         },
                         {
                           "name": "Area 4a (PreCG)",
@@ -3382,7 +3939,14 @@
                                 67748853
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3437,7 +4001,14 @@
                                 56050065
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3492,7 +4063,14 @@
                                 -20253609
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fo1 (OFC)",
@@ -3538,7 +4116,14 @@
                                 -25066859
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fo2 (OFC)",
@@ -3584,7 +4169,14 @@
                                 -21936370
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -3740,7 +4332,14 @@
                                 -6858425
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fo7 (OFC)",
@@ -3786,7 +4385,14 @@
                                 -13535015
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fo4 (OFC)",
@@ -3832,7 +4438,14 @@
                                 -15390093
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Fo6 (OFC)",
@@ -3878,7 +4491,14 @@
                                 -14205821
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -3942,7 +4562,14 @@
                                 8838776
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Ig2 (Insula)",
@@ -3988,7 +4615,14 @@
                                 5868966
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -4043,7 +4677,14 @@
                                 -8955882
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -4098,7 +4739,14 @@
                                 1550497
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -4153,7 +4801,14 @@
                                 -5112416
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "c22055c1-514f-4096-906b-abf57286053b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Id5 (Insula)",
@@ -4199,7 +4854,14 @@
                                 165741
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Id4 (Insula)",
@@ -4245,7 +4907,14 @@
                                 10987327
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area Id6 (Insula)",
@@ -4291,7 +4960,14 @@
                                 2772938
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -4355,7 +5031,14 @@
                                 -5666868
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area STS2 (STS)",
@@ -4401,7 +5084,14 @@
                                 -16698805
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -4456,7 +5146,14 @@
                                 -1006136
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -4511,7 +5208,14 @@
                                 -1426009
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area TE 1.1 (HESCHL)",
@@ -4557,7 +5261,14 @@
                                 10842857
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area TE 1.0 (HESCHL)",
@@ -4565,8 +5276,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area Te1"
+                          "relatedAreas": [
+                            {
+                              "name": "Area Te1",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f424643e-9baf-4c50-9417-db1ac33dcd3e"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             252,
@@ -4606,7 +5325,13 @@
                                 5319209
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
+                            }
+                          }
                         }
                       ]
                     },
@@ -4623,8 +5348,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area FG1"
+                          "relatedAreas": [
+                            {
+                              "name": "Area FG1",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "6318e160-4ad2-4eec-8a2e-2df6fe07d8f4"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             131,
@@ -4664,7 +5397,13 @@
                                 -12459885
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
+                            }
+                          }
                         },
                         {
                           "name": "Area FG4 (FusG)",
@@ -4710,7 +5449,14 @@
                                 -21712296
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area FG3 (FusG)",
@@ -4756,7 +5502,14 @@
                                 -15743424
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area FG2 (FusG)",
@@ -4764,8 +5517,16 @@
                           "status": "publicP",
                           "labelIndex": null,
                           "synonyms": [],
-                          "relatedAreas":[
-                            "Area FG2"
+                          "relatedAreas": [
+                            {
+                              "name": "Area FG2",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8f436328-4251-4706-ae38-767e1ab21c6f"
+                                }
+                              }
+                            }
                           ],
                           "rgb": [
                             67,
@@ -4805,7 +5566,13 @@
                                 -16661544
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
+                            }
+                          }
                         }
                       ]
                     }
@@ -4869,7 +5636,14 @@
                                 11145614
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area p24ab (pACC)",
@@ -4915,7 +5689,14 @@
                                 6891142
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area s32 (sACC)",
@@ -4961,7 +5742,14 @@
                                 -15008494
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 25 (sACC)",
@@ -5007,7 +5795,14 @@
                                 -13530501
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area s24 (sACC)",
@@ -5053,7 +5848,14 @@
                                 -10923181
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area p32 (pACC)",
@@ -5099,7 +5901,14 @@
                                 10022042
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Area 33 (ACC)",
@@ -5145,7 +5954,14 @@
                                 15680187
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -5200,15 +6016,30 @@
                                 -34844921
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "CA (Hippocampus)",
                           "arealabel": "CA",
                           "status": "publicP",
                           "labelIndex": null,
-                          "relatedAreas":[
-                            "CA1 (Hippocampus)"
+                          "relatedAreas": [
+                            {
+                              "name": "CA1 (Hippocampus)",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "bfc0beb7-310c-4c57-b810-2adc464bd02c"
+                                }
+                              }
+                            }
                           ],
                           "synonyms": [],
                           "rgb": [
@@ -5249,7 +6080,13 @@
                                 -11735266
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a0d14d3e-bc30-41cf-8b28-540067897f80"
+                            }
+                          }
                         },
                         {
                           "name": "DG (Hippocampus)",
@@ -5295,7 +6132,14 @@
                                 -11462629
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Subiculum (Hippocampus)",
@@ -5341,7 +6185,14 @@
                                 -18015846
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7e2dab4c-a140-440d-a322-c1679adef2d4"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "HATA (Hippocampus)",
@@ -5387,7 +6238,14 @@
                                 -18866667
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -5469,7 +6327,14 @@
                                 -32600000
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -5524,7 +6389,14 @@
                                 -37750665
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "58095aef-da69-43d4-887c-009c095cecce"
+                            }
+                          },
+                          "relatedAreas": []
                         },
                         {
                           "name": "Ventral Dentate Nucleus (Cerebellum)",
@@ -5570,7 +6442,14 @@
                                 -32527125
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -5625,7 +6504,14 @@
                                 -30598446
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     },
@@ -5680,7 +6566,14 @@
                                 -32600000
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                            }
+                          },
+                          "relatedAreas": []
                         }
                       ]
                     }
@@ -5694,113 +6587,164 @@
     },
     {
       "ngId": "fibre bundle long",
-      "auxillaryMeshIndices": [ 65535 ],
+      "auxillaryMeshIndices": [
+        65535
+      ],
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
       "name": "Fibre Bundle Atlas - Long Bundle",
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "fcbb049b-edd5-4fb5-acbc-7bf8ee933e24"
-      }],
-      "properties": {
-      },
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "fcbb049b-edd5-4fb5-acbc-7bf8ee933e24"
+        }
+      ],
+      "properties": {},
       "regions": [
         {
           "name": "Arcuate - Left",
           "children": [],
           "labelIndex": "1",
-          "relatedAreas": [
-            "Direct segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "7de080e0-fa5e-492f-9cbc-a4d7e498b1d5"
+            }
+          }
         },
         {
           "name": "Arcuate - Right",
           "children": [],
           "labelIndex": "31",
-          "relatedAreas": [
-            "Direct segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "17cbf31c-f68b-4753-9014-44aa38e1cdcf"
+            }
+          }
         },
         {
           "name": "Arcuate_Anterior - Left",
           "children": [],
           "labelIndex": "2",
-          "relatedAreas": [
-            "Anterior segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "1ed86a08-d720-427c-9796-ade24e34a36b"
+            }
+          }
         },
         {
           "name": "Arcuate_Anterior - Right",
           "children": [],
           "labelIndex": "32",
-          "relatedAreas": [
-            "Anterior segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "9f625fad-9329-4824-8751-8b27dc197d3e"
+            }
+          }
         },
         {
           "name": "Arcuate_Posterior - Left",
           "children": [],
           "labelIndex": "3",
-          "relatedAreas": [
-            "Posterior segment of the left arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f13ba46b-09ad-48bd-9301-282b0ee74d8d"
+            }
+          }
         },
         {
           "name": "Arcuate_Posterior - Right",
           "children": [],
           "labelIndex": "33",
-          "relatedAreas": [
-            "Posterior segment of the right arcuate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2a6ea612-46c1-4a0f-a6f4-5ffc7ff09548"
+            }
+          }
         },
         {
           "name": "Cingulum_Long - Left",
           "children": [],
           "labelIndex": "4",
-          "relatedAreas": [
-            "Left long cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "6fa27cc1-2efe-4fd3-83d7-973667a0b925"
+            }
+          }
         },
         {
           "name": "Cingulum_Long - Right",
           "children": [],
           "labelIndex": "34",
-          "relatedAreas": [
-            "Right long cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f5ae1188-8a10-4e17-9fa9-47b1dc4e50cd"
+            }
+          }
         },
         {
           "name": "Cingulum_Short - Left",
           "children": [],
           "labelIndex": "5",
-          "relatedAreas": [
-            "Left short cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "882d13c0-ffe4-4fd8-95a1-ba714cd25fbb"
+            }
+          }
         },
         {
           "name": "Cingulum_Short - Right",
           "children": [],
           "labelIndex": "35",
-          "relatedAreas": [
-            "Right short cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "4c5ecae5-17b4-4a65-8b66-c4d0882a2bca"
+            }
+          }
         },
         {
           "name": "Cingulum_Temporal - Left",
           "children": [],
           "labelIndex": "6",
-          "relatedAreas": [
-            "Left temporal cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2c71b329-5a32-4ba0-aacb-0fac99c46aca"
+            }
+          }
         },
         {
           "name": "Cingulum_Temporal - Right",
           "children": [],
           "labelIndex": "36",
-          "relatedAreas": [
-            "Right temporal cingulate fibres"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "7e965e21-1d9b-4b8d-b77d-4a7ca17603e6"
+            }
+          }
         },
         {
           "name": "CorpusCallosum_Body",
@@ -5826,17 +6770,25 @@
           "name": "CorticoSpinalTract - Left",
           "children": [],
           "labelIndex": "11",
-          "relatedAreas": [
-            "Left corticospinal tract"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "afbb2642-5e90-412f-9847-3d7a831f8f07"
+            }
+          }
         },
         {
           "name": "CorticoSpinalTract - Right",
           "children": [],
           "labelIndex": "41",
-          "relatedAreas": [
-            "Right corticospinal tract"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "2f398c6e-6264-4615-8a28-18b3573d0732"
+            }
+          }
         },
         {
           "name": "ExternalCapsule - Left",
@@ -5852,49 +6804,73 @@
           "name": "Fornix - Left",
           "children": [],
           "labelIndex": "13",
-          "relatedAreas": [
-            "Left fornix"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "c8d1e4a0-d0c2-4101-a971-3ffb1ba65ef8"
+            }
+          }
         },
         {
           "name": "Fornix - Right",
           "children": [],
           "labelIndex": "43",
-          "relatedAreas": [
-            "Right fornix"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "e7e8fd6d-aa43-452e-9fc3-635aa0333910"
+            }
+          }
         },
         {
           "name": "InferiorFrontoOccipital - Left",
           "children": [],
           "labelIndex": "14",
-          "relatedAreas": [
-            "Left inferior fronto-occipital fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "524cd5a0-7066-4149-83b8-c0c4aaa12820"
+            }
+          }
         },
         {
           "name": "InferiorFrontoOccipital - Right",
           "children": [],
           "labelIndex": "44",
-          "relatedAreas": [
-            "Right inferior fronto-occipital fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "34e8f68d-0b00-4e9e-bd43-ccaf10deef6d"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal - Left",
           "children": [],
           "labelIndex": "15",
-          "relatedAreas": [
-            "Left inferior longitudinal fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "d3a458e1-6dbf-418d-bb52-c0b0c6acb920"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal - Right",
           "children": [],
           "labelIndex": "45",
-          "relatedAreas": [
-            "Right inferior longitudinal fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "25326bc6-2b87-4483-9738-89ca249faccd"
+            }
+          }
         },
         {
           "name": "InferiorLongitudinal_Lateral - Left",
@@ -5950,31 +6926,43 @@
           "name": "Uncinate - Left",
           "children": [],
           "labelIndex": "21",
-          "relatedAreas": [
-            "Left uncinate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "f36707b5-d4f3-480b-a1c9-651bf8cc49d5"
+            }
+          }
         },
         {
           "name": "Uncinate - Right",
           "children": [],
           "labelIndex": "51",
-          "relatedAreas": [
-            "Right uncinate fasciculus"
-          ]
+          "relatedAreas": [],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "84ea1a64-03a6-4a7e-9f64-a3d2127ebf3f"
+            }
+          }
         }
       ]
     },
     {
       "ngId": "fibre bundle short",
-      "auxillaryMeshIndices": [ 65535 ],
+      "auxillaryMeshIndices": [
+        65535
+      ],
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
       "name": "Fibre Bundle Atlas - Short Bundle",
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "f58e4425-6614-4ad9-ac26-5e946b1296cb"
-      }],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "f58e4425-6614-4ad9-ac26-5e946b1296cb"
+        }
+      ],
       "regions": [
         {
           "name": "Left Hemisphere",

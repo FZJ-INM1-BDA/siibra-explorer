@@ -34,6 +34,9 @@ RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app
 WORKDIR /iv-app
 
+# Copy common folder
+COPY --from=builder /iv/common /common
+
 # Copy the express server
 COPY --from=builder /iv/deploy .
 

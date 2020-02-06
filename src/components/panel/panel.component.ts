@@ -1,33 +1,33 @@
-import { Component, Input, ViewChild, ElementRef, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild } from "@angular/core";
 import { ParseAttributeDirective } from "../parseAttribute.directive";
 
 @Component({
   selector : 'panel-component',
   templateUrl : './panel.template.html',
   styleUrls : [
-    `./panel.style.css`
+    `./panel.style.css`,
   ],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class PanelComponent extends ParseAttributeDirective {
 
-  @Input() showHeading : boolean = true
-  @Input() showBody : boolean = true
-  @Input() showFooter : boolean = false
+  @Input() public showHeading: boolean = true
+  @Input() public showBody: boolean = true
+  @Input() public showFooter: boolean = false
 
-  @Input() collapseBody : boolean = false
-  @Input() bodyCollapsable : boolean = false
+  @Input() public collapseBody: boolean = false
+  @Input() public bodyCollapsable: boolean = false
 
-  @ViewChild('panelBody',{ read : ElementRef }) efPanelBody : ElementRef
-  @ViewChild('panelFooter',{ read : ElementRef }) efPanelFooter : ElementRef
+  @ViewChild('panelBody', { read : ElementRef }) public efPanelBody: ElementRef
+  @ViewChild('panelFooter', { read : ElementRef }) public efPanelFooter: ElementRef
 
-  constructor(){
+  constructor() {
     super()
   }
 
-  toggleCollapseBody(_event:Event){
-    if(this.bodyCollapsable){
+  public toggleCollapseBody(_event: Event) {
+    if (this.bodyCollapsable) {
       this.collapseBody = !this.collapseBody
       this.showBody = !this.showBody
       this.showFooter = !this.showFooter

@@ -1,15 +1,16 @@
 import { Injectable } from "@angular/core";
 import { Store } from "@ngrx/store";
-import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 import { KgSingleDatasetService } from "src/ui/databrowserModule/kgSingleDatasetService.service";
+import { SNACKBAR_MESSAGE } from "./state/uiState.store";
 import { IavRootStoreInterface } from "./stateStore.service";
+import { DATASETS_ACTIONS_TYPES } from "./state/dataStore.store";
 
 /**
  * experimental service handling local user files such as nifti and gifti
  */
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
 export class LocalFileService {
@@ -18,41 +19,41 @@ export class LocalFileService {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private singleDsService: KgSingleDatasetService
-  ){
+    private singleDsService: KgSingleDatasetService,
+  ) {
 
   }
 
   private niiUrl
 
-  public handleFileDrop(files: File[]){
+  public handleFileDrop(files: File[]) {
     try {
       this.validateDrop(files)
       for (const file of files) {
         const ext = this.getExtension(file.name)
         switch (ext) {
-          case NII: {
-            this.handleNiiFile(file)
-            break;
-          }
-          default:
-            throw new Error(`File ${file.name} does not have a file handler`)
+        case NII: {
+          this.handleNiiFile(file)
+          break;
+        }
+        default:
+          throw new Error(`File ${file.name} does not have a file handler`)
         }
       }
     } catch (e) {
       this.store.dispatch({
         type: SNACKBAR_MESSAGE,
-        snackbarMessage: `Opening local NIFTI error: ${e.toString()}`
+        snackbarMessage: `Opening local NIFTI error: ${e.toString()}`,
       })
     }
   }
 
-  private getExtension(filename:string) {
+  private getExtension(filename: string) {
     const match = /(\.\w*?)$/i.exec(filename)
     return (match && match[1]) || ''
   }
 
-  private validateDrop(files: File[]){
+  private validateDrop(files: File[]) {
     if (files.length !== 1) {
       throw new Error('Interactive atlas viewer currently only supports drag and drop of one file at a time')
     }
@@ -64,14 +65,21 @@ export class LocalFileService {
     }
   }
 
-  private handleNiiFile(file: File){
+  private handleNiiFile(file: File) {
 
     if (this.niiUrl) {
       URL.revokeObjectURL(this.niiUrl)
     }
     this.niiUrl = URL.createObjectURL(file)
-    this.singleDsService.showNewNgLayer({
-      url: this.niiUrl
+    
+    this.store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
+      payload: {
+        file: {
+          mimetype: 'application/json',
+          url: this.niiUrl
+        }
+      }
     })
 
     this.showLocalWarning()
@@ -80,7 +88,7 @@ export class LocalFileService {
   private showLocalWarning() {
     this.store.dispatch({
       type: SNACKBAR_MESSAGE,
-      snackbarMessage: `Warning: sharing URL will not share the loaded local file`
+      snackbarMessage: `Warning: sharing URL will not share the loaded local file`,
     })
   }
 }
@@ -90,5 +98,5 @@ const GII = '.gii'
 
 const SUPPORTED_EXT = [
   NII,
-  GII
+  GII,
 ]

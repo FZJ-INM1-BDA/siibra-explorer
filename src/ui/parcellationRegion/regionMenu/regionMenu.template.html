@@ -11,7 +11,7 @@
       [color]="isSelected ? 'primary': 'basic'">
       <i class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
       <span>
-        Selected
+        {{isSelected? 'Deselect' : 'Select'}}
       </span>
     </button>
     <button mat-button (click)="navigateToRegion()">
@@ -20,11 +20,25 @@
         Navigate
       </span>
     </button>
-    <button *ngIf="hasConnectivity" mat-button (click)="showConnectivity(region.name)">
+    <button *ngIf="hasConnectivity"
+            mat-button
+            [matMenuTriggerFor]="connectivitySourceDatasets"
+            #connectivityMenuButton="matMenuTrigger">
       <i class="fab fa-connectdevelop"></i>
       <span>
         Connectivity
       </span>
+      <i class="fas fa-angle-right"></i>
     </button>
+
+    <!-- ToDo make dynamic with AVAILABLE CONNECTIVITY DATASETS data - get info from atlas viewer core -->
+    <mat-menu #connectivitySourceDatasets="matMenu" xPosition="before" (click)="$event.stopPropagation()" hasBackdrop="false">
+      <div>
+        <button mat-menu-item
+                (click)="showConnectivity(region.name)">
+          <span>1000 Brain Study - DTI connectivity</span>
+        </button>
+      </div>
+    </mat-menu>
   </mat-card-actions>
 </mat-card>

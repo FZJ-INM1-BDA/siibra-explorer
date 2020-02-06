@@ -1,51 +1,52 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy, HostListener, ViewChild, ElementRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, Output, ViewChild } from "@angular/core";
+import { IExraBtnClickEvent, IExtraButton, IHasExtraButtons } from '../radiolist/radiolist.component'
 import { dropdownAnimation } from "./dropdown.animation";
-import { HasExtraButtons, ExraBtnClickEvent, ExtraButton } from '../radiolist/radiolist.component'
 
 @Component({
   selector : 'dropdown-component',
   templateUrl : './dropdown.template.html',
   styleUrls : [
-    `./dropdown.style.css`
+    `./dropdown.style.css`,
   ],
-  animations:[
-    dropdownAnimation
+  animations: [
+    dropdownAnimation,
   ],
-  changeDetection : ChangeDetectionStrategy.OnPush
+  changeDetection : ChangeDetectionStrategy.OnPush,
 })
 
-export class DropdownComponent{
+export class DropdownComponent {
 
-  @Input() activeDisplayBtns: ExtraButton[] = []
-  @Output() activeDisplayBtnClicked: EventEmitter<{extraBtn: ExtraButton, event: MouseEvent}> = new EventEmitter()
+  @Input() public activeDisplayBtns: IExtraButton[] = []
+  @Output() public activeDisplayBtnClicked: EventEmitter<{extraBtn: IExtraButton, event: MouseEvent}> = new EventEmitter()
 
-  @Input() inputArray : HasExtraButtons[] = []
-  @Input() selectedItem : any | null = null
-  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
+  @Input() public inputArray: IHasExtraButtons[] = []
+  @Input() public selectedItem: any | null = null
+  @Input() public checkSelected: (selectedItem: any, item: any) => boolean = (si, i) => si === i
 
-  @Input() listDisplay : (obj:any)=>string = (obj)=>obj.name
-  @Input() activeDisplay : (obj:any|null)=>string = (obj)=>obj ? obj.name : `Please select an item.`
+  @Input() public listDisplay: (obj: any) => string = (obj) => obj.name
+  @Input() public activeDisplay: (obj: any|null) => string = (obj) => obj ? obj.name : `Please select an item.`
 
-  @Output() itemSelected : EventEmitter<any> = new EventEmitter()
-  @Output() extraBtnClicked: EventEmitter<ExraBtnClickEvent> = new EventEmitter()
+  @Output() public itemSelected: EventEmitter<any> = new EventEmitter()
+  @Output() public extraBtnClicked: EventEmitter<IExraBtnClickEvent> = new EventEmitter()
 
-  @ViewChild('dropdownToggle',{read:ElementRef}) dropdownToggle : ElementRef
+  @ViewChild('dropdownToggle', {read: ElementRef}) public dropdownToggle: ElementRef
 
-  openState : boolean = false
+  public openState: boolean = false
 
-  @HostListener('document:click',['$event'])
-  close(event:MouseEvent){
+  @HostListener('document:click', ['$event'])
+  public close(event: MouseEvent) {
     const contains = this.dropdownToggle.nativeElement.contains(event.target)
-    if(contains)
+    if (contains) {
       this.openState = !this.openState
-    else
+    } else {
       this.openState = false;
+    }
   }
 
-  handleActiveDisplayBtnClick(btn: ExtraButton, event: MouseEvent){
+  public handleActiveDisplayBtnClick(btn: IExtraButton, event: MouseEvent) {
     this.activeDisplayBtnClicked.emit({
       extraBtn: btn,
-      event
+      event,
     })
   }
 }

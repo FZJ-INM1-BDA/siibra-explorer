@@ -1,19 +1,20 @@
-import { Injectable, OnDestroy } from "@angular/core";
-import { Subscription, Observable, combineLatest, BehaviorSubject, fromEvent, from, of } from "rxjs";
-import { select, Store } from "@ngrx/store";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { DataEntry, safeFilter, FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface } from "src/services/stateStore.service";
-import { map, distinctUntilChanged, debounceTime, filter, tap, switchMap, catchError, shareReplay, withLatestFrom } from "rxjs/operators";
-import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
-import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
-import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
-import { ComponentRef } from "@angular/core/src/render3";
-import { DataBrowser } from "./databrowser/databrowser.component";
-import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
-import { SHOW_KG_TOS } from "src/services/state/uiState.store";
-import { regionFlattener } from "src/util/regionFlattener";
-import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { HttpClient } from "@angular/common/http";
+import { Injectable, OnDestroy } from "@angular/core";
+import { ComponentRef } from "@angular/core/src/render3";
+import { select, Store } from "@ngrx/store";
+import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscription } from "rxjs";
+import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
+import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
+import { LoggingService } from "src/services/logging.service";
+import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+import { SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
+import { regionFlattener } from "src/util/regionFlattener";
+import { DataBrowser } from "./databrowser/databrowser.component";
+import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
+import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -29,7 +30,7 @@ const SPATIAL_SEARCH_PRECISION = 6
  */
 const SPATIAL_SEARCH_DEBOUNCE = 500
 
-export function temporaryFilterDataentryName(name: string):string{
+export function temporaryFilterDataentryName(name: string): string {
   return /autoradiography/.test(name)
     ? 'autoradiography'
     : NO_METHODS === name
@@ -42,24 +43,24 @@ function generateToken() {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class DatabrowserService implements OnDestroy{
+export class DatabrowserService implements OnDestroy {
 
   public kgTos$: Observable<any>
-  public favedDataentries$: Observable<DataEntry[]>
+  public favedDataentries$: Observable<IDataEntry[]>
   public darktheme: boolean = false
 
   public instantiatedWidgetUnits: WidgetUnit[] = []
-  public queryData: (arg:{regions: any[], template:any, parcellation: any}) => void = (arg) => {
-    const { dataBrowser, widgetUnit } = this.createDatabrowser(arg)
+  public queryData: (arg: {regions: any[], template: any, parcellation: any}) => void = (arg) => {
+    const { widgetUnit } = this.createDatabrowser(arg)
     this.instantiatedWidgetUnits.push(widgetUnit.instance)
     widgetUnit.onDestroy(() => {
       this.instantiatedWidgetUnits = this.instantiatedWidgetUnits.filter(db => db !== widgetUnit.instance)
     })
   }
-  public createDatabrowser:  (arg:{regions:any[], template:any, parcellation:any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit:ComponentRef<WidgetUnit>}
-  public getDataByRegion: ({regions, parcellation, template}:{regions:any[], parcellation:any, template: any}) => Promise<DataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
+  public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
+  public getDataByRegion: ({regions, parcellation, template}: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
     this.lowLevelQuery(template.name, parcellation.name)
       .then(de => this.filterDEByRegion.transform(de, regions, parcellation.regions.map(regionFlattener).reduce((acc, item) => acc.concat(item), [])))
       .then(resolve)
@@ -67,7 +68,7 @@ export class DatabrowserService implements OnDestroy{
   })
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
-  private dataentries: DataEntry[] = []
+  private dataentries: IDataEntry[] = []
 
   private subscriptions: Subscription[] = []
   public fetchDataObservable$: Observable<any>
@@ -80,33 +81,34 @@ export class DatabrowserService implements OnDestroy{
     private workerService: AtlasWorkerService,
     private constantService: AtlasViewerConstantsServices,
     private store: Store<IavRootStoreInterface>,
-    private http: HttpClient
-  ){
+    private http: HttpClient,
+    private log: LoggingService,
+  ) {
 
     this.kgTos$ = this.http.get(`${this.constantService.backendUrl}datasets/tos`, {
-      responseType: 'text'
+      responseType: 'text',
     }).pipe(
-      catchError((err,obs) => {
-        console.warn(`fetching kgTos error`, err)
+      catchError((err, _obs) => {
+        this.log.warn(`fetching kgTos error`, err)
         return of(null)
       }),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.favedDataentries$ = this.store.pipe(
       select('dataStore'),
       select('favDataEntries'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.subscriptions.push(
       store.pipe(
         select('dataStore'),
         safeFilter('fetchedDataEntries'),
-        map(v => v.fetchedDataEntries)
+        map(v => v.fetchedDataEntries),
       ).subscribe(de => {
         this.dataentries = de
-      })
+      }),
     )
 
     this.viewportBoundingBox$ = this.store.pipe(
@@ -118,13 +120,13 @@ export class DatabrowserService implements OnDestroy{
       map(({ position, zoom }) => {
 
         // in mm
-        const center = position.map(n=>n/1e6)
+        const center = position.map(n => n / 1e6)
         const searchWidth = this.constantService.spatialWidth / 4 * zoom / 1e6
         const pt1 = center.map(v => (v - searchWidth)) as [number, number, number]
         const pt2 = center.map(v => (v + searchWidth)) as [number, number, number]
 
         return [pt1, pt2] as [Point, Point]
-      })
+      }),
     )
 
     this.spatialDatasets$ = this.viewportBoundingBox$.pipe(
@@ -132,7 +134,7 @@ export class DatabrowserService implements OnDestroy{
         select('viewerState'),
         select('templateSelected'),
         distinctUntilChanged(),
-        filter(v => !!v)
+        filter(v => !!v),
       )),
       switchMap(([ bbox, templateSelected ]) => {
 
@@ -140,10 +142,10 @@ export class DatabrowserService implements OnDestroy{
         /**
          * templateSelected and templateSelected.name must be defined for spatial search
          */
-        if (!templateSelected || !templateSelected.name) return from(Promise.reject('templateSelected must not be empty'))
+        if (!templateSelected || !templateSelected.name) { return from(Promise.reject('templateSelected must not be empty')) }
         const encodedTemplateName = encodeURIComponent(templateSelected.name)
         return this.http.get(`${this.constantService.backendUrl}datasets/spatialSearch/templateName/${encodedTemplateName}/bbox/${_bbox[0].join('_')}__${_bbox[1].join("_")}`).pipe(
-          catchError((err) => (console.log(err), of([]))) 
+          catchError((err) => (this.log.log(err), of([]))),
         )
       }),
     )
@@ -153,76 +155,76 @@ export class DatabrowserService implements OnDestroy{
         select('viewerState'),
         safeFilter('templateSelected'),
         tap(({templateSelected}) => this.darktheme = templateSelected.useTheme === 'dark'),
-        map(({templateSelected})=>(templateSelected.name)),
-        distinctUntilChanged()
+        map(({templateSelected}) => (templateSelected.name)),
+        distinctUntilChanged(),
       ),
       this.store.pipe(
         select('viewerState'),
         safeFilter('parcellationSelected'),
-        map(({parcellationSelected})=>(parcellationSelected.name)),
-        distinctUntilChanged()
+        map(({parcellationSelected}) => (parcellationSelected.name)),
+        distinctUntilChanged(),
       ),
-      this.manualFetchDataset$
+      this.manualFetchDataset$,
     )
 
     this.subscriptions.push(
       this.spatialDatasets$.subscribe(arr => {
         this.store.dispatch({
           type: FETCHED_SPATIAL_DATA,
-          fetchedDataEntries: arr
+          fetchedDataEntries: arr,
         })
-      })
+      }),
     )
 
     this.subscriptions.push(
       this.fetchDataObservable$.pipe(
-        debounceTime(16)
-      ).subscribe((param : [string, string, null] ) => this.fetchData(param[0], param[1]))
+        debounceTime(16),
+      ).subscribe((param: [string, string, null] ) => this.fetchData(param[0], param[1])),
     )
 
     this.subscriptions.push(
       fromEvent(this.workerService.worker, 'message').pipe(
-        filter((message:MessageEvent) => message && message.data && message.data.type === 'RETURN_REBUILT_REGION_SELECTION_TREE'),
+        filter((message: MessageEvent) => message && message.data && message.data.type === 'RETURN_REBUILT_REGION_SELECTION_TREE'),
         map(message => message.data),
-      ).subscribe((payload:any) => {
+      ).subscribe((payload: any) => {
         /**
-         * rebuiltSelectedRegion contains super region that are 
+         * rebuiltSelectedRegion contains super region that are
          * selected as a result of all of its children that are selectted
          */
         const { rebuiltSelectedRegions, rebuiltSomeSelectedRegions } = payload
         /**
          * apply filter and populate databrowser instances
          */
-      })
+      }),
     )
   }
 
-  ngOnDestroy(){
+  public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public toggleFav(dataentry: DataEntry){
+  public toggleFav(dataentry: IDataEntry) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
-      payload: dataentry
+      payload: dataentry,
     })
   }
 
-  public saveToFav(dataentry: DataEntry){
+  public saveToFav(dataentry: IDataEntry) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
-      payload: dataentry
+      payload: dataentry,
     })
   }
 
-  public removeFromFav(dataentry: DataEntry){
+  public removeFromFav(dataentry: IDataEntry) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
-      payload: dataentry
+      payload: dataentry,
     })
   }
 
-  public fetchPreviewData(datasetName: string){
+  public fetchPreviewData(datasetName: string) {
     const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
       fetch(`${this.constantService.backendUrl}datasets/preview/${encodedDatasetName}`, this.constantService.getFetchOption())
@@ -232,10 +234,10 @@ export class DatabrowserService implements OnDestroy{
     })
   }
 
-  private dispatchData(arr:DataEntry[]){
+  private dispatchData(arr: IDataEntry[]) {
     this.store.dispatch({
       type : FETCHED_DATAENTRIES,
-      fetchedDataEntries : arr
+      fetchedDataEntries : arr,
     })
   }
 
@@ -244,16 +246,11 @@ export class DatabrowserService implements OnDestroy{
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
-  private lowLevelQuery(templateName: string, parcellationName: string){
+  private lowLevelQuery(templateName: string, parcellationName: string) {
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
-    return Promise.all([
-      fetch(`${this.constantService.backendUrl}datasets/templateName/${encodedTemplateName}`, this.constantService.getFetchOption())
-        .then(res => res.json()),
-      fetch(`${this.constantService.backendUrl}datasets/parcellationName/${encodedParcellationName}`, this.constantService.getFetchOption())
-        .then(res => res.json())
-    ])
-      .then(arr => [...arr[0], ...arr[1]])
+    return fetch(`${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`, this.constantService.getFetchOption())
+      .then(res => res.json())
       /**
        * remove duplicates
        */
@@ -261,16 +258,16 @@ export class DatabrowserService implements OnDestroy{
         const newMap = new Map(acc)
         return newMap.set(item.name, item)
       }, new Map()))
-      .then(map => Array.from(map.values() as DataEntry[]))
+      .then(map => Array.from(map.values() as IDataEntry[]))
   }
 
-  private fetchData(templateName: string, parcellationName: string){
+  private fetchData(templateName: string, parcellationName: string) {
     this.dispatchData([])
 
     const requestToken = generateToken()
     this.mostRecentFetchToken = requestToken
     this.fetchingFlag = true
-    
+
     this.lowLevelQuery(templateName, parcellationName)
       .then(array => {
         if (this.mostRecentFetchToken === requestToken) {
@@ -286,7 +283,7 @@ export class DatabrowserService implements OnDestroy{
           this.fetchingFlag = false
           this.mostRecentFetchToken = null
           this.fetchError = 'Fetching dataset error.'
-          console.warn('Error fetching dataset', e)
+          this.log.warn('Error fetching dataset', e)
           /**
            * TODO
            * retry?
@@ -295,25 +292,24 @@ export class DatabrowserService implements OnDestroy{
       })
   }
 
-  rebuildRegionTree(selectedRegions, regions){
+  public rebuildRegionTree(selectedRegions, regions) {
     this.workerService.worker.postMessage({
       type: 'BUILD_REGION_SELECTION_TREE',
       selectedRegions,
-      regions
+      regions,
     })
   }
 
-  public dbComponentInit(db:DataBrowser){
+  public dbComponentInit(_db: DataBrowser) {
     this.store.dispatch({
-      type: SHOW_KG_TOS
+      type: SHOW_KG_TOS,
     })
   }
 
   public getModalityFromDE = getModalityFromDE
 }
 
-
-export function reduceDataentry(accumulator:{name:string, occurance:number}[], dataentry: DataEntry) {
+export function reduceDataentry(accumulator: Array<{name: string, occurance: number}>, dataentry: IDataEntry) {
   const methods = dataentry.methods
     .reduce((acc, item) => acc.concat(
       item.length > 0
@@ -327,7 +323,7 @@ export function reduceDataentry(accumulator:{name:string, occurance:number}[], d
   return newDE.map(name => {
     return {
       name,
-      occurance: 1
+      occurance: 1,
     }
   }).concat(accumulator.map(({name, occurance, ...rest}) => {
     return {
@@ -335,23 +331,22 @@ export function reduceDataentry(accumulator:{name:string, occurance:number}[], d
       name,
       occurance: methods.some(m => m === name)
         ? occurance + 1
-        : occurance
+        : occurance,
     }
   }))
 }
 
-export function getModalityFromDE(dataentries:DataEntry[]):CountedDataModality[] {
+export function getModalityFromDE(dataentries: IDataEntry[]): CountedDataModality[] {
   return dataentries.reduce((acc, de) => reduceDataentry(acc, de), [])
 }
 
-export function getIdFromDataEntry(dataentry: DataEntry){
+export function getIdFromDataEntry(dataentry: IDataEntry) {
   const { id, fullId } = dataentry
-  const regex = /\/([a-zA-Z0-9\-]*?)$/.exec(fullId)
+  const regex = /\/([a-zA-Z0-9-]*?)$/.exec(fullId)
   return (regex && regex[1]) || id
 }
 
-
-export interface CountedDataModality{
+export interface CountedDataModality {
   name: string
   occurance: number
   visible: boolean

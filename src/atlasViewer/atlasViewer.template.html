@@ -47,7 +47,7 @@
                          [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
                          iav-captureClickListenerDirective
                          (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
-                         (iav-captureClickListenerDirective-onClick)="mouseUpNehuba($event)">
+                         (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -77,7 +77,7 @@
 
           </button>
 
-          <mat-card *ngIf="!sideNavDrawer.opened" (click)="sideNavDrawer.open()" mat-ripple
+          <mat-card *ngIf="!sideNavDrawer.opened" (click)="toggleSideNavMenu(false)" mat-ripple
             class="pe-all mt-4 muted translate-x-4-n">
             <mat-card-content>
               <viewer-state-mini>
@@ -105,6 +105,11 @@
 
       <div class="fixed-bottom pe-none d-flex justify-content-end m-4">
         <ng-container *ngTemplateOutlet="logoTmpl">
+        </ng-container>
+      </div>
+
+      <div class="fixed-top pe-none d-flex justify-content-center m-4" *ngIf="pluginRegionSelectionEnabled">
+        <ng-container *ngTemplateOutlet="persistentStateNotifierTemplate">
         </ng-container>
       </div>
 
@@ -142,14 +147,17 @@
           <ng-container *ngFor="let onHoverRegion of onHoverSegments; let first = first">
 
             <!-- ToDo it should change - we should get information about connectivity existence from API-->
-            <region-menu
-              class="pe-all"
-              [region]="onHoverRegion"
-              [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
-              [hasConnectivity]="selectedParcellation && selectedParcellation.hasAdditionalViewMode && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
-            >
-            </region-menu>
-
+            <div class="d-flex flex-column">
+              <region-menu
+                      class="pe-all"
+                      [region]="onHoverRegion"
+                      [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
+                      [hasConnectivity]="selectedParcellation
+                      && selectedParcellation.hasAdditionalViewMode
+                      && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
+                      (closeRegionMenu)="rClContextualMenu.hide()">
+              </region-menu>
+            </div>
           </ng-container>
         </ng-container>
       </div>
@@ -202,3 +210,8 @@
 <ng-template #logoTmpl>
   <logo-container></logo-container>
 </ng-template>
+
+<ng-template #persistentStateNotifierTemplate>
+  <mat-card>{{persistentStateNotifierTemplate$ | async}}</mat-card>
+</ng-template>
+

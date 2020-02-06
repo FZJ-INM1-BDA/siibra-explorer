@@ -102,10 +102,11 @@
 </mat-menu>
 
 <ng-template #previewFilesListTemplate>
-  <preview-component
-    (previewFile)="handlePreviewFile($event)"
-    [datasetName]="name">
-  </preview-component>
+  <dataset-preview-list
+    [kgId]="kgId"
+    (previewingFile)="handlePreviewFile($event)">
+
+  </dataset-preview-list>
 </ng-template>
 
 <ng-template #fullIcons>

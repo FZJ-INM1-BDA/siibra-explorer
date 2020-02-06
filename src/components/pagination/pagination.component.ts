@@ -1,23 +1,23 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
+import { Component, EventEmitter, Input, Output } from '@angular/core'
 
 @Component({
   selector : 'pagination-component',
   templateUrl : './pagination.template.html',
   styleUrls : [
-    './pagination.style.css'
-  ]
+    './pagination.style.css',
+  ],
 })
 
 export class PaginationComponent {
-  @Input() total : number = 0
-  @Input() hitsPerPage : number = 15
-  @Input() currentPage : number = 0
+  @Input() public total: number = 0
+  @Input() public hitsPerPage: number = 15
+  @Input() public currentPage: number = 0
 
-  @Output() paginationChange : EventEmitter<number> = new EventEmitter()
-  @Output() outOfBound: EventEmitter<number> = new EventEmitter()
+  @Output() public paginationChange: EventEmitter<number> = new EventEmitter()
+  @Output() public outOfBound: EventEmitter<number> = new EventEmitter()
 
-  goto(pgnum:number){
-    const emitValue = pgnum < 0 ? 
+  public goto(pgnum: number) {
+    const emitValue = pgnum < 0 ?
       0 :
       pgnum >= Math.ceil(this.total / this.hitsPerPage) ?
         Math.ceil(this.total / this.hitsPerPage) - 1 :
@@ -26,34 +26,34 @@ export class PaginationComponent {
     this.paginationChange.emit(emitValue)
   }
 
-  gotoFirst(){
+  public gotoFirst() {
     this.goto(0)
   }
 
-  gotoLast(){
+  public gotoLast() {
     const num = Math.floor(this.total / this.hitsPerPage) + 1
     this.goto(num)
   }
 
-  get getPagination(){
+  get getPagination() {
     return Array.from(Array(Math.ceil(this.total / this.hitsPerPage)).keys()).filter((this.hidePagination).bind(this))
   }
 
-  get getPageLowerBound(){
+  get getPageLowerBound() {
     return this.currentPage * this.hitsPerPage + 1
   }
 
-  get getPageUpperBound(){
+  get getPageUpperBound() {
     return Math.min( ( this.currentPage + 1 ) * this.hitsPerPage , this.total )
   }
 
-  hidePagination(idx:number){
-    
+  public hidePagination(idx: number) {
+
     const correctedPagination = this.currentPage < 2 ?
       2 :
       this.currentPage > (Math.ceil(this.total / this.hitsPerPage) - 3) ?
         Math.ceil(this.total / this.hitsPerPage) - 3 :
         this.currentPage
-    return (Math.abs(idx-correctedPagination) < 3)
+    return (Math.abs(idx - correctedPagination) < 3)
   }
 }

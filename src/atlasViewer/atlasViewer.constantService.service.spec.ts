@@ -1,14 +1,12 @@
-import { encodeNumber, decodeToNumber } from './atlasViewer.constantService.service'
 import {} from 'jasmine'
+import { decodeToNumber, encodeNumber } from './atlasViewer.constantService.service'
 
 const FLOAT_PRECISION = 6
 
 describe('encodeNumber/decodeToNumber', () => {
 
-
-  const getCompareOriginal = (original: number[]) => (element:string, index: number) => 
+  const getCompareOriginal = (original: number[]) => (element: string, index: number) =>
     original[index].toString().length >= element.length
-  
 
   const lengthShortened = (original: number[], encodedString: string[]) =>
     encodedString.every(getCompareOriginal(original))
@@ -19,13 +17,13 @@ describe('encodeNumber/decodeToNumber', () => {
       0,
       1,
       99999999999,
-      12347
+      12347,
     ]
 
     const encodedString = positiveInt.map(n => encodeNumber(n))
     const decodedString = encodedString.map(s => decodeToNumber(s))
     expect(decodedString).toEqual(positiveInt)
-    
+
     expect(lengthShortened(positiveInt, encodedString)).toBe(true)
   })
 
@@ -41,7 +39,6 @@ describe('encodeNumber/decodeToNumber', () => {
     expect(lengthShortened(posInt, encodedString)).toBe(true)
   })
 
-
   it('should encode/decode signed integer as expected', () => {
 
     const signedInt = [
@@ -50,9 +47,9 @@ describe('encodeNumber/decodeToNumber', () => {
       -1,
       1,
       128,
-      -54
+      -54,
     ]
-  
+
     const encodedString = signedInt.map(n => encodeNumber(n))
     const decodedNumber = encodedString.map(s => decodeToNumber(s))
 
@@ -81,12 +78,11 @@ describe('encodeNumber/decodeToNumber', () => {
     expect(lengthShortened(signedInt, encodedString)).toBe(true)
   })
 
-
   it('should encode/decode float as expected', () => {
     const floatNum = [
       0.111,
       12.23,
-      1723.0
+      1723.0,
     ]
 
     const encodedString = floatNum.map(f => encodeNumber(f, { float: true }))
@@ -98,7 +94,7 @@ describe('encodeNumber/decodeToNumber', () => {
     const floatNums = Array(1000).fill(null).map(() => {
       const numDig = Math.ceil(Math.random() * 7)
       return (Math.random() > 0.5 ? 1 : -1) * Math.floor(
-        Math.random() * Math.pow(10, numDig)
+        Math.random() * Math.pow(10, numDig),
       )
     })
 
@@ -110,8 +106,8 @@ describe('encodeNumber/decodeToNumber', () => {
 
   it('poisoned hash should throw', () => {
     const illegialCharacters = './\\?#!@#^%&*()+={}[]\'"\n\t;:'
-    for (let char of illegialCharacters.split('')) {
-      expect(function (){
+    for (const char of illegialCharacters.split('')) {
+      expect(() => {
         decodeToNumber(char)
       }).toThrow()
     }

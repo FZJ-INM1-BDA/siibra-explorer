@@ -4,10 +4,10 @@ import { Component } from "@angular/core";
   selector: 'layout-single-panel',
   templateUrl: './single.template.html',
   styleUrls: [
-    './single.style.css'
-  ]
+    './single.style.css',
+  ],
 })
 
-export class SinglePanel{
+export class SinglePanel {
 
 }

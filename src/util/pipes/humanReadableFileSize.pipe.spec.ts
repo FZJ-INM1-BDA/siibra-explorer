@@ -1,13 +1,12 @@
-import { HumanReadableFileSizePipe } from './humanReadableFileSize.pipe'
 import {} from 'jasmine'
-
+import { HumanReadableFileSizePipe } from './humanReadableFileSize.pipe'
 
 describe('humanReadableFileSize.pipe.ts', () => {
   describe('HumanReadableFileSizePipe', () => {
     it('steps properly when nubmers ets large', () => {
       const pipe = new HumanReadableFileSizePipe()
       const num = 12
-      
+
       expect(pipe.transform(num, 0)).toBe(`12 byte(s)`)
       expect(pipe.transform(num * 1e3, 0)).toBe(`12 KB`)
       expect(pipe.transform(num * 1e6, 0)).toBe(`12 MB`)
@@ -38,7 +37,6 @@ describe('humanReadableFileSize.pipe.ts', () => {
     it('throws when a non number is passed to either argument', () => {
       // TODO finish tests
     })
-
 
   })
 })

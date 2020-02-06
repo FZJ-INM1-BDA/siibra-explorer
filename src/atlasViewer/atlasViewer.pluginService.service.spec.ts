@@ -46,17 +46,16 @@
 //       it(
 //         'fetches templateURL and scriptURL properly',
 //         inject([HttpTestingController], (httpMock: HttpTestingController) => {
-  
+
 //           pluginService.launchPlugin(MOCK_PLUGIN_MANIFEST)
-    
+
 //           const mockTemplate = httpMock.expectOne(MOCK_PLUGIN_MANIFEST.templateURL)
 //           const mockScript = httpMock.expectOne(MOCK_PLUGIN_MANIFEST.scriptURL)
-    
+
 //           expect(mockTemplate).toBeTruthy()
 //           expect(mockScript).toBeTruthy()
 //         })
 //       )
-  
 //       it(
 //         'template overrides templateURL',
 //         inject([HttpTestingController], (httpMock: HttpTestingController) => {
@@ -64,26 +63,26 @@
 //             ...MOCK_PLUGIN_MANIFEST,
 //             template: ''
 //           })
-          
+
 //           httpMock.expectNone(MOCK_PLUGIN_MANIFEST.templateURL)
 //           const mockScript = httpMock.expectOne(MOCK_PLUGIN_MANIFEST.scriptURL)
-    
+
 //           expect(mockScript).toBeTruthy()
 //         })
 //       )
-  
+
 //       it(
 //         'script overrides scriptURL',
-  
+
 //         inject([HttpTestingController], (httpMock: HttpTestingController) => {
 //           pluginService.launchPlugin({
 //             ...MOCK_PLUGIN_MANIFEST,
 //             script: ''
 //           })
-          
+
 //           const mockTemplate = httpMock.expectOne(MOCK_PLUGIN_MANIFEST.templateURL)
 //           httpMock.expectNone(MOCK_PLUGIN_MANIFEST.scriptURL)
-    
+
 //           expect(mockTemplate).toBeTruthy()
 //         })
 //       )
