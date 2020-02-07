@@ -67,7 +67,12 @@ jobs:
     - name: run pptr tests - ${{ env.ATLAS_URL }}
       run: |
         docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
-    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
+    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
+      if: success()
+      run: |
+        docker stop ${DOCKER_CONTAINER_NAME}
+        docker stop ${DOCKER_E2E_PPTR}
+    - name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
       if: success()
       run: |
         docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
