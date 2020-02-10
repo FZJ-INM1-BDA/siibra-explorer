@@ -1,6 +1,5 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnDestroy } from "@angular/core";
-import { ComponentRef } from "@angular/core/src/render3";
+import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscription } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
