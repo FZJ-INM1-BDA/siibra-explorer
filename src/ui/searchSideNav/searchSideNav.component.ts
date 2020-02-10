@@ -1,5 +1,4 @@
 import { Component, EventEmitter, OnDestroy, Output, TemplateRef, ViewChild } from "@angular/core";
-import { MatDialog, MatDialogRef, MatSnackBar } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import {Observable, Subscription} from "rxjs";
 import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
@@ -15,6 +14,8 @@ import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
 import { DS_PREVIEW_URL } from 'src/util/constants'
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'search-side-nav',

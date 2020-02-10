@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
-import { MatAutocompleteSelectedEvent, MatDialog } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap } from "rxjs/operators";
@@ -10,6 +9,8 @@ import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } 
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/services/logging.service";
+import {MatDialog} from "@angular/material/dialog";
+import {MatAutocompleteSelectedEvent} from "@angular/material/autocomplete";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))

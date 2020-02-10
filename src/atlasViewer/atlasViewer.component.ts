@@ -28,7 +28,6 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
-import { MatBottomSheet, MatBottomSheetRef, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef } from "@angular/material";
 import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { LoggingService } from "src/services/logging.service";
@@ -42,6 +41,9 @@ import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
+import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
+import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 /**
  * TODO

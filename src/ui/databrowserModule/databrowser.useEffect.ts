@@ -12,7 +12,7 @@ import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
 import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
-import { MatSnackBar, MatDialog } from "@angular/material";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
   map(string => JSON.parse(string)),

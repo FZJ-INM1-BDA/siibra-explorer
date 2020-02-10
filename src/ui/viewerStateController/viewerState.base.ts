@@ -1,11 +1,12 @@
 import { OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { MatBottomSheet, MatBottomSheetRef, MatSelectChange } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
+import {MatSelectChange} from "@angular/material/select";
+import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
 
 const ACTION_TYPES = {
   SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',

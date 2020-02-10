@@ -75,7 +75,7 @@ const scanFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean,
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
-  @ViewChild('container', {read: ViewContainerRef}) public container: ViewContainerRef
+  @ViewChild('container', {read: ViewContainerRef, static: true}) public container: ViewContainerRef
 
   private nehubaViewerFactory: ComponentFactory<NehubaViewerUnit>
 

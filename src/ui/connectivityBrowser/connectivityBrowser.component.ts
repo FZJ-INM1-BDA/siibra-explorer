@@ -36,7 +36,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
     public math = Math
 
-    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef
+    @ViewChild('connectivityComponent', {read: ElementRef, static: true}) public connectivityComponentElement: ElementRef
 
     constructor(
         private store$: Store<any>,

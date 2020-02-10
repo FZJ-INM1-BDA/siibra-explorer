@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
-import { MAT_DIALOG_DATA } from "@angular/material";
 import {
   AtlasViewerConstantsServices,
   DatabrowserService,
   KgSingleDatasetService,
   SingleDatasetBase,
 } from "../singleDataset.base";
+import {MAT_DIALOG_DATA} from "@angular/material/dialog";
 
 @Component({
   selector: 'single-dataset-view',
