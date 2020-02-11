@@ -4,8 +4,9 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/
   KgSingleDatasetService,
   AtlasViewerConstantsServices,
 } from "../singleDataset.base";
-import { MatDialog, MatSnackBar } from "@angular/material";
 import { SingleDatasetView } from "../detailedView/singleDataset.component";
+import {MatDialog} from "@angular/material/dialog";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'single-dataset-list-view',

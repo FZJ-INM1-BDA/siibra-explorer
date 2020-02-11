@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, ElementRef, Inject, Input, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material";
 import { fromEvent, Observable, Subscription } from "rxjs";
 import { filter, share } from "rxjs/operators";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 
 @Component({
   selector: 'dialog-component',

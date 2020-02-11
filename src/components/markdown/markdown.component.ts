@@ -30,7 +30,7 @@ export class MarkdownDom implements OnChanges, OnInit {
     }
   }
 
-  @ViewChild('ngContentWrapper', {read : ElementRef})
+  @ViewChild('ngContentWrapper', {read : ElementRef, static: true})
   public contentWrapper: ElementRef
 
 }

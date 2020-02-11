@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
-import { MatSliderChange, MatSlideToggleChange } from '@angular/material';
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
@@ -8,6 +7,8 @@ import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/stat
 import { VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 import { IavRootStoreInterface } from 'src/services/stateStore.service';
 import { isIdentityQuat } from '../nehubaContainer/util';
+import {MatSlideToggleChange} from "@angular/material/slide-toggle";
+import {MatSliderChange} from "@angular/material/slider";
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`

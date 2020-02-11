@@ -8,7 +8,7 @@ import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { getViewer } from "src/util/fn";
 import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
-import { MatSliderChange } from "@angular/material";
+import {MatSliderChange} from "@angular/material/slider";
 
 @Component({
   selector : 'layer-browser',

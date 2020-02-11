@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
-import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ToastHandler } from "src/util/pluginHandlerClasses/toastHandler";
+import {MatSnackBar, MatSnackBarConfig} from "@angular/material/snack-bar";
 
 @Injectable({
   providedIn: 'root',
