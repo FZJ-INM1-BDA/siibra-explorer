@@ -1,16 +1,14 @@
 name: Frontend Tests (Karma + Mocha + Chai)
 
-on: [push]
+on: [ push ]
 
 jobs:
   build:
-
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [10.x, 12.x]
-
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
