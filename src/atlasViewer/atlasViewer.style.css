@@ -61,10 +61,6 @@ mat-sidenav {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 
-.mobileMenuTabs {
-  margin: 40px 0 0 5px;
-}
-
 landmark-ui,
 region-menu
 {
