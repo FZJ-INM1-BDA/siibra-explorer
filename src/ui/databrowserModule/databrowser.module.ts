@@ -1,8 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { PopoverModule } from "ngx-bootstrap/popover";
-import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
@@ -37,8 +35,6 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     FormsModule,
     UtilModule,
     AngularMaterialModule,
-    TooltipModule.forRoot(),
-    PopoverModule.forRoot(),
   ],
   declarations: [
     DataBrowser,

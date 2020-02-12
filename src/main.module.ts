@@ -14,8 +14,6 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import {HttpClientModule} from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { TabsModule } from 'ngx-bootstrap/tabs'
-import { TooltipModule } from "ngx-bootstrap/tooltip";
 import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
@@ -68,8 +66,6 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
     AngularMaterialModule,
     UtilModule,
 
-    TooltipModule.forRoot(),
-    TabsModule.forRoot(),
     EffectsModule.forRoot([
       DataBrowserUseEffect,
       UseEffects,

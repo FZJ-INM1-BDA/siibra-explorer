@@ -28,7 +28,6 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
-import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
 import { LoggingService } from "src/services/logging.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
@@ -75,8 +74,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
-
-  @ViewChild('mobileMenuTabs') public mobileMenuTabs: TabsetComponent
 
   /**
    * required for styling of all child components
