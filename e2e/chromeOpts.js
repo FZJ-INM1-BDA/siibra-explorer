@@ -1,5 +1,5 @@
 module.exports = [
-  '--headless',
+  ...(process.env.DISABLE_CHROME_HEADLESS ?  [] : ['--headless']),
   '--no-sandbox',
   '--disable-gpu',
   '--disable-setuid-sandbox',

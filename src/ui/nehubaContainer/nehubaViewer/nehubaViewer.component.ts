@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan } from "rxjs/operators";
@@ -118,7 +118,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     private rd: Renderer2,
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
-    private zone: NgZone,
     public constantService: AtlasViewerConstantsServices,
     private log: LoggingService,
   ) {
@@ -341,7 +340,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err) => {
       /* print in debug mode */
-      this.log.log(err)
+      this.log.error(err)
     })
 
     /**

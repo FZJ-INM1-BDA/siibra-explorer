@@ -9,6 +9,7 @@
           Template
         </mat-label>
         <mat-select
+          aria-label="Select a new template"
           panelClass="no-max-width"
           [value]="(templateSelected$ | async)?.name"
           (selectionChange)="handleTemplateChange($event)"
