@@ -77,6 +77,20 @@ export class SingleDatasetBase implements OnInit {
     }
   }
 
+  public hasPreview = false
+  public previewFiles = []
+
+  handleKgDsPrvUpdate(event: CustomEvent){
+    this.hasPreview = false
+    this.previewFiles = []
+    const { detail } = event
+    const { datasetFiles } = detail
+    if (datasetFiles && Array.isArray(datasetFiles) && datasetFiles.length > 0) {
+      this.hasPreview = true
+      this.previewFiles = datasetFiles
+    }
+  }
+
   public ngOnInit() {
     const { kgId, kgSchema, dataset } = this
     this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
