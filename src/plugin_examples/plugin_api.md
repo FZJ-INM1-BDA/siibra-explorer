@@ -165,6 +165,9 @@ window.interactiveViewer
     "message":"Message to be seen by the user." // default: ""
   }
   ```
+  - *getUserToSelectARegion(string)* Used to turn on region selection mode (in this mode, region menu will not displayed on click). Expects message to display on top off viewer while selection mode is active. Returns a Promise, resolves when user clicks on parcellation region, resolve body is desired region(s) array, rejects when user cancels region selection mode. 
+  - *cancelPromise(promise)* Used to reject promises in "uiHandle". Expects listed promises to reject:
+    - getUserToSelectARegion
   
 - pluginControl
 

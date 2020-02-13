@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import {Injectable, NgZone} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscribable } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith } from "rxjs/operators";
@@ -30,13 +30,14 @@ export class AtlasViewerAPIServices {
 
   public loadedLibraries: Map<string, {counter: number, src: HTMLElement|null}> = new Map()
 
-  public getUserToSelectARegionResolve
-  public getUserToSelectARegionReject
+  public getUserToSelectARegionResolve: any
+  public rejectUserSelectionMode: any
 
   constructor(
     private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
     private log: LoggingService,
+    private zone: NgZone,
   ) {
 
     this.loadedTemplates$ = this.store.pipe(
@@ -132,21 +133,26 @@ export class AtlasViewerAPIServices {
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
         getUserToSelectARegion: (selectingMessage) => new Promise((resolve, reject) => {
-          this.store.dispatch({
-            type: ENABLE_PLUGIN_REGION_SELECTION,
-            payload: selectingMessage
-          })
+          this.zone.run(() => {
+            this.store.dispatch({
+              type: ENABLE_PLUGIN_REGION_SELECTION,
+              payload: selectingMessage
+            })
 
-          this.getUserToSelectARegionResolve = resolve
-          this.getUserToSelectARegionReject = reject
+            this.getUserToSelectARegionResolve = resolve
+            this.rejectUserSelectionMode = reject
+          })
         }),
 
         // ToDo Method should be able to cancel any pending promise.
         cancelPromise: (pr) => {
-          if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
-            if (this.getUserToSelectARegionReject) this.getUserToSelectARegionReject('Rej')
-            this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
-          }
+          this.zone.run(() => {
+            if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
+              if (this.rejectUserSelectionMode) this.rejectUserSelectionMode()
+              this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
+            }
+
+          })
         }
 
       },

@@ -1,7 +1,7 @@
 import {
   AfterViewInit, ChangeDetectorRef,
   Component,
-  HostBinding,
+  HostBinding, NgZone,
   OnDestroy,
   OnInit,
   Renderer2,
@@ -67,6 +67,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
+
+  private persistentStateNotifierMatDialogRef: MatDialogRef<any>
+  public persistentStateNotifierMsg: string
+  @ViewChild('persistentStateNotifierTemplate', {read: TemplateRef}) public persistentStateNotifierTemplate: TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
@@ -122,7 +126,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
-  public persistentStateNotifierTemplate$: Observable<string>
+  public persistentStateNotifierMessage$: Observable<string>
 
   private hoveringRegions = []
   public presentDatasetDialogRef: MatDialogRef<any>
@@ -138,8 +142,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private bottomSheet: MatBottomSheet,
-    private log: LoggingService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -152,9 +156,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select("pluginRegionSelectionEnabled"),
       distinctUntilChanged(),
     )
-    this.persistentStateNotifierTemplate$ = this.store.pipe(
+    this.persistentStateNotifierMessage$ = this.store.pipe(
       select('uiState'),
-      select("persistentStateNotifierTemplate"),
+      select("persistentStateNotifierMessage"),
       distinctUntilChanged(),
     )
 
@@ -253,6 +257,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
       }),
+
     )
 
     this.subscriptions.push(
@@ -277,6 +282,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.onhoverSegments$.subscribe(hr => {
         this.hoveringRegions = hr
       })
+    )
+
+    this.subscriptions.push(
+        this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
     )
   }
 
@@ -362,9 +371,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
-        this.pluginRegionSelectionEnabled = PRSE
-        this.changeDetectorRef.detectChanges()
+      this.persistentStateNotifierMessage$.pipe(
+      ).subscribe(msg => {
+        this.persistentStateNotifierMsg = msg
+        if (msg) this.persistentStateNotifierMatDialogRef = this.matDialog.open(this.persistentStateNotifierTemplate, { hasBackdrop: false, position: { top: '5px'} })
+        else {
+          if (this.persistentStateNotifierMatDialogRef) this.persistentStateNotifierMatDialogRef.close()
+        }
       })
     )
   }
