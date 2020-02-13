@@ -1,7 +1,7 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit,
   Component,
-  HostBinding, NgZone,
+  HostBinding,
   OnDestroy,
   OnInit,
   Renderer2,
@@ -29,7 +29,6 @@ import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import { LocalFileService } from "src/services/localFile.service";
-import { LoggingService } from "src/services/logging.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import {
   CLOSE_SIDE_PANEL,
@@ -141,9 +140,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet,
-    private cdr: ChangeDetectorRef,
-    private zone: NgZone,
+    private bottomSheet: MatBottomSheet
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -285,7 +282,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-        this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
+      this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
     )
   }
 
