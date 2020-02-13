@@ -15,8 +15,8 @@ env:
 
 jobs:
   buildimage:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: self-hosted
-
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,8 +28,8 @@ jobs:
         docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
       env:
         BACKEND_URL: ${{ env.ATLAS_URL }}
-
   test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: self-hosted
     needs: buildimage
     steps:
@@ -47,7 +47,6 @@ jobs:
           --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-
     - uses: actions/checkout@v1
     - name: Start pptr docker container with name ${{ env.DOCKER_E2E_PPTR }}
       run: |
