@@ -1,4 +1,4 @@
-import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, ComponentFactory, ComponentFactoryResolver, ComponentRef, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ViewContainerRef, ChangeDetectorRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, merge, Observable, of, Subscription, from } from "rxjs";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
@@ -153,6 +153,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     private store: Store<ViewerStateInterface>,
     private elementRef: ElementRef,
     private log: LoggingService,
+    private cdr: ChangeDetectorRef
   ) {
 
     this.useMobileUI$ = this.constantService.useMobileUI$
@@ -984,6 +985,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.viewerLoaded = false
     this.nehubaViewer = null
+
+    this.cdr.detectChanges()
   }
 
   private createNewNehuba(template: any, overwriteInitNavigation: any) {

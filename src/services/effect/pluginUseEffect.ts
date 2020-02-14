@@ -1,13 +1,14 @@
 import { Injectable } from "@angular/core"
 import { Effect } from "@ngrx/effects"
 import { select, Store } from "@ngrx/store"
-import { Observable } from "rxjs"
-import { filter, map, startWith } from "rxjs/operators"
+import { Observable, forkJoin } from "rxjs"
+import { filter, map, startWith, switchMap } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service"
 import { PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { LoggingService } from "../logging.service"
 import { IavRootStoreInterface } from "../stateStore.service"
+import { HttpClient } from "@angular/common/http"
 
 @Injectable({
   providedIn: 'root',
@@ -23,6 +24,7 @@ export class PluginServiceUseEffect {
     constantService: AtlasViewerConstantsServices,
     pluginService: PluginServices,
     private log: LoggingService,
+    http: HttpClient
   ) {
     this.initManifests$ = store$.pipe(
       select('pluginState'),
@@ -34,13 +36,17 @@ export class PluginServiceUseEffect {
         return arr.filter(([ source ]) => source === PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
       }),
       filter(arr => arr.length > 0),
-      map((arr: Array<[string, string|null]>) => {
-
-        for (const [_source, url] of arr) {
-          fetch(url, constantService.getFetchOption())
-            .then(res => res.json())
-            .then(json => pluginService.launchNewWidget(json))
-            .catch(e => this.log.error(e))
+      switchMap(arr => forkJoin(
+        ...arr.map(([_source, url]) => 
+          http.get(url, {
+            headers: constantService.getHttpHeader(),
+            responseType: 'json'
+          })
+        )
+      )),
+      map((jsons: any[]) => {
+        for (const json of jsons){
+          pluginService.launchNewWidget(json)
         }
 
         // clear init manifest

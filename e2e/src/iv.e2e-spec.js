@@ -57,66 +57,6 @@ describe('IAV', () => {
   
   describe('Url parsing', () => {
     
-    // tracking issue: https://github.com/HumanBrainProject/interactive-viewer/issues/455
-    // reenable when fixed
-    // it('incorrectly defined templateSelected should clear searchparam', async () => {
-    //   const search = '/?templateSelected=NoName2&parcellationSelected=NoName'
-    //   const page = await browser.newPage()
-    //   await page.goto(`${ATLAS_URL}${search}`, {waitUntil: 'networkidle2'})
-    //   await page.waitFor(500)
-    //   const searchParam = await getSearchParam(page)
-    //   const searchParamObj = new URLSearchParams(searchParam)
-    //   expect(searchParamObj.get('templateSelected')).toBeNull()
-    // })
-
-
-    it('navigation state should be perserved', async () => {
-      const searchParam = `/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps&cNavigation=zvyba.z0UJ7._WMxv.-TTch..2_cJ0e.2-OUQG._a9qP._QPHw..7LIx..2CQ3O.1FYC.259Wu..2r6`
-      const expectedNav = {
-        "position": [
-          36806872,
-          325772,
-          34904120
-        ],
-        "orientation": [
-          0.1131771132349968,
-          0.031712327152490616,
-          0.2527998387813568,
-          0.9603527784347534
-        ],
-        "zoom": 11590,
-        "perspectiveZoom": 1922235,
-        "perspectiveOrientation": [
-          -0.2991955280303955,
-          -0.8824243545532227,
-          0.28244855999946594,
-          0.22810545563697815
-        ]
-      }
-
-      const page = await browser.newPage()
-      await page.goto(`${ATLAS_URL}${searchParam}`, { waitUntil: 'networkidle2' })
-      await awaitNehubaViewer(page)
-      await page.waitFor(1000 * waitMultiple)
-
-      const actualNav = await getCurrentNavigationState(page)
-      
-      // TODO figure out why position[1] sometimes is -20790000
-      // expect(expectedNav).toEqual(actualNav)
-
-      console.log(
-        'troublesome nav',
-        expectedNav.position[1],
-        actualNav.position[1]
-      )
-
-      expect(expectedNav.orientation).toEqual(actualNav.orientation)
-      expect(expectedNav.zoom).toEqual(actualNav.zoom)
-      // expect(expectedNav.position).toEqual(actualNav.position)
-      expect(expectedNav.perspectiveOrientation).toEqual(actualNav.perspectiveOrientation)
-      expect(expectedNav.perspectiveZoom).toEqual(actualNav.perspectiveZoom)
-
-    })
 
     it('pluginStates should result in call to fetch pluginManifest', async () => {
       const searchParam = new URLSearchParams()

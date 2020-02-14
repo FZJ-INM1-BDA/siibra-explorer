@@ -7,7 +7,11 @@ import { Injectable } from "@angular/core";
 })
 
 export class LoggingService {
-  private loggingFlag: boolean = !PRODUCTION
+
+  get loggingFlag(){
+    return window['__IAV_LOGGING_FLAG__'] || !PRODUCTION
+  }
+
   public log(...arg) {
     if (this.loggingFlag) { console.log(...arg) }
   }
