@@ -21,37 +21,29 @@ pipeline {
     }
     stage('Test available datasets') {
       parallel {
-        stage('rat') {
-          parallel {
-            stage('v1.01') {
-              steps {
-                sh 'npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
-              }
-            }
-            stage('v2') {
-              steps {
-                sh 'npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
-              }
-            }
-            stage('v3') {
-              steps {
-                sh 'npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
-              }
-            }
+        stage('rat - v1.01') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
           }
         }
-        stage('mouse') {
-          parallel {
-            stage('mouse 2015') {
-              steps {
-                sh 'npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
-              }
-            }
-            stage('mouse 2017') {
-              steps {
-                sh 'npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
-              }
-            }
+        stage('rat - v2') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
+          }
+        }
+        stage('rat - v3') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
+          }
+        }
+        stage('mouse - 2015') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
+          }
+        }
+        stage('mouse - 2017') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
           }
         }
         stage('human') {
