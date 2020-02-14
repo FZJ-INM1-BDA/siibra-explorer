@@ -13,6 +13,9 @@ pipeline {
   }
   
   stages {
+    stage('cd into deploy') {
+      dir('deploy')
+    }
     stage('Build') {
       steps {
         echo 'Building..'
