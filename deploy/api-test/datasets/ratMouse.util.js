@@ -6,8 +6,12 @@ if (!WAXHOLM_RAT_GOOGLE_SHEET_ID) throw new Error(`env var WAXHOLM_RAT_GOOGLE_SH
 
 const doc = new GoogleSpreadsheet(WAXHOLM_RAT_GOOGLE_SHEET_ID)
 
+// TODO for backward compatiblity with what must be node v 0.0.1
+// OKD jenkins nodejs slave runs on nodejs that does not support generator function
+// swap request for got as soon as this is rectified
+// const got = require('got')
+const request = require('request')
 const { expect } = require('chai')
-const got = require('got')
 const { URL } = require('url')
 
 const getWaxholmAllenDatasetsPr = new Promise( async (rs, rj) => {
@@ -40,7 +44,13 @@ const getAllenWaxholmTest = ({
        let fetchedDatasets = []
        before(async () => {
          const getUrl = new URL(`${ATLAS_URL.replace(/\/$/, '')}/datasets/templateNameParcellationName/${encodeURIComponent(referenceSpace)}/${encodeURIComponent(atlas)}`)
-         const resp = await got(getUrl)
+        //  const resp = await got(getUrl)
+         const resp = await (new Promise((rs, rj) => {
+           request(getUrl, {},  (err, resp, body) => {
+             if (err) rj(err)
+             rs(resp)
+           })
+         }))
          expect(resp.statusCode).to.equal(200)
          fetchedDatasets = JSON.parse(resp.body).map(({ name }) => name)
        })

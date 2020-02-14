@@ -16,6 +16,7 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Building...'
+        sh 'node --version'
         sh 'cd deploy && npm install'
       }
     }
