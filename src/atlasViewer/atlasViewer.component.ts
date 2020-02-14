@@ -68,7 +68,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   private persistentStateNotifierMatDialogRef: MatDialogRef<any>
-  public persistentStateNotifierMsg: string
   @ViewChild('persistentStateNotifierTemplate', {read: TemplateRef}) public persistentStateNotifierTemplate: TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
@@ -368,9 +367,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.persistentStateNotifierMessage$.pipe(
-      ).subscribe(msg => {
-        this.persistentStateNotifierMsg = msg
+      this.persistentStateNotifierMessage$.subscribe(msg => {
         if (msg) this.persistentStateNotifierMatDialogRef = this.matDialog.open(this.persistentStateNotifierTemplate, { hasBackdrop: false, position: { top: '5px'} })
         else {
           if (this.persistentStateNotifierMatDialogRef) this.persistentStateNotifierMatDialogRef.close()
