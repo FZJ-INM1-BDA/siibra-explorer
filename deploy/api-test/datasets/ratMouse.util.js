@@ -10,6 +10,7 @@ const doc = new GoogleSpreadsheet(WAXHOLM_RAT_GOOGLE_SHEET_ID)
 // OKD jenkins nodejs slave runs on nodejs that does not support generator function
 // swap request for got as soon as this is rectified
 // const got = require('got')
+require('tls').DEFAULT_ECDH_CURVE = 'auto'
 const request = require('request')
 const { expect } = require('chai')
 const { URL } = require('url')
