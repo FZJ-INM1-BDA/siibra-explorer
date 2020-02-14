@@ -2,6 +2,7 @@ pipeline {
   agent {
     node {
       label 'nodejs'
+      customWorkspace 'deploy'
     }
   }
 
@@ -15,44 +16,40 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        dir('deploy') {
-          echo 'Building..'
-          sh 'npm install'
-        }
+        echo 'Building...'
+        sh 'npm install'
       }
     }
     stage('Test available datasets') {
-      dir('deploy') {
-        parallel {
-          stage('rat - v1.01') {
-            steps {
-              sh 'npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
-            }
+      parallel {
+        stage('rat - v1.01') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
           }
-          stage('rat - v2') {
-            steps {
-              sh 'npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
-            }
+        }
+        stage('rat - v2') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
           }
-          stage('rat - v3') {
-            steps {
-              sh 'npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
-            }
+        }
+        stage('rat - v3') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
           }
-          stage('mouse - 2015') {
-            steps {
-              sh 'npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
-            }
+        }
+        stage('mouse - 2015') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
           }
-          stage('mouse - 2017') {
-            steps {
-              sh 'npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
-            }
+        }
+        stage('mouse - 2017') {
+          steps {
+            sh 'npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
           }
-          stage('human') {
-            steps {
-              sh 'echo NYI'
-            }
+        }
+        stage('human') {
+          steps {
+            sh 'echo NYI'
           }
         }
       }
