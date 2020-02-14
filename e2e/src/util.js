@@ -17,18 +17,44 @@ async function getIndexFromArrayOfWebElements(search, webElements) {
   return texts.findIndex(text => text.indexOf(search) >= 0)
 }
 
-class WdIavPage{
-  constructor(){
+class WdBase{
+  constructor() {
+    browser.waitForAngularEnabled(false)
   }
-
   get browser(){
     return this.driver || browser
   }
-
   async init() {
 
   }
 
+  async initHttpInterceptor(){
+    await this.browser.executeScript(() => {
+      if (window.__isIntercepting__) return
+      window.__isIntercepting__ = true
+      const open = window.XMLHttpRequest.prototype.open
+      window.__interceptedXhr__ = []
+      window.XMLHttpRequest.prototype.open = function () {
+        window.__interceptedXhr__.push({
+          method: arguments[0],
+          url: arguments[1]
+        })
+        return open.apply(this, arguments)
+      }
+    })
+  }
+
+  async isHttpIntercepting(){
+    return await this.browser.executeScript(() => {
+      return window.__isIntercepting__
+    })
+  }
+
+  async getInterceptedHttpCalls(){
+    return await this.browser.executeScript(() => {
+      return window['__interceptedXhr__']
+    })
+  }
   async goto(url = '/', { interceptHttp } = {}){
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
@@ -38,10 +64,20 @@ class WdIavPage{
       await this.browser.get(actualUrl)
     }
   }
-
   async wait(ms) {
     if (!ms) throw new Error(`wait duration must be specified!`)
     await this.browser.sleep(ms)
+  }
+}
+
+class WdLayoutPage extends WdBase{
+
+  constructor(){
+    super()
+  }
+
+  async findElement(selector){
+    return await this.browser.findElement( By.css(selector) )
   }
 
   async getModal() {
@@ -53,7 +89,7 @@ class WdIavPage{
       const modal = await this.getModal()
       const okBtn = await modal
         .findElement( By.tagName('mat-dialog-actions') )
-        .findElement( By.css('button[color="primary"] > span.mat-button-wrapper') )
+        .findElement( By.css('button[color="primary"]') )
       await okBtn.click()
     } catch (e) {
       
@@ -71,6 +107,26 @@ class WdIavPage{
     const idx = await getIndexFromArrayOfWebElements(title, titleCards)
     if (idx >= 0) await titleCards[idx].click()
     else throw new Error(`${title} does not fit any titleCards`)
+  }
+
+  async getSideNav() {
+    return await this.browser.findElement( By.tagName('search-side-nav') )
+  }
+
+  async getSideNavTag(){
+    return await this.browser
+      .findElement( By.css('[mat-drawer-trigger]') )
+      .findElement( By.tagName('i') )
+  }
+
+  async getStatusPanel(){
+    return await this.browser.findElement( By.css('[mat-drawer-status-panel]') )
+  }
+}
+
+class WdIavPage extends WdLayoutPage{
+  constructor(){
+    super()
   }
 
   async selectDropdownTemplate(title) {
@@ -101,10 +157,6 @@ class WdIavPage{
     return !!canvas
   }
 
-  async getSideNav() {
-    return await this.browser.findElement( By.tagName('search-side-nav') )
-  }
-
   async getNavigationState() {
     const actualNav = await this.browser.executeScript(async () => {
       let returnObj, sub
@@ -131,33 +183,6 @@ class WdIavPage{
     return actualNav
   }
 
-  async initHttpInterceptor(){
-    await this.browser.executeScript(() => {
-      if (window.__isIntercepting__) return
-      window.__isIntercepting__ = true
-      const open = window.XMLHttpRequest.prototype.open
-      window.__interceptedXhr__ = []
-      window.XMLHttpRequest.prototype.open = function () {
-        window.__interceptedXhr__.push({
-          method: arguments[0],
-          url: arguments[1]
-        })
-        return open.apply(this, arguments)
-      }
-    })
-  }
-
-  async isHttpIntercepting(){
-    return await this.browser.executeScript(() => {
-      return window.__isIntercepting__
-    })
-  }
-
-  async getInterceptedHttpCalls(){
-    return await this.browser.executeScript(() => {
-      return window['__interceptedXhr__']
-    })
-  }
 }
 
 class PptrIAVPage{
@@ -205,3 +230,4 @@ exports.wait = (browser) => new Promise(resolve => {
 exports.waitMultiple = process.env.WAIT_ULTIPLE || 1
 
 exports.AtlasPage = WdIavPage
+exports.LayoutPage = WdLayoutPage
