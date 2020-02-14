@@ -2,7 +2,6 @@ pipeline {
   agent {
     node {
       label 'nodejs'
-      customWorkspace 'deploy'
     }
   }
 
@@ -17,39 +16,39 @@ pipeline {
     stage('Build') {
       steps {
         echo 'Building...'
-        sh 'npm install'
+        sh 'cd deploy && npm install'
       }
     }
     stage('Test available datasets') {
       parallel {
         stage('rat - v1.01') {
           steps {
-            sh 'npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
+            sh 'cd deploy && npm run mocha-env -- ./api-test/**/rat.v1_01.spec.js --timeout 60000'
           }
         }
         stage('rat - v2') {
           steps {
-            sh 'npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
+            sh 'cd deploy && npm run mocha-env -- ./api-test/**/rat.v2.spec.js --timeout 60000'
           }
         }
         stage('rat - v3') {
           steps {
-            sh 'npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
+            sh 'cd deploy && npm run mocha-env -- ./api-test/**/rat.v3.spec.js --timeout 60000'
           }
         }
         stage('mouse - 2015') {
           steps {
-            sh 'npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
+            sh 'cd deploy && npm run mocha-env -- ./api-test/**/mouse.2015.spec.js --timeout 60000'
           }
         }
         stage('mouse - 2017') {
           steps {
-            sh 'npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
+            sh 'cd deploy && npm run mocha-env -- ./api-test/**/mouse.2017.spec.js --timeout 60000'
           }
         }
         stage('human') {
           steps {
-            sh 'echo NYI'
+            sh 'cd deploy && echo NYI'
           }
         }
       }
