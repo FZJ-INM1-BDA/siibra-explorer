@@ -121,6 +121,8 @@ fs.readdir(RECEPTOR_PATH, (err, files) => {
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
 })
 
+
+// TODO deprecated
 datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   const { file } = req.query
   const filePath = previewFileMap.get(file)
@@ -149,6 +151,7 @@ const checkKgQuery = (req, res, next) => {
   else return next()
 }
 
+// TODO deprecated
 datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
   const { datasetName } = req.query
   if (!datasetName || datasetName === '') return res.status(400).send(`datasetName as query param is required.`)
