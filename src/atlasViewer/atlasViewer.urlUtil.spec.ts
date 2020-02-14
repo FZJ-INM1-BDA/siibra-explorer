@@ -62,7 +62,15 @@ describe('atlasViewer.urlService.service.ts', () => {
     })
 
     it('parses pluginStates correctly', () => {
-
+      const searchParam = new URLSearchParams()
+      searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+      searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+      searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
+  
+      const newState = cvtSearchParamToState(searchParam, fetchedTemplateRootState)
+      expect(newState.pluginState.initManifests).toEqual([
+        ['INIT_MANIFEST_SRC', 'http://localhost:3001/manifest.json']
+      ])
     })
   })
 

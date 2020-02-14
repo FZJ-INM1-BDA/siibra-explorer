@@ -4,7 +4,7 @@ const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/
 const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
-const { By } = require('selenium-webdriver')
+const { By, WebDriver } = require('selenium-webdriver')
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -19,25 +19,33 @@ async function getIndexFromArrayOfWebElements(search, webElements) {
 
 class WdIavPage{
   constructor(){
-    
+  }
+
+  get browser(){
+    return this.driver || browser
   }
 
   async init() {
 
   }
 
-  async goto(url = '/'){
+  async goto(url = '/', { interceptHttp } = {}){
     const actualUrl = getActualUrl(url)
-    await browser.get(actualUrl)
+    if (interceptHttp) {
+      this.browser.get(actualUrl)
+      await this.initHttpInterceptor() 
+    } else {
+      await this.browser.get(actualUrl)
+    }
   }
 
   async wait(ms) {
     if (!ms) throw new Error(`wait duration must be specified!`)
-    await browser.sleep(ms)
+    await this.browser.sleep(ms)
   }
 
   async getModal() {
-    return await browser.findElement( By.tagName('mat-dialog-container') )
+    return await this.browser.findElement( By.tagName('mat-dialog-container') )
   }
 
   async dismissModal() {
@@ -48,12 +56,12 @@ class WdIavPage{
         .findElement( By.css('button[color="primary"] > span.mat-button-wrapper') )
       await okBtn.click()
     } catch (e) {
-      console.log(e)
+      
     }
   }
 
   async findTitleCards() {
-    return await browser
+    return await this.browser
       .findElement( By.tagName('ui-splashscreen') )
       .findElements( By.tagName('mat-card') )
   }
@@ -71,7 +79,7 @@ class WdIavPage{
       .findElement( By.css('[aria-label="Select a new template"]') )
     await templateBtn.click()
 
-    const options = await browser.findElements(
+    const options = await this.browser.findElements(
       By.tagName('mat-option')
     )
     const idx = await getIndexFromArrayOfWebElements(title, options)
@@ -79,14 +87,8 @@ class WdIavPage{
     else throw new Error(`${title} is not found as one of the dropdown templates`)
   }
 
-  async screenshotViewer() {
-    const ngContainer = await this.getViewerContainer()
-    if (!ngContainer) throw new Error(`neuroglancer-container not defined`)
-    return await ngContainer.takeScreenshot(false)
-  }
-
   async getViewerContainer() {
-    return await browser.findElement(
+    return await this.browser.findElement(
       By.id('neuroglancer-container')
     )
   }
@@ -100,7 +102,61 @@ class WdIavPage{
   }
 
   async getSideNav() {
-    return await browser.findElement( By.tagName('search-side-nav') )
+    return await this.browser.findElement( By.tagName('search-side-nav') )
+  }
+
+  async getNavigationState() {
+    const actualNav = await this.browser.executeScript(async () => {
+      let returnObj, sub
+      const getPr = () =>  new Promise(rs => {
+
+        sub = nehubaViewer.navigationState.all
+          .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
+            returnObj = {
+              orientation: Array.from(orientation),
+              perspectiveOrientation: Array.from(perspectiveOrientation),
+              perspectiveZoom,
+              zoom,
+              position: Array.from(position)
+            }
+            rs()
+          })
+      })
+
+      await getPr()
+      sub.unsubscribe()
+
+      return returnObj
+    })
+    return actualNav
+  }
+
+  async initHttpInterceptor(){
+    await this.browser.executeScript(() => {
+      if (window.__isIntercepting__) return
+      window.__isIntercepting__ = true
+      const open = window.XMLHttpRequest.prototype.open
+      window.__interceptedXhr__ = []
+      window.XMLHttpRequest.prototype.open = function () {
+        window.__interceptedXhr__.push({
+          method: arguments[0],
+          url: arguments[1]
+        })
+        return open.apply(this, arguments)
+      }
+    })
+  }
+
+  async isHttpIntercepting(){
+    return await this.browser.executeScript(() => {
+      return window.__isIntercepting__
+    })
+  }
+
+  async getInterceptedHttpCalls(){
+    return await this.browser.executeScript(() => {
+      return window['__interceptedXhr__']
+    })
   }
 }
 

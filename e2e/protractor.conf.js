@@ -11,6 +11,9 @@ exports.config = {
     : { directConnect: true } 
   ),
   specs: ['./src/**/*.e2e-spec.js'],
+  jasmineNodeOpts: {
+    defaultTimeoutInterval: 1000 * 60 * 10
+  },
   capabilities: { 
 
     // Use headless chrome
