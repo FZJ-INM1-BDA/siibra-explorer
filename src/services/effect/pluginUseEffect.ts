@@ -24,7 +24,7 @@ export class PluginServiceUseEffect {
     constantService: AtlasViewerConstantsServices,
     pluginService: PluginServices,
     private log: LoggingService,
-    http:HttpClient
+    http: HttpClient
   ) {
     this.initManifests$ = store$.pipe(
       select('pluginState'),
