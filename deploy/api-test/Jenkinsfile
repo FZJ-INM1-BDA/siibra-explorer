@@ -1,6 +1,8 @@
 pipeline {
   agent {
-    docker 'node:12'
+    node {
+      label 'nodejs'
+    }
   }
 
   environment {
