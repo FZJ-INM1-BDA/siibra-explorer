@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit,
   Component,
   HostBinding,
   OnDestroy,
@@ -29,7 +29,6 @@ import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import { LocalFileService } from "src/services/localFile.service";
-import { LoggingService } from "src/services/logging.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import {
   CLOSE_SIDE_PANEL,
@@ -67,6 +66,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
+
+  private persistentStateNotifierMatDialogRef: MatDialogRef<any>
+  @ViewChild('persistentStateNotifierTemplate', {read: TemplateRef}) public persistentStateNotifierTemplate: TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
@@ -122,7 +124,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
-  public persistentStateNotifierTemplate$: Observable<string>
+  public persistentStateNotifierMessage$: Observable<string>
 
   private hoveringRegions = []
   public presentDatasetDialogRef: MatDialogRef<any>
@@ -137,9 +139,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet,
-    private log: LoggingService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private bottomSheet: MatBottomSheet
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -152,9 +152,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select("pluginRegionSelectionEnabled"),
       distinctUntilChanged(),
     )
-    this.persistentStateNotifierTemplate$ = this.store.pipe(
+    this.persistentStateNotifierMessage$ = this.store.pipe(
       select('uiState'),
-      select("persistentStateNotifierTemplate"),
+      select("persistentStateNotifierMessage"),
       distinctUntilChanged(),
     )
 
@@ -253,6 +253,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
       }),
+
     )
 
     this.subscriptions.push(
@@ -277,6 +278,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.onhoverSegments$.subscribe(hr => {
         this.hoveringRegions = hr
       })
+    )
+
+    this.subscriptions.push(
+      this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
     )
   }
 
@@ -362,9 +367,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
-        this.pluginRegionSelectionEnabled = PRSE
-        this.changeDetectorRef.detectChanges()
+      this.persistentStateNotifierMessage$.subscribe(msg => {
+        if (msg) this.persistentStateNotifierMatDialogRef = this.matDialog.open(this.persistentStateNotifierTemplate, { hasBackdrop: false, position: { top: '5px'} })
+        else {
+          if (this.persistentStateNotifierMatDialogRef) this.persistentStateNotifierMatDialogRef.close()
+        }
       })
     )
   }
