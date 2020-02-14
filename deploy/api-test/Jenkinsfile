@@ -14,7 +14,9 @@ pipeline {
   
   stages {
     stage('cd into deploy') {
-      dir('deploy')
+      steps{
+        dir('deploy')
+      }
     }
     stage('Build') {
       steps {
