@@ -9,49 +9,53 @@ const mni152JuBrain = require('./testData/mni152JuBrain')
 const colin27 = require('./testData/colin27')
 const hoc1Pmap = require('./testData/hoc1pmap')
 
+const SKIP_RETRY_TEST = process.env.SKIP_RETRY_TEST
+
 describe('datasets/util.js', () => {
 
-  // describe('retry', () => {
+  describe('retry', () => {
 
-  //   let val = 0
+    if(SKIP_RETRY_TEST) return
+
+    let val = 0
   
-  //   const failCall = fake()
-  //   const succeedCall = fake()
+    const failCall = fake()
+    const succeedCall = fake()
   
-  //   const prFn = () => {
-  //     val++
-  //     return val >=3
-  //       ? (succeedCall(), Promise.resolve())
-  //       : (failCall(), Promise.reject())
-  //   }
+    const prFn = () => {
+      val++
+      return val >=3
+        ? (succeedCall(), Promise.resolve())
+        : (failCall(), Promise.reject())
+    }
   
-  //   beforeEach(() => {
-  //     val = 0
-  //     succeedCall.resetHistory()
-  //     failCall.resetHistory()
-  //   })
+    beforeEach(() => {
+      val = 0
+      succeedCall.resetHistory()
+      failCall.resetHistory()
+    })
   
-  //   it('retry until succeed', async () => {
-  //     await retry(prFn)
-  //     assert(succeedCall.called)
-  //     assert(failCall.calledTwice)
-  //   })
+    it('retry until succeed', async () => {
+      await retry(prFn)
+      assert(succeedCall.called)
+      assert(failCall.calledTwice)
+    })
   
-  //   it('retry with shorter timeouts', async () => {
-  //     await retry(prFn, { timeout: 100 })
-  //     assert(succeedCall.called)
-  //     assert(failCall.calledTwice)
-  //   })
+    it('retry with shorter timeouts', async () => {
+      await retry(prFn, { timeout: 100 })
+      assert(succeedCall.called)
+      assert(failCall.calledTwice)
+    })
   
-  //   it('when retries excceeded, retry fn throws', async () => {
-  //     try {
-  //       await retry(prFn, { timeout: 100, retries: 2 })
-  //       assert(false, 'retry fn should throw if retries exceed')
-  //     } catch (e) {
-  //       assert(true)
-  //     }
-  //   })
-  // })
+    it('when retries excceeded, retry fn throws', async () => {
+      try {
+        await retry(prFn, { timeout: 100, retries: 2 })
+        assert(false, 'retry fn should throw if retries exceed')
+      } catch (e) {
+        assert(true)
+      }
+    })
+  })
 
   describe('datasetBelongsInTemplate', () => {
     it('should filter datasets with template defined', () => {
@@ -155,7 +159,7 @@ describe('datasets/util.js', () => {
     it('should filter allen 2015 properly', async () => {
 
       const filteredResult = await filterDatasets(allen2015, { parcellationName: 'Allen Mouse Common Coordinate Framework v3 2015' })
-      expect(filteredResult).to.have.length(1)
+      expect(filteredResult).to.have.length(allen2015.length)
     })
   })
 

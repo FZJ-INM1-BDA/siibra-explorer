@@ -51,6 +51,7 @@ jobs:
     - name: Start pptr docker container with name ${{ env.DOCKER_E2E_PPTR }}
       run: |
         docker run --rm \
+          -v /dev/shm:/dev/shm \
           --name ${DOCKER_E2E_PPTR} \
           -dt \
           puppeteer
