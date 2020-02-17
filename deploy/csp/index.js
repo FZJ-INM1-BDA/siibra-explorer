@@ -8,6 +8,8 @@ let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 // without it, testSafari.js will trigger no unsafe eval csp
 const reportOnly = true || process.env.NODE_ENV !== 'production'
 
+const CSP_REPORT_URI = process.env.CSP_REPORT_URI
+
 try {
   WHITE_LIST_SRC = JSON.parse(process.env.WHITE_LIST_SRC || '[]')
 } catch (e) {
@@ -78,19 +80,21 @@ module.exports = (app) => {
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC
       ],
-      reportUri: '/report-violation'
+      reportUri: CSP_REPORT_URI || '/report-violation'
     },
     reportOnly
   }))
 
-  app.post('/report-violation', bodyParser.json({
-    type: ['json', 'application/csp-report']
-  }), (req, res) => {
-    if (req.body) {
-      console.warn(`CSP Violation: `, req.body)
-    } else {
-      console.warn(`CSP Violation: no data received!`)
-    }
-    res.status(204).end()
-  })
+  if (!CSP_REPORT_URI) {
+    app.post('/report-violation', bodyParser.json({
+      type: ['json', 'application/csp-report']
+    }), (req, res) => {
+      if (req.body) {
+        console.warn(`CSP Violation: `, req.body)
+      } else {
+        console.warn(`CSP Violation: no data received!`)
+      }
+      res.status(204).end()
+    })
+  }
 }
