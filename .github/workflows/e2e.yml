@@ -65,7 +65,7 @@ jobs:
         docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_CONTAINER_NAME }}
     - name: run pptr tests - ${{ env.ATLAS_URL }}
       run: |
-        docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
+        docker exec --env ATLAS_URL=${ATLAS_URL} -v /dev/shm:/dev/shm -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
     - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
       if: success()
       run: |
