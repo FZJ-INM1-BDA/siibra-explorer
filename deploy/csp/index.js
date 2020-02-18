@@ -1,5 +1,6 @@
 const csp = require('helmet-csp')
 const bodyParser = require('body-parser')
+const crypto = require('crypto')
 
 let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 
@@ -46,6 +47,11 @@ const dataSource = [
 ]
 
 module.exports = (app) => {
+  app.use((req, res, next) => {
+    res.locals.nonce = crypto.randomBytes(16).toString('hex')
+    next()
+  })
+
   app.use(csp({
     directives: {
       defaultSrc: [
@@ -77,6 +83,7 @@ module.exports = (app) => {
         'unpkg.com',
         '*.unpkg.com',
         '*.jsdelivr.net',
+        (req, res) => `'nonce-${res.locals.nonce}'`,
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC
       ],

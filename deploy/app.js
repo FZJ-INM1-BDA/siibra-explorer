@@ -81,6 +81,18 @@ app.use((_req, res, next) => {
 app.use(require('./devBanner'))
 
 /**
+ * populate nonce token
+ */
+const indexTemplate = require('fs').readFileSync(
+  path.join(PUBLIC_PATH, 'index.html'),
+  'utf-8'
+)
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html')
+  res.status(200).send(`${indexTemplate.replace(/\$\$NONCE\$\$/g, res.locals.nonce)}`)
+})
+
+/**
  * only use compression for production
  * this allows locally built aot to be served without errors
  */
