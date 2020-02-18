@@ -700,3 +700,8 @@ kg-dataset-previewer > img
   padding-right: 16px!important;
   padding-top: 16px!important;
 }
+
+.fixed-bottom
+{
+  top: unset!important;
+}
