@@ -669,5 +669,34 @@ kg-dataset-previewer > img
 .h-117px
 {
   min-height:117px!important;
+  max-height:117px!important;
   flex-basis: 117px!important;
+}
+
+.hover-grab
+{
+  opacity: 0.5;
+  transition: opacity 200ms ease-in-out;
+}
+
+.hover-grab:hover
+{
+  cursor: grab;
+  opacity: 1.0;
+}
+
+.ml-4-n
+{
+  margin-left: -1rem!important;
+}
+.mr-4-n
+{
+  margin-right: -1rem!important;
+}
+
+.mat-card-sm > mat-dialog-container
+{
+  padding-left: 16px!important;
+  padding-right: 16px!important;
+  padding-top: 16px!important;
 }

@@ -6,13 +6,15 @@ import { catchError, filter, map, scan, switchMap, withLatestFrom, mapTo, shareR
 import { LoggingService } from "src/services/logging.service";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
-import { LOCAL_STORAGE_CONST } from "src/util/constants";
+import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";
 import { getIdFromDataEntry } from "./databrowser.service";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
 import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import { MatDialog } from "@angular/material/dialog";
+import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 
 const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
   map(string => JSON.parse(string)),
@@ -56,8 +58,46 @@ export class DataBrowserUseEffect implements OnDestroy {
     private actions$: Actions<any>,
     private kgSingleDatasetService: KgSingleDatasetService,
     private log: LoggingService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private dialog: MatDialog
   ) {
+
+    this.subscriptions.push(
+      this.store$.pipe(
+        select('dataStore'),
+        select('datasetPreviews'),
+        filter(datasetPreviews => datasetPreviews.length > 0),
+        map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
+        filter(({ file }) => determinePreviewFileType(file) !== PREVIEW_FILE_TYPES.NIFTI)
+      ).subscribe(({ dataset, file }) => {
+        
+        const { fullId, name } = dataset
+        const { filename } = file
+        
+        // TODO replace with common/util/getIdFromFullId
+        const previewKgId = /\/([a-f0-9-]{1,})$/.exec(fullId)[1]
+        
+        this.dialog.open(
+          PreviewComponentWrapper,
+          {
+            hasBackdrop: false,
+            disableClose: true,
+            autoFocus: false,
+            panelClass: 'mat-card-sm',
+            height: '50vh',
+            position: {
+              left: '5px'
+            },
+            data: {
+              filename,
+              kgId: previewKgId,
+              backendUrl: DS_PREVIEW_URL,
+              datasetName: name
+            }
+          }
+        )
+      })
+    )
 
     this.previewDatasetFile$ = actions$.pipe(
       ofType(DATASETS_ACTIONS_TYPES.PREVIEW_DATASET),

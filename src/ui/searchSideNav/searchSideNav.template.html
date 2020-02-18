@@ -172,14 +172,3 @@
     </ng-template>
   </ng-container>
 </ng-template>
-
-
-<ng-template #kgDatasetPreviewer>
-  <kg-dataset-previewer
-    [darkmode]="darktheme$ | async"
-    [filename]="previewFilename"
-    [kgId]="previewKgId"
-    [backendUrl]="DS_PREVIEW_URL">
-
-  </kg-dataset-previewer>
-</ng-template>

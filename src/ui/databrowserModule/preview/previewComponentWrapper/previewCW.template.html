@@ -1,0 +1,39 @@
+<h1 mat-dialog-title
+  class="flex-shrink-0 flex-grow-0">
+  <div class="d-flex flex-row">
+
+    <!-- drag handle -->
+    <div class="flex-grow-0 flex-shrink-0 d-flex align-items-center hover-grab ml-4-n"
+      cdkDrag
+      cdkDragHandle
+      cdkDragRootElement=".cdk-overlay-pane">
+      <i class="fas fa-grip-vertical pr-4 pl-4"></i>
+    </div>
+
+    <!-- main content -->
+    <div class="flex-grow-1 flex-shrink-1">
+      <span class="d-block">
+        {{ filename }}
+      </span>
+      <small class="text-muted d-block">
+        {{ datasetName }}
+      </small>
+    </div>
+
+    <!-- close btn -->
+    <div class="flex-grow-0 flex-shrink-0 d-flex align-items-center text-muted">
+      <button mat-dialog-close mat-icon-button>
+        <i class="fa-2x fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+</h1>
+
+<kg-dataset-previewer
+  class="flex-grow-1 flex-shrink-1"
+  [darkmode]="darktheme$ | async"
+  [filename]="filename"
+  [kgId]="kgId"
+  [backendUrl]="backendUrl">
+
+</kg-dataset-previewer>
