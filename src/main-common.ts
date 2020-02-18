@@ -7,7 +7,6 @@ import 'zone.js'
 import { enableProdMode } from '@angular/core';
 
 import * as ConnectivityComponent from 'hbp-connectivity-component/dist/loader'
-import * as PreviewDatasetComponent from 'kg-dataset-previewer/loader'
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic'
 import { MainModule } from './main.module';
 
@@ -21,5 +20,4 @@ requireAll(require.context(`./plugin_examples`, true))
 
 platformBrowserDynamic().bootstrapModule(MainModule)
 
-PreviewDatasetComponent.defineCustomElements(window)
 ConnectivityComponent.defineCustomElements(window)

@@ -26,6 +26,7 @@ import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
+import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 
 @NgModule({
   imports: [
@@ -42,6 +43,7 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     SingleDatasetView,
     SingleDatasetListView,
     DatasetPreviewList,
+    PreviewComponentWrapper,
 
     /**
      * pipes
@@ -73,6 +75,7 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
   entryComponents: [
     DataBrowser,
     SingleDatasetView,
+    PreviewComponentWrapper
   ],
   providers: [
     KgSingleDatasetService,
