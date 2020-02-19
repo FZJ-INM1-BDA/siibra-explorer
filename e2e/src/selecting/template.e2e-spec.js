@@ -18,7 +18,7 @@ describe('selecting template', () => {
     await iavPage.wait(1000)
 
     const viewerIsPopulated = await iavPage.viewerIsPopulated()
-    expect(viewerIsPopulated).toBeTrue
+    expect(viewerIsPopulated).toBe(true)
   })
   
 
@@ -36,6 +36,6 @@ describe('selecting template', () => {
     await iavPage.wait(7000)
 
     const viewerIsPopulated = await iavPage.viewerIsPopulated()
-    expect(viewerIsPopulated).toBeTrue
+    expect(viewerIsPopulated).toBe(true)
   })
 })
