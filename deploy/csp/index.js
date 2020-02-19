@@ -35,7 +35,9 @@ try {
 const defaultAllowedSites = [
   "'self'",
   '*.apps.hbp.eu',
-  '*.apps-dev.hbp.eu'
+  '*.apps-dev.hbp.eu',
+  'stats.humanbrainproject.eu',
+  'stats-dev.humanbrainproject.eu'
 ]
 
 const dataSource = [
