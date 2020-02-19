@@ -12,7 +12,7 @@ export class SafeResourcePipe implements PipeTransform{
 
   }
 
-  transform(input:string): SafeResourceUrl{
+  transform(input: string): SafeResourceUrl{
     return this.ds.bypassSecurityTrustResourceUrl(input)
   }
 }
