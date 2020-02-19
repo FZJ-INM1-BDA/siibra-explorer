@@ -1,4 +1,5 @@
 if (MATOMO_URL && MATOMO_ID) {
+  window['_paq'] = [];
   const _paq = window['_paq'] || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   
