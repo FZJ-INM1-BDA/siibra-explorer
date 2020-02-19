@@ -1,4 +1,4 @@
-FROM node:10 as builder
+FROM node:12 as builder
 
 ARG BACKEND_URL
 ENV BACKEND_URL=${BACKEND_URL}
@@ -19,7 +19,7 @@ RUN npm i
 RUN npm run build-aot
 
 # gzipping container
-FROM ubuntu:18.10 as compressor
+FROM ubuntu:19.10 as compressor
 RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv
@@ -29,7 +29,7 @@ WORKDIR /iv
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:10-alpine 
+FROM node:12-alpine 
 
 ENV NODE_ENV=production
 
