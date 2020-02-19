@@ -26,6 +26,13 @@ layout-floating-container
   overflow:hidden;
 }
 
+layout-floating-container > *
+{
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
 [signinWrapper]
 {
   margin: 0.8em 0.4em;
