@@ -7,7 +7,7 @@
     "build-export": "webpack --config webpack.export.js",
     "build-export-min": "webpack --config webpack.export.min.js",
     "build-export-aot": "webpack --config webpack.export.aot.js",
-    "build-aot": "PRODUCTION=true GIT_HASH=`git rev-parse --short HEAD` webpack --config webpack.aot.js",
+    "build-aot": "PRODUCTION=true GIT_HASH=`git rev-parse --short HEAD` webpack --config webpack.aot.js && node ./third_party/matomo/processMatomo.js",
     "plugin-server": "node ./src/plugin_examples/server.js",
     "dev-server": "BACKEND_URL=${BACKEND_URL:-http://localhost:3000/} webpack-dev-server --config webpack.dev.js --mode development",
     "dev": "npm run dev-server & (cd deploy; node server.js)",
