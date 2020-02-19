@@ -7,8 +7,6 @@ if (MATAMO_URL && MATAMO_ID) {
   // Should also use main.js numbers to find number of actual visitors
   _paq.push(["setDoNotTrack", true]);
 
-  // require consent is set AFTER do not track, so that it will not even trigger if user has DNT set
-  _paq.push(['requireConsent']);
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
