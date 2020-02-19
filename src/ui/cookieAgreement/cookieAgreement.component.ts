@@ -16,7 +16,7 @@ export class CookieAgreement {
   public showMore: boolean = false
   public showMamoto: boolean = false
 
-  public matomoUrl: string = MATAMO_URL
+  public matomoUrl: string = MATOMO_URL
 
   public markdownInfo: string = info
   public markdownReadmore: string = readmore

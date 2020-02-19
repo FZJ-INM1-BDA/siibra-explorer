@@ -17,5 +17,5 @@ declare var PRODUCTION: boolean
 declare var BACKEND_URL: string
 declare var USE_LOGO: string
 declare var DATASET_PREVIEW_URL: string
-declare var MATAMO_URL: string
-declare var MATAMO_ID: string
+declare var MATOMO_URL: string
+declare var MATOMO: string
