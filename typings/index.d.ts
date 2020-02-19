@@ -18,4 +18,4 @@ declare var BACKEND_URL: string
 declare var USE_LOGO: string
 declare var DATASET_PREVIEW_URL: string
 declare var MATOMO_URL: string
-declare var MATOMO: string
+declare var MATOMO_ID: string

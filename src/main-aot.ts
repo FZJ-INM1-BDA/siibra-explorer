@@ -1,5 +1,5 @@
 import './main-common'
-if (MATOMO_URL && MATOMO) {
+if (MATOMO_URL && MATOMO_ID) {
   const _paq = window['_paq'] || [];
   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   
@@ -12,7 +12,7 @@ if (MATOMO_URL && MATOMO) {
   (function() {
     const u=MATOMO_URL;
     _paq.push(['setTrackerUrl', u+'matomo.php']);
-    _paq.push(['setSiteId', MATOMO]);
+    _paq.push(['setSiteId', MATOMO_ID]);
     const d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
   })();
