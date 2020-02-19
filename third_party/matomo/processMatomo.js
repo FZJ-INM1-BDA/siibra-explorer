@@ -19,7 +19,7 @@
   
   const processed = matomoJs
     .replace(/MATOMO_URL/g, JSON.stringify(process.env.MATOMO_URL || null))
-    .replace(/MATOMO_ID/g, JSON.stringify(process.env.MATOMO_ID || null))
+    .replace(/MATOMO_ID/g, process.env.MATOMO_ID || 'null')
   
   fs.writeFileSync(
     pathToMatomoJs,
