@@ -58,8 +58,8 @@ jobs:
         docker cp . ${DOCKER_E2E_PPTR}:/iav
         docker exec -u root ${DOCKER_E2E_PPTR} chown -R pptruser:pptruser /iav
         docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm i
-        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome latest
-        docker exec -t ${DOCKER_E2E_PPTR} npm i puppeteer
+        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome=latest
+        docker exec -t ${DOCKER_E2E_PPTR} npm i --no-save puppeteer
     - name: Setup docker network
       run: |
         docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_E2E_PPTR }}

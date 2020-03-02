@@ -18,7 +18,7 @@ exports.config = {
 
     // Use headless chrome
     browserName: 'chrome',
-    chromeOptions: {
+    'goog:chromeOptions': {
       args: [
         ...chromeOpts
       ],

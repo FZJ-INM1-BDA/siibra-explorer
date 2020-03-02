@@ -30,6 +30,7 @@ export class RegionTextSearchAutocomplete {
 
   public compareFn = compareFn
 
+  @Input() public ariaLabel: string = `Search for any region of interest in the atlas selected`
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
 

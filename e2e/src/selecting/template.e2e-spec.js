@@ -10,10 +10,6 @@ describe('selecting template', () => {
 
   it('can select template by clicking main card', async () => {
     await iavPage.goto()
-    await iavPage.wait(200)
-    await iavPage.dismissModal()
-    await iavPage.wait(200)
-
     await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
     await iavPage.wait(1000)
 
@@ -25,9 +21,6 @@ describe('selecting template', () => {
   it('switching template after template init by clicking select should work', async () => {
 
     await iavPage.goto()
-    await iavPage.wait(200)
-    await iavPage.dismissModal()
-    await iavPage.wait(200)
 
     await iavPage.selectTitleCard('ICBM 2009c Nonlinear Asymmetric')
     await iavPage.wait(1000)
