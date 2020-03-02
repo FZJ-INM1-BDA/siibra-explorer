@@ -29,7 +29,7 @@ export class RegionBase {
   protected loadedTemplates: any[]
   protected selectedTemplate: any
   protected selectedParcellation: any
-  protected sameRegionTemplate: any[] = []
+  public sameRegionTemplate: any[] = []
 
   private parcellationRegions: any[] = []
 
