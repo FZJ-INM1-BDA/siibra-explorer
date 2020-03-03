@@ -89,7 +89,7 @@ The reference space associated with datasets are queried with the following quer
 }
 ```
 
-The dataset is considered relevant (returns true for this conditional) if the stripped `fullId` attribute[^1]  of any of the reference spaces matches to:
+The dataset is considered relevant if the stripped `fullId` attribute[^1]  of any of the reference spaces matches to:
 
 [^1]: `fullId` is a URI, which in the case of Human Brain Project Knowledge Graph, always starts with `https://nexus.humanbrainproject.org/v0/data/`. Stripping the domain allows for easier comparison.
 
@@ -98,9 +98,6 @@ The dataset is considered relevant (returns true for this conditional) if the st
 | Big Brain (Histology) | minds/core/dataset/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588 |
 | MNI 152 ICBM 2009c Nonlinear Asymmetric | minds/core/dataset/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2 |
 | MNI Colin 27 | minds/core/dataset/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992 |
-
-!!! important
-    If the dataset does not have any reference spaces defined, it is considered NOT relevant for any template space, and will return `false` for this conditional.
 
 ### Parcellation atlas
 
@@ -145,7 +142,7 @@ The parcellation region associated with the dataset are queried with the followi
           "relative_path": "http://schema.org/name"
         },
         {
-          "fieldname": "query:@id",
+          "fieldname": "query:fullId",
           "relative_path": "@id"
         },
         {
@@ -164,7 +161,7 @@ The parcellation region associated with the dataset are queried with the followi
 }
 ```
 
-A dataset is considered relevant (returns true for this conditional) if **both** of the following conditionals are true:
+A dataset is considered relevant if **both** of the following conditionals are true:
 
 #### Parcellation name
 
@@ -180,22 +177,40 @@ If the name of the selected parcellation in interactive atlas viewer matches exa
 
 #### Parcellation region
 
-If the name of any of the `parcellationRegion` matches either the name or any of the `relatedAreas` attribute of any of the regions of the selected parcellation.
+To determine if the dataset is relevant based on the parcellation region, **either one** of the following conditions needs to be met:
 
-For example, the following dataset ...
+- If the fullId of any of the `parcellationRegion` matches any of the fullId of a region described under the selected parcellation
+- If the fullId of any of the `parcellationRegion` matches the fullId of any `relatedAreas` of a region described under the selected parcellation.
+
+For example, the following datasets ...
 
 ```json
 {
-  "name": "dataset foobar",
+  "name": "foo",
   "parcellationRegion": [
     {
       "species": [],
-      "name": "Area 44v",
+      "name": "Area 44d",
+      "fullId": "minds/core/parcellationregion/v1.0.0/8aeae833-81c8-4e27-a8d6-deee339d6052",
       "alias": null
     }
   ]
 }
 
+```
+
+```json
+{
+  "name": "bar",
+  "parcellationRegion": [
+    {
+      "species": [],
+      "name": "Area 44 (IFG)",
+      "fullId": "minds/core/parcellationregion/v1.0.0/8a6be82c-5947-4fff-8348-cf9bf73e4f40",
+      "alias": null
+    }
+  ]
+}
 ```
 
 ... will be considered relevant to `JuBrain Cytoarchitectonic Atlas`, as it has an region entry with the following attributes:
@@ -204,9 +219,31 @@ For example, the following dataset ...
 
 {
   "name": "Area 44 (IFG)",
+  "fullId": {
+    "kg": {
+      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+      "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
+    }
+  },
   "relatedAreas": [
-    "Area 44v",
-    "Area 44d"
+    {
+      "name": "Area 44v",
+      "fullId": {
+        "kg": {
+          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+          "kgId": "7e5e7aa8-28b8-445b-8980-2a6f3fa645b3"
+        }
+      }
+    },
+    {
+      "name": "Area 44d",
+      "fullId": {
+        "kg": {
+          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+          "kgId": "8aeae833-81c8-4e27-a8d6-deee339d6052"
+        }
+      }
+    }
   ]
 }
 ```

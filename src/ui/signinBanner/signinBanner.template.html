@@ -71,11 +71,6 @@
 
   <mat-divider></mat-divider>
 
-  <button (click)="openTmplWithDialog(pluginTmpl)" mat-menu-item>
-    <mat-icon fontSet="fas" fontIcon="fa-cube"></mat-icon>
-    Plugins
-  </button>
-
   <button mat-menu-item
     (click)="openTmplWithDialog(settingTemplate)">
     <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
@@ -88,13 +83,6 @@
     About
   </button>
 </mat-menu>
-
-<ng-template #pluginTmpl>
-  <h2 mat-dialog-title>Plugins</h2>
-  <mat-dialog-content>
-    <plugin-banner (click)="openTmplWithDialog(null)"></plugin-banner>
-  </mat-dialog-content>
-</ng-template>
 
 <ng-template #helpComponent>
   <h2 mat-dialog-title>About Interactive Viewer</h2>
