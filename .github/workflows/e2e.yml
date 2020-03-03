@@ -12,6 +12,8 @@ env:
   DOCKER_E2E_PPTR: gha-iav-e2e-pptr-${{ github.sha }}
   DOCKER_E2E_NETWORK: gha-dkr-network
   ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000/
+  CHROMIUM_VERSION: "80.0.3987.106"
+  PPTR_VERSION: "2.1.0"
 
 jobs:
   buildimage:
@@ -58,8 +60,8 @@ jobs:
         docker cp . ${DOCKER_E2E_PPTR}:/iav
         docker exec -u root ${DOCKER_E2E_PPTR} chown -R pptruser:pptruser /iav
         docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm i
-        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome latest
-        docker exec -t ${DOCKER_E2E_PPTR} npm i puppeteer
+        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome=${{ env.CHROMIUM_VERSION }}
+        docker exec -t ${DOCKER_E2E_PPTR} npm i --no-save puppeteer@${{ env.PPTR_VERSION }}
     - name: Setup docker network
       run: |
         docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_E2E_PPTR }}

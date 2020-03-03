@@ -47,7 +47,7 @@ describe('url parsing', () => {
       ]
     }
 
-    await iavPage.goto(searchParam)
+    await iavPage.goto(searchParam, { doNotAutomate: true })
     await iavPage.wait(2000)
     const actualNav = await iavPage.getNavigationState()
 
@@ -69,7 +69,7 @@ describe('url parsing', () => {
     searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
     searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
 
-    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true })
+    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
     await iavPage.wait(10000)
     const interceptedCalls = await iavPage.getInterceptedHttpCalls()
     expect(
