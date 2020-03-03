@@ -103,17 +103,18 @@ const dictionary = {
       ]
     }
   },
+  // TODO big brain cytomap occassionally resets center position to -20mm. investigate why
   "Big Brain (Histology)": {
     "Cytoarchitectonic Maps": {
       url: "/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps&cNavigation=0.0.0.-W000.._eCwg.2-FUe3._-s_W.2_evlu..7LIx..1n5q~.1FYC.2Is-..1B9C",
       tests: [
         {
           position: [686, 677],
-          expectedLabelName: 'Area STS1 (STS) (interpolated)'
+          expectedLabelName: 'Area STS1 (STS)'
         },
         {
-          position: [440,200],
-          expectedLabelName: 'Area hOc1 (V1, 17, CalcS) (fully mapped)'
+          position: [617,682],
+          expectedLabelName: 'Entorhinal Cortex'
         }
       ]
     },
