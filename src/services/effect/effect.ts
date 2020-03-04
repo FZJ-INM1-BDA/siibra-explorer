@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { merge, Observable, Subscription } from "rxjs";
 import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo } from "rxjs/operators";
 import { LoggingService } from "../logging.service";
-import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID } from "../state/viewerState.store";
+import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, CHANGE_NAVIGATION, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
 import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, GENERAL_ACTION_TYPES } from '../stateStore.service';
 
 @Injectable({
@@ -187,6 +187,29 @@ export class UseEffects implements OnDestroy {
     mapTo({
       type: SELECT_REGIONS,
       selectRegions: [],
+    })
+  )
+
+  /**
+   * side effects of loading a new template space
+   * reset navigation (navigation translation is done by a different service)
+   * Landmarks will no longer be accurate (differente template space)
+   */
+  @Effect()
+  public onNewViewerResetNavigation$ = this.actions$.pipe(
+    ofType(NEWVIEWER),
+    mapTo({
+      type: CHANGE_NAVIGATION,
+      navigation: {}
+    })
+  )
+
+  @Effect()
+  public onNewViewerResetLandmarkSelected$ = this.actions$.pipe(
+    ofType(NEWVIEWER),
+    mapTo({
+      type: SELECT_LANDMARKS,
+      landmarks: []
     })
   )
 }

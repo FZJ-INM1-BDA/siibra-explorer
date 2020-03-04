@@ -92,6 +92,8 @@ class WdBase{
       return window['__interceptedXhr__']
     })
   }
+
+  // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
   async goto(url = '/', { interceptHttp, doNotAutomate } = {}){
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {

@@ -55,14 +55,10 @@ describe('effect.ts', () => {
           provideMockStore({ initialState: defaultRootState })
         ]
       })
-
-      const useEffectsInstance: UseEffects = TestBed.get(UseEffects)
-      useEffectsInstance.onParcellationSelected$.subscribe(console.log)
-
     })
 
     it('both SELECT_PARCELLATION and NEWVIEWER actions should trigger onParcellationSelected$', () => {
-      const useEffectsInstance: UseEffects = TestBed.get(UseEffects)
+      const useEffectsInstance: UseEffects = TestBed.inject(UseEffects)
       actions$ = hot(
         'ab',
         {
