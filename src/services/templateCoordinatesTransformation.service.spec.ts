@@ -31,11 +31,14 @@ describe('templateCoordinatesTransformation.service.spec.ts', () => {
         const service = TestBed.inject(TemplateCoordinatesTransformation)
         const httpTestingController = TestBed.inject(HttpTestingController)
 
+        // subscriptions are necessary for http fetch to occur
         service.getPointCoordinatesForTemplate(
           'from',
           'target',
           [1,2,3]
-        )
+        ).subscribe((_ev) => {
+          
+        })
         const req = httpTestingController.expectOne(service.url)
         expect(req.request.method).toEqual('POST')
         expect(

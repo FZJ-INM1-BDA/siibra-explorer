@@ -14,10 +14,12 @@ import { HttpClientModule } from '@angular/common/http'
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colinJson = require('!json-loader!src/res/ext/colin.json')
 const colinJsonNehubaConfig = require('!json-loader!src/res/ext/colinNehubaConfig.json')
-const reconstitutedColin = {
-  ...colinJson,
-  nehubaConfig: colinJsonNehubaConfig
-}
+const reconstitutedColin = JSON.parse(JSON.stringify(
+  {
+    ...colinJson,
+    nehubaConfig: colinJsonNehubaConfig
+  }
+))
 let returnPosition = null
 @Injectable()
 class MockCoordXformService{
@@ -28,12 +30,12 @@ class MockCoordXformService{
   }
 }
 
-const initialState = defaultRootState
-defaultRootState.viewerState.fetchedTemplates = [
+const initialState = JSON.parse(JSON.stringify( defaultRootState ))
+initialState.viewerState.fetchedTemplates = [
   bigbrainJson,
   reconstitutedColin
 ]
-initialState.viewerState.templateSelected = defaultRootState.viewerState.fetchedTemplates[0]
+initialState.viewerState.templateSelected = initialState.viewerState.fetchedTemplates[0]
 const currentNavigation = {
   position: [4, 5, 6],
   orientation: [0, 0, 0, 1],
