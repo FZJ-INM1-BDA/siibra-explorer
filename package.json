@@ -32,7 +32,6 @@
     "@angular/core": "^9.0.0",
     "@angular/elements": "^9.0.0",
     "@angular/forms": "^9.0.0",
-    "@angular/http": "^7.2.15",
     "@angular/language-service": "^9.0.0",
     "@angular/material": "^9.0.0",
     "@angular/platform-browser": "^9.0.0",
