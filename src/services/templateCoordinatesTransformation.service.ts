@@ -4,8 +4,8 @@ import { catchError, timeout, map } from "rxjs/operators";
 import { of, Observable } from "rxjs";
 
 export interface ITemplateCoordXformResp{
-  status: 'pending' | 'error' | 'completed',
-  statusText?: string,
+  status: 'pending' | 'error' | 'completed'
+  statusText?: string
   result? : [number, number, number]
 }
 
@@ -39,7 +39,7 @@ export class TemplateCoordinatesTransformation {
       map(resp => {
         return {
           status: 'completed',
-          result: resp['target_points'][0].map((r:number)=> r * 1e6)
+          result: resp['target_points'][0].map((r: number)=> r * 1e6)
         } as ITemplateCoordXformResp
       }),
       catchError(err => {
