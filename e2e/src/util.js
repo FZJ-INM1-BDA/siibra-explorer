@@ -257,7 +257,7 @@ class WdIavPage extends WdLayoutPage{
     const options = await this._browser.findElements(
       By.tagName('mat-option')
     )
-    const idx = await getIndexFromArrayOfWebElements(title, options)
+    const idx = await _getIndexFromArrayOfWebElements(title, options)
     if (idx >= 0) await options[idx].click()
     else throw new Error(`${title} is not found as one of the dropdown templates`)
   }
