@@ -210,6 +210,28 @@ class WdLayoutPage extends WdBase{
     // Will throw if status panel is not visible
     return this._getStatusPanel().click()
   }
+
+  // will throw if sidenav is not visible
+  async getTemplateInfo(){
+    const ariaText = `Hover to find out more info on the selected template`
+    const infoBtn = await this._getSideNav()
+      .findElement( By.css(`[aria-label="${ariaText}"]`) )
+    
+    await this._driver.actions()
+      .move()
+      .move({
+        origin: infoBtn,
+        duration: 1000
+      })
+      .perform()
+
+    await this.wait(500)
+    const text = await this._getSideNav()
+      .findElement( By.id('selected-template-detailed-info') )
+      .getText()
+
+    return text
+  }
 }
 
 class WdIavPage extends WdLayoutPage{

@@ -54,6 +54,7 @@
               <mat-card *ngFor="let originDataset of moreInfo.originDatasets"
                 class="position-absolute left-0 top-0 w-40em">
                 <single-dataset-view
+                  id="selected-template-detailed-info"
                   [name]="moreInfo.name"
                   [description]="moreInfo.description"
                   [publications]="moreInfo.publications"
