@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Input, OnInit, TemplateRef } from "@angular/core";
 import { Observable } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
@@ -12,7 +12,7 @@ export {
   DatabrowserService,
   KgSingleDatasetService,
   ChangeDetectorRef,
-  AtlasViewerConstantsServices,
+  AtlasViewerConstantsServices
 }
 
 export class SingleDatasetBase implements OnInit {
@@ -59,8 +59,6 @@ export class SingleDatasetBase implements OnInit {
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
     private cdr: ChangeDetectorRef,
-    private constantService: AtlasViewerConstantsServices,
-
     dataset?: any,
   ) {
 

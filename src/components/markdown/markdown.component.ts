@@ -32,7 +32,7 @@ export class MarkdownDom implements AfterViewChecked {
     this.innerHtml = this.converter.makeHtml(
       this.getMarkdown()
     )
-    this.cdr.markForCheck()
+    this.cdr.detectChanges()
   }
 
   @ViewChild('ngContentWrapper', {read : ElementRef, static: true})

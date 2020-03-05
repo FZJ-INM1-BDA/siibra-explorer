@@ -2,7 +2,6 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/
   SingleDatasetBase,
   DatabrowserService,
   KgSingleDatasetService,
-  AtlasViewerConstantsServices,
 } from "../singleDataset.base";
 import { SingleDatasetView } from "../detailedView/singleDataset.component";
 import {MatDialog} from "@angular/material/dialog";
@@ -23,11 +22,10 @@ export class SingleDatasetListView extends SingleDatasetBase {
     private _dbService: DatabrowserService,
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
-    constantService: AtlasViewerConstantsServices,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
   ) {
-    super(_dbService, singleDatasetService, cdr, constantService)
+    super(_dbService, singleDatasetService, cdr)
   }
 
   public showDetailInfo() {
