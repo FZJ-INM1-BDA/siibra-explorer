@@ -636,9 +636,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public setNavigationState(newViewerState: Partial<ViewerState>) {
 
     if (!this.nehubaViewer) {
-      if (!PRODUCTION) {
-        this.log.warn('setNavigationState > this.nehubaViewer is not yet defined')
-      }
+      this.log.warn('setNavigationState > this.nehubaViewer is not yet defined')
       return
     }
 
@@ -775,7 +773,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           perspectiveOrientation : Array.from(perspectiveOrientation),
           perspectiveZoom,
           zoom,
-          position,
+          position: Array.from(position),
           positionReal : true,
         })
       })
