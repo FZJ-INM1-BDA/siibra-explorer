@@ -192,17 +192,8 @@ export class UseEffects implements OnDestroy {
 
   /**
    * side effects of loading a new template space
-   * reset navigation (navigation translation is done by a different service)
    * Landmarks will no longer be accurate (differente template space)
    */
-  @Effect()
-  public onNewViewerResetNavigation$ = this.actions$.pipe(
-    ofType(NEWVIEWER),
-    mapTo({
-      type: CHANGE_NAVIGATION,
-      navigation: {}
-    })
-  )
 
   @Effect()
   public onNewViewerResetLandmarkSelected$ = this.actions$.pipe(

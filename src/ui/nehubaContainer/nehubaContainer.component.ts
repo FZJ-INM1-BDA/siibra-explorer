@@ -32,7 +32,7 @@ import { AtlasViewerAPIServices, IUserLandmark } from "../../atlasViewer/atlasVi
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
 import { timedValues } from "../../util/generator";
 import { computeDistance, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, getNavigationStateFromConfig } from "./util";
 
 const isFirstRow = (cell: HTMLElement) => {
   const { parentElement: row } = cell
@@ -605,12 +605,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         withLatestFrom(
           this.selectedParcellation$.pipe(
             startWith(null),
-          ),
-          this.navigationChanges$.pipe(
-            startWith({})
           )
         ),
-      ).subscribe(([templateSelected, parcellationSelected, navigation]) => {
+      ).subscribe(([templateSelected, parcellationSelected]) => {
         this.store.dispatch({
           type: NEHUBA_READY,
           nehubaReady: false,
@@ -618,7 +615,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         this.nehubaViewerSubscriptions.forEach(s => s.unsubscribe())
 
         this.selectedTemplate = templateSelected
-        this.createNewNehuba(templateSelected, navigation)
+        this.createNewNehuba(templateSelected)
         const foundParcellation = parcellationSelected
           && templateSelected.parcellations.find(parcellation => parcellationSelected.name === parcellation.name)
         this.handleParcellation(foundParcellation || templateSelected.parcellations[0])
@@ -742,7 +739,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     })
 
     this.subscriptions.push(
-      this.navigationChanges$.subscribe(this.handleDispatchedNavigationChange.bind(this)),
+      this.navigationChanges$.subscribe(ev => {
+        this.handleDispatchedNavigationChange(ev)
+      }),
     )
 
     /* handler to open/select landmark */
@@ -989,7 +988,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.cdr.detectChanges()
   }
 
-  private createNewNehuba(template: any, overwriteInitNavigation: any) {
+  private createNewNehuba(template: any) {
 
     this.viewerLoaded = true
     this.cr = this.container.createComponent(this.nehubaViewerFactory)
@@ -999,31 +998,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
      * apply viewer config such as gpu limit
      */
     const { gpuLimit = null } = this.viewerConfig
+
     const { nehubaConfig } = template
-    const { navigation = {}, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e7 } = nehubaConfig.dataset.initialNgState || {}
-    const { zoomFactor = 3e5, pose = {} } = navigation || {}
-    const { voxelSize = [1e6, 1e6, 1e6], voxelCoordinates = [0, 0, 0] } = (pose && pose.position) || {}
-    const { orientation = [0, 0, 0, 1] } = pose || {}
 
-    const {
-      orientation: owOrientation,
-      perspectiveOrientation: owPerspectiveOrientation,
-      perspectiveZoom: owPerspectiveZoom,
-      position: owPosition,
-      zoom: owZoom
-    } = overwriteInitNavigation
+    const navState = getNavigationStateFromConfig(nehubaConfig)
 
-    const initNavigation = {
-      orientation: owOrientation || [0, 0, 0, 1],
-      perspectiveOrientation: owPerspectiveOrientation || perspectiveOrientation,
-      perspectiveZoom: owPerspectiveZoom || perspectiveZoom,
-      position: owPosition ||  [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
-      zoom: owZoom || zoomFactor,
-    }
-
-    this.handleEmittedNavigationChange(initNavigation)
-
-    this.oldNavigation = initNavigation
+    this.oldNavigation = navState
+    this.handleEmittedNavigationChange(navState)
 
     if (gpuLimit) {
       const initialNgState = nehubaConfig && nehubaConfig.dataset && nehubaConfig.dataset.initialNgState

@@ -33,6 +33,15 @@ class WdBase{
   get _driver(){
     return this._browser.driver
   }
+
+  historyBack() {
+    return this._browser.navigate().back()
+  }
+
+  historyForward() {
+    return this._browser.navigate().forward()
+  }
+
   async init() {
     const wSizeArg = chromeOpts.find(arg => arg.indexOf('--window-size') >= 0)
     const [ _, width, height ] = /\=([0-9]{1,})\,([0-9]{1,})$/.exec(wSizeArg)
