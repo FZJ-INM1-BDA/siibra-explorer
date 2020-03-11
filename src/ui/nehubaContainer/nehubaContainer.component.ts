@@ -776,15 +776,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         }
       }),
     )
-
-    // To get WebGL content when taking screenshot
-    HTMLCanvasElement.prototype.getContext = function(origFn) {
-      return function(type, attribs) {
-        attribs = attribs || {}
-        attribs.preserveDrawingBuffer = true
-        return origFn.call(this, type, attribs)
-      }
-    }(HTMLCanvasElement.prototype.getContext)
   }
 
   // datasetViewerRegistry : Set<string> = new Set()
