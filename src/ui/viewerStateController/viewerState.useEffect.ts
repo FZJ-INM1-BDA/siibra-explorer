@@ -2,13 +2,14 @@ import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of } from "rxjs";
-import {distinctUntilChanged, filter, map, mergeMap, shareReplay, withLatestFrom, switchMap} from "rxjs/operators";
+import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
 import { UIService } from "src/services/uiService.service";
 import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
 
 @Injectable({
   providedIn: 'root',
@@ -54,6 +55,10 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
   @Effect()
   public navigateToRegion$: Observable<any>
 
+
+  @Effect()
+  public onTemplateSelectClearStandAloneVolumes$: Observable<any>
+
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
@@ -69,6 +74,13 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
     this.selectedRegions$ = viewerState$.pipe(
       select('regionsSelected'),
       distinctUntilChanged(),
+    )
+
+    this.onTemplateSelectClearStandAloneVolumes$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
+      mapTo({
+        type: CLEAR_STANDALONE_VOLUMES
+      })
     )
 
     this.selectParcellationWithName$ = this.actions$.pipe(
@@ -121,6 +133,15 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         viewerState$
       ),
       switchMap(([newTemplateName, { templateSelected, fetchedTemplates, navigation }]) => {
+        if (!templateSelected) {
+          return of({
+            newTemplateName,
+            templateSelected: templateSelected,
+            fetchedTemplates,
+            translatedCoordinate: null,
+            navigation
+          })
+        }
         const position = (navigation && navigation.position) || [0, 0, 0]
         if (newTemplateName === templateSelected.name) return of(null)
         return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(

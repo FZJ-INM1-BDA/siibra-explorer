@@ -183,8 +183,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.sidePanelIsOpen$ = this.store.pipe(
       select('uiState'),
-      filter(state => isDefined(state)),
-      map(state => state.sidePanelIsOpen),
+      select('sidePanelIsOpen')
     )
 
     this.selectedRegions$ = this.store.pipe(

@@ -30,6 +30,8 @@ export class ViewerStateBase implements OnInit {
 
   private subscriptions: Subscription[] = []
 
+  public standaloneVolumes$: Observable<any[]>
+
   public availableTemplates$: Observable<any[]>
   public availableParcellations$: Observable<any[]>
 
@@ -74,6 +76,12 @@ export class ViewerStateBase implements OnInit {
       select('regionsSelected'),
       distinctUntilChanged(),
       shareReplay(1),
+    )
+
+    this.standaloneVolumes$ = viewerState$.pipe(
+      select('standaloneVolumes'),
+      distinctUntilChanged(),
+      shareReplay(1)
     )
 
     this.availableTemplates$ = viewerState$.pipe(
