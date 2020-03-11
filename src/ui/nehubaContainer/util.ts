@@ -187,3 +187,18 @@ export const getNavigationStateFromConfig = nehubaConfig => {
     zoom: zoomFactor
   }
 }
+
+export const calculateSliceZoomFactor = (originalZoom) => originalZoom
+  ? 700 * originalZoom / Math.min(window.innerHeight, window.innerWidth)
+  : 1e7
+
+export const singleLmUnchanged = (lm: {id: string, position: [number, number, number]}, map: Map<string, [number, number, number]>) =>
+  map.has(lm.id) && map.get(lm.id).every((value, idx) => value === lm.position[idx])
+
+export const userLmUnchanged = (oldlms, newlms) => {
+  const oldmap = new Map(oldlms.map(lm => [lm.id, lm.position]))
+  const newmap = new Map(newlms.map(lm => [lm.id, lm.position]))
+
+  return oldlms.every(lm => singleLmUnchanged(lm, newmap as Map<string, [number, number, number]>))
+    && newlms.every(lm => singleLmUnchanged(lm, oldmap as Map<string, [number, number, number]>))
+}

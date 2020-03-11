@@ -79,6 +79,8 @@ import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/region
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
 import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
+import { NehubaModule } from "./nehubaContainer/nehuba.module";
+import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.component";
 
 @NgModule({
   imports : [
@@ -91,6 +93,7 @@ import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
+    NehubaModule
   ],
   declarations : [
     NehubaContainer,
@@ -100,6 +103,7 @@ import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
     PluginBannerUI,
     CitationsContainer,
     LayerBrowser,
+    LayerDetailComponent,
     KgEntryViewer,
     SubjectViewer,
     LogoContainer,

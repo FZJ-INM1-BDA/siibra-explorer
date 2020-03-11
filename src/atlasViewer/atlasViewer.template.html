@@ -42,6 +42,7 @@
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
     <ui-nehuba-container
+      #uiNehubaContainer
       iav-mouse-hover 
       #iavMouseHoverEl="iavMouseHover"
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
@@ -55,7 +56,7 @@
 
       <!-- dataset search side nav -->
       <mat-drawer-container
-        *ngIf="newViewer$ | async"
+        *ngIf="uiNehubaContainer.nehubaViewerLoaded | async"
         [hasBackdrop]="false"
         class="w-100 h-100 bg-none mat-drawer-content-overflow-visible">
         <mat-drawer mode="push"

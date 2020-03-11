@@ -297,7 +297,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     }
   }
 
-  public multiNgIdsLabelIndexMap: Map<string, Map<number, any>>
+  public multiNgIdsLabelIndexMap: Map<string, Map<number, any>> = new Map()
 
   public navPosReal: [number, number, number] = [0, 0, 0]
   public navPosVoxel: [number, number, number] = [0, 0, 0]

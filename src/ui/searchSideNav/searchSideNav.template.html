@@ -4,6 +4,7 @@
     <!-- content append -->
     <ng-container card-content="append">
       <region-text-search-autocomplete
+        *ngIf="viewerStateController.parcellationSelected$ | async"
         [showBadge]="true"
         class="d-block w-100">
       </region-text-search-autocomplete>
@@ -14,11 +15,21 @@
       <button mat-stroked-button
         *ngIf="!(sidePanelExploreCurrentViewIsOpen$ | async)"
         (click)="expandSidePanelCurrentView()"
-        class="m-1 flex-grow-1 overflow-hidden" >
-        <i class="fas fa-chevron-down"></i>
-        <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
-          {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
+        [disabled]="!(viewerStateController.parcellationSelected$ | async)"
+        class="m-1 flex-grow-1 overflow-hidden">
+
+        <!-- template parcellation selected -->
+        <ng-container *ngIf="viewerStateController.parcellationSelected$ | async; else exploreRegionNotAvailable">
+          <i class="fas fa-chevron-down"></i>
+          <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
+            {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
+          </ng-container>
         </ng-container>
+
+        <!-- nothing selected -->
+        <ng-template #exploreRegionNotAvailable>
+          No additional information available
+        </ng-template>
       </button>
     </div>
   </viewer-state-controller>
