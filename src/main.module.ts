@@ -53,6 +53,7 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { LoggingService } from "./services/logging.service";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
 
 @NgModule({
   imports : [
@@ -75,7 +76,8 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
       NgViewerUseEffect,
       PluginServiceUseEffect,
       AtlasViewerHistoryUseEffect,
-      UiStateUseEffect
+      UiStateUseEffect,
+      NewTemplateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,
