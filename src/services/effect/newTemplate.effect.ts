@@ -19,7 +19,6 @@ export class NewTemplateUseEffect{
   ){
     this.onNewTemplateShouldClearPreviewDataset$ = this.actions$.pipe(
       ofType(NEWVIEWER),
-      tap(() => console.log(`new`)),
       mapTo({
         type: DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASETS
       })
