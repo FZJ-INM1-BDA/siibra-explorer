@@ -37,9 +37,11 @@ export const determinePreviewFileType = (previewFile: ViewerPreviewFile) => {
   if (!previewFile) return null
   const { mimetype, data } = previewFile
   const chartType = data && data['chart.js'] && data['chart.js'].type
+  const registerdVolumes = data && data['iav-registered-volumes']
   if ( mimetype === 'application/nifti' ) { return PREVIEW_FILE_TYPES.NIFTI }
   if ( /^image/.test(mimetype)) { return PREVIEW_FILE_TYPES.IMAGE }
   if ( /application\/json/.test(mimetype) && (chartType === 'line' || chartType === 'radar')) { return PREVIEW_FILE_TYPES.CHART }
+  if ( /application\/json/.test(mimetype) && !!registerdVolumes) { return PREVIEW_FILE_TYPES.VOLUMES }
   return PREVIEW_FILE_TYPES.OTHER
 }
 
@@ -48,4 +50,10 @@ export const PREVIEW_FILE_TYPES = {
   IMAGE: 'IMAGE',
   CHART: 'CHART',
   OTHER: 'OTHER',
+  VOLUMES: 'VOLUMES'
 }
+
+export const PREVIEW_FILE_TYPES_NO_UI = [
+  PREVIEW_FILE_TYPES.NIFTI,
+  PREVIEW_FILE_TYPES.VOLUMES
+]

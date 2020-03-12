@@ -1,12 +1,13 @@
 import { Action } from '@ngrx/store'
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
 /**
  * TODO merge with databrowser.usereffect.ts
  */
 
-interface DatasetPreview {
-  dataset?: IDataEntry
-  file: Partial<ViewerPreviewFile>&{filename: string}
+export interface DatasetPreview {
+  datasetId: string
+  filename: string
 }
 
 export interface IStateInterface {
@@ -49,13 +50,25 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
 
     const { payload = {}} = action
     const { file , dataset } = payload
+    const { fullId } = dataset
+    const { filename } = file
     return {
       ...prevState,
       datasetPreviews: prevState.datasetPreviews.concat({
-        dataset,
-        file
+        datasetId: fullId,
+        filename
       })
     }
+  }
+  case ACTION_TYPES.CLEAR_PREVIEW_DATASETS: {
+    return {
+      ...prevState,
+      datasetPreviews: []
+    }
+  }
+  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+    const { dataStore } = (action as any).state
+    return dataStore
   }
   default: return prevState
   }
@@ -87,7 +100,7 @@ export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
 export interface IActivity {
   methods: string[]
   preparation: string[]
-  protocols: string[  ]
+  protocols: string[]
 }
 
 export interface IDataEntry {
@@ -206,6 +219,7 @@ const ACTION_TYPES = {
   UNFAV_DATASET: 'UNFAV_DATASET',
   TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET',
   PREVIEW_DATASET: 'PREVIEW_DATASET',
+  CLEAR_PREVIEW_DATASETS: 'CLEAR_PREVIEW_DATASETS'
 }
 
 export const DATASETS_ACTIONS_TYPES = ACTION_TYPES

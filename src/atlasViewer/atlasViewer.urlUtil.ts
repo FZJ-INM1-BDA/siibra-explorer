@@ -3,6 +3,9 @@ import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, GLSL_COLORMAP_JET, separator } from "./atlasViewer.constantService.service";
+import { GetKgSchemaIdFromFullIdPipe } from "src/ui/databrowserModule/util/getKgSchemaIdFromFullId.pipe";
+
+const getKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
 
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
@@ -21,7 +24,7 @@ export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
 export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchParams => {
   const searchParam = new URLSearchParams()
 
-  const { viewerState, ngViewerState, pluginState } = state
+  const { viewerState, ngViewerState, pluginState, dataStore } = state
   const { templateSelected, parcellationSelected, navigation, regionsSelected, standaloneVolumes } = viewerState
 
   if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
@@ -79,6 +82,30 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
     .filter(([ src ]) => src !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
     .map(([ _src, url]) => url)
     .join('__')
+
+  // previewDataset state
+
+  const { datasetPreviews } = dataStore
+
+  if (datasetPreviews && Array.isArray(datasetPreviews)) {
+    const dsPrvArr = []
+    for (const preview of datasetPreviews) {
+      const { filename, datasetId } = preview
+      
+      const re = getKgSchemaIdFromFullIdPipe.transform(datasetId)
+      if (!re)  {
+        // TODO catch error, inform user that kgschemaid cannot be transformed
+        continue
+      }
+      const [ kgSchema, kgId ] = re
+      dsPrvArr.push({
+        datasetId: `${kgSchema}/${kgId}`,
+        filename
+      })
+    }
+
+    if (dsPrvArr.length > 0) searchParam.set('previewingDatasetFiles', JSON.stringify(dsPrvArr))
+  }
 
   if (initManifests.length > 0) { searchParam.set('pluginState', pluginStateParam) }
 
@@ -288,5 +315,17 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
     const arrPluginStates = pluginStates.split('__')
     pluginState.initManifests = arrPluginStates.map(url => [PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC, url] as [string, string])
   }
+
+  const { dataStore } = returnState
+  const stringSearchParam = searchparams.get('previewingDatasetFiles')
+  try {
+    if (stringSearchParam) {
+      const arr = JSON.parse(stringSearchParam) as Array<{datasetId: string, filename: string}>
+      dataStore.datasetPreviews = arr
+    }
+  } catch (e) {
+    // parsing previewingDatasetFiles
+  }
+  
   return returnState
 }

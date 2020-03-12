@@ -1,20 +1,22 @@
-import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
-import { from, merge, Observable, of, Subscription } from "rxjs";
-import { catchError, filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay } from "rxjs/operators";
+import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
+import { catchError, filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";
 import { getIdFromDataEntry } from "./databrowser.service";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
-import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "./preview/previewFileIcon.pipe";
+import { determinePreviewFileType, PREVIEW_FILE_TYPES, PREVIEW_FILE_TYPES_NO_UI } from "./preview/previewFileIcon.pipe";
 import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
-import {MatSnackBar} from "@angular/material/snack-bar";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialog } from "@angular/material/dialog";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
+import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { HttpClient } from "@angular/common/http";
 
 const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
   map(string => JSON.parse(string)),
@@ -31,6 +33,8 @@ const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET
   }),
 )
 
+const getSchemaIdFromPipe = new GetKgSchemaIdFromFullIdPipe()
+
 @Injectable({
   providedIn: 'root',
 })
@@ -40,8 +44,13 @@ export class DataBrowserUseEffect implements OnDestroy {
   private subscriptions: Subscription[] = []
 
   // ng layer (currently only nifti file) needs to be previewed
+  // to be deprecated in favour of preview register volumes
   @Effect()
   previewNgLayer$: Observable<any>
+
+  // registerd layers (to be further developed)
+  @Effect()
+  previewRegisteredVolumes$: Observable<any>
 
   // when bottom sheet should be hidden (currently only when ng layer is visualised)
   @Effect()
@@ -52,6 +61,7 @@ export class DataBrowserUseEffect implements OnDestroy {
   navigateToPreviewPosition$: Observable<any>
 
   public previewDatasetFile$: Observable<ViewerPreviewFile>
+  private storePreviewDatasetFile$: Observable<{dataset: IDataEntry,file: ViewerPreviewFile}[]>
 
   constructor(
     private store$: Store<IavRootStoreInterface>,
@@ -59,7 +69,8 @@ export class DataBrowserUseEffect implements OnDestroy {
     private kgSingleDatasetService: KgSingleDatasetService,
     private log: LoggingService,
     private snackbar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private http: HttpClient
   ) {
 
     this.subscriptions.push(
@@ -68,15 +79,21 @@ export class DataBrowserUseEffect implements OnDestroy {
         select('datasetPreviews'),
         filter(datasetPreviews => datasetPreviews.length > 0),
         map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
-        filter(({ file }) => determinePreviewFileType(file) !== PREVIEW_FILE_TYPES.NIFTI)
-      ).subscribe(({ dataset, file }) => {
-        
-        const { fullId, name } = dataset
-        const { filename } = file
+        switchMap(({ datasetId, filename }) =>{
+          const re = getSchemaIdFromPipe.transform(datasetId)
+          return this.http.get(`${DATASET_PREVIEW_URL}/${re[1]}/${filename}`).pipe(
+            filter((file: any) => PREVIEW_FILE_TYPES_NO_UI.indexOf( determinePreviewFileType(file) ) < 0),
+            mapTo({
+              datasetId,
+              filename
+            })
+          )
+        }),
+      ).subscribe(({ datasetId, filename }) => {
         
         // TODO replace with common/util/getIdFromFullId
-        const previewKgId = /\/([a-f0-9-]{1,})$/.exec(fullId)[1]
         
+        const re = getSchemaIdFromPipe.transform(datasetId)
         this.dialog.open(
           PreviewComponentWrapper,
           {
@@ -85,16 +102,44 @@ export class DataBrowserUseEffect implements OnDestroy {
             autoFocus: false,
             panelClass: 'mat-card-sm',
             height: '50vh',
+            width: '350px',
             position: {
               left: '5px'
             },
             data: {
               filename,
-              kgId: previewKgId,
-              backendUrl: DS_PREVIEW_URL,
-              datasetName: name
+              kgId: re && re[1],
+              backendUrl: DS_PREVIEW_URL
             }
           }
+        )
+      })
+    )
+
+    this.storePreviewDatasetFile$ = store$.pipe(
+      select('dataStore'),
+      select('datasetPreviews'),
+      startWith([]),
+      switchMap((arr: any[]) => {
+        return merge(
+          ... (arr.map(({ datasetId, filename }) => {
+            const re = getSchemaIdFromPipe.transform(datasetId)
+            if (!re) throw new Error(`datasetId ${datasetId} does not follow organisation/domain/schema/version/uuid rule`)
+  
+            return forkJoin(
+              from(this.kgSingleDatasetService.getInfoFromKg({ kgSchema: re[0], kgId: re[1] })),
+              this.http.get(`${DS_PREVIEW_URL}/${re[1]}/${filename}`)
+            ).pipe(
+              map(([ dataset, file ]) => {
+                return {
+                  dataset,
+                  file
+                } as { dataset: IDataEntry, file: ViewerPreviewFile }
+              })
+            )
+          }))
+        ).pipe(
+          scan((acc, curr) => acc.concat(curr), [])
         )
       })
     )
@@ -127,6 +172,44 @@ export class DataBrowserUseEffect implements OnDestroy {
       )
     )
     
+    this.previewRegisteredVolumes$ = combineLatest(
+      this.store$.pipe(
+        select('viewerState'),
+        select('templateSelected'),
+        distinctUntilChanged(),
+        startWith(null)
+      ),
+      this.storePreviewDatasetFile$.pipe(
+        distinctUntilChanged()
+      )
+    ).pipe(
+      map(([templateSelected, arr]) => {
+        const re = getSchemaIdFromPipe.transform(
+          (templateSelected && templateSelected.fullId) || ''
+        )
+        const templateId = re && re[1]
+        return arr.filter(({ file }) => {
+          return determinePreviewFileType(file) === PREVIEW_FILE_TYPES.VOLUMES
+            && file.referenceSpaces.findIndex(({ fullId }) => {
+              if (fullId === '*') return true
+              const regex = getSchemaIdFromPipe.transform(fullId)
+              const fileReferenceTemplateId = regex && regex[1]
+              if (!fileReferenceTemplateId) return false
+              return fileReferenceTemplateId === templateId
+            }) >= 0
+        })
+      }),
+      filter(arr => arr.length > 0),
+      map(arr => arr[arr.length - 1]),
+      map(({ file }) => {
+        const { volumes } = file['data']['iav-registered-volumes']
+        return {
+          type: ADD_NG_LAYER,
+          layer: volumes
+        }
+      })
+    )
+
     this.previewNgLayer$ = this.previewDatasetFile$.pipe(
       filter(file => 
         determinePreviewFileType(file) === PREVIEW_FILE_TYPES.NIFTI
