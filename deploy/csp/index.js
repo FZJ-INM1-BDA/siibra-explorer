@@ -45,6 +45,8 @@ const dataSource = [
   '*.humanbrainproject.org',
   '*.humanbrainproject.eu',
   '*.fz-juelich.de',
+  '*.kfa-juelich.de',
+  'object.cscs.ch',
   ...DATA_SRC
 ]
 
