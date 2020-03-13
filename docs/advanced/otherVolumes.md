@@ -1,7 +1,7 @@
 # Displaying non-atlas volumes
 
 !!! warning
-  This section is still been developed, and the content/API may change in future versions.
+    This section is still been developed, and the content/API may change in future versions.
 
 Interactive atlas can allow for arbitary volumes to be viewed, either in the context of a reference template or without. 
 

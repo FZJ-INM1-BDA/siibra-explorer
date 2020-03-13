@@ -23,3 +23,8 @@ connectivity-browser {
 {
   min-height: 50vh!important;
 }
+
+.layerBrowserToggleBtn[toggle-open="true"]
+{
+  transform: translateY(-50%);
+}

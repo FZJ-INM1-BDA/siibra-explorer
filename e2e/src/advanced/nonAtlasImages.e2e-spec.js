@@ -10,7 +10,7 @@ describe('> non-atlas images', () => {
   describe('> standalone volumes', () => {
 
     // TODO investigates why it occassionally fails
-    it('> loads standalone volumes when set', async () => {
+    it('> loads standalone volumes when set (fails sometimes. Just rerun if it does.)', async () => {
       const searchParam = new URLSearchParams()
       searchParam.set('standaloneVolumes', '["precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64"]')
       await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
@@ -142,6 +142,84 @@ describe('> non-atlas images', () => {
           }
         )
       )
+    })
+  })
+
+  describe('> controls for non atlas volumes', () => {
+    it('if no additional volume is being shown, additional volume control is not visible', async () => {
+      const searchParam = new URLSearchParams()
+      searchParam.set('templateSelected', 'MNI Colin 27')
+      searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+  
+      const previewingDatasetFiles = [
+        {
+          "datasetId":"minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957",
+          "filename":"Overlay of data modalities"
+        }
+      ]
+      searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
+      
+      await iavPage.goto(`/?${searchParam.toString()}`)
+      await iavPage.wait(2000)
+
+      const additionalLayerControlIsShown = await iavPage.additionalLayerControlIsVisible()
+
+      expect(additionalLayerControlIsShown).toEqual(false)
+      
+    })
+
+    it('if additonal volumes are being shown, additional volume control is visible', async () => {
+      
+      const searchParam = new URLSearchParams()
+      searchParam.set('templateSelected', 'Big Brain (Histology)')
+      searchParam.set('parcellationSelected', 'Grey/White matter')
+  
+      const previewingDatasetFiles = [
+        {
+          "datasetId":"minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957",
+          "filename":"Overlay of data modalities"
+        }
+      ]
+      searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
+      
+      await iavPage.goto(`/?${searchParam.toString()}`)
+      await iavPage.wait(2000)
+      
+      const additionalLayerCtrlIsVisible = await iavPage.additionalLayerControlIsVisible()
+      expect(additionalLayerCtrlIsVisible).toEqual(true)
+
+    })
+
+    it('if additional volumes are being shown, it can be toggled', async () => {
+
+      const searchParam = new URLSearchParams()
+      searchParam.set('templateSelected', 'Big Brain (Histology)')
+      searchParam.set('parcellationSelected', 'Grey/White matter')
+  
+      const previewingDatasetFiles = [
+        {
+          "datasetId":"minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957",
+          "filename":"Overlay of data modalities"
+        }
+      ]
+      searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
+      
+      await iavPage.goto(`/?${searchParam.toString()}`)
+      await iavPage.wait(2000)
+      
+      const additionalLayerCtrlIsExpanded = await iavPage.additionalLayerControlIsExpanded()
+      expect(additionalLayerCtrlIsExpanded).toEqual(true)
+
+      await iavPage.toggleLayerControl()
+
+      const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
+      expect(additionalLayerCtrlIsExpanded2).toEqual(false)
+
+      await iavPage.toggleLayerControl()
+
+      const additionalLayerCtrlIsExpanded3 = await iavPage.additionalLayerControlIsExpanded()
+      expect(additionalLayerCtrlIsExpanded3).toEqual(true)
+
     })
   })
 })
