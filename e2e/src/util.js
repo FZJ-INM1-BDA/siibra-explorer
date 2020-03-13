@@ -241,6 +241,38 @@ class WdLayoutPage extends WdBase{
 
     return text
   }
+
+  _getAdditionalLayerControl(){
+    return this._browser.findElement(
+      By.css('[aria-label="Additional volumes control"]')
+    )
+  }
+
+  async additionalLayerControlIsVisible(){
+    try {
+      return await this._getAdditionalLayerControl().isDisplayed()
+    } catch (e) {
+      return false
+    }
+  }
+
+  // will throw if additional layer contorl is not visible
+  additionalLayerControlIsExpanded() {
+    return this._getAdditionalLayerControl()
+      .findElement(
+        By.tagName('layer-browser')
+      )
+      .isDisplayed()
+  }
+
+  // will throw if additional layer contorl is not visible
+  async toggleLayerControl(){
+    return this._getAdditionalLayerControl()
+      .findElement(
+        By.css('[aria-label="Toggle expansion state of additional layer browser"]')
+      )
+      .click()
+  }
 }
 
 class WdIavPage extends WdLayoutPage{

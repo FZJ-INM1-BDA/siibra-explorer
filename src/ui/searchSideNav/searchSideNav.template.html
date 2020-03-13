@@ -83,6 +83,7 @@
 
   <div class="d-flex justify-content-center position-static h-0 mt-4">
     <button mat-mini-fab
+      aria-label="Toggle expansion state of additional layer browser"
       [matBadge]="showLayerBrowser ? null : (layerBrowser.nonBaseNgLayers$ | async).length"
       class="position-absolute layerBrowserToggleBtn"
       matTooltip="Toggle the visiblity of the additional layer browser"

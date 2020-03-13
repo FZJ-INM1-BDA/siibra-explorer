@@ -102,10 +102,11 @@ export class SearchSideNav implements OnDestroy {
       type: CLOSE_SIDE_PANEL,
     })
 
-    const dialogToOpen = this.layerBrowserTmpl || LayerBrowser
+    const dialogToOpen = this.layerBrowserTmpl
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
       autoFocus: false,
+      ariaLabel: 'Additional volumes control',
       panelClass: [
         'layerBrowserContainer',
       ],
