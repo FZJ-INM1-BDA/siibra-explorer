@@ -6,6 +6,7 @@ const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, ge
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
+const archiver = require('archiver')
 
 const bodyParser = require('body-parser')
 
@@ -177,6 +178,36 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
     stream.pipe(res)
   } catch (e) {
     console.warn('datasets/index#downloadKgFiles', e)
+    res.status(400).send(e.toString())
+  }
+})
+
+datasetsRouter.post('/bulkDownloadKgFiles', bodyParser.urlencoded({ extended: false }), async (req, res) => {
+  try{
+    const { body = {}, user } = req
+    const { kgIds } = body
+    if (!kgIds) throw new Error(`kgIds needs to be populated`)
+    const arrKgIds = JSON.parse(kgIds)
+    if (!Array.isArray(arrKgIds)) {
+      throw new Error(`kgIds needs to be an array`)
+    }
+    if (arrKgIds.length === 0) {
+      throw new Error(`There needs to be at least 1 kgId in kgIds`)
+    }
+    const zip = archiver('zip')
+    for (const kgId of arrKgIds) {
+      zip.append(
+        await getDatasetFileAsZip({ user, kgId }),
+        {
+          name: `${kgId}.zip`
+        }
+      )
+    }
+    zip.finalize()
+    res.setHeader('Content-disposition', `attachment; filename="bulkDsDownload.zip"`)
+    res.setHeader('Content-Type', 'application/zip')
+    zip.pipe(res)
+  }catch(e){
     res.status(400).send(e.toString())
   }
 })

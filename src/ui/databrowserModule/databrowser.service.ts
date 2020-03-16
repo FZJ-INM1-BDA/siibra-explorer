@@ -202,21 +202,21 @@ export class DatabrowserService implements OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public toggleFav(dataentry: IDataEntry) {
+  public toggleFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
       payload: dataentry,
     })
   }
 
-  public saveToFav(dataentry: IDataEntry) {
+  public saveToFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
       payload: dataentry,
     })
   }
 
-  public removeFromFav(dataentry: IDataEntry) {
+  public removeFromFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
       payload: dataentry,

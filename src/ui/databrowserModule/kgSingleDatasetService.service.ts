@@ -15,8 +15,6 @@ export class KgSingleDatasetService implements OnDestroy {
   private subscriptions: Subscription[] = []
   public ngLayers: Set<string> = new Set()
 
-  private getKgSchemaIdFromFullIdPipe: GetKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
-
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private store$: Store<IavRootStoreInterface>,
@@ -92,14 +90,6 @@ export class KgSingleDatasetService implements OnDestroy {
         name : url,
       },
     })
-  }
-
-  public getKgSchemaKgIdFromFullId(fullId: string) {
-    const match = this.getKgSchemaIdFromFullIdPipe.transform(fullId)
-    return match && {
-      kgSchema: match[0],
-      kgId: match[1],
-    }
   }
 }
 

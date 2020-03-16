@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Input, OnInit, TemplateRef } from "@angular/core";
+import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges } from "@angular/core";
 import { Observable } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
@@ -7,6 +7,8 @@ import { DatabrowserService } from "../databrowser.service";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
 
 import { DS_PREVIEW_URL } from 'src/util/constants'
+import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 export {
   DatabrowserService,
@@ -15,7 +17,7 @@ export {
   AtlasViewerConstantsServices
 }
 
-export class SingleDatasetBase implements OnInit {
+export class SingleDatasetBase implements OnInit, OnChanges {
 
   @Input() public ripple: boolean = false
 
@@ -27,7 +29,18 @@ export class SingleDatasetBase implements OnInit {
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
-  @Input() public kgSchema?: string
+  private _fullId: string
+
+  @Input()
+  set fullId(val){
+    this._fullId = val
+  }
+
+  get fullId(){
+    return this._fullId || (this.kgSchema && this.kgId && `${this.kgSchema}/${this.kgId}`) || null
+  }
+
+  @Input() public kgSchema?: string = 'minds/core/dataset/v1.0.0'
   @Input() public kgId?: string
 
   @Input() public dataset: any = null
@@ -59,16 +72,16 @@ export class SingleDatasetBase implements OnInit {
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
     private cdr: ChangeDetectorRef,
+    private snackBar: MatSnackBar,
     dataset?: any,
   ) {
-
     this.favedDataentries$ = this.dbService.favedDataentries$
+
     if (dataset) {
-      this.dataset = dataset
       const { fullId } = dataset
-      const obj = this.singleDatasetService.getKgSchemaKgIdFromFullId(fullId)
+      const obj = getKgSchemaIdFromFullId(fullId)
       if (obj) {
-        const { kgSchema, kgId } = obj
+        const [ kgSchema, kgId ] = obj
         this.kgSchema = kgSchema
         this.kgId = kgId
       }
@@ -87,6 +100,38 @@ export class SingleDatasetBase implements OnInit {
       this.hasPreview = true
       this.previewFiles = datasetFiles
     }
+  }
+
+  public async fetchDatasetDetail(){
+    try {
+      const { kgId } = this
+      if (!kgId) return
+      const dataset = await this.singleDatasetService.getInfoFromKg({ kgId })
+      
+      const { name, description, publications, fullId } = dataset
+      this.name = name
+      this.description = description
+      this.publications = publications
+      this.fullId = fullId
+
+      this.cdr.detectChanges()
+    } catch (e) {
+      // catch error
+    }
+  }
+
+  public ngOnChanges(){
+    if (!this.kgId) {
+      const fullId = this.fullId || this.dataset?.fullId
+      
+      const re = getKgSchemaIdFromFullId(fullId)
+      if (re) {
+        this.kgSchema = re[0]
+        this.kgId = re[1]
+      }
+    }
+    
+    this.fetchDatasetDetail()
   }
 
   public ngOnInit() {
@@ -160,7 +205,7 @@ export class SingleDatasetBase implements OnInit {
   }
 
   public toggleFav() {
-    this.dbService.toggleFav(this.dataset)
+    this.dbService.toggleFav({ fullId: this.fullId })
   }
 
   public showPreviewList(templateRef: TemplateRef<any>) {
@@ -169,5 +214,33 @@ export class SingleDatasetBase implements OnInit {
 
   public handlePreviewFile(file: ViewerPreviewFile) {
     this.singleDatasetService.previewFile(file, this.dataset)
+  }
+
+  public undoableRemoveFav() {
+    this.snackBar.open(`Unpinned dataset: ${this.name}`, 'Undo', {
+      duration: 5000,
+      politeness: "polite"
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this.dbService.saveToFav({ fullId: this.fullId})
+        }
+      })
+    this.dbService.removeFromFav({ fullId: this.fullId})
+  }
+
+  public undoableAddFav() {
+    this.snackBar.open(`Pinned dataset: ${this.name}`, 'Undo', {
+      duration: 5000,
+      politeness: "polite"
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this.dbService.removeFromFav({ fullId: this.fullId})
+        }
+      })
+    this.dbService.saveToFav({ fullId: this.fullId})
   }
 }

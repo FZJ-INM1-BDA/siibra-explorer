@@ -2,12 +2,11 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
-import { catchError, filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
+import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
 import { LoggingService } from "src/services/logging.service";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";
-import { getIdFromDataEntry } from "./databrowser.service";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { determinePreviewFileType, PREVIEW_FILE_TYPES, PREVIEW_FILE_TYPES_NO_UI } from "./preview/previewFileIcon.pipe";
 import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -15,25 +14,8 @@ import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialog } from "@angular/material/dialog";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
-import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
 import { HttpClient } from "@angular/common/http";
-
-const savedFav$ = of(window.localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)).pipe(
-  map(string => JSON.parse(string)),
-  map(arr => {
-    if (arr.every(item => item.id )) { return arr }
-    throw new Error('Not every item has id and/or name defined')
-  }),
-  catchError(err => {
-    /**
-     * TODO emit proper error
-     * possibly wipe corrupted local stoage here?
-     */
-    return of(null)
-  }),
-)
-
-const getSchemaIdFromPipe = new GetKgSchemaIdFromFullIdPipe()
 
 @Injectable({
   providedIn: 'root',
@@ -80,7 +62,7 @@ export class DataBrowserUseEffect implements OnDestroy {
         filter(datasetPreviews => datasetPreviews.length > 0),
         map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
         switchMap(({ datasetId, filename }) =>{
-          const re = getSchemaIdFromPipe.transform(datasetId)
+          const re = getKgSchemaIdFromFullId(datasetId)
           return this.http.get(`${DATASET_PREVIEW_URL}/${re[1]}/${filename}`).pipe(
             filter((file: any) => PREVIEW_FILE_TYPES_NO_UI.indexOf( determinePreviewFileType(file) ) < 0),
             mapTo({
@@ -93,7 +75,7 @@ export class DataBrowserUseEffect implements OnDestroy {
         
         // TODO replace with common/util/getIdFromFullId
         
-        const re = getSchemaIdFromPipe.transform(datasetId)
+        const re = getKgSchemaIdFromFullId(datasetId)
         this.dialog.open(
           PreviewComponentWrapper,
           {
@@ -123,7 +105,7 @@ export class DataBrowserUseEffect implements OnDestroy {
       switchMap((arr: any[]) => {
         return merge(
           ... (arr.map(({ datasetId, filename }) => {
-            const re = getSchemaIdFromPipe.transform(datasetId)
+            const re = getKgSchemaIdFromFullId(datasetId)
             if (!re) throw new Error(`datasetId ${datasetId} does not follow organisation/domain/schema/version/uuid rule`)
   
             return forkJoin(
@@ -184,7 +166,7 @@ export class DataBrowserUseEffect implements OnDestroy {
       )
     ).pipe(
       map(([templateSelected, arr]) => {
-        const re = getSchemaIdFromPipe.transform(
+        const re = getKgSchemaIdFromFullId(
           (templateSelected && templateSelected.fullId) || ''
         )
         const templateId = re && re[1]
@@ -192,7 +174,7 @@ export class DataBrowserUseEffect implements OnDestroy {
           return determinePreviewFileType(file) === PREVIEW_FILE_TYPES.VOLUMES
             && file.referenceSpaces.findIndex(({ fullId }) => {
               if (fullId === '*') return true
-              const regex = getSchemaIdFromPipe.transform(fullId)
+              const regex = getKgSchemaIdFromFullId(fullId)
               const fileReferenceTemplateId = regex && regex[1]
               if (!fileReferenceTemplateId) return false
               return fileReferenceTemplateId === templateId
@@ -244,13 +226,25 @@ export class DataBrowserUseEffect implements OnDestroy {
       withLatestFrom(this.favDataEntries$),
       map(([action, prevFavDataEntries]) => {
         const { payload = {} } = action as any
-        const { id } = payload
+        const { fullId } = payload
 
-        const wasFav = prevFavDataEntries.findIndex(ds => ds.id === id) >= 0
+        const re1 = getKgSchemaIdFromFullId(fullId)
+
+        if (!re1) {
+          return {
+            type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+            favDataEntries: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+          }
+        }
+        const favIdx = prevFavDataEntries.findIndex(ds => {
+          const re2 = getKgSchemaIdFromFullId(ds.fullId)
+          if (!re2) return false
+          return re2[1] === re1[1]
+        })
         return {
           type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-          favDataEntries: wasFav
-            ? prevFavDataEntries.filter(ds => ds.id !== id)
+          favDataEntries: favIdx >= 0
+            ? prevFavDataEntries.filter((_, idx) => idx !== favIdx)
             : prevFavDataEntries.concat(payload),
         }
       }),
@@ -262,10 +256,18 @@ export class DataBrowserUseEffect implements OnDestroy {
       map(([action, prevFavDataEntries]) => {
 
         const { payload = {} } = action as any
-        const { id } = payload
+        const { fullId } = payload
+
+        const re1 = getKgSchemaIdFromFullId(fullId)
+
         return {
           type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-          favDataEntries: prevFavDataEntries.filter(ds => ds.id !== id),
+          favDataEntries: prevFavDataEntries.filter(ds => {
+            const re2 = getKgSchemaIdFromFullId(ds.fullId)
+            if (!re2) return false
+            if (!re1) return true
+            return re2[1] !== re1[1]
+          }),
         }
       }),
     )
@@ -279,7 +281,21 @@ export class DataBrowserUseEffect implements OnDestroy {
         /**
          * check duplicate
          */
-        const favDataEntries = prevFavDataEntries.find(favDEs => favDEs.id === payload.id)
+        const { fullId } = payload
+        const re1 = getKgSchemaIdFromFullId(fullId)
+        if (!re1) {
+          return {
+            type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+            favDataEntries: prevFavDataEntries,
+          }
+        }
+
+        const isDuplicate = prevFavDataEntries.some(favDe => {
+          const re2 = getKgSchemaIdFromFullId(favDe.fullId)
+          if (!re2) return false
+          return re1[1] === re2[1]
+        })
+        const favDataEntries = isDuplicate
           ? prevFavDataEntries
           : prevFavDataEntries.concat(payload)
 
@@ -300,52 +316,10 @@ export class DataBrowserUseEffect implements OnDestroy {
          *
          * do not save anything else on localstorage. This could potentially be leaking sensitive information
          */
-        const serialisedFavDataentries = favDataEntries.map(dataentry => {
-          const id = getIdFromDataEntry(dataentry)
-          return { id }
+        const serialisedFavDataentries = favDataEntries.map(({ fullId }) => {
+          return { fullId }
         })
         window.localStorage.setItem(LOCAL_STORAGE_CONST.FAV_DATASET, JSON.stringify(serialisedFavDataentries))
-      }),
-    )
-
-    this.savedFav$ = savedFav$
-
-    this.onInitGetFav$ = this.savedFav$.pipe(
-      filter(v => !!v),
-      switchMap(arr =>
-        merge(
-          ...arr.map(({ id: kgId }) =>
-            from( this.kgSingleDatasetService.getInfoFromKg({ kgId })).pipe(
-              catchError(err => {
-                this.log.log(`fetchInfoFromKg error`, err)
-                return of(null)
-              }),
-              switchMap(dataset =>
-                this.kgSingleDatasetService.datasetHasPreview(dataset).pipe(
-                  catchError(err => {
-                    this.log.log(`fetching hasPreview error`, err)
-                    return of({})
-                  }),
-                  map(resp => {
-                    return {
-                      ...dataset,
-                      ...resp,
-                    }
-                  }),
-                ),
-              ),
-            ),
-          ),
-        ).pipe(
-          filter(v => !!v),
-          scan((acc, curr) => acc.concat(curr), []),
-        ),
-      ),
-      map(favDataEntries => {
-        return {
-          type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-          favDataEntries,
-        }
       }),
     )
   }
@@ -357,9 +331,6 @@ export class DataBrowserUseEffect implements OnDestroy {
   }
 
   private savedFav$: Observable<Array<{id: string, name: string}> | null>
-
-  @Effect()
-  public onInitGetFav$: Observable<any>
 
   private favDataEntries$: Observable<IDataEntry[]>
 

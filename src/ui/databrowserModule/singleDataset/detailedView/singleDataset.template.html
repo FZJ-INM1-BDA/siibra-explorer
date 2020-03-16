@@ -1,16 +1,28 @@
 
 <!-- title -->
 <mat-card-subtitle>
-  {{ name }}
+  <span *ngIf="name; else nameLoading">
+    {{ name }}
+  </span>
+  <ng-template #nameLoading>
+    <div class="spinnerAnimationCircle"></div>
+  </ng-template>
 </mat-card-subtitle>
 
 <mat-card-content mat-dialog-content>
 
   <!-- description -->
   <small>
-    <markdown-dom class="d-block" [markdown]="description">
+    <markdown-dom
+      *ngIf="description; else descriptionLoading"
+      class="d-block"
+      [markdown]="description">
 
     </markdown-dom>
+
+    <ng-template #descriptionLoading>
+      <div class="d-inline-block spinnerAnimationCircle"></div>
+    </ng-template>
   </small>
 
   <!-- publications -->
@@ -46,15 +58,32 @@
   </a>
 
   <!-- pin data -->
-  <button mat-button
-    *ngIf="downloadEnabled"
-    iav-stop="click mousedown"
-    (click)="toggleFav()"
-    color="primary"
-    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
-    {{ (favedDataentries$ | async | datasetIsFaved : dataset) ? 'Unpin' : 'Pin' }} this dataset
-    <i class="fas fa-thumbtack"></i>
-  </button>
+  <ng-container *ngIf="downloadEnabled && kgId">
+
+    <!-- Is currently fav'ed -->
+    <ng-container *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else notCurrentlyFav">
+
+      <button mat-button
+        iav-stop="click mousedown"
+        (click)="undoableRemoveFav()"
+        color="primary">
+        Unpin this dataset
+        <i class="fas fa-thumbtack"></i>
+      </button>
+    </ng-container>
+
+    <!-- Is NOT currently fav'ed -->
+    <ng-template #notCurrentlyFav>
+      
+      <button mat-button
+        iav-stop="click mousedown"
+        (click)="undoableAddFav()"
+        color="default">
+        Pin this dataset
+        <i class="fas fa-thumbtack"></i>
+      </button>
+    </ng-template>
+  </ng-container>
 
 
   <!-- download -->
