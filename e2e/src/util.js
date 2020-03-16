@@ -127,6 +127,33 @@ class WdBase{
     if (!ms) throw new Error(`wait duration must be specified!`)
     await this._browser.sleep(ms)
   }
+
+  async getSnackbarMessage(){
+    const txt = await this._driver
+      .findElement( By.tagName('simple-snack-bar') )
+      .findElement( By.tagName('span') )
+      .getText()
+    return txt
+  }
+
+  async clickSnackbarAction(){
+    await this._driver
+      .findElement( By.tagName('simple-snack-bar') )
+      .findElement( By.tagName('button') )
+      .click()
+  }
+
+  async clearAlerts() {
+    await this._driver
+      .actions()
+      .sendKeys(
+        Key.ESCAPE,
+        Key.ESCAPE,
+        Key.ESCAPE,
+        Key.ESCAPE
+      )
+      .perform()
+  }
 }
 
 class WdLayoutPage extends WdBase{
@@ -135,16 +162,55 @@ class WdLayoutPage extends WdBase{
     super()
   }
 
+  _getModal(){
+    return this._browser.findElement( By.tagName('mat-dialog-container') )
+  }
+
   async dismissModal() {
     try {
-      const okBtn = await this._browser
-        .findElement( By.tagName('mat-dialog-container') )
+      const okBtn = await this._getModal()
         .findElement( By.tagName('mat-dialog-actions') )
         .findElement( By.css('button[color="primary"]') )
       await okBtn.click()
     } catch (e) {
       
     }
+  }
+
+  _getModalBtns(){
+    return this._getModal()
+      .findElement( By.tagName('mat-card-actions') )
+      .findElements( By.tagName('button') )
+  }
+
+  async getModalActions(){
+    const btns = await this._getModalBtns()
+
+    const arr = []
+    for (const btn of btns){
+      arr.push(await _getTextFromWebElement(btn))
+    }
+    return arr
+  }
+
+  // text can be instance of regex or string
+  async clickModalBtnByText(text){
+    const btns = await this._getModalBtns()
+    const arr = await this.getModalActions()
+    if (typeof text === 'string') {
+      const idx = arr.indexOf(text)
+      if (idx < 0) throw new Error(`clickModalBtnByText: ${text} not found.`)
+      await btns[idx].click()
+      return
+    }
+    if (text instanceof RegExp) {
+      const idx = arr.findIndex(item => text.test(item))
+      if (idx < 0) throw new Error(`clickModalBtnByText: regexp ${text.toString()} not found`)
+      await btns[idx].click()
+      return
+    }
+
+    throw new Error(`clickModalBtnByText arg must be instance of string or regexp`)
   }
 
   async _findTitleCard(title) {
@@ -273,6 +339,55 @@ class WdLayoutPage extends WdBase{
       )
       .click()
   }
+
+  // Signin banner
+  _getFavDatasetIcon(){
+    return this._driver
+      .findElement( By.css('[aria-label="Show pinned datasets"]') )
+  }
+
+  async getNumberOfFavDataset(){
+    const attr = await this._getFavDatasetIcon().getAttribute('pinned-datasets-length')
+    return Number(attr)
+  }
+
+  async showPinnedDatasetPanel(){
+    await this._getFavDatasetIcon().click()
+    await this.wait(500)
+  }
+
+  _getPinnedDatasetPanel(){
+    return this._driver
+      .findElement(
+        By.css('[aria-label="Pinned datasets panel"]')
+      )
+  }
+
+  async getPinnedDatasetsFromOpenedPanel(){
+    const list = await this._getPinnedDatasetPanel()
+      .findElements(
+        By.tagName('mat-list-item')
+      )
+
+    const returnArr = []
+    for (const el of list) {
+      const text = await _getTextFromWebElement(el)
+      returnArr.push(text)
+    }
+    return returnArr
+  }
+
+  async unpinNthDatasetFromOpenedPanel(index){
+    const list = await this._getPinnedDatasetPanel()
+      .findElements(
+        By.tagName('mat-list-item')
+      )
+
+    if (!list[index]) throw new Error(`index out of bound: ${index} in list with size ${list.length}`)
+    await list[index]
+      .findElement( By.css('[aria-label="Toggle pinning this dataset"]') )
+      .click()
+  }
 }
 
 class WdIavPage extends WdLayoutPage{
@@ -379,17 +494,36 @@ class WdIavPage extends WdLayoutPage{
     }
   }
 
-  async getVisibleDatasets() {
-    const singleDatasetListView = await this._browser
+  _getSingleDatasetListView(){
+    return this._browser
       .findElement( By.tagName('data-browser') )
       .findElement( By.css('div.cdk-virtual-scroll-content-wrapper') )
       .findElements( By.tagName('single-dataset-list-view') )
+  }
+
+  async getVisibleDatasets() {
+    const singleDatasetListView = await this._getSingleDatasetListView()
 
     const returnArr = []
     for (const item of singleDatasetListView) {
       returnArr.push( await item.getText() )
     }
     return returnArr
+  }
+
+  async clickNthDataset(index){
+    if (!Number.isInteger(index)) throw new Error(`index needs to be an integer`)
+    const list = await this._getSingleDatasetListView()
+    await list[index].click()
+  }
+
+  async togglePinNthDataset(index) {
+    if (!Number.isInteger(index)) throw new Error(`index needs to be an integer`)
+    const list = await this._getSingleDatasetListView()
+    if (!list[index]) throw new Error(`out of bound ${index} in list with length ${list.length}`)
+    await list[index]
+      .findElement( By.css('[aria-label="Toggle pinning this dataset"]') )
+      .click()
   }
 
   async viewerIsPopulated() {

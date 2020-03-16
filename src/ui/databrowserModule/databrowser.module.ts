@@ -27,6 +27,7 @@ import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
+import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 
 @NgModule({
   imports: [
@@ -44,6 +45,7 @@ import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previ
     SingleDatasetListView,
     DatasetPreviewList,
     PreviewComponentWrapper,
+    BulkDownloadBtn,
 
     /**
      * pipes
@@ -63,6 +65,7 @@ import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previ
     ResetCounterModalityPipe,
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
+    TransformDatasetToIdPipe,
   ],
   exports: [
     DataBrowser,
@@ -71,6 +74,8 @@ import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previ
     ModalityPicker,
     FilterDataEntriesbyMethods,
     GetKgSchemaIdFromFullIdPipe,
+    BulkDownloadBtn,
+    TransformDatasetToIdPipe,
   ],
   entryComponents: [
     DataBrowser,

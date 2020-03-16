@@ -1,5 +1,6 @@
 import { Action } from '@ngrx/store'
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
+import { LOCAL_STORAGE_CONST } from 'src/util/constants'
 
 /**
  * TODO merge with databrowser.usereffect.ts
@@ -12,14 +13,27 @@ export interface DatasetPreview {
 
 export interface IStateInterface {
   fetchedDataEntries: IDataEntry[]
-  favDataEntries: IDataEntry[]
+  favDataEntries: Partial<IDataEntry>[]
   fetchedSpatialData: IDataEntry[]
   datasetPreviews: DatasetPreview[]
 }
 
+
+
 export const defaultState = {
   fetchedDataEntries: [],
-  favDataEntries: [],
+  favDataEntries: (() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_CONST.FAV_DATASET)
+      const arr = JSON.parse(saved) as any[]
+      return arr.every(item => item && !!item.fullId)
+        ? arr
+        : []
+    } catch (e) {
+      // TODO propagate error
+      return []
+    }
+  })(),
   fetchedSpatialData: [],
   datasetPreviews: [],
 }
