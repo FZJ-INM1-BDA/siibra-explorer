@@ -21,6 +21,7 @@ pages:
     - Selecting: 'usage/selecting.md'
     - Navigating: 'usage/navigating.md'
     - Searching: 'usage/search.md'
+    - Connectivity: 'usage/connectivity.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'
