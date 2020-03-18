@@ -1,6 +1,6 @@
 # Exploring connectivity
 
-The interactive atlas viewer allows the exploration of connectivity of parcellation regions, based on datasets curated in HBP Knowledge Graph.
+Powered by <https://github.com/FZJ-INM1-BDA/HBP-connectivity-component>, the interactive atlas viewer allows the exploration of connectivity of parcellation regions, based on datasets curated in HBP Knowledge Graph.
 
 Currently, connectivity data is explorable for the parcellation `JuBrain Cytoarchitectonic Atlas`, which is available in template spaces `MNI Colin 27` and `ICBM 2009c Nonlinear Asymmetric`.
 
