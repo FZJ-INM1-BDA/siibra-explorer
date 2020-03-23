@@ -33,8 +33,9 @@ export class RegionMenuComponent extends RegionBase implements OnInit, OnDestroy
       }),
       this.loadedTemplate$.subscribe(templates => {
         this.loadedTemplates = templates
-        this.bigBrainJubrainSwitch()
-        this.getSameParcellationTemplates()
+        this.getDifferentTemplatesSameRegion()
+        // this.bigBrainJubrainSwitch()
+        // this.getSameParcellationTemplates()
       }),
     )
   }

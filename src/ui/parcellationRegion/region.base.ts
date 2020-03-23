@@ -1,6 +1,6 @@
 import {EventEmitter, Input, Output} from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
+import {NEWVIEWER, SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
 import {
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
   IavRootStoreInterface, OPEN_SIDE_PANEL,
@@ -89,53 +89,45 @@ export class RegionBase {
     })
   }
 
-  getSameParcellationTemplates = () => {
-    // Get All the templates which includes parcellation equal to selected parcellation
-    // (E.g. if MNI 152 ICBM Jubrain is selected method returns MNI Colin 27)
+
+  getDifferentTemplatesSameRegion() {
+    this.sameRegionTemplate = []
     this.loadedTemplates.forEach(template => {
-      if (this.selectedTemplate.name !== template.name
-          && template.parcellations.map(p => p.name).includes(this.selectedParcellation.name)) {
-        this.sameRegionTemplate.push(template.name)
-      }
-    })
-    return null
-  }
-
-  bigBrainJubrainSwitch = () => {
-    // If Jubrain or bigbrain is selected and clicked region is included in both of them
-    // push template name to sameRegionTemplate to change template from menu
-    this.loadedTemplates.forEach(template => {
-      if(this.selectedTemplate.name === 'Big Brain (Histology)'
-          && template.parcellations.map( p => p.name).includes('JuBrain Cytoarchitectonic Atlas')) {
-
-        this.parcellationRegions = []
-
-        this.getAllRegionsFromParcellation(template.parcellations.filter(p => p.name === 'JuBrain Cytoarchitectonic Atlas')[0].regions)
-        this.parcellationRegions.forEach(pr => {
-          if (!pr.name.includes(' - left hemisphere')) {
-            if (pr.name.includes(' - right hemisphere')) pr.name = pr.name.replace(' - right hemisphere','')
-            if (!this.sameRegionTemplate.includes(template.name)) this.sameRegionTemplate.push(template.name)
-          }
+      if (this.selectedTemplate.name !== template.name) {
+        template.parcellations.forEach(parcellation => {
+          this.parcellationRegions = []
+          this.getAllRegionsFromParcellation(parcellation.regions)
+          this.parcellationRegions.forEach(pr => {
+            if (JSON.stringify(pr.fullId) === JSON.stringify(this.region.fullId)) {
+              const baseAreaHemisphere =
+                  this.region.name.includes(' - right hemisphere')? 'right' :
+                    this.region.name.includes(' - left hemisphere')? 'left'
+                      : null
+              const areaHemisphere =
+                  pr.name.includes(' - right hemisphere')? 'right'
+                    : pr.name.includes(' - left hemisphere')? 'left'
+                      : null
+              const sameRegionSpace = {template: template, parcellation: parcellation, region: pr}
+              if (!this.sameRegionTemplate.map(sr => sr.template).includes(template)) {
+                if (!(baseAreaHemisphere && areaHemisphere && baseAreaHemisphere !== areaHemisphere)) {
+                  this.sameRegionTemplate.push(sameRegionSpace)
+                }
+              }
+            }
+          })
         })
       }
-      else if(this.selectedParcellation.name === 'JuBrain Cytoarchitectonic Atlas'
-          && template.name === 'Big Brain (Histology)') {
-        let exploreRegion = this.region.name
-        if (exploreRegion.includes(' - right hemisphere')) exploreRegion = exploreRegion.replace(' - right hemisphere','')
-        if (exploreRegion.includes(' - left hemisphere')) exploreRegion = exploreRegion.replace(' - left hemisphere','')
-        this.getAllRegionsFromParcellation(template.parcellations.filter(p => p.name === 'Cytoarchitectonic Maps')[0].regions)
-        if (this.parcellationRegions.map(pr => pr.name).includes(exploreRegion)) this.sameRegionTemplate.push(template.name)
-      }
     })
   }
 
-  selectTemplate(templateName) {
+  changeView(index) {
     this.closeRegionMenu.emit()
+
     this.store$.dispatch({
-      type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME,
-      payload: {
-        name: templateName,
-      },
+      type : NEWVIEWER,
+      selectTemplate : this.sameRegionTemplate[index].template,
+      selectParcellation : this.sameRegionTemplate[index].parcellation,
+      navigation: {position: this.sameRegionTemplate[index].region.position},
     })
   }
 

@@ -56,7 +56,7 @@
               #additionalActionsMenuButton="matMenuTrigger">
         <i class="fas fa-brain"></i>
         <span>
-          Explore in
+          Change template
         </span>
         <i class="fas fa-angle-right"></i>
       </button>
@@ -64,9 +64,9 @@
 
     <mat-menu #additionalActions="matMenu" xPosition="before" (click)="$event.stopPropagation()" hasBackdrop="false">
       <div>
-        <button mat-menu-item *ngFor="let templateName of sameRegionTemplate" (click)="selectTemplate(templateName)">
+        <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (click)="changeView(i)">
           <span>
-            {{templateName}}
+            {{sameRegion.template.name}}
           </span>
         </button>
       </div>
