@@ -3,7 +3,7 @@ const { AtlasPage } = require('../util')
 const template = 'ICBM 2009c Nonlinear Asymmetric'
 const area = 'Area hOc1 (V1, 17, CalcS)'
 
-const receptorName = `Density measurements of different receptors for Area hOc1`
+const receptorName = `Density measurements of different receptors for Area hOc1 (V1, 17, CalcS) [human, v1.0]`
 const pmapName = `Probabilistic cytoarchitectonic map of Area hOc1 (V1, 17, CalcS) (v2.4)`
 
 // TODO finish writing tests
@@ -172,7 +172,7 @@ describe(`fav'ing dataset`, () => {
       expect(number2).toEqual(0)
     })
 
-    it('click unpin in dataset detail sheet unpins fav, but also allows user to undo', async () => {
+    it('> click unpin in dataset detail sheet unpins fav, but also allows user to undo', async () => {
 
       const datasets = await iavPage.getVisibleDatasets()
 
@@ -184,6 +184,9 @@ describe(`fav'ing dataset`, () => {
 
       const numberOfFav = await iavPage.getNumberOfFavDataset()
       expect(numberOfFav).toEqual(1)
+
+      // this wait is unfortunately necessary, as the snack bar sometimes obscures the unpin this dataset button
+      await iavPage.wait(5000)
 
       await iavPage.clickModalBtnByText(/unpin\ this\ dataset/i)
       await iavPage.wait(500)
