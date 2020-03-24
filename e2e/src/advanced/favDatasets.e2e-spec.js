@@ -3,7 +3,7 @@ const { AtlasPage } = require('../util')
 const template = 'ICBM 2009c Nonlinear Asymmetric'
 const area = 'Area hOc1 (V1, 17, CalcS)'
 
-const receptorName = `Density measurements of different receptors for Area hOc1`
+const receptorName = `Density measurements of different receptors for Area hOc1 (V1, 17, CalcS) [human, v1.0]`
 const pmapName = `Probabilistic cytoarchitectonic map of Area hOc1 (V1, 17, CalcS) (v2.4)`
 
 // TODO finish writing tests
