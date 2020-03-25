@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http'
-import { ComponentFactory, ComponentFactoryResolver, Injectable, NgZone, ViewContainerRef } from "@angular/core";
+import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef } from "@angular/core";
 import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
-import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { PluginUnit } from "./pluginUnit/pluginUnit.component";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
@@ -21,6 +20,11 @@ import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 
 export class PluginServices {
 
+  public pluginHandlersMap: Map<string, PluginHandler> = new Map()
+
+  public loadExternalLibraries: (libraries: string[]) => Promise<any> = () => Promise.reject(`fail to overwritten`)
+  public unloadExternalLibraries: (libraries: string[]) => void = () => { throw new Error(`failed to be overwritten`) }
+
   public fetchedPluginManifests: IPluginManifest[] = []
   public pluginViewContainerRef: ViewContainerRef
   public appendSrc: (script: HTMLElement) => void
@@ -34,13 +38,11 @@ export class PluginServices {
   public fetch: (url: string, httpOption?: any) => Promise<any> = (url, httpOption = {}) => this.http.get(url, httpOption).toPromise()
 
   constructor(
-    private apiService: AtlasViewerAPIServices,
     private constantService: AtlasViewerConstantsServices,
     private widgetService: WidgetServices,
     private cfr: ComponentFactoryResolver,
     private store: Store<IavRootStoreInterface>,
     private http: HttpClient,
-    zone: NgZone,
     private log: LoggingService,
   ) {
 
@@ -52,18 +54,6 @@ export class PluginServices {
     )
 
     this.pluginUnitFactory = this.cfr.resolveComponentFactory( PluginUnit )
-    this.apiService.interactiveViewer.uiHandle.launchNewWidget = (arg) => {
-
-      return this.launchNewWidget(arg)
-        .then(arg2 => {
-          // trigger change detection in Angular
-          // otherwise, model won't be updated until user input
-
-          /* eslint-disable-next-line @typescript-eslint/no-empty-function */
-          zone.run(() => {  })
-          return arg2
-        })
-    }
 
     /**
      * TODO convert to rxjs streams, instead of Promise.all
@@ -216,7 +206,7 @@ export class PluginServices {
         */
 
         const handler = new PluginHandler()
-        this.apiService.interactiveViewer.pluginControl[plugin.name] = handler
+        this.pluginHandlersMap.set(plugin.name, handler)
 
         /**
          * define the handler properties prior to appending plugin script
@@ -289,7 +279,7 @@ export class PluginServices {
 
         handler.onShutdown(() => {
           unsubscribeOnPluginDestroy.forEach(s => s.unsubscribe())
-          delete this.apiService.interactiveViewer.pluginControl[plugin.name]
+          this.pluginHandlersMap.delete(plugin.name)
           this.mapPluginNameToWidgetUnit.delete(plugin.name)
         })
 

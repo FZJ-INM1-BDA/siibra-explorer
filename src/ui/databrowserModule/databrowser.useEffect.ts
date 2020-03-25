@@ -75,7 +75,7 @@ export class DataBrowserUseEffect implements OnDestroy {
       ).subscribe(({ datasetId, filename }) => {
         
         // TODO replace with common/util/getIdFromFullId
-        
+        // TODO replace with widgetService.open
         const re = getKgSchemaIdFromFullId(datasetId)
         this.dialog.open(
           PreviewComponentWrapper,

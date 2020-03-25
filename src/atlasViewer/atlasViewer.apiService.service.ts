@@ -1,9 +1,8 @@
 import {Injectable, NgZone} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subscribable } from "rxjs";
+import { Observable } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
-import { LoggingService } from "src/services/logging.service";
 import {
   DISABLE_PLUGIN_REGION_SELECTION,
   getLabelIndexMap,
@@ -13,8 +12,8 @@ import {
 } from "src/services/stateStore.service";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
-import { IPluginManifest } from "./atlasViewer.pluginService.service";
-import {ENABLE_PLUGIN_REGION_SELECTION} from "src/services/state/uiState.store";
+import { IPluginManifest, PluginServices } from "./atlasViewer.pluginService.service";
+import { ENABLE_PLUGIN_REGION_SELECTION } from "src/services/state/uiState.store";
 
 declare let window
 
@@ -36,8 +35,8 @@ export class AtlasViewerAPIServices {
   constructor(
     private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
-    private log: LoggingService,
     private zone: NgZone,
+    private pluginService: PluginServices,
   ) {
 
     this.loadedTemplates$ = this.store.pipe(
@@ -125,9 +124,14 @@ export class AtlasViewerAPIServices {
         /**
          * to be overwritten by atlas
          */
-        launchNewWidget: (_manifest) => {
-          return Promise.reject('Needs to be overwritted')
-        },
+        launchNewWidget: (manifest) => this.pluginService.launchNewWidget(manifest)
+          .then(() => {
+            // trigger change detection in Angular
+            // otherwise, model won't be updated until user input
+
+            /* eslint-disable-next-line @typescript-eslint/no-empty-function */
+            this.zone.run(() => {  })
+          }),
 
         getUserInput: config => this.dialogService.getUserInput(config) ,
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
@@ -156,13 +160,14 @@ export class AtlasViewerAPIServices {
         }
 
       },
-      pluginControl : {
-        loadExternalLibraries : () => Promise.reject('load External Library method not over written')
-        ,
-        unloadExternalLibraries : () => {
-          this.log.warn('unloadExternalLibrary method not overwritten by atlasviewer')
-        },
-      },
+      pluginControl: new Proxy({}, {
+        get: (_, prop) => {
+          if (prop === 'loadExternalLibraries') return this.pluginService.loadExternalLibraries
+          if (prop === 'unloadExternalLibraries') return this.pluginService.unloadExternalLibraries
+          if (typeof prop === 'string') return this.pluginService.pluginHandlersMap.get(prop)
+          return undefined
+        }
+      }) as any,
     }
     window.interactiveViewer = this.interactiveViewer
     this.init()
