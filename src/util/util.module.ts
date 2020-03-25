@@ -33,6 +33,8 @@ import { SafeResourcePipe } from "./pipes/safeResource.pipe";
     IncludesPipe,
     SafeResourcePipe,
   ],
+  providers: [
+  ]
 })
 
 export class UtilModule {

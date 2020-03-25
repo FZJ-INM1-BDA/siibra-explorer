@@ -1,10 +1,10 @@
-import {Component, Input, OnInit} from "@angular/core";
-import {select, Store} from "@ngrx/store";
-import { LoggingService } from "src/services/logging.service";
-import {CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface} from "src/services/stateStore.service";
+import { Component, Input, OnInit } from "@angular/core";
+import { select, Store } from "@ngrx/store";
+import { LoggingService } from "src/logging";
+import { CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface } from "src/services/stateStore.service";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import {Observable, Subscription} from "rxjs";
-import {distinctUntilChanged, shareReplay} from "rxjs/operators";
+import { Observable, Subscription } from "rxjs";
+import { distinctUntilChanged, shareReplay } from "rxjs/operators";
 
 @Component({
   selector : 'ui-status-card',

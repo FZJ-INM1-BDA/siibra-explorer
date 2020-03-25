@@ -210,6 +210,11 @@ class WdBase{
       )
       .perform()
   }
+
+  async execScript(fn, ...arg){
+    const result = await this._driver.executeScript(fn)
+    return result
+  }
 }
 
 class WdLayoutPage extends WdBase{
@@ -422,6 +427,59 @@ class WdLayoutPage extends WdBase{
   async showPinnedDatasetPanel(){
     await this._getFavDatasetIcon().click()
     await this.wait(500)
+  }
+
+  _getPinnedDatasetPanel(){
+    return this._driver
+      .findElement(
+        By.css('[aria-label="Pinned datasets panel"]')
+      )
+  }
+
+  async getPinnedDatasetsFromOpenedPanel(){
+    const list = await this._getPinnedDatasetPanel()
+      .findElements(
+        By.tagName('mat-list-item')
+      )
+
+    const returnArr = []
+    for (const el of list) {
+      const text = await _getTextFromWebElement(el)
+      returnArr.push(text)
+    }
+    return returnArr
+  }
+
+  async unpinNthDatasetFromOpenedPanel(index){
+    const list = await this._getPinnedDatasetPanel()
+      .findElements(
+        By.tagName('mat-list-item')
+      )
+
+    if (!list[index]) throw new Error(`index out of bound: ${index} in list with size ${list.length}`)
+    await list[index]
+      .findElement( By.css('[aria-label="Toggle pinning this dataset"]') )
+      .click()
+  }
+
+  _getWidgetPanel(title){
+    return this._driver.findElement( By.css(`[aria-label="Widget for ${title}"]`) )
+  }
+
+  async widgetPanelIsDispalyed(title){
+    try {
+      const isDisplayed = await this._getWidgetPanel(title).isDisplayed()
+      return isDisplayed
+    } catch (e) {
+      console.warn(`widgetPanelIsDisplayed error`, e)
+      return false
+    }
+  }
+
+  async closeWidgetByname(title){
+    await this._getWidgetPanel(title)
+      .findElement( By.css(`[aria-label="close"]`) )
+      .click()
   }
 }
 

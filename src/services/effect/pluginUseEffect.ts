@@ -4,9 +4,9 @@ import { select, Store } from "@ngrx/store"
 import { Observable, forkJoin } from "rxjs"
 import { filter, map, startWith, switchMap } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
-import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service"
+import { PluginServices } from "src/atlasViewer/pluginUnit"
 import { PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { LoggingService } from "../logging.service"
+import { LoggingService } from "src/logging"
 import { IavRootStoreInterface } from "../stateStore.service"
 import { HttpClient } from "@angular/common/http"
 

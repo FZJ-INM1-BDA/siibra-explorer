@@ -8,7 +8,7 @@ import { StateInterface as ViewerConfiguration } from "src/services/state/viewer
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 import { takeOnePipe } from "../nehubaContainer.component";
 
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import 'third_party/export_nehuba/main.bundle.js'
