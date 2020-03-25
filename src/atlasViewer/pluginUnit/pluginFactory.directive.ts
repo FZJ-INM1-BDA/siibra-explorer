@@ -1,7 +1,7 @@
 import { Directive, Renderer2, ViewContainerRef } from "@angular/core";
 import { SUPPORT_LIBRARY_MAP } from "src/atlasViewer/atlasViewer.constantService.service";
-import { PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
-import { LoggingService } from "src/services/logging.service";
+import { PluginServices } from "./atlasViewer.pluginService.service";
+import { LoggingService } from "src/logging";
 
 @Directive({
   selector: '[pluginFactoryDirective]',

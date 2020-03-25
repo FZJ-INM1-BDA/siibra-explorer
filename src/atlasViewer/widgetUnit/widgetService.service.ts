@@ -1,6 +1,6 @@
 import { ComponentFactory, ComponentFactoryResolver, ComponentRef, Injectable, Injector, OnDestroy, ViewContainerRef } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 import { WidgetUnit } from "./widgetUnit.component";
 

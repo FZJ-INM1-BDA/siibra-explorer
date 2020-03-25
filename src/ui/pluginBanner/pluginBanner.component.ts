@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { IPluginManifest, PluginServices } from "src/atlasViewer/atlasViewer.pluginService.service";
+import { IPluginManifest, PluginServices } from "src/atlasViewer/pluginUnit";
 
 @Component({
   selector : 'plugin-banner',

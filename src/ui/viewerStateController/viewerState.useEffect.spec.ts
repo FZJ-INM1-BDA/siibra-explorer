@@ -1,6 +1,6 @@
 import { ViewerStateControllerUseEffect } from './viewerState.useEffect'
 import { Observable, of } from 'rxjs'
-import { TestBed } from '@angular/core/testing'
+import { TestBed, async } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { provideMockStore } from '@ngrx/store/testing'
 import { defaultRootState, NEWVIEWER } from 'src/services/stateStore.service'
@@ -10,6 +10,8 @@ import { hot } from 'jasmine-marbles'
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from './viewerState.base'
 import { AngularMaterialModule } from '../sharedModules/angularMaterial.module'
 import { HttpClientModule } from '@angular/common/http'
+import { WidgetModule } from 'src/atlasViewer/widgetUnit/widget.module'
+import { PluginModule } from 'src/atlasViewer/pluginUnit/plugin.module'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colinJson = require('!json-loader!src/res/ext/colin.json')
@@ -49,7 +51,7 @@ describe('viewerState.useEffect.ts', () => {
   describe('ViewerStateControllerUseEffect', () => {
     let actions$: Observable<any>
     let spy: any
-    beforeEach(() => {
+    beforeEach(async(() => {
 
       const mock = new MockCoordXformService()
       spy = spyOn(mock, 'getPointCoordinatesForTemplate').and.callThrough()
@@ -67,7 +69,9 @@ describe('viewerState.useEffect.ts', () => {
       TestBed.configureTestingModule({
         imports: [
           AngularMaterialModule,
-          HttpClientModule
+          HttpClientModule,
+          WidgetModule,
+          PluginModule,
         ],
         providers: [
           ViewerStateControllerUseEffect,
@@ -78,8 +82,8 @@ describe('viewerState.useEffect.ts', () => {
             useValue: mock
           }
         ]
-      })
-    })
+      }).compileComponents()
+    }))
 
     describe('selectTemplateWithName$', () => {
 

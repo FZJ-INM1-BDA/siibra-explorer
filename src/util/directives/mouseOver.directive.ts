@@ -4,7 +4,7 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, merge, Observable } from "rxjs";
 import { distinctUntilChanged, filter, map, scan, shareReplay, startWith, withLatestFrom } from "rxjs/operators";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { getNgIdLabelIndexFromId, IavRootStoreInterface } from "src/services/stateStore.service";
 
 /**

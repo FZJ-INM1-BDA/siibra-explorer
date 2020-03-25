@@ -2,17 +2,17 @@ import { HttpClient } from '@angular/common/http'
 import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef } from "@angular/core";
 import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
-import { PluginUnit } from "./pluginUnit/pluginUnit.component";
-import { WidgetServices } from "./widgetUnit/widgetService.service";
-
+import { PluginUnit } from "./pluginUnit.component";
+import { WidgetServices } from "../widgetUnit/widgetService.service";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, merge, Observable, of } from "rxjs";
 import { filter, map, shareReplay } from "rxjs/operators";
-import { LoggingService } from 'src/services/logging.service';
+import { LoggingService } from 'src/logging';
 import { PluginHandler } from 'src/util/pluginHandler';
-import '../res/css/plugin_styles.css'
-import { AtlasViewerConstantsServices } from "./atlasViewer.constantService.service";
-import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
+import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
+import { WidgetUnit } from "../widgetUnit/widgetUnit.component";
+
+import './plugin_styles.css'
 
 @Injectable({
   providedIn : 'root',

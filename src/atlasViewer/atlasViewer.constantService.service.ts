@@ -3,7 +3,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, of, Subscription, throwError, fromEvent, forkJoin } from "rxjs";
 import { catchError, map, shareReplay, switchMap, tap, filter, take } from "rxjs/operators";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
 import { AtlasWorkerService } from "./atlasViewer.workerService.service";

@@ -6,7 +6,7 @@ import { catchError, debounceTime, distinctUntilChanged, filter, map, shareRepla
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";

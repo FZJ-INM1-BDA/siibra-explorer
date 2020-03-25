@@ -3,7 +3,7 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
 import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";

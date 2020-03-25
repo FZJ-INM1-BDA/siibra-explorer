@@ -12,7 +12,7 @@ import {
 } from "src/services/stateStore.service";
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
-import { IPluginManifest, PluginServices } from "./atlasViewer.pluginService.service";
+import { IPluginManifest, PluginServices } from "./pluginUnit";
 import { ENABLE_PLUGIN_REGION_SELECTION } from "src/services/state/uiState.store";
 
 declare let window

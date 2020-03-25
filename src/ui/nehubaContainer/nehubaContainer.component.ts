@@ -21,17 +21,15 @@ import {
   throttleTime,
   withLatestFrom
 } from "rxjs/operators";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { FOUR_PANEL, H_ONE_THREE, NEHUBA_READY, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
-import { MOUSE_OVER_SEGMENTS } from "src/services/state/uiState.store";
-import { NEHUBA_LAYER_CHANGED, SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { ADD_NG_LAYER, CHANGE_NAVIGATION, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "src/services/stateStore.service";
+import { SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
+import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "src/services/stateStore.service";
 import { getExportNehuba, isSame } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "../../atlasViewer/atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices } from "../../atlasViewer/atlasViewer.constantService.service";
-import { timedValues } from "../../util/generator";
 import { computeDistance, NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, getNavigationStateFromConfig, calculateSliceZoomFactor } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 
 const isFirstRow = (cell: HTMLElement) => {
