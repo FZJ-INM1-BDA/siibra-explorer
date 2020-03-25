@@ -27,19 +27,19 @@ describe(`fav'ing dataset`, () => {
       await iavPage.wait(500)
       await iavPage.clearAllSelectedRegions()
     }catch(e) {
-
+      console.warn(`#afterEach error: clearing text field`, e)
     }
 
     try {
       await iavPage.showPinnedDatasetPanel()
-      const textsArr = await iavPage.getPinnedDatasetsFromOpenedPanel()
+      const textsArr = await iavPage.getBottomSheetList()
       let length = textsArr.length
       while(length > 0){
-        await iavPage.unpinNthDatasetFromOpenedPanel(0)
+        await iavPage.clickNthItemFromBottomSheetList(0, `[aria-label="Toggle pinning this dataset"]`)
         length --
       }
     }catch(e){
-
+      console.warn(`#afterEach error: unfav all`, e)
     }
 
     await iavPage.wait(500)
@@ -71,7 +71,6 @@ describe(`fav'ing dataset`, () => {
     expect(txt2).toEqual(`Pinned dataset: ${pmapName}`)
   })
 
-
   describe('> fav dataset list', () => {
     beforeEach(async () => {
 
@@ -98,7 +97,7 @@ describe(`fav'ing dataset`, () => {
     it('> clicking pin shows pinned datasets', async () => {
       await iavPage.showPinnedDatasetPanel()
       await iavPage.wait(500)
-      const textsArr = await iavPage.getPinnedDatasetsFromOpenedPanel()
+      const textsArr = await iavPage.getBottomSheetList()
       
       expect(textsArr.length).toEqual(2)
       expect(textsArr).toContain(receptorName)
@@ -108,10 +107,10 @@ describe(`fav'ing dataset`, () => {
     it('> click unpin in fav data panel unpins, but also allow user to undo', async () => {
       await iavPage.showPinnedDatasetPanel()
       await iavPage.wait(1000)
-      const textsArr = await iavPage.getPinnedDatasetsFromOpenedPanel()
+      const textsArr = await iavPage.getBottomSheetList()
       const idx = textsArr.indexOf(receptorName)
       if (idx < 0) throw new Error(`index of receptor name not found: ${receptorName}: ${textsArr}`)
-      await iavPage.unpinNthDatasetFromOpenedPanel(idx)
+      await iavPage.clickNthItemFromBottomSheetList(idx, `[aria-label="Toggle pinning this dataset"]`)
       await iavPage.wait(500)
   
       const txt = await iavPage.getSnackbarMessage()
@@ -123,7 +122,7 @@ describe(`fav'ing dataset`, () => {
       await iavPage.clickSnackbarAction()
       await iavPage.wait(500)
 
-      const textsArr3 = await iavPage.getPinnedDatasetsFromOpenedPanel()
+      const textsArr3 = await iavPage.getBottomSheetList()
       const number2 = await iavPage.getNumberOfFavDataset()
       expect(number2).toEqual(2)
       expect(

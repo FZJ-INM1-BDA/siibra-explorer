@@ -61,6 +61,23 @@ class WdBase{
       })
   }
 
+  async waitForAsync(){
+
+    const checkReady = async () => {
+      const el = await this._browser.findElements(
+        By.css('.spinnerAnimationCircle')
+      )
+      return !el.length
+    }
+
+    do {
+      // Do nothing, until ready
+    } while (
+      await this.wait(100),
+      !(await checkReady())
+    )
+  }
+
   async cursorMoveTo({ position }) {
     if (!position) throw new Error(`cursorGoto: position must be defined!`)
     const x = Array.isArray(position) ? position[0] : position.x
@@ -128,6 +145,11 @@ class WdBase{
     await this._browser.sleep(ms)
   }
 
+  async waitFor(animation = false, async = false){
+    if (animation) await this.wait(500)
+    if (async) await this.waitForAsync()
+  }
+
   async getSnackbarMessage(){
     const txt = await this._driver
       .findElement( By.tagName('simple-snack-bar') )
@@ -141,6 +163,40 @@ class WdBase{
       .findElement( By.tagName('simple-snack-bar') )
       .findElement( By.tagName('button') )
       .click()
+  }
+
+  _getBottomSheet() {
+    return this._driver.findElement( By.tagName('mat-bottom-sheet-container') )
+  }
+
+  _getBottomSheetList(){
+    return this._getBottomSheet().findElements( By.tagName('mat-list-item') )
+  }
+
+  async getBottomSheetList(){
+    const listItems = await this._getBottomSheetList()
+    const output = []
+    for (const item of listItems) {
+      output.push(
+        await _getTextFromWebElement(item)
+      )
+    }
+    return output
+  }
+
+  async clickNthItemFromBottomSheetList(index, cssSelector){
+
+    const list = await this._getBottomSheetList()
+
+    if (!list[index]) throw new Error(`index out of bound: ${index} in list with size ${list.length}`)
+
+    if (cssSelector) {
+      await list[index]
+        .findElement( By.css(cssSelector) )
+        .click()
+    } else {
+      await list[index].click()
+    }
   }
 
   async clearAlerts() {
@@ -191,6 +247,18 @@ class WdLayoutPage extends WdBase{
       arr.push(await _getTextFromWebElement(btn))
     }
     return arr
+  }
+
+  async modalHasChild(cssSelector){
+    try {
+      const isDisplayed = await this._getModal()
+        .findElement( By.css( cssSelector ) )
+        .isDisplayed()
+      return isDisplayed
+    } catch (e) {
+      console.warn(`modalhaschild thrown error`, e)
+      return false
+    }
   }
 
   // text can be instance of regex or string
@@ -354,39 +422,6 @@ class WdLayoutPage extends WdBase{
   async showPinnedDatasetPanel(){
     await this._getFavDatasetIcon().click()
     await this.wait(500)
-  }
-
-  _getPinnedDatasetPanel(){
-    return this._driver
-      .findElement(
-        By.css('[aria-label="Pinned datasets panel"]')
-      )
-  }
-
-  async getPinnedDatasetsFromOpenedPanel(){
-    const list = await this._getPinnedDatasetPanel()
-      .findElements(
-        By.tagName('mat-list-item')
-      )
-
-    const returnArr = []
-    for (const el of list) {
-      const text = await _getTextFromWebElement(el)
-      returnArr.push(text)
-    }
-    return returnArr
-  }
-
-  async unpinNthDatasetFromOpenedPanel(index){
-    const list = await this._getPinnedDatasetPanel()
-      .findElements(
-        By.tagName('mat-list-item')
-      )
-
-    if (!list[index]) throw new Error(`index out of bound: ${index} in list with size ${list.length}`)
-    await list[index]
-      .findElement( By.css('[aria-label="Toggle pinning this dataset"]') )
-      .click()
   }
 }
 
