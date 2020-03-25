@@ -70,6 +70,9 @@ export class KgSingleDatasetService implements OnDestroy {
     this.store$.dispatch({
       type: SHOW_BOTTOM_SHEET,
       bottomSheetTemplate: template,
+      config: {
+        ariaLabel: `List of preview files`
+      }
     })
   }
 

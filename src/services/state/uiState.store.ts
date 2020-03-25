@@ -1,11 +1,12 @@
-import { Injectable, TemplateRef } from '@angular/core';
+import { Injectable, TemplateRef, OnDestroy } from '@angular/core';
 import { Action, select, Store } from '@ngrx/store'
 
-import { Effect } from "@ngrx/effects";
-import { Observable } from "rxjs";
+import { Effect, Actions, ofType } from "@ngrx/effects";
+import { Observable, Subscription } from "rxjs";
 import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
 import { IavRootStoreInterface } from '../stateStore.service'
+import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
 
 export const defaultState: StateInterface = {
   mouseOverSegments: [],
@@ -20,7 +21,6 @@ export const defaultState: StateInterface = {
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
-  bottomSheetTemplate: null,
 
   pluginRegionSelectionEnabled: false,
   persistentStateNotifierMessage: null,
@@ -143,13 +143,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       agreedKgTos: true,
     }
   }
-  case SHOW_BOTTOM_SHEET: {
-    const { bottomSheetTemplate } = action
-    return {
-      ...prevState,
-      bottomSheetTemplate,
-    }
-  }
   default: return prevState
   }
 }
@@ -191,8 +184,6 @@ export interface StateInterface {
 
   agreedCookies: boolean
   agreedKgTos: boolean
-
-  bottomSheetTemplate: TemplateRef<any>
 }
 
 export interface ActionInterface extends Action {
@@ -216,7 +207,9 @@ export interface ActionInterface extends Action {
   providedIn: 'root',
 })
 
-export class UiStateUseEffect {
+export class UiStateUseEffect implements OnDestroy{
+
+  private subscriptions: Subscription[] = []
 
   private numRegionSelectedWithHistory$: Observable<any[]>
 
@@ -226,7 +219,13 @@ export class UiStateUseEffect {
   @Effect()
   public viewCurrentOpen$: Observable<any>
 
-  constructor(store$: Store<IavRootStoreInterface>) {
+  private bottomSheetRef: MatBottomSheetRef
+
+  constructor(
+    store$: Store<IavRootStoreInterface>,
+    actions$: Actions,
+    bottomSheet: MatBottomSheet
+  ) {
     this.numRegionSelectedWithHistory$ = store$.pipe(
       select('viewerState'),
       select('regionsSelected'),
@@ -248,6 +247,30 @@ export class UiStateUseEffect {
         type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
       }),
     )
+    
+    this.subscriptions.push(
+      actions$.pipe(
+        ofType(SHOW_BOTTOM_SHEET)
+      ).subscribe(({ bottomSheetTemplate, config }) => {
+        if (!bottomSheetTemplate) {
+          if (this.bottomSheetRef) {
+            this.bottomSheetRef.dismiss()
+            this.bottomSheetRef = null
+          }
+        } else {
+          this.bottomSheetRef = bottomSheet.open(bottomSheetTemplate, config)
+          this.bottomSheetRef.afterDismissed().subscribe(() => {
+            this.bottomSheetRef = null
+          })
+        }
+      })
+    )
+  }
+
+  ngOnDestroy(){
+    while(this.subscriptions.length > 0) {
+      this.subscriptions.pop().unsubscribe()
+    }
   }
 }
 

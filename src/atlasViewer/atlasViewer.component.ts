@@ -29,7 +29,7 @@ import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
 import { LocalFileService } from "src/services/localFile.service";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL,
@@ -39,7 +39,6 @@ import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
-import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
@@ -95,8 +94,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
-  private bottomSheetRef: MatBottomSheetRef
-  private bottomSheet$: Observable<TemplateRef<any>>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
@@ -138,8 +135,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
-    private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet
+    private snackbar: MatSnackBar
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -155,12 +151,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.persistentStateNotifierMessage$ = this.store.pipe(
       select('uiState'),
       select("persistentStateNotifierMessage"),
-      distinctUntilChanged(),
-    )
-
-    this.bottomSheet$ = this.store.pipe(
-      select('uiState'),
-      select('bottomSheetTemplate'),
       distinctUntilChanged(),
     )
 
@@ -255,24 +245,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     )
 
-    this.subscriptions.push(
-      this.bottomSheet$.subscribe(templateRef => {
-        if (!templateRef) {
-          if (this.bottomSheetRef) {
-            this.bottomSheetRef.dismiss()
-          }
-        } else {
-          this.bottomSheetRef = this.bottomSheet.open(templateRef)
-          this.bottomSheetRef.afterDismissed().subscribe(() => {
-            this.store.dispatch({
-              type: SHOW_BOTTOM_SHEET,
-              bottomSheetTemplate: null,
-            })
-            this.bottomSheetRef = null
-          })
-        }
-      }),
-    )
     this.subscriptions.push(
       this.onhoverSegments$.subscribe(hr => {
         this.hoveringRegions = hr

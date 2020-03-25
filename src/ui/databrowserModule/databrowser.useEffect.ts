@@ -63,7 +63,8 @@ export class DataBrowserUseEffect implements OnDestroy {
         map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
         switchMap(({ datasetId, filename }) =>{
           const re = getKgSchemaIdFromFullId(datasetId)
-          return this.http.get(`${DATASET_PREVIEW_URL}/${re[1]}/${filename}`).pipe(
+          const url = `${DATASET_PREVIEW_URL}/${re[1]}/${encodeURIComponent(filename)}`
+          return this.http.get(url).pipe(
             filter((file: any) => PREVIEW_FILE_TYPES_NO_UI.indexOf( determinePreviewFileType(file) ) < 0),
             mapTo({
               datasetId,
