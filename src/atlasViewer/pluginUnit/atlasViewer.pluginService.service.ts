@@ -304,4 +304,10 @@ export interface IPluginManifest {
   initState?: any
   initStateUrl?: string
   persistency?: boolean
+
+  description?: string
+  desc?: string
+
+  homepage?: string
+  authors?: string
 }

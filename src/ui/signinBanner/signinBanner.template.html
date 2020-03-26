@@ -22,6 +22,7 @@
   <!-- plugin and tools -->
   <div class="btnWrapper" #pluginsAndToolsDiv>
     <button mat-icon-button
+      aria-label="Show tools and plugins"
       matTooltipPosition="below"
       [matTooltip]="pluginTooltipText"
       [matMenuTriggerFor]="pluginDropdownMenu"
@@ -50,7 +51,8 @@
 </div>
 
 <!-- plugin dropdownmenu -->
-<mat-menu #pluginDropdownMenu>
+<mat-menu #pluginDropdownMenu
+  [aria-label]="'Tools and plugins menu'">
   <button mat-menu-item
     [disabled]="!parcellationIsSelected"
     (click)="takingScreenshot = true;"

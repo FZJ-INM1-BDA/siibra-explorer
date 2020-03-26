@@ -47,6 +47,7 @@ jobs:
           --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
           --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
           --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
+          --env PLUGIN_URLS=${{ env.ATLAS_URL }}/res/plugin_examples/plugin1/manifest.json
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
     - uses: actions/checkout@v1
