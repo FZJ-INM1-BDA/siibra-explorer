@@ -11,6 +11,13 @@ describe('> sidenav', () => {
     await layoutPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
     await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
     await layoutPage.dismissModal()
+
+    do {
+
+    } while(
+      await this.wait(100),
+      !(await this.viewerIsPopulated())
+    )
   })
 
   it('> on init, side panel should be visible', async () => {
@@ -49,6 +56,13 @@ describe('> status panel', () => {
     await layoutPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
     await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
     await layoutPage.dismissModal()
+
+    do {
+
+    } while(
+      await this.wait(100),
+      !(await this.viewerIsPopulated())
+    )
   })
 
   afterEach(() => {

@@ -133,10 +133,14 @@ class WdBase{
       await this._browser.get(actualUrl)
     }
 
+    // if doNotAutomate is not set
+    // should wait for async operations to end 
     if (!doNotAutomate) {
       await this.wait(200)
       await this.dismissModal()
       await this.wait(200)
+      await this.waitForAsync()
+      
     }
   }
 
@@ -620,13 +624,23 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async viewerIsPopulated() {
-    const ngContainer = await this._browser.findElement(
-      By.id('neuroglancer-container')
-    )
-    const canvas = await ngContainer.findElement(
-      By.tagName('canvas')
-    )
-    return !!canvas
+    try {
+      const ngContainer = await this._browser.findElement(
+        By.id('neuroglancer-container')
+      )
+      if (! (await ngContainer.isDisplayed())) {
+        return false
+      }
+      const canvas = await ngContainer.findElement(
+        By.tagName('canvas')
+      )
+      if (!(await canvas.isDisplayed())) {
+        return false
+      }
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   async getNavigationState() {

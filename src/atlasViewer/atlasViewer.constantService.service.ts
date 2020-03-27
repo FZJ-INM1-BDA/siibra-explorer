@@ -101,7 +101,11 @@ export class AtlasViewerConstantsServices implements OnDestroy {
     })
   )
 
-  public initFetchTemplate$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
+  public getTemplateEndpoint$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
+    shareReplay(1)
+  )
+
+  public initFetchTemplate$ = this.getTemplateEndpoint$.pipe(
     tap((arr: any[]) => this.totalTemplates = arr.length),
     switchMap((templates: string[]) => merge(
       ...templates.map(templateName => this.fetchTemplate(templateName).pipe(

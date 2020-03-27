@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, ElementRef, Pipe, PipeTransform, ViewChild } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { fromEvent, Observable, Subject, Subscription } from "rxjs";
-import { bufferTime, filter, map, switchMap, take, withLatestFrom } from 'rxjs/operators'
+import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxjs";
+import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { NEWVIEWER, ViewerStateInterface } from "src/services/stateStore.service";
 
@@ -15,6 +15,7 @@ import { NEWVIEWER, ViewerStateInterface } from "src/services/stateStore.service
 
 export class SplashScreen implements AfterViewInit {
 
+  public stillLoadingTemplates$: Observable<any>
   public loadedTemplate$: Observable<any[]>
   @ViewChild('parentContainer', {read: ElementRef})
   private parentContainer: ElementRef
@@ -25,11 +26,29 @@ export class SplashScreen implements AfterViewInit {
   constructor(
     private store: Store<ViewerStateInterface>,
     private constanceService: AtlasViewerConstantsServices,
-    private constantsService: AtlasViewerConstantsServices,
   ) {
     this.loadedTemplate$ = this.store.pipe(
       select('viewerState'),
       select('fetchedTemplates'),
+      shareReplay(1),
+    )
+
+    this.stillLoadingTemplates$ = combineLatest(
+      this.constanceService.getTemplateEndpoint$.pipe(
+        startWith(null)
+      ),
+      this.loadedTemplate$.pipe(
+        startWith([])
+      )
+    ).pipe(
+      map(([templateEndpoints, loadedTemplates]) => {
+        if (templateEndpoints && Array.isArray(templateEndpoints)) {
+          // TODO this is not exactly correct
+          return templateEndpoints.slice(loadedTemplates.length)
+        } else {
+          return null
+        }
+      })
     )
   }
 
