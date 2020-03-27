@@ -244,6 +244,12 @@ class WdLayoutPage extends WdBase{
       .findElements( By.tagName('button') )
   }
 
+  async getModalText(){
+    const el = await this._getModal()
+    const txt = await _getTextFromWebElement(el)
+    return txt
+  }
+
   async getModalActions(){
     const btns = await this._getModalBtns()
 
@@ -414,6 +420,43 @@ class WdLayoutPage extends WdBase{
   }
 
   // Signin banner
+  _getToolsIcon(){
+    return this._driver
+      .findElement( By.css('[aria-label="Show tools and plugins"]') )
+  }
+
+  async showToolsMenu(){
+    await this._getToolsIcon().click()
+  }
+
+  _getToolsMenu(){
+    return this._driver
+      .findElement( By.css('[aria-label="Tools and plugins menu"]') )
+  }
+
+  _getAllTools(){
+    return this._getToolsMenu().findElements( By.css('[role="menuitem"]') )
+  }
+
+  async getVisibleTools(){
+    // may throw if tools menu not visible
+    const menuItems = await this._getAllTools()
+    const returnArr = []
+    for (const menuItem of menuItems){
+      returnArr.push(
+        await _getTextFromWebElement(menuItem)
+      )
+    }
+    return returnArr
+  }
+
+  async clickOnNthTool(index, cssSelector){
+    const menuItems = await this._getAllTools()
+    if (!menuItems[index]) throw new Error(`index out of bound: accessing index ${index} of length ${menuItems.length}`)
+    if (cssSelector) await menuItems[index].findElement( By.css(cssSelector) ).click()
+    else await menuItems[index].click()
+  }
+
   _getFavDatasetIcon(){
     return this._driver
       .findElement( By.css('[aria-label="Show pinned datasets"]') )

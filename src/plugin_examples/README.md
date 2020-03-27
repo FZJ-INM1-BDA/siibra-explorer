@@ -27,11 +27,16 @@ The manifest JSON file describes the metadata associated with the plugin.
     }
   },
   "initStateUrl": "http://LINK-TO-PLUGIN-STATE",
-  "persistency": false
+  "persistency": false,
+
+  "description": "Human readable description of the plugin.",
+  "desc": "Same as description. If both present, description takes more priority.",
+  "homepage": "https://HOMEPAGE-URL-TO-YOUR-PLUGIN/doc.html",
+  "authors": "Author <author@example.com>, Author2 <author2@example.org>"
 }
 ```
 *NB* 
-- Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
+- Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME\[.VERSION\]**. 
 - the `initState` object and `initStateUrl` will be available prior to the evaluation of `script.js`, and will populate the objects `interactiveViewer.pluginControl[MANIFEST.name].initState` and `interactiveViewer.pluginControl[MANIFEST.name].initStateUrl` respectively. 
 
 ---
