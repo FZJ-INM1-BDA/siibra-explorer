@@ -15,8 +15,8 @@ describe('> sidenav', () => {
     do {
 
     } while(
-      await this.wait(100),
-      !(await this.viewerIsPopulated())
+      await layoutPage.wait(100),
+      !(await layoutPage.viewerIsPopulated())
     )
   })
 
@@ -60,8 +60,8 @@ describe('> status panel', () => {
     do {
 
     } while(
-      await this.wait(100),
-      !(await this.viewerIsPopulated())
+      await layoutPage.wait(100),
+      !(await layoutPage.viewerIsPopulated())
     )
   })
 
