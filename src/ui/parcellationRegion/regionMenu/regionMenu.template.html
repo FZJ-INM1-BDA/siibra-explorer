@@ -64,10 +64,9 @@
 
     <mat-menu #additionalActions="matMenu" xPosition="before" (click)="$event.stopPropagation()" hasBackdrop="false">
       <div>
-        <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (click)="changeView(i)">
-          <span>
-            {{sameRegion.template.name}}
-          </span>
+        <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (click)="changeView(i)" class="d-flex">
+            <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
+            <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
         </button>
       </div>
     </mat-menu>

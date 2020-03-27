@@ -100,14 +100,22 @@ export class RegionBase {
           this.parcellationRegions.forEach(pr => {
             if (JSON.stringify(pr.fullId) === JSON.stringify(this.region.fullId)) {
               const baseAreaHemisphere =
-                  this.region.name.includes(' - right hemisphere')? 'right' :
-                    this.region.name.includes(' - left hemisphere')? 'left'
+                  this.region.name.includes(' - right hemisphere')? 'Right' :
+                    this.region.name.includes(' - left hemisphere')? 'Left'
                       : null
               const areaHemisphere =
-                  pr.name.includes(' - right hemisphere')? 'right'
-                    : pr.name.includes(' - left hemisphere')? 'left'
+                  pr.name.includes(' - right hemisphere')? 'Right'
+                    : pr.name.includes(' - left hemisphere')? 'Left'
                       : null
+
               const sameRegionSpace = {template: template, parcellation: parcellation, region: pr}
+
+              if (!baseAreaHemisphere && areaHemisphere) {
+                this.sameRegionTemplate.push({
+                  ...sameRegionSpace,
+                  hemisphere: areaHemisphere
+                })
+              } else
               if (!this.sameRegionTemplate.map(sr => sr.template).includes(template)) {
                 if (!(baseAreaHemisphere && areaHemisphere && baseAreaHemisphere !== areaHemisphere)) {
                   this.sameRegionTemplate.push(sameRegionSpace)
@@ -131,7 +139,6 @@ export class RegionBase {
     })
   }
 
-
   public getAllRegionsFromParcellation = (regions) => {
     for (const region of regions) {
       if (region.children && region.children.length) {
@@ -141,10 +148,5 @@ export class RegionBase {
       }
     }
   }
-
-
-
-
-
 
 }
