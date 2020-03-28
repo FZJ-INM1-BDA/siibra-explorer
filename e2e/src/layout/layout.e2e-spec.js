@@ -1,46 +1,46 @@
-const { LayoutPage } = require('../util')
+const { AtlasPage } = require('../util')
 
 const MAT_SIDENAV_TIMEOUT = 500
 
 describe('> sidenav', () => {
-  let layoutPage
+  let atlasPage
 
   beforeEach(async () => {
-    layoutPage = new LayoutPage()
-    await layoutPage.init()
-    await layoutPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
-    await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
-    await layoutPage.dismissModal()
+    atlasPage = new AtlasPage()
+    await atlasPage.init()
+    await atlasPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
+    await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
+    await atlasPage.dismissModal()
 
     do {
 
     } while(
-      await layoutPage.wait(100),
-      !(await layoutPage.viewerIsPopulated())
+      await atlasPage.wait(100),
+      !(await atlasPage.viewerIsPopulated())
     )
   })
 
   it('> on init, side panel should be visible', async () => {
-    const sideNavIsDisplayed = await layoutPage.sideNavIsVisible()
+    const sideNavIsDisplayed = await atlasPage.sideNavIsVisible()
     expect(sideNavIsDisplayed).toEqual(true)
 
-    const toggleTabIsDIsplayed = await layoutPage.sideNavTabIsVisible()
+    const toggleTabIsDIsplayed = await atlasPage.sideNavTabIsVisible()
     expect(toggleTabIsDIsplayed).toEqual(true)
   })
 
   describe('> toggling', () => {
     it('> toggle tab should toggle side nav', async () => {
-      const init = await layoutPage.sideNavIsVisible()
+      const init = await atlasPage.sideNavIsVisible()
       expect(init).toEqual(true)
 
-      await layoutPage.clickSideNavTab()
-      await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
-      const expectHidden = await layoutPage.sideNavIsVisible()
+      await atlasPage.clickSideNavTab()
+      await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
+      const expectHidden = await atlasPage.sideNavIsVisible()
       expect(expectHidden).toEqual(false)
 
-      await layoutPage.clickSideNavTab()
-      await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
-      const expectShown = await layoutPage.sideNavIsVisible()
+      await atlasPage.clickSideNavTab()
+      await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
+      const expectShown = await atlasPage.sideNavIsVisible()
       expect(expectShown).toEqual(true)
     })
   })
@@ -48,53 +48,53 @@ describe('> sidenav', () => {
 
 describe('> status panel', () => {
 
-  let layoutPage
+  let atlasPage
 
   beforeEach(async () => {
-    layoutPage = new LayoutPage()
-    await layoutPage.init()
-    await layoutPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
-    await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
-    await layoutPage.dismissModal()
+    atlasPage = new AtlasPage()
+    await atlasPage.init()
+    await atlasPage.goto('/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas')
+    await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
+    await atlasPage.dismissModal()
 
     do {
 
     } while(
-      await layoutPage.wait(100),
-      !(await layoutPage.viewerIsPopulated())
+      await atlasPage.wait(100),
+      !(await atlasPage.viewerIsPopulated())
     )
   })
 
   afterEach(() => {
-    layoutPage = null
+    atlasPage = null
   })
 
   it('> on init, status panel should not be visible', async () => {
     
-    const init = await layoutPage.statusPanelIsVisible()
+    const init = await atlasPage.statusPanelIsVisible()
     expect(init).toEqual(false)
   })
 
   it('> on toggling side panel, status panel should become visible', async () => {
-    await layoutPage.clickSideNavTab()
-    await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
+    await atlasPage.clickSideNavTab()
+    await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
 
-    const expectVisible = await layoutPage.statusPanelIsVisible()
+    const expectVisible = await atlasPage.statusPanelIsVisible()
     expect(expectVisible).toEqual(true)
   })
 
   it('> on click status panel, side nav become visible, status panel become invisible', async () => {
 
-    await layoutPage.clickSideNavTab()
-    await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
+    await atlasPage.clickSideNavTab()
+    await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
   
-    await layoutPage.clickStatusPanel()
-    await layoutPage.wait(MAT_SIDENAV_TIMEOUT)
+    await atlasPage.clickStatusPanel()
+    await atlasPage.wait(MAT_SIDENAV_TIMEOUT)
 
-    const expectHidden = await layoutPage.statusPanelIsVisible()
+    const expectHidden = await atlasPage.statusPanelIsVisible()
     expect(expectHidden).toEqual(false) 
     
-    const expectVisible = await layoutPage.sideNavIsVisible()
+    const expectVisible = await atlasPage.sideNavIsVisible()
     expect(expectVisible).toEqual(true)
   })
 })
