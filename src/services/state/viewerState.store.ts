@@ -7,7 +7,7 @@ import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { getViewer } from 'src/util/fn';
 import { LoggingService } from 'src/logging';
-import { generateLabelIndexId, IavRootStoreInterface, viewerState } from '../stateStore.service';
+import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
 
