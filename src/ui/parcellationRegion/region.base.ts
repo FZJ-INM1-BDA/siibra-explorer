@@ -1,12 +1,14 @@
 import {EventEmitter, Input, Output} from "@angular/core";
-import { Store } from "@ngrx/store";
-import {SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
+import {select, Store} from "@ngrx/store";
+import {NEWVIEWER, SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
 import {
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
   IavRootStoreInterface, OPEN_SIDE_PANEL,
   SHOW_SIDE_PANEL_CONNECTIVITY,
 } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
+import {distinctUntilChanged, shareReplay} from "rxjs/operators";
+import {Observable} from "rxjs";
 
 export class RegionBase {
 
@@ -20,10 +22,40 @@ export class RegionBase {
 
   @Output() public closeRegionMenu: EventEmitter<boolean> = new EventEmitter()
 
+  public loadedTemplate$: Observable<any[]>
+  public templateSelected$: Observable<any[]>
+  public parcellationSelected$: Observable<any[]>
+
+  protected loadedTemplates: any[]
+  protected selectedTemplate: any
+  protected selectedParcellation: any
+  public sameRegionTemplate: any[] = []
+
+  private parcellationRegions: any[] = []
+
   constructor(
     private store$: Store<IavRootStoreInterface>,
   ) {
 
+    const viewerState$ = this.store$.pipe(
+      select('viewerState'),
+      shareReplay(1),
+    )
+
+    this.loadedTemplate$ = viewerState$.pipe(
+      select('fetchedTemplates'),
+      distinctUntilChanged()
+    )
+
+    this.templateSelected$ = viewerState$.pipe(
+      select('templateSelected'),
+      distinctUntilChanged(),
+    )
+
+    this.parcellationSelected$ = viewerState$.pipe(
+      select('parcellationSelected'),
+      distinctUntilChanged(),
+    )
   }
 
   public navigateToRegion() {
@@ -56,4 +88,65 @@ export class RegionBase {
       connectivityRegion: regionName,
     })
   }
+
+
+  getDifferentTemplatesSameRegion() {
+    this.sameRegionTemplate = []
+    this.loadedTemplates.forEach(template => {
+      if (this.selectedTemplate.name !== template.name) {
+        template.parcellations.forEach(parcellation => {
+          this.parcellationRegions = []
+          this.getAllRegionsFromParcellation(parcellation.regions)
+          this.parcellationRegions.forEach(pr => {
+            if (JSON.stringify(pr.fullId) === JSON.stringify(this.region.fullId)) {
+              const baseAreaHemisphere =
+                  this.region.name.includes(' - right hemisphere')? 'Right' :
+                    this.region.name.includes(' - left hemisphere')? 'Left'
+                      : null
+              const areaHemisphere =
+                  pr.name.includes(' - right hemisphere')? 'Right'
+                    : pr.name.includes(' - left hemisphere')? 'Left'
+                      : null
+
+              const sameRegionSpace = {template: template, parcellation: parcellation, region: pr}
+
+              if (!baseAreaHemisphere && areaHemisphere) {
+                this.sameRegionTemplate.push({
+                  ...sameRegionSpace,
+                  hemisphere: areaHemisphere
+                })
+              } else
+              if (!this.sameRegionTemplate.map(sr => sr.template).includes(template)) {
+                if (!(baseAreaHemisphere && areaHemisphere && baseAreaHemisphere !== areaHemisphere)) {
+                  this.sameRegionTemplate.push(sameRegionSpace)
+                }
+              }
+            }
+          })
+        })
+      }
+    })
+  }
+
+  changeView(index) {
+    this.closeRegionMenu.emit()
+
+    this.store$.dispatch({
+      type : NEWVIEWER,
+      selectTemplate : this.sameRegionTemplate[index].template,
+      selectParcellation : this.sameRegionTemplate[index].parcellation,
+      navigation: {position: this.sameRegionTemplate[index].region.position},
+    })
+  }
+
+  public getAllRegionsFromParcellation = (regions) => {
+    for (const region of regions) {
+      if (region.children && region.children.length) {
+        this.getAllRegionsFromParcellation(region.children)
+      } else {
+        this.parcellationRegions.push(region)
+      }
+    }
+  }
+
 }
