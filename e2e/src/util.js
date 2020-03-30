@@ -95,6 +95,30 @@ class WdBase{
       .perform()
   }
 
+  async showRegionMenu({position}) {
+    if (!position) throw new Error(`cursorGoto: position must be defined!`)
+    const x = Array.isArray(position) ? position[0] : position.x
+    const y = Array.isArray(position) ? position[1] : position.y
+    if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
+    if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
+
+    const atlasViewer = await this._driver.findElement(By.tagName('atlas-viewer'))
+
+    console.log(x + ',' + y)
+
+    return this._driver.actions()
+      .move()
+      .move({
+        x,
+        y,
+        duration: 1000,
+      })
+      .click()
+      .perform()
+
+    console.log(1)
+  }
+
   async initHttpInterceptor(){
     await this._browser.executeScript(() => {
       if (window.__isIntercepting__) return
@@ -684,6 +708,16 @@ class WdIavPage extends WdLayoutPage{
     } catch (e) {
       return false
     }
+  }
+
+  async changeTemplateFromRegionMenu(templateName, hemisphere) {
+    const regionMenu = await this._driver.findElement(By.tagName('region-menu'))
+    const changeTemplate = await regionMenu.findElement(By.xpath("//button[contains(.,'Change template')]"))
+    await changeTemplate.click()
+    await this.wait(200)
+    const templateToChange = hemisphere? await regionMenu.findElement(By.xpath(`//button[contains(.,'${templateName}') and contains(.,'${hemisphere}')]`))
+      : await regionMenu.findElement(By.xpath(`//button[contains(.,'${templateName}')]`))
+    await templateToChange.click()
   }
 
   async getNavigationState() {

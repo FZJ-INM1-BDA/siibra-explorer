@@ -11,7 +11,7 @@
   <mat-card-content>
     {{ region.description }}
   </mat-card-content>
-  <mat-card-actions class="d-flex flex-row flex-wrap">
+  <div class="d-flex flex-row flex-wrap" #actionCard>
     <button mat-button
       (click)="toggleRegionSelected()"
       [color]="isSelected ? 'primary': 'basic'">
@@ -46,5 +46,30 @@
         </button>
       </div>
     </mat-menu>
-  </mat-card-actions>
+
+
+    <!-- Menu to navigate between template spaces to explore same region -->
+    <div>
+      <button mat-button
+              *ngIf="sameRegionTemplate.length"
+              [matMenuTriggerFor]="additionalActions"
+              #additionalActionsMenuButton="matMenuTrigger">
+        <i class="fas fa-brain"></i>
+        <span>
+          Change template
+        </span>
+        <i class="fas fa-angle-right"></i>
+      </button>
+    </div>
+
+    <mat-menu #additionalActions="matMenu" xPosition="before" (click)="$event.stopPropagation()" hasBackdrop="false">
+      <div>
+        <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (click)="changeView(i)" class="d-flex">
+            <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
+            <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
+        </button>
+      </div>
+    </mat-menu>
+
+  </div>
 </mat-card>

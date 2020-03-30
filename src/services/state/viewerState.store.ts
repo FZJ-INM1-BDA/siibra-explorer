@@ -106,7 +106,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
 
       // taken care of by effect.ts
       // landmarksSelected : [],
-      // navigation : {},
+      navigation : action.navigation,
       dedicatedView : null,
     }
   }
