@@ -12,7 +12,6 @@ import { RegionBase } from '../region.base'
 })
 export class RegionMenuComponent extends RegionBase implements OnInit, OnDestroy {
 
-  @ViewChild('additionalActionsMenuButton', {read: MatMenuTrigger}) actionsMenuTriggerButton: MatMenuTrigger
   @ViewChild('additionalActionsPanel', {read: ElementRef}) additionalActionsPanelElement: ElementRef
 
   private subscriptions: Subscription[] = []

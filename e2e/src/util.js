@@ -23,6 +23,20 @@ async function _getIndexFromArrayOfWebElements(search, webElements) {
 
 const regionSearchAriaLabelText = 'Search for any region of interest in the atlas selected'
 
+const vertifyPos = position => {
+
+  if (!position) throw new Error(`cursorGoto: position must be defined!`)
+  const x = Array.isArray(position) ? position[0] : position.x
+  const y = Array.isArray(position) ? position[1] : position.y
+  if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
+  if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
+
+  return {
+    x,
+    y
+  }
+}
+
 class WdBase{
   constructor() {
     browser.waitForAngularEnabled(false)
@@ -79,12 +93,7 @@ class WdBase{
   }
 
   async cursorMoveTo({ position }) {
-    if (!position) throw new Error(`cursorGoto: position must be defined!`)
-    const x = Array.isArray(position) ? position[0] : position.x
-    const y = Array.isArray(position)? position[1] : position.y
-    if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
-    if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
-
+    const { x, y } = vertifyPos(position)
     return this._driver.actions()
       .move()
       .move({
@@ -95,28 +104,17 @@ class WdBase{
       .perform()
   }
 
-  async showRegionMenu({position}) {
-    if (!position) throw new Error(`cursorGoto: position must be defined!`)
-    const x = Array.isArray(position) ? position[0] : position.x
-    const y = Array.isArray(position) ? position[1] : position.y
-    if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
-    if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
-
-    const atlasViewer = await this._driver.findElement(By.tagName('atlas-viewer'))
-
-    console.log(x + ',' + y)
-
+  async cursorMoveToAndClick({ position }) {
+    const { x, y } = vertifyPos(position)
     return this._driver.actions()
       .move()
       .move({
         x,
         y,
-        duration: 1000,
+        duration: 1000
       })
       .click()
       .perform()
-
-    console.log(1)
   }
 
   async initHttpInterceptor(){
@@ -485,6 +483,37 @@ class WdLayoutPage extends WdBase{
     else await menuItems[index].click()
   }
 
+  // other templates
+  async showOtherTemplateMenu(){
+    await this._driver
+      .findElement( By.css('[aria-label="Show availability in other reference spaces"]') )
+      .click()
+  }
+
+  _getOtherTemplateMenu(){
+    return this._driver
+      .findElement( By.css('[aria-label="Availability in other reference spaces"]') )
+  }
+
+  _getAllOtherTemplates(){
+    return this._getOtherTemplateMenu().findElements( By.css('[mat-menu-item]') )
+  }
+
+  async getAllOtherTemplates(){
+    const els = await this._getAllOtherTemplates()
+    const returnArr = []
+    for (const el of els) {
+      returnArr.push(await _getTextFromWebElement(el))
+    }
+    return returnArr
+  }
+
+  async clickNthItemAllOtherTemplates(index){
+    const arr = await this._getAllOtherTemplates()
+    if (!arr[index]) throw new Error(`index out of bound: trying to access ${index} from arr with length ${arr.length}`)
+    await arr[index].click()
+  }
+
   _getFavDatasetIcon(){
     return this._driver
       .findElement( By.css('[aria-label="Show pinned datasets"]') )
@@ -708,16 +737,6 @@ class WdIavPage extends WdLayoutPage{
     } catch (e) {
       return false
     }
-  }
-
-  async changeTemplateFromRegionMenu(templateName, hemisphere) {
-    const regionMenu = await this._driver.findElement(By.tagName('region-menu'))
-    const changeTemplate = await regionMenu.findElement(By.xpath("//button[contains(.,'Change template')]"))
-    await changeTemplate.click()
-    await this.wait(200)
-    const templateToChange = hemisphere? await regionMenu.findElement(By.xpath(`//button[contains(.,'${templateName}') and contains(.,'${hemisphere}')]`))
-      : await regionMenu.findElement(By.xpath(`//button[contains(.,'${templateName}')]`))
-    await templateToChange.click()
   }
 
   async getNavigationState() {
