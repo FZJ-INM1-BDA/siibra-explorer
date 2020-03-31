@@ -95,7 +95,9 @@ describe('> explore same region in different templates', () => {
        } = template
 
       describe(`> testing ${templateName}`, () => {
-        beforeEach(getBeforeEachFn(iavPage)(template))
+        beforeEach(async () => {
+          await getBeforeEachFn(iavPage)(template)()
+        })
 
         for (const tmplLabel of expectedTemplateLabels) {
           const { expectedPosition, name, hemisphere } = tmplLabel
