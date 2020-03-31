@@ -23,7 +23,7 @@ async function _getIndexFromArrayOfWebElements(search, webElements) {
 
 const regionSearchAriaLabelText = 'Search for any region of interest in the atlas selected'
 
-const vertifyPos = position => {
+const verifyPosition = position => {
 
   if (!position) throw new Error(`cursorGoto: position must be defined!`)
   const x = Array.isArray(position) ? position[0] : position.x
@@ -93,7 +93,7 @@ class WdBase{
   }
 
   async cursorMoveTo({ position }) {
-    const { x, y } = vertifyPos(position)
+    const { x, y } = verifyPosition(position)
     return this._driver.actions()
       .move()
       .move({
@@ -105,7 +105,7 @@ class WdBase{
   }
 
   async cursorMoveToAndClick({ position }) {
-    const { x, y } = vertifyPos(position)
+    const { x, y } = verifyPosition(position)
     return this._driver.actions()
       .move()
       .move({
@@ -114,6 +114,26 @@ class WdBase{
         duration: 1000
       })
       .click()
+      .perform()
+  }
+
+  async cursorMoveToAndDrag({ position, delta }) {
+    const { x, y } = verifyPosition(position)
+    const { x: deltaX, y: deltaY } = verifyPosition(delta)
+    return this._driver.actions()
+      .move()
+      .move({
+        x,
+        y,
+        duration: 1000
+      })
+      .press()
+      .move({
+        x: x + deltaX,
+        y: y + deltaY,
+        duration: 1000
+      })
+      .release()
       .perform()
   }
 
