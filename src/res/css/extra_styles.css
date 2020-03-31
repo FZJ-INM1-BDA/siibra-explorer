@@ -389,9 +389,14 @@ markdown-dom pre code
   overflow-y:hidden!important;
 }
 
+.muted-7
+{
+  opacity: 0.7!important;
+}
+
 .muted
 {
-  opacity : 0.5!important;
+  opacity: 0.5!important;
 }
 
 .card

@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject } from 'rxjs'
+import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -45,6 +45,11 @@ const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex
 })
 
 export class NehubaViewerUnit implements OnInit, OnDestroy {
+
+  public viewerPosInVoxel$ = new BehaviorSubject(null)
+  public viewerPosInReal$ = new BehaviorSubject(null)
+  public mousePosInVoxel$ = new BehaviorSubject(null)
+  public mousePosInReal$ = new BehaviorSubject(null)
 
   private exportNehuba: any
   private viewer: any
@@ -793,16 +798,28 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
 
     this._s4$ = this.nehubaViewer.navigationState.position.inRealSpace
       .filter(v => typeof v !== 'undefined' && v !== null)
-      .subscribe(v => this.navPosReal = v)
+      .subscribe(v => {
+        this.navPosReal = Array.from(v) as [number, number, number]
+        this.viewerPosInReal$.next(Array.from(v))
+      })
     this._s5$ = this.nehubaViewer.navigationState.position.inVoxels
       .filter(v => typeof v !== 'undefined' && v !== null)
-      .subscribe(v => this.navPosVoxel = v)
+      .subscribe(v => {
+        this.navPosVoxel = Array.from(v) as [number, number, number]
+        this.viewerPosInVoxel$.next(Array.from(v))
+      })
     this._s6$ = this.nehubaViewer.mousePosition.inRealSpace
       .filter(v => typeof v !== 'undefined' && v !== null)
-      .subscribe(v => (this.mousePosReal = v))
+      .subscribe(v => {
+        this.mousePosReal = Array.from(v) as [number, number, number]
+        this.mousePosInReal$.next(Array.from(v))
+      })
     this._s7$ = this.nehubaViewer.mousePosition.inVoxels
       .filter(v => typeof v !== 'undefined' && v !== null)
-      .subscribe(v => (this.mousePosVoxel = v))
+      .subscribe(v => {
+        this.mousePosVoxel = Array.from(v) as [number, number, number]
+        this.mousePosInVoxel$.next(Array.from(v))
+      })
   }
 
   private loadNewParcellation() {

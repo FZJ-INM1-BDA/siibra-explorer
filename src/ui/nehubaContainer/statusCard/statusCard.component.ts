@@ -1,31 +1,35 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, OnChanges, TemplateRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface } from "src/services/stateStore.service";
 import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
-import { Observable, Subscription } from "rxjs";
-import { distinctUntilChanged, shareReplay } from "rxjs/operators";
+import { Observable, Subscription, of, combineLatest, BehaviorSubject } from "rxjs";
+import { distinctUntilChanged, shareReplay, map, filter, startWith } from "rxjs/operators";
+import { MatBottomSheet } from "@angular/material/bottom-sheet";
 
 @Component({
   selector : 'ui-status-card',
   templateUrl : './statusCard.template.html',
   styleUrls : ['./statusCard.style.css'],
 })
-export class StatusCardComponent implements OnInit{
+export class StatusCardComponent implements OnInit, OnChanges{
 
   @Input() public selectedTemplateName: string;
   @Input() public isMobile: boolean;
   @Input() public nehubaViewer: NehubaViewerUnit;
-  @Input() public onHoverSegmentName: string;
 
   private selectedTemplateRoot$: Observable<any>
   private selectedTemplateRoot: any
   private subscriptions: Subscription[] = []
 
+  public navVal$: Observable<string>
+  public mouseVal$: Observable<string>
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private log: LoggingService,
     private store$: Store<IavRootStoreInterface>,
+    private bottomSheet: MatBottomSheet
   ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -45,22 +49,45 @@ export class StatusCardComponent implements OnInit{
     )
   }
 
-  public statusPanelRealSpace: boolean = true
+  ngOnChanges() {
+    if (!this.nehubaViewer) {
+      this.navVal$ = of(`neubaViewer is undefined`)
+      this.mouseVal$ = of(`neubaViewer is undefined`)
+      return
+    }
+    this.navVal$ = combineLatest(
+      this.statusPanelRealSpace$,
+      this.nehubaViewer.viewerPosInReal$.pipe(
+        filter(v => !!v)
+      ),
+      this.nehubaViewer.viewerPosInVoxel$.pipe(
+        filter(v => !!v)
+      )
+    ).pipe(
+      map(([realFlag, real, voxel]) => realFlag
+        ? real.map(v => `${ (v / 1e6).toFixed(3) }mm`).join(', ')
+        : voxel.map(v => v.toFixed(3)).join(', ') ),
+      startWith(`nehubaViewer initialising`)
+    )
 
-  get mouseCoord(): string {
-    return this.nehubaViewer ?
-      this.statusPanelRealSpace ?
-        this.nehubaViewer.mousePosReal ?
-          Array.from(this.nehubaViewer.mousePosReal.map(n => isNaN(n) ? 0 : n / 1e6))
-            .map(n => n.toFixed(3) + 'mm').join(' , ') :
-          '0mm , 0mm , 0mm (mousePosReal not yet defined)' :
-        this.nehubaViewer.mousePosVoxel ?
-          this.nehubaViewer.mousePosVoxel.join(' , ') :
-          '0 , 0 , 0 (mousePosVoxel not yet defined)' :
-      '0 , 0 , 0 (nehubaViewer not defined)'
+    this.mouseVal$ = combineLatest(
+      this.statusPanelRealSpace$,
+      this.nehubaViewer.mousePosInReal$.pipe(
+        filter(v => !!v)
+      ),
+      this.nehubaViewer.mousePosInVoxel$.pipe(
+        filter(v => !!v)
+      )
+    ).pipe(
+      map(([realFlag, real, voxel]) => realFlag
+        ? real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', ')
+        : voxel.map(v => v.toFixed(3)).join(', s')),
+      startWith(``)
+    )
   }
 
-  public editingNavState: boolean = false
+  public statusPanelRealSpace$ = new BehaviorSubject(true)
+  public statusPanelRealSpace: boolean = true
 
   public textNavigateTo(string: string) {
     if (string.split(/[\s|,]+/).length >= 3 && string.split(/[\s|,]+/).slice(0, 3).every(entry => !isNaN(Number(entry.replace(/mm/, ''))))) {
@@ -74,13 +101,8 @@ export class StatusCardComponent implements OnInit{
     }
   }
 
-  public navigationValue() {
-    return this.nehubaViewer ?
-      this.statusPanelRealSpace ?
-        Array.from(this.nehubaViewer.navPosReal.map(n => isNaN(n) ? 0 : n / 1e6))
-          .map(n => n.toFixed(3) + 'mm').join(' , ') :
-        Array.from(this.nehubaViewer.navPosVoxel.map(n => isNaN(n) ? 0 : n)).join(' , ') :
-      `[0,0,0] (neubaViewer is undefined)`
+  showBottomSheet(tmpl: TemplateRef<any>){
+    this.bottomSheet.open(tmpl)
   }
 
   /**
