@@ -1,56 +1,109 @@
-<div statusCard>
-  <div linksContainer>
-    <span>
-      reset: 
-    </span>
-    <a
-      href="#"
-      (click)="$event.preventDefault();resetNavigation({position:true})">
-      position
-    </a>
+<mat-card>
+  <mat-card-content>
 
-    <a
-      href="#"
-      (click)="$event.preventDefault();resetNavigation({rotation:true})">
-      rotation
-    </a>
+    <!-- reset -->
+    <div class="d-flex">
+      <span class="flex-grow-0 d-flex align-items-center">
+        Reset
+      </span>
 
-    <a
-      href="#"
-      (click)="$event.preventDefault();resetNavigation({zoom:true})">
-      zoom
-    </a>
+      <div class="flex-grow-1"></div>
 
-    <br />
-    <span>
-      space:
-    </span>
-    
-    <a href="#" (click)="$event.preventDefault();statusPanelRealSpace=!statusPanelRealSpace">
-      {{statusPanelRealSpace ? 'physical' : 'voxel'}}
-    </a>
+      <button
+        mat-icon-button
+        (click)="resetNavigation({position:true})"
+        matTooltip="Reset position">
+        <i class="fas fa-crosshairs"></i>
+      </button>
 
-  </div>
+      <button
+        mat-icon-button
+        (click)="resetNavigation({rotation:true})"
+        matTooltip="Reset rotation">
+        <i class="fas fa-compass"></i>
+      </button>
 
-  <br />
-  <div textContainer>
-    <small>Navigation: </small>
-      <input 
-        (keydown.enter)="textNavigateTo(navigateInput.value)"
-        (keydown.tab)="textNavigateTo(navigateInput.value)"
-        [ngModel]="navigationValue()" 
-        spellcheck="false"
-        #navigateInput
-        navigateInput/>
+      <button
+        mat-icon-button
+        (click)="resetNavigation({zoom:true})"
+        matTooltip="Reset zoom">
+        <i class="fas fa-search-plus"></i>
+      </button>
+    </div>
+
+    <!-- space -->
+    <div class="d-flex">
+      <span class="d-flex align-items-center">
+        Voxel space
+      </span>
+
+      <mat-slide-toggle
+        [checked]="statusPanelRealSpace$ | async"
+        (change)="statusPanelRealSpace$.next($event.checked)"
+        class="pl-2 pr-2">
+      </mat-slide-toggle>
+      
+      <span class="d-flex align-items center">
+        Physical space
+      </span>
+    </div>
+
+    <!-- coord -->
+    <div class="d-flex">
+
+      <mat-form-field class="flex-grow-1">
+        <mat-label>
+          {{ (statusPanelRealSpace$ | async) ? 'Physical Coord' : 'Voxel Coord' }}
+        </mat-label>
+        <input type="text"
+          matInput
+          (keydown.enter)="textNavigateTo(navInput.value)"
+          (keydown.tab)="textNavigateTo(navInput.value)"
+          [value]="navVal$ | async"
+          #navInput="matInput">
   
-    <br />
-    <small *ngIf="!isMobile">Cursor: </small>
-    <small *ngIf="!isMobile">
-      {{ mouseCoord }}
-    </small> 
-    <br *ngIf="!isMobile" />
-    <small onHoverSegment>
-      {{ onHoverSegmentName }}
-    </small>
-  </div>
-</div>
+      </mat-form-field>
+
+      <div class="w-0 position-relative">
+        <button
+          (click)="showBottomSheet(shareTmpl)"
+          mat-icon-button
+          class="position-absolute share-btn">
+          <i class="fas fa-share-square"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- cursor pos -->
+    <mat-form-field *ngIf="!isMobile"
+      class="w-100">
+      <mat-label>
+        Cursor Pos
+      </mat-label>
+      <input type="text"
+        matInput
+        [readonly]="true"
+        [value]="mouseVal$ | async">
+    </mat-form-field>
+
+  </mat-card-content>
+</mat-card>
+
+<!-- share template -->
+<ng-template #shareTmpl>
+  <h4 class="mat-h4">
+    Share via
+  </h4>
+  <mat-nav-list>
+    <mat-list-item iav-clipboard-copy>
+      <mat-icon
+        class="mr-4"
+        fontSet="fas"
+        fontIcon="fa-link">
+      </mat-icon>
+      <span>
+        Copy link to this view
+      </span>
+    </mat-list-item>
+  </mat-nav-list>
+</ng-template>

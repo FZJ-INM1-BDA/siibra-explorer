@@ -81,6 +81,7 @@ import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionS
 import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 import { NehubaModule } from "./nehubaContainer/nehuba.module";
 import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.component";
+import { ShareModule } from "src/share";
 
 @NgModule({
   imports : [
@@ -93,7 +94,8 @@ import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.com
     UtilModule,
     ScrollingModule,
     AngularMaterialModule,
-    NehubaModule
+    NehubaModule,
+    ShareModule,
   ],
   declarations : [
     NehubaContainer,
