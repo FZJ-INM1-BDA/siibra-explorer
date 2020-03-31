@@ -7,6 +7,7 @@ import { StopPropagationDirective } from "./directives/stopPropagation.directive
 import { FilterNullPipe } from "./pipes/filterNull.pipe";
 import { IncludesPipe } from "./pipes/includes.pipe";
 import { SafeResourcePipe } from "./pipes/safeResource.pipe";
+import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import { SafeResourcePipe } from "./pipes/safeResource.pipe";
     KeyListner,
     IncludesPipe,
     SafeResourcePipe,
+    CaptureClickListenerDirective,
   ],
   exports: [
     FilterNullPipe,
@@ -32,6 +34,7 @@ import { SafeResourcePipe } from "./pipes/safeResource.pipe";
     KeyListner,
     IncludesPipe,
     SafeResourcePipe,
+    CaptureClickListenerDirective,
   ],
   providers: [
   ]

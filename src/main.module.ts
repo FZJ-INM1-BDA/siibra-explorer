@@ -14,7 +14,6 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { CaptureClickListenerDirective } from "src/util/directives/captureClickListener.directive";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
@@ -100,7 +99,6 @@ import 'src/theme.scss'
     FloatingContainerDirective,
     FloatingMouseContextualContainerDirective,
     DragDropDirective,
-    CaptureClickListenerDirective,
 
     /* pipes */
     GetNamesPipe,

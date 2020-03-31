@@ -1,7 +1,6 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Store } from "@ngrx/store";
-import {MatMenuTrigger} from "@angular/material/menu";
-import {Subscription} from "rxjs";
+import { Subscription } from "rxjs";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { RegionBase } from '../region.base'
 
@@ -11,8 +10,6 @@ import { RegionBase } from '../region.base'
   styleUrls: ['./regionMenu.style.css'],
 })
 export class RegionMenuComponent extends RegionBase implements OnInit, OnDestroy {
-
-  @ViewChild('additionalActionsPanel', {read: ElementRef}) additionalActionsPanelElement: ElementRef
 
   private subscriptions: Subscription[] = []
 

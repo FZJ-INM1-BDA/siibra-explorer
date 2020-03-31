@@ -1,11 +1,11 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output, AfterContentChecked, ChangeDetectorRef, AfterViewInit } from "@angular/core";
 
 @Directive({
   selector: '[fixedMouseContextualContainerDirective]',
   exportAs: 'iavFixedMouseCtxContainer'
 })
 
-export class FixedMouseContextualContainerDirective {
+export class FixedMouseContextualContainerDirective implements AfterContentChecked {
 
   private defaultPos: [number, number] = [-1e3, -1e3]
   public isShown: boolean = false
@@ -21,6 +21,7 @@ export class FixedMouseContextualContainerDirective {
 
   constructor(
     private el: ElementRef,
+    private cdr: ChangeDetectorRef,
   ) {
   }
 
@@ -41,8 +42,12 @@ export class FixedMouseContextualContainerDirective {
     this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
   }
 
+  ngAfterContentChecked(){
+    this.recalculatePosition()
+    this.cdr.markForCheck()
+  }
+
   public show() {
-    setTimeout(() => this.recalculatePosition())
     this.styleDisplay = 'inline-block'
     this.isShown = true
     this.onShow.emit()
