@@ -70,7 +70,7 @@
   xPosition="before"
   hasBackdrop="false">
   <div>
-    <button mat-menu-item (click)="showConnectivity(region.name)">
+    <button mat-menu-item (mousedown)="showConnectivity(region.name)">
       <span>1000 Brain Study - DTI connectivity</span>
     </button>
   </div>
@@ -83,9 +83,9 @@
   xPosition="before"
   hasBackdrop="false">
   <div>
-    <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (click)="changeView(i)" class="d-flex">
-        <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
-        <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
+    <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (mousedown)="changeView(i)" class="d-flex">
+      <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
+      <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
     </button>
   </div>
 </mat-menu>
