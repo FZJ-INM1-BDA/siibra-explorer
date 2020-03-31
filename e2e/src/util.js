@@ -23,6 +23,20 @@ async function _getIndexFromArrayOfWebElements(search, webElements) {
 
 const regionSearchAriaLabelText = 'Search for any region of interest in the atlas selected'
 
+const vertifyPos = position => {
+
+  if (!position) throw new Error(`cursorGoto: position must be defined!`)
+  const x = Array.isArray(position) ? position[0] : position.x
+  const y = Array.isArray(position) ? position[1] : position.y
+  if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
+  if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
+
+  return {
+    x,
+    y
+  }
+}
+
 class WdBase{
   constructor() {
     browser.waitForAngularEnabled(false)
@@ -79,12 +93,7 @@ class WdBase{
   }
 
   async cursorMoveTo({ position }) {
-    if (!position) throw new Error(`cursorGoto: position must be defined!`)
-    const x = Array.isArray(position) ? position[0] : position.x
-    const y = Array.isArray(position)? position[1] : position.y
-    if (!x) throw new Error(`cursorGoto: position.x or position[0] must be defined`)
-    if (!y) throw new Error(`cursorGoto: position.y or position[1] must be defined`)
-
+    const { x, y } = vertifyPos(position)
     return this._driver.actions()
       .move()
       .move({
@@ -92,6 +101,19 @@ class WdBase{
         y,
         duration: 1000
       })
+      .perform()
+  }
+
+  async cursorMoveToAndClick({ position }) {
+    const { x, y } = vertifyPos(position)
+    return this._driver.actions()
+      .move()
+      .move({
+        x,
+        y,
+        duration: 1000
+      })
+      .click()
       .perform()
   }
 
@@ -459,6 +481,37 @@ class WdLayoutPage extends WdBase{
     if (!menuItems[index]) throw new Error(`index out of bound: accessing index ${index} of length ${menuItems.length}`)
     if (cssSelector) await menuItems[index].findElement( By.css(cssSelector) ).click()
     else await menuItems[index].click()
+  }
+
+  // other templates
+  async showOtherTemplateMenu(){
+    await this._driver
+      .findElement( By.css('[aria-label="Show availability in other reference spaces"]') )
+      .click()
+  }
+
+  _getOtherTemplateMenu(){
+    return this._driver
+      .findElement( By.css('[aria-label="Availability in other reference spaces"]') )
+  }
+
+  _getAllOtherTemplates(){
+    return this._getOtherTemplateMenu().findElements( By.css('[mat-menu-item]') )
+  }
+
+  async getAllOtherTemplates(){
+    const els = await this._getAllOtherTemplates()
+    const returnArr = []
+    for (const el of els) {
+      returnArr.push(await _getTextFromWebElement(el))
+    }
+    return returnArr
+  }
+
+  async clickNthItemAllOtherTemplates(index){
+    const arr = await this._getAllOtherTemplates()
+    if (!arr[index]) throw new Error(`index out of bound: trying to access ${index} from arr with length ${arr.length}`)
+    await arr[index].click()
   }
 
   _getFavDatasetIcon(){
