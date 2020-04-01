@@ -25,7 +25,9 @@ import {MatGridListModule} from "@angular/material/grid-list";
 import {MatIconModule} from "@angular/material/icon";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatMenuModule} from "@angular/material/menu";
+import { MatToolbarModule } from '@angular/material/toolbar'
 
+import { ClipboardModule } from '@angular/cdk/clipboard'
 
 const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
 
@@ -56,6 +58,8 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatIconModule,
     MatMenuModule,
     ExperimentalScrollingModule,
+    MatToolbarModule,
+    ClipboardModule,
   ],
   exports: [
     MatButtonModule,
@@ -83,6 +87,8 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatIconModule,
     MatMenuModule,
     ExperimentalScrollingModule,
+    MatToolbarModule,
+    ClipboardModule,
   ],
   providers: [{
     provide: MAT_DIALOG_DEFAULT_OPTIONS,

@@ -18,7 +18,6 @@ import {
   take,
   takeUntil,
   tap,
-  throttleTime,
   withLatestFrom
 } from "rxjs/operators";
 import { LoggingService } from "src/logging";

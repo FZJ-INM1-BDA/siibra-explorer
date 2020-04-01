@@ -1,29 +1,3 @@
-div[statusCard]
-{
-  position:absolute;
-  left:1em;
-  bottom:1em;
-  width : 20em;
-  pointer-events: all;
-}
-
-input
-{
-  background-color:rgba(240, 240, 240, 0.8);
-}
-
-:host-context([darktheme=false]) div[statusCard]
-{
-  background-color:rgba(230,230,230,0.8);
-}
-
-:host-context([darktheme=true]) div[statusCard],
-:host-context([darktheme=true]) input
-{
-  background-color:rgba(20,20,20,0.8);
-  color : rgba(250,250,250,0.8);
-}
-
 div[linksContainer]
 {
   display:inline-block;
@@ -40,13 +14,7 @@ small[onHoverSegment]
   margin-left:2em;
 }
 
-
-:host-context([darktheme=false]) input[navigateInput]
+.share-btn
 {
-  border:rgba(0,0,0,0.2) solid 1px;
-}
-
-:host-context([darktheme=true]) input[navigateInput]
-{
-  border:rgba(255,255,255,0.2) solid 1px;
+  right: 0;
 }
