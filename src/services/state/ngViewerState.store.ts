@@ -1,11 +1,11 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Action, select, Store } from '@ngrx/store'
-import { combineLatest, fromEvent, Observable, Subscription } from 'rxjs';
-import { distinctUntilChanged, filter, map, mapTo, scan, shareReplay, withLatestFrom } from 'rxjs/operators';
+import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
+import { Effect, Actions, ofType } from '@ngrx/effects';
+import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
 import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
-import { getNgIds, IavRootStoreInterface } from '../stateStore.service';
 import { SNACKBAR_MESSAGE } from './uiState.store';
+import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
+import { Action, select, Store } from '@ngrx/store'
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -132,14 +132,72 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       forceShowSegment : action.forceShowSegment,
     }
-  case NEHUBA_READY: {
-    const { nehubaReady } = action
-    return {
-      ...prevState,
-      nehubaReady,
-    }
-  }
-  default: return prevState
+    case ADD_NG_LAYER:
+      return {
+        ...prevState,
+
+        /* this configration hides the layer if a non mixable layer already present */
+
+        /* this configuration does not the addition of multiple non mixable layers */
+        // layers : action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+        //   ? prevState.layers
+        //   : prevState.layers.concat(action.layer)
+
+        /* this configuration allows the addition of multiple non mixables */
+        // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
+        layers : mixNgLayers(prevState.layers, action.layer) 
+        
+        // action.layer.constructor === Array 
+        //   ? prevState.layers.concat(action.layer)
+        //   : prevState.layers.concat({
+        //     ...action.layer,
+        //     ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
+        //           ? {visible: false}
+        //           : {})
+        //   })
+      } 
+    case REMOVE_NG_LAYERS:
+      const { layers } = action
+      const layerNameSet = new Set(layers.map(l => l.name))
+      return {
+        ...prevState,
+        layers: prevState.layers.filter(l => !layerNameSet.has(l.name))
+      }
+    case REMOVE_NG_LAYER:
+      return {
+        ...prevState,
+        layers : prevState.layers.filter(l => l.name !== action.layer.name)
+      }
+    case SHOW_NG_LAYER:
+      return {
+        ...prevState,
+        layers : prevState.layers.map(l => l.name === action.layer.name
+          ? { ...l, visible: true }
+          : l)
+      }
+    case HIDE_NG_LAYER:
+      return {
+        ...prevState,
+
+        layers : prevState.layers.map(l => l.name === action.layer.name
+          ? { ...l, visible: false }
+          : l)
+      }
+    case FORCE_SHOW_SEGMENT:
+      return {
+        ...prevState,
+        forceShowSegment : action.forceShowSegment
+      }
+    case NEHUBA_READY: 
+      const { nehubaReady } = action
+      return {
+        ...prevState,
+        nehubaReady
+      }
+    case GENERAL_ACTION_TYPES.APPLY_STATE:
+      const { ngViewerState } = (action as any).state
+      return ngViewerState
+    default: return prevState
   }
 }
 
@@ -187,11 +245,54 @@ export class NgViewerUseEffect implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
+  @Effect()
+  public applySavedUserConfig$: Observable<any>
+
   constructor(
     private actions: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices,
-  ) {
+    private constantService: AtlasViewerConstantsServices
+  ){
+
+    // TODO either split backend user to be more granular, or combine the user config into a single subscription
+    this.subscriptions.push(
+      this.store$.pipe(
+        select('ngViewerState'),
+        distinctUntilChanged(),
+        debounceTime(200),
+        skip(1),
+        // Max frequency save once every second
+        throttleTime(1000)
+      ).subscribe(({panelMode, panelOrder}) => {
+        fetch(`${this.constantService.backendUrl}user/config`, {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify({ ngViewerState: { panelMode, panelOrder } })
+        })
+      })
+    )
+
+    this.applySavedUserConfig$ = from(fetch(`${this.constantService.backendUrl}user/config`).then(r => r.json())).pipe(
+      catchError((err,caught) => of(null)),
+      filter(v => !!v),
+      withLatestFrom(this.store$),
+      map(([{ngViewerState: fetchedNgViewerState}, state]) => {
+        const { ngViewerState } = state
+        return {
+          type: GENERAL_ACTION_TYPES.APPLY_STATE,
+          state: {
+            ...state,
+            ngViewerState: {
+              ...ngViewerState,
+              ...fetchedNgViewerState
+            }
+          }
+        }
+      })
+    )
+
     const toggleMaxmimise$ = this.actions.pipe(
       ofType(ACTION_TYPES.TOGGLE_MAXIMISE),
       shareReplay(1),
