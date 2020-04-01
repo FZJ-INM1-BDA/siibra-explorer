@@ -1,30 +1,30 @@
-import { Directive, HostListener, HostBinding, Input } from "@angular/core";
+import { Directive, HostBinding, HostListener, Input } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 
 @Directive({
   selector : '[hoverable]',
   host : {
-    'style':`
-      transition : 
-        opacity 0.3s ease, 
-        box-shadow 0.3s ease, 
+    style: `
+      transition :
+        opacity 0.3s ease,
+        box-shadow 0.3s ease,
         transform 0.3s ease;
       cursor : default;`,
-  }
+  },
 })
 
-export class HoverableBlockDirective{
+export class HoverableBlockDirective {
 
   @Input('hoverable')
-  config:any = {
+  public config: any = {
     disable: false,
-    translateY: -5
+    translateY: -5,
   }
 
   private _disable = false
   private _translateY = -5
 
-  ngOnChanges(){
+  public ngOnChanges() {
     this._disable = this.config && !!this.config.disable
     /**
      * 0 is evaluated as falsy, but a valid number
@@ -36,17 +36,17 @@ export class HoverableBlockDirective{
   }
 
   @HostBinding('style.opacity')
-  opacity : number = 0.9
+  public opacity: number = 0.9
 
   @HostBinding('style.transform')
-  transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
+  public transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
 
   @HostBinding('style.box-shadow')
-  boxShadow = this.sanitizer.bypassSecurityTrustStyle('0 4px 6px 0 rgba(5,5,5,0.1)')
+  public boxShadow = this.sanitizer.bypassSecurityTrustStyle('0 4px 6px 0 rgba(5,5,5,0.1)')
 
   @HostListener('mouseenter')
-  onMouseenter(){
-    if (this._disable) return
+  public onMouseenter() {
+    if (this._disable) { return }
     this.opacity = 1.0
     this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.25)`)
     /**
@@ -57,14 +57,14 @@ export class HoverableBlockDirective{
   }
 
   @HostListener('mouseleave')
-  onmouseleave(){
-    if (this._disable) return
+  public onmouseleave() {
+    if (this._disable) { return }
     this.opacity = 0.9
     this.boxShadow = this.sanitizer.bypassSecurityTrustStyle(`0 4px 6px 0 rgba(5,5,5,0.1)`)
     this.transform = this.sanitizer.bypassSecurityTrustStyle(`translateY(0px)`)
   }
 
-  constructor(private sanitizer:DomSanitizer){
+  constructor(private sanitizer: DomSanitizer) {
 
   }
 }

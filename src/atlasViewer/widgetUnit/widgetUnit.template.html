@@ -1,4 +1,5 @@
 <panel-component
+  [attr.aria-label]="'Widget for ' + title"
   widgetUnitPanel
   [ngClass]="{'blinkOn': blinkOn}"
   [bodyCollapsable] = "state === 'docked'"
@@ -37,6 +38,7 @@
       </ng-container>
 
       <i *ngIf="exitable"
+        aria-label="close"
         (click)="exit($event)" 
         class="fas fa-times" 
         [hoverable] ="hoverableConfig"></i>

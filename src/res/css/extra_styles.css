@@ -70,16 +70,6 @@ ul#statusContainer
   /* width:25em; */
   max-width:999999px;
 }
-.inputSearchContainer .popover-arrow
-{
-  display:none;
-}
-
-.inputSearchContainer .popover-content.popover-body
-{
-  padding:0;
-  max-width:999999px;
-}
 
 .mute-text
 {
@@ -268,26 +258,6 @@ markdown-dom pre code
   color: rgba(255, 255, 255, 1.0);
 }
 
-.darktheme.popover
-{
-  background-color:rgba(0, 0, 0, 0.8);
-}
-
-.darktheme.popover .popover-body
-{
-  color:white;
-}
-
-.darktheme.popover.popover-bottom>.arrow::after
-{
-  border-bottom-color: rgba(0, 0, 0, 0.8);
-}
-
-.darktheme.popover.popover-right>.arrow::after
-{
-  border-right-color: rgba(0, 0, 0, 0.8);
-}
-
 .r-90
 {
   transform: rotate(90deg)!important;
@@ -414,9 +384,19 @@ markdown-dom pre code
   overflow-x:hidden!important;
 }
 
+.overflow-y-hidden
+{
+  overflow-y:hidden!important;
+}
+
+.muted-7
+{
+  opacity: 0.7!important;
+}
+
 .muted
 {
-  opacity : 0.5!important;
+  opacity: 0.5!important;
 }
 
 .card
@@ -470,21 +450,6 @@ markdown-dom pre code
 {
   top: 0!important;
 }
-
-/* TODO fix hack */
-/* ngx boostrap default z index for modal-container is 1050, which is higher than material tooltip 1000 */
-/* when migration away from ngx bootstrap is complete, remove these classes */
-
-modal-container.modal
-{
-  z-index: 950;
-}
-
-bs-modal-backdrop.modal-backdrop
-{
-  z-index: 940;
-}
-
 
 .outline-none {
     outline: none;
@@ -626,11 +591,6 @@ mat-icon[fontset="far"]
   min-height: 2rem;
 }
 
-.min-h-8
-{
-  min-height: 4rem;
-}
-
 .w-30vw
 {
   width: 30vw!important;
@@ -679,4 +639,74 @@ body::after
   padding: 0!important;
   overflow: hidden;
   margin-top: 0.25rem;
+}
+
+.linear-gradient-fade:before {
+  content:'';
+  width:100%;
+  height:100%;
+  position:absolute;
+  background:linear-gradient(transparent 50px, #424242);
+}
+
+.o-1
+{
+  opacity: 1.0!important;
+}
+
+.o-0
+{
+  opacity: 0.0!important;
+}
+
+kg-dataset-previewer > img
+{
+  max-width: 100%;
+  width: 100%;
+}
+
+/*
+  TODO, this really should be in searchSideNav.style.css. But karma tests does not seem to like to include style.css
+  figure out why
+*/
+/* exactly 1.5 line height */
+
+.h-117px
+{
+  min-height:117px!important;
+  max-height:117px!important;
+  flex-basis: 117px!important;
+}
+
+.hover-grab
+{
+  opacity: 0.5;
+  transition: opacity 200ms ease-in-out;
+}
+
+.hover-grab:hover
+{
+  cursor: grab;
+  opacity: 1.0;
+}
+
+.ml-4-n
+{
+  margin-left: -1rem!important;
+}
+.mr-4-n
+{
+  margin-right: -1rem!important;
+}
+
+.mat-card-sm > mat-dialog-container
+{
+  padding-left: 16px!important;
+  padding-right: 16px!important;
+  padding-top: 16px!important;
+}
+
+.fixed-bottom
+{
+  top: unset!important;
 }

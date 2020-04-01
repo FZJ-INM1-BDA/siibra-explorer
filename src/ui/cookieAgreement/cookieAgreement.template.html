@@ -1,116 +1,46 @@
-<div>
-  <p>The HBP Atlas Viewer uses ‘cookies’ (text files placed on your computer) to verify login details,
-    remember user choices and preferences, and in some instances determine site permissions. Cookies also provide,
-    in anonymous form, the number of visitors accessing the HBP Public Website, features users access during website
-    visits, and the general location of the user based on IP address.</p>
-  <p>HBP Atlas Viewer uses at least the following cookies:</p>
-  <p><strong>connect.sid</strong> : verify login details</p>
-  <p>To find out more about cookies, including how to determine the cookies that have been set on
-    your computer and how to manage
-    or delete them, visit <a href="www.aboutcookies.org">www.aboutcookies.org </a> .</p>
-  <p>To opt-out of being tracked by Google Analytics across all websites, visit
-    <a href="http://tools.google.com/dlpage/gaoptout">http://tools.google.com/dlpage/gaoptout</a> .</p>
+<markdown-dom [markdown]="markdownInfo">
+</markdown-dom>
 
-  <div class="d-flex">
+<!-- additional information -->
+<mat-accordion class="expansion-panel">
 
-    <button
-      mat-stroked-button
-      color="primary"
-      class="d-flex justify-content-center flex-grow-1"
-      (click)="showMore = !showMore">
-      Show {{showMore? "less" : "more"}}
-    </button>
-  
-  </div>
+  <!-- IAV specific -->
+  <mat-expansion-panel>
 
-  <div *ngIf="showMore">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        About IAV
+      </mat-panel-title>
+      <mat-panel-description>
+        More details
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
     <small>
-
-      <div>
-        <strong>Data controller(s):</strong>
-        <span>
-          HBP Atlas Viewer is the data controller for your login information.
-        </span>
-      </div>
-
-      <div>
-        <strong>List of partners responsible:</strong>
-        <span>
-          FZJ-INM1 <a href="mailto:inm1-bda@fz-juelich.de">inm1-bda@fz-juelich.de</a>
-        </span>
-      </div>
-
-      <div>
-        <strong>HBP Data Protection Officer (HBP DPO):</strong>
-        <span>
-          You can find out about HBP Data Protection policies here: 
-          <a href="https://www.humanbrainproject.eu/en/social-ethical-reflective/ethics-support/data-protection/">
-            https://www.humanbrainproject.eu/en/social-ethical-reflective/ethics-support/data-protection/
-          </a>
-          and you can contact HBP Data Protection Officer at
-          <a href="mailto:data.protection@humanbrainproject.eu">
-            data.protection@humanbrainproject.eu
-          </a>
-        </span>
-      </div>
-
-      <div>
-        <strong>Legal basis for data processing:</strong>
-        <span>
-          consent
-        </span>
-      </div>
-
-      <div>
-        <strong>General categories of personal data collected:</strong>
-        <span>
-          Name, ORC ID, JWT ID Token
-        </span>
-      </div>
-
-      <div>
-        <strong>Data shared within the HBP Consortium:</strong>
-        <span>
-          JWT ID Token is shared with ChunMa (Chunk Master), enabling upload and retrieval of user uploaded data.
-        </span>
-      </div>
-
-      <div>
-        <strong>Data Shared with Third Parties:</strong>
-        <span>none</span>
-      </div>
-
-      <div>
-        <strong>Transfer of any personal data to third countries:</strong>
-        <span>
-          Data are stored in HBP infrastructure, and will not be transferred to Third countries.
-        </span>
-      </div>
-
-      <div>
-        <strong>Retention periods:</strong>
-        <div>
-          24 hours
-        </div>
-      </div>
-
-      <div>
-        <strong>Lodging a complaint:</strong>
-        <span>
-          The HBP DPO and HBP partners will make every reasonable effort to address your data protection concerns.
-          However, you have a right to lodge a complaint with a data protection authority. Contact information for the
-          European Data Protection Board and EU DPAs are available here:
-          <ul>
-            <li><a
-                href="http://ec.europa.eu/newsroom/article29/item-detail.cfm?item_id=612080">http://ec.europa.eu/newsroom/article29/item-detail.cfm?item_id=612080</a>
-            </li>
-            <li data-v-fc2c56ac=""><a data-v-fc2c56ac=""
-                href="https://edpb.europa.eu/about-edpb/board/members_en">https://edpb.europa.eu/about-edpb/board/members_en</a>
-            </li>
-          </ul>
-        </span>
-      </div>
-
+      <markdown-dom [markdown]="markdownReadmore">
+      </markdown-dom>
     </small>
-  </div>
-</div>
+  </mat-expansion-panel>
+
+  <!-- matomo specific -->
+  <mat-expansion-panel *ngIf="matomoUrl">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        About Matomo
+      </mat-panel-title>
+      <mat-panel-description>
+        Usage tracking
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+    <ng-container *ngTemplateOutlet="matomoReadMore">
+    </ng-container>
+  </mat-expansion-panel>
+
+</mat-accordion>
+
+<!-- template for matomo -->
+<ng-template #matomoReadMore>
+  <markdown-dom [markdown]="matomoInfo">
+  </markdown-dom>
+  <iframe [src]="optOutUrl | safeResource"></iframe>
+</ng-template>

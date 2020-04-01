@@ -1,14 +1,14 @@
-export class ModalHandler{
+export class ModalHandler {
 
-  hide : () => void
-  show : () => void
+  public hide: () => void
+  public show: () => void
   // onHide : (callback: () => void) => void
   // onHidden : (callback : () => void) => void
   // onShow : (callback : () => void) => void
   // onShown : (callback : () => void) => void
-  title : string
-  body : string
-  footer : String
-  
-  dismissable: boolean = true
+  public title: string
+  public body: string
+  public footer: string
+
+  public dismissable = true
 }

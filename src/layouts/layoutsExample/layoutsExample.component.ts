@@ -1,16 +1,15 @@
 import { Component } from "@angular/core";
 
-
 @Component({
   selector : 'layouts-example',
   templateUrl : './layoutsExample.template.html',
   styleUrls : [
-    `./layoutsExample.style.css`
-  ]
+    `./layoutsExample.style.css`,
+  ],
 })
 
-export class LayoutsExample{
-  mainsideOverlay : boolean = true
-  mainsideShowSide : boolean = true
-  mainsideSideWidth : number = 100
+export class LayoutsExample {
+  public mainsideOverlay: boolean = true
+  public mainsideShowSide: boolean = true
+  public mainsideSideWidth: number = 100
 }

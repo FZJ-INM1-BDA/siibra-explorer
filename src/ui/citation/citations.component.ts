@@ -1,15 +1,14 @@
 import { Component, Input } from "@angular/core";
-import { Property } from "../../services/stateStore.service";
-
+import { IProperty } from "../../services/stateStore.service";
 
 @Component({
   selector : 'citations-component',
   templateUrl : './citations.template.html',
   styleUrls : [
-    './citations.style.css'
-  ]
+    './citations.style.css',
+  ],
 })
 
-export class CitationsContainer{
-  @Input() properties : Property
+export class CitationsContainer {
+  @Input() public properties: IProperty
 }

@@ -11,8 +11,28 @@
   <link rel="stylesheet" href="plugin_styles.css">
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="version.css">
+  
+  <script src="https://unpkg.com/kg-dataset-previewer@0.0.17/dist/kg-dataset-previewer/kg-dataset-previewer.js" defer>
+  </script>
 
   <title>Interactive Atlas Viewer</title>
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Map",
+      "url": "https://interactive-viewer.apps.hbp.eu",
+      "name": "Human Brain Project Interactive Atlas Viewer",
+      "reference space": {
+        "@type": "Place",
+        "parcellation atlas": {
+          "@type": "Place",
+          "regions": [{
+            "@type": "Place"
+          }]
+        }
+      }
+    }
+  </script>
 </head>
 <body>
   <atlas-viewer>
@@ -23,7 +43,37 @@
     </h1>
   </atlas-viewer>
 
-  <script src="testSafari.js">
+  <script nonce="$$NONCE$$">
+    /**
+    * Catching Safari 10 bug:
+    * 
+    * https://bugs.webkit.org/show_bug.cgi?id=171041
+    * 
+    */
+
+    (function(){
+      try{
+        eval('(()=>{\
+                let e = e => {\
+                  console.log(e);\
+                  for(let e of [1,2,3]){\
+                    console.log(e);\
+                  }\
+                }\
+            })()')
+      } catch (e) {
+        console.log(e)
+        const warning = 'Your browser cannot display the interactive viewer. Please use either Chrome >= 56 and/or Firefox >= 51'
+        console.log(warning)
+        const warningEl = document.createElement('h4')
+        warningEl.innerHTML = warning
+        const el = document.getElementsByTagName('atlas-viewer')
+        if(el.length > 0){
+          document.body.removeChild(el[0])
+        }
+        document.body.appendChild(warningEl)
+      }
+    })()
   </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef, OnDestroy, OnChanges } from "@angular/core";
+import { Directive, ElementRef, Input, OnChanges, OnDestroy } from "@angular/core";
 
 const VALID_EVENTNAMES = new Set([
   'mousedown',
@@ -8,43 +8,44 @@ const VALID_EVENTNAMES = new Set([
   'mouseleave',
   'touchstart',
   'touchmove',
-  'touchend'
+  'touchend',
 ])
 
 const stopPropagation = ev => ev.stopPropagation()
 
 @Directive({
-  selector: '[iav-stop]'
+  selector: '[iav-stop]',
 })
 
-export class StopPropagationDirective implements OnChanges, OnDestroy{
+export class StopPropagationDirective implements OnChanges, OnDestroy {
 
-  @Input('iav-stop') stopString: string = ''
+  @Input('iav-stop') public stopString: string = ''
 
-  private destroyCb: (() => void)[] = []
+  private destroyCb: Array<() => void> = []
 
-  constructor(private el: ElementRef){}
+  constructor(private el: ElementRef) {}
 
-  ngOnChanges(){
-    
+  public ngOnChanges() {
+
     this.ngOnDestroy()
 
-    if (!this.stopString || this.stopString === '') return
+    if (!this.stopString || this.stopString === '') { return }
 
     const element = (this.el.nativeElement as HTMLElement)
-    for (const evName of this.stopString.split(' ')){
-      if(VALID_EVENTNAMES.has(evName)){
+    for (const evName of this.stopString.split(' ')) {
+      if (VALID_EVENTNAMES.has(evName)) {
         element.addEventListener(evName, stopPropagation)
         this.destroyCb.push(() => {
           element.removeEventListener(evName, stopPropagation)
         })
       } else {
+        // tslint:disable-next-line
         console.warn(`${evName} is not a valid event name in the supported set: `, VALID_EVENTNAMES)
       }
     }
   }
 
-  ngOnDestroy(){
+  public ngOnDestroy() {
     while (this.destroyCb.length > 0) {
       this.destroyCb.pop()()
     }

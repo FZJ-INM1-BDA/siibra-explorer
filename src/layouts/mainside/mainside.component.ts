@@ -1,37 +1,37 @@
-import { Component, Input, EventEmitter, Output } from "@angular/core";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { mainSideAnimation } from "./mainside.animation";
 
 @Component({
   selector : 'layout-mainside',
   templateUrl : './mainside.template.html',
   styleUrls : [
-    './mainside.style.css'
+    './mainside.style.css',
   ],
   animations : [
-    mainSideAnimation
-  ]
+    mainSideAnimation,
+  ],
 })
 
-export class LayoutMainSide{
-  @Input() showResizeSliver : boolean = true
-  @Input() showSide : boolean = false
-  @Input() sideWidth : number = 300
-  @Input() animationFlag : boolean = false
+export class LayoutMainSide {
+  @Input() public showResizeSliver: boolean = true
+  @Input() public showSide: boolean = false
+  @Input() public sideWidth: number = 300
+  @Input() public animationFlag: boolean = false
 
-  @Output() panelShowStateChanged : EventEmitter<boolean> = new EventEmitter()
-  @Output() panelAnimationStart : EventEmitter<boolean> = new EventEmitter()
-  @Output() panelAnimationEnd : EventEmitter<boolean> = new EventEmitter()
+  @Output() public panelShowStateChanged: EventEmitter<boolean> = new EventEmitter()
+  @Output() public panelAnimationStart: EventEmitter<boolean> = new EventEmitter()
+  @Output() public panelAnimationEnd: EventEmitter<boolean> = new EventEmitter()
 
-  togglePanelShow(){
+  public togglePanelShow() {
     this.showSide = !this.showSide
     this.panelShowStateChanged.emit(this.showSide)
   }
 
-  animationStart(){
+  public animationStart() {
     this.panelAnimationStart.emit(true)
   }
 
-  animationEnd(){
+  public animationEnd() {
     this.panelAnimationEnd.emit(true)
   }
 }

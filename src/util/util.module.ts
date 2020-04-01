@@ -1,10 +1,13 @@
 import { NgModule } from "@angular/core";
-import { FilterNullPipe } from "./pipes/filterNull.pipe";
 import { FilterRowsByVisbilityPipe } from "src/components/flatTree/filterRowsByVisibility.pipe";
-import { StopPropagationDirective } from "./directives/stopPropagation.directive";
 import { DelayEventDirective } from "./directives/delayEvent.directive";
-import { MouseHoverDirective, MouseOverTextPipe, MouseOverIconPipe } from "./directives/mouseOver.directive";
 import { KeyListner } from "./directives/keyDownListener.directive";
+import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./directives/mouseOver.directive";
+import { StopPropagationDirective } from "./directives/stopPropagation.directive";
+import { FilterNullPipe } from "./pipes/filterNull.pipe";
+import { IncludesPipe } from "./pipes/includes.pipe";
+import { SafeResourcePipe } from "./pipes/safeResource.pipe";
+import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
 
 @NgModule({
   declarations: [
@@ -15,7 +18,10 @@ import { KeyListner } from "./directives/keyDownListener.directive";
     MouseHoverDirective,
     MouseOverTextPipe,
     MouseOverIconPipe,
-    KeyListner
+    KeyListner,
+    IncludesPipe,
+    SafeResourcePipe,
+    CaptureClickListenerDirective,
   ],
   exports: [
     FilterNullPipe,
@@ -25,10 +31,15 @@ import { KeyListner } from "./directives/keyDownListener.directive";
     MouseHoverDirective,
     MouseOverTextPipe,
     MouseOverIconPipe,
-    KeyListner
+    KeyListner,
+    IncludesPipe,
+    SafeResourcePipe,
+    CaptureClickListenerDirective,
+  ],
+  providers: [
   ]
 })
 
-export class UtilModule{
+export class UtilModule {
 
 }

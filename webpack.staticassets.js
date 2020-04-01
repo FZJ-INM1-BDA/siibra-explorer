@@ -70,7 +70,10 @@ module.exports = {
         ? true
         : false,
       BACKEND_URL: (process.env.BACKEND_URL && JSON.stringify(process.env.BACKEND_URL)) || 'null',
-      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' )
+      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' ),
+      DATASET_PREVIEW_URL: JSON.stringify(process.env.DATASET_PREVIEW_URL || 'https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview'),
+      MATOMO_URL: JSON.stringify(process.env.MATOMO_URL || null),
+      MATOMO_ID: JSON.stringify(process.env.MATOMO_ID || null)
     })
   ],
   resolve: {

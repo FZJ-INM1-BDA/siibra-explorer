@@ -1,17 +1,17 @@
 import { Injectable } from "@angular/core";
-import { MatSnackBar, MatSnackBarConfig } from "@angular/material";
 import { AtlasViewerAPIServices } from "src/atlasViewer/atlasViewer.apiService.service";
 import { ToastHandler } from "src/util/pluginHandlerClasses/toastHandler";
+import {MatSnackBar, MatSnackBarConfig} from "@angular/material/snack-bar";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
-export class UIService{
+export class UIService {
   constructor(
     private snackbar: MatSnackBar,
-    private apiService: AtlasViewerAPIServices
-  ){
+    private apiService: AtlasViewerAPIServices,
+  ) {
     this.apiService.interactiveViewer.uiHandle.getToastHandler = () => {
       const toasthandler = new ToastHandler()
       let handle
@@ -19,19 +19,17 @@ export class UIService{
         handle = this.showMessage(toasthandler.message, null, {
           duration: toasthandler.timeout,
         })
-        
       }
 
       toasthandler.hide = () => {
-        handle && handle.dismiss()
+        if (handle) { handle.dismiss() }
         handle = null
       }
-      
       return toasthandler
-    } 
+    }
   }
 
-  showMessage(message: string, actionBtnTxt: string = 'Dismiss', config?: Partial<MatSnackBarConfig>){
+  public showMessage(message: string, actionBtnTxt: string = 'Dismiss', config?: Partial<MatSnackBarConfig>) {
     return this.snackbar.open(message, actionBtnTxt, config)
   }
 }

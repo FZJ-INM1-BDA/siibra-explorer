@@ -1,10 +1,10 @@
-import { temporalPositveScanFn } from './mouseOver.directive'
-import { Subject } from 'rxjs';
 import {} from 'jasmine'
-import { scan, take, skip } from 'rxjs/operators';
+import { forkJoin, Subject } from 'rxjs';
+import { scan, skip, take } from 'rxjs/operators';
+import { temporalPositveScanFn } from './mouseOver.directive'
 
-const segmentsPositive = { segments: [{ hello: 'world' }] } as {segments:any}
-const segmentsNegative = { segments: null }
+const segmentsPositive = { segments: [{ hello: 'world' }] } as {segments: any}
+const segmentsNegative = { segments: [] }
 
 const userLandmarkPostive = { userLandmark: true }
 const userLandmarkNegative = { userLandmark: null }
@@ -12,7 +12,7 @@ const userLandmarkNegative = { userLandmark: null }
 describe('temporalPositveScanFn', () => {
   const subscriptions = []
   afterAll(() => {
-    while(subscriptions.length > 0) subscriptions.pop().unsubscribe()
+    while (subscriptions.length > 0) { subscriptions.pop().unsubscribe() }
   })
 
   it('should scan obs as expected', (done) => {
@@ -21,30 +21,44 @@ describe('temporalPositveScanFn', () => {
 
     const testFirstEv = source.pipe(
       scan(temporalPositveScanFn, []),
-      take(1)
+      take(1),
     )
 
     const testSecondEv = source.pipe(
       scan(temporalPositveScanFn, []),
       skip(1),
-      take(1)
+      take(1),
     )
 
     const testThirdEv = source.pipe(
       scan(temporalPositveScanFn, []),
       skip(2),
-      take(1)
+      take(1),
     )
-    subscriptions.push(
-      testFirstEv.subscribe(
-        arr => expect(arr).toBe([ segmentsPositive ]),
-        null,
-        () => done()
-      )
+
+    const testFourthEv = source.pipe(
+      scan(temporalPositveScanFn, []),
+      skip(3),
+      take(1),
     )
+
+    forkJoin(
+      testFirstEv,
+      testSecondEv,
+      testThirdEv,
+      testFourthEv,
+    ).pipe(
+      take(1),
+    ).subscribe(([ arr1, arr2, arr3, arr4 ]) => {
+      expect(arr1).toEqual([ segmentsPositive ])
+      expect(arr2).toEqual([ userLandmarkPostive, segmentsPositive ])
+      expect(arr3).toEqual([ userLandmarkPostive ])
+      expect(arr4).toEqual([])
+    }, null, () => done() )
 
     source.next(segmentsPositive)
     source.next(userLandmarkPostive)
     source.next(segmentsNegative)
+    source.next(userLandmarkNegative)
   })
 })

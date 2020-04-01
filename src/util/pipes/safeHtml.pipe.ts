@@ -1,17 +1,15 @@
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Pipe({
-  name : 'safeHtml'
+  name : 'safeHtml',
 })
 
-export class SafeHtmlPipe implements PipeTransform{
-  constructor(){
+export class SafeHtmlPipe implements PipeTransform {
+  constructor(private ds: DomSanitizer){
 
   }
-
-  public transform(html:string):string{
-    return html
-    // return this.ds.bypassSecurityTrustHtml(html)
+  public transform(html: string): SafeHtml {
+    return this.ds.bypassSecurityTrustHtml(html)
   }
 }

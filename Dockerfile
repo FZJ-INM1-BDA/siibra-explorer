@@ -1,20 +1,25 @@
-FROM node:10 as builder
+FROM node:12 as builder
 
 ARG BACKEND_URL
-ENV BACKEND_URL=$BACKEND_URL
+ENV BACKEND_URL=${BACKEND_URL}
+
+ARG USE_LOGO
+ENV USE_LOGO=${USE_LOGO:-hbp}
+
+ARG DATASET_PREVIEW_URL
+ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview}
 
 COPY . /iv
 WORKDIR /iv
 
-ENV VERSION=devNext
-
-RUN apt update && apt upgrade -y && apt install brotli
+ARG VERSION
+ENV VERSION=${VERSION:-devNext}
 
 RUN npm i
 RUN npm run build-aot
 
 # gzipping container
-FROM ubuntu:18.10 as compressor
+FROM ubuntu:19.10 as compressor
 RUN apt upgrade -y && apt update && apt install brotli
 
 RUN mkdir /iv
@@ -24,15 +29,16 @@ WORKDIR /iv
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
 # prod container
-FROM node:10-alpine 
+FROM node:12-alpine 
 
-ARG PORT
-ENV PORT=$PORT
 ENV NODE_ENV=production
 
 RUN apk --no-cache add ca-certificates
 RUN mkdir /iv-app
 WORKDIR /iv-app
+
+# Copy common folder
+COPY --from=builder /iv/common /common
 
 # Copy the express server
 COPY --from=builder /iv/deploy .
@@ -44,7 +50,5 @@ COPY --from=compressor /iv ./public
 # is this even necessary any more?
 COPY --from=compressor /iv/res/json ./res
 RUN npm i
-
-EXPOSE $PORT
 
 ENTRYPOINT [ "node", "server.js" ]

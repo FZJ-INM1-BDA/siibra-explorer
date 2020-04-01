@@ -1,46 +1,45 @@
-import { Component, ViewChild, ViewContainerRef,ComponentRef, HostBinding, HostListener, Output, EventEmitter, Input, OnInit, OnDestroy } from "@angular/core";
+import { Component, ComponentRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewContainerRef } from "@angular/core";
 
-import { WidgetServices } from "./widgetService.service";
-import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
-import { Subscription, Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { map } from "rxjs/operators";
-
+import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
+import { WidgetServices } from "./widgetService.service";
 
 @Component({
   templateUrl : './widgetUnit.template.html',
   styleUrls : [
-    `./widgetUnit.style.css`
-  ]
+    `./widgetUnit.style.css`,
+  ],
 })
 
-export class WidgetUnit implements OnInit, OnDestroy{
-  @ViewChild('container',{read:ViewContainerRef}) container : ViewContainerRef
+export class WidgetUnit implements OnInit, OnDestroy {
+  @ViewChild('container', {read: ViewContainerRef, static: true}) public container: ViewContainerRef
 
   @HostBinding('attr.state')
-  public state : 'docked' | 'floating' = 'docked'
+  public state: 'docked' | 'floating' = 'docked'
 
   @HostBinding('style.width')
-  width : string = this.state === 'docked' ? null : '0px'
+  public width: string = this.state === 'docked' ? null : '0px'
 
   @HostBinding('style.height')
-  height : string = this.state === 'docked' ? null : '0px'
+  public height: string = this.state === 'docked' ? null : '0px'
 
   @HostBinding('style.display')
-  isMinimised: string
+  public isMinimised: string
 
-  isMinimised$: Observable<boolean>
+  public isMinimised$: Observable<boolean>
 
   public useMobileUI$: Observable<boolean>
 
   public hoverableConfig = {
-    translateY: -1
+    translateY: -1,
   }
 
   /**
    * Timed alternates of blinkOn property should result in attention grabbing blink behaviour
    */
   private _blinkOn: boolean = false
-  get blinkOn(){
+  get blinkOn() {
     return this._blinkOn
   }
 
@@ -48,7 +47,7 @@ export class WidgetUnit implements OnInit, OnDestroy{
     this._blinkOn = !!val
   }
 
-  get showProgress(){
+  get showProgress() {
     return this.progressIndicator !== null
   }
 
@@ -58,11 +57,11 @@ export class WidgetUnit implements OnInit, OnDestroy{
    * This value should be between 0 and 1
    */
   private _progressIndicator: number = null
-  get progressIndicator(){
+  get progressIndicator() {
     return this._progressIndicator
   }
 
-  set progressIndicator(val:number) {
+  set progressIndicator(val: number) {
     if (isNaN(val)) {
       this._progressIndicator = null
       return
@@ -80,47 +79,47 @@ export class WidgetUnit implements OnInit, OnDestroy{
 
   public canBeDocked: boolean = false
   @HostListener('mousedown')
-  clicked(){
+  public clicked() {
     this.clickedEmitter.emit(this)
     this.blinkOn = false
   }
 
-  @Input() title : string = 'Untitled'
+  @Input() public title: string = 'Untitled'
 
   @Output()
-  clickedEmitter : EventEmitter<WidgetUnit> = new EventEmitter()
+  public clickedEmitter: EventEmitter<WidgetUnit> = new EventEmitter()
 
   @Input()
-  public exitable : boolean = true
+  public exitable: boolean = true
 
   @Input()
-  public titleHTML : string = null
+  public titleHTML: string = null
 
-  public guestComponentRef : ComponentRef<any>
-  public widgetServices:WidgetServices
-  public cf : ComponentRef<WidgetUnit>
+  public guestComponentRef: ComponentRef<any>
+  public widgetServices: WidgetServices
+  public cf: ComponentRef<WidgetUnit>
   private subscriptions: Subscription[] = []
 
-  public id: string 
-  constructor(private constantsService: AtlasViewerConstantsServices){
+  public id: string
+  constructor(private constantsService: AtlasViewerConstantsServices) {
     this.id = Date.now().toString()
 
     this.useMobileUI$ = this.constantsService.useMobileUI$
   }
 
-  ngOnInit(){
+  public ngOnInit() {
     this.canBeDocked = typeof this.widgetServices.dockedContainer !== 'undefined'
 
     this.isMinimised$ = this.widgetServices.minimisedWindow$.pipe(
-      map(set => set.has(this))
+      map(set => set.has(this)),
     )
     this.subscriptions.push(
-      this.isMinimised$.subscribe(flag => this.isMinimised = flag ? 'none' : null)
+      this.isMinimised$.subscribe(flag => this.isMinimised = flag ? 'none' : null),
     )
   }
 
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0){
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
@@ -131,38 +130,38 @@ export class WidgetUnit implements OnInit, OnDestroy{
    * @default false
    * @TODO does it make sense to tie widget persistency with WidgetUnit class?
    */
-  public persistency : boolean = false
+  public persistency: boolean = false
 
-  undock(event?:Event){
-    if(event){
+  public undock(event?: Event) {
+    if (event) {
       event.stopPropagation()
       event.preventDefault()
     }
-    
-    this.widgetServices.changeState(this,{
+
+    this.widgetServices.changeState(this, {
       title : this.title,
-      state:'floating',
-      exitable:this.exitable,
-      persistency:this.persistency
+      state: 'floating',
+      exitable: this.exitable,
+      persistency: this.persistency,
     })
   }
 
-  dock(event?:Event){
-    if(event){
+  public dock(event?: Event) {
+    if (event) {
       event.stopPropagation()
       event.preventDefault()
     }
-    
-    this.widgetServices.changeState(this,{
+
+    this.widgetServices.changeState(this, {
       title : this.title,
-      state:'docked',
-      exitable:this.exitable,
-      persistency:this.persistency
+      state: 'docked',
+      exitable: this.exitable,
+      persistency: this.persistency,
     })
   }
 
-  exit(event?:Event){
-    if(event){
+  public exit(event?: Event) {
+    if (event) {
       event.stopPropagation()
       event.preventDefault()
     }
@@ -170,7 +169,7 @@ export class WidgetUnit implements OnInit, OnDestroy{
     this.widgetServices.exitWidget(this)
   }
 
-  setWidthHeight(){
+  public setWidthHeight() {
     this.width = this.state === 'docked' ? null : '0px'
     this.height = this.state === 'docked' ? null : '0px'
   }
@@ -182,5 +181,5 @@ export class WidgetUnit implements OnInit, OnDestroy{
     return this.state === 'floating' ? `translate(${this.position.map(v => v + 'px').join(',')})` : null
   }
 
-  position : [number,number] = [400,100]
+  public position: [number, number] = [400, 100]
 }

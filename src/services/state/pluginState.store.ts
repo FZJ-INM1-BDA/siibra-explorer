@@ -1,32 +1,67 @@
 import { Action } from '@ngrx/store'
+import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 
-
-export interface PluginInitManifestInterface{
-  initManifests : Map<string,string|null>
+export const defaultState: StateInterface = {
+  initManifests: []
 }
 
-export interface PluginInitManifestActionInterface extends Action{
+export interface StateInterface {
+  initManifests: Array<[ string, string|null ]>
+}
+
+export interface ActionInterface extends Action {
   manifest: {
-    name : string,
-    initManifestUrl : string | null
+    name: string
+    initManifestUrl?: string
   }
 }
 
-const ACTION_TYPES = {
-  SET_INIT_PLUGIN: `SET_INIT_PLUGIN`
+export const PLUGINSTORE_ACTION_TYPES = {
+  SET_INIT_PLUGIN: `SET_INIT_PLUGIN`,
+  CLEAR_INIT_PLUGIN: 'CLEAR_INIT_PLUGIN',
 }
 
-export const PLUGIN_STATE_ACTION_TYPES = ACTION_TYPES
+export const PLUGINSTORE_CONSTANTS = {
+  INIT_MANIFEST_SRC: 'INIT_MANIFEST_SRC',
+}
 
-export function pluginState(prevState:PluginInitManifestInterface = {initManifests : new Map()}, action:PluginInitManifestActionInterface):PluginInitManifestInterface{
-  switch(action.type){
-    case ACTION_TYPES.SET_INIT_PLUGIN:
-      const newMap = new Map(prevState.initManifests )
-      return {
-        ...prevState,
-        initManifests: newMap.set(action.manifest.name, action.manifest.initManifestUrl)
-      }
-    default:
-      return prevState
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
+  switch (action.type) {
+  case PLUGINSTORE_ACTION_TYPES.SET_INIT_PLUGIN: {
+    const newMap = new Map(prevState.initManifests )
+
+    // reserved source label for init manifest
+    if (action.manifest.name !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC) { newMap.set(action.manifest.name, action.manifest.initManifestUrl) }
+    return {
+      ...prevState,
+      initManifests: Array.from(newMap),
+    }
   }
+  case PLUGINSTORE_ACTION_TYPES.CLEAR_INIT_PLUGIN: {
+    const { initManifests } = prevState
+    const newManifests = initManifests.filter(([source]) => source !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
+    return {
+      ...prevState,
+      initManifests: newManifests,
+    }
+  }
+  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+    const { pluginState } = (action as any).state
+    return pluginState
+  }
+  default: return prevState
+  }
+}
+
+// must export a named function for aot compilation
+// see https://github.com/angular/angular/issues/15587
+// https://github.com/amcdnl/ngrx-actions/issues/23
+// or just google for:
+//
+// angular function expressions are not supported in decorators
+
+const defaultStateStore = getStateStore()
+
+export function stateStore(state, action) {
+  return defaultStateStore(state, action)
 }

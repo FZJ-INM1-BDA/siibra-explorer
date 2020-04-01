@@ -1,0 +1,40 @@
+site_name: Interactive Atlas Viewer User Documentation
+
+theme:
+  name: 'material'
+
+extra_css:
+  - extra.css
+
+docs_dir: docs
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - footnotes
+  - mdx_truly_sane_lists
+
+pages:
+  - Home: 'index.md'
+  - System requirements: 'requirements.md'
+  - User documentation:
+    - Selecting: 'usage/selecting.md'
+    - Navigating: 'usage/navigating.md'
+    - Searching: 'usage/search.md'
+    - Exploring connectivity: 'usage/connectivity.md'
+    - Miscellaneous: 'usage/misc.md'
+  - Advanced usage:
+    - Keyboard shortcuts: 'advanced/keyboard.md'
+    - URL parsing: 'advanced/url.md'
+    - Fetching datasets: 'advanced/datasets.md'
+    - Display non-atlas volumes: 'advanced/otherVolumes.md'
+  - Release notes:
+    - v2.1.0: 'releases/v2.1.0.md'
+    - v2.0.2: 'releases/v2.0.2.md'
+    - v2.0.1: 'releases/v2.0.1.md'
+    - v2.0.0: 'releases/v2.0.0.md'
+    - v0.3.0-beta: 'releases/v0.3.0-beta.md'
+    - v0.2.9: 'releases/v0.2.9.md'
+    - v0.2.0: 'releases/v0.2.0.md'
+    - v0.1.0: 'releases/v0.1.0.md'
+    - legacy: 'releases/legacy.md'

@@ -1,59 +1,59 @@
-import { Component, ChangeDetectionStrategy, Input, Output, EventEmitter, OnInit, ViewChild, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
   selector: 'radio-list',
   templateUrl: './radiolist.template.html',
   styleUrls: [
-    './radiolist.style.css'
+    './radiolist.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class RadioList{
-  @Input() 
-  listDisplay : (item:any) => string = (obj) => obj.name
+export class RadioList {
+  @Input()
+  public listDisplay: (item: any) => string = (obj) => obj.name
 
   @Output()
-  itemSelected : EventEmitter<any> = new EventEmitter()
+  public itemSelected: EventEmitter<any> = new EventEmitter()
 
   @Input()
-  selectedItem: any | null = null
+  public selectedItem: any | null = null
 
   @Input()
-  inputArray: HasExtraButtons[] = []
+  public inputArray: IHasExtraButtons[] = []
 
   @Input()
-  ulClass: string = ''
-  
-  @Input() checkSelected: (selectedItem:any, item:any) => boolean = (si,i) => si === i
+  public ulClass: string = ''
 
-  @Output() extraBtnClicked = new EventEmitter<ExraBtnClickEvent>()
+  @Input() public checkSelected: (selectedItem: any, item: any) => boolean = (si, i) => si === i
 
-  handleExtraBtnClick(extraBtn:ExtraButton, inputItem:any, event:MouseEvent){
+  @Output() public extraBtnClicked = new EventEmitter<IExraBtnClickEvent>()
+
+  public handleExtraBtnClick(extraBtn: IExtraButton, inputItem: any, event: MouseEvent) {
     this.extraBtnClicked.emit({
       extraBtn,
       inputItem,
-      event
+      event,
     })
   }
 
-  overflowText(event) {
+  public overflowText(event) {
     return (event.offsetWidth < event.scrollWidth)
   }
 }
 
-export interface ExtraButton{
-  name: string,
+export interface IExtraButton {
+  name: string
   faIcon: string
   class?: string
 }
 
-export interface HasExtraButtons{
-  extraButtons?: ExtraButton[]
+export interface IHasExtraButtons {
+  extraButtons?: IExtraButton[]
 }
 
-export interface ExraBtnClickEvent{
-  extraBtn:ExtraButton
-  inputItem:any
-  event:MouseEvent
+export interface IExraBtnClickEvent {
+  extraBtn: IExtraButton
+  inputItem: any
+  event: MouseEvent
 }

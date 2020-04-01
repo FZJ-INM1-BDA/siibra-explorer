@@ -1,31 +1,31 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, Optional, Inject} from "@angular/core";
-import { 
-  SingleDatasetBase,
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
+import {
   DatabrowserService,
   KgSingleDatasetService,
-  AtlasViewerConstantsServices
+  SingleDatasetBase,
 } from "../singleDataset.base";
-import { MAT_DIALOG_DATA } from "@angular/material";
+import {MAT_DIALOG_DATA} from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'single-dataset-view',
   templateUrl: './singleDataset.template.html',
   styleUrls: [
-    `./singleDataset.style.css`
+    `./singleDataset.style.css`,
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class SingleDatasetView extends SingleDatasetBase{
+export class SingleDatasetView extends SingleDatasetBase {
 
   constructor(
     dbService: DatabrowserService,
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
-    constantService: AtlasViewerConstantsServices,
-
-    @Optional() @Inject(MAT_DIALOG_DATA) data: any
-  ){
-    super(dbService, singleDatasetService, cdr, constantService, data)
+    snackbar: MatSnackBar,
+    @Optional() @Inject(MAT_DIALOG_DATA) data: any,
+  ) {
+    super(dbService, singleDatasetService, cdr,snackbar, data)
   }
+
 }

@@ -1,10 +1,14 @@
-import { Input, OnInit, ChangeDetectorRef, TemplateRef, Output, EventEmitter } from "@angular/core";
-import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
-import { Publication, File, DataEntry, ViewerPreviewFile } from 'src/services/state/dataStore.store'
+import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges } from "@angular/core";
+import { Observable } from "rxjs";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
-import { Observable } from "rxjs";
+import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
+
+import { DS_PREVIEW_URL } from 'src/util/constants'
+import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 export {
   DatabrowserService,
@@ -13,39 +17,46 @@ export {
   AtlasViewerConstantsServices
 }
 
-export class SingleDatasetBase implements OnInit {
+export class SingleDatasetBase implements OnInit, OnChanges {
 
-  @Input() ripple: boolean = false
+  @Input() public ripple: boolean = false
 
   /**
    * the name/desc/publications are placeholder/fallback entries
    * while the actual data is being loaded from KG with kgSchema and kgId
    */
-  @Input() name?: string
-  @Input() description?: string
-  @Input() publications?: Publication[]
+  @Input() public name?: string
+  @Input() public description?: string
+  @Input() public publications?: IPublication[]
 
-  @Input() kgSchema?: string
-  @Input() kgId?: string
+  private _fullId: string
 
-  @Input() dataset: any = null
-  @Input() simpleMode: boolean = false
+  @Input()
+  set fullId(val){
+    this._fullId = val
+  }
 
-  @Output() previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
+  get fullId(){
+    return this._fullId || (this.kgSchema && this.kgId && `${this.kgSchema}/${this.kgId}`) || null
+  }
+
+  @Input() public kgSchema?: string = 'minds/core/dataset/v1.0.0'
+  @Input() public kgId?: string
+
+  @Input() public dataset: any = null
+  @Input() public simpleMode: boolean = false
 
   public preview: boolean = false
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
+
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
 
   /**
    * sic!
    */
   public kgReference: string[] = []
-  public files: File[] = []
+  public files: IFile[] = []
   private methods: string[] = []
-  /**
-   * sic!
-   */
-  private parcellationRegion: { name: string }[]
 
   private error: string = null
 
@@ -54,47 +65,94 @@ export class SingleDatasetBase implements OnInit {
 
   public dlFromKgHref: string = null
 
-  public favedDataentries$: Observable<DataEntry[]>
+  public selectedTemplateSpace$: Observable<any>
+
+  public favedDataentries$: Observable<IDataEntry[]>
   constructor(
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
     private cdr: ChangeDetectorRef,
-    private constantService: AtlasViewerConstantsServices,
-
-    dataset?: any
-  ){
+    private snackBar: MatSnackBar,
+    dataset?: any,
+  ) {
     this.favedDataentries$ = this.dbService.favedDataentries$
+
     if (dataset) {
-      this.dataset = dataset
       const { fullId } = dataset
-      const obj = this.singleDatasetService.getKgSchemaKgIdFromFullId(fullId)
+      const obj = getKgSchemaIdFromFullId(fullId)
       if (obj) {
-        const { kgSchema, kgId } = obj
+        const [ kgSchema, kgId ] = obj
         this.kgSchema = kgSchema
         this.kgId = kgId
       }
     }
   }
 
-  ngOnInit() {
+  public hasPreview = false
+  public previewFiles = []
+
+  handleKgDsPrvUpdate(event: CustomEvent){
+    this.hasPreview = false
+    this.previewFiles = []
+    const { detail } = event
+    const { datasetFiles } = detail
+    if (datasetFiles && Array.isArray(datasetFiles) && datasetFiles.length > 0) {
+      this.hasPreview = true
+      this.previewFiles = datasetFiles
+    }
+  }
+
+  public async fetchDatasetDetail(){
+    try {
+      const { kgId } = this
+      if (!kgId) return
+      const dataset = await this.singleDatasetService.getInfoFromKg({ kgId })
+      
+      const { name, description, publications, fullId } = dataset
+      this.name = name
+      this.description = description
+      this.publications = publications
+      this.fullId = fullId
+
+      this.cdr.detectChanges()
+    } catch (e) {
+      // catch error
+    }
+  }
+
+  public ngOnChanges(){
+    if (!this.kgId) {
+      const fullId = this.fullId || this.dataset?.fullId
+      
+      const re = getKgSchemaIdFromFullId(fullId)
+      if (re) {
+        this.kgSchema = re[0]
+        this.kgId = re[1]
+      }
+    }
+    
+    this.fetchDatasetDetail()
+  }
+
+  public ngOnInit() {
     const { kgId, kgSchema, dataset } = this
     this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
     if ( dataset ) {
-      const { name, description, kgReference, publications, files, preview, ...rest } = dataset
+      const { name, description, kgReference, publications, files, preview } = dataset
       this.name = name
       this.description = description
       this.kgReference = kgReference
       this.publications = publications
       this.files = files
       this.preview = preview
-      
+
       return
     }
-    if (!kgSchema || !kgId) return
+    if (!kgSchema || !kgId) { return }
     this.fetchingSingleInfoInProgress = true
     this.singleDatasetService.getInfoFromKg({
       kgId,
-      kgSchema
+      kgSchema,
     })
       .then(json => {
         /**
@@ -124,38 +182,65 @@ export class SingleDatasetBase implements OnInit {
     return this.kgSchema && this.kgId
   }
 
-  get numOfFiles(){
+  get numOfFiles() {
     return this.files
       ? this.files.length
       : null
   }
 
-  get totalFileByteSize(){
+  get totalFileByteSize() {
     return this.files
       ? this.files.reduce((acc, curr) => acc + curr.byteSize, 0)
       : null
   }
 
-  get tooltipText(){
+  get tooltipText() {
     return `${this.numOfFiles} files ~ ${this.humanReadableFileSizePipe.transform(this.totalFileByteSize)}`
   }
 
-  get showFooter(){
+  get showFooter() {
     return (this.kgReference && this.kgReference.length > 0)
       || (this.publications && this.publications.length > 0)
       || (this.files && this.files.length > 0)
   }
 
-  toggleFav() {
-    this.dbService.toggleFav(this.dataset)
+  public toggleFav() {
+    this.dbService.toggleFav({ fullId: this.fullId })
   }
 
-  showPreviewList(templateRef: TemplateRef<any>){
+  public showPreviewList(templateRef: TemplateRef<any>) {
     this.singleDatasetService.showPreviewList(templateRef)
   }
 
-  handlePreviewFile(file: ViewerPreviewFile){
-    this.previewingFile.emit(file)
+  public handlePreviewFile(file: ViewerPreviewFile) {
     this.singleDatasetService.previewFile(file, this.dataset)
+  }
+
+  public undoableRemoveFav() {
+    this.snackBar.open(`Unpinned dataset: ${this.name}`, 'Undo', {
+      duration: 5000,
+      politeness: "polite"
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this.dbService.saveToFav({ fullId: this.fullId})
+        }
+      })
+    this.dbService.removeFromFav({ fullId: this.fullId})
+  }
+
+  public undoableAddFav() {
+    this.snackBar.open(`Pinned dataset: ${this.name}`, 'Undo', {
+      duration: 5000,
+      politeness: "polite"
+    })
+      .afterDismissed()
+      .subscribe(({ dismissedByAction }) => {
+        if (dismissedByAction) {
+          this.dbService.removeFromFav({ fullId: this.fullId})
+        }
+      })
+    this.dbService.saveToFav({ fullId: this.fullId})
   }
 }

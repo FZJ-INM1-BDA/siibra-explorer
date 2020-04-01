@@ -9,12 +9,13 @@
           Template
         </mat-label>
         <mat-select
+          aria-label="Select a new template"
           panelClass="no-max-width"
           [value]="(templateSelected$ | async)?.name"
           (selectionChange)="handleTemplateChange($event)"
           (openedChange)="focused = $event">
           <mat-option
-            *ngFor="let template of (availableTemplates$ | async)"
+            *ngFor="let template of (availableTemplates$ | async); trackBy: trackByFn"
             [value]="template.name">
             {{ template.name }}
           </mat-option>
@@ -30,6 +31,7 @@
           <!-- shown when off -->
           <div sleight-of-hand-front>
             <button
+              aria-label="Hover to find out more info on the selected template"
               mat-icon-button>
               <i class="fas fa-info"></i>
             </button>
@@ -37,7 +39,10 @@
     
           <!-- shown on hover -->
           <div class="d-flex flex-row align-items-start" sleight-of-hand-back>
-            <button class="flex-grow-0 flex-shrink-0" mat-icon-button>
+            <button
+              aria-label="Hover to find out more info on the selected template"
+              class="flex-grow-0 flex-shrink-0"
+              mat-icon-button>
               <i class="fas fa-info"></i>
             </button>
     
@@ -49,6 +54,7 @@
               <mat-card *ngFor="let originDataset of moreInfo.originDatasets"
                 class="position-absolute left-0 top-0 w-40em">
                 <single-dataset-view
+                  id="selected-template-detailed-info"
                   [name]="moreInfo.name"
                   [description]="moreInfo.description"
                   [publications]="moreInfo.publications"

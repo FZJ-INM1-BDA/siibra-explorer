@@ -3,7 +3,9 @@
   "type": "template",
   "species": "Mouse",
   "ngId": "stpt",
-  "otherNgIds": ["nissl"],
+  "otherNgIds": [
+    "nissl"
+  ],
   "useTheme": "dark",
   "nehubaConfigURL": "nehubaConfig/allenMouseNehubaConfig",
   "parcellations": [
@@ -28,7 +30,15 @@
           "name": "root",
           "labelIndex": 997,
           "relatedAreas": [
-            "Whole brain"
+            {
+              "name": "Whole brain",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "be45bc91-8db5-419f-9471-73a320f44e06"
+                }
+              }
+            }
           ],
           "children": [
             {
@@ -367,6 +377,18 @@
                                           "name": "Primary motor area, Layer 6b",
                                           "labelIndex": 882,
                                           "children": []
+                                        }
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary motor area (2017)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "a07b4390-62db-451b-b211-a45f67c6b18e",
+                                              "alternateOf": []
+                                            }
+                                          }
                                         }
                                       ]
                                     },
@@ -932,6 +954,18 @@
                                                   "children": []
                                                 }
                                               ]
+                                            }
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory  area, barrel field (2017)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "f99995b6-a3d0-42be-88c3-eff8a83e60ea",
+                                                  "alternateOf": []
+                                                }
+                                              }
                                             }
                                           ]
                                         },
@@ -1499,6 +1533,18 @@
                                               "children": []
                                             }
                                           ]
+                                        }
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary somatosensory area (2017)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "baae9f67-b38e-4733-984a-56574ac6200b",
+                                              "alternateOf": []
+                                            }
+                                          }
                                         }
                                       ]
                                     },
@@ -2920,6 +2966,18 @@
                                           "name": "Primary visual area, layer 6b",
                                           "labelIndex": 305,
                                           "children": []
+                                        }
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary visual area (2017)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "308fadb5-8b60-4f68-8edc-fdbd948ef098",
+                                              "alternateOf": []
+                                            }
+                                          }
                                         }
                                       ]
                                     },
@@ -5119,6 +5177,18 @@
                                         }
                                       ]
                                     }
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Retrosplenial area (2017)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "8487fa58-9d0f-4139-8601-4efd82452067",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -5736,6 +5806,18 @@
                                       "children": []
                                     }
                                   ]
+                                }
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Isocortex (v3 2017)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "e7ed7c2f-cc4f-47df-8041-46b5d49cf155",
+                                      "alternateOf": []
+                                    }
+                                  }
                                 }
                               ]
                             },
@@ -6800,6 +6882,18 @@
                                               "labelIndex": 415,
                                               "children": []
                                             }
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Field CA1 (v3 2017)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "755ef6e9-29e5-4e7a-a869-094026b076ae",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -6932,6 +7026,18 @@
                                               "name": "Field CA3, stratum radiatum",
                                               "labelIndex": 504,
                                               "children": []
+                                            }
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Field CA3 (v3 2017)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "aad1e92a-4d91-4310-b310-7223fb7eafba",
+                                                  "alternateOf": []
+                                                }
+                                              }
                                             }
                                           ]
                                         }
@@ -7179,6 +7285,18 @@
                                       "name": "Induseum griseum",
                                       "labelIndex": 19,
                                       "children": []
+                                    }
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Hippocampal region (v3 2017)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "06d2fa96-961c-4f17-91f4-b0e8320071da",
+                                          "alternateOf": []
+                                        }
+                                      }
                                     }
                                   ]
                                 },
@@ -7524,6 +7642,18 @@
                                               "name": "Entorhinal area, medial part, dorsal zone, layer 6",
                                               "labelIndex": 743,
                                               "children": []
+                                            }
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Entorhinal area, medial part, dorsal zone (v3 2017)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "f7be1a12-adb1-430b-b7e5-a1a49e48b3e1",
+                                                  "alternateOf": []
+                                                }
+                                              }
                                             }
                                           ]
                                         },
@@ -7994,6 +8124,25 @@
                                     }
                                   ]
                                 }
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Hippocampal formation (v3 2017)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "925cdcf3-dc08-493a-b414-c125ed63e290",
+                                      "alternateOf": [
+                                        {
+                                          "prefLabel": "Hippocampal formation",
+                                          "label": "Hippocampal formation (mba)",
+                                          "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/967edd9a-515c-4583-8940-8ee6bacc73cd",
+                                          "geneOntologyId": null
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
                               ]
                             }
                           ]
@@ -8299,6 +8448,25 @@
                                   "name": "Caudoputamen",
                                   "labelIndex": 672,
                                   "children": []
+                                }
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Striatum dorsal region (v3 2017)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "5424eeb1-7069-4067-8aa8-f4858c8a3357",
+                                      "alternateOf": [
+                                        {
+                                          "prefLabel": "Striatum dorsal region",
+                                          "label": "Striatum dorsal region (mba)",
+                                          "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/07bef62d-942f-4698-a7ec-3beb49575279",
+                                          "geneOntologyId": null
+                                        }
+                                      ]
+                                    }
+                                  }
                                 }
                               ]
                             },
@@ -8784,6 +8952,18 @@
                                 }
                               ]
                             }
+                          ],
+                          "relatedAreas": [
+                            {
+                              "name": "Mouse Striatum (v3 2017)",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a1f2074f-a3fe-4c50-9032-148390c8dfaa",
+                                  "alternateOf": []
+                                }
+                              }
+                            }
                           ]
                         },
                         {
@@ -9212,6 +9392,25 @@
                           ]
                         }
                       ]
+                    }
+                  ],
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Cerebrum (v3 2017)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "accd54ac-9fcf-4983-b17c-c01c466c734a",
+                          "alternateOf": [
+                            {
+                              "prefLabel": "Cerebrum",
+                              "label": "Cerebrum (mba)",
+                              "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/fd6111ba-e172-4463-91c3-5f87d943cfc2",
+                              "geneOntologyId": null
+                            }
+                          ]
+                        }
+                      }
                     }
                   ]
                 },
@@ -11717,6 +11916,18 @@
                               "labelIndex": 10671,
                               "children": []
                             }
+                          ],
+                          "relatedAreas": [
+                            {
+                              "name": "Mouse Hypothalamus (v3 2017)",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f0a1bb41-cf2b-4d27-ab08-59b53f66fd48",
+                                  "alternateOf": []
+                                }
+                              }
+                            }
                           ]
                         }
                       ]
@@ -12907,6 +13118,18 @@
                               ]
                             }
                           ]
+                        }
+                      ],
+                      "relatedAreas": [
+                        {
+                          "name": "Mouse Midbrain (v3 2017)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "80deb95d-0d4f-4b3a-818e-7a7871ef7872",
+                              "alternateOf": []
+                            }
+                          }
                         }
                       ]
                     },
@@ -14853,6 +15076,18 @@
                         }
                       ]
                     }
+                  ],
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Brain stem (v3 2017)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "041b424e-670b-4918-b592-09bde6c3ec92",
+                          "alternateOf": []
+                        }
+                      }
+                    }
                   ]
                 },
                 {
@@ -15975,6 +16210,18 @@
                           "children": []
                         }
                       ]
+                    }
+                  ],
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Cerebellum (v3 2017)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "c20af5e0-b577-4b2f-8510-77ab3df12e8a",
+                          "alternateOf": []
+                        }
+                      }
                     }
                   ]
                 }
@@ -19106,9 +19353,11 @@
       "properties": {
         "name": "Allen Mouse Common Coordinate Framework v3 2017",
         "description": "Allen Mouse Common Coordinate Framework v3, downloaded on 19/09/2019, 2017 (662 newly drawn structures, 1522 structures total)",
-        "publications": [{
-          "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-        }]
+        "publications": [
+          {
+            "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+          }
+        ]
       }
     },
     {
@@ -19132,7 +19381,15 @@
           "name": "root",
           "labelIndex": 997,
           "relatedAreas": [
-            "Whole brain"
+            {
+              "name": "Whole brain",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "2bdfac7a-b38c-4c55-9843-0b56cb90bb67"
+                }
+              }
+            }
           ],
           "children": [
             {
@@ -19851,6 +20108,24 @@
                                           2337500,
                                           1677500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "368c29b4-affd-46cf-ac89-ce6d520759b1"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary motor area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "368c29b4-affd-46cf-ac89-ce6d520759b1",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -20128,6 +20403,24 @@
                                           3027500,
                                           1927500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "af019af1-3b69-42ac-be17-f1c2a1058329"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Secondary motor area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "af019af1-3b69-42ac-be17-f1c2a1058329",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     }
                                   ],
@@ -20166,6 +20459,18 @@
                                       2707500,
                                       1817500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Somatomotor areas (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "efd54363-f773-4250-aafe-3b39e07da82d",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -20771,6 +21076,24 @@
                                               967500,
                                               1577500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "6321aaf1-e663-48ac-a2e4-a0b53b2a4941"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, nose (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "6321aaf1-e663-48ac-a2e4-a0b53b2a4941",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -21249,6 +21572,24 @@
                                               -102500,
                                               2287500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "a2c0a613-0507-4878-a305-0b8455121e3a"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, barrel field (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "a2c0a613-0507-4878-a305-0b8455121e3a",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -21572,6 +21913,24 @@
                                               667500,
                                               2807500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "2442b0a6-5a4b-433f-b24c-24973831f4f4"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, lower limb (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "2442b0a6-5a4b-433f-b24c-24973831f4f4",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -21895,6 +22254,18 @@
                                               2017500,
                                               1027500
                                             ]
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, mouth (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "57a0c56b-a0f8-4024-9e4f-49ac0f4ee5c4",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -22218,6 +22589,24 @@
                                               1187500,
                                               2297500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "0b260c14-c381-4260-a958-505bfd6672d1"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, upper limb (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "0b260c14-c381-4260-a958-505bfd6672d1",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -22541,6 +22930,24 @@
                                               -42500,
                                               3097500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "4b9e5151-bf65-4d3c-9926-9f8e92061889"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, trunk (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "4b9e5151-bf65-4d3c-9926-9f8e92061889",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -22864,6 +23271,24 @@
                                               777500,
                                               2317500
                                             ]
+                                          ],
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "ac8f6062-6014-437d-b24a-715b211f2096"
+                                            }
+                                          },
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Primary somatosensory area, unassigned (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "ac8f6062-6014-437d-b24a-715b211f2096",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         }
                                       ],
@@ -22902,6 +23327,24 @@
                                           897500,
                                           1977500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6ffdfed4-d9bf-4c92-b6f7-e7de76dee881"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary somatosensory area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "6ffdfed4-d9bf-4c92-b6f7-e7de76dee881",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -23263,6 +23706,18 @@
                                       797500,
                                       1627500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Somatosensory areas (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "cc0d8ba1-4f64-4141-a3ae-7606f4cad868",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -24719,6 +25174,18 @@
                                           -1292500,
                                           1217500
                                         ]
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary auditory area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "2b4dd845-bcf1-441a-976c-7ab582ed864a",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -25867,6 +26334,24 @@
                                           -1622500,
                                           2357500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6f17fd2c-94d7-4807-be28-12eb2b870e6d"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Anterolateral visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "6f17fd2c-94d7-4807-be28-12eb2b870e6d",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -26190,6 +26675,24 @@
                                           -1022500,
                                           3317500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "f9925036-2394-48df-813e-150dce63aee4"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Anteromedial visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "f9925036-2394-48df-813e-150dce63aee4",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -26513,6 +27016,18 @@
                                           -2452500,
                                           2197500
                                         ]
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Lateral visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "ef1e4335-8e29-43ff-88c3-5cdbb9594cbb",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -26836,6 +27351,24 @@
                                           -2432500,
                                           2837500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "f9d426ec-d6b2-4370-8fa2-8e85d30168c6"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Primary visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "f9d426ec-d6b2-4370-8fa2-8e85d30168c6",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -27482,6 +28015,18 @@
                                           -1752500,
                                           3327500
                                         ]
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Posteromedial visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "c9877d13-d370-4b47-970c-856aa60b30c5",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -28128,6 +28673,18 @@
                                           -2932500,
                                           1307500
                                         ]
+                                      ],
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Postrhinal area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "e2722c74-cb1a-46b6-8d5b-29bc1cef07c8",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     }
                                   ],
@@ -28166,6 +28723,18 @@
                                       -2352500,
                                       2577500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Visual areas (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6b41c9db-0f9e-4cec-afce-cae74e575121",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -28562,6 +29131,24 @@
                                           2197500,
                                           2097500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6f9e275f-e4b1-4b73-ab3c-61f3d386ed00"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Anterior cingulate area, dorsal part (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "fd9cbe8e-a751-46f9-88b9-1147a21dcfab",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -29176,6 +29763,31 @@
                                       3527500,
                                       1257500
                                     ]
+                                  ],
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "157f0525-03ae-434b-8856-bac7abb0a2a3"
+                                    }
+                                  },
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Prelimbic area (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "157f0525-03ae-434b-8856-bac7abb0a2a3",
+                                          "alternateOf": [
+                                            {
+                                              "prefLabel": "Prelimbic area",
+                                              "label": "Prelimbic area (mba)",
+                                              "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/720993d9-6566-4952-944b-90fa321d6da4",
+                                              "geneOntologyId": null
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -32136,6 +32748,24 @@
                                           -1492500,
                                           3217500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "a43fe448-5035-4fb2-b141-3af62baf7c02"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Retrosplenial area, lateral agranular part (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "a43fe448-5035-4fb2-b141-3af62baf7c02",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -32459,6 +33089,24 @@
                                           -1382500,
                                           3237500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "30517d4d-668e-40eb-a7a8-7112058ca906"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Retrosplenial area, dorsal part (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "30517d4d-668e-40eb-a7a8-7112058ca906",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -32758,6 +33406,24 @@
                                           -1152500,
                                           2777500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "fc465f87-b153-4418-a526-52874591f64a"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Retrosplenial area, ventral part (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "fc465f87-b153-4418-a526-52874591f64a",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     }
                                   ],
@@ -32796,6 +33462,18 @@
                                       -1312500,
                                       3047500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Retrosplenial area (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "19ac96e7-4c5c-4b31-b45f-4c518a5d712a",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -33260,6 +33938,24 @@
                                           -612500,
                                           3177500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "cf5c7194-fe25-4828-8225-8a8125c30133"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Anterior area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "cf5c7194-fe25-4828-8225-8a8125c30133",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     },
                                     {
@@ -33583,6 +34279,24 @@
                                           -1162500,
                                           2797500
                                         ]
+                                      ],
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "d5ffb9fa-04e2-44dc-bcee-ab4a1467fa99"
+                                        }
+                                      },
+                                      "relatedAreas": [
+                                        {
+                                          "name": "Mouse Rostrolateral visual area (v3 2015)",
+                                          "fullId": {
+                                            "kg": {
+                                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                              "kgId": "d5ffb9fa-04e2-44dc-bcee-ab4a1467fa99",
+                                              "alternateOf": []
+                                            }
+                                          }
+                                        }
                                       ]
                                     }
                                   ],
@@ -33621,6 +34335,18 @@
                                       -842500,
                                       3017500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Posterior parietal association areas (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "97bee29b-562b-4730-8db9-ccb1ef469a37",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -34536,6 +35262,18 @@
                                   817500,
                                   1557500
                                 ]
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Isocortex (v3 2015)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "9889b7de-4235-4228-a81b-ce3682f4c9e5",
+                                      "alternateOf": []
+                                    }
+                                  }
+                                }
                               ]
                             },
                             {
@@ -36813,7 +37551,19 @@
                                                 "st_level": null,
                                                 "hemisphere_id": 3,
                                                 "parent_structure_id": 382
-                                              }
+                                              },
+                                              "relatedAreas": [
+                                                {
+                                                  "name": "Mouse Field CA1, stratum lacunosum-moleculare (v3 2015)",
+                                                  "fullId": {
+                                                    "kg": {
+                                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                      "kgId": "7ec10d44-8443-4c9d-9cda-02ee757c59a2",
+                                                      "alternateOf": []
+                                                    }
+                                                  }
+                                                }
+                                              ]
                                             },
                                             {
                                               "name": "Field CA1, stratum oriens",
@@ -36835,7 +37585,19 @@
                                                 "st_level": null,
                                                 "hemisphere_id": 3,
                                                 "parent_structure_id": 382
-                                              }
+                                              },
+                                              "relatedAreas": [
+                                                {
+                                                  "name": "Mouse Field CA1, stratum oriens (v3 2015)",
+                                                  "fullId": {
+                                                    "kg": {
+                                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                      "kgId": "359b3900-7509-4301-b15e-5e4d049a271d",
+                                                      "alternateOf": []
+                                                    }
+                                                  }
+                                                }
+                                              ]
                                             },
                                             {
                                               "name": "Field CA1, pyramidal layer",
@@ -36879,7 +37641,19 @@
                                                 "st_level": null,
                                                 "hemisphere_id": 3,
                                                 "parent_structure_id": 382
-                                              }
+                                              },
+                                              "relatedAreas": [
+                                                {
+                                                  "name": "Mouse Field CA1, stratum radiatum (v3 2015)",
+                                                  "fullId": {
+                                                    "kg": {
+                                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                      "kgId": "18d9ee65-0eda-47f1-b36e-721b2b70ac21",
+                                                      "alternateOf": []
+                                                    }
+                                                  }
+                                                }
+                                              ]
                                             }
                                           ],
                                           "ontologyMetadata": {
@@ -36917,6 +37691,18 @@
                                               -1342500,
                                               1157500
                                             ]
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Field CA1 (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "82170354-680f-4fde-b6a8-f3316497634c",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -37052,6 +37838,18 @@
                                               -1192500,
                                               1227500
                                             ]
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Field CA2 (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "869a3026-71e9-495a-9795-a9ffc479c24e",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         },
                                         {
@@ -37209,6 +38007,18 @@
                                               -1202500,
                                               457500
                                             ]
+                                          ],
+                                          "relatedAreas": [
+                                            {
+                                              "name": "Mouse Field CA3 (v3 2015)",
+                                              "fullId": {
+                                                "kg": {
+                                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                                  "kgId": "90294f8c-71c7-48d4-b5f8-a133054de168",
+                                                  "alternateOf": []
+                                                }
+                                              }
+                                            }
                                           ]
                                         }
                                       ],
@@ -37851,6 +38661,31 @@
                                       -1332500,
                                       797500
                                     ]
+                                  ],
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "fc429031-1632-49a4-b9c6-00ab72100c85"
+                                    }
+                                  },
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Hippocampal region (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "fc429031-1632-49a4-b9c6-00ab72100c85",
+                                          "alternateOf": [
+                                            {
+                                              "prefLabel": "Hippocampal formation",
+                                              "label": "Hippocampal formation (mba)",
+                                              "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/967edd9a-515c-4583-8940-8ee6bacc73cd",
+                                              "geneOntologyId": null
+                                            }
+                                          ]
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -40539,6 +41374,31 @@
                           997500,
                           1107500
                         ]
+                      ],
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "b4747984-ae71-4de2-bf18-e5965a27b490"
+                        }
+                      },
+                      "relatedAreas": [
+                        {
+                          "name": "Mouse Cerebral cortex (v3 2015)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b4747984-ae71-4de2-bf18-e5965a27b490",
+                              "alternateOf": [
+                                {
+                                  "prefLabel": "Cerebral cortex",
+                                  "label": "Cerebral cortex (mba)",
+                                  "fullId": "https://nexus.humanbrainproject.org/v0/data/ontologies/core/parcellationregion/v1.0.1/57cffdd5-3c00-4697-89a7-fb2767b6b6ee",
+                                  "geneOntologyId": null
+                                }
+                              ]
+                            }
+                          }
+                        }
                       ]
                     },
                     {
@@ -40612,6 +41472,18 @@
                                       1297500,
                                       -172500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Caudoputamen (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "3454aa21-305d-42df-88d6-df94ca5ade24",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 }
                               ],
@@ -40705,6 +41577,18 @@
                                       2397500,
                                       -1772500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Nucleus accumbens (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "6353d45c-9675-4cad-bc20-62f6ca8adc65",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -41988,6 +42872,18 @@
                                       507500,
                                       -722500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Globus pallidus, external segment (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "1c0e3881-dd67-4441-a6e1-084a1fadd43e",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -42034,6 +42930,18 @@
                                       57500,
                                       -1242500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Globus pallidus, internal segment (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "e4b6d66e-cd57-43b8-9f29-445e450b5820",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 }
                               ],
@@ -43051,6 +43959,24 @@
                       867500,
                       297500
                     ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "2f520589-1a89-427d-ac6b-3a561e0fa0f3"
+                    }
+                  },
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Cerebrum (v3 2015)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "2f520589-1a89-427d-ac6b-3a561e0fa0f3",
+                          "alternateOf": []
+                        }
+                      }
+                    }
                   ]
                 },
                 {
@@ -46324,6 +47250,18 @@
                               -372500,
                               17500
                             ]
+                          ],
+                          "relatedAreas": [
+                            {
+                              "name": "Mouse Thalamus (v3 2015)",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "21e9b196-8bf8-4958-ab31-7c557fc0bfeb",
+                                  "alternateOf": []
+                                }
+                              }
+                            }
                           ]
                         },
                         {
@@ -49247,6 +50185,18 @@
                                       -672500,
                                       -1342500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse subthalamic nucleus (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "9fdcb3a5-b29c-4bc6-82f7-5fa541efc39e",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -50233,6 +51183,18 @@
                                   -1802500,
                                   -1132500
                                 ]
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Substantia nigra, reticular part (v3 2015)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "6ca82a0a-aa35-4f30-9638-4f87cc0d9721",
+                                      "alternateOf": []
+                                    }
+                                  }
+                                }
                               ]
                             },
                             {
@@ -51933,6 +52895,18 @@
                                   -1652500,
                                   -1112500
                                 ]
+                              ],
+                              "relatedAreas": [
+                                {
+                                  "name": "Mouse Substantia nigra, compact part (v3 2015)",
+                                  "fullId": {
+                                    "kg": {
+                                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                      "kgId": "5ca3c4f9-909c-4743-ab85-a761417ec71b",
+                                      "alternateOf": []
+                                    }
+                                  }
+                                }
                               ]
                             },
                             {
@@ -53271,6 +54245,18 @@
                                       -2322500,
                                       -2362500
                                     ]
+                                  ],
+                                  "relatedAreas": [
+                                    {
+                                      "name": "Mouse Pontine gray (v3 2015)",
+                                      "fullId": {
+                                        "kg": {
+                                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                          "kgId": "4067b24c-7b53-4377-8111-a5e85e74305e",
+                                          "alternateOf": []
+                                        }
+                                      }
+                                    }
                                   ]
                                 },
                                 {
@@ -57486,6 +58472,24 @@
                       -2602500,
                       -722500
                     ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "a470f51b-bf1f-4c63-a18f-df2ea2c65f3f"
+                    }
+                  },
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Brain stem (v3 2015)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "a470f51b-bf1f-4c63-a18f-df2ea2c65f3f",
+                          "alternateOf": []
+                        }
+                      }
+                    }
                   ]
                 },
                 {
@@ -58840,6 +59844,24 @@
                               -5122500,
                               1147500
                             ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8b7490d6-bde7-438a-aee9-34820860fe12"
+                            }
+                          },
+                          "relatedAreas": [
+                            {
+                              "name": "Mouse Vermal regions (v3 2015)",
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8b7490d6-bde7-438a-aee9-34820860fe12",
+                                  "alternateOf": []
+                                }
+                              }
+                            }
                           ]
                         },
                         {
@@ -60098,6 +61120,24 @@
                       -4942500,
                       777500
                     ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "caa2c52c-0d6c-4eba-b2b6-5414cc241553"
+                    }
+                  },
+                  "relatedAreas": [
+                    {
+                      "name": "Mouse Cerebellum (v3 2015)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "caa2c52c-0d6c-4eba-b2b6-5414cc241553",
+                          "alternateOf": []
+                        }
+                      }
+                    }
                   ]
                 }
               ],
@@ -67952,28 +68992,35 @@
         }
       ],
       "properties": {
-        "name":"Allen Mouse Common Coordinate Framework v3 2015",
-        "description":"Allen Mouse Common Coordinate Framework v3, downloaded on 01/07/2017  2015 (178 newly drawn structures, 1045 structures total)",
-        "publications": [{
-          "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-        },{
-          "doi": "10.1038/nature13186",
-          "citation": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214. "
-        }]
+        "name": "Allen Mouse Common Coordinate Framework v3 2015",
+        "description": "Allen Mouse Common Coordinate Framework v3, downloaded on 01/07/2017  2015 (178 newly drawn structures, 1045 structures total)",
+        "publications": [
+          {
+            "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+          },
+          {
+            "doi": "10.1038/nature13186",
+            "citation": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214. "
+          }
+        ]
       }
     }
   ],
   "properties": {
     "name": "Allen Mouse Common Coordinate Framework v3 2015",
     "description": "The Allen Mouse Common Coordinate Framework v3 2015 includes a full-color, high-resolution anatomical reference atlas accompanied by a systematic, hierarchically organized taxonomy of mouse brain structures. Anatomical annotations in classical histological atlas plates were extracted to create a comprehensive volumetric reference atlas of the mouse brain.",
-    "publications":[{
-      "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
-    },{
-      "cite":"Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214.",
-      "doi": "10.1038/nature13186"
-    }, {
-      "cite": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/",
-      "doi": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/"
-    }]
+    "publications": [
+      {
+        "cite": "Allen Mouse Brain Connectivity Atlas [Internet]. Seattle (WA): Allen Institute for Brain Science. ©2011. Available from: http://connectivity.brain-map.org/."
+      },
+      {
+        "cite": "Oh, S.W. et al. (2014) A mesoscale connectome of the mouse brain, Nature 508: 207-214.",
+        "doi": "10.1038/nature13186"
+      },
+      {
+        "cite": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/",
+        "doi": "http://download.alleninstitute.org/informatics-archive/current-release/mouse_ccf/"
+      }
+    ]
   }
 }

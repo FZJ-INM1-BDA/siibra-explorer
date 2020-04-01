@@ -4,7 +4,7 @@
   "species": "Rat",
   "useTheme": "dark",
   "ngId": "template",
-  "otherNgIds":[
+  "otherNgIds": [
     "templateUnMasked"
   ],
   "nehubaConfigURL": "nehubaConfig/waxholmRatV2_0NehubaConfig",
@@ -13,1545 +13,1621 @@
       "ngId": "v3",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v3",
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "e80f9946-1aa9-494b-b81a-9048ca9afdbe"
-      }],
-      "regions": [{
-        "ngId": "v3",
-        "name": "Whole brain",
-        "labelIndex": null,
-        "rgb": null,
-        "children":[
-          {
-            "ngId": "v3",
-            "labelIndex": null,
-            "name": "White matter",
-            "children": [
-              {
-                "ngId": "v3",
-                "labelIndex": 67,
-                "name": "corpus callosum and associated subcortical white matter",
-                "rgb": [
-                  255,
-                  110,
-                  0
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Anterior commissure",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 36,
-                    "name": "anterior commissure, anterior part",
-                    "rgb": [
-                      124,
-                      252,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 37,
-                    "name": "anterior commissure, posterior part",
-                    "rgb": [
-                      255,
-                      186,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 73,
-                    "name": "anterior commissure",
-                    "rgb": [
-                      255,
-                      79,
-                      206
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Hippocampal white matter",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 6,
-                    "name": "alveus of the hippocampus",
-                    "rgb": [
-                      255,
-                      0,
-                      255
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 38,
-                    "name": "ventral hippocampal commissure",
-                    "rgb": [
-                      174,
-                      0,
-                      232
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 52,
-                    "name": "fornix",
-                    "rgb": [
-                      21,
-                      192,
-                      255
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 59,
-                    "name": "fimbria of the hippocampus",
-                    "rgb": [
-                      0,
-                      255,
-                      29
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Corticofugal pathways",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 1,
-                    "name": "descending corticofugal pathways",
-                    "rgb": [
-                      255,
-                      52,
-                      39
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 85,
-                    "name": "pyramidal decussation",
-                    "rgb": [
-                      114,
-                      9,
-                      212
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Medial lemniscus",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 34,
-                    "name": "medial lemniscus",
-                    "rgb": [
-                      212,
-                      255,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 84,
-                    "name": "medial lemniscus decussation",
-                    "rgb": [
-                      65,
-                      150,
-                      255
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Thalamic tracts",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 53,
-                    "name": "mammillothalamic tract",
-                    "rgb": [
-                      238,
-                      186,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 54,
-                    "name": "commissural stria terminalis",
-                    "rgb": [
-                      173,
-                      255,
-                      47
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 60,
-                    "name": "fasciculus retroflexus",
-                    "rgb": [
-                      244,
-                      67,
-                      69
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 61,
-                    "name": "stria medullaris of the thalamus",
-                    "rgb": [
-                      0,
-                      255,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 62,
-                    "name": "stria terminalis",
-                    "rgb": [
-                      238,
-                      117,
-                      51
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 80,
-                    "name": "habenular commissure",
-                    "rgb": [
-                      69,
-                      235,
-                      202
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 63,
-                "name": "posterior commissure",
-                "rgb": [
-                  255,
-                  0,
-                  218
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Facial nerve",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 35,
-                    "name": "facial nerve",
-                    "rgb": [
-                      255,
-                      25,
-                      240
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 72,
-                    "name": "ascending fibers of the facial nerve",
-                    "rgb": [
-                      179,
-                      28,
-                      53
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 57,
-                    "name": "genu of the facial nerve",
-                    "rgb": [
-                      250,
-                      244,
-                      247
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Optic fiber system and supraoptic decussation",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 41,
-                    "name": "optic nerve",
-                    "rgb": [
-                      48,
-                      218,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 42,
-                    "name": "optic tract and optic chiasm",
-                    "rgb": [
-                      38,
-                      126,
-                      255
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 83,
-                    "name": "supraoptic decussation",
-                    "rgb": [
-                      250,
-                      170,
-                      64
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 76,
-                "name": "spinal trigeminal tract",
-                "rgb": [
-                  250,
-                  128,
-                  114
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "White matter of the tectum",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 46,
-                    "name": "commissure of the superior colliculus",
-                    "rgb": [
-                      33,
-                      230,
-                      255
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 68,
-                    "name": "brachium of the superior colliculus",
-                    "rgb": [
-                      188,
-                      32,
-                      173
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 69,
-                    "name": "inferior colliculus, commissure",
-                    "rgb": [
-                      255,
-                      42,
-                      39
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 146,
-                    "name": "inferior colliculus, brachium",
-                    "rgb": [
-                      176,
-                      58,
-                      72
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Cerebellar and precerebellar white matter",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 7,
-                    "name": "inferior cerebellar peduncle",
-                    "rgb": [
-                      52,
-                      255,
-                      13
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 78,
-                    "name": "middle cerebellar peduncle",
-                    "rgb": [
-                      134,
-                      204,
-                      76
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 79,
-                    "name": "transverse fibers of the pons",
-                    "rgb": [
-                      128,
-                      170,
-                      255
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "White matter of the brainstem",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Lateral lemniscus",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 140,
-                        "name": "lateral lemniscus, commissure",
-                        "rgb": [
-                          255,
-                          29,
-                          0
-                        ],
-                        "children": []
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "e80f9946-1aa9-494b-b81a-9048ca9afdbe"
+        }
+      ],
+      "regions": [
+        {
+          "ngId": "v3",
+          "name": "Whole brain",
+          "labelIndex": null,
+          "rgb": null,
+          "children": [
+            {
+              "ngId": "v3",
+              "labelIndex": null,
+              "name": "White matter",
+              "children": [
+                {
+                  "ngId": "v3",
+                  "labelIndex": 67,
+                  "name": "corpus callosum and associated subcortical white matter",
+                  "rgb": [
+                    255,
+                    110,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Anterior commissure",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 36,
+                      "name": "anterior commissure, anterior part",
+                      "rgb": [
+                        124,
+                        252,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 37,
+                      "name": "anterior commissure, posterior part",
+                      "rgb": [
+                        255,
+                        186,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 73,
+                      "name": "anterior commissure",
+                      "rgb": [
+                        255,
+                        79,
+                        206
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Hippocampal white matter",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 6,
+                      "name": "alveus of the hippocampus",
+                      "rgb": [
+                        255,
+                        0,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 38,
+                      "name": "ventral hippocampal commissure",
+                      "rgb": [
+                        174,
+                        0,
+                        232
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 52,
+                      "name": "fornix",
+                      "rgb": [
+                        21,
+                        192,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 59,
+                      "name": "fimbria of the hippocampus",
+                      "rgb": [
+                        0,
+                        255,
+                        29
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Corticofugal pathways",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 1,
+                      "name": "descending corticofugal pathways",
+                      "rgb": [
+                        255,
+                        52,
+                        39
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 85,
+                      "name": "pyramidal decussation",
+                      "rgb": [
+                        114,
+                        9,
+                        212
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Medial lemniscus",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 34,
+                      "name": "medial lemniscus",
+                      "rgb": [
+                        212,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 84,
+                      "name": "medial lemniscus decussation",
+                      "rgb": [
+                        65,
+                        150,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Thalamic tracts",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 53,
+                      "name": "mammillothalamic tract",
+                      "rgb": [
+                        238,
+                        186,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 54,
+                      "name": "commissural stria terminalis",
+                      "rgb": [
+                        173,
+                        255,
+                        47
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 60,
+                      "name": "fasciculus retroflexus",
+                      "rgb": [
+                        244,
+                        67,
+                        69
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 61,
+                      "name": "stria medullaris of the thalamus",
+                      "rgb": [
+                        0,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 62,
+                      "name": "stria terminalis",
+                      "rgb": [
+                        238,
+                        117,
+                        51
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 80,
+                      "name": "habenular commissure",
+                      "rgb": [
+                        69,
+                        235,
+                        202
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 63,
+                  "name": "posterior commissure",
+                  "rgb": [
+                    255,
+                    0,
+                    218
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Facial nerve",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 35,
+                      "name": "facial nerve",
+                      "rgb": [
+                        255,
+                        25,
+                        240
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 72,
+                      "name": "ascending fibers of the facial nerve",
+                      "rgb": [
+                        179,
+                        28,
+                        53
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 57,
+                      "name": "genu of the facial nerve",
+                      "rgb": [
+                        250,
+                        244,
+                        247
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Optic fiber system and supraoptic decussation",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 41,
+                      "name": "optic nerve",
+                      "rgb": [
+                        48,
+                        218,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 42,
+                      "name": "optic tract and optic chiasm",
+                      "rgb": [
+                        38,
+                        126,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 83,
+                      "name": "supraoptic decussation",
+                      "rgb": [
+                        250,
+                        170,
+                        64
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 76,
+                  "name": "spinal trigeminal tract",
+                  "rgb": [
+                    250,
+                    128,
+                    114
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "White matter of the tectum",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 46,
+                      "name": "commissure of the superior colliculus",
+                      "rgb": [
+                        33,
+                        230,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 68,
+                      "name": "brachium of the superior colliculus",
+                      "rgb": [
+                        188,
+                        32,
+                        173
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 69,
+                      "name": "inferior colliculus, commissure",
+                      "rgb": [
+                        255,
+                        42,
+                        39
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 146,
+                      "name": "inferior colliculus, brachium",
+                      "rgb": [
+                        176,
+                        58,
+                        72
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Cerebellar and precerebellar white matter",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 7,
+                      "name": "inferior cerebellar peduncle",
+                      "rgb": [
+                        52,
+                        255,
+                        13
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 78,
+                      "name": "middle cerebellar peduncle",
+                      "rgb": [
+                        134,
+                        204,
+                        76
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 79,
+                      "name": "transverse fibers of the pons",
+                      "rgb": [
+                        128,
+                        170,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "White matter of the brainstem",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Lateral lemniscus",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 140,
+                          "name": "lateral lemniscus, commissure",
+                          "rgb": [
+                            255,
+                            29,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 141,
+                          "name": "lateral lemniscus",
+                          "rgb": [
+                            255,
+                            166,
+                            0
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 129,
+                      "name": "acoustic striae",
+                      "rgb": [
+                        255,
+                        217,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 130,
+                      "name": "trapezoid body",
+                      "rgb": [
+                        213,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 157,
+                  "name": "auditory radiation",
+                  "rgb": [
+                    244,
+                    156,
+                    255
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "v3",
+              "labelIndex": null,
+              "name": "Gray matter",
+              "children": [
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Olfactory system",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 64,
+                      "name": "glomerular layer of the accessory olfactory bulb",
+                      "rgb": [
+                        15,
+                        109,
+                        230
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 65,
+                      "name": "glomerular layer of the olfactory bulb",
+                      "rgb": [
+                        255,
+                        227,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 66,
+                      "name": "olfactory bulb",
+                      "rgb": [
+                        255,
+                        135,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Cerebral cortex including the neocortex and the hippocampus",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Neocortex",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 77,
+                          "name": "frontal association cortex",
+                          "rgb": [
+                            206,
+                            211,
+                            7
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 92,
+                          "name": "neocortex",
+                          "rgb": [
+                            3,
+                            193,
+                            45
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 10,
+                          "name": "cingulate cortex, area 2",
+                          "rgb": [
+                            29,
+                            104,
+                            235
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 108,
+                          "name": "postrhinal cortex",
+                          "rgb": [
+                            40,
+                            112,
+                            130
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 109,
+                          "name": "presubiculum",
+                          "rgb": [
+                            80,
+                            123,
+                            175
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 110,
+                          "name": "parasubiculum",
+                          "rgb": [
+                            23,
+                            54,
+                            96
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 112,
+                          "name": "perirhinal area 35",
+                          "rgb": [
+                            205,
+                            51,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 113,
+                          "name": "perirhinal area 36",
+                          "rgb": [
+                            112,
+                            48,
+                            160
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 114,
+                          "name": "entorhinal cortex",
+                          "rgb": [
+                            122,
+                            187,
+                            51
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 115,
+                          "name": "lateral entorhinal cortex",
+                          "rgb": [
+                            90,
+                            111,
+                            47
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": null,
+                          "name": "Auditory cortex",
+                          "children": [
+                            {
+                              "ngId": "v3",
+                              "labelIndex": 151,
+                              "name": "primary auditory cortex",
+                              "rgb": [
+                                255,
+                                215,
+                                0
+                              ],
+                              "children": []
+                            },
+                            {
+                              "ngId": "v3",
+                              "labelIndex": 152,
+                              "name": "secondary auditory cortex, dorsal area",
+                              "rgb": [
+                                240,
+                                255,
+                                255
+                              ],
+                              "children": []
+                            },
+                            {
+                              "ngId": "v3",
+                              "labelIndex": 153,
+                              "name": "secondary auditory cortex, ventral area",
+                              "rgb": [
+                                216,
+                                191,
+                                216
+                              ],
+                              "children": []
+                            }
+                          ]
+                        }
+                      ],
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "b4ab5ba5-0753-4ffb-80f9-ccd5d85cb6ac"
+                        }
                       },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 141,
-                        "name": "lateral lemniscus",
-                        "rgb": [
-                          255,
-                          166,
-                          0
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 129,
-                    "name": "acoustic striae",
-                    "rgb": [
-                      255,
-                      217,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 130,
-                    "name": "trapezoid body",
-                    "rgb": [
-                      213,
-                      255,
-                      0
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 157,
-                "name": "auditory radiation",
-                "rgb": [
-                  244,
-                  156,
-                  255
-                ],
-                "children": []
-              }
-            ]
-          },
-          {
-            "ngId": "v3",
-            "labelIndex": null,
-            "name": "Gray matter",
-            "children": [
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Olfactory system",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 64,
-                    "name": "glomerular layer of the accessory olfactory bulb",
-                    "rgb": [
-                      15,
-                      109,
-                      230
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 65,
-                    "name": "glomerular layer of the olfactory bulb",
-                    "rgb": [
-                      255,
-                      227,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 66,
-                    "name": "olfactory bulb",
-                    "rgb": [
-                      255,
-                      135,
-                      0
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Cerebral cortex including the neocortex and the hippocampus",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Neocortex",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 77,
-                        "name": "frontal association cortex",
-                        "rgb": [
-                          206,
-                          211,
-                          7
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 92,
-                        "name": "neocortex",
-                        "rgb": [
-                          3,
-                          193,
-                          45
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 10,
-                        "name": "cingulate cortex, area 2",
-                        "rgb": [
-                          29,
-                          104,
-                          235
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 108,
-                        "name": "postrhinal cortex",
-                        "rgb": [
-                          40,
-                          112,
-                          130
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 109,
-                        "name": "presubiculum",
-                        "rgb": [
-                          80,
-                          123,
-                          175
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 110,
-                        "name": "parasubiculum",
-                        "rgb": [
-                          23,
-                          54,
-                          96
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 112,
-                        "name": "perirhinal area 35",
-                        "rgb": [
-                          205,
-                          51,
-                          255
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 113,
-                        "name": "perirhinal area 36",
-                        "rgb": [
-                          112,
-                          48,
-                          160
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 114,
-                        "name": "entorhinal cortex",
-                        "rgb": [
-                          122,
-                          187,
-                          51
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 115,
-                        "name": "lateral entorhinal cortex",
-                        "rgb": [
-                          90,
-                          111,
-                          47
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": null,
-                        "name": "Auditory cortex",
-                        "children": [
-                          {
-                            "ngId": "v3",
-                            "labelIndex": 151,
-                            "name": "primary auditory cortex",
-                            "rgb": [
-                              255,
-                              215,
-                              0
-                            ],
-                            "children": []
-                          },
-                          {
-                            "ngId": "v3",
-                            "labelIndex": 152,
-                            "name": "secondary auditory cortex, dorsal area",
-                            "rgb": [
-                              240,
-                              255,
-                              255
-                            ],
-                            "children": []
-                          },
-                          {
-                            "ngId": "v3",
-                            "labelIndex": 153,
-                            "name": "secondary auditory cortex, ventral area",
-                            "rgb": [
-                              216,
-                              191,
-                              216
-                            ],
-                            "children": []
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Neocortex (v3)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0db35172-495f-494d-9c14-01a2d6c7e398",
+                              "alternateOf": []
+                            }
                           }
-                        ]
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Allocortex",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 95,
+                          "name": "cornu ammonis 3",
+                          "rgb": [
+                            165,
+                            131,
+                            107
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 96,
+                          "name": "dentate gyrus",
+                          "rgb": [
+                            91,
+                            45,
+                            10
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 97,
+                          "name": "cornu ammonis 2",
+                          "rgb": [
+                            255,
+                            255,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 98,
+                          "name": "cornu ammonis 1",
+                          "rgb": [
+                            217,
+                            104,
+                            13
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 99,
+                          "name": "fasciola cinereum",
+                          "rgb": [
+                            255,
+                            0,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 100,
+                          "name": "subiculum",
+                          "rgb": [
+                            255,
+                            192,
+                            0
+                          ],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 30,
+                  "name": "striatum",
+                  "rgb": [
+                    129,
+                    79,
+                    255
+                  ],
+                  "children": [],
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Striatum (v3)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "a06b8f76-c92e-4b16-9281-4c314a925ee4",
+                          "alternateOf": []
+                        }
                       }
-                    ]
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 31,
+                  "name": "globus pallidus",
+                  "rgb": [
+                    255,
+                    145,
+                    186
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 32,
+                  "name": "entopeduncular nucleus",
+                  "rgb": [
+                    26,
+                    231,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 3,
+                  "name": "subthalamic nucleus",
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 82,
+                  "name": "basal forebrain region",
+                  "rgb": [
+                    225,
+                    240,
+                    13
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 40,
+                  "name": "septal region",
+                  "rgb": [
+                    255,
+                    8,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Thalamus",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 39,
+                      "name": "thalamus",
+                      "rgb": [
+                        0,
+                        100,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 147,
+                      "name": "medial geniculate body, medial division",
+                      "rgb": [
+                        10,
+                        244,
+                        217
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 148,
+                      "name": "medial geniculate body, dorsal division",
+                      "rgb": [
+                        239,
+                        163,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 149,
+                      "name": "medial geniculate body, ventral division",
+                      "rgb": [
+                        131,
+                        58,
+                        31
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 150,
+                      "name": "medial geniculate body, marginal zone",
+                      "rgb": [
+                        255,
+                        47,
+                        242
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 164,
+                      "name": "reticular thalamic nucleus, auditory segment",
+                      "rgb": [
+                        110,
+                        0,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 93,
+                  "name": "bed nucleus of the stria terminalis",
+                  "rgb": [
+                    0,
+                    8,
+                    182
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 81,
+                  "name": "nucleus of the stria medullaris",
+                  "rgb": [
+                    222,
+                    7,
+                    237
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 48,
+                  "name": "hypothalamic region",
+                  "rgb": [
+                    226,
+                    120,
+                    161
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 43,
+                  "name": "pineal gland",
+                  "rgb": [
+                    218,
+                    170,
+                    62
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Tectum",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Inferior colliculus",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 142,
+                          "name": "inferior colliculus, dorsal cortex",
+                          "rgb": [
+                            206,
+                            255,
+                            142
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 143,
+                          "name": "inferior colliculus, central nucleus",
+                          "rgb": [
+                            0,
+                            238,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 145,
+                          "name": "inferior colliculus, external cortex",
+                          "rgb": [
+                            48,
+                            136,
+                            203
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 94,
+                      "name": "pretectal region",
+                      "rgb": [
+                        255,
+                        87,
+                        30
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 50,
+                      "name": "superficial gray layer of the superior colliculus",
+                      "rgb": [
+                        86,
+                        0,
+                        221
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 55,
+                      "name": "deeper layers of the superior colliculus",
+                      "rgb": [
+                        225,
+                        151,
+                        15
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 2,
+                  "name": "substantia nigra",
+                  "rgb": [
+                    255,
+                    186,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 71,
+                  "name": "interpeduncular nucleus",
+                  "rgb": [
+                    63,
+                    192,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 51,
+                  "name": "periaqueductal gray",
+                  "rgb": [
+                    7,
+                    255,
+                    89
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 58,
+                  "name": "pontine nuclei",
+                  "rgb": [
+                    0,
+                    215,
+                    11
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Cerebellum",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 4,
+                      "name": "molecular layer of the cerebellum",
+                      "rgb": [
+                        255,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 5,
+                      "name": "granule cell level of the cerebellum",
+                      "rgb": [
+                        0,
+                        255,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "a844d80f-1d94-41a0-901a-14ae257519db"
+                    }
                   },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Allocortex",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 95,
-                        "name": "cornu ammonis 3",
-                        "rgb": [
-                          165,
-                          131,
-                          107
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 96,
-                        "name": "dentate gyrus",
-                        "rgb": [
-                          91,
-                          45,
-                          10
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 97,
-                        "name": "cornu ammonis 2",
-                        "rgb": [
-                          255,
-                          255,
-                          0
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 98,
-                        "name": "cornu ammonis 1",
-                        "rgb": [
-                          217,
-                          104,
-                          13
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 99,
-                        "name": "fasciola cinereum",
-                        "rgb": [
-                          255,
-                          0,
-                          0
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 100,
-                        "name": "subiculum",
-                        "rgb": [
-                          255,
-                          192,
-                          0
-                        ],
-                        "children": []
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Cerebellum (v3)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "f29cd2fd-fa5c-412f-b83e-7832c3cff80b",
+                          "alternateOf": []
+                        }
                       }
-                    ]
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 30,
-                "name": "striatum",
-                "rgb": [
-                  129,
-                  79,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 31,
-                "name": "globus pallidus",
-                "rgb": [
-                  255,
-                  145,
-                  186
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 32,
-                "name": "entopeduncular nucleus",
-                "rgb": [
-                  26,
-                  231,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 3,
-                "name": "subthalamic nucleus",
-                "rgb": [
-                  0,
-                  0,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 82,
-                "name": "basal forebrain region",
-                "rgb": [
-                  225,
-                  240,
-                  13
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 40,
-                "name": "septal region",
-                "rgb": [
-                  255,
-                  8,
-                  0
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Thalamus",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 39,
-                    "name": "thalamus",
-                    "rgb": [
-                      0,
-                      100,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 147,
-                    "name": "medial geniculate body, medial division",
-                    "rgb": [
-                      10,
-                      244,
-                      217
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 148,
-                    "name": "medial geniculate body, dorsal division",
-                    "rgb": [
-                      239,
-                      163,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 149,
-                    "name": "medial geniculate body, ventral division",
-                    "rgb": [
-                      131,
-                      58,
-                      31
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 150,
-                    "name": "medial geniculate body, marginal zone",
-                    "rgb": [
-                      255,
-                      47,
-                      242
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 164,
-                    "name": "reticular thalamic nucleus, auditory segment",
-                    "rgb": [
-                      110,
-                      0,
-                      255
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 93,
-                "name": "bed nucleus of the stria terminalis",
-                "rgb": [
-                  0,
-                  8,
-                  182
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 81,
-                "name": "nucleus of the stria medullaris",
-                "rgb": [
-                  222,
-                  7,
-                  237
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 48,
-                "name": "hypothalamic region",
-                "rgb": [
-                  226,
-                  120,
-                  161
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 43,
-                "name": "pineal gland",
-                "rgb": [
-                  218,
-                  170,
-                  62
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Tectum",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Inferior colliculus",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 142,
-                        "name": "inferior colliculus, dorsal cortex",
-                        "rgb": [
-                          206,
-                          255,
-                          142
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 143,
-                        "name": "inferior colliculus, central nucleus",
-                        "rgb": [
-                          0,
-                          238,
-                          255
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 145,
-                        "name": "inferior colliculus, external cortex",
-                        "rgb": [
-                          48,
-                          136,
-                          203
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 94,
-                    "name": "pretectal region",
-                    "rgb": [
-                      255,
-                      87,
-                      30
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 50,
-                    "name": "superficial gray layer of the superior colliculus",
-                    "rgb": [
-                      86,
-                      0,
-                      221
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 55,
-                    "name": "deeper layers of the superior colliculus",
-                    "rgb": [
-                      225,
-                      151,
-                      15
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 2,
-                "name": "substantia nigra",
-                "rgb": [
-                  255,
-                  186,
-                  0
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 71,
-                "name": "interpeduncular nucleus",
-                "rgb": [
-                  63,
-                  192,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 51,
-                "name": "periaqueductal gray",
-                "rgb": [
-                  7,
-                  255,
-                  89
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 58,
-                "name": "pontine nuclei",
-                "rgb": [
-                  0,
-                  215,
-                  11
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Cerebellum",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 4,
-                    "name": "molecular layer of the cerebellum",
-                    "rgb": [
-                      255,
-                      255,
-                      0
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 5,
-                    "name": "granule cell level of the cerebellum",
-                    "rgb": [
-                      0,
-                      255,
-                      255
-                    ],
-                    "children": []
-                  }
-                ]
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 74,
-                "name": "inferior olive",
-                "rgb": [
-                  0,
-                  246,
-                  14
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 75,
-                "name": "spinal trigeminal nucleus",
-                "rgb": [
-                  91,
-                  241,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 56,
-                "name": "periventricular gray",
-                "rgb": [
-                  235,
-                  87,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": null,
-                "name": "Brainstem",
-                "children": [
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 47,
-                    "name": "brainstem",
-                    "rgb": [
-                      153,
-                      83,
-                      255
-                    ],
-                    "children": []
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Cochlear nucleus, ventral part",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 158,
-                        "name": "ventral cochlear nucleus, anterior part",
-                        "rgb": [
-                          34,
-                          152,
-                          255
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 159,
-                        "name": "ventral cochlear nucleus, posterior part",
-                        "rgb": [
-                          0,
-                          230,
-                          207
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 160,
-                        "name": "ventral cochlear nucleus, cap area",
-                        "rgb": [
-                          0,
-                          255,
-                          106
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 123,
-                        "name": "ventral cochlear nucleus, granule cell layer",
-                        "rgb": [
-                          0,
-                          12,
-                          255
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Cochlear nucleus, dorsal part",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 126,
-                        "name": "dorsal cochlear nucleus, molecular layer",
-                        "rgb": [
-                          92,
-                          156,
-                          211
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 127,
-                        "name": "dorsal cochlear nucleus, fusiform and granule layer",
-                        "rgb": [
-                          0,
-                          80,
-                          156
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 128,
-                        "name": "dorsal cochlear nucleus, deep core",
-                        "rgb": [
-                          197,
-                          238,
-                          255
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Superior olivary complex",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 131,
-                        "name": "nucleus of the trapezoid body",
-                        "rgb": [
-                          0,
-                          255,
-                          81
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 132,
-                        "name": "superior paraolivary nucleus",
-                        "rgb": [
-                          0,
-                          238,
-                          255
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 133,
-                        "name": "medial superior olive",
-                        "rgb": [
-                          219,
-                          239,
-                          61
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 134,
-                        "name": "lateral superior olive",
-                        "rgb": [
-                          35,
-                          76,
-                          190
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 135,
-                        "name": "superior periolivary region",
-                        "rgb": [
-                          1,
-                          153,
-                          21
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 136,
-                        "name": "ventral periolivary nuclei",
-                        "rgb": [
-                          0,
-                          174,
-                          255
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": null,
-                    "name": "Nuclei of the lateral lemniscus",
-                    "children": [
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 137,
-                        "name": "lateral lemniscus, ventral nucleus",
-                        "rgb": [
-                          255,
-                          0,
-                          115
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 138,
-                        "name": "lateral lemniscus, intermediate nucleus",
-                        "rgb": [
-                          171,
-                          16,
-                          91
-                        ],
-                        "children": []
-                      },
-                      {
-                        "ngId": "v3",
-                        "labelIndex": 139,
-                        "name": "lateral lemniscus, dorsal nucleus",
-                        "rgb": [
-                          108,
-                          18,
-                          91
-                        ],
-                        "children": []
-                      }
-                    ]
-                  },
-                  {
-                    "ngId": "v3",
-                    "labelIndex": 163,
-                    "name": "nucleus sagulum",
-                    "rgb": [
-                      99,
-                      205,
-                      0
-                    ],
-                    "children": []
-                  }
-                ]
-              }
-            ]
+                    }
+                  ]
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 74,
+                  "name": "inferior olive",
+                  "rgb": [
+                    0,
+                    246,
+                    14
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 75,
+                  "name": "spinal trigeminal nucleus",
+                  "rgb": [
+                    91,
+                    241,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 56,
+                  "name": "periventricular gray",
+                  "rgb": [
+                    235,
+                    87,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": null,
+                  "name": "Brainstem",
+                  "children": [
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 47,
+                      "name": "brainstem",
+                      "rgb": [
+                        153,
+                        83,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Cochlear nucleus, ventral part",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 158,
+                          "name": "ventral cochlear nucleus, anterior part",
+                          "rgb": [
+                            34,
+                            152,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 159,
+                          "name": "ventral cochlear nucleus, posterior part",
+                          "rgb": [
+                            0,
+                            230,
+                            207
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 160,
+                          "name": "ventral cochlear nucleus, cap area",
+                          "rgb": [
+                            0,
+                            255,
+                            106
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 123,
+                          "name": "ventral cochlear nucleus, granule cell layer",
+                          "rgb": [
+                            0,
+                            12,
+                            255
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Cochlear nucleus, dorsal part",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 126,
+                          "name": "dorsal cochlear nucleus, molecular layer",
+                          "rgb": [
+                            92,
+                            156,
+                            211
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 127,
+                          "name": "dorsal cochlear nucleus, fusiform and granule layer",
+                          "rgb": [
+                            0,
+                            80,
+                            156
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 128,
+                          "name": "dorsal cochlear nucleus, deep core",
+                          "rgb": [
+                            197,
+                            238,
+                            255
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Superior olivary complex",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 131,
+                          "name": "nucleus of the trapezoid body",
+                          "rgb": [
+                            0,
+                            255,
+                            81
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 132,
+                          "name": "superior paraolivary nucleus",
+                          "rgb": [
+                            0,
+                            238,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 133,
+                          "name": "medial superior olive",
+                          "rgb": [
+                            219,
+                            239,
+                            61
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 134,
+                          "name": "lateral superior olive",
+                          "rgb": [
+                            35,
+                            76,
+                            190
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 135,
+                          "name": "superior periolivary region",
+                          "rgb": [
+                            1,
+                            153,
+                            21
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 136,
+                          "name": "ventral periolivary nuclei",
+                          "rgb": [
+                            0,
+                            174,
+                            255
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": null,
+                      "name": "Nuclei of the lateral lemniscus",
+                      "children": [
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 137,
+                          "name": "lateral lemniscus, ventral nucleus",
+                          "rgb": [
+                            255,
+                            0,
+                            115
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 138,
+                          "name": "lateral lemniscus, intermediate nucleus",
+                          "rgb": [
+                            171,
+                            16,
+                            91
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "v3",
+                          "labelIndex": 139,
+                          "name": "lateral lemniscus, dorsal nucleus",
+                          "rgb": [
+                            108,
+                            18,
+                            91
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "v3",
+                      "labelIndex": 163,
+                      "name": "nucleus sagulum",
+                      "rgb": [
+                        99,
+                        205,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "ngId": "v3",
+              "labelIndex": null,
+              "name": "Ventricular system",
+              "children": [
+                {
+                  "ngId": "v3",
+                  "labelIndex": 33,
+                  "name": "ventricular system",
+                  "rgb": [
+                    2,
+                    44,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 125,
+                  "name": "4th ventricle",
+                  "rgb": [
+                    52,
+                    29,
+                    144
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "v3",
+              "labelIndex": null,
+              "name": "Spinal cord",
+              "children": [
+                {
+                  "ngId": "v3",
+                  "labelIndex": 45,
+                  "name": "spinal cord",
+                  "rgb": [
+                    134,
+                    255,
+                    90
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 70,
+                  "name": "central canal",
+                  "rgb": [
+                    39,
+                    244,
+                    253
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "v3",
+              "labelIndex": null,
+              "name": "Inner ear",
+              "children": [
+                {
+                  "ngId": "v3",
+                  "labelIndex": 119,
+                  "name": "vestibular apparatus",
+                  "rgb": [
+                    0,
+                    144,
+                    55
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 120,
+                  "name": "cochlea",
+                  "rgb": [
+                    0,
+                    255,
+                    29
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 121,
+                  "name": "cochlear nerve",
+                  "rgb": [
+                    253,
+                    148,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 122,
+                  "name": "vestibular nerve",
+                  "rgb": [
+                    253,
+                    50,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "v3",
+                  "labelIndex": 162,
+                  "name": "spiral ganglion",
+                  "rgb": [
+                    185,
+                    255,
+                    233
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba"
+            }
           },
-          {
-            "ngId": "v3",
-            "labelIndex": null,
-            "name": "Ventricular system",
-            "children": [
-              {
-                "ngId": "v3",
-                "labelIndex": 33,
-                "name": "ventricular system",
-                "rgb": [
-                  2,
-                  44,
-                  255
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 125,
-                "name": "4th ventricle",
-                "rgb": [
-                  52,
-                  29,
-                  144
-                ],
-                "children": []
+          "relatedAreas": [
+            {
+              "name": "Rat Whole brain (v3)",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "781a8728-4178-4af4-b3e9-3e61ea5bc3cd",
+                  "alternateOf": []
+                }
               }
-            ]
-          },
-          {
-            "ngId": "v3",
-            "labelIndex": null,
-            "name": "Spinal cord",
-            "children": [
-              {
-                "ngId": "v3",
-                "labelIndex": 45,
-                "name": "spinal cord",
-                "rgb": [
-                  134,
-                  255,
-                  90
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 70,
-                "name": "central canal",
-                "rgb": [
-                  39,
-                  244,
-                  253
-                ],
-                "children": []
-              }
-            ]
-          },
-          {
-            "ngId": "v3",
-            "labelIndex": null,
-            "name": "Inner ear",
-            "children": [
-              {
-                "ngId": "v3",
-                "labelIndex": 119,
-                "name": "vestibular apparatus",
-                "rgb": [
-                  0,
-                  144,
-                  55
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 120,
-                "name": "cochlea",
-                "rgb": [
-                  0,
-                  255,
-                  29
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 121,
-                "name": "cochlear nerve",
-                "rgb": [
-                  253,
-                  148,
-                  0
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 122,
-                "name": "vestibular nerve",
-                "rgb": [
-                  253,
-                  50,
-                  0
-                ],
-                "children": []
-              },
-              {
-                "ngId": "v3",
-                "labelIndex": 162,
-                "name": "spiral ganglion",
-                "rgb": [
-                  185,
-                  255,
-                  233
-                ],
-                "children": []
-              }
-            ]
-          }]
-      }],
+            }
+          ]
+        }
+      ],
       "properties": {
         "name": "Waxholm Space rat brain atlas v3",
         "description": "Waxholm Space atlas of the rat brain, with detailed delineations of the ascending auditory system. (40 new structures added, 10 structures revised, in total 118 structures delineated)",
-        "publications": [{
-          "cite": "https://www.nitrc.org/frs/?group_id=1081",
-          "doi": "https://www.nitrc.org/frs/?group_id=1081"
-        },{
-          "doi": "10.1016/j.neuroimage.2019.05.016",
-          "cite": "Osen KK, Imad J, Wennberg AE, Papp EA, Leergaard TB (2019) Waxholm Space atlas of the rat brain auditory system: Three-dimensional delineations based on structural and diffusion tensor magnetic resonance imaging. NeuroImage 199, 38-56"
-        }]
+        "publications": [
+          {
+            "cite": "https://www.nitrc.org/frs/?group_id=1081",
+            "doi": "https://www.nitrc.org/frs/?group_id=1081"
+          },
+          {
+            "doi": "10.1016/j.neuroimage.2019.05.016",
+            "cite": "Osen KK, Imad J, Wennberg AE, Papp EA, Leergaard TB (2019) Waxholm Space atlas of the rat brain auditory system: Three-dimensional delineations based on structural and diffusion tensor magnetic resonance imaging. NeuroImage 199, 38-56"
+          }
+        ]
       }
     },
     {
       "ngId": "v2",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v2",
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "2c8ec4fb-45ca-4fe7-accf-c41b5e92c43d"
-      }],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "2c8ec4fb-45ca-4fe7-accf-c41b5e92c43d"
+        }
+      ],
       "regions": [
         {
           "name": "Whole brain",
@@ -2413,7 +2489,19 @@
                         193,
                         45
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Neocortex (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b4ab5ba5-0753-4ffb-80f9-ccd5d85cb6ac",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "cingulate cortex, area 2",
@@ -2447,7 +2535,19 @@
                         131,
                         107
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 1 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8b9dc624-b341-4b6a-9a9a-ac651c704daf",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "dentate gyrus",
@@ -2481,7 +2581,19 @@
                         255,
                         0
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 2 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3017940f-ea61-47d1-8b8a-fc2bee012980",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "cornu ammonis 3",
@@ -2497,7 +2609,19 @@
                         104,
                         13
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 3 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "28b4ba4a-eeb3-4307-8b9c-1d3eca66618e",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "fasciola cinereum",
@@ -2597,7 +2721,19 @@
                         51,
                         255
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Perirhinal area 35 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b700dc11-cdd8-4e95-9605-25d1aa24bc46",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "perirhinal area 36",
@@ -2613,7 +2749,19 @@
                         48,
                         160
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Perirhinal area 36 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "ae4b1c4f-83a4-48db-8f8c-2167c4ebc2d5",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "entorhinal cortex",
@@ -2665,7 +2813,19 @@
                     79,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Striatum (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "39ed89c6-4653-4fd3-81cf-3be1c60ead10",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "globus pallidus",
@@ -2683,7 +2843,19 @@
                     145,
                     186
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Globus pallidus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9ab96590-23e6-413f-8055-6b6dbc543dce",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "entopeduncular nucleus",
@@ -2701,7 +2873,19 @@
                     231,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Entopeduncular nucleus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "0026b0c8-da96-4329-8e29-8504dc2790d3",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "subthalamic nucleus",
@@ -2719,7 +2903,19 @@
                     0,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Subthalamic nucleus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "916d047f-a4f3-4d5b-89f9-b7c8ddc98edf",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "basal forebrain region",
@@ -2773,7 +2969,19 @@
                     100,
                     0
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Thalamus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9f7936a8-08bd-4fc0-b8c7-f057befac01d",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "bed nucleus of the stria terminalis",
@@ -2827,7 +3035,19 @@
                     120,
                     161
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Hypothalamic region (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "e96b882e-cd42-4e10-9e72-a87219c3f9b2",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "pineal gland",
@@ -2950,7 +3170,19 @@
                     186,
                     0
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Substantia nigra (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "4338cc81-ab0f-4972-bbba-c86328a8c66b",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "interpeduncular nucleus",
@@ -3004,7 +3236,19 @@
                     215,
                     11
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Pontine nuclei (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9c431f67-90c5-4a37-83c8-9706e62c1966",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "Cerebellum",
@@ -3054,6 +3298,24 @@
                         255
                       ],
                       "children": null
+                    }
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "a844d80f-1d94-41a0-901a-14ae257519db"
+                    }
+                  },
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Cerebellum (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "a844d80f-1d94-41a0-901a-14ae257519db",
+                          "alternateOf": []
+                        }
+                      }
                     }
                   ]
                 },
@@ -3182,37 +3444,59 @@
                 }
               ]
             }
+          ],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba"
+            }
+          },
+          "relatedAreas": [
+            {
+              "name": "Rat Whole brain (v2)",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba",
+                  "alternateOf": []
+                }
+              }
+            }
           ]
         }
       ],
       "properties": {
         "name": "Waxholm Space rat brain atlas v2",
         "description": "Waxholm Space atlas of the rat brain, expanded with detailed delineations of 13 hippocampal and parahippocampal region (79 structures total).",
-        "publications": [{
-          "cite": "https://www.nitrc.org/frs/?group_id=1081",
-          "doi": "https://www.nitrc.org/frs/?group_id=1081"
-        },{
-          "cite": "Kjonigsen LJ, Lillehaug S, Bjaalie JG, Witter MP, Leergaard TB (2015) Waxholm Space atlas of the rat brain hippocampal region: Three-dimensional delineations based on magnetic resonance and diffusion tensor imaging. NeuroImage 108, 441-449",
-          "doi": "10.1016/j.neuroimage.2014.12.080"
-        }]
+        "publications": [
+          {
+            "cite": "https://www.nitrc.org/frs/?group_id=1081",
+            "doi": "https://www.nitrc.org/frs/?group_id=1081"
+          },
+          {
+            "cite": "Kjonigsen LJ, Lillehaug S, Bjaalie JG, Witter MP, Leergaard TB (2015) Waxholm Space atlas of the rat brain hippocampal region: Three-dimensional delineations based on magnetic resonance and diffusion tensor imaging. NeuroImage 108, 441-449",
+            "doi": "10.1016/j.neuroimage.2014.12.080"
+          }
+        ]
       }
     },
     {
       "ngId": "v1_01",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v1",
-      "originDatasets":[{
-        "kgSchema": "minds/core/dataset/v1.0.0",
-        "kgId": "f40e466b-8247-463a-a4cb-56dfe68e7059"
-      }],
+      "originDatasets": [
+        {
+          "kgSchema": "minds/core/dataset/v1.0.0",
+          "kgId": "f40e466b-8247-463a-a4cb-56dfe68e7059"
+        }
+      ],
       "regions": [
         {
           "ngId": "v1_01",
           "name": "Whole brain",
           "labelIndex": null,
           "rgb": null,
-          "children":[
-
+          "children": [
             {
               "name": "White matter",
               "labelIndex": null,
@@ -4718,7 +5002,14 @@
                       },
                       "children": []
                     }
-                  ]
+                  ],
+                  "fullId": {
+                    "kg": {
+                      "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                      "kgId": "a844d80f-1d94-41a0-901a-14ae257519db"
+                    }
+                  },
+                  "relatedAreas": []
                 },
                 {
                   "name": "inferior olive",
@@ -4885,33 +5176,47 @@
               },
               "children": []
             }
-          ]
+          ],
+          "fullId": {
+            "kg": {
+              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+              "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba"
+            }
+          },
+          "relatedAreas": []
         }
       ],
       "properties": {
         "name": "Waxholm Space rat brain atlas v1",
         "description": "Waxholm Space atlas of the Sprague Dawley rat brain, first iteration with major brain regions delineated (76 structures).",
-        "publications": [{
-          "cite": "https://www.nitrc.org/frs/?group_id=1081",
-          "doi": "https://www.nitrc.org/frs/?group_id=1081"
-        },{
-          "doi": "10.1016/j.neuroimage.2014.04.001",
-          "cite": "Papp EA, Leergaard TB, Calabrese E, Johnson GA, Bjaalie JG (2014) Waxholm Space atlas of the Sprague Dawley rat brain. NeuroImage 97, 374-386"
-        }]
+        "publications": [
+          {
+            "cite": "https://www.nitrc.org/frs/?group_id=1081",
+            "doi": "https://www.nitrc.org/frs/?group_id=1081"
+          },
+          {
+            "doi": "10.1016/j.neuroimage.2014.04.001",
+            "cite": "Papp EA, Leergaard TB, Calabrese E, Johnson GA, Bjaalie JG (2014) Waxholm Space atlas of the Sprague Dawley rat brain. NeuroImage 97, 374-386"
+          }
+        ]
       }
     }
   ],
   "properties": {
     "name": "Waxholm Space rat brain MRI/DTI",
     "description": "MRI/DTI template of adult male Sprague Dawley rat brain.",
-    "publications": [{
-      "doi": "10.1016/j.neuroimage.2014.04.001",
-      "cite": "Papp EA, Leergaard TB, Calabrese E, Johnson GA, Bjaalie JG (2014) Waxholm Space atlas of the Sprague Dawley rat brain. NeuroImage 97, 374-386"
-    },{
-      "cite": "RRID: SCR_017124"
-    },{
-      "doi": "https://www.nitrc.org/projects/whs-sd-atlas",
-      "cite": "https://www.nitrc.org/projects/whs-sd-atlas"
-    }]
+    "publications": [
+      {
+        "doi": "10.1016/j.neuroimage.2014.04.001",
+        "cite": "Papp EA, Leergaard TB, Calabrese E, Johnson GA, Bjaalie JG (2014) Waxholm Space atlas of the Sprague Dawley rat brain. NeuroImage 97, 374-386"
+      },
+      {
+        "cite": "RRID: SCR_017124"
+      },
+      {
+        "doi": "https://www.nitrc.org/projects/whs-sd-atlas",
+        "cite": "https://www.nitrc.org/projects/whs-sd-atlas"
+      }
+    ]
   }
 }

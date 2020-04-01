@@ -1,0 +1,91 @@
+<mat-card>
+  <mat-card-title>
+    {{ region.name }}
+  </mat-card-title>
+  <mat-card-subtitle>
+    <i class="fas fa-brain"></i>
+    <span>
+      Brain region
+    </span>
+  </mat-card-subtitle>
+  <mat-card-content>
+    {{ region.description }}
+  </mat-card-content>
+  <div class="d-flex flex-row flex-wrap">
+    <button mat-button
+      (click)="toggleRegionSelected()"
+      [color]="isSelected ? 'primary': 'basic'">
+      <i class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
+      <span>
+        {{isSelected? 'Deselect' : 'Select'}}
+      </span>
+    </button>
+    <button mat-button (click)="navigateToRegion()">
+      <i class="fas fa-map-marked-alt"></i>
+      <span>
+        Navigate
+      </span>
+    </button>
+    <button *ngIf="hasConnectivity"
+      mat-button
+      [matMenuTriggerFor]="connectivitySourceDatasets"
+      #connectivityMenuButton="matMenuTrigger"
+      iav-captureClickListenerDirective
+      [iav-captureClickListenerDirective-captureDocument]="true"
+      (iav-captureClickListenerDirective-onMousedown)="connectivityMenuButton.closeMenu()">
+      <i class="fab fa-connectdevelop"></i>
+      <span>
+        Connectivity
+      </span>
+      <i class="fas fa-angle-right"></i>
+    </button>
+
+
+
+    <!-- Menu to navigate between template spaces to explore same region -->
+    <div>
+      <button mat-button
+        aria-label="Show availability in other reference spaces"
+        *ngIf="sameRegionTemplate.length"
+        [matMenuTriggerFor]="additionalActions"
+        #changeTmplTrigger="matMenuTrigger"
+        iav-captureClickListenerDirective
+        [iav-captureClickListenerDirective-captureDocument]="true"
+        (iav-captureClickListenerDirective-onMousedown)="changeTmplTrigger.closeMenu()">
+        <i class="fas fa-brain"></i>
+        <span>
+          Change template
+        </span>
+        <i class="fas fa-angle-right"></i>
+      </button>
+    </div>
+
+  </div>
+</mat-card>
+
+
+<!-- ToDo make dynamic with AVAILABLE CONNECTIVITY DATASETS data - get info from atlas viewer core -->
+<mat-menu
+  #connectivitySourceDatasets="matMenu"
+  xPosition="before"
+  hasBackdrop="false">
+  <div>
+    <button mat-menu-item (mousedown)="showConnectivity(region.name)">
+      <span>1000 Brain Study - DTI connectivity</span>
+    </button>
+  </div>
+</mat-menu>
+
+
+<mat-menu
+  [aria-label]="'Availability in other reference spaces'"
+  #additionalActions="matMenu"
+  xPosition="before"
+  hasBackdrop="false">
+  <div>
+    <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (mousedown)="changeView(i)" class="d-flex">
+      <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
+      <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
+    </button>
+  </div>
+</mat-menu>

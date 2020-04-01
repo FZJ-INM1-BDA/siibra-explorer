@@ -4,10 +4,10 @@ import { Component } from "@angular/core";
   selector: 'layout-four-panel',
   templateUrl: './fourPanel.template.html',
   styleUrls: [
-    './fourPanel.style.css'
-  ]
+    './fourPanel.style.css',
+  ],
 })
 
-export class FourPanelLayout{
-  
+export class FourPanelLayout {
+
 }

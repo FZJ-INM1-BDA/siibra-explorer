@@ -41,7 +41,9 @@ const getPublicAccessToken = async () => {
 
   const decoded = jwtDecode(__publicAccessToken)
   const { exp } = decoded
-  if (!exp || isNaN(exp) || (exp * 1000 - Date.now() < 0)) {
+
+  // refresh token if it is less than 30 minute expiring
+  if (!exp || isNaN(exp) || (exp * 1000 - Date.now() < 1e3 * 60 * 30 )) {
     await refreshToken()
   }
   

@@ -1,12 +1,19 @@
-import { PipeTransform, Pipe } from "@angular/core";
-import { DataEntry } from "src/services/stateStore.service";
+import { Pipe, PipeTransform } from "@angular/core";
+import { IDataEntry } from "src/services/stateStore.service";
+import { getKgSchemaIdFromFullId } from "./getKgSchemaIdFromFullId.pipe";
 
 @Pipe({
-  name: 'datasetIsFaved'
+  name: 'datasetIsFaved',
 })
-export class DatasetIsFavedPipe implements PipeTransform{
-  public transform(favedDataEntry: DataEntry[], dataentry: DataEntry):boolean{
-    if (!dataentry) return false
-    return favedDataEntry.findIndex(ds => ds.id === dataentry.id) >= 0
+export class DatasetIsFavedPipe implements PipeTransform {
+  public transform(favedDataEntry: IDataEntry[], dataentry: IDataEntry): boolean {
+    if (!dataentry) { return false }
+    const re2 = getKgSchemaIdFromFullId(dataentry.fullId)
+    if (!re2) return false
+    return favedDataEntry.findIndex(ds => {
+      const re1 = getKgSchemaIdFromFullId(ds.fullId)
+      if (!re1) return false
+      return re1[1] === re2[1]
+    }) >= 0
   }
 }

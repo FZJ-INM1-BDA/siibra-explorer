@@ -1,16 +1,15 @@
 import { Directive, ViewContainerRef } from "@angular/core";
 import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
 
-
 @Directive({
-  selector: '[dockedContainerDirective]'
+  selector: '[dockedContainerDirective]',
 })
 
-export class DockedContainerDirective{
+export class DockedContainerDirective {
   constructor(
     widgetService: WidgetServices,
-    viewContainerRef: ViewContainerRef
-  ){
+    viewContainerRef: ViewContainerRef,
+  ) {
     widgetService.dockedContainer = viewContainerRef
   }
 }

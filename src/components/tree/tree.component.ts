@@ -1,156 +1,154 @@
-import { Component, Input, Output, EventEmitter, ViewChildren, QueryList, HostBinding, ChangeDetectionStrategy, OnChanges, AfterContentChecked, ViewChild, ElementRef, Optional, OnInit, ChangeDetectorRef, OnDestroy } from "@angular/core";
-import { treeAnimations } from "./tree.animation";
-import { TreeService } from "./treeService.service";
+import { AfterContentChecked, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostBinding, Input, OnChanges, OnDestroy, OnInit, Optional, Output, QueryList, ViewChild, ViewChildren } from "@angular/core";
 import { Subscription } from "rxjs";
 import { ParseAttributeDirective } from "../parseAttribute.directive";
-
+import { treeAnimations } from "./tree.animation";
+import { TreeService } from "./treeService.service";
 
 @Component({
   selector : 'tree-component',
   templateUrl : './tree.template.html',
   styleUrls : [
-    './tree.style.css'
+    './tree.style.css',
   ],
   animations : [
-    treeAnimations
+    treeAnimations,
   ],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class TreeComponent extends ParseAttributeDirective implements OnChanges,OnInit,OnDestroy,AfterContentChecked{
-  @Input() inputItem : any = {
+export class TreeComponent extends ParseAttributeDirective implements OnChanges, OnInit, OnDestroy, AfterContentChecked {
+  @Input() public inputItem: any = {
     name : 'Untitled',
-    children : []
+    children : [],
   }
-  @Input() childrenExpanded : boolean = true
+  @Input() public childrenExpanded: boolean = true
 
-  @Output() mouseentertree : EventEmitter<any> = new EventEmitter()
-  @Output() mouseleavetree : EventEmitter<any> = new EventEmitter()
-  @Output() mouseclicktree : EventEmitter<any> = new EventEmitter()
+  @Output() public mouseentertree: EventEmitter<any> = new EventEmitter()
+  @Output() public mouseleavetree: EventEmitter<any> = new EventEmitter()
+  @Output() public mouseclicktree: EventEmitter<any> = new EventEmitter()
 
-  @ViewChildren(TreeComponent) treeChildren : QueryList<TreeComponent>
-  @ViewChild('childrenContainer',{ read : ElementRef }) childrenContainer : ElementRef
+  @ViewChildren(TreeComponent) public treeChildren: QueryList<TreeComponent>
+  @ViewChild('childrenContainer', { read : ElementRef }) public childrenContainer: ElementRef
 
-  constructor( 
-    private cdr : ChangeDetectorRef,
-    @Optional() public treeService : TreeService 
-  ){
+  constructor(
+    private cdr: ChangeDetectorRef,
+    @Optional() public treeService: TreeService,
+  ) {
     super()
   }
-  
-  subscriptions : Subscription[] = []
 
-  ngOnInit(){
-    if( this.treeService ){
+  public subscriptions: Subscription[] = []
+
+  public ngOnInit() {
+    if ( this.treeService ) {
       this.subscriptions.push(
-        this.treeService.markForCheck.subscribe(()=>this.cdr.markForCheck())
+        this.treeService.markForCheck.subscribe(() => this.cdr.markForCheck()),
       )
     }
   }
 
-
-  ngOnDestroy(){
-    this.subscriptions.forEach(s=>s.unsubscribe())
+  public ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  _fullHeight : number = 9999
+  public _fullHeight: number = 9999
 
-  set fullHeight(num:number){
+  set fullHeight(num: number) {
     this._fullHeight = num
   }
 
-  get fullHeight(){
+  get fullHeight() {
     return this._fullHeight
   }
 
-  ngAfterContentChecked(){
+  public ngAfterContentChecked() {
     this.fullHeight = this.childrenContainer ? this.childrenContainer.nativeElement.offsetHeight : 0
     this.cdr.detectChanges()
   }
 
-  mouseenter(ev:MouseEvent){
+  public mouseenter(ev: MouseEvent) {
     this.treeService.mouseenter.next({
       inputItem : this.inputItem,
       node : this,
-      event : ev
+      event : ev,
     })
   }
 
-  mouseleave(ev:MouseEvent){
+  public mouseleave(ev: MouseEvent) {
     this.treeService.mouseleave.next({
       inputItem : this.inputItem,
       node : this,
-      event : ev
+      event : ev,
     })
   }
 
-  mouseclick(ev:MouseEvent){
+  public mouseclick(ev: MouseEvent) {
     this.treeService.mouseclick.next({
       inputItem : this.inputItem,
       node : this,
-      event : ev
+      event : ev,
     })
   }
 
-  get chevronClass():string{
-    return this.children ? 
+  get chevronClass(): string {
+    return this.children ?
       this.children.length > 0 ?
-        this.childrenExpanded ? 
+        this.childrenExpanded ?
           'fa-chevron-down' :
           'fa-chevron-right' :
         'fa-none' :
       'fa-none'
   }
 
-  public handleEv(event:Event){
+  public handleEv(event: Event) {
     event.preventDefault();
     event.stopPropagation();
   }
 
-  public toggleChildrenShow(event:Event){
+  public toggleChildrenShow(event: Event) {
     this.childrenExpanded = !this.childrenExpanded
     event.stopPropagation()
     event.preventDefault()
   }
 
-  get children():any[]{
-    return this.treeService ? 
+  get children(): any[] {
+    return this.treeService ?
       this.treeService.findChildren(this.inputItem) :
       this.inputItem.children
   }
 
   @HostBinding('attr.filterHidden')
-  get visibilityOnFilter():boolean{
+  get visibilityOnFilter(): boolean {
     return this.treeService ?
       this.treeService.searchFilter(this.inputItem) :
       true
   }
-  handleMouseEnter(fullObj:any){
+  public handleMouseEnter(fullObj: any) {
 
     this.mouseentertree.emit(fullObj)
 
-    if(this.treeService){
+    if (this.treeService) {
       this.treeService.mouseenter.next(fullObj)
     }
   }
 
-  handleMouseLeave(fullObj:any){
-    
+  public handleMouseLeave(fullObj: any) {
+
     this.mouseleavetree.emit(fullObj)
 
-    if(this.treeService){
+    if (this.treeService) {
       this.treeService.mouseleave.next(fullObj)
     }
   }
 
-  handleMouseClick(fullObj:any){
+  public handleMouseClick(fullObj: any) {
 
     this.mouseclicktree.emit(fullObj)
 
-    if(this.treeService){
+    if (this.treeService) {
       this.treeService.mouseclick.next(fullObj)
     }
   }
 
-  public defaultSearchFilter = ()=>true
+  public defaultSearchFilter = () => true
 }

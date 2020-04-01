@@ -1,33 +1,33 @@
-import { Component, Input, HostBinding, ChangeDetectionStrategy, HostListener } from "@angular/core";
+import { ChangeDetectionStrategy, Component, HostBinding, HostListener, Input } from "@angular/core";
 
 @Component({
   selector: 'sleight-of-hand',
   templateUrl: './soh.template.html',
   styleUrls: [
-    './soh.style.css'
+    './soh.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class SleightOfHand{
+export class SleightOfHand {
 
   @HostBinding('class.do-not-close')
-  get doNotCloseClass(){
+  get doNotCloseClass() {
     return this.doNotClose || this.focusInStatus
   }
 
   @HostListener('focusin')
-  focusInHandler(){
+  public focusInHandler() {
     this.focusInStatus = true
   }
 
   @HostListener('focusout')
-  focusOutHandler(){
+  public focusOutHandler() {
     this.focusInStatus = false
   }
 
   private focusInStatus: boolean = false
 
   @Input()
-  doNotClose: boolean = false
+  public doNotClose: boolean = false
 }

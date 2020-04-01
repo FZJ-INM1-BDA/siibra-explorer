@@ -1,48 +1,86 @@
-import { Subscription, Observable } from "rxjs";
-import { Injectable, OnInit, OnDestroy } from "@angular/core";
-import { Actions, ofType, Effect } from "@ngrx/effects";
-import { Store, select, Action } from "@ngrx/store";
-import { shareReplay, distinctUntilChanged, map, withLatestFrom, filter } from "rxjs/operators";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
-import { CHANGE_NAVIGATION, SELECT_REGIONS, NEWVIEWER, GENERAL_ACTION_TYPES, SELECT_PARCELLATION, isDefined } from "src/services/stateStore.service";
-import { regionFlattener } from "src/util/regionFlattener";
+import { Injectable, OnDestroy, OnInit } from "@angular/core";
+import { Actions, Effect, ofType } from "@ngrx/effects";
+import { Action, select, Store } from "@ngrx/store";
+import { Observable, Subscription, of } from "rxjs";
+import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
 import { UIService } from "src/services/uiService.service";
+import { regionFlattener } from "src/util/regionFlattener";
+import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
+import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
-export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
+export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
 
   private subscriptions: Subscription[] = []
 
   private selectedRegions$: Observable<any[]>
 
   @Effect()
-  singleClickOnHierarchy$: Observable<any>
+  public init$ = this.constantSerivce.initFetchTemplate$.pipe(
+    map(fetchedTemplate => {
+      return {
+        type: FETCHED_TEMPLATE,
+        fetchedTemplate,
+      }
+    }),
+  )
 
   @Effect()
-  selectTemplateWithName$: Observable<any>
-  
-  @Effect()
-  selectParcellationWithName$: Observable<any>
+  public selectTemplateWithName$: Observable<any>
 
   @Effect()
-  doubleClickOnHierarchy$: Observable<any>
+  public selectParcellationWithName$: Observable<any>
+
+  /**
+   * Determines how single click on region hierarchy will affect view
+   */
+  @Effect()
+  public singleClickOnHierarchy$: Observable<any>
+
+  /**
+   * Determines how double click on region hierarchy will effect view
+   */
+  @Effect()
+  public doubleClickOnHierarchy$: Observable<any>
+
+  @Effect()
+  public toggleRegionSelection$: Observable<any>
+
+  @Effect()
+  public navigateToRegion$: Observable<any>
+
+
+  @Effect()
+  public onTemplateSelectClearStandAloneVolumes$: Observable<any>
 
   constructor(
     private actions$: Actions,
-    private store$: Store<any>,
-    private uiService: UIService
-  ){
+    private store$: Store<IavRootStoreInterface>,
+    private uiService: UIService,
+    private constantSerivce: AtlasViewerConstantsServices,
+    private coordinatesTransformation: TemplateCoordinatesTransformation
+  ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
-      shareReplay(1)
+      shareReplay(1),
     )
 
     this.selectedRegions$ = viewerState$.pipe(
       select('regionsSelected'),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+    )
+
+    this.onTemplateSelectClearStandAloneVolumes$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
+      mapTo({
+        type: CLEAR_STANDALONE_VOLUMES
+      })
     )
 
     this.selectParcellationWithName$ = this.actions$.pipe(
@@ -54,15 +92,15 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
       }),
       filter(name => !!name),
       withLatestFrom(viewerState$.pipe(
-        select('parcellationSelected')
+        select('parcellationSelected'),
       )),
       filter(([name,  parcellationSelected]) => {
-        if (parcellationSelected && parcellationSelected.name === name) return false
+        if (parcellationSelected && parcellationSelected.name === name) { return false }
         return true
       }),
-      map(([name,  _]) => name),
+      map(([name]) => name),
       withLatestFrom(viewerState$.pipe(
-        select('templateSelected')
+        select('templateSelected'),
       )),
       map(([name, templateSelected]) => {
 
@@ -72,17 +110,17 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
             payload: {
-              message: 'Selected parcellation not found.'
-            }
+              message: 'Selected parcellation not found.',
+            },
           }
         }
         return {
           type: SELECT_PARCELLATION,
-          selectParcellation: newParcellation
+          selectParcellation: newParcellation,
         }
-      })
+      }),
     )
-    
+
     this.selectTemplateWithName$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
       map(action => {
@@ -91,37 +129,92 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
         return name
       }),
       filter(name => !!name),
-      withLatestFrom(viewerState$.pipe(
-        select('templateSelected')
-      )),
-      filter(([name,  templateSelected]) => {
-        if (templateSelected && templateSelected.name === name) return false
-        return true
+      withLatestFrom(
+        viewerState$
+      ),
+      switchMap(([newTemplateName, { templateSelected, fetchedTemplates, navigation }]) => {
+        if (!templateSelected) {
+          return of({
+            newTemplateName,
+            templateSelected: templateSelected,
+            fetchedTemplates,
+            translatedCoordinate: null,
+            navigation
+          })
+        }
+        const position = (navigation && navigation.position) || [0, 0, 0]
+        if (newTemplateName === templateSelected.name) return of(null)
+        return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(
+          map(({ status, statusText, result }) => {
+            if (status === 'error') {
+              return {
+                newTemplateName,
+                templateSelected: templateSelected,
+                fetchedTemplates,
+                translatedCoordinate: null,
+                navigation
+              }
+            }
+            return {
+              newTemplateName,
+              templateSelected: templateSelected,
+              fetchedTemplates,
+              translatedCoordinate: result,
+              navigation
+            }
+          })
+        )
       }),
-      map(([name,  templateSelected]) => name),
-      withLatestFrom(viewerState$.pipe(
-        select('fetchedTemplates')
-      )),
-      map(([name, availableTemplates]) => {
-        const newTemplateTobeSelected = availableTemplates.find(t => t.name === name)
+      filter(v => !!v),
+      map(({ newTemplateName, templateSelected, fetchedTemplates, translatedCoordinate, navigation }) => {
+        const newTemplateTobeSelected = fetchedTemplates.find(t => t.name === newTemplateName)
         if (!newTemplateTobeSelected) {
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
             payload: {
-              message: 'Selected template not found.'
-            }
+              message: 'Selected template not found.',
+            },
           }
         }
+
+        if (!translatedCoordinate) {
+          return {
+            type: NEWVIEWER,
+            selectTemplate: newTemplateTobeSelected,
+            selectParcellation: newTemplateTobeSelected.parcellations[0],
+          }
+        }
+        const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
+        const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
+
+        const { zoom = null, orientation = null } = navigation || {}
+        if (zoom) initNavigation.zoomFactor = zoom
+        if (orientation) initNavigation.pose.orientation = orientation
+
+        for (const idx of [0, 1, 2]) {
+          initNavigation.pose.position.voxelCoordinates[idx] = translatedCoordinate[idx] / initNavigation.pose.position.voxelSize[idx]
+        }
+
         return {
           type: NEWVIEWER,
-          selectTemplate: newTemplateTobeSelected,
-          selectParcellation: newTemplateTobeSelected.parcellations[0]
+          selectTemplate: deepCopiedState,
+          selectParcellation: newTemplateTobeSelected.parcellations[0],
         }
-      })
+      }),
     )
 
     this.doubleClickOnHierarchy$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY),
+      map(action => {
+        return {
+          ...action,
+          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION,
+        }
+      }),
+    )
+
+    this.navigateToRegion$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION),
       map(action => {
         const { payload = {} } = action as ViewerStateAction
         const { region } = payload
@@ -129,8 +222,8 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
             payload: {
-              message: `Go to region: region not defined`
-            }
+              message: `Go to region: region not defined`,
+            },
           }
         }
 
@@ -139,8 +232,8 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
             payload: {
-              message: `${region.name} - does not have a position defined`
-            }
+              message: `${region.name} - does not have a position defined`,
+            },
           }
         }
 
@@ -148,14 +241,24 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
           type: CHANGE_NAVIGATION,
           navigation: {
             position,
-            animation: {}
-          }
+            animation: {},
+          },
         }
-      })
+      }),
     )
 
     this.singleClickOnHierarchy$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY),
+      map(action => {
+        return {
+          ...action,
+          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT,
+        }
+      }),
+    )
+
+    this.toggleRegionSelection$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT),
       withLatestFrom(this.selectedRegions$),
       map(([action, regionsSelected]) => {
 
@@ -170,13 +273,13 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
           type: SELECT_REGIONS,
           selectRegions: selectAll
             ? regionsSelected.concat(flattenedRegion)
-            : regionsSelected.filter(r => !flattenedRegionNames.has(r.name))
+            : regionsSelected.filter(r => !flattenedRegionNames.has(r.name)),
         }
-      })
+      }),
     )
   }
 
-  ngOnInit(){
+  public ngOnInit() {
     this.subscriptions.push(
       this.doubleClickOnHierarchy$.subscribe(({ region } = {}) => {
         const { position } = region
@@ -185,24 +288,24 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy{
             type: CHANGE_NAVIGATION,
             navigation: {
               position,
-              animation: {}
-            }
+              animation: {},
+            },
           })
         } else {
           this.uiService.showMessage(`${region.name} does not have a position defined`)
         }
-      })
+      }),
     )
   }
 
-  ngOnDestroy(){
-    while(this.subscriptions.length > 0) {
+  public ngOnDestroy() {
+    while (this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
   }
 }
 
-interface ViewerStateAction extends Action{
+interface ViewerStateAction extends Action {
   payload: any
   config: any
 }

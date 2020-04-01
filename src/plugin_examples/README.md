@@ -6,7 +6,7 @@ A plugin needs to contain three files.
 - script JS
 
 
-These files need to be served by GET requests over HTTP with appropriate CORS header. If your application requires a backend, it is strongly recommended to host these three files with your backend. 
+These files need to be served by GET requests over HTTP with appropriate CORS header. 
 
 ---
 
@@ -27,11 +27,16 @@ The manifest JSON file describes the metadata associated with the plugin.
     }
   },
   "initStateUrl": "http://LINK-TO-PLUGIN-STATE",
-  "persistency": false
+  "persistency": false,
+
+  "description": "Human readable description of the plugin.",
+  "desc": "Same as description. If both present, description takes more priority.",
+  "homepage": "https://HOMEPAGE-URL-TO-YOUR-PLUGIN/doc.html",
+  "authors": "Author <author@example.com>, Author2 <author2@example.org>"
 }
 ```
 *NB* 
-- Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME**. 
+- Plugin name must be unique globally. To prevent plugin name clashing, please adhere to the convention of naming your package **AFFILIATION.AUTHORNAME.PACKAGENAME\[.VERSION\]**. 
 - the `initState` object and `initStateUrl` will be available prior to the evaluation of `script.js`, and will populate the objects `interactiveViewer.pluginControl[MANIFEST.name].initState` and `interactiveViewer.pluginControl[MANIFEST.name].initStateUrl` respectively. 
 
 ---
@@ -109,5 +114,5 @@ The script will always be appended **after** the rendering of the template.
 - for every observable subscription, call *unsubscribe()* in the *onShutdown* callback
 - some frameworks such as *jquery2*, *jquery3*, *react/reactdom* and *webcomponents* can be loaded via *interactiveViewer.pluinControl.loadExternalLibraries([LIBRARY_NAME_1, LIBRARY_NAME_2])*. if the libraries are loaded, remember to hook *interactiveViewer.pluginControl.unloadExternalLibraries([LIBRARY_NAME_1,LIBRARY_NAME_2])* in the *onShutdown* callback
 - when/if using webcomponents, please be aware that the `connectedCallback()` and `disconnectedCallback()` will be called everytime user toggle between *floating* and *docked* modes. 
-- when user navigate to a new template all existing widgets will be destroyed, unless the `persistency` is set to `true` in `mannifest.json`.
+- when user navigate to a new template all existing widgets will be destroyed, unless the `persistency` is set to `true` in `manifest.json`.
 - for a list of APIs, see [plugin_api.md](plugin_api.md)

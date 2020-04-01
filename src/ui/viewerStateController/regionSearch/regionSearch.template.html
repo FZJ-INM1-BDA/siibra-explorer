@@ -8,6 +8,7 @@
         #trigger="matAutocompleteTrigger"
         type="text"
         matInput
+        [attr.aria-label]="ariaLabel"
         [formControl]="formControl"
         [matAutocomplete]="auto">
     </mat-form-field>
@@ -23,34 +24,14 @@
         *ngFor="let region of autocompleteList$ | async"
         [value]="region.labelIndexId">
 
-        <div class="d-flex flex-row">
+        <simple-region
+          #simpleRegion
+          (click)="simpleRegion.toggleRegionSelected()"
+          iav-stop="click"
+          [region]="region"
+          [isSelected]="regionsSelected$ | async | includes : region : compareFn">
 
-          <small class="text-truncate flex-shrink-1 flex-grow-1">
-            {{ region.name }}
-          </small>
-  
-          <div class="flex-grow-0 flex-shrink-0 d-flex flex-row">
-
-            <!-- if has position defined -->
-            <button *ngIf="region.position"
-              iav-stop="click"
-              (click)="navigateTo(region.position)"
-              mat-icon-button>
-              <i class="fas fa-map-marked-alt"></i>
-            </button>
-
-            <!-- region selected  -->
-            <button mat-icon-button
-              iav-stop="click"
-              (click)="toggleRegionWithId(region.labelIndexId, selectedRegionLabelIndexSet.has(region.labelIndexId))"
-              [color]="selectedRegionLabelIndexSet.has(region.labelIndexId) ? 'primary' : 'basic'">
-              <i class="far"
-                [ngClass]="{'fa-check-square': selectedRegionLabelIndexSet.has(region.labelIndexId), 'fa-square': !selectedRegionLabelIndexSet.has(region.labelIndexId)}">
-              </i>
-            </button>
-          </div>
-      
-        </div>
+        </simple-region>
       </mat-option>
     </mat-autocomplete>
   </form>

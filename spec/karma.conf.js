@@ -6,6 +6,11 @@ const webpackTest = require('../webpack.test')
 const webpackConfig = require('../webpack.dev')
 const fullWebpack = merge(webpackTest, webpackConfig)
 
+const singleRun = process.env.NODE_ENV === 'test'
+const browsers = process.env.NODE_ENV === 'test'
+  ? ['ChromeHeadless']
+  : ['Chrome']
+
 module.exports = function(config) {
   config.set({
 
@@ -20,7 +25,27 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      './spec/test.ts'
+      './spec/test.ts',
+      {
+        pattern: 'node_modules/bootstrap/dist/css/bootstrap.min.css',
+        served: true,
+        included: true
+      },
+      {
+        pattern: 'node_modules/@angular/material/prebuilt-themes/indigo-pink.css',
+        served: true,
+        included: true
+      },
+      {
+        pattern: './src/util/worker.js',
+        served: true,
+        included: false
+      },
+      {
+        pattern: './src/res/css/extra_styles.css',
+        served: true,
+        included: true
+      }
     ],
 
 
@@ -62,12 +87,12 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers,
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun,
 
     // Concurrency level
     // how many browser should be started simultaneous

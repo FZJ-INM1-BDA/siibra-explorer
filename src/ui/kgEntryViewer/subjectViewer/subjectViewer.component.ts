@@ -1,36 +1,36 @@
-import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
+import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
 
 @Component({
   selector : 'kg-entry-viewer-subject-viewer',
   templateUrl : './subjectViewer.template.html',
   styleUrls : ['./subjectViewer.style.css'],
-  changeDetection : ChangeDetectionStrategy.OnPush
+  changeDetection : ChangeDetectionStrategy.OnPush,
 })
 
-export class SubjectViewer{
-  @Input() subjects: any = []
+export class SubjectViewer {
+  @Input() public subjects: any = []
 
-  get isSingle():boolean{
+  get isSingle(): boolean {
     return this.subjects.constructor !== Array
   }
 
-  get species():string[]{
+  get species(): string[] {
     return this.isSingle
       ? [this.subjects.children.species.value]
-      : this.subjects.reduce((acc:string[],curr:any) => 
+      : this.subjects.reduce((acc: string[], curr: any) =>
         acc.findIndex(species => species === curr.children.species.value) >= 0
           ? acc
           : acc.concat(curr.children.species.value)
       , [])
   }
 
-  get groupBySex(){
+  get groupBySex() {
     return this.isSingle
       ? [{
-          name : this.subjects.children.sex.value,
-          count : 1
-        }]
-      : this.subjects.reduce((acc:any[],curr) => 
+        name : this.subjects.children.sex.value,
+        count : 1,
+      }]
+      : this.subjects.reduce((acc: any[], curr) =>
         acc.findIndex(item => item.name === curr.children.sex.value) >= 0
           ? acc.map(item => item.name === curr.children.sex.value
             ? Object.assign({}, item, { count: item.count + 1 })

@@ -1,20 +1,20 @@
 import { Directive, ElementRef, Renderer2 } from "@angular/core";
 
 @Directive({
-  selector : 'a[download]'
+  selector : 'a[download]',
 })
 
-export class DownloadDirective{
+export class DownloadDirective {
 
-  public downloadIcon:HTMLElement
+  public downloadIcon: HTMLElement
 
-  constructor(public el:ElementRef, public rd2:Renderer2){
+  constructor(public el: ElementRef, public rd2: Renderer2) {
     this.downloadIcon = rd2.createElement('i')
     rd2.addClass(this.downloadIcon, 'fas')
     rd2.addClass(this.downloadIcon, 'fa-download-alt')
   }
 
-  ngAfterViewInit(){
+  public ngAfterViewInit() {
     this.rd2.appendChild(this.el.nativeElement, this.downloadIcon)
   }
 }

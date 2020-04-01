@@ -1,6 +1,6 @@
-import {EventEmitter, Component, Input, Output, ChangeDetectionStrategy, ViewChild, AfterViewChecked} from "@angular/core";
-import { FlattenedTreeInterface } from "./flattener.pipe";
 import {CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
+import {AfterViewChecked, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild} from "@angular/core";
+import { IFlattenedTreeInterface } from "./flattener.pipe";
 
 /**
  * TODO to be replaced by virtual scrolling when ivy is in stable
@@ -10,44 +10,44 @@ import {CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
   selector : 'flat-tree-component',
   templateUrl : './flatTree.template.html',
   styleUrls : [
-    './flatTree.style.css'
+    './flatTree.style.css',
   ],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class FlatTreeComponent implements AfterViewChecked {
-  @Input() inputItem : any = {
+  @Input() public inputItem: any = {
     name : 'Untitled',
-    children : []
+    children : [],
   }
-  @Input() childrenExpanded : boolean = true
+  @Input() public childrenExpanded: boolean = true
 
-  @Input() useDefaultList: boolean = false
+  @Input() public useDefaultList: boolean = false
 
-  @Output() treeNodeClick : EventEmitter<any> = new EventEmitter()
+  @Output() public treeNodeClick: EventEmitter<any> = new EventEmitter()
 
   /* highly non-performant. rerenders each time on mouseover or mouseout */
   // @Output() treeNodeEnter : EventEmitter<any> = new EventEmitter()
   // @Output() treeNodeLeave : EventEmitter<any> = new EventEmitter()
 
-  @Input() renderNode : (item:any)=>string = (item)=>item.name
-  @Input() findChildren : (item:any)=>any[] = (item)=>item.children ? item.children : [] 
-  @Input() searchFilter : (item:any)=>boolean | null = ()=>true
+  @Input() public renderNode: (item: any) => string = (item) => item.name
+  @Input() public findChildren: (item: any) => any[] = (item) => item.children ? item.children : []
+  @Input() public searchFilter: (item: any) => boolean | null = () => true
 
-  @ViewChild('flatTreeVirtualScrollViewPort') virtualScrollViewPort: CdkVirtualScrollViewport
-  @Output() totalRenderedListChanged = new EventEmitter<{ previous: number, current: number }>()
+  @ViewChild('flatTreeVirtualScrollViewPort') public virtualScrollViewPort: CdkVirtualScrollViewport
+  @Output() public totalRenderedListChanged = new EventEmitter<{ previous: number, current: number }>()
   private totalDataLength: number = null
 
-  public flattenedItems : any[] = []
+  public flattenedItems: any[] = []
 
-  getClass(level:number){
-    return [...Array(level+1)].map((v,idx) => `render-node-level-${idx}`).join(' ')
+  public getClass(level: number) {
+    return [...Array(level + 1)].map((v, idx) => `render-node-level-${idx}`).join(' ')
   }
 
-  collapsedLevels: Set<string> = new Set()
-  uncollapsedLevels : Set<string> = new Set()
+  public collapsedLevels: Set<string> = new Set()
+  public uncollapsedLevels: Set<string> = new Set()
 
-  ngAfterViewChecked(){
+  public ngAfterViewChecked() {
     /**
      * if useDefaultList is true, virtualscrollViewPort will be undefined
      */
@@ -59,12 +59,12 @@ export class FlatTreeComponent implements AfterViewChecked {
 
     this.totalRenderedListChanged.emit({
       current: currentTotalDataLength,
-      previous: previousDataLength
+      previous: previousDataLength,
     })
     this.totalDataLength = currentTotalDataLength
   }
 
-  toggleCollapse(flattenedItem:FlattenedTreeInterface){
+  public toggleCollapse(flattenedItem: IFlattenedTreeInterface) {
     if (this.isCollapsed(flattenedItem)) {
       this.collapsedLevels.delete(flattenedItem.lvlId)
       this.uncollapsedLevels.add(flattenedItem.lvlId)
@@ -76,32 +76,32 @@ export class FlatTreeComponent implements AfterViewChecked {
     this.uncollapsedLevels = new Set(this.uncollapsedLevels)
   }
 
-  isCollapsed(flattenedItem:FlattenedTreeInterface):boolean{
+  public isCollapsed(flattenedItem: IFlattenedTreeInterface): boolean {
     return this.isCollapsedById(flattenedItem.lvlId)
   }
 
-  isCollapsedById(id:string):boolean{
-    return this.collapsedLevels.has(id) 
+  public isCollapsedById(id: string): boolean {
+    return this.collapsedLevels.has(id)
       ? true
       : this.uncollapsedLevels.has(id)
         ? false
         : !this.childrenExpanded
   }
 
-  collapseRow(flattenedItem:FlattenedTreeInterface):boolean{
+  public collapseRow(flattenedItem: IFlattenedTreeInterface): boolean {
     return flattenedItem.lvlId.split('_')
-      .filter((v,idx,arr) => idx < arr.length -1 )
-      .reduce((acc,curr) => acc
-        .concat(acc.length === 0 
-          ? curr 
-          : acc[acc.length -1].concat(`_${curr}`)), [])
+      .filter((v, idx, arr) => idx < arr.length - 1 )
+      .reduce((acc, curr) => acc
+        .concat(acc.length === 0
+          ? curr
+          : acc[acc.length - 1].concat(`_${curr}`)), [])
       .some(id => this.isCollapsedById(id))
   }
 
-  handleTreeNodeClick(event:MouseEvent, inputItem: any){
+  public handleTreeNodeClick(event: MouseEvent, inputItem: any) {
     this.treeNodeClick.emit({
       event,
-      inputItem
+      inputItem,
     })
   }
 }

@@ -1,38 +1,46 @@
-import { EventEmitter, Component, ElementRef, ViewChild, HostListener, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, Input, Output, AfterViewInit } from "@angular/core";
-import {  Subscription, Subject, fromEvent } from "rxjs";
-import { buffer, debounceTime, tap } from "rxjs/operators";
-import { FilterNameBySearch } from "./filterNameBySearch.pipe";
+import { AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from "@angular/core";
+import { fromEvent, Subject, Subscription } from "rxjs";
+import { buffer, debounceTime } from "rxjs/operators";
 import { generateLabelIndexId } from "src/services/stateStore.service";
+import { FilterNameBySearch } from "./filterNameBySearch.pipe";
 
-const insertHighlight :(name:string, searchTerm:string) => string = (name:string, searchTerm:string = '') => {
+const insertHighlight: (name: string, searchTerm: string) => string = (name: string, searchTerm: string = '') => {
   const regex = new RegExp(searchTerm, 'gi')
   return searchTerm === '' ?
     name :
     name.replace(regex, (s) => `<span class = "highlight">${s}</span>`)
 }
 
-const getDisplayTreeNode : (searchTerm:string, selectedRegions:any[]) => (item:any) => string = (searchTerm:string = '', selectedRegions:any[] = []) => ({ ngId, name, status, labelIndex }) =>  {
+const getDisplayTreeNode: (searchTerm: string, selectedRegions: any[]) => (item: any) => string = (searchTerm: string = '', selectedRegions: any[] = []) => ({ ngId, name, status, labelIndex }) =>  {
   return !!labelIndex
     && !!ngId
     && selectedRegions.findIndex(re =>
-      generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex })
+      generateLabelIndexId({ labelIndex: re.labelIndex, ngId: re.ngId }) === generateLabelIndexId({ ngId, labelIndex }),
     ) >= 0
-      ? `<span class="cursor-default regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
-      : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+    ? `<span class="cursor-default regionSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
+    : `<span class="cursor-default regionNotSelected">${insertHighlight(name, searchTerm)}</span>` + (status ? ` <span class="text-muted">(${insertHighlight(status, searchTerm)})</span>` : ``)
 }
 
-const getFilterTreeBySearch = (pipe:FilterNameBySearch, searchTerm:string) => (node:any) => pipe.transform([node.name, node.status], searchTerm)
+const getFilterTreeBySearch = (pipe: FilterNameBySearch, searchTerm: string) =>
+  (node: any) => {
+    const searchFields = [
+      node.name,
+      node.status,
+      ...(node.relatedAreas ? node.relatedAreas : [])
+    ]
+    return pipe.transform(searchFields, searchTerm)
+  }
 
 @Component({
   selector: 'region-hierarchy',
   templateUrl: './regionHierarchy.template.html',
   styleUrls: [
-    './regionHierarchy.style.css'
+    './regionHierarchy.style.css',
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class RegionHierarchy implements OnInit, AfterViewInit{
+export class RegionHierarchy implements OnInit, AfterViewInit {
 
   @Input()
   public useMobileUI: boolean = false
@@ -68,21 +76,21 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   /**
    * set the height to max, bound by max-height
    */
-  numTotalRenderedRegions: number = 999
-  windowHeight: number
+  public numTotalRenderedRegions: number = 999
+  public windowHeight: number
 
   @HostListener('document:click', ['$event'])
-  closeRegion(event: MouseEvent) {
+  public closeRegion(event: MouseEvent) {
     const contains = this.el.nativeElement.contains(event.target)
     this.showRegionTree = contains
-    if (!this.showRegionTree){
+    if (!this.showRegionTree) {
       this.searchTerm = ''
       this.numTotalRenderedRegions = 999
     }
   }
 
   @HostListener('window:resize', ['$event'])
-  onResize(event) {
+  public onResize(event) {
     this.windowHeight = event.target.innerHeight;
   }
 
@@ -91,38 +99,38 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 
   constructor(
-    private cdr:ChangeDetectorRef,
-    private el:ElementRef
-  ){
+    private cdr: ChangeDetectorRef,
+    private el: ElementRef,
+  ) {
     this.windowHeight = window.innerHeight;
   }
 
-  ngOnChanges(){
+  public ngOnChanges() {
     if (this.parcellationSelected) {
       this.placeHolderText = `Search region in ${this.parcellationSelected.name}`
       this.aggregatedRegionTree = {
         name: this.parcellationSelected.name,
-        children: this.parcellationSelected.regions
+        children: this.parcellationSelected.regions,
       }
     }
     this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
   }
 
-  clearRegions(event:MouseEvent){
+  public clearRegions(event: MouseEvent) {
     this.clearAllRegions.emit(event)
   }
 
-  get showRegionTree(){
+  get showRegionTree() {
     return this._showRegionTree
   }
 
-  set showRegionTree(flag: boolean){
+  set showRegionTree(flag: boolean) {
     this._showRegionTree = flag
     this.showRegionFlagChanged.emit(this._showRegionTree)
   }
 
-  ngOnInit(){
+  public ngOnInit() {
     this.displayTreeNode = getDisplayTreeNode(this.searchTerm, this.selectedRegions)
     this.filterTreeBySearch = getFilterTreeBySearch(this.filterNameBySearchPipe, this.searchTerm)
 
@@ -130,47 +138,47 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
       this.handleRegionTreeClickSubject.pipe(
         buffer(
           this.handleRegionTreeClickSubject.pipe(
-            debounceTime(200)
-          )
-        )
-      ).subscribe(arr => arr.length > 1 ? this.doubleClick(arr[0]) : this.singleClick(arr[0]))
+            debounceTime(200),
+          ),
+        ),
+      ).subscribe(arr => arr.length > 1 ? this.doubleClick(arr[0]) : this.singleClick(arr[0])),
     )
   }
 
-  ngAfterViewInit(){
+  public ngAfterViewInit() {
     this.subscriptions.push(
       fromEvent(this.searchTermInput.nativeElement, 'input').pipe(
-        debounceTime(200)
+        debounceTime(200),
       ).subscribe(ev => {
         this.changeSearchTerm(ev)
-      })
+      }),
     )
   }
 
-  escape(event:KeyboardEvent){
+  public escape(event: KeyboardEvent) {
     this.showRegionTree = false
     this.searchTerm = '';
     (event.target as HTMLInputElement).blur()
 
   }
 
-  handleTotalRenderedListChanged(changeEvent: {previous: number, current: number}){
+  public handleTotalRenderedListChanged(changeEvent: {previous: number, current: number}) {
     const { current } = changeEvent
     this.numTotalRenderedRegions = current
   }
 
-  regionHierarchyHeight(){
+  public regionHierarchyHeight() {
     return({
       'height' : (this.numTotalRenderedRegions * 15 + 60).toString() + 'px',
-      'max-height': (this.windowHeight - 100) + 'px'
+      'max-height': (this.windowHeight - 100) + 'px',
     })
   }
 
   /* NB need to bind two way data binding like this. Or else, on searchInput blur, the flat tree will be rebuilt,
     resulting in first click to be ignored */
 
-  changeSearchTerm(event: any) {
-    if (event.target.value === this.searchTerm) return
+  public changeSearchTerm(event: any) {
+    if (event.target.value === this.searchTerm) { return }
     this.searchTerm = event.target.value
     this.ngOnChanges()
     this.cdr.markForCheck()
@@ -178,7 +186,7 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
 
   private handleRegionTreeClickSubject: Subject<any> = new Subject()
 
-  handleClickRegion(obj: any) {
+  public handleClickRegion(obj: any) {
     const {event} = obj
     /**
      * TODO figure out why @closeRegion gets triggered, but also, contains returns false
@@ -191,26 +199,28 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
 
   /* single click selects/deselects region(s) */
   private singleClick(obj: any) {
-    if (!obj) return
+    if (!obj) { return }
     const { inputItem : region } = obj
-    if (!region) return
+    if (!region) { return }
     this.singleClickRegion.emit(region)
   }
 
   /* double click navigate to the interested area */
   private doubleClick(obj: any) {
-    if (!obj)
+    if (!obj) {
       return
+    }
     const { inputItem : region } = obj
-    if (!region)
+    if (!region) {
       return
+    }
     this.doubleClickRegion.emit(region)
   }
 
-  public displayTreeNode: (item:any) => string
+  public displayTreeNode: (item: any) => string
 
   private filterNameBySearchPipe = new FilterNameBySearch()
-  public filterTreeBySearch: (node:any) => boolean 
+  public filterTreeBySearch: (node: any) => boolean
 
   public aggregatedRegionTree: any
 
@@ -223,6 +233,6 @@ export class RegionHierarchy implements OnInit, AfterViewInit{
   }
 }
 
-export function trackRegionBy(index: number, region: any){
+export function trackRegionBy(index: number, region: any) {
   return region.labelIndex || region.id
 }

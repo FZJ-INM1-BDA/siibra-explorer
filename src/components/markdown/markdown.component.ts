@@ -1,35 +1,41 @@
-import { Component, OnChanges, Input, ChangeDetectionStrategy, ViewChild, ElementRef, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, ElementRef, Input, ViewChild, ChangeDetectorRef, AfterViewChecked } from '@angular/core'
 import * as showdown from 'showdown'
 
 @Component({
   selector : 'markdown-dom',
   templateUrl : `./markdown.template.html`,
   styleUrls : [
-    `./markdown.style.css`
+    `./markdown.style.css`,
   ],
-  changeDetection : ChangeDetectionStrategy.OnPush
+  changeDetection : ChangeDetectionStrategy.OnPush,
 })
 
-export class MarkdownDom implements OnChanges,OnInit{
+export class MarkdownDom implements AfterViewChecked {
 
-  @Input() markdown : string = ``
-  public innerHtml : string = ``
+  @Input() public markdown: string = ``
+  public innerHtml: string = ``
   private converter = new showdown.Converter()
 
-  constructor(){
+  constructor(
+    private cdr: ChangeDetectorRef
+  ) {
     this.converter.setFlavor('github')
   }
 
-  ngOnChanges(){
-    this.innerHtml = this.converter.makeHtml(this.markdown)
+  private getMarkdown(){
+    if (this.markdown) return this.markdown
+    if (this.contentWrapper.nativeElement.innerHTML.replace(/\w|\n/g, '') !== '') return this.contentWrapper.nativeElement.innerHTML
+    return ''
   }
 
-  ngOnInit(){
-    if(this.contentWrapper.nativeElement.innerHTML.replace(/\w|\n/g,'') !== '')
-      this.innerHtml = this.converter.makeHtml(this.contentWrapper.nativeElement.innerHTML)
+  public ngAfterViewChecked(){
+    this.innerHtml = this.converter.makeHtml(
+      this.getMarkdown()
+    )
+    this.cdr.detectChanges()
   }
 
-  @ViewChild('ngContentWrapper', {read : ElementRef})
-  contentWrapper : ElementRef
+  @ViewChild('ngContentWrapper', {read : ElementRef, static: true})
+  public contentWrapper: ElementRef
 
 }

@@ -1,2 +1,3 @@
 require('../auth/util.spec')
-require('../compression/index.spec')
+require('../datasets/query.spec')
+require('../datasets/util.spec')

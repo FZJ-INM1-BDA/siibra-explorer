@@ -1,67 +1,28 @@
 
 <!-- title -->
 <mat-card-subtitle>
-  {{ name }}
+  <span *ngIf="name; else nameLoading">
+    {{ name }}
+  </span>
+  <ng-template #nameLoading>
+    <div class="spinnerAnimationCircle"></div>
+  </ng-template>
 </mat-card-subtitle>
 
 <mat-card-content mat-dialog-content>
-  <mat-grid-list *ngIf="false" [cols]="kgReference.length + (preview ? 1 : 0) + (downloadEnabled ? 2 : 0)" rowHeight="4em">
-
-    <!-- explore -->
-    <mat-grid-tile *ngFor="let kgRef of kgReference">
-      <a [href]="kgRef | doiParserPipe"
-        matTooltip="Explore"
-        iav-stop="click mousedown"
-        mat-icon-button
-        target="_blank">
-        <i class="fas fa-external-link-alt"></i>
-      </a>
-    </mat-grid-tile>
-
-    <!-- pin -->
-    <mat-grid-tile *ngIf="downloadEnabled">
-
-      <button
-        iav-stop="click mousedown"
-        (click)="toggleFav()"
-        matTooltip="Pin"
-        mat-icon-button
-        [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
-        <i class="fas fa-thumbtack"></i>
-      </button>
-    </mat-grid-tile>
-
-    <!-- preview -->
-    <mat-grid-tile *ngIf="preview">
-      <button
-        iav-stop="click mousedown"
-        (click)="showPreviewList(previewFilesListTemplate)"
-        matTooltip="Preview"
-        mat-icon-button>
-        <i class="far fa-eye"></i>
-      </button>
-    </mat-grid-tile>
-
-    <!-- download -->
-    <mat-grid-tile *ngIf="downloadEnabled">
-      <a [href]="dlFromKgHref"
-        target="_blank"
-        iav-stop="click mousedown">
-        <button
-          matTooltip="Download"
-          [disabled]="downloadInProgress"
-          mat-icon-button>
-          <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-        </button>
-      </a>
-    </mat-grid-tile>
-  </mat-grid-list>
 
   <!-- description -->
   <small>
-    <markdown-dom class="d-block" [markdown]="description">
+    <markdown-dom
+      *ngIf="description; else descriptionLoading"
+      class="d-block"
+      [markdown]="description">
 
     </markdown-dom>
+
+    <ng-template #descriptionLoading>
+      <div class="d-inline-block spinnerAnimationCircle"></div>
+    </ng-template>
   </small>
 
   <!-- publications -->
@@ -97,19 +58,36 @@
   </a>
 
   <!-- pin data -->
-  <button mat-button
-    *ngIf="downloadEnabled"
-    iav-stop="click mousedown"
-    (click)="toggleFav()"
-    color="primary"
-    [color]="(favedDataentries$ | async | datasetIsFaved : dataset) ? 'primary' : 'basic'">
-    {{ (favedDataentries$ | async | datasetIsFaved : dataset) ? 'Unpin' : 'Pin' }} this dataset
-    <i class="fas fa-thumbtack"></i>
-  </button>
+  <ng-container *ngIf="downloadEnabled && kgId">
+
+    <!-- Is currently fav'ed -->
+    <ng-container *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else notCurrentlyFav">
+
+      <button mat-button
+        iav-stop="click mousedown"
+        (click)="undoableRemoveFav()"
+        color="primary">
+        Unpin this dataset
+        <i class="fas fa-thumbtack"></i>
+      </button>
+    </ng-container>
+
+    <!-- Is NOT currently fav'ed -->
+    <ng-template #notCurrentlyFav>
+      
+      <button mat-button
+        iav-stop="click mousedown"
+        (click)="undoableAddFav()"
+        color="default">
+        Pin this dataset
+        <i class="fas fa-thumbtack"></i>
+      </button>
+    </ng-template>
+  </ng-container>
 
 
   <!-- download -->
-  <a *ngIf="files.length > 0"
+  <a *ngIf="files && files.length > 0"
     [href]="dlFromKgHref"
     target="_blank">
     <button
@@ -125,9 +103,20 @@
     </button>
   </a>
 
+
+  <!-- check if has preview -->
+  <kg-dataset-list
+    class="d-none"
+    [backendUrl]="DS_PREVIEW_URL"
+    *ngIf="kgId"
+    (kgDsPrvUpdated)="handleKgDsPrvUpdate($event)"
+    [kgId]="kgId">
+
+  </kg-dataset-list>
+
   <button mat-button
     mat-dialog-close
-    *ngIf="preview"
+    *ngIf="hasPreview"
     (click)="showPreviewList(previewFilesListTemplate)"
     color="basic">
     <span>
@@ -135,13 +124,15 @@
     </span>
     <i class="ml-1 far fa-eye"></i>
   </button>
+
 </mat-card-actions>
 
 <mat-card-footer></mat-card-footer>
 
 <ng-template #previewFilesListTemplate>
-  <preview-component
-    (previewFile)="handlePreviewFile($event)"
-    [datasetName]="name">
-  </preview-component>
+  <dataset-preview-list
+    [kgId]="kgId"
+    (previewingFile)="handlePreviewFile($event)">
+
+  </dataset-preview-list>
 </ng-template>

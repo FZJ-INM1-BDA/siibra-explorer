@@ -1,42 +1,40 @@
 import { Injectable } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material";
-import { DialogComponent } from "src/components/dialog/dialog.component";
 import { ConfirmDialogComponent } from "src/components/confirmDialog/confirmDialog.component";
-
+import { DialogComponent } from "src/components/dialog/dialog.component";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
-export class DialogService{
+export class DialogService {
 
   private dialogRef: MatDialogRef<DialogComponent>
   private confirmDialogRef: MatDialogRef<ConfirmDialogComponent>
 
-  constructor(private dialog:MatDialog){
+  constructor(private dialog: MatDialog) {
 
   }
 
-  public getUserConfirm(config: Partial<DialogConfig> = {}): Promise<string>{
+  public getUserConfirm(config: Partial<DialogConfig> = {}): Promise<string> {
     this.confirmDialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: config
+      data: config,
     })
     return new Promise((resolve, reject) => this.confirmDialogRef.afterClosed()
       .subscribe(val => {
-        if (val) resolve()
-        else reject('User cancelled')
+        if (val) { resolve() } else { reject('User cancelled') }
       },
       reject,
       () => this.confirmDialogRef = null))
   }
 
-  public getUserInput(config: Partial<DialogConfig> = {}):Promise<string>{
+  public getUserInput(config: Partial<DialogConfig> = {}): Promise<string> {
     const {
       defaultValue = '',
       placeholder = 'Type your response here',
       title = 'Message',
       message = '',
-      iconClass
+      iconClass,
     } = config
     this.dialogRef = this.dialog.open(DialogComponent, {
       data: {
@@ -44,8 +42,8 @@ export class DialogService{
         placeholder,
         defaultValue,
         message,
-        iconClass
-      }
+        iconClass,
+      },
     })
     return new Promise((resolve, reject) => {
       /**
@@ -53,15 +51,14 @@ export class DialogService{
        * Should not result in leak
        */
       this.dialogRef.afterClosed().subscribe(value => {
-        if (value) resolve(value)
-        else reject('User cancelled input')
+        if (value) { resolve(value) } else { reject('User cancelled input') }
         this.dialogRef = null
       })
     })
   }
 }
 
-export interface DialogConfig{
+export interface DialogConfig {
   title: string
   placeholder: string
   defaultValue: string
