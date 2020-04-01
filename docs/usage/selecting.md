@@ -20,7 +20,6 @@ If an atlas is already loaded, the list of available templates and parcellations
 
 [![](images/bigbrain_parcellation_selector_open.png)](images/bigbrain_parcellation_selector_open.png)
 
-
 ### Information on the selected template / parcellation
 
 Information on the selected template or parcellation can be revealed by `hovering` or `tapping` the `info` button
@@ -54,6 +53,15 @@ To view the full hierarchy, `click` the _hierarchy tree_ button.
 [![](images/bigbrain_region_hierarchy.png)](images/bigbrain_region_hierarchy.png)
 
 [![](images/bigbrain_full_hierarchy.png)](images/bigbrain_full_hierarchy.png)
+
+### Explore the region in other reference templates
+If the parcellation region is available in multiple reference spaces, it is possible to explore them directly from the region context menu.
+
+Click on a parcellation region (coloured segment) to reveal the region context menu. If the region is available in multiple reference spaces, a `Change template` button will appear. Click on `Change template` button to expand available templates.
+
+[![](images/selecting_change_template_from_region.png)](images/selecting_change_template_from_region.png)
+
+In the popout menu, you can jump directly to the region in a different reference template by clicking the corresponding option.
 
 ## Selecting / Deselecting region(s)
 
