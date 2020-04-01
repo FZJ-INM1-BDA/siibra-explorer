@@ -13,7 +13,6 @@ import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';
 import { ConfirmDialogComponent } from './confirmDialog/confirmDialog.component';
 import { DialogComponent } from './dialog/dialog.component';
-import { DropdownComponent } from './dropdown/dropdown.component';
 import { AppendSiblingFlagPipe } from './flatTree/appendSiblingFlag.pipe';
 import { ClusteringPipe } from './flatTree/clustering.pipe';
 import { FilterCollapsePipe } from './flatTree/filterCollapse.pipe';
@@ -46,7 +45,6 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     /* components */
     MarkdownDom,
     ReadmoreComponent,
-    DropdownComponent,
     TreeComponent,
     PanelComponent,
     PaginationComponent,
@@ -79,7 +77,6 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
 
     MarkdownDom,
     ReadmoreComponent,
-    DropdownComponent,
     TreeComponent,
     PanelComponent,
     PaginationComponent,

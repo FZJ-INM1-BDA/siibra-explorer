@@ -6,17 +6,19 @@ on:
       - dev
 
 env:
-  DOCKER_IMAGE_NAME: interactive-viewer
+  DOCKER_IMAGE_NAME: gha-iav-image
   DOCKER_IMAGE_TAG: ${{ github.sha }}
   DOCKER_CONTAINER_NAME: gha-iav-built-${{ github.sha }}
   DOCKER_E2E_PPTR: gha-iav-e2e-pptr-${{ github.sha }}
-  DOCKER_E2E_NETWORK: gha-dkr-network-${{ github.sha }}
+  DOCKER_E2E_NETWORK: gha-dkr-network
   ATLAS_URL: http://gha-iav-built-${{ github.sha }}:3000/
+  CHROMIUM_VERSION: "80.0.3987.106"
+  PPTR_VERSION: "2.1.0"
 
 jobs:
   buildimage:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: self-hosted
-
     steps:
     - uses: actions/checkout@v1
     - name: Use Node.js ${{ matrix.node-version }}
@@ -28,11 +30,15 @@ jobs:
         docker build --build-arg BACKEND_URL=${BACKEND_URL} -t ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG} .
       env:
         BACKEND_URL: ${{ env.ATLAS_URL }}
-
   test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: self-hosted
     needs: buildimage
     steps:
+    - name: clean up previous 
+      run: |
+        GHA_CONTAINERS=$( docker ps | grep gha | awk '{print $1}' )
+        if [ -z "$GHA_CONTAINERS" ]; then for f in $GHA_CONTAINERS; do docker stop $f; done; fi
     - name: run docker image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} as container ${{ env.DOCKER_CONTAINER_NAME }}
       run: |
         docker run \
@@ -41,33 +47,35 @@ jobs:
           --env HBP_CLIENTID=${{ secrets.HBP_CLIENTID }} \
           --env HBP_CLIENTSECRET=${{ secrets.HBP_CLIENTSECRET }} \
           --env REFRESH_TOKEN=${{ secrets.REFRESH_TOKEN }} \
+          --env PLUGIN_URLS=${{ env.ATLAS_URL }}/res/plugin_examples/plugin1/manifest.json \
           -dit \
           ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}
-
     - uses: actions/checkout@v1
     - name: Start pptr docker container with name ${{ env.DOCKER_E2E_PPTR }}
       run: |
         docker run --rm \
+          -v /dev/shm:/dev/shm \
           --name ${DOCKER_E2E_PPTR} \
           -dt \
           puppeteer
         docker cp . ${DOCKER_E2E_PPTR}:/iav
         docker exec -u root ${DOCKER_E2E_PPTR} chown -R pptruser:pptruser /iav
         docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm i
-        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome latest
-        docker exec -t ${DOCKER_E2E_PPTR} npm i puppeteer
+        docker exec -t -w /iav ${DOCKER_E2E_PPTR} npm run wd -- update --versions.chrome=${{ env.CHROMIUM_VERSION }}
+        docker exec -t ${DOCKER_E2E_PPTR} npm i --no-save puppeteer@${{ env.PPTR_VERSION }}
     - name: Setup docker network
       run: |
-        docker network create ${{ env.DOCKER_E2E_NETWORK }}
         docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_E2E_PPTR }}
         docker network connect ${{ env.DOCKER_E2E_NETWORK }} ${{ env.DOCKER_CONTAINER_NAME }}
     - name: run pptr tests - ${{ env.ATLAS_URL }}
       run: |
         docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
-    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }}
+    - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
       if: success()
       run: |
         docker stop ${DOCKER_CONTAINER_NAME}
         docker stop ${DOCKER_E2E_PPTR}
-        docker network rm ${DOCKER_E2E_NETWORK}
+    - name: cleanup, remove image ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+      if: success()
+      run: |
         docker rmi ${DOCKER_IMAGE_NAME}:${DOCKER_IMAGE_TAG}

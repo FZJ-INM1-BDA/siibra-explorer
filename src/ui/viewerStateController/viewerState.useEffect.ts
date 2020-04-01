@@ -1,14 +1,15 @@
 import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
-import { Observable, Subscription } from "rxjs";
-import {distinctUntilChanged, filter, map, mergeMap, shareReplay, withLatestFrom} from "rxjs/operators";
+import { Observable, Subscription, of } from "rxjs";
+import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
 import { UIService } from "src/services/uiService.service";
 import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
 
 @Injectable({
   providedIn: 'root',
@@ -54,6 +55,10 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
   @Effect()
   public navigateToRegion$: Observable<any>
 
+
+  @Effect()
+  public onTemplateSelectClearStandAloneVolumes$: Observable<any>
+
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
@@ -69,6 +74,13 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
     this.selectedRegions$ = viewerState$.pipe(
       select('regionsSelected'),
       distinctUntilChanged(),
+    )
+
+    this.onTemplateSelectClearStandAloneVolumes$ = this.actions$.pipe(
+      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
+      mapTo({
+        type: CLEAR_STANDALONE_VOLUMES
+      })
     )
 
     this.selectParcellationWithName$ = this.actions$.pipe(
@@ -117,45 +129,45 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         return name
       }),
       filter(name => !!name),
-      withLatestFrom(viewerState$.pipe(
-        select('templateSelected'),
-      )),
-      filter(([name,  templateSelected]) => {
-        if (templateSelected && templateSelected.name === name) { return false }
-        return true
-      }),
       withLatestFrom(
-        viewerState$.pipe(
-          select('fetchedTemplates'),
-        ),
-        viewerState$.pipe(
-          select('navigation'),
-        ),
+        viewerState$
       ),
-      mergeMap(([[name, templateSelected], availableTemplates, navigation]) =>
-        this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, name, navigation.position)
-          .then(res => {
-            navigation.position = res
+      switchMap(([newTemplateName, { templateSelected, fetchedTemplates, navigation }]) => {
+        if (!templateSelected) {
+          return of({
+            newTemplateName,
+            templateSelected: templateSelected,
+            fetchedTemplates,
+            translatedCoordinate: null,
+            navigation
+          })
+        }
+        const position = (navigation && navigation.position) || [0, 0, 0]
+        if (newTemplateName === templateSelected.name) return of(null)
+        return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(
+          map(({ status, statusText, result }) => {
+            if (status === 'error') {
+              return {
+                newTemplateName,
+                templateSelected: templateSelected,
+                fetchedTemplates,
+                translatedCoordinate: null,
+                navigation
+              }
+            }
             return {
-              name: name,
+              newTemplateName,
               templateSelected: templateSelected,
-              availableTemplates: availableTemplates,
-              coordinates: res,
-              navigation: navigation
+              fetchedTemplates,
+              translatedCoordinate: result,
+              navigation
             }
           })
-          .catch(() => {
-            return {
-              name: name,
-              templateSelected: templateSelected,
-              availableTemplates: availableTemplates,
-              coordinates: null,
-              navigation: null
-            }
-          })
-      ),
-      map(({name, templateSelected, availableTemplates, coordinates, navigation}) => {
-        const newTemplateTobeSelected = availableTemplates.find(t => t.name === name)
+        )
+      }),
+      filter(v => !!v),
+      map(({ newTemplateName, templateSelected, fetchedTemplates, translatedCoordinate, navigation }) => {
+        const newTemplateTobeSelected = fetchedTemplates.find(t => t.name === newTemplateName)
         if (!newTemplateTobeSelected) {
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
@@ -165,19 +177,23 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
           }
         }
 
-        if (!coordinates && !navigation)
+        if (!translatedCoordinate) {
           return {
             type: NEWVIEWER,
             selectTemplate: newTemplateTobeSelected,
             selectParcellation: newTemplateTobeSelected.parcellations[0],
           }
-
+        }
         const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
         const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
 
-        initNavigation.zoomFactor = navigation.zoom
-        initNavigation.pose.position.voxelCoordinates = coordinates.map((c, i) => c/initNavigation.pose.position.voxelSize[i])
-        initNavigation.pose.orientation = navigation.orientation
+        const { zoom = null, orientation = null } = navigation || {}
+        if (zoom) initNavigation.zoomFactor = zoom
+        if (orientation) initNavigation.pose.orientation = orientation
+
+        for (const idx of [0, 1, 2]) {
+          initNavigation.pose.position.voxelCoordinates[idx] = translatedCoordinate[idx] / initNavigation.pose.position.voxelSize[idx]
+        }
 
         return {
           type: NEWVIEWER,

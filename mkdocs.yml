@@ -16,15 +16,18 @@ markdown_extensions:
 
 pages:
   - Home: 'index.md'
+  - System requirements: 'requirements.md'
   - User documentation:
-    - Getting started: 'usage/gettingStarted.md'
     - Selecting: 'usage/selecting.md'
     - Navigating: 'usage/navigating.md'
     - Searching: 'usage/search.md'
+    - Exploring connectivity: 'usage/connectivity.md'
+    - Miscellaneous: 'usage/misc.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'
     - Fetching datasets: 'advanced/datasets.md'
+    - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
     - v2.1.0: 'releases/v2.1.0.md'
     - v2.0.2: 'releases/v2.0.2.md'

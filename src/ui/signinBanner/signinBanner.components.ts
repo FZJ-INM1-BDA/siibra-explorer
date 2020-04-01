@@ -7,12 +7,13 @@ import {
   TemplateRef,
   ViewChild
 } from "@angular/core";
-import { MatBottomSheet, MatDialog, MatDialogRef } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService, IUser } from "src/services/auth.service";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatBottomSheet} from "@angular/material/bottom-sheet";
 
 @Component({
   selector: 'signin-banner',

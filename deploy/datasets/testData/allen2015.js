@@ -1,5 +1,115 @@
 module.exports = [
   {
+    "formats" : [],
+    "name" : "Neuropsin tetracycline-transactivator expression: horizontal sections (case 2877)",
+    "publications" : [
+       {
+          "cite" : "Lillehaug, S., Yetman, M.J., Puchades,M.A., Checinska, M.M., Kleven, H., Jankowsky, J.L., Bjaalie, J.G., Leergaard, T.B. (2019). Brain-wide distribution of reporter expression in five transgenic tetracycline-transactivator mouse lines. Scientific Data, 6, 190028.",
+          "name" : "Brain-wide distribution of reporter expression in five transgenic tetracycline-transactivator mouse lines",
+          "doi" : "10.1038/sdata.2019.28"
+       },
+       {
+          "doi" : "10.1007/s00429-015-1040-9",
+          "name" : "Transgene expression in the Nop-tTA driver line is not inherently restricted to the entorhinal cortex",
+          "cite" : "Yetman, M. J., Lillehaug, S., Bjaalie, J. G., Leergaard, T. B., & Jankowsky, J. L. (2015). Transgene expression in the Nop-tTA driver line is not inherently restricted to the entorhinal cortex. Brain Structure and Function, 221(4), 2231–2249. "
+       }
+    ],
+    "contributors" : [
+       "Jankowsky, Joanna L.",
+       "Leergaard, Trygve B.",
+       "Bjaalie, Jan G.",
+       "Lillehaug, Sveinung",
+       "Yetman, Michael J."
+    ],
+    "project" : [
+       "Transgene expression in tetracycline-transactivator driver lines"
+    ],
+    "methods" : [
+       "Immunohistochemistry",
+       "Reporter genes",
+       "Brightfield microscopy",
+       "Reporter proteins"
+    ],
+    "activity" : [
+       {
+          "preparation" : [
+             "Ex vivo"
+          ],
+          "protocols" : [
+             "Prss19",
+             "Kallikrein related-peptidase 8",
+             "Klk8-tTA",
+             "EC-tTA",
+             "tTA-EC",
+             "B6.Cg-Tg(Klk8-tTA)QMmay/MullMmmh",
+             "Neuropsin promoter",
+             "Atlas",
+             "Brain-wide",
+             "Tet-lacZ reporter",
+             "Double-transgenic",
+             "X-gal",
+             "histology",
+             "Reporter gene",
+             "Conditional model",
+             "Tet-off",
+             "Tetracycline transactivator protein",
+             "tTA",
+             "Nop-tTA",
+             "Nop"
+          ]
+       }
+    ],
+    "kgReference" : [
+       "10.25493/AYBB-BXV"
+    ],
+    "id" : "d56b1fe14bb84987a3a2340e21652b2d",
+    "custodians" : [
+       "Jankowsky, Joanna L."
+    ],
+    "parcellationRegion" : [
+       {
+          "species" : [],
+          "name" : "Mouse Whole brain (v3 2015)",
+          "alias" : "Whole brain",
+          "fullId" : "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/2bdfac7a-b38c-4c55-9843-0b56cb90bb67"
+       }
+    ],
+    "license" : [],
+    "embargoStatus" : [
+       "Free"
+    ],
+    "species" : [
+       "Mus musculus"
+    ],
+    "licenseInfo" : [
+       {
+          "url" : "https://creativecommons.org/licenses/by/4.0/",
+          "name" : "Creative Commons Attribution 4.0 International"
+       }
+    ],
+    "datasetDOI" : [
+       {
+          "doi" : "10.1038/sdata.2019.28",
+          "cite" : "Lillehaug, S., Yetman, M.J., Puchades,M.A., Checinska, M.M., Kleven, H., Jankowsky, J.L., Bjaalie, J.G., Leergaard, T.B. (2019). Brain-wide distribution of reporter expression in five transgenic tetracycline-transactivator mouse lines. Scientific Data, 6, 190028."
+       },
+       {
+          "cite" : "Yetman, M. J., Lillehaug, S., Bjaalie, J. G., Leergaard, T. B., & Jankowsky, J. L. (2015). Transgene expression in the Nop-tTA driver line is not inherently restricted to the entorhinal cortex. Brain Structure and Function, 221(4), 2231–2249. ",
+          "doi" : "10.1007/s00429-015-1040-9"
+       }
+    ],
+    "description" : "Bright-field microscopy images of serial horizontal brain sections showing neuropsin (Nop) promoter expression in a bigenic Nop-tetracycline-transactivator (tTA) mouse brain (case 2877, adult male), using a driver-reporter construct in which the Nop-tTA promoter regulates the expression of the E. coli derived LacZ reporter gene encoding β-galactosidase, which is visualized histologically using X-gal (5-Bromo-4-chloro-3-indolyl β-d-galactopyranoside) as a substrate. Methodological details are provided in Yetman et al., Brain Struct Funct 221:2231-49, 2016. Our data show that the Nop-tTA promoter mainly is expressed in the entorhinal cortex, but also in several other cortical regions.",
+    "referenceSpaces" : [],
+    "parcellationAtlas" : [
+       {
+          "id" : "39a1384b-8413-4d27-af8d-22432225401f",
+          "name" : "Allen Mouse Common Coordinate Framework v3 2015",
+          "fullId" : "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f"
+       }
+    ],
+    "fullId" : "https://nexus.humanbrainproject.org/v0/data/minds/core/dataset/v1.0.0/82a9c981-0ba0-4a5a-9bbc-a3b74c568f5b",
+    "files" : []
+  },
+  {
     "formats": [],
     "datasetDOI": [],
     "activity": [

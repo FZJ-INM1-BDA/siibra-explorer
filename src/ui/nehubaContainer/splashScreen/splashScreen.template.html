@@ -24,7 +24,7 @@
         {{ template.properties.description }}
       </mat-card-content>
 
-      <mat-card-content>
+      <mat-card-content class="available-parcellations-container">
         <mat-card-subtitle class="text-nowrap">
           Parcellations available
         </mat-card-subtitle>
@@ -43,5 +43,12 @@
       <mat-card-footer>
       </mat-card-footer>
     </mat-card>
+    <ng-container *ngIf="stillLoadingTemplates$ | async as stillLoadingTemplates">
+      <div class="d-flex align-items-center p-4" *ngFor="let t of stillLoadingTemplates">
+        <h1 class="mat-h1">
+          <div class="spinnerAnimationCircle"></div>
+        </h1>
+      </div>
+    </ng-container>
   </div>
 </div>

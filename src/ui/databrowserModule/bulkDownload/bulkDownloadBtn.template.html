@@ -1,0 +1,20 @@
+<form [action]="postUrl"
+  method="POST"
+  target="_blank"
+  #bulkDlForm>
+  <input
+    hidden
+    [value]="stringifiedKgIds"
+    type="text"
+    name="kgIds"
+    id="kgIds"
+    readonly="readonly">
+
+    <button mat-icon-button
+      [attr.aria-label]="ariaLabel"
+      [ngClass]="{'text-muted': kgIds.length === 0}"
+      [matTooltip]="kgIds.length === 0 ? 'No favourite datasets to download' : 'Bulk download all favourited datasets'"
+      (click)="kgIds.length === 0 ? null : bulkDlForm.submit()">
+      <i class="fas fa-download"></i>
+    </button>
+</form>

@@ -1,5 +1,6 @@
-<ng-template #container>
-</ng-template>
+<div iav-nehuba-viewer-container
+  (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+</div>
 
 <ui-splashscreen iav-stop="mousedown mouseup touchstart touchmove touchend" *ngIf="!viewerLoaded">
 </ui-splashscreen>
@@ -27,7 +28,7 @@
   <!-- StatusCard container-->
   <ui-status-card
     *ngIf="!(useMobileUI$ | async)"
-    [selectedTemplateName]="selectedTemplate.name"
+    [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
     [isMobile]="useMobileUI$ | async"
     [nehubaViewer]="nehubaViewer">
   </ui-status-card>

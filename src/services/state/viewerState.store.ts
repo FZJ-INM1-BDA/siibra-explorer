@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { Action, select, Store } from '@ngrx/store'
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, filter, map, shareReplay, startWith, withLatestFrom } from 'rxjs/operators';
+import { distinctUntilChanged, filter, map, shareReplay, startWith, withLatestFrom, mapTo } from 'rxjs/operators';
 import { IUserLandmark } from 'src/atlasViewer/atlasViewer.apiService.service';
 import { INgLayerInterface } from 'src/atlasViewer/atlasViewer.component';
 import { getViewer } from 'src/util/fn';
-import { LoggingService } from '../logging.service';
+import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
-import { MOUSEOVER_USER_LANDMARK } from './uiState.store';
+import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -26,6 +26,8 @@ export interface StateInterface {
 
   loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
+
+  standaloneVolumes: any[]
 }
 
 export interface ActionInterface extends Action {
@@ -62,6 +64,8 @@ export const defaultState: StateInterface = {
   parcellationSelected: null,
   templateSelected: null,
   connectivityRegion: '',
+
+  standaloneVolumes: []
 }
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: Partial<StateInterface> = state, action: ActionInterface) => {
@@ -85,6 +89,11 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
         ? prevState.dedicatedView.filter(dv => dv !== action.dedicatedView)
         : [],
     }
+  case CLEAR_STANDALONE_VOLUMES:
+    return {
+      ...prevState,
+      standaloneVolumes: []
+    }
   case NEWVIEWER: {
 
     const { selectParcellation: parcellation } = action
@@ -94,8 +103,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       parcellationSelected : parcellation,
       // taken care of by effect.ts
       // regionsSelected : [],
-      landmarksSelected : [],
-      // navigation : {},
+
+      // taken care of by effect.ts
+      // landmarksSelected : [],
+      navigation : action.navigation,
       dedicatedView : null,
     }
   }
@@ -222,6 +233,7 @@ export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
+export const CLEAR_STANDALONE_VOLUMES = `CLEAR_STANDALONE_VOLUMES`
 
 @Injectable({
   providedIn: 'root',
@@ -233,8 +245,12 @@ export class ViewerStateUseEffect {
     private store$: Store<IavRootStoreInterface>,
     private log: LoggingService,
   ) {
-    this.currentLandmarks$ = this.store$.pipe(
+
+    const viewerState$ = this.store$.pipe(
       select('viewerState'),
+      shareReplay(1)
+    )
+    this.currentLandmarks$ = viewerState$.pipe(
       select('userLandmarks'),
       shareReplay(1),
     )
@@ -329,8 +345,7 @@ export class ViewerStateUseEffect {
 
     this.doubleClickOnViewerToggleRegions$ = doubleClickOnViewer$.pipe(
       filter(({ segments }) => segments && segments.length > 0),
-      withLatestFrom(this.store$.pipe(
-        select('viewerState'),
+      withLatestFrom(viewerState$.pipe(
         select('regionsSelected'),
         distinctUntilChanged(),
         startWith([]),
@@ -354,8 +369,7 @@ export class ViewerStateUseEffect {
 
     this.doubleClickOnViewerToggleLandmark$ = doubleClickOnViewer$.pipe(
       filter(({ landmark }) => !!landmark),
-      withLatestFrom(this.store$.pipe(
-        select('viewerState'),
+      withLatestFrom(viewerState$.pipe(
         select('landmarksSelected'),
         startWith([]),
       )),
@@ -377,9 +391,20 @@ export class ViewerStateUseEffect {
     this.doubleClickOnViewerToogleUserLandmark$ = doubleClickOnViewer$.pipe(
       filter(({ userLandmark }) => userLandmark),
     )
+
+    this.onStandAloneVolumesExistCloseMatDrawer$ = viewerState$.pipe(
+      select('standaloneVolumes'),
+      filter(v => v && Array.isArray(v) && v.length > 0),
+      mapTo({
+        type: CLOSE_SIDE_PANEL
+      })
+    )
   }
 
   private currentLandmarks$: Observable<any[]>
+
+  @Effect()
+  public onStandAloneVolumesExistCloseMatDrawer$: Observable<any>
 
   @Effect()
   public mouseoverUserLandmarks: Observable<any>

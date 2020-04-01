@@ -12,18 +12,12 @@ import { UIModule } from "./ui/ui.module";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
-import {HttpClientModule} from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { TabsModule } from 'ngx-bootstrap/tabs'
-import { TooltipModule } from "ngx-bootstrap/tooltip";
-import {CaptureClickListenerDirective} from "src/util/directives/captureClickListener.directive";
 import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
-import { PluginUnit } from "./atlasViewer/pluginUnit/pluginUnit.component";
-import { WidgetServices } from './atlasViewer/widgetUnit/widgetService.service'
-import { WidgetUnit } from "./atlasViewer/widgetUnit/widgetUnit.component";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
 import { AuthService } from "./services/auth.service";
@@ -41,20 +35,22 @@ import { DockedContainerDirective } from "./util/directives/dockedContainer.dire
 import { DragDropDirective } from "./util/directives/dragDrop.directive";
 import { FloatingContainerDirective } from "./util/directives/floatingContainer.directive";
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
-import { PluginFactoryDirective } from "./util/directives/pluginFactory.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
 import { UtilModule } from "./util/util.module";
 
-import 'hammerjs'
-
-import 'src/res/css/extra_styles.css'
-import 'src/res/css/version.css'
-import {UiStateUseEffect} from "src/services/state/uiState.store";
-import 'src/theme.scss'
+import { UiStateUseEffect } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
-import { LoggingService } from "./services/logging.service";
-import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
+import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
+import { WidgetModule } from './atlasViewer/widgetUnit/widget.module';
+import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
+import { LoggingModule } from './logging/logging.module';
+
+import 'hammerjs'
+import 'src/res/css/extra_styles.css'
+import 'src/res/css/version.css'
+import 'src/theme.scss'
 
 @NgModule({
   imports : [
@@ -67,9 +63,10 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
     DatabrowserModule,
     AngularMaterialModule,
     UtilModule,
+    WidgetModule,
+    PluginModule,
+    LoggingModule,
 
-    TooltipModule.forRoot(),
-    TabsModule.forRoot(),
     EffectsModule.forRoot([
       DataBrowserUseEffect,
       UseEffects,
@@ -79,7 +76,8 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
       NgViewerUseEffect,
       PluginServiceUseEffect,
       AtlasViewerHistoryUseEffect,
-      UiStateUseEffect
+      UiStateUseEffect,
+      NewTemplateUseEffect
     ]),
     StoreModule.forRoot({
       pluginState,
@@ -94,17 +92,13 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
   ],
   declarations : [
     AtlasViewer,
-    WidgetUnit,
     ModalUnit,
-    PluginUnit,
 
     /* directives */
     DockedContainerDirective,
     FloatingContainerDirective,
-    PluginFactoryDirective,
     FloatingMouseContextualContainerDirective,
     DragDropDirective,
-    CaptureClickListenerDirective,
 
     /* pipes */
     GetNamesPipe,
@@ -113,21 +107,17 @@ import {TemplateCoordinatesTransformation} from "src/services/templateCoordinate
     NewViewerDisctinctViewToLayer,
   ],
   entryComponents : [
-    WidgetUnit,
     ModalUnit,
-    PluginUnit,
     DialogComponent,
     ConfirmDialogComponent,
   ],
   providers : [
-    WidgetServices,
     AtlasViewerAPIServices,
     AtlasWorkerService,
     AuthService,
     LocalFileService,
     DialogService,
     UIService,
-    LoggingService,
     TemplateCoordinatesTransformation,
 
     /**

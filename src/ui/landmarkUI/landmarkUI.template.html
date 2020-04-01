@@ -1,0 +1,67 @@
+<mat-card>
+  <mat-card-title>
+
+    {{ name }}
+  </mat-card-title>
+  <mat-card-subtitle>
+
+    <i class="fas fa-map-marker-alt"></i>
+    <span>
+      spatial landmark
+    </span>
+  </mat-card-subtitle>
+
+  <div class="scroll-snap-container w-100 d-flex flex-row w-30em overflow-auto" mat-card-image>
+    <div *ngFor="let dsPreview of previewFiles"
+      class="scroll-snap-child w-30em">
+      <kg-dataset-previewer
+        [darkmode]="darktheme$ | async"
+        [filename]="dsPreview.filename"
+        [kgId]="dsPreview.datasetKgId"
+        [backendUrl]="DS_PREVIEW_URL">
+      </kg-dataset-previewer>
+    </div>
+
+  </div>
+  <mat-card-content>
+
+    <!-- preview -->
+    <div>
+      <small class="text-muted">
+        Dataset preview
+      </small>
+
+      <ng-container *ngFor="let dataset of datasets; let index = index">
+        <kg-dataset-list
+          class="d-none"
+          [backendUrl]="DS_PREVIEW_URL"
+          [filterCriteriaProp]="filterCriteria"
+          *ngIf="dataset.fullId | getKgSchemaIdFromFullIdPipe as kgSchemaId"
+          (kgDsPrvUpdated)="handleKgDsPrvUpdate($event, kgSchemaId[1])"
+          [kgId]="kgSchemaId[1]">
+
+        </kg-dataset-list>
+      </ng-container>
+    </div>
+
+    <hr class="text-muted">
+    <!-- associated datasets -->
+    <div>
+      <small class="text-muted">
+        Associated datasets
+      </small>
+      <div>
+        <ng-container *ngFor="let dataset of datasets">
+
+          <single-dataset-list-view
+            *ngIf="dataset.fullId | getKgSchemaIdFromFullIdPipe as kgSchemaId"
+            [ripple]="true"
+            [kgSchema]="kgSchemaId[0]"
+            [kgId]="kgSchemaId[1]">
+
+          </single-dataset-list-view>
+        </ng-container>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

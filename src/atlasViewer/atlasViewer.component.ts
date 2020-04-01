@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, ChangeDetectorRef,
+  AfterViewInit,
   Component,
   HostBinding,
   OnDestroy,
@@ -28,11 +28,8 @@ import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
-import { MatBottomSheet, MatBottomSheetRef, MatDialog, MatDialogRef, MatSnackBar, MatSnackBarRef } from "@angular/material";
-import { TabsetComponent } from "ngx-bootstrap/tabs";
 import { LocalFileService } from "src/services/localFile.service";
-import { LoggingService } from "src/services/logging.service";
-import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_BOTTOM_SHEET, SHOW_KG_TOS } from "src/services/state/uiState.store";
+import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
 import {
   CLOSE_SIDE_PANEL,
   OPEN_SIDE_PANEL,
@@ -41,6 +38,9 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { getViewer, isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
+import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
+import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
 /**
  * TODO
@@ -65,14 +65,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
+
+  private persistentStateNotifierMatDialogRef: MatDialogRef<any>
+  @ViewChild('persistentStateNotifierTemplate', {read: TemplateRef}) public persistentStateNotifierTemplate: TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
   @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
   @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
-
-  @ViewChild('mobileMenuTabs') public mobileMenuTabs: TabsetComponent
+  @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   /**
    * required for styling of all child components
@@ -92,13 +94,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private snackbarRef: MatSnackBarRef<any>
   public snackbarMessage$: Observable<string>
-  private bottomSheetRef: MatBottomSheetRef
-  private bottomSheet$: Observable<TemplateRef<any>>
 
   public dedicatedView$: Observable<string | null>
   public onhoverSegments$: Observable<string[]>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
+  public onhoverLandmarkForFixed$: Observable<any>
+
   private subscriptions: Subscription[] = []
 
   /* handlers for nglayer */
@@ -119,8 +121,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private pluginRegionSelectionEnabled$: Observable<boolean>
   private pluginRegionSelectionEnabled: boolean = false
-  private persistentStateNotifierTemplate$: Observable<string>
-  // private pluginRegionSelectionEnabled: boolean = false
+  public persistentStateNotifierMessage$: Observable<string>
+
+  private hoveringRegions = []
+  public presentDatasetDialogRef: MatDialogRef<any>
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -131,10 +135,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
-    private snackbar: MatSnackBar,
-    private bottomSheet: MatBottomSheet,
-    private log: LoggingService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private snackbar: MatSnackBar
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -147,15 +148,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select("pluginRegionSelectionEnabled"),
       distinctUntilChanged(),
     )
-    this.persistentStateNotifierTemplate$ = this.store.pipe(
+    this.persistentStateNotifierMessage$ = this.store.pipe(
       select('uiState'),
-      select("persistentStateNotifierTemplate"),
-      distinctUntilChanged(),
-    )
-
-    this.bottomSheet$ = this.store.pipe(
-      select('uiState'),
-      select('bottomSheetTemplate'),
+      select("persistentStateNotifierMessage"),
       distinctUntilChanged(),
     )
 
@@ -178,8 +173,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.sidePanelIsOpen$ = this.store.pipe(
       select('uiState'),
-      filter(state => isDefined(state)),
-      map(state => state.sidePanelIsOpen),
+      select('sidePanelIsOpen')
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -207,6 +201,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(isSame),
     )
 
+    // TODO deprecate
     this.dedicatedView$ = this.store.pipe(
       select('viewerState'),
       filter(state => isDefined(state) && typeof state.dedicatedView !== 'undefined'),
@@ -214,47 +209,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       distinctUntilChanged(),
     )
 
-    this.onhoverLandmark$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        map(state => state.mouseOverLandmark),
-      ),
-      this.store.pipe(
-        select('dataStore'),
-        safeFilter('fetchedSpatialData'),
-        map(state => state.fetchedSpatialData),
-      ),
-    ).pipe(
-      map(([landmark, spatialDatas]) => {
-        if (landmark === null) {
-          return landmark
-        }
-        const idx = Number(landmark.replace('label=', ''))
-        if (isNaN(idx)) {
-          this.log.warn(`Landmark index could not be parsed as a number: ${landmark}`)
-          return {
-            landmarkName: idx,
-          }
-        } else {
-          return  {
-            landmarkName: spatialDatas[idx].name,
-          }
-        }
-      }),
-    )
-
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
-    this.onhoverSegments$ = combineLatest(
-      this.store.pipe(
-        select('uiState'),
-        select('mouseOverSegments'),
-        filter(v => !!v),
-        distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
-        /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
+    this.onhoverSegments$ = this.store.pipe(
+      select('uiState'),
+      select('mouseOverSegments'),
+      filter(v => !!v),
+      distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
+      /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
 
-      ),
-      this.onhoverLandmark$,
     ).pipe(
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
       map(([segments, onhoverLandmark]) => onhoverLandmark ? null : segments ),
       map(segments => {
         if (!segments) { return null }
@@ -276,30 +242,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.selectedParcellation$.subscribe(parcellation => {
         this.selectedParcellation = parcellation
       }),
+
     )
 
     this.subscriptions.push(
-      this.bottomSheet$.subscribe(templateRef => {
-        if (!templateRef) {
-          if (this.bottomSheetRef) {
-            this.bottomSheetRef.dismiss()
-          }
-        } else {
-          this.bottomSheetRef = this.bottomSheet.open(templateRef)
-          this.bottomSheetRef.afterDismissed().subscribe(() => {
-            this.store.dispatch({
-              type: SHOW_BOTTOM_SHEET,
-              bottomSheetTemplate: null,
-            })
-            this.bottomSheetRef = null
-          })
-        }
-      }),
+      this.onhoverSegments$.subscribe(hr => {
+        this.hoveringRegions = hr
+      })
     )
 
-    this.onhoverSegments$.subscribe(hr => {
-      this.hoveringRegions = hr
-    })
+    this.subscriptions.push(
+      this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
+    )
   }
 
   private selectedParcellation$: Observable<any>
@@ -384,9 +338,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
 
     this.subscriptions.push(
-      this.pluginRegionSelectionEnabled$.subscribe(PRSE => {
-        this.pluginRegionSelectionEnabled = PRSE
-        this.changeDetectorRef.detectChanges()
+      this.persistentStateNotifierMessage$.subscribe(msg => {
+        if (msg) this.persistentStateNotifierMatDialogRef = this.matDialog.open(this.persistentStateNotifierTemplate, { hasBackdrop: false, position: { top: '5px'} })
+        else {
+          if (this.persistentStateNotifierMatDialogRef) this.persistentStateNotifierMatDialogRef.close()
+        }
       })
     )
   }
@@ -404,6 +360,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       prefecthMainBundle.href = 'main.bundle.js'
       this.rd.appendChild(document.head, prefecthMainBundle)
     }
+
+    this.onhoverLandmark$ = this.mouseOverNehuba.currentOnHoverObs$.pipe(
+      select('landmark')
+    )
 
     /**
      * Show Cookie disclaimer if not yet agreed
@@ -437,21 +397,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       withLatestFrom(this.onhoverSegments$),
       map(([_flag, onhoverSegments]) => onhoverSegments || []),
     )
-  }
 
-  private hoveringRegions = []
+    this.onhoverLandmarkForFixed$ = this.rClContextualMenu.onShow.pipe(
+      withLatestFrom(
+        this.onhoverLandmark$ || of(null)
+      ),
+      map(([_flag, onhoverLandmark]) => onhoverLandmark)
+    )
+  }
 
   public mouseDownNehuba(_event) {
     this.rClContextualMenu.hide()
   }
 
   public mouseClickNehuba(event) {
-    // if (this.mouseUpLeftPosition === event.pageX && this.mouseUpTopPosition === event.pageY) {}
+
     if (!this.rClContextualMenu) { return }
     this.rClContextualMenu.mousePos = [
       event.clientX,
       event.clientY,
     ]
+
+    // TODO what if user is hovering a landmark?
     if (!this.pluginRegionSelectionEnabled) {
       this.rClContextualMenu.show()
     } else {

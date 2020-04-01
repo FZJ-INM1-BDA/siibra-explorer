@@ -1,7 +1,6 @@
 import { Component, EventEmitter, OnDestroy, Output, TemplateRef, ViewChild } from "@angular/core";
-import { MatDialog, MatDialogRef, MatSnackBar } from "@angular/material";
 import { select, Store } from "@ngrx/store";
-import {Observable, Subscription} from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
 import { INgLayerInterface } from "src/atlasViewer/atlasViewer.component";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -13,7 +12,8 @@ import {
 import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
 import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
-import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModule/preview/previewFileIcon.pipe";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: 'search-side-nav',
@@ -26,13 +26,14 @@ import { determinePreviewFileType, PREVIEW_FILE_TYPES } from "../databrowserModu
 export class SearchSideNav implements OnDestroy {
   public availableDatasets: number = 0
 
+  public showLayerBrowser: boolean = true
+
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
 
   @Output() public dismiss: EventEmitter<any> = new EventEmitter()
 
   @ViewChild('layerBrowserTmpl', {read: TemplateRef}) public layerBrowserTmpl: TemplateRef<any>
-  @ViewChild('kgDatasetPreviewer', {read: TemplateRef}) private kgDatasetPreview: TemplateRef<any>
 
   public autoOpenSideNavDataset$: Observable<any>
 
@@ -45,7 +46,7 @@ export class SearchSideNav implements OnDestroy {
     public dialog: MatDialog,
     private store$: Store<IavRootStoreInterface>,
     private snackBar: MatSnackBar,
-    private constantService: AtlasViewerConstantsServices,
+    private constantService: AtlasViewerConstantsServices
   ) {
 
     this.darktheme$ = this.constantService.darktheme$
@@ -67,34 +68,9 @@ export class SearchSideNav implements OnDestroy {
 
     this.sidePanelCurrentViewContent = this.store$.pipe(
       select('uiState'),
-      select("sidePanelCurrentViewContent"),
-    )
-
-    this.subscriptions.push(
-      this.store$.pipe(
-        select('dataStore'),
-        select('datasetPreviews'),
-        filter(datasetPreviews => datasetPreviews.length > 0),
-        map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
-        filter(({ file }) => determinePreviewFileType(file) !== PREVIEW_FILE_TYPES.NIFTI)
-      ).subscribe(({ dataset, file }) => {
-        
-        const { fullId } = dataset
-        const { filename } = file
-        
-        // TODO replace with common/util/getIdFromFullId
-        this.previewKgId = /\/([a-f0-9-]{1,})$/.exec(fullId)[1]
-        this.previewFilename = filename
-        this.dialog.open(this.kgDatasetPreview, {
-          minWidth: '50vw',
-          minHeight: '50vh'
-        })
-      })
+      select("sidePanelCurrentViewContent")
     )
   }
-
-  public previewKgId: string 
-  public previewFilename: string
 
   public collapseSidePanelCurrentView() {
     this.store$.dispatch({
@@ -126,10 +102,11 @@ export class SearchSideNav implements OnDestroy {
       type: CLOSE_SIDE_PANEL,
     })
 
-    const dialogToOpen = this.layerBrowserTmpl || LayerBrowser
+    const dialogToOpen = this.layerBrowserTmpl
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
       hasBackdrop: false,
       autoFocus: false,
+      ariaLabel: 'Additional volumes control',
       panelClass: [
         'layerBrowserContainer',
       ],

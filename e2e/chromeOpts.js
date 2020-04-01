@@ -1,8 +1,8 @@
 module.exports = [
-  '--headless',
+  ...(process.env.DISABLE_CHROME_HEADLESS ?  [] : ['--headless']),
   '--no-sandbox',
   '--disable-gpu',
   '--disable-setuid-sandbox',
   "--disable-extensions",
-  '--window-size=1600,900'
+  '--window-size=800,796'
 ]

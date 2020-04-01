@@ -189,6 +189,7 @@ export class TakeScreenshotComponent implements OnInit, OnDestroy {
     }
 
     public mouseUp(_event: MouseEvent) {
+      (window as any).viewer.display.update()
       this.borderWidth = '0'
 
       this.isDragging = false

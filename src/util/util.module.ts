@@ -6,6 +6,8 @@ import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./dir
 import { StopPropagationDirective } from "./directives/stopPropagation.directive";
 import { FilterNullPipe } from "./pipes/filterNull.pipe";
 import { IncludesPipe } from "./pipes/includes.pipe";
+import { SafeResourcePipe } from "./pipes/safeResource.pipe";
+import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
 
 @NgModule({
   declarations: [
@@ -18,6 +20,8 @@ import { IncludesPipe } from "./pipes/includes.pipe";
     MouseOverIconPipe,
     KeyListner,
     IncludesPipe,
+    SafeResourcePipe,
+    CaptureClickListenerDirective,
   ],
   exports: [
     FilterNullPipe,
@@ -29,7 +33,11 @@ import { IncludesPipe } from "./pipes/includes.pipe";
     MouseOverIconPipe,
     KeyListner,
     IncludesPipe,
+    SafeResourcePipe,
+    CaptureClickListenerDirective,
   ],
+  providers: [
+  ]
 })
 
 export class UtilModule {

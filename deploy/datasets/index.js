@@ -6,6 +6,7 @@ const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, ge
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
+const archiver = require('archiver')
 
 const bodyParser = require('body-parser')
 
@@ -121,6 +122,8 @@ fs.readdir(RECEPTOR_PATH, (err, files) => {
   files.forEach(file => previewFileMap.set(`res/image/receptor/${file}`, path.join(RECEPTOR_PATH, file)))
 })
 
+
+// TODO deprecated
 datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   const { file } = req.query
   const filePath = previewFileMap.get(file)
@@ -149,6 +152,7 @@ const checkKgQuery = (req, res, next) => {
   else return next()
 }
 
+// TODO deprecated
 datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
   const { datasetName } = req.query
   if (!datasetName || datasetName === '') return res.status(400).send(`datasetName as query param is required.`)
@@ -174,6 +178,36 @@ datasetsRouter.get('/downloadKgFiles', checkKgQuery, async (req, res) => {
     stream.pipe(res)
   } catch (e) {
     console.warn('datasets/index#downloadKgFiles', e)
+    res.status(400).send(e.toString())
+  }
+})
+
+datasetsRouter.post('/bulkDownloadKgFiles', bodyParser.urlencoded({ extended: false }), async (req, res) => {
+  try{
+    const { body = {}, user } = req
+    const { kgIds } = body
+    if (!kgIds) throw new Error(`kgIds needs to be populated`)
+    const arrKgIds = JSON.parse(kgIds)
+    if (!Array.isArray(arrKgIds)) {
+      throw new Error(`kgIds needs to be an array`)
+    }
+    if (arrKgIds.length === 0) {
+      throw new Error(`There needs to be at least 1 kgId in kgIds`)
+    }
+    const zip = archiver('zip')
+    for (const kgId of arrKgIds) {
+      zip.append(
+        await getDatasetFileAsZip({ user, kgId }),
+        {
+          name: `${kgId}.zip`
+        }
+      )
+    }
+    zip.finalize()
+    res.setHeader('Content-disposition', `attachment; filename="bulkDsDownload.zip"`)
+    res.setHeader('Content-Type', 'application/zip')
+    zip.pipe(res)
+  }catch(e){
     res.status(400).send(e.toString())
   }
 })

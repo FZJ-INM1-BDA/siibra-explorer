@@ -1,10 +1,11 @@
-import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output } from "@angular/core";
+import { Directive, ElementRef, EventEmitter, HostBinding, Input, Output, AfterContentChecked, ChangeDetectorRef, AfterViewInit } from "@angular/core";
 
 @Directive({
   selector: '[fixedMouseContextualContainerDirective]',
+  exportAs: 'iavFixedMouseCtxContainer'
 })
 
-export class FixedMouseContextualContainerDirective {
+export class FixedMouseContextualContainerDirective implements AfterContentChecked {
 
   private defaultPos: [number, number] = [-1e3, -1e3]
   public isShown: boolean = false
@@ -20,22 +21,33 @@ export class FixedMouseContextualContainerDirective {
 
   constructor(
     private el: ElementRef,
+    private cdr: ChangeDetectorRef,
   ) {
+  }
 
+  public recalculatePosition(){
+    const clientWidth = this.el.nativeElement.clientWidth
+    const clientHeight = this.el.nativeElement.clientHeight
+
+    const windowInnerWidth = window.innerWidth
+    const windowInnerHeight = window.innerHeight
+    if (windowInnerHeight - this.mousePos[1] < clientHeight) {
+      this.mousePos[1] = windowInnerHeight - clientHeight
+    }
+
+    if ((windowInnerWidth - this.mousePos[0]) < clientWidth) {
+      this.mousePos[0] = windowInnerWidth - clientWidth
+    }
+
+    this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
+  }
+
+  ngAfterContentChecked(){
+    this.recalculatePosition()
+    this.cdr.markForCheck()
   }
 
   public show() {
-    setTimeout(() => {
-      if (window.innerHeight - this.mousePos[1] < this.el.nativeElement.clientHeight) {
-        this.mousePos[1] = window.innerHeight - this.el.nativeElement.clientHeight
-      }
-
-      if ((window.innerWidth - this.mousePos[0]) < this.el.nativeElement.clientWidth) {
-        this.mousePos[0] = window.innerWidth - this.el.nativeElement.clientWidth
-      }
-
-      this.transform = `translate(${this.mousePos.map(v => v.toString() + 'px').join(', ')})`
-    })
     this.styleDisplay = 'inline-block'
     this.isShown = true
     this.onShow.emit()

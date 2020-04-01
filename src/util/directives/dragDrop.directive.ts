@@ -1,7 +1,7 @@
 import { Directive, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from "@angular/core";
-import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from "@angular/material";
 import { fromEvent, merge, Observable, of, Subscription } from "rxjs";
 import { debounceTime, map, scan, switchMap } from "rxjs/operators";
+import {MatSnackBar, MatSnackBarRef, SimpleSnackBar} from "@angular/material/snack-bar";
 
 @Directive({
   selector: '[drag-drop]',

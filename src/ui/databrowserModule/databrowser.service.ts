@@ -1,13 +1,12 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, OnDestroy } from "@angular/core";
-import { ComponentRef } from "@angular/core/src/render3";
+import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscription } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
@@ -203,27 +202,28 @@ export class DatabrowserService implements OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public toggleFav(dataentry: IDataEntry) {
+  public toggleFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
       payload: dataentry,
     })
   }
 
-  public saveToFav(dataentry: IDataEntry) {
+  public saveToFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
       payload: dataentry,
     })
   }
 
-  public removeFromFav(dataentry: IDataEntry) {
+  public removeFromFav(dataentry: Partial<IDataEntry>) {
     this.store.dispatch({
       type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
       payload: dataentry,
     })
   }
 
+  // TODO deprecate
   public fetchPreviewData(datasetName: string) {
     const encodedDatasetName = encodeURIComponent(datasetName)
     return new Promise((resolve, reject) => {
@@ -246,19 +246,25 @@ export class DatabrowserService implements OnDestroy {
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
-  private lowLevelQuery(templateName: string, parcellationName: string) {
+  private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {
     const encodedTemplateName = encodeURIComponent(templateName)
     const encodedParcellationName = encodeURIComponent(parcellationName)
-    return fetch(`${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`, this.constantService.getFetchOption())
-      .then(res => res.json())
-      /**
-       * remove duplicates
-       */
-      .then(arr => arr.reduce((acc, item) => {
-        const newMap = new Map(acc)
-        return newMap.set(item.name, item)
-      }, new Map()))
-      .then(map => Array.from(map.values() as IDataEntry[]))
+
+    return this.http.get(
+      `${this.constantService.backendUrl}datasets//templateNameParcellationName/${encodedTemplateName}/${encodedParcellationName}`,
+      {
+        headers: this.constantService.getHttpHeader(),
+        responseType: 'json'
+      }
+    ).pipe(
+      map((arr: any[]) => {
+        const map = arr.reduce((acc, item) => {
+          const newMap = new Map(acc)
+          return newMap.set(item.name, item)
+        }, new Map())
+        return Array.from(map.values() as IDataEntry[])
+      })
+    ).toPromise()
   }
 
   private fetchData(templateName: string, parcellationName: string) {

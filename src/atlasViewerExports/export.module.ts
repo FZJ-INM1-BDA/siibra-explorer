@@ -3,7 +3,6 @@ import { createCustomElement } from '@angular/elements'
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { ComponentsModule } from "../components/components.module";
 import { MarkdownDom } from '../components/markdown/markdown.component'
 import { PanelComponent } from "../components/panel/panel.component";
@@ -18,7 +17,6 @@ import { SampleBoxUnit } from "./sampleBox/sampleBox.component";
     BrowserAnimationsModule,
     FormsModule,
     ComponentsModule,
-    BsDropdownModule.forRoot(),
   ],
   declarations : [
     SampleBoxUnit,

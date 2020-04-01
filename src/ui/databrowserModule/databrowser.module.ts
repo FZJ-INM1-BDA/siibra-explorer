@@ -1,8 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { PopoverModule } from "ngx-bootstrap/popover";
-import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
@@ -28,6 +26,8 @@ import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
+import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
+import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 
 @NgModule({
   imports: [
@@ -37,8 +37,6 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     FormsModule,
     UtilModule,
     AngularMaterialModule,
-    TooltipModule.forRoot(),
-    PopoverModule.forRoot(),
   ],
   declarations: [
     DataBrowser,
@@ -46,6 +44,8 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     SingleDatasetView,
     SingleDatasetListView,
     DatasetPreviewList,
+    PreviewComponentWrapper,
+    BulkDownloadBtn,
 
     /**
      * pipes
@@ -65,6 +65,7 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     ResetCounterModalityPipe,
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
+    TransformDatasetToIdPipe,
   ],
   exports: [
     DataBrowser,
@@ -73,10 +74,13 @@ import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetP
     ModalityPicker,
     FilterDataEntriesbyMethods,
     GetKgSchemaIdFromFullIdPipe,
+    BulkDownloadBtn,
+    TransformDatasetToIdPipe,
   ],
   entryComponents: [
     DataBrowser,
     SingleDatasetView,
+    PreviewComponentWrapper
   ],
   providers: [
     KgSingleDatasetService,

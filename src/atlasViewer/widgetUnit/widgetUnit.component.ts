@@ -13,7 +13,7 @@ import { WidgetServices } from "./widgetService.service";
 })
 
 export class WidgetUnit implements OnInit, OnDestroy {
-  @ViewChild('container', {read: ViewContainerRef}) public container: ViewContainerRef
+  @ViewChild('container', {read: ViewContainerRef, static: true}) public container: ViewContainerRef
 
   @HostBinding('attr.state')
   public state: 'docked' | 'floating' = 'docked'

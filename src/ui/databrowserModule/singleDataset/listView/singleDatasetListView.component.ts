@@ -2,10 +2,10 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/
   SingleDatasetBase,
   DatabrowserService,
   KgSingleDatasetService,
-  AtlasViewerConstantsServices,
 } from "../singleDataset.base";
-import { MatDialog, MatSnackBar } from "@angular/material";
 import { SingleDatasetView } from "../detailedView/singleDataset.component";
+import {MatDialog} from "@angular/material/dialog";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'single-dataset-list-view',
@@ -19,45 +19,21 @@ import { SingleDatasetView } from "../detailedView/singleDataset.component";
 export class SingleDatasetListView extends SingleDatasetBase {
 
   constructor(
-    private _dbService: DatabrowserService,
+    _dbService: DatabrowserService,
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
-    constantService: AtlasViewerConstantsServices,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
+    snackBar: MatSnackBar,
   ) {
-    super(_dbService, singleDatasetService, cdr, constantService)
+    super(_dbService, singleDatasetService, cdr, snackBar)
   }
 
   public showDetailInfo() {
     this.dialog.open(SingleDatasetView, {
-      data: this.dataset,
+      autoFocus: false,
+      data: {
+        fullId: this.fullId
+      },
     })
-  }
-
-  public undoableRemoveFav() {
-    this.snackBar.open(`Unpinned dataset: ${this.dataset.name}`, 'Undo', {
-      duration: 5000,
-    })
-      .afterDismissed()
-      .subscribe(({ dismissedByAction }) => {
-        if (dismissedByAction) {
-          this._dbService.saveToFav(this.dataset)
-        }
-      })
-    this._dbService.removeFromFav(this.dataset)
-  }
-
-  public undoableAddFav() {
-    this.snackBar.open(`Pin dataset: ${this.dataset.name}`, 'Undo', {
-      duration: 5000,
-    })
-      .afterDismissed()
-      .subscribe(({ dismissedByAction }) => {
-        if (dismissedByAction) {
-          this._dbService.removeFromFav(this.dataset)
-        }
-      })
-    this._dbService.saveToFav(this.dataset)
   }
 }

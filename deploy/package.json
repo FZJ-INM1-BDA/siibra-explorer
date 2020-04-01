@@ -8,7 +8,8 @@
     "test": "npm run testEnv && npm run testNoEnv",
     "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js --timeout 60000",
     "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js --timeout 60000",
-    "mocha": "mocha"
+    "mocha": "mocha",
+    "mocha-env": "node -r dotenv/config ./node_modules/.bin/mocha"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +33,8 @@
     "chai-as-promised": "^7.1.1",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
+    "google-spreadsheet": "^3.0.8",
+    "got": "^10.5.5",
     "mocha": "^6.1.4",
     "sinon": "^8.0.2"
   }

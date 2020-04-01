@@ -6,8 +6,9 @@ export const LOCAL_STORAGE_CONST = {
   AGREE_COOKIE: 'fzj.xg.iv.AGREE_COOKIE',
   AGREE_KG_TOS: 'fzj.xg.iv.AGREE_KG_TOS',
 
-  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET',
+  FAV_DATASET: 'fzj.xg.iv.FAV_DATASET_V2',
 }
 
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
+export const DS_PREVIEW_URL = DATASET_PREVIEW_URL

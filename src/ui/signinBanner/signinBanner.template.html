@@ -6,6 +6,8 @@
 
   <div class="btnWrapper">
     <button mat-icon-button
+      aria-label="Show pinned datasets"
+      [attr.pinned-datasets-length]="(favDataEntries$ | async)?.length"
       (click)="bottomSheet.open(savedDatasets)"
       [matBadge]="(favDataEntries$ | async)?.length > 0 ? (favDataEntries$ | async)?.length : null "
       matBadgeColor="accent"
@@ -20,6 +22,7 @@
   <!-- plugin and tools -->
   <div class="btnWrapper" #pluginsAndToolsDiv>
     <button mat-icon-button
+      aria-label="Show tools and plugins"
       matTooltipPosition="below"
       [matTooltip]="pluginTooltipText"
       [matMenuTriggerFor]="pluginDropdownMenu"
@@ -48,7 +51,8 @@
 </div>
 
 <!-- plugin dropdownmenu -->
-<mat-menu #pluginDropdownMenu>
+<mat-menu #pluginDropdownMenu
+  [aria-label]="'Tools and plugins menu'">
   <button mat-menu-item
     [disabled]="!parcellationIsSelected"
     (click)="takingScreenshot = true;"
@@ -71,11 +75,6 @@
 
   <mat-divider></mat-divider>
 
-  <button (click)="openTmplWithDialog(pluginTmpl)" mat-menu-item>
-    <mat-icon fontSet="fas" fontIcon="fa-cube"></mat-icon>
-    Plugins
-  </button>
-
   <button mat-menu-item
     (click)="openTmplWithDialog(settingTemplate)">
     <mat-icon fontSet="fas" fontIcon="fa-cog"></mat-icon>
@@ -88,13 +87,6 @@
     About
   </button>
 </mat-menu>
-
-<ng-template #pluginTmpl>
-  <h2 mat-dialog-title>Plugins</h2>
-  <mat-dialog-content>
-    <plugin-banner (click)="openTmplWithDialog(null)"></plugin-banner>
-  </mat-dialog-content>
-</ng-template>
 
 <ng-template #helpComponent>
   <h2 mat-dialog-title>About Interactive Viewer</h2>
@@ -139,8 +131,17 @@
 <!-- saved dataset tmpl -->
 
 <ng-template #savedDatasets>
-  <mat-list rol="list">
-    <h3 mat-subheader>Pinned Datasets</h3>
+  <mat-list rol="list"
+    aria-label="Pinned datasets panel">
+    <h3 mat-subheader>
+      <span>
+        Pinned Datasets
+      </span>
+      <iav-datamodule-bulkdownload-cmp
+        [kgIds]="favDataEntries$ | async | iavDatamoduleTransformDsToIdPipe">
+
+      </iav-datamodule-bulkdownload-cmp>
+    </h3>
 
     <!-- place holder when no fav data is available -->
     <mat-card *ngIf="(!(favDataEntries$ | async)) || (favDataEntries$ | async).length === 0">

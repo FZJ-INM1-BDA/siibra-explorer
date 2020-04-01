@@ -740,7 +740,18 @@
                           "kgId": "b4ab5ba5-0753-4ffb-80f9-ccd5d85cb6ac"
                         }
                       },
-                      "relatedAreas": []
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Neocortex (v3)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0db35172-495f-494d-9c14-01a2d6c7e398",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "ngId": "v3",
@@ -826,7 +837,19 @@
                     79,
                     255
                   ],
-                  "children": []
+                  "children": [],
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Striatum (v3)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "a06b8f76-c92e-4b16-9281-4c314a925ee4",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "ngId": "v3",
@@ -1158,7 +1181,18 @@
                       "kgId": "a844d80f-1d94-41a0-901a-14ae257519db"
                     }
                   },
-                  "relatedAreas": []
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Cerebellum (v3)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "f29cd2fd-fa5c-412f-b83e-7832c3cff80b",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "ngId": "v3",
@@ -1555,7 +1589,18 @@
               "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba"
             }
           },
-          "relatedAreas": []
+          "relatedAreas": [
+            {
+              "name": "Rat Whole brain (v3)",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "781a8728-4178-4af4-b3e9-3e61ea5bc3cd",
+                  "alternateOf": []
+                }
+              }
+            }
+          ]
         }
       ],
       "properties": {
@@ -2444,7 +2489,19 @@
                         193,
                         45
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Neocortex (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b4ab5ba5-0753-4ffb-80f9-ccd5d85cb6ac",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "cingulate cortex, area 2",
@@ -2478,7 +2535,19 @@
                         131,
                         107
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 1 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8b9dc624-b341-4b6a-9a9a-ac651c704daf",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "dentate gyrus",
@@ -2512,7 +2581,19 @@
                         255,
                         0
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 2 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3017940f-ea61-47d1-8b8a-fc2bee012980",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "cornu ammonis 3",
@@ -2528,7 +2609,19 @@
                         104,
                         13
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Cornu ammonis 3 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "28b4ba4a-eeb3-4307-8b9c-1d3eca66618e",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "fasciola cinereum",
@@ -2628,7 +2721,19 @@
                         51,
                         255
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Perirhinal area 35 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b700dc11-cdd8-4e95-9605-25d1aa24bc46",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "perirhinal area 36",
@@ -2644,7 +2749,19 @@
                         48,
                         160
                       ],
-                      "children": null
+                      "children": null,
+                      "relatedAreas": [
+                        {
+                          "name": "Rat Perirhinal area 36 (v2)",
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "ae4b1c4f-83a4-48db-8f8c-2167c4ebc2d5",
+                              "alternateOf": []
+                            }
+                          }
+                        }
+                      ]
                     },
                     {
                       "name": "entorhinal cortex",
@@ -2696,7 +2813,19 @@
                     79,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Striatum (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "39ed89c6-4653-4fd3-81cf-3be1c60ead10",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "globus pallidus",
@@ -2714,7 +2843,19 @@
                     145,
                     186
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Globus pallidus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9ab96590-23e6-413f-8055-6b6dbc543dce",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "entopeduncular nucleus",
@@ -2732,7 +2873,19 @@
                     231,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Entopeduncular nucleus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "0026b0c8-da96-4329-8e29-8504dc2790d3",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "subthalamic nucleus",
@@ -2750,7 +2903,19 @@
                     0,
                     255
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Subthalamic nucleus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "916d047f-a4f3-4d5b-89f9-b7c8ddc98edf",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "basal forebrain region",
@@ -2804,7 +2969,19 @@
                     100,
                     0
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Thalamus (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9f7936a8-08bd-4fc0-b8c7-f057befac01d",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "bed nucleus of the stria terminalis",
@@ -2858,7 +3035,19 @@
                     120,
                     161
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Hypothalamic region (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "e96b882e-cd42-4e10-9e72-a87219c3f9b2",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "pineal gland",
@@ -2981,7 +3170,19 @@
                     186,
                     0
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Substantia nigra (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "4338cc81-ab0f-4972-bbba-c86328a8c66b",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "interpeduncular nucleus",
@@ -3035,7 +3236,19 @@
                     215,
                     11
                   ],
-                  "children": null
+                  "children": null,
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Pontine nuclei (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "9c431f67-90c5-4a37-83c8-9706e62c1966",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "Cerebellum",
@@ -3093,7 +3306,18 @@
                       "kgId": "a844d80f-1d94-41a0-901a-14ae257519db"
                     }
                   },
-                  "relatedAreas": []
+                  "relatedAreas": [
+                    {
+                      "name": "Rat Cerebellum (v2)",
+                      "fullId": {
+                        "kg": {
+                          "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                          "kgId": "a844d80f-1d94-41a0-901a-14ae257519db",
+                          "alternateOf": []
+                        }
+                      }
+                    }
+                  ]
                 },
                 {
                   "name": "inferior olive",
@@ -3227,7 +3451,18 @@
               "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba"
             }
           },
-          "relatedAreas": []
+          "relatedAreas": [
+            {
+              "name": "Rat Whole brain (v2)",
+              "fullId": {
+                "kg": {
+                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                  "kgId": "b2b56201-472c-4f70-842f-cf2133eacaba",
+                  "alternateOf": []
+                }
+              }
+            }
+          ]
         }
       ],
       "properties": {

@@ -194,6 +194,7 @@ const defaultB64EncodingOption = {
 }
 
 export const encodeNumber = (number, option = defaultB64EncodingOption) => {
+  const { float } = option
   if (!float) return encodeInt(number)
   else {
     const floatArray = new Float32Array(1)

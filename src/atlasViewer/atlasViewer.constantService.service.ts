@@ -1,9 +1,9 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { merge, Observable, of, Subscription, throwError, fromEvent, forkJoin } from "rxjs";
 import { catchError, map, shareReplay, switchMap, tap, filter, take } from "rxjs/operators";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
 import { AtlasWorkerService } from "./atlasViewer.workerService.service";
@@ -101,7 +101,11 @@ export class AtlasViewerConstantsServices implements OnDestroy {
     })
   )
 
-  public initFetchTemplate$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
+  public getTemplateEndpoint$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
+    shareReplay(1)
+  )
+
+  public initFetchTemplate$ = this.getTemplateEndpoint$.pipe(
     tap((arr: any[]) => this.totalTemplates = arr.length),
     switchMap((templates: string[]) => merge(
       ...templates.map(templateName => this.fetchTemplate(templateName).pipe(
@@ -120,18 +124,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
       return of(null)
     }),
   )
-
-  /* to be provided by KG in future */
-  public templateUrlsPr: Promise<string[]> = new Promise((resolve, reject) => {
-    fetch(`${this.backendUrl}templates`, this.getFetchOption())
-      .then(res => res.json())
-      .then(arr => {
-        this.templateUrls = arr
-        return arr
-      })
-      .then(resolve)
-      .catch(reject)
-  })
 
   public templateUrls = Array(100)
 
@@ -219,6 +211,12 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     const url = new URL(window.location.href)
     url.searchParams.delete('regionsSelected')
     return url.toString()
+  }
+
+  public getHttpHeader(): HttpHeaders {
+    const header = new HttpHeaders()
+    header.set('referrer', this.getScopedReferer())
+    return header
   }
 
   public getFetchOption(): RequestInit {

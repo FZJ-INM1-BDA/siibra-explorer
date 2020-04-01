@@ -3,6 +3,9 @@ import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, GLSL_COLORMAP_JET, separator } from "./atlasViewer.constantService.service";
+import { GetKgSchemaIdFromFullIdPipe } from "src/ui/databrowserModule/util/getKgSchemaIdFromFullId.pipe";
+
+const getKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
 
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
@@ -21,28 +24,31 @@ export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
 export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchParams => {
   const searchParam = new URLSearchParams()
 
-  const { viewerState, ngViewerState, pluginState } = state
-  const { templateSelected, parcellationSelected, navigation, regionsSelected } = viewerState
+  const { viewerState, ngViewerState, pluginState, dataStore } = state
+  const { templateSelected, parcellationSelected, navigation, regionsSelected, standaloneVolumes } = viewerState
 
-  if (!templateSelected) { throw new Error(CVT_STATE_TO_SEARCHPARAM_ERROR.TEMPLATE_NOT_SELECTED) }
+  if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
+    searchParam.set('standaloneVolumes', JSON.stringify(standaloneVolumes))
+  } else {
+    if (!templateSelected) { throw new Error(CVT_STATE_TO_SEARCHPARAM_ERROR.TEMPLATE_NOT_SELECTED) }
 
-  // encoding states
-  searchParam.set('templateSelected', templateSelected.name)
-  if (!!parcellationSelected) searchParam.set('parcellationSelected', parcellationSelected.name)
-
-  // encoding selected regions
-  const accumulatorMap = new Map<string, number[]>()
-  for (const region of regionsSelected) {
-    const { ngId, labelIndex } = getNgIdLabelIndexFromRegion({ region })
-    const existingEntry = accumulatorMap.get(ngId)
-    if (existingEntry) { existingEntry.push(labelIndex) } else { accumulatorMap.set(ngId, [ labelIndex ]) }
+    // encoding states
+    searchParam.set('templateSelected', templateSelected.name)
+    if (!!parcellationSelected) searchParam.set('parcellationSelected', parcellationSelected.name)
+  
+    // encoding selected regions
+    const accumulatorMap = new Map<string, number[]>()
+    for (const region of regionsSelected) {
+      const { ngId, labelIndex } = getNgIdLabelIndexFromRegion({ region })
+      const existingEntry = accumulatorMap.get(ngId)
+      if (existingEntry) { existingEntry.push(labelIndex) } else { accumulatorMap.set(ngId, [ labelIndex ]) }
+    }
+    const cRegionObj = {}
+    for (const [key, arr] of accumulatorMap) {
+      cRegionObj[key] = arr.map(n => encodeNumber(n)).join(separator)
+    }
+    if (Object.keys(cRegionObj).length > 0) searchParam.set('cRegionsSelected', JSON.stringify(cRegionObj))  
   }
-  const cRegionObj = {}
-  for (const [key, arr] of accumulatorMap) {
-    cRegionObj[key] = arr.map(n => encodeNumber(n)).join(separator)
-  }
-  if (Object.keys(cRegionObj).length > 0) searchParam.set('cRegionsSelected', JSON.stringify(cRegionObj))
-
   // encoding navigation
   if (navigation) {
     const { orientation, perspectiveOrientation, perspectiveZoom, position, zoom } = navigation
@@ -59,7 +65,7 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
   }
 
   // encode nifti layers
-  if (!!templateSelected.nehubaConfig) {
+  if (templateSelected && templateSelected.nehubaConfig) {
     const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
     const { layers } = ngViewerState
     const additionalLayers = layers.filter(layer =>
@@ -77,9 +83,136 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
     .map(([ _src, url]) => url)
     .join('__')
 
+  // previewDataset state
+
+  const { datasetPreviews } = dataStore
+
+  if (datasetPreviews && Array.isArray(datasetPreviews)) {
+    const dsPrvArr = []
+    for (const preview of datasetPreviews) {
+      const { filename, datasetId } = preview
+      
+      const re = getKgSchemaIdFromFullIdPipe.transform(datasetId)
+      if (!re)  {
+        // TODO catch error, inform user that kgschemaid cannot be transformed
+        continue
+      }
+      const [ kgSchema, kgId ] = re
+      dsPrvArr.push({
+        datasetId: `${kgSchema}/${kgId}`,
+        filename
+      })
+    }
+
+    if (dsPrvArr.length > 0) searchParam.set('previewingDatasetFiles', JSON.stringify(dsPrvArr))
+  }
+
   if (initManifests.length > 0) { searchParam.set('pluginState', pluginStateParam) }
 
   return searchParam
+}
+
+const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR
+const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR } = PARSING_SEARCHPARAM_WARNING
+
+const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchParams, state: IavRootStoreInterface, cb?: (arg: any) => void) => {
+
+
+  /**
+   * TODO if search param of either template or parcellation is incorrect, wrong things are searched
+   */
+
+
+  const templateSelected = (() => {
+    const { fetchedTemplates } = state.viewerState
+
+    const searchedName = (() => {
+      const param = searchparams.get('templateSelected')
+      if (param === 'Allen Mouse') { return `Allen adult mouse brain reference atlas V3` }
+      if (param === 'Waxholm Rat V2.0') { return 'Waxholm Space rat brain atlas v.2.0' }
+      return param
+    })()
+
+    if (!searchedName) { throw new Error(TEMPALTE_NOT_SET) }
+    const templateToLoad = fetchedTemplates.find(template => template.name === searchedName)
+    if (!templateToLoad) { throw new Error(TEMPLATE_NOT_FOUND) }
+    return templateToLoad
+  })()
+
+  const parcellationSelected = (() => {
+    const searchedName = (() => {
+      const param = searchparams.get('parcellationSelected')
+      if (param === 'Allen Mouse Brain Atlas') { return 'Allen adult mouse brain reference atlas V3 Brain Atlas' }
+      if (param === 'Whole Brain (v2.0)') { return 'Waxholm Space rat brain atlas v.2.0' }
+      return param
+    })()
+    const parcellationToLoad = templateSelected.parcellations.find(parcellation => parcellation.name === searchedName)
+    if (!parcellationToLoad) { cb && cb({ type: UNKNOWN_PARCELLATION }) }
+    return parcellationToLoad || templateSelected.parcellations[0]
+  })()
+
+  /* selected regions */
+
+  const regionsSelected = (() => {
+
+    // TODO deprecate. Fallback (defaultNgId) (should) already exist
+    // if (!viewerState.parcellationSelected.updated) throw new Error(PARCELLATION_NOT_UPDATED)
+
+    const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({ parcellation: parcellationSelected })
+    /**
+     * either or both parcellationToLoad and .regions maybe empty
+     */
+    /**
+     * backwards compatibility
+     */
+    const selectedRegionsParam = searchparams.get('regionsSelected')
+    if (selectedRegionsParam) {
+      const ids = selectedRegionsParam.split('_')
+
+      return ids.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
+    }
+
+    const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
+    if (cRegionsSelectedParam) {
+      try {
+        const json = JSON.parse(cRegionsSelectedParam)
+
+        const selectRegionIds = []
+
+        for (const ngId in json) {
+          const val = json[ngId]
+          const labelIndicies = val.split(separator).map(n => {
+            try {
+              return decodeToNumber(n)
+            } catch (e) {
+              /**
+               * TODO poisonsed encoded char, send error message
+               */
+              cb && cb({ type: DECODE_CIPHER_ERROR, message: `cRegionSelectionParam is malformed: cannot decode ${n}` })
+              return null
+            }
+          }).filter(v => !!v)
+          for (const labelIndex of labelIndicies) {
+            selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
+          }
+        }
+        return selectRegionIds.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
+
+      } catch (e) {
+        /**
+         * parsing cRegionSelected error
+         */
+        cb && cb({ type: DECODE_CIPHER_ERROR, message: `parsing cRegionSelected error ${e.toString()}` })
+      }
+    }
+    return []
+  })()
+
+  return {
+    templateSelected,
+    parcellationSelected,
+    regionsSelected
+  }
 }
 
 export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavRootStoreInterface, callback?: (error: any) => void): IavRootStoreInterface => {
@@ -89,91 +222,31 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
   /* eslint-disable-next-line @typescript-eslint/no-empty-function */
   const warningCb = callback || (() => {})
 
-  const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR
-  const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR } = PARSING_SEARCHPARAM_WARNING
-  const { fetchedTemplates } = state.viewerState
-
-  const searchedTemplatename = (() => {
-    const param = searchparams.get('templateSelected')
-    if (param === 'Allen Mouse') { return `Allen adult mouse brain reference atlas V3` }
-    if (param === 'Waxholm Rat V2.0') { return 'Waxholm Space rat brain atlas v.2.0' }
-    return param
-  })()
-  const searchedParcellationName = (() => {
-    const param = searchparams.get('parcellationSelected')
-    if (param === 'Allen Mouse Brain Atlas') { return 'Allen adult mouse brain reference atlas V3 Brain Atlas' }
-    if (param === 'Whole Brain (v2.0)') { return 'Waxholm Space rat brain atlas v.2.0' }
-    return param
-  })()
-
-  if (!searchedTemplatename) { throw new Error(TEMPALTE_NOT_SET) }
-
-  const templateToLoad = fetchedTemplates.find(template => template.name === searchedTemplatename)
-  if (!templateToLoad) { throw new Error(TEMPLATE_NOT_FOUND) }
-
-  /**
-   * TODO if search param of either template or parcellation is incorrect, wrong things are searched
-   */
-  const parcellationToLoad = templateToLoad.parcellations.find(parcellation => parcellation.name === searchedParcellationName)
-  if (!parcellationToLoad) { warningCb({ type: UNKNOWN_PARCELLATION }) }
-
   const { viewerState } = returnState
-  viewerState.templateSelected = templateToLoad
-  viewerState.parcellationSelected = parcellationToLoad || templateToLoad.parcellations[0]
 
-  /* selected regions */
-
-  // TODO deprecate. Fallback (defaultNgId) (should) already exist
-  // if (!viewerState.parcellationSelected.updated) throw new Error(PARCELLATION_NOT_UPDATED)
-
-  const getRegionFromlabelIndexId = getGetRegionFromLabelIndexId({ parcellation: viewerState.parcellationSelected })
-  /**
-   * either or both parcellationToLoad and .regions maybe empty
-   */
-  /**
-   * backwards compatibility
-   */
-  const selectedRegionsParam = searchparams.get('regionsSelected')
-  if (selectedRegionsParam) {
-    const ids = selectedRegionsParam.split('_')
-
-    viewerState.regionsSelected = ids.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
-  }
-
-  const cRegionsSelectedParam = searchparams.get('cRegionsSelected')
-  if (cRegionsSelectedParam) {
-    try {
-      const json = JSON.parse(cRegionsSelectedParam)
-
-      const selectRegionIds = []
-
-      for (const ngId in json) {
-        const val = json[ngId]
-        const labelIndicies = val.split(separator).map(n => {
-          try {
-            return decodeToNumber(n)
-          } catch (e) {
-            /**
-             * TODO poisonsed encoded char, send error message
-             */
-            warningCb({ type: DECODE_CIPHER_ERROR, message: `cRegionSelectionParam is malformed: cannot decode ${n}` })
-            return null
-          }
-        }).filter(v => !!v)
-        for (const labelIndex of labelIndicies) {
-          selectRegionIds.push( generateLabelIndexId({ ngId, labelIndex }) )
-        }
-      }
-      viewerState.regionsSelected = selectRegionIds.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
-
-    } catch (e) {
-      /**
-       * parsing cRegionSelected error
-       */
-      warningCb({ type: DECODE_CIPHER_ERROR, message: `parsing cRegionSelected error ${e.toString()}` })
+  const searchParamStandaloneVolumes = (() => {
+    const param = searchparams.get('standaloneVolumes')
+    if (!param) {
+      return null
     }
-  }
+    const arr = JSON.parse(param)
+    if (Array.isArray(arr)) {
+      return arr
+    }
+    else {
+      throw new Error(`param standaloneVolumes does not parse to array: ${param}`)
+    }
+  })()
 
+  if (!!searchParamStandaloneVolumes) {
+    viewerState.standaloneVolumes = searchParamStandaloneVolumes
+  } else {
+    const { templateSelected, parcellationSelected, regionsSelected } = parseSearchParamForTemplateParcellationRegion(searchparams, state, warningCb)
+    viewerState.templateSelected = templateSelected
+    viewerState.parcellationSelected = parcellationSelected
+    viewerState.regionsSelected = regionsSelected
+  }
+  
   /* now that the parcellation is loaded, load the navigation state */
   /* what to do with malformed navigation? */
 
@@ -242,5 +315,17 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
     const arrPluginStates = pluginStates.split('__')
     pluginState.initManifests = arrPluginStates.map(url => [PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC, url] as [string, string])
   }
+
+  const { dataStore } = returnState
+  const stringSearchParam = searchparams.get('previewingDatasetFiles')
+  try {
+    if (stringSearchParam) {
+      const arr = JSON.parse(stringSearchParam) as Array<{datasetId: string, filename: string}>
+      dataStore.datasetPreviews = arr
+    }
+  } catch (e) {
+    // parsing previewingDatasetFiles
+  }
+  
   return returnState
 }

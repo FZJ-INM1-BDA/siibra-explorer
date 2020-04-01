@@ -1,17 +1,22 @@
-<span *ngIf="templateSelected$ | async as templateSelected">
+<!-- selected template and parcellation -->
+<div *ngIf="templateSelected$ | async as templateSelected">
   {{ templateSelected.name }}
-</span>
-<br>
-<span *ngIf="parcellationSelected$ | async as parcellationSelected">
+</div>
+<div *ngIf="parcellationSelected$ | async as parcellationSelected">
   {{ parcellationSelected.name }}
-</span>
+</div>
 
+<!-- selected parcellation regions -->
 <ng-container *ngIf="regionsSelected$ | async as regionsSelected">
   <ng-container *ngIf="regionsSelected.length > 0">
-
-      <br>
-      <span>
-        {{ regionsSelected.length }} region{{ regionsSelected.length > 1 ? 's' : '' }} selected
-      </span>
+    <div class="mt-2">
+      {{ regionsSelected.length }} region{{ regionsSelected.length > 1 ? 's' : '' }} selected
+    </div>
   </ng-container>
+</ng-container>
+
+<ng-container *ngIf="standaloneVolumes$ | async as standaloneVolumes">
+  <div *ngFor="let vol of standaloneVolumes">
+    {{ vol }}
+  </div>
 </ng-container>

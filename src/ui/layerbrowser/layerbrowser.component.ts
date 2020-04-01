@@ -3,12 +3,12 @@ import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { getViewer } from "src/util/fn";
 import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
-import { MatSliderChange } from "@angular/material";
+import { MatSliderChange } from "@angular/material/slider";
 
 @Component({
   selector : 'layer-browser',
@@ -48,6 +48,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
   public darktheme$: Observable<boolean>
 
+  private customNgLayers: string[] = ['spatial landmark layer']
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private constantsService: AtlasViewerConstantsServices,
@@ -65,6 +67,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
 
         return [
           ngId,
+          ...this.customNgLayers,
           ...otherNgIds,
           ...templateSelected.parcellations.reduce((acc, curr) => {
             return acc.concat([

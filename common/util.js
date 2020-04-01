@@ -33,4 +33,6 @@
   
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
+
+  exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 })(typeof exports === 'undefined' ? module.exports : exports)

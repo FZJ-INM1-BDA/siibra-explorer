@@ -6,9 +6,12 @@
 
   <!-- title -->
   <div class="flex-grow-1 name-container d-flex align-items-start">
-    <small class="flex-grow-1 flex-shrink-1">
+    <small *ngIf="name else loadingName" class="flex-grow-1 flex-shrink-1">
       {{ name }}
     </small>
+    <ng-template #loadingName>
+      <div class="spinnerAnimationCircle"></div>
+    </ng-template>
   </div>
 
 
@@ -19,6 +22,7 @@
       <!-- unpin -->
       <button mat-icon-button
         *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else pinTmpl"
+        aria-label="Toggle pinning this dataset"
         (click)="undoableRemoveFav()"
         class="no-focus flex-grow-0 flex-shrink-0"
         color="primary">
@@ -28,6 +32,7 @@
       <!-- pin -->
       <ng-template #pinTmpl>
         <button mat-icon-button
+          aria-label="Toggle pinning this dataset"
           (click)="undoableAddFav()"
           class="no-focus flex-grow-0 flex-shrink-0"
           color="basic">
@@ -122,6 +127,7 @@
 
   <!-- pin dataset -->
   <button mat-icon-button
+    aria-label="Toggle pinning this dataset"
     *ngIf="downloadEnabled"
     iav-stop="click mousedown"
     (click)="toggleFav()"

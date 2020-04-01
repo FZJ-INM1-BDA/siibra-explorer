@@ -4,6 +4,7 @@
     <!-- content append -->
     <ng-container card-content="append">
       <region-text-search-autocomplete
+        *ngIf="viewerStateController.parcellationSelected$ | async"
         [showBadge]="true"
         class="d-block w-100">
       </region-text-search-autocomplete>
@@ -14,11 +15,21 @@
       <button mat-stroked-button
         *ngIf="!(sidePanelExploreCurrentViewIsOpen$ | async)"
         (click)="expandSidePanelCurrentView()"
-        class="m-1 flex-grow-1 overflow-hidden" >
-        <i class="fas fa-chevron-down"></i>
-        <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
-          {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
+        [disabled]="!(viewerStateController.parcellationSelected$ | async)"
+        class="m-1 flex-grow-1 overflow-hidden">
+
+        <!-- template parcellation selected -->
+        <ng-container *ngIf="viewerStateController.parcellationSelected$ | async; else exploreRegionNotAvailable">
+          <i class="fas fa-chevron-down"></i>
+          <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
+            {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
+          </ng-container>
         </ng-container>
+
+        <!-- nothing selected -->
+        <ng-template #exploreRegionNotAvailable>
+          No additional information available
+        </ng-template>
       </button>
     </div>
   </viewer-state-controller>
@@ -64,10 +75,25 @@
 </div>
 
 <ng-template #layerBrowserTmpl>
-  <mat-dialog-content>
-    <layer-browser></layer-browser>
+  <mat-dialog-content [hidden]="!showLayerBrowser">
+    <div class="d-flex flex-column">
+      <layer-browser></layer-browser>
+    </div>
   </mat-dialog-content>
-</ng-template>
+
+  <div class="d-flex justify-content-center position-static h-0 mt-4">
+    <button mat-mini-fab
+      aria-label="Toggle expansion state of additional layer browser"
+      [matBadge]="showLayerBrowser ? null : (layerBrowser.nonBaseNgLayers$ | async).length"
+      class="position-absolute layerBrowserToggleBtn"
+      matTooltip="Toggle the visiblity of the additional layer browser"
+      [attr.toggle-open]="showLayerBrowser"
+      (click)="showLayerBrowser = !showLayerBrowser">
+      <i class="fas" [ngClass]="{'fa-chevron-down': !showLayerBrowser, 'fa-chevron-up': showLayerBrowser}">
+      </i>
+    </button>
+  </div>
+</ng-template>  
 
 <!-- selected regions container -->
 <ng-template #selectedRegionsTmpl>
@@ -86,7 +112,7 @@
       </div>
 
       <!-- show when regions are selected -->
-      <div *ngIf="regionsSelected.length > 0" class="h-100 d-flex flex-column">
+      <div *ngIf="regionsSelected.length > 0" class="flex-grow-1 d-flex flex-column">
 
         <!-- header -->
         <div class="flex-grow-0 flex-shrink-0">
@@ -95,7 +121,7 @@
         </div>
 
         <!-- body (region descriptor or multi region list) -->
-        <div  class="flex-grow-1 flex-shrink-1">
+        <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
           <ng-container *ngTemplateOutlet="body">
           </ng-container>
         </div>
@@ -117,6 +143,7 @@
             class="position-absolute"
             (click)="deselectAllRegions()"
             matTooltip="Clear all regions"
+            aria-label="Clear all regions"
             color="primary">
             <i class="fas fa-times-circle"></i>
           </button>
@@ -125,6 +152,9 @@
     </ng-template>
 
     <ng-template #body>
+
+      <!-- TODO bug in browser? unless using d-flex here and flex-grow-1 in child, child cannot fille parent, even with h-100 -->
+
       <!-- single region -->
       <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
       
@@ -139,9 +169,10 @@
         </region-list-simple-view>
       </ng-template>
 
+
       <!-- multi region -->
       <ng-template #multiRegionTemplate>
-        <div class="h-100 d-flex flex-column">
+        <div class="flex-grow-1 d-flex flex-row">
 
           <cdk-virtual-scroll-viewport
             class="flex-grow-1 flex-shrink-1"
@@ -167,15 +198,4 @@
       </ng-template>
     </ng-template>
   </ng-container>
-</ng-template>
-
-
-<ng-template #kgDatasetPreviewer>
-  <kg-dataset-previewer
-    [darkmode]="darktheme$ | async"
-    [filename]="previewFilename"
-    [kgId]="previewKgId"
-    kg-ds-prv-backend-url="https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview">
-
-  </kg-dataset-previewer>
 </ng-template>

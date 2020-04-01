@@ -1,5 +1,6 @@
 const csp = require('helmet-csp')
 const bodyParser = require('body-parser')
+const crypto = require('crypto')
 
 let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 
@@ -7,6 +8,8 @@ let WHITE_LIST_SRC, DATA_SRC, SCRIPT_SRC
 // OKD/nginx reverse proxy seems to strip csp header
 // without it, testSafari.js will trigger no unsafe eval csp
 const reportOnly = true || process.env.NODE_ENV !== 'production'
+
+const CSP_REPORT_URI = process.env.CSP_REPORT_URI
 
 try {
   WHITE_LIST_SRC = JSON.parse(process.env.WHITE_LIST_SRC || '[]')
@@ -32,7 +35,9 @@ try {
 const defaultAllowedSites = [
   "'self'",
   '*.apps.hbp.eu',
-  '*.apps-dev.hbp.eu'
+  '*.apps-dev.hbp.eu',
+  'stats.humanbrainproject.eu',
+  'stats-dev.humanbrainproject.eu'
 ]
 
 const dataSource = [
@@ -40,10 +45,17 @@ const dataSource = [
   '*.humanbrainproject.org',
   '*.humanbrainproject.eu',
   '*.fz-juelich.de',
+  '*.kfa-juelich.de',
+  'object.cscs.ch',
   ...DATA_SRC
 ]
 
 module.exports = (app) => {
+  app.use((req, res, next) => {
+    res.locals.nonce = crypto.randomBytes(16).toString('hex')
+    next()
+  })
+
   app.use(csp({
     directives: {
       defaultSrc: [
@@ -75,22 +87,25 @@ module.exports = (app) => {
         'unpkg.com',
         '*.unpkg.com',
         '*.jsdelivr.net',
+        (req, res) => `'nonce-${res.locals.nonce}'`,
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC
       ],
-      reportUri: '/report-violation'
+      reportUri: CSP_REPORT_URI || '/report-violation'
     },
     reportOnly
   }))
 
-  app.post('/report-violation', bodyParser.json({
-    type: ['json', 'application/csp-report']
-  }), (req, res) => {
-    if (req.body) {
-      console.warn(`CSP Violation: `, req.body)
-    } else {
-      console.warn(`CSP Violation: no data received!`)
-    }
-    res.status(204).end()
-  })
+  if (!CSP_REPORT_URI) {
+    app.post('/report-violation', bodyParser.json({
+      type: ['json', 'application/csp-report']
+    }), (req, res) => {
+      if (req.body) {
+        console.warn(`CSP Violation: `, req.body)
+      } else {
+        console.warn(`CSP Violation: no data received!`)
+      }
+      res.status(204).end()
+    })
+  }
 }

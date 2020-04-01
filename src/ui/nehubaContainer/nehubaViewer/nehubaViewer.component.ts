@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, NgZone, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan } from "rxjs/operators";
@@ -8,7 +8,7 @@ import { StateInterface as ViewerConfiguration } from "src/services/state/viewer
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 import { takeOnePipe } from "../nehubaContainer.component";
 
-import { LoggingService } from "src/services/logging.service";
+import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import 'third_party/export_nehuba/main.bundle.js'
@@ -118,7 +118,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     private rd: Renderer2,
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
-    private zone: NgZone,
     public constantService: AtlasViewerConstantsServices,
     private log: LoggingService,
   ) {
@@ -298,7 +297,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     }
   }
 
-  public multiNgIdsLabelIndexMap: Map<string, Map<number, any>>
+  public multiNgIdsLabelIndexMap: Map<string, Map<number, any>> = new Map()
 
   public navPosReal: [number, number, number] = [0, 0, 0]
   public navPosVoxel: [number, number, number] = [0, 0, 0]
@@ -341,7 +340,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public loadNehuba() {
     this.nehubaViewer = this.exportNehuba.createNehubaViewer(this.config, (err) => {
       /* print in debug mode */
-      this.log.log(err)
+      this.log.error(err)
     })
 
     /**
@@ -637,9 +636,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public setNavigationState(newViewerState: Partial<ViewerState>) {
 
     if (!this.nehubaViewer) {
-      if (!PRODUCTION) {
-        this.log.warn('setNavigationState > this.nehubaViewer is not yet defined')
-      }
+      this.log.warn('setNavigationState > this.nehubaViewer is not yet defined')
       return
     }
 
@@ -776,11 +773,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           perspectiveOrientation : Array.from(perspectiveOrientation),
           perspectiveZoom,
           zoom,
-          position,
+          position: Array.from(position),
           positionReal : true,
         })
       })
 
+    // TODO bug: mouseoverlandmarkemitter does not emit empty for VTK layer when user mouse click
     this.ondestroySubscriptions.push(
       this.nehubaViewer.mouseOver.layer
         .filter(obj => obj.layer.name === this.constantService.ngLandmarkLayerName)

@@ -62,7 +62,28 @@ describe('atlasViewer.urlService.service.ts', () => {
     })
 
     it('parses pluginStates correctly', () => {
+      const searchParam = new URLSearchParams()
+      searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+      searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+      searchParam.set('pluginStates', 'http://localhost:3001/manifest.json')
+  
+      const newState = cvtSearchParamToState(searchParam, fetchedTemplateRootState)
+      expect(newState.pluginState.initManifests).toEqual([
+        ['INIT_MANIFEST_SRC', 'http://localhost:3001/manifest.json']
+      ])
+    })
 
+    it('if both standaloneVolumes and templateSelected are set, only standaloneVolumes are honoured', () => {
+      const searchParam = new URLSearchParams()
+      
+      searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+      searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+      searchParam.set('standaloneVolumes', JSON.stringify(['nifti://http://localhost/nii.gz']))
+
+      const newState = cvtSearchParamToState(searchParam, fetchedTemplateRootState)
+      expect(newState.viewerState.templateSelected).toBeFalsy()
+      expect(newState.viewerState.parcellationSelected).toBeFalsy()
+      expect(newState.viewerState.standaloneVolumes).toEqual(['nifti://http://localhost/nii.gz'])
     })
   })
 

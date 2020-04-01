@@ -296,6 +296,9 @@ const init = async () => {
   getPublicAccessToken = getPublic
 }
 
+const KG_ROOT = process.env.KG_ROOT || `https://kg.humanbrainproject.eu/query`
+const KG_SEARCH_VOCAB = process.env.KG_SEARCH_VOCAB || 'https://schema.hbp.eu/myQuery/'
+
 module.exports = {
   getIdFromFullId,
   populateSet,
@@ -318,5 +321,9 @@ module.exports = {
       allen2015Set,
       allen2017Set
     }
+  },
+  constants: {
+    KG_ROOT,
+    KG_SEARCH_VOCAB
   }
 }

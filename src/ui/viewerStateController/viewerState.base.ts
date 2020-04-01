@@ -1,11 +1,12 @@
 import { OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { MatBottomSheet, MatBottomSheetRef, MatSelectChange } from "@angular/material";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged, filter, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
+import {MatSelectChange} from "@angular/material/select";
+import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
 
 const ACTION_TYPES = {
   SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',
@@ -28,6 +29,8 @@ export class ViewerStateBase implements OnInit {
   public focused: boolean = false
 
   private subscriptions: Subscription[] = []
+
+  public standaloneVolumes$: Observable<any[]>
 
   public availableTemplates$: Observable<any[]>
   public availableParcellations$: Observable<any[]>
@@ -73,6 +76,12 @@ export class ViewerStateBase implements OnInit {
       select('regionsSelected'),
       distinctUntilChanged(),
       shareReplay(1),
+    )
+
+    this.standaloneVolumes$ = viewerState$.pipe(
+      select('standaloneVolumes'),
+      distinctUntilChanged(),
+      shareReplay(1)
     )
 
     this.availableTemplates$ = viewerState$.pipe(
