@@ -139,7 +139,7 @@ const dictionary = {
           expectedLabelName: 'White matter'
         },
         {
-          position: [293, 598],
+          position: [600, 150],
           expectedLabelName: 'Grey matter'
         }
       ]
@@ -147,7 +147,7 @@ const dictionary = {
   }
 }
 
-describe('mouse over viewer show area name', () => {
+describe('> mouse over viewer show area name', () => {
   let iavPage
   beforeAll(async () => {
     iavPage = new AtlasPage()
@@ -156,7 +156,7 @@ describe('mouse over viewer show area name', () => {
 
   for (const templateName in dictionary) {
     for (const parcellationName in dictionary[templateName]) {
-      describe(`testing template: ${templateName} & parcellation: ${parcellationName}`, () => {
+      describe(`> testing template: ${templateName} & parcellation: ${parcellationName}`, () => {
 
         const {url, tests} = dictionary[templateName][parcellationName]
         beforeAll(async () => {
@@ -173,7 +173,7 @@ describe('mouse over viewer show area name', () => {
           await iavPage.waitUntilAllChunksLoaded()
         })
         for (const { position, expectedLabelName } of tests ) {          
-          it(`at cursor position: ${JSON.stringify(position)}, expect label name: ${expectedLabelName}`, async () => {
+          it(`> at cursor position: ${JSON.stringify(position)}, expect label name: ${expectedLabelName}`, async () => {
 
             await iavPage.cursorMoveTo({ position })
             await iavPage.wait(2000)
