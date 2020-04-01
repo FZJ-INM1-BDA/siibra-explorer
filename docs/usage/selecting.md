@@ -20,6 +20,14 @@ If an atlas is already loaded, the list of available templates and parcellations
 
 [![](images/bigbrain_parcellation_selector_open.png)](images/bigbrain_parcellation_selector_open.png)
 
+### From region specific menu
+If the same region is available in different template spaces, it is possible to select template from region specific menu.
+
+`click` on a region (coloured segment) to bring up a context specific menu. `click` on `change template` button to expand available templates.
+
+[![](images/selecting_change_template_from_region.png)](images/selecting_change_template_from_region.png)
+
+If selected region has not hemisphere data, but available templates have, you will see multiple buttons with template and hemisphere information, like: `MNI Colin 27 - right` and `MNI Colin 27 - left`. `click` on desired menu item to change template space. After changing template, new navigation state will be set to desired region. 
 
 ### Information on the selected template / parcellation
 
