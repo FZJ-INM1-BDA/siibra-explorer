@@ -29,7 +29,7 @@ const redisURL = redisAddr && `${redisProto}://${redisAddr}:${redisPort}`
 const limiter = new RateLimit({
   windowMs: 1e3 * 5,
   max: 5,
-  ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
+  // ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
 })
 
 const passthrough = (_, __, next) => next()
