@@ -20,7 +20,6 @@ import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
-import { AuthService } from "./services/auth.service";
 import { DialogService } from "./services/dialogService.service";
 import { UseEffects } from "./services/effect/effect";
 import { LocalFileService } from "./services/localFile.service";
@@ -52,6 +51,7 @@ import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { ShareModule } from './share';
+import { AuthService } from './auth'
 
 @NgModule({
   imports : [

@@ -71,6 +71,8 @@ if(HOST_PATHNAME !== '') {
   if (HOST_PATHNAME.slice(-1) === '/') throw new Error(`HOST_PATHNAME, if defined and non-emtpy, should NOT end with a slash. HOST_PATHNAME: ${HOST_PATHNAME}`)
 }
 
+server.set('trust proxy', 1)
+
 server.disable('x-powered-by')
 
 server.use(HOST_PATHNAME, app)

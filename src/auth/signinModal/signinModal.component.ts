@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { AuthService, IAuthMethod, IUser } from "src/services/auth.service";
+import { AuthService, IAuthMethod, IUser } from "../auth.service";
 
 @Component({
   selector: 'signin-modal',
