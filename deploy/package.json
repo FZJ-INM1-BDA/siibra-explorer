@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "test": "npm run testEnv && npm run testNoEnv",
-    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js --timeout 60000",
-    "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js --timeout 60000",
+    "testEnv": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha ./**/*.spec.js --timeout 60000",
+    "testNoEnv": "node ./node_modules/.bin/mocha ./**/*.noenv-spec.js --timeout 60000",
     "mocha": "mocha",
     "mocha-env": "node -r dotenv/config ./node_modules/.bin/mocha"
   },

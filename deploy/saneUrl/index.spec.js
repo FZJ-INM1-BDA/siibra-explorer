@@ -1,9 +1,5 @@
 const sinon = require('sinon')
-const { Store } = require('./store')
-
-sinon
-  .stub(Store.prototype, 'getToken')
-  .returns(Promise.resolve(`--fake-token--`))
+const { Store, NotFoundError } = require('./store')
 
 const userStore = require('../user/store')
 
@@ -44,6 +40,17 @@ const payload = {
 
 describe('> saneUrl/index.js', () => {
 
+  let getTokenStub
+  before(() => {
+    getTokenStub = sinon
+      .stub(Store.prototype, 'getToken')
+      .returns(Promise.resolve(`--fake-token--`))
+  })
+
+  after(() => {
+    getTokenStub.restore()
+  })
+
   describe('> router', () => {
 
     let server, setStub
@@ -61,6 +68,7 @@ describe('> saneUrl/index.js', () => {
 
     after(() => {
       server.close()
+      setStub.restore()
     })
     
     it('> works', async () => {
@@ -94,25 +102,13 @@ describe('> saneUrl/index.js', () => {
       getStub.restore()
     })
 
-    it('> set works', async () => {
+    describe('> set', () => {
 
-      await got(`http://localhost:50000/${name}`, {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      })
+      it('> checks if the name is available', async () => {
 
-      const [ storedName, _ ] = setStub.args[0]
-
-      expect(storedName).to.equal(name)
-      expect(setStub.called).to.be.true
-    })
-
-    describe('> set with unauthenticated user', () => {
-
-      it('> set with anonymous user has user undefined and expiry as defined', async () => {
+        const getStub = sinon
+          .stub(Store.prototype, 'get')
+          .returns(Promise.reject(new NotFoundError()))
 
         await got(`http://localhost:50000/${name}`, {
           method: 'POST',
@@ -122,78 +118,167 @@ describe('> saneUrl/index.js', () => {
           body: JSON.stringify(payload)
         })
   
-        expect(setStub.called).to.be.true
-        const [ _, storedContent] = setStub.args[0]
-        const { userId, expiry } = JSON.parse(storedContent)
-        expect(!!userId).to.be.false
-        expect(!!expiry).to.be.true
+        const [ storedName, _ ] = setStub.args[0]
   
-        // there will be some discrepencies, but the server lag should not exceed 5 seconds
-        expect( 1e3 * 60 * 60 * 72 - expiry + Date.now() ).to.be.lessThan(1e3 * 5)
-      })  
-    })
+        expect(storedName).to.equal(name)
+        expect(getStub.called).to.be.true
+        expect(setStub.called).to.be.true
 
-    describe('> set with authenticated user', () => {
-      
-      before(() => {
-        user = {
-          id: 'test/1',
-          name: 'hello world'
-        }
+        getStub.restore()
       })
 
-      afterEach(() => {
-        readUserDataStub.resetHistory()
-        saveUserDataStub.resetHistory()
-      })
 
-      after(() => {
-        user = null
-        readUserDataStub.restore()
-        saveUserDataStub.restore()
-      })
+      it('> if file exist, will return 409 conflict', async () => {
 
-      it('> userId set, expiry unset', async () => {
+        const getStub = sinon
+          .stub(Store.prototype, 'get')
+          .returns(Promise.resolve('{}'))
 
-        await got(`http://localhost:50000/${name}`, {
+        const { statusCode } = await got(`http://localhost:50000/${name}`, {
           method: 'POST',
           headers: {
             'Content-type': 'application/json'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          throwHttpErrors: false
         })
   
-        expect(setStub.called).to.be.true
-        const [ _, storedContent] = setStub.args[0]
-        const { userId, expiry } = JSON.parse(storedContent)
-        expect(!!userId).to.be.true
-        expect(!!expiry).to.be.false
-  
-        expect( userId ).to.equal('test/1')
+        expect(statusCode).to.equal(409)
+        expect(getStub.called).to.be.true
+        expect(setStub.called).to.be.false
+
+        getStub.restore()
       })
 
-      it('> readUserDataset saveUserDataset data stubs called', async () => {
+      it('> if other error, will return 500', async () => {
+        
+        const getStub = sinon
+          .stub(Store.prototype, 'get')
+          .returns(Promise.reject(new Error(`other errors`)))
 
-        await got(`http://localhost:50000/${name}`, {
+        const { statusCode } = await got(`http://localhost:50000/${name}`, {
           method: 'POST',
           headers: {
             'Content-type': 'application/json'
           },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          throwHttpErrors: false
+        })
+  
+        expect(statusCode).to.equal(500)
+        expect(getStub.called).to.be.true
+        expect(setStub.called).to.be.false
+
+        getStub.restore()
+      })
+
+      describe('> set with unauthenticated user', () => {
+        let getStub
+        
+        before(() => {
+          getStub = sinon
+            .stub(Store.prototype, 'get')
+            .returns(Promise.reject(new NotFoundError()))
+        })
+
+        after(() => {
+          getStub.restore()
         })
         
-        expect(readUserDataStub.called).to.be.true
-        expect(readUserDataStub.calledWith(user)).to.be.true
+        it('> set with anonymous user has user undefined and expiry as defined', async () => {
+  
+          await got(`http://localhost:50000/${name}`, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+    
+          expect(setStub.called).to.be.true
+          const [ _, storedContent] = setStub.args[0]
+          const { userId, expiry } = JSON.parse(storedContent)
+          expect(!!userId).to.be.false
+          expect(!!expiry).to.be.true
+    
+          // there will be some discrepencies, but the server lag should not exceed 5 seconds
+          expect( 1e3 * 60 * 60 * 72 - expiry + Date.now() ).to.be.lessThan(1e3 * 5)
+        })  
+      })
+  
+      describe('> set with authenticated user', () => {
         
-        expect(saveUserDataStub.called).to.be.true
-        expect(saveUserDataStub.calledWith(user, {
-          ...savedUserDataPayload,
-          savedCustomLinks: [
-            ...savedUserDataPayload.savedCustomLinks,
-            name
-          ]
-        })).to.be.true
+        before(() => {
+          getStub = sinon
+            .stub(Store.prototype, 'get')
+            .returns(Promise.reject(new NotFoundError()))
+        })
+
+        after(() => {
+          getStub.restore()
+        })
+        
+        before(() => {
+          user = {
+            id: 'test/1',
+            name: 'hello world'
+          }
+        })
+  
+        afterEach(() => {
+          readUserDataStub.resetHistory()
+          saveUserDataStub.resetHistory()
+        })
+  
+        after(() => {
+          user = null
+          readUserDataStub.restore()
+          saveUserDataStub.restore()
+        })
+  
+        it('> userId set, expiry unset', async () => {
+  
+          await got(`http://localhost:50000/${name}`, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+    
+          expect(setStub.called).to.be.true
+          const [ _, storedContent] = setStub.args[0]
+          const { userId, expiry } = JSON.parse(storedContent)
+          expect(!!userId).to.be.true
+          expect(!!expiry).to.be.false
+    
+          expect( userId ).to.equal('test/1')
+        })
+  
+        it('> readUserDataset saveUserDataset data stubs called', async () => {
+  
+          await got(`http://localhost:50000/${name}`, {
+            method: 'POST',
+            headers: {
+              'Content-type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          })
+          
+          expect(readUserDataStub.called).to.be.true
+          expect(readUserDataStub.calledWith(user)).to.be.true
+          
+          expect(saveUserDataStub.called).to.be.true
+          expect(saveUserDataStub.calledWith(user, {
+            ...savedUserDataPayload,
+            savedCustomLinks: [
+              ...savedUserDataPayload.savedCustomLinks,
+              name
+            ]
+          })).to.be.true
+        })
       })
     })
   })
 })
+
