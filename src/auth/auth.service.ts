@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { Observable, of, Subscription } from "rxjs";
-import { catchError, shareReplay } from "rxjs/operators";
+import { catchError, shareReplay, mapTo } from "rxjs/operators";
 
 const IV_REDIRECT_TOKEN = `IV_REDIRECT_TOKEN`
 

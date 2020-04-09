@@ -106,11 +106,20 @@ const { compressionMiddleware } = require('nomiseco')
 
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
 
+/**
+ * saneUrl end points
+ */
+const saneUrlRouter = require('./saneUrl')
+app.use('/saneUrl', saneUrlRouter)
+
 const jsonMiddleware = (req, res, next) => {
   if (!res.get('Content-Type')) res.set('Content-Type', 'application/json')
   next()
 }
 
+/**
+ * resources endpoints
+ */
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
 const datasetRouter = require('./datasets')

@@ -47,7 +47,7 @@ import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.com
 import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
-import { SigninModal } from "./signinModal/signinModal.component";
+
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { FilterNameBySearch } from "./viewerStateController/regionHierachy/filterNameBySearch.pipe";
 
@@ -82,6 +82,8 @@ import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 import { NehubaModule } from "./nehubaContainer/nehuba.module";
 import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.component";
 import { ShareModule } from "src/share";
+import { StateModule } from "src/state";
+import { AuthModule } from "src/auth";
 
 @NgModule({
   imports : [
@@ -96,6 +98,8 @@ import { ShareModule } from "src/share";
     AngularMaterialModule,
     NehubaModule,
     ShareModule,
+    StateModule,
+    AuthModule,
   ],
   declarations : [
     NehubaContainer,
@@ -114,7 +118,7 @@ import { ShareModule } from "src/share";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
-    SigninModal,
+    
     StatusCardComponent,
     CookieAgreement,
     KGToS,
@@ -192,7 +196,7 @@ import { ShareModule } from "src/share";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
-    SigninModal,
+    
     CookieAgreement,
     KGToS,
     StatusCardComponent,
