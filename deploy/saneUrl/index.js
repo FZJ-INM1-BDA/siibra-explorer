@@ -16,6 +16,9 @@ const {
   REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR,
   REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT,
 
+  REDIS_USERNAME,
+  REDIS_PASSWORD,
+
   HOSTNAME,
   DISABLE_LIMITER,
 } = process.env
@@ -24,12 +27,14 @@ const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP
 const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
 const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
 
-const redisURL = redisAddr && `${redisProto}://${redisAddr}:${redisPort}`
+const userPass = `${REDIS_USERNAME || ''}${( REDIS_PASSWORD && (':' + REDIS_PASSWORD)) || ''}${ (REDIS_USERNAME || REDIS_PASSWORD) && '@'}`
+
+const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
 
 const limiter = new RateLimit({
   windowMs: 1e3 * 5,
   max: 5,
-  // ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
+  ...( redisURL ? { store: new RedisStore({ redisURL }) } : {} )
 })
 
 const passthrough = (_, __, next) => next()
