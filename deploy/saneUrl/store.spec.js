@@ -1,4 +1,4 @@
-const { NotFoundError, Store } = require('./store')
+const { Store } = require('./store')
 const sinon = require('sinon')
 const { expect } = require("chai")
 const nock = require('nock')
@@ -11,12 +11,21 @@ const objContent = `objContent`
 describe('> store.js', () => {
   
   describe('> Store', () => {
-    const getTokenSpy = sinon
-      .stub(Store.prototype, 'getToken')
-      .returns(Promise.resolve(fakeToken))
-    
-    const store = new Store({ objStorateRootUrl })
 
+    let getTokenSpy, store
+    before(() => {
+
+      getTokenSpy = sinon
+        .stub(Store.prototype, 'getToken')
+        .returns(Promise.resolve(fakeToken))
+    
+      store = new Store({ objStorateRootUrl })
+    })
+
+    after(() => {
+      getTokenSpy.restore()
+      nock.restore()
+    })
     afterEach(() => {
       getTokenSpy.resetHistory()
     })
