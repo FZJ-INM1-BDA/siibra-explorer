@@ -17,6 +17,7 @@
   "dependencies": {
     "archiver": "^3.0.0",
     "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "express": "^4.16.4",
     "express-rate-limit": "^5.1.1",
     "express-session": "^1.15.6",

@@ -4,6 +4,7 @@ const app = express.Router()
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
+const cookieParser = require('cookie-parser')
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
@@ -87,9 +88,15 @@ const indexTemplate = require('fs').readFileSync(
   path.join(PUBLIC_PATH, 'index.html'),
   'utf-8'
 )
-app.get('/', (req, res) => {
+app.get('/', cookieParser(), (req, res) => {
+  const iavError = req.cookies && req.cookies['iav-error']
+  if (iavError) res.clearCookie('iav-error', { httpOnly: true, sameSite: 'strict' })
+  
   res.setHeader('Content-Type', 'text/html')
-  res.status(200).send(`${indexTemplate.replace(/\$\$NONCE\$\$/g, res.locals.nonce)}`)
+  const returnTemplate = indexTemplate
+    .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+    .replace('<atlas-viewer>', `<atlas-viewer data-error="${iavError.replace(/"/g, '&quot;')}">`)
+  res.status(200).send(returnTemplate)
 })
 
 /**
