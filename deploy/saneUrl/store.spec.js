@@ -28,6 +28,10 @@ describe('> store.js', () => {
       expect(token).to.equal(fakeToken)
     })
 
+    it('> spy gets reset', async () => {
+      expect(getTokenSpy.notCalled).to.be.true
+    })
+
     it('> get works', async () => {
       const scope = nock(objStorateRootUrl)
         .get(`/${objName}`)
@@ -50,8 +54,22 @@ describe('> store.js', () => {
       })
 
       await store.set(objName, objContent)
-      
       expect(scope.isDone()).to.be.true
+    })
+
+    it('> set retries if at first fails', async () => {
+      let index = 0
+      const scope = nock(objStorateRootUrl)
+        .put(`/${objName}`)
+        .twice()
+        .reply((_uri, _reqBody, cb) => {
+          cb(null, [ index % 2 === 0 ? 401 : 200 ])
+          index ++
+        })
+      
+      await store.set(objName, objContent)
+      expect(scope.isDone()).to.be.true
+      expect(getTokenSpy.called).to.be.true
     })
   })
 })

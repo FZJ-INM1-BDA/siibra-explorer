@@ -43,6 +43,7 @@ class Store {
 
   async getToken() {
     this.token = await this.wrapper.getScopedToken({ projectId: OBJ_STORAGE_PROJECT_ID })
+    return this.token
   }
 
   get(id) {
@@ -60,7 +61,7 @@ class Store {
     })
   }
 
-  set(id, value) {
+  _set(id, value) {
     return new Promise((rs, rj) => {
       request.put(`${this.objStorateRootUrl}/${id}`, {
         headers: {
@@ -73,6 +74,17 @@ class Store {
         return rs(body)
       })
     })
+  }
+
+  async set(id, value) {
+    try {
+      const result = await this._set(id, value)
+      return result
+    } catch (e) {
+      await this.getToken()
+      const result = await this._set(id, value)
+      return result
+    }
   }
 
   async healthCheck(){
