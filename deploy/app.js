@@ -90,13 +90,21 @@ const indexTemplate = require('fs').readFileSync(
 )
 app.get('/', cookieParser(), (req, res) => {
   const iavError = req.cookies && req.cookies['iav-error']
-  if (iavError) res.clearCookie('iav-error', { httpOnly: true, sameSite: 'strict' })
   
   res.setHeader('Content-Type', 'text/html')
-  const returnTemplate = indexTemplate
-    .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
-    .replace('<atlas-viewer>', `<atlas-viewer data-error="${iavError.replace(/"/g, '&quot;')}">`)
-  res.status(200).send(returnTemplate)
+
+  if (iavError) {
+    res.clearCookie('iav-error', { httpOnly: true, sameSite: 'strict' })
+
+    const returnTemplate = indexTemplate
+      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+      .replace('<atlas-viewer>', `<atlas-viewer data-error="${iavError.replace(/"/g, '&quot;')}">`)
+    res.status(200).send(returnTemplate)
+  } else {
+    const returnTemplate = indexTemplate
+      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+    res.status(200).send(returnTemplate)
+  }
 })
 
 /**
