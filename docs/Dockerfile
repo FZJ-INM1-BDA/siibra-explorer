@@ -1,20 +1,24 @@
 # TODO using dockerfile will not work for readthedocs ... 
 # need to consider how to build for read the docs
 
-FROM node:12 as img_autogen
-
+FROM xgui3783/pptr-docker:4383e79bc83452e4bdaf098039635c36c55ffb8f as img_autogen
 COPY . /iav
 WORKDIR /iav
 
 # build aot first && install webdriver & pptr
 RUN npm i 
 
+# build-aot
+RUN npm run build-aot
+
+# for selenium web driver
+# RUN apt-get update && apt-get install default-jre -y
+
 # update webdriver
 RUN npm run wd -- update --versions.chrome=80.0.3987.106
 
-# parallel build-aot and install pptr
-RUN npm run build-aot & \
-    npm i --no-save puppeteer@2.1.0
+# install pptr
+RUN npm i --no-save puppeteer@2.1.0
 
 # install deploy folder
 RUN cd deploy && \

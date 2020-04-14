@@ -5,7 +5,7 @@ const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
 const { By, WebDriver, Key } = require('selenium-webdriver')
-const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.0.2/citruslight.js`
+const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -68,8 +68,27 @@ class WdBase{
           })
       }, CITRUS_LIGHT_URL, cssSelector)
     }
+    
     await this.wait(1000)
     const result = await this._browser.takeScreenshot()
+
+    if (cssSelector) {
+      await this._browser.executeAsyncScript(async () => {
+        const cb = arguments[arguments.length - 1]
+        const moduleUrl = arguments[0]
+        const cssSelector = arguments[1]
+
+        const el = document.querySelector(cssSelector)
+        if (!el) throw new Error(`css selector not fetching anything`)
+        import(moduleUrl)
+          .then(async m => {
+            m.clearAll()
+            cb()
+          })
+      }, CITRUS_LIGHT_URL, cssSelector)
+    }
+    
+    await this.wait(1000)
     return result
   }
 

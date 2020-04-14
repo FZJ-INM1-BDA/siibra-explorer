@@ -9,13 +9,18 @@ if (!exists) fs.mkdirSync(outputDir)
 
 describe('> share', () => {
   let iavPage
-  beforeEach(async () => {
+  beforeAll(async () => {
     iavPage = new AtlasPage()
     await iavPage.init()
     await iavPage.goto()
-    await iavPage.selectTitleCard('Big Brain (Histology)')
+    await iavPage.wait(1000)
+    await iavPage.selectTitleTemplateParcellation('Big Brain (Histology)', 'Grey/White matter')
     await iavPage.wait(1000)
     await iavPage.waitUntilAllChunksLoaded()
+  })
+
+  afterEach(async () => {
+    await iavPage.clearAlerts()
   })
 
   it('> generating highlight share btn', async () => {
