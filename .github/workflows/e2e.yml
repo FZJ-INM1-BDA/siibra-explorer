@@ -74,11 +74,12 @@ jobs:
       if: success()
       run: |
         docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e -- --specs ./e2e/screenshots/gen.js
+        docker cp ${DOCKER_E2E_PPTR}:/iav/docs/autogen_images ./autogen_images
     - uses: actions/upload-artifact@v1
       if: success()
       with:
         name: screenshots-${{ github.sha }}
-        path: /iav/docs/autogen_images
+        path: ./autogen_images
     - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
       if: success()
       run: |
