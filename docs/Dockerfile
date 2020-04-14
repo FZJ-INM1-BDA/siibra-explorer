@@ -7,9 +7,10 @@ COPY . /iav
 WORKDIR /iav
 
 # build aot first && install webdriver & pptr
+RUN npm i 
+
 # parallel build-aot, update webdriver and install pptr
-RUN npm i && \
-    npm run build-aot & \
+RUN npm run build-aot & \
     npm run wd -- update --versions.chrome=80.0.3987.106 & \
     npm i --no-save puppeteer@2.1.0
 
