@@ -70,6 +70,15 @@ jobs:
     - name: run pptr tests - ${{ env.ATLAS_URL }}
       run: |
         docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e
+    - name : make screenshot, if success
+      if: success()
+      run: |
+        docker exec --env ATLAS_URL=${ATLAS_URL} -t -w /iav ${DOCKER_E2E_PPTR} npm run e2e -- --specs ./e2e/screenshots/gen.js
+    - uses: actions/upload-artifact@v1
+      if: success()
+      with:
+        name: screenshots-${{ github.sha }}
+        path: /iav/docs/autogen_images
     - name: cleanup, stop container ${{ env.DOCKER_CONTAINER_NAME }} && ${{ env.DOCKER_E2E_PPTR }}
       if: success()
       run: |
