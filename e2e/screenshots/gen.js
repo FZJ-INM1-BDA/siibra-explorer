@@ -3,7 +3,8 @@ const path = require('path')
 const glob = require('glob')
 describe('> generating screenshot', () => {
   let childProcess
-  const matches = glob.sync('**/*.e2e-screenshot.js', { cwd: path.join(__dirname, '../src') })
+  const matchCwdPath = path.join(__dirname, '../src')
+  const matches = glob.sync('**/*.e2e-screenshot.js', { cwd: matchCwdPath })
   const cwdPath = path.join(__dirname, '../../deploy/')
   
   beforeAll(done => {
@@ -18,7 +19,7 @@ describe('> generating screenshot', () => {
   })
 
   for (const match of matches) {
-    const requirePath = path.join(cwdPath, match)
+    const requirePath = path.join(matchCwdPath, match)
     require(requirePath)
   }
   afterAll(() => {
