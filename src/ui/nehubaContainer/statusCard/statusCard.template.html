@@ -67,6 +67,7 @@
       <div class="w-0 position-relative">
         <button
           (click)="showBottomSheet(shareTmpl)"
+          [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
           mat-icon-button
           class="position-absolute share-btn">
           <i class="fas fa-share-square"></i>
@@ -95,7 +96,9 @@
     Share via
   </h4>
   <mat-nav-list>
-    <mat-list-item iav-clipboard-copy>
+    <mat-list-item iav-clipboard-copy
+      [attr.aria-label]="COPY_URL_TO_CLIPBOARD_ARIA_LABEL"
+      [attr.tab-index]="10">
       <mat-icon
         class="mr-4"
         fontSet="fas"
@@ -105,7 +108,9 @@
         Copy link to this view
       </span>
     </mat-list-item>
-    <mat-list-item (click)="openDialog(shareSaneUrl)">
+    <mat-list-item (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL })"
+      [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
+      [attr.tab-index]="10">
       <mat-icon 
         class="mr-4"
         fontSet="fas"

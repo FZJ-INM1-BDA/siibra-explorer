@@ -23,12 +23,14 @@ pages:
     - Searching: 'usage/search.md'
     - Exploring connectivity: 'usage/connectivity.md'
     - Miscellaneous: 'usage/misc.md'
+    - Sharing: 'usage/sharing.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.2.0: 'releases/v2.2.0.md'
     - v2.1.0: 'releases/v2.1.0.md'
     - v2.0.2: 'releases/v2.0.2.md'
     - v2.0.1: 'releases/v2.0.1.md'
