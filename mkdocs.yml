@@ -14,6 +14,16 @@ markdown_extensions:
   - footnotes
   - mdx_truly_sane_lists
 
+plugins:
+  - search
+  - errandkun:
+      extract_path: docs/autogen_images
+      external_resources:
+      - type: github
+        owner: fzj-inm1-bda
+        repo: interactive-viewer
+        workflow_name: e2e
+
 pages:
   - Home: 'index.md'
   - System requirements: 'requirements.md'
