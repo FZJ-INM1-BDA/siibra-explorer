@@ -7,6 +7,7 @@ import {
   Renderer2,
   TemplateRef,
   ViewChild,
+  ElementRef,
 } from "@angular/core";
 import { ActionsSubject, select, Store } from "@ngrx/store";
 import {combineLatest, interval, merge, Observable, of, Subscription} from "rxjs";
@@ -135,7 +136,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
-    private snackbar: MatSnackBar
+    private snackbar: MatSnackBar,
+    private el: ElementRef,
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -254,6 +256,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.push(
       this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
     )
+
+    const error = this.el.nativeElement.getAttribute('data-error')
+
+    if (error) {
+      this.snackbar.open(error, 'Dismiss', { duration: 5000 })
+      this.el.nativeElement.removeAttribute('data-error')
+    }
   }
 
   private selectedParcellation$: Observable<any>

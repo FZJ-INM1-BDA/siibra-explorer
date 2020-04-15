@@ -65,12 +65,29 @@ router.get('/:name', DISABLE_LIMITER ? passthrough : limiter, async (req, res) =
     const json = JSON.parse(value)
     const { queryString } = json
 
-    const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME}/`
+    const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
 
-    if (redirectFlag) res.redirect(`${REAL_HOSTNAME}/?${queryString}`)
+    if (redirectFlag) res.redirect(`${REAL_HOSTNAME}?${queryString}`)
     else res.status(200).send(value)
 
   } catch (e) {
+    if (redirectFlag) {
+
+      const REAL_HOSTNAME = `${HOSTNAME}${HOST_PATHNAME || ''}/`
+
+      res.cookie(
+        'iav-error', 
+        e instanceof NotFoundError ? `${name} 
+        
+        not found` : `error while fetching ${name}.`,
+        {
+          httpOnly: true,
+          sameSite: "strict",
+          maxAge: 1e3 * 30
+        }
+      )
+      return res.redirect(REAL_HOSTNAME)
+    }
     if (e instanceof NotFoundError) return res.status(404).end()
     else return res.status(500).send(e.toString())
   }

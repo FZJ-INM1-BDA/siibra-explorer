@@ -14,6 +14,16 @@ markdown_extensions:
   - footnotes
   - mdx_truly_sane_lists
 
+plugins:
+  - search
+  - errandkun:
+      extract_path: docs/autogen_images
+      external_resources:
+      - type: github
+        owner: fzj-inm1-bda
+        repo: interactive-viewer
+        workflow_name: e2e
+
 pages:
   - Home: 'index.md'
   - System requirements: 'requirements.md'
@@ -23,12 +33,14 @@ pages:
     - Searching: 'usage/search.md'
     - Exploring connectivity: 'usage/connectivity.md'
     - Miscellaneous: 'usage/misc.md'
+    - Sharing: 'usage/sharing.md'
   - Advanced usage:
     - Keyboard shortcuts: 'advanced/keyboard.md'
     - URL parsing: 'advanced/url.md'
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.2.0: 'releases/v2.2.0.md'
     - v2.1.0: 'releases/v2.1.0.md'
     - v2.0.2: 'releases/v2.0.2.md'
     - v2.0.1: 'releases/v2.0.1.md'

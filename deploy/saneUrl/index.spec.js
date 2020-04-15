@@ -1,4 +1,5 @@
 const sinon = require('sinon')
+const cookie = require('cookie')
 const { Store, NotFoundError } = require('./store')
 
 const userStore = require('../user/store')
@@ -100,6 +101,32 @@ describe('> saneUrl/index.js', () => {
       expect(statusCode).to.equal(404)
       expect(getStub.calledWith(name)).to.be.true
       getStub.restore()
+    })
+
+    it('> get on expired with txt html header sets cookie and redirect', async () => {
+
+      const body = {
+        ...payload,
+        expiry: Date.now() - 1e3 * 60
+      }
+      const getStub = sinon
+        .stub(Store.prototype, 'get')
+        .returns(Promise.resolve(JSON.stringify(body)))
+        
+      const { statusCode, headers } = await got(`http://localhost:50000/${name}`, {
+        headers: {
+          'accept': 'text/html'
+        },
+        followRedirect: false
+      })
+      expect(statusCode).to.be.greaterThan(300)
+      expect(statusCode).to.be.lessThan(303)
+
+      expect(getStub.calledWith(name)).to.be.true
+      getStub.restore()
+
+      const c = cookie.parse(...headers['set-cookie'])
+      expect(!!c['iav-error']).to.be.true
     })
 
     describe('> set', () => {
