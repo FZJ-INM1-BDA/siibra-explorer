@@ -52,7 +52,7 @@ const dataSource = [
 
 module.exports = (app) => {
   app.use((req, res, next) => {
-    res.locals.nonce = crypto.randomBytes(16).toString('hex')
+    if (req.path === '/') res.locals.nonce = crypto.randomBytes(16).toString('hex')
     next()
   })
 
@@ -87,7 +87,10 @@ module.exports = (app) => {
         'unpkg.com',
         '*.unpkg.com',
         '*.jsdelivr.net',
-        (req, res) => `'nonce-${res.locals.nonce}'`,
+
+        // Catching Safari 10 bug unsafe-eval
+        "'sha256-yEVCaeeaeg6koloXfx+6DuFnP7SnjOwYZiWBTRFurJw='",
+        (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
         ...SCRIPT_SRC,
         ...WHITE_LIST_SRC
       ],
