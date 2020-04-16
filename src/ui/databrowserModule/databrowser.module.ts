@@ -28,6 +28,8 @@ import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previe
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
+import { ShowDatasetDialogDirective } from "./showDatasetDialog.directive";
+import { PreviewDatasetFile } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
 
 @NgModule({
   imports: [
@@ -46,6 +48,12 @@ import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDo
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
+
+    /**
+     * Directives
+     */
+    ShowDatasetDialogDirective,
+    PreviewDatasetFile,
 
     /**
      * pipes
@@ -76,6 +84,8 @@ import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDo
     GetKgSchemaIdFromFullIdPipe,
     BulkDownloadBtn,
     TransformDatasetToIdPipe,
+    ShowDatasetDialogDirective,
+    PreviewDatasetFile,
   ],
   entryComponents: [
     DataBrowser,

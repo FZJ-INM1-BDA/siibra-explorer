@@ -1,6 +1,66 @@
 <mat-card>
   <mat-card-title>
-    {{ region.name }}
+    <div class="position-relative">
+      <span class="mr-8">
+        {{ region.name }}
+      </span>
+
+      <!-- only show speed dial if originDatasets exists and are greater than 0 -->
+      <div *ngIf="((region && region.originDatasets) || []).length > 0"
+        class="speed-dial position-absolute d-flex flex-row-reverse align-items-center"
+        (iav-onclick-outside)="fab.close()"
+        #fab="iavFabSpeedDialContainer"
+        iav-fab-speed-dial-scale-origin="right"
+        iav-fab-spped-dial-container>
+
+        <!-- main btn -->
+        <button mat-fab class="ml-3"
+          iav-fab-speed-dial-trigger
+          [color]="fab.isOpen ? 'default' : 'accent'">
+
+          <!-- TODO add test to ensure this does not happen -->
+          <!-- nb pe-none is essential for iav-onclick-outside directive to work properly -->
+          <ng-container *ngIf="fab.isOpen; else closedTmpl">
+            <i class="pe-none fas fa-times"></i>
+          </ng-container>
+          <ng-template #closedTmpl>
+            <i class="pe-none fas fa-ellipsis-v"></i>
+          </ng-template>
+        </button>
+
+        <!-- action btns -->
+        <!-- originDatasets -->
+        <ng-container *ngFor="let originDataset of (region.originDatasets || []); let index = index">
+
+          <!-- preview file -->
+          <button *ngIf="originDataset.kgSchema && originDataset.kgId && originDataset.filename"
+            mat-mini-fab
+            iav-dataset-preview-dataset-file
+            [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+            [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+            class="m-1"
+            [iav-fab-speed-dial-child-index]="index * 2"
+            matTooltip="Preview file"
+            iav-fab-speed-dial-child>
+            <i class="far fa-eye"></i>
+          </button>
+
+          <!-- show dataset -->
+          <button *ngIf="originDataset.kgSchema && originDataset.kgId"
+            mat-mini-fab
+            class="m-1"
+            (click)="fab.close()"
+            matTooltip="More detail on dataset"
+            [iav-dataset-show-dataset-dialog-kgid]="originDataset.kgId"
+            iav-dataset-show-dataset-dialog
+            [iav-fab-speed-dial-child-index]="index * 2 + 1"
+            iav-fab-speed-dial-child>
+            <i class="fas fa-info"></i>
+          </button>
+        </ng-container>
+
+      </div>
+    </div>
   </mat-card-title>
   <mat-card-subtitle>
     <i class="fas fa-brain"></i>

@@ -1,5 +1,6 @@
 <div mat-ripple
-  (click)="ripple ? showDetailInfo() : null"
+  iav-dataset-show-dataset-dialog
+  [iav-dataset-show-dataset-dialog-fullid]="fullId"
   [iav-stop]="ripple ? 'click' : null"
   [matRippleDisabled]="!ripple"
   class="d-flex flex-row flex-nowrap align-items-center h-100">
@@ -66,7 +67,8 @@
     <button mat-menu-item
       *ngIf="true"
       class="no-focus"
-      (click)="showDetailInfo()">
+      [iav-dataset-show-dataset-dialog-fullid]="fullId"
+      iav-dataset-show-dataset-dialog>
       <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
       Detail
     </button>
@@ -108,8 +110,7 @@
 
 <ng-template #previewFilesListTemplate>
   <dataset-preview-list
-    [kgId]="kgId"
-    (previewingFile)="handlePreviewFile($event)">
+    [kgId]="kgId">
 
   </dataset-preview-list>
 </ng-template>

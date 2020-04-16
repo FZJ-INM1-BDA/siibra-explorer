@@ -1,10 +1,6 @@
-.regionDescriptionTextClass
+.speed-dial
 {
-  max-height:100px;
-  transition: max-height 0.15s ease-out;
-}
-.regionDescriptionTextOpened
-{
-  max-height: 310px;
-  transition: max-height 0.25s ease-in;
+  right: 0;
+  bottom: 0;
+  height: 0;
 }

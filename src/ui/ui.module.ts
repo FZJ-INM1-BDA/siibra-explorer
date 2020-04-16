@@ -84,6 +84,7 @@ import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.com
 import { ShareModule } from "src/share";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 
 @NgModule({
   imports : [
@@ -100,6 +101,7 @@ import { AuthModule } from "src/auth";
     ShareModule,
     StateModule,
     AuthModule,
+    FabSpeedDialModule,
   ],
   declarations : [
     NehubaContainer,
