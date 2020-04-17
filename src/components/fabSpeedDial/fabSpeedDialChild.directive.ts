@@ -1,4 +1,4 @@
-import { Directive, Input, HostBinding, OnDestroy, OnChanges } from "@angular/core";
+import { Directive, Input, HostBinding, OnDestroy } from "@angular/core";
 import { Subscription } from "rxjs";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 
@@ -11,7 +11,7 @@ const INDEX_FACTOR = 5
   exportAs: 'iavFabSpeedDialChild'
 })
 
-export class FabSpeedDialChild implements OnDestroy, OnChanges{
+export class FabSpeedDialChild implements OnDestroy{
 
   private s: Subscription[] = []
 
@@ -33,13 +33,6 @@ export class FabSpeedDialChild implements OnDestroy, OnChanges{
   
   @Input('iav-fab-speed-dial-child-index')
   public index: number = 0
-
-  ngOnChanges(){
-    
-    // const transitionTimer = this.fabService.isOpen ? (NORMAL + delta) : (NORMAL - delta )
-    // console.log(this.index, delta, transitionTimer)
-    // this.transitionProp = `all ${transitionTimer}ms ${this.fabService.isOpen ? 'ease-in' : 'ease-out'}`
-  }
 
   quickDialOpening(flag){
     const _index = Number(this.index)

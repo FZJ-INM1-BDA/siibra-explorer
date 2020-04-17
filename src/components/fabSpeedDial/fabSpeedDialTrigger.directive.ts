@@ -1,4 +1,4 @@
-import { Directive, Input, HostListener } from "@angular/core";
+import { Directive, HostListener } from "@angular/core";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 
 @Directive({

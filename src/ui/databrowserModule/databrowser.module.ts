@@ -28,8 +28,24 @@ import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previe
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
-import { ShowDatasetDialogDirective } from "./showDatasetDialog.directive";
-import { PreviewDatasetFile } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
+import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
+import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
+import { Store } from "@ngrx/store";
+import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+
+
+// TODO not too sure if this is the correct place for providing the callback token
+const previewEmitFactory = (store) => {
+  return (file, dataset) => {
+    store.dispatch({
+      type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
+      payload: {
+        file,
+        dataset
+      }
+    })
+  }
+}
 
 @NgModule({
   imports: [
@@ -94,6 +110,14 @@ import { PreviewDatasetFile } from "./singleDataset/datasetPreviews/previewDatas
   ],
   providers: [
     KgSingleDatasetService,
+    {
+      provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
+      useValue: SingleDatasetView
+    },{
+      provide: IAV_DATASET_PREVIEW_DATASET_FN,
+      useFactory: previewEmitFactory,
+      deps: [ Store ]
+    }
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

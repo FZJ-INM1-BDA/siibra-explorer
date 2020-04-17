@@ -2,9 +2,10 @@ import { Directive, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleCha
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 import { Subscription } from "rxjs";
 import { SCALE_ORIGIN } from './fabSpeedDial.service'
+import { distinctUntilChanged } from "rxjs/operators";
 
 @Directive({
-  selector: '[iav-fab-spped-dial-container]',
+  selector: '[iav-fab-speed-dial-container]',
   exportAs: 'iavFabSpeedDialContainer',
   providers: [
     FabSpeedDialService
@@ -27,11 +28,12 @@ export class FabSpeedDialContainer implements OnDestroy, OnChanges{
 
   constructor(
     private fabSDService: FabSpeedDialService,
-    private el: ElementRef
   ){
 
     this.s.push(
-      this.fabSDService.openState$.subscribe(flag => {
+      this.fabSDService.openState$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag => {
         this.isOpen = flag
         this.openStateChanged.emit(this.isOpen)
       })

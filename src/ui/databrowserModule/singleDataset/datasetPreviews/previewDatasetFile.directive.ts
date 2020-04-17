@@ -1,7 +1,8 @@
-import { Directive, Input, HostListener } from "@angular/core";
-import { KgSingleDatasetService } from "../singleDataset.base";
+import { Directive, Input, HostListener, Inject, Output, EventEmitter, Optional } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ViewerPreviewFile, IDataEntry } from 'src/services/state/dataStore.store'
+
+export const IAV_DATASET_PREVIEW_DATASET_FN = 'IAV_DATASET_PREVIEW_DATASET_FN'
 
 @Directive({
   selector: '[iav-dataset-preview-dataset-file]',
@@ -27,9 +28,12 @@ export class PreviewDatasetFile{
   @Input('iav-dataset-preview-dataset-file-fullid')
   fullId: string
 
+  @Output('iav-dataset-preview-dataset-file-emit')
+  emitter: EventEmitter<{file: Partial<ViewerPreviewFile>, dataset: Partial<IDataEntry>}> = new EventEmitter()
+
   constructor(
-    private kgSingleDSService: KgSingleDatasetService,
     private snackbar: MatSnackBar,
+    @Optional() @Inject(IAV_DATASET_PREVIEW_DATASET_FN) private emitFn: any
   ){
   }
 
@@ -44,7 +48,7 @@ export class PreviewDatasetFile{
 
   private getDataset(): Partial<IDataEntry>{
     return this.dataset || {
-      fullId: this.fullId || `${this.kgSchema}/${this.kgId}`
+      fullId: this.fullId || (this.kgSchema && this.kgId && `${this.kgSchema}/${this.kgId}`) || null
     }
   }
 
@@ -56,6 +60,7 @@ export class PreviewDatasetFile{
       this.snackbar.open(`Cannot preview dataset file. Neither file nor filename are defined.`)
       return
     }
-    this.kgSingleDSService.previewFile(file, dataset)
+    if (this.emitFn) this.emitFn(file, dataset)
+    this.emitter.emit({ file, dataset })
   }
 }
