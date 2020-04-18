@@ -46,6 +46,105 @@ describe('> plugin api', () => {
           expect(newTitle).toEqual(`hello world ${prevTitle}`)
         })
       })
+
+      describe('> cancelPromise', () => {
+        let originalTitle
+        beforeEach(async () => {
+          originalTitle = await iavPage.execScript(() => window.document.title)
+
+          await iavPage.execScript(() => {
+            const pr = interactiveViewer.uiHandle.getUserToSelectARegion('hello world title')
+            pr
+              .then(obj => window.document.title = 'success ' + obj.segment.name)
+              .catch(() => window.document.title = 'failed')
+            window.pr = pr
+          })
+
+          await iavPage.wait(500)
+
+          await iavPage.execScript(() => {
+            const pr = window.pr
+            interactiveViewer.uiHandle.cancelPromise(pr)
+          })
+        })
+
+        it('> cancelPromise rejects promise', async () => {
+          const newTitle = await iavPage.execScript(() => window.document.title)
+          expect(newTitle).toEqual('failed')
+        })
+      })
+
+      describe('> getUserToSelectARegion', () => {
+        let originalTitle
+        beforeEach(async () => {
+          originalTitle = await iavPage.execScript(() => window.document.title)
+
+          await iavPage.execScript(() => {
+            interactiveViewer.uiHandle.getUserToSelectARegion('hello world title')
+              .then(obj => window.document.title = 'success ' + obj.segment.name)
+              .catch(() => window.document.title = 'failed')
+          })
+          
+          await iavPage.wait(500)
+        })
+
+        it('> shows modal dialog', async () => {
+          const text = await iavPage.getModalText()
+          expect(text).toContain('hello world title')
+        })
+
+        it('> modal has cancel button', async () => {
+          const texts = await iavPage.getModalActions()
+          const idx = texts.findIndex(text => /cancel/i.test(text))
+          expect(idx).toBeGreaterThanOrEqual(0)
+        })
+
+        it('> cancelling by esc rejects pr', async () => {
+          await iavPage.clearAlerts()
+          await iavPage.wait(500)
+          const newTitle = await iavPage.execScript(() => window.document.title)
+          expect(newTitle).toEqual('failed')
+        })
+
+        it('> cancelling by pressing cancel rejects pr', async () => {
+          await iavPage.clickModalBtnByText('Cancel')
+          await iavPage.wait(500)
+          const newTitle = await iavPage.execScript(() => window.document.title)
+          expect(newTitle).toEqual('failed')
+        })
+
+        it('> on clicking region, resolves pr', async () => {
+          await iavPage.cursorMoveToAndClick({ position: [600, 490] })
+          await iavPage.wait(500)
+          const newTitle = await iavPage.execScript(() => window.document.title)
+          expect(newTitle).toEqual(`success Area 6ma (preSMA, mesial SFG) - left hemisphere`)
+        })
+
+        it('> on failusre, clears modal', async () => {
+
+          await iavPage.clearAlerts()
+          await iavPage.wait(500)
+          try {
+            const text = await iavPage.getModalText()
+            fail(`expected modal to clear, but modal has text ${text}`)
+          } catch (e) {
+            expect(true).toEqual(true)
+          }
+        })
+
+        it('> on success, clears modal', async () => {
+
+          await iavPage.cursorMoveToAndClick({ position: [600, 490] })
+          await iavPage.wait(500)
+          
+          try {
+            const text = await iavPage.getModalText()
+            fail(`expected modal to clear, but modal has text ${text}`)
+          } catch (e) {
+            expect(true).toEqual(true)
+          }
+        })
+      })
     })
   })
 

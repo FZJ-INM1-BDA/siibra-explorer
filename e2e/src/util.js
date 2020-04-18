@@ -334,9 +334,7 @@ class WdLayoutPage extends WdBase{
   }
 
   _getModalBtns(){
-    return this._getModal()
-      .findElement( By.tagName('mat-card-actions') )
-      .findElements( By.tagName('button') )
+    return this._getModal().findElements( By.tagName('button') )
   }
 
   async getModalText(){

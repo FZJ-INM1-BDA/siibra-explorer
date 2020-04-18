@@ -3,7 +3,7 @@ import { Action, select, Store } from '@ngrx/store'
 
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable, Subscription } from "rxjs";
-import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
+import { filter, map, mapTo, scan, startWith, take } from "rxjs/operators";
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
 import { IavRootStoreInterface } from '../stateStore.service'
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
@@ -21,9 +21,6 @@ export const defaultState: StateInterface = {
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
-
-  pluginRegionSelectionEnabled: false,
-  persistentStateNotifierMessage: null,
 
   /**
    * replace with server side logic (?)
@@ -108,21 +105,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       sidePanelCurrentViewContent: 'Dataset',
     }
 
-  case ENABLE_PLUGIN_REGION_SELECTION: {
-    return {
-      ...prevState,
-      pluginRegionSelectionEnabled: true,
-      persistentStateNotifierMessage: action.payload
-    }
-  }
-  case DISABLE_PLUGIN_REGION_SELECTION: {
-    return {
-      ...prevState,
-      pluginRegionSelectionEnabled: false,
-      persistentStateNotifierMessage: null
-    }
-  }
-
   case AGREE_COOKIE: {
     /**
        * TODO replace with server side logic
@@ -179,9 +161,6 @@ export interface StateInterface {
 
   snackbarMessage: symbol
 
-  pluginRegionSelectionEnabled: boolean
-  persistentStateNotifierMessage: string
-
   agreedCookies: boolean
   agreedKgTos: boolean
 }
@@ -201,6 +180,20 @@ export interface ActionInterface extends Action {
   bottomSheetTemplate: TemplateRef<any>
 
   payload: any
+}
+
+export const GET_MOUSEOVER_SEGMENTS_TOKEN = `GET_MOUSEOVER_SEGMENTS_TOKEN`
+
+export const getMouseoverSegmentsFactory = (store: Store<IavRootStoreInterface>) => {
+  return () => {
+    let moSegments
+    store.pipe(
+      select('uiState'),
+      select('mouseOverSegments'),
+      take(1)
+    ).subscribe(v => moSegments = v)
+    return moSegments
+  }
 }
 
 @Injectable({
@@ -286,9 +279,6 @@ export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
 export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
-
-export const ENABLE_PLUGIN_REGION_SELECTION = `ENABLE_PLUGIN_REGION_SELECTION`
-export const DISABLE_PLUGIN_REGION_SELECTION = `DISABLE_PLUGIN_REGION_SELECTION`
 
 export const AGREE_COOKIE = `AGREE_COOKIE`
 export const AGREE_KG_TOS = `AGREE_KG_TOS`

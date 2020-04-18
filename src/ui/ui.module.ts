@@ -84,6 +84,7 @@ import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.com
 import { ShareModule } from "src/share";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import { ActionDialog } from "./actionDialog/actionDialog.component";
 
 @NgModule({
   imports : [
@@ -142,6 +143,8 @@ import { AuthModule } from "src/auth";
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
 
+    ActionDialog,
+
     /* pipes */
     GroupDatasetByRegion,
     FilterRegionDataEntries,
@@ -181,6 +184,7 @@ import { AuthModule } from "src/auth";
     NehubaViewerUnit,
     LayerBrowser,
     PluginBannerUI,
+    ActionDialog,
   ],
   exports : [
     SubjectViewer,

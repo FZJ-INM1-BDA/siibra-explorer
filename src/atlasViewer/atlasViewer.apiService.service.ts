@@ -1,10 +1,10 @@
-import {Injectable, NgZone} from "@angular/core";
+/* eslint-disable @typescript-eslint/no-empty-function */
+import {Injectable, NgZone, Optional, Inject, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable } from "rxjs";
-import { distinctUntilChanged, map, filter, startWith } from "rxjs/operators";
+import { Observable, Subject, Subscription, from, race, of, interval } from "rxjs";
+import { distinctUntilChanged, map, filter, startWith, take, switchMap, catchError, mapTo, tap } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import {
-  DISABLE_PLUGIN_REGION_SELECTION,
   getLabelIndexMap,
   getMultiNgIdsRegionsLabelIndexMap,
   IavRootStoreInterface,
@@ -13,15 +13,29 @@ import {
 import { ModalHandler } from "../util/pluginHandlerClasses/modalHandler";
 import { ToastHandler } from "../util/pluginHandlerClasses/toastHandler";
 import { IPluginManifest, PluginServices } from "./pluginUnit";
-import { ENABLE_PLUGIN_REGION_SELECTION } from "src/services/state/uiState.store";
 
 declare let window
+
+interface IRejectUserInput{
+  userInitiated: boolean
+  reason?: string
+}
+
+interface IGetUserSelectRegionPr{
+  message: string
+  promise: Promise<any>
+  rs: (region:any) => void
+  rj: (reject:IRejectUserInput) => void
+}
+
+export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
+export const GET_TOAST_HANDLER_TOKEN = 'GET_TOAST_HANDLER_TOKEN'
 
 @Injectable({
   providedIn : 'root',
 })
 
-export class AtlasViewerAPIServices {
+export class AtlasViewerAPIServices implements OnDestroy{
 
   private loadedTemplates$: Observable<any>
   private selectParcellation$: Observable<any>
@@ -29,15 +43,80 @@ export class AtlasViewerAPIServices {
 
   public loadedLibraries: Map<string, {counter: number, src: HTMLElement|null}> = new Map()
 
-  public getUserToSelectARegionResolve: any
-  public rejectUserSelectionMode: any
+  public removeBasedOnPr = (pr: Promise<any>, {userInitiated = false} = {}) => {
+
+    const idx = this.getUserToSelectRegion.findIndex(({ promise }) => promise === pr)
+    if (idx >=0) {
+      const { rj } = this.getUserToSelectRegion.splice(idx, 1)[0]
+      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+      this.zone.run(() => {  })
+      rj({ userInitiated })
+    }
+    else throw new Error(`This promise has already been fulfilled.`)
+
+  }
+
+  private dismissDialog: Function
+  public getUserToSelectRegion: IGetUserSelectRegionPr[] = []
+  public getUserToSelectRegionUI$: Subject<IGetUserSelectRegionPr[]> = new Subject()
+
+  public getUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
+    if (this.getUserToSelectRegion.length > 0) {
+      const handler =  this.getUserToSelectRegion.pop()
+      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+      return handler
+    } 
+    else return null
+  }
+
+  private s: Subscription[] = []
 
   constructor(
     private store: Store<IavRootStoreInterface>,
     private dialogService: DialogService,
     private zone: NgZone,
     private pluginService: PluginServices,
+    @Optional() @Inject(CANCELLABLE_DIALOG) openCancellableDialog: (message: string, options: any) => () => void,
+    @Optional() @Inject(GET_TOAST_HANDLER_TOKEN) private getToastHandler: Function,
   ) {
+    if (openCancellableDialog) {
+      this.s.push(
+        this.getUserToSelectRegionUI$.pipe(
+          distinctUntilChanged(),
+          switchMap(arr => {
+            if (this.dismissDialog) {
+              this.dismissDialog()
+              this.dismissDialog = null
+            }
+            
+            if (arr.length === 0) return of(null)
+
+            const last = arr[arr.length - 1]
+            const { message, promise } = last
+            return race(
+              from(new Promise(resolve => {
+                this.dismissDialog = openCancellableDialog(message, {
+                  userCancelCallback: () => {
+                    resolve(last)
+                  },
+                  ariaLabel: message
+                })
+              })),
+              from(promise).pipe(
+                catchError(() => of(null)),
+                mapTo(null),
+              )
+            )
+          })
+        ).subscribe(obj => {
+          if (obj) {
+            const { promise, rj } = obj
+            rj({ userInitiated: true })
+            this.removeBasedOnPr(promise, { userInitiated: true })
+          }
+        })
+      )
+    }
 
     this.loadedTemplates$ = this.store.pipe(
       select('viewerState'),
@@ -118,7 +197,8 @@ export class AtlasViewerAPIServices {
 
         /* to be overwritten by atlasViewer.component.ts */
         getToastHandler : () => {
-          throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
+          if (this.getToastHandler) return this.getToastHandler()
+          else throw new Error('getToast Handler not overwritten by atlasViewer.component.ts')
         },
 
         /**
@@ -136,29 +216,33 @@ export class AtlasViewerAPIServices {
         getUserInput: config => this.dialogService.getUserInput(config) ,
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
-        getUserToSelectARegion: (selectingMessage) => new Promise((resolve, reject) => {
-          this.zone.run(() => {
-            this.store.dispatch({
-              type: ENABLE_PLUGIN_REGION_SELECTION,
-              payload: selectingMessage
-            })
-
-            this.getUserToSelectARegionResolve = resolve
-            this.rejectUserSelectionMode = reject
+        getUserToSelectARegion: message => {
+          const obj = {
+            message,
+            promise: null,
+            rs: null,
+            rj: null
+          }
+          const pr = new Promise((rs, rj) => {
+            obj.rs = rs
+            obj.rj = rj
           })
-        }),
 
-        // ToDo Method should be able to cancel any pending promise.
-        cancelPromise: (pr) => {
+          obj.promise = pr
+
+          this.getUserToSelectRegion.push(obj)
+          this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
           this.zone.run(() => {
-            if (pr === this.interactiveViewer.uiHandle.getUserToSelectARegion) {
-              if (this.rejectUserSelectionMode) this.rejectUserSelectionMode()
-              this.store.dispatch({type: DISABLE_PLUGIN_REGION_SELECTION})
-            }
 
           })
+          return pr
+        },
+
+        cancelPromise: pr => {
+          this.removeBasedOnPr(pr)
+
+          this.zone.run(() => {  })
         }
-
       },
       pluginControl: new Proxy({}, {
         get: (_, prop) => {
@@ -182,6 +266,12 @@ export class AtlasViewerAPIServices {
       this.interactiveViewer.metadata.regionsLabelIndexMap = getLabelIndexMap(parcellation.regions)
       this.interactiveViewer.metadata.layersRegionLabelIndexMap = getMultiNgIdsRegionsLabelIndexMap(parcellation)
     })
+  }
+
+  ngOnDestroy(){
+    while(this.s.length > 0){
+      this.s.pop().unsubscribe()
+    }
   }
 }
 
@@ -266,4 +356,17 @@ export interface IUserLandmark {
   position: [number, number, number]
   id: string /* probably use the it to track and remove user landmarks */
   highlight: boolean
+}
+
+export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, getMouseoverSegments: () => any [] ) => {
+  return (next: () => void) => {
+    let moSegments = getMouseoverSegments()
+    if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
+      const { rs } = apiService.getUserRegionSelectHandler() || {}
+      if (!!rs) {
+        return rs(moSegments[0])
+      }
+    }
+    next()
+  }
 }
