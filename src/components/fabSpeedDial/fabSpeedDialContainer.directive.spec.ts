@@ -1,17 +1,12 @@
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
-import { CommonModule } from "@angular/common";
 import { FabSpeedDialContainer } from "./fabSpeedDialContainer.directive";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 import { BehaviorSubject } from "rxjs";
 import { By } from "@angular/platform-browser";
 
 @Component({
-  template: `
-  <div iav-fab-speed-dial-container
-    [iav-fab-speed-dial-scale-origin]="origin">
-  </div>
-  `
+  template: ``
 })
 
 class TestCmp{
@@ -31,7 +26,7 @@ const dummyServiceFactory = () => {
 describe('FabSpeedDialContainer', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [],
+      imports: [ ],
       declarations: [
         TestCmp,
         FabSpeedDialContainer,
@@ -49,7 +44,15 @@ describe('FabSpeedDialContainer', () => {
        * in tests, override, and provide on a module level
        */
       set: {
-        providers: []
+        providers: [],
+      }
+    }).overrideComponent(TestCmp, {
+      set: {
+        template: `
+        <div iav-fab-speed-dial-container
+          [iav-fab-speed-dial-scale-origin]="origin">
+        </div>
+        `
       }
     })
   })
