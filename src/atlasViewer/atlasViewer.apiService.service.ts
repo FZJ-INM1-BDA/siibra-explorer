@@ -24,8 +24,8 @@ interface IRejectUserInput{
 interface IGetUserSelectRegionPr{
   message: string
   promise: Promise<any>
-  rs: (region:any) => void
-  rj: (reject:IRejectUserInput) => void
+  rs: (region: any) => void
+  rj: (reject: IRejectUserInput) => void
 }
 
 export const CANCELLABLE_DIALOG = 'CANCELLABLE_DIALOG'
@@ -360,7 +360,7 @@ export interface IUserLandmark {
 
 export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, getMouseoverSegments: () => any [] ) => {
   return (next: () => void) => {
-    let moSegments = getMouseoverSegments()
+    const moSegments = getMouseoverSegments()
     if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
       const { rs } = apiService.getUserRegionSelectHandler() || {}
       if (!!rs) {

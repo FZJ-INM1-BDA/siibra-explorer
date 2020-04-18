@@ -20,7 +20,7 @@ export class ActionDialog{
   public sameLine: boolean = false
 
   constructor(
-    @Optional() @Inject(MAT_DIALOG_DATA) data:any
+    @Optional() @Inject(MAT_DIALOG_DATA) data: any
   ){
     const { config, content, template, actions = [] } = data || {}
     const { sameLine = false } = config || {}
