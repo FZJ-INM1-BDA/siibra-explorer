@@ -1,0 +1,63 @@
+<div mat-dialog-content class="d-inline-flex">
+  <div class="flex-grow-1 flex-shrink-1 d-flex align-items-center mr-2">
+    <span>
+      {{ content }}
+    </span>
+  </div>
+
+  <!-- action btn if same line === true -->
+  <div *ngIf="sameLine" class="flex-grow-0 flex-shrink-0">
+    <ng-container *ngTemplateOutlet="actionTemplate">
+    </ng-container>
+  </div>
+</div>
+
+<div *ngIf="!sameLine" mat-dialog-actions>
+
+</div>
+
+<ng-template #actionTemplate>
+  <ng-container *ngFor="let action of actions"
+    [ngSwitch]="action.type">
+
+    <ng-template #textNodeTmpl let-text="text">
+      {{ text }}
+    </ng-template>
+
+    <!-- mat-flat-button -->
+    <button *ngSwitchCase="'mat-flat-button'"
+      mat-flat-button
+      [color]="action.color || 'default'"
+      [mat-dialog-close]="action.dismiss && action"
+      (click)="actionHandler($event, action)">
+      <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
+    </button>
+
+    <!-- mat-raised-button -->
+    <button *ngSwitchCase="'mat-raised-button'"
+      mat-raised-button
+      [color]="action.color || 'default'"
+      [mat-dialog-close]="action.dismiss && action"
+      (click)="actionHandler($event, action)">
+      <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
+    </button>
+
+    <!-- mat-stroked-button -->
+    <button *ngSwitchCase="'mat-stroked-button'"
+      mat-stroked-button
+      [color]="action.color || 'default'"
+      [mat-dialog-close]="action.dismiss && action"
+      (click)="actionHandler($event, action)">
+      <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>        
+    </button>
+
+    <!-- default / mat-button -->
+    <button *ngSwitchDefault
+      mat-button
+      [color]="action.color || 'default'"
+      [mat-dialog-close]="action.dismiss && action"
+      (click)="actionHandler($event, action)">
+      <ng-container *ngTemplateOutlet="textNodeTmpl; context: action"></ng-container>    
+    </button>
+  </ng-container>
+</ng-template>
