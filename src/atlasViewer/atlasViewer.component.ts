@@ -8,6 +8,8 @@ import {
   TemplateRef,
   ViewChild,
   ElementRef,
+  Inject,
+  Optional,
 } from "@angular/core";
 import { ActionsSubject, select, Store } from "@ngrx/store";
 import {combineLatest, interval, merge, Observable, of, Subscription} from "rxjs";
@@ -43,6 +45,8 @@ import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 
+export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
+
 /**
  * TODO
  * check against auxlillary mesh indicies, to only filter out aux indicies
@@ -68,7 +72,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
   private persistentStateNotifierMatDialogRef: MatDialogRef<any>
-  @ViewChild('persistentStateNotifierTemplate', {read: TemplateRef}) public persistentStateNotifierTemplate: TemplateRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
@@ -120,40 +123,22 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
-  private pluginRegionSelectionEnabled$: Observable<boolean>
-  private pluginRegionSelectionEnabled: boolean = false
-  public persistentStateNotifierMessage$: Observable<string>
-
-  private hoveringRegions = []
-  public presentDatasetDialogRef: MatDialogRef<any>
-
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
-    public apiService: AtlasViewerAPIServices,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
+    @Optional() @Inject(NEHUBA_CLICK_OVERRIDE) private nehubaClickOverride: Function
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
       select('uiState'),
       select("snackbarMessage"),
-    )
-
-    this.pluginRegionSelectionEnabled$ = this.store.pipe(
-      select('uiState'),
-      select("pluginRegionSelectionEnabled"),
-      distinctUntilChanged(),
-    )
-    this.persistentStateNotifierMessage$ = this.store.pipe(
-      select('uiState'),
-      select("persistentStateNotifierMessage"),
-      distinctUntilChanged(),
     )
 
     /**
@@ -247,16 +232,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     )
 
-    this.subscriptions.push(
-      this.onhoverSegments$.subscribe(hr => {
-        this.hoveringRegions = hr
-      })
-    )
-
-    this.subscriptions.push(
-      this.pluginRegionSelectionEnabled$.subscribe(bool => this.pluginRegionSelectionEnabled = bool)
-    )
-
     const error = this.el.nativeElement.getAttribute('data-error')
 
     if (error) {
@@ -345,15 +320,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.rd.setAttribute(document.body, 'darktheme', flag.toString())
       }),
     )
-
-    this.subscriptions.push(
-      this.persistentStateNotifierMessage$.subscribe(msg => {
-        if (msg) this.persistentStateNotifierMatDialogRef = this.matDialog.open(this.persistentStateNotifierTemplate, { hasBackdrop: false, position: { top: '5px'} })
-        else {
-          if (this.persistentStateNotifierMatDialogRef) this.persistentStateNotifierMatDialogRef.close()
-        }
-      })
-    )
   }
 
   public ngAfterViewInit() {
@@ -421,18 +387,19 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public mouseClickNehuba(event) {
 
-    if (!this.rClContextualMenu) { return }
-    this.rClContextualMenu.mousePos = [
-      event.clientX,
-      event.clientY,
-    ]
+    const next = () => {
 
-    // TODO what if user is hovering a landmark?
-    if (!this.pluginRegionSelectionEnabled) {
+      if (!this.rClContextualMenu) { return }
+      this.rClContextualMenu.mousePos = [
+        event.clientX,
+        event.clientY,
+      ]
+  
       this.rClContextualMenu.show()
-    } else {
-      if (this.hoveringRegions) this.apiService.getUserToSelectARegionResolve(this.hoveringRegions)
     }
+
+    this.nehubaClickOverride(next)
+
   }
 
   public toggleSideNavMenu(opened) {

@@ -85,6 +85,7 @@ import { ShareModule } from "src/share";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import { FabSpeedDialModule } from "src/components/fabSpeedDial";
+import { ActionDialog } from "./actionDialog/actionDialog.component";
 
 @NgModule({
   imports : [
@@ -144,6 +145,8 @@ import { FabSpeedDialModule } from "src/components/fabSpeedDial";
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
 
+    ActionDialog,
+
     /* pipes */
     GroupDatasetByRegion,
     FilterRegionDataEntries,
@@ -183,6 +186,7 @@ import { FabSpeedDialModule } from "src/components/fabSpeedDial";
     NehubaViewerUnit,
     LayerBrowser,
     PluginBannerUI,
+    ActionDialog,
   ],
   exports : [
     SubjectViewer,

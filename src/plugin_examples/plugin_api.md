@@ -165,9 +165,60 @@ window.interactiveViewer
     "message":"Message to be seen by the user." // default: ""
   }
   ```
-  - *getUserToSelectARegion(string)* Used to turn on region selection mode (in this mode, region menu will not displayed on click). Expects message to display on top off viewer while selection mode is active. Returns a Promise, resolves when user clicks on parcellation region, resolve body is desired region(s) array, rejects when user cancels region selection mode. 
-  - *cancelPromise(promise)* Used to reject promises in "uiHandle". Expects listed promises to reject:
-    - getUserToSelectARegion
+  - *getUserToSelectARegion(message)* returns a `Promise`
+
+    _input_
+    
+    | input | type | desc |
+    | --- | --- | --- |
+    | message | `string` | human readable message displayed to the user | 
+
+    _returns_
+
+    `Promise`, resolves to return `RegionSelectedByUser`, rejects with error object `{ userInitiated: boolean }`
+    
+    Requests user to select a parcellation region, displaying the message. Resolving to the region selected by the user. Rejects if either user cancels by pressing `Esc` or `Cancel`, or by developer calling `cancelPromise`
+  
+  - *cancelPromise(promise)* returns `void`
+  
+    _input_ 
+    
+    | input | type | desc |
+    | --- | --- | --- |
+    | promise | `Promise` | Reference to the __exact__ promise returned by `uiHnandle` methods |
+    
+    Cancel the request to select a parcellation region.
+
+    _usage example_
+
+    ```javascript
+
+    (() => {
+      const pr = interactive.uiHandle.getUserToSelectARegion(`webJuGEx would like you to select a region`)
+
+      pr.then(region => {  })
+        .catch(console.warn)
+
+      /*
+       * do NOT do 
+       * 
+       * const pr = interactive.uiHandle.getUserToSelectARegion(`webJuGEx would like you to select a region`)
+       *   .then(region => {  })
+       *   -catch(console.warn)
+       * 
+       * the promise passed to `cancelPromise` must be the exact promise returned.
+       * by chaining then/catch, a new reference is returned
+       */
+
+      setTimeout(() => {
+        try {
+          interactive.uiHandle.cancelPromise(pr)
+        } catch (e) {
+          // if the promise has been fulfilled (by resolving or user cancel), cancelPromise will throw
+        }
+      }, 5000)
+    })()
+    ```
   
 - pluginControl
 
