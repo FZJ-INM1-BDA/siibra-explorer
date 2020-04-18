@@ -109,7 +109,11 @@ describe('ShowDatasetDialogDirective', () => {
     directive.nativeElement.click()
 
     expect(snackbarOpenSpy).not.toHaveBeenCalled()
-    expect(dialogOpenSpy).toHaveBeenCalledWith(DummyDialogCmp, {
+    const mostRecentCall = dialogOpenSpy.calls.mostRecent()
+    const args = mostRecentCall.args as any[]
+
+    expect(args[0]).toEqual(DummyDialogCmp)
+    expect(args[1]).toEqual({
       ...ShowDatasetDialogDirective.defaultDialogConfig,
       data: {
         fullId: `minds/core/dataset/v1.0.0/aaa-bbb`
@@ -142,7 +146,10 @@ describe('ShowDatasetDialogDirective', () => {
     directive.nativeElement.click()
 
     expect(snackbarOpenSpy).not.toHaveBeenCalled()
-    expect(dialogOpenSpy).toHaveBeenCalledWith(DummyDialogCmp, {
+    const mostRecentCall = dialogOpenSpy.calls.mostRecent()
+    const args = mostRecentCall.args as any[]
+    expect(args[0]).toEqual(DummyDialogCmp)
+    expect(args[1]).toEqual({
       ...ShowDatasetDialogDirective.defaultDialogConfig,
       data: {
         fullId: `abc/ccc-ddd`

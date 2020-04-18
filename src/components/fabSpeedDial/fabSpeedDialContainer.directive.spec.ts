@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { TestBed } from "@angular/core/testing";
 import { FabSpeedDialContainer } from "./fabSpeedDialContainer.directive";
-import { FabSpeedDialService } from "./fabSpeedDial.service";
+import { FabSpeedDialService, SCALE_ORIGIN } from "./fabSpeedDial.service";
 import { BehaviorSubject } from "rxjs";
 import { By } from "@angular/platform-browser";
 
@@ -94,7 +94,7 @@ describe('FabSpeedDialContainer', () => {
     const scaleOriginNextSpy = spyOn(dummyService.scaleOrigin$, 'next').and.callThrough()
     fixture.componentInstance.origin = 'right'
     fixture.detectChanges()
-    expect(scaleOriginNextSpy).toHaveBeenCalledWith('right')
+    expect(scaleOriginNextSpy).toHaveBeenCalledWith(SCALE_ORIGIN.RIGHT)
   })
 
   it('on change, if invalid, expect next to not be called', () => {
