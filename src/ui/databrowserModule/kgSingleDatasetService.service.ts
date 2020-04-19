@@ -7,7 +7,6 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
-import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy {
@@ -76,7 +75,7 @@ export class KgSingleDatasetService implements OnDestroy {
     })
   }
 
-  public previewFile(file: ViewerPreviewFile, dataset: IDataEntry) {
+  public previewFile(file: Partial<ViewerPreviewFile>, dataset: Partial<IDataEntry>) {
     this.store$.dispatch({
       type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
       payload: {

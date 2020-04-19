@@ -84,6 +84,7 @@ import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.com
 import { ShareModule } from "src/share";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
+import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
 
 @NgModule({
@@ -101,6 +102,7 @@ import { ActionDialog } from "./actionDialog/actionDialog.component";
     ShareModule,
     StateModule,
     AuthModule,
+    FabSpeedDialModule,
   ],
   declarations : [
     NehubaContainer,

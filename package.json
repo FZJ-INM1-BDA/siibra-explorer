@@ -41,7 +41,7 @@
     "@ngrx/effects": "^7.4.0",
     "@ngrx/store": "^7.4.0",
     "@ngtools/webpack": "^9.0.1",
-    "@types/jasmine": "^3.3.12",
+    "@types/jasmine": "^3.5.0",
     "@types/node": "^12.0.0",
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^2.12.0",

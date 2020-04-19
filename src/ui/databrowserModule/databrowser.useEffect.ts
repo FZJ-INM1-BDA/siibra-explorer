@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
-import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
+import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged, concatMap } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
@@ -55,6 +55,8 @@ export class DataBrowserUseEffect implements OnDestroy {
     private http: HttpClient
   ) {
 
+    // TODO this is almost definitely wrong
+    // possibily causing https://github.com/HumanBrainProject/interactive-viewer/issues/502
     this.subscriptions.push(
       this.store$.pipe(
         select('dataStore'),
@@ -129,12 +131,24 @@ export class DataBrowserUseEffect implements OnDestroy {
 
     this.previewDatasetFile$ = actions$.pipe(
       ofType(DATASETS_ACTIONS_TYPES.PREVIEW_DATASET),
-      map(actionBody => {
+      concatMap(actionBody => {
+
         const { payload = {} } = actionBody as any
-        const { file = null } = payload as { file: ViewerPreviewFile, dataset: IDataEntry }
-        return file
+        const { file = null, dataset } = payload as { file: ViewerPreviewFile, dataset: IDataEntry }
+        const { fullId } = dataset
+
+        const { filename, ...rest } = file
+        if (Object.keys(rest).length === 0) {
+          const re = /\/([a-f0-9-]+)$/.exec(fullId)
+          if (!re) return of(null)
+          const url = `${DATASET_PREVIEW_URL}/${re[0]}/${encodeURIComponent(filename)}`
+          return this.http.get<ViewerPreviewFile>(url)
+        } else {
+          return of(file)
+        }
       }),
-      shareReplay(1)
+      shareReplay(1),
+      distinctUntilChanged()
     )
 
     this.navigateToPreviewPosition$ = this.previewDatasetFile$.pipe(

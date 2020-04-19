@@ -212,10 +212,6 @@ export class SingleDatasetBase implements OnInit, OnChanges {
     this.singleDatasetService.showPreviewList(templateRef)
   }
 
-  public handlePreviewFile(file: ViewerPreviewFile) {
-    this.singleDatasetService.previewFile(file, this.dataset)
-  }
-
   public undoableRemoveFav() {
     this.snackBar.open(`Unpinned dataset: ${this.name}`, 'Undo', {
       duration: 5000,

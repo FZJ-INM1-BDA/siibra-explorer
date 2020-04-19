@@ -16,8 +16,12 @@
     <ng-container *ngFor="let file of datasetPreviewList">
 
       <!-- preview available -->
-      <ng-template [ngIf]="(selectedTemplateSpace$ | async | previewFileVisibleInSelectedReferenceTemplatePipe : file)" [ngIfElse]="notAvailalbePreview" >
-        <mat-list-item (click)=" handlePreviewFile(file)">
+      <ng-template [ngIf]="(selectedTemplateSpace$ | async | previewFileVisibleInSelectedReferenceTemplatePipe : file)"
+        [ngIfElse]="notAvailalbePreview" >
+        <mat-list-item
+          [iav-dataset-preview-dataset-file-kgid]="kgId"
+          [iav-dataset-preview-dataset-file]="file">
+          
           <mat-icon
             [fontSet]="(file | previewFileIconPipe).fontSet"
             [fontIcon]="(file | previewFileIconPipe).fontIcon"
