@@ -1,20 +1,19 @@
-# Exploring connectivity
+# Exploring a connectivity matrix for the selected brain parcellation
 
-Powered by <https://github.com/FZJ-INM1-BDA/HBP-connectivity-component>, the interactive atlas viewer allows the exploration of connectivity of parcellation regions, based on datasets curated in HBP Knowledge Graph.
+Via the <https://github.com/FZJ-INM1-BDA/HBP-connectivity-component>, the interactive atlas viewer allows interactive exploration of a connectivity matrix, that is defined for the currently selected brain parcellation and available from the HBP Knowledge Graph.
 
-Currently, connectivity data is explorable for the parcellation `JuBrain Cytoarchitectonic Atlas`, which is available in template spaces `MNI Colin 27` and `ICBM 2009c Nonlinear Asymmetric`.
+As of now, this function is only available for the `JuBrain Cytoarchitectonic Atlas.
 
-## Getting started
+## Launching the connectivity browser
 
-- Select parcellation `JuBrain Cytoarchitectonic Atlas` and click on a region to bring up a context-specific menu
+- Select the `JuBrain Cytoarchitectonic Atlas` from the list of parcellations (available for  the `MNI Colin 27` and `ICBM 2009c Nonlinear Asymmetric` templates), and click on any brain region to bring up its context menu.
 
    [![](images/region_menu_with_connectivity.png)](images/region_menu_with_connectivity.png)
 
-- Click the `Connectivity` button, available datasets for connectivity will be displayed
+- Select `Connectivity` to select one of the available connecitivty matrices. Note that this list will be growing in the near future, to inlude connectivity information from different sources.
 
    [![](images/connectivity_dataset_menu.png)](images/connectivity_dataset_menu.png)
 
-- Click on a dataset (e.g. `1000 Brain Study - DTI connectivity`) to explore the connectivity data associated with it.
 
 ## Working with connectivity data
 
