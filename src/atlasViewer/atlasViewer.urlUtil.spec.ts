@@ -7,6 +7,7 @@ import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR, cvtStateToSearchParam
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colin = require('!json-loader!src/res/ext/colin.json')
 const mni152 = require('!json-loader!src/res/ext/MNI152.json')
+const mni152Nehubaconfig = require('!json-loader!src/res/ext/MNI152NehubaConfig.json')
 const allen = require('!json-loader!src/res/ext/allenMouse.json')
 const waxholm = require('!json-loader!src/res/ext/waxholmRatV2_0.json')
 
@@ -57,8 +58,47 @@ describe('atlasViewer.urlService.service.ts', () => {
 
     })
 
-    it('parses niftiLayers correctly', () => {
+    describe('niftiLayers', () => {
+      let searchparam = new URLSearchParams()
+      beforeEach(() => {
+        searchparam = new URLSearchParams()
+        searchparam.set('templateSelected', mni152.name)
+        searchparam.set('parcellationSelected', mni152.parcellations[1].name)
+      })
 
+
+      it('parses niftiLayers correctly', () => {
+        const uri1 = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+        const uri2 = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2000.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+        searchparam.set('niftiLayers', [uri1, uri2].join('__'))
+  
+        const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
+        expect(newState.ngViewerState.layers.length).toEqual(2)
+  
+        const layer1 = newState.ngViewerState.layers[0]
+        expect(layer1.name).toEqual(uri1)
+        expect(layer1.source).toEqual(`nifti://${uri1}`)
+        expect(layer1.mixability).toEqual('nonmixable')
+
+        const layer2 = newState.ngViewerState.layers[1]
+        expect(layer2.name).toEqual(uri2)
+        expect(layer2.source).toEqual(`nifti://${uri2}`)
+        expect(layer2.mixability).toEqual('nonmixable')
+      })
+      
+      it('parses multiple niftiLayers correctly', () => {
+
+        const uri = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+        searchparam.set('niftiLayers', uri)
+  
+        const newState = cvtSearchParamToState(searchparam, fetchedTemplateRootState)
+        expect(newState.ngViewerState.layers.length).toEqual(1)
+  
+        const layer = newState.ngViewerState.layers[0]
+        expect(layer.name).toEqual(uri)
+        expect(layer.source).toEqual(`nifti://${uri}`)
+        expect(layer.mixability).toEqual('nonmixable')
+      })
     })
 
     it('parses pluginStates correctly', () => {
@@ -102,21 +142,59 @@ describe('atlasViewer.urlService.service.ts', () => {
       const stringified = searchParam.toString()
       expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29')
     })
-  })
-
-  it('should convert template selected and parcellation selected', () => {
-
-    const { viewerState } = defaultRootState
-    const searchParam = cvtStateToSearchParam({
-      ...defaultRootState,
-      viewerState: {
-        ...viewerState,
-        templateSelected: bigbrainJson,
-        parcellationSelected: bigbrainJson.parcellations[0]
-      }
+    it('should convert template selected and parcellation selected', () => {
+  
+      const { viewerState } = defaultRootState
+      const searchParam = cvtStateToSearchParam({
+        ...defaultRootState,
+        viewerState: {
+          ...viewerState,
+          templateSelected: bigbrainJson,
+          parcellationSelected: bigbrainJson.parcellations[0]
+        }
+      })
+  
+      const stringified = searchParam.toString()
+      expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
     })
 
-    const stringified = searchParam.toString()
-    expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
+    describe('niftiLayers', () => {
+      it('should convert multiple nifti layers', () => {
+
+        const uri1 = `http://localhost:1111/test1.nii.gz`
+        const uri2 = `http://localhost:2222/test2.nii.gz`
+
+        const layer1 = {
+          mixability: 'nonmixable',
+          name: 'foo',
+          source: `nifti://${uri1}`,
+        }
+
+        const layer2 = {
+          mixability: 'nonmixable',
+          name: 'bar',
+          source: `nifti://${uri2}`
+        }
+        const { ngViewerState, viewerState } = defaultRootState
+        const searchParam = cvtStateToSearchParam({
+          ...defaultRootState,
+          viewerState: {
+            ...viewerState,
+            templateSelected: {
+              ...mni152,
+              nehubaConfig: mni152Nehubaconfig
+            },
+            parcellationSelected: mni152.parcellations[0]
+          },
+          ngViewerState: {
+            ...ngViewerState,
+            layers: [ layer1, layer2 ]
+          }
+        })
+        const str = searchParam.get('niftiLayers')
+        expect(str).toBeTruthy()
+        expect( encodeURIComponent(str) ).toEqual(`http%3A%2F%2Flocalhost%3A1111%2Ftest1.nii.gz__http%3A%2F%2Flocalhost%3A2222%2Ftest2.nii.gz`)
+      })
+    })
   })
 })

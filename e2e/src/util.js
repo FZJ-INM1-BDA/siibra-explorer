@@ -182,7 +182,6 @@ class WdBase{
       await this.dismissModal()
       await this.wait(200)
       await this.waitForAsync()
-      
     }
   }
 
@@ -255,6 +254,8 @@ class WdBase{
         Key.ESCAPE
       )
       .perform()
+
+    await this.wait(500)
   }
 
   async execScript(fn, ...arg){

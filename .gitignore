@@ -9,3 +9,5 @@ deploy/datasets/data/
 .DS_Store
 venv/
 site
+
+*.log
