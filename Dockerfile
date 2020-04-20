@@ -28,6 +28,15 @@ WORKDIR /iv
 
 RUN for f in $(find . -type f); do gzip < $f > $f.gz && brotli < $f > $f.br; done
 
+# Building doc
+FROM python:3.7 as doc-builder
+
+COPY . /iav
+WORKDIR /iav
+
+RUN pip install mkdocs mkdocs-material mdx_truly_sane_lists
+RUN mkdocs build
+
 # prod container
 FROM node:12-alpine 
 
@@ -45,6 +54,9 @@ COPY --from=builder /iv/deploy .
 
 # Copy built interactive viewer
 COPY --from=compressor /iv ./public
+
+# Copy docs
+COPY --from=doc-builder /iav/site ./docs
 
 # Copy the resources files needed to respond to queries
 # is this even necessary any more?

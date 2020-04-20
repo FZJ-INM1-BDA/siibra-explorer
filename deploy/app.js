@@ -9,6 +9,13 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
 }
 
+
+const DOC_PUBLIC_PATH = process.env.NODE_ENV === 'production'
+  ? path.join(__dirname, 'docs')
+  : path.join(__dirname, '..', 'site')
+
+app.use('/docs', express.static(DOC_PUBLIC_PATH))
+
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')
 
 app.use((req, _, next) => {

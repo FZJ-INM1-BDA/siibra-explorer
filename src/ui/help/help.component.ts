@@ -20,7 +20,7 @@ export class HelpComponent {
   public contactEmailHref: string
   public contactEmail: string
 
-  public userDoc: string = `https://interactive-viewer-user-documentation.apps-dev.hbp.eu`
+  public userDoc: string = `docs/`
 
   constructor(
     private constantService: AtlasViewerConstantsServices,
