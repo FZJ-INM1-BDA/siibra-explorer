@@ -1,7 +1,7 @@
 const { AtlasPage } = require("../util")
 const proxy = require('selenium-webdriver/proxy')
 
-describe('url parsing', () => {
+describe('> url parsing', () => {
   let iavPage
   
   beforeEach(async () => {
@@ -22,7 +22,7 @@ describe('url parsing', () => {
   //   expect(searchParamObj.get('templateSelected')).toBeNull()
   // })
 
-  it('navigation state should be perserved', async () => {
+  it('> navigation state should be perserved', async () => {
 
     const searchParam = `/?templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps&cNavigation=zvyba.z0UJ7._WMxv.-TTch..2_cJ0e.2-OUQG._a9qP._QPHw..7LIx..2CQ3O.1FYC.259Wu..2r6`
     const expectedNav = {
@@ -62,7 +62,100 @@ describe('url parsing', () => {
 
   })
 
-  it('pluginStates should result in xhr to get pluginManifest', async () => {
+  it('> if cRegionSelected is defined, should select region in viewer', async () => {
+    const url = '/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&cRegionsSelected=%7B"jubrain+mni152+v18+left"%3A"8"%7D'
+    await iavPage.goto(url)
+    await iavPage.clearAlerts()
+
+    // TODO use screenshot API when merg v2.3.0
+    const screenshotData = await iavPage._driver.takeScreenshot()
+    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
+      
+      const dataUri = arguments[0]
+      const pos = arguments[1]
+      const dim = arguments[2]
+      const cb = arguments[arguments.length - 1]
+
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = dim[0]
+        canvas.height = dim[1]
+
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
+
+        const idx = (dim[0] * pos[1] + pos[0]) * 4
+        const red = imgData.data[idx]
+        const green = imgData.data[idx + 1]
+        const blue = imgData.data[idx + 2]
+        cb([red, green, blue])
+      }
+      img.src = dataUri
+
+    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
+    
+    expect(red).toBeGreaterThan(0)
+    expect(red).toEqual(green)
+    expect(red).toEqual(blue)
+  })
+
+  it('> if niftiLayers are defined, parcellation layer should be hidden', async () => {
+    const url = `/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.eu%2Fprecomputed%2FJuBrain%2F17%2Ficbm152casym%2Fpmaps%2FVisual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+    await iavPage.goto(url)
+    await iavPage.clearAlerts()
+
+    // TODO use screenshot API when merg v2.3.0
+    const screenshotData = await iavPage._driver.takeScreenshot()
+    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
+      
+      const dataUri = arguments[0]
+      const pos = arguments[1]
+      const dim = arguments[2]
+      const cb = arguments[arguments.length - 1]
+
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = dim[0]
+        canvas.height = dim[1]
+
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
+
+        const idx = (dim[0] * pos[1] + pos[0]) * 4
+        const red = imgData.data[idx]
+        const green = imgData.data[idx + 1]
+        const blue = imgData.data[idx + 2]
+        cb([red, green, blue])
+      }
+      img.src = dataUri
+
+    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
+    
+    expect(red).toBeGreaterThan(0)
+    expect(red).toEqual(green)
+    expect(red).toEqual(blue)
+  })
+
+  it('> if niftiLayers is defined, after parsing, it should persist', async () => {
+    const url = `/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&niftiLayers=https%3A%2F%2Fneuroglancer.humanbrainproject.eu%2Fprecomputed%2FJuBrain%2F17%2Ficbm152casym%2Fpmaps%2FVisual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+    await iavPage.goto(url)
+    await iavPage.clearAlerts()
+
+    // TODO use execScript from iavPage API
+    const niftiLayers = await iavPage._driver.executeScript(() => {
+      const search = new URLSearchParams(window.location.search)
+      return search.get('niftiLayers')
+    })
+    const expected = `https://neuroglancer.humanbrainproject.eu/precomputed/JuBrain/17/icbm152casym/pmaps/Visual_hOc1_r_N10_nlin2MNI152ASYM2009C_2.4_publicP_a48ca5d938781ebaf1eaa25f59df74d0.nii.gz`
+    expect(niftiLayers).toEqual(expected)
+  })
+  
+
+  it('> pluginStates should result in xhr to get pluginManifest', async () => {
 
     const searchParam = new URLSearchParams()
     searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')

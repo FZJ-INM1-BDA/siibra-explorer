@@ -69,11 +69,13 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
     const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
     const { layers } = ngViewerState
     const additionalLayers = layers.filter(layer =>
-      /^blob:/.test(layer.name) &&
+      !/^blob:/.test(layer.name) &&
       Object.keys(initialNgState.layers).findIndex(layerName => layerName === layer.name) < 0,
     )
     const niftiLayers = additionalLayers.filter(layer => /^nifti:\/\//.test(layer.source))
-    if (niftiLayers.length > 0) { searchParam.set('niftiLayers', niftiLayers.join('__')) }
+    if (niftiLayers.length > 0) {
+      searchParam.set('niftiLayers', niftiLayers.map(layer => layer.source.replace(/^nifti:\/\//, '')).join('__'))
+    }
   }
 
   // plugin state
