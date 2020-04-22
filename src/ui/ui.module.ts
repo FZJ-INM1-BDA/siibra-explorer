@@ -86,6 +86,7 @@ import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
 import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
+import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterface/nehubaViewerTouch.directive";
 
 @NgModule({
   imports : [
@@ -179,6 +180,7 @@ import { ActionDialog } from "./actionDialog/actionDialog.component";
     TouchSideClass,
     ElementOutClickDirective,
     FixedMouseContextualContainerDirective,
+    NehubaViewerTouchDirective,
   ],
   entryComponents : [
 
@@ -211,7 +213,8 @@ import { ActionDialog } from "./actionDialog/actionDialog.component";
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,
-    LandmarkUIComponent
+    LandmarkUIComponent,
+    NehubaViewerTouchDirective,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

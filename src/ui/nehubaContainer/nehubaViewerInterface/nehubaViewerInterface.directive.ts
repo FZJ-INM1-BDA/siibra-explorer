@@ -3,7 +3,7 @@ import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
-import { distinctUntilChanged, filter, switchMap, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
+import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
 import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { getNavigationStateFromConfig } from "../util";
 import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
