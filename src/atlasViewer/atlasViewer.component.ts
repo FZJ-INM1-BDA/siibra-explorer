@@ -291,6 +291,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     /**
      * TODO deprecated
+     * TODO what the??? is this?
      */
     this.subscriptions.push(
       this.ngLayerNames$.pipe(

@@ -42,8 +42,15 @@
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
     <ui-nehuba-container
-      #uiNehubaContainer
-      iav-mouse-hover 
+      iav-viewer-touch-interface
+      [iav-viewer-touch-interface-v-panels]="uiNehubaContainer.viewPanels"
+      [iav-viewer-touch-interface-vp-to-data]="uiNehubaContainer.nehubaViewer?.viewportToDatas"
+      [iav-viewer-touch-interface-ngviewer]="uiNehubaContainer.nehubaViewer?.nehubaViewer?.ngviewer"
+      [iav-viewer-touch-interface-nehuba-config]="uiNehubaContainer.selectedTemplate?.nehubaConfig"
+      #iavNehubaViewerTouch="iavNehubaViewerTouch"
+
+      #uiNehubaContainer="uiNehubaContainer"
+      iav-mouse-hover
       #iavMouseHoverEl="iavMouseHover"
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
@@ -89,6 +96,7 @@
 
           </button>
 
+          <!-- visible status card when mat drawer is closed -->
           <mat-card
             *ngIf="!sideNavDrawer.opened"
             (click)="toggleSideNavMenu(false)"
