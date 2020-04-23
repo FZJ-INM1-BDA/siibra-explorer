@@ -73,6 +73,12 @@ export class SigninBanner {
     }
   }
 
+  resetScreenshotTaking() {
+    this.takingScreenshot = true
+    //ToDo find out better way to detect changes
+    setTimeout(() => this.changeDetectionRef.detectChanges())
+  }
+
   disableScreenshotTaking() {
     this.takingScreenshot = false
     this.changeDetectionRef.detectChanges()
