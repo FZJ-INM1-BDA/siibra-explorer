@@ -51,7 +51,6 @@ export class NehubaViewerTouchDirective implements OnDestroy{
      * with multitouch, and end up as single touch
      */
     const touchStart$ = fromEvent(this.el.nativeElement, 'touchstart').pipe(
-      tap((ev: TouchEvent) => ev.preventDefault()),
       shareReplay(1),
     )
     this.singleTouchStart$ = merge(

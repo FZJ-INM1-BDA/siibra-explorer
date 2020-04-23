@@ -41,7 +41,9 @@
 <!-- atlas template -->
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
+    <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
     <ui-nehuba-container
+      (touchmove)="$event.preventDefault()"
       iav-viewer-touch-interface
       [iav-viewer-touch-interface-v-panels]="uiNehubaContainer.viewPanels"
       [iav-viewer-touch-interface-vp-to-data]="uiNehubaContainer.nehubaViewer?.viewportToDatas"
@@ -55,7 +57,7 @@
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
-      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
+      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba()"
       (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
     </ui-nehuba-container>
 
