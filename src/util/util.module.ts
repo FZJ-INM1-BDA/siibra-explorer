@@ -8,6 +8,9 @@ import { FilterNullPipe } from "./pipes/filterNull.pipe";
 import { IncludesPipe } from "./pipes/includes.pipe";
 import { SafeResourcePipe } from "./pipes/safeResource.pipe";
 import { CaptureClickListenerDirective } from "./directives/captureClickListener.directive";
+import { AddUnitAndJoin } from "./pipes/addUnitAndJoin.pipe";
+import { NmToMm } from "./pipes/numbers.pipe";
+import { SwitchDirective } from "./directives/switch.directive";
 
 @NgModule({
   declarations: [
@@ -22,6 +25,9 @@ import { CaptureClickListenerDirective } from "./directives/captureClickListener
     IncludesPipe,
     SafeResourcePipe,
     CaptureClickListenerDirective,
+    AddUnitAndJoin,
+    NmToMm,
+    SwitchDirective,
   ],
   exports: [
     FilterNullPipe,
@@ -35,8 +41,9 @@ import { CaptureClickListenerDirective } from "./directives/captureClickListener
     IncludesPipe,
     SafeResourcePipe,
     CaptureClickListenerDirective,
-  ],
-  providers: [
+    AddUnitAndJoin,
+    NmToMm,
+    SwitchDirective,
   ]
 })
 

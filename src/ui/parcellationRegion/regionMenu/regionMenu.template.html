@@ -4,62 +4,6 @@
       <span class="mr-8">
         {{ region.name }}
       </span>
-
-      <!-- only show speed dial if originDatasets exists and are greater than 0 -->
-      <div *ngIf="((region && region.originDatasets) || []).length > 0"
-        class="speed-dial position-absolute d-flex flex-row-reverse align-items-center"
-        (iav-onclick-outside)="fab.close()"
-        #fab="iavFabSpeedDialContainer"
-        iav-fab-speed-dial-scale-origin="right"
-        iav-fab-speed-dial-container>
-
-        <!-- main btn -->
-        <button mat-fab class="ml-3"
-          iav-fab-speed-dial-trigger
-          [color]="fab.isOpen ? 'default' : 'accent'">
-
-          <!-- TODO add test to ensure this does not happen -->
-          <!-- nb pe-none is essential for iav-onclick-outside directive to work properly -->
-          <ng-container *ngIf="fab.isOpen; else closedTmpl">
-            <i class="pe-none fas fa-times"></i>
-          </ng-container>
-          <ng-template #closedTmpl>
-            <i class="pe-none fas fa-ellipsis-v"></i>
-          </ng-template>
-        </button>
-
-        <!-- action btns -->
-        <!-- originDatasets -->
-        <ng-container *ngFor="let originDataset of (region.originDatasets || []); let index = index">
-
-          <!-- preview file -->
-          <button *ngIf="originDataset.kgSchema && originDataset.kgId && originDataset.filename"
-            mat-mini-fab
-            iav-dataset-preview-dataset-file
-            [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-            [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-            class="m-1"
-            [iav-fab-speed-dial-child-index]="index * 2"
-            matTooltip="Preview file"
-            iav-fab-speed-dial-child>
-            <i class="far fa-eye"></i>
-          </button>
-
-          <!-- show dataset -->
-          <button *ngIf="originDataset.kgSchema && originDataset.kgId"
-            mat-mini-fab
-            class="m-1"
-            (click)="fab.close()"
-            matTooltip="More detail on dataset"
-            [iav-dataset-show-dataset-dialog-kgid]="originDataset.kgId"
-            iav-dataset-show-dataset-dialog
-            [iav-fab-speed-dial-child-index]="index * 2 + 1"
-            iav-fab-speed-dial-child>
-            <i class="fas fa-info"></i>
-          </button>
-        </ng-container>
-
-      </div>
     </div>
   </mat-card-title>
   <mat-card-subtitle>
@@ -68,61 +12,185 @@
       Brain region
     </span>
   </mat-card-subtitle>
+  
   <mat-card-content>
-    {{ region.description }}
-  </mat-card-content>
-  <div class="d-flex flex-row flex-wrap">
-    <button mat-button
-      (click)="toggleRegionSelected()"
-      [color]="isSelected ? 'primary': 'basic'">
-      <i class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
-      <span>
-        {{isSelected? 'Deselect' : 'Select'}}
-      </span>
-    </button>
-    <button mat-button (click)="navigateToRegion()">
-      <i class="fas fa-map-marked-alt"></i>
-      <span>
-        Navigate
-      </span>
-    </button>
-    <button *ngIf="hasConnectivity"
-      mat-button
-      [matMenuTriggerFor]="connectivitySourceDatasets"
-      #connectivityMenuButton="matMenuTrigger"
-      iav-captureClickListenerDirective
-      [iav-captureClickListenerDirective-captureDocument]="true"
-      (iav-captureClickListenerDirective-onMousedown)="connectivityMenuButton.closeMenu()">
-      <i class="fab fa-connectdevelop"></i>
-      <span>
-        Connectivity
-      </span>
-      <i class="fas fa-angle-right"></i>
-    </button>
+    <mat-divider></mat-divider>
+    
+    <!-- region actions -->
+    <mat-grid-list cols="2" rowHeight="6rem" gutterSize="0px">
+
+      <mat-grid-tile>
+        <iav-v-button
+          class="h-100 w-100"
+          mat-ripple
+          [color]="isSelected ? 'primary' : 'default'"
+          (click)="toggleRegionSelected()">
+          <i iav-v-button-icon class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
+          <span iav-v-button-text>{{isSelected ? 'Deselect' : 'Select'}}</span>
+        </iav-v-button>
+      </mat-grid-tile>
+
+      <mat-grid-tile>
+        <iav-v-button
+          class="h-100 w-100"
+          mat-ripple
+          (click)="navigateToRegion()">
+          <i class="fas fa-map-marked-alt" iav-v-button-icon></i>
+          <span iav-v-button-text>Navigate</span>
+        </iav-v-button>
+      </mat-grid-tile>
+
+      <ng-template #safeHarbour>
+        <ng-container *ngFor="let originDataset of (region.originDatasets || [])">
+          <mat-grid-tile class="iv-custom-comp">
+            <iav-v-button
+              iav-dataset-preview-dataset-file
+              [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+              [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+              #previewDirective="iavDatasetPreviewDatasetFile"
+              class="h-100 w-100"
+              mat-ripple>
+              <i class="far fa-eye" iav-v-button-icon></i>
+              <span iav-v-button-text [class]="(previewDirective.active | async) ? 'iv-custom-comp primary' : ''">Probability Map {{ previewDirective.active | async }}</span>
+            </iav-v-button>
+          </mat-grid-tile>
+        </ng-container> 
+        
+        <mat-grid-tile>
+          <iav-v-button *ngIf="hasConnectivity"
+            class="h-100 w-100"
+            mat-ripple
+            [matMenuTriggerFor]="connectivitySourceDatasets"
+            #connectivityMenuButton="matMenuTrigger"
+            iav-captureClickListenerDirective
+            [iav-captureClickListenerDirective-captureDocument]="true"
+            (iav-captureClickListenerDirective-onMousedown)="connectivityMenuButton.closeMenu()">
+            <i class="fab fa-connectdevelop" iav-v-button-icon></i>
+            <span iav-v-button-text>Connectivity</span>
+            <i class="fas fa-chevron-down" iav-v-button-footer></i>
+          </iav-v-button>
+        </mat-grid-tile>
+
+        <mat-grid-tile>
+          <iav-v-button *ngIf="sameRegionTemplate.length"
+            [attr.aria-label]="'Show availability in other reference spaces'"
+            class="h-100 w-100"
+            mat-ripple
+            [matMenuTriggerFor]="additionalActions"
+            #changeTmplTrigger="matMenuTrigger"
+            iav-captureClickListenerDirective
+            [iav-captureClickListenerDirective-captureDocument]="true"
+            (iav-captureClickListenerDirective-onMousedown)="changeTmplTrigger.closeMenu()">
+            <i class="fas fa-brain" iav-v-button-icon></i>
+            <span iav-v-button-text>Change template</span>
+            <i class="fas fa-chevron-down" iav-v-button-footer></i>
+          </iav-v-button>
+        </mat-grid-tile> 
+      </ng-template>
+    </mat-grid-list>
 
 
-
-    <!-- Menu to navigate between template spaces to explore same region -->
-    <div>
-      <button mat-button
-        aria-label="Show availability in other reference spaces"
-        *ngIf="sameRegionTemplate.length"
-        [matMenuTriggerFor]="additionalActions"
-        #changeTmplTrigger="matMenuTrigger"
-        iav-captureClickListenerDirective
-        [iav-captureClickListenerDirective-captureDocument]="true"
-        (iav-captureClickListenerDirective-onMousedown)="changeTmplTrigger.closeMenu()">
-        <i class="fas fa-brain"></i>
-        <span>
-          Change template
-        </span>
-        <i class="fas fa-angle-right"></i>
-      </button>
+    <!-- region desc -->
+    <ng-container *ngIf="region?.description?.length > 0">
+      <mat-divider></mat-divider>
+      <div>
+        {{ region.description }}
     </div>
+    </ng-container>
 
-  </div>
+    <mat-divider></mat-divider>
+
+    <mat-list class="sm">
+
+      <!-- position -->
+      <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
+        <mat-icon scaled-down fontSet="fas" fontIcon="fa-map-marked-alt" mat-list-icon></mat-icon>
+        <div mat-line>
+          {{ region.position | nmToMm | addUnitAndJoin : 'mm' }}
+        </div>
+      </mat-list-item>
+
+      <!-- originData -->
+      <mat-list-item *ngFor="let originDataset of (region.originDatasets || [])"
+        iav-dataset-preview-dataset-file
+        [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+        [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+        #previewDirective="iavDatasetPreviewDatasetFile"
+        iv-custom-comp
+        [attr.primary]="previewDirective.active || null"
+        role="switch"
+        [attr.aria-checked]="previewDirective.active"
+        [attr.aria-label]="SHOW_ORIGIN_DATASET"
+        mat-ripple>
+        <mat-icon fontSet="fas" fontIcon="fa-eye" mat-list-icon></mat-icon>
+        <div mat-line>
+          Preview probability map
+        </div>
+      </mat-list-item>
+
+      <!-- connectivity -->
+      <div iav-switch #connectivitySwitch="iavSwitch">
+
+        <mat-list-item mat-ripple
+          (click)="connectivitySwitch.toggle()"
+          [attr.aria-label]="SHOW_CONNECTIVITY_DATA">
+          <mat-icon fontSet="fab" fontIcon="fa-connectdevelop" mat-list-icon></mat-icon >
+          <div mat-line>
+            <span>
+              Connectivity
+            </span>
+            <span class="muted">
+             ({{ 1 }})
+            </span>
+          </div>
+          <mat-icon fontSet="fas" [fontIcon]="connectivitySwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
+        </mat-list-item>
+  
+        <!-- connectivity -->
+        <mat-list-item *ngIf="connectivitySwitch.switchState" mat-ripple (click)="showConnectivity(region.name)">
+          <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
+          <div mat-line>1000 Brain Study - DTI connectivity</div>
+        </mat-list-item>
+
+      </div>
+
+      <!-- change template -->
+      <div iav-switch #changeTmplSwitch="iavSwitch">
+
+        <mat-list-item *ngIf="sameRegionTemplate.length"
+          mat-ripple
+          [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE"
+          (click)="changeTmplSwitch && changeTmplSwitch.toggle()">
+          <mat-icon fontSet="fas" fontIcon="fa-brain" mat-list-icon></mat-icon>
+          <div mat-line>
+            <span>
+              Explore in other templates
+            </span>
+            <span class="muted">
+              ({{ sameRegionTemplate.length }})
+            </span>
+          </div>
+          <mat-icon fontSet="fas" [fontIcon]="changeTmplSwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
+        </mat-list-item>
+
+        <!-- change template items -->
+        <div *ngIf="changeTmplSwitch.switchState"
+          aria-label="Availability in other reference spaces">
+          <mat-list-item *ngFor="let sameRegion of sameRegionTemplate; let i = index"
+            (click)="changeView(i)"
+            mat-ripple>
+            <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
+            <div mat-line>
+              <span class="overflow-x-hidden text-truncate"> {{ sameRegion.template.name }} </span>
+              <span *ngIf="sameRegion.hemisphere"> - {{ sameRegion.hemisphere }}</span>
+            </div>
+          </mat-list-item>
+        </div>
+      
+      </div>
+    </mat-list>
+  </mat-card-content>
 </mat-card>
-
 
 <!-- ToDo make dynamic with AVAILABLE CONNECTIVITY DATASETS data - get info from atlas viewer core -->
 <mat-menu
@@ -138,7 +206,6 @@
 
 
 <mat-menu
-  [aria-label]="'Availability in other reference spaces'"
   #additionalActions="matMenu"
   xPosition="before"
   hasBackdrop="false">

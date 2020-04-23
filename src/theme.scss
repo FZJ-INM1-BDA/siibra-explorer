@@ -2,6 +2,34 @@
 
 @include  mat-core();
 
+@mixin custom-cmp($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+
+  [iv-custom-comp],
+  .iv-custom-comp
+  {
+    &[primary],
+    &.primary
+    {
+      color: mat-color($primary);
+    }
+
+    &[accent],
+    &.accent
+    {
+      color: mat-color($accent);
+    }
+
+    &[warn],
+    &.warn
+    {
+      color: mat-color($warn);
+    }
+  }
+}
+
 $iv-theme-primary: mat-palette($mat-indigo);
 $iv-theme-accent: mat-palette($mat-amber);
 $iv-theme-warn: mat-palette($mat-red);
@@ -9,6 +37,7 @@ $iv-theme-warn: mat-palette($mat-red);
 $iv-theme: mat-light-theme($iv-theme-primary, $iv-theme-accent, $iv-theme-warn);
 
 @include angular-material-theme($iv-theme);
+@include custom-cmp($iv-theme);
 
 $iv-dark-theme-primary: mat-palette($mat-blue);
 $iv-dark-theme-accent:  mat-palette($mat-amber, A200, A100, A400);
@@ -18,6 +47,7 @@ $iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, 
 [darktheme=true]
 {
   @include angular-material-theme($iv-dark-theme);
+  @include custom-cmp($iv-dark-theme);
 }
 
 .iav-dialog-class

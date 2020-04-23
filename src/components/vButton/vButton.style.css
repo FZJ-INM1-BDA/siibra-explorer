@@ -1,0 +1,28 @@
+:host
+{
+  padding: 1rem 2rem;
+  /* background-color:rgba(128,128,128,0.3) */
+}
+
+:host:hover
+{
+  cursor: pointer;
+}
+
+.icon-container
+{
+  flex-basis: 2.5rem;
+}
+
+.text-container
+{
+  flex-basis: 0;
+  overflow: visible;
+  text-align: center;
+}
+
+.footer-container
+{
+  flex-basis: 0rem;
+  margin-bottom: -1rem;
+}

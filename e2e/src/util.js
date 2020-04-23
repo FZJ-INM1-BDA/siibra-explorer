@@ -92,6 +92,14 @@ class WdBase{
     return result
   }
 
+  async switchIsChecked(cssSelector){
+    if (!cssSelector) throw new Error(`switchChecked method requies css selector`)
+    const checked = await this._browser
+      .findElement( By.css(cssSelector) )
+      .getAttribute('aria-checked')
+    return checked === 'true'
+  }
+
   async click(cssSelector){
     if (!cssSelector) throw new Error(`click method needs to define a css selector`)
     await this._browser.findElement( By.css(cssSelector) ).click()
