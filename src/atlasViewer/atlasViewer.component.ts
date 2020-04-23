@@ -382,7 +382,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  public mouseDownNehuba(_event) {
+  public mouseDownNehuba() {
     this.rClContextualMenu.hide()
   }
 
