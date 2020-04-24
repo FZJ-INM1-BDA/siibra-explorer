@@ -1,4 +1,6 @@
-const {AtlasPage} = require('../util')
+const { AtlasPage } = require('../util')
+const { ARIA_LABELS } = require('../../../common/constants')
+const { SHOW_IN_OTHER_REF_SPACE, AVAILABILITY_IN_OTHER_REF_SPACE } = ARIA_LABELS
 
 const TEST_DATA = [
   {
@@ -72,7 +74,7 @@ const getBeforeEachFn = iavPage => ({
   await iavPage.waitUntilAllChunksLoaded()
   await iavPage.cursorMoveToAndClick({ position })
 
-  await iavPage.showOtherTemplateMenu()
+  await iavPage.click(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}"]`)
   await iavPage.wait(500)
 }
 
@@ -104,18 +106,13 @@ describe('> explore same region in different templates', () => {
           describe(`> moving to ${name}`, () => {
             it('> works as expected', async () => {
 
-              const otherTemplates = await iavPage.getAllOtherTemplates()
-              const idx = otherTemplates.findIndex(template => {
-                if (hemisphere) {
-                  if (template.indexOf(hemisphere) < 0) return false
-                }
-                return template.indexOf(name) >= 0
-              })
+              const otherTemplates = await iavPage.getText(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${name}${hemisphere ? (' - ' + hemisphere) : ''}"]`)
+              if (hemisphere) {
+                expect(otherTemplates.indexOf(hemisphere)).toBeGreaterThanOrEqual(0)
+              }
+              expect(otherTemplates.indexOf(name)).toBeGreaterThanOrEqual(0)
       
-              expect(idx).toBeGreaterThanOrEqual(0)
-      
-              await iavPage.clickNthItemAllOtherTemplates(idx)
-      
+              await iavPage.click(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${name}${hemisphere ? (' - ' + hemisphere) : ''}"]`)
               await iavPage.wait(500)
               await iavPage.waitUntilAllChunksLoaded()
               

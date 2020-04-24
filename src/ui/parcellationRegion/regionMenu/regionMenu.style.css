@@ -1,6 +1,11 @@
-.speed-dial
+mat-list.sm mat-list-item
 {
-  right: 0;
-  bottom: 0;
-  height: 0;
+  height:36px;
+  font-size: 90%;
+  cursor: default;
+}
+
+mat-icon
+{
+  transform: scale(0.75);
 }

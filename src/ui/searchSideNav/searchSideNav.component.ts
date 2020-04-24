@@ -10,7 +10,6 @@ import {
   EXPAND_SIDE_PANEL_CURRENT_VIEW,
 } from "src/services/state/uiState.store";
 import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
-import { LayerBrowser } from "../layerbrowser/layerbrowser.component";
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";

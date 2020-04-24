@@ -9,6 +9,7 @@ import {
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerStateController/viewerState.base";
 import {distinctUntilChanged, shareReplay} from "rxjs/operators";
 import {Observable} from "rxjs";
+import { ARIA_LABELS } from 'common/constants'
 
 export class RegionBase {
 
@@ -149,4 +150,8 @@ export class RegionBase {
     }
   }
 
+  public SHOW_CONNECTIVITY_DATA = ARIA_LABELS.SHOW_CONNECTIVITY_DATA
+  public SHOW_IN_OTHER_REF_SPACE = ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE
+  public SHOW_ORIGIN_DATASET = ARIA_LABELS.SHOW_ORIGIN_DATASET
+  public AVAILABILITY_IN_OTHER_REF_SPACE = ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE
 }

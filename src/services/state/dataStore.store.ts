@@ -18,8 +18,6 @@ export interface IStateInterface {
   datasetPreviews: DatasetPreview[]
 }
 
-
-
 export const defaultState = {
   fetchedDataEntries: [],
   favDataEntries: (() => {
@@ -72,6 +70,17 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
         datasetId: fullId,
         filename
       })
+    }
+  }
+  case ACTION_TYPES.CLEAR_PREVIEW_DATASET: {
+    const { payload = {}} = action
+    const { file , dataset } = payload
+    const { fullId } = dataset
+    const { filename } = file
+    return {
+      ...prevState,
+      datasetPreviews: prevState.datasetPreviews
+        .filter(({ datasetId, filename: fName }) => !(datasetId === fullId && fName === filename))
     }
   }
   case ACTION_TYPES.CLEAR_PREVIEW_DATASETS: {
@@ -233,6 +242,7 @@ const ACTION_TYPES = {
   UNFAV_DATASET: 'UNFAV_DATASET',
   TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET',
   PREVIEW_DATASET: 'PREVIEW_DATASET',
+  CLEAR_PREVIEW_DATASET: 'CLEAR_PREVIEW_DATASET',
   CLEAR_PREVIEW_DATASETS: 'CLEAR_PREVIEW_DATASETS'
 }
 

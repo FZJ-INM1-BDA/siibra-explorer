@@ -205,10 +205,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
       return
     }
     this.store.dispatch({
-      type : REMOVE_NG_LAYER,
-      layer : {
-        name : layer.name,
-      },
+      type: REMOVE_NG_LAYER,
+      layer
     })
   }
 

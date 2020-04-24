@@ -530,7 +530,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           type : ADD_NG_LAYER,
           layer : dispatchLayers,
         })
-      }),
+      })
     )
 
     this.subscriptions.push(
