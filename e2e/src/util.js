@@ -105,6 +105,14 @@ class WdBase{
     await this._browser.findElement( By.css(cssSelector) ).click()
   }
 
+  async getText(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    
+    const text = await el.getText()
+    return text
+  }
+
   historyBack() {
     return this._browser.navigate().back()
   }
@@ -556,37 +564,6 @@ class WdLayoutPage extends WdBase{
     if (!menuItems[index]) throw new Error(`index out of bound: accessing index ${index} of length ${menuItems.length}`)
     if (cssSelector) await menuItems[index].findElement( By.css(cssSelector) ).click()
     else await menuItems[index].click()
-  }
-
-  // other templates
-  async showOtherTemplateMenu(){
-    await this._driver
-      .findElement( By.css('[aria-label="Show availability in other reference spaces"]') )
-      .click()
-  }
-
-  _getOtherTemplateMenu(){
-    return this._driver
-      .findElement( By.css('[aria-label="Availability in other reference spaces"]') )
-  }
-
-  _getAllOtherTemplates(){
-    return this._getOtherTemplateMenu().findElements( By.css('[mat-menu-item]') )
-  }
-
-  async getAllOtherTemplates(){
-    const els = await this._getAllOtherTemplates()
-    const returnArr = []
-    for (const el of els) {
-      returnArr.push(await _getTextFromWebElement(el))
-    }
-    return returnArr
-  }
-
-  async clickNthItemAllOtherTemplates(index){
-    const arr = await this._getAllOtherTemplates()
-    if (!arr[index]) throw new Error(`index out of bound: trying to access ${index} from arr with length ${arr.length}`)
-    await arr[index].click()
   }
 
   _getFavDatasetIcon(){

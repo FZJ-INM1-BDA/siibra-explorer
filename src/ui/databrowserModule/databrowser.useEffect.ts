@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
-import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged, concatMap } from "rxjs/operators";
+import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged, concatMap, pairwise } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile, DatasetPreview } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
@@ -78,17 +78,30 @@ export class DataBrowserUseEffect implements OnDestroy {
     )
 
     this.removePreviewDataset$ = ngViewerStateLayers$.pipe(
-      map(layers => layers.filter(({ annotation }) => annotation && annotation.indexOf(DATASET_PREVIEW_ANNOTATION) >= 0)),
-      withLatestFrom(this.datasetPreviews$),
-      map(([ ngViewerLayers, datasetPreviews ]) => {
+      distinctUntilChanged(),
+      pairwise(),
+      map(([o, n]: [INgLayerInterface[], INgLayerInterface[]]) => {
+        const nNameSet = new Set(n.map(({ name }) => name))
+        const oNameSet = new Set(o.map(({ name }) => name))
+        return {
+          add: n.filter(({ name: nName }) => !oNameSet.has(nName)),
+          remove: o.filter(({ name: oName }) => !nNameSet.has(oName)),
+        }
+      }),
+      map(({ remove }) => remove),
+      withLatestFrom(
+        this.datasetPreviews$,
+      ),
+      map(([ removedLayers, datasetPreviews ]) => {
+        const removeLayersAnnotation = removedLayers.map(({ annotation }) => annotation)
         return datasetPreviews.filter(({ filename }) => {
-          return ngViewerLayers.findIndex(({ annotation }) => annotation.indexOf(filename) >= 0) < 0
+          return removeLayersAnnotation.findIndex(annnoation => annnoation.indexOf(filename) >= 0) >= 0
         })
       }),
       filter(arr => arr.length > 0),
       concatMap(arr => from(arr).pipe(
         map(item => {
-          const { filename, datasetId } = item
+          const { datasetId, filename } = item
           return {
             type: DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASET,
             payload: {

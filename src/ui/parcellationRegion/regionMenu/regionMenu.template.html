@@ -73,7 +73,6 @@
 
         <mat-grid-tile>
           <iav-v-button *ngIf="sameRegionTemplate.length"
-            [attr.aria-label]="'Show availability in other reference spaces'"
             class="h-100 w-100"
             mat-ripple
             [matMenuTriggerFor]="additionalActions"
@@ -175,8 +174,9 @@
 
         <!-- change template items -->
         <div *ngIf="changeTmplSwitch.switchState"
-          aria-label="Availability in other reference spaces">
+          [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE">
           <mat-list-item *ngFor="let sameRegion of sameRegionTemplate; let i = index"
+            [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
             (click)="changeView(i)"
             mat-ripple>
             <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>

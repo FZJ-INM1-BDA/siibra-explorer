@@ -12,5 +12,6 @@
     SHOW_ORIGIN_DATASET: `Show probabilistic map`,
     SHOW_CONNECTIVITY_DATA: `Show connectivity data`,
     SHOW_IN_OTHER_REF_SPACE: `Show in other reference space`,
+    AVAILABILITY_IN_OTHER_REF_SPACE: 'Availability in other reference spaces'
   }
 })(typeof exports === 'undefined' ? module.exports : exports)
