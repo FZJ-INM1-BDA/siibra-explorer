@@ -16,31 +16,32 @@
   <mat-card-content>
     <mat-divider></mat-divider>
     
-    <!-- region actions -->
-    <mat-grid-list cols="2" rowHeight="6rem" gutterSize="0px">
+    <ng-template #safeHarbour>
+        
+      <!-- enlarged region actions -->
+      <mat-grid-list cols="2" rowHeight="6rem" gutterSize="0px">
 
-      <mat-grid-tile>
-        <iav-v-button
-          class="h-100 w-100"
-          mat-ripple
-          [color]="isSelected ? 'primary' : 'default'"
-          (click)="toggleRegionSelected()">
-          <i iav-v-button-icon class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
-          <span iav-v-button-text>{{isSelected ? 'Deselect' : 'Select'}}</span>
-        </iav-v-button>
-      </mat-grid-tile>
-
-      <mat-grid-tile>
-        <iav-v-button
-          class="h-100 w-100"
-          mat-ripple
-          (click)="navigateToRegion()">
-          <i class="fas fa-map-marked-alt" iav-v-button-icon></i>
-          <span iav-v-button-text>Navigate</span>
-        </iav-v-button>
-      </mat-grid-tile>
-
-      <ng-template #safeHarbour>
+        <mat-grid-tile>
+          <iav-v-button
+            class="h-100 w-100"
+            mat-ripple
+            [color]="isSelected ? 'primary' : 'default'"
+            (click)="toggleRegionSelected()">
+            <i iav-v-button-icon class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
+            <span iav-v-button-text>{{isSelected ? 'Deselect' : 'Select'}}</span>
+          </iav-v-button>
+        </mat-grid-tile>
+  
+        <mat-grid-tile>
+          <iav-v-button
+            class="h-100 w-100"
+            mat-ripple
+            (click)="navigateToRegion()">
+            <i class="fas fa-map-marked-alt" iav-v-button-icon></i>
+            <span iav-v-button-text>Navigate</span>
+          </iav-v-button>
+        </mat-grid-tile>
+  
         <ng-container *ngFor="let originDataset of (region.originDatasets || [])">
           <mat-grid-tile class="iv-custom-comp">
             <iav-v-button
@@ -70,7 +71,7 @@
             <i class="fas fa-chevron-down" iav-v-button-footer></i>
           </iav-v-button>
         </mat-grid-tile>
-
+  
         <mat-grid-tile>
           <iav-v-button *ngIf="sameRegionTemplate.length"
             class="h-100 w-100"
@@ -85,9 +86,8 @@
             <i class="fas fa-chevron-down" iav-v-button-footer></i>
           </iav-v-button>
         </mat-grid-tile> 
-      </ng-template>
-    </mat-grid-list>
-
+      </mat-grid-list>
+    </ng-template>
 
     <!-- region desc -->
     <ng-container *ngIf="region?.description?.length > 0">
@@ -101,6 +101,18 @@
 
     <mat-list class="sm">
 
+      <!-- selected -->
+      <mat-list-item
+        mat-ripple
+        iv-custom-comp
+        [attr.primary]="isSelected || null"
+        (click)="toggleRegionSelected()">
+        <mat-icon scaled-down="" fontSet="far" [fontIcon]="isSelected ? 'fa-check-square' : 'fa-square'"  mat-list-icon></mat-icon>
+        <div mat-line>
+          {{ isSelected ? 'Selected' : 'Add to selected' }}
+        </div>
+      </mat-list-item>
+      
       <!-- position -->
       <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
         <mat-icon scaled-down fontSet="fas" fontIcon="fa-map-marked-alt" mat-list-icon></mat-icon>
