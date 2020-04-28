@@ -120,6 +120,10 @@ export class SingleDatasetBase implements OnInit, OnChanges {
     }
   }
 
+  // TODO this is not perfect logic for singledataset
+  // singledataset.base.ts should be tidied up in general
+  // fullId, kgId, dataset... too many different entries
+  
   public ngOnChanges(){
     if (!this.kgId) {
       const fullId = this.fullId || this.dataset?.fullId
