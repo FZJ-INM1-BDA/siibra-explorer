@@ -227,9 +227,6 @@ export class NehubaViewerTouchDirective implements OnDestroy{
             [0, 0, 1]
           ][panelIndex]
         )
-        const ori = this.ngViewer.navigationState.pose.orientation.orientation
-        vec3.transformQuat(axis, axis, ori)
-        vec3.normalize(axis, axis)
 
         this.ngViewer.navigationState.pose.rotateRelative(axis, theta)
       }),
