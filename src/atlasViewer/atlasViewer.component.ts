@@ -391,13 +391,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       if (!this.rClContextualMenu) { return }
 
       if (dismissRClCtxtMenu) {
-        if (this.rClContextualMenu.el.nativeElement.contains(event.target)) {
-
-        } else {
+        if (!this.rClContextualMenu.el.nativeElement.contains(event.target)) {
           this.rClContextualMenu.hide()
         }
       } else {
-
         this.rClContextualMenu.mousePos = [
           event.clientX,
           event.clientY,
