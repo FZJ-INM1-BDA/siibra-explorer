@@ -12,8 +12,6 @@ import { PluginHandler } from 'src/util/pluginHandler';
 import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 import { WidgetUnit } from "../widgetUnit/widgetUnit.component";
 
-import './plugin_styles.css'
-
 @Injectable({
   providedIn : 'root',
 })

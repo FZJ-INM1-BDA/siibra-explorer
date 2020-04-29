@@ -113,6 +113,15 @@ class WdBase{
     return text
   }
 
+  async isVisible(cssSelector) {
+
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    const isDisplayed = await el.isDisplayed()
+
+    return isDisplayed
+  }
+
   historyBack() {
     return this._browser.navigate().back()
   }

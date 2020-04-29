@@ -5,7 +5,7 @@ import { Directive, Input } from "@angular/core";
   exportAs: 'iavSwitch'
 })
 export class SwitchDirective{
-  @Input() switchState: boolean = false
+  @Input('iav-switch-initstate') switchState: boolean = false
   
   toggle(){
     this.switchState = !this.switchState

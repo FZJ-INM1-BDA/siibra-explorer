@@ -25,8 +25,6 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 export class SearchSideNav implements OnDestroy {
   public availableDatasets: number = 0
 
-  public showLayerBrowser: boolean = true
-
   private subscriptions: Subscription[] = []
   private layerBrowserDialogRef: MatDialogRef<any>
 

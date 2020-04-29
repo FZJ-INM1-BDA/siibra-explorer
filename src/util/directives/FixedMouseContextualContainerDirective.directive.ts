@@ -43,6 +43,9 @@ export class FixedMouseContextualContainerDirective implements AfterContentCheck
   }
 
   ngAfterContentChecked(){
+    if (this.el.nativeElement.childElementCount === 0) {
+      this.hide()
+    }
     this.recalculatePosition()
     this.cdr.markForCheck()
   }
