@@ -122,6 +122,12 @@ class WdBase{
     return isDisplayed
   }
 
+  async isAt(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const { x, y, width, height } = await this._browser.findElement( By.css(cssSelector) ).getRect()
+    return { x, y, width, height }
+  }
+
   historyBack() {
     return this._browser.navigate().back()
   }

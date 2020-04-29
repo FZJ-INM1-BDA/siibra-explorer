@@ -20,7 +20,7 @@ export class FixedMouseContextualContainerDirective implements AfterContentCheck
   public onHide: EventEmitter<null> = new EventEmitter()
 
   constructor(
-    private el: ElementRef,
+    public el: ElementRef,
     private cdr: ChangeDetectorRef,
   ) {
   }

@@ -382,20 +382,28 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  public mouseClickDocument(event) {
+  public mouseClickDocument(event: MouseEvent) {
 
     const dismissRClCtxtMenu = this.rClContextualMenu.isShown
 
     const next = () => {
 
       if (!this.rClContextualMenu) { return }
-      this.rClContextualMenu.mousePos = [
-        event.clientX,
-        event.clientY,
-      ]
-  
-      if (dismissRClCtxtMenu) this.rClContextualMenu.hide()
-      else this.rClContextualMenu.show()
+
+      if (dismissRClCtxtMenu) {
+        if (this.rClContextualMenu.el.nativeElement.contains(event.target)) {
+
+        } else {
+          this.rClContextualMenu.hide()
+        }
+      } else {
+
+        this.rClContextualMenu.mousePos = [
+          event.clientX,
+          event.clientY,
+        ]
+        this.rClContextualMenu.show()
+      } 
     }
 
     this.nehubaClickOverride(next)

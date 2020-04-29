@@ -41,6 +41,16 @@ describe('> viewerCtxMenu', () => {
           expect(visible).toBeTrue()
         })
 
+        it('> pos does not change when click inside', async () => {
+          const { x: xBefore, y: yBefore, height: hBefore } = await iavPage.isAt(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
+          await iavPage.click(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`)
+          await iavPage.wait(500)
+          const { x: xAfter, y: yAfter, height: hAfter } = await iavPage.isAt(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
+          expect(xBefore).toEqual(xAfter)
+          expect(yBefore).toEqual(yAfter)
+          expect(hAfter).toBeGreaterThan(hBefore)
+        })
+
         it('> disappear again on click of anywhere else', async () => {
           await iavPage.cursorMoveToAndClick({ position: [10, 10] })
           await iavPage.wait(500)
