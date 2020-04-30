@@ -54,8 +54,8 @@ describe('origin dataset pmap', () => {
             await iavPage.wait(5000)
             await iavPage.waitForAsync()
 
-            const additionalLayerControlIsShown = await iavPage.additionalLayerControlIsVisible()
-            expect(additionalLayerControlIsShown).toEqual(true)
+            const additionalLayerControlIsExpanded = await iavPage.additionalLayerControlIsExpanded()
+            expect(additionalLayerControlIsExpanded).toEqual(false)
             
             const checked = await iavPage.switchIsChecked(cssSelector)
             expect(checked).toEqual(true)
