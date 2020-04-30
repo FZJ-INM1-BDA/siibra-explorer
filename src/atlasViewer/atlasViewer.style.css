@@ -73,3 +73,8 @@ region-menu
 {
   display:inline-block;
 }
+
+.floating-container
+{
+  max-width: 350px;
+}

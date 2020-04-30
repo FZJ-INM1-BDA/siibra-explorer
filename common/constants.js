@@ -1,6 +1,8 @@
 (function(exports){
 
   exports.ARIA_LABELS = {
+    // overlay specific
+    CONTEXT_MENU: `Viewer context menu`,
 
     // sharing module
     SHARE_BTN: `Share this view`,

@@ -57,8 +57,8 @@
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
-      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba()"
-      (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
+      [iav-captureClickListenerDirective-captureDocument]="true"
+      (iav-captureClickListenerDirective-onClick)="mouseClickDocument($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -165,7 +165,9 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
-      <div fixedMouseContextualContainerDirective
+      <div class="floating-container"
+        [attr.aria-label]="CONTEXT_MENU_ARIA_LABEL"
+        fixedMouseContextualContainerDirective
         #fixedContainer="iavFixedMouseCtxContainer">
 
         <!-- on click segment menu -->

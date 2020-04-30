@@ -1,9 +1,7 @@
 <mat-card>
   <mat-card-title>
-    <div class="position-relative">
-      <span class="mr-8">
-        {{ region.name }}
-      </span>
+    <div class="position-relative region-name">
+      {{ region.name }}
     </div>
   </mat-card-title>
   <mat-card-subtitle>
@@ -28,7 +26,7 @@
             [color]="isSelected ? 'primary' : 'default'"
             (click)="toggleRegionSelected()">
             <i iav-v-button-icon class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
-            <span iav-v-button-text>{{isSelected ? 'Deselect' : 'Select'}}</span>
+            <span iav-v-button-text>Select</span>
           </iav-v-button>
         </mat-grid-tile>
   
@@ -99,7 +97,7 @@
 
     <mat-divider></mat-divider>
 
-    <mat-list class="sm">
+    <mat-list class="action-list sm">
 
       <!-- selected -->
       <mat-list-item
@@ -109,7 +107,7 @@
         (click)="toggleRegionSelected()">
         <mat-icon scaled-down="" fontSet="far" [fontIcon]="isSelected ? 'fa-check-square' : 'fa-square'"  mat-list-icon></mat-icon>
         <div mat-line>
-          {{ isSelected ? 'Selected' : 'Add to selected' }}
+          Select
         </div>
       </mat-list-item>
       

@@ -27,7 +27,6 @@ import {
   isDefined,
   safeFilter,
 } from "../services/stateStore.service";
-import { AtlasViewerAPIServices } from "./atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
 import { WidgetServices } from "./widgetUnit/widgetService.service";
 
@@ -44,6 +43,7 @@ import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import { ARIA_LABELS } from 'common/constants'
 
 export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
 
@@ -67,11 +67,11 @@ const compareFn = (it, item) => it.name === item.name
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
+  public CONTEXT_MENU_ARIA_LABEL = ARIA_LABELS.CONTEXT_MENU
   public compareFn = compareFn
 
   @ViewChild('cookieAgreementComponent', {read: TemplateRef}) public cookieAgreementComponent: TemplateRef<any>
 
-  private persistentStateNotifierMatDialogRef: MatDialogRef<any>
   @ViewChild('kgToS', {read: TemplateRef}) public kgTosComponent: TemplateRef<any>
   @ViewChild(LayoutMainSide) public layoutMainSide: LayoutMainSide
 
@@ -382,21 +382,25 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  public mouseDownNehuba() {
-    this.rClContextualMenu.hide()
-  }
+  public mouseClickDocument(event: MouseEvent) {
 
-  public mouseClickNehuba(event) {
+    const dismissRClCtxtMenu = this.rClContextualMenu.isShown
 
     const next = () => {
 
       if (!this.rClContextualMenu) { return }
-      this.rClContextualMenu.mousePos = [
-        event.clientX,
-        event.clientY,
-      ]
-  
-      this.rClContextualMenu.show()
+
+      if (dismissRClCtxtMenu) {
+        if (!this.rClContextualMenu.el.nativeElement.contains(event.target)) {
+          this.rClContextualMenu.hide()
+        }
+      } else {
+        this.rClContextualMenu.mousePos = [
+          event.clientX,
+          event.clientY,
+        ]
+        this.rClContextualMenu.show()
+      } 
     }
 
     this.nehubaClickOverride(next)

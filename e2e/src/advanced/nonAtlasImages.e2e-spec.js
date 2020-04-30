@@ -87,7 +87,7 @@ describe('> non-atlas images', () => {
         jasmine.objectContaining(
           {
             method: 'GET',
-            url: 'https://zam10143.zam.kfa-juelich.de/chumni/nifti/cb905d54437734b39807e252ef8aa68bc6ac889047fbebbafd885490/BI-TIM/info'
+            url: 'https://zam10143.zam.kfa-juelich.de/chumni/nifti/5c38faad1b0deab8d1674248b0107cd3637faa46a88e7a039c511163/BI-TIM/info'
           }
         )
       )
@@ -127,7 +127,7 @@ describe('> non-atlas images', () => {
         jasmine.objectContaining(
           {
             method: 'GET',
-            url: 'https://zam10143.zam.kfa-juelich.de/chumni/nifti/cb905d54437734b39807e252ef8aa68bc6ac889047fbebbafd885490/BI-TIM/info'
+            url: 'https://zam10143.zam.kfa-juelich.de/chumni/nifti/5c38faad1b0deab8d1674248b0107cd3637faa46a88e7a039c511163/BI-TIM/info'
           }
         )
       )
@@ -185,8 +185,8 @@ describe('> non-atlas images', () => {
       await iavPage.goto(`/?${searchParam.toString()}`)
       await iavPage.wait(2000)
       
-      const additionalLayerCtrlIsVisible = await iavPage.additionalLayerControlIsVisible()
-      expect(additionalLayerCtrlIsVisible).toEqual(true)
+      const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
+      expect(additionalLayerCtrlIsExpanded2).toEqual(false)
 
     })
 
@@ -208,17 +208,17 @@ describe('> non-atlas images', () => {
       await iavPage.wait(2000)
       
       const additionalLayerCtrlIsExpanded = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded).toEqual(true)
+      expect(additionalLayerCtrlIsExpanded).toEqual(false)
 
       await iavPage.toggleLayerControl()
 
       const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded2).toEqual(false)
+      expect(additionalLayerCtrlIsExpanded2).toEqual(true)
 
       await iavPage.toggleLayerControl()
 
       const additionalLayerCtrlIsExpanded3 = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded3).toEqual(true)
+      expect(additionalLayerCtrlIsExpanded3).toEqual(false)
 
     })
   })
