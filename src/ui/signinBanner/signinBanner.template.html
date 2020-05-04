@@ -42,7 +42,7 @@
       <ng-template [ngIf]="user$ | async" [ngIfElse]="notLoggedInTmpl" let-user="ngIf">
         {{ (user && user.name || 'Unnamed User').slice(0,1) }}
       </ng-template>
-      
+
       <ng-template #notLoggedInTmpl>
         <i class="fas fa-user"></i>
       </ng-template>
@@ -166,7 +166,7 @@
         [ripple]="true">
 
       </single-dataset-list-view>
-    
+
     </mat-list-item>
   </mat-list>
 </ng-template>
@@ -176,5 +176,5 @@
   *ngIf="takingScreenshot"
   class="position-fixed fixed-top"
   (screenshotTaking)="disableScreenshotTaking()"
-  (resetScreenshot)="$event? takingScreenshot = true : disableScreenshotTaking()">
+  (resetScreenshot)="$event? resetScreenshotTaking() : disableScreenshotTaking()">
 </take-screenshot>

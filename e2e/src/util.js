@@ -104,6 +104,23 @@ class WdBase{
       .perform()
   }
 
+  async scrollElementBy(cssSelector, options) {
+    const { delta } = options
+    await this._browser.executeScript(() => {
+      const { delta } = arguments[1]
+      const el = document.querySelector(arguments[0])
+      el.scrollBy(...delta)
+    }, cssSelector, { delta })
+  }
+
+  async getScrollStatus(cssSelector) {
+    const val = await this._browser.executeScript(() => {
+      const el = document.querySelector(arguments[0])
+      return el.scrollTop
+    }, cssSelector)
+    return val
+  }
+
   async cursorMoveToAndClick({ position }) {
     const { x, y } = verifyPosition(position)
     return this._driver.actions()
