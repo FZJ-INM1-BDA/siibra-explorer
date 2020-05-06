@@ -180,12 +180,6 @@ export class AtlasViewerConstantsServices implements OnDestroy {
     pointHitRadius : 0,
   }
 
-  public minReqExplaner = `
-  - Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
-  - You can check browsers' support of webgl2.0 by visiting <https://caniuse.com/#feat=webgl2>
-  - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
-  `
-
   public minReqMD = `
 # Hmm... it seems like we hit a snag
 It seems your browser has trouble loading interactive atlas viewer.

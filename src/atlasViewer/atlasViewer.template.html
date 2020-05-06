@@ -119,8 +119,8 @@
 
     <div class="d-flex flex-row justify-content-end z-index-10 position-absolute pe-none w-100 h-100">
       <signin-banner
-          signinWrapper
-          [parcellationIsSelected]="selectedParcellation? true : false">
+        signinWrapper
+        [parcellationIsSelected]="!!selectedParcellation">
       </signin-banner>
     </div>
 
@@ -136,14 +136,14 @@
 
       <div floatingMouseContextualContainerDirective>
 
-        <div *ngIf="!ismobile && !presentDatasetDialogRef"
+        <div *ngIf="!ismobile"
           class="d-inline-block"
           iav-mouse-hover
           #iavMouseHoverContextualBlock="iavMouseHover"
           contextualBlock>
 
           <ng-container
-            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
+            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe">
 
             <mat-list dense>
 
@@ -180,9 +180,7 @@
                 class="pe-all"
                 [region]="onHoverRegion"
                 [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
-                [hasConnectivity]="selectedParcellation
-                  && selectedParcellation.hasAdditionalViewMode
-                  && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
+                [hasConnectivity]="selectedParcellation?.hasAdditionalViewMode?.includes('connectivity')"
                 (closeRegionMenu)="rClContextualMenu.hide()">
               </region-menu>
             </div>
@@ -227,7 +225,7 @@
         </p>
         <div class="col-6 d-inline-block text-left">
           <readmore-component [collapsedHeight]="0">
-            <markdown-dom [markdown]="constantsService.minReqExplaner">
+            <markdown-dom [markdown]="MIN_REQ_EXPLAINER">
 
             </markdown-dom>
           </readmore-component>
@@ -252,8 +250,3 @@
 <ng-template #logoTmpl>
   <logo-container></logo-container>
 </ng-template>
-
-<ng-template #persistentStateNotifierTemplate>
-  {{persistentStateNotifierMessage$ | async}}
-</ng-template>
-

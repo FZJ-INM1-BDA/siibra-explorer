@@ -6,9 +6,11 @@ const AngularCompilerPlugin = ngtools.AngularCompilerPlugin
 const ClosureCompilerPlugin = require('webpack-closure-compiler')
 const merge = require('webpack-merge')
 const staticAssets = require('./webpack.staticassets')
+const TerserPlugin = require('terser-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = merge(staticAssets, {
-
+  mode: 'production',
   entry : {
     main : './src/main-aot.ts'
   },
@@ -56,9 +58,21 @@ module.exports = merge(staticAssets, {
     }),
     new AngularCompilerPlugin({
       tsConfigPath: 'tsconfig-aot.json',
-      entryModule: 'src/main.module#MainModule'
+      entryModule: 'src/main.module#MainModule',
+      directTemplateLoading: true
+    }),
+    new webpack.DefinePlugin({
+      // TODO have to figure out how to set this properly
+      // needed to avoid inline eval
+      // shouldn't mode: 'production' do that already?
+      ngDevMode: false
     })
   ],
+  optimization: {
+    minimizer: [
+      new TerserPlugin()
+    ]
+  },
   resolve : {
     extensions : [
       '.ts',
