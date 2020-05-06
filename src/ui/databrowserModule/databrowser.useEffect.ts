@@ -425,7 +425,7 @@ export class DataBrowserUseEffect implements OnDestroy {
 
   private savedFav$: Observable<Array<{id: string, name: string}> | null>
 
-  private favDataEntries$: Observable<IDataEntry[]>
+  private favDataEntries$: Observable<Partial<IDataEntry>[]>
 
   @Effect()
   public favDataset$: Observable<any>

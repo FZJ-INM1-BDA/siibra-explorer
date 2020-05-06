@@ -47,6 +47,8 @@ import { ARIA_LABELS } from 'common/constants'
 
 export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
 
+import { MIN_REQ_EXPLAINER } from 'src/util/constants'
+
 /**
  * TODO
  * check against auxlillary mesh indicies, to only filter out aux indicies
@@ -123,6 +125,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
+  public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
+
   constructor(
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
@@ -191,9 +195,9 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     // TODO deprecate
     this.dedicatedView$ = this.store.pipe(
       select('viewerState'),
-      filter(state => isDefined(state) && typeof state.dedicatedView !== 'undefined'),
-      map(state => state.dedicatedView),
+      select('dedicatedView'),
       distinctUntilChanged(),
+      map(v => v[v.length -1])
     )
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
@@ -241,7 +245,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   }
 
   private selectedParcellation$: Observable<any>
-  private selectedParcellation: any
+  public selectedParcellation: any
 
   private cookieDialogRef: MatDialogRef<any>
   private kgTosDialogRef: MatDialogRef<any>

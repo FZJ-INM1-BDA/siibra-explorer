@@ -50,7 +50,7 @@
               class="h-100 w-100"
               mat-ripple>
               <i class="far fa-eye" iav-v-button-icon></i>
-              <span iav-v-button-text [class]="(previewDirective.active | async) ? 'iv-custom-comp primary' : ''">Probability Map {{ previewDirective.active | async }}</span>
+              <span iav-v-button-text [class]="previewDirective.active ? 'iv-custom-comp primary' : ''">Probability Map {{ previewDirective.active }}</span>
             </iav-v-button>
           </mat-grid-tile>
         </ng-container> 

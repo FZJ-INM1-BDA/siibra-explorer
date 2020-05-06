@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxjs";
 import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { NEWVIEWER, ViewerStateInterface } from "src/services/stateStore.service";
+import { NEWVIEWER, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
 
 @Component({
   selector : 'ui-splashscreen',
@@ -19,12 +19,12 @@ export class SplashScreen implements AfterViewInit {
   public loadedTemplate$: Observable<any[]>
   @ViewChild('parentContainer', {read: ElementRef})
   private parentContainer: ElementRef
-  private activatedTemplate$: Subject<any> = new Subject()
+  public activatedTemplate$: Subject<any> = new Subject()
 
   private subscriptions: Subscription[] = []
 
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     private constanceService: AtlasViewerConstantsServices,
   ) {
     this.loadedTemplate$ = this.store.pipe(

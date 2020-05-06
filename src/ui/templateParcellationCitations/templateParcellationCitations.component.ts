@@ -2,7 +2,7 @@ import { Component } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
-import { safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
+import { safeFilter, IavRootStoreInterface } from "../../services/stateStore.service";
 
 @Component({
   selector : 'template-parcellation-citation-container',
@@ -16,7 +16,7 @@ export class TemplateParcellationCitationsContainer {
   public selectedTemplate$: Observable<any>
   public selectedParcellation$: Observable<any>
 
-  constructor(private store: Store<ViewerStateInterface>) {
+  constructor(private store: Store<IavRootStoreInterface>) {
     this.selectedTemplate$ = this.store.pipe(
       select('viewerState'),
       safeFilter('templateSelected'),

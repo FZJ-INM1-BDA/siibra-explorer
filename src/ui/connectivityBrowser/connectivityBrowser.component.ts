@@ -23,7 +23,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public region: string
     public datasetList: any[] = []
     public selectedDataset: any
-    private connectedAreas = []
+    public connectedAreas = []
     public componentHeight: any
 
     private connectivityRegion$: Observable<any>

@@ -13,7 +13,7 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatAutocompleteModule} from "@angular/material/autocomplete";
 
-import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling'
+import { ScrollingModule } from '@angular/cdk/scrolling'
 import {MatInputModule} from "@angular/material/input";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatListModule} from "@angular/material/list";
@@ -57,7 +57,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatGridListModule,
     MatIconModule,
     MatMenuModule,
-    ExperimentalScrollingModule,
+    ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
   ],
@@ -86,7 +86,7 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
     MatGridListModule,
     MatIconModule,
     MatMenuModule,
-    ExperimentalScrollingModule,
+    ScrollingModule,
     MatToolbarModule,
     ClipboardModule,
   ],

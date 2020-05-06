@@ -67,7 +67,7 @@ export class SingleDatasetBase implements OnInit, OnChanges {
 
   public selectedTemplateSpace$: Observable<any>
 
-  public favedDataentries$: Observable<IDataEntry[]>
+  public favedDataentries$: Observable<Partial<IDataEntry>[]>
   constructor(
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,

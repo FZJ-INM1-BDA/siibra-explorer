@@ -34,7 +34,7 @@ export class SigninBanner {
 
   public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
-  public favDataEntries$: Observable<IDataEntry[]>
+  public favDataEntries$: Observable<Partial<IDataEntry>[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'

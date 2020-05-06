@@ -22,7 +22,7 @@ import {
 import { LoggingService } from "src/logging";
 import { FOUR_PANEL, H_ONE_THREE, NEHUBA_READY, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
 import { SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "src/services/stateStore.service";
+import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
 import { getExportNehuba, isSame } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
@@ -113,10 +113,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public onHoverSegments$: Observable<any[]>
 
-  public spatialResultsVisible$: Observable<boolean>
-  private spatialResultsVisible: boolean = false
-
-  private selectedTemplate: any | null
+  public selectedTemplate: any | null
   private selectedRegionIndexSet: Set<string> = new Set()
   public fetchedSpatialData: ILandmark[] = []
 
@@ -146,7 +143,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   constructor(
     private constantService: AtlasViewerConstantsServices,
     private apiService: AtlasViewerAPIServices,
-    private store: Store<ViewerStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     private elementRef: ElementRef,
     private log: LoggingService,
     private cdr: ChangeDetectorRef
@@ -219,16 +216,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       map(state => state.fetchedSpatialData),
       distinctUntilChanged(this.constantService.testLandmarksChanged),
       debounceTime(300),
-    )
-
-    this.spatialResultsVisible$ = this.store.pipe(
-      select('spatialSearchState'),
-      map(state => isDefined(state) ?
-        isDefined(state.spatialDataVisible) ?
-          state.spatialDataVisible :
-          true :
-        true),
-      distinctUntilChanged(),
     )
 
     this.userLandmarks$ = this.store.pipe(
@@ -408,11 +395,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.push(
       combineLatest(
         this.fetchedSpatialDatasets$,
-        this.spatialResultsVisible$,
-      ).subscribe(([fetchedSpatialData, visible]) => {
+      ).subscribe(([fetchedSpatialData]) => {
         this.fetchedSpatialData = fetchedSpatialData
 
-        if (visible && this.fetchedSpatialData && this.fetchedSpatialData.length > 0) {
+        if (this.fetchedSpatialData && this.fetchedSpatialData.length > 0) {
           this.nehubaViewer.addSpatialSearch3DLandmarks(
             this.fetchedSpatialData
               .map(data => data.geometry.type === 'point'
@@ -443,10 +429,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           this.nehubaViewer.updateUserLandmarks(landmarks)
         }
       }),
-    )
-
-    this.subscriptions.push(
-      this.spatialResultsVisible$.subscribe(visible => this.spatialResultsVisible = visible),
     )
 
     this.subscriptions.push(

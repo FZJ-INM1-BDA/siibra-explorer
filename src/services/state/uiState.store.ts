@@ -159,7 +159,7 @@ export interface StateInterface {
 
   focusedSidePanel: string | null
 
-  snackbarMessage: symbol
+  snackbarMessage: string
 
   agreedCookies: boolean
   agreedKgTos: boolean
