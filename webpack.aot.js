@@ -65,12 +65,15 @@ module.exports = merge(staticAssets, {
       // TODO have to figure out how to set this properly
       // needed to avoid inline eval
       // shouldn't mode: 'production' do that already?
-      ngDevMode: false
+      ngDevMode: false,
+      ngJitMode: false
     })
   ],
   optimization: {
     minimizer: [
-      new TerserPlugin()
+      new TerserPlugin({
+        extractComments: false
+      })
     ]
   },
   resolve : {
