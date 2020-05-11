@@ -1,10 +1,10 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule, Renderer2} from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
-import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
@@ -87,6 +87,9 @@ import { AuthModule } from "src/auth";
 import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
 import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterface/nehubaViewerTouch.directive";
+import { DOCUMENT } from "@angular/common";
+import { importNehubaFactory } from "./nehubaContainer/util";
+
 
 @NgModule({
   imports : [
@@ -181,6 +184,13 @@ import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterf
     ElementOutClickDirective,
     FixedMouseContextualContainerDirective,
     NehubaViewerTouchDirective,
+  ],
+  providers: [
+    {
+      provide: IMPORT_NEHUBA_INJECT_TOKEN,
+      useFactory: importNehubaFactory,
+      deps: [ DOCUMENT ]
+    }
   ],
   entryComponents : [
 

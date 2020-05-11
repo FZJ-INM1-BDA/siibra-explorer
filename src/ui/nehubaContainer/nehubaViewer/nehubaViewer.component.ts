@@ -1,8 +1,7 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2 } from "@angular/core";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, Optional, Inject } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
@@ -13,12 +12,29 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import 'third_party/export_nehuba/chunk_worker.bundle.js'
 import 'third_party/export_nehuba/main.bundle.js'
 
+const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
+const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
+
+/**
+ * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
+ *  sliceZoom
+ *  sliceViewportWidth
+ *  sliceViewportHeight
+ */
+const NG_LANDMARK_CONSTANT = 1e-8
+
+export const IMPORT_NEHUBA_INJECT_TOKEN = `IMPORT_NEHUBA_INJECT_TOKEN`
+
 interface LayerLabelIndex {
   layer: {
     name: string
   }
 
   labelIndicies: number[]
+}
+
+export interface INehubaLifecycleHook{
+  onInit?: () => void
 }
 
 const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex[] = (acc: LayerLabelIndex[], curr: LayerLabelIndex) => {
@@ -45,6 +61,16 @@ const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex
 })
 
 export class NehubaViewerUnit implements OnInit, OnDestroy {
+
+  public overrideShowLayers: string[] = []
+  get showLayersName() {
+    return [
+      ...this.overrideShowLayers,
+      ...Array.from(this.multiNgIdsLabelIndexMap.keys())
+    ]
+  }
+
+  public lifecycle: INehubaLifecycleHook
 
   public viewerPosInVoxel$ = new BehaviorSubject(null)
   public viewerPosInReal$ = new BehaviorSubject(null)
@@ -119,26 +145,18 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this.createNehubaPromiseRs = rs
   })
 
+  public nehubaLoaded: boolean = false
+
   constructor(
-    private rd: Renderer2,
     public elementRef: ElementRef,
     private workerService: AtlasWorkerService,
-    public constantService: AtlasViewerConstantsServices,
     private log: LoggingService,
+    @Inject(IMPORT_NEHUBA_INJECT_TOKEN) getImportNehubaPr: () => Promise<any>
   ) {
 
-    if (!this.constantService.loadExportNehubaPromise) {
-      this.constantService.loadExportNehubaPromise = new Promise((resolve, reject) => {
-        const scriptEl = this.rd.createElement('script')
-        scriptEl.src = 'main.bundle.js'
-        scriptEl.onload = () => resolve(true)
-        scriptEl.onerror = (e) => reject(e)
-        this.rd.appendChild(window.document.head, scriptEl)
-      })
-    }
-
-    this.constantService.loadExportNehubaPromise
+    getImportNehubaPr()
       .then(() => {
+        this.nehubaLoaded = true
         this.exportNehuba = getExportNehuba()
         const fixedZoomPerspectiveSlices = this.config && this.config.layout && this.config.layout.useNehubaPerspective && this.config.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
         if (fixedZoomPerspectiveSlices) {
@@ -186,7 +204,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       ).subscribe(url => {
         this.removeSpatialSearch3DLandmarks()
         const _ = {}
-        _[this.constantService.ngLandmarkLayerName] = {
+        _[NG_LANDMARK_LAYER_NAME] = {
           type : 'mesh',
           source : `vtk://${url}`,
           shader : FRAGMENT_MAIN_WHITE,
@@ -231,7 +249,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
          */
         if (!url) { return }
         const _ = {}
-        _[this.constantService.ngUserLandmarkLayerName] = {
+        _[NG_USER_LANDMARK_LAYER_NAME] = {
           type : 'mesh',
           source : `vtk://${url}`,
           shader : FRAGMENT_MAIN_WHITE,
@@ -290,7 +308,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       if (!PRODUCTION) { this.log.warn('setting special landmark selection changed failed ... nehubaViewer is not yet defined') }
       return
     }
-    const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(this.constantService.ngLandmarkLayerName)
+    const landmarkLayer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(NG_LANDMARK_LAYER_NAME)
     if (!landmarkLayer) {
       if (!PRODUCTION) { this.log.warn('landmark layer could not be found ... will not update colour map') }
       return
@@ -354,10 +372,12 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
      */
     const managedLayers = this.nehubaViewer.ngviewer.layerManager.managedLayers
     managedLayers.slice(1).forEach(layer => layer.setVisible(false))
-    Array.from(this.multiNgIdsLabelIndexMap.keys()).forEach(ngId => {
-      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(ngId)
-      if (layer) { layer.setVisible(true) } else { this.log.log('layer unavailable', ngId) }
-    })
+
+    for (const layerName of this.showLayersName) {
+      const layer = this.nehubaViewer.ngviewer.layerManager.getLayerByName(layerName)
+      if (layer) { layer.setVisible(true) } else { this.log.log('layer unavailable', layerName) }
+    }
+
     this.redraw()
 
     /* creation of the layout is done on next frame, hence the settimeout */
@@ -407,6 +427,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         // this.numMeshesToBeLoaded = totalMeshes
       }),
     )
+
+    const { onInit } = this.lifecycle || {}
+    onInit && onInit.call(this)
   }
 
   public ngOnDestroy() {
@@ -421,7 +444,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     while (this.onDestroyCb.length > 0) {
       this.onDestroyCb.pop()()
     }
-    this.nehubaViewer.dispose()
+    this.nehubaViewer && this.nehubaViewer.dispose()
   }
 
   private onDestroyCb: Array<() => void> = []
@@ -491,20 +514,20 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     }
     this.workerService.worker.postMessage({
       type : 'GET_USERLANDMARKS_VTK',
-      scale: Math.min(...this.dim.map(v => v * this.constantService.nehubaLandmarkConstant)),
+      scale: Math.min(...this.dim.map(v => v * NG_LANDMARK_CONSTANT)),
       landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6)),
     })
   }
 
   public removeSpatialSearch3DLandmarks() {
     this.removeLayer({
-      name : this.constantService.ngLandmarkLayerName,
+      name : NG_LANDMARK_LAYER_NAME,
     })
   }
 
   public removeuserLandmarks() {
     this.removeLayer({
-      name : this.constantService.ngUserLandmarkLayerName,
+      name : NG_USER_LANDMARK_LAYER_NAME,
     })
   }
 
@@ -513,7 +536,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     this.workerService.worker.postMessage({
       type : 'GET_LANDMARKS_VTK',
       template : this.templateId,
-      scale: Math.min(...this.dim.map(v => v * this.constantService.nehubaLandmarkConstant)),
+      scale: Math.min(...this.dim.map(v => v * NG_LANDMARK_CONSTANT)),
       landmarks : geometries.map(geometry =>
         geometry === null
           ? null
@@ -786,13 +809,13 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     // TODO bug: mouseoverlandmarkemitter does not emit empty for VTK layer when user mouse click
     this.ondestroySubscriptions.push(
       this.nehubaViewer.mouseOver.layer
-        .filter(obj => obj.layer.name === this.constantService.ngLandmarkLayerName)
+        .filter(obj => obj.layer.name === NG_LANDMARK_LAYER_NAME)
         .subscribe(obj => this.mouseoverLandmarkEmitter.emit(obj.value)),
     )
 
     this.ondestroySubscriptions.push(
       this.nehubaViewer.mouseOver.layer
-        .filter(obj => obj.layer.name === this.constantService.ngUserLandmarkLayerName)
+        .filter(obj => obj.layer.name === NG_USER_LANDMARK_LAYER_NAME)
         .subscribe(obj => this.mouseoverUserlandmarkEmitter.emit(obj.value)),
     )
 
