@@ -109,15 +109,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   private subscriptions: Subscription[] = []
 
-  /* handlers for nglayer */
-  /**
-   * TODO make untangle nglayernames and its dependency on ng
-   * TODO deprecated
-   */
-  public ngLayerNames$: Observable<any>
-  public ngLayers: INgLayerInterface[]
-  private disposeHandler: any
-
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
@@ -143,17 +134,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.snackbarMessage$ = this.store.pipe(
       select('uiState'),
       select("snackbarMessage"),
-    )
-
-    /**
-     * TODO deprecated
-     */
-    this.ngLayerNames$ = this.store.pipe(
-      select('viewerState'),
-      filter(state => isDefined(state) && isDefined(state.templateSelected)),
-      distinctUntilChanged((o, n) => o.templateSelected.name === n.templateSelected.name),
-      map(state => Object.keys(state.templateSelected.nehubaConfig.dataset.initialNgState.layers)),
-      delay(0),
     )
 
     this.sidePanelView$ = this.store.pipe(
@@ -293,21 +273,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       }),
     )
 
-    /**
-     * TODO deprecated
-     * TODO what the??? is this?
-     */
-    this.subscriptions.push(
-      this.ngLayerNames$.pipe(
-        concatMap(data => this.constantsService.loadExportNehubaPromise.then(data)),
-      ).subscribe(() => {
-        this.ngLayersChangeHandler()
-        const viewer = getViewer()
-        this.disposeHandler = viewer.layerManager.layersChanged.add(() => this.ngLayersChangeHandler())
-        viewer.registerDisposer(this.disposeHandler)
-      }),
-    )
-
     this.subscriptions.push(
       this.newViewer$.subscribe(() => {
         this.widgetServices.clearAllWidgets()
@@ -441,21 +406,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     return true
-  }
-
-  /**
-   * TODO deprecated
-   */
-  public ngLayersChangeHandler() {
-    const viewer = getViewer()
-    this.ngLayers = (viewer.layerManager.managedLayers as any[])
-      // .filter(obj => obj.sourceUrl && /precomputed|nifti/.test(obj.sourceUrl))
-      .map(obj => ({
-        name : obj.name,
-        type : obj.initialSpecification.type,
-        source : obj.sourceUrl,
-        visible : obj.visible,
-      }) as INgLayerInterface)
   }
 
   public kgTosClickedOk() {

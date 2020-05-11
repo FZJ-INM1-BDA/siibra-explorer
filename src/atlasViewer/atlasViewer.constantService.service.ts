@@ -24,20 +24,8 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public darktheme$: Observable<boolean>
 
   public useMobileUI$: Observable<boolean>
-  public loadExportNehubaPromise: Promise<boolean>
-
-  public ngLandmarkLayerName = 'spatial landmark layer'
-  public ngUserLandmarkLayerName = 'user landmark layer'
 
   public citationToastDuration = 7e3
-
-  /**
-   * optimized for nehubaConfig.layout.useNehubaPerspective.fixedZoomPerspectiveSlices
-   *  sliceZoom
-   *  sliceViewportWidth
-   *  sliceViewportHeight
-   */
-  public nehubaLandmarkConstant = 1e-8
 
   /**
    * Timeout can be longer, since configs are lazy loaded.

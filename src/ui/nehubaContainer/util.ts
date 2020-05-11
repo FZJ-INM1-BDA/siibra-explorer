@@ -202,3 +202,21 @@ export const userLmUnchanged = (oldlms, newlms) => {
   return oldlms.every(lm => singleLmUnchanged(lm, newmap as Map<string, [number, number, number]>))
     && newlms.every(lm => singleLmUnchanged(lm, oldmap as Map<string, [number, number, number]>))
 }
+
+export const importNehubaFactory = (document: Document) => {
+  let pr: Promise<any>
+  return () => {
+    if ((window as any).export_nehuba) return Promise.resolve()
+
+    if (pr) return pr
+    pr = new Promise((rs, rj) => {
+      const scriptEl = document.createElement('script')
+      scriptEl.src = 'main.bundle.js'
+      scriptEl.onload = () => rs()
+      scriptEl.onerror = (e) => rj(e)
+      document.head.appendChild(scriptEl)
+    })
+
+    return pr
+  }
+}
