@@ -180,16 +180,6 @@ import { APPEND_SCRIPT_TOKEN, appendScriptFactory, REMOVE_SCRIPT_TOKEN, removeSc
       },
       deps: [ UIService ]
     },
-    {
-      provide: APPEND_SCRIPT_TOKEN,
-      useFactory: appendScriptFactory,
-      deps: [ DOCUMENT ]
-    },
-    {
-      provide: REMOVE_SCRIPT_TOKEN,
-      useFactory: removeScriptFactory,
-      deps: [ DOCUMENT ]
-    },
 
 
     /**

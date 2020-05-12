@@ -88,7 +88,8 @@ import { FabSpeedDialModule } from "src/components/fabSpeedDial";
 import { ActionDialog } from "./actionDialog/actionDialog.component";
 import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterface/nehubaViewerTouch.directive";
 import { importNehubaFactory } from "./nehubaContainer/util";
-import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
+import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
+import { DOCUMENT } from "@angular/common";
 
 
 @NgModule({
@@ -190,6 +191,11 @@ import { APPEND_SCRIPT_TOKEN } from "src/util/constants";
       provide: IMPORT_NEHUBA_INJECT_TOKEN,
       useFactory: importNehubaFactory,
       deps: [ APPEND_SCRIPT_TOKEN ]
+    },
+    {
+      provide: APPEND_SCRIPT_TOKEN,
+      useFactory: appendScriptFactory,
+      deps: [ DOCUMENT ]
     }
   ],
   entryComponents : [
