@@ -5,7 +5,8 @@ import { defaultRootState } from "src/services/stateStore.service";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { HttpClientModule } from '@angular/common/http';
 import { WidgetModule } from './widgetUnit/widget.module';
-import { PluginModule } from './pluginUnit/plugin.module';
+import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
+import { PluginServices } from "./pluginUnit";
 
 describe('atlasViewer.apiService.service.ts', () => {
 
@@ -17,15 +18,17 @@ describe('atlasViewer.apiService.service.ts', () => {
     afterEach(() => {
       cancelTokenSpy.calls.reset()
       cancellableDialogSpy.calls.reset()
+
+      const ctrl = TestBed.inject(HttpTestingController)
+      ctrl.verify()
     })
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         imports: [
           AngularMaterialModule,
-          HttpClientModule,
+          HttpClientTestingModule,
           WidgetModule,
-          PluginModule,
         ],
         providers: [
           AtlasViewerAPIServices,
@@ -33,6 +36,10 @@ describe('atlasViewer.apiService.service.ts', () => {
           {
             provide: CANCELLABLE_DIALOG,
             useValue: cancellableDialogSpy
+          },
+          {
+            provide: PluginServices,
+            useValue: {}
           }
         ]
       }).compileComponents()
@@ -250,7 +257,6 @@ describe('atlasViewer.apiService.service.ts', () => {
           AngularMaterialModule,
           HttpClientModule,
           WidgetModule,
-          PluginModule,
         ],
         providers: [
           {
@@ -266,6 +272,10 @@ describe('atlasViewer.apiService.service.ts', () => {
             useValue: () => {
               return mockGetMouseOverSegments
             }
+          },
+          {
+            provide: PluginServices,
+            useValue: {}
           },
           AtlasViewerAPIServices,
           provideMockStore({ initialState: defaultRootState }),

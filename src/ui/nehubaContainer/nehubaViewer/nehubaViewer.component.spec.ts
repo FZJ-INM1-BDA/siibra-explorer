@@ -4,6 +4,7 @@ import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaViewer.com
 import { importNehubaFactory } from "../util"
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service"
 import { LoggingModule } from "src/logging"
+import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants"
 
 
 describe('nehubaViewer.component,ts', () => {
@@ -21,6 +22,11 @@ describe('nehubaViewer.component,ts', () => {
           {
             provide: IMPORT_NEHUBA_INJECT_TOKEN,
             useFactory: importNehubaFactory,
+            deps: [ APPEND_SCRIPT_TOKEN ]
+          },
+          {
+            provide: APPEND_SCRIPT_TOKEN,
+            useFactory: appendScriptFactory,
             deps: [ DOCUMENT ]
           },
           AtlasWorkerService

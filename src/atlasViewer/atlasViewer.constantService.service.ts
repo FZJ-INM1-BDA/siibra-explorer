@@ -338,13 +338,6 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
   public dissmissUserLayerSnackbarMessage: string = this.dissmissUserLayerSnackbarMessageDesktop
 }
 
-const parseURLToElement = (url: string): HTMLElement => {
-  const el = document.createElement('script')
-  el.setAttribute('crossorigin', 'true')
-  el.src = url
-  return el
-}
-
 export const UNSUPPORTED_PREVIEW = [{
   text: 'Preview of Colin 27 and JuBrain Cytoarchitectonic',
   previewSrc: './res/image/1.png',
@@ -358,16 +351,6 @@ export const UNSUPPORTED_PREVIEW = [{
 
 export const UNSUPPORTED_INTERVAL = 7000
 
-export const SUPPORT_LIBRARY_MAP: Map<string, HTMLElement> = new Map([
-  ['jquery@3', parseURLToElement('https://code.jquery.com/jquery-3.3.1.min.js')],
-  ['jquery@2', parseURLToElement('https://code.jquery.com/jquery-2.2.4.min.js')],
-  ['webcomponentsLite@1.1.0', parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js')],
-  ['react@16', parseURLToElement('https://unpkg.com/react@16/umd/react.development.js')],
-  ['reactdom@16', parseURLToElement('https://unpkg.com/react-dom@16/umd/react-dom.development.js')],
-  ['vue@2.5.16', parseURLToElement('https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js')],
-  ['preact@8.4.2', parseURLToElement('https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js')],
-  ['d3@5.7.0', parseURLToElement('https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js')],
-])
 
 /**
  * First attempt at encoding int (e.g. selected region, navigation location) from number (loc info density) to b64 (higher info density)

@@ -203,19 +203,13 @@ export const userLmUnchanged = (oldlms, newlms) => {
     && newlms.every(lm => singleLmUnchanged(lm, oldmap as Map<string, [number, number, number]>))
 }
 
-export const importNehubaFactory = (document: Document) => {
+export const importNehubaFactory = appendSrc => {
   let pr: Promise<any>
   return () => {
     if ((window as any).export_nehuba) return Promise.resolve()
 
     if (pr) return pr
-    pr = new Promise((rs, rj) => {
-      const scriptEl = document.createElement('script')
-      scriptEl.src = 'main.bundle.js'
-      scriptEl.onload = () => rs()
-      scriptEl.onerror = (e) => rj(e)
-      document.head.appendChild(scriptEl)
-    })
+    pr = appendSrc('main.bundle.js')
 
     return pr
   }
