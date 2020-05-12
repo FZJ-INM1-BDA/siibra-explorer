@@ -1,8 +1,8 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, Store, select } from "@ngrx/store";
+import { StoreModule, Store } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { AtlasViewer, NEHUBA_CLICK_OVERRIDE } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
@@ -52,6 +52,7 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
+import { APPEND_SCRIPT_TOKEN, appendScriptFactory, REMOVE_SCRIPT_TOKEN, removeScriptFactory } from './util/constants';
 
 @NgModule({
   imports : [
@@ -179,6 +180,17 @@ import 'src/theme.scss'
       },
       deps: [ UIService ]
     },
+    {
+      provide: APPEND_SCRIPT_TOKEN,
+      useFactory: appendScriptFactory,
+      deps: [ DOCUMENT ]
+    },
+    {
+      provide: REMOVE_SCRIPT_TOKEN,
+      useFactory: removeScriptFactory,
+      deps: [ DOCUMENT ]
+    },
+
 
     /**
      * TODO
