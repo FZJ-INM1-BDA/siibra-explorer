@@ -9,8 +9,9 @@ import { takeOnePipe } from "../nehubaContainer.component";
 
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
-import 'third_party/export_nehuba/chunk_worker.bundle.js'
-import 'third_party/export_nehuba/main.bundle.js'
+
+import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
+import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
