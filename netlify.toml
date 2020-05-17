@@ -2,6 +2,6 @@
 
 [build]
   publish="dist/aot/"
-  command="cp -R src/res/ext functions/json && npm run build-aot"
+  command="cp -R src/res/ext functions/templates/json && cp -R src/res/ext functions/nehubaConfig/json && npm run build-aot"
   functions="functions"
   environment={ BACKEND_URL=".netlify/functions/" }
