@@ -1,0 +1,5 @@
+# toml netfliy: https://docs.netlify.com/configure-builds/file-based-configuration/#sample-file
+
+[build]
+  publish="dist/aot/"
+  command="npm run build-aot"
