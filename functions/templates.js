@@ -13,11 +13,11 @@ exports.handler = (ev, ctx, cb) => {
 
   const templates = [
     // 'infant',
-    'bigbrain',
-    'colin',
-    'MNI152',
-    'waxholmRatV2_0',
-    'allenMouse'
+    'templates/bigbrain',
+    'templates/colin',
+    'templates/MNI152',
+    'templates/waxholmRatV2_0',
+    'templates/allenMouse'
   ]
 
   const resp = templates
