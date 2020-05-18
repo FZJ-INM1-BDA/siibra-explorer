@@ -18,14 +18,14 @@ exports.handler = (ev, ctx, cb) => {
   const [ _, templateName, parcellationName ] = re
   if (CACHED_DATASET_URL) {
     cb(null, {
-      status: 302,
+      statusCode: 302,
       headers: {
         'Location': CACHED_DATASET_URL
       }
     })
   } else {
     return cb(null, {
-      status: 200,
+      statusCode: 200,
       body: '[]',
       headers: {
         'content-type': 'application/json'
