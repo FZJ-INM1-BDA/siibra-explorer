@@ -10,7 +10,7 @@ exports.handler = (ev, ctx, cb) => {
   } = ev
 
 
-  const re = /datasets\/templateNameParcellationName\/\/?(.+)\/(.*?)$/.exec(path)
+  const re = /datasets\/\/?templateNameParcellationName\/(.+)\/(.*?)$/.exec(path)
   if (!re) {
     return cb(null, { status: 401 })
   }
