@@ -7,7 +7,27 @@ const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
 
 let cachedData = null
-let otherQueryResult = null
+
+const CACHE_DATASET_FILENAME = process.env.CACHE_DATASET_FILENAME || path.join(__dirname, 'cachedKgDataset.json')
+
+fs.readFile(CACHE_DATASET_FILENAME, 'utf-8', (err, data) => {
+  /**
+   * the file may or may not be present on init
+   */
+  if (err) {
+    console.warn(`read cache failed`, err)
+    return
+  }
+
+  try {
+    cachedData = JSON.parse(data)
+  }catch (e) {
+    /**
+     * parsing saved cached json error
+     */
+    console.error(e)
+  }
+})
 
 const { KG_ROOT, KG_SEARCH_VOCAB } = constants
 
@@ -51,6 +71,9 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 const cacheData = ({ results, ...rest }) => {
   cachedData = results
   otherQueryResult = rest
+  fs.writeFile(CACHE_DATASET_FILENAME, JSON.stringify(results), (err) => {
+    if (err) console.error('writing cached data fail')
+  })
   return cachedData
 }
 

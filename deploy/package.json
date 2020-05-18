@@ -30,7 +30,8 @@
     "passport": "^0.4.0",
     "rate-limit-redis": "^1.7.0",
     "request": "^2.88.0",
-    "soswrap": "^0.0.2"
+    "soswrap": "^0.0.2",
+    "through2": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

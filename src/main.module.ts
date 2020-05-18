@@ -36,6 +36,8 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
 import { UtilModule } from "./util/util.module";
+import { SpotLightModule } from 'src/spotlight/spot-light.module'
+import { TryMeComponent } from "./ui/tryme/tryme.component";
 
 import { UiStateUseEffect, getMouseoverSegmentsFactory, GET_MOUSEOVER_SEGMENTS_TOKEN } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
@@ -70,6 +72,8 @@ import { APPEND_SCRIPT_TOKEN, appendScriptFactory, REMOVE_SCRIPT_TOKEN, removeSc
     LoggingModule,
     ShareModule,
 
+    SpotLightModule,
+    
     EffectsModule.forRoot([
       DataBrowserUseEffect,
       UseEffects,
@@ -96,6 +100,7 @@ import { APPEND_SCRIPT_TOKEN, appendScriptFactory, REMOVE_SCRIPT_TOKEN, removeSc
   declarations : [
     AtlasViewer,
     ModalUnit,
+    TryMeComponent,
 
     /* directives */
     DockedContainerDirective,

@@ -50,6 +50,7 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
 
   public DS_PREVIEW_URL = DS_PREVIEW_URL
+  public strictLocal: boolean = STRICT_LOCAL
 
   /**
    * sic!
