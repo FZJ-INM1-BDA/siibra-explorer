@@ -1,5 +1,5 @@
 const fs = require('fs')
-
+const { reconfigureUrl } = require('../../deploy/util/reconfigPrecomputedServer')
 exports.handler = (ev, ctx, cb) => {
   const {
     path,
@@ -29,7 +29,7 @@ exports.handler = (ev, ctx, cb) => {
     }
     return cb(null, {
       status: 200,
-      body: data,
+      body: reconfigureUrl(data),
       headers: {
         'Content-type': 'application/json'
       }
