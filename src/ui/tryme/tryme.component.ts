@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { Observable, timer, interval } from "rxjs";
+import { Component } from "@angular/core";
+import { Observable, interval } from "rxjs";
 import { mapTo, startWith, scan } from "rxjs/operators";
 
 @Component({
@@ -10,7 +10,7 @@ import { mapTo, startWith, scan } from "rxjs/operators";
   ]
 })
 
-export class TryMeComponent implements OnInit{
+export class TryMeComponent{
   public interval$: Observable<any>
 
   constructor(){
@@ -27,8 +27,4 @@ export class TryMeComponent implements OnInit{
     'Drag around',
     'Zoom in / Zoom out'
   ]
-
-  ngOnInit(){
-
-  }
 }

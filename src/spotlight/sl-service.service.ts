@@ -21,7 +21,7 @@ export class SlServiceService implements OnDestroy{
     this.cf = cfr.resolveComponentFactory(SpotlightBackdropComponent)
   }
 
-  public showBackdrop(tmp?:TemplateRef<any>){
+  public showBackdrop(tmp?: TemplateRef<any>){
     this.hideBackdrop()
 
     this.backdropRef = this.cf.create(this.injector)

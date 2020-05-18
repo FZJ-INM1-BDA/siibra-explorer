@@ -27,15 +27,14 @@ export class SpotlightBackdropComponent {
 
   // TODO use DI for service injection ?
   public slService: SlServiceService
-  constructor() { }
 
   @HostBinding('@onShownOnDismiss')
   animation: string = 'attach'
 
   @HostListener('click', ['$event'])
-  clickHandler(ev:MouseEvent){
+  clickHandler(ev: MouseEvent){
     this.slService && this.slService.onClick.next(ev)
   }
 
-  insert:TemplateRef<any>
+  insert: TemplateRef<any>
 }

@@ -1,4 +1,4 @@
-import { Directive, Input, TemplateRef, OnDestroy } from '@angular/core';
+import { Directive, TemplateRef } from '@angular/core';
 import { SlServiceService } from './sl-service.service';
 
 @Directive({
@@ -8,12 +8,12 @@ import { SlServiceService } from './sl-service.service';
 export class SlSpotlightDirective {
 
   constructor(
-    private slService:SlServiceService
+    private slService: SlServiceService
   ) {
     
   }
 
-  showBackdrop(tmpl?:TemplateRef<any>){
+  showBackdrop(tmpl?: TemplateRef<any>){
     this.slService.showBackdrop(tmpl)
   }
 }
