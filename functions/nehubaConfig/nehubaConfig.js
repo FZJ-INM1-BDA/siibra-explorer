@@ -1,5 +1,5 @@
 const fs = require('fs')
-const { reconfigureUrl } = require('../../deploy/util/reconfigPrecomputedServer')
+const { reconfigureUrl } = require('./reconfigPrecomputedServer')
 exports.handler = (ev, ctx, cb) => {
   const {
     path,
