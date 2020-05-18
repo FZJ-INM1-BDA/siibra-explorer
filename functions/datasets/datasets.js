@@ -1,5 +1,4 @@
 const CACHED_DATASET_URL = process.env.CACHED_DATASET_URL
-const got = require('got')
 exports.handler = (ev, ctx, cb) => {
   const {
     path,
@@ -18,14 +17,12 @@ exports.handler = (ev, ctx, cb) => {
   
   const [ _, templateName, parcellationName ] = re
   if (CACHED_DATASET_URL) {
-    got(CACHED_DATASET_URL)
-      .then(text => cb(null, {
-        status: 200,
-        body: text,
-        headers: {
-          'content-type': 'application/json'
-        }
-      }))
+    cb(null, {
+      status: 302,
+      headers: {
+        'Location': CACHED_DATASET_URL
+      }
+    })
   } else {
     return cb(null, {
       status: 200,
