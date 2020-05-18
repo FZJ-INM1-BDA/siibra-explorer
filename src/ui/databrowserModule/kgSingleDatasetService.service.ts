@@ -57,7 +57,7 @@ export class KgSingleDatasetService implements OnDestroy {
   }
 
   public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }) {
-    const _url = new URL(`datasets/downloadKgFiles`, BACKENDURL)
+    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/downloadKgFiles`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
