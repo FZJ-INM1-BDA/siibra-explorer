@@ -54,7 +54,6 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { APPEND_SCRIPT_TOKEN, appendScriptFactory, REMOVE_SCRIPT_TOKEN, removeScriptFactory } from './util/constants';
 
 @NgModule({
   imports : [
