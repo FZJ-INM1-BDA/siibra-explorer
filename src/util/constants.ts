@@ -19,7 +19,7 @@ export const BACKENDURL = BACKEND_URL && /^http/.test(BACKEND_URL)
   : (() => {
     const url = new URL(window.location.href)
     const { protocol, hostname, pathname } = url
-    return `${protocol}//${hostname}${pathname}`
+    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
   })() || 'http://localhost:3000/'
 
 export const MIN_REQ_EXPLAINER = `
