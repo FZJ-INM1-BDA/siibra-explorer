@@ -54,7 +54,6 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { ShareModule } from './share';
 
 @NgModule({
   imports : [
