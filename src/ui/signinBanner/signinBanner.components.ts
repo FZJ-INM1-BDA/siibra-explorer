@@ -10,7 +10,7 @@ import {
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { AuthService, IUser } from "src/services/auth.service";
+import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {MatBottomSheet} from "@angular/material/bottom-sheet";
@@ -32,9 +32,9 @@ export class SigninBanner {
 
   @ViewChild('takeScreenshotElement', {read: ElementRef}) takeScreenshotElement: ElementRef
 
-  public user$: Observable<IUser>
+  public user$: Observable<any>
   public userBtnTooltip$: Observable<string>
-  public favDataEntries$: Observable<IDataEntry[]>
+  public favDataEntries$: Observable<Partial<IDataEntry>[]>
 
   public pluginTooltipText: string = `Plugins and Tools`
   public screenshotTooltipText: string = 'Take screenshot'

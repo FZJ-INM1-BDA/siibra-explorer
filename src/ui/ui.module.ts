@@ -1,10 +1,10 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule, Renderer2} from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
-import { NehubaViewerUnit } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
@@ -47,7 +47,7 @@ import { MobileOverlay } from "./nehubaContainer/mobileOverlay/mobileOverlay.com
 import { MobileControlNubStylePipe } from "./nehubaContainer/pipes/mobileControlNubStyle.pipe";
 import { StatusCardComponent } from "./nehubaContainer/statusCard/statusCard.component";
 import { SigninBanner } from "./signinBanner/signinBanner.components";
-import { SigninModal } from "./signinModal/signinModal.component";
+
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { FilterNameBySearch } from "./viewerStateController/regionHierachy/filterNameBySearch.pipe";
 
@@ -82,6 +82,15 @@ import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 import { NehubaModule } from "./nehubaContainer/nehuba.module";
 import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.component";
 import { ShareModule } from "src/share";
+import { StateModule } from "src/state";
+import { AuthModule } from "src/auth";
+import { FabSpeedDialModule } from "src/components/fabSpeedDial";
+import { ActionDialog } from "./actionDialog/actionDialog.component";
+import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterface/nehubaViewerTouch.directive";
+import { importNehubaFactory } from "./nehubaContainer/util";
+import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
+import { DOCUMENT } from "@angular/common";
+
 
 @NgModule({
   imports : [
@@ -96,6 +105,9 @@ import { ShareModule } from "src/share";
     AngularMaterialModule,
     NehubaModule,
     ShareModule,
+    StateModule,
+    AuthModule,
+    FabSpeedDialModule,
   ],
   declarations : [
     NehubaContainer,
@@ -114,7 +126,7 @@ import { ShareModule } from "src/share";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
-    SigninModal,
+    
     StatusCardComponent,
     CookieAgreement,
     KGToS,
@@ -137,6 +149,8 @@ import { ShareModule } from "src/share";
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
+
+    ActionDialog,
 
     /* pipes */
     GroupDatasetByRegion,
@@ -170,6 +184,19 @@ import { ShareModule } from "src/share";
     TouchSideClass,
     ElementOutClickDirective,
     FixedMouseContextualContainerDirective,
+    NehubaViewerTouchDirective,
+  ],
+  providers: [
+    {
+      provide: IMPORT_NEHUBA_INJECT_TOKEN,
+      useFactory: importNehubaFactory,
+      deps: [ APPEND_SCRIPT_TOKEN ]
+    },
+    {
+      provide: APPEND_SCRIPT_TOKEN,
+      useFactory: appendScriptFactory,
+      deps: [ DOCUMENT ]
+    }
   ],
   entryComponents : [
 
@@ -177,6 +204,7 @@ import { ShareModule } from "src/share";
     NehubaViewerUnit,
     LayerBrowser,
     PluginBannerUI,
+    ActionDialog,
   ],
   exports : [
     SubjectViewer,
@@ -192,7 +220,7 @@ import { ShareModule } from "src/share";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
-    SigninModal,
+    
     CookieAgreement,
     KGToS,
     StatusCardComponent,
@@ -201,7 +229,8 @@ import { ShareModule } from "src/share";
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,
-    LandmarkUIComponent
+    LandmarkUIComponent,
+    NehubaViewerTouchDirective,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

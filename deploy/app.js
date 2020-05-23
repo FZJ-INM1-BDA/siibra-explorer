@@ -1,9 +1,13 @@
+const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const app = express.Router()
 const session = require('express-session')
 const MemoryStore = require('memorystore')(session)
 const crypto = require('crypto')
+const cookieParser = require('cookie-parser')
+
+const LOCAL_CDN_FLAG = !!process.env.PRECOMPUTED_SERVER
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(require('cors')())
@@ -57,7 +61,12 @@ app.use(session({
 /**
  * configure CSP
  */
-require('./csp')(app)
+if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
+  console.warn(`DISABLE_CSP is set to true, csp will not be enabled`)
+} else {
+  require('./csp')(app)
+}
+
 
 /**
  * configure Auth
@@ -75,6 +84,35 @@ const PUBLIC_PATH = process.env.NODE_ENV === 'production'
  * well known path
  */
 app.use('/.well-known', express.static(path.join(__dirname, 'well-known')))
+
+if (LOCAL_CDN_FLAG) {
+  /*
+  * TODO setup local cdn for supported libraries map
+  */
+  const LOCAL_CDN = process.env.LOCAL_CDN
+  const CDN_ARRAY = [
+    'https://stackpath.bootstrapcdn.com',
+    'https://use.fontawesome.com'
+  ]
+
+  let indexFile
+  fs.readFile(path.join(PUBLIC_PATH, 'index.html'), 'utf-8', (err, data) => {
+    if (err) throw err
+    if (!LOCAL_CDN) {
+      indexFile = data
+      return
+    }
+    const regexString = CDN_ARRAY.join('|').replace(/\/|\./g, s => `\\${s}`)
+    const regex = new RegExp(regexString, 'gm')
+    indexFile = data.replace(regex, LOCAL_CDN)
+  })
+  
+  app.get('/', (_req, res) => {
+    if (!indexFile) return res.status(404).end()
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    return res.status(200).send(indexFile)
+  })
+}
 
 app.use((_req, res, next) => {
   res.setHeader('Referrer-Policy', 'origin-when-cross-origin')
@@ -94,9 +132,23 @@ const indexTemplate = require('fs').readFileSync(
   path.join(PUBLIC_PATH, 'index.html'),
   'utf-8'
 )
-app.get('/', (req, res) => {
+app.get('/', cookieParser(), (req, res) => {
+  const iavError = req.cookies && req.cookies['iav-error']
+  
   res.setHeader('Content-Type', 'text/html')
-  res.status(200).send(`${indexTemplate.replace(/\$\$NONCE\$\$/g, res.locals.nonce)}`)
+
+  if (iavError) {
+    res.clearCookie('iav-error', { httpOnly: true, sameSite: 'strict' })
+
+    const returnTemplate = indexTemplate
+      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+      .replace('<atlas-viewer>', `<atlas-viewer data-error="${iavError.replace(/"/g, '&quot;')}">`)
+    res.status(200).send(returnTemplate)
+  } else {
+    const returnTemplate = indexTemplate
+      .replace(/\$\$NONCE\$\$/g, res.locals.nonce)
+    res.status(200).send(returnTemplate)
+  }
 })
 
 /**
@@ -108,16 +160,25 @@ app.use('/user', require('./user'))
  * only use compression for production
  * this allows locally built aot to be served without errors
  */
-
-const { compressionMiddleware } = require('nomiseco')
+const { compressionMiddleware, setAlwaysOff } = require('nomiseco')
+if (LOCAL_CDN_FLAG) setAlwaysOff(true)
 
 app.use(compressionMiddleware, express.static(PUBLIC_PATH))
+
+/**
+ * saneUrl end points
+ */
+const saneUrlRouter = require('./saneUrl')
+app.use('/saneUrl', saneUrlRouter)
 
 const jsonMiddleware = (req, res, next) => {
   if (!res.get('Content-Type')) res.set('Content-Type', 'application/json')
   next()
 }
 
+/**
+ * resources endpoints
+ */
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
 const datasetRouter = require('./datasets')

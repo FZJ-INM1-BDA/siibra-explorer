@@ -12,8 +12,6 @@ import { DS_PREVIEW_URL } from 'src/util/constants'
 
 export class DatasetPreviewList{
 
-  @Output() public previewingFile: EventEmitter<ViewerPreviewFile> = new EventEmitter()
-
   public datasetPreviewList: any[] = []
   public loadingDatasetPreviewList: boolean = false
   public selectedTemplateSpace$: Observable<any>
@@ -41,10 +39,6 @@ export class DatasetPreviewList{
     this.datasetPreviewList = datasetFiles
 
     this.cdr.markForCheck()
-  }
-  public handlePreviewFile(file: ViewerPreviewFile) {
-    
-    this.previewingFile.emit(file)
   }
 }
 

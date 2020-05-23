@@ -67,6 +67,7 @@
       <div class="w-0 position-relative">
         <button
           (click)="showBottomSheet(shareTmpl)"
+          [attr.aria-label]="SHARE_BTN_ARIA_LABEL"
           mat-icon-button
           class="position-absolute share-btn">
           <i class="fas fa-share-square"></i>
@@ -78,7 +79,7 @@
     <mat-form-field *ngIf="!isMobile"
       class="w-100">
       <mat-label>
-        Cursor Pos
+        Cursor Position
       </mat-label>
       <input type="text"
         matInput
@@ -95,15 +96,84 @@
     Share via
   </h4>
   <mat-nav-list>
-    <mat-list-item iav-clipboard-copy>
+    <mat-list-item iav-clipboard-copy
+      [attr.aria-label]="COPY_URL_TO_CLIPBOARD_ARIA_LABEL"
+      [attr.tab-index]="10">
       <mat-icon
         class="mr-4"
         fontSet="fas"
-        fontIcon="fa-link">
+        fontIcon="fa-copy">
       </mat-icon>
       <span>
         Copy link to this view
       </span>
     </mat-list-item>
+    <mat-list-item (click)="openDialog(shareSaneUrl, { ariaLabel: SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL })"
+      [attr.aria-label]="SHARE_CUSTOM_URL_ARIA_LABEL"
+      [attr.tab-index]="10">
+      <mat-icon 
+        class="mr-4"
+        fontSet="fas"
+        fontIcon="fa-link">
+      </mat-icon>
+      
+      <span>
+        Create custom URL
+      </span>
+
+    </mat-list-item>
   </mat-nav-list>
+</ng-template>
+
+<ng-template #shareSaneUrl>
+  <h2 mat-dialog-title>
+    Create custom URL
+  </h2>
+
+  <div mat-dialog-content>
+    <div iav-auth-authState
+      #authState="iavAuthAuthState">
+
+      <!-- Logged in. Explain that links will not expire, offer to logout -->
+      <ng-container *ngIf="authState.user$ | async as user; else otherTmpl">
+        <span>
+          Logged in as {{ user.name }}
+        </span>
+        <button mat-button
+          color="warn"
+          tabindex="-1">
+          <i class="fas fa-sign-in-alt"></i>
+          <span>
+            Logout
+          </span>
+        </button>
+      </ng-container>
+
+      <!-- Not logged in. Offer to login -->
+      <ng-template #otherTmpl>
+        <span>
+          Not logged in
+        </span>
+        <signin-modal></signin-modal>
+      </ng-template>
+    </div>
+
+    <!-- explain links expiration -->
+    <div class="text-muted mat-small">
+      {{ (authState.user$ | async) ? 'Links you generate will not expire' : 'Links you generate will expire after 72 hours' }}
+    </div>
+
+    <iav-sane-url iav-state-aggregator
+      [stateTobeSaved]="stateAggregator.jsonifiedSstate$ | async"
+      #stateAggregator="iavStateAggregator">
+    </iav-sane-url>
+  </div>
+
+  <div mat-dialog-actions
+    class="d-flex justify-content-center">
+    <button mat-button
+      mat-dialog-close>
+      close
+    </button>
+  </div>
 </ng-template>

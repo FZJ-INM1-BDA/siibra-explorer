@@ -1,0 +1,46 @@
+<mat-form-field class="mr-2">
+  <span matPrefix class="text-muted">
+    {{ saneUrlRoot }}
+  </span>
+
+  <input type="text"
+    autocomplete="off"
+    placeholder="my_custom_url"
+    matInput
+    aria-label="Custom link"
+    (keyup.enter)="submitBtn.disabled ? null : saveLink()"
+    [formControl]="customUrl"
+    [errorStateMatcher]="matcher">
+
+  <button mat-icon-button
+    matSuffix
+    aria-label="Copy created custom URL to clipboard"
+    matTooltip="Copy created custom URL to clipboard."
+    (click)="copyLinkToClipboard()"
+    *ngIf="saved$ | async"
+    color="primary">
+    <i class="fas fa-copy"></i>
+  </button>
+
+  <mat-error *ngIf="customUrl.invalid">
+    Error: {{ customUrl.errors.message }}
+  </mat-error>
+
+  <mat-hint>
+    {{ btnHintTxt$ | async }} 
+  </mat-hint>
+
+</mat-form-field>
+
+<button mat-flat-button
+  (click)="saveLink()"
+  color="primary"
+  aria-label="Create custom link"
+  [disabled]="createBtnDisabled$ | async"
+  #submitBtn="matButton">
+
+  <i [class]="iconClass$ | async"></i>
+  <span>
+    {{ (saved$ | async) ? 'Created!' : 'Create' }}
+  </span>
+</button>

@@ -1,7 +1,44 @@
-import { Directive, Renderer2, ViewContainerRef } from "@angular/core";
-import { SUPPORT_LIBRARY_MAP } from "src/atlasViewer/atlasViewer.constantService.service";
-import { PluginServices } from "./atlasViewer.pluginService.service";
-import { LoggingService } from "src/logging";
+import { Directive, ViewContainerRef, Inject, Optional } from "@angular/core";
+import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN } from "src/util/constants";
+
+export const SUPPORT_LIBRARY_MAP: Map<string, Map<string, string>> = new Map([
+  ['jquery', new Map<string, string>([
+    ['3', 'https://code.jquery.com/jquery-3.3.1.min.js'],
+    ['2', 'https://code.jquery.com/jquery-2.2.4.min.js']
+  ])],
+  ['webcomponentsLite', new Map([
+    ['1.1.0', 'https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.1.0/webcomponents-lite.js']
+  ])],
+  ['react', new Map([
+    ['16', 'https://unpkg.com/react@16/umd/react.development.js']
+  ])],
+  ['reactdom', new Map([
+    ['16', 'https://unpkg.com/react-dom@16/umd/react-dom.development.js']
+  ])],
+  ['vue', new Map([
+    ['2.5.16', 'https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js']
+  ])],
+  ['preact', new Map([
+    ['8.4.2', 'https://cdn.jsdelivr.net/npm/preact@8.4.2/dist/preact.min.js']
+  ])],
+  ['d3', new Map([
+    ['5.7.0', 'https://cdnjs.cloudflare.com/ajax/libs/d3/5.7.0/d3.min.js']
+  ])],
+])
+
+export const parseLibrary = (libVer: string) => {
+  const re = /^([a-zA-Z0-9]+)@([0-9.]+)$/.exec(libVer)
+  if (!re) throw new Error(`${libVer} cannot be parsed properly`)
+  const lib = re[1]
+  const ver = re[2]
+  const libMap = SUPPORT_LIBRARY_MAP.get(lib) 
+  if (!libMap) throw new Error(`${lib} not supported. Only supported libraries are ${Array.from(SUPPORT_LIBRARY_MAP.keys())}`)
+  const src = libMap.get(ver)
+  if (!src) throw new Error(`${lib} version ${ver} not supported. Only supports ${Array.from(libMap.keys())}`)
+  return src
+}
+
+export const REGISTER_PLUGIN_FACTORY_DIRECTIVE = `REGISTER_PLUGIN_FACTORY_DIRECTIVE`
 
 @Directive({
   selector: '[pluginFactoryDirective]',
@@ -9,72 +46,53 @@ import { LoggingService } from "src/logging";
 
 export class PluginFactoryDirective {
   constructor(
-    pluginService: PluginServices,
-    viewContainerRef: ViewContainerRef,
-    private rd2: Renderer2,
-    private log: LoggingService,
+    public viewContainerRef: ViewContainerRef,
+    @Optional() @Inject(REGISTER_PLUGIN_FACTORY_DIRECTIVE) registerPluginFactoryDirective: (directive: PluginFactoryDirective) => void,
+    @Inject(APPEND_SCRIPT_TOKEN) private appendScript: (src: string) => Promise<HTMLScriptElement>,
+    @Inject(REMOVE_SCRIPT_TOKEN) private removeScript: (srcEl: HTMLScriptElement) => void,
   ) {
-    pluginService.loadExternalLibraries = this.loadExternalLibraries.bind(this)
-    pluginService.unloadExternalLibraries = this.unloadExternalLibraries.bind(this)
-    pluginService.pluginViewContainerRef = viewContainerRef
-    pluginService.appendSrc = (src: HTMLElement) => rd2.appendChild(document.head, src)
-    pluginService.removeSrc = (src: HTMLElement) => rd2.removeChild(document.head, src)
+    if (registerPluginFactoryDirective) {
+      registerPluginFactoryDirective(this)
+    }
   }
 
-  private loadedLibraries: Map<string, {counter: number, src: HTMLElement|null}> = new Map()
+  private loadedLibraries: Map<string, {counter: number, srcEl: HTMLScriptElement|null}> = new Map()
   
-  loadExternalLibraries(libraries: string[]) {
-    const srcHTMLElement = libraries.map(libraryName => ({
-      name: libraryName,
-      srcEl: SUPPORT_LIBRARY_MAP.get(libraryName),
-    }))
+  async loadExternalLibraries(libraries: string[]) {
+    const libsToBeLoaded = libraries.map(libName => {
+      return {
+        libName,
+        libSrc: parseLibrary(libName),
+      }
+    })
 
-    const rejected = srcHTMLElement.filter(scriptObj => scriptObj.srcEl === null)
-    if (rejected.length > 0) {
-      return Promise.reject(`Some library names cannot be recognised. No libraries were loaded: ${rejected.map(srcObj => srcObj.name).join(', ')}`)
+    for (const libToBeLoaded of libsToBeLoaded) {
+  
+      const { libSrc, libName } = libToBeLoaded
+
+      // if browser natively support custom element, do not append polyfill
+      if ('customElements' in window && /^webcomponentsLite@/.test(libName)) continue
+
+      let srcEl
+      const { counter, srcEl: srcElOld } = this.loadedLibraries.get(libName) || { counter: 0 }
+      if (counter === 0) {
+
+        // slight performance penalty not loading external libraries in parallel, but this should be an edge case any way
+        srcEl = await this.appendScript(libSrc)
+      }
+      this.loadedLibraries.set(libName, { counter: counter + 1, srcEl: srcEl || srcElOld })
     }
-
-    return Promise.all(srcHTMLElement.map(scriptObj => new Promise((rs, rj) => {
-      /**
-       * if browser already support customElements, do not append polyfill
-       */
-      if ('customElements' in window && scriptObj.name === 'webcomponentsLite') {
-        return rs()
-      }
-      const existingEntry = this.loadedLibraries.get(scriptObj.name)
-      if (existingEntry) {
-        this.loadedLibraries.set(scriptObj.name, { counter: existingEntry.counter + 1, src: existingEntry.src })
-        rs()
-      } else {
-        const srcEl = scriptObj.srcEl
-        srcEl.onload = () => rs()
-        srcEl.onerror = (e: any) => rj(e)
-        this.rd2.appendChild(document.head, srcEl)
-        this.loadedLibraries.set(scriptObj.name, { counter: 1, src: srcEl })
-      }
-    })))
   }
 
   unloadExternalLibraries(libraries: string[]) {
-    libraries
-      .filter((stringname) => SUPPORT_LIBRARY_MAP.get(stringname) !== null)
-      .forEach(libname => {
-        const ledger = this.loadedLibraries.get(libname)
-        if (!ledger) {
-          this.log.warn('unload external libraries error. cannot find ledger entry...', libname, this.loadedLibraries)
-          return
-        }
-        if (ledger.src === null) {
-          this.log.log('webcomponents is native supported. no library needs to be unloaded')
-          return
-        }
-
-        if (ledger.counter - 1 == 0) {
-          this.rd2.removeChild(document.head, ledger.src)
-          this.loadedLibraries.delete(libname)
-        } else {
-          this.loadedLibraries.set(libname, { counter: ledger.counter - 1, src: ledger.src })
-        }
-      })
+    for (const lib of libraries) {
+      const { counter, srcEl } = this.loadedLibraries.get(lib) || { counter: 0 }
+      if (counter > 1) {
+        this.loadedLibraries.set(lib, { counter: counter - 1, srcEl })
+      } else {
+        this.loadedLibraries.set(lib, { counter: 0, srcEl: null })
+        this.removeScript(srcEl)
+      }
+    }
   }
 }

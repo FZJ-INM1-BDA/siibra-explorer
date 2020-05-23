@@ -7,20 +7,76 @@
         class = "btn btn-default theme-controlled property scrollFocus">
         <!-- scrollFocus class -->
         <span>
-          {{ p }}
+          {{ p.displayName || p.name }}
         </span>
       </div>
     </div>
   </div>
 </div>
 
-<ng-content *ngIf="showDelta$ | async" select="[delta]" guide>
-</ng-content>
+<!-- container class -->
+<div class="d-flex flex-column-reverse flex-nowrap align-items-center base-container position-relative">
 
-<ng-content *ngIf="showScreen$ | async" select="[guide]" guide>
-</ng-content>
+  <!-- ctrl nub -->
+  <div class="h-0 d-inline-flex align-items-center" [hidden]="!(showInitiator$ | async)" #initiator>
+    <div (contextmenu)="$event.stopPropagation(); $event.preventDefault();"
+      [ngStyle]="ctrlBtnPosition"
+      class="pe-all"
+      initiator>
+      <button mat-mini-fab color="primary">
+        <i class="fas fa-globe"></i>
+      </button>
+    </div>
+  </div>
 
-<div [hidden]="!(showInitiator$ | async)" #initiator>
-  <ng-content select="[initiator]">
-  </ng-content>
+  <!-- guide text -->
+  <mat-card [ngClass]="{ 'scale-y-0': !(showScreen$ | async)  }"
+    class="mb-4 popup muted position-absolute subMenu">
+    <mat-card-content>
+      <ng-container *ngTemplateOutlet="guideTmpl">
+      </ng-container>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- mobile set value -->
+  <div *ngIf="showDelta$ | async" class="position-absolute h-0 w-100 d-flex flex-row justify-content-end align-items-end">
+
+    <!-- intersection observer -->
+    <div class="w-50 d-flex flex-row flex-nowrap" #subMenuObserver>
+    
+      <!-- value selection container -->
+      <div class="position-relative mb-4" [style.transform]="subMenuTransform" #setValueContainer>
+        <!-- value selections -->
+        <ng-container *ngFor="let value of focusedProperty.values">
+          <!-- selected button -->
+          <ng-template
+            [ngIf]="focusedProperty.selected === value"
+            [ngIfElse]="notSelectedTmpl">
+            <button
+              [attr.data-submenu-value]="value"
+              mat-flat-button
+              [ngClass]="{ 'muted': (highlightedSubmenu$ | async) !== value }"
+              color="primary"
+              class="mr-2">
+              {{ value }}
+            </button>
+          </ng-template>
+
+          <!-- not selected button -->
+          <ng-template #notSelectedTmpl>
+            <button
+              [attr.data-submenu-value]="value"
+              mat-flat-button
+              [ngClass]="{ 'muted': (highlightedSubmenu$ | async) !== value }"
+              color="default"
+              class="mr-2">
+              {{ value }}
+            </button>
+          </ng-template>
+
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -1,9 +1,9 @@
 import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory, ComponentRef, OnInit, OnDestroy, Output, EventEmitter } from "@angular/core";
-import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
+import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { Subscription, Observable } from "rxjs";
-import { distinctUntilChanged, filter, switchMap, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
+import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
 import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { getNavigationStateFromConfig } from "../util";
 import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
@@ -148,10 +148,22 @@ const determineProtocol = (url: string) => {
   return re && re[1]
 }
 
+const getPrecomputedUrl = url => url.replace(/^precomputed:\/\//, '')
+
+const getPrecomputedInfo = async url => {
+  const rootUrl = getPrecomputedUrl(url)
+  return new Promise((rs, rj) => {
+    fetch(`${rootUrl.replace(/\/$/,'')}/info`)
+      .then(res => res.json())
+      .then(rs)
+      .catch(rj)
+  })
+}
+
 interface IProcessedVolume{
   name?: string
   layer: {
-    type: 'image' | 'segmentation'
+    type?: 'image' | 'segmentation'
     source: string
     transform?: any
   }
@@ -163,15 +175,25 @@ const processStandaloneVolume: (url: string) => Promise<IProcessedVolume> = asyn
     return {
       layer: {
         type: 'image',
-        source: url
+        source: url,
+        visible: true
       }
     }
   }
   if (protocol === 'precomputed'){
+    let layerType
+    try {
+      const { type } = await getPrecomputedInfo(url) as any
+      layerType = type
+    } catch (e) {
+      console.warn(`getPrecomputedInfo error:`, e)
+    }
+    
     return {
       layer: {
-        type: 'image', 
-        source: url
+        type: layerType || 'image', 
+        source: url,
+        visible: true
       }
     }
   }
@@ -288,15 +310,21 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         distinctUntilChanged()
       ).subscribe(async volumes => {
         const copiedNehubaConfig = JSON.parse(JSON.stringify(defaultNehubaConfig))
+
+        const forceShowLayerNames = []
         for (const idx in volumes){
           try {
             const { name = `layer-${idx}`, layer } = await processStandaloneVolume(volumes[idx])
-            copiedNehubaConfig.dataset.initialNgState.layers[`layer-${idx}`] = layer
+            copiedNehubaConfig.dataset.initialNgState.layers[name] = layer
+            forceShowLayerNames.push(name)
           }catch(e) {
             // TODO catch error
           }
         }
-        this.createNehubaInstance({ nehubaConfig: copiedNehubaConfig })
+        function onInit() {
+          this.overrideShowLayers = forceShowLayerNames
+        }
+        this.createNehubaInstance({ nehubaConfig: copiedNehubaConfig }, { onInit })
       }),
 
       this.viewerPerformanceConfig$.pipe(
@@ -328,13 +356,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     }
   }
 
-  createNehubaInstance(template: any){
-    
-    this.store$.dispatch({
-      type: NEHUBA_READY,
-      nehubaReady: false,
-    })
-
+  createNehubaInstance(template: any, lifeCycle: INehubaLifecycleHook = {}){
     this.clear()
     this.iavNehubaViewerContainerViewerLoading.emit(true)
     this.cr = this.el.createComponent(this.nehubaViewerFactory)
@@ -352,6 +374,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     const { gpuLimit = null } = this.viewerConfig
 
     this.nehubaViewerInstance.config = nehubaConfig
+    this.nehubaViewerInstance.lifecycle = lifeCycle
 
     this.oldNavigation = getNavigationStateFromConfig(nehubaConfig)
     this.handleEmittedNavigationChange(this.oldNavigation)

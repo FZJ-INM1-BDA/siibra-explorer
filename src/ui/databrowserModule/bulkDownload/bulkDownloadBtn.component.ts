@@ -39,11 +39,12 @@ export class BulkDownloadBtn implements OnChanges{
 }
 
 @Pipe({
-  name: 'iavDatamoduleTransformDsToIdPipe'
+  name: 'iavDatamoduleTransformDsToIdPipe',
+  pure: true
 })
 
 export class TransformDatasetToIdPipe implements PipeTransform{
-  public transform(datasets: IDataEntry[]): string[]{
+  public transform(datasets: Partial<IDataEntry>[]): string[]{
     return datasets.map(({ fullId }) => {
       const re = getKgSchemaIdFromFullId(fullId)
       if (re) return re[1]

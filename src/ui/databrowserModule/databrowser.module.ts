@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -28,6 +28,49 @@ import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previe
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
+import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
+import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
+import { Store, select } from "@ngrx/store";
+import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
+import { startWith, map, take, debounceTime } from "rxjs/operators";
+import { Observable } from "rxjs";
+
+const previewDisplayedFactory = (store: Store<any>) => {
+
+  return (file, dataset) => store.pipe(
+    select('dataStore'),
+    select('datasetPreviews'),
+    startWith([]),
+    map(datasetPreviews => {
+      const { fullId } = dataset || {}
+      const { filename } = file
+      return (datasetPreviews as any[]).findIndex(({ datasetId, filename: fName }) =>
+        datasetId === fullId && fName === filename) >= 0
+    })
+  )
+}
+
+// TODO not too sure if this is the correct place for providing the callback token
+const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) => Observable<boolean>) => {
+
+  return (file, dataset) => {
+    previewDisplayed(file, dataset).pipe(
+      debounceTime(10),
+      take(1),
+    ).subscribe(flag => 
+      
+      store.dispatch({
+        type: flag
+          ? DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASET
+          : DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
+        payload: {
+          file,
+          dataset
+        }
+      })
+    )
+  }
+}
 
 @NgModule({
   imports: [
@@ -46,6 +89,12 @@ import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDo
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
+
+    /**
+     * Directives
+     */
+    ShowDatasetDialogDirective,
+    PreviewDatasetFile,
 
     /**
      * pipes
@@ -76,6 +125,8 @@ import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDo
     GetKgSchemaIdFromFullIdPipe,
     BulkDownloadBtn,
     TransformDatasetToIdPipe,
+    ShowDatasetDialogDirective,
+    PreviewDatasetFile,
   ],
   entryComponents: [
     DataBrowser,
@@ -84,6 +135,18 @@ import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDo
   ],
   providers: [
     KgSingleDatasetService,
+    {
+      provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
+      useValue: SingleDatasetView
+    },{
+      provide: IAV_DATASET_PREVIEW_DATASET_FN,
+      useFactory: previewEmitFactory,
+      deps: [ Store, IAV_DATASET_PREVIEW_ACTIVE ]
+    },{
+      provide: IAV_DATASET_PREVIEW_ACTIVE,
+      useFactory: previewDisplayedFactory,
+      deps: [ Store ]
+    }
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA

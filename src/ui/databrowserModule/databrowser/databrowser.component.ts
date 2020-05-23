@@ -43,7 +43,7 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   @ViewChild(ModalityPicker)
   public modalityPicker: ModalityPicker
 
-  public favDataentries$: Observable<IDataEntry[]>
+  public favDataentries$: Observable<Partial<IDataEntry>[]>
 
   /**
    * TODO

@@ -7,7 +7,7 @@ The interactive atlas viewer can be accessed from either a desktop or an Android
 | | Desktop | Mobile |
 | --- | --- | --- |
 | Translating / Panning | `click drag` on any _slice views_ | `touchmove` on any _slice views_ |
-| Oblique rotation | `shift` + `click drag` on any _slice views_ | hold `🌏` + `drag up/down` to switch rotation mode<br> hold 🌏 + `drag left/right` to rotate |
+| Oblique rotation | `shift` + `click drag` on any _slice views_ | `pinch rotate` |
 | Zooming (_slice view_, _3d view_) | `mouse wheel` | `pinch zoom` |
 | Next slice (_slice view_) | `ctrl` + `mouse wheel` | |
 | Next 10 slice (_slice view_) | `ctrl` + `shift` + `mouse wheel` | |

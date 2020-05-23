@@ -1,12 +1,12 @@
-<div id = "neuroglancer-container">
-  <div placeholder *ngIf = "constantService.loadExportNehubaPromise ? !(constantService.loadExportNehubaPromise | async) : true">
-    <h1 tyle = "text-align:center;">
+<div id="neuroglancer-container">
+  <div placeholder *ngIf="nehubaLoaded">
+    <h1 tyle="text-align:center;">
       loading nehuba viewer
     </h1>
     <h1 style = "text-align:center;">
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
-      <span class = "homeAnimationDots loadingAnimationDots">&bull;</span>
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
+      <span class="homeAnimationDots loadingAnimationDots">&bull;</span>
     </h1>
   </div>
 </div>

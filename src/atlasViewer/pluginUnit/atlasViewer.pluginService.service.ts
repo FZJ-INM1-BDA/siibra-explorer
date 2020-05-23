@@ -1,18 +1,25 @@
 import { HttpClient } from '@angular/common/http'
-import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef } from "@angular/core";
+import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRef, Inject } from "@angular/core";
 import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
 import { PluginUnit } from "./pluginUnit.component";
 import { WidgetServices } from "../widgetUnit/widgetService.service";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, merge, Observable, of } from "rxjs";
-import { filter, map, shareReplay } from "rxjs/operators";
+import { BehaviorSubject, merge, Observable, of, zip } from "rxjs";
+import { filter, map, shareReplay, switchMap, catchError } from "rxjs/operators";
 import { LoggingService } from 'src/logging';
 import { PluginHandler } from 'src/util/pluginHandler';
-import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
 import { WidgetUnit } from "../widgetUnit/widgetUnit.component";
+import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN, BACKENDURL, getHttpHeader } from 'src/util/constants';
+import { PluginFactoryDirective } from './pluginFactory.directive';
 
-import './plugin_styles.css'
+export const registerPluginFactoryDirectiveFactory = (pSer: PluginServices) => {
+  return (pFactoryDirective: PluginFactoryDirective) => {
+    pSer.loadExternalLibraries = pFactoryDirective.loadExternalLibraries.bind(pFactoryDirective)
+    pSer.unloadExternalLibraries = pFactoryDirective.unloadExternalLibraries.bind(pFactoryDirective)
+    pSer.pluginViewContainerRef = pFactoryDirective.viewContainerRef
+  }
+}
 
 @Injectable({
   providedIn : 'root',
@@ -27,8 +34,7 @@ export class PluginServices {
 
   public fetchedPluginManifests: IPluginManifest[] = []
   public pluginViewContainerRef: ViewContainerRef
-  public appendSrc: (script: HTMLElement) => void
-  public removeSrc: (script: HTMLElement) => void
+
   private pluginUnitFactory: ComponentFactory<PluginUnit>
   public minimisedPlugins$: Observable<Set<string>>
 
@@ -38,12 +44,13 @@ export class PluginServices {
   public fetch: (url: string, httpOption?: any) => Promise<any> = (url, httpOption = {}) => this.http.get(url, httpOption).toPromise()
 
   constructor(
-    private constantService: AtlasViewerConstantsServices,
     private widgetService: WidgetServices,
     private cfr: ComponentFactoryResolver,
     private store: Store<IavRootStoreInterface>,
     private http: HttpClient,
     private log: LoggingService,
+    @Inject(APPEND_SCRIPT_TOKEN) private appendSrc: (src: string) => Promise<HTMLScriptElement>,
+    @Inject(REMOVE_SCRIPT_TOKEN) private removeSrc: (src: HTMLScriptElement) => void,
   ) {
 
     // TODO implement
@@ -58,46 +65,36 @@ export class PluginServices {
     /**
      * TODO convert to rxjs streams, instead of Promise.all
      */
-    const promiseFetchedPluginManifests: Promise<IPluginManifest[]> = new Promise((resolve, reject) => {
-      Promise.all([
-        // TODO convert to use this.fetch
-        PLUGINDEV
-          ? fetch(PLUGINDEV, this.constantService.getFetchOption()).then(res => res.json())
-          : Promise.resolve([]),
-        new Promise(rs => {
-          fetch(`${this.constantService.backendUrl}plugins`, this.constantService.getFetchOption())
-            .then(res => res.json())
-            .then(arr => Promise.all(
-              arr.map(url => new Promise(rs2 =>
-                /**
-                 * instead of failing all promises when fetching manifests, only fail those that fails to fetch
-                 */
-                fetch(url, this.constantService.getFetchOption()).then(res => res.json()).then(rs2).catch(e => (this.log.log('fetching manifest error', e), rs2(null)))),
-              ),
-            ))
-            .then(manifests => rs(
-              manifests.filter(m => !!m),
-            ))
-            .catch(e => {
-              this.constantService.catchError(e)
-              rs([])
-            })
-        }),
-        Promise.all(
-          BUNDLEDPLUGINS
-            .filter(v => typeof v === 'string')
-            .map(v => fetch(`res/plugin_examples/${v}/manifest.json`, this.constantService.getFetchOption()).then(res => res.json())),
-        )
-          .then(arr => arr.reduce((acc, curr) => acc.concat(curr) , [])),
-      ])
-        .then(arr => resolve( [].concat(arr[0]).concat(arr[1]) ))
-        .catch(reject)
-    })
 
-    promiseFetchedPluginManifests
-      .then(arr =>
-        this.fetchedPluginManifests = arr)
-      .catch(this.log.error)
+    const pluginUrl = `${BACKENDURL.replace(/\/$/,'')}/plugins`
+    const streamFetchedManifests$ = this.http.get(pluginUrl,{
+      responseType: 'json',
+      headers: getHttpHeader(),
+    }).pipe(
+      switchMap((arr: string[]) => {
+        return zip(
+          ...arr.map(url => this.http.get(url, {
+            responseType: 'json',
+            headers: getHttpHeader()
+          }).pipe(
+            catchError((err, caught) => of(null))
+          ))
+        ).pipe(
+          map(arr => arr.filter(v => !!v))
+        )
+      })
+    )
+
+    streamFetchedManifests$.subscribe(
+      arr => {
+        this.fetchedPluginManifests = arr
+        this.log.log(this.fetchedPluginManifests)
+      },
+      this.log.error,
+      () => {
+        this.log.log(`fetching end`)
+      }
+    )
 
     this.minimisedPlugins$ = merge(
       of(new Set()),
@@ -193,7 +190,7 @@ export class PluginServices {
     this.addPluginToIsLaunchingSet(plugin.name)
 
     return this.readyPlugin(plugin)
-      .then(() => {
+      .then(async () => {
         const pluginUnit = this.pluginViewContainerRef.createComponent( this.pluginUnitFactory )
         /* TODO in v0.2, I used:
 
@@ -242,11 +239,8 @@ export class PluginServices {
           shutdownCB.push(cb)
         }
 
-        const script = document.createElement('script')
-        script.src = plugin.scriptURL
-
-        this.appendSrc(script)
-        handler.onShutdown(() => this.removeSrc(script))
+        const scriptEl = await this.appendSrc(plugin.scriptURL)
+        handler.onShutdown(() => this.removeSrc(scriptEl))
 
         const template = document.createElement('div')
         template.insertAdjacentHTML('afterbegin', plugin.template)
