@@ -3,6 +3,7 @@ const query = require('./query')
 const path = require('path')
 const { detEncoding } = require('nomiseco')
 const url = require('url')
+const { getHandleErrorFn } = require('../util/streamHandleError')
 
 /**
  * root path fetches all templates
@@ -38,7 +39,7 @@ router.get('/:template', (req, res, next) => {
         })
 
       if (acceptedEncoding) res.set('Content-Encoding', acceptedEncoding)
-      query.getTemplate({ template, acceptedEncoding, returnAsStream:true }).pipe(res)
+      query.getTemplate({ template, acceptedEncoding, returnAsStream:true }).pipe(res).on('error', getHandleErrorFn(req, res))
     })
     .catch(error => next({
       code: 500,

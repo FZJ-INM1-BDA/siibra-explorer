@@ -1,5 +1,4 @@
-const { configureAuth } = require('./oidc')
-const jwtDecode = require('jwt-decode')
+const { configureAuth, jwtDecode } = require('./oidc')
 
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''

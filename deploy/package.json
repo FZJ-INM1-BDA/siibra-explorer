@@ -5,11 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "npm run testEnv && npm run testNoEnv",
-    "testEnv": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha ./**/*.spec.js --timeout 60000",
-    "testNoEnv": "node ./node_modules/.bin/mocha ./**/*.noenv-spec.js --timeout 60000",
-    "mocha": "mocha",
-    "mocha-env": "node -r dotenv/config ./node_modules/.bin/mocha"
+    "test": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha ./**/*.spec.js --timeout 60000",
+    "mocha": "mocha"
   },
   "keywords": [],
   "author": "",
@@ -30,7 +27,8 @@
     "passport": "^0.4.0",
     "rate-limit-redis": "^1.7.0",
     "request": "^2.88.0",
-    "soswrap": "^0.0.2"
+    "soswrap": "^0.0.2",
+    "through2": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",

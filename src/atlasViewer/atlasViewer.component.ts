@@ -11,16 +11,10 @@ import {
   Inject,
   Optional,
 } from "@angular/core";
-import { ActionsSubject, select, Store } from "@ngrx/store";
-import {combineLatest, interval, merge, Observable, of, Subscription} from "rxjs";
-import {
-  concatMap,
-  delay,
-  distinctUntilChanged,
-  filter,
-  map,
-  withLatestFrom,
-} from "rxjs/operators";
+import { Store, select, ActionsSubject } from "@ngrx/store";
+import { Observable, Subscription, combineLatest, interval, merge, of, timer, fromEvent } from "rxjs";
+import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
+
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
   IavRootStoreInterface,
@@ -37,7 +31,7 @@ import {
   OPEN_SIDE_PANEL,
 } from "src/services/state/uiState.store";
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
-import { getViewer, isSame } from "src/util/fn";
+import { isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
@@ -48,6 +42,7 @@ import { ARIA_LABELS } from 'common/constants'
 export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
 
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
+import { SlServiceService } from "src/spotlight/sl-service.service";
 
 /**
  * TODO
@@ -81,6 +76,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
+
+  @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
 
   /**
    * required for styling of all child components
@@ -128,7 +125,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     public localFileService: LocalFileService,
     private snackbar: MatSnackBar,
     private el: ElementRef,
-    @Optional() @Inject(NEHUBA_CLICK_OVERRIDE) private nehubaClickOverride: Function
+    @Optional() @Inject(NEHUBA_CLICK_OVERRIDE) private nehubaClickOverride: Function,
+    private slService: SlServiceService
   ) {
 
     this.snackbarMessage$ = this.store.pipe(
@@ -232,6 +230,29 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
+
+    if (KIOSK_MODE) {
+
+      this.subscriptions.push(
+        merge(
+          fromEvent(window.document, 'mouseup'),
+          this.slService.onClick
+        ).pipe(
+          startWith(true),
+          switchMapTo(timer(1000 * 5 * 60).pipe(
+            take(1)
+          ))
+        ).subscribe(() => {
+          this.slService.showBackdrop(this.idelTmpl)
+        })
+      )
+  
+      this.subscriptions.push(
+        this.slService.onClick.subscribe(() => {
+          this.slService.hideBackdrop()
+        })  
+      )
+    }
 
     if (!this.meetsRequirement) {
       merge(
