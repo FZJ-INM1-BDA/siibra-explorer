@@ -1,6 +1,6 @@
 import { Directive, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Input, Inject } from "@angular/core";
 import { fromEvent, Subscription } from "rxjs";
-import { switchMapTo, takeUntil } from "rxjs/operators";
+import { switchMapTo, takeUntil, filter } from "rxjs/operators";
 import { DOCUMENT } from "@angular/common";
 
 @Directive({
@@ -43,7 +43,7 @@ export class CaptureClickListenerDirective implements OnInit, OnDestroy {
         ),
       ).subscribe(event => {
         this.mapClicked.emit(event)
-      }),
+      })
     )
   }
 

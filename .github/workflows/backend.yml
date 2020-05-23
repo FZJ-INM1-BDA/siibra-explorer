@@ -22,15 +22,7 @@ jobs:
       run: |
         cd deploy
         npm i
-    - name: test no env
+    - name: test
       run: |
         cd deploy
-        npm run testNoEnv
-    - name: test with env
-      env:
-        REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
-        HBP_CLIENTID: ${{ secrets.HBP_CLIENTID }}
-        HBP_CLIENTSECRET: ${{ secrets.HBP_CLIENTSECRET }}
-      run: |
-        cd deploy
-        npm run testEnv
+        npm run test

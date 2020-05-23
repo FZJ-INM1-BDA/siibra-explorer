@@ -41,15 +41,24 @@
 <!-- atlas template -->
 <ng-template #viewerBody>
   <div class="atlas-container" (drag-drop)="localFileService.handleFileDrop($event)">
+    <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
     <ui-nehuba-container
-      #uiNehubaContainer
-      iav-mouse-hover 
+      (touchmove)="$event.preventDefault()"
+      iav-viewer-touch-interface
+      [iav-viewer-touch-interface-v-panels]="uiNehubaContainer.viewPanels"
+      [iav-viewer-touch-interface-vp-to-data]="uiNehubaContainer.nehubaViewer?.viewportToDatas"
+      [iav-viewer-touch-interface-ngviewer]="uiNehubaContainer.nehubaViewer?.nehubaViewer?.ngviewer"
+      [iav-viewer-touch-interface-nehuba-config]="uiNehubaContainer.selectedTemplate?.nehubaConfig"
+      #iavNehubaViewerTouch="iavNehubaViewerTouch"
+
+      #uiNehubaContainer="uiNehubaContainer"
+      iav-mouse-hover
       #iavMouseHoverEl="iavMouseHover"
       [currentOnHoverObs$]="iavMouseHoverEl.currentOnHoverObs$"
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
-      (iav-captureClickListenerDirective-onMousedown)="mouseDownNehuba($event)"
-      (iav-captureClickListenerDirective-onClick)="mouseClickNehuba($event)">
+      [iav-captureClickListenerDirective-captureDocument]="true"
+      (iav-captureClickListenerDirective-onClick)="mouseClickDocument($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -89,6 +98,7 @@
 
           </button>
 
+          <!-- visible status card when mat drawer is closed -->
           <mat-card
             *ngIf="!sideNavDrawer.opened"
             (click)="toggleSideNavMenu(false)"
@@ -109,8 +119,8 @@
 
     <div class="d-flex flex-row justify-content-end z-index-10 position-absolute pe-none w-100 h-100">
       <signin-banner
-          signinWrapper
-          [parcellationIsSelected]="selectedParcellation? true : false">
+        signinWrapper
+        [parcellationIsSelected]="!!selectedParcellation">
       </signin-banner>
     </div>
 
@@ -126,14 +136,14 @@
 
       <div floatingMouseContextualContainerDirective>
 
-        <div *ngIf="!ismobile && !presentDatasetDialogRef"
+        <div *ngIf="!ismobile"
           class="d-inline-block"
           iav-mouse-hover
           #iavMouseHoverContextualBlock="iavMouseHover"
           contextualBlock>
 
           <ng-container
-            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe : selectedParcellation">
+            *ngFor="let labelText of iavMouseHoverContextualBlock.currentOnHoverObs$ | async | mouseOverTextPipe">
 
             <mat-list dense>
 
@@ -155,7 +165,9 @@
         <!-- TODO Potentially implementing plugin contextual info -->
       </div>
 
-      <div fixedMouseContextualContainerDirective
+      <div class="floating-container"
+        [attr.aria-label]="CONTEXT_MENU_ARIA_LABEL"
+        fixedMouseContextualContainerDirective
         #fixedContainer="iavFixedMouseCtxContainer">
 
         <!-- on click segment menu -->
@@ -168,9 +180,7 @@
                 class="pe-all"
                 [region]="onHoverRegion"
                 [isSelected]="selectedRegions$ | async | includes : onHoverRegion : compareFn"
-                [hasConnectivity]="selectedParcellation
-                  && selectedParcellation.hasAdditionalViewMode
-                  && selectedParcellation.hasAdditionalViewMode.includes('connectivity')"
+                [hasConnectivity]="selectedParcellation?.hasAdditionalViewMode?.includes('connectivity')"
                 (closeRegionMenu)="rClContextualMenu.hide()">
               </region-menu>
             </div>
@@ -215,7 +225,7 @@
         </p>
         <div class="col-6 d-inline-block text-left">
           <readmore-component [collapsedHeight]="0">
-            <markdown-dom [markdown]="constantsService.minReqExplaner">
+            <markdown-dom [markdown]="MIN_REQ_EXPLAINER">
 
             </markdown-dom>
           </readmore-component>
@@ -241,7 +251,6 @@
   <logo-container></logo-container>
 </ng-template>
 
-<ng-template #persistentStateNotifierTemplate>
-  {{persistentStateNotifierMessage$ | async}}
+<ng-template #idleOverlay>
+  <tryme-component></tryme-component>
 </ng-template>
-

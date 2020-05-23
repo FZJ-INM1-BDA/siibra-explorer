@@ -47,7 +47,7 @@ function generateToken() {
 export class DatabrowserService implements OnDestroy {
 
   public kgTos$: Observable<any>
-  public favedDataentries$: Observable<IDataEntry[]>
+  public favedDataentries$: Observable<Partial<IDataEntry>[]>
   public darktheme: boolean = false
 
   public instantiatedWidgetUnits: WidgetUnit[] = []

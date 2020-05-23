@@ -1,10 +1,29 @@
-.regionDescriptionTextClass
+mat-list.sm mat-list-item
 {
-  max-height:100px;
-  transition: max-height 0.15s ease-out;
+  height:36px;
+  font-size: 90%;
+  cursor: default;
 }
-.regionDescriptionTextOpened
+
+mat-icon
 {
-  max-height: 310px;
-  transition: max-height 0.25s ease-in;
+  transform: scale(0.75);
+}
+
+.action-list
+{
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.action-list mat-icon
+{
+  padding-left: 0px;
+}
+
+.region-name
+{
+  display: inherit;
+  font-size: 95%;
+  line-height: normal;
 }

@@ -5,6 +5,7 @@ const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
 const { By, WebDriver, Key } = require('selenium-webdriver')
+const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -46,6 +47,85 @@ class WdBase{
   }
   get _driver(){
     return this._browser.driver
+  }
+
+  // without image header
+  // output as b64 png
+  async takeScreenshot(cssSelector){
+    
+    if(cssSelector) {
+      await this._browser.executeAsyncScript(async () => {
+        const cb = arguments[arguments.length - 1]
+        const moduleUrl = arguments[0]
+        const cssSelector = arguments[1]
+
+        const el = document.querySelector(cssSelector)
+        if (!el) throw new Error(`css selector not fetching anything`)
+        import(moduleUrl)
+          .then(async m => {
+            m.citruslight(el)
+            cb()
+          })
+      }, CITRUS_LIGHT_URL, cssSelector)
+    }
+    
+    await this.wait(1000)
+    const result = await this._browser.takeScreenshot()
+
+    if (cssSelector) {
+      await this._browser.executeAsyncScript(async () => {
+        const cb = arguments[arguments.length - 1]
+        const moduleUrl = arguments[0]
+        const cssSelector = arguments[1]
+
+        const el = document.querySelector(cssSelector)
+        if (!el) throw new Error(`css selector not fetching anything`)
+        import(moduleUrl)
+          .then(async m => {
+            m.clearAll()
+            cb()
+          })
+      }, CITRUS_LIGHT_URL, cssSelector)
+    }
+    
+    await this.wait(1000)
+    return result
+  }
+
+  async switchIsChecked(cssSelector){
+    if (!cssSelector) throw new Error(`switchChecked method requies css selector`)
+    const checked = await this._browser
+      .findElement( By.css(cssSelector) )
+      .getAttribute('aria-checked')
+    return checked === 'true'
+  }
+
+  async click(cssSelector){
+    if (!cssSelector) throw new Error(`click method needs to define a css selector`)
+    await this._browser.findElement( By.css(cssSelector) ).click()
+  }
+
+  async getText(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    
+    const text = await el.getText()
+    return text
+  }
+
+  async isVisible(cssSelector) {
+
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    const isDisplayed = await el.isDisplayed()
+
+    return isDisplayed
+  }
+
+  async isAt(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const { x, y, width, height } = await this._browser.findElement( By.css(cssSelector) ).getRect()
+    return { x, y, width, height }
   }
 
   historyBack() {
@@ -303,9 +383,7 @@ class WdLayoutPage extends WdBase{
   }
 
   _getModalBtns(){
-    return this._getModal()
-      .findElement( By.tagName('mat-card-actions') )
-      .findElements( By.tagName('button') )
+    return this._getModal().findElements( By.tagName('button') )
   }
 
   async getModalText(){
@@ -519,37 +597,6 @@ class WdLayoutPage extends WdBase{
     if (!menuItems[index]) throw new Error(`index out of bound: accessing index ${index} of length ${menuItems.length}`)
     if (cssSelector) await menuItems[index].findElement( By.css(cssSelector) ).click()
     else await menuItems[index].click()
-  }
-
-  // other templates
-  async showOtherTemplateMenu(){
-    await this._driver
-      .findElement( By.css('[aria-label="Show availability in other reference spaces"]') )
-      .click()
-  }
-
-  _getOtherTemplateMenu(){
-    return this._driver
-      .findElement( By.css('[aria-label="Availability in other reference spaces"]') )
-  }
-
-  _getAllOtherTemplates(){
-    return this._getOtherTemplateMenu().findElements( By.css('[mat-menu-item]') )
-  }
-
-  async getAllOtherTemplates(){
-    const els = await this._getAllOtherTemplates()
-    const returnArr = []
-    for (const el of els) {
-      returnArr.push(await _getTextFromWebElement(el))
-    }
-    return returnArr
-  }
-
-  async clickNthItemAllOtherTemplates(index){
-    const arr = await this._getAllOtherTemplates()
-    if (!arr[index]) throw new Error(`index out of bound: trying to access ${index} from arr with length ${arr.length}`)
-    await arr[index].click()
   }
 
   _getFavDatasetIcon(){

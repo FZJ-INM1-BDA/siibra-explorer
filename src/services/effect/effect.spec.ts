@@ -27,6 +27,13 @@ const hoc1 = {
     -84646549,
     1855106,
   ],
+  originDatasets: [
+    {
+      kgSchema: "minds/core/dataset/v1.0.0",
+      kgId: "5c669b77-c981-424a-858d-fe9f527dbc07",
+      filename: "Area hOc1 (V1, 17, CalcS) [v2.4, Colin 27, left hemisphere]"
+    }
+  ],
 }
 
 describe('effect.ts', () => {

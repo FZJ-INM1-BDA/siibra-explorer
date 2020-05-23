@@ -20,7 +20,7 @@ export class FixedMouseContextualContainerDirective implements AfterContentCheck
   public onHide: EventEmitter<null> = new EventEmitter()
 
   constructor(
-    private el: ElementRef,
+    public el: ElementRef,
     private cdr: ChangeDetectorRef,
   ) {
   }
@@ -43,6 +43,9 @@ export class FixedMouseContextualContainerDirective implements AfterContentCheck
   }
 
   ngAfterContentChecked(){
+    if (this.el.nativeElement.childElementCount === 0) {
+      this.hide()
+    }
     this.recalculatePosition()
     this.cdr.markForCheck()
   }

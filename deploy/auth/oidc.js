@@ -1,4 +1,5 @@
 const { Issuer, Strategy } = require('openid-client')
+const jwtDecode = require('jwt-decode')
 
 const defaultCb = (tokenset, {id, ...rest}, done) => {
   return done(null, {
@@ -6,6 +7,8 @@ const defaultCb = (tokenset, {id, ...rest}, done) => {
     ...rest
   })
 }
+
+exports.jwtDecode = jwtDecode
 
 exports.configureAuth = async ({ discoveryUrl, clientId, clientSecret, redirectUri, clientConfig = {}, cb = defaultCb, scope = 'openid' }) => {
   if (!discoveryUrl)

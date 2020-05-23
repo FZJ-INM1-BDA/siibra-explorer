@@ -26,18 +26,21 @@
   </small>
 
   <!-- publications -->
-  <small class="d-block mb-2"
-    *ngFor="let publication of publications">
-    <a *ngIf="publication.doi; else plainText"
-      iav-stop="click mousedown"
-      [href]="publication.doi | doiParserPipe"
-      target="_blank">
-      {{ publication.cite }}
-    </a>
-    <ng-template #plainText>
-      {{ publication.cite }}
-    </ng-template>
-  </small>
+  <ng-container *ngIf="!strictLocal">
+
+    <small class="d-block mb-2"
+      *ngFor="let publication of publications">
+      <a *ngIf="publication.doi; else plainText"
+        iav-stop="click mousedown"
+        [href]="publication.doi | doiParserPipe"
+        target="_blank">
+        {{ publication.cite }}
+      </a>
+      <ng-template #plainText>
+        {{ publication.cite }}
+      </ng-template>
+    </small>
+  </ng-container>
 </mat-card-content>
 
 
@@ -45,17 +48,20 @@
 <mat-card-actions>
 
   <!-- explore -->
-  <a *ngFor="let kgRef of kgReference"
-    class="m-2"
-    [href]="kgRef | doiParserPipe"
-    target="_blank">
-    <button 
-      mat-raised-button
-      color="primary">
-      Explore
-      <i class="fas fa-external-link-alt"></i>
-    </button>
-  </a>
+  <ng-container *ngIf="!strictLocal">
+
+    <a *ngFor="let kgRef of kgReference"
+      class="m-2"
+      [href]="kgRef | doiParserPipe"
+      target="_blank">
+      <button 
+        mat-raised-button
+        color="primary">
+        Explore
+        <i class="fas fa-external-link-alt"></i>
+      </button>
+    </a>
+  </ng-container>
 
   <!-- pin data -->
   <ng-container *ngIf="downloadEnabled && kgId">
@@ -87,21 +93,24 @@
 
 
   <!-- download -->
-  <a *ngIf="files && files.length > 0"
-    [href]="dlFromKgHref"
-    target="_blank">
-    <button
-      [disabled]="downloadInProgress"
-      [matTooltip]="tooltipText"
-      class="m-2"
-      mat-button
-      color="basic">
-      <span>
-        Download as Zip
-      </span>
-      <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-    </button>
-  </a>
+  <ng-container *ngIf="!strictLocal">
+
+    <a *ngIf="files && files.length > 0"
+      [href]="dlFromKgHref"
+      target="_blank">
+      <button
+        [disabled]="downloadInProgress"
+        [matTooltip]="tooltipText"
+        class="m-2"
+        mat-button
+        color="basic">
+        <span>
+          Download as Zip
+        </span>
+        <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
+      </button>
+    </a>
+  </ng-container>
 
 
   <!-- check if has preview -->
@@ -131,8 +140,7 @@
 
 <ng-template #previewFilesListTemplate>
   <dataset-preview-list
-    [kgId]="kgId"
-    (previewingFile)="handlePreviewFile($event)">
+    [kgId]="kgId">
 
   </dataset-preview-list>
 </ng-template>

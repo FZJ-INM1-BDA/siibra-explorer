@@ -3,6 +3,15 @@ import '!!file-loader?context=third_party&name=vanilla.html!third_party/vanilla.
 import '!!file-loader?context=third_party&name=vanilla_styles.css!third_party/styles.css'
 import '!!file-loader?context=third_party&name=vanilla_nehuba.js!third_party/vanilla_nehuba.js'
 
+/**
+* Catching Safari 10 bug:
+* 
+* https://bugs.webkit.org/show_bug.cgi?id=171041
+* 
+*/
+import '!!file-loader?context=third_party&name=catchSyntaxError.js!third_party/catchSyntaxError.js'
+import '!!file-loader?context=third_party&name=syntaxError.js!third_party/syntaxError.js'
+
 import 'zone.js'
 import { enableProdMode } from '@angular/core';
 

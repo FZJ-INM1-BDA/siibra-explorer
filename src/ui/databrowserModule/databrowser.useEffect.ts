@@ -2,9 +2,9 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { from, merge, Observable, of, Subscription, forkJoin, combineLatest } from "rxjs";
-import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged } from "rxjs/operators";
+import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, startWith, distinctUntilChanged, concatMap, pairwise } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile } from "src/services/state/dataStore.store";
+import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile, DatasetPreview } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
 import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
@@ -16,6 +16,9 @@ import { MatDialog } from "@angular/material/dialog";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
 import { HttpClient } from "@angular/common/http";
+import { INgLayerInterface, REMOVE_NG_LAYERS } from "src/services/state/ngViewerState.store";
+
+const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
 
 @Injectable({
   providedIn: 'root',
@@ -29,6 +32,9 @@ export class DataBrowserUseEffect implements OnDestroy {
   // to be deprecated in favour of preview register volumes
   @Effect()
   previewNgLayer$: Observable<any>
+
+  @Effect()
+  removePreviewNgLayers$: Observable<any>
 
   // registerd layers (to be further developed)
   @Effect()
@@ -45,6 +51,8 @@ export class DataBrowserUseEffect implements OnDestroy {
   public previewDatasetFile$: Observable<ViewerPreviewFile>
   private storePreviewDatasetFile$: Observable<{dataset: IDataEntry,file: ViewerPreviewFile}[]>
 
+  private datasetPreviews$: Observable<DatasetPreview[]>
+
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private actions$: Actions<any>,
@@ -55,10 +63,64 @@ export class DataBrowserUseEffect implements OnDestroy {
     private http: HttpClient
   ) {
 
+    const ngViewerStateLayers$ = this.store$.pipe(
+      select('ngViewerState'),
+      select('layers'),
+      startWith([]),
+      shareReplay(1)
+    ) as Observable<INgLayerInterface[]>
+
+    this.datasetPreviews$ = this.store$.pipe(
+      select('dataStore'),
+      select('datasetPreviews'),
+      startWith([]),
+      shareReplay(1),
+    )
+
+    this.removePreviewDataset$ = ngViewerStateLayers$.pipe(
+      distinctUntilChanged(),
+      pairwise(),
+      map(([o, n]: [INgLayerInterface[], INgLayerInterface[]]) => {
+        const nNameSet = new Set(n.map(({ name }) => name))
+        const oNameSet = new Set(o.map(({ name }) => name))
+        return {
+          add: n.filter(({ name: nName }) => !oNameSet.has(nName)),
+          remove: o.filter(({ name: oName }) => !nNameSet.has(oName)),
+        }
+      }),
+      map(({ remove }) => remove),
+      withLatestFrom(
+        this.datasetPreviews$,
+      ),
+      map(([ removedLayers, datasetPreviews ]) => {
+        const removeLayersAnnotation = removedLayers.map(({ annotation }) => annotation)
+        return datasetPreviews.filter(({ filename }) => {
+          return removeLayersAnnotation.findIndex(annnoation => annnoation.indexOf(filename) >= 0) >= 0
+        })
+      }),
+      filter(arr => arr.length > 0),
+      concatMap(arr => from(arr).pipe(
+        map(item => {
+          const { datasetId, filename } = item
+          return {
+            type: DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASET,
+            payload: {
+              dataset: {
+                fullId: datasetId
+              },
+              file: {
+                filename
+              }
+            }
+          }
+        })
+      ))
+    )
+
+    // TODO this is almost definitely wrong
+    // possibily causing https://github.com/HumanBrainProject/interactive-viewer/issues/502
     this.subscriptions.push(
-      this.store$.pipe(
-        select('dataStore'),
-        select('datasetPreviews'),
+      this.datasetPreviews$.pipe(
         filter(datasetPreviews => datasetPreviews.length > 0),
         map((datasetPreviews) => datasetPreviews[datasetPreviews.length - 1]),
         switchMap(({ datasetId, filename }) =>{
@@ -129,12 +191,24 @@ export class DataBrowserUseEffect implements OnDestroy {
 
     this.previewDatasetFile$ = actions$.pipe(
       ofType(DATASETS_ACTIONS_TYPES.PREVIEW_DATASET),
-      map(actionBody => {
+      concatMap(actionBody => {
+
         const { payload = {} } = actionBody as any
-        const { file = null } = payload as { file: ViewerPreviewFile, dataset: IDataEntry }
-        return file
+        const { file = null, dataset } = payload as { file: ViewerPreviewFile, dataset: IDataEntry }
+        const { fullId } = dataset
+
+        const { filename, ...rest } = file
+        if (Object.keys(rest).length === 0) {
+          const re = /\/([a-f0-9-]+)$/.exec(fullId)
+          if (!re) return of(null)
+          const url = `${DATASET_PREVIEW_URL}/${re[0]}/${encodeURIComponent(filename)}`
+          return this.http.get<ViewerPreviewFile>(url)
+        } else {
+          return of(file)
+        }
       }),
-      shareReplay(1)
+      shareReplay(1),
+      distinctUntilChanged()
     )
 
     this.navigateToPreviewPosition$ = this.previewDatasetFile$.pipe(
@@ -193,16 +267,34 @@ export class DataBrowserUseEffect implements OnDestroy {
       })
     )
 
+    this.removePreviewNgLayers$ = this.datasetPreviews$.pipe(
+      withLatestFrom( ngViewerStateLayers$ ),
+      map(([ datasetPreviews, ngLayers ]) => {
+        const previewingFilesName = datasetPreviews.map(({ filename }) => filename)
+        return ngLayers.filter(({ name, annotation }) =>
+          annotation && annotation.indexOf(DATASET_PREVIEW_ANNOTATION) >= 0
+          && previewingFilesName.indexOf(name) < 0)
+      }),
+      filter(layers => layers.length > 0),
+      map(layers => {
+        return {
+          type: REMOVE_NG_LAYERS,
+          layers
+        }
+      })
+    )
+
     this.previewNgLayer$ = this.previewDatasetFile$.pipe(
       filter(file => 
         determinePreviewFileType(file) === PREVIEW_FILE_TYPES.NIFTI
       ),
-      map(({ url }) => {
+      map(({ url, filename }) => {
         const layer = {
-          name: url,
+          name: filename,
           source : `nifti://${url}`,
           mixability : 'nonmixable',
           shader : GLSL_COLORMAP_JET,
+          annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
         }
         return {
           type: ADD_NG_LAYER,
@@ -333,7 +425,7 @@ export class DataBrowserUseEffect implements OnDestroy {
 
   private savedFav$: Observable<Array<{id: string, name: string}> | null>
 
-  private favDataEntries$: Observable<IDataEntry[]>
+  private favDataEntries$: Observable<Partial<IDataEntry>[]>
 
   @Effect()
   public favDataset$: Observable<any>
@@ -343,4 +435,7 @@ export class DataBrowserUseEffect implements OnDestroy {
 
   @Effect()
   public toggleDataset$: Observable<any>
+
+  @Effect()
+  public removePreviewDataset$: Observable<any>
 }

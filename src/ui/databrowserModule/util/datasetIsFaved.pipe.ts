@@ -6,7 +6,7 @@ import { getKgSchemaIdFromFullId } from "./getKgSchemaIdFromFullId.pipe";
   name: 'datasetIsFaved',
 })
 export class DatasetIsFavedPipe implements PipeTransform {
-  public transform(favedDataEntry: IDataEntry[], dataentry: IDataEntry): boolean {
+  public transform(favedDataEntry: Partial<IDataEntry>[], dataentry: IDataEntry): boolean {
     if (!dataentry) { return false }
     const re2 = getKgSchemaIdFromFullId(dataentry.fullId)
     if (!re2) return false

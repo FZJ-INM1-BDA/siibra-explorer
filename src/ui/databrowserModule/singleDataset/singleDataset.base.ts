@@ -50,6 +50,7 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   private humanReadableFileSizePipe: HumanReadableFileSizePipe = new HumanReadableFileSizePipe()
 
   public DS_PREVIEW_URL = DS_PREVIEW_URL
+  public strictLocal: boolean = STRICT_LOCAL
 
   /**
    * sic!
@@ -67,7 +68,7 @@ export class SingleDatasetBase implements OnInit, OnChanges {
 
   public selectedTemplateSpace$: Observable<any>
 
-  public favedDataentries$: Observable<IDataEntry[]>
+  public favedDataentries$: Observable<Partial<IDataEntry>[]>
   constructor(
     private dbService: DatabrowserService,
     private singleDatasetService: KgSingleDatasetService,
@@ -214,10 +215,6 @@ export class SingleDatasetBase implements OnInit, OnChanges {
 
   public showPreviewList(templateRef: TemplateRef<any>) {
     this.singleDatasetService.showPreviewList(templateRef)
-  }
-
-  public handlePreviewFile(file: ViewerPreviewFile) {
-    this.singleDatasetService.previewFile(file, this.dataset)
   }
 
   public undoableRemoveFav() {

@@ -31,6 +31,7 @@ import { SleightOfHand } from './sleightOfHand/soh.component';
 import { TimerComponent } from './timer/timer.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
+import { IAVVerticalButton } from './vButton/vButton.component';
 
 @NgModule({
   imports : [
@@ -56,6 +57,7 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
+    IAVVerticalButton,
 
     /* directive */
     HoverableBlockDirective,
@@ -88,6 +90,7 @@ import { TreeBaseDirective } from './tree/treeBase.directive';
     SleightOfHand,
     DialogComponent,
     ConfirmDialogComponent,
+    IAVVerticalButton,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,
