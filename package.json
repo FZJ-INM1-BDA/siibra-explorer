@@ -38,7 +38,6 @@
     "@material/dialog": "^4.0.0",
     "@ngtools/webpack": "^9.0.1",
     "@types/jasmine": "^3.5.0",
-    "@types/node": "^12.0.0",
     "@types/webpack-env": "^1.13.6",
     "@typescript-eslint/eslint-plugin": "^2.12.0",
     "@typescript-eslint/parser": "^2.12.0",
@@ -81,14 +80,15 @@
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.2",
     "webpack-closure-compiler": "^2.1.6",
-    "webpack-dev-server": "^3.1.4",
-    "webpack-merge": "^4.1.2",
-    "zone.js": "^0.10.2"
+    "webpack-dev-server": "^3.10.3",
+    "webpack-merge": "^4.1.2"
   },
   "dependencies": {
     "@ngrx/effects": "^9.1.1",
     "@ngrx/store": "^9.1.1",
+    "@types/node": "12.12.39",
     "export-nehuba": "0.0.2",
-    "hbp-connectivity-component": "^0.1.0"
+    "hbp-connectivity-component": "^0.1.0",
+    "zone.js": "^0.10.2"
   }
 }
