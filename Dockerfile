@@ -43,7 +43,7 @@ FROM python:3.7 as doc-builder
 COPY . /iav
 WORKDIR /iav
 
-RUN pip install mkdocs mkdocs-material mdx_truly_sane_lists
+RUN pip install mkdocs mkdocs-material mdx_truly_sane_lists errandkun
 RUN mkdocs build
 
 # prod container
