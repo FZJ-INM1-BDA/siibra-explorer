@@ -16,13 +16,13 @@ markdown_extensions:
 
 plugins:
   - search
-  - errandkun:
-      extract_path: docs/autogen_images
-      external_resources:
-      - type: github
-        owner: fzj-inm1-bda
-        repo: interactive-viewer
-        workflow_name: e2e
+  # - errandkun:
+  #     extract_path: docs/autogen_images
+  #     external_resources:
+  #     - type: github
+  #       owner: fzj-inm1-bda
+  #       repo: interactive-viewer
+  #       workflow_name: e2e
 
 pages:
   - Home: 'index.md'
