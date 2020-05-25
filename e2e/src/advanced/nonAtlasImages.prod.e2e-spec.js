@@ -81,16 +81,27 @@ describe('> non-atlas images', () => {
       await iavPage.wait(10000)
       const interceptedCalls = await iavPage.getInterceptedHttpCalls()
 
-      expect(
-        interceptedCalls
-      ).toContain(
-        jasmine.objectContaining(
-          {
-            method: 'GET',
-            url: 'https://zam10143.zam.kfa-juelich.de/chumni/nifti/5c38faad1b0deab8d1674248b0107cd3637faa46a88e7a039c511163/BI-TIM/info'
-          }
-        )
-      )
+      const arr = [
+        'BI-FOM-HSV_R',
+        'BI-FOM-HSV_G',
+        'BI-FOM-HSV_B',
+        'BI',
+        'BI-TIM',
+        'BI-MRI',
+        'BI-MRS',
+      ]
+
+      for (const item of arr) {
+        expect(
+          interceptedCalls.find(({
+            method,
+            url
+          }) => {
+            const regex = new RegExp(item)
+            return method === 'GET' && regex.test(url)
+          })
+        ).toBeTruthy()
+      }
 
       expect(
         interceptedCalls

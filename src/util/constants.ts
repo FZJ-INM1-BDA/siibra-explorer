@@ -14,13 +14,14 @@ export const LOCAL_STORAGE_CONST = {
 export const COOKIE_VERSION = '0.3.0'
 export const KG_TOS_VERSION = '0.3.0'
 export const DS_PREVIEW_URL = DATASET_PREVIEW_URL
-export const BACKENDURL = BACKEND_URL && /^http/.test(BACKEND_URL)
-  ? BACKEND_URL
-  : (() => {
-    const url = new URL(window.location.href)
-    const { protocol, hostname, pathname } = url
-    return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
-  })() || 'http://localhost:3000/'
+export const BACKENDURL = (() => {
+  if (!BACKEND_URL) return `http://localhost:3000/`
+  if (/^http/.test(BACKEND_URL)) return BACKEND_URL
+
+  const url = new URL(window.location.href)
+  const { protocol, hostname, pathname } = url
+  return `${protocol}//${hostname}${pathname.replace(/\/$/, '')}/${BACKEND_URL}`
+})()
 
 export const MIN_REQ_EXPLAINER = `
 - Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float\` extension enabled.
