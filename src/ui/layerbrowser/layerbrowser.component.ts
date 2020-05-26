@@ -7,7 +7,7 @@ import { LoggingService } from "src/logging";
 import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
 import { getViewer } from "src/util/fn";
 import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
-import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface } from "../../services/stateStore.service";
+import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "../../services/stateStore.service";
 import { MatSliderChange } from "@angular/material/slider";
 
 @Component({
@@ -51,7 +51,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
   private customNgLayers: string[] = ['spatial landmark layer']
 
   constructor(
-    private store: Store<ViewerStateInterface>,
+    private store: Store<IavRootStoreInterface>,
     private constantsService: AtlasViewerConstantsServices,
     private log: LoggingService,
   ) {
@@ -205,10 +205,8 @@ export class LayerBrowser implements OnInit, OnDestroy {
       return
     }
     this.store.dispatch({
-      type : REMOVE_NG_LAYER,
-      layer : {
-        name : layer.name,
-      },
+      type: REMOVE_NG_LAYER,
+      layer
     })
   }
 

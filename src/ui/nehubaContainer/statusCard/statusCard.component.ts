@@ -6,6 +6,8 @@ import { NehubaViewerUnit } from "../nehubaViewer/nehubaViewer.component";
 import { Observable, Subscription, of, combineLatest, BehaviorSubject } from "rxjs";
 import { distinctUntilChanged, shareReplay, map, filter, startWith } from "rxjs/operators";
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
+import { MatDialog } from "@angular/material/dialog";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector : 'ui-status-card',
@@ -25,11 +27,17 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public navVal$: Observable<string>
   public mouseVal$: Observable<string>
 
+  public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
+  public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
+  public SHARE_CUSTOM_URL_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL
+  public SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL_DIALOG
+
   constructor(
     private store: Store<ViewerStateInterface>,
     private log: LoggingService,
     private store$: Store<IavRootStoreInterface>,
-    private bottomSheet: MatBottomSheet
+    private bottomSheet: MatBottomSheet,
+    private dialog: MatDialog,
   ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -152,6 +160,13 @@ export class StatusCardComponent implements OnInit, OnChanges{
           animation : {},
         },
       },
+    })
+  }
+
+  openDialog(tmpl: TemplateRef<any>, options) {
+    const { ariaLabel } = options
+    this.dialog.open(tmpl, {
+      ariaLabel
     })
   }
 }

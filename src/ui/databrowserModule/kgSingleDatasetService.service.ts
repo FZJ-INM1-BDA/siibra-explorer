@@ -3,11 +3,10 @@ import { Injectable, OnDestroy, TemplateRef } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
-import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { BACKENDURL } from "src/util/constants";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy {
@@ -16,7 +15,6 @@ export class KgSingleDatasetService implements OnDestroy {
   public ngLayers: Set<string> = new Set()
 
   constructor(
-    private constantService: AtlasViewerConstantsServices,
     private store$: Store<IavRootStoreInterface>,
     private http: HttpClient,
   ) {
@@ -40,14 +38,14 @@ export class KgSingleDatasetService implements OnDestroy {
   // TODO deprecate, in favour of web component
   public datasetHasPreview({ name }: { name: string } = { name: null }) {
     if (!name) { throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined') }
-    const _url = new URL(`datasets/hasPreview`, this.constantService.backendUrl )
+    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/hasPreview`)
     const searchParam = _url.searchParams
     searchParam.set('datasetName', name)
     return this.http.get(_url.toString())
   }
 
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
-    const _url = new URL(`datasets/kgInfo`, this.constantService.backendUrl )
+    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/kgInfo`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
@@ -59,7 +57,7 @@ export class KgSingleDatasetService implements OnDestroy {
   }
 
   public getDownloadZipFromKgHref({ kgSchema = 'minds/core/dataset/v1.0.0', kgId }) {
-    const _url = new URL(`datasets/downloadKgFiles`, this.constantService.backendUrl)
+    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/downloadKgFiles`)
     const searchParam = _url.searchParams
     searchParam.set('kgSchema', kgSchema)
     searchParam.set('kgId', kgId)
@@ -76,7 +74,7 @@ export class KgSingleDatasetService implements OnDestroy {
     })
   }
 
-  public previewFile(file: ViewerPreviewFile, dataset: IDataEntry) {
+  public previewFile(file: Partial<ViewerPreviewFile>, dataset: Partial<IDataEntry>) {
     this.store$.dispatch({
       type: DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
       payload: {

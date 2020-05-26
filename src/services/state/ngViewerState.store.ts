@@ -6,6 +6,8 @@ import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.consta
 import { SNACKBAR_MESSAGE } from './uiState.store';
 import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
 import { Action, select, Store } from '@ngrx/store'
+import { BACKENDURL } from 'src/util/constants';
+import { HttpClient } from '@angular/common/http';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -78,26 +80,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
   case ADD_NG_LAYER:
     return {
       ...prevState,
-
-      /* this configration hides the layer if a non mixable layer already present */
-
-      /* this configuration does not the addition of multiple non mixable layers */
-      // layers : action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-      //   ? prevState.layers
-      //   : prevState.layers.concat(action.layer)
-
-      /* this configuration allows the addition of multiple non mixables */
-      // layers : prevState.layers.map(l => mapLayer(l, action.layer)).concat(action.layer)
       layers : mixNgLayers(prevState.layers, action.layer),
-
-      // action.layer.constructor === Array
-      //   ? prevState.layers.concat(action.layer)
-      //   : prevState.layers.concat({
-      //     ...action.layer,
-      //     ...( action.layer.mixability === 'nonmixable' && prevState.layers.findIndex(l => l.mixability === 'nonmixable') >= 0
-      //           ? {visible: false}
-      //           : {})
-      //   })
     }
   case REMOVE_NG_LAYERS: {
     const { layers } = action
@@ -198,30 +181,34 @@ export class NgViewerUseEffect implements OnDestroy {
   constructor(
     private actions: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices
+    private constantService: AtlasViewerConstantsServices,
+    private http: HttpClient,
   ){
 
     // TODO either split backend user to be more granular, or combine the user config into a single subscription
     this.subscriptions.push(
       this.store$.pipe(
         select('ngViewerState'),
-        distinctUntilChanged(),
         debounceTime(200),
         skip(1),
         // Max frequency save once every second
+
+        // properties to be saved
+        map(({ panelMode, panelOrder }) => {
+          return { panelMode, panelOrder }
+        }),
+        distinctUntilChanged(),
         throttleTime(1000)
-      ).subscribe(({panelMode, panelOrder}) => {
-        fetch(`${this.constantService.backendUrl}user/config`, {
-          method: 'POST',
+      ).subscribe(ngViewerState => {
+        this.http.post(`${BACKENDURL}user/config`, JSON.stringify({ ngViewerState }),  {
           headers: {
             'Content-type': 'application/json'
-          },
-          body: JSON.stringify({ ngViewerState: { panelMode, panelOrder } })
+          }
         })
       })
     )
 
-    this.applySavedUserConfig$ = from(fetch(`${this.constantService.backendUrl}user/config`).then(r => r.json())).pipe(
+    this.applySavedUserConfig$ = this.http.get(`${BACKENDURL}user/config`).pipe(
       catchError((err,caught) => of(null)),
       filter(v => !!v),
       withLatestFrom(this.store$),
@@ -449,6 +436,7 @@ export interface INgLayerInterface {
   name: string
   source: string
   mixability: string // base | mixable | nonmixable
+  annotation?: string //
   visible?: boolean
   shader?: string
   transform?: any

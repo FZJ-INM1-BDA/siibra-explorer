@@ -1,0 +1,22 @@
+<div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
+
+  <mat-card>
+    <mat-card-title *ngIf="interval$ | async as indexVal">
+      {{ texts[indexVal % (texts.length)] }}
+    </mat-card-title>
+  </mat-card>
+
+  <div class="tmp d-inline-block position-relative">
+    <button class="d-inline-block"
+      mat-icon-button
+      color="accent">
+      <i class="fas fa-bullseye"></i>
+    </button>
+    
+    <button class="position-absolute finger"
+      mat-icon-button
+      color="accent">
+      <i class="fas fa-hand-point-up fa-2x"></i>
+    </button>
+  </div>
+</div>

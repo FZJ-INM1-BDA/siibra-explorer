@@ -3,6 +3,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",
+    "module": "esnext",
     "target": "es2015",
     "sourceMap": false,
     "baseUrl": ".",
@@ -13,6 +14,8 @@
     }
   },
   "angularCompilerOptions":{
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true,
     "annotateForClosureCompiler" : true
   }
 }

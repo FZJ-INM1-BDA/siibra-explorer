@@ -5,11 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "npm run testEnv && npm run testNoEnv",
-    "testEnv": "node -r dotenv/config ./node_modules/.bin/mocha ./test/mocha.test.js --timeout 60000",
-    "testNoEnv": "node ./node_modules/.bin/mocha ./test/mocha.test.noenv.js --timeout 60000",
-    "mocha": "mocha",
-    "mocha-env": "node -r dotenv/config ./node_modules/.bin/mocha"
+    "test": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha ./**/*.spec.js --timeout 60000",
+    "mocha": "mocha"
   },
   "keywords": [],
   "author": "",
@@ -17,7 +14,9 @@
   "dependencies": {
     "archiver": "^3.0.0",
     "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
     "express": "^4.16.4",
+    "express-rate-limit": "^5.1.1",
     "express-session": "^1.15.6",
     "hbp-seafile": "0.0.6",
     "helmet-csp": "^2.8.0",
@@ -26,16 +25,21 @@
     "nomiseco": "0.0.2",
     "openid-client": "^2.4.5",
     "passport": "^0.4.0",
-    "request": "^2.88.0"
+    "rate-limit-redis": "^1.7.0",
+    "request": "^2.88.0",
+    "soswrap": "^0.0.2",
+    "through2": "^3.0.1"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "cookie": "^0.4.0",
     "cors": "^2.8.5",
     "dotenv": "^6.2.0",
     "google-spreadsheet": "^3.0.8",
     "got": "^10.5.5",
     "mocha": "^6.1.4",
+    "nock": "^12.0.3",
     "sinon": "^8.0.2"
   }
 }

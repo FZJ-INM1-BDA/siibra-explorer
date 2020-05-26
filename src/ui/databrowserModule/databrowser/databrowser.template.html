@@ -148,12 +148,3 @@
   </mat-accordion>
 
 </ng-template>
-
-<!-- currently unused -->
-<ng-template #history>
-  <mat-list>
-    <mat-list-item *ngFor="let item of (history$ | async)">
-      Viewed {{ item.file.name }}
-    </mat-list-item>
-  </mat-list>
-</ng-template>

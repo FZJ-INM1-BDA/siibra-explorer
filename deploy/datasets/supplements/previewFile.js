@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const { reconfigureFlag, reconfigureUrl } = require('../../util/reconfigPrecomputedServer')
 
 const DISABLE_RECEPTOR_PREVIEW = process.env.DISABLE_RECEPTOR_PREVIEW
 const DISABLE_JUBRAIN_PMAP = process.env.DISABLE_JUBRAIN_PMAP
@@ -38,6 +39,19 @@ Promise.all([
     console.error('preview file error', e)
   })
 
+const processFile = ({ url, ...rest }) => {
+  if (!url) return { ...rest }
+  const processedUrl = !/^http/.test(url)
+    ? `${HOSTNAME}/${url}`
+    : reconfigureFlag
+      ? reconfigureUrl(url)
+      : url
+  return {
+    ...rest,
+    url: processedUrl
+  }
+}
+  
 exports.getPreviewFile = ({ datasetName, templateSelected }) => previewMap.get(datasetName)
   ? Promise.resolve(
       previewMap.get(datasetName)
@@ -46,16 +60,7 @@ exports.getPreviewFile = ({ datasetName, templateSelected }) => previewMap.get(d
           if (!templateSelected) return true
           return templateSpace === templateSelected
         })
-        .map(file => {
-          return {
-            ...file,
-            ...(file.url && !/^http/.test(file.url)
-              ? {
-                url: `${HOSTNAME}${HOST_PATHNAME}/${file.url}`
-              }
-              : {})
-          }
-        })
+        .map(processFile)
     )
   : Promise.reject(`Preview file cannot be found!`)
 

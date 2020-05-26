@@ -3,8 +3,6 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from "@angular/
   DatabrowserService,
   KgSingleDatasetService,
 } from "../singleDataset.base";
-import { SingleDatasetView } from "../detailedView/singleDataset.component";
-import {MatDialog} from "@angular/material/dialog";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
@@ -22,18 +20,8 @@ export class SingleDatasetListView extends SingleDatasetBase {
     _dbService: DatabrowserService,
     singleDatasetService: KgSingleDatasetService,
     cdr: ChangeDetectorRef,
-    private dialog: MatDialog,
     snackBar: MatSnackBar,
   ) {
     super(_dbService, singleDatasetService, cdr, snackBar)
-  }
-
-  public showDetailInfo() {
-    this.dialog.open(SingleDatasetView, {
-      autoFocus: false,
-      data: {
-        fullId: this.fullId
-      },
-    })
   }
 }

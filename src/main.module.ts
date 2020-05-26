@@ -1,26 +1,25 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule } from "@angular/common";
+import { CommonModule, DOCUMENT } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule } from "@ngrx/store";
+import { StoreModule, Store } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
-import { AtlasViewer } from "./atlasViewer/atlasViewer.component";
+import { AtlasViewer, NEHUBA_CLICK_OVERRIDE } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
-import { dataStore, ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
+import { dataStore, ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState, IavRootStoreInterface } from "./services/stateStore.service";
 import { UIModule } from "./ui/ui.module";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, overrideNehubaClickFactory, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
 import { ConfirmDialogComponent } from "./components/confirmDialog/confirmDialog.component";
 import { DialogComponent } from "./components/dialog/dialog.component";
-import { AuthService } from "./services/auth.service";
 import { DialogService } from "./services/dialogService.service";
 import { UseEffects } from "./services/effect/effect";
 import { LocalFileService } from "./services/localFile.service";
@@ -37,8 +36,10 @@ import { FloatingContainerDirective } from "./util/directives/floatingContainer.
 import { FloatingMouseContextualContainerDirective } from "./util/directives/floatingMouseContextualContainer.directive";
 import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctViewToLayer.pipe";
 import { UtilModule } from "./util/util.module";
+import { SpotLightModule } from 'src/spotlight/spot-light.module'
+import { TryMeComponent } from "./ui/tryme/tryme.component";
 
-import { UiStateUseEffect } from "src/services/state/uiState.store";
+import { UiStateUseEffect, getMouseoverSegmentsFactory, GET_MOUSEOVER_SEGMENTS_TOKEN } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
@@ -46,12 +47,13 @@ import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
 import { WidgetModule } from './atlasViewer/widgetUnit/widget.module';
 import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
 import { LoggingModule } from './logging/logging.module';
+import { ShareModule } from './share';
+import { AuthService } from './auth'
 
 import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { ShareModule } from './share';
 
 @NgModule({
   imports : [
@@ -69,6 +71,8 @@ import { ShareModule } from './share';
     LoggingModule,
     ShareModule,
 
+    SpotLightModule,
+    
     EffectsModule.forRoot([
       DataBrowserUseEffect,
       UseEffects,
@@ -95,6 +99,7 @@ import { ShareModule } from './share';
   declarations : [
     AtlasViewer,
     ModalUnit,
+    TryMeComponent,
 
     /* directives */
     DockedContainerDirective,
@@ -121,6 +126,65 @@ import { ShareModule } from './share';
     DialogService,
     UIService,
     TemplateCoordinatesTransformation,
+    {
+      provide: NEHUBA_CLICK_OVERRIDE,
+      useFactory: overrideNehubaClickFactory,
+      deps: [
+        AtlasViewerAPIServices,
+        GET_MOUSEOVER_SEGMENTS_TOKEN
+      ]
+    },
+    {
+      provide: GET_MOUSEOVER_SEGMENTS_TOKEN,
+      useFactory: getMouseoverSegmentsFactory,
+      deps: [ Store ]
+    },
+    {
+      provide: GET_TOAST_HANDLER_TOKEN,
+      useFactory: (uiService: UIService) => {
+        return () => uiService.getToastHandler()
+      },
+      deps: [ UIService ]
+    },
+    {
+      provide: CANCELLABLE_DIALOG,
+      useFactory: (uiService: UIService) => {
+        return (message, option) => {
+          const actionBtn = {
+            type: 'mat-stroked-button',
+            color: 'default',
+            dismiss: true,
+            text: 'Cancel',
+            ariaLabel: 'Cancel'
+          }
+          const data = {
+            content: message,
+            config: {
+              sameLine: true
+            },
+            actions: [ actionBtn ]
+          }
+          const { userCancelCallback, ariaLabel } = option
+          const dialogRef = uiService.showDialog(data, {
+            hasBackdrop: false,
+            position: { top: '5px'},
+            ariaLabel
+          })
+
+          dialogRef.afterClosed().subscribe(closeReason => {
+            if (closeReason && closeReason.programmatic) return
+            if (closeReason && closeReason === actionBtn) return userCancelCallback()
+            if (!closeReason) return userCancelCallback()
+          })
+
+          return () => {
+            dialogRef.close({ userInitiated: false, programmatic: true })
+          }
+        } 
+      },
+      deps: [ UIService ]
+    },
+
 
     /**
      * TODO

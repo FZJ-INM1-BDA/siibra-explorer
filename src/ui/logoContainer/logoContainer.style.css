@@ -18,6 +18,16 @@
   background-image:url('res/image/HBP_Primary_RGB_BlackText.png')
 }
 
+:host-context([darktheme="true"]) [uselogo="fzj"][hbpLogoContainer]
+{
+  background-image:url('res/image/fzj_white_transparent_svg.svg')
+}
+
+:host-context([darktheme="false"]) [uselogo="fzj"][hbpLogoContainer]
+{
+  background-image:url('res/image/fzj_black_transparent_svg.svg')
+}
+
 [hbpLogoContainer]
 {
   display:inline-block;
