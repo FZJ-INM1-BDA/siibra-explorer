@@ -2,8 +2,9 @@ import { getGetRegionFromLabelIndexId } from "src/services/effect/effect";
 import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
-import { decodeToNumber, encodeNumber, GLSL_COLORMAP_JET, separator } from "./atlasViewer.constantService.service";
+import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
 import { GetKgSchemaIdFromFullIdPipe } from "src/ui/databrowserModule/util/getKgSchemaIdFromFullId.pipe";
+import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 
 const getKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
 
@@ -304,7 +305,7 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
           name : layer,
           source : `nifti://${layer}`,
           mixability : 'nonmixable',
-          shader : GLSL_COLORMAP_JET,
+          shader : getShader(PMAP_DEFAULT_CONFIG),
         } as any
       })
     const { ngViewerState } = returnState

@@ -13,7 +13,7 @@
       class="layer-expansion-unit"
       #expansionPanel>
       <mat-expansion-panel-header>
-        <div class="align-items-center d-flex flex-nowrap pr-4">
+        <div class="align-items-center d-flex flex-nowrap pr-4 w-100">
           <!-- toggle opacity -->
           <div matTooltip="opacity">
 
@@ -70,11 +70,12 @@
           <mat-label
             [matTooltipPosition]="matTooltipPosition"
             [matTooltip]="ngLayer.name | getFilenamePipe "
-            [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate'">
+            [class]="((darktheme$ | async) ? 'text-light' : 'text-dark') + ' text-truncate flex-grow-1 flex-shrink-1'">
             {{ ngLayer.name | getFilenamePipe }}
           </mat-label>
 
           <button mat-icon-button
+            [attr.aria-label]="TOGGLE_SHOW_LAYER_CONTROL_ARIA_LABEL"
             (click)="expansionPanel.toggle()">
             <ng-container *ngIf="expansionPanel.expanded; else btnIconAlt">
               <i class="fas fa-chevron-up"></i>
