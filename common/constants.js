@@ -1,6 +1,11 @@
 (function(exports){
 
   exports.ARIA_LABELS = {
+    // dataset specific
+    TOGGLE_EXPLORE_PANEL: `Toggle explore panel`,
+    MODALITY_FILTER: `Toggle dataset modality filter`,
+    LIST_OF_DATASETS: `List of datasets`,
+
     // overlay specific
     CONTEXT_MENU: `Viewer context menu`,
 

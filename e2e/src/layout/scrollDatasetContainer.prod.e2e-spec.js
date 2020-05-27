@@ -1,11 +1,12 @@
 const { AtlasPage } = require('../util')
-
+const { ARIA_LABELS } = require('../../../common/constants')
 describe('> scroll dataset container', () => {
   let iavPage
 
   beforeEach(async () => {
     iavPage = new AtlasPage()
     await iavPage.init()
+
   })
 
   it('> can scroll to the end', async () => {
@@ -14,23 +15,13 @@ describe('> scroll dataset container', () => {
     await iavPage.wait(1000)
     await iavPage.waitForAsync()
 
-    const btnCssSelector = `[aria-label="Toggle explore panel"]`
-    // const btnCssSelector = `button[mat-stroked-button].m-1.flex-grow-1.overflow-hidden`
-
-    // TODO use .clickByCss method in future
-    // TODO import aria label from common/constant.js in future
-    await iavPage._browser
-      .findElement( By.css(btnCssSelector) )
-      .click()
+    await iavPage.click(`[aria-label="${ARIA_LABELS.TOGGLE_EXPLORE_PANEL}"]`)
 
     await iavPage.clearAlerts()
 
-    const scrollContainerCssSelector = '[aria-label="List of datasets"]'
-    // const scrollContainerCssSelector = 'cdk-virtual-scroll-viewport'
-
     let countdown = 100
     do {
-      await iavPage.scrollElementBy(scrollContainerCssSelector, {
+      await iavPage.scrollElementBy(`[aria-label="${ARIA_LABELS.LIST_OF_DATASETS}"]`, {
         delta: [0, 100]
       })
       await iavPage.wait(100)
@@ -39,7 +30,7 @@ describe('> scroll dataset container', () => {
 
     await iavPage.wait(500)
 
-    const val = await iavPage.getScrollStatus(scrollContainerCssSelector)
+    const val = await iavPage.getScrollStatus(`[aria-label="${ARIA_LABELS.LIST_OF_DATASETS}"]`)
     expect(val).toBeGreaterThanOrEqual(10000)
   })
 })

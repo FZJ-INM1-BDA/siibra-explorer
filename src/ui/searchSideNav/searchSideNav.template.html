@@ -14,7 +14,7 @@
     <div class="d-flex flex-row justify-content-center" card-footer>
       <!-- TODO export all aria labels to common/constants.js in future patch -->
       <button mat-stroked-button
-        aria-label="Toggle explore panel"
+        [attr.aria-label]="TOGGLE_EXPLORE_PANEL_ARIA_LABEL"
         *ngIf="!(sidePanelExploreCurrentViewIsOpen$ | async)"
         (click)="expandSidePanelCurrentView()"
         [disabled]="!(viewerStateController.parcellationSelected$ | async)"

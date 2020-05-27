@@ -772,6 +772,23 @@ class WdIavPage extends WdLayoutPage{
     }
   }
 
+  _getModalityListView(){
+    return this._browser
+      .findElement( By.tagName('modality-picker') )
+      .findElements( By.tagName('mat-checkbox') )
+  }
+
+  async getModalities(){
+    const els = await this._getModalityListView()
+    const returnArr = []
+    for (const el of els) {
+      returnArr.push(
+        await el.getText()
+      )
+    }
+    return returnArr
+  }
+
   _getSingleDatasetListView(){
     return this._browser
       .findElement( By.tagName('data-browser') )

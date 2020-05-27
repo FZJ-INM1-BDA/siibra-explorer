@@ -1,4 +1,6 @@
 const { AtlasPage } = require('../util')
+const { ARIA_LABELS } = require('../../../common/constants')
+const { TOGGLE_EXPLORE_PANEL, MODALITY_FILTER } = ARIA_LABELS
 
 const templates = [
   'MNI Colin 27',
@@ -120,5 +122,32 @@ describe('> dataset previews', () => {
     await iavPage.waitFor(true, true)
     const modalHasImage = await iavPage.modalHasChild('div[data-img-src]')
     expect(modalHasImage).toEqual(true)
+  })
+})
+
+describe('> modality picker', () => {
+  let iavPage
+  beforeAll(async () => {
+    iavPage = new AtlasPage()
+    await iavPage.init()
+    await iavPage.goto()
+  })
+  it('> sorted alphabetically', async () => {
+    await iavPage.selectTitleCard(templates[1])
+    await iavPage.wait(500)
+    await iavPage.waitUntilAllChunksLoaded()
+    await iavPage.click(`[aria-label="${TOGGLE_EXPLORE_PANEL}"]`)
+    await iavPage.wait(500)
+    await iavPage.clearAlerts()
+    await iavPage.click(`[aria-label="${MODALITY_FILTER}"]`)
+    await iavPage.wait(500)
+    const modalities = await iavPage.getModalities()
+    for (let i = 1; i < modalities.length; i ++) {
+      expect(
+        modalities[i].charCodeAt(0)
+      ).toBeGreaterThanOrEqual(
+        modalities[i - 1].charCodeAt(0)
+      )
+    }
   })
 })
