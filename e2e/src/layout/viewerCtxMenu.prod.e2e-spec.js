@@ -58,8 +58,11 @@ describe('> viewerCtxMenu', () => {
           await iavPage.wait(500)
           if (expectedLabelStatus) {
             const fullMenuText = await iavPage.getText(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
-            const titleStatusText = await fullMenuText.substr(0, fullMenuText.indexOf('Brain region'))
-            expect(titleStatusText.trim()).toEqual(`${expectedLabelName} ${expectedLabelStatus}`)
+            if (fullMenuText.includes(`${expectedLabelName} ${expectedLabelStatus}`)) {
+              expect(true).toBe(true)
+            } else {
+              expect(true).toBe(false)
+            }
           }
         })
 
@@ -69,8 +72,11 @@ describe('> viewerCtxMenu', () => {
           await iavPage.wait(500)
           if (!expectedLabelStatus) {
             const fullMenuText = await iavPage.getText(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
-            const titleStatusText = await fullMenuText.substr(0, fullMenuText.indexOf('Brain region'))
-            expect(titleStatusText.trim()).toEqual(expectedLabelName)
+            if (fullMenuText.includes(expectedLabelName)) {
+              expect(true).toBe(true)
+            } else {
+              expect(true).toBe(false)
+            }
           }
         })
 
