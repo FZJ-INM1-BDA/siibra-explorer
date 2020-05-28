@@ -192,7 +192,7 @@
             <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
             <div class="cursorPointer" #exploreTemplateButton mat-line>
               <span #exploreTemplateName class="overflow-x-hidden text-truncate"
-                    [matTooltip]="exploreTemplateButton.offsetWidth < exploreTemplateName.offsetWidth? sameRegion.template.name + ' ' + sameRegion.hemisphere : null">
+                    [matTooltip]="sameRegion.template.name + ' ' + sameRegion.hemisphere">
                 {{ sameRegion.template.name + ' ' + sameRegion.hemisphere }}
               </span>
             </div>

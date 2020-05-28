@@ -161,14 +161,12 @@ describe('> explore same region in different templates', () => {
     it('> Tooltip visible if overflowed', async () => {
       const data2 = TEST_DATA[1]
       await getBeforeEachFn(iavPage)(data2)()
-
-      const {expectedRegion, expectedTemplateLabels, position, url, templateName} = data2
-
+      const {expectedTemplateLabels} = data2
       const desiredTemplateButton = await expectedTemplateLabels.find(el => el.name.length > 30)
-
       if (desiredTemplateButton) {
-        const test = await iavPage.getAttribute(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${desiredTemplateButton.name}${desiredTemplateButton.hemisphere ? (' - ' + desiredTemplateButton.hemisphere) : ''}"]`, 'matTooltip')
-        console.log(test)
+        await iavPage.cursorMoveToElement(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${desiredTemplateButton.name}${desiredTemplateButton.hemisphere ? (' - ' + desiredTemplateButton.hemisphere) : ''}"]`)
+        const tooltipText = await iavPage.getText('mat-tooltip-component')
+        expect(tooltipText.trim()).toContain(desiredTemplateButton.name)
       }
     })
   })
