@@ -138,7 +138,7 @@
       </mat-list-item>
 
       <!-- connectivity -->
-      <div iav-switch #connectivitySwitch="iavSwitch">
+      <div *ngIf="hasConnectivity" iav-switch #connectivitySwitch="iavSwitch">
 
         <mat-list-item mat-ripple
           (click)="connectivitySwitch.toggle()"

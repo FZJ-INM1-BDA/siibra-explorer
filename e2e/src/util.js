@@ -6,6 +6,9 @@ if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
 const { By, WebDriver, Key } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
+const { polyFillClick } = require('./material-util')
+
+const { ARIA_LABELS } = require('../../common/constants')
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -92,6 +95,40 @@ class WdBase{
     return result
   }
 
+  async getRgbAt({ position } = {}, cssSelector = null){
+    if (!position) throw new Error(`position is required for getRgbAt`)
+    const { x, y } = verifyPosition(position)
+    const screenshotData = await this.takeScreenshot(cssSelector)
+    const [ red, green, blue ] = await this._driver.executeAsyncScript(() => {
+      
+      const dataUri = arguments[0]
+      const pos = arguments[1]
+      const dim = arguments[2]
+      const cb = arguments[arguments.length - 1]
+
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = dim[0]
+        canvas.height = dim[1]
+
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
+
+        const idx = (dim[0] * pos[1] + pos[0]) * 4
+        const red = imgData.data[idx]
+        const green = imgData.data[idx + 1]
+        const blue = imgData.data[idx + 2]
+        cb([red, green, blue])
+      }
+      img.src = dataUri
+
+    }, `data:image/png;base64,${screenshotData}`, [x, y], [800, 796])
+
+    return { red, green, blue }
+  }
+
   async switchIsChecked(cssSelector){
     if (!cssSelector) throw new Error(`switchChecked method requies css selector`)
     const checked = await this._browser
@@ -101,8 +138,7 @@ class WdBase{
   }
 
   async click(cssSelector){
-    if (!cssSelector) throw new Error(`click method needs to define a css selector`)
-    await this._browser.findElement( By.css(cssSelector) ).click()
+    return await polyFillClick.bind(this)(cssSelector)
   }
 
   async getText(cssSelector){
@@ -559,6 +595,13 @@ class WdLayoutPage extends WdBase{
         By.css('[aria-label="Toggle expansion state of additional layer browser"]')
       )
       .click()
+  }
+
+  async toggleNthLayerControl(idx) {
+    const els = await this._getAdditionalLayerControl()
+      .findElements( By.css(`[aria-label="${ARIA_LABELS.TOGGLE_SHOW_LAYER_CONTROL}"]`))
+    if (!els[idx]) throw new Error(`toggleNthLayerControl index out of bound: accessor ${idx} with length ${els.length}`)
+    await els[idx].click()
   }
 
   // Signin banner

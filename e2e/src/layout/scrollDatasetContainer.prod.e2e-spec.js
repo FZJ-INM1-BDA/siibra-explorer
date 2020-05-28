@@ -37,6 +37,8 @@ describe('> scroll dataset container', () => {
       countdown --
     }while(countdown > 0)
 
+    await iavPage.wait(500)
+
     const val = await iavPage.getScrollStatus(scrollContainerCssSelector)
     expect(val).toBeGreaterThanOrEqual(10000)
   })

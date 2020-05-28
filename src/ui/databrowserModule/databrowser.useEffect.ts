@@ -6,10 +6,9 @@ import { filter, map, scan, switchMap, withLatestFrom, mapTo, shareReplay, start
 import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES, IDataEntry, ViewerPreviewFile, DatasetPreview } from "src/services/state/dataStore.store";
 import { IavRootStoreInterface, ADD_NG_LAYER, CHANGE_NAVIGATION } from "src/services/stateStore.service";
-import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL } from "src/util/constants";
+import { LOCAL_STORAGE_CONST, DS_PREVIEW_URL, getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service";
 import { determinePreviewFileType, PREVIEW_FILE_TYPES, PREVIEW_FILE_TYPES_NO_UI } from "./preview/previewFileIcon.pipe";
-import { GLSL_COLORMAP_JET } from "src/atlasViewer/atlasViewer.constantService.service";
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { MatDialog } from "@angular/material/dialog";
@@ -293,7 +292,7 @@ export class DataBrowserUseEffect implements OnDestroy {
           name: filename,
           source : `nifti://${url}`,
           mixability : 'nonmixable',
-          shader : GLSL_COLORMAP_JET,
+          shader : getShader(PMAP_DEFAULT_CONFIG),
           annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
         }
         return {
