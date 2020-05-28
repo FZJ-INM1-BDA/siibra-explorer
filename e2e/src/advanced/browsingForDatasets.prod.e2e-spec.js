@@ -1,6 +1,6 @@
 const { AtlasPage } = require('../util')
 const { ARIA_LABELS } = require('../../../common/constants')
-const { TOGGLE_EXPLORE_PANEL, MODALITY_FILTER } = ARIA_LABELS
+const { TOGGLE_EXPLORE_PANEL, MODALITY_FILTER, DOWNLOAD_PREVIEW, DOWNLOAD_PREVIEW_CSV } = ARIA_LABELS
 
 const templates = [
   'MNI Colin 27',
@@ -103,6 +103,14 @@ describe('> receptor dataset previews', () => {
       await iavPage.waitFor(true, true)
       const modalHasCanvas = await iavPage.modalHasChild('canvas')
       expect(modalHasCanvas).toEqual(true)
+
+      await iavPage.wait(500)
+
+      const modalHasDownloadBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW}"]`)
+      const modalHasDownloadCSVBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW_CSV}"]`)
+
+      expect(modalHasDownloadBtn).toEqual(true)
+      expect(modalHasDownloadCSVBtn).toEqual(true)
     })
 
     it('> can display profile', async () => {
@@ -113,6 +121,14 @@ describe('> receptor dataset previews', () => {
       await iavPage.waitFor(true, true)
       const modalHasCanvas = await iavPage.modalHasChild('canvas')
       expect(modalHasCanvas).toEqual(true)
+
+      await iavPage.wait(500)
+
+      const modalHasDownloadBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW}"]`)
+      const modalHasDownloadCSVBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW_CSV}"]`)
+
+      expect(modalHasDownloadBtn).toEqual(true)
+      expect(modalHasDownloadCSVBtn).toEqual(true)
     })
   })
   it('> can display image', async () => {
@@ -122,6 +138,14 @@ describe('> receptor dataset previews', () => {
     await iavPage.waitFor(true, true)
     const modalHasImage = await iavPage.modalHasChild('div[data-img-src]')
     expect(modalHasImage).toEqual(true)
+
+    await iavPage.wait(500)
+
+    const modalHasDownloadBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW}"]`)
+    const modalHasDownloadCSVBtn = await iavPage.modalHasChild(`[aria-label="${DOWNLOAD_PREVIEW_CSV}"]`)
+
+    expect(modalHasDownloadBtn).toEqual(true)
+    expect(modalHasDownloadCSVBtn).toEqual(false)
   })
 })
 

@@ -11,8 +11,8 @@
     </div>
 
     <!-- main content -->
-    <div class="flex-grow-1 flex-shrink-1">
-      <span class="d-block">
+    <div class="flex-grow-1 flex-shrink-1 w-0 d-flex align-items-center">
+      <span class="text-truncate">
         {{ filename }}
       </span>
       <small class="text-muted d-block">
@@ -34,6 +34,29 @@
   [darkmode]="darktheme$ | async"
   [filename]="filename"
   [kgId]="kgId"
-  [backendUrl]="backendUrl">
+  [backendUrl]="backendUrl"
+  #dataPreviewerStencilCmp>
 
 </kg-dataset-previewer>
+
+<div class="flex-shrink-0 flex-grow-0 d-inline-flex">
+  <a *ngIf="downloadHref"
+    [attr.href]="downloadHref"
+    [attr.download]="filename"
+    [attr.aria-label]="DOWNLOAD_PREVIEW_ARIA_LABEL"
+    target="_blank"
+    mat-icon-button
+    color="primary">
+    <i class="fas fa-download"></i>
+  </a>
+
+  <a *ngIf="downloadCsvHref"
+    [attr.href]="downloadCsvHref"
+    [attr.download]="filename"
+    [attr.aria-label]="DOWNLOAD_PREVIEW_CSV_ARIA_LABEL"
+    target="_blank"
+    mat-icon-button
+    color="primary">
+    <i class="fas fa-file-csv"></i>
+  </a>
+</div>
