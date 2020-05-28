@@ -220,6 +220,18 @@ class WdBase{
       .perform()
   }
 
+  async cursorMoveToElement(cssSelector) {
+    if (!cssSelector) throw new Error(`cursorMoveToElement needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    await this._driver.actions()
+      .move()
+      .move({
+        origin: el,
+        duration: 1000
+      })
+      .perform()
+  }
+
   async scrollElementBy(cssSelector, options) {
     const { delta } = options
     await this._browser.executeScript(() => {

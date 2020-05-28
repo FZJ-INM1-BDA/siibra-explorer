@@ -134,12 +134,12 @@ describe('> explore same region in different templates', () => {
 
   describe('> menu UI', () => {
     const data = TEST_DATA[0]
-    
+
     beforeEach(async () => {
-      await getBeforeEachFn(iavPage)(data)()
     })
 
     it('> dismisses when user clicks/drags outside', async () => {
+      await getBeforeEachFn(iavPage)(data)()
       const { expectedRegion, expectedTemplateLabels, position, url, templateName } = data
 
       await iavPage.cursorMoveToAndDrag({
@@ -155,6 +155,18 @@ describe('> explore same region in different templates', () => {
         expect(true).toBe(false)
       } catch(e) {
         expect(true).toBe(true)
+      }
+    })
+
+    it('> Tooltip visible if overflowed', async () => {
+      const data2 = TEST_DATA[1]
+      await getBeforeEachFn(iavPage)(data2)()
+      const {expectedTemplateLabels} = data2
+      const desiredTemplateButton = await expectedTemplateLabels.find(el => el.name.length > 30)
+      if (desiredTemplateButton) {
+        await iavPage.cursorMoveToElement(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${desiredTemplateButton.name}${desiredTemplateButton.hemisphere ? (' - ' + desiredTemplateButton.hemisphere) : ''}"]`)
+        const tooltipText = await iavPage.getText('mat-tooltip-component')
+        expect(tooltipText.trim()).toContain(desiredTemplateButton.name)
       }
     })
   })
