@@ -2,6 +2,7 @@
   <mat-card-title>
     <div class="position-relative region-name">
       {{ region.name }}
+      <small *ngIf="region.status"> ({{region.status}})</small>
     </div>
   </mat-card-title>
   <mat-card-subtitle>
@@ -10,12 +11,12 @@
       Brain region
     </span>
   </mat-card-subtitle>
-  
+
   <mat-card-content>
     <mat-divider></mat-divider>
-    
+
     <ng-template #safeHarbour>
-        
+
       <!-- enlarged region actions -->
       <mat-grid-list cols="2" rowHeight="6rem" gutterSize="0px">
 
@@ -29,7 +30,7 @@
             <span iav-v-button-text>Select</span>
           </iav-v-button>
         </mat-grid-tile>
-  
+
         <mat-grid-tile>
           <iav-v-button
             class="h-100 w-100"
@@ -39,7 +40,7 @@
             <span iav-v-button-text>Navigate</span>
           </iav-v-button>
         </mat-grid-tile>
-  
+
         <ng-container *ngFor="let originDataset of (region.originDatasets || [])">
           <mat-grid-tile class="iv-custom-comp">
             <iav-v-button
@@ -53,8 +54,8 @@
               <span iav-v-button-text [class]="previewDirective.active ? 'iv-custom-comp primary' : ''">Probability Map {{ previewDirective.active }}</span>
             </iav-v-button>
           </mat-grid-tile>
-        </ng-container> 
-        
+        </ng-container>
+
         <mat-grid-tile>
           <iav-v-button *ngIf="hasConnectivity"
             class="h-100 w-100"
@@ -69,7 +70,7 @@
             <i class="fas fa-chevron-down" iav-v-button-footer></i>
           </iav-v-button>
         </mat-grid-tile>
-  
+
         <mat-grid-tile>
           <iav-v-button *ngIf="sameRegionTemplate.length"
             class="h-100 w-100"
@@ -83,7 +84,7 @@
             <span iav-v-button-text>Change template</span>
             <i class="fas fa-chevron-down" iav-v-button-footer></i>
           </iav-v-button>
-        </mat-grid-tile> 
+        </mat-grid-tile>
       </mat-grid-list>
     </ng-template>
 
@@ -110,7 +111,7 @@
           Select
         </div>
       </mat-list-item>
-      
+
       <!-- position -->
       <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
         <mat-icon scaled-down fontSet="fas" fontIcon="fa-map-marked-alt" mat-list-icon></mat-icon>
@@ -154,7 +155,7 @@
           </div>
           <mat-icon fontSet="fas" [fontIcon]="connectivitySwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
         </mat-list-item>
-  
+
         <!-- connectivity -->
         <mat-list-item *ngIf="connectivitySwitch.switchState" mat-ripple (click)="showConnectivity(region.name)">
           <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
@@ -196,7 +197,7 @@
             </div>
           </mat-list-item>
         </div>
-      
+
       </div>
     </mat-list>
   </mat-card-content>
