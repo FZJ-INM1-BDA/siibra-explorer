@@ -172,7 +172,7 @@ export class DataBrowserUseEffect implements OnDestroy {
   
             return forkJoin(
               from(this.kgSingleDatasetService.getInfoFromKg({ kgSchema: re[0], kgId: re[1] })),
-              this.http.get(`${DS_PREVIEW_URL}/${re[1]}/${filename}`)
+              this.http.get(`${DS_PREVIEW_URL}/${re[1]}/${encodeURIComponent(filename)}`)
             ).pipe(
               map(([ dataset, file ]) => {
                 return {

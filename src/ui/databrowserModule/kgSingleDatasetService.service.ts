@@ -35,15 +35,6 @@ export class KgSingleDatasetService implements OnDestroy {
     }
   }
 
-  // TODO deprecate, in favour of web component
-  public datasetHasPreview({ name }: { name: string } = { name: null }) {
-    if (!name) { throw new Error('kgSingleDatasetService#datasetHashPreview name must be defined') }
-    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/hasPreview`)
-    const searchParam = _url.searchParams
-    searchParam.set('datasetName', name)
-    return this.http.get(_url.toString())
-  }
-
   public getInfoFromKg({ kgId, kgSchema = 'minds/core/dataset/v1.0.0' }: Partial<KgQueryInterface>) {
     const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/kgInfo`)
     const searchParam = _url.searchParams
