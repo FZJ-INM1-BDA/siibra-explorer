@@ -9,6 +9,7 @@ import { getViewer } from "src/util/fn";
 import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
 import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "../../services/stateStore.service";
 import { MatSliderChange } from "@angular/material/slider";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector : 'layer-browser',
@@ -20,6 +21,8 @@ import { MatSliderChange } from "@angular/material/slider";
 })
 
 export class LayerBrowser implements OnInit, OnDestroy {
+
+  public TOGGLE_SHOW_LAYER_CONTROL_ARIA_LABEL = ARIA_LABELS.TOGGLE_SHOW_LAYER_CONTROL
 
   @Output() public nonBaseLayersChanged: EventEmitter<INgLayerInterface[]> = new EventEmitter()
 

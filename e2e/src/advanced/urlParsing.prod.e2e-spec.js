@@ -67,35 +67,7 @@ describe('> url parsing', () => {
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
-    // TODO use screenshot API when merg v2.3.0
-    const screenshotData = await iavPage._driver.takeScreenshot()
-    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
-      
-      const dataUri = arguments[0]
-      const pos = arguments[1]
-      const dim = arguments[2]
-      const cb = arguments[arguments.length - 1]
-
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = dim[0]
-        canvas.height = dim[1]
-
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
-
-        const idx = (dim[0] * pos[1] + pos[0]) * 4
-        const red = imgData.data[idx]
-        const green = imgData.data[idx + 1]
-        const blue = imgData.data[idx + 2]
-        cb([red, green, blue])
-      }
-      img.src = dataUri
-
-    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
-    
+    const { red, green, blue } = await iavPage.getRgbAt({ position: [600, 490] })
     expect(red).toBeGreaterThan(0)
     expect(red).toEqual(green)
     expect(red).toEqual(blue)
@@ -106,34 +78,7 @@ describe('> url parsing', () => {
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
-    // TODO use screenshot API when merg v2.3.0
-    const screenshotData = await iavPage._driver.takeScreenshot()
-    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
-      
-      const dataUri = arguments[0]
-      const pos = arguments[1]
-      const dim = arguments[2]
-      const cb = arguments[arguments.length - 1]
-
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = dim[0]
-        canvas.height = dim[1]
-
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
-
-        const idx = (dim[0] * pos[1] + pos[0]) * 4
-        const red = imgData.data[idx]
-        const green = imgData.data[idx + 1]
-        const blue = imgData.data[idx + 2]
-        cb([red, green, blue])
-      }
-      img.src = dataUri
-
-    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
+    const { red, green, blue } = await iavPage.getRgbAt({ position: [600, 490] })
     
     expect(red).toBeGreaterThan(0)
     expect(red).toEqual(green)

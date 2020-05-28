@@ -9,8 +9,6 @@ import { IavRootStoreInterface } from "../services/stateStore.service";
 import { AtlasWorkerService } from "./atlasViewer.workerService.service";
 
 export const CM_THRESHOLD = `0.05`
-export const CM_MATLAB_JET = `float r;if( x < 0.7 ){r = 4.0 * x - 1.5;} else {r = -4.0 * x + 4.5;}float g;if (x < 0.5) {g = 4.0 * x - 0.5;} else {g = -4.0 * x + 3.5;}float b;if (x < 0.3) {b = 4.0 * x + 0.5;} else {b = -4.0 * x + 2.5;}float a = 1.0;`
-export const GLSL_COLORMAP_JET = `void main(){float x = toNormalized(getDataValue());${CM_MATLAB_JET}if(x>${CM_THRESHOLD}){emitRGB(vec3(r,g,b));}else{emitTransparent();}}`
 
 const getUniqueId = () => Math.round(Math.random() * 1e16).toString(16)
 

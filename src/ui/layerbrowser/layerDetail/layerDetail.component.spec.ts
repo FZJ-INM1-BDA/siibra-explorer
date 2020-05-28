@@ -1,8 +1,9 @@
-import { LayerDetailComponent } from './layerDetail.component'
+import { LayerDetailComponent, VIEWER_INJECTION_TOKEN } from './layerDetail.component'
 import { async, TestBed } from '@angular/core/testing'
 import { NgLayersService } from '../ngLayerService.service'
 import { UIModule } from 'src/ui/ui.module'
 import { By } from '@angular/platform-browser'
+import * as CONSTANT from 'src/util/constants'
 
 const getSpies = (service: NgLayersService) => {
   const lowThMapGetSpy = spyOn(service.lowThresholdMap, 'get').and.callThrough()
@@ -65,8 +66,19 @@ const getSliderChangeTest = ctrlName => describe(`testing: ${ctrlName}`, () => {
   })
 })
 
-describe('layerDetail.component.ts', () => {
-  describe('LayerDetailComponent', () => {
+const fragmentMainSpy = {
+  value: `test value`,
+  restoreState: () => {}
+}
+
+const defaultViewer = {
+  layerManager: {
+    getLayerByName: jasmine.createSpy('getLayerByName').and.returnValue({layer: {fragmentMain: fragmentMainSpy}})
+  }
+}
+
+describe('> layerDetail.component.ts', () => {
+  describe('> LayerDetailComponent', () => {
 
     beforeEach(async(() => {
       TestBed.configureTestingModule({
@@ -74,21 +86,28 @@ describe('layerDetail.component.ts', () => {
           UIModule
         ],
         providers: [
-          NgLayersService
+          NgLayersService,
+          {
+            provide: VIEWER_INJECTION_TOKEN,
+            useValue: defaultViewer
+          }
         ]
       }).compileComponents()
     }))
 
-    describe('basic', () => {
+    describe('> basic funcitonalities', () => {
 
-      it('should be created', () => {
+      it('> it should be created', () => {
         const fixture = TestBed.createComponent(LayerDetailComponent)
         const element = fixture.debugElement.componentInstance
         expect(element).toBeTruthy()
       })
   
-      it('on bind input, if input is truthy, calls get on layerService maps', () => {
+      it('> on bind input, if input is truthy, calls get on layerService maps', () => {
         const service = TestBed.inject(NgLayersService)
+        TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
+          useValue: {}
+        })
         const {
           brightnessMapGetSpy,
           contractMapGetSpy,
@@ -109,7 +128,7 @@ describe('layerDetail.component.ts', () => {
         expect(removeBgMapGetSpy).toHaveBeenCalledWith(layerName)
       })
   
-      it('on bind input, if input is falsy, does not call layerService map get', () => {
+      it('> on bind input, if input is falsy, does not call layerService map get', () => {
         const service = TestBed.inject(NgLayersService)
         const {
           brightnessMapGetSpy,
@@ -144,8 +163,6 @@ describe('layerDetail.component.ts', () => {
       getSliderChangeTest(sliderCtrl)
     }
 
-    // TODO test remove bg toggle
-
     describe('testing: removeBG toggle', () => {
       it('on change, calls window', () => {
 
@@ -177,6 +194,9 @@ describe('layerDetail.component.ts', () => {
 
     describe('triggerChange', () => {
       it('should throw if viewer is not defined', () => {
+        TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
+          useValue: null
+        })
         const fixutre = TestBed.createComponent(LayerDetailComponent)
         expect(function(){
           fixutre.componentInstance.triggerChange()
@@ -184,16 +204,21 @@ describe('layerDetail.component.ts', () => {
       })
 
       it('should throw if layer is not found', () => {
-        const fixutre = TestBed.createComponent(LayerDetailComponent)
-        const layerName = `test-kitty`
         const fakeGetLayerByName = jasmine.createSpy().and.returnValue(undefined)
         const fakeNgInstance = {
           layerManager: {
             getLayerByName: fakeGetLayerByName
           }
         }
+
+        TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
+          useValue: fakeNgInstance
+        })
+
+        const fixutre = TestBed.createComponent(LayerDetailComponent)
+        const layerName = `test-kitty`
+
         fixutre.componentInstance.layerName = layerName
-        fixutre.componentInstance.ngViewerInstance = fakeNgInstance
 
         expect(function(){
           fixutre.componentInstance.triggerChange()
@@ -201,8 +226,6 @@ describe('layerDetail.component.ts', () => {
       })
 
       it('should throw if layer.layer.fragmentMain is undefined', () => {
-
-        const fixutre = TestBed.createComponent(LayerDetailComponent)
         const layerName = `test-kitty`
 
         const fakeLayer = {
@@ -214,8 +237,14 @@ describe('layerDetail.component.ts', () => {
             getLayerByName: fakeGetLayerByName
           }
         }
+
+        TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
+          useValue: fakeNgInstance
+        })
+
+        const fixutre = TestBed.createComponent(LayerDetailComponent)
+
         fixutre.componentInstance.layerName = layerName
-        fixutre.componentInstance.ngViewerInstance = fakeNgInstance
 
         expect(function(){
           fixutre.componentInstance.triggerChange()
@@ -225,13 +254,12 @@ describe('layerDetail.component.ts', () => {
       it('should call getShader and restoreState if all goes right', () => {
 
         const replacementShader = `blabla ahder`
-
-        const service = TestBed.inject(NgLayersService)
-        const getShaderSpy = spyOn(service, 'getShader').and.returnValue(replacementShader)
-        const fixutre = TestBed.createComponent(LayerDetailComponent)
+        const getShaderSpy = jasmine.createSpy('getShader').and.returnValue(replacementShader)
+        spyOnProperty(CONSTANT, 'getShader').and.returnValue(getShaderSpy)
+        
         const layerName = `test-kitty`
 
-        const fakeRestoreState = jasmine.createSpy()
+        const fakeRestoreState = jasmine.createSpy('fakeGetLayerByName')
         const fakeLayer = {
           layer: {
             fragmentMain: {
@@ -239,14 +267,19 @@ describe('layerDetail.component.ts', () => {
             }
           }
         }
-        const fakeGetLayerByName = jasmine.createSpy().and.returnValue(fakeLayer)
+        const fakeGetLayerByName = jasmine.createSpy('fakeGetLayerByName').and.returnValue(fakeLayer)
         const fakeNgInstance = {
           layerManager: {
             getLayerByName: fakeGetLayerByName
           }
         }
+        TestBed.overrideProvider(VIEWER_INJECTION_TOKEN, {
+          useValue: fakeNgInstance
+        })
+        
+        const fixutre = TestBed.createComponent(LayerDetailComponent)
         fixutre.componentInstance.layerName = layerName
-        fixutre.componentInstance.ngViewerInstance = fakeNgInstance
+        fixutre.detectChanges()
 
         fixutre.componentInstance.triggerChange()
         
