@@ -13,6 +13,9 @@ import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.s
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { ARIA_LABELS } from 'common/constants.js'
+
+const { TOGGLE_EXPLORE_PANEL } = ARIA_LABELS
 
 @Component({
   selector: 'search-side-nav',
@@ -23,6 +26,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 })
 
 export class SearchSideNav implements OnDestroy {
+  public TOGGLE_EXPLORE_PANEL_ARIA_LABEL = TOGGLE_EXPLORE_PANEL
   public availableDatasets: number = 0
 
   private subscriptions: Subscription[] = []

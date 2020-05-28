@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from "@angular/core";
+import { Component, EventEmitter, Input, OnChanges, Output, Pipe, PipeTransform } from "@angular/core";
 import { CountedDataModality } from "../databrowser.service";
 
 @Component({
@@ -59,5 +59,18 @@ export class ModalityPicker implements OnChanges {
         }
       }),
     )
+  }
+}
+
+const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').charCodeAt(0) - (b.name || '0').charCodeAt(0) 
+
+@Pipe({
+  name: 'sortModalityAlphabetically',
+  pure: true
+})
+
+export class SortModalityAlphabeticallyPipe implements PipeTransform{
+  public transform(arr: CountedDataModality[]): CountedDataModality[]{
+    return [...arr].sort(sortByFn)
   }
 }

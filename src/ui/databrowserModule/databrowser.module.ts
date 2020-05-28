@@ -7,7 +7,7 @@ import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { UtilModule } from "src/util/util.module";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
-import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
+import { ModalityPicker, SortModalityAlphabeticallyPipe } from "./modalityPicker/modalityPicker.component";
 import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
@@ -115,6 +115,7 @@ const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) 
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
     TransformDatasetToIdPipe,
+    SortModalityAlphabeticallyPipe
   ],
   exports: [
     DataBrowser,
