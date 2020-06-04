@@ -7,6 +7,7 @@ import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/servi
 import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
 import { IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
 import { BACKENDURL } from "src/util/constants";
+import { uiStateShowBottomSheet } from "src/services/state/uiState.store.helper";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy {
@@ -56,13 +57,14 @@ export class KgSingleDatasetService implements OnDestroy {
   }
 
   public showPreviewList(template: TemplateRef<any>) {
-    this.store$.dispatch({
-      type: SHOW_BOTTOM_SHEET,
-      bottomSheetTemplate: template,
-      config: {
-        ariaLabel: `List of preview files`
-      }
-    })
+    this.store$.dispatch(
+      uiStateShowBottomSheet({
+        bottomSheetTemplate: template,
+        config: {
+          ariaLabel: `List of preview files`
+        }
+      })
+    )
   }
 
   public previewFile(file: Partial<ViewerPreviewFile>, dataset: Partial<IDataEntry>) {

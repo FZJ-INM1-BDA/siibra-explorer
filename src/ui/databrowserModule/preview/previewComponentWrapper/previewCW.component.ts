@@ -1,7 +1,7 @@
 import { Component, Input, Inject, ViewChild, ElementRef } from "@angular/core";
 import { MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { AtlasViewerConstantsServices } from "../../singleDataset/singleDataset.base";
-import { Observable, fromEvent, Subscription, from, of, throwError } from "rxjs";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { Observable, fromEvent, Subscription, of, throwError } from "rxjs";
 import { switchMapTo, catchError, take, concatMap, map, retryWhen, delay } from "rxjs/operators";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ARIA_LABELS } from 'common/constants'
@@ -12,8 +12,9 @@ const {
 } = ARIA_LABELS
 
 const fromPromiseRetry = ({ retries = 10, timeout = 100 } = {}) => {
-  const retryCounter = 0
+  let retryCounter = 0
   return (fn: () => Promise<any>) => new Observable(obs => {
+    retryCounter += 1
     fn()
       .then(val => obs.next(val))
       .catch(e => obs.error(e))
@@ -37,6 +38,9 @@ const fromPromiseRetry = ({ retries = 10, timeout = 100 } = {}) => {
 })
 
 export class PreviewComponentWrapper{
+
+  public touched: boolean = false
+  public untouchedIndex: number = 0
 
   public DOWNLOAD_PREVIEW_ARIA_LABEL = DOWNLOAD_PREVIEW
   public DOWNLOAD_PREVIEW_CSV_ARIA_LABEL = DOWNLOAD_PREVIEW_CSV
@@ -86,7 +90,7 @@ export class PreviewComponentWrapper{
       switchMapTo(
         fromPromiseRetry()(() => this.dataPreviewerStencilCmp.nativeElement.getDownloadPreviewHref()).pipe(
           concatMap((downloadHref: string) => {
-            return from(this.dataPreviewerStencilCmp.nativeElement.getDownloadCsvHref()).pipe(
+            return fromPromiseRetry({ retries: 0 })(() => this.dataPreviewerStencilCmp.nativeElement.getDownloadCsvHref()).pipe(
               catchError(err => of(null)),
               map(csvHref => {
                 return {
@@ -113,5 +117,5 @@ export class PreviewComponentWrapper{
     while(this.subscriptions.length > 0) {
       this.subscriptions.pop().unsubscribe()
     }
-  }  
+  }
 }

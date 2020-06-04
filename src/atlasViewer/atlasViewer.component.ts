@@ -22,7 +22,7 @@ import {
   safeFilter,
 } from "../services/stateStore.service";
 import { AtlasViewerConstantsServices, UNSUPPORTED_INTERVAL, UNSUPPORTED_PREVIEW } from "./atlasViewer.constantService.service";
-import { WidgetServices } from "./widgetUnit/widgetService.service";
+import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";

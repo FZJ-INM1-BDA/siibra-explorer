@@ -149,6 +149,22 @@ class WdBase{
     return text
   }
 
+  async areVisible(cssSelector) {
+
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const els = await this._browser.findElements( By.css(cssSelector) )
+
+    const returnArr = []
+
+    for (const el of els) {
+      const isDisplayed = await el.isDisplayed()
+      if (isDisplayed) returnArr.push(true)
+      else returnArr.push(false)
+    }
+
+    return returnArr
+  }
+
   async isVisible(cssSelector) {
 
     if (!cssSelector) throw new Error(`getText needs to define css selector`)
@@ -311,7 +327,7 @@ class WdBase{
   }
 
   // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
-  async goto(url = '/', { interceptHttp, doNotAutomate } = {}){
+  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout } = {}){
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
       this._browser.get(actualUrl)
@@ -326,7 +342,15 @@ class WdBase{
       await this.wait(200)
       await this.dismissModal()
       await this.wait(200)
-      await this.waitForAsync()
+
+      if (forceTimeout) {
+        await Promise.race([
+          this.waitForAsync(),
+          this.wait(forceTimeout)
+        ])
+      } else {
+        await this.waitForAsync()
+      }
     }
   }
 
@@ -591,7 +615,7 @@ class WdLayoutPage extends WdBase{
     }
   }
 
-  // will throw if additional layer contorl is not visible
+  // will throw if additional layer control is not visible
   additionalLayerControlIsExpanded() {
     return this._getAdditionalLayerControl()
       .findElement(
@@ -600,7 +624,7 @@ class WdLayoutPage extends WdBase{
       .isDisplayed()
   }
 
-  // will throw if additional layer contorl is not visible
+  // will throw if additional layer control is not visible
   async toggleLayerControl(){
     return this._getAdditionalLayerControl()
       .findElement(

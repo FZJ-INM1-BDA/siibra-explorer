@@ -1,14 +1,17 @@
 import { Injectable, TemplateRef, OnDestroy } from '@angular/core';
-import { Action, select, Store } from '@ngrx/store'
+import { Action, select, Store, createAction, props } from '@ngrx/store'
 
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable, Subscription } from "rxjs";
 import { filter, map, mapTo, scan, startWith, take } from "rxjs/operators";
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
-import { IavRootStoreInterface } from '../stateStore.service'
+import { IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
+import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet } from './uiState.store.helper';
 
 export const defaultState: StateInterface = {
+  previewingDatasetFiles: [],
+
   mouseOverSegments: [],
   mouseOverSegment: null,
 
@@ -31,6 +34,14 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
   switch (action.type) {
+  
+  case uiActionSetPreviewingDatasetFiles.type: {
+    const { previewingDatasetFiles } = action as any
+    return {
+      ...prevState,
+      previewingDatasetFiles
+    }
+  }
   case MOUSE_OVER_SEGMENTS: {
     const { segments } = action
     return {
@@ -66,22 +77,25 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       snackbarMessage: Symbol(snackbarMessage),
     }
   }
+  case uiStateOpenSidePanel.type:
   case OPEN_SIDE_PANEL:
     return {
       ...prevState,
       sidePanelIsOpen: true,
     }
+  case uiStateCloseSidePanel.type:
   case CLOSE_SIDE_PANEL:
     return {
       ...prevState,
       sidePanelIsOpen: false,
     }
-
+  case uiStateExpandSidePanel.type:
   case EXPAND_SIDE_PANEL_CURRENT_VIEW:
     return {
       ...prevState,
       sidePanelExploreCurrentViewIsOpen: true,
     }
+  case uiStateCollapseSidePanel.type:
   case COLLAPSE_SIDE_PANEL_CURRENT_VIEW:
     return {
       ...prevState,
@@ -125,6 +139,10 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       agreedKgTos: true,
     }
   }
+  case GENERAL_ACTION_TYPES.APPLY_STATE: {
+    const { uiState } = (action as any).state
+    return uiState
+  }
   default: return prevState
   }
 }
@@ -143,6 +161,8 @@ export function stateStore(state, action) {
 }
 
 export interface StateInterface {
+  previewingDatasetFiles: {datasetId: string, filename: string}[]
+
   mouseOverSegments: Array<{
     layer: {
       name: string
@@ -243,7 +263,7 @@ export class UiStateUseEffect implements OnDestroy{
     
     this.subscriptions.push(
       actions$.pipe(
-        ofType(SHOW_BOTTOM_SHEET)
+        ofType(uiStateShowBottomSheet.type)
       ).subscribe(({ bottomSheetTemplate, config }) => {
         if (!bottomSheetTemplate) {
           if (this.bottomSheetRef) {

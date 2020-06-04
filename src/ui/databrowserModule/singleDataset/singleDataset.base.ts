@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges } from "@angular/core";
 import { Observable } from "rxjs";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
@@ -14,7 +13,6 @@ export {
   DatabrowserService,
   KgSingleDatasetService,
   ChangeDetectorRef,
-  AtlasViewerConstantsServices
 }
 
 export class SingleDatasetBase implements OnInit, OnChanges {
@@ -242,6 +240,6 @@ export class SingleDatasetBase implements OnInit, OnChanges {
           this.dbService.removeFromFav({ fullId: this.fullId})
         }
       })
-    this.dbService.saveToFav({ fullId: this.fullId})
+    this.dbService.saveToFav({ fullId: this.fullId })
   }
 }

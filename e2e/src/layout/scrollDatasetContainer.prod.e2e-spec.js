@@ -31,6 +31,6 @@ describe('> scroll dataset container', () => {
     await iavPage.wait(500)
 
     const val = await iavPage.getScrollStatus(`[aria-label="${ARIA_LABELS.LIST_OF_DATASETS}"]`)
-    expect(val).toBeGreaterThanOrEqual(10000)
+    expect(val).toBeGreaterThanOrEqual(9900)
   })
 })

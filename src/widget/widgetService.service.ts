@@ -1,8 +1,7 @@
 import { ComponentFactory, ComponentFactoryResolver, ComponentRef, Injectable, Injector, OnDestroy, ViewContainerRef } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
 import { LoggingService } from "src/logging";
-import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
-import { WidgetUnit } from "./widgetUnit.component";
+import { WidgetUnit } from "./widgetUnit/widgetUnit.component";
 
 @Injectable({
   providedIn : 'root',
@@ -24,21 +23,15 @@ export class WidgetServices implements OnDestroy {
 
   constructor(
     private cfr: ComponentFactoryResolver,
-    private constantServce: AtlasViewerConstantsServices,
     private injector: Injector,
     private log: LoggingService,
   ) {
     this.widgetUnitFactory = this.cfr.resolveComponentFactory(WidgetUnit)
     this.minimisedWindow$ = new BehaviorSubject(this.minimisedWindow)
-
-    this.subscriptions.push(
-      this.constantServce.useMobileUI$.subscribe(bool => this.useMobileUI = bool),
-    )
   }
 
   private subscriptions: Subscription[] = []
 
-  public useMobileUI: boolean = false
 
   public ngOnDestroy() {
     while (this.subscriptions.length > 0) {
@@ -114,7 +107,7 @@ export class WidgetServices implements OnDestroy {
       _component.instance.guestComponentRef = guestComponentRef
 
       if (_option.state === 'floating') {
-        let position = this.constantServce.floatingWidgetStartingPos
+        let position = [400, 100] as [number, number]
         while ([...this.widgetComponentRefs].some(widget =>
           widget.instance.state === 'floating' &&
           widget.instance.position.every((v, idx) => v === position[idx]))) {

@@ -5,6 +5,7 @@
     <!-- drag handle -->
     <div class="flex-grow-0 flex-shrink-0 d-flex align-items-center hover-grab ml-4-n"
       cdkDrag
+      (cdkDragStarted)="touched = true"
       cdkDragHandle
       cdkDragRootElement=".cdk-overlay-pane">
       <i class="fas fa-grip-vertical pr-4 pl-4"></i>
