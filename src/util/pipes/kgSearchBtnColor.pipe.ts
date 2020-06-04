@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
+import { WidgetUnit } from "src/widget";
 
 @Pipe({
   name: 'kgSearchBtnColorPipe',

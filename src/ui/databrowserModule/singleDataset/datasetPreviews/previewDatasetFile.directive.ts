@@ -1,11 +1,14 @@
-import { Directive, Input, HostListener, Inject, Output, EventEmitter, Optional, OnChanges } from "@angular/core";
+import { Directive, Input, HostListener, Inject, Output, EventEmitter, Optional, OnChanges, InjectionToken } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { ViewerPreviewFile, IDataEntry } from 'src/services/state/dataStore.store'
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
 export const IAV_DATASET_PREVIEW_DATASET_FN = 'IAV_DATASET_PREVIEW_DATASET_FN'
-export const IAV_DATASET_PREVIEW_ACTIVE = `IAV_DATASET_PREVIEW_ACTIVE`
+
+// TODO consolidate type
+export type TypePreviewDispalyed = (file, dataset) => Observable<boolean>
+export const IAV_DATASET_PREVIEW_ACTIVE = new InjectionToken<TypePreviewDispalyed>('IAV_DATASET_PREVIEW_ACTIVE')
 
 @Directive({
   selector: '[iav-dataset-preview-dataset-file]',

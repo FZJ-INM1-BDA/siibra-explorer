@@ -8,6 +8,7 @@ import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateS
 import { Action, select, Store } from '@ngrx/store'
 import { BACKENDURL } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
+import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from './ngViewerState.store.helper'
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -77,23 +78,26 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       panelMode,
     }
   }
+  case ngViewerActionAddNgLayer.type:
   case ADD_NG_LAYER:
     return {
       ...prevState,
       layers : mixNgLayers(prevState.layers, action.layer),
     }
-  case REMOVE_NG_LAYERS: {
-    const { layers } = action
-    const layerNameSet = new Set(layers.map(l => l.name))
-    return {
-      ...prevState,
-      layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
-    }
-  }
+  case ngViewerActionRemoveNgLayer.type:
   case REMOVE_NG_LAYER: {
-    return {
-      ...prevState,
-      layers : prevState.layers.filter(l => l.name !== action.layer.name),
+    if (Array.isArray(action.layer)) {
+      const { layer } = action
+      const layerNameSet = new Set(layer.map(l => l.name))
+      return {
+        ...prevState,
+        layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
+      }
+    } else {
+      return {
+        ...prevState,
+        layers : prevState.layers.filter(l => l.name !== action.layer.name),
+      }
     }
   }
   case SHOW_NG_LAYER: 
@@ -408,10 +412,10 @@ export class NgViewerUseEffect implements OnDestroy {
         const baseNameSet = new Set(baseNgLayerNames)
         return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
       }),
-      map(layers => {
+      map(layer => {
         return {
-          type: REMOVE_NG_LAYERS,
-          layers,
+          type: REMOVE_NG_LAYER,
+          layer,
         }
       }),
     )
@@ -426,21 +430,12 @@ export class NgViewerUseEffect implements OnDestroy {
 
 export const ADD_NG_LAYER = 'ADD_NG_LAYER'
 export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
-export const REMOVE_NG_LAYERS = 'REMOVE_NG_LAYERS'
 export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
 export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
 export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
 export const NEHUBA_READY = `NEHUBA_READY`
 
-export interface INgLayerInterface {
-  name: string
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  visible?: boolean
-  shader?: string
-  transform?: any
-}
+export { INgLayerInterface } 
 
 const ACTION_TYPES = {
   SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE',

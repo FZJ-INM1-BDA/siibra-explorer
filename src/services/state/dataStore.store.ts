@@ -1,3 +1,7 @@
+/**
+ * TODO move to databrowser module
+ */
+
 import { Action } from '@ngrx/store'
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { LOCAL_STORAGE_CONST } from 'src/util/constants'
@@ -15,9 +19,9 @@ export interface IStateInterface {
   fetchedDataEntries: IDataEntry[]
   favDataEntries: Partial<IDataEntry>[]
   fetchedSpatialData: IDataEntry[]
-  datasetPreviews: DatasetPreview[]
 }
 
+// TODO deprecate
 export const defaultState = {
   fetchedDataEntries: [],
   favDataEntries: (() => {
@@ -33,7 +37,6 @@ export const defaultState = {
     }
   })(),
   fetchedSpatialData: [],
-  datasetPreviews: [],
 }
 
 export const getStateStore = ({ state: state = defaultState } = {}) => (prevState: IStateInterface = state, action: Partial<IActionInterface>) => {
@@ -56,37 +59,6 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
     return {
       ...prevState,
       favDataEntries,
-    }
-  }
-  case ACTION_TYPES.PREVIEW_DATASET: {
-
-    const { payload = {}} = action
-    const { file , dataset } = payload
-    const { fullId } = dataset
-    const { filename } = file
-    return {
-      ...prevState,
-      datasetPreviews: prevState.datasetPreviews.concat({
-        datasetId: fullId,
-        filename
-      })
-    }
-  }
-  case ACTION_TYPES.CLEAR_PREVIEW_DATASET: {
-    const { payload = {}} = action
-    const { file , dataset } = payload
-    const { fullId } = dataset
-    const { filename } = file
-    return {
-      ...prevState,
-      datasetPreviews: prevState.datasetPreviews
-        .filter(({ datasetId, filename: fName }) => !(datasetId === fullId && fName === filename))
-    }
-  }
-  case ACTION_TYPES.CLEAR_PREVIEW_DATASETS: {
-    return {
-      ...prevState,
-      datasetPreviews: []
     }
   }
   case GENERAL_ACTION_TYPES.APPLY_STATE: {
@@ -119,6 +91,8 @@ export interface IActionInterface extends Action {
 
 export const FETCHED_DATAENTRIES = 'FETCHED_DATAENTRIES'
 export const FETCHED_SPATIAL_DATA = `FETCHED_SPATIAL_DATA`
+
+// TODO deprecate in favour of src/ui/datamodule/constants.ts
 
 export interface IActivity {
   methods: string[]

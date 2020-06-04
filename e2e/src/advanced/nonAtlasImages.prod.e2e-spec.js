@@ -193,7 +193,7 @@ describe('> non-atlas images', () => {
       ]
       searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
       
-      await iavPage.goto(`/?${searchParam.toString()}`)
+      await iavPage.goto(`/?${searchParam.toString()}`, { forceTimeout: 20000 })
       await iavPage.wait(2000)
       
       const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
@@ -215,7 +215,7 @@ describe('> non-atlas images', () => {
       ]
       searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
       
-      await iavPage.goto(`/?${searchParam.toString()}`)
+      await iavPage.goto(`/?${searchParam.toString()}`, { forceTimeout: 20000 })
       await iavPage.wait(2000)
       
       const additionalLayerCtrlIsExpanded = await iavPage.additionalLayerControlIsExpanded()

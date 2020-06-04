@@ -205,10 +205,6 @@ Interactive atlas viewer requires **webgl2.0**, and the \`EXT_color_buffer_float
     }
   }
 
-  get floatingWidgetStartingPos(): [number, number] {
-    return [400, 100]
-  }
-
   /**
    * message when user on hover a segment or landmark
    */

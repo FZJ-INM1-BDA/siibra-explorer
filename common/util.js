@@ -1,16 +1,25 @@
 (function(exports) {
-  exports.getIdFromFullId = fullId => {
+  const getIdObj = fullId => {
     if (!fullId) return null
     if (typeof fullId === 'string') {
-      const re = /([a-z]{1,}\/[a-z]{1,}\/[a-z]{1,}\/v[0-9.]{1,}\/[0-9a-z-]{1,}$)/.exec(fullId)
-      if (re) return re[1]
+      const re = /([a-z]{1,}\/[a-z]{1,}\/[a-z]{1,}\/v[0-9.]{1,})\/([0-9a-f-]{1,}$)/.exec(fullId)
+      if (re) return { kgSchema: re[1], kgId: re[2] }
       return null
     } else {
       const { kg = {} } = fullId
       const { kgSchema , kgId } = kg
       if (!kgSchema || !kgId) return null
-      return `${kgSchema}/${kgId}`
+      return { kgSchema, kgId }
     }
+  }
+
+  exports.getIdObj = getIdObj
+
+  exports.getIdFromFullId = fullId => {
+    const idObj = getIdObj(fullId)
+    if (!idObj) return null
+    const { kgSchema, kgId } = idObj
+    return `${kgSchema}/${kgId}`
   }
 
   const defaultConfig = {

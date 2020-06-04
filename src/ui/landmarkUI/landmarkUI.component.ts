@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, AfterContentChecked } from "@angular/core";
 import { IDataEntry } from "src/services/stateStore.service"; 
 import { GetKgSchemaIdFromFullIdPipe } from 'src/ui/databrowserModule/util/getKgSchemaIdFromFullId.pipe'
-import { AtlasViewerConstantsServices } from "../databrowserModule/singleDataset/singleDataset.base";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { Observable } from "rxjs";
 import { DS_PREVIEW_URL } from 'src/util/constants'
 

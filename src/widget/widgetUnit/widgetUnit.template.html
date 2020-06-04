@@ -18,15 +18,7 @@
       </div>
     </div>
     <div icons>
-      <i
-        *ngIf="useMobileUI$ | async"
-        (click)="widgetServices.minimise(this)"
-        class="fas fa-window-minimize"
-        [hoverable] ="hoverableConfig">
-
-      </i>
-
-      <ng-container *ngIf="!(useMobileUI$ | async)">
+      <ng-container>
         <i *ngIf="canBeDocked && state === 'floating'"
           (click)="dock($event)" 
           class="fas fa-window-minimize" 

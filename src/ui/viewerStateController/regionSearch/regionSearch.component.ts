@@ -103,6 +103,7 @@ export class RegionTextSearchAutocomplete {
         const arrLabelIndexId = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
         this.selectedRegionLabelIndexSet = new Set(arrLabelIndexId)
       }),
+      startWith([]),
       shareReplay(1),
     )
 

@@ -1,5 +1,5 @@
 import { Directive, ViewContainerRef } from "@angular/core";
-import { WidgetServices } from "src/atlasViewer/widgetUnit/widgetService.service";
+import { WidgetServices } from "src/widget";
 
 @Directive({
   selector: '[floatingContainerDirective]',

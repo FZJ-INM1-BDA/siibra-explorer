@@ -5,12 +5,18 @@ const pptr = require('puppeteer')
 const chromeOpts = require('./chromeOpts')
 const SELENIUM_ADDRESS = process.env.SELENIUM_ADDRESS
 
+const PROD_FLAG = process.env.NODE_ENV === 'production'
+
 exports.config = {
   ...(SELENIUM_ADDRESS
     ? { seleniumAddress: SELENIUM_ADDRESS }
     : { directConnect: true } 
   ),
-  specs: ['./src/**/*.e2e-spec.js'],
+  specs: [
+    PROD_FLAG
+      ? './src/**/*.prod.e2e-spec.js'
+      : './src/**/*.e2e-spec.js'
+  ],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 1000 * 60 * 10
   },
