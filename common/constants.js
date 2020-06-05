@@ -2,12 +2,14 @@
 
   exports.ARIA_LABELS = {
     // dataset specific
+    SHOW_DATASET_PREVIEW: 'Show dataset preview',
     TOGGLE_EXPLORE_PANEL: `Toggle explore panel`,
     MODALITY_FILTER: `Toggle dataset modality filter`,
     LIST_OF_DATASETS: `List of datasets`,
     DOWNLOAD_PREVIEW: `Download`,
     DOWNLOAD_PREVIEW_CSV: `Download CSV`,
     DATASET_FILE_PREVIEW: `Preview of dataset`,
+    PIN_DATASET: 'Toggle pinning dataset',
 
     // overlay specific
     CONTEXT_MENU: `Viewer context menu`,

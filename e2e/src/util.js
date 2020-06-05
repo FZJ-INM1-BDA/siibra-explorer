@@ -481,7 +481,6 @@ class WdLayoutPage extends WdBase{
         .isDisplayed()
       return isDisplayed
     } catch (e) {
-      console.warn(`modalhaschild thrown error`, e)
       return false
     }
   }

@@ -32,6 +32,7 @@ import { TimerComponent } from './timer/timer.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeBaseDirective } from './tree/treeBase.directive';
 import { IAVVerticalButton } from './vButton/vButton.component';
+import { DynamicMaterialBtn } from './dynamicMaterialBtn/dynamicMaterialBtn.component';
 
 @NgModule({
   imports : [
@@ -58,6 +59,7 @@ import { IAVVerticalButton } from './vButton/vButton.component';
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
+    DynamicMaterialBtn,
 
     /* directive */
     HoverableBlockDirective,
@@ -91,6 +93,7 @@ import { IAVVerticalButton } from './vButton/vButton.component';
     DialogComponent,
     ConfirmDialogComponent,
     IAVVerticalButton,
+    DynamicMaterialBtn,
 
     SearchResultPaginationPipe,
     TreeSearchPipe,

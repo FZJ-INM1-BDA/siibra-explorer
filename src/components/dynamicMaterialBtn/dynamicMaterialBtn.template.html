@@ -1,0 +1,84 @@
+<ng-container [ngSwitch]="matBtnStyle">
+
+  <!-- mat-raise-button -->
+  <button *ngSwitchCase="'mat-raised-button'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-raised-button
+    [color]="matBtnColor">
+    
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-stroked-button -->
+  <button *ngSwitchCase="'mat-stroked-button'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-stroked-button
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-flat-button -->
+  <button *ngSwitchCase="'mat-flat-button'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-flat-button
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-icon-button -->
+  <button *ngSwitchCase="'mat-icon-button'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-icon-button
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-fab -->
+  <button *ngSwitchCase="'mat-fab'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-fab
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-mini-fab -->
+  <button *ngSwitchCase="'mat-mini-fab'"
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-mini-fab
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+  <!-- mat-mini-fab -->
+  <button *ngSwitchDefault
+    [attr.aria-label]="matBtnAriaLabel"
+    [disabled]="matBtnDisabled"
+    mat-button
+    [color]="matBtnColor">
+
+    <ng-container *ngTemplateOutlet="transcludedContent">
+    </ng-container>
+  </button>
+
+</ng-container>
+
+<ng-template #transcludedContent>
+  <ng-content></ng-content>
+</ng-template>

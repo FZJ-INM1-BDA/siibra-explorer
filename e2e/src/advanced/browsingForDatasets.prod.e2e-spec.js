@@ -89,8 +89,8 @@ describe('> receptor dataset previews', () => {
     const receptorIndex = datasets.indexOf(receptorName)
 
     await iavPage.clickNthDataset(receptorIndex)
-    await iavPage.waitFor(true, true)
-    await iavPage.clickModalBtnByText(/preview/i)
+    await iavPage.wait(500)
+    await iavPage.click(`[aria-label="${ARIA_LABELS.SHOW_DATASET_PREVIEW}"]`)
     await iavPage.waitFor(true, true)
   })
 
@@ -135,7 +135,7 @@ describe('> receptor dataset previews', () => {
     const files = await iavPage.getBottomSheetList()
     const imageIndex = files.findIndex(file => /image\//i.test(file))
     await iavPage.clickNthItemFromBottomSheetList(imageIndex)
-    await iavPage.waitFor(true, true)
+    await iavPage.wait(500)
     const modalHasImage = await iavPage.modalHasChild('div[data-img-src]')
     expect(modalHasImage).toEqual(true)
 
