@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges } from "@angular/core";
 import { Observable } from "rxjs";
-import { IDataEntry, IFile, IPublication, ViewerPreviewFile } from 'src/services/state/dataStore.store'
+import { IDataEntry, IFile, IPublication } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
 import { KgSingleDatasetService } from "../kgSingleDatasetService.service";
@@ -9,6 +9,8 @@ import { DS_PREVIEW_URL } from 'src/util/constants'
 import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
+import { ARIA_LABELS } from 'common/constants'
+
 export {
   DatabrowserService,
   KgSingleDatasetService,
@@ -16,6 +18,9 @@ export {
 }
 
 export class SingleDatasetBase implements OnInit, OnChanges {
+
+  public SHOW_DATASET_PREVIEW_ARIA_LABEL = ARIA_LABELS.SHOW_DATASET_PREVIEW
+  public PIN_DATASET_ARIA_LABEL = ARIA_LABELS.PIN_DATASET
 
   @Input() public ripple: boolean = false
 
