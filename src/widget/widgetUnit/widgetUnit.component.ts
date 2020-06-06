@@ -2,8 +2,7 @@ import { Component, ComponentRef, EventEmitter, HostBinding, HostListener, Input
 
 import { Observable, Subscription } from "rxjs";
 import { map } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "../atlasViewer.constantService.service";
-import { WidgetServices } from "./widgetService.service";
+import { WidgetServices } from "../widgetService.service";
 
 @Component({
   templateUrl : './widgetUnit.template.html',
@@ -28,8 +27,6 @@ export class WidgetUnit implements OnInit, OnDestroy {
   public isMinimised: string
 
   public isMinimised$: Observable<boolean>
-
-  public useMobileUI$: Observable<boolean>
 
   public hoverableConfig = {
     translateY: -1,
@@ -101,10 +98,8 @@ export class WidgetUnit implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = []
 
   public id: string
-  constructor(private constantsService: AtlasViewerConstantsServices) {
+  constructor() {
     this.id = Date.now().toString()
-
-    this.useMobileUI$ = this.constantsService.useMobileUI$
   }
 
   public ngOnInit() {

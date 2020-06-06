@@ -4,7 +4,7 @@ import { Store } from "@ngrx/store";
 import { fromEvent, merge, of, Subscription } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, startWith, switchMap, switchMapTo, take, withLatestFrom, shareReplay } from "rxjs/operators";
 import { defaultRootState, GENERAL_ACTION_TYPES, IavRootStoreInterface } from "src/services/stateStore.service";
-import { AtlasViewerConstantsServices } from "src/ui/databrowserModule/singleDataset/singleDataset.base";
+import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { cvtSearchParamToState, cvtStateToSearchParam } from "./atlasViewer.urlUtil";
 
 const getSearchParamStringFromState = state => {

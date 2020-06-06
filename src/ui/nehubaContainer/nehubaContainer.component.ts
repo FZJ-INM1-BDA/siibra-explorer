@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription } from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer } from "rxjs";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import {
   buffer,
@@ -17,10 +17,11 @@ import {
   switchMapTo,
   take,
   tap,
-  withLatestFrom
+  withLatestFrom,
+  delayWhen,
 } from "rxjs/operators";
 import { LoggingService } from "src/logging";
-import { FOUR_PANEL, H_ONE_THREE, NEHUBA_READY, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
+import { FOUR_PANEL, H_ONE_THREE, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
 import { SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
 import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
 import { getExportNehuba, isSame } from "src/util/fn";
@@ -475,10 +476,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           )
         ),
       ).subscribe(([templateSelected, parcellationSelected]) => {
-        this.store.dispatch({
-          type: NEHUBA_READY,
-          nehubaReady: false,
-        })
 
         this.selectedTemplate = templateSelected
         this.createNewNehuba(templateSelected)
@@ -533,25 +530,25 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           distinctUntilChanged(),
         ),
         this.selectedParcellation$,
-      )
-        .subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation]) => {
-          if (!this.nehubaViewer) { return }
+      ).pipe(
+        delayWhen(() => timer())
+      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation]) => {
+        if (!this.nehubaViewer) { return }
 
-          const { ngId: defaultNgId } = selectedParcellation
+        const { ngId: defaultNgId } = selectedParcellation
 
-          /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-          this.selectedRegionIndexSet = new Set(regions.map(({ngId = defaultNgId, labelIndex}) => generateLabelIndexId({ ngId, labelIndex })))
+        /* selectedregionindexset needs to be updated regardless of forceshowsegment */
+        this.selectedRegionIndexSet = new Set(regions.map(({ngId = defaultNgId, labelIndex}) => generateLabelIndexId({ ngId, labelIndex })))
 
-          if ( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ) {
-            this.nehubaViewer.hideAllSeg()
-            return
-          }
+        if ( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ) {
+          this.nehubaViewer.hideAllSeg()
+          return
+        }
 
-          this.selectedRegionIndexSet.size > 0 ?
-            this.nehubaViewer.showSegs([...this.selectedRegionIndexSet]) :
-            this.nehubaViewer.showAllSeg()
-        },
-        ),
+        this.selectedRegionIndexSet.size > 0
+          ? this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
+          : this.nehubaViewer.showAllSeg()
+      }),
     )
 
     this.subscriptions.push(

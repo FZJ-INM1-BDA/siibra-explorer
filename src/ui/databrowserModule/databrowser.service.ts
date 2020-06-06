@@ -5,7 +5,10 @@ import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscr
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
-import { WidgetUnit } from "src/atlasViewer/widgetUnit/widgetUnit.component";
+
+// TODO remove dependency on widget unit module
+import { WidgetUnit } from "src/widget";
+
 import { LoggingService } from "src/logging";
 import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";

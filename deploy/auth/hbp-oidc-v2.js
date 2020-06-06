@@ -5,7 +5,7 @@ const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 const clientId = process.env.HBP_CLIENTID_V2 || 'no hbp id'
 const clientSecret = process.env.HBP_CLIENTSECRET_V2 || 'no hbp client secret'
-const discoveryUrl = 'https://iam.humanbrainproject.eu/auth/realms/hbp'
+const discoveryUrl = 'https://iam.ebrains.eu/auth/realms/hbp'
 const redirectUri = `${HOSTNAME}${HOST_PATHNAME}/hbp-oidc-v2/cb`
 const cb = (tokenset, {sub, given_name, family_name, ...rest}, done) => {
   return done(null, {
@@ -39,6 +39,6 @@ module.exports = async (app) => {
       failureRedirect: `${HOST_PATHNAME}/`
     }))
   } catch (e) {
-    console.error(e)
+    console.error('oidcv2 auth error', e)
   }
 }

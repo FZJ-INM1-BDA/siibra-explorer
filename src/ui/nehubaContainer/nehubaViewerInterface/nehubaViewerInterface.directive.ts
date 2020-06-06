@@ -213,7 +213,43 @@ const accumulatorFn: (
   return newMap
 }
 
-// TODO port viewer related functionalities (input/outputs) from nehubacontainer to here!
+// methods
+//
+// new viewer
+// change state (layer visibliity)
+// change state (segment visibility)
+// change state (color map)
+// change state (add/remove layer)
+// changeNavigation
+// setLayout (2x2 or max screen)
+
+// emitters
+//
+// mouseoverSegments
+// mouseoverLandmarks
+// selectSegment
+// navigationChanged
+
+/**
+ * This directive should only deal with non-navigational interface between
+ * - viewer (nehuba)
+ * - state store (ngrx)
+ * 
+ * 
+ * public prop
+ * 
+ * - newViewer (new template / null for destroying current instance)
+ * - segmentVisibility change
+ * - setColorMap for segmentation map
+ * - add/remove layer (image/segmentation/mesh)
+ * 
+ * emitters
+ * 
+ * - mouseoverSegments
+ * - mouseoverLandmark
+ * - selectSegment
+ * - loadingStatus
+ */
 
 @Directive({
   selector: '[iav-nehuba-viewer-container]',
@@ -230,7 +266,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   constructor(
     private el: ViewContainerRef,
     private cfr: ComponentFactoryResolver,
-    private store$: Store<IavRootStoreInterface>
+    private store$: Store<IavRootStoreInterface>,
   ){
     this.nehubaViewerFactory = this.cfr.resolveComponentFactory(NehubaViewerUnit)
 

@@ -11,8 +11,13 @@ import { CaptureClickListenerDirective } from "./directives/captureClickListener
 import { AddUnitAndJoin } from "./pipes/addUnitAndJoin.pipe";
 import { NmToMm } from "./pipes/numbers.pipe";
 import { SwitchDirective } from "./directives/switch.directive";
+import { MediaQueryDirective } from './directives/mediaQuery.directive'
+import { LayoutModule } from "@angular/cdk/layout";
 
 @NgModule({
+  imports:[
+    LayoutModule
+  ],
   declarations: [
     FilterNullPipe,
     FilterRowsByVisbilityPipe,
@@ -28,6 +33,7 @@ import { SwitchDirective } from "./directives/switch.directive";
     AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
+    MediaQueryDirective
   ],
   exports: [
     FilterNullPipe,
@@ -44,6 +50,7 @@ import { SwitchDirective } from "./directives/switch.directive";
     AddUnitAndJoin,
     NmToMm,
     SwitchDirective,
+    MediaQueryDirective
   ]
 })
 

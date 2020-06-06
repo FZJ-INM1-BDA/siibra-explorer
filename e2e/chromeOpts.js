@@ -4,5 +4,6 @@ module.exports = [
   '--disable-gpu',
   '--disable-setuid-sandbox',
   "--disable-extensions",
-  '--window-size=800,796'
+  '--window-size=800,796',
+  '--disable-application-cache'
 ]

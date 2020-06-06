@@ -10,7 +10,7 @@ import { hot } from 'jasmine-marbles'
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from './viewerState.base'
 import { AngularMaterialModule } from '../sharedModules/angularMaterial.module'
 import { HttpClientModule } from '@angular/common/http'
-import { WidgetModule } from 'src/atlasViewer/widgetUnit/widget.module'
+import { WidgetModule } from 'src/widget'
 import { PluginModule } from 'src/atlasViewer/pluginUnit/plugin.module'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')

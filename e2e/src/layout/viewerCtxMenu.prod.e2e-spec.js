@@ -10,6 +10,17 @@ const dict = {
         }
       ]
     }
+  },
+  "Big Brain (Histology)": {
+    "Cytoarchitectonic Maps": {
+      tests:[
+        {
+          position: [440,200],
+          expectedLabelName: 'Area hOc1 (V1, 17, CalcS)',
+          expectedLabelStatus: '(fully mapped)'
+        }
+      ]
+    }
   }
 }
 
@@ -39,6 +50,26 @@ describe('> viewerCtxMenu', () => {
           await iavPage.wait(500)
           const visible = await iavPage.isVisible(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
           expect(visible).toBeTrue()
+        })
+
+        it('> Title includes region status', async () => {
+          const { tests } = dict[templateName][parcellationName]
+          const { expectedLabelStatus, expectedLabelName } = tests[0]
+          await iavPage.wait(500)
+          if (expectedLabelStatus) {
+            const fullMenuText = await iavPage.getText(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
+            expect(fullMenuText.includes(`${expectedLabelName} ${expectedLabelStatus}`)).toEqual(true)
+          }
+        })
+
+        it('> Title do not includes region status', async () => {
+          const { tests } = dict[templateName][parcellationName]
+          const { expectedLabelStatus, expectedLabelName } = tests[0]
+          await iavPage.wait(500)
+          if (!expectedLabelStatus) {
+            const fullMenuText = await iavPage.getText(`[aria-label="${ARIA_LABELS.CONTEXT_MENU}"]`)
+            expect(fullMenuText.includes(expectedLabelName)).toEqual(true)
+          }
         })
 
         it('> pos does not change when click inside', async () => {

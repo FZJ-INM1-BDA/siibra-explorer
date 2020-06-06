@@ -58,12 +58,15 @@ const fetchDatasetFromKg = async ({ user } = {}) => {
 
   return await new Promise((resolve, reject) => {
     request(`${KG_QUERY_DATASETS_URL}${releasedOnly ? '&databaseScope=RELEASED' : ''}`, option, (err, resp, body) => {
-      if (err)
-        return reject(err)
-      if (resp.statusCode >= 400)
-        return reject(resp.statusCode)
-      const json = JSON.parse(body)
-      return resolve(json)
+      if (err) return reject(err)
+      if (resp.statusCode >= 400) return reject(resp.statusCode)
+      try {
+        const json = JSON.parse(body)
+        return resolve(json)
+      }catch (e) {
+        console.warn(`parsing json obj error`, body)
+        reject(e)
+      }
     })
   })
 }

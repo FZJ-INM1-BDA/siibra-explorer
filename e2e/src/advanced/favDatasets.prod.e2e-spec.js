@@ -1,4 +1,5 @@
 const { AtlasPage } = require('../util')
+const { ARIA_LABELS } = require('../../../common/constants')
 
 const template = 'ICBM 2009c Nonlinear Asymmetric'
 const area = 'Area hOc1 (V1, 17, CalcS)'
@@ -155,7 +156,9 @@ describe(`fav'ing dataset`, () => {
       const receptorIndex = datasets.indexOf(receptorName)
       await iavPage.clickNthDataset(receptorIndex)
       await iavPage.wait(500)
-      await iavPage.clickModalBtnByText(/pin\ this\ dataset/i)
+
+      // specificity is required, because single dataset card for julich brain also can be selected, and will be clicked and fail this test
+      await iavPage.click(`mat-dialog-container [aria-label="${ARIA_LABELS.PIN_DATASET}"]`)
       await iavPage.wait(500)
 
       const txt = await iavPage.getSnackbarMessage()
@@ -178,7 +181,9 @@ describe(`fav'ing dataset`, () => {
       const receptorIndex = datasets.indexOf(receptorName)
       await iavPage.clickNthDataset(receptorIndex)
       await iavPage.wait(500)
-      await iavPage.clickModalBtnByText(/pin\ this\ dataset/i)
+
+      // specificity is required, because single dataset card for julich brain also can be selected, and will be clicked and fail this test
+      await iavPage.click(`mat-dialog-container [aria-label="${ARIA_LABELS.PIN_DATASET}"]`)
       await iavPage.wait(500)
 
       const numberOfFav = await iavPage.getNumberOfFavDataset()
@@ -187,7 +192,8 @@ describe(`fav'ing dataset`, () => {
       // this wait is unfortunately necessary, as the snack bar sometimes obscures the unpin this dataset button	
       await iavPage.wait(5000)
 
-      await iavPage.clickModalBtnByText(/unpin\ this\ dataset/i)
+      // specificity is required, because single dataset card for julich brain also can be selected, and will be clicked and fail this test
+      await iavPage.click(`mat-dialog-container [aria-label="${ARIA_LABELS.PIN_DATASET}"]`)
       await iavPage.wait(500)
 
       const txt = await iavPage.getSnackbarMessage()

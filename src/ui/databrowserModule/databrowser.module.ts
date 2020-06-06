@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA, OnDestroy } from "@angular/core";
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Optional } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -7,7 +7,7 @@ import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
 import { UtilModule } from "src/util/util.module";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
-import { ModalityPicker } from "./modalityPicker/modalityPicker.component";
+import { ModalityPicker, SortModalityAlphabeticallyPipe } from "./modalityPicker/modalityPicker.component";
 import { SingleDatasetView } from './singleDataset/detailedView/singleDataset.component'
 import { AggregateArrayIntoRootPipe } from "./util/aggregateArrayIntoRoot.pipe";
 import { CopyPropertyPipe } from "./util/copyProperty.pipe";
@@ -22,54 +22,32 @@ import { PreviewFileIconPipe } from "./preview/previewFileIcon.pipe";
 import { PreviewFileTypePipe } from "./preview/previewFileType.pipe";
 import { SingleDatasetListView } from "./singleDataset/listView/singleDatasetListView.component";
 import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
-import { GetKgSchemaIdFromFullIdPipe } from "./util/getKgSchemaIdFromFullId.pipe";
+import { GetKgSchemaIdFromFullIdPipe, getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
 import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
-import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
-import { Store, select } from "@ngrx/store";
-import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
-import { startWith, map, take, debounceTime } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
+import { StoreModule } from "@ngrx/store";
 
-const previewDisplayedFactory = (store: Store<any>) => {
+import {
+  stateStore,
+  DatasetPreview
+} from 'src/services/state/dataStore.store'
 
-  return (file, dataset) => store.pipe(
-    select('dataStore'),
-    select('datasetPreviews'),
-    startWith([]),
-    map(datasetPreviews => {
-      const { fullId } = dataset || {}
-      const { filename } = file
-      return (datasetPreviews as any[]).findIndex(({ datasetId, filename: fName }) =>
-        datasetId === fullId && fName === filename) >= 0
-    })
-  )
-}
+import {
+  OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
+} from './constants'
+import { EffectsModule } from "@ngrx/effects";
+import { DataBrowserUseEffect } from "./databrowser.useEffect";
 
-// TODO not too sure if this is the correct place for providing the callback token
-const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) => Observable<boolean>) => {
+export const DATESTORE_FEATURE_KEY = `dataStore`
 
-  return (file, dataset) => {
-    previewDisplayed(file, dataset).pipe(
-      debounceTime(10),
-      take(1),
-    ).subscribe(flag => 
-      
-      store.dispatch({
-        type: flag
-          ? DATASETS_ACTIONS_TYPES.CLEAR_PREVIEW_DATASET
-          : DATASETS_ACTIONS_TYPES.PREVIEW_DATASET,
-        payload: {
-          file,
-          dataset
-        }
-      })
-    )
-  }
+const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
+  if (overrideFn) return overrideFn
+  return () => console.error(`previewEmitFactory not overriden`)
 }
 
 @NgModule({
@@ -80,6 +58,8 @@ const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) 
     FormsModule,
     UtilModule,
     AngularMaterialModule,
+    StoreModule.forFeature(DATESTORE_FEATURE_KEY, stateStore),
+    EffectsModule.forFeature([ DataBrowserUseEffect ])
   ],
   declarations: [
     DataBrowser,
@@ -115,6 +95,7 @@ const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) 
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
     TransformDatasetToIdPipe,
+    SortModalityAlphabeticallyPipe
   ],
   exports: [
     DataBrowser,
@@ -141,11 +122,7 @@ const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) 
     },{
       provide: IAV_DATASET_PREVIEW_DATASET_FN,
       useFactory: previewEmitFactory,
-      deps: [ Store, IAV_DATASET_PREVIEW_ACTIVE ]
-    },{
-      provide: IAV_DATASET_PREVIEW_ACTIVE,
-      useFactory: previewDisplayedFactory,
-      deps: [ Store ]
+      deps: [ [new Optional(), OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN] ]
     }
   ],
   schemas: [
@@ -158,3 +135,7 @@ const previewEmitFactory = (store: Store<any>, previewDisplayed: (file,dataset) 
 
 export class DatabrowserModule {
 }
+
+export { DatasetPreview, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed }
+
+export { getKgSchemaIdFromFullId }

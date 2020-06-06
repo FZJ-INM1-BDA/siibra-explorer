@@ -99,7 +99,8 @@ export class RegionBase {
           this.parcellationRegions = []
           this.getAllRegionsFromParcellation(parcellation.regions)
           this.parcellationRegions.forEach(pr => {
-            if (JSON.stringify(pr.fullId) === JSON.stringify(this.region.fullId)) {
+            if (!(JSON.stringify(pr.fullId) === 'null' || JSON.stringify(this.region.fullId) === 'null')
+                && JSON.stringify(pr.fullId) === JSON.stringify(this.region.fullId)) {
               const baseAreaHemisphere =
                   this.region.name.includes(' - right hemisphere')? 'Right' :
                     this.region.name.includes(' - left hemisphere')? 'Left'

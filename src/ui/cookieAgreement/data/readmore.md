@@ -1,6 +1,6 @@
 **Data controller(s)**: HBP Atlas Viewer is the data controller for your login information.
 **List of partners responsible**: HBP Atlas Viewer is the data controller for your login information.
-**HBP Data Protection Officer (HBP DPO)**: FZJ-INM1 <inm1-bda@fz-juelich.de>
+**HBP Data Protection Officer (HBP DPO)**: <data.protection@humanbrainproject.eu>
 **Legal basis for data processing**: You can find out about HBP Data Protection policies here: <https://www.humanbrainproject.eu/en/social-ethical-reflective/ethics-support/data-protection/> and you can contact HBP Data Protection Officer at <data.protection@humanbrainproject.eu>
 **General categories of personal data collected**: consent
 **Data shared within the HBP Consortium**: Name, ORC ID, JWT ID Token

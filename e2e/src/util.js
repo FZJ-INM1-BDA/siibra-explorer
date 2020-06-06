@@ -6,6 +6,9 @@ if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
 const { By, WebDriver, Key } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
+const { polyFillClick } = require('./material-util')
+
+const { ARIA_LABELS } = require('../../common/constants')
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -92,6 +95,40 @@ class WdBase{
     return result
   }
 
+  async getRgbAt({ position } = {}, cssSelector = null){
+    if (!position) throw new Error(`position is required for getRgbAt`)
+    const { x, y } = verifyPosition(position)
+    const screenshotData = await this.takeScreenshot(cssSelector)
+    const [ red, green, blue ] = await this._driver.executeAsyncScript(() => {
+      
+      const dataUri = arguments[0]
+      const pos = arguments[1]
+      const dim = arguments[2]
+      const cb = arguments[arguments.length - 1]
+
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        canvas.width = dim[0]
+        canvas.height = dim[1]
+
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0)
+        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
+
+        const idx = (dim[0] * pos[1] + pos[0]) * 4
+        const red = imgData.data[idx]
+        const green = imgData.data[idx + 1]
+        const blue = imgData.data[idx + 2]
+        cb([red, green, blue])
+      }
+      img.src = dataUri
+
+    }, `data:image/png;base64,${screenshotData}`, [x, y], [800, 796])
+
+    return { red, green, blue }
+  }
+
   async switchIsChecked(cssSelector){
     if (!cssSelector) throw new Error(`switchChecked method requies css selector`)
     const checked = await this._browser
@@ -101,8 +138,7 @@ class WdBase{
   }
 
   async click(cssSelector){
-    if (!cssSelector) throw new Error(`click method needs to define a css selector`)
-    await this._browser.findElement( By.css(cssSelector) ).click()
+    return await polyFillClick.bind(this)(cssSelector)
   }
 
   async getText(cssSelector){
@@ -111,6 +147,22 @@ class WdBase{
     
     const text = await el.getText()
     return text
+  }
+
+  async areVisible(cssSelector) {
+
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const els = await this._browser.findElements( By.css(cssSelector) )
+
+    const returnArr = []
+
+    for (const el of els) {
+      const isDisplayed = await el.isDisplayed()
+      if (isDisplayed) returnArr.push(true)
+      else returnArr.push(false)
+    }
+
+    return returnArr
   }
 
   async isVisible(cssSelector) {
@@ -184,6 +236,35 @@ class WdBase{
       .perform()
   }
 
+  async cursorMoveToElement(cssSelector) {
+    if (!cssSelector) throw new Error(`cursorMoveToElement needs to define css selector`)
+    const el = await this._browser.findElement( By.css(cssSelector) )
+    await this._driver.actions()
+      .move()
+      .move({
+        origin: el,
+        duration: 1000
+      })
+      .perform()
+  }
+
+  async scrollElementBy(cssSelector, options) {
+    const { delta } = options
+    await this._browser.executeScript(() => {
+      const { delta } = arguments[1]
+      const el = document.querySelector(arguments[0])
+      el.scrollBy(...delta)
+    }, cssSelector, { delta })
+  }
+
+  async getScrollStatus(cssSelector) {
+    const val = await this._browser.executeScript(() => {
+      const el = document.querySelector(arguments[0])
+      return el.scrollTop
+    }, cssSelector)
+    return val
+  }
+
   async cursorMoveToAndClick({ position }) {
     const { x, y } = verifyPosition(position)
     return this._driver.actions()
@@ -246,7 +327,7 @@ class WdBase{
   }
 
   // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
-  async goto(url = '/', { interceptHttp, doNotAutomate } = {}){
+  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout } = {}){
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
       this._browser.get(actualUrl)
@@ -261,8 +342,15 @@ class WdBase{
       await this.wait(200)
       await this.dismissModal()
       await this.wait(200)
-      await this.waitForAsync()
-      
+
+      if (forceTimeout) {
+        await Promise.race([
+          this.waitForAsync(),
+          this.wait(forceTimeout)
+        ])
+      } else {
+        await this.waitForAsync()
+      }
     }
   }
 
@@ -335,6 +423,8 @@ class WdBase{
         Key.ESCAPE
       )
       .perform()
+
+    await this.wait(500)
   }
 
   async execScript(fn, ...arg){
@@ -391,7 +481,6 @@ class WdLayoutPage extends WdBase{
         .isDisplayed()
       return isDisplayed
     } catch (e) {
-      console.warn(`modalhaschild thrown error`, e)
       return false
     }
   }
@@ -525,7 +614,7 @@ class WdLayoutPage extends WdBase{
     }
   }
 
-  // will throw if additional layer contorl is not visible
+  // will throw if additional layer control is not visible
   additionalLayerControlIsExpanded() {
     return this._getAdditionalLayerControl()
       .findElement(
@@ -534,13 +623,20 @@ class WdLayoutPage extends WdBase{
       .isDisplayed()
   }
 
-  // will throw if additional layer contorl is not visible
+  // will throw if additional layer control is not visible
   async toggleLayerControl(){
     return this._getAdditionalLayerControl()
       .findElement(
         By.css('[aria-label="Toggle expansion state of additional layer browser"]')
       )
       .click()
+  }
+
+  async toggleNthLayerControl(idx) {
+    const els = await this._getAdditionalLayerControl()
+      .findElements( By.css(`[aria-label="${ARIA_LABELS.TOGGLE_SHOW_LAYER_CONTROL}"]`))
+    if (!els[idx]) throw new Error(`toggleNthLayerControl index out of bound: accessor ${idx} with length ${els.length}`)
+    await els[idx].click()
   }
 
   // Signin banner
@@ -752,6 +848,23 @@ class WdIavPage extends WdLayoutPage{
     } else {
       throw new Error(`_getIndexFromArrayOfWebElements ${text} option not founds`)
     }
+  }
+
+  _getModalityListView(){
+    return this._browser
+      .findElement( By.tagName('modality-picker') )
+      .findElements( By.tagName('mat-checkbox') )
+  }
+
+  async getModalities(){
+    const els = await this._getModalityListView()
+    const returnArr = []
+    for (const el of els) {
+      returnArr.push(
+        await el.getText()
+      )
+    }
+    return returnArr
   }
 
   _getSingleDatasetListView(){

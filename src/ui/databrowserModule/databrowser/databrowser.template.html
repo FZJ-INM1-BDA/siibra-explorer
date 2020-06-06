@@ -68,12 +68,14 @@
 
   <ng-container *ngIf="dataentries | filterDataEntriesByMethods : visibleCountedDataM as filteredDataEntry">
     <mat-card-content class="dataset-container w-100 overflow-hidden">
+      <!-- TODO export aria labels to common/constants -->
       <cdk-virtual-scroll-viewport
+        [attr.aria-label]="LIST_OF_DATASETS_ARIA_LABEL"
         class="h-100"
         minBufferPx="200"
         maxBufferPx="400"
         itemSize="50">
-        <div class="virtual-scroll-element overflow-hidden" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 0; let index = index">
+        <div class="virtual-scroll-element overflow-hidden" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 20; let index = index">
 
           <!-- divider, show if not first -->
           <mat-divider *ngIf="index !== 0"></mat-divider>
@@ -101,7 +103,8 @@
     <!-- Filters -->
     <mat-expansion-panel hideToggle>
 
-      <mat-expansion-panel-header class="align-items-center">
+      <mat-expansion-panel-header class="align-items-center"
+        [attr.aria-label]="MODALITY_FILTER_ARIA_LABEL">
         <mat-panel-title class="d-inline-flex align-items-center">
           <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
             <span>
