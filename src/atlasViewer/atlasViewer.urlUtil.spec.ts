@@ -157,44 +157,5 @@ describe('atlasViewer.urlService.service.ts', () => {
       const stringified = searchParam.toString()
       expect(stringified).toBe('templateSelected=Big+Brain+%28Histology%29&parcellationSelected=Cytoarchitectonic+Maps')
     })
-
-    describe('niftiLayers', () => {
-      it('should convert multiple nifti layers', () => {
-
-        const uri1 = `http://localhost:1111/test1.nii.gz`
-        const uri2 = `http://localhost:2222/test2.nii.gz`
-
-        const layer1 = {
-          mixability: 'nonmixable',
-          name: 'foo',
-          source: `nifti://${uri1}`,
-        }
-
-        const layer2 = {
-          mixability: 'nonmixable',
-          name: 'bar',
-          source: `nifti://${uri2}`
-        }
-        const { ngViewerState, viewerState } = defaultRootState
-        const searchParam = cvtStateToSearchParam({
-          ...defaultRootState,
-          viewerState: {
-            ...viewerState,
-            templateSelected: {
-              ...mni152,
-              nehubaConfig: mni152Nehubaconfig
-            },
-            parcellationSelected: mni152.parcellations[0]
-          },
-          ngViewerState: {
-            ...ngViewerState,
-            layers: [ layer1, layer2 ]
-          }
-        })
-        const str = searchParam.get('niftiLayers')
-        expect(str).toBeTruthy()
-        expect( encodeURIComponent(str) ).toEqual(`http%3A%2F%2Flocalhost%3A1111%2Ftest1.nii.gz__http%3A%2F%2Flocalhost%3A2222%2Ftest2.nii.gz`)
-      })
-    })
   })
 })

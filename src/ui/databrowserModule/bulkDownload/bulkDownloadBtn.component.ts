@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges, Pipe, PipeTransform, ChangeDetectionStrategy } from "@angular/core";
-import { AtlasViewerConstantsServices } from "../singleDataset/singleDataset.base";
+import { BACKENDURL } from 'src/util/constants'
 import { IDataEntry } from "src/services/stateStore.service";
 import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
 
@@ -24,9 +24,8 @@ export class BulkDownloadBtn implements OnChanges{
   public ariaLabel = ARIA_LABEL_HAS_DOWNLOAD
 
   constructor(
-    constantService: AtlasViewerConstantsServices
   ){
-    const _url = new URL(`datasets/bulkDownloadKgFiles`, constantService.backendUrl)
+    const _url = new URL(`${BACKENDURL.replace(/\/$/, '')}/datasets/bulkDownloadKgFiles`)
     this.postUrl = _url.toString()
   }
 

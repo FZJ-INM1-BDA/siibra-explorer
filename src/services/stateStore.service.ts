@@ -1,12 +1,6 @@
 import { filter } from 'rxjs/operators';
 
 import {
-  defaultState as dataStoreDefaultState,
-  IActionInterface as DatasetAction,
-  IStateInterface as DataStateInterface,
-  stateStore as dataStore,
-} from './state/dataStore.store'
-import {
   ActionInterface as NgViewerActionInterface,
   defaultState as ngViewerDefaultState,
   StateInterface as NgViewerStateInterface,
@@ -45,7 +39,6 @@ export { pluginState }
 export { viewerConfigState }
 export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
 export { ViewerStateInterface, ViewerActionInterface, viewerState }
-export { DataStateInterface, DatasetAction, dataStore }
 export { UIStateInterface, UIActionInterface, uiState }
 export { userConfigState,  USER_CONFIG_ACTION_TYPES}
 
@@ -202,14 +195,16 @@ export interface IavRootStoreInterface {
   viewerConfigState: ViewerConfigStateInterface
   ngViewerState: NgViewerStateInterface
   viewerState: ViewerStateInterface
-  dataStore: DataStateInterface
+  dataStore: any
   uiState: UIStateInterface
   userConfigState: UserConfigStateInterface
 }
 
+import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
+
 export const defaultRootState: IavRootStoreInterface = {
   pluginState: pluginDefaultState,
-  dataStore: dataStoreDefaultState,
+  dataStore: DATASTORE_DEFAULT_STATE,
   ngViewerState: ngViewerDefaultState,
   uiState: uiDefaultState,
   userConfigState: userConfigDefaultState,

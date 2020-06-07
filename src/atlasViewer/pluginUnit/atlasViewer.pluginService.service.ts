@@ -3,13 +3,12 @@ import { ComponentFactory, ComponentFactoryResolver, Injectable, ViewContainerRe
 import { PLUGINSTORE_ACTION_TYPES } from "src/services/state/pluginState.store";
 import { IavRootStoreInterface, isDefined } from 'src/services/stateStore.service'
 import { PluginUnit } from "./pluginUnit.component";
-import { WidgetServices } from "../widgetUnit/widgetService.service";
 import { select, Store } from "@ngrx/store";
 import { BehaviorSubject, merge, Observable, of, zip } from "rxjs";
 import { filter, map, shareReplay, switchMap, catchError } from "rxjs/operators";
 import { LoggingService } from 'src/logging';
 import { PluginHandler } from 'src/util/pluginHandler';
-import { WidgetUnit } from "../widgetUnit/widgetUnit.component";
+import { WidgetUnit, WidgetServices } from "src/widget";
 import { APPEND_SCRIPT_TOKEN, REMOVE_SCRIPT_TOKEN, BACKENDURL, getHttpHeader } from 'src/util/constants';
 import { PluginFactoryDirective } from './pluginFactory.directive';
 

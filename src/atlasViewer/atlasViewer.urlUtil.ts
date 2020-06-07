@@ -2,11 +2,8 @@ import { getGetRegionFromLabelIndexId } from "src/services/effect/effect";
 import { mixNgLayers } from "src/services/state/ngViewerState.store";
 import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
-import { decodeToNumber, encodeNumber, GLSL_COLORMAP_JET, separator } from "./atlasViewer.constantService.service";
-import { GetKgSchemaIdFromFullIdPipe } from "src/ui/databrowserModule/util/getKgSchemaIdFromFullId.pipe";
-
-const getKgSchemaIdFromFullIdPipe = new GetKgSchemaIdFromFullIdPipe()
-
+import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
+import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
   TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
@@ -21,10 +18,10 @@ export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
   TEMPLATE_NOT_SELECTED: 'TEMPLATE_NOT_SELECTED',
 }
 
-export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchParams => {
+export const cvtStateToSearchParam = (state: any): URLSearchParams => {
   const searchParam = new URLSearchParams()
 
-  const { viewerState, ngViewerState, pluginState, dataStore } = state
+  const { viewerState, pluginState, uiState } = state
   const { templateSelected, parcellationSelected, navigation, regionsSelected, standaloneVolumes } = viewerState
 
   if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
@@ -64,46 +61,22 @@ export const cvtStateToSearchParam = (state: IavRootStoreInterface): URLSearchPa
     }
   }
 
-  // encode nifti layers
-  if (templateSelected && templateSelected.nehubaConfig) {
-    const initialNgState = templateSelected.nehubaConfig.dataset.initialNgState
-    const { layers } = ngViewerState
-    const additionalLayers = layers.filter(layer =>
-      !/^blob:/.test(layer.name) &&
-      Object.keys(initialNgState.layers).findIndex(layerName => layerName === layer.name) < 0,
-    )
-    const niftiLayers = additionalLayers.filter(layer => /^nifti:\/\//.test(layer.source))
-    if (niftiLayers.length > 0) {
-      searchParam.set('niftiLayers', niftiLayers.map(layer => layer.source.replace(/^nifti:\/\//, '')).join('__'))
-    }
-  }
-
   // plugin state
   const { initManifests } = pluginState
-  const pluginStateParam = initManifests
+  const pluginStateParam = (initManifests as any[])
     .filter(([ src ]) => src !== PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC)
     .map(([ _src, url]) => url)
     .join('__')
 
   // previewDataset state
 
-  const { datasetPreviews } = dataStore
+  const { previewingDatasetFiles } = uiState
 
-  if (datasetPreviews && Array.isArray(datasetPreviews)) {
+  if (previewingDatasetFiles && Array.isArray(previewingDatasetFiles)) {
     const dsPrvArr = []
+    const datasetPreviews = (previewingDatasetFiles as {datasetId: string, filename: string}[])
     for (const preview of datasetPreviews) {
-      const { filename, datasetId } = preview
-      
-      const re = getKgSchemaIdFromFullIdPipe.transform(datasetId)
-      if (!re)  {
-        // TODO catch error, inform user that kgschemaid cannot be transformed
-        continue
-      }
-      const [ kgSchema, kgId ] = re
-      dsPrvArr.push({
-        datasetId: `${kgSchema}/${kgId}`,
-        filename
-      })
+      dsPrvArr.push(preview)
     }
 
     if (dsPrvArr.length > 0) searchParam.set('previewingDatasetFiles', JSON.stringify(dsPrvArr))
@@ -170,7 +143,6 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
     const selectedRegionsParam = searchparams.get('regionsSelected')
     if (selectedRegionsParam) {
       const ids = selectedRegionsParam.split('_')
-
       return ids.map(labelIndexId => getRegionFromlabelIndexId({ labelIndexId }))
     }
 
@@ -304,7 +276,7 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
           name : layer,
           source : `nifti://${layer}`,
           mixability : 'nonmixable',
-          shader : GLSL_COLORMAP_JET,
+          shader : getShader(PMAP_DEFAULT_CONFIG),
         } as any
       })
     const { ngViewerState } = returnState
@@ -318,12 +290,17 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
     pluginState.initManifests = arrPluginStates.map(url => [PLUGINSTORE_CONSTANTS.INIT_MANIFEST_SRC, url] as [string, string])
   }
 
-  const { dataStore } = returnState
+  const { uiState } = returnState
   const stringSearchParam = searchparams.get('previewingDatasetFiles')
   try {
     if (stringSearchParam) {
       const arr = JSON.parse(stringSearchParam) as Array<{datasetId: string, filename: string}>
-      dataStore.datasetPreviews = arr
+      uiState.previewingDatasetFiles = arr.map(({ datasetId, filename }) => {
+        return {
+          datasetId,
+          filename
+        }
+      })
     }
   } catch (e) {
     // parsing previewingDatasetFiles

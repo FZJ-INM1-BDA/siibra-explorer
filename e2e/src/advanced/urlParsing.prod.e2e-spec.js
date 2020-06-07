@@ -1,5 +1,6 @@
 const { AtlasPage } = require("../util")
 const proxy = require('selenium-webdriver/proxy')
+const { ARIA_LABELS } = require('../../../common/constants')
 
 describe('> url parsing', () => {
   let iavPage
@@ -67,35 +68,7 @@ describe('> url parsing', () => {
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
-    // TODO use screenshot API when merg v2.3.0
-    const screenshotData = await iavPage._driver.takeScreenshot()
-    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
-      
-      const dataUri = arguments[0]
-      const pos = arguments[1]
-      const dim = arguments[2]
-      const cb = arguments[arguments.length - 1]
-
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = dim[0]
-        canvas.height = dim[1]
-
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
-
-        const idx = (dim[0] * pos[1] + pos[0]) * 4
-        const red = imgData.data[idx]
-        const green = imgData.data[idx + 1]
-        const blue = imgData.data[idx + 2]
-        cb([red, green, blue])
-      }
-      img.src = dataUri
-
-    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
-    
+    const { red, green, blue } = await iavPage.getRgbAt({ position: [600, 490] })
     expect(red).toBeGreaterThan(0)
     expect(red).toEqual(green)
     expect(red).toEqual(blue)
@@ -106,34 +79,7 @@ describe('> url parsing', () => {
     await iavPage.goto(url)
     await iavPage.clearAlerts()
 
-    // TODO use screenshot API when merg v2.3.0
-    const screenshotData = await iavPage._driver.takeScreenshot()
-    const [ red, green, blue ] = await iavPage._driver.executeAsyncScript(() => {
-      
-      const dataUri = arguments[0]
-      const pos = arguments[1]
-      const dim = arguments[2]
-      const cb = arguments[arguments.length - 1]
-
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        canvas.width = dim[0]
-        canvas.height = dim[1]
-
-        const ctx = canvas.getContext('2d')
-        ctx.drawImage(img, 0, 0)
-        const imgData = ctx.getImageData(0, 0, dim[0], dim[1])
-
-        const idx = (dim[0] * pos[1] + pos[0]) * 4
-        const red = imgData.data[idx]
-        const green = imgData.data[idx + 1]
-        const blue = imgData.data[idx + 2]
-        cb([red, green, blue])
-      }
-      img.src = dataUri
-
-    }, `data:image/png;base64,${screenshotData}`, [600, 490], [800, 796])
+    const { red, green, blue } = await iavPage.getRgbAt({ position: [600, 490] })
     
     expect(red).toBeGreaterThan(0)
     expect(red).toEqual(green)
@@ -173,5 +119,34 @@ describe('> url parsing', () => {
         url: 'http://localhost:3001/manifest.json'
       }
     ))
+  })
+
+  it('> if datasetPreview is set, should load with previews', async () => {
+    const url = `http://localhost:3000/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas&previewingDatasetFiles=%5B%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22fingerprint%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fautoradiography%22%7D%2C%7B%22datasetId%22%3A%22e715e1f7-2079-45c4-a67f-f76b102acfce%22%2C%22filename%22%3A%22GABA%E1%B4%80%28BZ%29%2Fprofile%22%7D%5D`
+    const datasetPreview = [
+      {
+        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+        "filename": "fingerprint"
+      },
+      {
+        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+        "filename": "GABAᴀ(BZ)/autoradiography"
+      },
+      {
+        "datasetId": "e715e1f7-2079-45c4-a67f-f76b102acfce",
+        "filename": "GABAᴀ(BZ)/profile"
+      }
+    ]
+
+    const searchParam = new URLSearchParams()
+
+    searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+    searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+    searchParam.set('previewingDatasetFiles', JSON.stringify(datasetPreview))
+    await iavPage.goto(`/?${searchParam.toString()}`)
+
+    const visibleArr = await iavPage.areVisible(`[aria-label="${ARIA_LABELS.DATASET_FILE_PREVIEW}"]`)
+    expect(visibleArr.length).toEqual(3)
+    expect(visibleArr).toEqual([true, true, true])
   })
 })

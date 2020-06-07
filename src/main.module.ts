@@ -1,13 +1,13 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
-import { CommonModule, DOCUMENT } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { StoreModule, Store } from "@ngrx/store";
+import { StoreModule, Store, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { AtlasViewer, NEHUBA_CLICK_OVERRIDE } from "./atlasViewer/atlasViewer.component";
 import { ComponentsModule } from "./components/components.module";
 import { LayoutModule } from "./layouts/layout.module";
-import { dataStore, ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState, IavRootStoreInterface } from "./services/stateStore.service";
+import { ngViewerState, pluginState, uiState, userConfigState, UserConfigStateUseEffect, viewerConfigState, viewerState } from "./services/stateStore.service";
 import { UIModule } from "./ui/ui.module";
 import { GetNamePipe } from "./util/pipes/getName.pipe";
 import { GetNamesPipe } from "./util/pipes/getNames.pipe";
@@ -26,9 +26,8 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule } from "./ui/databrowserModule/databrowser.module";
+import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN } from "src/ui/databrowserModule";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
-import { DataBrowserUseEffect } from "./ui/databrowserModule/databrowser.useEffect";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
 import { DragDropDirective } from "./util/directives/dragDrop.directive";
@@ -44,16 +43,28 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
-import { WidgetModule } from './atlasViewer/widgetUnit/widget.module';
+import { WidgetModule, ACTION_TO_WIDGET_TOKEN } from 'src/widget';
 import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { ShareModule } from './share';
 import { AuthService } from './auth'
+import { IAV_DATASET_PREVIEW_ACTIVE } from 'src/ui/databrowserModule'
 
 import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue } from './glue';
+
+export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
+  return function(state, action) {
+    console.log('state', state);
+    console.log('action', action);
+ 
+    return reducer(state, action);
+  };
+}
+ 
 
 @NgModule({
   imports : [
@@ -74,7 +85,6 @@ import 'src/theme.scss'
     SpotLightModule,
     
     EffectsModule.forRoot([
-      DataBrowserUseEffect,
       UseEffects,
       UserConfigStateUseEffect,
       ViewerStateControllerUseEffect,
@@ -90,9 +100,10 @@ import 'src/theme.scss'
       viewerConfigState,
       ngViewerState,
       viewerState,
-      dataStore,
       uiState,
       userConfigState,
+    },{
+      metaReducers: [ datasetPreviewMetaReducer ]
     }),
     HttpClientModule,
   ],
@@ -147,6 +158,11 @@ import 'src/theme.scss'
       deps: [ UIService ]
     },
     {
+      provide: OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
+      useFactory: (glue: IDatasetPreviewGlue) => glue.displayDatasetPreview.bind(glue),
+      deps: [ DatasetPreviewGlue ]
+    },
+    {
       provide: CANCELLABLE_DIALOG,
       useFactory: (uiService: UIService) => {
         return (message, option) => {
@@ -185,6 +201,12 @@ import 'src/theme.scss'
       deps: [ UIService ]
     },
 
+    {
+      provide: IAV_DATASET_PREVIEW_ACTIVE,
+      useFactory: (glue: DatasetPreviewGlue) => glue.datasetPreviewDisplayed.bind(glue),
+      deps: [ DatasetPreviewGlue ]
+    },
+    DatasetPreviewGlue,
 
     /**
      * TODO
@@ -204,6 +226,9 @@ export class MainModule {
 
   constructor(
     authServce: AuthService,
+    // bandaid fix: required to init glueService on startup
+    // TODO figure out why, then init service without this hack
+    glueService: DatasetPreviewGlue
   ) {
     authServce.authReloadState()
   }

@@ -3,16 +3,14 @@ import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { filter, map, mapTo, scan, startWith } from "rxjs/operators";
 import { INgLayerInterface } from "src/atlasViewer/atlasViewer.component";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import {
-  CLOSE_SIDE_PANEL,
-  COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
-  EXPAND_SIDE_PANEL_CURRENT_VIEW,
-} from "src/services/state/uiState.store";
-import { IavRootStoreInterface, SELECT_REGIONS } from "src/services/stateStore.service";
+
 import { trackRegionBy } from '../viewerStateController/regionHierachy/regionHierarchy.component'
 import { MatDialog, MatDialogRef } from "@angular/material/dialog";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { ARIA_LABELS } from 'common/constants.js'
+import { viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
+import { uiStateCloseSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel } from "src/services/state/uiState.store.helper";
+
+const { TOGGLE_EXPLORE_PANEL } = ARIA_LABELS
 
 @Component({
   selector: 'search-side-nav',
@@ -23,6 +21,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 })
 
 export class SearchSideNav implements OnDestroy {
+  public TOGGLE_EXPLORE_PANEL_ARIA_LABEL = TOGGLE_EXPLORE_PANEL
   public availableDatasets: number = 0
 
   private subscriptions: Subscription[] = []
@@ -41,12 +40,12 @@ export class SearchSideNav implements OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    private store$: Store<IavRootStoreInterface>,
-    private snackBar: MatSnackBar,
-    private constantService: AtlasViewerConstantsServices
+    private store$: Store<any>,
   ) {
 
-    this.darktheme$ = this.constantService.darktheme$
+    this.darktheme$ = this.store$.pipe(
+      select(state => state?.viewerState?.templateSelected?.useTheme === 'dark')
+    )
     
     this.autoOpenSideNavDataset$ = this.store$.pipe(
       select('viewerState'),
@@ -70,15 +69,11 @@ export class SearchSideNav implements OnDestroy {
   }
 
   public collapseSidePanelCurrentView() {
-    this.store$.dispatch({
-      type: COLLAPSE_SIDE_PANEL_CURRENT_VIEW,
-    })
+    this.store$.dispatch( uiStateCollapseSidePanel() )
   }
 
   public expandSidePanelCurrentView() {
-    this.store$.dispatch({
-      type: EXPAND_SIDE_PANEL_CURRENT_VIEW,
-    })
+    this.store$.dispatch( uiStateExpandSidePanel() )
   }
 
   public ngOnDestroy() {
@@ -95,9 +90,7 @@ export class SearchSideNav implements OnDestroy {
     }
     if (this.layerBrowserDialogRef) { return }
 
-    this.store$.dispatch({
-      type: CLOSE_SIDE_PANEL,
-    })
+    this.store$.dispatch(uiStateCloseSidePanel())
 
     const dialogToOpen = this.layerBrowserTmpl
     this.layerBrowserDialogRef = this.dialog.open(dialogToOpen, {
@@ -112,20 +105,10 @@ export class SearchSideNav implements OnDestroy {
       },
       disableClose: true,
     })
-
-    this.layerBrowserDialogRef.afterClosed().subscribe(val => {
-      if (val === 'user action') { this.snackBar.open(this.constantService.dissmissUserLayerSnackbarMessage, 'Dismiss', {
-        duration: 5000,
-      })
-      }
-    })
   }
 
   public deselectAllRegions() {
-    this.store$.dispatch({
-      type: SELECT_REGIONS,
-      selectRegions: [],
-    })
+    this.store$.dispatch( viewerStateSetSelectedRegions({ selectRegions: [] }) )
   }
 
   public trackByFn = trackRegionBy

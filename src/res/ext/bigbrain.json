@@ -8,7 +8,7 @@
   "originDatasets": [
     {
       "kgSchema": "minds/core/dataset/v1.0.0",
-      "kgId": "e32f9053-38c9-4911-b868-845c56828f4d"
+      "kgId": "d07f9305-1e75-4548-a348-b155fb323d31"
     }
   ],
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",

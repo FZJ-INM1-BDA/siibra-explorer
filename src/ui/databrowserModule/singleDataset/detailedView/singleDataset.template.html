@@ -45,52 +45,62 @@
 
 
 <!-- footer -->
-<mat-card-actions>
+<mat-card-actions iav-media-query #iavMediaQuery="iavMediaQuery">
+  <ng-container *ngTemplateOutlet="actionBtns; context: { $implicit: (iavMediaQuery.mediaBreakPoint$ | async) }" >
+  </ng-container>
+</mat-card-actions>
+
+<mat-card-footer></mat-card-footer>
+
+<ng-template #previewFilesListTemplate>
+  <dataset-preview-list
+    [kgId]="kgId">
+
+  </dataset-preview-list>
+</ng-template>
+
+<!-- using ng template for context binding of media breakpoints -->
+<ng-template #actionBtns let-mediaBreakPoint>
 
   <!-- explore -->
   <ng-container *ngIf="!strictLocal">
 
     <a *ngFor="let kgRef of kgReference"
-      class="m-2"
       [href]="kgRef | doiParserPipe"
       target="_blank">
-      <button 
-        mat-raised-button
-        color="primary">
-        Explore
+      <iav-dynamic-mat-button
+        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-raised-button' : 'mat-icon-button'"
+        iav-dynamic-mat-button-color="primary">
+
+        <span *ngIf="mediaBreakPoint < 2">
+          Explore
+        </span>
         <i class="fas fa-external-link-alt"></i>
-      </button>
+      </iav-dynamic-mat-button>
     </a>
   </ng-container>
 
   <!-- pin data -->
   <ng-container *ngIf="downloadEnabled && kgId">
 
-    <!-- Is currently fav'ed -->
-    <ng-container *ngIf="favedDataentries$ | async | datasetIsFaved : dataset; else notCurrentlyFav">
-
-      <button mat-button
-        iav-stop="click mousedown"
-        (click)="undoableRemoveFav()"
-        color="primary">
-        Unpin this dataset
-        <i class="fas fa-thumbtack"></i>
-      </button>
+    <ng-container *ngTemplateOutlet="favDatasetBtn; context: { $implicit: (favedDataentries$ | async | datasetIsFaved : dataset) }">
     </ng-container>
 
-    <!-- Is NOT currently fav'ed -->
-    <ng-template #notCurrentlyFav>
-      
-      <button mat-button
+    <ng-template #favDatasetBtn let-isFav>
+      <iav-dynamic-mat-button
+        (click)="isFav ? undoableRemoveFav() : undoableAddFav()"
         iav-stop="click mousedown"
-        (click)="undoableAddFav()"
-        color="default">
-        Pin this dataset
+        [iav-dynamic-mat-button-aria-label]="PIN_DATASET_ARIA_LABEL"
+        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+        [iav-dynamic-mat-button-color]="isFav ? 'primary' : 'basic'">
+
+        <span *ngIf="mediaBreakPoint < 2">
+          {{ isFav ? 'Unpin this dataset' : 'Pin this dataset' }}
+        </span>
         <i class="fas fa-thumbtack"></i>
-      </button>
+      </iav-dynamic-mat-button>
     </ng-template>
   </ng-container>
-
 
   <!-- download -->
   <ng-container *ngIf="!strictLocal">
@@ -98,17 +108,16 @@
     <a *ngIf="files && files.length > 0"
       [href]="dlFromKgHref"
       target="_blank">
-      <button
-        [disabled]="downloadInProgress"
+      <iav-dynamic-mat-button
         [matTooltip]="tooltipText"
-        class="m-2"
-        mat-button
-        color="basic">
-        <span>
-          Download as Zip
+        [disabled]="downloadInProgress"
+        [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'">
+
+        <span *ngIf="mediaBreakPoint < 2">
+          Download Zip
         </span>
         <i class="ml-1 fas" [ngClass]="!downloadInProgress? 'fa-download' :'fa-spinner fa-pulse'"></i>
-      </button>
+      </iav-dynamic-mat-button>
     </a>
   </ng-container>
 
@@ -123,24 +132,17 @@
 
   </kg-dataset-list>
 
-  <button mat-button
-    mat-dialog-close
+  <iav-dynamic-mat-button
     *ngIf="hasPreview"
-    (click)="showPreviewList(previewFilesListTemplate)"
-    color="basic">
-    <span>
+    mat-dialog-close
+    [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+    [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
+    (click)="showPreviewList(previewFilesListTemplate)">
+
+    <span *ngIf="mediaBreakPoint < 2">
       Preview
     </span>
     <i class="ml-1 far fa-eye"></i>
-  </button>
+  </iav-dynamic-mat-button>
 
-</mat-card-actions>
-
-<mat-card-footer></mat-card-footer>
-
-<ng-template #previewFilesListTemplate>
-  <dataset-preview-list
-    [kgId]="kgId">
-
-  </dataset-preview-list>
 </ng-template>

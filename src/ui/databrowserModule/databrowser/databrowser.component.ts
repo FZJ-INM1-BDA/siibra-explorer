@@ -4,6 +4,9 @@ import { LoggingService } from "src/logging";
 import { IDataEntry } from "src/services/stateStore.service";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
+import { ARIA_LABELS } from 'common/constants.js'
+
+const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 
 @Component({
   selector : 'data-browser',
@@ -17,6 +20,8 @@ import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 
 export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
+  public MODALITY_FILTER_ARIA_LABEL = MODALITY_FILTER
+  public LIST_OF_DATASETS_ARIA_LABEL = LIST_OF_DATASETS
   @Input()
   public regions: any[] = []
 

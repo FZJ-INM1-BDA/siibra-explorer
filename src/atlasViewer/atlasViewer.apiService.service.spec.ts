@@ -4,7 +4,7 @@ import { provideMockStore } from "@ngrx/store/testing";
 import { defaultRootState } from "src/services/stateStore.service";
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module";
 import { HttpClientModule } from '@angular/common/http';
-import { WidgetModule } from './widgetUnit/widget.module';
+import { WidgetModule } from 'src/widget';
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
 import { PluginServices } from "./pluginUnit";
 
