@@ -47,7 +47,6 @@ It is recommended to manage your environments with `.env` file.
 | `PORT` | port to listen on | 3000 |
 | `HOST_PATHNAME` | pathname to listen on, restrictions: leading slash, no trailing slash | `''` | `/viewer` |
 | `SESSIONSECRET` | session secret for cookie session |
-| `DISABLE_CSP` | disable csp | | `true`
 | `NODE_ENV` | determines where the built viewer will be served from | | `production` |
 | `PRECOMPUTED_SERVER` | redirect data uri to another server. Useful for offline demos | | `http://localhost:8080/precomputed/` |
 | `LOCAL_CDN` | rewrite cdns to local server. useful for offlnie demo | | `http://localhost:7080/` |
@@ -94,11 +93,12 @@ It is recommended to manage your environments with `.env` file.
 
 | name | description | default | example |
 | --- | --- | --- | --- |
-| CSP_REPORT_URI | report uri for csp violations | `/report-violation` |
-| NODE_ENV | set to `production` to disable [`reportOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) | `null` |
-| SCRIPT_SRC | `JSON.stringify`'ed array of allowed scriptSrc | `[]` |
-| DATA_SRC | `JSON.stringify`'ed array of allowed dataSrc | `[]` |
-| WHITE_LIST_SRC | `JSON.stringify`'ed array of allowed src | `[]` |
+| `DISABLE_CSP` | disable csp | | `true` |
+| `CSP_REPORT_URI` | report uri for csp violations | `/report-violation` |
+| `NODE_ENV` | set to `production` to disable [`reportOnly`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) | `null` |
+| `SCRIPT_SRC` | `JSON.stringify`'ed array of allowed scriptSrc | `[]` |
+| `DATA_SRC` | `JSON.stringify`'ed array of allowed dataSrc | `[]` |
+| `WHITE_LIST_SRC` | `JSON.stringify`'ed array of allowed src | `[]` |
 | `PROXY_HOSTNAME_WHITELIST` |
 
 ##### Rate limiting
@@ -132,7 +132,7 @@ It is recommended to manage your environments with `.env` file.
 | `SERVICE_ACCOUNT_CRED` | 
 | `SERVICE_ACCOUNT_CRED_PATH` | 
 | `WAXHOLM_RAT_GOOGLE_SHEET_ID` |
-| `SKIP_RETRY_TEST` |
+| `SKIP_RETRY_TEST` | retry tests contains some timeouts, which may slow down tests | 
 
 #### Start dev server
 
