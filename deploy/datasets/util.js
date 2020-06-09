@@ -3,7 +3,7 @@ const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
-const { getIdFromFullId, retry } = require('../../common/util')
+const { getIdFromFullId, retry, flattenRegions } = require('../../common/util')
 
 let getPublicAccessToken
 
@@ -33,14 +33,6 @@ const getUserKGRequestParam = async ({ user }) => {
 /**
  * Needed by filter by parcellation
  */
-
-const flattenArray = (array) => {
-  return array.concat(
-    ...array.map(item => item.children && item.children instanceof Array
-      ? flattenArray(item.children)
-      : [])
-  )
-}
 
 const readConfigFile = (filename) => new Promise((resolve, reject) => {
   let filepath
@@ -93,7 +85,7 @@ initPrArray.push(
   readConfigFile('bigbrain.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const bigbrainCyto = flattenArray(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
+      const bigbrainCyto = flattenRegions(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
       bigbrainCytoSet = populateSet(bigbrainCyto)
     })
     .catch(console.error)
@@ -103,9 +95,9 @@ initPrArray.push(
   readConfigFile('MNI152.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const longBundle = flattenArray(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
-      const shortBundle = flattenArray(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
-      const jubrain = flattenArray(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
+      const longBundle = flattenRegions(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
+      const shortBundle = flattenRegions(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
+      const jubrain = flattenRegions(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
       longBundleSet = populateSet(longBundle)
       shortBundleSet = populateSet(shortBundle)
       juBrainSet = populateSet(jubrain)
@@ -117,9 +109,9 @@ initPrArray.push(
   readConfigFile('waxholmRatV2_0.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const waxholm3 = flattenArray(json.parcellations[0].regions)
-      const waxholm2 = flattenArray(json.parcellations[1].regions)
-      const waxholm1 = flattenArray(json.parcellations[2].regions)
+      const waxholm3 = flattenRegions(json.parcellations[0].regions)
+      const waxholm2 = flattenRegions(json.parcellations[1].regions)
+      const waxholm1 = flattenRegions(json.parcellations[2].regions)
 
       waxholm1Set = populateSet(waxholm1)
       waxholm2Set = populateSet(waxholm2)
@@ -132,10 +124,10 @@ initPrArray.push(
   readConfigFile('allenMouse.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const flattenedAllen2017 = flattenArray(json.parcellations[0].regions)
+      const flattenedAllen2017 = flattenRegions(json.parcellations[0].regions)
       allen2017Set = populateSet(flattenedAllen2017)
 
-      const flattenedAllen2015 = flattenArray(json.parcellations[1].regions)
+      const flattenedAllen2015 = flattenRegions(json.parcellations[1].regions)
       allen2015Set = populateSet(flattenedAllen2015)
     })
     .catch(console.error)

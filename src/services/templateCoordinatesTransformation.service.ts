@@ -16,7 +16,7 @@ export class TemplateCoordinatesTransformation {
 
   constructor(private httpClient: HttpClient) {}
 
-  public url = 'https://hbp-spatial-backend.apps-dev.hbp.eu/v1/transform-points'
+  public url = `${SPATIAL_TRANSFORM_BACKEND.replace(/\/$/, '')}/v1/transform-points`
 
   // jasmine marble cannot test promise properly
   // see https://github.com/ngrx/platform/issues/498#issuecomment-337465179

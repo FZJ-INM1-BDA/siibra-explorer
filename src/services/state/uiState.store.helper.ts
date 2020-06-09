@@ -30,6 +30,10 @@ export const uiActionSetPreviewingDatasetFiles = createAction(
   props<{previewingDatasetFiles: {datasetId: string, filename: string}[]}>()
 )
 
+export const uiActionShowSidePanelConnectivity = createAction(
+  `[uiState] showSidePanelConnectivity`
+)
+
 export enum EnumWidgetTypes{
   DATASET_PREVIEW,
 }

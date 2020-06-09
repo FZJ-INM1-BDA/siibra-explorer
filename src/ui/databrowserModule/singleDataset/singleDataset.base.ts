@@ -109,9 +109,10 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   public async fetchDatasetDetail(){
     try {
       const { kgId } = this
+      const { kgSchema } = this
       if (!kgId) return
-      const dataset = await this.singleDatasetService.getInfoFromKg({ kgId })
-      
+      const dataset = await this.singleDatasetService.getInfoFromKg({ kgId, kgSchema })
+
       const { name, description, publications, fullId } = dataset
       this.name = name
       this.description = description
@@ -127,18 +128,18 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   // TODO this is not perfect logic for singledataset
   // singledataset.base.ts should be tidied up in general
   // fullId, kgId, dataset... too many different entries
-  
+
   public ngOnChanges(){
     if (!this.kgId) {
       const fullId = this.fullId || this.dataset?.fullId
-      
+
       const re = getKgSchemaIdFromFullId(fullId)
       if (re) {
         this.kgSchema = re[0]
         this.kgId = re[1]
       }
     }
-    
+
     this.fetchDatasetDetail()
   }
 
