@@ -5,6 +5,7 @@ const path = require('path')
 const archiver = require('archiver')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
 const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
+const ibc = require('./importIBS')
 
 let cachedData = null
 
@@ -104,12 +105,18 @@ const getPublicDs = async () => {
   if (cachedData) return Promise.resolve(cachedData)
   if (getPublicDsPr) return getPublicDsPr
   throw `cached Data not yet resolved, neither is get public ds defined`
-} 
+}
 
 
 const getDs = ({ user }) => user
   ? fetchDatasetFromKg({ user }).then(({ results }) => results)
   : getPublicDs()
+
+const getExternalSchemaDatasets = (kgId, kgSchema) => {
+  if (kgSchema === ibc.IBC_SCHEMA) {
+    return ibc.getIbcDatasetByFileName(kgId)
+  }
+}
 
 /**
  * on init, populate the cached data
@@ -119,8 +126,21 @@ const init = async () => {
   return await getPublicDs()
 }
 
-const getDatasets = ({ templateName, parcellationName, user }) => getDs({ user })
-  .then(json => filterDatasets(json, { templateName, parcellationName }))
+const getDatasets = ({ templateName, parcellationName, user }) => {
+  // Get Local datasets
+  const localDatasets = [
+    ...ibc.getIBCData(),
+    // ... Add more dataset sources here
+  ]
+
+  // Get all datasets and merge local ones
+  return getDs({ user })
+    .then(json => {
+      // console.log(json.map(j=> j.parcellationRegion))
+      json = [...json, ...localDatasets]
+      return filterDatasets(json, { templateName, parcellationName })
+    })
+}
 
 const getPreview = ({ datasetName, templateSelected }) => getPreviewFile({ datasetName, templateSelected })
 
@@ -195,7 +215,7 @@ const getDatasetFileAsZip = async ({ user, kgId } = {}) => {
    */
   for (let file of files) {
     const { name, absolutePath } = file
-    zip.append(request(absolutePath), { 
+    zip.append(request(absolutePath), {
       name: path.join(datasetName, name)
     })
   }
@@ -212,6 +232,7 @@ module.exports = {
   getDatasets,
   getPreview,
   hasPreview,
-  getTos
+  getTos,
+  getExternalSchemaDatasets
 }
 
