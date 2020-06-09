@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "test": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha ./**/*.spec.js --timeout 60000",
+    "test": "DISABLE_LIMITER=1 node -r dotenv/config ./node_modules/.bin/mocha './**/*.spec.js' --exclude 'node_modules/*' --timeout 60000",
     "mocha": "mocha"
   },
   "keywords": [],
