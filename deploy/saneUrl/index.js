@@ -28,9 +28,21 @@ const redisProto = REDIS_PROTO || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP
 const redisAddr = REDIS_ADDR || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_ADDR || null
 const redisPort = REDIS_PORT || REDIS_RATE_LIMITING_DB_EPHEMERAL_PORT_6379_TCP_PORT || 6379
 
-const userPass = `${REDIS_USERNAME || ''}${( REDIS_PASSWORD && (':' + REDIS_PASSWORD)) || ''}${ (REDIS_USERNAME || REDIS_PASSWORD) && '@'}`
+/**
+ * nb this way to set username and pswd can be risky, but given that site adnimistrator sets the username and pswd via env var
+ * it should not be a security concern
+ */
+const userPass = (() => {
+  let outstring = ''
+  if (!REDIS_USERNAME && !REDIS_PASSWORD) return outstring
+  if (REDIS_USERNAME) outstring += REDIS_USERNAME
+  if (outstring.length > 0) outstring += ':'
+  if (REDIS_PASSWORD) outstring += REDIS_PASSWORD
+  if (outstring.length > 0) outstring += '@'
+  return outstring
+})()
 
-const redisURL = redisAddr && `${redisProto}://${userPass}${redisAddr}:${redisPort}`
+const redisURL = redisAddr && `${redisProto}://${userPass || ''}${redisAddr}:${redisPort}`
 
 const limiter = new RateLimit({
   windowMs: 1e3 * 5,
