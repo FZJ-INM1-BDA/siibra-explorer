@@ -53,7 +53,6 @@ const getIbcDatasetByFileName = (file) => {
         name: 'Jülich Cytoarchitechtonic Brain Atlas (human)',
         fullId:
           'https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579',
-        id: [Array]
       }],
     parcellationRegion: [
       {
