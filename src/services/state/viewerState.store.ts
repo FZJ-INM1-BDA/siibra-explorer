@@ -10,7 +10,7 @@ import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
-import { viewerStateSetSelectedRegions } from './viewerState.store.helper';
+import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion } from './viewerState.store.helper';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -185,6 +185,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     const { viewerState } = (action as any).state
     return viewerState
   }
+  case viewerStateSetConnectivityRegion.type:
   case SET_CONNECTIVITY_REGION:
     return {
       ...prevState,

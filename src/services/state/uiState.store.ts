@@ -7,7 +7,7 @@ import { filter, map, mapTo, scan, startWith, take } from "rxjs/operators";
 import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/constants'
 import { IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
-import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet } from './uiState.store.helper';
+import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
 
 export const defaultState: StateInterface = {
   previewingDatasetFiles: [],
@@ -108,6 +108,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       sidePanelCurrentViewContent: 'Dataset',
     }
 
+  case uiActionShowSidePanelConnectivity.type:
   case SHOW_SIDE_PANEL_CONNECTIVITY:
     return {
       ...prevState,

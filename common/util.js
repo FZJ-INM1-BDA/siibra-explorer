@@ -42,6 +42,13 @@
   
     throw new Error(`fn failed ${retries} times. Aborting.`)
   }
+  const flattenRegions = regions => regions.concat(
+    ...regions.map(region => region.children && region.children instanceof Array
+      ? flattenRegions(region.children)
+      : [])
+  )
+
+  exports.flattenRegions = flattenRegions
 
   exports.getRandomHex = (digit = 1024 * 1024 * 1024 * 1024) => Math.round(Math.random() * digit).toString(16)
 })(typeof exports === 'undefined' ? module.exports : exports)

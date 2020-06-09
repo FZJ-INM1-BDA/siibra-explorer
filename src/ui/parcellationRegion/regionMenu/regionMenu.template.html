@@ -15,79 +15,6 @@
   <mat-card-content>
     <mat-divider></mat-divider>
 
-    <ng-template #safeHarbour>
-
-      <!-- enlarged region actions -->
-      <mat-grid-list cols="2" rowHeight="6rem" gutterSize="0px">
-
-        <mat-grid-tile>
-          <iav-v-button
-            class="h-100 w-100"
-            mat-ripple
-            [color]="isSelected ? 'primary' : 'default'"
-            (click)="toggleRegionSelected()">
-            <i iav-v-button-icon class="far" [ngClass]="{'fa-check-square': isSelected, 'fa-square': !isSelected}"></i>
-            <span iav-v-button-text>Select</span>
-          </iav-v-button>
-        </mat-grid-tile>
-
-        <mat-grid-tile>
-          <iav-v-button
-            class="h-100 w-100"
-            mat-ripple
-            (click)="navigateToRegion()">
-            <i class="fas fa-map-marked-alt" iav-v-button-icon></i>
-            <span iav-v-button-text>Navigate</span>
-          </iav-v-button>
-        </mat-grid-tile>
-
-        <ng-container *ngFor="let originDataset of (region.originDatasets || [])">
-          <mat-grid-tile class="iv-custom-comp">
-            <iav-v-button
-              iav-dataset-preview-dataset-file
-              [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-              [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-              #previewDirective="iavDatasetPreviewDatasetFile"
-              class="h-100 w-100"
-              mat-ripple>
-              <i class="far fa-eye" iav-v-button-icon></i>
-              <span iav-v-button-text [class]="previewDirective.active ? 'iv-custom-comp primary' : ''">Probability Map {{ previewDirective.active }}</span>
-            </iav-v-button>
-          </mat-grid-tile>
-        </ng-container>
-
-        <mat-grid-tile>
-          <iav-v-button *ngIf="hasConnectivity"
-            class="h-100 w-100"
-            mat-ripple
-            [matMenuTriggerFor]="connectivitySourceDatasets"
-            #connectivityMenuButton="matMenuTrigger"
-            iav-captureClickListenerDirective
-            [iav-captureClickListenerDirective-captureDocument]="true"
-            (iav-captureClickListenerDirective-onMousedown)="connectivityMenuButton.closeMenu()">
-            <i class="fab fa-connectdevelop" iav-v-button-icon></i>
-            <span iav-v-button-text>Connectivity</span>
-            <i class="fas fa-chevron-down" iav-v-button-footer></i>
-          </iav-v-button>
-        </mat-grid-tile>
-
-        <mat-grid-tile>
-          <iav-v-button *ngIf="sameRegionTemplate.length"
-            class="h-100 w-100"
-            mat-ripple
-            [matMenuTriggerFor]="additionalActions"
-            #changeTmplTrigger="matMenuTrigger"
-            iav-captureClickListenerDirective
-            [iav-captureClickListenerDirective-captureDocument]="true"
-            (iav-captureClickListenerDirective-onMousedown)="changeTmplTrigger.closeMenu()">
-            <i class="fas fa-brain" iav-v-button-icon></i>
-            <span iav-v-button-text>Change template</span>
-            <i class="fas fa-chevron-down" iav-v-button-footer></i>
-          </iav-v-button>
-        </mat-grid-tile>
-      </mat-grid-list>
-    </ng-template>
-
     <!-- region desc -->
     <ng-container *ngIf="region?.description?.length > 0">
       <mat-divider></mat-divider>
@@ -165,42 +92,9 @@
       </div>
 
       <!-- change template -->
-      <div iav-switch #changeTmplSwitch="iavSwitch">
+      <ng-container *ngTemplateOutlet="regionInOtherTemplatesTmpl; context: { regionInOtherTemplates: regionInOtherTemplates$ | async }">
+      </ng-container>
 
-        <mat-list-item *ngIf="sameRegionTemplate.length"
-          mat-ripple
-          [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE"
-          (click)="changeTmplSwitch && changeTmplSwitch.toggle()">
-          <mat-icon fontSet="fas" fontIcon="fa-brain" mat-list-icon></mat-icon>
-          <div mat-line>
-            <span>
-              Explore in other templates
-            </span>
-            <span class="muted">
-              ({{ sameRegionTemplate.length }})
-            </span>
-          </div>
-          <mat-icon fontSet="fas" [fontIcon]="changeTmplSwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
-        </mat-list-item>
-
-        <!-- change template items -->
-        <div *ngIf="changeTmplSwitch.switchState"
-          [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE">
-          <mat-list-item *ngFor="let sameRegion of sameRegionTemplate; let i = index"
-            [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
-            (click)="changeView(i)"
-            mat-ripple>
-            <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-            <div class="cursorPointer" #exploreTemplateButton mat-line>
-              <span #exploreTemplateName class="overflow-x-hidden text-truncate"
-                    [matTooltip]="sameRegion.template.name + ' ' + sameRegion.hemisphere">
-                {{ sameRegion.template.name + ' ' + sameRegion.hemisphere }}
-              </span>
-            </div>
-          </mat-list-item>
-        </div>
-
-      </div>
     </mat-list>
   </mat-card-content>
 </mat-card>
@@ -217,15 +111,54 @@
   </div>
 </mat-menu>
 
+<!-- template for switching template -->
+<ng-template #regionInOtherTemplatesTmpl let-regionInOtherTemplates="regionInOtherTemplates">
 
-<mat-menu
-  #additionalActions="matMenu"
-  xPosition="before"
-  hasBackdrop="false">
-  <div>
-    <button mat-menu-item *ngFor="let sameRegion of sameRegionTemplate; let i = index" (mousedown)="changeView(i)" class="d-flex">
-      <span class="overflow-x-hidden text-truncate"> {{sameRegion.template.name}} </span>
-      <span *ngIf="sameRegion.hemisphere"> - {{sameRegion.hemisphere}}</span>
-    </button>
+  <div iav-switch #changeTmplSwitch="iavSwitch">
+
+    <mat-list-item *ngIf="regionInOtherTemplates.length"
+      mat-ripple
+      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE"
+      (click)="changeTmplSwitch && changeTmplSwitch.toggle()">
+      <mat-icon fontSet="fas" fontIcon="fa-brain" mat-list-icon></mat-icon>
+      <div mat-line>
+        <span>
+          Explore in other templates
+        </span>
+        <span class="muted">
+          ({{ regionInOtherTemplates.length }})
+        </span>
+      </div>
+      <mat-icon fontSet="fas" [fontIcon]="changeTmplSwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
+    </mat-list-item>
+
+    <!-- change template items -->
+    <div *ngIf="changeTmplSwitch.switchState"
+      [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE">
+      <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
+        [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
+        (click)="changeView(sameRegion)"
+        mat-ripple
+        [attr.role]="'button'">
+        <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
+        <div mat-line>
+          <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
+          </ng-container>
+        </div>
+      </mat-list-item>
+    </div>
   </div>
-</mat-menu>
+</ng-template>
+
+<!-- template for rendering template name and template hemisphere -->
+<ng-template #regionInOtherTemplate let-template="template" let-hemisphere="hemisphere">
+  <span class="overflow-x-hidden text-truncate"
+  [matTooltip]="template.name  + (hemisphere ? (' ' + hemisphere) : '')">
+    <span>
+      {{ template.name }}
+    </span>
+    <span *ngIf="hemisphere" class="text-muted">
+      ({{ hemisphere }})
+    </span>
+  </span>
+</ng-template>
