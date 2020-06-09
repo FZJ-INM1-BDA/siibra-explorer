@@ -455,8 +455,8 @@ markdown-dom pre code
     outline: none;
 }
 
-.cursorPointer {
-    cursor: pointer;
+.cursor-pointer {
+    cursor: pointer!important;
 }
 
 cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .cdk-virtual-scroll-content-wrapper

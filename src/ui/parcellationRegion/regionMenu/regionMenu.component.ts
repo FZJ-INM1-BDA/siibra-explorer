@@ -1,7 +1,6 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import { Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
-import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { RegionBase } from '../region.base'
 
 @Component({
@@ -9,31 +8,14 @@ import { RegionBase } from '../region.base'
   templateUrl: './regionMenu.template.html',
   styleUrls: ['./regionMenu.style.css'],
 })
-export class RegionMenuComponent extends RegionBase implements OnInit, OnDestroy {
+export class RegionMenuComponent extends RegionBase implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
   constructor(
-    store$: Store<IavRootStoreInterface>,
+    store$: Store<any>,
   ) {
     super(store$)
-  }
-
-  ngOnInit(): void {
-    this.subscriptions.push(
-      this.templateSelected$.subscribe(template => {
-        this.selectedTemplate = template
-      }),
-      this.parcellationSelected$.subscribe(parcellation => {
-        this.selectedParcellation = parcellation
-      }),
-      this.loadedTemplate$.subscribe(templates => {
-        this.loadedTemplates = templates
-        this.getDifferentTemplatesSameRegion()
-        // this.bigBrainJubrainSwitch()
-        // this.getSameParcellationTemplates()
-      }),
-    )
   }
 
   ngOnDestroy(): void {

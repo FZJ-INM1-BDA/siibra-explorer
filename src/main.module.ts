@@ -37,7 +37,7 @@ import { NewViewerDisctinctViewToLayer } from "./util/pipes/newViewerDistinctVie
 import { UtilModule } from "./util/util.module";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
-
+import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./atlasViewer/mouseOver.directive";
 import { UiStateUseEffect, getMouseoverSegmentsFactory, GET_MOUSEOVER_SEGMENTS_TOKEN } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
@@ -117,12 +117,15 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     FloatingContainerDirective,
     FloatingMouseContextualContainerDirective,
     DragDropDirective,
+    MouseHoverDirective, 
 
     /* pipes */
     GetNamesPipe,
     GetNamePipe,
     TransformOnhoverSegmentPipe,
     NewViewerDisctinctViewToLayer,
+    MouseOverTextPipe,
+    MouseOverIconPipe,
   ],
   entryComponents : [
     ModalUnit,

@@ -31,22 +31,22 @@ const TEST_DATA = [
     expectedTemplateLabels: [
       {
         name: 'MNI Colin 27',
-        hemisphere: 'Left',
+        hemisphere: 'left hemisphere',
         expectedPosition: [-54514755, -16753913, -5260713]
       },
       {
         name: 'MNI Colin 27',
-        hemisphere: 'Right',
+        hemisphere: 'right hemisphere',
         expectedPosition: [54536567, -17992636, -5712544]
       },
       {
         name: 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
-        hemisphere: 'Left',
+        hemisphere: 'left hemisphere',
         expectedPosition: [-55442669, -18314601, -6381831]
       },
       {
         name: 'MNI 152 ICBM 2009c Nonlinear Asymmetric',
-        hemisphere: 'Right',
+        hemisphere: 'right hemisphere',
         expectedPosition: [52602966, -18339402, -5666868]
       },
     ],
@@ -106,11 +106,13 @@ describe('> explore same region in different templates', () => {
           describe(`> moving to ${name}`, () => {
             it('> works as expected', async () => {
 
-              const otherTemplates = await iavPage.getText(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${name}${hemisphere ? (' - ' + hemisphere) : ''}"]`)
+              const otherTemplate = await iavPage.getText(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${name}${hemisphere ? (' - ' + hemisphere) : ''}"]`)
+              const trimmedTemplate = otherTemplate.replace(/^\s+/, '').replace(/\s+$/, '').replace(/\s+/g, ' ')
               if (hemisphere) {
-                expect(otherTemplates.indexOf(hemisphere)).toBeGreaterThanOrEqual(0)
+                expect(trimmedTemplate).toEqual(`${name} (${hemisphere})`)
+              } else {
+                expect(trimmedTemplate).toEqual(name)
               }
-              expect(otherTemplates.indexOf(name)).toBeGreaterThanOrEqual(0)
       
               await iavPage.click(`[aria-label="${SHOW_IN_OTHER_REF_SPACE}: ${name}${hemisphere ? (' - ' + hemisphere) : ''}"]`)
               await iavPage.wait(500)
