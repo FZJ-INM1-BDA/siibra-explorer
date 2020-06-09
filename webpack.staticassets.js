@@ -72,6 +72,7 @@ module.exports = {
       PRODUCTION: !!process.env.PRODUCTION,
       BACKEND_URL: (process.env.BACKEND_URL && JSON.stringify(process.env.BACKEND_URL)) || 'null',
       DATASET_PREVIEW_URL: JSON.stringify(process.env.DATASET_PREVIEW_URL || 'https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview'),
+      SPATIAL_TRANSFORM_BACKEND: JSON.stringify(process.env.SPATIAL_TRANSFORM_BACKEND || 'https://hbp-spatial-backend.apps.hbp.eu'),
       MATOMO_URL: JSON.stringify(process.env.MATOMO_URL || null),
       MATOMO_ID: JSON.stringify(process.env.MATOMO_ID || null),
       USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' || 'fzj'),

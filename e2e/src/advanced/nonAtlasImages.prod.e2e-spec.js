@@ -114,7 +114,7 @@ describe('> non-atlas images', () => {
         )
       )
 
-      const arr = [
+      const arrPli = [
         "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_R",
         "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_G",
         "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_B",
@@ -135,7 +135,7 @@ describe('> non-atlas images', () => {
         )
       )
 
-      for (const url of arr) {
+      for (const url of arrPli) {
         expect(
           interceptedCalls
         ).toContain(
