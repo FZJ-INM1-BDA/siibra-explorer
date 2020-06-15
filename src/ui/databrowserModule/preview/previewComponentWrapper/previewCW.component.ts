@@ -5,6 +5,7 @@ import { Observable, fromEvent, Subscription, of, throwError } from "rxjs";
 import { switchMapTo, catchError, take, concatMap, map, retryWhen, delay } from "rxjs/operators";
 import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
 import { ARIA_LABELS } from 'common/constants'
+import { DS_PREVIEW_URL } from 'src/util/constants'
 
 const { 
   DOWNLOAD_PREVIEW,
@@ -39,6 +40,7 @@ const fromPromiseRetry = ({ retries = 10, timeout = 100 } = {}) => {
 
 export class PreviewComponentWrapper{
 
+  public DS_PREVIEW_URL = DS_PREVIEW_URL
   public touched: boolean = false
   public untouchedIndex: number = 0
 
