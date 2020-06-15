@@ -516,6 +516,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       this.selectedParcellation$.subscribe((this.handleParcellation).bind(this)),
     )
 
+    let prevParcellation = null
+
     this.subscriptions.push(
 
       combineLatest(
@@ -538,12 +540,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         const { ngId: defaultNgId } = selectedParcellation
 
         /* selectedregionindexset needs to be updated regardless of forceshowsegment */
-        this.selectedRegionIndexSet = new Set(regions.map(({ngId = defaultNgId, labelIndex}) => generateLabelIndexId({ ngId, labelIndex })))
+        this.selectedRegionIndexSet = !prevParcellation || prevParcellation === selectedParcellation?
+          new Set(regions.map(({ngId = defaultNgId, labelIndex}) => generateLabelIndexId({ ngId, labelIndex }))) : new Set()
 
         if ( forceShowSegment === false || (forceShowSegment === null && hideSegmentFlag) ) {
           this.nehubaViewer.hideAllSeg()
           return
         }
+
+        prevParcellation = selectedParcellation
 
         this.selectedRegionIndexSet.size > 0
           ? this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
