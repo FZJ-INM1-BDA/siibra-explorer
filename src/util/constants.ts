@@ -83,15 +83,18 @@ export const getShader = ({
 } = {}): string => {
   const header = colormap === 'jet' ? COLORMAP_IS_JET : COLORMAP_IS_DEFAULT
   const colormapGlsl = colormap === 'jet' ? CM_MATLAB_JET : CM_DEFAULT
+
+  // so that if lowthreshold is defined to be 0, at least some background removal will be done
+  const _lowThreshold = lowThreshold + 1e-10
   return `${header}
 void main() {
   float raw_x = toNormalized(getDataValue());
-  float x = (raw_x - ${lowThreshold.toFixed(5)}) / (${highThreshold - lowThreshold}) ${ brightness > 0 ? '+' : '-' } ${Math.abs(brightness).toFixed(5)};
+  float x = (raw_x - ${_lowThreshold.toFixed(10)}) / (${highThreshold - _lowThreshold}) ${ brightness > 0 ? '+' : '-' } ${Math.abs(brightness).toFixed(10)};
 
   ${ removeBg ? 'if(x>1.0){emitTransparent();}else if(x<0.0){emitTransparent();}else{' : '' }
     ${colormapGlsl}
 
-    emitRGB(vec3(r, g, b)*exp(${contrast.toFixed(5)}));
+    emitRGB(vec3(r, g, b)*exp(${contrast.toFixed(10)}));
   ${ removeBg ? '}' : '' }
 }
 `

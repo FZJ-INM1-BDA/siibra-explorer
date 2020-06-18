@@ -227,14 +227,19 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
       ).subscribe(([ { prvToShow, prvToDismiss }, templateSelected ]) => {
         // TODO consider where to check validity of previewed nifti file
         for (const prv of prvToShow) {
-          const { url, filename } = prv
+          const { url, filename, volumeMetadata = {} } = prv
+          const { min, max } = volumeMetadata || {}
           const previewFileId = DatasetPreviewGlue.GetDatasetPreviewId(prv)
           const layer = {
             name: filename,
             id: previewFileId,
             source : `nifti://${url}`,
             mixability : 'nonmixable',
-            shader : getShader(PMAP_DEFAULT_CONFIG),
+            shader : getShader({
+              ...PMAP_DEFAULT_CONFIG,
+              ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
+              ...( max ? { highThreshold: max } : {} )
+            }),
             annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
           }
           this.store$.dispatch(
