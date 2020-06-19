@@ -2,7 +2,7 @@ import { Component, Input, OnChanges, ChangeDetectionStrategy, Optional, Inject 
 import { NgLayersService } from "../ngLayerService.service";
 import { MatSliderChange } from "@angular/material/slider";
 import { MatSlideToggleChange } from "@angular/material/slide-toggle";
-import { COLORMAP_IS_JET, getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
+import { getShader } from "src/util/constants";
 
 export const VIEWER_INJECTION_TOKEN = `VIEWER_INJECTION_TOKEN`
 
@@ -28,19 +28,12 @@ export class LayerDetailComponent implements OnChanges{
   ngOnChanges(){
     if (!this.layerName) return
 
-    const isPmap = (this.fragmentMain.value as string).includes(COLORMAP_IS_JET)
-    const { colormap, lowThreshold, removeBg } = PMAP_DEFAULT_CONFIG
-    if (isPmap) {
-      this.colormap = colormap
-      this.lowThreshold = lowThreshold
-      this.removeBg = removeBg
-    }
-
     this.lowThreshold = this.layersService.lowThresholdMap.get(this.layerName) || this.lowThreshold
     this.highThreshold = this.layersService.highThresholdMap.get(this.layerName) || this.highThreshold
     this.brightness = this.layersService.brightnessMap.get(this.layerName) || this.brightness
     this.contrast = this.layersService.contrastMap.get(this.layerName) || this.contrast
     this.removeBg = this.layersService.removeBgMap.get(this.layerName) || this.removeBg
+    this.colormap = this.layersService.colorMapMap.get(this.layerName) || this.colormap
   }
 
   public lowThreshold: number = 0
