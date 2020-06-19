@@ -449,15 +449,6 @@ export const SAVE_USER_DATA = new InjectionToken<TypeSaveUserData>('SAVE_USER_DA
 
 type TypeSaveUserData = (key: string, value: string) => void
 
-
-@Injectable({
-  providedIn: 'root'
-})
-
-export class DatasetUserGlue {
-
-}
-
 export const gluActionFavDataset = createAction(
   '[glue] favDataset',
   props<{dataentry: Partial<IKgDataEntry>}>()
