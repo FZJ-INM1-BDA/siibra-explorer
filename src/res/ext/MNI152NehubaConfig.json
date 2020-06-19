@@ -215,6 +215,161 @@
               1
             ]
           ]
+        },
+        "DiFuMo Atlas (64 dimensions)": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-97d7cf5f-9bb7-4143-8b1e-757ab4cb7354",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96937500
+            ],
+            [
+              0,
+              1,
+              0,
+              -132937500
+            ],
+            [
+              0,
+              0,
+              1,
+              -78937500
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "DiFuMo Atlas (128 dimensions)": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-d37f81c3-0449-4ace-83dc-e4d21a045142",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96937500
+            ],
+            [
+              0,
+              1,
+              0,
+              -132937500
+            ],
+            [
+              0,
+              0,
+              1,
+              -78937500
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "DiFuMo Atlas (256 dimensions)": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-ae7dc2f2-8135-4a64-8c3b-e28008ec9d72",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96937500
+            ],
+            [
+              0,
+              1,
+              0,
+              -132937500
+            ],
+            [
+              0,
+              0,
+              1,
+              -78937500
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "DiFuMo Atlas (512 dimensions)": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-3ac156f3-ba17-4253-8d76-fa78d6958081",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96937500
+            ],
+            [
+              0,
+              1,
+              0,
+              -132937500
+            ],
+            [
+              0,
+              0,
+              1,
+              -78937500
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "DiFuMo Atlas (1024 dimensions)": {
+          "type": "segmentation",
+          "visible": false,
+          "source": "precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-9b021cdc-8c27-4b5a-ab24-6561ce22d1fc",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96937500
+            ],
+            [
+              0,
+              1,
+              0,
+              -132937500
+            ],
+            [
+              0,
+              0,
+              1,
+              -78937500
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
         }
       },
       "navigation": {
