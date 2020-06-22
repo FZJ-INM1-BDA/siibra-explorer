@@ -10,8 +10,6 @@ declare module '*.css' {
 
 declare module '*.md'
 
-declare var PLUGINDEV : string
-declare var BUNDLEDPLUGINS : string[]
 declare var VERSION : string
 declare var PRODUCTION: boolean
 declare var BACKEND_URL: string
