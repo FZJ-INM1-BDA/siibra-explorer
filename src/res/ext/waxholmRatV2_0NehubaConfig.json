@@ -204,6 +204,37 @@
               1
             ]
           ]
+        },
+        "WHS_SD_rat_atlas_v4_beta": {
+          "type": "segmentation",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/WHS_SD_rat/parcellations/WHS_SD_rat_atlas_v4_beta",
+          "selectedAlpha": 0.35,
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -9550781
+            ],
+            [
+              0,
+              1,
+              0,
+              -24355468
+            ],
+            [
+              0,
+              0,
+              1,
+              -9707031
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
         }
       },
       "navigation": {

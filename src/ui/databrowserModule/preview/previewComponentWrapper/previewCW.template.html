@@ -39,7 +39,7 @@
       [darkmode]="darktheme$ | async"
       [filename]="filename"
       [kgId]="kgId"
-      [backendUrl]="backendUrl"
+      [backendUrl]="backendUrl || DS_PREVIEW_URL"
       #dataPreviewerStencilCmp>
 
     </kg-dataset-previewer>

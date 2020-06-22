@@ -11,6 +11,8 @@ import { HttpClient } from "@angular/common/http"
 import { DS_PREVIEW_URL, getShader, PMAP_DEFAULT_CONFIG } from 'src/util/constants'
 import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, INgLayerInterface } from "./services/state/ngViewerState.store.helper"
 import { ARIA_LABELS } from 'common/constants'
+import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
+import { EnumColorMapName } from "./util/colorMaps"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -165,6 +167,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   constructor(
     private store$: Store<any>,
     private http: HttpClient,
+    private layersService: NgLayersService,
     @Optional() @Inject(ACTION_TO_WIDGET_TOKEN) private actionOnWidget: TypeActionToWidget<any>
   ){
     if (!this.actionOnWidget) console.warn(`actionOnWidget not provided in DatasetPreviewGlue. Did you forget to provide it?`)
@@ -227,26 +230,47 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
       ).subscribe(([ { prvToShow, prvToDismiss }, templateSelected ]) => {
         // TODO consider where to check validity of previewed nifti file
         for (const prv of prvToShow) {
-          const { url, filename } = prv
+
+          const { url, filename, name, volumeMetadata = {} } = prv
+          const { min, max, colormap = EnumColorMapName.VIRIDIS } = volumeMetadata || {}
+          
           const previewFileId = DatasetPreviewGlue.GetDatasetPreviewId(prv)
+
+          const shaderObj = {
+            ...PMAP_DEFAULT_CONFIG,
+            ...{ colormap },
+            ...( typeof min !== 'undefined' ? { lowThreshold: min } : {} ),
+            ...( max ? { highThreshold: max } : { highThreshold: 1 } )
+          }
+
           const layer = {
-            name: filename,
+            // name: filename,
+            name: name || filename,
             id: previewFileId,
             source : `nifti://${url}`,
             mixability : 'nonmixable',
-            shader : getShader(PMAP_DEFAULT_CONFIG),
+            shader : getShader(shaderObj),
             annotation: `${DATASET_PREVIEW_ANNOTATION} ${filename}`
           }
+
+          const { name: layerName } = layer
+          const { colormap: cmap, lowThreshold, highThreshold, removeBg } = shaderObj
+
+          this.layersService.highThresholdMap.set(layerName, highThreshold)
+          this.layersService.lowThresholdMap.set(layerName, lowThreshold)
+          this.layersService.colorMapMap.set(layerName, cmap)
+          this.layersService.removeBgMap.set(layerName, removeBg)
+
           this.store$.dispatch(
             ngViewerActionAddNgLayer({ layer })
           )
         }
 
         for (const prv of prvToDismiss) {
-          const { url, filename } = prv
+          const { url, filename, name } = prv
           const previewFileId = DatasetPreviewGlue.GetDatasetPreviewId(prv)
           const layer = {
-            name: filename,
+            name: name || filename,
             id: previewFileId,
             source : `nifti://${url}`,
             mixability : 'nonmixable',
