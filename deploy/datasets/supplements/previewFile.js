@@ -1,3 +1,7 @@
+/**
+ * TODO deprecate?
+ */
+
 const fs = require('fs')
 const path = require('path')
 const { reconfigureFlag, reconfigureUrl } = require('../../util/reconfigPrecomputedServer')
