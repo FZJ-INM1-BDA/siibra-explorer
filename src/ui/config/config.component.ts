@@ -2,13 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { select, Store } from '@ngrx/store';
 import { combineLatest, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map, startWith } from 'rxjs/operators';
-import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { NG_VIEWER_ACTION_TYPES, SUPPORTED_PANEL_MODES } from 'src/services/state/ngViewerState.store';
 import { VIEWER_CONFIG_ACTION_TYPES, StateInterface as ViewerConfiguration } from 'src/services/state/viewerConfig.store'
 import { IavRootStoreInterface } from 'src/services/stateStore.service';
 import { isIdentityQuat } from '../nehubaContainer/util';
 import {MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {MatSliderChange} from "@angular/material/slider";
+import { PureContantService } from 'src/util';
 
 const GPU_TOOLTIP = `Higher GPU usage can cause crashes on lower end machines`
 const ANIMATION_TOOLTIP = `Animation can cause slowdowns in lower end machines`
@@ -53,10 +53,10 @@ export class ConfigComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     this.gpuLimit$ = this.store.pipe(
       select('viewerConfigState'),

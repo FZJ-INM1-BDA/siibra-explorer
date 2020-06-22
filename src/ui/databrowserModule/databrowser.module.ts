@@ -4,7 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { ComponentsModule } from "src/components/components.module";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 import { DoiParserPipe } from "src/util/pipes/doiPipe.pipe";
-import { UtilModule } from "src/util/util.module";
+import { UtilModule } from "src/util";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { KgSingleDatasetService } from "./kgSingleDatasetService.service"
 import { ModalityPicker, SortModalityAlphabeticallyPipe } from "./modalityPicker/modalityPicker.component";
