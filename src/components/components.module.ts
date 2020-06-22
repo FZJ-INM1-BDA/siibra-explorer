@@ -7,7 +7,7 @@ import {  MarkdownDom } from './markdown/markdown.component';
 
 import { CommonModule } from '@angular/common';
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module';
-import { UtilModule } from 'src/util/util.module';
+import { UtilModule } from 'src/util';
 import { SearchResultPaginationPipe } from '../util/pipes/pagination.pipe';
 import { SafeHtmlPipe } from '../util/pipes/safeHtml.pipe'
 import { TreeSearchPipe } from '../util/pipes/treeSearch.pipe';

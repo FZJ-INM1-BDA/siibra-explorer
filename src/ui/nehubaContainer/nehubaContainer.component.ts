@@ -23,14 +23,21 @@ import {
 import { LoggingService } from "src/logging";
 import { FOUR_PANEL, H_ONE_THREE, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
 import { SELECT_REGIONS_WITH_ID, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
+import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface, REMOVE_NG_LAYER, safeFilter } from "src/services/stateStore.service";
 import { getExportNehuba, isSame } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
+import { compareLandmarksChanged } from "src/util/constants";
+import { PureContantService } from "src/util";
+import { ARIA_LABELS } from 'common/constants'
+
+const { 
+  ZOOM_IN,
+  ZOOM_OUT,
+} = ARIA_LABELS
 
 const isFirstRow = (cell: HTMLElement) => {
   const { parentElement: row } = cell
@@ -74,6 +81,9 @@ const scanFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean,
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
+  public ARIA_LABEL_ZOOM_IN = ZOOM_IN
+  public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+
   @ViewChild(NehubaViewerContainerDirective,{static: true})
   public nehubaContainerDirective: NehubaViewerContainerDirective
 
@@ -87,10 +97,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public viewerLoaded: boolean = false
 
-  private sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
-  public sliceViewLoading0$: Observable<boolean>
-  public sliceViewLoading1$: Observable<boolean>
-  public sliceViewLoading2$: Observable<boolean>
+  public sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public perspectiveViewLoading$: Observable<string|null>
 
   private templateSelected$: Observable<any>
@@ -135,22 +142,21 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public viewPanels: [HTMLElement, HTMLElement, HTMLElement, HTMLElement] = [null, null, null, null]
   public panelMode$: Observable<string>
 
-  private panelOrder: string
   public panelOrder$: Observable<string>
   private redrawLayout$: Observable<[string, string]>
 
   public hoveredPanelIndices$: Observable<number>
 
   constructor(
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private apiService: AtlasViewerAPIServices,
-    private store: Store<IavRootStoreInterface>,
+    private store: Store<any>,
     private elementRef: ElementRef,
     private log: LoggingService,
     private cdr: ChangeDetectorRef
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     this.panelMode$ = this.store.pipe(
       select('ngViewerState'),
@@ -164,7 +170,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       select('panelOrder'),
       distinctUntilChanged(),
       shareReplay(1),
-      tap(panelOrder => this.panelOrder = panelOrder),
     )
 
     this.redrawLayout$ = this.store.pipe(
@@ -215,7 +220,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       select('dataStore'),
       safeFilter('fetchedSpatialData'),
       map(state => state.fetchedSpatialData),
-      distinctUntilChanged(this.constantService.testLandmarksChanged),
+      distinctUntilChanged(compareLandmarksChanged),
       debounceTime(300),
     )
 
@@ -227,23 +232,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
       scan(scanFn, [null, null, null]),
+      startWith([true, true, true] as [boolean, boolean, boolean]),
       shareReplay(1),
     )
-
-    this.sliceViewLoading0$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[0]),
-      )
-
-    this.sliceViewLoading1$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[1]),
-      )
-
-    this.sliceViewLoading2$ = this.sliceViewLoadingMain$
-      .pipe(
-        map(arr => arr[2]),
-      )
 
     /* missing chunk perspective view */
     this.perspectiveViewLoading$ = fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent')
@@ -719,10 +710,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public test(){
-    console.log('test')
-  }
-
   public toggleMaximiseMinimise(index: number) {
     this.store.dispatch({
       type: NG_VIEWER_ACTION_TYPES.TOGGLE_MAXIMISE,
@@ -944,6 +931,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     }
   }
 
+  public zoomNgView(panelIndex: number, factor: number) {
+    const ngviewer = this.nehubaViewer?.nehubaViewer?.ngviewer
+    if (!ngviewer) throw new Error(`ngviewer not defined!`)
+
+    /**
+     * panelIndex < 3 === slice view
+     */
+    if (panelIndex < 3) {
+      /**
+       * factor > 1 === zoom out
+       */
+      ngviewer.navigationState.zoomBy(factor)
+    } else {
+      ngviewer.perspectiveNavigationState.zoomBy(factor)
+    }
+  }
 }
 
 export const identifySrcElement = (element: HTMLElement) => {

@@ -106,3 +106,11 @@ export const PMAP_DEFAULT_CONFIG = {
   lowThreshold: 0.05,
   removeBg: true
 }
+
+export const compareLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]) => boolean = (prevLandmarks: any[], newLandmarks: any[]) => {
+  return prevLandmarks.every(lm => typeof lm.name !== 'undefined') &&
+    newLandmarks.every(lm => typeof lm.name !== 'undefined') &&
+    prevLandmarks.length === newLandmarks.length
+}
+
+export const CYCLE_PANEL_MESSAGE = `[spacebar] to cycle through views`

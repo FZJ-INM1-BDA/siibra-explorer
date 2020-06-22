@@ -7,8 +7,7 @@ import { LoggingService } from "src/logging";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
 import { AtlasWorkerService } from "./atlasViewer.workerService.service";
-
-export const CM_THRESHOLD = `0.05`
+import { PureContantService } from "src/util";
 
 const getUniqueId = () => Math.round(Math.random() * 1e16).toString(16)
 
@@ -21,21 +20,12 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   public darktheme: boolean = false
   public darktheme$: Observable<boolean>
 
-  public useMobileUI$: Observable<boolean>
-
   public citationToastDuration = 7e3
 
   /**
    * Timeout can be longer, since configs are lazy loaded.
    */
   private TIMEOUT = 16000
-
-  /* TODO to be replaced by @id: Landmark/UNIQUE_ID in KG in the future */
-  public testLandmarksChanged: (prevLandmarks: any[], newLandmarks: any[]) => boolean = (prevLandmarks: any[], newLandmarks: any[]) => {
-    return prevLandmarks.every(lm => typeof lm.name !== 'undefined') &&
-      newLandmarks.every(lm => typeof lm.name !== 'undefined') &&
-      prevLandmarks.length === newLandmarks.length
-  }
 
   // instead of using window.location.href, which includes query param etc
   public backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
@@ -270,7 +260,8 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
     private store$: Store<IavRootStoreInterface>,
     private http: HttpClient,
     private log: LoggingService,
-    private workerService: AtlasWorkerService
+    private workerService: AtlasWorkerService,
+    private pureConstantService: PureContantService
   ) {
 
     this.darktheme$ = this.store$.pipe(
@@ -283,18 +274,12 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
       shareReplay(1),
     )
 
-    this.useMobileUI$ = this.store$.pipe(
-      select('viewerConfigState'),
-      select('useMobileUI'),
-      shareReplay(1),
-    )
-
     this.subscriptions.push(
       this.darktheme$.subscribe(flag => this.darktheme = flag),
     )
 
     this.subscriptions.push(
-      this.useMobileUI$.subscribe(bool => {
+      this.pureConstantService.useTouchUI$.subscribe(bool => {
         if (bool) {
           this.showHelpSliceViewMap = this.showHelpSliceViewMobile
           this.showHelpGeneralMap = this.showHelpGeneralMobile
@@ -324,8 +309,6 @@ Send us an email: <a target = "_blank" href = "mailto:${this.supportEmailAddress
       snackbarMessage: e.toString(),
     })
   }
-
-  public cyclePanelMessage: string = `[spacebar] to cycle through views`
 
   private dissmissUserLayerSnackbarMessageDesktop = `You can dismiss extra layers with [ESC]`
   private dissmissUserLayerSnackbarMessageMobile = `You can dismiss extra layers in the 🌏 menu`
