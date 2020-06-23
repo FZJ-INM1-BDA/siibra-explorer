@@ -29,5 +29,35 @@ describe('trans template navigation', () => {
     expect(!!found).toBe(true)
   })
 
+  it('Check region color after template change when region was selected', async () => {
+
+    const searchParam = new URLSearchParams()
+    searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
+    searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+    const area = 'Area TE 3 (STG) - right hemisphere'
+    const expectedPosition = [630, 510]
+    const expectedColor = {red: 70, green: 138, blue: 57}
+
+    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
+    await iavPage.wait(200)
+    await iavPage.dismissModal()
+    await iavPage.waitUntilAllChunksLoaded()
+
+    await iavPage.searchRegionWithText(area)
+    await iavPage.wait(1000)
+
+    await iavPage.selectSearchRegionAutocompleteWithText()
+    await iavPage.dismissModal()
+    await iavPage.wait(500)
+    await iavPage.selectDropdownTemplate('MNI Colin 27')
+    await iavPage.waitUntilAllChunksLoaded()
+    const { red, green, blue } = await iavPage.getRgbAt({ position: expectedPosition })
+
+    expect(red).toEqual(expectedColor.red)
+    expect(green).toEqual(expectedColor.green)
+    expect(blue).toEqual(expectedColor.blue)
+
+  })
+
   // TODO test that nav/zoom/orientation are actually preserved
 })

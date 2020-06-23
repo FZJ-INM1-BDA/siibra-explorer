@@ -81,7 +81,7 @@ describe('> non-atlas images', () => {
       await iavPage.wait(10000)
       const interceptedCalls = await iavPage.getInterceptedHttpCalls()
 
-      const arr = [
+      const array = [
         'BI-FOM-HSV_R',
         'BI-FOM-HSV_G',
         'BI-FOM-HSV_B',
@@ -91,7 +91,7 @@ describe('> non-atlas images', () => {
         'BI-MRS',
       ]
 
-      for (const item of arr) {
+      for (const item of array) {
         expect(
           interceptedCalls.find(({
             method,
