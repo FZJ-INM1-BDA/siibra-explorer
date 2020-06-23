@@ -1,17 +1,15 @@
 language: node_js
 
-os: linux
-dist: xenial
-
-node_js:
-- 10
-- 12
-
 jobs:
   include:
 
     - stage: frontend
-      install:
+      os: linux
+      dist: xenial
+      node_js:
+      - 10
+      - 12
+        install:
       - npm i
       script:
       - npm run lint
@@ -20,6 +18,11 @@ jobs:
       - NODE_ENV=test
 
     - stage: backend
+      os: linux
+      dist: xenial
+      node_js:
+      - 10
+      - 12
       install:
       - cd deploy && npm i
       script:
