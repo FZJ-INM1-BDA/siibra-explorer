@@ -1,18 +1,26 @@
 language: node_js
 
-# sudo false implies containerized builds
-sudo: false
+os: linux
+dist: xenial
 
 node_js:
 - 10
 - 12
 
-install:
-- npm i
+jobs:
+  include:
 
-script:
-- npm run lint
-- npm test
+    - stage: frontend
+      install:
+      - npm i
+      script:
+      - npm run lint
+      - npm test
+      env:
+      - NODE_ENV=test
 
-env:
-- NODE_ENV=test
+    - stage: backend
+      install:
+      - cd deploy && npm i
+      script:
+      - cd deploy && npm test
