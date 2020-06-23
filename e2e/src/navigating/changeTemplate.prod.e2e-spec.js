@@ -31,14 +31,12 @@ describe('trans template navigation', () => {
 
   it('Check region color after template change when region was selected', async () => {
 
-    const searchParam = new URLSearchParams()
-    searchParam.set('templateSelected', 'MNI 152 ICBM 2009c Nonlinear Asymmetric')
-    searchParam.set('parcellationSelected', 'JuBrain Cytoarchitectonic Atlas')
+    const url = '/?templateSelected=MNI+152+ICBM+2009c+Nonlinear+Asymmetric&parcellationSelected=JuBrain+Cytoarchitectonic+Atlas'
     const area = 'Area TE 3 (STG) - right hemisphere'
     const expectedPosition = [630, 510]
-    const expectedColor = {red: 70, green: 138, blue: 57}
+    const expectedColor = {red: 70, green: 139, blue: 57}
 
-    await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
+    await iavPage.goto(url, { interceptHttp: true, doNotAutomate: true })
     await iavPage.wait(200)
     await iavPage.dismissModal()
     await iavPage.waitUntilAllChunksLoaded()
