@@ -9,7 +9,7 @@ node_js:
 git:
   depth: 3
 
-script: 'Running against $(node -v)'
+script: 'echo Running against $(node -v)'
 
 jobs:
   include:
