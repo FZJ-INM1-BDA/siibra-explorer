@@ -14,19 +14,20 @@ script: 'echo Running against $(node -v)'
 jobs:
   include:
 
-    - stage: frontend
-      name: frontend unit test
-      install:
-      - npm i
-      script:
-      - npm run lint
-      - npm test
-      env:
-      - NODE_ENV=test
+    # - stage: Unit test frontend
+    #   name: frontend unit test
+    #   install:
+    #   - npm i
+    #   script:
+    #   - npm run lint
+    #   - npm test
+    #   env:
+    #   - NODE_ENV=test
 
-    - stage: backend
+    - stage: Unit test backend
       name: backend unit test
       install:
+      - ls
       - cd deploy && npm i
       script:
       - cd deploy && npm test
@@ -37,7 +38,7 @@ jobs:
       # build aot
       - npm i
       - npm run build-aot
-      - cd deploy && node server.js
+      - cd deploy && node server.js &
       script:
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
       env:
