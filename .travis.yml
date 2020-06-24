@@ -41,7 +41,7 @@ jobs:
       - npm i
       - npm run build-aot
       script:
-      - cd deploy && nohup node server.js &
+      - cd deploy && NODE_ENV=production nohup node server.js &
       - sleep 5s
       - curl http://localhost:3000
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
