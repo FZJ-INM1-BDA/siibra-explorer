@@ -31,9 +31,11 @@ jobs:
       install:
       - npm i
       script:
+      - ss -tulpn
       - npm test
       env:
-      - NODE_ENV: test
+      - NODE_ENV=test
+      - PORT=12234
 
     - stage: e2e
       name: e2e (with browserstack)
