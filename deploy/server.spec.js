@@ -55,13 +55,16 @@ describe('> server.js', () => {
   
       const childProcess = spawn('node', ['server.js'],  {
         cwd: cwdPath,
+        stdio: 'inherit',
         env: {
           ...process.env,
           PORT,
           HOST_PATHNAME: '/viewer'
         }
       })
-  
+      
+      let timedKillSig
+      
       childProcess.on('exit', (code, signal) => {
         clearTimeout(timedKillSig)
         console.log('process exit')
@@ -74,7 +77,7 @@ describe('> server.js', () => {
         assert(false, err)
       })
 
-      const timedKillSig = setTimeout(() => {
+      timedKillSig = setTimeout(() => {
         console.log('killing on timeout')
         childProcess.kill()
       }, 500)
