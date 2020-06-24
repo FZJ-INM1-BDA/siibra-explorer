@@ -29,18 +29,21 @@ jobs:
       before_install:
       - cd deploy
       install:
-      - ls
       - npm i
       script:
       - npm test
+      env:
+      - NODE_ENV: test
 
     - stage: e2e
       name: e2e (with browserstack)
-      install:
-      # build aot
+      before_install:
       - npm i
       - npm run build-aot
-      - cd deploy && node server.js &
+      - cd deploy
+      install:
+      # build aot
+      - node server.js &
       script:
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
       env:
