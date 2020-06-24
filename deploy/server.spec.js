@@ -3,6 +3,8 @@ const { expect } = require('chai')
 const path = require('path')
 const got = require('got')
 
+const PORT = process.env.PORT || 3000
+
 describe('> server.js', () => {
   const cwdPath = path.join(__dirname)
 
@@ -23,7 +25,7 @@ describe('> server.js', () => {
       
       childProcess.on('exit', (code) => {
         clearTimeout(timedKillSig)
-        expect(code).not.to.equal(0)
+        expect(code).to.be.greaterThan(0)
         done()
       })
     })
@@ -44,12 +46,10 @@ describe('> server.js', () => {
       
       childProcess.on('exit', (code) => {
         clearTimeout(timedKillSig)
-        expect(code).not.to.equal(0)
+        expect(code).to.be.greaterThan(0)
         done()
       })
     })
-
-    const PORT = process.env.PORT || 3000
 
     it('> does not throw if HOST_PATHNAME leads with slash, but does not end with slash', done => {
   
@@ -63,12 +63,12 @@ describe('> server.js', () => {
       })
   
       const timedKillSig = setTimeout(() => {
-        childProcess.kill(2)
+        childProcess.kill()
       }, 500)
       
-      childProcess.on('exit', (code) => {
+      childProcess.on('exit', (code, signal) => {
+        expect(signal).to.equal('SIGTERM')
         clearTimeout(timedKillSig)
-        expect(code).to.equal(null)
         done()
       })
     })
@@ -83,6 +83,7 @@ describe('> server.js', () => {
         cwd: cwdPath,
         env: {
           ...process.env,
+          PORT,
           HOST_PATHNAME: '/viewer'
         }
       })
