@@ -26,11 +26,13 @@ jobs:
 
     - stage: Unit test backend
       name: backend unit test
+      before_install:
+      - cd deploy
       install:
       - ls
-      - cd deploy && npm i
+      - npm i
       script:
-      - cd deploy && npm test
+      - npm test
 
     - stage: e2e
       name: e2e (with browserstack)
