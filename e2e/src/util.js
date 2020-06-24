@@ -1,5 +1,5 @@
 const chromeOpts = require('../chromeOpts')
-const pptr = require('puppeteer')
+// const pptr = require('puppeteer')
 const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/$/, '')
 const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
@@ -356,7 +356,9 @@ class WdBase{
 
   async wait(ms) {
     if (!ms) throw new Error(`wait duration must be specified!`)
-    await this._browser.sleep(ms)
+    return new Promise(rs => {
+      setTimeout(rs, ms)
+    })
   }
 
   async waitFor(animation = false, async = false){
@@ -760,19 +762,12 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async waitUntilAllChunksLoaded(){
-    const checkReady = async () => {
-      const el = await this._browser.findElements(
+    await this._browser.wait(async () => {
+      const els = await this._browser.findElements(
         By.css('div.loadingIndicator')
       )
-      return !el.length
-    }
-
-    do {
-      // Do nothing, until ready
-    } while (
-      await this.wait(1000),
-      !(await checkReady())
-    )
+      return els.length === 0
+    }, 1e3 * 60 * 10)
   }
 
   async getFloatingCtxInfoAsText(){

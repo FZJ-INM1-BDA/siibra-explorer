@@ -22,8 +22,10 @@ describe('trans template navigation', () => {
     await iavPage.selectDropdownTemplate('Big Brain (Histology)')
     await iavPage.wait(2000)
     const interceptedCalls = await iavPage.getInterceptedHttpCalls()
+    
+    expect(interceptedCalls).toBeTruthy()
 
-    const found = interceptedCalls.find(({ method, url }) => {
+    const found = interceptedCalls && interceptedCalls.find(({ method, url }) => {
       return method === 'POST' && /transform-points/.test(url)
     })
     expect(!!found).toBe(true)
