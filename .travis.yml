@@ -43,7 +43,7 @@ jobs:
       - cd deploy
       install:
       # build aot
-      - node server.js &
+      - nohup node server.js &
       before_script:
       - cd ..
       script:
