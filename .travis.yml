@@ -6,10 +6,16 @@ node_js:
 - 10
 - 12
 
+git:
+  depth: 3
+
+script: 'Running against $(node -v)'
+
 jobs:
   include:
 
     - stage: frontend
+      name: frontend unit test
       install:
       - npm i
       script:
@@ -19,14 +25,17 @@ jobs:
       - NODE_ENV=test
 
     - stage: backend
+      name: backend unit test
       install:
       - cd deploy && npm i
       script:
       - cd deploy && npm test
 
     - stage: e2e
+      name: e2e (with browserstack)
       install:
       # build aot
+      - npm i
       - npm run build-aot
       - cd deploy && node server.js
       script:
