@@ -15,15 +15,17 @@ describe('> server.js', () => {
         cwd: cwdPath,
         env: {
           ...process.env,
+          NODE_ENV: 'test',
           HOST_PATHNAME: 'viewer'
         }
       })
   
       const timedKillSig = setTimeout(() => {
-        childProcess.kill(0)
+        childProcess.kill()
       }, 500)
       
       childProcess.on('exit', (code) => {
+        childProcess.kill()
         clearTimeout(timedKillSig)
         expect(code).to.be.greaterThan(0)
         done()
@@ -36,6 +38,7 @@ describe('> server.js', () => {
         cwd: cwdPath,
         env: {
           ...process.env,
+          NODE_ENV: 'test',
           HOST_PATHNAME: '/viewer/'
         }
       })
@@ -58,29 +61,22 @@ describe('> server.js', () => {
         stdio: 'inherit',
         env: {
           ...process.env,
+          NODE_ENV: 'test',
           PORT,
           HOST_PATHNAME: '/viewer'
         }
       })
-      
-      let timedKillSig
-      
-      childProcess.on('exit', (code, signal) => {
-        clearTimeout(timedKillSig)
-        console.log('process exit')
-        expect(signal).to.equal('SIGTERM')
-        done()
-      })
 
-      childProcess.on('error', (err) => {
-        console.error('process erroring out', err)
-        assert(false, err)
-      })
-
-      timedKillSig = setTimeout(() => {
+      const timedKillSig = setTimeout(() => {
         console.log('killing on timeout')
         childProcess.kill()
       }, 500)
+      
+      childProcess.on('exit', (code, signal) => {
+        clearTimeout(timedKillSig)
+        expect(signal).to.equal('SIGTERM')
+        done()
+      })
     })
   })
 
@@ -93,6 +89,7 @@ describe('> server.js', () => {
         cwd: cwdPath,
         env: {
           ...process.env,
+          NODE_ENV: 'test',
           PORT,
           HOST_PATHNAME: '/viewer'
         }
