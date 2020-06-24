@@ -30,7 +30,6 @@ jobs:
       install:
       - npm i
       script:
-      - ss -tulpn
       - npm test
       env:
       - NODE_ENV=test
@@ -60,3 +59,5 @@ addons:
     access_key:
       secure: "j0NdVLyNwm1gDclEeE/xYrXAYiYAlx3HQxNRHMFhJyFml5R22spEMTwrTRl/vzyhv1FwfJAKfh4qbOn99cZ5Dzm7fWc8+Kq1zpp/1PRTzbFaLluJkV1wCwoODZkzmSVPj43M6070FhCJvOfe5VRUV440CgZH8IWRm7xaxRnN/MVyFMErMV/GIczEBB7D7E4mMhe6c9pBxjmojDDP4rGvKLGOYU7oVQKgZtbHtP/BxjQ7uzMysdTHZGZ/2c/XW/2bKVSADi4vFzge5PMVF3nSH+vzA09ro180Q5aoaek4XQPoIza0s0cqtqkbvkbJ+lWRE+Q7wJDhQLM4WNx5GX3fegJiqJRT7272EgGAUy6C+e2F+D5nPucf3w6Uov9vBn5zZjbfXdNah3GZEXOTRNAVzstySiwiZe7/f4bk0vWIiEhHC+iutjn8skMxFnuw2eM3SJ5ayjxskHOdRux+1fuDya32ctx8y9a3XLhuFcuGTaeMSAn5Dw5qOlI5Qoc+xRSARoRWKmlEuxTUudD0e+b8xqfZgmOP7D3GZ6QX2W4yFrOLGqUzEySHr8hxxzhIlfwSvVdJ15AtN2AtPFQYQXb7M+XX1L7fr39Z/5ctr7DDgljSE3F2U5ofyWV2hh54aGMBQe76cZfVzF4bi98X3r6u0b3Knyti2pvx5jIoxP46nOA="
     only: localhost,3000,0
+    forcelocal: true
+  
