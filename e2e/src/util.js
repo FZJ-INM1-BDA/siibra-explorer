@@ -4,7 +4,7 @@ const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/
 const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
-const { By, WebDriver, Key } = require('selenium-webdriver')
+const { By, WebDriver, Key, until } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 const { polyFillClick } = require('./material-util')
 
@@ -784,6 +784,11 @@ class WdIavPage extends WdLayoutPage{
       .findElement( By.tagName('viewer-state-controller') )
       .findElement( By.css('[aria-label="Select a new template"]') )
     await templateBtn.click()
+
+    await this._browser.wait(
+      until.elementLocated( By.tagName('mat-option') ),
+      1e3 * 60 * 10
+    )
 
     const options = await this._browser.findElements(
       By.tagName('mat-option')
