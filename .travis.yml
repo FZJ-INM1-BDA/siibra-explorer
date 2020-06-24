@@ -47,6 +47,8 @@ jobs:
       before_script:
       - cd ..
       script:
+      - sleep 5s
+      - curl http://localhost:3000
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
       env:
       - BROWSERSTACK_USERNAME=xiao33
