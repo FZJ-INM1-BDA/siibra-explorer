@@ -1,5 +1,5 @@
 const { spawn } = require("child_process")
-const { expect } = require('chai')
+const { expect, assert } = require('chai')
 const path = require('path')
 const got = require('got')
 
@@ -70,6 +70,11 @@ describe('> server.js', () => {
         expect(signal).to.equal('SIGTERM')
         clearTimeout(timedKillSig)
         done()
+      })
+
+      childProcess.on('error', (err) => {
+        console.error('process erroring out', err)
+        assert(false, err)
       })
     })
   })
