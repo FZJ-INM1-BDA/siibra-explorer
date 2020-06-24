@@ -37,16 +37,11 @@ jobs:
 
     - stage: e2e
       name: e2e (with browserstack)
-      before_install:
+      install:
       - npm i
       - npm run build-aot
-      - cd deploy
-      install:
-      # build aot
-      - nohup node server.js &
-      before_script:
-      - cd ..
       script:
+      - cd deploy && nohup node server.js &
       - sleep 5s
       - curl http://localhost:3000
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
