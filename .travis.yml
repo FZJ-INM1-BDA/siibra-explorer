@@ -45,6 +45,8 @@ jobs:
       install:
       # build aot
       - node server.js &
+      before_script:
+      - cd ..
       script:
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
       env:
