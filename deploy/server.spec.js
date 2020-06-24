@@ -62,15 +62,10 @@ describe('> server.js', () => {
         }
       })
   
-      const timedKillSig = setTimeout(() => {
-        console.log('killing on timeout')
-        childProcess.kill()
-      }, 500)
-      
       childProcess.on('exit', (code, signal) => {
+        clearTimeout(timedKillSig)
         console.log('process exit')
         expect(signal).to.equal('SIGTERM')
-        clearTimeout(timedKillSig)
         done()
       })
 
@@ -78,6 +73,11 @@ describe('> server.js', () => {
         console.error('process erroring out', err)
         assert(false, err)
       })
+
+      const timedKillSig = setTimeout(() => {
+        console.log('killing on timeout')
+        childProcess.kill()
+      }, 500)
     })
   })
 
