@@ -49,12 +49,15 @@ describe('> server.js', () => {
       })
     })
 
+    const PORT = process.env.PORT || 3000
+
     it('> does not throw if HOST_PATHNAME leads with slash, but does not end with slash', done => {
   
       const childProcess = spawn('node', ['server.js'],  {
         cwd: cwdPath,
         env: {
           ...process.env,
+          PORT,
           HOST_PATHNAME: '/viewer'
         }
       })
@@ -87,7 +90,7 @@ describe('> server.js', () => {
     })
   
     it('> redirects as expected', async () => {
-      const { statusCode } = await got(`http://localhost:3000/viewer`, {
+      const { statusCode } = await got(`http://localhost:${PORT}/viewer`, {
         followRedirect: false
       })
       expect(statusCode).to.be.greaterThan(300)
