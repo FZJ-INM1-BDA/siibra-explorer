@@ -42,9 +42,10 @@ jobs:
       - npm run build-aot
       script:
       - cd deploy && npm i
-      - NODE_ENV=production nohup node server.js &
+      - nohup node server.js &
       - sleep 5s
       - curl http://localhost:3000
+      - cd ..
       - npm run e2e -- --specs ./e2e/src/navigating/changeTemplate.prod.e2e-spec.js
       env:
       - BROWSERSTACK_USERNAME=xiao33
