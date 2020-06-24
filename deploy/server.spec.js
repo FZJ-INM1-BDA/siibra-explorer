@@ -63,10 +63,12 @@ describe('> server.js', () => {
       })
   
       const timedKillSig = setTimeout(() => {
+        console.log('killing on timeout')
         childProcess.kill()
       }, 500)
       
       childProcess.on('exit', (code, signal) => {
+        console.log('process exit')
         expect(signal).to.equal('SIGTERM')
         clearTimeout(timedKillSig)
         done()
