@@ -19,7 +19,7 @@ jobs:
       # env(TEST_SUITE) = 'unit-frontend' - for parallel runs in TravisCI
       # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
-      if: env(TEST_SUITE) = 'unit-frontend' AND NOT type = pull_request AND NOT branch in (master, staging, dev)
+      if: (env(TEST_SUITE) = 'unit-frontend') AND (NOT type = pull_request) AND (NOT branch in (master, staging, dev))
       install:
       - npm i
       script:
@@ -34,7 +34,7 @@ jobs:
       # env(TEST_SUITE) = 'unit-backend' - for parallel runs in TravisCI
       # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
-      if: env(TEST_SUITE) = 'unit-backend' AND NOT type = pull_request AND NOT branch in (master, staging, dev)
+      if: (env(TEST_SUITE) = 'unit-backend') AND (NOT type = pull_request) AND (NOT branch in (master, staging, dev))
       before_install:
       - cd deploy
       install:
@@ -48,7 +48,7 @@ jobs:
     - stage: local e2e
       # type = api - should only be activated by API
       # when send API, ensure to set env TEST_SUITE=e2e-local to explicitly trigger this build
-      if: (env(TEST_SUITE) =~ /^https/) AND (branch IN (master, staging, dev)) AND (type = api)
+      if: env(TEST_SUITE) =~ /^https/
       name: e2e (local)
       install:
       - npm i
