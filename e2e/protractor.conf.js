@@ -54,34 +54,34 @@ const bsConfig = {
     "os" : "Windows",
     "osVersion" : "10",
     'browserName': 'chrome',
-    'browserstack.local': false,
+    // 'browserstack.local': false,
     "seleniumVersion" : "4.0.0-alpha-2",
     'browserstack.debug': 'true'
   },
   "browserName" : "Chrome",
   "browserVersion" : "83.0",
 
-  // Code to start browserstack local before start of test
-  beforeLaunch: function(){
-    console.log("Connecting local");
-    return new Promise(function(resolve, reject){
-      bsLocal = new Local();
-      bsLocal.start({'key': bsAccessKey }, function(error) {
-        if (error) return reject(error);
-        console.log('Connected. Now testing...');
+  // // Code to start browserstack local before start of test
+  // beforeLaunch: function(){
+  //   console.log("Connecting local");
+  //   return new Promise(function(resolve, reject){
+  //     bsLocal = new Local();
+  //     bsLocal.start({'key': bsAccessKey }, function(error) {
+  //       if (error) return reject(error);
+  //       console.log('Connected. Now testing...');
 
-        resolve();
-      });
-    });
-  },
+  //       resolve();
+  //     });
+  //   });
+  // },
 
-  // Code to stop browserstack local after end of test
-  afterLaunch: function(){
-    return new Promise(function(resolve, reject){
-      if (bsLocal) bsLocal.stop(resolve)
-      else resolve()
-    });
-  }
+  // // Code to stop browserstack local after end of test
+  // afterLaunch: function(){
+  //   return new Promise(function(resolve, reject){
+  //     if (bsLocal) bsLocal.stop(resolve)
+  //     else resolve()
+  //   });
+  // }
 }
 
 exports.config = {
