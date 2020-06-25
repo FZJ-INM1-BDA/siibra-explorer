@@ -8,53 +8,54 @@ node_js:
 git:
   depth: 3
 
-stages:
+script: echo starting test
 
-  - name: Unit test frontend
-    if: |
-      env(TEST_SUITE) = 'unit-frontend' AND \
-      type = push AND \
-      branch NOT IN (master, staging, dev)
-    install:
-    - npm i
-    script:
-    - npm run lint
-    - npm test
-    env:
-    - NODE_ENV=test
+jobs:
+  include:
+    - name: Unit test frontend
+      if: |
+        type = push AND \
+        branch NOT IN (master, staging, dev)
+      install:
+      - npm i
+      script:
+      - npm run lint
+      - npm test
+      env:
+      - NODE_ENV=test
 
-  - name: Unit test backend
-    if: |
-      env(TEST_SUITE) = 'unit-backend' AND \
-      type = push AND \
-      branch NOT IN (master, staging, dev)
-    before_install:
-    - cd deploy
-    install:
-    - npm i
-    script:
-    - npm test
-    env:
-    - NODE_ENV=test
-    - PORT=12234
+    - name: Unit test backend
+      if: |
+        type = push AND \
+        branch NOT IN (master, staging, dev)
+      before_install:
+      - cd deploy
+      install:
+      - npm i
+      script:
+      - npm test
+      env:
+      - NODE_ENV=test
+      - PORT=12234
 
-  - name: local e2e
-    if: |
-      branch = chore_debugTravisE2e AND \
-      type = api AND \
-      env(TEST_SUITE) = e2e-local AND \
-      env(ATLAS_URL) IS present
-    install:
-    - npm i
-    - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
-    - npm i --no-save puppeteer@${PPTR_VERSION}
-    script:
-    - echo Running test against $ATLAS_URL
-    - npm run e2e
-    env:
-    - CHROMIUM_VERSION=80.0.3987.106
-    - PPTR_VERSION=2.1.0
-    - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
+    - name: local e2e
+      if: |
+        branch = chore_debugTravisE2e AND \
+        type = api AND \
+        env(TEST_SUITE) = e2e-local AND \
+        env(ATLAS_URL) IS present
+      install:
+      - npm i
+      - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
+      - npm i --no-save puppeteer@${PPTR_VERSION}
+      script:
+      - echo Running test against $ATLAS_URL
+      - npm run e2e
+      env:
+      - CHROMIUM_VERSION=80.0.3987.106
+      - PPTR_VERSION=2.1.0
+      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
+
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
