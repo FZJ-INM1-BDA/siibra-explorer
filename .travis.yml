@@ -8,6 +8,11 @@ node_js:
 git:
   depth: 3
 
+stages:
+  - Unit test frontend
+  - Unit test backend
+  - local e2e
+
 jobs:
   include:
     - name: Unit test frontend
