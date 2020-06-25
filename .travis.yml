@@ -36,7 +36,8 @@ jobs:
       - PORT=12234
 
     - stage: local e2e
-      if: env(LOCAL_TEST_E2E) = 1
+      name: local e2e
+      # if: env(LOCAL_TEST_E2E) = 1
       name: e2e (local)
       install:
       - npm i
@@ -49,18 +50,18 @@ jobs:
       - PPTR_VERSION=2.1.0
       - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
 
-    - stage: browserstack e2e
-      # only triggered via API, where env can be overwritten
-      if: NOT env(LOCAL_TEST_E2E) = 1
-      name: e2e (with browserstack)
-      install:
-      - npm i
-      script:
-      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js BROWSERSTACK_TEST_NAME=e2e_navigating npm run e2e
-      env:
-      - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
-      - BROWSERSTACK_USERNAME=xiao33
-      - secure: "YD2hDBnWzcMs9mTJCsKkJimd+mYKP8V1lTaCnxNvspJUxTuBWFmr8cvryIs9G9DhwgxkC3YL7hugsGkwMg6OIq27vLlo8mgoKS7/qrkWAJApGvDW4jc4CHpI2iE/ryrwG1bI3u9TuG0kSw+2sN/786LBgArlf5NbmwB9zmW4zyzjXXzSME34cwYdfEP96L2cob/uGiIj9YdaA1k3zfBhQQlp328i/xzYbIAcwfIia1AKYh/wgCzj+yfWDQ0Rtg9VcI2JiNfcbzMCgvDEBzshgeXuubFd9GPqPsc8zJhYqAi/15ge+WiB8R50MnZsYHO39JJihQzKz6WxIZQDeOQ2xd600NhFFLg6WPdE3jxAyENouTAd+0zJgXEeUU71YBDBl6RViagf8k7eOe9oMPW5ZlevdD3vcI8BC/qUL6Evye8QDDNi0s8gbIvcnJl5QMRBpeYcm/QaRUow1YeJobpccj/3tb7qTbc7T4Rha/NRBNhbhp/WzDSO/BUSEtpgJ3YwSEPTiEeSocTRT8ylnhEtBB70h4vQSClV73lW4vn7WjdZUTRACdxFNJ1MteQJ+3bgzyWMhDtdQo6BSz2UxF0mQFayAu2p9j0+MbB7x2zW9tksSw+6B6EjzPhQw6eOs2K0+syxWg09MTW1Fy6n0Zgchn0RWSnEPqPvss6kB2pkAR4="
+    # - stage: browserstack e2e
+    #   # only triggered via API, where env can be overwritten
+    #   if: NOT env(LOCAL_TEST_E2E) = 1
+    #   name: e2e (with browserstack)
+    #   install:
+    #   - npm i
+    #   script:
+    #   - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js BROWSERSTACK_TEST_NAME=e2e_navigating npm run e2e
+    #   env:
+    #   - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
+    #   - BROWSERSTACK_USERNAME=xiao33
+    #   - secure: "YD2hDBnWzcMs9mTJCsKkJimd+mYKP8V1lTaCnxNvspJUxTuBWFmr8cvryIs9G9DhwgxkC3YL7hugsGkwMg6OIq27vLlo8mgoKS7/qrkWAJApGvDW4jc4CHpI2iE/ryrwG1bI3u9TuG0kSw+2sN/786LBgArlf5NbmwB9zmW4zyzjXXzSME34cwYdfEP96L2cob/uGiIj9YdaA1k3zfBhQQlp328i/xzYbIAcwfIia1AKYh/wgCzj+yfWDQ0Rtg9VcI2JiNfcbzMCgvDEBzshgeXuubFd9GPqPsc8zJhYqAi/15ge+WiB8R50MnZsYHO39JJihQzKz6WxIZQDeOQ2xd600NhFFLg6WPdE3jxAyENouTAd+0zJgXEeUU71YBDBl6RViagf8k7eOe9oMPW5ZlevdD3vcI8BC/qUL6Evye8QDDNi0s8gbIvcnJl5QMRBpeYcm/QaRUow1YeJobpccj/3tb7qTbc7T4Rha/NRBNhbhp/WzDSO/BUSEtpgJ3YwSEPTiEeSocTRT8ylnhEtBB70h4vQSClV73lW4vn7WjdZUTRACdxFNJ1MteQJ+3bgzyWMhDtdQo6BSz2UxF0mQFayAu2p9j0+MbB7x2zW9tksSw+6B6EjzPhQw6eOs2K0+syxWg09MTW1Fy6n0Zgchn0RWSnEPqPvss6kB2pkAR4="
 env:
   - LOCAL_TEST_E2E=1
 # addons:
