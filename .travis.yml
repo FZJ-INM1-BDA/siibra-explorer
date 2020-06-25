@@ -36,7 +36,6 @@ jobs:
       - PORT=12234
 
     - stage: local e2e
-      name: local e2e
       # if: env(LOCAL_TEST_E2E) = 1
       name: e2e (local)
       install:
