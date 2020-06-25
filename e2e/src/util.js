@@ -4,11 +4,12 @@ const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/
 const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
-const { By, WebDriver, Key, until } = require('selenium-webdriver')
+const { By, Key, until } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 const { polyFillClick } = require('./material-util')
 
 const { ARIA_LABELS } = require('../../common/constants')
+const { retry } = require('../../common/util')
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -804,7 +805,11 @@ class WdIavPage extends WdLayoutPage{
       By.tagName('mat-option')
     )
     const idx = await _getIndexFromArrayOfWebElements(title, options)
-    if (idx >= 0) await options[idx].click()
+    if (idx >= 0) {
+      retry(async () => {
+        await options[idx].click()
+      }, { timeout: 1000, retries: 3 })
+    }
     else throw new Error(`${title} is not found as one of the dropdown templates`)
   }
 
