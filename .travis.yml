@@ -21,7 +21,6 @@ jobs:
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
       if: |
         env(TEST_SUITE) = 'unit-frontend' AND \
-        type = push AND \
         branch NOT IN (master, staging, dev)
       install:
       - npm i
@@ -39,8 +38,7 @@ jobs:
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
       if: |
         env(TEST_SUITE) = 'unit-backend' AND \
-        type = push AND \
-        branch NOT IN (master, staging, dev)
+        type = push 
       before_install:
       - cd deploy
       install:
@@ -57,7 +55,8 @@ jobs:
       if: |
         branch = chore_debugTravisE2e AND \
         type = api AND \
-        env(TEST_SUITE) = e2e-local
+        env(TEST_SUITE) = e2e-local AND \
+        env(ATLAS_URL) IS present
       name: e2e (local)
       install:
       - npm i
