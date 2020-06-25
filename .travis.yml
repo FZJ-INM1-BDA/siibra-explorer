@@ -8,8 +8,6 @@ node_js:
 git:
   depth: 3
 
-script: 'echo Running ${TEST_SUITE} against $(node -v)'
-
 jobs:
   include:
     - name: Unit test frontend
