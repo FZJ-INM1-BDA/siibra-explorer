@@ -54,7 +54,7 @@ const bsConfig = {
     "os" : "Windows",
     "osVersion" : "10",
     'browserName': 'chrome',
-    'browserstack.local': true,
+    'browserstack.local': false,
     "seleniumVersion" : "4.0.0-alpha-2",
     'browserstack.debug': 'true'
   },
