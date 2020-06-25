@@ -11,7 +11,7 @@ const directConnect = !!process.env.DIRECT_CONNECT
 
 const PROTRACTOR_SPECS = process.env.PROTRACTOR_SPECS
 
-const localConfig = bsUsername && bsUsername
+const localConfig = bsUsername && bsAccessKey
   ? {}
   : {
   ...(SELENIUM_ADDRESS

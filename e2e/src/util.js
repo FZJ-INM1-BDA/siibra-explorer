@@ -328,7 +328,7 @@ class WdBase{
   }
 
   // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
-  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout } = {}){
+  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout = 20 * 1000 } = {}){
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
       this._browser.get(actualUrl)
@@ -445,11 +445,12 @@ class WdBase{
 }
 
 class WdLayoutPage extends WdBase{
-  static TagNames = {
-    sideNav: 'search-side-nav'
-  }
   constructor(){
     super()
+    WdLayoutPage.TagNames = {
+      ...(WdBase.TagNames || {} ),
+      sideNav: 'search-side-nav'
+    }
   }
 
   _getModal(){
