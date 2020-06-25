@@ -18,6 +18,8 @@ describe('trans template navigation', () => {
     await iavPage.wait(200)
     await iavPage.dismissModal()
 
+    await iavPage.waitFor( AtlasPage.TagNames.sideNav )
+
     await iavPage.selectDropdownTemplate('Big Brain (Histology)')
     await iavPage.wait(2000)
     const interceptedCalls = await iavPage.getInterceptedHttpCalls()

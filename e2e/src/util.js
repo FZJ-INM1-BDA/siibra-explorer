@@ -361,6 +361,14 @@ class WdBase{
     })
   }
 
+  async waitFor(cssSelector) {
+    if (!cssSelector) throw new Error(`css selector must be defined`)
+    await this._browser.wait(
+      until.elementLocated( By.css(cssSelector) ),
+      1e3 * 60 * 10
+    )
+  }
+
   async waitFor(animation = false, async = false){
     if (animation) await this.wait(500)
     if (async) await this.waitForAsync()
@@ -436,7 +444,9 @@ class WdBase{
 }
 
 class WdLayoutPage extends WdBase{
-
+  static TagNames = {
+    sideNav: 'search-side-nav'
+  }
   constructor(){
     super()
   }
@@ -534,7 +544,7 @@ class WdLayoutPage extends WdBase{
 
   // SideNav
   _getSideNav() {
-    return this._browser.findElement( By.tagName('search-side-nav') )
+    return this._browser.findElement( By.tagName(WdLayoutPage.TagNames.sideNav) )
   }
 
   async getSideNavTag(){
