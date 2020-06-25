@@ -9,7 +9,7 @@ const bsUsername = process.env.BROWSERSTACK_USERNAME
 const bsAccessKey = process.env.BROWSERSTACK_ACCESS_KEY
 const directConnect = !!process.env.DIRECT_CONNECT
 
-const PROD_FLAG = process.env.NODE_ENV === 'production'
+const PROTRACTOR_SPECS = process.env.PROTRACTOR_SPECS
 
 const localConfig = bsUsername && bsUsername
   ? {}
@@ -86,9 +86,7 @@ const bsConfig = {
 
 exports.config = {
   specs: [
-    PROD_FLAG
-      ? './src/**/*.prod.e2e-spec.js'
-      : './src/**/*.e2e-spec.js'
+    (PROTRACTOR_SPECS && PROTRACTOR_SPECS) || './src/**/*.prod.e2e-spec.js'
   ],
   jasmineNodeOpts: {
     defaultTimeoutInterval: 1000 * 60 * 10

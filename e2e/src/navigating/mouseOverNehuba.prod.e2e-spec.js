@@ -98,7 +98,7 @@ const dictionary = {
         },
         {
           position: [642, 541],
-          expectedLabelName: 'lh_PoCi-PrCu_0',
+          expectedLabelName: 'lh_CAC-PrCu_0',
         }
       ]
     }
