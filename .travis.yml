@@ -20,8 +20,7 @@ jobs:
       # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
       if: |
-        env(TEST_SUITE) = 'unit-frontend' AND \
-        branch NOT IN (master, staging, dev)
+        env(TEST_SUITE) = 'unit-frontend'
       install:
       - npm i
       script:
@@ -37,8 +36,7 @@ jobs:
       # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
       # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
       if: |
-        env(TEST_SUITE) = 'unit-backend' AND \
-        type = push 
+        env(TEST_SUITE) = 'unit-backend'
       before_install:
       - cd deploy
       install:
@@ -69,6 +67,8 @@ jobs:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
       - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
+      - ATLAS_URL=env(ATLAS_URL)
+      - TEST_SUITE=env(TEST_SUITE)
 
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
