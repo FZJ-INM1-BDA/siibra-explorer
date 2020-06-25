@@ -44,7 +44,7 @@
       </mat-card-footer>
     </mat-card>
     <ng-container *ngIf="stillLoadingTemplates$ | async as stillLoadingTemplates">
-      <div class="d-flex align-items-center p-4" *ngFor="let t of stillLoadingTemplates">
+      <div class="d-flex align-items-center p-4 loadingIndicator" *ngFor="let t of stillLoadingTemplates">
         <h1 class="mat-h1">
           <div class="spinnerAnimationCircle"></div>
         </h1>
