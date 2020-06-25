@@ -8,10 +8,8 @@ node_js:
 git:
   depth: 3
 
-stages:
-  - Unit test frontend
-  - Unit test backend
-  - local e2e
+before_install:
+  - echo before_install
 
 jobs:
   include:
@@ -29,10 +27,6 @@ jobs:
       - NODE_ENV=test
 
     - name: Unit test backend
-      if: |
-        env(TEST_SUITE) = 'unit-backend' AND \
-        type = push AND \
-        branch NOT IN (master, staging, dev)
       before_install:
       - cd deploy
       install:
