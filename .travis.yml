@@ -48,13 +48,15 @@ jobs:
     - stage: local e2e
       # type = api - should only be activated by API
       # when send API, ensure to set env TEST_SUITE=e2e-local to explicitly trigger this build
-      if: env(TEST_SUITE) = 'e2e-local' AND branch IN (master, staging, dev) AND type = api
+      if: env(TEST_SUITE) =~ /^https/ AND branch IN (master, staging, dev) AND type = api
       name: e2e (local)
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
       - npm i --no-save puppeteer@${PPTR_VERSION}
       script:
+      - ATLAS_URL=$TEST_SUITE
+      - echo Running test against $ATLAS_URL
       - npm run e2e
       env:
       - CHROMIUM_VERSION=80.0.3987.106
