@@ -10,17 +10,29 @@ git:
 
 script: 'echo Running ${TEST_SUITE} against $(node -v)'
 
+stages:
+  - name: Unit test frontend
+    if: |
+      env(TEST_SUITE) = 'unit-frontend' AND \
+      type = push AND \
+      branch NOT IN (master, staging, dev)
+  - name: Unit test backend
+    if: |
+      env(TEST_SUITE) = 'unit-backend' AND \
+      type = push AND \
+      branch NOT IN (master, staging, dev)
+  - name: local e2e
+    if: |
+      branch = chore_debugTravisE2e AND \
+      type = api AND \
+      env(TEST_SUITE) = e2e-local AND \
+      env(ATLAS_URL) IS present
+
 jobs:
   include:
 
     - stage: Unit test frontend
-      name: frontend unit test
 
-      # env(TEST_SUITE) = 'unit-frontend' - for parallel runs in TravisCI
-      # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
-      # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
-      if: |
-        env(TEST_SUITE) = 'unit-frontend'
       install:
       - npm i
       script:
@@ -30,13 +42,7 @@ jobs:
       - NODE_ENV=test
 
     - stage: Unit test backend
-      name: backend unit test
 
-      # env(TEST_SUITE) = 'unit-backend' - for parallel runs in TravisCI
-      # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
-      # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
-      if: |
-        env(TEST_SUITE) = 'unit-backend'
       before_install:
       - cd deploy
       install:
@@ -48,14 +54,7 @@ jobs:
       - PORT=12234
 
     - stage: local e2e
-      # type = api - should only be activated by API
-      # when send API, ensure to set env TEST_SUITE=e2e-local to explicitly trigger this build
-      if: |
-        branch = chore_debugTravisE2e AND \
-        type = api AND \
-        env(TEST_SUITE) = e2e-local AND \
-        env(ATLAS_URL) IS present
-      name: e2e (local)
+
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
@@ -67,8 +66,6 @@ jobs:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
       - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
-      - ATLAS_URL=env(ATLAS_URL)
-      - TEST_SUITE=env(TEST_SUITE)
 
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
