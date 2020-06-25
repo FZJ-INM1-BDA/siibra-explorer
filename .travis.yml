@@ -10,29 +10,13 @@ git:
 
 script: 'echo Running ${TEST_SUITE} against $(node -v)'
 
-stages:
-  - name: Unit test frontend
-    if: |
-      env(TEST_SUITE) = 'unit-frontend' AND \
-      type = push AND \
-      branch NOT IN (master, staging, dev)
-  - name: Unit test backend
-    if: |
-      env(TEST_SUITE) = 'unit-backend' AND \
-      type = push AND \
-      branch NOT IN (master, staging, dev)
-  - name: local e2e
-    if: |
-      branch = chore_debugTravisE2e AND \
-      type = api AND \
-      env(TEST_SUITE) = e2e-local AND \
-      env(ATLAS_URL) IS present
-
 jobs:
   include:
-
-    - stage: Unit test frontend
-
+    - name: Unit test frontend
+      if: |
+        env(TEST_SUITE) = 'unit-frontend' AND \
+        type = push AND \
+        branch NOT IN (master, staging, dev)
       install:
       - npm i
       script:
@@ -41,8 +25,11 @@ jobs:
       env:
       - NODE_ENV=test
 
-    - stage: Unit test backend
-
+    - name: Unit test backend
+      if: |
+        env(TEST_SUITE) = 'unit-backend' AND \
+        type = push AND \
+        branch NOT IN (master, staging, dev)
       before_install:
       - cd deploy
       install:
@@ -53,8 +40,12 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
-    - stage: local e2e
-
+    - name: local e2e
+      if: |
+        branch = chore_debugTravisE2e AND \
+        type = api AND \
+        env(TEST_SUITE) = e2e-local AND \
+        env(ATLAS_URL) IS present
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
