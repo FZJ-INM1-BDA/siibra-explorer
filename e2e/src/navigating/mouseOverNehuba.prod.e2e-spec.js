@@ -97,8 +97,12 @@ const dictionary = {
           expectedLabelName: 'rh_SP-SM_0',
         },
         {
-          position: [642, 541],
-          expectedLabelName: 'lh_CAC-PrCu_0',
+          /**
+           * Changed from [677, 579] as it is extremely unfortunate in that
+           * it is literally the connecting point between lh_CAC-PrCu_0 and lh_PoCi-PrCu_0
+           */
+          position: [677, 579],
+          expectedLabelName: 'lh_ST-TT_0',
         }
       ]
     }

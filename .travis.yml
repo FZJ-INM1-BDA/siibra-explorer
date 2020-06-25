@@ -15,7 +15,11 @@ jobs:
 
     - stage: Unit test frontend
       name: frontend unit test
-      if: env(TEST_SUITE) = 'unit-frontend'
+
+      # env(TEST_SUITE) = 'unit-frontend' - for parallel runs in TravisCI
+      # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
+      # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
+      if: env(TEST_SUITE) = 'unit-frontend' AND NOT type = pull_request AND NOT branch in (master, staging, dev)
       install:
       - npm i
       script:
@@ -26,7 +30,11 @@ jobs:
 
     - stage: Unit test backend
       name: backend unit test
-      if: env(TEST_SUITE) = 'unit-backend'
+
+      # env(TEST_SUITE) = 'unit-backend' - for parallel runs in TravisCI
+      # NOT type = pull_request - only run on branch, so it is not run on PR (duplicated runs)
+      # NOT branch in (master, staging, dev) - all changes done to these branches should go through PR, so do not run unit tests
+      if: env(TEST_SUITE) = 'unit-backend' AND NOT type = pull_request AND NOT branch in (master, staging, dev)
       before_install:
       - cd deploy
       install:
@@ -38,18 +46,20 @@ jobs:
       - PORT=12234
 
     - stage: local e2e
-      if: env(TEST_SUITE) = 'e2e-local'
+      # type = api - should only be activated by API
+      # when send API, ensure to set env TEST_SUITE=e2e-local to explicitly trigger this build
+      if: env(TEST_SUITE) = 'e2e-local' AND branch IN (master, staging, dev) AND type = api
       name: e2e (local)
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
       - npm i --no-save puppeteer@${PPTR_VERSION}
       script:
-      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js npm run e2e
+      - npm run e2e
       env:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
-      - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
+      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
 
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
@@ -77,5 +87,6 @@ jobs:
 # Parallelising tests in Travis
 
 env:
-- TEST_SUITE=unit-frontend
-- TEST_SUITE=unit-backend
+  jobs:
+  - TEST_SUITE=unit-frontend
+  - TEST_SUITE=unit-backend
