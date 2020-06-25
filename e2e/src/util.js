@@ -362,7 +362,7 @@ class WdBase{
     })
   }
 
-  async waitFor(cssSelector) {
+  async waitForCss(cssSelector) {
     if (!cssSelector) throw new Error(`css selector must be defined`)
     await this._browser.wait(
       until.elementLocated( By.css(cssSelector) ),
