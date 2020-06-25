@@ -17,7 +17,6 @@ describe('trans template navigation', () => {
     await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
     await iavPage.wait(200)
     await iavPage.dismissModal()
-    await iavPage.waitUntilAllChunksLoaded()
 
     await iavPage.selectDropdownTemplate('Big Brain (Histology)')
     await iavPage.wait(2000)
