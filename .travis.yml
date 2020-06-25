@@ -48,7 +48,7 @@ jobs:
     - stage: local e2e
       # type = api - should only be activated by API
       # when send API, ensure to set env TEST_SUITE=e2e-local to explicitly trigger this build
-      if: env(TEST_SUITE) =~ /^https/
+      if: type = api
       name: e2e (local)
       install:
       - npm i
