@@ -43,10 +43,11 @@ jobs:
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
       - npm i --no-save puppeteer@${PPTR_VERSION}
       script:
-      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js BROWSERSTACK_TEST_NAME=e2e_navigating npm run e2e
+      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js npm run e2e
       env:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
+      - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
 
     - stage: browserstack e2e
       # only triggered via API, where env can be overwritten
