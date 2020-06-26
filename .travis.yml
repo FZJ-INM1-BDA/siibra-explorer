@@ -10,19 +10,10 @@ git:
 
 # skipping install and script at root
 # as otherwise, travis will run npm install / npm test
-install: skip
-script: skip
-
-stages:
-  - name: Unit tests and Lint
-    if: |
-      type = push AND \
-      branch NOT IN (master, staging, dev)
-  - name: e2e tests
-    if: |
-      branch = chore_debugTravisE2e AND \
-      type = api AND \
-      env(ATLAS_URL) IS present
+install: 
+  - if [[ -z "${ATLAS_URL}" ]]; then npm i && npm run wd -- update --versions.chrome=${CHROMIUM_VERSION} && npm i --no-save puppeteer@${PPTR_VERSION} ; fi
+script: 
+  - if [[ -z "${ATLAS_URL}" ]]; then echo Running test against $ATLAS_URL && npm run e2e; fi
 
 jobs:
   include:
@@ -79,6 +70,11 @@ jobs:
     #   - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
     #   - BROWSERSTACK_USERNAME=xiao33
     #   - secure: "YD2hDBnWzcMs9mTJCsKkJimd+mYKP8V1lTaCnxNvspJUxTuBWFmr8cvryIs9G9DhwgxkC3YL7hugsGkwMg6OIq27vLlo8mgoKS7/qrkWAJApGvDW4jc4CHpI2iE/ryrwG1bI3u9TuG0kSw+2sN/786LBgArlf5NbmwB9zmW4zyzjXXzSME34cwYdfEP96L2cob/uGiIj9YdaA1k3zfBhQQlp328i/xzYbIAcwfIia1AKYh/wgCzj+yfWDQ0Rtg9VcI2JiNfcbzMCgvDEBzshgeXuubFd9GPqPsc8zJhYqAi/15ge+WiB8R50MnZsYHO39JJihQzKz6WxIZQDeOQ2xd600NhFFLg6WPdE3jxAyENouTAd+0zJgXEeUU71YBDBl6RViagf8k7eOe9oMPW5ZlevdD3vcI8BC/qUL6Evye8QDDNi0s8gbIvcnJl5QMRBpeYcm/QaRUow1YeJobpccj/3tb7qTbc7T4Rha/NRBNhbhp/WzDSO/BUSEtpgJ3YwSEPTiEeSocTRT8ylnhEtBB70h4vQSClV73lW4vn7WjdZUTRACdxFNJ1MteQJ+3bgzyWMhDtdQo6BSz2UxF0mQFayAu2p9j0+MbB7x2zW9tksSw+6B6EjzPhQw6eOs2K0+syxWg09MTW1Fy6n0Zgchn0RWSnEPqPvss6kB2pkAR4="
+
+env:
+  global:
+    - CHROMIUM_VERSION=80.0.3987.106
+    - PPTR_VERSION=2.1.0
 
 # addons:
 #   browserstack:
