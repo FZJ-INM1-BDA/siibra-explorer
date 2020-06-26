@@ -13,13 +13,21 @@ git:
 install: skip
 script: skip
 
+stages:
+  - name: Unit tests and Lint
+    if: |
+      type = push AND \
+      branch NOT IN (master, staging, dev)
+  - name: e2e tests
+    if: |
+      branch = chore_debugTravisE2e AND \
+      type = api AND \
+      env(ATLAS_URL) IS present
+
 jobs:
   include:
     - stage: Unit tests and Lint
       name: Unit test frontend / Lint
-      if: |
-        type = push AND \
-        branch NOT IN (master, staging, dev)
       install:
       - npm i
       script:
@@ -44,9 +52,6 @@ jobs:
 
     - stage: e2e tests 
       name: local e2e
-      if: |
-        branch = chore_debugTravisE2e AND \
-        type = api
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
@@ -58,7 +63,6 @@ jobs:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
       - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
-      - ATLAS_URL=env(ATLAS_URL)
 
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
