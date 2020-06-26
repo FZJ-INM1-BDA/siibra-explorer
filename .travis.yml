@@ -8,11 +8,15 @@ node_js:
 git:
   depth: 3
 
-script: echo starting test
+# skipping install and script at root
+# as otherwise, travis will run npm install / npm test
+install: skip
+script: skip
 
 jobs:
   include:
-    - name: Unit test frontend
+    - stage: Unit tests and Lint
+      name: Unit test frontend / Lint
       if: |
         type = push AND \
         branch NOT IN (master, staging, dev)
@@ -38,12 +42,11 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
-    - name: local e2e
+    - stage: e2e tests 
+      name: local e2e
       if: |
         branch = chore_debugTravisE2e AND \
-        type = api AND \
-        env(TEST_SUITE) = e2e-local AND \
-        env(ATLAS_URL) IS present
+        type = api
       install:
       - npm i
       - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
@@ -55,6 +58,7 @@ jobs:
       - CHROMIUM_VERSION=80.0.3987.106
       - PPTR_VERSION=2.1.0
       - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
+      - ATLAS_URL=env(ATLAS_URL)
 
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
@@ -78,10 +82,3 @@ jobs:
 #     access_key:
 #       secure: "j0NdVLyNwm1gDclEeE/xYrXAYiYAlx3HQxNRHMFhJyFml5R22spEMTwrTRl/vzyhv1FwfJAKfh4qbOn99cZ5Dzm7fWc8+Kq1zpp/1PRTzbFaLluJkV1wCwoODZkzmSVPj43M6070FhCJvOfe5VRUV440CgZH8IWRm7xaxRnN/MVyFMErMV/GIczEBB7D7E4mMhe6c9pBxjmojDDP4rGvKLGOYU7oVQKgZtbHtP/BxjQ7uzMysdTHZGZ/2c/XW/2bKVSADi4vFzge5PMVF3nSH+vzA09ro180Q5aoaek4XQPoIza0s0cqtqkbvkbJ+lWRE+Q7wJDhQLM4WNx5GX3fegJiqJRT7272EgGAUy6C+e2F+D5nPucf3w6Uov9vBn5zZjbfXdNah3GZEXOTRNAVzstySiwiZe7/f4bk0vWIiEhHC+iutjn8skMxFnuw2eM3SJ5ayjxskHOdRux+1fuDya32ctx8y9a3XLhuFcuGTaeMSAn5Dw5qOlI5Qoc+xRSARoRWKmlEuxTUudD0e+b8xqfZgmOP7D3GZ6QX2W4yFrOLGqUzEySHr8hxxzhIlfwSvVdJ15AtN2AtPFQYQXb7M+XX1L7fr39Z/5ctr7DDgljSE3F2U5ofyWV2hh54aGMBQe76cZfVzF4bi98X3r6u0b3Knyti2pvx5jIoxP46nOA="
 
-
-# Parallelising tests in Travis
-
-env:
-  jobs:
-  - TEST_SUITE=unit-frontend
-  - TEST_SUITE=unit-backend
