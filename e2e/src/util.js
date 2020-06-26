@@ -175,10 +175,34 @@ class WdBase{
     return isDisplayed
   }
 
+  async areVisible(cssSelector){
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const els = await this._browser.findElements( By.css( cssSelector ) )
+    const returnArr = []
+
+    for (const el of els) {
+      returnArr.push(await el.isDisplayed())
+    }
+    return returnArr
+  }
+
   async isAt(cssSelector){
     if (!cssSelector) throw new Error(`getText needs to define css selector`)
     const { x, y, width, height } = await this._browser.findElement( By.css(cssSelector) ).getRect()
     return { x, y, width, height }
+  }
+
+  async areAt(cssSelector){
+
+    if (!cssSelector) throw new Error(`getText needs to define css selector`)
+    const els = await this._browser.findElements( By.css( cssSelector ) )
+    const returnArr = []
+
+    for (const el of els) {
+      const { x, y, width, height } = await el.getRect()
+      returnArr.push({ x, y, width, height })
+    }
+    return returnArr
   }
 
   historyBack() {
@@ -329,6 +353,7 @@ class WdBase{
 
   // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
   async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout = 20 * 1000 } = {}){
+    this.__trackingNavigationState__ = false
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
       this._browser.get(actualUrl)
@@ -936,29 +961,33 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async getNavigationState() {
-    const actualNav = await this._browser.executeScript(async () => {
-      let returnObj, sub
-      const getPr = () =>  new Promise(rs => {
-
-        sub = nehubaViewer.navigationState.all
-          .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
-            returnObj = {
-              orientation: Array.from(orientation),
-              perspectiveOrientation: Array.from(perspectiveOrientation),
-              perspectiveZoom,
-              zoom,
-              position: Array.from(position)
-            }
-            rs()
-          })
+    if (!this.__trackingNavigationState__) {
+      await this._browser.executeScript(async () => {
+        window.__iavE2eNavigationState__ = {}
+        
+        const getPr = () => new Promise(rs => {
+  
+          window.__iavE2eNavigationStateSubptn__ = nehubaViewer.navigationState.all
+            .subscribe(({ orientation, perspectiveOrientation, perspectiveZoom, position, zoom }) => {
+              window.__iavE2eNavigationState__ = {
+                orientation: Array.from(orientation),
+                perspectiveOrientation: Array.from(perspectiveOrientation),
+                perspectiveZoom,
+                zoom,
+                position: Array.from(position)
+              }
+              rs()
+            })
+        })
+  
+        await getPr()
       })
 
-      await getPr()
-      sub.unsubscribe()
+      this.__trackingNavigationState__ = true
+    }
 
-      return returnObj
-    })
-    return actualNav
+    const returnVal = await this._browser.executeScript(() => window.__iavE2eNavigationState__)
+    return returnVal
   }
 
 }

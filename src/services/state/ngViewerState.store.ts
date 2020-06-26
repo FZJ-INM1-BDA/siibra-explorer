@@ -2,13 +2,13 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
-import { AtlasViewerConstantsServices } from 'src/atlasViewer/atlasViewer.constantService.service';
 import { SNACKBAR_MESSAGE } from './uiState.store';
 import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
 import { Action, select, Store } from '@ngrx/store'
-import { BACKENDURL } from 'src/util/constants';
+import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from './ngViewerState.store.helper'
+import { PureContantService } from 'src/util';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
 export const V_ONE_THREE = 'V_ONE_THREE'
@@ -185,7 +185,7 @@ export class NgViewerUseEffect implements OnDestroy {
   constructor(
     private actions: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private http: HttpClient,
   ){
 
@@ -343,14 +343,14 @@ export class NgViewerUseEffect implements OnDestroy {
 
     this.toggleMaximiseCycleMessage$ = combineLatest(
       this.toggleMaximiseMode$,
-      this.constantService.useMobileUI$,
+      this.pureConstantService.useTouchUI$,
     ).pipe(
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === SINGLE_PANEL),
       mapTo({
         type: SNACKBAR_MESSAGE,
-        snackbarMessage: this.constantService.cyclePanelMessage,
+        snackbarMessage: CYCLE_PANEL_MESSAGE,
       }),
     )
 

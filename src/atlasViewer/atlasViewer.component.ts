@@ -43,6 +43,7 @@ export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
 
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
+import { PureContantService } from "src/util";
 
 /**
  * TODO
@@ -119,6 +120,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     private store: Store<IavRootStoreInterface>,
     private widgetServices: WidgetServices,
     private constantsService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private matDialog: MatDialog,
     private dispatcher$: ActionsSubject,
     private rd: Renderer2,
@@ -272,7 +274,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
-      this.constantsService.useMobileUI$.subscribe(bool => this.ismobile = bool),
+      this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
     )
 
     this.subscriptions.push(

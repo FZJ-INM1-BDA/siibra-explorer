@@ -3,7 +3,6 @@ import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
@@ -11,6 +10,7 @@ import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { PureContantService } from "src/util";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -44,11 +44,11 @@ export class RegionTextSearchAutocomplete {
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private dialog: MatDialog,
-    private constantService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService,
     private log: LoggingService
   ) {
 
-    this.useMobileUI$ = this.constantService.useMobileUI$
+    this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     const viewerState$ = this.store$.pipe(
       select('viewerState'),

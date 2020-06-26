@@ -19,6 +19,9 @@ current-layout
 {
   top: 0;
   left: 0;
+  /** z index of current layout has to be higher than that of layout-floating-container, or status container will cover panel control */
+  /** TODO decide which behaviour is more nature */
+  z-index: 6;
 }
 
 div[landmarkMasterContainer]
@@ -117,29 +120,11 @@ div#scratch-pad
   bottom: 0;
 }
 
-maximise-panel-button
+.overlay-btn-container
 {
-  transition: opacity 170ms ease-in-out,
-    transform 250ms ease-in-out;
-
   position: absolute;
   bottom: 0;
   right: 0;
-}
-
-/* if not mobile, then show on hover */
-maximise-panel-button
-{
-  opacity: 0.0;
-  pointer-events: none;
-}
-
-maximise-panel-button.onHover,
-maximise-panel-button:hover,
-:host-context([ismobile="true"]) maximise-panel-button
-{
-  opacity: 1.0 !important;
-  pointer-events: all !important;
 }
 
 .status-card-container
@@ -149,4 +134,27 @@ maximise-panel-button:hover,
   bottom:1em;
   width : 20em;
   pointer-events: all;
+}
+
+/* if not mobile, then show on hover */
+
+.opacity-crossfade
+{
+  transition: opacity 170ms ease-in-out,
+    transform 250ms ease-in-out;
+}
+
+.opacity-crossfade
+{
+
+  opacity: 0.0;
+  pointer-events: none;
+}
+
+.opacity-crossfade.onHover,
+.opacity-crossfade:hover,
+:host-context([ismobile="true"]) .opacity-crossfade
+{
+  opacity: 1.0 !important;
+  pointer-events: all !important;
 }

@@ -10,6 +10,3196 @@
   "nehubaConfigURL": "nehubaConfig/waxholmRatV2_0NehubaConfig",
   "parcellations": [
     {
+      "ngId": "WHS_SD_rat_atlas_v4_beta",
+      "type": "parcellation",
+      "name": "Waxholm Space rat brain atlas v4 beta",
+      "regions": [
+        {
+          "name": "White matter",
+          "children": [
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 67,
+              "name": "corpus callosum and associated subcortical white matter",
+              "rgb": [
+                255,
+                110,
+                0
+              ],
+              "children": []
+            },
+            {
+              "name": "Anterior commissure",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 36,
+                  "name": "anterior commissure, anterior part",
+                  "rgb": [
+                    124,
+                    252,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 37,
+                  "name": "anterior commissure, posterior part",
+                  "rgb": [
+                    255,
+                    186,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 73,
+                  "name": "anterior commissure",
+                  "rgb": [
+                    255,
+                    79,
+                    206
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Hippocampal white matter",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 6,
+                  "name": "alveus of the hippocampus",
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 38,
+                  "name": "ventral hippocampal commissure",
+                  "rgb": [
+                    174,
+                    0,
+                    232
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 52,
+                  "name": "fornix",
+                  "rgb": [
+                    21,
+                    192,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 59,
+                  "name": "fimbria of the hippocampus",
+                  "rgb": [
+                    0,
+                    255,
+                    29
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Corticofugal pathways",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 1,
+                  "name": "descending corticofugal pathways",
+                  "rgb": [
+                    255,
+                    52,
+                    39
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 85,
+                  "name": "pyramidal decussation",
+                  "rgb": [
+                    114,
+                    9,
+                    212
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Medial lemniscus",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 34,
+                  "name": "medial lemniscus",
+                  "rgb": [
+                    212,
+                    255,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 84,
+                  "name": "medial lemniscus decussation",
+                  "rgb": [
+                    65,
+                    150,
+                    255
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Thalamic tracts",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 53,
+                  "name": "mammillothalamic tract",
+                  "rgb": [
+                    238,
+                    186,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 54,
+                  "name": "commissural stria terminalis",
+                  "rgb": [
+                    173,
+                    255,
+                    47
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 60,
+                  "name": "fasciculus retroflexus",
+                  "rgb": [
+                    244,
+                    67,
+                    69
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 61,
+                  "name": "stria medullaris of the thalamus",
+                  "rgb": [
+                    0,
+                    255,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 62,
+                  "name": "stria terminalis",
+                  "rgb": [
+                    238,
+                    117,
+                    51
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 80,
+                  "name": "habenular commissure",
+                  "rgb": [
+                    69,
+                    235,
+                    202
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 63,
+              "name": "posterior commissure",
+              "rgb": [
+                255,
+                0,
+                218
+              ],
+              "children": []
+            },
+            {
+              "name": "Facial nerve",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 35,
+                  "name": "facial nerve",
+                  "rgb": [
+                    255,
+                    25,
+                    240
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 72,
+                  "name": "ascending fibers of the facial nerve",
+                  "rgb": [
+                    179,
+                    28,
+                    53
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 57,
+                  "name": "genu of the facial nerve",
+                  "rgb": [
+                    250,
+                    244,
+                    247
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Optic fiber system and supraoptic decussation",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 41,
+                  "name": "optic nerve",
+                  "rgb": [
+                    48,
+                    218,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 42,
+                  "name": "optic tract and optic chiasm",
+                  "rgb": [
+                    38,
+                    126,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 83,
+                  "name": "supraoptic decussation",
+                  "rgb": [
+                    250,
+                    170,
+                    64
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 76,
+              "name": "spinal trigeminal tract",
+              "rgb": [
+                250,
+                128,
+                114
+              ],
+              "children": []
+            },
+            {
+              "name": "White matter of the tectum",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 46,
+                  "name": "commissure of the superior colliculus",
+                  "rgb": [
+                    33,
+                    230,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 68,
+                  "name": "brachium of the superior colliculus",
+                  "rgb": [
+                    188,
+                    32,
+                    173
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 316,
+                  "name": "Deep white layer of the superior colliculus",
+                  "rgb": [
+                    217,
+                    90,
+                    209
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 69,
+                  "name": "inferior colliculus, commissure",
+                  "rgb": [
+                    255,
+                    42,
+                    39
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 146,
+                  "name": "inferior colliculus, brachium",
+                  "rgb": [
+                    176,
+                    58,
+                    72
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Cerebellar and precerebellar white matter",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 7,
+                  "name": "inferior cerebellar peduncle",
+                  "rgb": [
+                    52,
+                    255,
+                    13
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 78,
+                  "name": "middle cerebellar peduncle",
+                  "rgb": [
+                    134,
+                    204,
+                    76
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 79,
+                  "name": "transverse fibers of the pons",
+                  "rgb": [
+                    128,
+                    170,
+                    255
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "White matter of the brainstem",
+              "children": [
+                {
+                  "name": "Lateral lemniscus",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 140,
+                      "name": "lateral lemniscus, commissure",
+                      "rgb": [
+                        255,
+                        29,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 141,
+                      "name": "lateral lemniscus",
+                      "rgb": [
+                        255,
+                        166,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 129,
+                  "name": "acoustic striae",
+                  "rgb": [
+                    255,
+                    217,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 130,
+                  "name": "trapezoid body",
+                  "rgb": [
+                    213,
+                    255,
+                    0
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 157,
+              "name": "auditory radiation",
+              "rgb": [
+                244,
+                156,
+                255
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Gray matter",
+          "children": [
+            {
+              "name": "Olfactory system",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 64,
+                  "name": "glomerular layer of the accessory olfactory bulb",
+                  "rgb": [
+                    15,
+                    109,
+                    230
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 65,
+                  "name": "glomerular layer of the olfactory bulb",
+                  "rgb": [
+                    255,
+                    227,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 66,
+                  "name": "olfactory bulb",
+                  "rgb": [
+                    255,
+                    135,
+                    0
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Cerebral cortex including the neocortex and the hippocampus",
+              "children": [
+                {
+                  "name": "Neocortex",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 77,
+                      "name": "frontal association cortex",
+                      "rgb": [
+                        206,
+                        211,
+                        7
+                      ],
+                      "children": []
+                    },
+                    {
+                      "name": "Orbitofrontal cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 401,
+                          "name": "lateral orbital cortex",
+                          "rgb": [
+                            255,
+                            174,
+                            201
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 402,
+                          "name": "ventral orbital cortex",
+                          "rgb": [
+                            200,
+                            191,
+                            231
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 403,
+                          "name": "medial orbital cortex",
+                          "rgb": [
+                            63,
+                            72,
+                            204
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 404,
+                          "name": "dorsolateral orbital cortex",
+                          "rgb": [
+                            185,
+                            122,
+                            87
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Limbic cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 405,
+                          "name": "Prelimbic cortex",
+                          "rgb": [
+                            163,
+                            73,
+                            164
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 413,
+                          "name": "infralimbic cortex",
+                          "rgb": [
+                            34,
+                            177,
+                            76
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 412,
+                      "name": "claustrum",
+                      "rgb": [
+                        153,
+                        217,
+                        200
+                      ],
+                      "children": []
+                    },
+                    {
+                      "name": "Motor cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 408,
+                          "name": "primary motor cortex",
+                          "rgb": [
+                            153,
+                            217,
+                            234
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 406,
+                          "name": "secondary motor cortex",
+                          "rgb": [
+                            0,
+                            162,
+                            232
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 407,
+                          "name": "frontal cortex, area 3",
+                          "rgb": [
+                            136,
+                            0,
+                            21
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Insular cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 409,
+                          "name": "agranular insular cortex, ventral part",
+                          "rgb": [
+                            255,
+                            201,
+                            14
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 410,
+                          "name": "agranular insular cortex, dorsal part",
+                          "rgb": [
+                            255,
+                            127,
+                            39
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 424,
+                          "name": "agranular insular cortex, posterior part",
+                          "rgb": [
+                            181,
+                            230,
+                            29
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 416,
+                          "name": "granular insular cortex",
+                          "rgb": [
+                            239,
+                            228,
+                            176
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 414,
+                          "name": "dysgranular insular cortex",
+                          "rgb": [
+                            255,
+                            242,
+                            0
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Cingulate cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 411,
+                          "name": "cingulate cortex, area 1",
+                          "rgb": [
+                            0,
+                            128,
+                            128
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 10,
+                          "name": "cingulate cortex, area 2",
+                          "rgb": [
+                            29,
+                            104,
+                            235
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Somatosensory cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 417,
+                          "name": "primary somatosensory cortex, forelimb region",
+                          "rgb": [
+                            255,
+                            128,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 418,
+                          "name": "primary somatosensory cortex, dysgranular zone",
+                          "rgb": [
+                            237,
+                            28,
+                            36
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 420,
+                          "name": "primary somatoseonsory cortex, upper lip region (face)",
+                          "rgb": [
+                            255,
+                            128,
+                            192
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 423,
+                          "name": "primary somatosensory cortex, hindlimb region",
+                          "rgb": [
+                            136,
+                            100,
+                            21
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 425,
+                          "name": "primary somatorsensory cortex, barrel field",
+                          "rgb": [
+                            120,
+                            177,
+                            76
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 429,
+                          "name": "primary somatosensory cortex, trunk region",
+                          "rgb": [
+                            225,
+                            150,
+                            201
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 422,
+                          "name": "secondary somatosensory cortex",
+                          "rgb": [
+                            200,
+                            100,
+                            250
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Posterior parietal cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 432,
+                          "name": "lateral parietal association cortex",
+                          "rgb": [
+                            255,
+                            29,
+                            61
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 433,
+                          "name": "medial parietal association cortex",
+                          "rgb": [
+                            108,
+                            0,
+                            108
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 436,
+                          "name": "parietal cortex, posterior area",
+                          "rgb": [
+                            128,
+                            0,
+                            64
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Retrosplenial cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 427,
+                          "name": "retrosplenial dysgranular cortex",
+                          "rgb": [
+                            200,
+                            73,
+                            164
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 430,
+                          "name": "retrosplenial granular cortex",
+                          "rgb": [
+                            25,
+                            100,
+                            200
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Auditory cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 151,
+                          "name": "primary auditory cortex",
+                          "rgb": [
+                            255,
+                            215,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 152,
+                          "name": "secondary auditory cortex, dorsal area",
+                          "rgb": [
+                            240,
+                            255,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 153,
+                          "name": "secondary auditory cortex, ventral area",
+                          "rgb": [
+                            216,
+                            191,
+                            216
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 444,
+                      "name": "temporal association cortex",
+                      "rgb": [
+                        0,
+                        128,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "name": "Parahippocampus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 108,
+                          "name": "postrhinal cortex",
+                          "rgb": [
+                            40,
+                            112,
+                            130
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 109,
+                          "name": "presubiculum",
+                          "rgb": [
+                            80,
+                            123,
+                            175
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 110,
+                          "name": "parasubiculum",
+                          "rgb": [
+                            23,
+                            54,
+                            96
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 112,
+                          "name": "perirhinal area 35",
+                          "rgb": [
+                            205,
+                            51,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 113,
+                          "name": "perirhinal area 36",
+                          "rgb": [
+                            112,
+                            48,
+                            160
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 114,
+                          "name": "entorhinal cortex",
+                          "rgb": [
+                            122,
+                            187,
+                            51
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 115,
+                          "name": "lateral entorhinal cortex",
+                          "rgb": [
+                            90,
+                            111,
+                            47
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Visual cortex",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 442,
+                          "name": "primary visual cortex",
+                          "rgb": [
+                            84,
+                            52,
+                            35
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 448,
+                          "name": "secondary visual cortex, medial area",
+                          "rgb": [
+                            128,
+                            0,
+                            100
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 443,
+                          "name": "secondary visual cortex, lateral area",
+                          "rgb": [
+                            255,
+                            100,
+                            100
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 92,
+                      "name": "neocortex",
+                      "rgb": [
+                        3,
+                        193,
+                        45
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Allocortex",
+                  "children": [
+                    {
+                      "name": "Hippocampal formation",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 95,
+                          "name": "cornu ammonis 3",
+                          "rgb": [
+                            165,
+                            131,
+                            107
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 96,
+                          "name": "dentate gyrus",
+                          "rgb": [
+                            91,
+                            45,
+                            10
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 97,
+                          "name": "cornu ammonis 2",
+                          "rgb": [
+                            255,
+                            255,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 98,
+                          "name": "cornu ammonis 1",
+                          "rgb": [
+                            217,
+                            104,
+                            13
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 99,
+                          "name": "fasciola cinereum",
+                          "rgb": [
+                            255,
+                            0,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 100,
+                          "name": "subiculum",
+                          "rgb": [
+                            255,
+                            192,
+                            0
+                          ],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Cerebral nuclei",
+              "children": [
+                {
+                  "name": "Striatum",
+                  "children": [
+                    {
+                      "name": "Accumbens nucleus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 184,
+                          "name": "Accumbens nucleus, core",
+                          "rgb": [
+                            230,
+                            216,
+                            250
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 192,
+                          "name": "Accumbens nucleus, shell",
+                          "rgb": [
+                            88,
+                            47,
+                            108
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 197,
+                      "name": "Caudoputamen",
+                      "rgb": [
+                        129,
+                        79,
+                        155
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Pallidum",
+                  "children": [
+                    {
+                      "name": "Globus pallidus external ",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 195,
+                          "name": "Globus pallidus external, medial part",
+                          "rgb": [
+                            255,
+                            85,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 198,
+                          "name": "Globus pallidus external, lateral part",
+                          "rgb": [
+                            200,
+                            25,
+                            200
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 32,
+                      "name": "entopeduncular nucleus",
+                      "rgb": [
+                        26,
+                        231,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 193,
+                      "name": "Ventral pallidum",
+                      "rgb": [
+                        0,
+                        162,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 40,
+                  "name": "septal region",
+                  "rgb": [
+                    255,
+                    8,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 93,
+                  "name": "bed nucleus of the stria terminalis",
+                  "rgb": [
+                    0,
+                    8,
+                    182
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 82,
+              "name": "basal forebrain region",
+              "rgb": [
+                225,
+                240,
+                13
+              ],
+              "children": []
+            },
+            {
+              "name": "Thalamus",
+              "children": [
+                {
+                  "name": "Medial geniculate body",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 147,
+                      "name": "medial geniculate body, medial division",
+                      "rgb": [
+                        10,
+                        244,
+                        217
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 148,
+                      "name": "medial geniculate body, dorsal division",
+                      "rgb": [
+                        239,
+                        163,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 149,
+                      "name": "medial geniculate body, ventral division",
+                      "rgb": [
+                        131,
+                        58,
+                        31
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 150,
+                      "name": "medial geniculate body, marginal zone",
+                      "rgb": [
+                        255,
+                        47,
+                        242
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 259,
+                  "name": "Anteroventral thalamic nucleus",
+                  "rgb": [
+                    48,
+                    203,
+                    48
+                  ],
+                  "children": [
+                    {
+                      "name": "Anteroventral thalamic nucleus",
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 214,
+                      "name": "Anteroventral thalamic nucleus, dorsomedial part",
+                      "rgb": [
+                        239,
+                        121,
+                        218
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 215,
+                      "name": "Anteroventral thalamic nucleus, ventrolateral part",
+                      "rgb": [
+                        101,
+                        35,
+                        142
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Anteromedial thalamic nucleus ",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 244,
+                      "name": "Anteromedial thalamic nucleus",
+                      "rgb": [
+                        255,
+                        170,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 251,
+                      "name": "Anteromedial thalamic nucleus, ventral part",
+                      "rgb": [
+                        95,
+                        158,
+                        160
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 206,
+                  "name": "Lateral habenular nucleus",
+                  "rgb": [
+                    217,
+                    108,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "name": "Lateral habenular nucleus",
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 263,
+                      "name": "Lateral habenular nucleus, medial part",
+                      "rgb": [
+                        255,
+                        170,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 264,
+                      "name": "Lateral habenular nucleus, lateral part",
+                      "rgb": [
+                        255,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Lateral posterior thalamic nucleus ",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 283,
+                      "name": "Lateral posterior thalamic nucleus, laterorostral part",
+                      "rgb": [
+                        199,
+                        87,
+                        61
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 285,
+                      "name": "Lateral posterior thalamic nucleus, mediorostral part",
+                      "rgb": [
+                        60,
+                        179,
+                        113
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 286,
+                      "name": "Lateral posterior thalamic nucleus, mediocaudal part",
+                      "rgb": [
+                        255,
+                        235,
+                        205
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 288,
+                      "name": "Lateral posterior thalamic nucleus, laterocaudal part",
+                      "rgb": [
+                        218,
+                        165,
+                        32
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 207,
+                  "name": "Medial habenular nucleus",
+                  "rgb": [
+                    205,
+                    0,
+                    24
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "Zona incerta ",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 235,
+                      "name": "Zona incerta, dorsal part",
+                      "rgb": [
+                        216,
+                        191,
+                        216
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 236,
+                      "name": "Zona incerta, ventral part",
+                      "rgb": [
+                        75,
+                        200,
+                        138
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 257,
+                      "name": "Zona incerta, rostral part",
+                      "rgb": [
+                        30,
+                        144,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 287,
+                      "name": "Zona incerta, caudal part",
+                      "rgb": [
+                        255,
+                        228,
+                        196
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Laterodorsal thalamic nucleus ",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 228,
+                      "name": "Laterodorsal thalamic nucleus, dorsomedial part",
+                      "rgb": [
+                        255,
+                        123,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 229,
+                      "name": "Laterodorsal thalamic nucleus, ventrolateral part",
+                      "rgb": [
+                        43,
+                        153,
+                        31
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 212,
+                  "name": "Mediodorsal thalamic nucleus ",
+                  "rgb": [
+                    61,
+                    255,
+                    246
+                  ],
+                  "children": [
+                    {
+                      "name": "Mediodorsal thalamic nucleus ",
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 240,
+                      "name": "Mediodorsal thalamic nucleus, medial part",
+                      "rgb": [
+                        170,
+                        255,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 232,
+                      "name": "Mediodorsal thalamic nucleus , lateral part",
+                      "rgb": [
+                        255,
+                        85,
+                        127
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 233,
+                      "name": "Mediodorsal thalamic nucleus , central part",
+                      "rgb": [
+                        85,
+                        170,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 202,
+                  "name": "Paraventricular thalamic nucleus",
+                  "rgb": [
+                    0,
+                    0,
+                    205
+                  ],
+                  "children": [
+                    {
+                      "name": "Paraventricular thalamic nucleus",
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 242,
+                      "name": "Paraventricular thalamic nucleus, anterior part",
+                      "rgb": [
+                        156,
+                        51,
+                        51
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Subparafascicular thalamic nucleus ",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 271,
+                      "name": "Subparafascicular thalamic nucleus",
+                      "rgb": [
+                        102,
+                        205,
+                        170
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 278,
+                      "name": "Subparafascicular thalamic nucleus, parvicellular part",
+                      "rgb": [
+                        233,
+                        150,
+                        122
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 200,
+                  "name": "Reticular thalamic nucleus",
+                  "rgb": [
+                    0,
+                    217,
+                    255
+                  ],
+                  "children": [
+                    {
+                      "name": "Reticular thalamic nucleus",
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 164,
+                      "name": "reticular thalamic nucleus, auditory segment",
+                      "rgb": [
+                        110,
+                        0,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Geniculate nucleus",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 204,
+                      "name": "Ventral lateral geniculate nucleus",
+                      "rgb": [
+                        255,
+                        25,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 205,
+                      "name": "Dorsal lateral geniculate nucleus",
+                      "rgb": [
+                        255,
+                        226,
+                        0
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 203,
+                  "name": "Paracentral thalamic nuclei",
+                  "rgb": [
+                    205,
+                    144,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 209,
+                  "name": "Ventral posterolateral thalamic nucleus",
+                  "rgb": [
+                    255,
+                    136,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 211,
+                  "name": "Paratenial thalamic nucleus ",
+                  "rgb": [
+                    205,
+                    0,
+                    6
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 213,
+                  "name": "Anterodorsal thalamic nucleus",
+                  "rgb": [
+                    131,
+                    10,
+                    121
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 216,
+                  "name": "Rhomboid thalamic nucleus",
+                  "rgb": [
+                    0,
+                    255,
+                    17
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 217,
+                  "name": "Xiphoid thalamic nucleus",
+                  "rgb": [
+                    28,
+                    145,
+                    153
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 218,
+                  "name": "Paraxiphoid nucleus of thalamus",
+                  "rgb": [
+                    65,
+                    255,
+                    236
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 219,
+                  "name": "Reuniens thalamic nucleus",
+                  "rgb": [
+                    255,
+                    170,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 220,
+                  "name": "Ventral reuniens thalamic nucleus",
+                  "rgb": [
+                    255,
+                    253,
+                    106
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 221,
+                  "name": "Ventromedial thalamic nucleus",
+                  "rgb": [
+                    0,
+                    185,
+                    126
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 222,
+                  "name": "Submedius thalamic nucleus",
+                  "rgb": [
+                    130,
+                    0,
+                    217
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 227,
+                  "name": "Ventral posteromedial thalamic nucleus",
+                  "rgb": [
+                    255,
+                    0,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 230,
+                  "name": "Posterior thalamic nuclear group",
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 231,
+                  "name": "Ventrolateral thalamic nucleus",
+                  "rgb": [
+                    170,
+                    170,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 237,
+                  "name": "A13 dopamine cells",
+                  "rgb": [
+                    219,
+                    112,
+                    147
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 239,
+                  "name": "Angular thalamic nucleus",
+                  "rgb": [
+                    139,
+                    93,
+                    139
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 246,
+                  "name": "Bed nucleus of the stria medullaris, medial division, posterolateral part",
+                  "rgb": [
+                    118,
+                    148,
+                    65
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 247,
+                  "name": "Central medial thalamic nucleus",
+                  "rgb": [
+                    224,
+                    182,
+                    64
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 248,
+                  "name": "Accessory neurosecretory nuclei",
+                  "rgb": [
+                    255,
+                    0,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 249,
+                  "name": "External medullary lamina",
+                  "rgb": [
+                    170,
+                    255,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 252,
+                  "name": "Interanterodorsal thalamic nucleus",
+                  "rgb": [
+                    0,
+                    180,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 253,
+                  "name": "Interanteromedial thalamic nucleus",
+                  "rgb": [
+                    0,
+                    85,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 260,
+                  "name": "Intermediodorsal thalamic nucleus",
+                  "rgb": [
+                    160,
+                    82,
+                    45
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 265,
+                  "name": "Oval paracentral thalamic nucleus",
+                  "rgb": [
+                    0,
+                    255,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 266,
+                  "name": "Ventral posterior nucleus of the thalamus, parvicellular part",
+                  "rgb": [
+                    0,
+                    255,
+                    8
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 267,
+                  "name": "Parafascicular thalamic nucleus",
+                  "rgb": [
+                    255,
+                    239,
+                    213
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 268,
+                  "name": "Retrouniens area",
+                  "rgb": [
+                    0,
+                    0,
+                    205
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 269,
+                  "name": "Superior cerebellar peduncle",
+                  "rgb": [
+                    205,
+                    133,
+                    63
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 270,
+                  "name": "Prerubral field",
+                  "rgb": [
+                    210,
+                    180,
+                    140
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 272,
+                  "name": "Intergeniculat leaf",
+                  "rgb": [
+                    0,
+                    0,
+                    128
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 273,
+                  "name": "Posteromedian thalamic nucleus",
+                  "rgb": [
+                    0,
+                    139,
+                    139
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 274,
+                  "name": "Subcommissural organ",
+                  "rgb": [
+                    46,
+                    139,
+                    87
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 275,
+                  "name": "Precommissural nucleus",
+                  "rgb": [
+                    255,
+                    228,
+                    225
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 276,
+                  "name": "Anterior pretectal nucleus, dorsal part",
+                  "rgb": [
+                    106,
+                    90,
+                    205
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 279,
+                  "name": "Ventral linear nucleus of the thalamus",
+                  "rgb": [
+                    165,
+                    42,
+                    42
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 280,
+                  "name": "Nucleus of the fields of Forel",
+                  "rgb": [
+                    255,
+                    250,
+                    250
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 281,
+                  "name": "Subgeniculate nucleus",
+                  "rgb": [
+                    147,
+                    112,
+                    219
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 282,
+                  "name": "Ethmoid thalamic nucleus",
+                  "rgb": [
+                    218,
+                    112,
+                    214
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 284,
+                  "name": "A11 dopamine cells",
+                  "rgb": [
+                    255,
+                    182,
+                    193
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 81,
+                  "name": "nucleus of the stria medullaris",
+                  "rgb": [
+                    222,
+                    7,
+                    237
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 39,
+                  "name": "thalamus",
+                  "rgb": [
+                    0,
+                    100,
+                    0
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "name": "Hypothalamus",
+              "children": [
+                {
+                  "name": "Paraventricular hypothalamic nucleus",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 254,
+                      "name": "Paraventricular hypothalamic nucleus, lateral magnocellular part",
+                      "rgb": [
+                        224,
+                        255,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 255,
+                      "name": "Paraventricular hypothalamic nucleus, ventral part",
+                      "rgb": [
+                        255,
+                        85,
+                        127
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 258,
+                      "name": "Paraventricular hypothalamic nucleus, posterior part",
+                      "rgb": [
+                        255,
+                        0,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 262,
+                      "name": "Paraventricular hypothalamic nucleus, anterior parvicellular part",
+                      "rgb": [
+                        0,
+                        255,
+                        0
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 256,
+                      "name": "Paraventricular hypothalamic nucleus, medial parvicellular part",
+                      "rgb": [
+                        138,
+                        43,
+                        226
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 48,
+                  "name": "hypothalamic region",
+                  "rgb": [
+                    226,
+                    120,
+                    161
+                  ],
+                  "children": []
+                }
+              ]
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 43,
+              "name": "pineal gland",
+              "rgb": [
+                218,
+                170,
+                62
+              ],
+              "children": []
+            },
+            {
+              "name": "Midbrain",
+              "children": [
+                {
+                  "name": "Substantia nigra",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 187,
+                      "name": "Substantia nigra, reticular part",
+                      "rgb": [
+                        99,
+                        197,
+                        18
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 188,
+                      "name": "Substantia nigra, compact part",
+                      "rgb": [
+                        255,
+                        255,
+                        127
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 189,
+                      "name": "Substantia nigra, lateral part",
+                      "rgb": [
+                        0,
+                        159,
+                        159
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 3,
+                  "name": "subthalamic nucleus",
+                  "rgb": [
+                    0,
+                    0,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 196,
+                  "name": "Ventral tegmental area",
+                  "rgb": [
+                    127,
+                    255,
+                    212
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "Tectum",
+                  "children": [
+                    {
+                      "name": "Inferior colliculus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 142,
+                          "name": "inferior colliculus, dorsal cortex",
+                          "rgb": [
+                            206,
+                            255,
+                            142
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 143,
+                          "name": "inferior colliculus, central nucleus",
+                          "rgb": [
+                            0,
+                            238,
+                            255
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 145,
+                          "name": "inferior colliculus, external cortex",
+                          "rgb": [
+                            48,
+                            136,
+                            203
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 94,
+                      "name": "pretectal region",
+                      "rgb": [
+                        255,
+                        87,
+                        30
+                      ],
+                      "children": []
+                    },
+                    {
+                      "name": "Superior colliculus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 50,
+                          "name": "superficial gray layer of the superior colliculus",
+                          "rgb": [
+                            86,
+                            0,
+                            221
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 55,
+                          "name": "deeper layers of the superior colliculus",
+                          "rgb": [
+                            225,
+                            151,
+                            15
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 317,
+                          "name": "Intermediate gray layer of the superior colliculus",
+                          "rgb": [
+                            250,
+                            240,
+                            230
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 318,
+                          "name": "Intermediate white layer of the superior colliculus",
+                          "rgb": [
+                            128,
+                            0,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 319,
+                          "name": "Optic nerve layer of the superior colliculus",
+                          "rgb": [
+                            50,
+                            205,
+                            50
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 320,
+                          "name": "Zonal layer of the superior colliculus",
+                          "rgb": [
+                            215,
+                            244,
+                            96
+                          ],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Cerebellum",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 4,
+                  "name": "molecular layer of the cerebellum",
+                  "rgb": [
+                    255,
+                    255,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 5,
+                  "name": "granule cell level of the cerebellum",
+                  "rgb": [
+                    0,
+                    255,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "Cerebellar nuclei",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 321,
+                      "name": "Lateral (dentate) cerebellar nucleus",
+                      "rgb": [
+                        80,
+                        244,
+                        62
+                      ],
+                      "children": [
+                        {
+                          "name": "Lateral (dentate) cerebellar nucleus",
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 326,
+                          "name": "Lateral cerebellar nucleus, parvicellular part",
+                          "rgb": [
+                            127,
+                            255,
+                            212
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 325,
+                      "name": "Medial (fastigial) cerebellar nucleus",
+                      "rgb": [
+                        255,
+                        192,
+                        203
+                      ],
+                      "children": [
+                        {
+                          "name": "Medial (fastigial) cerebellar nucleus",
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 327,
+                          "name": "Medial cerebellar nucleus, lateral part",
+                          "rgb": [
+                            255,
+                            140,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 328,
+                          "name": "Medial cerebellar nucleus, dorsolateral protuberance",
+                          "rgb": [
+                            143,
+                            188,
+                            143
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Interposed cerebellar nucleus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 322,
+                          "name": "Interposed cerebellar nucleus, anterior part",
+                          "rgb": [
+                            123,
+                            104,
+                            238
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 323,
+                          "name": "Interposed cerebellar nucleus, dorsolateral part",
+                          "rgb": [
+                            255,
+                            165,
+                            0
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 324,
+                          "name": "Interposed cerebellar nucleus, dorsomedial part",
+                          "rgb": [
+                            173,
+                            216,
+                            230
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 329,
+                          "name": "Interposed cerebellar nucleus, posterior parvicellular part",
+                          "rgb": [
+                            220,
+                            20,
+                            60
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 330,
+                          "name": "Interposed cerebellar nucleus, posterior part",
+                          "rgb": [
+                            244,
+                            71,
+                            201
+                          ],
+                          "children": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Brainstem",
+              "children": [
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 47,
+                  "name": "brainstem",
+                  "rgb": [
+                    153,
+                    83,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "Cochlear nucleus, ventral part",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 158,
+                      "name": "ventral cochlear nucleus, anterior part",
+                      "rgb": [
+                        34,
+                        152,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 159,
+                      "name": "ventral cochlear nucleus, posterior part",
+                      "rgb": [
+                        0,
+                        230,
+                        207
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 160,
+                      "name": "ventral cochlear nucleus, cap area",
+                      "rgb": [
+                        0,
+                        255,
+                        106
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 123,
+                      "name": "ventral cochlear nucleus, granule cell layer",
+                      "rgb": [
+                        0,
+                        12,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Cochlear nucleus, dorsal part",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 126,
+                      "name": "dorsal cochlear nucleus, molecular layer",
+                      "rgb": [
+                        92,
+                        156,
+                        211
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 127,
+                      "name": "dorsal cochlear nucleus, fusiform and granule layer",
+                      "rgb": [
+                        0,
+                        80,
+                        156
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 128,
+                      "name": "dorsal cochlear nucleus, deep core",
+                      "rgb": [
+                        197,
+                        238,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Superior olivary complex",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 131,
+                      "name": "nucleus of the trapezoid body",
+                      "rgb": [
+                        0,
+                        255,
+                        81
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 132,
+                      "name": "superior paraolivary nucleus",
+                      "rgb": [
+                        0,
+                        238,
+                        255
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 133,
+                      "name": "medial superior olive",
+                      "rgb": [
+                        219,
+                        239,
+                        61
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 134,
+                      "name": "lateral superior olive",
+                      "rgb": [
+                        35,
+                        76,
+                        190
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 135,
+                      "name": "superior periolivary region",
+                      "rgb": [
+                        1,
+                        153,
+                        21
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 136,
+                      "name": "ventral periolivary nuclei",
+                      "rgb": [
+                        0,
+                        174,
+                        255
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "name": "Nuclei of the lateral lemniscus",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 137,
+                      "name": "lateral lemniscus, ventral nucleus",
+                      "rgb": [
+                        255,
+                        0,
+                        115
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 138,
+                      "name": "lateral lemniscus, intermediate nucleus",
+                      "rgb": [
+                        171,
+                        16,
+                        91
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 139,
+                      "name": "lateral lemniscus, dorsal nucleus",
+                      "rgb": [
+                        108,
+                        18,
+                        91
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 163,
+                  "name": "nucleus sagulum",
+                  "rgb": [
+                    99,
+                    205,
+                    0
+                  ],
+                  "children": []
+                },
+                {
+                  "name": "Vestibular nuclei",
+                  "children": [
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 301,
+                      "name": "Superior vestibular nucleus",
+                      "rgb": [
+                        238,
+                        232,
+                        170
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 304,
+                      "name": "Lateral vestibular nucleus",
+                      "rgb": [
+                        184,
+                        134,
+                        11
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 305,
+                      "name": "Nucleus Y of the vestibular complex",
+                      "rgb": [
+                        45,
+                        36,
+                        178
+                      ],
+                      "children": []
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 306,
+                      "name": "Spinal vestibular nucleus",
+                      "rgb": [
+                        255,
+                        20,
+                        147
+                      ],
+                      "children": []
+                    },
+                    {
+                      "name": "Medial vestibular nucleus",
+                      "children": [
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 308,
+                          "name": "Medial vestibular nucleus, magnocellular part",
+                          "rgb": [
+                            112,
+                            128,
+                            144
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 309,
+                          "name": "Medial vestibular nucleus, parvicellular part",
+                          "rgb": [
+                            34,
+                            139,
+                            34
+                          ],
+                          "children": []
+                        },
+                        {
+                          "ngId": "WHS_SD_rat_atlas_v4_beta",
+                          "labelIndex": 337,
+                          "name": "Medial vestibular nucleus, caudal part",
+                          "rgb": [
+                            4,
+                            25,
+                            159
+                          ],
+                          "children": []
+                        }
+                      ]
+                    },
+                    {
+                      "ngId": "WHS_SD_rat_atlas_v4_beta",
+                      "labelIndex": 343,
+                      "name": "Nucleus X of the vestibular nucleus",
+                      "rgb": [
+                        40,
+                        117,
+                        10
+                      ],
+                      "children": []
+                    }
+                  ]
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 312,
+                  "name": "Abducens nucleus",
+                  "rgb": [
+                    255,
+                    160,
+                    122
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 336,
+                  "name": "Nucleus of efferents of vestibular nerve",
+                  "rgb": [
+                    250,
+                    128,
+                    114
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 339,
+                  "name": "Locus coeruleus",
+                  "rgb": [
+                    255,
+                    127,
+                    80
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 310,
+                  "name": "Vestibulocerebellar nucleus",
+                  "rgb": [
+                    223,
+                    216,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 74,
+                  "name": "inferior olive",
+                  "rgb": [
+                    0,
+                    246,
+                    14
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 75,
+                  "name": "spinal trigeminal nucleus",
+                  "rgb": [
+                    91,
+                    241,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 56,
+                  "name": "periventricular gray",
+                  "rgb": [
+                    235,
+                    87,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 71,
+                  "name": "interpeduncular nucleus",
+                  "rgb": [
+                    63,
+                    192,
+                    255
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 51,
+                  "name": "periaqueductal gray",
+                  "rgb": [
+                    7,
+                    255,
+                    89
+                  ],
+                  "children": []
+                },
+                {
+                  "ngId": "WHS_SD_rat_atlas_v4_beta",
+                  "labelIndex": 58,
+                  "name": "pontine nuclei",
+                  "rgb": [
+                    0,
+                    215,
+                    11
+                  ],
+                  "children": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Ventricular system",
+          "children": [
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 33,
+              "name": "ventricular system",
+              "rgb": [
+                2,
+                44,
+                255
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 125,
+              "name": "4th ventricle",
+              "rgb": [
+                52,
+                29,
+                144
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Spinal cord",
+          "children": [
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 45,
+              "name": "spinal cord",
+              "rgb": [
+                134,
+                255,
+                90
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 70,
+              "name": "central canal",
+              "rgb": [
+                39,
+                244,
+                253
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Inner ear",
+          "children": [
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 119,
+              "name": "vestibular apparatus",
+              "rgb": [
+                0,
+                144,
+                55
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 120,
+              "name": "cochlea",
+              "rgb": [
+                0,
+                255,
+                29
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 121,
+              "name": "cochlear nerve",
+              "rgb": [
+                253,
+                148,
+                0
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 122,
+              "name": "vestibular nerve",
+              "rgb": [
+                253,
+                50,
+                0
+              ],
+              "children": []
+            },
+            {
+              "ngId": "WHS_SD_rat_atlas_v4_beta",
+              "labelIndex": 162,
+              "name": "spiral ganglion",
+              "rgb": [
+                185,
+                255,
+                233
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "ngId": "v3",
       "type": "parcellation",
       "name": "Waxholm Space rat brain atlas v3",

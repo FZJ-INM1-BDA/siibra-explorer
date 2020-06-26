@@ -5,11 +5,12 @@ import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
 import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
-import * as DATABROWSER_MODULE_EXPORTS from 'src/ui/databrowserModule'
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
 import { getIdObj } from 'common/util'
 import { DS_PREVIEW_URL } from 'src/util/constants'
+import { NgLayersService } from "./ui/layerbrowser/ngLayerService.service"
+import { EnumColorMapName } from "./util/colorMaps"
 
 const mockActionOnSpyReturnVal0 = { 
   id: getRandomHex(),
@@ -32,7 +33,14 @@ let actionOnWidgetSpy
 const nifti = {
   mimetype: "application/nifti",
   url: "http://abc.xyz",
-  referenceSpaces: []
+  referenceSpaces: [],
+  volumeMetadata: {
+    min: 0.1,
+    max: 0.45,
+    colormap: 'viridis'
+  },
+  name: 'helloworld',
+  filename: 'foobar'
 }
 
 const chart = {
@@ -88,7 +96,8 @@ describe('> glue.ts', () => {
           {
             provide: ACTION_TO_WIDGET_TOKEN,
             useValue: actionOnWidgetSpy
-          }
+          },
+          NgLayersService
         ]
       })
     })
@@ -246,6 +255,42 @@ describe('> glue.ts', () => {
 
         const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
+      }))
+
+      it('> on previewing nifti, thresholds, colormap and remove bg flag set properly', fakeAsync(() => {
+        const store = TestBed.inject(MockStore)
+        const ctrl = TestBed.inject(HttpTestingController)
+
+        const layerService = TestBed.inject(NgLayersService)
+
+        const highThresholdMapSpy = spyOn(layerService.highThresholdMap, 'set').and.callThrough()
+        const lowThresholdMapSpy = spyOn(layerService.lowThresholdMap, 'set').and.callThrough()
+        const colorMapMapSpy = spyOn(layerService.colorMapMap, 'set').and.callThrough()
+        const bgFlagSpy = spyOn(layerService.removeBgMap, 'set').and.callThrough()
+
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        
+
+        store.setState({
+          uiState: {
+            previewingDatasetFiles: [ file1 ]
+          }
+        })
+
+        const { datasetId, filename } = file1
+        // debounce at 100ms
+        tick(200)
+
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
+        req.flush(nifti)
+
+        const { name, volumeMetadata } = nifti
+        const { min, max } = volumeMetadata
+        expect(highThresholdMapSpy).toHaveBeenCalledWith(name, max)
+        expect(lowThresholdMapSpy).toHaveBeenCalledWith(name, min)
+        expect(colorMapMapSpy).toHaveBeenCalledWith(name, EnumColorMapName.VIRIDIS)
+        expect(bgFlagSpy).toHaveBeenCalledWith(name, true)
       }))
     })
 

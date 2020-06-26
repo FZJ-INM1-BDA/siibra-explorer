@@ -55,16 +55,8 @@ module.exports = {
       filename: 'theme.css'
     }),
     new webpack.DefinePlugin({
-      // TODO deprecate
-      PLUGINDEV : process.env.PLUGINDEV
-        ? JSON.stringify(process.env.PLUGINDEV)
-        : false,
 
-      // TODO deprecate
-      BUNDLEDPLUGINS : process.env.BUNDLEDPLUGINS
-        ? JSON.stringify(process.env.BUNDLEDPLUGINS.split(','))
-        : JSON.stringify([]),
-      VERSION : process.env.VERSION 
+      VERSION: process.env.VERSION 
         ? JSON.stringify(process.env.VERSION) 
         : process.env.GIT_HASH
           ? JSON.stringify(process.env.GIT_HASH)

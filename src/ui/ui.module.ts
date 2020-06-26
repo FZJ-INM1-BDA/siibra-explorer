@@ -29,7 +29,7 @@ import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
 import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
-import { UtilModule } from "src/util/util.module";
+import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
 import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
 import { ConfigComponent } from './config/config.component'

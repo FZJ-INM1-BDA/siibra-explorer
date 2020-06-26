@@ -13,6 +13,10 @@
 
     // overlay specific
     CONTEXT_MENU: `Viewer context menu`,
+    ZOOM_IN: 'Zoom in',
+    ZOOM_OUT: 'Zoom out',
+    MAXIMISE_VIEW: 'Maximise this view',
+    UNMAXIMISE_VIEW: 'Undo maximise',
 
     // sharing module
     SHARE_BTN: `Share this view`,

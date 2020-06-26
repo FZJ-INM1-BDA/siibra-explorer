@@ -10,20 +10,20 @@
 
 <current-layout *ngIf="viewerLoaded" class="position-absolute w-100 h-100 d-block pe-none">
   <div class="w-100 h-100 position-relative" cell-i>
-    <ng-content *ngTemplateOutlet="overlayi"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 0 }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-ii>
-    <ng-content *ngTemplateOutlet="overlayii"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 1 }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iii>
-    <ng-content *ngTemplateOutlet="overlayiii"></ng-content>
+    <ng-content *ngTemplateOutlet="ngPanelOverlayTmpl; context: { panelIndex: 2 }"></ng-content>
   </div>
   <div class="w-100 h-100 position-relative" cell-iv>
-    <ng-content *ngTemplateOutlet="overlayiv"></ng-content>
+    <ng-content *ngTemplateOutlet="overlayPerspectiveTmpl"></ng-content>
   </div>
 </current-layout>
 
-<layout-floating-container *ngIf="viewerLoaded">
+<layout-floating-container *ngIf="viewerLoaded" [zIndex]="5">
 
   <!-- StatusCard container-->
   <div class="status-card-container muted-7">
@@ -65,101 +65,14 @@
 </ng-template>
 
 <!-- overlay templates -->
-<!-- inserted using ngTemplateOutlet -->
-<ng-template #overlayi>
-  <layout-floating-container pos00 landmarkContainer>
-    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-      (mouseenter)="handleMouseEnterLandmark(spatialData)"
-      (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-      [highlight]="spatialData.highlight ? spatialData.highlight : false"
-      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-      [positionX]="getPositionX(0,spatialData)"
-      [positionY]="getPositionY(0,spatialData)"
-      [positionZ]="getPositionZ(0,spatialData)">
-    </nehuba-2dlandmark-unit>
+
+<!-- perspective view tmpl -->
+<ng-template #overlayPerspectiveTmpl>
+  <layout-floating-container landmarkContainer>
 
     <!-- maximise/minimise button -->
-    <maximise-panel-button
-      (click)="toggleMaximiseMinimise(0)"
-      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 0 }"
-      [touch-side-class]="0"
-      class="pe-all">
-    </maximise-panel-button>
-    
-    <div *ngIf="sliceViewLoading0$ | async" class="loadingIndicator">
-      <div class="spinnerAnimationCircle">
-
-      </div>
-    </div>
-  </layout-floating-container>
-</ng-template>
-
-<ng-template #overlayii>
-  <layout-floating-container pos01 landmarkContainer>
-    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-      (mouseenter)="handleMouseEnterLandmark(spatialData)"
-      (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-      [highlight]="spatialData.highlight ? spatialData.highlight : false"
-      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-      [positionX]="getPositionX(1,spatialData)"
-      [positionY]="getPositionY(1,spatialData)"
-      [positionZ]="getPositionZ(1,spatialData)">
-    </nehuba-2dlandmark-unit>
-
-    <!-- maximise/minimise button -->
-    <maximise-panel-button
-      (click)="toggleMaximiseMinimise(1)"
-      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 1 }"
-      [touch-side-class]="1"
-      class="pe-all">
-    </maximise-panel-button>
-
-    <div *ngIf="sliceViewLoading1$ | async" class="loadingIndicator">
-      <div class="spinnerAnimationCircle">
-
-      </div>
-    </div>
-  </layout-floating-container>
-</ng-template>
-
-<ng-template #overlayiii>
-  <layout-floating-container pos10 landmarkContainer>
-    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
-      (mouseenter)="handleMouseEnterLandmark(spatialData)"
-      (mouseleave)="handleMouseLeaveLandmark(spatialData)"
-      [highlight]="spatialData.highlight ? spatialData.highlight : false"
-      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
-      [positionX]="getPositionX(2,spatialData)"
-      [positionY]="getPositionY(2,spatialData)"
-      [positionZ]="getPositionZ(2,spatialData)">
-    </nehuba-2dlandmark-unit>
-
-    <!-- maximise/minimise button -->
-    <maximise-panel-button
-      (click)="toggleMaximiseMinimise(2)"
-      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 2 }"
-      [touch-side-class]="2"
-      class="pe-all">
-    </maximise-panel-button>
-
-    <div *ngIf="sliceViewLoading2$ | async" class="loadingIndicator">
-      <div class="spinnerAnimationCircle">
-
-      </div>
-    </div>
-  </layout-floating-container>
-</ng-template>
-
-<ng-template #overlayiv>
-  <layout-floating-container pos11 landmarkContainer>
-
-    <!-- maximise/minimise button -->
-    <maximise-panel-button
-      (click)="toggleMaximiseMinimise(3)"
-      [ngClass]="{ onHover: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }"
-      [touch-side-class]="3"
-      class="pe-all">
-    </maximise-panel-button>
+    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: 3, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }">
+    </ng-container>
     
     <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
       <div class="spinnerAnimationCircle"></div>
@@ -169,4 +82,62 @@
       </div>
     </div>
   </layout-floating-container>
+</ng-template>
+
+<!-- slice view overlay tmpl -->
+<ng-template #ngPanelOverlayTmpl let-panelIndex="panelIndex">
+
+  <!-- nb this slice view is not suitable for perspective view! -->
+  <layout-floating-container *ngIf="panelIndex < 3" landmarkContainer>
+
+    <!-- only show landmarks in slice views -->
+
+    <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
+      (mouseenter)="handleMouseEnterLandmark(spatialData)"
+      (mouseleave)="handleMouseLeaveLandmark(spatialData)"
+      [highlight]="spatialData.highlight ? spatialData.highlight : false"
+      [fasClass]="spatialData.type === 'userLandmark' ? 'fa-chevron-down' : 'fa-map-marker'"
+      [positionX]="getPositionX(panelIndex, spatialData)"
+      [positionY]="getPositionY(panelIndex, spatialData)"
+      [positionZ]="getPositionZ(panelIndex, spatialData)">
+    </nehuba-2dlandmark-unit>
+
+    <!-- maximise/minimise button -->
+    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: panelIndex, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === panelIndex }">
+    </ng-container>
+
+    <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]" class="loadingIndicator">
+      <div class="spinnerAnimationCircle">
+
+      </div>
+    </div>
+  </layout-floating-container>
+</ng-template>
+
+<!-- panel control template -->
+<ng-template #panelCtrlTmpl let-panelIndex="panelIndex" let-visible="visible">
+
+  <div class="opacity-crossfade pe-all overlay-btn-container"
+    [ngClass]="{ onHover: visible }">
+
+    <!-- factor < 1.0 === zoom in -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 0.9)"
+      [attr.aria-label]="ARIA_LABEL_ZOOM_IN">
+      <i class="fas fa-search-plus"></i>
+    </button>
+
+    <!-- factor > 1.0 === zoom out -->
+    <button mat-icon-button color="primary"
+      (click)="zoomNgView(panelIndex, 1.1)"
+      [attr.aria-label]="ARIA_LABEL_ZOOM_OUT">
+      <i class="fas fa-search-minus"></i>
+    </button>
+
+    <maximise-panel-button
+      (click)="toggleMaximiseMinimise(panelIndex)"
+      [touch-side-class]="panelIndex">
+    </maximise-panel-button>
+  </div>
+
 </ng-template>
