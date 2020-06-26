@@ -18,6 +18,9 @@ script:
 jobs:
   include:
     - stage: Unit tests and Lint
+      if: |
+        type = push AND \
+        branch NOT IN (master, staging, dev)
       name: Unit test frontend / Lint
       install:
       - npm i
