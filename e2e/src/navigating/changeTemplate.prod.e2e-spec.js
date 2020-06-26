@@ -39,10 +39,7 @@ describe('trans template navigation', () => {
     const expectedPosition = [630, 510]
     const expectedColor = {red: 70, green: 139, blue: 57}
 
-    await iavPage.goto(url, { interceptHttp: true, doNotAutomate: true })
-    await iavPage.wait(200)
-    await iavPage.dismissModal()
-    await iavPage.waitUntilAllChunksLoaded()
+    await iavPage.goto(url)
 
     await iavPage.searchRegionWithText(area)
     await iavPage.wait(1000)
@@ -51,12 +48,16 @@ describe('trans template navigation', () => {
     await iavPage.dismissModal()
     await iavPage.wait(500)
     await iavPage.selectDropdownTemplate('MNI Colin 27')
+    /**
+     * wait for template translate & js execution
+     */
+    await iavPage.wait(1000)
     await iavPage.waitUntilAllChunksLoaded()
-    const { red, green, blue } = await iavPage.getRgbAt({ position: expectedPosition })
+    const actualColor = await iavPage.getRgbAt({ position: expectedPosition })
 
-    expect(red).toEqual(expectedColor.red)
-    expect(green).toEqual(expectedColor.green)
-    expect(blue).toEqual(expectedColor.blue)
+    for (const key in actualColor) {
+      expect(Math.abs(actualColor[key] - expectedColor[key])).toBeLessThan(5)
+    }
 
   })
 
