@@ -1,14 +1,15 @@
 const chromeOpts = require('../chromeOpts')
-const pptr = require('puppeteer')
+// const pptr = require('puppeteer')
 const ATLAS_URL = (process.env.ATLAS_URL || 'http://localhost:3000').replace(/\/$/, '')
 const USE_SELENIUM = !!process.env.SELENIUM_ADDRESS
 if (ATLAS_URL.length === 0) throw new Error(`ATLAS_URL must either be left unset or defined.`)
 if (ATLAS_URL[ATLAS_URL.length - 1] === '/') throw new Error(`ATLAS_URL should not trail with a slash: ${ATLAS_URL}`)
-const { By, WebDriver, Key } = require('selenium-webdriver')
+const { By, Key, until } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 const { polyFillClick } = require('./material-util')
 
 const { ARIA_LABELS } = require('../../common/constants')
+const { retry } = require('../../common/util')
 
 function getActualUrl(url) {
   return /^http\:\/\//.test(url) ? url : `${ATLAS_URL}/${url.replace(/^\//, '')}`
@@ -351,7 +352,7 @@ class WdBase{
   }
 
   // it seems if you set intercept http to be true, you might also want ot set do not automat to be true
-  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout } = {}){
+  async goto(url = '/', { interceptHttp, doNotAutomate, forceTimeout = 20 * 1000 } = {}){
     this.__trackingNavigationState__ = false
     const actualUrl = getActualUrl(url)
     if (interceptHttp) {
@@ -381,7 +382,17 @@ class WdBase{
 
   async wait(ms) {
     if (!ms) throw new Error(`wait duration must be specified!`)
-    await this._browser.sleep(ms)
+    return new Promise(rs => {
+      setTimeout(rs, ms)
+    })
+  }
+
+  async waitForCss(cssSelector) {
+    if (!cssSelector) throw new Error(`css selector must be defined`)
+    await this._browser.wait(
+      until.elementLocated( By.css(cssSelector) ),
+      1e3 * 60 * 10
+    )
   }
 
   async waitFor(animation = false, async = false){
@@ -459,9 +470,12 @@ class WdBase{
 }
 
 class WdLayoutPage extends WdBase{
-
   constructor(){
     super()
+    WdLayoutPage.TagNames = {
+      ...(WdBase.TagNames || {} ),
+      sideNav: 'search-side-nav'
+    }
   }
 
   _getModal(){
@@ -557,7 +571,7 @@ class WdLayoutPage extends WdBase{
 
   // SideNav
   _getSideNav() {
-    return this._browser.findElement( By.tagName('search-side-nav') )
+    return this._browser.findElement( By.tagName(WdLayoutPage.TagNames.sideNav) )
   }
 
   async getSideNavTag(){
@@ -785,19 +799,12 @@ class WdIavPage extends WdLayoutPage{
   }
 
   async waitUntilAllChunksLoaded(){
-    const checkReady = async () => {
-      const el = await this._browser.findElements(
+    await this._browser.wait(async () => {
+      const els = await this._browser.findElements(
         By.css('div.loadingIndicator')
       )
-      return !el.length
-    }
-
-    do {
-      // Do nothing, until ready
-    } while (
-      await this.wait(1000),
-      !(await checkReady())
-    )
+      return els.length === 0
+    }, 1e3 * 60 * 10)
   }
 
   async getFloatingCtxInfoAsText(){
@@ -815,11 +822,20 @@ class WdIavPage extends WdLayoutPage{
       .findElement( By.css('[aria-label="Select a new template"]') )
     await templateBtn.click()
 
+    await this._browser.wait(
+      until.elementLocated( By.tagName('mat-option') ),
+      1e3 * 60 * 10
+    )
+
     const options = await this._browser.findElements(
       By.tagName('mat-option')
     )
     const idx = await _getIndexFromArrayOfWebElements(title, options)
-    if (idx >= 0) await options[idx].click()
+    if (idx >= 0) {
+      retry(async () => {
+        await options[idx].click()
+      }, { timeout: 1000, retries: 3 })
+    }
     else throw new Error(`${title} is not found as one of the dropdown templates`)
   }
 

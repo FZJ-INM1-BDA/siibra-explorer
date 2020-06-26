@@ -2,12 +2,13 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getExternalSchemaDatasets, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
 const archiver = require('archiver')
 const { getHandleErrorFn } = require('../util/streamHandleError')
+const { IBC_SCHEMA } = require('./importIBS')
 
 const bodyParser = require('body-parser')
 
@@ -56,7 +57,7 @@ datasetsRouter.use('/spatialSearch', noCacheMiddleWare, require('./spatialRouter
 
 datasetsRouter.get('/templateNameParcellationName/:templateName/:parcellationName', noCacheMiddleWare, (req, res, next) => {
   const { templateName, parcellationName } = req.params
-  
+
   const { user } = req
   getDatasets({ templateName, parcellationName, user })
     .then(ds => {
@@ -80,13 +81,13 @@ datasetsRouter.get('/templateName/:templateName', deprecatedNotice)
 datasetsRouter.get('/parcellationName/:parcellationName', deprecatedNotice)
 
 /**
- * It appears that query param are not 
+ * It appears that query param are not
  */
 datasetsRouter.get('/preview/:datasetName', getVary(['referer']), cacheMaxAge24Hr, (req, res, next) => {
   const { datasetName } = req.params
   const ref = url.parse(req.headers.referer)
   const { templateSelected, parcellationSelected } = qs.parse(ref.query)
-  
+
   getPreview({ datasetName, templateSelected })
     .then(preview => {
       if (preview) {
@@ -139,7 +140,7 @@ datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   // for now, just serve non encoded image
 
   res.removeHeader('Content-Encoding')
-  
+
   if (filePath) {
     fs.createReadStream(filePath).pipe(res).on('error', getHandleErrorFn(req, res))
   } else {
@@ -147,9 +148,14 @@ datasetsRouter.get('/previewFile', cacheMaxAge24Hr, (req, res) => {
   }
 })
 
+const kgExternalDatasetSchemas = [
+  IBC_SCHEMA,
+  // Add more here...
+]
+
 const checkKgQuery = (req, res, next) => {
   const { kgSchema } = req.query
-  if (kgSchema !== 'minds/core/dataset/v1.0.0') return res.status(400).send('Only kgSchema is required and the only accepted value is minds/core/dataset/v1.0.0')
+  if (kgSchema !== 'minds/core/dataset/v1.0.0' && !kgExternalDatasetSchemas.includes(kgSchema)) return res.status(400).send('Only kgSchema is required and the only accepted value is minds/core/dataset/v1.0.0')
   else return next()
 }
 
@@ -164,10 +170,16 @@ datasetsRouter.get('/hasPreview', cacheMaxAge24Hr, async (req, res) => {
 
 datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) => {
   const { kgId } = req.query
+  const { kgSchema } = req.query
   const { user } = req
   try{
-    const stream = await getDatasetFromId({ user, kgId, returnAsStream: true })
-    stream.on('error', getHandleErrorFn(req, res)).pipe(res)
+    if (kgSchema === 'minds/core/dataset/v1.0.0') {
+      const stream = await getDatasetFromId({user, kgId, returnAsStream: true})
+      stream.on('error', getHandleErrorFn(req, res)).pipe(res)
+    } else {
+      const data = getExternalSchemaDatasets(kgId, kgSchema)
+      res.status(200).send(data)
+    }
   }catch(e){
     getHandleErrorFn(req, res)(e)
   }

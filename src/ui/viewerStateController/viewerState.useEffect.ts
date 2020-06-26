@@ -10,6 +10,7 @@ import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
+import { viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
@@ -249,16 +250,11 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
 
     this.singleClickOnHierarchy$ = this.actions$.pipe(
       ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY),
-      map(action => {
-        return {
-          ...action,
-          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT,
-        }
-      }),
+      map(action => viewerStateToggleRegionSelect(action as any)),
     )
 
     this.toggleRegionSelection$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.TOGGLE_REGION_SELECT),
+      ofType(viewerStateToggleRegionSelect.type),
       withLatestFrom(this.selectedRegions$),
       map(([action, regionsSelected]) => {
 

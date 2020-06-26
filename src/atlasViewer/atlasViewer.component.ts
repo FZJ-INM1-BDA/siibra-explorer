@@ -34,7 +34,7 @@ import { FixedMouseContextualContainerDirective } from "src/util/directives/Fixe
 import { isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
-import { MouseHoverDirective } from "src/util/directives/mouseOver.directive";
+import { MouseHoverDirective } from "src/atlasViewer/mouseOver.directive";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'

@@ -81,7 +81,7 @@ describe('> non-atlas images', () => {
       await iavPage.wait(10000)
       const interceptedCalls = await iavPage.getInterceptedHttpCalls()
 
-      const arr = [
+      const array = [
         'BI-FOM-HSV_R',
         'BI-FOM-HSV_G',
         'BI-FOM-HSV_B',
@@ -91,7 +91,7 @@ describe('> non-atlas images', () => {
         'BI-MRS',
       ]
 
-      for (const item of arr) {
+      for (const item of array) {
         expect(
           interceptedCalls.find(({
             method,
@@ -113,6 +113,40 @@ describe('> non-atlas images', () => {
           }
         )
       )
+
+      const arrPli = [
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_R",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_G",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-FOM-HSV_B",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-TIM",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-MRI",
+        "https://neuroglancer.humanbrainproject.eu/precomputed/PLI_FOM/BI-MRS",
+      ]
+
+      expect(
+        interceptedCalls
+      ).toContain(
+        jasmine.objectContaining(
+          {
+            method: 'GET',
+            url: 'https://neuroglancer.humanbrainproject.org/precomputed/BigBrainRelease.2015/8bit/info'
+          }
+        )
+      )
+
+      for (const url of arrPli) {
+        expect(
+          interceptedCalls
+        ).toContain(
+          jasmine.objectContaining(
+            {
+              method: 'GET',
+              url: `${url}/info`
+            }
+          )
+        )
+      }
     })
 
     it('> if ref tmpl is not right, only tmpl is loaded', async () => {

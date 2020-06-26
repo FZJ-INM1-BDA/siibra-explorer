@@ -58,7 +58,6 @@ if (process.env.FLUENT_HOST) {
 
 const server = require('express')()
 
-const app = require('./app')
 const PORT = process.env.PORT || 3000
 
 // e.g. HOST_PATHNAME=/viewer
@@ -82,5 +81,9 @@ if (HOST_PATHNAME && HOST_PATHNAME !== '') {
   })
 }
 
-server.use(`${HOST_PATHNAME}/`, app)
+if (process.env.NODE_ENV !== 'test') {
+  const app = require('./app')
+  server.use(`${HOST_PATHNAME}/`, app)
+}
+
 server.listen(PORT, () => console.log(`listening on port ${PORT}`))
