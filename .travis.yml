@@ -41,20 +41,6 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
-    - stage: e2e tests 
-      name: local e2e
-      install:
-      - npm i
-      - npm run wd -- update --versions.chrome=${CHROMIUM_VERSION}
-      - npm i --no-save puppeteer@${PPTR_VERSION}
-      script:
-      - echo Running test against $ATLAS_URL
-      - npm run e2e
-      env:
-      - CHROMIUM_VERSION=80.0.3987.106
-      - PPTR_VERSION=2.1.0
-      - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
-
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
@@ -75,6 +61,7 @@ env:
   global:
     - CHROMIUM_VERSION=80.0.3987.106
     - PPTR_VERSION=2.1.0
+    - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
 
 # addons:
 #   browserstack:
