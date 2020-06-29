@@ -1,0 +1,14 @@
+{
+  "@id": "juelich/iav/atlas/v1.0.0/1",
+  "name": "Multilevel Human Atlas",
+  "templateSpaces": [{
+    "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
+    "name": "Big Brain (Histology)"
+  }, {
+    "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
+    "name": "MNI Colin 27"
+  }, {
+    "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
+    "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+  }]
+}
