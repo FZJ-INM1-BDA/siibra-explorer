@@ -37,8 +37,8 @@ router.get('/:atlasId', async (req, res) => {
       return {
         ...tmpl,
         url: res.locals.routePathname
-          ? url.resolve(`${res.locals.routePathname}/${encodeURIComponent(atlasId)}/`, encodeURIComponent(tmpl['@id']))
-          : `${encodeURIComponent(atlasId)}/${encodeURIComponent(tmpl['@id'])}`
+          ? url.resolve(`${res.locals.routePathname}/${encodeURIComponent(atlasId)}/template/`, encodeURIComponent(tmpl['@id']))
+          : `${encodeURIComponent(atlasId)}/template/${encodeURIComponent(tmpl['@id'])}`
       }
     })
   })
@@ -52,7 +52,7 @@ const templateIdToStringMap = new Map([
   ['minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992', 'colin']
 ])
 
-router.get('/:atlasId/:templateId', async (req, res) => {
+router.get('/:atlasId/template/:templateId', async (req, res) => {
   const { atlasId, templateId } = req.params
   
   const mappedString = templateIdToStringMap.get(templateId)
@@ -67,6 +67,10 @@ router.get('/:atlasId/:templateId', async (req, res) => {
   getTemplate({ template: mappedString, acceptedEncoding, returnAsStream: true })
     .pipe(res)
     .on('error', getHandleErrorFn(req, res))
+})
+
+router.get('/:atlasId/parcellation/:parcellationId', async (req, res) => {
+  res.status(501).end()
 })
 
 
