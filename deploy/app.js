@@ -179,6 +179,7 @@ const jsonMiddleware = (req, res, next) => {
 /**
  * resources endpoints
  */
+const atlasesRouter = require('./atlas')
 const templateRouter = require('./templates')
 const nehubaConfigRouter = require('./nehubaConfig')
 const datasetRouter = require('./datasets')
@@ -190,6 +191,7 @@ const setResLocalMiddleWare = routePathname => (req, res, next) => {
   next()
 }
 
+app.use('/atlases', setResLocalMiddleWare('atlases'), atlasesRouter)
 app.use('/templates', setResLocalMiddleWare('templates'), jsonMiddleware, templateRouter)
 app.use('/nehubaConfig', jsonMiddleware, nehubaConfigRouter)
 app.use('/datasets', jsonMiddleware, datasetRouter)

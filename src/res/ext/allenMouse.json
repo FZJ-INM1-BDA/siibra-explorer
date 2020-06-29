@@ -1,5 +1,6 @@
 {
   "name": "Allen Mouse Common Coordinate Framework v3",
+  "fullId": "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9",
   "type": "template",
   "species": "Mouse",
   "ngId": "stpt",
@@ -11,6 +12,7 @@
   "parcellations": [
     {
       "ngId": "v3_2017",
+      "fullId": "minds/core/parcellationatlas/v1.0.0/05655b58-3b6f-49db-b285-64b5a0276f83",
       "name": "Allen Mouse Common Coordinate Framework v3 2017",
       "ngData": null,
       "type": "parcellation",
@@ -19361,6 +19363,7 @@
       }
     },
     {
+      "fullId": "minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f",
       "ngId": "atlas",
       "name": "Allen Mouse Common Coordinate Framework v3 2015",
       "ngData": null,
