@@ -1,8 +1,8 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Store, createSelector, select } from "@ngrx/store";
-import { Observable, merge, Subscription } from "rxjs";
+import { Observable, merge, Subscription, of } from "rxjs";
 import { VIEWER_CONFIG_FEATURE_KEY, IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, switchMap, scan } from "rxjs/operators";
+import { shareReplay, tap, switchMap, scan, catchError, filter } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { BACKENDURL } from './constants'
 import { viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";
@@ -33,6 +33,8 @@ export class PureContantService implements OnDestroy{
     )
 
     this.fetchedAtlases$ = this.http.get(`${BACKENDURL.replace(/\/$/, '')}/atlases/`, { responseType: 'json' }).pipe(
+      catchError((err, obs) => of(null)),
+      filter(v => !!v),
       tap((arr: any[]) => this.totalAtlasesLength = arr.length),
       switchMap(atlases => merge(
         ...atlases.map(({ url }) => this.http.get(`${BACKENDURL.replace(/\/$/, '')}/${url}`, { responseType: 'json' }))
