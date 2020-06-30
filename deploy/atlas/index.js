@@ -27,20 +27,44 @@ router.get('/ready', (req, res) => {
   }
 })
 
+router.get('/preview', (req, res) => {
+  res.status(501).end()
+})
+
 router.get('/:atlasId', async (req, res) => {
   const { atlasId } = req.params
-  const { templateSpaces, ...rest } = await getAtlasById(atlasId)
+  const { templateSpaces, parcellations, ...rest } = await getAtlasById(atlasId)
+
+  const searchParam = new url.URLSearchParams()
+  searchParam.set('id', atlasId)
+  const lastPathPreview = `preview?${searchParam.toString()}`
 
   return res.status(200).json({
     ...rest,
+    previewUrl: res.locals.routePathname
+      ? url.resolve(`${res.locals.routePathname}/`, lastPathPreview)
+      : lastPathPreview,
+    parcellations: parcellations.map(p => {
+      const spSearchParam = new url.URLSearchParams()
+      spSearchParam.set('id', p['@id'])
+      const parcellationPreview = `preview?${spSearchParam.toString()}`
+      return {
+        previewUrl: res.locals.routePathname
+          ? url.resolve(`${res.locals.routePathname}/`, parcellationPreview)
+          : parcellationPreview,
+        ...p
+      }
+    }),
     templateSpaces: templateSpaces.map(tmpl => {
+      const lastTemplatePath = `${encodeURIComponent(atlasId)}/template/${encodeURIComponent(tmpl['@id'])}`
       return {
         ...tmpl,
         url: res.locals.routePathname
-          ? url.resolve(`${res.locals.routePathname}/${encodeURIComponent(atlasId)}/`, encodeURIComponent(tmpl['@id']))
-          : `${encodeURIComponent(atlasId)}/${encodeURIComponent(tmpl['@id'])}`
+          ? url.resolve(`${res.locals.routePathname}/`, lastTemplatePath)
+          : lastTemplatePath
       }
     })
+
   })
 })
 
@@ -52,7 +76,7 @@ const templateIdToStringMap = new Map([
   ['minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992', 'colin']
 ])
 
-router.get('/:atlasId/:templateId', async (req, res) => {
+router.get('/:atlasId/template/:templateId', async (req, res) => {
   const { atlasId, templateId } = req.params
   
   const mappedString = templateIdToStringMap.get(templateId)
@@ -67,6 +91,10 @@ router.get('/:atlasId/:templateId', async (req, res) => {
   getTemplate({ template: mappedString, acceptedEncoding, returnAsStream: true })
     .pipe(res)
     .on('error', getHandleErrorFn(req, res))
+})
+
+router.get('/:atlasId/parcellation/:parcellationId', async (req, res) => {
+  res.status(501).end()
 })
 
 

@@ -22,9 +22,14 @@ const getData = async () => {
 
   for (const file of files) {
 
-    const data = await readFileAsync(path.join(filepath, 'atlas', file), 'utf-8')
-    const json = JSON.parse(data)
-    map.set(json['@id'], json)
+    try {
+
+      const data = await readFileAsync(path.join(filepath, 'atlas', file), 'utf-8')
+      const json = JSON.parse(data)
+      map.set(json['@id'], json)
+    } catch (e) {
+      
+    }
   }
   ready = true
 }
