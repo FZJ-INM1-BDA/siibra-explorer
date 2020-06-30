@@ -81,38 +81,9 @@
 
         </mat-drawer>
 
-        <!-- tag for opening and closing side nav -->
-        <div class="d-flex h-100 align-items-start bg-none pe-none">
-
-          <button mat-flat-button
-            matBadgePosition="above after"
-            matBadgeColor="accent"
-            [matBadge]="!sideNavDrawer.opened && (selectedRegions$ | async)?.length ? (selectedRegions$ | async)?.length : null"
-            [matTooltip]="!sideNavDrawer.opened ? (selectedRegions$ | async)?.length ?  ('Explore ' + (selectedRegions$ | async)?.length + ' selected regions.') : 'Explore current view' : null"
-            [ngClass]="{'translate-x-6-n': !sideNavDrawer.opened, 'translate-x-7-n': sideNavDrawer.opened}"
-            class="pe-all mt-5"
-            (click)="toggleSideNavMenu(sideNavDrawer.opened)"
-            mat-drawer-trigger>
-            <i [ngClass]="{'fa-chevron-left': sideNavDrawer.opened, 'fa-chevron-right': !sideNavDrawer.opened}"
-              class="fas translate-x-3"></i>
-
-          </button>
-
-          <!-- visible status card when mat drawer is closed -->
-          <mat-card
-            *ngIf="!sideNavDrawer.opened"
-            (click)="toggleSideNavMenu(false)"
-            mat-ripple
-            mat-drawer-status-panel
-            class="pe-all mt-4 muted translate-x-4-n">
-            <mat-card-content>
-              <viewer-state-mini>
-              </viewer-state-mini>
-            </mat-card-content>
-            <mat-card-footer></mat-card-footer>
-          </mat-card>
-
-          <!-- TODO clean up menu icon -->
+        <div class="d-inline-block iv-custom-comp background pl-4 pt-2 pr-4">
+          <atlas-dropdown-selector class="pe-all">
+          </atlas-dropdown-selector>
         </div>
       </mat-drawer-container>
     </div>

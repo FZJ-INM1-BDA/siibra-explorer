@@ -1,5 +1,6 @@
 {
   "name": "Waxholm Space rat brain MRI/DTI",
+  "@id": "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8",
   "fullId": "minds/core/referencespace/v1.0.0/d5717c4a-0fa1-46e6-918c-b8003069ade8",
   "type": "template",
   "species": "Rat",
@@ -3203,6 +3204,7 @@
     {
       "ngId": "v3",
       "type": "parcellation",
+      "@id": "minds/core/parcellationatlas/v1.0.0/ebb923ba-b4d5-4b82-8088-fa9215c2e1fe",
       "name": "Waxholm Space rat brain atlas v3",
       "originDatasets": [
         {
@@ -4812,6 +4814,7 @@
     {
       "ngId": "v2",
       "type": "parcellation",
+      "@id": "minds/core/parcellationatlas/v1.0.0/2449a7f0-6dd0-4b5a-8f1e-aec0db03679d",
       "name": "Waxholm Space rat brain atlas v2",
       "originDatasets": [
         {
@@ -6674,6 +6677,7 @@
     {
       "ngId": "v1_01",
       "type": "parcellation",
+      "@id": "minds/core/parcellationatlas/v1.0.0/11017b35-7056-4593-baad-3934d211daba",
       "name": "Waxholm Space rat brain atlas v1",
       "originDatasets": [
         {

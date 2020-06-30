@@ -10,7 +10,7 @@ import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
-import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion } from './viewerState.store.helper';
+import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion, viewerStateSelectAtlas } from './viewerState.store.helper';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -71,6 +71,31 @@ export const defaultState: StateInterface = {
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: Partial<StateInterface> = state, action: ActionInterface) => {
   switch (action.type) {
+  /**
+   * glue code. in future, viewerStateSelectAtlas should load templates and parcellations by it self
+   */
+  case viewerStateSelectAtlas.type: {
+    const { fetchedTemplates } = prevState
+    /**
+     * selecting atlas means selecting the first available templateSpace
+     */
+    const atlas = (action as any).atlas
+    const templateTobeSelected = atlas.templateSpaces[0]
+    const templateSpaceId = templateTobeSelected['@id']
+    
+    const parcellationId = (atlas.parcellations.find(p => !!p.baseLayer) ||
+      templateTobeSelected.availableIn.find(p => !!p.baseLayer) ||
+      templateTobeSelected.availableIn[0])['@id']
+      
+    const templateSelected = fetchedTemplates.find(t => templateSpaceId === t['@id'])
+    const parcellationSelected = templateSelected.parcellations.find(p => p['@id'] === parcellationId)
+
+    return {
+      ...prevState,
+      templateSelected,
+      parcellationSelected
+    }
+  }
   /**
      * TODO may be obsolete. test when nifti become available
      */
