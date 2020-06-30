@@ -31,7 +31,10 @@ module.exports = {
         use : [{
           loader : 'file-loader',
           options : {
-            name : '[name].[ext]',
+            name (resourcePath, resourceQuery) {
+              const appendAtlas = /res\/ext\/atlas\//.test(resourcePath)
+              return `${appendAtlas ? 'atlas/' : ''}[name].[ext]`
+            },
             outputPath : 'res/json'
           }
         }]
