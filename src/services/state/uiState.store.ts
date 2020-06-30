@@ -19,7 +19,7 @@ export const defaultState: StateInterface = {
   mouseOverUserLandmark: null,
 
   focusedSidePanel: null,
-  sidePanelIsOpen: true,
+  sidePanelIsOpen: false,
   sidePanelCurrentViewContent: 'Dataset',
   sidePanelExploreCurrentViewIsOpen: false,
 

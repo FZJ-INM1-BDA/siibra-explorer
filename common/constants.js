@@ -11,7 +11,8 @@
     DATASET_FILE_PREVIEW: `Preview of dataset`,
     PIN_DATASET: 'Toggle pinning dataset',
 
-    // overlay specific
+    // overlay/layout specific
+    SELECT_ATLAS: 'Select a different atlas',
     CONTEXT_MENU: `Viewer context menu`,
     ZOOM_IN: 'Zoom in',
     ZOOM_OUT: 'Zoom out',

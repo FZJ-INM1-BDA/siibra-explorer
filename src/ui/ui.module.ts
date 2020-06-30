@@ -90,7 +90,7 @@ import { NehubaViewerTouchDirective } from "./nehubaContainer/nehubaViewerInterf
 import { importNehubaFactory } from "./nehubaContainer/util";
 import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
-
+import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
 
 @NgModule({
   imports : [
@@ -126,6 +126,7 @@ import { DOCUMENT } from "@angular/common";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
+    AtlasDropdownSelector,
     
     StatusCardComponent,
     CookieAgreement,
@@ -231,6 +232,7 @@ import { DOCUMENT } from "@angular/common";
     FixedMouseContextualContainerDirective,
     LandmarkUIComponent,
     NehubaViewerTouchDirective,
+    AtlasDropdownSelector,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

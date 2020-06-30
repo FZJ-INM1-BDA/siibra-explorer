@@ -1,5 +1,6 @@
 {
   "name": "Big Brain (Histology)",
+  "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
   "fullId": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
   "type": "template",
   "species": "Human",
@@ -14,6 +15,7 @@
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {
+      "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "fullId": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "name": "Cytoarchitectonic Maps",
       "properties": {
@@ -653,6 +655,7 @@
       ]
     },
     {
+      "@id": "juelich/iav/atlas/v1.0.0/3",
       "name": "BigBrain Cortical Layers Segmentation",
       "ngId": "cortical layers",
       "properties": {
@@ -743,6 +746,7 @@
       ]
     },
     {
+      "@id": "juelich/iav/atlas/v1.0.0/4",
       "name": "Grey/White matter",
       "type": "parcellation",
       "ngData": null,
