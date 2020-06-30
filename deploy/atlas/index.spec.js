@@ -40,7 +40,7 @@ describe('atlas/index.js', () => {
     const { body } = await got(`${baseUrl}/`, { responseType: 'json' })
     expect(body.length).to.equal(3)
     assert(
-      body.every(({ url }) => !/undefined/.test(url)),
+      body.every(({ url }) => !/undefined/.test(url) ),
       'url pathname should not contain undefined'
     )
     atlases = body
