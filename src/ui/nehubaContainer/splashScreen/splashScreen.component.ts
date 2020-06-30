@@ -4,6 +4,8 @@ import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxj
 import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { NEWVIEWER, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
+import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
+import { PureContantService } from "src/util";
 
 @Component({
   selector : 'ui-splashscreen',
@@ -15,8 +17,12 @@ import { NEWVIEWER, ViewerStateInterface, IavRootStoreInterface } from "src/serv
 
 export class SplashScreen implements AfterViewInit {
 
-  public stillLoadingTemplates$: Observable<any>
+  public stillLoadingTemplates$: Observable<any[]>
   public loadedTemplate$: Observable<any[]>
+
+  public loadedAtlases$: Observable<any[]>
+  public stillLoadingAtlases$: Observable<any[]>
+
   @ViewChild('parentContainer', {read: ElementRef})
   private parentContainer: ElementRef
   public activatedTemplate$: Subject<any> = new Subject()
@@ -26,6 +32,7 @@ export class SplashScreen implements AfterViewInit {
   constructor(
     private store: Store<IavRootStoreInterface>,
     private constanceService: AtlasViewerConstantsServices,
+    private pureConstantService: PureContantService
   ) {
     this.loadedTemplate$ = this.store.pipe(
       select('viewerState'),
@@ -50,6 +57,16 @@ export class SplashScreen implements AfterViewInit {
         }
       })
     )
+
+    this.loadedAtlases$ = this.store.pipe(
+      select(state => state[viewerStateHelperStoreName]),
+      select(state => state.fetchedAtlases)
+    )
+
+    this.stillLoadingAtlases$ = this.loadedAtlases$.pipe(
+      map(arr => this.pureConstantService.totalAtlasesLength - arr.length),
+      map(num => Array(num >= 0 ? num : 0).fill(null))
+    )
   }
 
   public ngAfterViewInit() {
@@ -61,14 +78,17 @@ export class SplashScreen implements AfterViewInit {
      */
     this.subscriptions.push(
       fromEvent(this.parentContainer.nativeElement, 'mousedown').pipe(
+        filter((ev: MouseEvent) => ev.which === 1),
         switchMap(() => fromEvent(this.parentContainer.nativeElement, 'mouseup').pipe(
           bufferTime(200),
           take(1),
         )),
         filter(arr => arr.length > 0),
         withLatestFrom(this.activatedTemplate$),
-        map(([_, template]) => template),
-      ).subscribe(template => this.selectTemplate(template)),
+        map(([_, atlas]) => atlas),
+      ).subscribe(atlas => this.store.dispatch(
+        viewerStateSelectAtlas({ atlas })
+      )),
     )
   }
 
