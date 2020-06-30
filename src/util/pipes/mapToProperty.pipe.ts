@@ -7,6 +7,6 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 export class MapToPropertyPipe implements PipeTransform{
   public transform(input, property = '@id') {
-    return input[property]
+    return input && input[property]
   }
 }
