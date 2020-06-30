@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, TemplateRef } from "@angular/core";
+import { Component, Input, OnInit, OnChanges, TemplateRef, HostBinding } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { LoggingService } from "src/logging";
 import { CHANGE_NAVIGATION, IavRootStoreInterface, ViewerStateInterface } from "src/services/stateStore.service";
@@ -8,6 +8,7 @@ import { distinctUntilChanged, shareReplay, map, filter, startWith } from "rxjs/
 import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
+import { PureContantService } from "src/util";
 
 @Component({
   selector : 'ui-status-card',
@@ -17,8 +18,11 @@ import { ARIA_LABELS } from 'common/constants'
 export class StatusCardComponent implements OnInit, OnChanges{
 
   @Input() public selectedTemplateName: string;
-  @Input() public isMobile: boolean;
   @Input() public nehubaViewer: NehubaViewerUnit;
+
+  @HostBinding('attr.aria-label')
+  public arialabel = ARIA_LABELS.STATUS_PANEL
+  public showFull = false
 
   private selectedTemplateRoot$: Observable<any>
   private selectedTemplateRoot: any
@@ -27,17 +31,21 @@ export class StatusCardComponent implements OnInit, OnChanges{
   public navVal$: Observable<string>
   public mouseVal$: Observable<string>
 
+  public useTouchInterface$: Observable<boolean>
+
   public SHARE_BTN_ARIA_LABEL = ARIA_LABELS.SHARE_BTN
   public COPY_URL_TO_CLIPBOARD_ARIA_LABEL = ARIA_LABELS.SHARE_COPY_URL_CLIPBOARD
   public SHARE_CUSTOM_URL_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL
   public SHARE_CUSTOM_URL_DIALOG_ARIA_LABEL = ARIA_LABELS.SHARE_CUSTOM_URL_DIALOG
-
+  public SHOW_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.SHOW_FULL_STATUS_PANEL
+  public HIDE_FULL_STATUS_PANEL_ARIA_LABEL = ARIA_LABELS.HIDE_FULL_STATUS_PANEL
   constructor(
     private store: Store<ViewerStateInterface>,
     private log: LoggingService,
     private store$: Store<IavRootStoreInterface>,
     private bottomSheet: MatBottomSheet,
     private dialog: MatDialog,
+    private pureConstantService: PureContantService
   ) {
     const viewerState$ = this.store$.pipe(
       select('viewerState'),
@@ -47,6 +55,8 @@ export class StatusCardComponent implements OnInit, OnChanges{
       select('fetchedTemplates'),
       distinctUntilChanged(),
     )
+
+    this.useTouchInterface$ = this.pureConstantService.useTouchUI$
   }
 
   ngOnInit(): void {

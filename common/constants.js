@@ -17,6 +17,9 @@
     ZOOM_OUT: 'Zoom out',
     MAXIMISE_VIEW: 'Maximise this view',
     UNMAXIMISE_VIEW: 'Undo maximise',
+    STATUS_PANEL: 'Viewre status panel',
+    SHOW_FULL_STATUS_PANEL: 'Show full status panel',
+    HIDE_FULL_STATUS_PANEL: 'Hide full status panel',
 
     // sharing module
     SHARE_BTN: `Share this view`,

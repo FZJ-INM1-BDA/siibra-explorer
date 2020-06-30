@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card *ngIf="showFull; else showMin">
   <mat-card-content>
 
     <!-- reset -->
@@ -28,6 +28,14 @@
         (click)="resetNavigation({zoom:true})"
         matTooltip="Reset zoom">
         <i class="fas fa-search-plus"></i>
+      </button>
+
+      <mat-divider [vertical]="true"></mat-divider>
+
+      <button mat-icon-button
+        [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
+        (click)="showFull = false">
+        <i class="fas fa-angle-down"></i>
       </button>
     </div>
 
@@ -76,7 +84,7 @@
     </div>
 
     <!-- cursor pos -->
-    <mat-form-field *ngIf="!isMobile"
+    <mat-form-field *ngIf="!(useTouchInterface$ | async)"
       class="w-100">
       <mat-label>
         Cursor Position
@@ -89,6 +97,36 @@
 
   </mat-card-content>
 </mat-card>
+
+<!-- minimised status bar -->
+<ng-template #showMin>
+  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center pb-2">
+    
+    <i aria-label="viewer navigation" class="fas fa-compass"></i>
+    <span  class="pl-2">
+      {{ navVal$ | async }}
+    </span>
+
+    <!-- only show cursor if touch interface is not on -->
+    <span *ngIf="!(useTouchInterface$ | async)">
+      <!-- padding -->
+      <span class="pl-4"></span>
+
+      <i aria-label="cursor location" class="fas fa-mouse-pointer"></i>
+      <span class="pl2">
+        {{ mouseVal$ | async }}
+      </span>
+    </span>
+
+    <mat-divider [vertical]="true"></mat-divider>
+
+    <button mat-icon-button
+      [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
+      (click)="showFull = true">
+      <i class="fas fa-angle-up"></i>
+    </button>
+  </div>
+</ng-template>
 
 <!-- share template -->
 <ng-template #shareTmpl>
