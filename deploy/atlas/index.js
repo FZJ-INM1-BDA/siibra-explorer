@@ -57,8 +57,15 @@ router.get('/:atlasId', async (req, res) => {
     }),
     templateSpaces: templateSpaces.map(tmpl => {
       const lastTemplatePath = `${encodeURIComponent(atlasId)}/template/${encodeURIComponent(tmpl['@id'])}`
+
+      const searchParam = new url.URLSearchParams()
+      searchParam.set('id', tmpl['@id'])
+      const lastPathPreview = `preview?${searchParam.toString()}`
       return {
         ...tmpl,
+        previewUrl: res.locals.routePathname
+          ? url.resolve(`${res.locals.routePathname}/`, lastPathPreview)
+          : lastPathPreview,
         url: res.locals.routePathname
           ? url.resolve(`${res.locals.routePathname}/`, lastTemplatePath)
           : lastTemplatePath
