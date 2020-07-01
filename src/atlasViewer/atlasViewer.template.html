@@ -95,12 +95,17 @@
       </signin-banner>
     </div>
 
-    <layout-floating-container zIndex="13" #floatingOverlayContainer>
+    <layout-floating-container
+      zIndex="13"
+      #floatingOverlayContainer
+      iav-media-query
+      #media="iavMediaQuery">
       <div floatingContainerDirective>
-
       </div>
 
-      <div class="fixed-bottom muted-7 pe-none mb-8 d-flex justify-content-end m-4">
+      <div
+        *ngIf="(media.mediaBreakPoint$ | async) < 3"
+        class="fixed-bottom muted-7 pe-none mb-8 d-flex justify-content-end m-4">
         <ng-container *ngTemplateOutlet="logoTmpl">
         </ng-container>
       </div>

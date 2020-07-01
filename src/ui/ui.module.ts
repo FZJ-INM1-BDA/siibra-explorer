@@ -62,7 +62,6 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
 import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 
-import {ElementOutClickDirective} from "src/util/directives/elementOutClick.directive";
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
 import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
 
@@ -186,7 +185,6 @@ import {ViewerSelectorComponent} from "src/ui/viewerSelector/viewerSelector.comp
     /* directive */
     DownloadDirective,
     TouchSideClass,
-    ElementOutClickDirective,
     FixedMouseContextualContainerDirective,
     NehubaViewerTouchDirective,
   ],
@@ -228,7 +226,6 @@ import {ViewerSelectorComponent} from "src/ui/viewerSelector/viewerSelector.comp
     CookieAgreement,
     KGToS,
     StatusCardComponent,
-    ElementOutClickDirective,
     SearchSideNav,
     ViewerStateMini,
     RegionMenuComponent,
