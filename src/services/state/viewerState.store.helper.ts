@@ -37,6 +37,16 @@ export const viewerStateSelectAtlas = createAction(
   props<{ atlas: { ['@id']: string } }>()
 )
 
+export const viewerStateSelectParcellationWithId = createAction(
+  `[viewerState] selectParcellationWithId`,
+  props<{ payload: { ['@id']: string } }>()
+)
+
+export const viewerStateSelectTemplateWithId = createAction(
+  `[viewerState] selectTemplateWithId`,
+  props<{ payload: { ['@id']: string } }>()
+)
+
 export const viewerStateToggleAdditionalLayer = createAction(
   `[viewerState] toggleAdditionalLayer`,
   props<{ atlas: { ['@id']: string }  }>()

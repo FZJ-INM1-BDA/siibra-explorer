@@ -15,6 +15,7 @@ export class PureContantService implements OnDestroy{
   
   public useTouchUI$: Observable<boolean>
   public fetchedAtlases$: Observable<any>
+  public darktheme$: Observable<boolean>
 
   public totalAtlasesLength: number
 
@@ -25,8 +26,12 @@ export class PureContantService implements OnDestroy{
 
   constructor(
     private store: Store<any>,
-    private http: HttpClient  
+    private http: HttpClient,
   ){
+    this.darktheme$ = this.store.pipe(
+      select(state => state?.viewerState?.templateSelected?.useTheme === 'dark')
+    )
+
     this.useTouchUI$ = this.store.pipe(
       select(this.useTouchUiSelector),
       shareReplay(1)
@@ -37,7 +42,11 @@ export class PureContantService implements OnDestroy{
       filter(v => !!v),
       tap((arr: any[]) => this.totalAtlasesLength = arr.length),
       switchMap(atlases => merge(
-        ...atlases.map(({ url }) => this.http.get(`${BACKENDURL.replace(/\/$/, '')}/${url}`, { responseType: 'json' }))
+        ...atlases.map(({ url }) => this.http.get(
+          /^http/.test(url)
+            ? url
+            : `${BACKENDURL.replace(/\/$/, '')}/${url}`,
+          { responseType: 'json' }))
       )),
       scan((acc, curr) => acc.concat(curr), []),
       shareReplay(1)

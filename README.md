@@ -31,7 +31,6 @@ As interactive atlas viewer uses [webpack define plugin](https://webpack.js.org/
 | `DATASET_PREVIEW_URL` | dataset preview url used by component <https://github.com/fzj-inm1-bda/kg-dataset-previewer>. Useful for diagnosing issues with dataset previews.| https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview | http://localhost:1234/datasetPreview |
 | `MATOMO_URL` | base url for matomo analytics | `null` | https://example.com/matomo/ |
 | `MATOMO_ID` | application id for matomo analytics | `null` | 6 |
-| `USE_LOGO` | possible values are `hbp`, `ebrains`, `fzj` | `hbp` | `ebrains` |
 | `STRICT_LOCAL` | hides **Explore** and **Download** buttons. Useful for offline demo's | `false` | `true` |
 | `KIOSK_MODE` | after 5 minutes of inactivity, shows overlay inviting users to interact | `false` | `true` |
 | `BUILD_TEXT` | overlay text at bottom right of the viewer. set to `''` to hide. | |
@@ -52,7 +51,7 @@ It is recommended to manage your environments with `.env` file.
 | `LOCAL_CDN` | rewrite cdns to local server. useful for offlnie demo | | `http://localhost:7080/` |
 | `PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
 | `STAGING_PLUGIN_URLS` | semi colon separated urls to be returned when user queries plugins | `''`
-
+| `USE_LOGO` | possible values are `hbp`, `ebrains`, `fzj` | `hbp` | `ebrains` |
 
 ##### ebrains user authentication
 

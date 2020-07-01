@@ -576,6 +576,11 @@ mat-icon[fontset="far"]
   max-width: none!important;
 }
 
+.mb-8
+{
+  margin-bottom:4rem!important;
+}
+
 .min-h-2
 {
   min-height: 1rem;
@@ -704,4 +709,14 @@ kg-dataset-previewer > img
 .fixed-bottom
 {
   top: unset!important;
+}
+
+.fixed-top
+{
+  bottom: unset!important;
+}
+
+.layerGroupMenu > .mat-menu-content
+{
+  width: 100%;
 }

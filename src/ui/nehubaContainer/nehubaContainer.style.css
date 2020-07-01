@@ -7,11 +7,7 @@
 
 atlas-layer-container
 {
-  position: absolute;
-  bottom: 0;
-  lefT: 0;
-
-  margin-bottom: 5em;
+  margin-bottom: 1em;
   margin-left: 1em;
   width: 30em;
   height: 50em;
@@ -138,13 +134,18 @@ div#scratch-pad
   right: 0;
 }
 
-.status-card-container
+.viewer-config-container
 {
   position:absolute;
   left:1em;
   bottom:1em;
-  width : 20em;
-  pointer-events: all;
+}
+
+.viewer-status-container
+{
+  position: absolute;
+  right: 1em;
+  bottom: 1em;
 }
 
 /* if not mobile, then show on hover */

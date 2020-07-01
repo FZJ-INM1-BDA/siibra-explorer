@@ -25,16 +25,29 @@
 
 <layout-floating-container [zIndex]="5">
 
-  <!-- StatusCard container-->
-  <div *ngIf="viewerLoaded" class="status-card-container muted-7">
-    <ui-status-card
-      [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
-      [nehubaViewer]="nehubaViewer">
-    </ui-status-card>
+  <div *ngIf="templateSelected$ | async"
+    class="viewer-config-container d-flex align-items-end pe-none">
+    <!-- Viewer Selector Container-->
+    <viewer-selector
+      #viewerSelector
+      class="pe-all"
+      (iav-outsideClick)="viewerSelector.selectorExpanded = false">
+    </viewer-selector>
+
+    <atlas-layer-container class="pe-none overflow-visible"></atlas-layer-container>
   </div>
 
-  <atlas-layer-container class="overflow-visible"></atlas-layer-container>
+  <!-- StatusCard container-->
+  <div class="viewer-status-container pe-all">
 
+    <div class="muted-7" *ngIf="viewerLoaded">
+      <ui-status-card
+        [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
+        [nehubaViewer]="nehubaViewer">
+      </ui-status-card>
+    </div>
+
+  </div>
 </layout-floating-container>
 
 <div id="scratch-pad">

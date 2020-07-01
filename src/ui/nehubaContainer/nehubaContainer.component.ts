@@ -100,7 +100,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public perspectiveViewLoading$: Observable<string|null>
 
-  private templateSelected$: Observable<any>
+  public templateSelected$: Observable<any>
   private newViewer$: Observable<any>
   private selectedParcellation$: Observable<any>
   private selectedRegions$: Observable<any[]>

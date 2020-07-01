@@ -5,7 +5,7 @@
     {
       "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
       "name": "Big Brain (Histology)",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
           "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
@@ -23,7 +23,7 @@
     {
       "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
       "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
           "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
@@ -34,6 +34,7 @@
         },
         {
           "ngId": "fibre bundle short",
+          "name": "Fibre Bundle Atlas - Short Bundle",
           "@id": "juelich/iav/atlas/v1.0.0/6"
         },
         {
@@ -61,7 +62,7 @@
     {
       "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
       "name": "MNI Colin 27",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
           "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
@@ -74,7 +75,7 @@
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "name": "Jülich Cytoarchitechtonic Brain Atlas (human)",
       "baseLayer": true,
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
           "name": "Big Brain (Histology)"
@@ -92,7 +93,7 @@
     {
       "name": "BigBrain Cortical Layers Segmentation",
       "@id": "juelich/iav/atlas/v1.0.0/3",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
           "name": "Big Brain (Histology)"
@@ -102,7 +103,7 @@
     {
       "name": "Grey/White matter",
       "@id": "juelich/iav/atlas/v1.0.0/4",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
           "name": "Big Brain (Histology)"
@@ -112,7 +113,7 @@
     {
       "name": "Fibre Bundle Atlas - Long Bundle",
       "@id": "juelich/iav/atlas/v1.0.0/5",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -121,8 +122,9 @@
     },
     {
       "ngId": "fibre bundle short",
+      "name": "Fibre Bundle Atlas - Short Bundle",
       "@id": "juelich/iav/atlas/v1.0.0/6",
-      "avilableIn": [
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -132,7 +134,8 @@
     {
       "name": "DiFuMo Atlas (64 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721",
-      "avilableIn": [
+      "groupName": "DiFuMo Atlas",
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -142,7 +145,8 @@
     {
       "name": "DiFuMo Atlas (128 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8",
-      "avilableIn": [
+      "groupName": "DiFuMo Atlas",
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -152,7 +156,8 @@
     {
       "name": "DiFuMo Atlas (256 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235",
-      "avilableIn": [
+      "groupName": "DiFuMo Atlas",
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -162,7 +167,8 @@
     {
       "name": "DiFuMo Atlas (512 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16",
-      "avilableIn": [
+      "groupName": "DiFuMo Atlas",
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
@@ -172,7 +178,8 @@
     {
       "name": "DiFuMo Atlas (1024 dimensions)",
       "@id": "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1",
-      "avilableIn": [
+      "groupName": "DiFuMo Atlas",
+      "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
           "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"

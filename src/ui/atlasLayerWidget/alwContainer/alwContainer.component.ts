@@ -37,6 +37,7 @@ export class AtlasLayerContainer {
 
     this.overlayingParcellationLayers$ = this.store$.pipe(
       select(viewerStateGetOverlayingAdditionalParcellations),
+      filter(v => !!v),
       withLatestFrom(this.templateSelected$),
       map(([ additionalP, templateSelected ]) => {
         return additionalP

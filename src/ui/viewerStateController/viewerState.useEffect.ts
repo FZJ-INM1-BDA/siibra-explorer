@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy, OnInit } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
-import { Observable, Subscription, of } from "rxjs";
+import { Observable, Subscription, of, merge } from "rxjs";
 import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
@@ -10,7 +10,7 @@ import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
@@ -33,10 +33,10 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
   )
 
   @Effect()
-  public selectTemplateWithName$: Observable<any>
+  public selectParcellation$: Observable<any>
 
   @Effect()
-  public selectParcellationWithName$: Observable<any>
+  public selectTemplate$: Observable<any>
 
   /**
    * Determines how single click on region hierarchy will affect view
@@ -77,36 +77,47 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
       distinctUntilChanged(),
     )
 
-    this.onTemplateSelectClearStandAloneVolumes$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
-      mapTo({
-        type: CLEAR_STANDALONE_VOLUMES
-      })
+    this.onTemplateSelectClearStandAloneVolumes$ = viewerState$.pipe(
+      select('templateSelected'),
+      distinctUntilChanged(),
+      mapTo({ type: CLEAR_STANDALONE_VOLUMES })
     )
 
-    this.selectParcellationWithName$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_PARCELLATION_WITH_NAME),
-      map(action => {
-        const { payload = {} } = action as ViewerStateAction
-        const { name } = payload
-        return name
-      }),
-      filter(name => !!name),
-      withLatestFrom(viewerState$.pipe(
-        select('parcellationSelected'),
-      )),
-      filter(([name,  parcellationSelected]) => {
-        if (parcellationSelected && parcellationSelected.name === name) { return false }
-        return true
-      }),
-      map(([name]) => name),
+    /**
+     * merge all sources of selecting parcellation into parcellation id
+     */
+    this.selectParcellation$ = merge(
+
+      this.actions$.pipe(
+        ofType(viewerStateSelectParcellationWithId.type),
+        map(({ payload }) => payload['@id'])
+      ),
+
+      /**
+       * deprecated method...
+       * finding id from name
+       */
+      this.actions$.pipe(
+        ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_PARCELLATION_WITH_NAME),
+        withLatestFrom(viewerState$.pipe(
+          select('templateSelected')
+        )),
+        map(([ action, templateSelected ]) => {
+          const parcellationName = (action as any).payload.name
+          const foundParcellation = templateSelected.parcellations.find(p => p.name === parcellationName)
+          return foundParcellation && foundParcellation['@id']
+        }),
+        filter(v => !!v)
+      )
+    ).pipe(
+      distinctUntilChanged(),
       withLatestFrom(viewerState$.pipe(
         select('templateSelected'),
       )),
-      map(([name, templateSelected]) => {
+      map(([id, templateSelected]) => {
 
         const { parcellations: availableParcellations } = templateSelected
-        const newParcellation = availableParcellations.find(t => t.name === name)
+        const newParcellation = availableParcellations.find(t => t['@id'] === id)
         if (!newParcellation) {
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
@@ -119,56 +130,76 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
           type: SELECT_PARCELLATION,
           selectParcellation: newParcellation,
         }
-      }),
+      })
     )
 
-    this.selectTemplateWithName$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
-      map(action => {
-        const { payload = {} } = action as ViewerStateAction
-        const { name } = payload
-        return name
-      }),
-      filter(name => !!name),
+    /**
+     * merge all sources into single stream consisting of template id's
+     */
+    this.selectTemplate$ = merge(
+      this.actions$.pipe(
+        ofType(viewerStateSelectTemplateWithId.type),
+        map(({ payload }) => payload['@id'])
+      ),
+      this.actions$.pipe(
+        ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
+        withLatestFrom(viewerState$.pipe(
+          select('fetchedTemplates')
+        )),
+        map(([ action, fetchedTemplates ]) => {
+          const templateName = (action as any).payload.name
+          const foundTemplate = fetchedTemplates.find(t => t.name === templateName)
+          return foundTemplate && foundTemplate['@id']
+        }),
+        filter(v => !!v)
+      )
+    ).pipe(
+
       withLatestFrom(
         viewerState$
       ),
-      switchMap(([newTemplateName, { templateSelected, fetchedTemplates, navigation }]) => {
+      switchMap(([newTemplateId, { templateSelected, fetchedTemplates, navigation, parcellationSelected }]) => {
         if (!templateSelected) {
           return of({
-            newTemplateName,
+            newTemplateId,
             templateSelected: templateSelected,
             fetchedTemplates,
             translatedCoordinate: null,
-            navigation
+            navigation,
+            parcellationSelected
           })
         }
         const position = (navigation && navigation.position) || [0, 0, 0]
-        if (newTemplateName === templateSelected.name) return of(null)
+        if (newTemplateId === templateSelected['@id']) return of(null)
+
+        const newTemplateName = fetchedTemplates.find(t => t['@id'] === newTemplateId).name
+
         return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(
           map(({ status, statusText, result }) => {
             if (status === 'error') {
               return {
-                newTemplateName,
+                newTemplateId,
                 templateSelected: templateSelected,
                 fetchedTemplates,
                 translatedCoordinate: null,
-                navigation
+                navigation,
+                parcellationSelected
               }
             }
             return {
-              newTemplateName,
+              newTemplateId,
               templateSelected: templateSelected,
               fetchedTemplates,
               translatedCoordinate: result,
-              navigation
+              navigation,
+              parcellationSelected
             }
           })
         )
       }),
       filter(v => !!v),
-      map(({ newTemplateName, templateSelected, fetchedTemplates, translatedCoordinate, navigation }) => {
-        const newTemplateTobeSelected = fetchedTemplates.find(t => t.name === newTemplateName)
+      map(({ newTemplateId, templateSelected, fetchedTemplates, translatedCoordinate, navigation, parcellationSelected }) => {
+        const newTemplateTobeSelected = fetchedTemplates.find(t => t['@id'] === newTemplateId)
         if (!newTemplateTobeSelected) {
           return {
             type: GENERAL_ACTION_TYPES.ERROR,
@@ -177,12 +208,16 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
             },
           }
         }
+        
+        const selectParcellationWithTemplate = newTemplateTobeSelected.parcellations.map(p => p['@id']).includes(parcellationSelected['@id']) ?
+          newTemplateTobeSelected.parcellations[newTemplateTobeSelected.parcellations.findIndex(p => p['@id'] === parcellationSelected['@id'])]
+          : newTemplateTobeSelected.parcellations[0]
 
         if (!translatedCoordinate) {
           return {
             type: NEWVIEWER,
             selectTemplate: newTemplateTobeSelected,
-            selectParcellation: newTemplateTobeSelected.parcellations[0],
+            selectParcellation: selectParcellationWithTemplate,
           }
         }
         const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
