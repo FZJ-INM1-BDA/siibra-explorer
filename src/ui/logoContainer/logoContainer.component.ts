@@ -1,4 +1,7 @@
 import { Component } from "@angular/core";
+import { BACKENDURL } from "src/util/constants";
+import { PureContantService } from "src/util";
+import { Subscription } from "rxjs";
 
 @Component({
   selector : 'logo-container',
@@ -10,13 +13,22 @@ import { Component } from "@angular/core";
 
 export class LogoContainer {
   // only used to define size
-  public imgSrc = USE_LOGO === 'hbp'
-    ? 'res/image/HBP_Primary_RGB_WhiteText.png'
-    : USE_LOGO === 'ebrains'
-      ? `res/image/ebrains-logo-light.svg`
-      : USE_LOGO === 'fzj'
-        ? 'res/image/fzj_black_transparent_svg.svg'
-        : null
-      
-  public useLogo = USE_LOGO
+  public imgSrc = `${BACKENDURL}logo`
+  
+  public containerStyle = {
+    backgroundImage: `url('${BACKENDURL}logo')`
+  }
+
+  private subscriptions: Subscription[] = []
+  constructor(
+    pureConstantService: PureContantService
+  ){
+    this.subscriptions.push(
+      pureConstantService.darktheme$.subscribe(flag => {
+        this.containerStyle = {
+          backgroundImage: `url('${BACKENDURL}logo${!!flag ? '?darktheme=true' : ''}')`
+        }
+      })
+    )
+  }
 }

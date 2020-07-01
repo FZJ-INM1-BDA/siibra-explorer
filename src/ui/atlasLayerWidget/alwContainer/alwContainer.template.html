@@ -87,27 +87,33 @@
     </mat-chip>
   </mat-chip-list>
 
-  <button class="pe-all"
-    [color]="visibleTab === 'hierarchy' ? 'primary' : ''"
-    (click)="handleClickWidget('hierarchy')"
-    mat-icon-button>
-    <i class="fas fa-sitemap"></i>
-  </button>
-  <button class="pe-all"
-    [color]="visibleTab === 'connectivity' ? 'primary' : ''"
-    (click)="handleClickWidget('connectivity')"
-    mat-icon-button>
-    <i class="fas fa-braille"></i>
-  </button>
-  <button class="pe-all"
-    mat-icon-button
-    [matBadge]="visibleTab === 'dataset' ? null : availableDatasets"
-    matBadgeColor="accent"
-    [color]="visibleTab === 'dataset' ? 'primary' : ''"
-    (click)="handleClickWidget('dataset')">
-    <i class="fas fa-database"></i>
-  </button>
+  <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'hierarchy', iconClass: 'fas fa-sitemap' }">
+  </ng-container>
+
+  <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'connectivity', iconClass: 'fas fa-braille' }">
+  </ng-container>
+
+  <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'dataset', iconClass: 'fas fa-database', badge: visibleTab === 'dataset' ? null : availableDatasets }">
+  </ng-container>
 </div>
+
+<ng-template
+  #btnTmpl
+  let-matBtnDisabled="matBtnDisabled"
+  let-tab="tab"
+  let-badge="badge"
+  let-iconClass="iconClass">
+  <iav-dynamic-mat-button
+    class="pe-all"
+    [matBadge]="badge"
+    matBadgeColor="accent"
+    (click)="handleClickWidget(tab)"
+    [iav-dynamic-mat-button-disabled]="matBtnDisabled"
+    iav-dynamic-mat-button-color="primary"
+    [iav-dynamic-mat-button-style]="tab === visibleTab ? 'mat-mini-fab' : 'mat-icon-button'">
+    <i [class]="iconClass"></i>
+  </iav-dynamic-mat-button>
+</ng-template>
 
 <ng-template #closeBtn>
   <button mat-icon-button

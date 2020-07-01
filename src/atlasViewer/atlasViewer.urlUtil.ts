@@ -322,6 +322,5 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
     }
   })()
 
-  console.log(returnState)
   return returnState
 }

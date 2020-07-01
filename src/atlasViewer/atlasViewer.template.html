@@ -58,7 +58,7 @@
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
       [iav-captureClickListenerDirective-captureDocument]="true"
-      (iav-captureClickListenerDirective-onClick)="mouseClickDocument($event)">
+      (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
     </ui-nehuba-container>
 
     <div class="z-index-10 position-absolute pe-none w-100 h-100">
@@ -100,7 +100,7 @@
 
       </div>
 
-      <div class="fixed-bottom pe-none d-flex justify-content-end m-4">
+      <div class="fixed-bottom muted-7 pe-none mb-8 d-flex justify-content-end m-4">
         <ng-container *ngTemplateOutlet="logoTmpl">
         </ng-container>
       </div>

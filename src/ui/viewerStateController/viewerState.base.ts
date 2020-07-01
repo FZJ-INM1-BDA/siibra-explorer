@@ -17,10 +17,6 @@ const ACTION_TYPES = {
   NAVIGATETO_REGION: 'NAVIGATETO_REGION',
 }
 
-const compareWith = (o, n) => !o || !n
-  ? false
-  : o.name === n.name
-
 export class ViewerStateBase implements OnInit {
 
   @ViewChild('savedRegionBottomSheetTemplate', {read: TemplateRef}) public savedRegionBottomSheetTemplate: TemplateRef<any>
@@ -39,8 +35,6 @@ export class ViewerStateBase implements OnInit {
   public regionsSelected$: Observable<any>
 
   public savedRegionsSelections$: Observable<any[]>
-
-  public compareWith = compareWith
 
   private savedRegionBottomSheetRef: MatBottomSheetRef
 
@@ -209,3 +203,4 @@ export class ViewerStateBase implements OnInit {
 }
 
 export const VIEWERSTATE_CONTROLLER_ACTION_TYPES = ACTION_TYPES
+

@@ -91,6 +91,7 @@ import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
 import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
 import { AtlasLayerContainer } from "./atlasLayerWidget/alwContainer/alwContainer.component";
+import {ViewerSelectorComponent} from "src/ui/viewerSelector/viewerSelector.component";
 
 @NgModule({
   imports : [
@@ -127,7 +128,9 @@ import { AtlasLayerContainer } from "./atlasLayerWidget/alwContainer/alwContaine
     ConfigComponent,
     SigninBanner,
     AtlasDropdownSelector,
-    
+    ViewerSelectorComponent,
+    AtlasDropdownSelector,
+
     StatusCardComponent,
     CookieAgreement,
     KGToS,

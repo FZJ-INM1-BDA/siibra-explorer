@@ -151,6 +151,9 @@ app.get('/', cookieParser(), (req, res) => {
   }
 })
 
+
+app.use('/logo', require('./logo'))
+
 /**
  * User route, for user profile/management
  */

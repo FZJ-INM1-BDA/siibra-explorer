@@ -14,6 +14,7 @@ import { SwitchDirective } from "./directives/switch.directive";
 import { MediaQueryDirective } from './directives/mediaQuery.directive'
 import { LayoutModule } from "@angular/cdk/layout";
 import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
+import {ClickOutsideDirective} from "src/util/directives/clickOutside.directive";
 
 @NgModule({
   imports:[
@@ -32,7 +33,8 @@ import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
     NmToMm,
     SwitchDirective,
     MediaQueryDirective,
-    MapToPropertyPipe
+    MapToPropertyPipe,
+    ClickOutsideDirective
   ],
   exports: [
     FilterNullPipe,
@@ -47,7 +49,8 @@ import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
     NmToMm,
     SwitchDirective,
     MediaQueryDirective,
-    MapToPropertyPipe
+    MapToPropertyPipe,
+    ClickOutsideDirective
   ]
 })
 

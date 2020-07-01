@@ -70,7 +70,6 @@ module.exports = {
       SPATIAL_TRANSFORM_BACKEND: JSON.stringify(process.env.SPATIAL_TRANSFORM_BACKEND || 'https://hbp-spatial-backend.apps.hbp.eu'),
       MATOMO_URL: JSON.stringify(process.env.MATOMO_URL || null),
       MATOMO_ID: JSON.stringify(process.env.MATOMO_ID || null),
-      USE_LOGO: JSON.stringify(process.env.USE_LOGO || 'hbp' || 'ebrains' || 'fzj'),
 
       // strick local hides "explore" and "download" btns, which requires internet
       STRICT_LOCAL: process.env.STRICT_LOCAL === 'true' ? 'true' : 'false',

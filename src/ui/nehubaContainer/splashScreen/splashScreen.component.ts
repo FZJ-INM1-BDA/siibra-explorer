@@ -60,7 +60,8 @@ export class SplashScreen implements AfterViewInit {
 
     this.loadedAtlases$ = this.store.pipe(
       select(state => state[viewerStateHelperStoreName]),
-      select(state => state.fetchedAtlases)
+      select(state => state.fetchedAtlases),
+      filter(v => !!v)
     )
 
     this.stillLoadingAtlases$ = this.loadedAtlases$.pipe(
