@@ -100,10 +100,12 @@
 
 <!-- minimised status bar -->
 <ng-template #showMin>
-  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center pb-2">
+  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center pb-2"
+    iav-media-query
+    #media="iavMediaQuery">
     
     <i aria-label="viewer navigation" class="fas fa-compass"></i>
-    <span  class="pl-2">
+    <span *ngIf="(media.mediaBreakPoint$ | async) < 3" class="pl-2">
       {{ navVal$ | async }}
     </span>
 

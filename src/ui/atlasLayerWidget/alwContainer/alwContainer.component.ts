@@ -9,7 +9,8 @@ import { map, shareReplay, withLatestFrom, filter, tap } from "rxjs/operators";
   templateUrl: './alwContainer.template.html',
   styleUrls: [
     './alwContainer.style.css'
-  ]
+  ],
+  exportAs: 'atlasLayerWidgetContainer'
 })
 
 export class AtlasLayerContainer {

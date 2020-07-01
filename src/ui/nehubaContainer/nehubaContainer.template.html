@@ -23,7 +23,7 @@
   </div>
 </current-layout>
 
-<layout-floating-container [zIndex]="5">
+<layout-floating-container [zIndex]="10">
 
   <div *ngIf="templateSelected$ | async"
     class="viewer-config-container d-flex align-items-end pe-none">
@@ -34,7 +34,11 @@
       (iav-outsideClick)="viewerSelector.selectorExpanded = false">
     </viewer-selector>
 
-    <atlas-layer-container class="pe-none overflow-visible"></atlas-layer-container>
+    <atlas-layer-container
+      class="pe-none overflow-visible"
+      (iav-outsideClick)="alwWidget.visibleTab = null"
+      #alwWidget="atlasLayerWidgetContainer">
+    </atlas-layer-container>
   </div>
 
   <!-- StatusCard container-->
