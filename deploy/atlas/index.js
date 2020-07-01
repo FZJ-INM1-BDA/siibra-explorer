@@ -61,12 +61,8 @@ router.get('/preview', (req, res) => {
   const filename = previewImageFIleNameMap.get(id)
   if (!filename) return res.status(404).end()
 
-  let filepath
-  if (process.env.NODE_ENV === 'production') {
-    filepath = path.join(__dirname, '../res/image', filename)
-  } else {
-    filepath = path.join(__dirname, '../../src/res/images/atlas-selection', filename)
-  }
+  const filepath = path.join(__dirname, '../assets/images/atlas-selection', filename)
+
   try {
     res.setHeader('Content-Type', 'image/png')
     fs.createReadStream(filepath).pipe(res).on('error', getHandleErrorFn(req, res))
