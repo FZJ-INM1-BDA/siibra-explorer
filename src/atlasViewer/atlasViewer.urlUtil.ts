@@ -4,6 +4,7 @@ import { PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
 import { generateLabelIndexId, getNgIdLabelIndexFromRegion, IavRootStoreInterface } from "../services/stateStore.service";
 import { decodeToNumber, encodeNumber, separator } from "./atlasViewer.constantService.service";
 import { getShader, PMAP_DEFAULT_CONFIG } from "src/util/constants";
+import { viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
 export const PARSING_SEARCHPARAM_ERROR = {
   TEMPALTE_NOT_SET: 'TEMPALTE_NOT_SET',
   TEMPLATE_NOT_FOUND: 'TEMPLATE_NOT_FOUND',
@@ -305,6 +306,22 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
   } catch (e) {
     // parsing previewingDatasetFiles
   }
-  
+
+  /**
+   * parsing template to get atlasId
+   */
+  (() => {
+
+    const viewreHelperState = returnState[viewerStateHelperStoreName]
+    const { templateSelected, parcellationSelected } = returnState['viewerState']
+    const { fetchedAtlases, ...rest } = viewreHelperState
+    const selectedAtlas = fetchedAtlases.find(a => a['templateSpaces'].find(t => t['@id'] === templateSelected['@id']))
+    returnState[viewerStateHelperStoreName] = {
+      ...viewreHelperState,
+      selectedAtlasId: selectedAtlas['@id']
+    }
+  })()
+
+  console.log(returnState)
   return returnState
 }

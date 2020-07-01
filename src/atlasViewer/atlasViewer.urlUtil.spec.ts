@@ -23,6 +23,13 @@ const fetchedTemplateRootState = {
 // TODO finish writing tests
 describe('atlasViewer.urlService.service.ts', () => {
   describe('cvtSearchParamToState', () => {
+    it('parses template  into atlasId properly', () => {
+      /**
+       * TODO finish test
+       */
+      expect(true).toBe(false)
+    })
+
     it('convert empty search param to empty state', () => {
       const searchparam = new URLSearchParams()
       expect(() => cvtSearchParamToState(searchparam, defaultRootState)).toThrow()
