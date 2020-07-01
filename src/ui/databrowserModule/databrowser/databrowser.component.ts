@@ -20,6 +20,9 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 
 export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
+  @Input()
+  showList: boolean = true
+
   public MODALITY_FILTER_ARIA_LABEL = MODALITY_FILTER
   public LIST_OF_DATASETS_ARIA_LABEL = LIST_OF_DATASETS
   @Input()

@@ -43,7 +43,7 @@ import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.s
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { NewTemplateUseEffect } from './services/effect/newTemplate.effect';
-import { WidgetModule, ACTION_TO_WIDGET_TOKEN } from 'src/widget';
+import { WidgetModule } from 'src/widget';
 import { PluginModule } from './atlasViewer/pluginUnit/plugin.module';
 import { LoggingModule } from './logging/logging.module';
 import { ShareModule } from './share';

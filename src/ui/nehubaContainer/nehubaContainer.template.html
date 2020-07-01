@@ -23,15 +23,18 @@
   </div>
 </current-layout>
 
-<layout-floating-container *ngIf="viewerLoaded" [zIndex]="5">
+<layout-floating-container [zIndex]="5">
 
   <!-- StatusCard container-->
-  <div class="status-card-container muted-7">
+  <div *ngIf="viewerLoaded" class="status-card-container muted-7">
     <ui-status-card
       [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
       [nehubaViewer]="nehubaViewer">
     </ui-status-card>
   </div>
+
+  <atlas-layer-container class="overflow-visible"></atlas-layer-container>
+
 </layout-floating-container>
 
 <div id="scratch-pad">

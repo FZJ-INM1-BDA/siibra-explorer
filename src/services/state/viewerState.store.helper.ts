@@ -37,30 +37,68 @@ export const viewerStateSelectAtlas = createAction(
   props<{ atlas: { ['@id']: string } }>()
 )
 
+export const viewerStateToggleAdditionalLayer = createAction(
+  `[viewerState] toggleAdditionalLayer`,
+  props<{ atlas: { ['@id']: string }  }>()
+)
+
+export const viewerStateRemoveAdditionalLayer = createAction(
+  `[viewerState] removeAdditionalLayer`,
+  props<{ atlas: { ['@id']: string } }>()
+)
+
 interface IViewerStateHelperStore{
   fetchedAtlases: any[]
   selectedAtlasId: string
-  selectedParcellations: any[]
+  overlayingAdditionalParcellations: any[]
 }
 
 const initialState: IViewerStateHelperStore = {
   fetchedAtlases: [],
   selectedAtlasId: null,
-  selectedParcellations: []
+  overlayingAdditionalParcellations: []
 }
 
 export const viewerStateHelperReducer = createReducer(
   initialState,
   on(viewerStateSetFetchedAtlases, (state, { fetchedAtlases }) => ({ ...state, fetchedAtlases })),
   on(viewerStateSelectAtlas, (state, { atlas }) => ({ ...state, selectedAtlasId: atlas['@id'] })),
-  on(generalApplyState, (_prevState, { state }) => ({ ...state[viewerStateHelperStoreName] }))
+  on(generalApplyState, (_prevState, { state }) => ({ ...state[viewerStateHelperStoreName] })),
+  on(viewerStateToggleAdditionalLayer, (state, { atlas }) => {
+    const { overlayingAdditionalParcellations } = state
+    const layerAlreadyDisplayed = overlayingAdditionalParcellations.find(p => p['@id'] === atlas['@id'])
+
+    /**
+     * TODO this logic only allows for at most one additional layer to be displayed
+     */
+    return {
+      ...state,
+      overlayingAdditionalParcellations: layerAlreadyDisplayed
+        ? []
+        : [ atlas ]
+    }
+  }),
+  on(viewerStateRemoveAdditionalLayer, (state, { atlas }) => {
+    const { overlayingAdditionalParcellations } = state
+    return {
+      ...state,
+      overlayingAdditionalParcellations: overlayingAdditionalParcellations.filter(p => p['@id'] !== atlas['@id'])
+    }
+  })
 )
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
 
-export const viewerStateGetParcellationsSelected = createSelector(
+export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
   state => state[viewerStateHelperStoreName],
-  state => state.selectedParcellations
+  localState => localState.overlayingAdditionalParcellations
+)
+
+export const viewerStateGetSelectedAtlas = createSelector(
+  state => state[viewerStateHelperStoreName],
+  ({ selectedAtlasId, fetchedAtlases }) => {
+    return selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
+  }
 )
 
 export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionReducer<any> {

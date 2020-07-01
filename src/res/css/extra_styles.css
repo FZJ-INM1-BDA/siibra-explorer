@@ -15,6 +15,11 @@ body
   overflow:hidden;
 }
 
+.d-none
+{
+  display: none;
+}
+
 .touch-bottom.touch-left > .scale-bar-container
 {
   bottom: 0;
@@ -452,11 +457,6 @@ markdown-dom pre code
 
 .cursor-pointer {
     cursor: pointer!important;
-}
-
-cdk-virtual-scroll-viewport:not(.cdk-virtual-scroll-orientation-horizontal) > .cdk-virtual-scroll-content-wrapper
-{
-  width: 100%;
 }
 
 .z-index-10

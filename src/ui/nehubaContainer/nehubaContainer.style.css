@@ -5,6 +5,17 @@
   position:relative;
 }
 
+atlas-layer-container
+{
+  position: absolute;
+  bottom: 0;
+  lefT: 0;
+
+  margin-bottom: 5em;
+  margin-left: 1em;
+  width: 30em;
+  height: 50em;
+}
 
 input[navigateInput]
 {
