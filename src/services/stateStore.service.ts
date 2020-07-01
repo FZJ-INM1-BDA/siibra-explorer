@@ -48,10 +48,7 @@ export { IDataEntry, IParcellationRegion, FETCHED_DATAENTRIES, FETCHED_SPATIAL_D
 export { CLOSE_SIDE_PANEL, MOUSE_OVER_LANDMARK, MOUSE_OVER_SEGMENT, OPEN_SIDE_PANEL, SHOW_SIDE_PANEL_CONNECTIVITY, HIDE_SIDE_PANEL_CONNECTIVITY, COLLAPSE_SIDE_PANEL_CURRENT_VIEW, EXPAND_SIDE_PANEL_CURRENT_VIEW } from './state/uiState.store'
 export { UserConfigStateUseEffect } from './state/userConfigState.store'
 
-export const GENERAL_ACTION_TYPES = {
-  ERROR: 'ERROR',
-  APPLY_STATE: 'APPLY_STATE',
-}
+export { GENERAL_ACTION_TYPES } from './stateStore.helper'
 
 // TODO deprecate
 export function safeFilter(key: string) {
@@ -201,6 +198,7 @@ export interface IavRootStoreInterface {
 }
 
 import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
+import { createAction, props } from '@ngrx/store';
 
 export const defaultRootState: IavRootStoreInterface = {
   pluginState: pluginDefaultState,

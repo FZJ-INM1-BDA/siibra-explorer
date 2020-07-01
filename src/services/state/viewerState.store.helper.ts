@@ -1,6 +1,6 @@
 // TODO merge with viewerstate.store.ts when refactor is done
 import { createAction, props, createReducer, on, ActionReducer, createSelector } from "@ngrx/store";
-import { reduce } from "rxjs/operators";
+import { generalApplyState } from "../stateStore.helper";
 
 export interface IRegion{
   name: string
@@ -52,7 +52,8 @@ const initialState: IViewerStateHelperStore = {
 export const viewerStateHelperReducer = createReducer(
   initialState,
   on(viewerStateSetFetchedAtlases, (state, { fetchedAtlases }) => ({ ...state, fetchedAtlases })),
-  on(viewerStateSelectAtlas, (state, { atlas }) => ({ ...state, selectedAtlasId: atlas['@id'] }))
+  on(viewerStateSelectAtlas, (state, { atlas }) => ({ ...state, selectedAtlasId: atlas['@id'] })),
+  on(generalApplyState, (_prevState, { state }) => ({ ...state[viewerStateHelperStoreName] }))
 )
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
@@ -71,3 +72,4 @@ export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionRe
     return reducer(state, action)
   }
 }
+
