@@ -1,70 +1,16 @@
 <div class="d-flex flex-column h-100">
-  <viewer-state-controller class="pe-all flex-grow-0 flex-shrink-0 mb-1" #viewerStateController>
-
-    <!-- content append -->
-    <ng-container card-content="append">
-      <region-text-search-autocomplete
-        *ngIf="viewerStateController.parcellationSelected$ | async"
-        [showBadge]="true"
-        class="d-block w-100">
-      </region-text-search-autocomplete>
-    </ng-container>
-
-    <!-- footer content -->
-    <div class="d-flex flex-row justify-content-center" card-footer>
-      <!-- TODO export all aria labels to common/constants.js in future patch -->
-      <button mat-stroked-button
-        [attr.aria-label]="TOGGLE_EXPLORE_PANEL_ARIA_LABEL"
-        *ngIf="!(sidePanelExploreCurrentViewIsOpen$ | async)"
-        (click)="expandSidePanelCurrentView()"
-        [disabled]="!(viewerStateController.parcellationSelected$ | async)"
-        class="m-1 flex-grow-1 overflow-hidden">
-
-        <!-- template parcellation selected -->
-        <ng-container *ngIf="viewerStateController.parcellationSelected$ | async; else exploreRegionNotAvailable">
-          <i class="fas fa-chevron-down"></i>
-          <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
-            {{ regionsSelected.length === 0 ? 'Explore the current view' : regionsSelected.length === 1 ? ('Explore ' + regionsSelected[0].name) : ('Explore selected regions (' + regionsSelected.length + ' selected)') }}
-          </ng-container>
-        </ng-container>
-
-        <!-- nothing selected -->
-        <ng-template #exploreRegionNotAvailable>
-          No additional information available
-        </ng-template>
-      </button>
-    </div>
-  </viewer-state-controller>
+  
+  <region-text-search-autocomplete
+    *ngIf="false"
+    [showBadge]="true"
+    class="d-block w-100">
+  </region-text-search-autocomplete>
 
   <ng-container *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async)" [ngSwitch]="(sidePanelCurrentViewContent | async)">
     <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1"
                           *ngSwitchCase = "'Connectivity'">
 
     </connectivity-browser>
-    <data-browser *ngSwitchCase = "'Dataset'"
-      class="pe-all flex-grow-5 flex-shrink-1"
-      [template]="viewerStateController.templateSelected$ | async"
-      [parcellation]="viewerStateController.parcellationSelected$ | async"
-      [regions]="viewerStateController.regionsSelected$ | async"
-      (dataentriesUpdated)="availableDatasets = $event.length">
-
-      <ng-container card-content='prepend'>
-        <ng-container *ngTemplateOutlet="selectedRegionsTmpl">
-
-        </ng-container>
-
-        <mat-divider class="position-relative mt-2 mb-2 mat-divider-full-width"></mat-divider>
-      </ng-container>
-
-      <!-- footer content -->
-      <div class="d-flex flex-row justify-content-center" card-footer>
-        <button mat-stroked-button
-          class="m-1"
-          (click)="collapseSidePanelCurrentView()" >
-          <i class="fas fa-chevron-up"></i>
-        </button>
-      </div>
-    </data-browser>
   </ng-container>
 
 </div>
@@ -99,108 +45,3 @@
     </button>
   </div>
 </ng-template>  
-
-<!-- selected regions container -->
-<ng-template #selectedRegionsTmpl>
-  <ng-container *ngIf="viewerStateController.regionsSelected$ | async as regionsSelected">
-    <div [ngClass]="{'h-117px flex-grow-1': regionsSelected.length > 1, 'flex-grow-0': regionsSelected.length < 2}"
-      class="flex-shrink-0 mb-1 pe-all d-flex flex-column">
-
-      <!-- show when no region is selected -->
-      <div *ngIf="regionsSelected.length === 0"
-        class="pt-2 pb-2 d-flex flex-row align-items-center flex-nowrap">
-        <i *ngIf="false" class="fas fa-brain mr-2"></i>
-
-        <small>
-          In this parcellation atlas
-        </small>
-      </div>
-
-      <!-- show when regions are selected -->
-      <div *ngIf="regionsSelected.length > 0" class="flex-grow-1 d-flex flex-column">
-
-        <!-- header -->
-        <div class="flex-grow-0 flex-shrink-0">
-          <ng-container *ngTemplateOutlet="header">
-          </ng-container>
-        </div>
-
-        <!-- body (region descriptor or multi region list) -->
-        <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
-          <ng-container *ngTemplateOutlet="body">
-          </ng-container>
-        </div>
-      </div>
-    </div>
-
-    <ng-template #header>
-      <div class="d-flex flex-row align-items-center">
-        <small *ngIf="regionsSelected.length === 1" class="text-muted position-relative">
-          Region selected
-        </small>
-      
-        <small *ngIf="regionsSelected.length > 1" class="text-muted position-relative">
-          {{ regionsSelected.length }} regions selected
-        </small>
-        
-        <div class="position-relative d-flex align-items-center">
-          <button mat-icon-button
-            class="position-absolute"
-            (click)="deselectAllRegions()"
-            matTooltip="Clear all regions"
-            aria-label="Clear all regions"
-            color="primary">
-            <i class="fas fa-times-circle"></i>
-          </button>
-        </div>
-      </div>
-    </ng-template>
-
-    <ng-template #body>
-
-      <!-- TODO bug in browser? unless using d-flex here and flex-grow-1 in child, child cannot fille parent, even with h-100 -->
-
-      <!-- single region -->
-      <ng-template [ngIf]="regionsSelected.length === 1" [ngIfElse]="multiRegionTemplate">
-      
-        <!-- selected brain region -->
-        <region-list-simple-view
-          class="position-relative"
-          [showBrainIcon]="true"
-          [region]="regionsSelected[0]"
-          [isSelected]="true"
-          [showDesc]="true">
-
-        </region-list-simple-view>
-      </ng-template>
-
-
-      <!-- multi region -->
-      <ng-template #multiRegionTemplate>
-        <div class="flex-grow-1 d-flex flex-row">
-
-          <cdk-virtual-scroll-viewport
-            class="flex-grow-1 flex-shrink-1"
-            itemSize="55"
-            maxBufferPx="600"
-            minBufferPx="300">
-            <div *cdkVirtualFor="let region of regionsSelected; trackBy: trackByFn ; let first = first"
-              class="region-wrapper d-flex flex-column" >
-              <!-- divider if not first -->
-              <mat-divider class="flex-grow-0 flex-shrink-0" *ngIf="!first"></mat-divider>
-
-              <!-- selected brain region -->
-              <region-list-simple-view
-                class="d-block w-100 h-100"
-                [showBrainIcon]="true"
-                [region]="region"
-                [isSelected]="true">
-
-              </region-list-simple-view>
-            </div>
-          </cdk-virtual-scroll-viewport>
-        </div>
-      </ng-template>
-    </ng-template>
-  </ng-container>
-</ng-template>

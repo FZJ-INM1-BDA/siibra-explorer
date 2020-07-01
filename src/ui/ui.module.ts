@@ -51,7 +51,6 @@ import { SigninBanner } from "./signinBanner/signinBanner.components";
 import { TemplateParcellationCitationsContainer } from "./templateParcellationCitations/templateParcellationCitations.component";
 import { FilterNameBySearch } from "./viewerStateController/regionHierachy/filterNameBySearch.pipe";
 
-import { ViewerStateController } from 'src/ui/viewerStateController/viewerStateCFull/viewerState.component'
 import { ViewerStateMini } from 'src/ui/viewerStateController/viewerStateCMini/viewerStateMini.component'
 
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
@@ -91,6 +90,7 @@ import { importNehubaFactory } from "./nehubaContainer/util";
 import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
 import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
+import { AtlasLayerContainer } from "./atlasLayerWidget/alwContainer/alwContainer.component";
 
 @NgModule({
   imports : [
@@ -136,7 +136,6 @@ import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
     VerticalOneThree,
     SinglePanel,
     CurrentLayout,
-    ViewerStateController,
     ViewerStateMini,
     RegionHierarchy,
     CurrentlySelectedRegions,
@@ -150,6 +149,7 @@ import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
+    AtlasLayerContainer,
 
     ActionDialog,
 

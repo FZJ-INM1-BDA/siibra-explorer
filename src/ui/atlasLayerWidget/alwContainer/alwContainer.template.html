@@ -1,0 +1,118 @@
+<!-- content container -->
+<div class="flex-grow-1 position-relative d-flex flex-column-reverse content-container">
+
+  <div class="h-100" [ngClass]="{'d-none': visibleTab !== 'hierarchy'}">
+    <mat-card class="h-100 pe-all d-flex flex-column">
+      <mat-card-header class="flex-grow-0 d-flex flex-row justify-content-between">
+        <mat-card-title>
+          <span>
+            Region hierarchy
+          </span>
+        </mat-card-title>
+
+        <ng-container *ngTemplateOutlet="closeBtn">
+        </ng-container>
+      </mat-card-header>
+
+      <mat-card-content class="flex-grow-1">
+        <region-hierarchy
+          *ngIf="visibleTab === 'hierarchy'"
+          class="h-100"
+          [parcellationSelected]="parcellationOfInterest$ | async">
+
+        </region-hierarchy>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="h-100" [ngClass]="{'d-none': visibleTab !== 'connectivity'}">
+    <mat-card class="h-100 pe-all d-flex flex-column">
+      <mat-card-header class="flex-grow-0 d-flex flex-row justify-content-between">
+        <mat-card-title>
+          Connectivity
+        </mat-card-title>
+
+        <ng-container *ngTemplateOutlet="closeBtn">
+        </ng-container>
+      </mat-card-header>
+      <mat-card-content class="flex-grow-1">
+        connectivity data here ....
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <data-browser
+    [ngClass]="{'d-none': visibleTab !== 'dataset'}"
+    [showList]="visibleTab === 'dataset'"
+    class="position-absolute w-100 h-100 pe-all"
+    [template]="templateSelected$ | async"
+    [parcellation]="parcellationOfInterest$ | async"
+    (dataentriesUpdated)="availableDatasets = $event.length">
+
+    <div card-header>
+      <mat-card-header class="d-flex flex-row justify-content-between">
+        <mat-card-title>
+          Datasets
+        </mat-card-title>
+
+        <ng-container *ngTemplateOutlet="closeBtn">
+        </ng-container>
+      </mat-card-header>
+    </div>
+
+    <!-- footer content -->
+    <div class="d-flex flex-row justify-content-center" card-footer>
+    </div>
+  </data-browser>
+</div>
+
+<!-- tab btn selector -->
+<div class="flex-grow-0 widget-container d-flex pe-none position-relative">
+
+  <mat-chip-list class="poi-name-tag" *ngIf="parcellationOfInterest$ | async as poi">
+    <mat-chip class="pe-all"
+      [color]="!poiIsBaseLayer ? 'primary' : 'basic'"
+      [selected]="!poiIsBaseLayer">
+      <span>
+        {{ poi.name }}
+      </span>
+      <mat-icon
+        *ngIf="!poiIsBaseLayer"
+        (click)="removeNonBaseLayer(poi)"
+        matChipRemove
+        fontSet="fas"
+        fontIcon="fa-times-circle">
+      </mat-icon>
+      <!-- <i matChipRemove class="fas fa-times-circle"></i> -->
+    </mat-chip>
+  </mat-chip-list>
+
+  <button class="pe-all"
+    [color]="visibleTab === 'hierarchy' ? 'primary' : ''"
+    (click)="handleClickWidget('hierarchy')"
+    mat-icon-button>
+    <i class="fas fa-sitemap"></i>
+  </button>
+  <button class="pe-all"
+    [color]="visibleTab === 'connectivity' ? 'primary' : ''"
+    (click)="handleClickWidget('connectivity')"
+    mat-icon-button>
+    <i class="fas fa-braille"></i>
+  </button>
+  <button class="pe-all"
+    mat-icon-button
+    [matBadge]="visibleTab === 'dataset' ? null : availableDatasets"
+    matBadgeColor="accent"
+    [color]="visibleTab === 'dataset' ? 'primary' : ''"
+    (click)="handleClickWidget('dataset')">
+    <i class="fas fa-database"></i>
+  </button>
+</div>
+
+<ng-template #closeBtn>
+  <button mat-icon-button
+    (click)="visibleTab = null">
+    <mat-icon fontSet="fas" fontIcon="fa-times">
+    </mat-icon>
+  </button>
+</ng-template>
