@@ -124,7 +124,7 @@
           <button mat-icon-button
             [matTooltip]="visibleCountedDataM.length > 0 ? 'Reset filters' : null"
             iav-delay-event="click"
-            (delayedEmit)="visibleCountedDataM.length > 0 ? clearAll() : null"
+            (iav-delay-event-emit)="visibleCountedDataM.length > 0 ? clearAll() : null"
             [iav-stop]="visibleCountedDataM.length > 0 ? 'click' : null"
             [color]="visibleCountedDataM.length > 0 ? 'primary' : 'basic'">
             <i class="fas fa-filter"></i>
