@@ -2,7 +2,7 @@
     <div [hidden]="selectorExpanded"
          class="muted-7 m-2 selectedLayerBorder cursorPointer selectedTemplateDefaultContainer"
          (click)="selectorExpanded = true">
-        <img [src]="(selectedTemplate$ | async)?.previewUrl" draggable="false"/>
+        <img [src]="selectedTemplatePreviewUrl" draggable="false"/>
     </div>
 
 

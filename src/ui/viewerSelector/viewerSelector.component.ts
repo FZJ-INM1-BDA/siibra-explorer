@@ -29,6 +29,7 @@ export class ViewerSelectorComponent implements OnInit {
     public layerGroupMenuItems: any[]
 
     public selectorExpanded: boolean = false
+    public selectedTemplatePreviewUrl: string = ''
 
     constructor(private store$: Store<any>) {
       this.selectedAtlas$ = this.store$.pipe(
@@ -58,6 +59,7 @@ export class ViewerSelectorComponent implements OnInit {
     ngOnInit(): void {
       this.subscriptions.push(
         this.selectedTemplate$.subscribe(st => {
+          this.selectedTemplatePreviewUrl = st.templateSpaces.find(t => t['@id'] === st['@id']).previewUrl
           this.selectedTemplateSpaceIndex = this.atlas && this.atlas.templateSpaces.findIndex(ts => ts['@id'] === st['@id'])
         })
       )
