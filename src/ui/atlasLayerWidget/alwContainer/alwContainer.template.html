@@ -107,7 +107,8 @@
     class="pe-all"
     [matBadge]="badge"
     matBadgeColor="accent"
-    (click)="handleClickWidget(tab)"
+    iav-delay-event="click"
+    (iav-delay-event-emit)="handleClickWidget(tab)"
     [iav-dynamic-mat-button-disabled]="matBtnDisabled"
     iav-dynamic-mat-button-color="primary"
     [iav-dynamic-mat-button-style]="tab === visibleTab ? 'mat-mini-fab' : 'mat-icon-button'">
