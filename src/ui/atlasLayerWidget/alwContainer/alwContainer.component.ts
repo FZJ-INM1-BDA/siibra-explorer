@@ -3,6 +3,7 @@ import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest } from "rxjs";
 import { viewerStateGetOverlayingAdditionalParcellations, viewerStateGetSelectedAtlas, viewerStateToggleAdditionalLayer, viewerStateRemoveAdditionalLayer } from 'src/services/state/viewerState.store.helper'
 import { map, shareReplay, withLatestFrom, filter, tap } from "rxjs/operators";
+import {safeFilter} from "src/services/stateStore.service";
 
 @Component({
   selector: 'atlas-layer-container',
@@ -21,11 +22,14 @@ export class AtlasLayerContainer {
   public parcellationOfInterest$: Observable<any>
   
   public availableDatasets: number 
+  public connectedRegionsNumber: number
 
   private overlayingParcellationLayers$: Observable<any[]>
   private parcellationSelected$: Observable<any>
 
   public visibleTab: 'dataset' | 'connectivity' | 'hierarchy'
+
+  private connectivityRegion$: Observable<any>
 
   constructor(
     private store$: Store<any>
@@ -64,6 +68,12 @@ export class AtlasLayerContainer {
         this.poiIsBaseLayer = !firstOverlayingLayer
         return firstOverlayingLayer || parcellationSelected
       })
+    )
+
+    this.connectivityRegion$ = this.store$.pipe(
+      select('viewerState'),
+      safeFilter('connectivityRegion'),
+      map(state => state.connectivityRegion),
     )
   }
 
