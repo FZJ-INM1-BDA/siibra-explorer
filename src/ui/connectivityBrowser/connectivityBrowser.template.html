@@ -11,10 +11,10 @@
             show-description="false"
             show-dataset-name="false"
             custom-dataset-selector="true"
-            [customHeight]="componentHeight + 'px'">
+            [customHeight]="componentHeight + 'px'"
+            [ngStyle]="connectivityComponentStyle">
         <div slot="header" class="w-100 d-flex justify-content-between mt-3">
-            <span>Connectivity Browser</span>
-            <i (click)="closeConnectivityView(); setDefaultMap()" class="far fa-times-circle cursor-pointer"></i>
+            <button (click)="closeConnectivityView(); setDefaultMap()" class="w-100" mat-button><i class="far fa-times-circle cursor-pointer"></i> Close connectivity</button>
         </div>
 
         <div slot="dataset">

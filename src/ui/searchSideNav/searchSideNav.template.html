@@ -6,13 +6,6 @@
     class="d-block w-100">
   </region-text-search-autocomplete>
 
-  <ng-container *ngIf="(sidePanelExploreCurrentViewIsOpen$ | async)" [ngSwitch]="(sidePanelCurrentViewContent | async)">
-    <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1"
-                          *ngSwitchCase = "'Connectivity'">
-
-    </connectivity-browser>
-  </ng-container>
-
 </div>
 
 <div class="d-none">
@@ -44,4 +37,4 @@
       </i>
     </button>
   </div>
-</ng-template>  
+</ng-template>

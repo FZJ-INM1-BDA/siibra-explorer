@@ -2,8 +2,8 @@ import {
   AfterContentChecked,
   AfterViewInit, ChangeDetectorRef,
   Component,
-  ElementRef,
-  OnDestroy,
+  ElementRef, EventEmitter, Input,
+  OnDestroy, Output,
   ViewChild,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
@@ -35,7 +35,17 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
     public math = Math
 
+    public connectivityComponentStyle: any = {
+      // ToDo - new popup panels from layer container hardcoded height and when I'm trying to grow connectivity popup, it overflows below.
+      //  For that I will just set hardcoded height, If we will able to grow new popups dynamically, below commented maxHeight should be apply.
+      // maxHeight: +(+getWindow().innerHeight - 200) + 'px',
+      maxHeight: '500px'
+    }
+
     @ViewChild('connectivityComponent', {read: ElementRef, static: true}) public connectivityComponentElement: ElementRef
+
+    @Output() public closeConnectivity: EventEmitter<boolean> = new EventEmitter()
+    @Output() public connectedAreaCount: EventEmitter<number> = new EventEmitter()
 
     constructor(
         private store$: Store<any>,
@@ -91,6 +101,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived', { capture: true })
           .subscribe((e: CustomEvent) => {
             this.connectedAreas = e.detail
+            this.connectedAreaCount.emit(this.connectedAreas.length)
             if (this.connectedAreas.length > 0) { this.addNewColorMap() }
           }),
         fromEvent(this.connectivityComponentElement.nativeElement, 'collapsedMenuChanged', { capture: true })
@@ -134,6 +145,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     public closeConnectivityView() {
+      this.closeConnectivity.emit()
       this.store$.dispatch({
         type: HIDE_SIDE_PANEL_CONNECTIVITY,
       })

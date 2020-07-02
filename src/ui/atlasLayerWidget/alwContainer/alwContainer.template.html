@@ -36,7 +36,10 @@
         </ng-container>
       </mat-card-header>
       <mat-card-content class="flex-grow-1">
-        connectivity data here ....
+        <connectivity-browser (closeConnectivity)="visibleTab = null; connectedRegionsNumber = null"
+                              (connectedAreaCount)="connectedRegionsNumber = $event"
+                              class="pe-all flex-grow-5 flex-shrink-1">
+        </connectivity-browser>
       </mat-card-content>
     </mat-card>
   </div>
@@ -90,7 +93,9 @@
   <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'hierarchy', iconClass: 'fas fa-sitemap' }">
   </ng-container>
 
-  <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'connectivity', iconClass: 'fas fa-braille' }">
+  <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'connectivity', iconClass: 'fas fa-braille',
+   badge: visibleTab === 'connectivity' && (connectivityRegion$ | async).length ? null : connectedRegionsNumber,
+   tooltipText: !(connectivityRegion$ | async).length? 'Select connectivity region' : null, matBtnDisabled: !(connectivityRegion$ | async).length} ">
   </ng-container>
 
   <ng-container *ngTemplateOutlet="btnTmpl; context: { tab: 'dataset', iconClass: 'fas fa-database', badge: visibleTab === 'dataset' ? null : availableDatasets }">
@@ -102,13 +107,16 @@
   let-matBtnDisabled="matBtnDisabled"
   let-tab="tab"
   let-badge="badge"
-  let-iconClass="iconClass">
+  let-iconClass="iconClass"
+  let-tooltipText="tooltipText">
   <iav-dynamic-mat-button
     class="pe-all"
     [matBadge]="badge"
+    [matTooltip]="tooltipText"
+    matTooltipPosition="after"
     matBadgeColor="accent"
     iav-delay-event="click"
-    (iav-delay-event-emit)="handleClickWidget(tab)"
+    (iav-delay-event-emit)="!matBtnDisabled && handleClickWidget(tab)"
     [iav-dynamic-mat-button-disabled]="matBtnDisabled"
     iav-dynamic-mat-button-color="primary"
     [iav-dynamic-mat-button-style]="tab === visibleTab ? 'mat-mini-fab' : 'mat-icon-button'">
