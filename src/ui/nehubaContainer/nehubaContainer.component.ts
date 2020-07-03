@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer } from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler } from "rxjs";
 import { pipeFromArray } from "rxjs/internal/util/pipe";
 import {
   buffer,
@@ -19,6 +19,7 @@ import {
   tap,
   withLatestFrom,
   delayWhen,
+  throttleTime,
 } from "rxjs/operators";
 import { LoggingService } from "src/logging";
 import { FOUR_PANEL, H_ONE_THREE, NG_VIEWER_ACTION_TYPES, SINGLE_PANEL, V_ONE_THREE } from "src/services/state/ngViewerState.store";
@@ -27,48 +28,19 @@ import { ADD_NG_LAYER, generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, 
 import { getExportNehuba, isSame } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, isFirstRow, isFirstCell } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, IDS } from 'common/constants'
+
+const { MESH_LOADING_STATUS } = IDS
 
 const { 
   ZOOM_IN,
   ZOOM_OUT,
 } = ARIA_LABELS
-
-const isFirstRow = (cell: HTMLElement) => {
-  const { parentElement: row } = cell
-  const { parentElement: container } = row
-  return container.firstElementChild === row
-}
-
-const isFirstCell = (cell: HTMLElement) => {
-  const { parentElement: row } = cell
-  return row.firstElementChild === cell
-}
-
-const scanFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean, boolean, boolean] = (acc, curr) => {
-
-  const target = curr.target as HTMLElement
-  const targetIsFirstRow = isFirstRow(target)
-  const targetIsFirstCell = isFirstCell(target)
-  const idx = targetIsFirstRow
-    ? targetIsFirstCell
-      ? 0
-      : 1
-    : targetIsFirstCell
-      ? 2
-      : null
-
-  const returnAcc = [...acc]
-  const num1 = typeof curr.detail.missingChunks === 'number' ? curr.detail.missingChunks : 0
-  const num2 = typeof curr.detail.missingImageChunks === 'number' ? curr.detail.missingImageChunks : 0
-  returnAcc[idx] = Math.max(num1, num2) > 0
-  return returnAcc as [boolean, boolean, boolean]
-}
 
 @Component({
   selector : 'ui-nehuba-container',
@@ -83,6 +55,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+  public ID_MESH_LOADING_STATUS = MESH_LOADING_STATUS
 
   @ViewChild(NehubaViewerContainerDirective,{static: true})
   public nehubaContainerDirective: NehubaViewerContainerDirective
@@ -97,8 +70,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public viewerLoaded: boolean = false
 
+  private sliceRenderEvent$: Observable<CustomEvent> 
   public sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public perspectiveViewLoading$: Observable<string|null>
+  public showPerpsectiveScreen$: Observable<string>
 
   public templateSelected$: Observable<any>
   private newViewer$: Observable<any>
@@ -230,11 +205,53 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       distinctUntilChanged(),
     )
 
-    this.sliceViewLoadingMain$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+    this.sliceRenderEvent$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+      shareReplay(1),
+      map(ev => ev as CustomEvent)
+    )
+
+    this.sliceViewLoadingMain$ = this.sliceRenderEvent$.pipe(
       scan(scanFn, [null, null, null]),
       startWith([true, true, true] as [boolean, boolean, boolean]),
       shareReplay(1),
     )
+
+    this.showPerpsectiveScreen$ = this.newViewer$.pipe(
+      switchMapTo(this.sliceRenderEvent$.pipe(
+        scan((acc, curr) => {
+
+          /**
+           * if at any point, all chunks have been loaded, always return loaded state
+           */
+          if (acc.every(v => v === 0)) return [0, 0, 0]
+          const { detail = {}, target } = curr || {}
+          const { missingChunks = -1, missingImageChunks = -1 } = detail
+          const idx = this.findPanelIndex(target as HTMLElement)
+          const returnAcc = [...acc]
+          if (idx >= 0) {
+            returnAcc[idx] = missingChunks + missingImageChunks
+          }
+          return returnAcc
+        }, [-1, -1, -1]),
+        map(arr => {
+          let sum = 0
+          let uncertain = false
+          for (const num of arr) {
+            if (num < 0) {
+              uncertain = true
+            } else {
+              sum += num
+            }
+          }
+          return sum > 0
+            ? `Loading ${sum}${uncertain ? '+' : ''} chunks ...`
+            : null
+        }),
+        distinctUntilChanged(),
+        startWith('Loading ...'),
+        throttleTime(100, asyncScheduler, { leading: true, trailing: true })
+      ))
+    ) 
 
     /* missing chunk perspective view */
     this.perspectiveViewLoading$ = fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent')
@@ -242,22 +259,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         filter(event => isDefined(event) && isDefined((event as any).detail) && isDefined((event as any).detail.lastLoadedMeshId) ),
         map(event => {
 
-          const e = (event as any)
-          const lastLoadedIdString = e.detail.lastLoadedMeshId.split(',')[0]
-          const lastLoadedIdNum = Number(lastLoadedIdString)
           /**
            * TODO dig into event detail to see if the exact mesh loaded
            */
-          return e.detail.meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
+          const { meshesLoaded, meshFragmentsLoaded, lastLoadedMeshId } = (event as any).detail
+          return meshesLoaded >= this.nehubaViewer.numMeshesToBeLoaded
             ? null
-            : isNaN(lastLoadedIdNum)
-              ? 'Loading unknown chunk'
-              : lastLoadedIdNum >= 65500
-                ? 'Loading auxiliary chunk'
-                // : this.regionsLabelIndexMap.get(lastLoadedIdNum)
-                //   ? `Loading ${this.regionsLabelIndexMap.get(lastLoadedIdNum).name}`
-                : 'Loading meshes ...'
+            : 'Loading meshes ...'
         }),
+        distinctUntilChanged()
       )
 
     this.ngLayers$ = this.store.pipe(
@@ -308,7 +318,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.subscriptions.push(
       this.newViewer$.pipe(
-        switchMap(() => pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent'))),
+        switchMap(() => pipeFromArray([...takeOnePipe])(this.sliceRenderEvent$)),
       ).subscribe((events) => {
         for (const idx in [0, 1, 2]) {
           const ev = events[idx] as CustomEvent

@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, Optional, Inject } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject } from 'rxjs'
+import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject, Observable } from 'rxjs'
 import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { debounceTime, filter, map, scan } from "rxjs/operators";
+import { debounceTime, filter, map, scan, startWith, debounce, tap } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
@@ -12,6 +12,7 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
+import { scanSliceViewRenderFn } from "../util";
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -62,6 +63,8 @@ const scanFn: (acc: LayerLabelIndex[], curr: LayerLabelIndex) => LayerLabelIndex
 })
 
 export class NehubaViewerUnit implements OnInit, OnDestroy {
+
+  private sliceviewLoading$: Observable<boolean>
 
   public overrideShowLayers: string[] = []
   get showLayersName() {
@@ -413,10 +416,19 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
+    this.sliceviewLoading$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
+      scan(scanSliceViewRenderFn, [ null, null, null ]),
+      map(arrOfFlags => arrOfFlags.some(flag => flag)),
+      startWith(true),
+    )
+
     this.subscriptions.push(
       this.loadMeshes$.pipe(
         scan(scanFn, []),
-        debounceTime(100)
+        debounceTime(100),
+        debounce(() => this.sliceviewLoading$.pipe(
+          filter(flag => !flag),
+        ))
       ).subscribe(layersLabelIndex => {
         let totalMeshes = 0
         for (const layerLayerIndex of layersLabelIndex) {
@@ -425,7 +437,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
           this.nehubaViewer.setMeshesToLoad(labelIndicies, layer)
         }
         // TODO implement total mesh to be loaded and mesh loading UI
-        // this.numMeshesToBeLoaded = totalMeshes
+        this.numMeshesToBeLoaded = totalMeshes
       }),
     )
 

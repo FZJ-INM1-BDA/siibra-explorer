@@ -86,16 +86,32 @@
 
 <!-- perspective view tmpl -->
 <ng-template #overlayPerspectiveTmpl>
-  <layout-floating-container landmarkContainer>
+  <layout-floating-container class="tmp" landmarkContainer>
+
+    <div class="d-flex flex-column justify-content-center align-items-center w-100 h-100 position-absolute opacity-crossfade screen-overlay pe-none"
+      [ngClass]="{onHover: !!(showPerpsectiveScreen$ | async)}"
+      [attr.id]="ID_MESH_LOADING_STATUS"
+      role="status">
+
+      <div class="spinnerAnimationCircle">
+      </div>
+      <mat-list>
+        <mat-list-item>
+          {{ showPerpsectiveScreen$ | async }}
+        </mat-list-item>
+      </mat-list>
+    </div>
 
     <!-- maximise/minimise button -->
     <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: 3, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }">
     </ng-container>
     
+    <!-- mesh loading is still weird -->
+    <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
     <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
       <div class="spinnerAnimationCircle"></div>
 
-      <div perspectiveLoadingText>
+      <div *ngIf="false" perspectiveLoadingText>
         {{ perspectiveViewLoading$ | async }}
       </div>
     </div>

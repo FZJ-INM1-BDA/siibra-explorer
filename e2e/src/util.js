@@ -235,17 +235,22 @@ class WdBase{
   async waitForAsync(){
 
     const checkReady = async () => {
-      const el = await this._browser.findElements(
+      const els = await this._browser.findElements(
         By.css('.spinnerAnimationCircle')
       )
-      return !el.length
+      const visibleEls = []
+      for (const el of els) {
+        if (await el.isDisplayed()) {
+          visibleEls.push(el)
+        }
+      }
+      return !visibleEls.length
     }
 
     do {
-      // Do nothing, until ready
+      await this.wait(500)
     } while (
-      await this.wait(100),
-      !(await checkReady())
+      !(await retry(checkReady.bind(this), { timeout: 1000, retries: 10 }))
     )
   }
 
