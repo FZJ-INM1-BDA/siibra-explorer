@@ -57,6 +57,11 @@ export const viewerStateRemoveAdditionalLayer = createAction(
   props<{ atlas: { ['@id']: string } }>()
 )
 
+export const viewerStateSelectedRegionsSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['regionsSelected']
+)
+
 interface IViewerStateHelperStore{
   fetchedAtlases: any[]
   selectedAtlasId: string

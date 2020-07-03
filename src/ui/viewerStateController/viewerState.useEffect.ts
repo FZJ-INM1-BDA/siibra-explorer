@@ -10,7 +10,7 @@ import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
@@ -37,18 +37,6 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
 
   @Effect()
   public selectTemplate$: Observable<any>
-
-  /**
-   * Determines how single click on region hierarchy will affect view
-   */
-  @Effect()
-  public singleClickOnHierarchy$: Observable<any>
-
-  /**
-   * Determines how double click on region hierarchy will effect view
-   */
-  @Effect()
-  public doubleClickOnHierarchy$: Observable<any>
 
   @Effect()
   public toggleRegionSelection$: Observable<any>
@@ -239,18 +227,9 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
       }),
     )
 
-    this.doubleClickOnHierarchy$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY),
-      map(action => {
-        return {
-          ...action,
-          type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION,
-        }
-      }),
-    )
 
     this.navigateToRegion$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION),
+      ofType(viewerStateNavigateToRegion),
       map(action => {
         const { payload = {} } = action as ViewerStateAction
         const { region } = payload
@@ -283,11 +262,6 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
       }),
     )
 
-    this.singleClickOnHierarchy$ = this.actions$.pipe(
-      ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY),
-      map(action => viewerStateToggleRegionSelect(action as any)),
-    )
-
     this.toggleRegionSelection$ = this.actions$.pipe(
       ofType(viewerStateToggleRegionSelect.type),
       withLatestFrom(this.selectedRegions$),
@@ -311,22 +285,6 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
   }
 
   public ngOnInit() {
-    this.subscriptions.push(
-      this.doubleClickOnHierarchy$.subscribe(({ region } = {}) => {
-        const { position } = region
-        if (position) {
-          this.store$.dispatch({
-            type: CHANGE_NAVIGATION,
-            navigation: {
-              position,
-              animation: {},
-            },
-          })
-        } else {
-          this.uiService.showMessage(`${region.name} does not have a position defined`)
-        }
-      }),
-    )
   }
 
   public ngOnDestroy() {

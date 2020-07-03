@@ -11,7 +11,7 @@ import {fromEvent, Observable, Subscription} from "rxjs";
 import {distinctUntilChanged, filter, map} from "rxjs/operators";
 import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_REGION} from "src/services/state/viewerState.store";
 import {HIDE_SIDE_PANEL_CONNECTIVITY, isDefined, safeFilter} from "src/services/stateStore.service";
-import {VIEWERSTATE_CONTROLLER_ACTION_TYPES} from "src/ui/viewerStateController/viewerState.base";
+import { viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
 
 @Component({
   selector: 'connectivity-browser',
@@ -134,10 +134,11 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     navigateToRegion(region) {
-      this.store$.dispatch({
-        type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.NAVIGATETO_REGION,
-        payload: { region: this.getRegionWithName(region) },
-      })
+      this.store$.dispatch(
+        viewerStateNavigateToRegion({
+          payload: { region: this.getRegionWithName(region) }
+        })
+      )
     }
 
     getRegionWithName(region) {

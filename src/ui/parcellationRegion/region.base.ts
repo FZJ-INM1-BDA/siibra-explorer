@@ -1,7 +1,7 @@
-import {EventEmitter, Input, Output } from "@angular/core";
-import {select, Store, createSelector} from "@ngrx/store";
+import { EventEmitter, Input, Output } from "@angular/core";
+import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import {distinctUntilChanged, switchMap, filter} from "rxjs/operators";
+import { distinctUntilChanged, switchMap, filter } from "rxjs/operators";
 import { Observable, BehaviorSubject } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId } from 'common/util'

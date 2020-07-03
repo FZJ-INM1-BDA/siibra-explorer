@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 import { DESELECT_REGIONS } from "src/services/state/viewerState.store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "src/ui/viewerStateController/viewerState.base";
+import { viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
 
 @Component({
   selector: 'currently-selected-regions',
@@ -38,9 +38,10 @@ export class CurrentlySelectedRegions {
   }
 
   public gotoRegion(event: MouseEvent, region: any) {
-    this.store$.dispatch({
-      type: VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY,
-      payload: { region },
-    })
+    this.store$.dispatch(
+      viewerStateNavigateToRegion({
+        payload: { region }
+      })
+    )
   }
 }

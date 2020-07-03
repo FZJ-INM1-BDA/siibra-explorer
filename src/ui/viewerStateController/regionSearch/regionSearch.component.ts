@@ -6,11 +6,11 @@ import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
-import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "../viewerState.base";
 import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PureContantService } from "src/util";
+import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -170,15 +170,20 @@ export class RegionTextSearchAutocomplete {
 
   // TODO handle mobile
   public handleRegionClick({ mode = null, region = null } = {}) {
-    const type = mode === 'single'
-      ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.SINGLE_CLICK_ON_REGIONHIERARCHY
-      : mode === 'double'
-        ? VIEWERSTATE_CONTROLLER_ACTION_TYPES.DOUBLE_CLICK_ON_REGIONHIERARCHY
-        : ''
-    this.store$.dispatch({
-      type,
-      payload: { region },
-    })
+    if (mode === 'single') {
+      this.store$.dispatch(
+        viewerStateToggleRegionSelect({
+          payload: { region }
+        })
+      )
+    }
+    if (mode === 'double') {
+      this.store$.dispatch(
+        viewerStateNavigateToRegion({
+          payload: { region }
+        })
+      )
+    }
   }
 
   public showHierarchy(_event: MouseEvent) {

@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest } from "rxjs";
-import { viewerStateGetOverlayingAdditionalParcellations, viewerStateGetSelectedAtlas, viewerStateToggleAdditionalLayer, viewerStateRemoveAdditionalLayer } from 'src/services/state/viewerState.store.helper'
-import { map, shareReplay, withLatestFrom, filter, tap } from "rxjs/operators";
+import { viewerStateGetOverlayingAdditionalParcellations, viewerStateToggleAdditionalLayer, viewerStateRemoveAdditionalLayer, viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSelectedRegionsSelector } from 'src/services/state/viewerState.store.helper'
+import { map, shareReplay, withLatestFrom, filter} from "rxjs/operators";
 import {safeFilter} from "src/services/stateStore.service";
 
 @Component({
@@ -31,6 +31,8 @@ export class AtlasLayerContainer {
 
   public connectivityRegion$: Observable<any>
 
+  public regionsSelected$: Observable<any>
+
   constructor(
     private store$: Store<any>
   ){
@@ -55,6 +57,11 @@ export class AtlasLayerContainer {
       select('viewerState'),
       select('parcellationSelected')
     )
+
+    this.regionsSelected$ = this.store$.pipe(
+      select(viewerStateSelectedRegionsSelector)
+    )
+
     /**
      * added layer if defined, or else use default parcellation
      */
@@ -80,6 +87,20 @@ export class AtlasLayerContainer {
   handleClickWidget(type: 'dataset' | 'connectivity' | 'hierarchy'){
     if (type !== this.visibleTab) this.visibleTab = type
     else this.visibleTab = null
+  }
+
+  handleRegionClick({ mode, region }){
+    if (mode === 'single')  {
+      this.store$.dispatch(
+        viewerStateToggleRegionSelect({ payload: { region } })
+      )
+    }
+
+    if (mode === 'double') {
+      this.store$.dispatch(
+        viewerStateNavigateToRegion({ payload: { region } })
+      )
+    }
   }
 
   toggleLayer(atlas) {
