@@ -29,7 +29,7 @@ export class AtlasLayerContainer {
 
   public visibleTab: 'dataset' | 'connectivity' | 'hierarchy'
 
-  private connectivityRegion$: Observable<any>
+  public connectivityRegion$: Observable<any>
 
   constructor(
     private store$: Store<any>
