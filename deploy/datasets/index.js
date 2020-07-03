@@ -172,9 +172,16 @@ datasetsRouter.get('/kgInfo', checkKgQuery, cacheMaxAge24Hr, async (req, res) =>
   const { kgId } = req.query
   const { kgSchema } = req.query
   const { user } = req
+
+  const tokenInRequest = req.headers['authorization'] && req.headers['authorization'].replace(/bearer\s+/i, '')
+  const reqUser = tokenInRequest && ({
+    tokenset: {
+      access_token: tokenInRequest
+    }
+  })
   try{
     if (kgSchema === 'minds/core/dataset/v1.0.0') {
-      const stream = await getDatasetFromId({user, kgId, returnAsStream: true})
+      const stream = await getDatasetFromId({user: reqUser || user, kgId, returnAsStream: true})
       stream.on('error', getHandleErrorFn(req, res)).pipe(res)
     } else {
       const data = getExternalSchemaDatasets(kgId, kgSchema)

@@ -62,7 +62,7 @@ export class ModalityPicker implements OnChanges {
   }
 }
 
-const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').charCodeAt(0) - (b.name || '0').charCodeAt(0) 
+const sortByFn = (a: CountedDataModality, b: CountedDataModality) => (a.name || '0').toLowerCase().charCodeAt(0) - (b.name || '0').toLowerCase().charCodeAt(0) 
 
 @Pipe({
   name: 'sortModalityAlphabetically',

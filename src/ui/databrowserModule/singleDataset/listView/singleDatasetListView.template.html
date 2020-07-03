@@ -7,7 +7,7 @@
 
   <!-- title -->
   <div class="flex-grow-1 name-container d-flex align-items-start">
-    <small *ngIf="name else loadingName" class="flex-grow-1 flex-shrink-1">
+    <small *ngIf="!fetchFlag else loadingName" class="flex-grow-1 flex-shrink-1">
       {{ name }}
     </small>
     <ng-template #loadingName>

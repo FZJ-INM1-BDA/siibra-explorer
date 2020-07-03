@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
+import { ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
 import {
   DatabrowserService,
   KgSingleDatasetService,
@@ -12,8 +12,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
   templateUrl: './singleDataset.template.html',
   styleUrls: [
     `./singleDataset.style.css`,
-  ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  ]
 })
 
 export class SingleDatasetView extends SingleDatasetBase {
