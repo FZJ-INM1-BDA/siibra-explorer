@@ -5,16 +5,13 @@ import { distinctUntilChanged, filter, shareReplay } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
-import {MatSelectChange} from "@angular/material/select";
-import {MatBottomSheet, MatBottomSheetRef} from "@angular/material/bottom-sheet";
+import { MatSelectChange } from "@angular/material/select";
+import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
 
 const ACTION_TYPES = {
-  SINGLE_CLICK_ON_REGIONHIERARCHY: 'SINGLE_CLICK_ON_REGIONHIERARCHY',
-  DOUBLE_CLICK_ON_REGIONHIERARCHY: 'DOUBLE_CLICK_ON_REGIONHIERARCHY',
   SELECT_TEMPLATE_WITH_NAME: 'SELECT_TEMPLATE_WITH_NAME',
   SELECT_PARCELLATION_WITH_NAME: 'SELECT_PARCELLATION_WITH_NAME',
 
-  NAVIGATETO_REGION: 'NAVIGATETO_REGION',
 }
 
 export class ViewerStateBase implements OnInit {

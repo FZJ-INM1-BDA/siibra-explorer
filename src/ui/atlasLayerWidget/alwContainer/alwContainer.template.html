@@ -16,6 +16,9 @@
 
       <mat-card-content class="flex-grow-1">
         <region-hierarchy
+          [selectedRegions]="regionsSelected$ | async"
+          (singleClickRegion)="handleRegionClick({ mode: 'single', region: $event })"
+          (doubleClickRegion)="handleRegionClick({ mode: 'double', region: $event })"
           *ngIf="visibleTab === 'hierarchy'"
           class="h-100"
           [parcellationSelected]="parcellationOfInterest$ | async">
