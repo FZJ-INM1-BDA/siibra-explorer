@@ -214,3 +214,39 @@ export const importNehubaFactory = appendSrc => {
     return pr
   }
 }
+
+
+export const isFirstRow = (cell: HTMLElement) => {
+  const { parentElement: row } = cell
+  const { parentElement: container } = row
+  return container.firstElementChild === row
+}
+
+export const isFirstCell = (cell: HTMLElement) => {
+  const { parentElement: row } = cell
+  return row.firstElementChild === cell
+}
+
+export const scanSliceViewRenderFn: (acc: [boolean, boolean, boolean], curr: CustomEvent) => [boolean, boolean, boolean] = (acc, curr) => {
+  
+  const target = curr.target as HTMLElement
+  const targetIsFirstRow = isFirstRow(target)
+  const targetIsFirstCell = isFirstCell(target)
+  const idx = targetIsFirstRow
+    ? targetIsFirstCell
+      ? 0
+      : 1
+    : targetIsFirstCell
+      ? 2
+      : null
+
+  const returnAcc = [...acc]
+  const num1 = typeof curr.detail.missingChunks === 'number' ? curr.detail.missingChunks : 0
+  const num2 = typeof curr.detail.missingImageChunks === 'number' ? curr.detail.missingImageChunks : 0
+  if (num1 < 0 && num2 < 0) {
+    returnAcc[idx] = true
+  } else {
+    returnAcc[idx] = Math.max(num1, num2) > 0
+  }
+  return returnAcc as [boolean, boolean, boolean]
+}

@@ -37,4 +37,9 @@
     // additional volumes
     TOGGLE_SHOW_LAYER_CONTROL: `Show layer control`,
   }
+
+  exports.IDS = {
+    // mesh loading status
+    MESH_LOADING_STATUS: 'mesh-loading-status'
+  }
 })(typeof exports === 'undefined' ? module.exports : exports)
