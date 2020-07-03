@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges } from "@angular/core";
-import { Observable } from "rxjs";
+import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges, OnDestroy } from "@angular/core";
+import { Observable, Subject, Subscription, of, combineLatest } from "rxjs";
 import { IDataEntry, IFile, IPublication } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
@@ -10,6 +10,7 @@ import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { ARIA_LABELS } from 'common/constants'
+import { switchMap, catchError, distinctUntilChanged, filter } from "rxjs/operators";
 
 export {
   DatabrowserService,
@@ -17,7 +18,7 @@ export {
   ChangeDetectorRef,
 }
 
-export class SingleDatasetBase implements OnInit, OnChanges {
+export class SingleDatasetBase implements OnInit, OnChanges, OnDestroy {
 
   public SHOW_DATASET_PREVIEW_ARIA_LABEL = ARIA_LABELS.SHOW_DATASET_PREVIEW
   public PIN_DATASET_ARIA_LABEL = ARIA_LABELS.PIN_DATASET
@@ -32,6 +33,7 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
+  public fetchFlag = false
   private _fullId: string
 
   @Input()
@@ -42,9 +44,32 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   get fullId(){
     return this._fullId || (this.kgSchema && this.kgId && `${this.kgSchema}/${this.kgId}`) || null
   }
+  
+  private _kgSchema: string = 'minds/core/dataset/v1.0.0'
+  private kgSchema$: Subject<string> = new Subject()
 
-  @Input() public kgSchema?: string = 'minds/core/dataset/v1.0.0'
-  @Input() public kgId?: string
+  @Input() 
+  set kgSchema(val) {
+    this._kgSchema = val
+    this.kgSchema$.next(this._kgSchema)
+  }
+
+  get kgSchema(){
+    return this._kgSchema
+  }
+
+  private _kgId: string
+  private kgId$: Subject<string> = new Subject()
+
+  @Input()
+  set kgId(val){
+    this._kgId = val
+    this.kgId$.next(this._kgId)
+  }
+
+  get kgId(){
+    return this._kgId
+  }
 
   @Input() public dataset: any = null
   @Input() public simpleMode: boolean = false
@@ -81,6 +106,37 @@ export class SingleDatasetBase implements OnInit, OnChanges {
   ) {
     this.favedDataentries$ = this.dbService.favedDataentries$
 
+    this.subscriptions.push(
+      combineLatest(
+        this.kgSchema$.pipe(
+          distinctUntilChanged(),
+          filter(v => !!v)
+        ),
+        this.kgId$.pipe(
+          distinctUntilChanged(),
+          filter(v => !!v)
+        )
+      ).pipe(
+        switchMap(([kgSchema, kgId]) => {
+          this.fetchFlag = true
+          this.cdr.markForCheck()
+          return this.singleDatasetService.getInfoFromKg({ kgSchema, kgId }).pipe(
+            catchError((err, obs) => of(null))
+          )
+        })
+      ).subscribe(dataset => {
+        if (!dataset) return
+        const { name, description, publications, fullId } = dataset
+        this.name = name
+        this.description = description
+        this.publications = publications
+        this.fullId = fullId
+        
+        this.fetchFlag = false
+        this.cdr.markForCheck()
+      })
+    )
+    
     if (dataset) {
       const { fullId } = dataset
       const obj = getKgSchemaIdFromFullId(fullId)
@@ -106,25 +162,6 @@ export class SingleDatasetBase implements OnInit, OnChanges {
     }
   }
 
-  public async fetchDatasetDetail(){
-    try {
-      const { kgId } = this
-      const { kgSchema } = this
-      if (!kgId) return
-      const dataset = await this.singleDatasetService.getInfoFromKg({ kgId, kgSchema })
-
-      const { name, description, publications, fullId } = dataset
-      this.name = name
-      this.description = description
-      this.publications = publications
-      this.fullId = fullId
-
-      this.cdr.detectChanges()
-    } catch (e) {
-      // catch error
-    }
-  }
-
   // TODO this is not perfect logic for singledataset
   // singledataset.base.ts should be tidied up in general
   // fullId, kgId, dataset... too many different entries
@@ -139,8 +176,12 @@ export class SingleDatasetBase implements OnInit, OnChanges {
         this.kgId = re[1]
       }
     }
+  }
 
-    this.fetchDatasetDetail()
+  private subscriptions: Subscription[] = []
+
+  public ngOnDestroy(){
+    while(this.subscriptions.length > 0) this.subscriptions.pop().unsubscribe()
   }
 
   public ngOnInit() {
@@ -159,32 +200,6 @@ export class SingleDatasetBase implements OnInit, OnChanges {
     }
     if (!kgSchema || !kgId) { return }
     this.fetchingSingleInfoInProgress = true
-    this.singleDatasetService.getInfoFromKg({
-      kgId,
-      kgSchema,
-    })
-      .then(json => {
-        /**
-         * TODO dataset specific
-         */
-        const { files, publications, name, description, kgReference} = json
-        this.name = name
-        this.description = description
-        this.kgReference = kgReference
-        this.publications = publications
-        this.files = files
-
-        this.dataset = json
-
-        this.cdr.markForCheck()
-      })
-      .catch(e => {
-        this.error = e
-      })
-      .finally(() => {
-        this.fetchingSingleInfoInProgress = false
-        this.cdr.markForCheck()
-      })
   }
 
   get downloadEnabled() {

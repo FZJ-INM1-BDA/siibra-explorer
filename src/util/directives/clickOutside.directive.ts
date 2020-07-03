@@ -13,7 +13,8 @@ export class ClickOutsideDirective {
   @HostListener('document:click', ['$event.target'])
   onMouseClick(targetElement) {
     const clickedInside = this.elementRef.nativeElement.contains(targetElement)
-    if (!clickedInside) {
+    const clickInsideCdkOverlay = document.querySelector('.cdk-overlay-container')?.contains(targetElement)
+    if (!clickedInside && !clickInsideCdkOverlay) {
       this.clickOutside.emit()
     }
   }
