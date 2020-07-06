@@ -72,7 +72,7 @@
   </data-browser>
 </div>
 
-<!-- tab btn selector -->
+<!-- tab btn container -->
 <div class="flex-grow-0 widget-container d-flex pe-none position-relative">
 
   <mat-chip-list class="poi-name-tag" *ngIf="parcellationOfInterest$ | async as poi">
@@ -82,6 +82,13 @@
       <span>
         {{ poi.name }}
       </span>
+      <mat-icon *ngFor="let oDataset of poi.originDatasets"
+        fontSet="fas"
+        fontIcon="fa-info-circle"
+        iav-dataset-show-dataset-dialog
+        [iav-dataset-show-dataset-dialog-kgschema]="oDataset.kgSchema"
+        [iav-dataset-show-dataset-dialog-kgid]="oDataset.kgId">
+      </mat-icon>
       <mat-icon
         *ngIf="!poiIsBaseLayer"
         (click)="removeNonBaseLayer(poi)"
@@ -105,6 +112,7 @@
   </ng-container>
 </div>
 
+<!-- icon for layer widget -->
 <ng-template
   #btnTmpl
   let-matBtnDisabled="matBtnDisabled"
@@ -112,6 +120,8 @@
   let-badge="badge"
   let-iconClass="iconClass"
   let-tooltipText="tooltipText">
+  <!-- delay event emit needs to be used. otherwise, iav-dynamic-mat-button will replace the clicked btn with a new btn (via ngSwitch directive)
+  this results in outsideClick being a false positive -->
   <iav-dynamic-mat-button
     class="pe-all"
     [matBadge]="badge"
@@ -127,6 +137,7 @@
   </iav-dynamic-mat-button>
 </ng-template>
 
+<!-- close btn for atlas layer widget -->
 <ng-template #closeBtn>
   <button mat-icon-button
     (click)="visibleTab = null">

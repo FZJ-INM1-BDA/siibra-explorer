@@ -18,7 +18,7 @@ export {
   ChangeDetectorRef,
 }
 
-export class SingleDatasetBase implements OnInit, OnChanges, OnDestroy {
+export class SingleDatasetBase implements OnChanges, OnDestroy {
 
   public SHOW_DATASET_PREVIEW_ARIA_LABEL = ARIA_LABELS.SHOW_DATASET_PREVIEW
   public PIN_DATASET_ARIA_LABEL = ARIA_LABELS.PIN_DATASET
@@ -89,7 +89,6 @@ export class SingleDatasetBase implements OnInit, OnChanges, OnDestroy {
 
   private error: string = null
 
-  public fetchingSingleInfoInProgress = false
   public downloadInProgress = false
 
   public dlFromKgHref: string = null
@@ -126,11 +125,18 @@ export class SingleDatasetBase implements OnInit, OnChanges, OnDestroy {
         })
       ).subscribe(dataset => {
         if (!dataset) return
-        const { name, description, publications, fullId } = dataset
+        const { kgSchema, kgId } = this
+
+        const { name, description, publications, fullId, kgReference, files } = dataset
         this.name = name
         this.description = description
         this.publications = publications
+        this.files = files
         this.fullId = fullId
+
+        this.kgReference = kgReference
+
+        this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
         
         this.fetchFlag = false
         this.cdr.markForCheck()
@@ -182,24 +188,6 @@ export class SingleDatasetBase implements OnInit, OnChanges, OnDestroy {
 
   public ngOnDestroy(){
     while(this.subscriptions.length > 0) this.subscriptions.pop().unsubscribe()
-  }
-
-  public ngOnInit() {
-    const { kgId, kgSchema, dataset } = this
-    this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
-    if ( dataset ) {
-      const { name, description, kgReference, publications, files, preview } = dataset
-      this.name = name
-      this.description = description
-      this.kgReference = kgReference
-      this.publications = publications
-      this.files = files
-      this.preview = preview
-
-      return
-    }
-    if (!kgSchema || !kgId) { return }
-    this.fetchingSingleInfoInProgress = true
   }
 
   get downloadEnabled() {

@@ -1,32 +1,32 @@
-import { Component, ElementRef, OnInit, ViewChild, ViewChildren, QueryList } from "@angular/core";
+import { Component, OnInit, ViewChildren, QueryList } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay } from "rxjs/operators";
-import { Observable, Subscription } from "rxjs";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan } from "rxjs/operators";
+import { Observable, Subscription, from, zip, of } from "rxjs";
 import { viewerStateGetSelectedAtlas, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 
 @Component({
-  selector: 'viewer-selector',
-  templateUrl: './viewerSelector.template.html',
-  styleUrls: ['./viewerSelector.style.css'],
+  selector: 'atlas-layer-selector',
+  templateUrl: './atlasLayerSelector.template.html',
+  styleUrls: ['./atlasLayerSelector.style.css'],
+  exportAs: 'atlasLayerSelector'
 })
-export class ViewerSelectorComponent implements OnInit {
+export class AtlasLayerSelector implements OnInit {
 
     @ViewChildren(MatMenuTrigger) matMenuTriggers: QueryList<MatMenuTrigger>
     public atlas: any
 
-    public groupedLayers = []
+    public nonGroupedLayers$: Observable<any[]>
+    public groupedLayers$: Observable<any[]>
 
-    public selectedTemplateSpaceIndex: number = 0
+    public selectedTemplateSpaceId: string
     public selectedLayers = []
 
     public selectedTemplate$: Observable<any>
     private selectedParcellation$: Observable<any>
     public selectedAtlas$: Observable<any>
     private subscriptions: Subscription[] = []
-
-    public layerGroupMenuItems: any[]
 
     public selectorExpanded: boolean = false
     public selectedTemplatePreviewUrl: string = ''
@@ -54,14 +54,44 @@ export class ViewerSelectorComponent implements OnInit {
         safeFilter('parcellationSelected'),
         map(state => state.parcellationSelected),
       )
+
+      const layersGroupBy$ = this.selectedAtlas$.pipe(
+        switchMap(selectedAtlas => from((selectedAtlas?.parcellations) || []).pipe(
+          groupBy((parcellation: any) => parcellation.groupName, p => p),
+          mergeMap(group => zip(
+            of(group.key),
+            group.pipe(toArray()))
+          ),
+          scan((acc, curr) => acc.concat([ curr ]), []),
+          shareReplay(1),
+        ))
+      )
+
+      this.nonGroupedLayers$ = layersGroupBy$.pipe(
+        map(arr => {
+          const nonGrouped = arr.find(([ _key ]) => !_key)
+          return (nonGrouped && nonGrouped[1]) || []
+        })
+      )
+
+      this.groupedLayers$ = layersGroupBy$.pipe(
+        map(arr => arr
+          .filter(([ key ]) => !!key )
+          .map(([key, parcellations]) => ({
+            name: key,
+            previewUrl: parcellations[0].previewUrl,
+            parcellations
+          }))
+        ),
+      )
     }
 
     ngOnInit(): void {
       this.subscriptions.push(
         this.selectedTemplate$.subscribe(st => {
           this.selectedTemplatePreviewUrl = st.templateSpaces.find(t => t['@id'] === st['@id']).previewUrl
-          this.selectedTemplateSpaceIndex = this.atlas && this.atlas.templateSpaces.findIndex(ts => ts['@id'] === st['@id'])
-        })
+          this.selectedTemplateSpaceId = st['@id']
+        }),
       )
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(ps => {
@@ -71,15 +101,6 @@ export class ViewerSelectorComponent implements OnInit {
       this.subscriptions.push(
         this.selectedAtlas$.subscribe(sa => {
           if (sa && sa !== 'undefined') this.atlas = sa
-
-          const groupableParcellations = this.atlas?.parcellations.filter(p => p.groupName && p.groupName.length)
-
-          const groupsDict = groupableParcellations.reduce((r, a) => {
-            r[a.groupName] = r[a.groupName] || []
-            r[a.groupName].push(a)
-            return r
-          }, {})
-          this.groupedLayers = Object.entries(groupsDict)
         })
       )
     }
@@ -96,16 +117,16 @@ export class ViewerSelectorComponent implements OnInit {
       )
     }
 
-    templateIncludesLayer(layer, template) {
-      return layer.availableIn.map(a => a['@id']).includes(template['@id'])
+    currentTemplateIncludesLayer(layer) {
+      return layer.availableIn.map(a => a['@id']).includes(this.selectedTemplateSpaceId)
     }
 
-    templateIncludesGroup(group, template) {
-      return group[1].every(v => v.availableIn.map(t => t['@id']).includes(template['@id']))
+    templateIncludesGroup(group) {
+      return group.parcellations.some(v => v.availableIn.map(t => t['@id']).includes(this.selectedTemplateSpaceId))
     }
 
     selectedOneOfTheLayers(layers) {
-      const includes = layers.map(l=>l['@id']).some(r=> this.selectedLayers.includes(r))
+      const includes = layers.map(l=>l['@id']).some(id=> this.selectedLayers.includes(id))
       return includes
     }
 
@@ -113,11 +134,11 @@ export class ViewerSelectorComponent implements OnInit {
       return this.selectedLayers.includes(id)
     }
 
-    notGroupedParcellations(parcellations) {
-      return parcellations.filter(p => !p.groupName)
-    }
-
     collapseExpandedGroup(){
       this.matMenuTriggers.forEach(t => t.menuOpen && t.closeMenu())
+    }
+
+    getTileTmplClickFnAsCtx(fn: (...arg) => void, param: any) {
+      return () => fn.call(this, param)
     }
 }

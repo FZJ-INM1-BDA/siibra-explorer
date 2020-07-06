@@ -78,3 +78,9 @@ region-menu
 {
   max-width: 350px;
 }
+
+logo-container
+{
+  height: 2rem;
+  opacity: 0.2;
+}

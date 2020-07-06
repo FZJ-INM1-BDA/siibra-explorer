@@ -1,0 +1,129 @@
+<div>
+    <div [hidden]="selectorExpanded"
+         class="muted-7 m-2 selectedLayerBorder cursor-pointer selectedTemplateDefaultContainer"
+         (click)="selectorExpanded = true">
+        <img [src]="selectedTemplatePreviewUrl" draggable="false"/>
+    </div>
+
+
+    <small *ngIf="selectorExpanded" class="position-relative">
+        <mat-card class="scale-up-bl">
+            <div class="position-absolute cursor-pointer" style="top: 10px; right: 10px;" (click)="selectorExpanded = false">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <!-- templates -->
+            <mat-card-subtitle class="mb-1">Templates</mat-card-subtitle>
+
+            <div class="d-flex flex-wrap w-100">
+                <ng-container *ngFor="let template of (selectedAtlas$ | async)?.templateSpaces">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: template,
+                        selected: selectedTemplateSpaceId === template['@id'],
+                        onClick: getTileTmplClickFnAsCtx(selectTemplateWithName, template)
+                    }">
+                    
+                    </ng-container>
+                </ng-container>
+            </div>
+
+            <!-- atlas layers -->
+            <mat-card-subtitle class="mb-1 mt-2">Layers</mat-card-subtitle>
+
+            <div class="d-flex flex-wrap w-100">
+                <ng-container *ngFor="let layer of (nonGroupedLayers$ | async)">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: layer,
+                        selected: selectedLayersIncludes(layer['@id']),
+                        onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
+                        disabled: !currentTemplateIncludesLayer(layer)
+                    }">
+
+                    </ng-container>
+                </ng-container>
+
+                <ng-container *ngFor="let group of (groupedLayers$ | async)">
+                    <ng-container *ngTemplateOutlet="tileTmpl; context: {
+                        tileSrc: group,
+                        selected: selectedOneOfTheLayers(group.parcellations),
+                        disabled: !templateIncludesGroup(group),
+                        menuTriggerFor: layerGroupMenu,
+                        menuTriggerData: { layerGroupItems: group.parcellations },
+                        isDirectory: true
+                    }">
+
+                    </ng-container>
+                </ng-container>
+            </div>
+        </mat-card>
+    </small>
+</div>
+
+<!-- image tile tmpl -->
+<ng-template #tileTmpl
+    let-tileSrc="tileSrc"
+    let-selected="selected"
+    let-onClick="onClick"
+    let-disabled="disabled"
+    let-isDirectory="isDirectory"
+    let-menuTriggerFor="menuTriggerFor"
+    let-menuTriggerData="menuTriggerData">
+    <div *ngIf="menuTriggerFor; else noMatMenuTriggerTmpl"
+        iav-stop="click"
+        [matMenuTriggerFor]="menuTriggerFor"
+        [matMenuTriggerData]="menuTriggerData">
+
+        <ng-container *ngTemplateOutlet="tileContent">
+
+        </ng-container>
+    </div>
+
+    <ng-template #noMatMenuTriggerTmpl>
+        <ng-container *ngTemplateOutlet="tileContent">
+
+        </ng-container>
+    </ng-template>
+
+    <ng-template #tileContent>
+        <div class="d-flex flex-column justify-content-start w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
+            [matTooltip]="tileSrc.name"
+            matTooltipPosition="above"
+            (click)="!disabled && onClick && onClick()"
+            [ngStyle]="{opacity: disabled ? '0.2': '1' }">
+            <img [src]="tileSrc.previewUrl"
+                alt="Preview of this tile"
+                class="layer-image align-self-center"
+                [ngClass]="{ 'selectedLayerBorder': selected }"
+                draggable="false">
+            <div *ngIf="isDirectory" class="d-flex flex-row-reverse align-items-end w-100 h-0">
+                <i class="fas fa-folder folder-container fa-2x"></i>
+            </div>
+            <small class="ml-1 mr-1 mt-2 text-truncate">{{ tileSrc.name }}</small>
+        </div>
+    </ng-template>
+</ng-template>
+
+<!-- mat menu for grouped layer -->
+<mat-menu
+    #layerGroupMenu="matMenu"
+    class="layerGroupMenu"
+    hasBackdrop="false">
+
+    <ng-template matMenuContent let-layerGroupItems="layerGroupItems">
+        <div iav-stop="click"
+            class="d-flex flex-column align-items-center"
+            (iav-outsideClick)="collapseExpandedGroup()">
+            <div class="d-flex flex-column justify-content-center w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
+                *ngFor="let layer of layerGroupItems; let i = index;"
+                [matTooltip]="layer.name"
+                matTooltipPosition="above"
+                (click)="currentTemplateIncludesLayer(layer) && selectParcellationWithName(layer)"
+                [ngStyle]="{opacity: currentTemplateIncludesLayer(layer)? '1' : '0.2'}">
+                <img class="layer-image align-self-center"
+                    [ngClass]="selectedLayersIncludes(layer['@id'])? 'selectedLayerBorder' : null"
+                    [src]="layer.previewUrl"
+                    draggable="false"/>
+                <small class="iv-custom-comp text ml-1 mr-1 mt-2 mb-2 text-truncate">{{layer.name}}</small>
+            </div>
+        </div>
+    </ng-template>
+</mat-menu>

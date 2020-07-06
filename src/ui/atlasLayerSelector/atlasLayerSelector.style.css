@@ -31,11 +31,6 @@
     border: 2px solid #FED363;
 }
 
-.cursorPointer {
-    cursor: pointer !important;
-}
-
-
 .scale-up-bl {
     -webkit-animation: scale-up-bl .2s cubic-bezier(.39, .575, .565, 1.000) both;
     animation: scale-up-bl .2s cubic-bezier(.39, .575, .565, 1.000) both;
