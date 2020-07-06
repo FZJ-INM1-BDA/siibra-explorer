@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, OnInit } from "@angular/core";
+import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
@@ -16,7 +16,7 @@ import { viewerStateToggleRegionSelect, viewerStateSelectParcellationWithId, vie
   providedIn: 'root',
 })
 
-export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
+export class ViewerStateControllerUseEffect implements OnDestroy {
 
   private subscriptions: Subscription[] = []
 
@@ -282,9 +282,6 @@ export class ViewerStateControllerUseEffect implements OnInit, OnDestroy {
         }
       }),
     )
-  }
-
-  public ngOnInit() {
   }
 
   public ngOnDestroy() {
