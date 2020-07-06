@@ -16,7 +16,7 @@ export class ShowDatasetDialogDirective{
     autoFocus: false
   }
 
-  @Input()
+  @Input('iav-dataset-show-dataset-dialog-kgschema')
   kgSchema: string = 'minds/core/dataset/v1.0.0'
 
   @Input('iav-dataset-show-dataset-dialog-kgid')

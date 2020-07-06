@@ -2,13 +2,11 @@
 {
   display:inline-block;
   background-size: cover;
-  pointer-events: none;
-  height:80px;
+  height: 100%;
 }
 
 [hbpLogoContainer] > img
 {
   visibility: hidden;
-  height:80px;
-  pointer-events: none;
+  height: 100%;
 }

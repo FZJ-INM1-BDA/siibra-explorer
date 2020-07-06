@@ -576,11 +576,6 @@ mat-icon[fontset="far"]
   max-width: none!important;
 }
 
-.mb-8
-{
-  margin-bottom:4rem!important;
-}
-
 .min-h-2
 {
   min-height: 1rem;
@@ -611,10 +606,11 @@ body::after
 {
   content: '';
   position: fixed;
-  bottom: 1rem;
-  right: 2rem;
+  bottom: 3rem;
+  width: 100%;
+  text-align: center;
   font-size: 200%;
-  color: rgba(128, 128, 128, 0.5);
+  color: rgba(128, 128, 128, 0.2);
   pointer-events: none;
   z-index: 99999;
 }
@@ -697,6 +693,11 @@ kg-dataset-previewer > img
 .mr-4-n
 {
   margin-right: -1rem!important;
+}
+
+.mb-6
+{
+  margin-bottom: 3rem!important;
 }
 
 .mat-card-sm > mat-dialog-container

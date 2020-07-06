@@ -28,11 +28,11 @@
   <div *ngIf="templateSelected$ | async"
     class="viewer-config-container d-flex align-items-end pe-none">
     <!-- Viewer Selector Container-->
-    <viewer-selector
-      #viewerSelector
+    <atlas-layer-selector
+      #alSelector="atlasLayerSelector"
       class="pe-all"
-      (iav-outsideClick)="viewerSelector.selectorExpanded = false">
-    </viewer-selector>
+      (iav-outsideClick)="alSelector.selectorExpanded = false">
+    </atlas-layer-selector>
 
     <atlas-layer-container
       class="pe-none overflow-visible"
@@ -42,10 +42,11 @@
   </div>
 
   <!-- StatusCard container-->
-  <div class="viewer-status-container pe-all">
+  <div *ngIf="viewerLoaded" class="viewer-status-container pe-none">
 
-    <div class="muted-7" *ngIf="viewerLoaded">
+    <div class="muted-7 mb-6 mr-1">
       <ui-status-card
+        class="pe-all"
         [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
         [nehubaViewer]="nehubaViewer">
       </ui-status-card>
