@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChildren, QueryList } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap } from "rxjs/operators";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap, filter } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
-import { viewerStateGetSelectedAtlas, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateAllParcellationsSelector } from "src/services/state/viewerState.store.helper";
+import { viewerStateGetSelectedAtlas, viewerStateSelectTemplateWithId, viewerStateAllParcellationsSelector, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 
 @Component({
@@ -81,6 +81,10 @@ export class AtlasLayerSelector implements OnInit {
 
       const layersGroupBy$ = this.selectedAtlas$.pipe(
         switchMap(selectedAtlas => from((selectedAtlas?.parcellations) || []).pipe(
+          /**
+           * do not show base layers
+           */
+          filter(p => !(p as any).baseLayer),
           groupBy((parcellation: any) => parcellation.groupName, p => p),
           mergeMap(group => zip(
             of(group.key),
@@ -161,7 +165,7 @@ export class AtlasLayerSelector implements OnInit {
 
     selectParcellationWithName(layer) {
       this.store$.dispatch(
-        viewerStateSelectParcellationWithId({ payload: layer })
+        viewerStateToggleLayer({ payload: layer })
       )
     }
 

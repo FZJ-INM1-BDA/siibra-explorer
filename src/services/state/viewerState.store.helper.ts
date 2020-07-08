@@ -37,9 +37,14 @@ export const viewerStateSelectAtlas = createAction(
   props<{ atlas: { ['@id']: string } }>()
 )
 
-export const viewerStateSelectParcellationWithId = createAction(
-  `[viewerState] selectParcellationWithId`,
+export const viewerStateHelperSelectParcellationWithId = createAction(
+  `[viewerStateHelper] selectParcellationWithId`,
   props<{ payload: { ['@id']: string } }>()
+)
+
+export const viewerStateSelectParcellation = createAction(
+  `[viewerState] selectParcellation`,
+  props<{ selectParcellation: any }>()
 )
 
 export const viewerStateSelectTemplateWithId = createAction(
@@ -47,14 +52,19 @@ export const viewerStateSelectTemplateWithId = createAction(
   props<{ payload: { ['@id']: string } }>()
 )
 
-export const viewerStateToggleAdditionalLayer = createAction(
-  `[viewerState] toggleAdditionalLayer`,
-  props<{ atlas: { ['@id']: string }  }>()
+export const viewerStateToggleLayer = createAction(
+  `[viewerState] toggleLayer`,
+  props<{ payload: { ['@id']: string }  }>()
+)
+
+export const viewerStateHelperToggleAdditionalLayer = createAction(
+  `[viewerStateHelper] toggleAdditionalLayer`,
+  props<{ payload: { ['@id']: string } }>()
 )
 
 export const viewerStateRemoveAdditionalLayer = createAction(
   `[viewerState] removeAdditionalLayer`,
-  props<{ atlas: { ['@id']: string } }>()
+  props<{ payload?: { ['@id']: string } }>()
 )
 
 export const viewerStateSelectedRegionsSelector = createSelector(
@@ -91,14 +101,62 @@ const initialState: IViewerStateHelperStore = {
   overlayingAdditionalParcellations: []
 }
 
+function handleToggleLayerAction(reducer: ActionReducer<any>): ActionReducer<any>{
+  return function(state, action) {
+    switch(action.type){
+    case viewerStateToggleLayer.type: {
+      const { payload } = action as any
+      const { fetchedAtlases, selectedAtlasId, overlayingAdditionalParcellations } = state[viewerStateHelperStoreName]
+      const { templateSelected } = state['viewerState']
+      const selectedAtlas = fetchedAtlases.find(atlas => atlas['@id'] === selectedAtlasId)
+      const atlasBaseLayer = selectedAtlas['parcellations'].find(p => !!p['baseLayer'])
+      if (atlasBaseLayer) {
+        /**
+           * if toggling base layer, remove all additional layers
+           * otherwise, just toggle the payload layer
+           */
+        if (payload['@id'] === atlasBaseLayer['@id']) {
+          return reducer(state, viewerStateRemoveAdditionalLayer({ payload: null }))
+        } else {
+          return reducer(state, viewerStateHelperToggleAdditionalLayer({ payload }))
+        }
+      } else {
+        const selectParcellation = templateSelected['parcellations'].find(p => p['@id'] === payload['@id'])
+        return reducer(state, viewerStateSelectParcellation({ selectParcellation }))
+      }
+    }
+    case viewerStateSelectTemplateWithId.type: {
+      /**
+         * on template change clear additional parcellations/layers
+         */
+      return reducer({
+        ...state,
+        [viewerStateHelperStoreName]: {
+          ...state[viewerStateHelperStoreName],
+          overlayingAdditionalParcellations: []
+        }
+      }, action)
+    }
+    default: reducer(state, action)
+    }
+    return reducer(state, action)
+  }
+}
+
+export const viewerStateMetaReducers = [
+  handleToggleLayerAction
+]
+
+
+
 export const viewerStateHelperReducer = createReducer(
   initialState,
   on(viewerStateSetFetchedAtlases, (state, { fetchedAtlases }) => ({ ...state, fetchedAtlases })),
   on(viewerStateSelectAtlas, (state, { atlas }) => ({ ...state, selectedAtlasId: atlas['@id'] })),
   on(generalApplyState, (_prevState, { state }) => ({ ...state[viewerStateHelperStoreName] })),
-  on(viewerStateToggleAdditionalLayer, (state, { atlas }) => {
+  on(viewerStateHelperToggleAdditionalLayer, (state, { payload }) => {
     const { overlayingAdditionalParcellations } = state
-    const layerAlreadyDisplayed = overlayingAdditionalParcellations.find(p => p['@id'] === atlas['@id'])
+    const layerAlreadyDisplayed = overlayingAdditionalParcellations.find(p => p['@id'] === payload['@id'])
 
     /**
      * TODO this logic only allows for at most one additional layer to be displayed
@@ -107,14 +165,16 @@ export const viewerStateHelperReducer = createReducer(
       ...state,
       overlayingAdditionalParcellations: layerAlreadyDisplayed
         ? []
-        : [ atlas ]
+        : [ payload ]
     }
   }),
-  on(viewerStateRemoveAdditionalLayer, (state, { atlas }) => {
+  on(viewerStateRemoveAdditionalLayer, (state, { payload }) => {
     const { overlayingAdditionalParcellations } = state
     return {
       ...state,
-      overlayingAdditionalParcellations: overlayingAdditionalParcellations.filter(p => p['@id'] !== atlas['@id'])
+      overlayingAdditionalParcellations: !!payload
+        ? overlayingAdditionalParcellations.filter(p => p['@id'] !== payload['@id'])
+        : []
     }
   })
 )
