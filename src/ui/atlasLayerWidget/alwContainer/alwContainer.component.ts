@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { Store, select } from "@ngrx/store";
 import { Observable, combineLatest } from "rxjs";
-import { viewerStateGetOverlayingAdditionalParcellations, viewerStateToggleLayer, viewerStateRemoveAdditionalLayer, viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSelectedRegionsSelector } from 'src/services/state/viewerState.store.helper'
+import { viewerStateGetOverlayingAdditionalParcellations, viewerStateRemoveAdditionalLayer, viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSelectedRegionsSelector } from 'src/services/state/viewerState.store.helper'
 import { map, shareReplay, withLatestFrom, filter} from "rxjs/operators";
 import {safeFilter} from "src/services/stateStore.service";
 
