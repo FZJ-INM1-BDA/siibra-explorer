@@ -42,9 +42,10 @@
   </div>
 
   <!-- StatusCard container-->
-  <div *ngIf="viewerLoaded" class="viewer-status-container pe-none">
-
-    <div class="muted-7 mb-6 mr-1">
+  <div *ngIf="viewerLoaded" class="viewer-status-container pe-none m-2">
+    <atlas-dropdown-selector class="pe-all">
+    </atlas-dropdown-selector>
+    <div class="muted-7 mt-5-n">
       <ui-status-card
         class="pe-all"
         [selectedTemplateName]="selectedTemplate && selectedTemplate.name"

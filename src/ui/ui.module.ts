@@ -63,7 +63,6 @@ import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 
 import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
-import { SearchSideNav } from "./searchSideNav/searchSideNav.component";
 
 import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
 import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
@@ -142,7 +141,6 @@ import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.c
     RegionHierarchy,
     CurrentlySelectedRegions,
     MaximmisePanelButton,
-    SearchSideNav,
     RegionTextSearchAutocomplete,
     RegionsListView,
     TakeScreenshotComponent,
@@ -226,7 +224,6 @@ import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.c
     CookieAgreement,
     KGToS,
     StatusCardComponent,
-    SearchSideNav,
     ViewerStateMini,
     RegionMenuComponent,
     FixedMouseContextualContainerDirective,

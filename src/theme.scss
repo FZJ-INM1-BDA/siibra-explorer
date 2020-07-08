@@ -52,10 +52,23 @@ $iv-dark-theme-accent:  mat-palette($mat-amber, A200, A100, A400);
 $iv-dark-theme-warn:    mat-palette($mat-red);
 $iv-dark-theme:   mat-dark-theme($iv-dark-theme-primary, $iv-dark-theme-accent, $iv-dark-theme-warn);
 
-[darktheme=true]
+/**
+  * attribute has lower priority than class
+  * by default, use attribute to set UI wide theme
+  * use class for specific localised theme 
+  */
+[darktheme=true],
+.darktheme.darktheme
 {
   @include angular-material-theme($iv-dark-theme);
   @include custom-cmp($iv-dark-theme);
+}
+
+[darktheme=false],
+.lighttheme.lighttheme
+{
+  @include angular-material-theme($iv-theme);
+  @include custom-cmp($iv-theme);
 }
 
 .iav-dialog-class

@@ -143,14 +143,25 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
       })
     )
     
+    /**
+     * opened via mat-dialog
+     */
+
     if (dataset) {
-      const { fullId } = dataset
-      const obj = getKgSchemaIdFromFullId(fullId)
-      if (obj) {
-        const [ kgSchema, kgId ] = obj
-        this.kgSchema = kgSchema
-        this.kgId = kgId
+      const { fullId, name, description } = dataset
+      if (fullId) {
+
+        const obj = getKgSchemaIdFromFullId(fullId)
+        if (obj) {
+          const [ kgSchema, kgId ] = obj
+          this.kgSchema = kgSchema
+          this.kgId = kgId
+          return
+        }
       }
+
+      this.name = name
+      this.description = description
     }
   }
 

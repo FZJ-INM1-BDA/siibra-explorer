@@ -478,8 +478,7 @@ class WdLayoutPage extends WdBase{
   constructor(){
     super()
     WdLayoutPage.TagNames = {
-      ...(WdBase.TagNames || {} ),
-      sideNav: 'search-side-nav'
+      ...(WdBase.TagNames || {} )
     }
   }
 
@@ -576,7 +575,7 @@ class WdLayoutPage extends WdBase{
 
   // SideNav
   _getSideNav() {
-    return this._browser.findElement( By.tagName(WdLayoutPage.TagNames.sideNav) )
+    throw new Error(`side bar no longer exist`)
   }
 
   async getSideNavTag(){

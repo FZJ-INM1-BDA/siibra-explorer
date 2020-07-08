@@ -16,6 +16,12 @@ export class ShowDatasetDialogDirective{
     autoFocus: false
   }
 
+  @Input('iav-dataset-show-dataset-dialog-name')
+  name: string
+
+  @Input('iav-dataset-show-dataset-dialog-description')
+  description: string
+
   @Input('iav-dataset-show-dataset-dialog-kgschema')
   kgSchema: string = 'minds/core/dataset/v1.0.0'
 
@@ -43,6 +49,12 @@ export class ShowDatasetDialogDirective{
         }
       })
 
+    } else if (this.name || this.description) {
+      const { name, description } = this
+      this.matDialog.open(this.dialogCmp, {
+        ...ShowDatasetDialogDirective.defaultDialogConfig,
+        data: { name, description }
+      })
     } else {
       this.snackbar.open(`Cannot show dataset. Neither fullId nor kgId provided.`)
     }

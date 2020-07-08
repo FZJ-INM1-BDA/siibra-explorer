@@ -62,6 +62,23 @@ export const viewerStateSelectedRegionsSelector = createSelector(
   viewerState => viewerState['regionsSelected']
 )
 
+export const viewerStateAllParcellationsSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => {
+    return (viewerState['fetchedTemplates'] as any[] || [])
+      .reduce((acc, curr) => {
+        const parcelations = (curr['parcellations'] || []).map(p => {
+          return {
+            ...p,
+            useTheme: curr['useTheme']
+          }
+        })
+        
+        return acc.concat( parcelations )
+      }, [])
+  }
+)
+
 interface IViewerStateHelperStore{
   fetchedAtlases: any[]
   selectedAtlasId: string
