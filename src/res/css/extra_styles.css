@@ -451,6 +451,16 @@ markdown-dom pre code
   top: 0!important;
 }
 
+.right-0
+{
+  right: 0!important;
+}
+
+.bottom-0
+{
+  bottom: 0!important;
+}
+
 .outline-none {
     outline: none;
 }
@@ -661,19 +671,6 @@ kg-dataset-previewer > img
   width: 100%;
 }
 
-/*
-  TODO, this really should be in searchSideNav.style.css. But karma tests does not seem to like to include style.css
-  figure out why
-*/
-/* exactly 1.5 line height */
-
-.h-117px
-{
-  min-height:117px!important;
-  max-height:117px!important;
-  flex-basis: 117px!important;
-}
-
 .hover-grab
 {
   opacity: 0.5;
@@ -693,6 +690,11 @@ kg-dataset-previewer > img
 .mr-4-n
 {
   margin-right: -1rem!important;
+}
+
+.mt-5-n
+{
+  margin-top: -1.25rem!important;
 }
 
 .mb-6

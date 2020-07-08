@@ -1,9 +1,9 @@
 import { Component, OnInit, ViewChildren, QueryList } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan } from "rxjs/operators";
-import { Observable, Subscription, from, zip, of } from "rxjs";
-import { viewerStateGetSelectedAtlas, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId } from "src/services/state/viewerState.store.helper";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap } from "rxjs/operators";
+import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
+import { viewerStateGetSelectedAtlas, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateAllParcellationsSelector } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 
 @Component({
@@ -31,12 +31,36 @@ export class AtlasLayerSelector implements OnInit {
     public selectorExpanded: boolean = false
     public selectedTemplatePreviewUrl: string = ''
 
+    public availableTemplates$: Observable<any[]>
+
+    public containerMaxWidth: number
+
     constructor(private store$: Store<any>) {
       this.selectedAtlas$ = this.store$.pipe(
         select(viewerStateGetSelectedAtlas),
         distinctUntilChanged(),
         shareReplay(1)
       )
+
+      this.availableTemplates$ = combineLatest(
+        this.selectedAtlas$,
+        this.store$.pipe(
+          select('viewerState'),
+          select('fetchedTemplates')
+        )
+      ).pipe(
+        map(([ { templateSpaces }, fetchedTemplates ]) => {
+          return templateSpaces.map(templateSpace => {
+            const fullTemplateInfo = fetchedTemplates.find(t => t['@id'] === templateSpace['@id'])
+            return {
+              ...templateSpace,
+              ...(fullTemplateInfo || {}),
+              darktheme: (fullTemplateInfo || {}).useTheme === 'dark'
+            }
+          })
+        }),
+      )
+
       this.selectedTemplate$ = this.store$.pipe(
         select('viewerState'),
         safeFilter('templateSelected'),
@@ -67,20 +91,44 @@ export class AtlasLayerSelector implements OnInit {
         ))
       )
 
-      this.nonGroupedLayers$ = layersGroupBy$.pipe(
-        map(arr => {
+      this.nonGroupedLayers$ = combineLatest(
+        this.store$.pipe(
+          select(viewerStateAllParcellationsSelector)
+        ),
+        layersGroupBy$
+      ).pipe(
+        map(([ allParcellations, arr]) => {
           const nonGrouped = arr.find(([ _key ]) => !_key)
-          return (nonGrouped && nonGrouped[1]) || []
-        })
+          return ((nonGrouped && nonGrouped[1]) || []).map(layer => {
+            const fullLayerInfo = allParcellations.find(p => p['@id'] === layer['@id']) || {}
+            return {
+              ...fullLayerInfo,
+              ...layer,
+              darktheme: (fullLayerInfo || {}).useTheme === 'dark'
+            }
+          })
+        }),
       )
 
-      this.groupedLayers$ = layersGroupBy$.pipe(
-        map(arr => arr
+      this.groupedLayers$ = combineLatest(
+        this.store$.pipe(
+          select(viewerStateAllParcellationsSelector)
+        ),
+        layersGroupBy$
+      ).pipe(
+        map(([ allParcellations, arr]) => arr
           .filter(([ key ]) => !!key )
           .map(([key, parcellations]) => ({
             name: key,
             previewUrl: parcellations[0].previewUrl,
-            parcellations
+            parcellations: parcellations.map(p => {
+              const fullInfo = allParcellations.find(fullP => fullP['@id'] === p['@id']) || {}
+              return {
+                ...fullInfo,
+                ...p,
+                darktheme: (fullInfo || {}).useTheme === 'dark'
+              }
+            })
           }))
         ),
       )
@@ -95,12 +143,12 @@ export class AtlasLayerSelector implements OnInit {
       )
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(ps => {
-          this.selectedLayers = this.atlas  && [this.atlas.parcellations.find(l => l['@id'] === ps['@id'])['@id']]
+          this.selectedLayers = (this.atlas && [this.atlas.parcellations.find(l => l['@id'] === ps['@id'])['@id']]) || []
         })
       )
       this.subscriptions.push(
         this.selectedAtlas$.subscribe(sa => {
-          if (sa && sa !== 'undefined') this.atlas = sa
+          this.atlas = sa
         })
       )
     }

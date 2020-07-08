@@ -80,12 +80,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
 
-  /**
-   * required for styling of all child components
-   */
-  @HostBinding('attr.darktheme')
-  public darktheme: boolean = false
-
   @HostBinding('attr.ismobile')
   public ismobile: boolean = false
   public meetsRequirement: boolean = true
@@ -109,8 +103,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
-
-  public sidePanelIsOpen$: Observable<boolean>
 
   public onhoverSegmentsForFixed$: Observable<string[]>
 
@@ -140,11 +132,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       select('uiState'),
       filter(state => isDefined(state)),
       map(state => state.focusedSidePanel),
-    )
-
-    this.sidePanelIsOpen$ = this.store.pipe(
-      select('uiState'),
-      select('sidePanelIsOpen')
     )
 
     this.selectedRegions$ = this.store.pipe(
@@ -397,10 +384,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.nehubaClickOverride(next)
 
-  }
-
-  public toggleSideNavMenu(opened) {
-    this.store.dispatch({type: opened ? CLOSE_SIDE_PANEL : OPEN_SIDE_PANEL})
   }
 
   /**

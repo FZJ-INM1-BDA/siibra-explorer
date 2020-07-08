@@ -9,11 +9,6 @@
     -moz-border-radius: 10px;
 }
 
-.singleLayerImageContainer {
-    max-width: 80px;
-    width: 80px;
-    height: 90px;
-}
 
 .selectedTemplateDefaultContainer {
     width: 100px;
@@ -78,12 +73,14 @@
         transform: scale(1);
         -webkit-transform-origin: 0 100%;
         transform-origin: 0 100%;
+        opacity: 1;
     }
     100% {
         -webkit-transform: scale(.5);
         transform: scale(.5);
         -webkit-transform-origin: 0 100%;
         transform-origin: 0 100%;
+        opacity: 0;
     }
 }
 
@@ -93,12 +90,14 @@
         transform: scale(1);
         -webkit-transform-origin: 0 100%;
         transform-origin: 0 100%;
+        opacity: 1;
     }
     100% {
         -webkit-transform: scale(.5);
         transform: scale(.5);
         -webkit-transform-origin: 0 100%;
         transform-origin: 0 100%;
+        opacity: 0;
     }
 }
 
@@ -106,4 +105,22 @@
 {
     margin-right:0.5rem;
     margin-bottom:-0.5rem;
+}
+
+.info-container
+{
+    margin-right:0.25rem;
+    margin-top:-0.25rem;
+}
+
+.selector-container
+{
+    width: 18rem;
+    bottom: 0;
+    z-index: 5;
+}
+
+.single-column-tile
+{
+    width: calc((18rem - 32px)/3);
 }

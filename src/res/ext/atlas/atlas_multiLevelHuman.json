@@ -8,14 +8,14 @@
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
+          "name": "Cytoarchitechtonic Maps"
         },
         {
-          "name": "BigBrain Cortical Layers Segmentation",
+          "name": "Cortical Layers Segmentation",
           "@id": "juelich/iav/atlas/v1.0.0/3"
         },
         {
-          "name": "Grey/White matter",
+          "name": "Isocortical/Non-isocortical structures",
           "@id": "juelich/iav/atlas/v1.0.0/4"
         }
       ]
@@ -26,35 +26,35 @@
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
+          "name": "Cytoarchitechtonic maps"
         },
         {
-          "name": "Fibre Bundle Atlas - Long Bundle",
+          "name": "Long Bundle",
           "@id": "juelich/iav/atlas/v1.0.0/5"
         },
         {
           "ngId": "fibre bundle short",
-          "name": "Fibre Bundle Atlas - Short Bundle",
+          "name": "Short Bundle",
           "@id": "juelich/iav/atlas/v1.0.0/6"
         },
         {
-          "name": "DiFuMo Atlas (64 dimensions)",
+          "name": "64 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721"
         },
         {
-          "name": "DiFuMo Atlas (128 dimensions)",
+          "name": "128 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8"
         },
         {
-          "name": "DiFuMo Atlas (256 dimensions)",
+          "name": "256 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235"
         },
         {
-          "name": "DiFuMo Atlas (512 dimensions)",
+          "name": "512 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16"
         },
         {
-          "name": "DiFuMo Atlas (1024 dimensions)",
+          "name": "1024 dimensions",
           "@id": "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1"
         }
       ]
@@ -65,7 +65,7 @@
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Jülich Cytoarchitechtonic Brain Atlas (human)"
+          "name": "Cytoarchitechtonic maps"
         }
       ]
     }
@@ -73,7 +73,7 @@
   "parcellations": [
     {
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-      "name": "Jülich Cytoarchitechtonic Brain Atlas (human)",
+      "name": "Cytoarchitechtonic maps",
       "baseLayer": true,
       "availableIn": [
         {
@@ -91,7 +91,7 @@
       ]
     },
     {
-      "name": "BigBrain Cortical Layers Segmentation",
+      "name": "Cortical Layers Segmentation",
       "@id": "juelich/iav/atlas/v1.0.0/3",
       "availableIn": [
         {
@@ -101,7 +101,7 @@
       ]
     },
     {
-      "name": "Grey/White matter",
+      "name": "Isocortical/Non-isocortical structures",
       "@id": "juelich/iav/atlas/v1.0.0/4",
       "availableIn": [
         {
@@ -111,8 +111,9 @@
       ]
     },
     {
-      "name": "Fibre Bundle Atlas - Long Bundle",
+      "name": "Long Bundle",
       "@id": "juelich/iav/atlas/v1.0.0/5",
+      "groupName": "Fibre tracts",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -122,8 +123,9 @@
     },
     {
       "ngId": "fibre bundle short",
-      "name": "Fibre Bundle Atlas - Short Bundle",
+      "name": "Short Bundle",
       "@id": "juelich/iav/atlas/v1.0.0/6",
+      "groupName": "Fibre tracts",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -132,9 +134,9 @@
       ]
     },
     {
-      "name": "DiFuMo Atlas (64 dimensions)",
+      "name": "64 dimensions",
       "@id": "minds/core/parcellationatlas/v1.0.0/d80fbab2-ce7f-4901-a3a2-3c8ef8a3b721",
-      "groupName": "DiFuMo Atlas",
+      "groupName": "Functional Modes",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -143,9 +145,9 @@
       ]
     },
     {
-      "name": "DiFuMo Atlas (128 dimensions)",
+      "name": "128 dimensions",
       "@id": "minds/core/parcellationatlas/v1.0.0/73f41e04-b7ee-4301-a828-4b298ad05ab8",
-      "groupName": "DiFuMo Atlas",
+      "groupName": "Functional Modes",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -154,9 +156,9 @@
       ]
     },
     {
-      "name": "DiFuMo Atlas (256 dimensions)",
+      "name": "256 dimensions",
       "@id": "minds/core/parcellationatlas/v1.0.0/141d510f-0342-4f94-ace7-c97d5f160235",
-      "groupName": "DiFuMo Atlas",
+      "groupName": "Functional Modes",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -165,9 +167,9 @@
       ]
     },
     {
-      "name": "DiFuMo Atlas (512 dimensions)",
+      "name": "512 dimensions",
       "@id": "minds/core/parcellationatlas/v1.0.0/63b5794f-79a4-4464-8dc1-b32e170f3d16",
-      "groupName": "DiFuMo Atlas",
+      "groupName": "Functional Modes",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
@@ -176,9 +178,9 @@
       ]
     },
     {
-      "name": "DiFuMo Atlas (1024 dimensions)",
+      "name": "1024 dimensions",
       "@id": "minds/core/parcellationatlas/v1.0.0/12fca5c5-b02c-46ce-ab9f-f12babf4c7e1",
-      "groupName": "DiFuMo Atlas",
+      "groupName": "Functional Modes",
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",

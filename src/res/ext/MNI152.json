@@ -11,7 +11,7 @@
     {
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "fullId": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-      "name": "JuBrain Cytoarchitectonic Atlas",
+      "name": "Cytoarchitechtonic maps",
       "ngId": "jubrain mni152 v18 left",
       "auxillaryMeshIndices": [
         65535
@@ -8123,7 +8123,7 @@
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
-      "name": "Fibre Bundle Atlas - Long Bundle",
+      "name": "Long Bundle",
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
@@ -8487,7 +8487,7 @@
       "type": "parcellation",
       "surfaceParcellation": true,
       "ngData": null,
-      "name": "Fibre Bundle Atlas - Short Bundle",
+      "name": "Short Bundle",
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",

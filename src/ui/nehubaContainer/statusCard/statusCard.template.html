@@ -35,7 +35,7 @@
       <button mat-icon-button
         [attr.aria-label]="HIDE_FULL_STATUS_PANEL_ARIA_LABEL"
         (click)="showFull = false">
-        <i class="fas fa-angle-down"></i>
+        <i class="fas fa-angle-up"></i>
       </button>
     </div>
 
@@ -110,7 +110,7 @@
     </span>
 
     <!-- only show cursor if touch interface is not on -->
-    <span *ngIf="!(useTouchInterface$ | async)">
+    <span *ngIf="false && !(useTouchInterface$ | async)">
       <!-- padding -->
       <span class="pl-4"></span>
 
@@ -125,7 +125,7 @@
     <button mat-icon-button
       [attr.aria-label]="SHOW_FULL_STATUS_PANEL_ARIA_LABEL"
       (click)="showFull = true">
-      <i class="fas fa-angle-up"></i>
+      <i class="fas fa-angle-down"></i>
     </button>
   </div>
 </ng-template>

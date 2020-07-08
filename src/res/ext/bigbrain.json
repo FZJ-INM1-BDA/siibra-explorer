@@ -19,6 +19,7 @@
       "fullId": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "name": "Cytoarchitectonic Maps",
       "properties": {
+        "name": "Cytoarchitectonic Maps",
         "description": "This dataset contains cytoarchitectonic maps of brain regions in the BigBrain space [Amunts et al. 2013]. The mappings were created using the semi-automatic method presented in Schleicher et al. 1999, based on coronal histological sections on 1 micron resolution. Mappings are available on approximately every 100th section for each region. They were then transformed to the sections of the 3D reconstructed BigBrain space using the transformations used in Amunts et al. 2013, which were provided by Claude Lepage (McGill). Only a few cytoarchitectonic maps in the Big Brain are currently **fully mapped**, based on a workflow that automatically fills in missing sections based on expert annotations. Other 3D maps are available in a preliminary version, in which the expert annotations in the Big Brain space were simply **interpolated**."
       },
       "regions": [
@@ -656,9 +657,10 @@
     },
     {
       "@id": "juelich/iav/atlas/v1.0.0/3",
-      "name": "BigBrain Cortical Layers Segmentation",
+      "name": "Cortical Layers Segmentation",
       "ngId": "cortical layers",
       "properties": {
+        "name": "Cortical Layers Segmentation",
         "description": "The cerebral isocortex has six cytoarchitectonic layers that vary depending on cortical area and local morphology. This datasets provides a 3D segmentation of all cortical and laminar surfaces in the BigBrain, a high-resolution, 3D histological model of the human brain. The segmentation has been computed automatically based on histological intensities along 3D cortical profiles which were sampled between the pial and white matter throughout the dataset. These cortical profiles were segmented into layers using a convolutional neural network. Training profiles were generated from examples of manually segmented layers on cortical regions from 2D histological sections of the BigBrain. From the segmented intensity profiles, surface meshes and voxel masks of all six cortical layers in the space of the Big Brain have been computed.",
         "publications": [
           {
@@ -732,7 +734,7 @@
               "children": []
             },
             {
-              "name": "non-cortical structures",
+              "name": "Non-isocortical structures",
               "labelIndex": 7,
               "rgb": [
                 255,
@@ -753,7 +755,7 @@
       "ngId": " tissue type: ",
       "regions": [
         {
-          "name": "Grey matter",
+          "name": "Isocortex",
           "labelIndex": 100,
           "rgb": [
             200,
@@ -763,7 +765,7 @@
           "children": []
         },
         {
-          "name": "White matter",
+          "name": "Non-isocortical structures",
           "labelIndex": 200,
           "rgb": [
             255,
