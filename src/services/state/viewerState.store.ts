@@ -10,7 +10,7 @@ import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
-import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion, viewerStateSelectAtlas } from './viewerState.store.helper';
+import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion, viewerStateSelectAtlas, viewerStateSelectParcellation } from './viewerState.store.helper';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -148,6 +148,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       navigation : action.navigation,
     }
   }
+  case viewerStateSelectParcellation.type:
   case SELECT_PARCELLATION : {
     const { selectParcellation } = action
     return {

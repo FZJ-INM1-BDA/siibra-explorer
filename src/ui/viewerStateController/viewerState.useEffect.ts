@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
-import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
+import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, tap } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, isDefined, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
 import { UIService } from "src/services/uiService.service";
@@ -10,7 +10,7 @@ import { regionFlattener } from "src/util/regionFlattener";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
@@ -51,7 +51,6 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private uiService: UIService,
     private constantSerivce: AtlasViewerConstantsServices,
     private coordinatesTransformation: TemplateCoordinatesTransformation
   ) {
@@ -76,8 +75,31 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
      */
     this.selectParcellation$ = merge(
 
+      /**
+       * merge viewer helper stream
+       */
+      this.store$.pipe(
+        select(state => state[viewerStateHelperStoreName]),
+        map(viewreHelperState => {
+          const {
+            fetchedAtlases,
+            selectedAtlasId,
+            overlayingAdditionalParcellations,
+          } = viewreHelperState
+          const selectedAtlas = fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
+          const baseLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => !!p['baseLayer']) || {}
+          return overlayingAdditionalParcellations.length > 0
+            ? overlayingAdditionalParcellations[0]['@id']
+            : baseLayer['@id']
+        }),
+        filter(v => !!v)
+      ),
+      /**
+       * listening on aciton
+       */
+
       this.actions$.pipe(
-        ofType(viewerStateSelectParcellationWithId.type),
+        ofType(viewerStateHelperSelectParcellationWithId.type),
         map(({ payload }) => payload['@id'])
       ),
 

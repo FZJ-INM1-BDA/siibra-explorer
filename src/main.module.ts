@@ -55,7 +55,7 @@ import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue } from './glue';
-import { viewerStateHelperReducer, viewerStateFleshOutDetail } from './services/state/viewerState.store.helper';
+import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers } from './services/state/viewerState.store.helper';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -105,7 +105,12 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       uiState,
       userConfigState,
     },{
-      metaReducers: [ datasetPreviewMetaReducer, viewerStateFleshOutDetail ]
+      metaReducers: [ 
+        // debug,
+        ...viewerStateMetaReducers,
+        datasetPreviewMetaReducer,
+        viewerStateFleshOutDetail
+      ]
     }),
     HttpClientModule,
   ],
