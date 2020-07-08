@@ -76,26 +76,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
     this.selectParcellation$ = merge(
 
       /**
-       * merge viewer helper stream
-       */
-      this.store$.pipe(
-        select(state => state[viewerStateHelperStoreName]),
-        map(viewreHelperState => {
-          const {
-            fetchedAtlases,
-            selectedAtlasId,
-            overlayingAdditionalParcellations,
-          } = viewreHelperState
-          const selectedAtlas = fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
-          const baseLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => !!p['baseLayer']) || {}
-          return overlayingAdditionalParcellations.length > 0
-            ? overlayingAdditionalParcellations[0]['@id']
-            : baseLayer['@id']
-        }),
-        filter(v => !!v)
-      ),
-      /**
-       * listening on aciton
+       * listening on action
        */
 
       this.actions$.pipe(
@@ -120,12 +101,10 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         filter(v => !!v)
       )
     ).pipe(
-      distinctUntilChanged(),
       withLatestFrom(viewerState$.pipe(
         select('templateSelected'),
       )),
       map(([id, templateSelected]) => {
-
         const { parcellations: availableParcellations } = templateSelected
         const newParcellation = availableParcellations.find(t => t['@id'] === id)
         if (!newParcellation) {
@@ -149,7 +128,12 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
     this.selectTemplate$ = merge(
       this.actions$.pipe(
         ofType(viewerStateSelectTemplateWithId.type),
-        map(({ payload }) => payload['@id'])
+        map(({ payload, config }) => {
+          return {
+            templateId: payload['@id'],
+            parcellationId: config && config['selectParcellation'] && config['selectParcellation']['@id']
+          }
+        })
       ),
       this.actions$.pipe(
         ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
@@ -161,14 +145,17 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           const foundTemplate = fetchedTemplates.find(t => t.name === templateName)
           return foundTemplate && foundTemplate['@id']
         }),
-        filter(v => !!v)
+        filter(v => !!v),
+        map(templateId => {
+          return { templateId, parcellationId: null }
+        })
       )
     ).pipe(
 
       withLatestFrom(
         viewerState$
       ),
-      switchMap(([newTemplateId, { templateSelected, fetchedTemplates, navigation, parcellationSelected }]) => {
+      switchMap(([{ templateId: newTemplateId, parcellationId: newParcellationId }, { templateSelected, fetchedTemplates, navigation, parcellationSelected }]) => {
         if (!templateSelected) {
           return of({
             newTemplateId,
@@ -176,6 +163,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
             fetchedTemplates,
             translatedCoordinate: null,
             navigation,
+            newParcellationId,
             parcellationSelected
           })
         }
@@ -193,6 +181,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
                 fetchedTemplates,
                 translatedCoordinate: null,
                 navigation,
+                newParcellationId,
                 parcellationSelected
               }
             }
@@ -202,13 +191,14 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
               fetchedTemplates,
               translatedCoordinate: result,
               navigation,
+              newParcellationId,
               parcellationSelected
             }
           })
         )
       }),
       filter(v => !!v),
-      map(({ newTemplateId, templateSelected, fetchedTemplates, translatedCoordinate, navigation, parcellationSelected }) => {
+      map(({ newTemplateId, templateSelected, newParcellationId, fetchedTemplates, translatedCoordinate, navigation, parcellationSelected }) => {
         const newTemplateTobeSelected = fetchedTemplates.find(t => t['@id'] === newTemplateId)
         if (!newTemplateTobeSelected) {
           return {
@@ -218,10 +208,10 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
             },
           }
         }
-        
-        const selectParcellationWithTemplate = newTemplateTobeSelected.parcellations.map(p => p['@id']).includes(parcellationSelected['@id']) ?
-          newTemplateTobeSelected.parcellations[newTemplateTobeSelected.parcellations.findIndex(p => p['@id'] === parcellationSelected['@id'])]
-          : newTemplateTobeSelected.parcellations[0]
+
+        const selectParcellationWithTemplate = (newParcellationId && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === newParcellationId))
+          || (parcellationSelected && parcellationSelected['@id'] && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === parcellationSelected['@id']))
+          || newTemplateTobeSelected.parcellations[0]
 
         if (!translatedCoordinate) {
           return {
@@ -244,7 +234,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         return {
           type: NEWVIEWER,
           selectTemplate: deepCopiedState,
-          selectParcellation: newTemplateTobeSelected.parcellations[0],
+          selectParcellation: selectParcellationWithTemplate,
         }
       }),
     )

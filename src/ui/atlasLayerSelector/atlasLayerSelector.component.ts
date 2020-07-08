@@ -164,13 +164,20 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     selectParcellationWithName(layer) {
-      this.store$.dispatch(
-        viewerStateToggleLayer({ payload: layer })
-      )
+      const templateChangeRequired = !this.currentTemplateIncludesLayer(layer)
+      if (!templateChangeRequired) {
+        this.store$.dispatch(
+          viewerStateToggleLayer({ payload: layer })
+        )
+      } else {
+        this.store$.dispatch(
+          viewerStateSelectTemplateWithId({ payload: layer.availableIn[0], config: { selectParcellation: layer } })
+        )
+      }
     }
 
     currentTemplateIncludesLayer(layer) {
-      return layer.availableIn.map(a => a['@id']).includes(this.selectedTemplateSpaceId)
+      return layer && layer.availableIn.map(a => a['@id']).includes(this.selectedTemplateSpaceId)
     }
 
     templateIncludesGroup(group) {
@@ -192,5 +199,24 @@ export class AtlasLayerSelector implements OnInit {
 
     getTileTmplClickFnAsCtx(fn: (...arg) => void, param: any) {
       return () => fn.call(this, param)
+    }
+
+    getTooltipText(layer) {
+      if (this.atlas.templateSpaces.map(tmpl => tmpl['@id']).includes(layer['@id'])) return layer.name
+      if (layer.availableIn) {
+        if (this.currentTemplateIncludesLayer(layer)) return layer.name
+        else {
+          const firstAvailableRefSpaceId = layer && Array.isArray(layer.availableIn) && layer.availableIn.length > 0 && layer.availableIn[0]['@id']
+          const firstAvailableRefSpace = firstAvailableRefSpaceId && this.atlas.templateSpaces.find(t => t['@id'] === firstAvailableRefSpaceId)
+          return `${layer.name} 🔄 ${(firstAvailableRefSpace && firstAvailableRefSpace.name) || ''}`
+        }
+      }
+
+      if (layer.parcellations) {
+        if (this.templateIncludesGroup(layer)) return layer.name
+        else return `${layer.name} 🔄`
+      }
+      
+      return layer.name
     }
 }

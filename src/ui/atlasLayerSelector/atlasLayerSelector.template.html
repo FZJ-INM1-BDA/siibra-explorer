@@ -95,9 +95,9 @@
 
     <ng-template #tileContent>
         <div class="d-flex flex-column justify-content-start w-100 mb-1 mt-1 overflow-hidden cursor-pointer singleLayerImageContainer"
-            [matTooltip]="tileSrc.name"
+            [matTooltip]="getTooltipText(tileSrc)"
             matTooltipPosition="above"
-            (click)="!disabled && onClick && onClick()"
+            (click)="onClick && onClick()"
             [ngStyle]="{opacity: disabled ? '0.2': '1' }">
 
             <div class="position-relative d-flex flex-column align-items-center">

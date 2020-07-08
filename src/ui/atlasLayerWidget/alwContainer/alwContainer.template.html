@@ -82,13 +82,11 @@
       <span>
         {{ poi.name }}
       </span>
-      <mat-icon *ngFor="let oDataset of poi.originDatasets"
-        fontSet="fas"
-        fontIcon="fa-info-circle"
-        iav-dataset-show-dataset-dialog
-        [iav-dataset-show-dataset-dialog-kgschema]="oDataset.kgSchema"
-        [iav-dataset-show-dataset-dialog-kgid]="oDataset.kgId">
-      </mat-icon>
+
+      <!-- info btn -->
+      <ng-container *ngTemplateOutlet="infoIcon; context: { source: poi }">
+      </ng-container>
+      
       <mat-icon
         *ngIf="!poiIsBaseLayer"
         (click)="removeNonBaseLayer(poi)"
@@ -144,4 +142,30 @@
     <mat-icon fontSet="fas" fontIcon="fa-times">
     </mat-icon>
   </button>
+</ng-template>
+
+
+<!-- info btn tmpl -->
+<ng-template #infoIcon let-source="source">
+
+  <mat-icon *ngIf="source && source.originDatasets && source.originDatasets.length > 0; else plainBtn"
+    fontSet="fas"
+    fontIcon="fa-info-circle"
+    iav-dataset-show-dataset-dialog
+    [iav-dataset-show-dataset-dialog-kgschema]="source.kgSchema"
+    [iav-dataset-show-dataset-dialog-kgid]="source.kgId">
+  </mat-icon>
+
+  <ng-template #plainBtn>
+
+    <mat-icon
+      *ngIf="source && source.properties && source.properties.name && source.properties.description"
+      fontSet="fas"
+      fontIcon="fa-info-circle"
+      iav-dataset-show-dataset-dialog
+      [iav-dataset-show-dataset-dialog-name]="source.properties.name"
+      [iav-dataset-show-dataset-dialog-description]="source.properties.description">
+    </mat-icon>
+
+  </ng-template>
 </ng-template>
