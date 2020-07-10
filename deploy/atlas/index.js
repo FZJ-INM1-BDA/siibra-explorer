@@ -99,8 +99,7 @@ router.get('/:atlasId', async (req, res) => {
       const lastPathPreview = `preview?${searchParam.toString()}`
       return {
         ...tmpl,
-        previewUrl: getPreviewFn({ res, lastpart: lastPathPreview }),
-        url: getPreviewFn({ res, lastpart: lastTemplatePath })
+        previewUrl: getPreviewFn({ res, lastpart: lastPathPreview })
       }
     })
   })

@@ -7,6 +7,14 @@ const { getIdFromFullId, retry, flattenRegions } = require('../../common/util')
 
 let getPublicAccessToken
 
+const KG_IDS = {
+  PARCELLATIONS: {
+    LONG_BUNDLE: 'juelich/iav/atlas/v1.0.0/5',
+    SHORT_BUNDLE: 'juelich/iav/atlas/v1.0.0/6',
+    JULICH_BRAIN: 'minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579'
+  }
+}
+
 const getUserKGRequestParam = async ({ user }) => {
   let publicAccessToken
   /**
@@ -95,9 +103,9 @@ initPrArray.push(
   readConfigFile('MNI152.json')
     .then(data => JSON.parse(data))
     .then(json => {
-      const longBundle = flattenRegions(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
-      const shortBundle = flattenRegions(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
-      const jubrain = flattenRegions(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
+      const longBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.LONG_BUNDLE).regions)
+      const shortBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) =>  id === KG_IDS.PARCELLATIONS.SHORT_BUNDLE).regions)
+      const jubrain = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.JULICH_BRAIN).regions)
       longBundleSet = populateSet(longBundle)
       shortBundleSet = populateSet(shortBundle)
       juBrainSet = populateSet(jubrain)
