@@ -185,3 +185,4 @@ export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionRe
   }
 }
 
+export const defaultState = initialState

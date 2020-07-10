@@ -64,6 +64,7 @@ env:
     - PPTR_VERSION=2.1.0
     - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
 
+
 # addons:
 #   browserstack:
 #     username: "xiao33"
