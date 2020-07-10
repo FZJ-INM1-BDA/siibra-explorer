@@ -151,7 +151,10 @@
 </ng-template>
 
 <!-- panel control template -->
-<ng-template #panelCtrlTmpl let-panelIndex="panelIndex" let-visible="visible">
+<ng-template
+  #panelCtrlTmpl
+  let-panelIndex="panelIndex"
+  let-visible="visible">
 
   <div class="opacity-crossfade pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }">

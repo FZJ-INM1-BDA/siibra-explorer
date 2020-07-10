@@ -48,8 +48,8 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
           return {
             type: GENERAL_ACTION_TYPES.APPLY_STATE,
             state: {
-              ...storeState,
               ...defaultRootState,
+              ...storeState,
               viewerState: {
                 ...defaultRootState.viewerState,
                 fetchedTemplates: storeState.viewerState.fetchedTemplates,

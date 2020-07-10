@@ -319,13 +319,11 @@ export const cvtSearchParamToState = (searchparams: URLSearchParams, state: IavR
     const selectedAtlas = fetchedAtlases.find(a => a['templateSpaces'].find(t => t['@id'] === (templateSelected && templateSelected['@id'])))
     
     const overlayLayer = selectedAtlas && selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
-    returnState[viewerStateHelperStoreName] = {
-      ...viewreHelperState,
-      selectedAtlasId: selectedAtlas && selectedAtlas['@id'],
-      overlayingAdditionalParcellations: (overlayLayer && !overlayLayer['baseLayer'])
-        ? [ overlayLayer ]
-        : []
-    }
+
+    viewreHelperState['selectedAtlasId'] = selectedAtlas && selectedAtlas['@id']
+    viewreHelperState['overlayingAdditionalParcellations'] = (overlayLayer && !overlayLayer['baseLayer'])
+      ? [ overlayLayer ]
+      : []
   })()
 
   return returnState
