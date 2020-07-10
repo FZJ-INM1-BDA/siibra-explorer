@@ -85,45 +85,42 @@ describe('viewerState.useEffect.ts', () => {
       }).compileComponents()
     }))
 
-    describe('selectTemplateWithName$', () => {
+    describe('selectTemplate$', () => {
 
       it('if coordXform returns error', () => {
-        expect(false).toBe(true)
         const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        // expect(
-        //   viewerStateCtrlEffect.selectTemplateWithName$
-        // ).toBeObservable(
-        //   hot(
-        //     'a',
-        //     {
-        //       a: {
-        //         type: NEWVIEWER,
-        //         selectTemplate: reconstitutedColin,
-        //         selectParcellation: reconstitutedColin.parcellations[0]
-        //       }
-        //     }
-        //   )
-        // )
+        expect(
+          viewerStateCtrlEffect.selectTemplate$
+        ).toBeObservable(
+          hot(
+            'a',
+            {
+              a: {
+                type: NEWVIEWER,
+                selectTemplate: reconstitutedColin,
+                selectParcellation: reconstitutedColin.parcellations[0]
+              }
+            }
+          )
+        )
       })
 
       it('calls with correct param', () => {
-        expect(false).toBe(true)
-        // necessary for observable to fire
         const viewerStateCtrlEffect = TestBed.inject(ViewerStateControllerUseEffect)
-        // expect(
-        //   viewerStateCtrlEffect.selectTemplateWithName$
-        // ).toBeObservable(
-        //   hot(
-        //     'a',
-        //     {
-        //       a: {
-        //         type: NEWVIEWER,
-        //         selectTemplate: reconstitutedColin,
-        //         selectParcellation: reconstitutedColin.parcellations[0]
-        //       }
-        //     }
-        //   )
-        // )
+        expect(
+          viewerStateCtrlEffect.selectTemplate$
+        ).toBeObservable(
+          hot(
+            'a',
+            {
+              a: {
+                type: NEWVIEWER,
+                selectTemplate: reconstitutedColin,
+                selectParcellation: reconstitutedColin.parcellations[0]
+              }
+            }
+          )
+        )
         expect(spy).toHaveBeenCalledWith(
           bigbrainJson.name,
           reconstitutedColin.name,
@@ -145,21 +142,21 @@ describe('viewerState.useEffect.ts', () => {
         }
         updatedColinNavigation.zoomFactor = zoom
         updatedColinNavigation.pose.orientation = orientation
-        expect(false).toBe(true)
-        // expect(
-        //   viewerStateCtrlEffect.selectTemplateWithName$
-        // ).toBeObservable(
-        //   hot(
-        //     'a',
-        //     {
-        //       a: {
-        //         type: NEWVIEWER,
-        //         selectTemplate: updatedColin,
-        //         selectParcellation: updatedColin.parcellations[0]
-        //       }
-        //     }
-        //   )
-        // )
+        
+        expect(
+          viewerStateCtrlEffect.selectTemplate$
+        ).toBeObservable(
+          hot(
+            'a',
+            {
+              a: {
+                type: NEWVIEWER,
+                selectTemplate: updatedColin,
+                selectParcellation: updatedColin.parcellations[0]
+              }
+            }
+          )
+        )
       })
     })
   })

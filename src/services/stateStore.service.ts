@@ -35,6 +35,11 @@ import {
   stateStore as viewerState,
 } from './state/viewerState.store'
 
+import { 
+  defaultState as defaultViewerHelperState,
+  viewerStateHelperStoreName
+} from './state/viewerState.store.helper'
+
 export { pluginState }
 export { viewerConfigState }
 export { NgViewerStateInterface, NgViewerActionInterface, ngViewerState }
@@ -198,9 +203,8 @@ export interface IavRootStoreInterface {
 }
 
 import { DATASTORE_DEFAULT_STATE } from 'src/ui/databrowserModule'
-import { createAction, props } from '@ngrx/store';
 
-export const defaultRootState: IavRootStoreInterface = {
+export const defaultRootState: any = {
   pluginState: pluginDefaultState,
   dataStore: DATASTORE_DEFAULT_STATE,
   ngViewerState: ngViewerDefaultState,
@@ -208,4 +212,5 @@ export const defaultRootState: IavRootStoreInterface = {
   userConfigState: userConfigDefaultState,
   viewerConfigState: viewerConfigDefaultState,
   viewerState: viewerDefaultState,
+  [viewerStateHelperStoreName]: defaultViewerHelperState
 }
