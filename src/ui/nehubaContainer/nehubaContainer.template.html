@@ -23,7 +23,9 @@
   </div>
 </current-layout>
 
-<layout-floating-container [zIndex]="10">
+<layout-floating-container
+  class="overflow-hidden w-100 h-100"
+  [zIndex]="10">
 
   <div *ngIf="templateSelected$ | async"
     class="viewer-config-container d-flex align-items-end pe-none">
