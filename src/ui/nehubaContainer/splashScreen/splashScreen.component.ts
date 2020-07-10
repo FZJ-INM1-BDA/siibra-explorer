@@ -3,7 +3,7 @@ import { select, Store } from "@ngrx/store";
 import { fromEvent, Observable, Subject, Subscription, combineLatest } from "rxjs";
 import { bufferTime, filter, map, switchMap, take, withLatestFrom, shareReplay, startWith } from 'rxjs/operators'
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { NEWVIEWER, ViewerStateInterface, IavRootStoreInterface } from "src/services/stateStore.service";
+import { NEWVIEWER, IavRootStoreInterface } from "src/services/stateStore.service";
 import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { PureContantService } from "src/util";
 
