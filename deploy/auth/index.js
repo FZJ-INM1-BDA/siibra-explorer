@@ -15,7 +15,7 @@ const configureAuth = async (app) => {
   
   const obj = await require('./util')()
   const { initPassportJs } = obj
-  initPassportJs()
+  initPassportJs(app)
 
   await retry(() => hbpOidc(app), { timeout: 1000, retries: 3 })
   await retry(() => hbpOidc2(app), { timeout: 1000, retries: 3 })
