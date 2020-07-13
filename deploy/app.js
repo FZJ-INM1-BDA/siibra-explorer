@@ -160,8 +160,9 @@ app.use('/logo', require('./logo'))
 app.use('/user', require('./user'))
 
 app.get('/ready', async (req, res) => {
+  const authIsReady = await authReady()
   const allReady = [ 
-    await authReady()
+    authIsReady
     /**
      * add other ready endpoints here
      * call sig is await fn(): boolean
