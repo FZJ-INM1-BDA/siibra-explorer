@@ -22,3 +22,8 @@ export const ngViewerActionRemoveNgLayer = createAction(
   '[ngLayerAction] removeNgLayer',
   props<{ layer: Partial<INgLayerInterface>|Partial<INgLayerInterface>[] }>()
 )
+
+export const ngViewerActionSetPerspOctantRemoval = createAction(
+  `[ngViewerAction] setPerspectiveOctant`,
+  props<{ octantRemovalFlag: boolean }>()
+)

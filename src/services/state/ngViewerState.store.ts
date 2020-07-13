@@ -7,7 +7,7 @@ import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateS
 import { Action, select, Store } from '@ngrx/store'
 import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
-import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from './ngViewerState.store.helper'
+import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 
 export const FOUR_PANEL = 'FOUR_PANEL'
@@ -35,6 +35,7 @@ export interface StateInterface {
   panelMode: string
   panelOrder: string
 
+  octantRemoval: boolean
   showSubstrate: boolean
   showZoomlevel: boolean
 }
@@ -54,12 +55,20 @@ export const defaultState: StateInterface = {
   panelMode: FOUR_PANEL,
   panelOrder: `0123`,
 
+  octantRemoval: true,
   showSubstrate: null,
   showZoomlevel: null,
 }
 
 export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
   switch (action.type) {
+  case ngViewerActionSetPerspOctantRemoval.type:{
+    const { octantRemovalFlag } = action as any
+    return {
+      ...prevState,
+      octantRemoval: octantRemovalFlag
+    }
+  }
   case ACTION_TYPES.SET_PANEL_ORDER: {
     const { payload } = action
     const { panelOrder } = payload

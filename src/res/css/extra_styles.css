@@ -120,15 +120,6 @@ label.perspective-panel-show-slice-views:hover
   color:#d7e6f4;
 }
 
-label.perspective-panel-show-slice-views:before
-{
-  margin-left: .2em;
-  content: "toggle frontal octant";
-  visibility: visible;
-  pointer-events: all;
-  color: #337ab7;
-}
-
 [darktheme="true"] label.perspective-panel-show-slice-views:before
 {
   color: #d7e6f4;
