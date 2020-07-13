@@ -49,6 +49,25 @@ const getPublicAccessToken = async () => {
   return __publicAccessToken
 }
 
+const initPassportJs = app => {
+  const passport = require('passport')
+  
+  app.use(passport.initialize())
+  app.use(passport.session())
+
+  passport.serializeUser((user, done) => {
+    const { tokenset, rest } = user
+    objStoreDb.set(user.id, user)
+    done(null, user.id)
+  })
+
+  passport.deserializeUser((id, done) => {
+    const user = objStoreDb.get(id)
+    if (user) return done(null, user)
+    else return done(null, false)
+  })
+}
+
 module.exports = async () => {
 
   const { client } = await configureAuth({
@@ -65,6 +84,7 @@ module.exports = async () => {
   __client = client
 
   return {
+    initPassportJs,
     getPublicAccessToken: async () => await getPublicAccessToken()
   }
 }

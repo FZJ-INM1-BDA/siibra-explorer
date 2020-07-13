@@ -40,7 +40,7 @@ app.use((req, _, next) => {
  * load env first, then load other modules
  */
 
-const configureAuth = require('./auth')
+const { configureAuth, ready: authReady } = require('./auth')
 
 const store = new MemoryStore({
   checkPeriod: 86400000
@@ -158,6 +158,18 @@ app.use('/logo', require('./logo'))
  * User route, for user profile/management
  */
 app.use('/user', require('./user'))
+
+app.get('/ready', async (req, res) => {
+  const allReady = [ 
+    await authReady()
+    /**
+     * add other ready endpoints here
+     * call sig is await fn(): boolean
+     */
+  ].every(f => !!f)
+  if (allReady) return res.status(200).end()
+  else return res.status(400).end()
+})
 
 /**
  * only use compression for production
