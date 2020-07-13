@@ -288,8 +288,14 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       select('navigation'),
       filter(v => !!v)
     )
+
+    this.nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
+      select('ngViewerState'),
+      select('octantRemoval')
+    )
   }
 
+  private nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
   private navigationChanges$: Observable<any>
 
   private viewerPerformanceConfig$: Observable<ViewerConfigStateInterface>
@@ -302,6 +308,16 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
   private subscriptions: Subscription[] = []
 
   ngOnInit(){
+    this.subscriptions.push(
+      this.nehubaViewerPerspectiveOctantRemoval$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag =>{
+        const showPerspectiveSliceViews = this.nehubaViewerInstance?.nehubaViewer?.ngviewer?.showPerspectiveSliceViews
+        if (showPerspectiveSliceViews) showPerspectiveSliceViews.restoreState(flag)
+        else console.warn(`showPerspectiveSliceViews not defined`)
+      })
+    )
+
     this.subscriptions.push(
       this.store$.pipe(
         select('viewerState'),

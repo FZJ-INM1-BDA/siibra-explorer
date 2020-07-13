@@ -34,6 +34,7 @@ import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
+import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState.store.helper";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -88,6 +89,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public onHoverSegment$: Observable<any>
 
+  public nehubaViewerPerspectiveOctantRemoval$: Observable<boolean>
+
   @Input()
   private currentOnHover: {segments: any, landmark: any, userLandmark: any}
 
@@ -132,6 +135,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   ) {
 
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
+
+    this.nehubaViewerPerspectiveOctantRemoval$ = this.store.pipe(
+      select('ngViewerState'),
+      select('octantRemoval')
+    )
 
     this.panelMode$ = this.store.pipe(
       select('ngViewerState'),
@@ -944,6 +952,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       mouseOverNehubaLayers: this.onHoverSegments$,
       getNgHash : this.nehubaViewer.getNgHash,
     }
+  }
+
+  public setOctantRemoval(octantRemovalFlag: boolean) {
+    this.store.dispatch(
+      ngViewerActionSetPerspOctantRemoval({
+        octantRemovalFlag
+      })
+    )
   }
 
   public zoomNgView(panelIndex: number, factor: number) {

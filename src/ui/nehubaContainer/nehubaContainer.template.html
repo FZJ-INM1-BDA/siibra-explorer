@@ -161,6 +161,13 @@
   <div class="opacity-crossfade pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }">
 
+    <!-- perspective specific control -->
+    <ng-container *ngIf="panelIndex === 3">
+      <ng-container *ngTemplateOutlet="perspectiveOctantRemovalTmpl; context: { state: (nehubaViewerPerspectiveOctantRemoval$ | async) }">
+
+      </ng-container>
+    </ng-container>
+
     <!-- factor < 1.0 === zoom in -->
     <button mat-icon-button color="primary"
       (click)="zoomNgView(panelIndex, 0.9)"
@@ -181,4 +188,23 @@
     </maximise-panel-button>
   </div>
 
+</ng-template>
+
+
+<ng-template #perspectiveOctantRemovalTmpl let-state="state">
+  <button
+    (click)="setOctantRemoval(!state)"
+    mat-icon-button
+    color="primary">
+  
+    <!-- octant removal is true -->
+    <ng-template [ngIf]="nehubaViewerPerspectiveOctantRemoval$ | async" [ngIfElse]="octantRemovalOffTmpl">
+      <i class="fas fa-eye-slash"></i>
+    </ng-template>
+
+    <!-- octant removal is false -->
+    <ng-template #octantRemovalOffTmpl>
+      <i class="fas fa-eye"></i>
+    </ng-template>
+  </button>
 </ng-template>
