@@ -148,19 +148,22 @@
 <!-- info btn tmpl -->
 <ng-template #infoIcon let-source="source">
 
-  <mat-icon *ngIf="source && source.originDatasets && source.originDatasets.length > 0; else plainBtn"
-    fontSet="fas"
-    fontIcon="fa-info-circle"
-    iav-dataset-show-dataset-dialog
-    [iav-dataset-show-dataset-dialog-kgschema]="source.kgSchema"
-    [iav-dataset-show-dataset-dialog-kgid]="source.kgId">
-  </mat-icon>
+  <ng-container *ngIf="source && source.originDatasets && source.originDatasets.length > 0; else plainBtn">
+    <mat-icon *ngFor="let source of source.originDatasets"
+      fontSet="fas"
+      fontIcon="fa-info-circle"
+      iav-dataset-show-dataset-dialog
+      [iav-dataset-show-dataset-dialog-kgschema]="source.kgSchema"
+      [iav-dataset-show-dataset-dialog-kgid]="source.kgId">
+    </mat-icon>
+  </ng-container>
 
   <ng-template #plainBtn>
 
     <mat-icon
       *ngIf="source && source.properties && source.properties.name && source.properties.description"
       fontSet="fas"
+      [attr.plain-btn]="true"
       fontIcon="fa-info-circle"
       iav-dataset-show-dataset-dialog
       [iav-dataset-show-dataset-dialog-name]="source.properties.name"
