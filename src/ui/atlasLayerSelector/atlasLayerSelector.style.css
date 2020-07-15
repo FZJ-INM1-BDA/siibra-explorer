@@ -2,8 +2,8 @@
     flex-shrink: 0;
     /*min-width: 100%;*/
     /*min-height: 100%;*/
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 10px;
     -webkit-border-radius: 10px;
     -moz-border-radius: 10px;
@@ -63,8 +63,8 @@
 
 
 .scale-down-bl {
-    -webkit-animation: scale-down-bl .4s cubic-bezier(.25, .46, .45, .94) both;
-    animation: scale-down-bl .4s cubic-bezier(.25, .46, .45, .94) both;
+    -webkit-animation: scale-down-bl .2s cubic-bezier(.25, .46, .45, .94) both;
+    animation: scale-down-bl .2s cubic-bezier(.25, .46, .45, .94) both;
 }
 
 @-webkit-keyframes scale-down-bl {
@@ -115,12 +115,18 @@
 
 .selector-container
 {
-    width: 18rem;
+    width: 21rem;
     bottom: 0;
     z-index: 5;
 }
 
 .single-column-tile
 {
-    width: calc((18rem - 32px)/3);
+    width: calc((28rem - 32px)/3);
+}
+
+.infoButton {
+    height: 15px;
+    width: 40px;
+    border-radius: 10px;
 }
