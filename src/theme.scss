@@ -5,6 +5,7 @@
 @mixin custom-cmp($theme) {
 
   $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
 
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
@@ -13,6 +14,11 @@
   [iv-custom-comp],
   .iv-custom-comp
   {
+    &[bg],
+    &.bg
+    {
+      background-color: mat-color($background, background);
+    }
     &[text],
     &.text
     {

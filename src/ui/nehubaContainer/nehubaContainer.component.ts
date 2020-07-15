@@ -35,6 +35,16 @@ import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
 import { ngViewerActionSetPerspOctantRemoval } from "src/services/state/ngViewerState.store.helper";
+import { SwitchDirective } from "src/util/directives/switch.directive";
+import { 
+  trigger,
+  state,
+  style,
+  animate,
+  transition,
+  
+} from '@angular/animations'
+import { MatDrawer } from "@angular/material/sidenav";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -49,6 +59,38 @@ const {
   styleUrls : [
     `./nehubaContainer.style.css`,
   ],
+  animations: [
+    trigger('openClose', [
+      state('open', style({
+        transform: 'translateY(0)',
+        opacity: 1
+      })),
+      state('closed', style({
+        transform: 'translateY(-100vh)',
+        opacity: 0
+      })),
+      transition('open => closed', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ]),
+      transition('closed => open', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ])
+    ]),
+    trigger('openCloseAnchor', [
+      state('open', style({
+        transform: 'translateY(0)'
+      })),
+      state('closed', style({
+        transform: 'translateY(100vh)'
+      })),
+      transition('open => closed', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ]),
+      transition('closed => open', [
+        animate('200ms cubic-bezier(0.35, 0, 0.25, 1)')
+      ])
+    ]),
+  ],
   exportAs: 'uiNehubaContainer',
 })
 
@@ -60,6 +102,18 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   @ViewChild(NehubaViewerContainerDirective,{static: true})
   public nehubaContainerDirective: NehubaViewerContainerDirective
+
+  @ViewChild('sideNavMasterSwitch', { static: true })
+  private navSideDrawerMainSwitch: SwitchDirective
+
+  @ViewChild('sideNavSwitch', { static: true })
+  private navSideDrawerSwitch: SwitchDirective
+
+  @ViewChild('matDrawerMaster', { static: true })
+  private matDrawerMaster: MatDrawer
+
+  @ViewChild('matDrawerMinor', { static: true })
+  private matDrawerMinor: MatDrawer
 
   @Output()
   public nehubaViewerLoaded: EventEmitter<boolean> = new EventEmitter()
@@ -79,7 +133,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public templateSelected$: Observable<any>
   private newViewer$: Observable<any>
   private selectedParcellation$: Observable<any>
-  private selectedRegions$: Observable<any[]>
+  public selectedRegions: any[] = []
+  public selectedRegions$: Observable<any[]>
   public selectedLandmarks$: Observable<any[]>
   public selectedPtLandmarks$: Observable<any[]>
   private hideSegmentations$: Observable<boolean>
@@ -603,11 +658,24 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     /* setup init view state */
     
-    this.selectedRegions$.pipe(
-      filter(() => !!this.nehubaViewer),
-    ).subscribe(regions => {
-      this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
-    })
+    this.subscriptions.push(
+      this.selectedRegions$.pipe(
+        filter(() => !!this.nehubaViewer),
+      ).subscribe(regions => {
+        this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
+      })
+    )
+
+    /** switch side nav */
+    this.subscriptions.push(
+      this.selectedRegions$.subscribe(regions => {
+        this.selectedRegions = regions
+        if (regions.length > 0) {
+          this.matDrawerMinor && this.matDrawerMinor.open()
+          this.navSideDrawerMainSwitch && this.navSideDrawerMainSwitch.open()
+        }
+      })
+    )
 
     /* handler to open/select landmark */
     const clickObs$ = fromEvent(this.elementRef.nativeElement, 'click')

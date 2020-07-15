@@ -88,11 +88,12 @@ import { importNehubaFactory } from "./nehubaContainer/util";
 import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
 import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
-import { AtlasLayerContainer } from "./atlasLayerWidget/alwContainer/alwContainer.component";
 import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.component";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 @NgModule({
   imports : [
+    BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -149,7 +150,6 @@ import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.c
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
-    AtlasLayerContainer,
 
     ActionDialog,
 

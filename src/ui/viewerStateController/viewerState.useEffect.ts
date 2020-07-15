@@ -279,18 +279,31 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       withLatestFrom(this.selectedRegions$),
       map(([action, regionsSelected]) => {
 
-        const {payload = {}} = action as ViewerStateAction
+        const { payload = {} } = action as ViewerStateAction
         const { region } = payload
 
-        const flattenedRegion = regionFlattener(region).filter(r => isDefined(r.labelIndex))
-        const flattenedRegionNames = new Set(flattenedRegion.map(r => r.name))
-        const selectedRegionNames = new Set(regionsSelected.map(r => r.name))
-        const selectAll = flattenedRegion.every(r => !selectedRegionNames.has(r.name))
+        /**
+         * if region does not have labelIndex (not tree leaf), for now, return error
+         */
+        if (!region.labelIndex) {
+          return {
+            type: GENERAL_ACTION_TYPES.ERROR,
+            payload: {
+              message: 'Currently, only regions at the lowest hierarchy can be selected.',
+            },
+          }
+        }
+
+        /**
+         * if the region is already selected, deselect it
+         * if the region is not yet selected, deselect any existing region, and select this region
+         */
+        const roiIsSelected = !!regionsSelected.find(r => r.name === region.name)
         return {
           type: SELECT_REGIONS,
-          selectRegions: selectAll
-            ? regionsSelected.concat(flattenedRegion)
-            : regionsSelected.filter(r => !flattenedRegionNames.has(r.name)),
+          selectRegions: roiIsSelected
+            ? []
+            : [ region ]
         }
       }),
     )

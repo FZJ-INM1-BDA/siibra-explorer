@@ -1,3 +1,27 @@
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); 
+}
+
 html
 {
   width:100%;
@@ -467,7 +491,7 @@ markdown-dom pre code
 
 .bg-none
 {
-  background:none!important;
+  background: none!important;
 }
 
 .dot
@@ -683,9 +707,9 @@ kg-dataset-previewer > img
   margin-right: -1rem!important;
 }
 
-.mt-5-n
+.mt-4-n
 {
-  margin-top: -1.25rem!important;
+  margin-top: -1rem!important;
 }
 
 .mb-6
@@ -714,3 +738,4 @@ kg-dataset-previewer > img
 {
   width: 100%;
 }
+

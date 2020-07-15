@@ -5,7 +5,10 @@ type TypeMatBtnColor = 'basic' | 'primary' | 'accent' | 'warn'
 
 @Component({
   selector: 'iav-dynamic-mat-button',
-  templateUrl: './dynamicMaterialBtn.template.html'
+  templateUrl: './dynamicMaterialBtn.template.html',
+  styleUrls: [
+    './dynamicMaterialBtn.style.css'
+  ]
 })
 
 export class DynamicMaterialBtn{

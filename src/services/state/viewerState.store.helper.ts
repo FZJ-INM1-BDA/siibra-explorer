@@ -11,6 +11,11 @@ export interface IRegion{
   [key: string]: string
 }
 
+export const viewerStateSetSelectedRegionsWithIds = createAction(
+  `[viewerState] setSelectedRegionsWithIds`,
+  props<{ selectRegionIds: string[] }>()
+)
+
 export const viewerStateSetSelectedRegions = createAction(
   '[viewerState] setSelectedRegions',
   props<{ selectRegions: IRegion[] }>()

@@ -27,36 +27,261 @@
   class="overflow-hidden w-100 h-100"
   [zIndex]="10">
 
-  <div *ngIf="templateSelected$ | async"
-    class="viewer-config-container d-flex align-items-end pe-none">
-    <!-- Viewer Selector Container-->
-    <atlas-layer-selector
-      #alSelector="atlasLayerSelector"
-      class="pe-all"
-      (iav-outsideClick)="alSelector.selectorExpanded = false">
-    </atlas-layer-selector>
+  <!-- drawer #1 -->
+  <mat-drawer-container
+    [iav-switch-initstate]="false"
+    iav-switch
+    #sideNavMasterSwitch="iavSwitch"
+    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    [hasBackdrop]="false">
 
-    <atlas-layer-container
-      class="pe-none overflow-visible"
-      (iav-outsideClick)="alwWidget.visibleTab = null"
-      #alwWidget="atlasLayerWidgetContainer">
-    </atlas-layer-container>
-  </div>
+    <!-- sidenav-content -->
+    <mat-drawer class="box-shadow-none pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
+      mode="push"
+      [opened]="sideNavMasterSwitch.switchState"
+      [autoFocus]="false"
+      (closedStart)="sideNavSwitch.switchState && matDrawerMinor.close()"
+      (openedStart)="sideNavSwitch.switchState && matDrawerMinor.open()"
+      [disableClose]="true"
+      #matDrawerMaster="matDrawer">
+      
 
-  <!-- StatusCard container-->
-  <div *ngIf="viewerLoaded" class="viewer-status-container pe-none m-2">
-    <atlas-dropdown-selector class="pe-all">
-    </atlas-dropdown-selector>
-    <div class="muted-7 mt-5-n">
-      <ui-status-card
-        class="pe-all"
-        [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
-        [nehubaViewer]="nehubaViewer">
-      </ui-status-card>
-    </div>
+      <div class="h-0 w-100 region-text-search-autocomplete-position">
+        <ng-container *ngTemplateOutlet="autocompleteTmpl">
+        </ng-container>
+      </div>
 
-  </div>
+      <button mat-raised-button
+        (click)="matDrawerMinor.open()"
+        class="explore-btn pe-all"
+        [color]="selectedRegions.length > 0 ? 'accent' : 'basic'">
+        Explore regional features & connectivity
+      </button>
+    </mat-drawer>
+    <mat-drawer-content class="visible position-relative">
+
+      <div *ngIf="viewerLoaded" class="viewer-status-container pe-none m-2">
+        <button mat-raised-button
+          class="pe-all tab-toggle"
+          (click)="sideNavMasterSwitch.toggle()"
+          [color]="!sideNavMasterSwitch.switchState && selectedRegions.length > 0 ? 'accent' : 'basic'">
+          <i class="fas" [ngClass]="sideNavMasterSwitch.switchState ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+        </button>
+
+        <!-- atlas selector -->
+        <atlas-dropdown-selector class="pe-all">
+        </atlas-dropdown-selector>
+
+        <!-- StatusCard container-->
+        <div class="muted-7 mt-4-n">
+          <ui-status-card
+            class="pe-all"
+            [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
+            [nehubaViewer]="nehubaViewer">
+          </ui-status-card>
+        </div>
+      </div>
+
+    </mat-drawer-content>
+  </mat-drawer-container>
+
+  <!-- drawer #2 -->
+  <mat-drawer-container
+    [iav-switch-initstate]="true"
+    iav-switch
+    #sideNavSwitch="iavSwitch"
+    class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
+    [hasBackdrop]="false">
+
+    <!-- sidenav-content -->
+    <mat-drawer class="visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
+      mode="push"
+      [autoFocus]="false"
+      #matDrawerMinor="matDrawer"
+      (openedChange)="$event && sideNavSwitch.open()"
+      [disableClose]="true"
+      [@openClose]="sideNavMasterSwitch.switchState && sideNavSwitch.switchState ? 'open' : 'closed'"
+      (@openClose.done)="$event.toState === 'closed' && matDrawerMinor.close()">
+
+      <div class="position-relative d-flex flex-column h-100">
+
+        <!-- region search autocomplete  -->
+        
+        <div class="h-0 w-100 region-text-search-autocomplete-position"
+          [@openCloseAnchor]="sideNavSwitch.switchState ? 'open' : 'closed'">
+          <ng-container *ngTemplateOutlet="autocompleteTmpl">
+          </ng-container>
+        </div>
+
+        <ng-container *ngTemplateOutlet="sidenavTmpl">
+        </ng-container>  
+      </div>
+    </mat-drawer>
+
+    <!-- main-content -->
+    <mat-drawer-content class="visible position-relative">
+  
+      <div *ngIf="templateSelected$ | async"
+        class="viewer-config-container d-flex align-items-end pe-none">
+        <!-- Viewer Selector Container-->
+        <atlas-layer-selector
+          #alSelector="atlasLayerSelector"
+          class="pe-all"
+          (iav-outsideClick)="alSelector.selectorExpanded = false">
+        </atlas-layer-selector>
+        
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
+
 </layout-floating-container>
+
+<!-- sidenav tmpl -->
+<ng-template #sidenavTmpl>
+
+  <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
+    [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
+    <!-- region detail -->
+    <ng-container *ngIf="selectedRegions$ | async as selectedRegions; else selectRegionErrorTmpl">
+      <ng-container *ngFor="let region of selectedRegions">
+        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: region }">
+
+        </ng-container>
+      </ng-container>
+
+      <!-- place holder if length < 0 -->
+      <ng-container *ngIf="selectedRegions.length === 0">
+        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: false }">
+        </ng-container>
+      </ng-container>
+    </ng-container>
+
+    <div class="spacer">
+    </div>
+  </div>
+
+  <!-- collapse btn -->
+  <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
+    <button mat-raised-button class="mat-elevation-z8"
+      (click)="sideNavSwitch.close()"
+      [color]="selectedRegions.length > 0 ? 'accent' : 'basic'">
+      <i class="fas fa-chevron-up"></i>
+      <span>
+        collapse
+      </span>
+    </button>
+  </div>
+
+</ng-template>
+
+<ng-template #empty>
+</ng-template>
+
+<ng-template #autocompleteTmpl>
+  <div class="iv-custom-comp bg region-text-search-autocomplete w-100 mat-elevation-z8 pe-all">
+    <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
+    </region-text-search-autocomplete>
+  </div>
+</ng-template>
+
+<ng-template #selectRegionErrorTmpl>
+  SELECT REGION ERROR
+</ng-template>
+
+<!-- single region template -->
+<ng-template #singleRegionTmpl let-region="region">
+  <ng-template #regionDetailTmpl>
+    <div class="placeholder-region-detail">
+      <span class="text-muted">
+        Select a region by clicking on the viewer or search from above
+      </span>
+    </div>
+  </ng-template>
+
+  <!-- region detail -->
+  <ng-container *ngIf="region; else regionDetailTmpl">
+    <region-menu
+      [region]="region"
+      class="side-nav-cover">
+    </region-menu>
+  </ng-container>
+
+  <!-- regional features -->
+  <mat-card class="mt-2 side-nav-cover feature-card d-flex flex-column">
+    <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
+      Regional features
+    </mat-card-subtitle>
+    
+    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card overflow-hidden">
+      <ng-container *ngIf="region; else regionalFeaturesPlaceholderTmpl">
+        <data-browser
+          [template]="templateSelected$ | async"
+          [parcellation]="selectedParcellation"
+          [regions]="[region]">
+        </data-browser>
+      </ng-container>
+  
+      <!-- place holder regional features -->
+      <ng-template #regionalFeaturesPlaceholderTmpl>
+
+        <span *ngIf="selectedParcellation">
+          Regional features available in {{ selectedParcellation.name }}
+        </span>
+
+        <div class="d-inline-flex w-100 modality-card-container">
+          <mat-card class="flex-grow-0 flex-shrink-0 modality-card m-2" *ngFor="let dataM of dataBrowser.countedDataM">
+            <mat-card-content>
+              <span>
+                {{ dataM.name }}
+              </span>
+              <small class="text-muted">
+                ({{ dataM.occurance }})
+              </small>
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <data-browser
+          class="invisible"
+          [template]="templateSelected$ | async"
+          [parcellation]="selectedParcellation"
+          #dataBrowser="dataBrowser">
+        </data-browser>
+      </ng-template>
+    </mat-card-content>
+
+  </mat-card>
+
+  <mat-card class="mt-2 side-nav-cover feature-card d-flex flex-column">
+    <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
+      Connectivity
+    </mat-card-subtitle>
+
+    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card">
+      <!-- add connectivity component -->
+
+      <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
+        <hbp-connectivity-matrix-row 
+          [region]="region.name"
+          theme="dark"
+          show-export="true"
+          show-source="true"
+          show-title="false"
+          show-toolbar="false"
+          show-description="false"
+          show-dataset-name="false"
+          custom-dataset-selector="true"
+          loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+          dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies">
+        </hbp-connectivity-matrix-row>
+      </ng-container>
+  
+      <ng-template #cnctvtyPlaceholderTmpl>
+        CONNECTIVITY PLACEHOLDER
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
 
 <div id="scratch-pad">
 </div>
