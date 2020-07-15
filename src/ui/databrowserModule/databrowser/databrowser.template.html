@@ -1,48 +1,43 @@
-<mat-card class="h-100 w-100 overflow-hidden d-block flex-grow-1 flex-shrink-1 d-flex flex-column">
+<!-- transclusion header -->
+<ng-content select="[card-header]">
+</ng-content>
 
-  <!-- transclusion header -->
-  <ng-content select="[card-header]">
-  </ng-content>
+<!-- transclusion content prepend -->
+<ng-content select="[card-content='prepend']">
+</ng-content>
+
+<!-- modality filter -->
+<div class="mb-1" >
+  <ng-container *ngTemplateOutlet="modalitySelector">
+  </ng-container>
+</div>
+
+<!-- if still loading, show spinner -->
+<ng-template [ngIf]="fetchingFlag" [ngIfElse]="resultsTmpl">
+  <ng-container *ngTemplateOutlet="loadingSpinner">
+  </ng-container>
+</ng-template>
+
+<!-- else, show fetched -->
+<ng-template #resultsTmpl>
+
+  <!-- if error, show error only -->
+  <ng-template [ngIf]="fetchError">
+    <ng-container *ngTemplateOutlet="errorTemplate">
+    </ng-container>
+  </ng-template>
+
+  <!-- if not error, show dataset template -->
   
-  <!-- transclusion content prepend -->
-  <ng-content select="[card-content='prepend']">
-  </ng-content>
-
-  <!-- modality filter -->
-  <div class="mb-1" >
-    <ng-container *ngTemplateOutlet="modalitySelector">
-    </ng-container>
-  </div>
-
-  <!-- if still loading, show spinner -->
-  <ng-template [ngIf]="fetchingFlag" [ngIfElse]="resultsTmpl">
-    <ng-container *ngTemplateOutlet="loadingSpinner">
+  <ng-template [ngIf]="!fetchError">
+    <ng-container *ngTemplateOutlet="datasetTemplate">
     </ng-container>
   </ng-template>
+</ng-template>
 
-  <!-- else, show fetched -->
-  <ng-template #resultsTmpl>
-
-    <!-- if error, show error only -->
-    <ng-template [ngIf]="fetchError">
-      <ng-container *ngTemplateOutlet="errorTemplate">
-      </ng-container>
-    </ng-template>
-
-    <!-- if not error, show dataset template -->
-    
-    <ng-template [ngIf]="!fetchError">
-      <ng-container *ngTemplateOutlet="datasetTemplate">
-      </ng-container>
-    </ng-template>
-  </ng-template>
-
-  <!-- footer, populated by content transclusion -->
-  <mat-card-footer>
-    <ng-content select="[card-footer]">
-    </ng-content>
-  </mat-card-footer>
-</mat-card>
+<!-- footer, populated by content transclusion -->
+<ng-content select="[card-footer]">
+</ng-content>
 
 <ng-template #loadingSpinner>
   <mat-card-content class="h-100">
@@ -107,7 +102,7 @@
         <mat-panel-title class="d-inline-flex align-items-center">
           <div class="flex-grow-1 flex-shrink-1 d-flex flex-column">
             <span>
-                Related datasets
+                Filter features
             </span>
             <small *ngIf="dataentries.length > 0" class="text-muted">
               <ng-template [ngIf]="modalityPickerCmp && modalityPickerCmp.checkedModality.length > 0"
@@ -116,7 +111,7 @@
               </ng-template>
               
               <ng-template #noFilterTmpl>
-                {{ dataentries.length }} datasets
+                {{ dataentries.length }} features
               </ng-template>
             </small>
           </div>

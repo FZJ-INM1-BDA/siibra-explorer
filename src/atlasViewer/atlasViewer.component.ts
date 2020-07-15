@@ -13,7 +13,7 @@ import {
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { Observable, Subscription, combineLatest, interval, merge, of, timer, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith, shareReplay } from "rxjs/operators";
 
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
@@ -44,6 +44,7 @@ export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
+import { viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
 
 /**
  * TODO
@@ -75,7 +76,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   @ViewChild(NehubaContainer) public nehubaContainer: NehubaContainer
 
-  @ViewChild(FixedMouseContextualContainerDirective) public rClContextualMenu: FixedMouseContextualContainerDirective
   @ViewChild(MouseHoverDirective) private mouseOverNehuba: MouseHoverDirective
 
   @ViewChild('idleOverlay', {read: TemplateRef}) idelTmpl: TemplateRef<any>
@@ -94,17 +94,15 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public snackbarMessage$: Observable<string>
 
   public dedicatedView$: Observable<string | null>
-  public onhoverSegments$: Observable<string[]>
+  public onhoverSegments: any[]
+  public onhoverSegments$: Observable<any[]>
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
-  public onhoverLandmarkForFixed$: Observable<any>
 
   private subscriptions: Subscription[] = []
 
   public unsupportedPreviewIdx: number = 0
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
-
-  public onhoverSegmentsForFixed$: Observable<string[]>
 
   public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
 
@@ -261,6 +259,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     }
 
     this.subscriptions.push(
+      this.onhoverSegments$.subscribe(seg => this.onhoverSegments = seg)
+    )
+
+    this.subscriptions.push(
       this.pureConstantService.useTouchUI$.subscribe(bool => this.ismobile = bool),
     )
 
@@ -347,39 +349,17 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     ).subscribe(() => {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
-
-    this.onhoverSegmentsForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(this.onhoverSegments$),
-      map(([_flag, onhoverSegments]) => onhoverSegments || []),
-    )
-
-    this.onhoverLandmarkForFixed$ = this.rClContextualMenu.onShow.pipe(
-      withLatestFrom(
-        this.onhoverLandmark$ || of(null)
-      ),
-      map(([_flag, onhoverLandmark]) => onhoverLandmark)
-    )
   }
 
   public mouseClickDocument(event: MouseEvent) {
 
-    const dismissRClCtxtMenu = this.rClContextualMenu.isShown
-
     const next = () => {
-
-      if (!this.rClContextualMenu) { return }
-
-      if (dismissRClCtxtMenu) {
-        if (!this.rClContextualMenu.el.nativeElement.contains(event.target)) {
-          this.rClContextualMenu.hide()
-        }
-      } else {
-        this.rClContextualMenu.mousePos = [
-          event.clientX,
-          event.clientY,
-        ]
-        this.rClContextualMenu.show()
-      } 
+      if (!this.onhoverSegments) return
+      this.store.dispatch(
+        viewerStateSetSelectedRegions({
+          selectRegions: this.onhoverSegments
+        })
+      )
     }
 
     this.nehubaClickOverride(next)

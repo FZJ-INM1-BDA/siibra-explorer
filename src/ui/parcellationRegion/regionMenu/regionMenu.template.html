@@ -1,16 +1,23 @@
 <mat-card>
-  <mat-card-title>
-    <div class="position-relative region-name">
-      {{ region.name }}
-      <small *ngIf="region.status"> ({{region.status}})</small>
-    </div>
-  </mat-card-title>
-  <mat-card-subtitle>
-    <i class="fas fa-brain"></i>
-    <span>
-      Brain region
-    </span>
-  </mat-card-subtitle>
+  <!-- rgbDarkmode must be checked for strict equality to true/false 
+  as if rgb is undefined, rgbDarkmode will be null/undefined
+  which is falsy -->
+  <div class="header-container"
+    [ngClass]="{'darktheme': rgbDarkmode === true, 'lighttheme': rgbDarkmode === false}"
+    [style.backgroundColor]="rgbString">
+    <mat-card-title>
+      <div class="position-relative region-name iv-custom-comp text">
+        {{ region.name }}
+        <small *ngIf="region.status"> ({{region.status}})</small>
+      </div>
+    </mat-card-title>
+    <mat-card-subtitle class="mb-0">
+      <i class="fas fa-brain"></i>
+      <span class="text">
+        Brain region
+      </span>
+    </mat-card-subtitle>
+  </div>
 
   <mat-card-content>
     <mat-divider></mat-divider>
@@ -26,18 +33,6 @@
     <mat-divider></mat-divider>
 
     <mat-list class="action-list sm">
-
-      <!-- selected -->
-      <mat-list-item
-        mat-ripple
-        iv-custom-comp
-        [attr.primary]="isSelected || null"
-        (click)="toggleRegionSelected()">
-        <mat-icon scaled-down="" fontSet="far" [fontIcon]="isSelected ? 'fa-check-square' : 'fa-square'"  mat-list-icon></mat-icon>
-        <div mat-line>
-          Select
-        </div>
-      </mat-list-item>
 
       <!-- position -->
       <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>

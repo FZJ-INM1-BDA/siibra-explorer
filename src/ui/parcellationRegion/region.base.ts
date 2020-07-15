@@ -4,11 +4,13 @@ import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConn
 import { distinctUntilChanged, switchMap, filter } from "rxjs/operators";
 import { Observable, BehaviorSubject } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
-import { flattenRegions, getIdFromFullId } from 'common/util'
+import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
 
 export class RegionBase {
 
+  public rgbString: string
+  public rgbDarkmode: boolean
 
   private _region: any
 
@@ -20,6 +22,10 @@ export class RegionBase {
   set region(val) {
     this._region = val
     this.region$.next(this.region)
+    if (!this.region.rgb) return
+    this.rgbString = `rgb(${this.region.rgb.join(',')})`
+    const [h, s, l] = rgbToHsl(...this.region.rgb)
+    this.rgbDarkmode = l < 0.4
   }
   
   private region$: BehaviorSubject<any> = new BehaviorSubject(null)

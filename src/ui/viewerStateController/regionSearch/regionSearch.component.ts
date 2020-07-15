@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, TemplateRef, ViewChild } from "@angular/core";
 import { FormControl } from "@angular/forms";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap } from "rxjs/operators";
+import { combineLatest, Observable, Subject, merge } from "rxjs";
+import { debounceTime, distinctUntilChanged, filter, map, shareReplay, startWith, take, tap, withLatestFrom } from "rxjs/operators";
 import { VIEWER_STATE_ACTION_TYPES } from "src/services/effect/effect";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, CHANGE_NAVIGATION, SELECT_REGIONS } from "src/services/state/viewerState.store";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, IavRootStoreInterface } from "src/services/stateStore.service";
@@ -10,7 +10,7 @@ import { LoggingService } from "src/logging";
 import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PureContantService } from "src/util";
-import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -28,13 +28,18 @@ const compareFn = (it, item) => it.name === item.name
 
 export class RegionTextSearchAutocomplete {
 
+  public renderInputText(regionsSelected: any[]){
+    return regionsSelected && regionsSelected.length > 0 && regionsSelected[0].name || ''
+  }
+
+  public manualRenderList$: Subject<any> = new Subject()
+
   public compareFn = compareFn
 
   @Input() public ariaLabel: string = `Search for any region of interest in the atlas selected`
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
 
-  @ViewChild('autoTrigger', {read: ElementRef}) public autoTrigger: ElementRef
   @ViewChild('regionHierarchyDialog', {read: TemplateRef}) public regionHierarchyDialogTemplate: TemplateRef<any>
 
   public useMobileUI$: Observable<boolean>
@@ -82,20 +87,6 @@ export class RegionTextSearchAutocomplete {
       shareReplay(1),
     )
 
-    this.autocompleteList$ = combineLatest(
-      this.formControl.valueChanges.pipe(
-        startWith(''),
-        distinctUntilChanged(),
-        debounceTime(200),
-      ),
-      this.regionsWithLabelIndex$.pipe(
-        startWith([]),
-      ),
-    ).pipe(
-      map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
-      map(arr => arr.slice(0, 5)),
-    )
-
     this.regionsSelected$ = viewerState$.pipe(
       select('regionsSelected'),
       distinctUntilChanged(),
@@ -105,6 +96,27 @@ export class RegionTextSearchAutocomplete {
       }),
       startWith([]),
       shareReplay(1),
+    )
+
+    this.autocompleteList$ = combineLatest(
+      merge(
+        this.manualRenderList$.pipe(
+          withLatestFrom(this.regionsSelected$),
+          map(([_, selectedRegions]) => this.renderInputText(selectedRegions)),
+          startWith('')
+        ),
+        this.formControl.valueChanges.pipe(
+          startWith(''),
+          distinctUntilChanged(),
+          debounceTime(200),
+        )
+      ),
+      this.regionsWithLabelIndex$.pipe(
+        startWith([]),
+      ),
+    ).pipe(
+      map(([searchTerm, regionsWithLabelIndex]) => regionsWithLabelIndex.filter(filterRegionBasedOnText(searchTerm))),
+      map(arr => arr.slice(0, 5)),
     )
 
     this.parcellationSelected$ = viewerState$.pipe(
@@ -138,8 +150,12 @@ export class RegionTextSearchAutocomplete {
     })
   }
 
-  public optionSelected(_ev: MatAutocompleteSelectedEvent) {
-    this.autoTrigger.nativeElement.value = ''
+  public optionSelected(_ev?: MatAutocompleteSelectedEvent) {
+    this.store$.dispatch(
+      viewerStateSetSelectedRegionsWithIds({
+        selectRegionIds: _ev ? [ _ev.option.value ] : []
+      })
+    )
   }
 
   private regionsWithLabelIndex$: Observable<any[]>
@@ -213,4 +229,12 @@ export class RegionTextSearchAutocomplete {
     ).subscribe(() => this.focused = false)
   }
 
+  public deselectAndSelectRegion(region: any) {
+    console.log('region', region)
+    this.store$.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: [ region ]
+      })
+    )
+  }
 }

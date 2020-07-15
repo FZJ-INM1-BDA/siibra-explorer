@@ -13,15 +13,6 @@ atlas-layer-container
   height: 50em;
 }
 
-input[navigateInput]
-{
-  background:none;
-  width : 16em;
-  padding-left: 0.5em;
-  font-size:85%;
-  box-shadow: inset 0px 2px 2px 2px rgba(0,0,0,0.05);
-}
-
 current-layout
 {
   top: 0;
@@ -30,56 +21,6 @@ current-layout
   /** TODO decide which behaviour is more nature */
   z-index: 6;
 }
-
-div[landmarkMasterContainer]
-{
-  background:none;
-  position: absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-wrap: wrap;
-  pointer-events: none;
-}
-
-div[landmarkMasterContainer] > div
-{
-  flex: 0 0 50%;
-  height:50%;
-  overflow:hidden;
-  pointer-events: none;
-  position : relative;
-  border: 1 px solid blue;
-}
-
-
-div[landmarkMasterContainer] > div > [landmarkContainer] > div
-{
-  position : absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  margin-left:-0.5em;
-  margin-top:-1em;
-}
-
-
-[citationContainer]
-{
-  display:inline-block;
-  max-width:300px;
-  box-sizing: border-box;
-  padding: 0.5em 1em;
-}
-
-hr
-{
-  margin : 0.2em 2em;
-}
-
 
 div.loadingIndicator
 {
@@ -119,12 +60,6 @@ div#scratch-pad
   width: 100%;
   height: 100%;
   pointer-events: none;
-}
-
-.load-fav-dataentries-fab
-{
-  right: 0;
-  bottom: 0;
 }
 
 .overlay-btn-container
@@ -179,4 +114,84 @@ div#scratch-pad
 :host-context([darktheme="true"]) .screen-overlay
 {
   background-color: rgba(0, 0, 0, 0.7);
+}
+
+.side-nav-cover
+{
+  
+  margin-left: -15px;
+  margin-right: -15px;
+
+  box-sizing: border-box;
+}
+
+.feature-card
+{
+ 
+  height: 20em;
+  max-height: 20em;
+  flex: 0 0 20em;
+  align-items: flex-start; 
+}
+
+.region-populated .feature-card
+{
+  height: 25em;
+  max-height: 25em;
+  flex: 0 0 25em;
+  align-items: flex-start;
+}
+
+.region-text-search-autocomplete-position
+{
+  z-index: 10;
+  position: sticky;
+  top: 0.5rem;
+}
+
+.collapse-position
+{
+  z-index: 10;
+  position: sticky;
+  bottom: 0.5rem;
+}
+
+.region-text-search-autocomplete
+{
+  padding: 0 1em 0 1.5em;
+  border-radius: 0.25em;
+}
+
+.placeholder-region-detail
+{
+  margin-top: 6rem;
+}
+
+.explore-btn
+{
+  margin-top: 4.5rem;
+  width: 100%;
+}
+
+.modality-card-container
+{
+  overflow-x: scroll;
+}
+
+.modality-card
+{
+  width: 10em;
+}
+
+.spacer
+{
+  height: 6rem;
+}
+
+.tab-toggle
+{
+  margin-left: -2.5rem;
+  padding-right: 0.75rem;
+  margin-right: 1rem;
+  text-align: right;
 }
