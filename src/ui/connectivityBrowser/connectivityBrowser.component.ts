@@ -67,7 +67,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       this.connectivityRegion$ = this.store$.pipe(
         select('viewerState'),
         safeFilter('connectivityRegion'),
-        map(state => state.connectivityRegion),
+        map(state => state.connectivityRegion)
       )
 
       this.selectedRegions$ = this.store$.pipe(
@@ -103,7 +103,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
           }
         }),
         this.connectivityRegion$.subscribe(cr => {
-          if (cr) {
+          if (cr && cr.length) {
             this.region = cr
             this.changeDetectionRef.detectChanges()
           }
@@ -155,7 +155,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
-      this.closeConnectivityView()
     }
 
     public updateConnevtivityRegion(regionName) {

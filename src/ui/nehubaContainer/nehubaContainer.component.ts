@@ -158,8 +158,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public selectedParcellation: any | null
 
-  public selectedParcellationHasConnectivity: boolean = false
-
   public nehubaViewer: NehubaViewerUnit
   private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>> = new Map()
   private landmarksLabelIndexMap: Map<number, any> = new Map()
@@ -573,14 +571,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       })
     )
 
-    this.subscriptions.push(
-      this.selectedParcellation$.subscribe(parcellation => {
-        this.selectedParcellationHasConnectivity = parcellation.hasAdditionalViewMode
-        && parcellation.hasAdditionalViewMode.includes('connectivity')? true : false
-        return this.handleParcellation(parcellation)
-      }),
-    )
-
     let prevParcellation = null
 
     this.subscriptions.push(
@@ -599,13 +589,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         this.selectedParcellation$,
         this.store.pipe(
           select('viewerState'),
-          safeFilter('connectivityVisible'),
-          map(state => state.connectivityVisible),
+          safeFilter('overwrittenColorMap'),
+          map(state => state.overwrittenColorMap),
           distinctUntilChanged()
         )
       ).pipe(
         delayWhen(() => timer())
-      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, connectivityVisible]) => {
+      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, overwrittenColorMap]) => {
         if (!this.nehubaViewer) { return }
 
         const { ngId: defaultNgId } = selectedParcellation
@@ -619,7 +609,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           return
         }
 
-        this.selectedRegionIndexSet.size > 0 && !connectivityVisible
+        this.selectedRegionIndexSet.size > 0 && !overwrittenColorMap
           ? this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
           : this.nehubaViewer.showAllSeg()
 

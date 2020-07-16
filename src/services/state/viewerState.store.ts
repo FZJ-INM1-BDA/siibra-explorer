@@ -27,7 +27,7 @@ export interface StateInterface {
 
   loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
-  connectivityVisible: boolean
+  overwrittenColorMap: boolean
 
   standaloneVolumes: any[]
 }
@@ -66,7 +66,7 @@ export const defaultState: StateInterface = {
   parcellationSelected: null,
   templateSelected: null,
   connectivityRegion: '',
-  connectivityVisible: false,
+  overwrittenColorMap: false,
   standaloneVolumes: []
 }
 
@@ -226,7 +226,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
   case SET_CONNECTIVITY_VISIBLE:
     return {
       ...prevState,
-      connectivityVisible: action.payload,
+      overwrittenColorMap: action.payload,
     }  
   default :
     return prevState
