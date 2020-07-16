@@ -364,28 +364,17 @@
 
   </mat-card>
 
-  <mat-card class="mt-2 side-nav-cover feature-card d-flex flex-column">
+  <mat-card *ngIf="selectedParcellationHasConnectivity" class="mt-2 side-nav-cover d-flex flex-column">
     <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
       Connectivity
     </mat-card-subtitle>
 
-    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card">
+    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
       <!-- add connectivity component -->
-
       <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
-        <hbp-connectivity-matrix-row 
-          [region]="region.name"
-          theme="dark"
-          show-export="true"
-          show-source="true"
-          show-title="false"
-          show-toolbar="false"
-          show-description="false"
-          show-dataset-name="false"
-          custom-dataset-selector="true"
-          loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
-          dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies">
-        </hbp-connectivity-matrix-row>
+        <connectivity-browser *ngIf="selectedParcellationHasConnectivity"
+                              class="pe-all flex-grow-5 flex-shrink-1">
+        </connectivity-browser>
       </ng-container>
   
       <ng-template #cnctvtyPlaceholderTmpl>
