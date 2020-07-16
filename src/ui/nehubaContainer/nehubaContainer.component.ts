@@ -45,6 +45,7 @@ import {
   
 } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
+import {viewerStateSetConnectivityRegion} from "src/services/state/viewerState.store.helper";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -162,6 +163,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private ngLayers$: Observable<NgViewerStateInterface>
 
   public selectedParcellation: any | null
+
+  public selectedParcellationHasConnectivity: boolean = false
 
   public nehubaViewer: NehubaViewerUnit
   private multiNgIdsRegionsLabelIndexMap: Map<string, Map<number, any>> = new Map()
@@ -577,7 +580,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(
-      this.selectedParcellation$.subscribe((this.handleParcellation).bind(this)),
+      this.selectedParcellation$.subscribe(parcellation => {
+        this.selectedParcellationHasConnectivity = parcellation.hasAdditionalViewMode
+        && parcellation.hasAdditionalViewMode.includes('connectivity')? true : false
+        return this.handleParcellation(parcellation)
+      }),
     )
 
     let prevParcellation = null
@@ -596,9 +603,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           distinctUntilChanged(),
         ),
         this.selectedParcellation$,
+        this.store.pipe(
+          select('viewerState'),
+          safeFilter('connectivityVisible'),
+          map(state => state.connectivityVisible),
+          distinctUntilChanged()
+        )
       ).pipe(
         delayWhen(() => timer())
-      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation]) => {
+      ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, connectivityVisible]) => {
         if (!this.nehubaViewer) { return }
 
         const { ngId: defaultNgId } = selectedParcellation
@@ -612,11 +625,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           return
         }
 
-        prevParcellation = selectedParcellation
-
-        this.selectedRegionIndexSet.size > 0
+        this.selectedRegionIndexSet.size > 0 && !connectivityVisible
           ? this.nehubaViewer.showSegs([...this.selectedRegionIndexSet])
           : this.nehubaViewer.showAllSeg()
+
+        prevParcellation = selectedParcellation
       }),
     )
 
@@ -665,6 +678,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         this.nehubaViewer.initRegions = regions.map(({ ngId, labelIndex }) => generateLabelIndexId({ ngId, labelIndex }))
       })
     )
+
+    this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
+      if (sr.length ===1) this.setConnectivityRegion(sr[0].name)
+      this.selectedRegions = sr
+    }))
 
     /** switch side nav */
     this.subscriptions.push(
@@ -795,6 +813,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         }),
       )
     }
+  }
+
+  setConnectivityRegion(regionName) {
+    this.store.dispatch(viewerStateSetConnectivityRegion({ connectivityRegion: regionName }))
   }
 
   public ngOnDestroy() {

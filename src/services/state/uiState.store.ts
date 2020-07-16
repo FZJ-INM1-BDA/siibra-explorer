@@ -109,17 +109,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
     }
 
   case uiActionShowSidePanelConnectivity.type:
-  case SHOW_SIDE_PANEL_CONNECTIVITY:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Connectivity',
-    }
-  case HIDE_SIDE_PANEL_CONNECTIVITY:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Dataset',
-    }
-
   case AGREE_COOKIE: {
     /**
        * TODO replace with server side logic
@@ -296,8 +285,6 @@ export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
 export const SHOW_SIDE_PANEL_DATASET_LIST = `SHOW_SIDE_PANEL_DATASET_LIST`
-export const SHOW_SIDE_PANEL_CONNECTIVITY = `SHOW_SIDE_PANEL_CONNECTIVITY`
-export const HIDE_SIDE_PANEL_CONNECTIVITY = `HIDE_SIDE_PANEL_CONNECTIVITY`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 

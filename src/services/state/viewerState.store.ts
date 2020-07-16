@@ -27,6 +27,7 @@ export interface StateInterface {
 
   loadedNgLayers: INgLayerInterface[]
   connectivityRegion: string | null
+  connectivityVisible: boolean
 
   standaloneVolumes: any[]
 }
@@ -65,7 +66,7 @@ export const defaultState: StateInterface = {
   parcellationSelected: null,
   templateSelected: null,
   connectivityRegion: '',
-
+  connectivityVisible: false,
   standaloneVolumes: []
 }
 
@@ -222,6 +223,11 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       ...prevState,
       connectivityRegion: '',
     }
+  case SET_CONNECTIVITY_VISIBLE:
+    return {
+      ...prevState,
+      connectivityVisible: action.payload,
+    }  
   default :
     return prevState
   }
@@ -262,6 +268,7 @@ export const ADD_TO_REGIONS_SELECTION_WITH_IDS = `ADD_TO_REGIONS_SELECTION_WITH_
 export const NEHUBA_LAYER_CHANGED = `NEHUBA_LAYER_CHANGED`
 export const SET_CONNECTIVITY_REGION = `SET_CONNECTIVITY_REGION`
 export const CLEAR_CONNECTIVITY_REGION = `CLEAR_CONNECTIVITY_REGION`
+export const SET_CONNECTIVITY_VISIBLE = `SET_CONNECTIVITY_VISIBLE`
 export const CLEAR_STANDALONE_VOLUMES = `CLEAR_STANDALONE_VOLUMES`
 
 @Injectable({
