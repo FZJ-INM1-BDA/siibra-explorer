@@ -169,7 +169,10 @@ export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
     const selectedAtlas = selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
     const atlasLayer =  selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
     const isBaseLayer = atlasLayer && atlasLayer.baseLayer
-    return (!!atlasLayer && !isBaseLayer) ? [ atlasLayer ] : []
+    return (!!atlasLayer && !isBaseLayer) ? [{
+      ...(parcellationSelected || {} ),
+      ...atlasLayer
+    }] : []
   }
 )
 

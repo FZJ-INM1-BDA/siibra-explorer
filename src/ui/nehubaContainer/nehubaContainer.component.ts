@@ -45,7 +45,7 @@ import {
   
 } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
-import {viewerStateSetConnectivityRegion} from "src/services/state/viewerState.store.helper";
+import { viewerStateSetConnectivityRegion, viewerStateGetOverlayingAdditionalParcellations, viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer } from "src/services/state/viewerState.store.helper";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -174,6 +174,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private redrawLayout$: Observable<[string, string]>
 
   public hoveredPanelIndices$: Observable<number>
+
+  public selectedAdditionalLayers$ = this.store.pipe(
+    select(viewerStateGetOverlayingAdditionalParcellations),
+  )
 
   constructor(
     private pureConstantService: PureContantService,
@@ -340,6 +344,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   public useMobileUI$: Observable<boolean>
+
+  public clearSelectedRegions(){
+    this.store.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: []
+      })
+    )
+  }
+
+  public clearAdditionalLayer(layer: { ['@id']: string }){
+    this.store.dispatch(
+      viewerStateRemoveAdditionalLayer({
+        payload: layer
+      })
+    )
+  }
 
   private removeExistingPanels() {
     const element = this.nehubaViewer.nehubaViewer.ngviewer.layout.container.componentValue.element as HTMLElement
