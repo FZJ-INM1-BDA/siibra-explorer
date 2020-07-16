@@ -261,7 +261,8 @@
 
   </mat-card>
 
-  <mat-card *ngIf="selectedParcellationHasConnectivity" class="mt-2 side-nav-cover d-flex flex-column">
+  <mat-card *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
+        && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length" class="mt-2 side-nav-cover d-flex flex-column">
     <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
       Connectivity
     </mat-card-subtitle>
@@ -269,8 +270,7 @@
     <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
       <!-- add connectivity component -->
       <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
-        <connectivity-browser *ngIf="selectedParcellationHasConnectivity"
-                              class="pe-all flex-grow-5 flex-shrink-1">
+        <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1">
         </connectivity-browser>
       </ng-container>
   

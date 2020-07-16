@@ -1,5 +1,6 @@
 <div class="w-100 h-100 d-block d-flex flex-column pb-2" #connectivityComponent>
     <hbp-connectivity-matrix-row
+            *ngIf="region"
             [region]="region"
             theme="dark"
             loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
@@ -11,10 +12,7 @@
             show-description="false"
             show-dataset-name="false"
             custom-dataset-selector="true">
-<!--        [customHeight]="componentHeight + 'px'"-->
-<!--        [ngStyle]="connectivityComponentStyle">-->
         <div slot="header" class="w-100 d-flex justify-content-between mt-3">
-<!--            <button (click)="closeConnectivityView(); setDefaultMap()" class="w-100" mat-button><i class="far fa-times-circle cursor-pointer"></i> Close connectivity</button>-->
             <mat-slide-toggle (change)="this.defaultColorMap && toggleConnectivityOnViewer($event)">Show connectivity on viewer</mat-slide-toggle>
         </div>
 
