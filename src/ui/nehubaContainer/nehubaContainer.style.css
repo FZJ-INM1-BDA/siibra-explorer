@@ -100,7 +100,7 @@ div#scratch-pad
 
 .opacity-crossfade.onHover,
 .opacity-crossfade:hover,
-:host-context([ismobile="true"]) .opacity-crossfade
+:host-context([ismobile="true"]) .opacity-crossfade.always-show-touchdevice
 {
   opacity: 1.0 !important;
   pointer-events: all !important;

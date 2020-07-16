@@ -230,7 +230,6 @@ export class RegionTextSearchAutocomplete {
   }
 
   public deselectAndSelectRegion(region: any) {
-    console.log('region', region)
     this.store$.dispatch(
       viewerStateSetSelectedRegions({
         selectRegions: [ region ]

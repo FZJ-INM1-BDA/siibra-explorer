@@ -1,4 +1,4 @@
-import { Directive, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleChanges, HostListener, ElementRef } from "@angular/core";
+import { Directive, OnDestroy, Output, EventEmitter, Input, OnChanges, SimpleChanges, HostListener, ElementRef, HostBinding } from "@angular/core";
 import { FabSpeedDialService } from "./fabSpeedDial.service";
 import { Subscription } from "rxjs";
 import { SCALE_ORIGIN } from './fabSpeedDial.service'
@@ -13,6 +13,9 @@ import { distinctUntilChanged } from "rxjs/operators";
 })
 
 export class FabSpeedDialContainer implements OnDestroy, OnChanges{
+
+  @HostBinding('style.pointer-events')
+  pointerEvents = 'none'
 
   private s: Subscription[] = []
   
