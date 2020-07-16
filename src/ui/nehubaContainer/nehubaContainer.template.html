@@ -1,5 +1,14 @@
-<div iav-nehuba-viewer-container
-  (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+<div class="position-absolute h-100 w-100"
+  (touchmove)="$event.preventDefault()"
+  iav-viewer-touch-interface
+  [iav-viewer-touch-interface-v-panels]="viewPanels"
+  [iav-viewer-touch-interface-vp-to-data]="nehubaViewer?.viewportToDatas"
+  [iav-viewer-touch-interface-ngviewer]="nehubaViewer?.nehubaViewer?.ngviewer"
+  [iav-viewer-touch-interface-nehuba-config]="selectedTemplate?.nehubaConfig">
+  <div 
+    iav-nehuba-viewer-container
+    (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+  </div>
 </div>
 
 <ui-splashscreen iav-stop="mousedown mouseup touchstart touchmove touchend" *ngIf="!viewerLoaded">
@@ -337,7 +346,7 @@
     
     <!-- mesh loading is still weird -->
     <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
-    <div *ngIf="perspectiveViewLoading$ | async" class="loadingIndicator">
+    <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
       <div class="spinnerAnimationCircle"></div>
 
       <div *ngIf="false" perspectiveLoadingText>
@@ -383,7 +392,7 @@
   let-panelIndex="panelIndex"
   let-visible="visible">
 
-  <div class="opacity-crossfade pe-all overlay-btn-container"
+  <div class="opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
     [ngClass]="{ onHover: visible }">
 
     <!-- perspective specific control -->

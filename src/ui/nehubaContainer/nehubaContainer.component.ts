@@ -106,12 +106,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   @ViewChild('sideNavMasterSwitch', { static: true })
   private navSideDrawerMainSwitch: SwitchDirective
 
-  @ViewChild('sideNavSwitch', { static: true })
-  private navSideDrawerSwitch: SwitchDirective
-
-  @ViewChild('matDrawerMaster', { static: true })
-  private matDrawerMaster: MatDrawer
-
   @ViewChild('matDrawerMinor', { static: true })
   private matDrawerMinor: MatDrawer
 
