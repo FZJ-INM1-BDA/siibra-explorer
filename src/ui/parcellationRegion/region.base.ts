@@ -21,10 +21,11 @@ export class RegionBase {
   @Input()
   set region(val) {
     this._region = val
-    this.region$.next(this.region)
-    if (!this.region.rgb) return
-    this.rgbString = `rgb(${this.region.rgb.join(',')})`
-    const [h, s, l] = rgbToHsl(...this.region.rgb)
+    this.region$.next(this._region)
+    if (!this._region) return
+    if (!this._region.rgb) return
+    this.rgbString = `rgb(${this._region.rgb.join(',')})`
+    const [h, s, l] = rgbToHsl(...this._region.rgb)
     this.rgbDarkmode = l < 0.4
   }
   

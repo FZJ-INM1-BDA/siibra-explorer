@@ -138,7 +138,110 @@
           class="pe-all"
           (iav-outsideClick)="alSelector.selectorExpanded = false">
         </atlas-layer-selector>
-        
+
+        <mat-chip-list class="mb-2">
+          <!-- additional layer -->
+          <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
+          </ng-container>
+
+          <!-- any selected region(s) -->
+          <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+          </ng-container>
+        </mat-chip-list>
+
+        <!-- current layer tmpl -->
+        <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
+          <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
+            <ng-container *ngFor="let p of addParc">
+              <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                parcel: p,
+                selected: true,
+                dismissable: true
+              }">
+              </ng-container>
+            </ng-container>
+          </ng-template>
+          <ng-template #defaultParcTmpl>
+            <ng-container *ngTemplateOutlet="chipTmpl; context: {
+              parcel: parc,
+              selected: false,
+              dismissable: false
+            }">
+            </ng-container>
+          </ng-template>
+
+          <!-- render parc templ -->
+          <ng-template #chipTmpl
+            let-parcel="parcel"
+            let-selected="selected"
+            let-dismissable="dismissable">
+            <mat-chip class="pe-all"
+              (click)="alSelector.selectorExpanded = true"
+              [selected]="selected">
+              
+              {{ parcel.groupName ? (parcel.groupName + ' - ') : '' }}{{ parcel.name }}
+
+              <!-- info icon -->
+              <ng-template [ngIf]="parcel.originDatasets && parcel.originDatasets.length > 0"
+                  [ngIfElse]="infoIconBasic">
+
+                <mat-icon
+                  *ngFor="let ds of parcel.originDatasets"
+                  fontSet="fas"
+                  fontIcon="fa-info-circle"
+                  iav-stop="click"
+                  iav-dataset-show-dataset-dialog
+                  [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
+                  [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
+                  [iav-dataset-show-dataset-dialog-name]="parcel.properties?.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel.properties?.description">
+                </mat-icon>
+
+              </ng-template>
+
+              <ng-template #infoIconBasic>
+                <mat-icon *ngIf="parcel.properties?.name && parcel.properties?.description"
+                  fontSet="fas"
+                  fontIcon="fa-info-circle"
+                  iav-stop="click"
+                  iav-dataset-show-dataset-dialog
+                  [iav-dataset-show-dataset-dialog-name]="parcel.properties?.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel.properties?.description">>
+
+                </mat-icon>
+              </ng-template>
+
+              <!-- dismiss icon -->
+              <mat-icon
+                *ngIf="dismissable"
+                (click)="clearAdditionalLayer(parcel)"
+                fontSet="fas"
+                fontIcon="fa-times">
+              </mat-icon>
+            </mat-chip>
+          </ng-template>
+        </ng-template>
+
+        <ng-template #selectedRegionTmpl>
+          <mat-chip *ngFor="let r of (selectedRegions$ | async)"
+            iav-region
+            (click)="matDrawerMinor.open() && sideNavMasterSwitch.open()"
+            [region]="r"
+            class="pe-all"
+            [ngClass]="{'darktheme':regionDirective.rgbDarkmode === true, 'lighttheme': regionDirective.rgbDarkmode === false}"
+            [style.backgroundColor]="regionDirective.rgbString"
+            #regionDirective="iavRegion">
+            <span class="iv-custom-comp text">
+              {{ r.name }}
+            </span>
+            <mat-icon
+              class="iv-custom-comp text"
+              (click)="clearSelectedRegions()"
+              fontSet="fas"
+              fontIcon="fa-times">
+            </mat-icon>
+          </mat-chip>
+        </ng-template>
       </div>
     </mat-drawer-content>
   </mat-drawer-container>

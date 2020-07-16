@@ -90,6 +90,7 @@ import { DOCUMENT } from "@angular/common";
 import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
 import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { RegionDirective } from "./parcellationRegion/region.directive";
 
 @NgModule({
   imports : [
@@ -185,6 +186,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
     TouchSideClass,
     FixedMouseContextualContainerDirective,
     NehubaViewerTouchDirective,
+    RegionDirective
   ],
   providers: [
     {
