@@ -126,7 +126,9 @@
 }
 
 .infoButton {
-    height: 15px;
-    width: 40px;
-    border-radius: 10px;
+    height: 18px;
+    width: 18px;
+    margin-top: 10px;
+    margin-right: 12px;
+    border-radius: 50%;
 }
