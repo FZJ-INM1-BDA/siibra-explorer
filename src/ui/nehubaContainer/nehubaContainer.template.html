@@ -113,6 +113,7 @@
     <!-- sidenav-content -->
     <mat-drawer class="visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
+      [ngStyle]="{backgroundColor: selectedTemplate?.useTheme === 'dark'? 'rgba(66,66,66,0.9)' : 'rgba(155,155,155,0.9)'}"
       [autoFocus]="false"
       #matDrawerMinor="matDrawer"
       (openedChange)="$event && sideNavSwitch.open()"
@@ -315,90 +316,6 @@
 </ng-template>
 
 <!-- single region template -->
-<ng-template #singleRegionTmpl let-region="region">
-  <ng-template #regionDetailTmpl>
-    <div class="placeholder-region-detail side-nav-cover mat-elevation-z4">
-      <span class="text-muted">
-        Select a region by clicking on the viewer or search from above
-      </span>
-    </div>
-  </ng-template>
-
-  <!-- region detail -->
-  <ng-container *ngIf="region; else regionDetailTmpl">
-    <region-menu
-      [region]="region"
-      class="side-nav-cover mat-elevation-z4">
-    </region-menu>
-  </ng-container>
-
-  <!-- regional features -->
-  <mat-card class="mt-3 overflow-hidden mat-elevation-z4 side-nav-cover feature-card d-flex flex-column">
-    <mat-card-subtitle class="flex-grow-0 flex-shrink-0 font-weight-bold">
-      Regional features
-    </mat-card-subtitle>
-    
-    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card overflow-hidden">
-      <ng-container *ngIf="region; else regionalFeaturesPlaceholderTmpl">
-        <data-browser
-          [template]="templateSelected$ | async"
-          [parcellation]="selectedParcellation"
-          [regions]="[region]">
-        </data-browser>
-      </ng-container>
-  
-      <!-- place holder regional features -->
-      <ng-template #regionalFeaturesPlaceholderTmpl>
-
-        <span *ngIf="selectedParcellation">
-          Regional features available in {{ selectedParcellation.name }}
-        </span>
-
-        <div class="d-inline-flex w-100 modality-card-container">
-          <mat-card class="flex-grow-0 flex-shrink-0 modality-card m-2" *ngFor="let dataM of dataBrowser.countedDataM">
-            <mat-card-content>
-              <span>
-                {{ dataM.name }}
-              </span>
-              <small class="text-muted">
-                ({{ dataM.occurance }})
-              </small>
-            </mat-card-content>
-          </mat-card>
-        </div>
-
-        <data-browser
-          class="invisible"
-          [template]="templateSelected$ | async"
-          [parcellation]="selectedParcellation"
-          #dataBrowser="dataBrowser">
-        </data-browser>
-      </ng-template>
-    </mat-card-content>
-
-  </mat-card>
-
-  <mat-card *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
-        && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length" class="mt-2 side-nav-cover d-flex flex-column">
-    <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
-      Connectivity
-    </mat-card-subtitle>
-
-    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
-      <!-- add connectivity component -->
-      <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
-        <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1">
-        </connectivity-browser>
-      </ng-container>
-  
-      <ng-template #cnctvtyPlaceholderTmpl>
-        CONNECTIVITY PLACEHOLDER
-      </ng-template>
-    </mat-card-content>
-  </mat-card>
-  
-</ng-template>
-
 <div id="scratch-pad">
 </div>
 
@@ -425,6 +342,136 @@
       Modify item value
     </span>
   </div>
+</ng-template>
+
+<ng-template #singleRegionTmpl let-region="region">
+  <ng-template #regionDetailTmpl>
+    <div class="placeholder-region-detail side-nav-cover mat-elevation-z4">
+      <span class="text-muted">
+        Select a region by clicking on the viewer or search from above
+      </span>
+    </div>
+  </ng-template>
+
+  <!-- region detail -->
+  <ng-container *ngIf="region; else regionDetailTmpl">
+    <region-menu
+            #regionMenuComponent
+            [region]="region"
+            class="side-nav-cover mat-elevation-z4">
+    </region-menu>
+  </ng-container>
+
+  <mat-accordion class="side-nav-cover mt-2">
+    <!--  regional features-->
+    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 1" (opened)="expandedSideBarAccordion = 1" hideToggle class="mt-1 mb-1">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Regional features
+        </mat-panel-title>
+        <mat-panel-description  class="d-flex align-items-center"
+                                [ngClass]="!region && selectedParcellation? 'justify-content-between' : 'justify-content-end'">
+          <span *ngIf="!region && selectedParcellation">in {{ selectedParcellation.name }}</span>
+          <i class="fas fa-database"></i>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card overflow-hidden">
+        <ng-container *ngIf="region; else regionalFeaturesPlaceholderTmpl">
+          <data-browser
+                  [template]="templateSelected$ | async"
+                  [parcellation]="selectedParcellation"
+                  [regions]="[region]">
+          </data-browser>
+        </ng-container>
+
+        <!-- place holder regional features -->
+        <ng-template #regionalFeaturesPlaceholderTmpl>
+
+          <div class="d-inline-flex w-100 modality-card-container">
+            <mat-card class="flex-grow-0 flex-shrink-0 modality-card m-2"
+                      *ngFor="let dataM of dataBrowser.countedDataM">
+              <mat-card-content>
+              <span>
+                {{ dataM.name }}
+              </span>
+                <small class="text-muted">
+                  ({{ dataM.occurance }})
+                </small>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <data-browser
+                  class="invisible"
+                  [template]="templateSelected$ | async"
+                  [parcellation]="selectedParcellation"
+                  #dataBrowser="dataBrowser">
+          </data-browser>
+        </ng-template>
+      </mat-card-content>
+    </mat-expansion-panel>
+
+
+    <!--    Explore in other template -->
+    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 0"
+                         (opened)="expandedSideBarAccordion = 0"
+                         hideToggle
+                         class="mt-1 mb-1"
+                         *ngIf="(regionMenuComponent?.regionInOtherTemplates$ | async)?.length as sameRegionLength">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Explore in other templates
+        </mat-panel-title>
+        <mat-panel-description class="d-flex align-items-center justify-content-end">
+          <span class="mr-3">{{sameRegionLength}}</span>
+          <i class="fas fa-brain"></i>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div *ngIf="regionMenuComponent?.regionInOtherTemplates$ | async as regionInOtherTemplates">
+        <div *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
+             [attr.aria-label]="regionMenuComponent.SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
+             (click)="regionMenuComponent.changeView(sameRegion)">
+          <button mat-button
+                  class="w-100 d-flex justify-content-start overflow-hidden text-truncate"
+                  [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')">
+            {{sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')}}
+          </button>
+        </div>
+      </div>
+    </mat-expansion-panel>
+
+
+    <!--    Connectivity-->
+    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 2" (opened)="expandedSideBarAccordion = 2"
+                         hideToggle
+                         *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
+                         && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Connectivity
+        </mat-panel-title>
+        <mat-panel-description class="d-flex align-items-center justify-content-end">
+          <span class="mr-3">{{selectedRegionConnectionNumber}}</span>
+          <i class="fab fa-connectdevelop"></i>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+
+      <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
+        <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
+          <connectivity-browser (connectedAreaCount)="selectedRegionConnectionNumber = $event" class="pe-all flex-grow-5 flex-shrink-1">
+          </connectivity-browser>
+        </ng-container>
+
+        <ng-template #cnctvtyPlaceholderTmpl>
+          Please select region to explore connectivity.
+        </ng-template>
+      </mat-card-content>
+    </mat-expansion-panel>
+
+  </mat-accordion>
+
+
 </ng-template>
 
 <!-- overlay templates -->
