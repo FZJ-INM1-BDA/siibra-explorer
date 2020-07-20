@@ -46,7 +46,7 @@
     #media="iavMediaQuery">
     <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
     <ui-nehuba-container
-
+      class="z-index-10"
       #uiNehubaContainer="uiNehubaContainer"
       iav-mouse-hover
       #iavMouseHoverEl="iavMouseHover"
@@ -55,15 +55,21 @@
       iav-captureClickListenerDirective
       [iav-captureClickListenerDirective-captureDocument]="true"
       (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
+
+      <div ui-nehuba-container-overlay-top-right
+        class="d-inline-flex flex-row justify-content-end align-items-start z-index-6 position-absolute pe-none w-100 h-100">
+        <!-- atlas selector -->
+        <atlas-dropdown-selector class="pe-all mt-4">
+        </atlas-dropdown-selector>
+
+        <signin-banner
+          class="mt-3 mr-2"
+          [parcellationIsSelected]="!!selectedParcellation"
+          [ismobile]="(media.mediaBreakPoint$ | async) > 3">
+        </signin-banner>
+      </div>
     </ui-nehuba-container>
 
-    <div class="d-flex flex-row justify-content-end z-index-10 position-absolute pe-none w-100 h-100">
-      <signin-banner
-        class="mt-3 mr-2"
-        [parcellationIsSelected]="!!selectedParcellation"
-        [ismobile]="(media.mediaBreakPoint$ | async) > 3">
-      </signin-banner>
-    </div>
 
     <layout-floating-container
       zIndex="13"

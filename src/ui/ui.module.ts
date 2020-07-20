@@ -4,7 +4,7 @@ import { ComponentsModule } from "src/components/components.module";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
-import { NehubaViewerUnit, IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
+import {  IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
@@ -112,7 +112,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
   ],
   declarations : [
     NehubaContainer,
-    NehubaViewerUnit,
+    
     SplashScreen,
     LandmarkUnit,
     PluginBannerUI,
@@ -203,7 +203,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
   entryComponents : [
 
     /* dynamically created components needs to be declared here */
-    NehubaViewerUnit,
+    
     LayerBrowser,
     PluginBannerUI,
     ActionDialog,
@@ -214,7 +214,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
     CitationsContainer,
     PluginBannerUI,
     NehubaContainer,
-    NehubaViewerUnit,
+    
     LayerBrowser,
     LogoContainer,
     TemplateParcellationCitationsContainer,

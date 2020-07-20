@@ -9,11 +9,8 @@ import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
-
-export const FOUR_PANEL = 'FOUR_PANEL'
-export const V_ONE_THREE = 'V_ONE_THREE'
-export const H_ONE_THREE = 'H_ONE_THREE'
-export const SINGLE_PANEL = 'SINGLE_PANEL'
+import { PANELS } from './ngViewerState.store.helper'
+import { ngViewerActionToggleMax } from './ngViewerState/actions';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -52,7 +49,7 @@ export const defaultState: StateInterface = {
   layers: [],
   forceShowSegment: null,
   nehubaReady: false,
-  panelMode: FOUR_PANEL,
+  panelMode: PANELS.FOUR_PANEL,
   panelOrder: `0123`,
 
   octantRemoval: true,
@@ -241,7 +238,7 @@ export class NgViewerUseEffect implements OnDestroy {
     )
 
     const toggleMaxmimise$ = this.actions.pipe(
-      ofType(ACTION_TYPES.TOGGLE_MAXIMISE),
+      ofType(ngViewerActionToggleMax.type),
       shareReplay(1),
     )
 
@@ -277,7 +274,7 @@ export class NgViewerUseEffect implements OnDestroy {
           this.panelMode$,
         ),
       ),
-      filter(([_action, [_panelOrder, panelMode]]) => panelMode !== SINGLE_PANEL),
+      filter(([_action, [_panelOrder, panelMode]]) => panelMode !== PANELS.SINGLE_PANEL),
       map(([ action, [ oldPanelOrder ] ]) => {
         const { payload } = action as ActionInterface
         const { index = 0 } = payload
@@ -307,7 +304,7 @@ export class NgViewerUseEffect implements OnDestroy {
           panelMode,
         }, ...acc.slice(0, 1)]
       }, [] as any[]),
-      filter(([ { panelMode } ]) => panelMode === SINGLE_PANEL),
+      filter(([ { panelMode } ]) => panelMode === PANELS.SINGLE_PANEL),
       map(arr => {
         const {
           action,
@@ -342,9 +339,9 @@ export class NgViewerUseEffect implements OnDestroy {
         return {
           type: ACTION_TYPES.SWITCH_PANEL_MODE,
           payload: {
-            panelMode: panelModes[0] === SINGLE_PANEL
-              ? (panelModes[1] || FOUR_PANEL)
-              : SINGLE_PANEL,
+            panelMode: panelModes[0] === PANELS.SINGLE_PANEL
+              ? (panelModes[1] || PANELS.FOUR_PANEL)
+              : PANELS.SINGLE_PANEL,
           },
         }
       }),
@@ -356,7 +353,7 @@ export class NgViewerUseEffect implements OnDestroy {
     ).pipe(
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
-      filter(({ payload }) => payload.panelMode && payload.panelMode === SINGLE_PANEL),
+      filter(({ payload }) => payload.panelMode && payload.panelMode === PANELS.SINGLE_PANEL),
       mapTo({
         type: SNACKBAR_MESSAGE,
         snackbarMessage: CYCLE_PANEL_MESSAGE,
@@ -366,7 +363,7 @@ export class NgViewerUseEffect implements OnDestroy {
     this.spacebarListener$ = fromEvent(document.body, 'keydown', { capture: true }).pipe(
       filter((ev: KeyboardEvent) => ev.key === ' '),
       withLatestFrom(this.panelMode$),
-      filter(([_ , panelMode]) => panelMode === SINGLE_PANEL),
+      filter(([_ , panelMode]) => panelMode === PANELS.SINGLE_PANEL),
       mapTo({
         type: ACTION_TYPES.CYCLE_VIEWS,
       }),
@@ -450,17 +447,16 @@ const ACTION_TYPES = {
   SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE',
   SET_PANEL_ORDER: 'SET_PANEL_ORDER',
 
-  TOGGLE_MAXIMISE: 'TOGGLE_MAXIMISE',
   CYCLE_VIEWS: 'CYCLE_VIEWS',
 
   REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,
 }
 
 export const SUPPORTED_PANEL_MODES = [
-  FOUR_PANEL,
-  H_ONE_THREE,
-  V_ONE_THREE,
-  SINGLE_PANEL,
+  PANELS.FOUR_PANEL,
+  PANELS.H_ONE_THREE,
+  PANELS.V_ONE_THREE,
+  PANELS.SINGLE_PANEL,
 ]
 
 export const NG_VIEWER_ACTION_TYPES = ACTION_TYPES

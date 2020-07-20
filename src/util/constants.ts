@@ -29,7 +29,7 @@ export const MIN_REQ_EXPLAINER = `
 - Unfortunately, Safari and iOS devices currently do not support **webgl2.0**: <https://webkit.org/status/#specification-webgl-2>
 `
 
-export const APPEND_SCRIPT_TOKEN = `APPEND_SCRIPT_TOKEN`
+export const APPEND_SCRIPT_TOKEN: InjectionToken<(url: string) => Promise<HTMLScriptElement>> = new InjectionToken(`APPEND_SCRIPT_TOKEN`)
 
 export const appendScriptFactory = (document: Document) => {
   return src => new Promise((rs, rj) => {
@@ -41,7 +41,7 @@ export const appendScriptFactory = (document: Document) => {
   })
 }
 
-export const REMOVE_SCRIPT_TOKEN = `REMOVE_SCRIPT_TOKEN`
+export const REMOVE_SCRIPT_TOKEN: InjectionToken<(el: HTMLScriptElement) => void> = new InjectionToken(`REMOVE_SCRIPT_TOKEN`) 
 
 export const removeScriptFactory = (document: Document) => {
   return (srcEl: HTMLScriptElement) => {
@@ -70,6 +70,7 @@ export const getHttpHeader: () => HttpHeaders = () => {
 
 export const COLORMAP_IS_JET = `// iav-colormap-is-jet`
 import { EnumColorMapName, mapKeyColorMap } from './colorMaps'
+import { InjectionToken } from "@angular/core"
 
 export const getShader = ({
   colormap = EnumColorMapName.GREYSCALE, 

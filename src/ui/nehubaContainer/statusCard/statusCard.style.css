@@ -18,3 +18,8 @@ small[onHoverSegment]
 {
   right: 0;
 }
+
+.expandedContainer
+{
+  width: 20rem;
+}

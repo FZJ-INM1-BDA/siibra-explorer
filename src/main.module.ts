@@ -26,7 +26,7 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN } from "src/ui/databrowserModule";
+import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore } from "src/ui/databrowserModule";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
@@ -76,6 +76,7 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     DragDropModule,
     UIModule,
     DatabrowserModule,
+    DataBrowserFeatureStore,
     AngularMaterialModule,
     UtilModule,
     WidgetModule,

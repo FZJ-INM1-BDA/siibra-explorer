@@ -76,13 +76,6 @@ div#scratch-pad
   bottom:1em;
 }
 
-.viewer-status-container
-{
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
 /* if not mobile, then show on hover */
 
 .opacity-crossfade

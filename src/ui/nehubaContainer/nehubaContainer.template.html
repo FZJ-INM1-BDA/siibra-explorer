@@ -46,7 +46,7 @@
 
     <!-- sidenav-content -->
     <mat-drawer class="box-shadow-none pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
-      mode="push"
+      mode="side"
       [opened]="sideNavMasterSwitch.switchState"
       [autoFocus]="false"
       (closedStart)="sideNavSwitch.switchState && matDrawerMinor.close()"
@@ -69,7 +69,19 @@
     </mat-drawer>
     <mat-drawer-content class="visible position-relative">
 
-      <div *ngIf="viewerLoaded" class="viewer-status-container pe-none m-2">
+      <!-- top left overlay -->
+      <div class="position-absolute top-0 left-0 d-inline-block pe-none">
+        <ng-content select="[ui-nehuba-container-overlay-top-left]">
+        </ng-content>
+      </div>
+
+      <!-- top right overlay -->
+      <div class="position-absolute top-0 right-0 d-inline-block pe-none">
+        <ng-content select="[ui-nehuba-container-overlay-top-right]">
+        </ng-content>
+      </div>
+
+      <div *ngIf="viewerLoaded" class="position-absolute z-index-6 top-0 left-0 pe-none m-2">
         <button mat-raised-button
           class="pe-all tab-toggle"
           (click)="sideNavMasterSwitch.toggle()"
@@ -77,12 +89,8 @@
           <i class="fas" [ngClass]="sideNavMasterSwitch.switchState ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
         </button>
 
-        <!-- atlas selector -->
-        <atlas-dropdown-selector class="pe-all">
-        </atlas-dropdown-selector>
-
         <!-- StatusCard container-->
-        <div class="muted-7 mt-4-n">
+        <div class="muted-7 d-inline">
           <ui-status-card
             class="pe-all"
             [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
@@ -132,6 +140,9 @@
   
       <div *ngIf="templateSelected$ | async"
         class="viewer-config-container d-flex align-items-end pe-none">
+
+        <!-- bottom left overlay -->
+
         <!-- Viewer Selector Container-->
         <atlas-layer-selector
           #alSelector="atlasLayerSelector"
@@ -179,10 +190,10 @@
               (click)="alSelector.selectorExpanded = true"
               [selected]="selected">
               
-              {{ parcel.groupName ? (parcel.groupName + ' - ') : '' }}{{ parcel.name }}
+              {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
 
               <!-- info icon -->
-              <ng-template [ngIf]="parcel.originDatasets && parcel.originDatasets.length > 0"
+              <ng-template [ngIf]="parcel?.originDatasets?.length > 0"
                   [ngIfElse]="infoIconBasic">
 
                 <mat-icon
@@ -193,20 +204,20 @@
                   iav-dataset-show-dataset-dialog
                   [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
                   [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
-                  [iav-dataset-show-dataset-dialog-name]="parcel.properties?.name"
-                  [iav-dataset-show-dataset-dialog-description]="parcel.properties?.description">
+                  [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
                 </mat-icon>
 
               </ng-template>
 
               <ng-template #infoIconBasic>
-                <mat-icon *ngIf="parcel.properties?.name && parcel.properties?.description"
+                <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
                   fontSet="fas"
                   fontIcon="fa-info-circle"
                   iav-stop="click"
                   iav-dataset-show-dataset-dialog
-                  [iav-dataset-show-dataset-dialog-name]="parcel.properties?.name"
-                  [iav-dataset-show-dataset-dialog-description]="parcel.properties?.description">
+                  [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
 
                 </mat-icon>
               </ng-template>
@@ -228,10 +239,13 @@
             (click)="matDrawerMinor.open() && sideNavMasterSwitch.open()"
             [region]="r"
             class="pe-all"
-            [ngClass]="{'darktheme':regionDirective.rgbDarkmode === true, 'lighttheme': regionDirective.rgbDarkmode === false}"
+            [ngClass]="{
+              'darktheme':regionDirective.rgbDarkmode === true,
+              'lighttheme': regionDirective.rgbDarkmode === false
+            }"
             [style.backgroundColor]="regionDirective.rgbString"
             #regionDirective="iavRegion">
-            <span class="iv-custom-comp text">
+            <span class="iv-custom-comp text text-truncate d-inline">
               {{ r.name }}
             </span>
             <mat-icon
@@ -303,7 +317,7 @@
 <!-- single region template -->
 <ng-template #singleRegionTmpl let-region="region">
   <ng-template #regionDetailTmpl>
-    <div class="placeholder-region-detail">
+    <div class="placeholder-region-detail mat-elevation-z4">
       <span class="text-muted">
         Select a region by clicking on the viewer or search from above
       </span>
@@ -314,13 +328,13 @@
   <ng-container *ngIf="region; else regionDetailTmpl">
     <region-menu
       [region]="region"
-      class="side-nav-cover">
+      class="side-nav-cover mat-elevation-z4">
     </region-menu>
   </ng-container>
 
   <!-- regional features -->
-  <mat-card class="mt-2 side-nav-cover feature-card d-flex flex-column">
-    <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
+  <mat-card class="mt-3 overflow-hidden mat-elevation-z4 side-nav-cover feature-card d-flex flex-column">
+    <mat-card-subtitle class="flex-grow-0 flex-shrink-0 font-weight-bold">
       Regional features
     </mat-card-subtitle>
     
@@ -364,17 +378,28 @@
 
   </mat-card>
 
-  <mat-card *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
-        && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length" class="mt-2 side-nav-cover d-flex flex-column">
-    <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
+  <mat-card class="mt-3 overflow-hidden mat-elevation-z4 side-nav-cover feature-card d-flex flex-column">
+    <mat-card-subtitle class="flex-grow-0 flex-shrink-0 font-weight-bold">
       Connectivity
     </mat-card-subtitle>
 
-    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
+    <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card">
       <!-- add connectivity component -->
+
       <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
-        <connectivity-browser class="pe-all flex-grow-5 flex-shrink-1">
-        </connectivity-browser>
+        <hbp-connectivity-matrix-row 
+          [region]="region.name"
+          theme="dark"
+          show-export="true"
+          show-source="true"
+          show-title="false"
+          show-toolbar="false"
+          show-description="false"
+          show-dataset-name="false"
+          custom-dataset-selector="true"
+          loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+          dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies">
+        </hbp-connectivity-matrix-row>
       </ng-container>
   
       <ng-template #cnctvtyPlaceholderTmpl>

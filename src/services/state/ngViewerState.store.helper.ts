@@ -1,29 +1,18 @@
 // TODO to be merged with ng viewer state after refactor
+import { INgLayerInterface, PANELS } from './ngViewerState/constants'
 
-import { createAction, props } from "@ngrx/store";
+export { INgLayerInterface, PANELS }
 
-export interface INgLayerInterface {
-  name: string // displayName
-  source: string
-  mixability: string // base | mixable | nonmixable
-  annotation?: string //
-  id?: string // unique identifier
-  visible?: boolean
-  shader?: string
-  transform?: any
+import {
+  ngViewerActionAddNgLayer,
+  ngViewerActionRemoveNgLayer,
+  ngViewerActionSetPerspOctantRemoval,
+  ngViewerActionToggleMax,
+} from './ngViewerState/actions'
+
+export {
+  ngViewerActionAddNgLayer,
+  ngViewerActionRemoveNgLayer,
+  ngViewerActionSetPerspOctantRemoval,
+  ngViewerActionToggleMax,
 }
-
-export const ngViewerActionAddNgLayer = createAction(
-  '[ngLayerAction] addNgLayer',
-  props<{ layer: INgLayerInterface|INgLayerInterface[] }>()
-)
-
-export const ngViewerActionRemoveNgLayer = createAction(
-  '[ngLayerAction] removeNgLayer',
-  props<{ layer: Partial<INgLayerInterface>|Partial<INgLayerInterface>[] }>()
-)
-
-export const ngViewerActionSetPerspOctantRemoval = createAction(
-  `[ngViewerAction] setPerspectiveOctant`,
-  props<{ octantRemovalFlag: boolean }>()
-)
