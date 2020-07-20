@@ -9,11 +9,7 @@ import {
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription} from "rxjs";
 import {distinctUntilChanged, filter, map, shareReplay} from "rxjs/operators";
-import {
-  CLEAR_CONNECTIVITY_REGION,
-  SET_CONNECTIVITY_REGION,
-  SET_CONNECTIVITY_VISIBLE
-} from "src/services/state/viewerState.store";
+import {CLEAR_CONNECTIVITY_REGION, SELECT_REGIONS, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 import {isDefined, safeFilter} from "src/services/stateStore.service";
 import { viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
 
@@ -157,19 +153,19 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       this.subscriptions.forEach(s => s.unsubscribe())
     }
 
-    public updateConnevtivityRegion(regionName) {
-      this.store$.dispatch({
-        type: SET_CONNECTIVITY_REGION,
-        connectivityRegion: regionName,
-      })
-    }
-
     navigateToRegion(region) {
       this.store$.dispatch(
         viewerStateNavigateToRegion({
           payload: { region: this.getRegionWithName(region) }
         })
       )
+    }
+    
+    selectRegion(region) {
+      this.store$.dispatch({
+        type: SELECT_REGIONS,
+        selectRegions: [region],
+      })
     }
 
     getRegionWithName(region) {

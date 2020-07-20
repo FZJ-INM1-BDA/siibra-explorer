@@ -134,26 +134,24 @@
     <div *ngIf="tileSrc.originDatasets?.length > 0; else plainBtn"
         mat-icon-button
         iav-stop="click"
-        class="iv-custom-comp mt-2 mr-2 d-flex justify-content-center infoButton"
+        class="iv-custom-comp d-flex justify-content-center infoButton"
         [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
         iav-dataset-show-dataset-dialog
         [iav-dataset-show-dataset-dialog-kgid]="tileSrc.originDatasets[0].kgId"
         [iav-dataset-show-dataset-dialog-kgschema]="tileSrc.originDatasets[0].kgSchema">
         <small><i class="fas fa-info"></i></small>
-        <small class="ml-1">Info</small>
     </div>
 
     <ng-template #plainBtn>
         <div *ngIf="tileSrc.properties?.name || tileSrc.properties?.description"
             mat-icon-button
             iav-stop="click"
-            class="iv-custom-comp mt-2 mr-2 d-flex justify-content-center infoButton"
+            class="iv-custom-comp d-flex justify-content-center align-items-center infoButton"
             [ngStyle]="{backgroundColor: tileSrc.darktheme ? 'white': 'black', color: tileSrc.darktheme ? 'black': 'white' }"
             iav-dataset-show-dataset-dialog
             [iav-dataset-show-dataset-dialog-name]="tileSrc.properties.name"
             [iav-dataset-show-dataset-dialog-description]="tileSrc.properties.description">
             <small><i class="fas fa-info"></i></small>
-            <small class="ml-1">Info</small>
         </div>
     </ng-template>
 </ng-template>
