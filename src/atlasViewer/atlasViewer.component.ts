@@ -10,10 +10,11 @@ import {
   ElementRef,
   Inject,
   Optional,
+  InjectionToken,
 } from "@angular/core";
 import { Store, select, ActionsSubject } from "@ngrx/store";
 import { Observable, Subscription, combineLatest, interval, merge, of, timer, fromEvent } from "rxjs";
-import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith, shareReplay } from "rxjs/operators";
+import { map, filter, distinctUntilChanged, delay, withLatestFrom, switchMapTo, take, startWith } from "rxjs/operators";
 
 import { LayoutMainSide } from "../layouts/mainside/mainside.component";
 import {
@@ -26,11 +27,6 @@ import { WidgetServices } from "src/widget";
 
 import { LocalFileService } from "src/services/localFile.service";
 import { AGREE_COOKIE, AGREE_KG_TOS, SHOW_KG_TOS } from "src/services/state/uiState.store";
-import {
-  CLOSE_SIDE_PANEL,
-  OPEN_SIDE_PANEL,
-} from "src/services/state/uiState.store";
-import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { isSame } from "src/util/fn";
 import { NehubaContainer } from "../ui/nehubaContainer/nehubaContainer.component";
 import { colorAnimation } from "./atlasViewer.animation"
@@ -39,7 +35,7 @@ import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
 
-export const NEHUBA_CLICK_OVERRIDE = 'NEHUBA_CLICK_OVERRIDE'
+export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> = new InjectionToken('NEHUBA_CLICK_OVERRIDE')
 
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";

@@ -2,7 +2,7 @@ import { Component, Input } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
-import { SINGLE_PANEL } from "src/services/state/ngViewerState.store";
+import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { ARIA_LABELS } from 'common/constants'
 
 const {
@@ -46,7 +46,7 @@ export class MaximmisePanelButton {
     )
 
     this.isMaximised$ = this.panelMode$.pipe(
-      map(panelMode => panelMode === SINGLE_PANEL),
+      map(panelMode => panelMode === PANELS.SINGLE_PANEL),
     )
   }
 }

@@ -1,5 +1,4 @@
 export {
-  DATESTORE_FEATURE_KEY,
   DatabrowserModule,
   DatasetPreview,
   IAV_DATASET_PREVIEW_ACTIVE,
@@ -20,3 +19,4 @@ export {
 } from './constants'
 
 export { PreviewComponentWrapper } from './preview/previewComponentWrapper/previewCW.component'
+export { DataBrowserFeatureStore, DATESTORE_FEATURE_KEY } from './store.module'

@@ -246,6 +246,11 @@ export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
+import {
+  dep_viewerStateSelectRegionWithId
+} from './viewerState.store.helper'
+import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from './viewerState/actions';
+
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
@@ -258,7 +263,7 @@ export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
-export const SELECT_REGIONS_WITH_ID = `SELECT_REGIONS_WITH_ID`
+export const SELECT_REGIONS_WITH_ID = dep_viewerStateSelectRegionWithId.type
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`
@@ -462,12 +467,12 @@ export class ViewerStateUseEffect {
 }
 
 const ACTION_TYPES = {
-  ADD_USERLANDMARKS: `ADD_USERLANDMARKS`,
-  REMOVE_USER_LANDMARKS: 'REMOVE_USER_LANDMARKS',
+  ADD_USERLANDMARKS: viewerStateAddUserLandmarks.type,
+  REMOVE_USER_LANDMARKS: viewreStateRemoveUserLandmarks.type,
   MOUSEOVER_USER_LANDMARK_LABEL: 'MOUSEOVER_USER_LANDMARK_LABEL',
 
   SINGLE_CLICK_ON_VIEWER: 'SINGLE_CLICK_ON_VIEWER',
-  DOUBLE_CLICK_ON_VIEWER: 'DOUBLE_CLICK_ON_VIEWER',
+  DOUBLE_CLICK_ON_VIEWER: viewerStateDblClickOnViewer.type
 }
 
 export const VIEWERSTATE_ACTION_TYPES = ACTION_TYPES

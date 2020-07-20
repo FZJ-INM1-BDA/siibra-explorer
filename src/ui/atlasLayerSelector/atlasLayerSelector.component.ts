@@ -141,7 +141,7 @@ export class AtlasLayerSelector implements OnInit {
     ngOnInit(): void {
       this.subscriptions.push(
         this.selectedTemplate$.subscribe(st => {
-          this.selectedTemplatePreviewUrl = st.templateSpaces.find(t => t['@id'] === st['@id']).previewUrl
+          this.selectedTemplatePreviewUrl = st.templateSpaces?.find(t => t['@id'] === st['@id']).previewUrl
           this.selectedTemplateSpaceId = st['@id']
         }),
       )

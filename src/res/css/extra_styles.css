@@ -484,6 +484,10 @@ markdown-dom pre code
     cursor: pointer!important;
 }
 
+.z-index-6
+{
+  z-index: 6!important;
+}
 .z-index-10
 {
   z-index: 10!important;

@@ -6,6 +6,7 @@
 
   $foreground: map-get($theme, foreground);
   $background: map-get($theme, background);
+  $background-color: map-get($background, background);
 
   $primary: map-get($theme, primary);
   $accent: map-get($theme, accent);
@@ -17,8 +18,14 @@
     &[bg],
     &.bg
     {
-      background-color: mat-color($background, background);
+      background-color: mat-color($background, background)
     }
+
+    &.darker-bg
+    {
+      background-color: $background-color;
+    }
+
     &[text],
     &.text
     {

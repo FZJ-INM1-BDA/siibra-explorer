@@ -1,14 +1,21 @@
 import { NgModule } from "@angular/core";
 import { NehubaViewerContainerDirective } from './nehubaViewerInterface/nehubaViewerInterface.directive'
+import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
+import { CommonModule } from "@angular/common";
 @NgModule({
   imports: [
-
+    CommonModule
   ],
   declarations: [
-    NehubaViewerContainerDirective
+    NehubaViewerContainerDirective,
+    NehubaViewerUnit
   ],
   exports: [
-    NehubaViewerContainerDirective
+    NehubaViewerContainerDirective,
+    NehubaViewerUnit
+  ],
+  entryComponents: [
+    NehubaViewerUnit
   ]
 })
 

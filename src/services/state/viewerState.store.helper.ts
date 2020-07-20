@@ -1,97 +1,54 @@
 // TODO merge with viewerstate.store.ts when refactor is done
-import { createAction, props, createReducer, on, ActionReducer, createSelector, Store, select } from "@ngrx/store";
+import { createReducer, on, ActionReducer, createSelector, Store, select } from "@ngrx/store";
 import { generalApplyState } from "../stateStore.helper";
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable } from "rxjs";
 import { withLatestFrom, map } from "rxjs/operators";
 import { Injectable } from "@angular/core";
 
-export interface IRegion{
-  name: string
-  [key: string]: string
+import {
+  viewerStateHelperSelectParcellationWithId,
+  viewerStateNavigateToRegion,
+  viewerStateRemoveAdditionalLayer,
+  viewerStateSelectAtlas,
+  viewerStateSelectParcellation,
+  viewerStateSelectTemplateWithId,
+  viewerStateSetConnectivityRegion,
+  viewerStateSetFetchedAtlases,
+  viewerStateSetSelectedRegions,
+  viewerStateSetSelectedRegionsWithIds,
+  viewerStateToggleLayer,
+  viewerStateToggleRegionSelect,
+  dep_viewerStateSelectRegionWithId,
+  viewerStateDblClickOnViewer,
+  viewerStateAddUserLandmarks,
+  viewreStateRemoveUserLandmarks
+} from './viewerState/actions'
+
+export {
+  viewerStateHelperSelectParcellationWithId,
+  viewerStateNavigateToRegion,
+  viewerStateRemoveAdditionalLayer,
+  viewerStateSelectAtlas,
+  viewerStateSelectParcellation,
+  viewerStateSelectTemplateWithId,
+  viewerStateSetConnectivityRegion,
+  viewerStateSetFetchedAtlases,
+  viewerStateSetSelectedRegions,
+  viewerStateSetSelectedRegionsWithIds,
+  viewerStateToggleLayer,
+  viewerStateToggleRegionSelect,
+  dep_viewerStateSelectRegionWithId,
+  viewerStateDblClickOnViewer,
+  viewerStateAddUserLandmarks,
+  viewreStateRemoveUserLandmarks
 }
 
-export const viewerStateSetSelectedRegionsWithIds = createAction(
-  `[viewerState] setSelectedRegionsWithIds`,
-  props<{ selectRegionIds: string[] }>()
-)
+export {
+  viewerStateAllParcellationsSelector,
+  viewerStateSelectedRegionsSelector
+} from './viewerState/selectors'
 
-export const viewerStateSetSelectedRegions = createAction(
-  '[viewerState] setSelectedRegions',
-  props<{ selectRegions: IRegion[] }>()
-)
-
-export const viewerStateSetConnectivityRegion = createAction(
-  `[viewerState] setConnectivityRegion`,
-  props<{ connectivityRegion: any }>()
-)
-
-export const viewerStateNavigateToRegion = createAction(
-  `[viewerState] navigateToRegion`,
-  props<{ payload: { region: any } }>()
-)
-
-export const viewerStateToggleRegionSelect = createAction(
-  `[viewerState] toggleRegionSelect`,
-  props<{ payload: { region: any } }>()
-)
-
-export const viewerStateSetFetchedAtlases = createAction(
-  '[viewerState] setFetchedatlases',
-  props<{ fetchedAtlases: any[] }>()
-)
-
-export const viewerStateSelectAtlas = createAction(
-  `[viewerState] selectAtlas`,
-  props<{ atlas: { ['@id']: string } }>()
-)
-
-export const viewerStateHelperSelectParcellationWithId = createAction(
-  `[viewerStateHelper] selectParcellationWithId`,
-  props<{ payload: { ['@id']: string } }>()
-)
-
-export const viewerStateSelectParcellation = createAction(
-  `[viewerState] selectParcellation`,
-  props<{ selectParcellation: any }>()
-)
-
-export const viewerStateSelectTemplateWithId = createAction(
-  `[viewerState] selectTemplateWithId`,
-  props<{ payload: { ['@id']: string }, config?: { selectParcellation: { ['@id']: string } } }>()
-)
-
-export const viewerStateToggleLayer = createAction(
-  `[viewerState] toggleLayer`,
-  props<{ payload: { ['@id']: string }  }>()
-)
-
-export const viewerStateRemoveAdditionalLayer = createAction(
-  `[viewerState] removeAdditionalLayer`,
-  props<{ payload?: { ['@id']: string } }>()
-)
-
-export const viewerStateSelectedRegionsSelector = createSelector(
-  state => state['viewerState'],
-  viewerState => viewerState['regionsSelected']
-)
-
-export const viewerStateAllParcellationsSelector = createSelector(
-  state => state['viewerState'],
-  viewerState => {
-    return (viewerState['fetchedTemplates'] as any[] || [])
-      .reduce((acc, curr) => {
-        const parcelations = (curr['parcellations'] || []).map(p => {
-          return {
-            ...p,
-            useTheme: curr['useTheme']
-          }
-        })
-        
-        return acc.concat( parcelations )
-      }, [])
-  }
-)
 
 interface IViewerStateHelperStore{
   fetchedAtlases: any[]
@@ -112,7 +69,7 @@ function handleToggleLayerAction(reducer: ActionReducer<any>): ActionReducer<any
       const { payload } = action as any
       const { templateSelected } = (state && state['viewerState']) || {}
 
-      const selectParcellation = templateSelected['parcellations'].find(p => p['@id'] === payload['@id'])
+      const selectParcellation = templateSelected?.parcellations.find(p => p['@id'] === payload['@id'])
       return reducer(state, viewerStateSelectParcellation({ selectParcellation }))
     }
     default: reducer(state, action)
@@ -167,7 +124,7 @@ export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
     const { parcellationSelected } = viewerState
 
     const selectedAtlas = selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
-    const atlasLayer =  selectedAtlas['parcellations'].find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
+    const atlasLayer =  selectedAtlas?.parcellations.find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
     const isBaseLayer = atlasLayer && atlasLayer.baseLayer
     return (!!atlasLayer && !isBaseLayer) ? [{
       ...(parcellationSelected || {} ),

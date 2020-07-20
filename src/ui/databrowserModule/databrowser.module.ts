@@ -30,20 +30,15 @@ import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previ
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
 import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
-import { StoreModule } from "@ngrx/store";
 
 import {
-  stateStore,
   DatasetPreview
 } from 'src/services/state/dataStore.store'
 
 import {
   OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
 } from './constants'
-import { EffectsModule } from "@ngrx/effects";
-import { DataBrowserUseEffect } from "./databrowser.useEffect";
 
-export const DATESTORE_FEATURE_KEY = `dataStore`
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   if (overrideFn) return overrideFn
@@ -58,8 +53,6 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FormsModule,
     UtilModule,
     AngularMaterialModule,
-    StoreModule.forFeature(DATESTORE_FEATURE_KEY, stateStore),
-    EffectsModule.forFeature([ DataBrowserUseEffect ])
   ],
   declarations: [
     DataBrowser,
