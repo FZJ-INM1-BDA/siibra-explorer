@@ -10,7 +10,7 @@ export class DatasetIsFavedPipe implements PipeTransform {
     if (!dataentry) { return false }
     const re2 = getKgSchemaIdFromFullId(dataentry.fullId)
     if (!re2) return false
-    return favedDataEntry.findIndex(ds => {
+    return favedDataEntry?.findIndex(ds => {
       const re1 = getKgSchemaIdFromFullId(ds.fullId)
       if (!re1) return false
       return re1[1] === re2[1]

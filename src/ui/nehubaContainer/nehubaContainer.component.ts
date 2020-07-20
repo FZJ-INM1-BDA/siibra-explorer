@@ -306,6 +306,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       select('dataStore'),
       select('fetchedSpatialData'),
       distinctUntilChanged(compareLandmarksChanged),
+      filter(v => !!v),
+      startWith([]),
       debounceTime(300),
     )
 
