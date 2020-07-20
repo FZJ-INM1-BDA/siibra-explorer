@@ -247,7 +247,7 @@ export function stateStore(state, action) {
 }
 
 import {
-  dep_viewerStateSelectRegionWithId
+  viewerStateSelectRegionWithIdDeprecated
 } from './viewerState.store.helper'
 import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from './viewerState/actions';
 
@@ -263,7 +263,7 @@ export const SELECT_PARCELLATION = `SELECT_PARCELLATION`
 
 export const DESELECT_REGIONS = `DESELECT_REGIONS`
 export const SELECT_REGIONS = `SELECT_REGIONS`
-export const SELECT_REGIONS_WITH_ID = dep_viewerStateSelectRegionWithId.type
+export const SELECT_REGIONS_WITH_ID = viewerStateSelectRegionWithIdDeprecated.type
 export const SELECT_LANDMARKS = `SELECT_LANDMARKS`
 export const DESELECT_LANDMARKS = `DESELECT_LANDMARKS`
 export const USER_LANDMARKS = `USER_LANDMARKS`

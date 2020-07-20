@@ -19,7 +19,7 @@ import {
   viewerStateSetSelectedRegionsWithIds,
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
-  dep_viewerStateSelectRegionWithId,
+  viewerStateSelectRegionWithIdDeprecated,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks
@@ -38,7 +38,7 @@ export {
   viewerStateSetSelectedRegionsWithIds,
   viewerStateToggleLayer,
   viewerStateToggleRegionSelect,
-  dep_viewerStateSelectRegionWithId,
+  viewerStateSelectRegionWithIdDeprecated,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
   viewreStateRemoveUserLandmarks

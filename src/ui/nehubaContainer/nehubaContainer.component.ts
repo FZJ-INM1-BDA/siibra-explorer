@@ -15,7 +15,7 @@ import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
 import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
-import { dep_viewerStateSelectRegionWithId, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
+import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import {
   viewerStateSetConnectivityRegion,
@@ -970,13 +970,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
             selectRegionIds.push(generateLabelIndexId({ ngId, labelIndex }))
           })
         })
-        this.store.dispatch(dep_viewerStateSelectRegionWithId({
+        this.store.dispatch(viewerStateSelectRegionWithIdDeprecated({
           selectRegionIds
         }))
       },
       hideAllSegments : () => {
-        this.store.dispatch(dep_viewerStateSelectRegionWithId({
-            selectRegionIds: []
+        this.store.dispatch(viewerStateSelectRegionWithIdDeprecated({
+          selectRegionIds: []
         }))
       },
       segmentColourMap : new Map(),

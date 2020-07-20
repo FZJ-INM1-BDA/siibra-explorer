@@ -61,7 +61,7 @@ export const viewerStateRemoveAdditionalLayer = createAction(
   props<{ payload?: { ['@id']: string } }>()
 )
 
-export const dep_viewerStateSelectRegionWithId = createAction(
+export const viewerStateSelectRegionWithIdDeprecated = createAction(
   `[viewerState] [deprecated] selectRegionsWithId`,
   props<{ selectRegionIds: number[] }>()
 )
