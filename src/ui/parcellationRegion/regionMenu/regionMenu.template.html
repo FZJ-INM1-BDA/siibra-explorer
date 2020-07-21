@@ -86,6 +86,11 @@
 
       </div>
 
+      <!-- change template -->
+      <ng-container *ngIf="showRegionInOtherTmpl">
+        <ng-container *ngTemplateOutlet="regionInOtherTemplatesTmpl; context: { regionInOtherTemplates: regionInOtherTemplates$ | async }">
+        </ng-container>
+      </ng-container>
 
     </mat-list>
   </mat-card-content>

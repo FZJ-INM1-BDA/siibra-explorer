@@ -19,6 +19,9 @@ export class RegionBase {
   }
 
   @Input()
+  showRegionInOtherTmpl: boolean = true
+
+  @Input()
   set region(val) {
     this._region = val
     this.region$.next(this._region)
