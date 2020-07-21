@@ -32,7 +32,7 @@
 
     <mat-divider></mat-divider>
 
-    <mat-list class="action-list sm">
+    <mat-list class="action-list sm cursor-default">
 
       <!-- position -->
       <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
@@ -86,10 +86,6 @@
 
       </div>
 
-<!--      ToDo Discuss thich place is better to place current feature - accordion or region actions-->
-<!--      &lt;!&ndash; change template &ndash;&gt;-->
-<!--      <ng-container *ngTemplateOutlet="regionInOtherTemplatesTmpl; context: { regionInOtherTemplates: regionInOtherTemplates$ | async }">-->
-<!--      </ng-container>-->
 
     </mat-list>
   </mat-card-content>
