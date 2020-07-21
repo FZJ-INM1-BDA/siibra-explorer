@@ -2,12 +2,13 @@
   (touchmove)="$event.preventDefault()"
   iav-viewer-touch-interface
   [iav-viewer-touch-interface-v-panels]="viewPanels"
-  [iav-viewer-touch-interface-vp-to-data]="nehubaViewer?.viewportToDatas"
+  [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
   [iav-viewer-touch-interface-ngviewer]="nehubaViewer?.nehubaViewer?.ngviewer"
   [iav-viewer-touch-interface-nehuba-config]="selectedTemplate?.nehubaConfig">
   <div 
     iav-nehuba-viewer-container
-    (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)">
+    (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)"
+    #iavContainer="iavNehubaViewerContainer">
   </div>
 </div>
 
