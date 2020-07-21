@@ -28,7 +28,6 @@ import {
 import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, isFirstRow, isFirstCell } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
-import {RegionMenuComponent} from "src/ui/parcellationRegion/regionMenu/regionMenu.component";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -146,8 +145,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   @ViewChild('matDrawerMinor', { static: true })
   private matDrawerMinor: MatDrawer
 
-  @ViewChild('regionMenuComponent', {read: RegionMenuComponent}) regionMenuComponent: RegionMenuComponent
-
   @Output()
   public nehubaViewerLoaded: EventEmitter<boolean> = new EventEmitter()
 
@@ -228,13 +225,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public hoveredPanelIndices$: Observable<number>
 
-  public expandedSideBarAccordion: number
-
   public selectedAdditionalLayers$ = this.store.pipe(
     select(viewerStateGetOverlayingAdditionalParcellations),
   )
-
-  public selectedRegionConnectionNumber: number
 
   constructor(
     private pureConstantService: PureContantService,

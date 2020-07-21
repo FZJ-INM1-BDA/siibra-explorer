@@ -113,7 +113,6 @@
     <!-- sidenav-content -->
     <mat-drawer class="visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
-      [ngStyle]="{backgroundColor: selectedTemplate?.useTheme === 'dark'? 'rgba(66,66,66,0.9)' : 'rgba(155,155,155,0.9)'}"
       [autoFocus]="false"
       #matDrawerMinor="matDrawer"
       (openedChange)="$event && sideNavSwitch.open()"
@@ -356,122 +355,129 @@
   <!-- region detail -->
   <ng-container *ngIf="region; else regionDetailTmpl">
     <region-menu
-            #regionMenuComponent
-            [region]="region"
-            class="side-nav-cover mat-elevation-z4">
+      [showRegionInOtherTmpl]="false"
+      [region]="region"
+      class="side-nav-cover mat-elevation-z4">
     </region-menu>
   </ng-container>
 
-  <mat-accordion class="side-nav-cover mt-2">
+
+  <mat-accordion *ngIf="region"
+    class="side-nav-cover mt-2"
+    iav-region
+    [region]="region"
+    #iavRegion="iavRegion">
+
+    <!-- expansion tmpl -->
+    <ng-template #ngMatAccordionTmpl
+      let-title="title"
+      let-desc="desc"
+      let-iconClass="iconClass"
+      let-iavNgIf="iavNgIf"
+      let-content="content">
+      <mat-expansion-panel class="mt-1 mb-1"
+        hideToggle
+        *ngIf="iavNgIf">
+
+        <mat-expansion-panel-header>
+
+          <!-- title -->
+          <mat-panel-title>
+            {{ title }}
+          </mat-panel-title>
+
+          <!-- desc + icon -->
+          <mat-panel-description class="d-flex align-items-center justify-content-end">
+            <span class="mr-3">{{ desc }}</span>
+            <span class="accordion-icon d-inline-flex justify-content-center">
+              <i [class]="iconClass"></i>
+            </span>
+          </mat-panel-description>
+
+        </mat-expansion-panel-header>
+
+        <!-- content -->
+        <ng-template matExpansionPanelContent>
+          <ng-container *ngTemplateOutlet="content">
+          </ng-container>
+        </ng-template>
+      </mat-expansion-panel>
+    </ng-template>
+
+    <!-- Explore in other template -->
+    <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
+
+      <ng-template #exploreInOtherTmpl>
+        <mat-list class="action-list sm cursor-default">
+          <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates"
+            (click)="iavRegion.changeView(sameRegion)"
+            [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
+            mat-ripple>
+            {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
+          </mat-list-item>
+        </mat-list>
+      </ng-template>
+
+      <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+        title: 'Explore in other templates',
+        desc: regionInOtherTemplates.length,
+        iconClass: 'fas fa-brain',
+        iavNgIf: regionInOtherTemplates.length,
+        content: exploreInOtherTmpl
+      }">
+
+  
+      </ng-container>
+    </ng-container>
+
     <!--  regional features-->
-    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 1" (opened)="expandedSideBarAccordion = 1" hideToggle class="mt-1 mb-1">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Regional features
-        </mat-panel-title>
-        <mat-panel-description  class="d-flex align-items-center"
-                                [ngClass]="!region && selectedParcellation? 'justify-content-between' : 'justify-content-end'">
-          <span *ngIf="!region && selectedParcellation">in {{ selectedParcellation.name }}</span>
-          <i class="fas fa-database"></i>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
+    <ng-template #regionalFeaturesTmpl>
+      <data-browser [template]="templateSelected$ | async"
+        [parcellation]="selectedParcellation"
+        [regions]="[region]">
+      </data-browser>
+    </ng-template>
 
-      <mat-card-content class="flex-grow-1 flex-shrink-1 w-100 feature-card overflow-hidden">
-        <ng-container *ngIf="region; else regionalFeaturesPlaceholderTmpl">
-          <data-browser
-                  [template]="templateSelected$ | async"
-                  [parcellation]="selectedParcellation"
-                  [regions]="[region]">
-          </data-browser>
-        </ng-container>
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: 'Regional features',
+      desc: 123,
+      iconClass: 'fas fa-database',
+      iavNgIf: true,
+      content: regionalFeaturesTmpl
+    }">
+    </ng-container>
 
-        <!-- place holder regional features -->
-        <ng-template #regionalFeaturesPlaceholderTmpl>
-
-          <div class="d-inline-flex w-100 modality-card-container">
-            <mat-card class="flex-grow-0 flex-shrink-0 modality-card m-2"
-                      *ngFor="let dataM of dataBrowser.countedDataM">
-              <mat-card-content>
-              <span>
-                {{ dataM.name }}
-              </span>
-                <small class="text-muted">
-                  ({{ dataM.occurance }})
-                </small>
-              </mat-card-content>
-            </mat-card>
-          </div>
-
-          <data-browser
-                  class="invisible"
-                  [template]="templateSelected$ | async"
-                  [parcellation]="selectedParcellation"
-                  #dataBrowser="dataBrowser">
-          </data-browser>
-        </ng-template>
-      </mat-card-content>
-    </mat-expansion-panel>
-
-
-    <!--    Explore in other template -->
-    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 0"
-                         (opened)="expandedSideBarAccordion = 0"
-                         hideToggle
-                         class="mt-1 mb-1"
-                         *ngIf="(regionMenuComponent?.regionInOtherTemplates$ | async)?.length as sameRegionLength">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Explore in other templates
-        </mat-panel-title>
-        <mat-panel-description class="d-flex align-items-center justify-content-end">
-          <span class="mr-3">{{sameRegionLength}}</span>
-          <i class="fas fa-brain"></i>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-      <div *ngIf="regionMenuComponent?.regionInOtherTemplates$ | async as regionInOtherTemplates">
-        <div *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
-             [attr.aria-label]="regionMenuComponent.SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
-             (click)="regionMenuComponent.changeView(sameRegion)">
-          <button mat-button
-                  class="w-100 d-flex justify-content-start overflow-hidden text-truncate"
-                  [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')">
-            {{sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')}}
-          </button>
-        </div>
-      </div>
-    </mat-expansion-panel>
-
-
-    <!--    Connectivity-->
-    <mat-expansion-panel [expanded]="expandedSideBarAccordion === 2" (opened)="expandedSideBarAccordion = 2"
-                         hideToggle
-                         *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
-                         && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length">
-      <mat-expansion-panel-header>
-        <mat-panel-title>
-          Connectivity
-        </mat-panel-title>
-        <mat-panel-description class="d-flex align-items-center justify-content-end">
-          <span class="mr-3">{{selectedRegionConnectionNumber}}</span>
-          <i class="fab fa-connectdevelop"></i>
-        </mat-panel-description>
-      </mat-expansion-panel-header>
-
+    <!-- Connectivity -->
+    <ng-template #connectivityContentTmpl>
       <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
-        <ng-container *ngIf="region; else cnctvtyPlaceholderTmpl">
-          <connectivity-browser (connectedAreaCount)="selectedRegionConnectionNumber = $event" class="pe-all flex-grow-5 flex-shrink-1">
-          </connectivity-browser>
-        </ng-container>
-
-        <ng-template #cnctvtyPlaceholderTmpl>
-          Please select region to explore connectivity.
-        </ng-template>
+        <connectivity-browser class="pe-all flex-shrink-1">
+        </connectivity-browser>
       </mat-card-content>
-    </mat-expansion-panel>
+    </ng-template>
+
+    <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
+      title: 'Connectivity',
+      desc: connectedCounterDir.value,
+      iconClass: 'fas fa-braille',
+      iavNgIf: selectedParcellation
+        && selectedParcellation.hasAdditionalViewMode
+        && selectedParcellation.hasAdditionalViewMode.includes('connectivity'),
+      content: connectivityContentTmpl
+    }">
+    </ng-container>
 
   </mat-accordion>
+  <div class="w-0 h-0"
+    iav-counter
+    #connectedCounterDir="iavCounter">
 
-
+    <hbp-connectivity-matrix-row [region]="region.name"
+      (connectivityDataReceived)="connectedCounterDir.value = $event.detail.length"
+      class="invisible d-block h-0 w-0"
+      loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
+      dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies">
+    </hbp-connectivity-matrix-row>
+  </div>
 </ng-template>
 
 <!-- overlay templates -->
