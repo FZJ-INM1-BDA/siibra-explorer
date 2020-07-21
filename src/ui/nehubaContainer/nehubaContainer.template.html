@@ -112,7 +112,7 @@
     [hasBackdrop]="false">
 
     <!-- sidenav-content -->
-    <mat-drawer class="visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
+    <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
       [autoFocus]="false"
       #matDrawerMinor="matDrawer"
@@ -153,11 +153,15 @@
 
         <mat-chip-list class="mb-2">
           <!-- additional layer -->
-          <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
+          <ng-container *ngIf="!alSelector.selectorExpanded">
+            <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
+            </ng-container>
           </ng-container>
 
           <!-- any selected region(s) -->
-          <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+          <ng-container *ngIf="!sideNavMasterSwitch.switchState || !sideNavSwitch.switchState">
+            <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+            </ng-container>
           </ng-container>
         </mat-chip-list>
 
@@ -379,8 +383,11 @@
 
   </mat-card>
 
-  <mat-card *ngIf="selectedParcellation && selectedParcellation.hasAdditionalViewMode
-        && selectedParcellation.hasAdditionalViewMode.includes('connectivity') && selectedRegions?.length" class="mt-2 side-nav-cover d-flex flex-column">
+  <mat-card *ngIf="selectedParcellation
+    && selectedParcellation.hasAdditionalViewMode
+    && selectedParcellation.hasAdditionalViewMode.includes('connectivity')
+    && selectedRegions?.length"
+    class="mt-3 side-nav-cover d-flex flex-column">
     <mat-card-subtitle class="flex-grow-0 flex-shrink-0">
       Connectivity
     </mat-card-subtitle>

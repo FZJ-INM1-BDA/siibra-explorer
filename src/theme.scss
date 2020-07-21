@@ -21,6 +21,7 @@
       background-color: mat-color($background, background)
     }
 
+    &[darker-bg],
     &.darker-bg
     {
       background-color: $background-color;
