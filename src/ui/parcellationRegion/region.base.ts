@@ -12,14 +12,10 @@ export class RegionBase {
   public rgbString: string
   public rgbDarkmode: boolean
 
-  private _region: any
-
-  get region(){
-    return this._region
-  }
-
   @Input()
   showRegionInOtherTmpl: boolean = true
+
+  private _region: any
 
   @Input()
   set region(val) {
@@ -30,6 +26,10 @@ export class RegionBase {
     this.rgbString = `rgb(${this._region.rgb.join(',')})`
     const [h, s, l] = rgbToHsl(...this._region.rgb)
     this.rgbDarkmode = l < 0.4
+  }
+
+  get region(){
+    return this._region
   }
   
   private region$: BehaviorSubject<any> = new BehaviorSubject(null)
