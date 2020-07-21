@@ -130,6 +130,11 @@ describe('> nehubaContainer.component.ts', () => {
         fixture.detectChanges()
         expect(importNehubaSpy).toHaveBeenCalled()
       })
+
+      /**
+       * TODO perhaps move this to e2e?
+       */
+      it('> drag handle reattaches properly')
     })
 
     describe('> on selectedparcellation change', () => {

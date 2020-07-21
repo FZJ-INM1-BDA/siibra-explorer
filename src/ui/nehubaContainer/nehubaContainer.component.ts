@@ -1,19 +1,20 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject } from "rxjs";
-import { pipeFromArray } from "rxjs/internal/util/pipe";
-import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime } from "rxjs/operators";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, from } from "rxjs";
+import { pipe } from "rxjs/internal/util/pipe";
+import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime, delay, bufferWhen, concatMap } from "rxjs/operators";
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
 
 import { LoggingService } from "src/logging";
 import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface } from "src/services/stateStore.service";
-import { getExportNehuba, isSame } from "src/util/fn";
+import { getExportNehuba, isSame, getViewer } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
+import { retry } from 'common/util'
 import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
 import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
@@ -318,7 +319,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.sliceRenderEvent$ = fromEvent(this.elementRef.nativeElement, 'sliceRenderEvent').pipe(
-      shareReplay(1),
       map(ev => ev as CustomEvent)
     )
 
@@ -446,7 +446,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     /* each time a new viewer is initialised, take the first event to get the translation function */
     this.subscriptions.push(
       this.newViewer$.pipe(
-        switchMap(() => pipeFromArray([...takeOnePipe])(this.sliceRenderEvent$)),
+        switchMapTo(this.sliceRenderEvent$.pipe(
+          takeOnePipe()
+        ))
       ).subscribe((events) => {
         for (const idx in [0, 1, 2]) {
           const ev = events[idx] as CustomEvent
@@ -1043,38 +1045,34 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 }
 
-export const identifySrcElement = (element: HTMLElement) => {
-  const elementIsFirstRow = isFirstRow(element)
-  const elementIsFirstCell = isFirstCell(element)
+export const takeOnePipe = () => {
 
-  return elementIsFirstCell && elementIsFirstRow
-    ? 0
-    : !elementIsFirstCell && elementIsFirstRow
-      ? 1
-      : elementIsFirstCell && !elementIsFirstRow
-        ? 2
-        : !elementIsFirstCell && !elementIsFirstRow
-          ? 3
-          : 4
+  return pipe(
+    scan((acc: Event[], event: Event) => {
+      const target = (event as Event).target as HTMLElement
+      /**
+       * 0 | 1
+       * 2 | 3
+       *
+       * 4 ???
+       */
+      const panels = getViewer()['display']['panels']
+      const panelEls = Array.from(panels).map(({ element }) => element)
+
+      const identifySrcElement = (element: HTMLElement) => {
+        const idx = panelEls.indexOf(element)
+        return idx
+      }
+  
+      const key = identifySrcElement(target)
+      const _ = {}
+      _[key] = event
+      return Object.assign({}, acc, _)
+    }, []),
+    filter(v => {
+      const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+      return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
+    }),
+    take(1),
+  )
 }
-
-export const takeOnePipe = [
-  scan((acc: Event[], event: Event) => {
-    const target = (event as Event).target as HTMLElement
-    /**
-     * 0 | 1
-     * 2 | 3
-     *
-     * 4 ???
-     */
-    const key = identifySrcElement(target)
-    const _ = {}
-    _[key] = event
-    return Object.assign({}, acc, _)
-  }, []),
-  filter(v => {
-    const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-    return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
-  }),
-  take(1),
-]

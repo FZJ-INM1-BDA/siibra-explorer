@@ -1,11 +1,9 @@
 import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, Optional, Inject } from "@angular/core";
 import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject, Observable } from 'rxjs'
-import { pipeFromArray } from "rxjs/internal/util/pipe";
 import { debounceTime, filter, map, scan, startWith, debounce, tap } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
-import { takeOnePipe } from "../nehubaContainer.component";
 
 import { LoggingService } from "src/logging";
 import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
@@ -354,8 +352,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
   public mouseOverSegment: number | null
   public mouseOverLayer: {name: string, url: string}| null
 
-  public viewportToDatas: [any, any, any] = [null, null, null]
-
   public getNgHash: () => string = () => this.exportNehuba
     ? this.exportNehuba.getNgHash()
     : null
@@ -396,23 +392,6 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     setNehubaViewer(this.nehubaViewer)
 
     this.onDestroyCb.push(() => setNehubaViewer(null))
-
-    /**
-     * TODO
-     * move this to nehubaContainer
-     * do NOT use position logic to determine idx
-     */
-    this.ondestroySubscriptions.push(
-      // fromEvent(this.elementRef.nativeElement, 'viewportToData').pipe(
-      //   ...takeOnePipe
-      // ).subscribe((events:CustomEvent[]) => {
-      //   [0,1,2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-      // })
-      pipeFromArray([...takeOnePipe])(fromEvent(this.elementRef.nativeElement, 'viewportToData'))
-        .subscribe((events: CustomEvent[]) => {
-          [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
-        }),
-    )
   }
 
   public ngOnInit() {
