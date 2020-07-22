@@ -1,10 +1,8 @@
 <ng-template [ngIf]="ismobile" [ngIfElse]="fullTmpl">
   <div iav-fab-speed-dial-container
-    cdkDrag
     #fab="iavFabSpeedDialContainer">
     <button mat-fab
       iav-fab-speed-dial-trigger
-      cdkDragHandle
       [color]="fab.isOpen ? 'basic' : 'accent'">
       <i class="fas" [ngClass]="fab.isOpen ? 'fa-times' : 'fa-bars'"></i>
     </button>

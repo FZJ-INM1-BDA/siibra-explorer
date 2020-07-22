@@ -54,7 +54,6 @@
       (openedStart)="sideNavSwitch.switchState && matDrawerMinor.open()"
       [disableClose]="true"
       #matDrawerMaster="matDrawer">
-      
 
       <div class="h-0 w-100 region-text-search-autocomplete-position">
         <ng-container *ngTemplateOutlet="autocompleteTmpl">
@@ -71,13 +70,13 @@
     <mat-drawer-content class="visible position-relative">
 
       <!-- top left overlay -->
-      <div class="position-absolute top-0 left-0 d-inline-block pe-none">
+      <div class="content-transclusion-top-left position-absolute top-0 left-0 w-100 d-inline-block pe-none">
         <ng-content select="[ui-nehuba-container-overlay-top-left]">
         </ng-content>
       </div>
 
       <!-- top right overlay -->
-      <div class="position-absolute top-0 right-0 d-inline-block pe-none">
+      <div class="position-absolute top-0 right-0 w-100 d-inline-block pe-none">
         <ng-content select="[ui-nehuba-container-overlay-top-right]">
         </ng-content>
       </div>
@@ -89,15 +88,6 @@
           [color]="!sideNavMasterSwitch.switchState && selectedRegions.length > 0 ? 'accent' : 'basic'">
           <i class="fas" [ngClass]="sideNavMasterSwitch.switchState ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
         </button>
-
-        <!-- StatusCard container-->
-        <div class="muted-7 d-inline">
-          <ui-status-card
-            class="pe-all"
-            [selectedTemplateName]="selectedTemplate && selectedTemplate.name"
-            [nehubaViewer]="nehubaViewer">
-          </ui-status-card>
-        </div>
       </div>
 
     </mat-drawer-content>
@@ -139,129 +129,12 @@
     <!-- main-content -->
     <mat-drawer-content class="visible position-relative">
   
-      <div *ngIf="templateSelected$ | async"
-        class="viewer-config-container d-flex align-items-end pe-none">
-
-        <!-- bottom left overlay -->
-
-        <!-- Viewer Selector Container-->
-        <atlas-layer-selector
-          #alSelector="atlasLayerSelector"
-          class="pe-all"
-          (iav-outsideClick)="alSelector.selectorExpanded = false">
-        </atlas-layer-selector>
-
-        <mat-chip-list class="mb-2">
-          <!-- additional layer -->
-          <ng-container *ngIf="!alSelector.selectorExpanded">
-            <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
-            </ng-container>
-          </ng-container>
-
-          <!-- any selected region(s) -->
-          <ng-container *ngIf="!sideNavMasterSwitch.switchState || !sideNavSwitch.switchState">
-            <ng-container *ngTemplateOutlet="selectedRegionTmpl">
-            </ng-container>
-          </ng-container>
-        </mat-chip-list>
-
-        <!-- current layer tmpl -->
-        <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
-          <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
-            <ng-container *ngFor="let p of addParc">
-              <ng-container *ngTemplateOutlet="chipTmpl; context: {
-                parcel: p,
-                selected: true,
-                dismissable: true
-              }">
-              </ng-container>
-            </ng-container>
-          </ng-template>
-          <ng-template #defaultParcTmpl>
-            <ng-container *ngTemplateOutlet="chipTmpl; context: {
-              parcel: parc,
-              selected: false,
-              dismissable: false
-            }">
-            </ng-container>
-          </ng-template>
-
-          <!-- render parc templ -->
-          <ng-template #chipTmpl
-            let-parcel="parcel"
-            let-selected="selected"
-            let-dismissable="dismissable">
-            <mat-chip class="pe-all"
-              (click)="alSelector.selectorExpanded = true"
-              [selected]="selected">
-              
-              {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
-
-              <!-- info icon -->
-              <ng-template [ngIf]="parcel?.originDatasets?.length > 0"
-                  [ngIfElse]="infoIconBasic">
-
-                <mat-icon
-                  *ngFor="let ds of parcel.originDatasets"
-                  fontSet="fas"
-                  fontIcon="fa-info-circle"
-                  iav-stop="click"
-                  iav-dataset-show-dataset-dialog
-                  [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
-                  [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
-                  [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
-                  [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
-                </mat-icon>
-
-              </ng-template>
-
-              <ng-template #infoIconBasic>
-                <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
-                  fontSet="fas"
-                  fontIcon="fa-info-circle"
-                  iav-stop="click"
-                  iav-dataset-show-dataset-dialog
-                  [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
-                  [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
-
-                </mat-icon>
-              </ng-template>
-
-              <!-- dismiss icon -->
-              <mat-icon
-                *ngIf="dismissable"
-                (click)="clearAdditionalLayer(parcel)"
-                fontSet="fas"
-                fontIcon="fa-times">
-              </mat-icon>
-            </mat-chip>
-          </ng-template>
-        </ng-template>
-
-        <ng-template #selectedRegionTmpl>
-          <mat-chip *ngFor="let r of (selectedRegions$ | async)"
-            iav-region
-            (click)="matDrawerMinor.open() && sideNavMasterSwitch.open()"
-            [region]="r"
-            class="pe-all"
-            [ngClass]="{
-              'darktheme':regionDirective.rgbDarkmode === true,
-              'lighttheme': regionDirective.rgbDarkmode === false
-            }"
-            [style.backgroundColor]="regionDirective.rgbString"
-            #regionDirective="iavRegion">
-            <span class="iv-custom-comp text text-truncate d-inline">
-              {{ r.name }}
-            </span>
-            <mat-icon
-              class="iv-custom-comp text"
-              (click)="clearSelectedRegions()"
-              fontSet="fas"
-              fontIcon="fa-times">
-            </mat-icon>
-          </mat-chip>
-        </ng-template>
+      <!-- bottom left overlay -->
+      <div class="position-absolute bottom-0 left-0 w-100 d-inline-block pe-none">
+        <ng-content select="[ui-nehuba-container-overlay-bottom-left]">
+        </ng-content>
       </div>
+
     </mat-drawer-content>
   </mat-drawer-container>
 
@@ -309,7 +182,7 @@
 </ng-template>
 
 <ng-template #autocompleteTmpl>
-  <div class="iv-custom-comp bg region-text-search-autocomplete w-100 mat-elevation-z8 pe-all">
+  <div class="iv-custom-comp bg card w-100 mat-elevation-z8 pe-all">
     <region-text-search-autocomplete class="w-100 pt-2 flex-shrink-0 flex-grow-0">
     </region-text-search-autocomplete>
   </div>
