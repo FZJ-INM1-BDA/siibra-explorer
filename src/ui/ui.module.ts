@@ -91,6 +91,7 @@ import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
 import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionDirective } from "./parcellationRegion/region.directive";
+import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.base";
 
 @NgModule({
   imports : [
@@ -180,6 +181,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
     GetInitialLayerOpacityPipe,
+    RenderViewOriginDatasetLabelPipe,
 
     /* directive */
     DownloadDirective,

@@ -135,7 +135,9 @@ export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
 
 export const viewerStateGetSelectedAtlas = createSelector(
   state => state[viewerStateHelperStoreName],
-  ({ selectedAtlasId, fetchedAtlases }) => {
+  helperState => {
+    if (!helperState) return null
+    const { selectedAtlasId, fetchedAtlases } = helperState
     return selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
   }
 )

@@ -33,6 +33,8 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
+  @Input() public contributors: any[] = []
+
   public fetchFlag = false
   private _fullId: string
 
@@ -127,10 +129,11 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
         if (!dataset) return
         const { kgSchema, kgId } = this
 
-        const { name, description, publications, fullId, kgReference, files } = dataset
+        const { name, description, publications, fullId, kgReference, files, contributors, ...rest } = dataset
         this.name = name
         this.description = description
         this.publications = publications
+        this.contributors = contributors
         this.files = files
         this.fullId = fullId
 

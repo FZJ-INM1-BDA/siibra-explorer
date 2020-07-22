@@ -43,7 +43,7 @@
       </mat-list-item>
 
       <!-- originData -->
-      <mat-list-item *ngFor="let originDataset of (region.originDatasets || [])"
+      <mat-list-item *ngFor="let originDataset of (region.originDatasets || []); let index = index"
         iav-dataset-preview-dataset-file
         [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
         [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
@@ -56,7 +56,7 @@
         mat-ripple>
         <mat-icon fontSet="fas" fontIcon="fa-eye" mat-list-icon></mat-icon>
         <div mat-line>
-          View probability map
+          {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
         </div>
       </mat-list-item>
 

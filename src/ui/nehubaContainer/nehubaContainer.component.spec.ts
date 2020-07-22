@@ -33,6 +33,7 @@ import { NehubaModule } from './nehuba.module'
 import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
 import { viewerStateHelperStoreName } from 'src/services/state/viewerState.store.helper'
+import { RenderViewOriginDatasetLabelPipe } from '../parcellationRegion/region.base'
 
 const _bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const _bigbrainNehubaConfigJson = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
@@ -84,7 +85,8 @@ describe('> nehubaContainer.component.ts', () => {
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
-          SafeStylePipe
+          SafeStylePipe,
+          RenderViewOriginDatasetLabelPipe
         ],
         providers: [
           provideMockStore({ initialState: defaultRootState }),
