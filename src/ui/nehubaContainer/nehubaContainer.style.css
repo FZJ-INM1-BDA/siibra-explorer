@@ -180,3 +180,8 @@ div#scratch-pad
   margin-right: 1rem;
   text-align: right;
 }
+
+.tab-toggle-container
+{
+  margin-top: 1.5rem;
+}

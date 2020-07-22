@@ -34,6 +34,15 @@ import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
 import { viewerStateHelperStoreName } from 'src/services/state/viewerState.store.helper'
 import { RenderViewOriginDatasetLabelPipe } from '../parcellationRegion/region.base'
+import { By } from '@angular/platform-browser'
+import { ARIA_LABELS } from 'common/constants'
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+
+const { 
+  TOGGLE_SIDE_PANEL,
+  EXPAND,
+  COLLAPSE
+} = ARIA_LABELS
 
 const _bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const _bigbrainNehubaConfigJson = require('!json-loader!src/res/ext/bigbrainNehubaConfig.json')
@@ -52,6 +61,7 @@ describe('> nehubaContainer.component.ts', () => {
 
       TestBed.configureTestingModule({
         imports: [
+          NoopAnimationsModule,
           PluginModule,
           WidgetModule,
           ComponentsModule,
@@ -183,6 +193,203 @@ describe('> nehubaContainer.component.ts', () => {
 
         expect(setSpy).toHaveBeenCalled()
         
+      })
+    })
+
+    describe('> extended sidepanel hides and shows as expected', () => {
+      describe('> on start, if nothing is selected', () => {
+        beforeEach(() => {
+          const mockStore = TestBed.inject(MockStore)
+          const newState = {
+            ...defaultRootState,
+            viewerState: {
+              ...defaultRootState.viewerState,
+              fetchedTemplates: [ bigbrainJson ],
+              templateSelected: bigbrainJson,
+              parcellationSelected: bigbrainJson.parcellations[0]
+            },
+            [viewerStateHelperStoreName]: {
+              fetchedAtlases: [ humanAtlas ],
+              selectedAtlasId: humanAtlas['@id']
+            }
+          }
+
+          mockStore.setState(newState)
+        })
+
+        it('> both should be shut', () => {
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(false)
+          expect(
+            fixture.componentInstance.matDrawerMinor.opened
+          ).toEqual(false)
+        })
+
+        it('> opening via tab should result in only top drawer open', () => {
+
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
+          toggleBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(true)
+          expect(
+            fixture.componentInstance.matDrawerMinor.opened
+          ).toEqual(false)
+        })
+
+        it('> on opening top drawer, explore features should not be present', () => {
+
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
+          toggleBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${EXPAND}"]`) )
+          expect(expandRegionFeatureBtn).toBeNull()
+        })
+        it('> collapse btn should not be visible', () => {
+
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
+          toggleBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          expect(expandRegionFeatureBtn).toBeNull()
+        })
+      })
+
+      describe('> on start, if something is selected', () => {
+        beforeEach(() => {
+          const mockStore = TestBed.inject(MockStore)
+          const newState = {
+            ...defaultRootState,
+            viewerState: {
+              ...defaultRootState.viewerState,
+              fetchedTemplates: [ bigbrainJson ],
+              templateSelected: bigbrainJson,
+              parcellationSelected: bigbrainJson.parcellations[0],
+              regionsSelected: [{
+                name: "foobar"
+              }]
+            },
+            [viewerStateHelperStoreName]: {
+              fetchedAtlases: [ humanAtlas ],
+              selectedAtlasId: humanAtlas['@id']
+            }
+          }
+
+          mockStore.setState(newState)
+        })
+        it('> both should be open', () => {
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(true)
+          expect(
+            fixture.componentInstance.matDrawerMinor.opened
+          ).toEqual(true)
+
+          expect(
+            fixture.componentInstance.navSideDrawerMainSwitch.switchState
+          ).toEqual(true)
+          expect(
+            fixture.componentInstance.navSideDrawerMinorSwitch.switchState
+          ).toEqual(true)
+        })
+
+        it('> closing main drawer via tag should close both', () => {
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
+          toggleBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(false)
+
+          /**
+           * TODO investigate why openedStart/closedStart events fail to fire
+           */
+          // expect(
+          //   fixture.componentInstance.matDrawerMinor.opened
+          // ).toEqual(false)
+
+          // expect(
+          //   fixture.componentInstance.navSideDrawerMainSwitch.switchState
+          // ).toEqual(false)
+          // expect(
+          //   fixture.componentInstance.navSideDrawerMinorSwitch.switchState
+          // ).toEqual(false)
+        })
+        it('> collapse btn should be visible', () => {
+
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          expect(collapseRegionFeatureBtn).not.toBeNull()
+        })
+        it('> clicking on collapse btn should minimize 1 drawer', () => {
+
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          collapseRegionFeatureBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(true)
+
+          /**
+           * TODO investigate why property does not get updated
+           */
+          // expect(
+          //   fixture.componentInstance.matDrawerMinor.opened
+          // ).toEqual(false)
+
+          expect(
+            fixture.componentInstance.navSideDrawerMainSwitch.switchState
+          ).toEqual(true)
+          expect(
+            fixture.componentInstance.navSideDrawerMinorSwitch.switchState
+          ).toEqual(false)
+        })
+
+        it('> on minimize drawer, clicking expand btn should expand everything', () => {
+          const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.detectChanges()
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          collapseRegionFeatureBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${EXPAND}"]`) )
+          expandRegionFeatureBtn.triggerEventHandler('click', null)
+          fixture.detectChanges()
+
+          expect(
+            fixture.componentInstance.matDrawerMain.opened
+          ).toEqual(true)
+          expect(
+            fixture.componentInstance.matDrawerMinor.opened
+          ).toEqual(true)
+
+          expect(
+            fixture.componentInstance.navSideDrawerMainSwitch.switchState
+          ).toEqual(true)
+          /**
+           * TODO figoure out why switch state is updated async, and karma can't force update state
+           */
+          // expect(
+          //   fixture.componentInstance.navSideDrawerMinorSwitch.switchState
+          // ).toEqual(true)
+        })
       })
     })
   })

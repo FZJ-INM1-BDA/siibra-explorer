@@ -48,6 +48,7 @@
     <!-- sidenav-content -->
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
+      [attr.data-mat-drawer-open]="matDrawerMaster.opened"
       [opened]="sideNavMasterSwitch.switchState"
       [autoFocus]="false"
       (closedStart)="sideNavSwitch.switchState && matDrawerMinor.close()"
@@ -61,9 +62,11 @@
       </div>
 
       <button mat-raised-button
+        *ngIf="selectedRegions.length > 0"
+        [attr.aria-label]="ARIA_LABEL_EXPAND"
         (click)="matDrawerMinor.open()"
         class="explore-btn pe-all"
-        [color]="selectedRegions.length > 0 ? 'accent' : 'basic'">
+        color="accent">
         Explore regional features & connectivity
       </button>
     </mat-drawer>
@@ -81,8 +84,9 @@
         </ng-content>
       </div>
 
-      <div *ngIf="viewerLoaded" class="position-absolute z-index-6 top-0 left-0 pe-none m-2">
+      <div *ngIf="viewerLoaded" class="position-absolute z-index-6 top-0 left-0 pe-none tab-toggle-container">
         <button mat-raised-button
+          [attr.aria-label]="ARIA_LABEL_TOGGLE_SIDE_PANEL"
           class="pe-all tab-toggle"
           (click)="sideNavMasterSwitch.toggle()"
           [color]="!sideNavMasterSwitch.switchState && selectedRegions.length > 0 ? 'accent' : 'basic'">
@@ -95,7 +99,7 @@
 
   <!-- drawer #2 -->
   <mat-drawer-container
-    [iav-switch-initstate]="true"
+    [iav-switch-initstate]="selectedRegions.length > 0"
     iav-switch
     #sideNavSwitch="iavSwitch"
     class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
@@ -104,11 +108,13 @@
     <!-- sidenav-content -->
     <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
+      [attr.data-mat-drawer-open]="matDrawerMinor.opened"
       [autoFocus]="false"
       #matDrawerMinor="matDrawer"
       (openedChange)="$event && sideNavSwitch.open()"
       [disableClose]="true"
       [@openClose]="sideNavMasterSwitch.switchState && sideNavSwitch.switchState ? 'open' : 'closed'"
+      (@openClose.start)="_tmp=1"
       (@openClose.done)="$event.toState === 'closed' && matDrawerMinor.close()">
 
       <div class="position-relative d-flex flex-column h-100">
@@ -167,6 +173,7 @@
   <!-- collapse btn -->
   <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
     <button mat-raised-button class="mat-elevation-z8"
+      [attr.aria-label]="ARIA_LABEL_COLLAPSE"
       (click)="sideNavSwitch.close()"
       [color]="selectedRegions.length > 0 ? 'accent' : 'basic'">
       <i class="fas fa-chevron-up"></i>
