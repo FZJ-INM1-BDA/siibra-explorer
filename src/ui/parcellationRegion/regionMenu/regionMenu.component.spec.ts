@@ -5,7 +5,7 @@ import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
 import { PreviewDatasetFile } from "src/ui/databrowserModule/singleDataset/datasetPreviews/previewDatasetFile.directive"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
-import { regionInOtherTemplateSelector } from '../region.base'
+import { regionInOtherTemplateSelector, RenderViewOriginDatasetLabelPipe } from '../region.base'
 import { ARIA_LABELS } from 'common/constants'
 import { By } from "@angular/platform-browser"
 
@@ -67,7 +67,7 @@ describe('> regionMenu.component.ts', () => {
         ],
         declarations: [
           RegionMenuComponent,
-
+          RenderViewOriginDatasetLabelPipe,
           /**
            * Used by regionMenu.template.html to show region preview
            */
