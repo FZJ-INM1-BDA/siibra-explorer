@@ -368,7 +368,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  public mouseClickDocument(event: MouseEvent) {
+  public mouseClickDocument(_event: MouseEvent) {
 
     const next = () => {
       if (!this.onhoverSegments) return
