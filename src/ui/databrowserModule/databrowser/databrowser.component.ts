@@ -76,7 +76,7 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
        * TODO to be replaced with properly region UUIDs from KG
        */
       return {
-        id: `${this.parcellation.name}/${r.name}`,
+        id: `${this.parcellation?.name || 'untitled_parcellation'}/${r.name}`,
         ...r,
       }
     })

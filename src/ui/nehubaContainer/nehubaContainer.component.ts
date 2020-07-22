@@ -84,6 +84,9 @@ const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
 const { 
   ZOOM_IN,
   ZOOM_OUT,
+  TOGGLE_SIDE_PANEL,
+  EXPAND,
+  COLLAPSE
 } = ARIA_LABELS
 
 @Component({
@@ -129,8 +132,13 @@ const {
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
+  public _tmp: number = 0
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+  public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL
+  public ARIA_LABEL_EXPAND = EXPAND
+  public ARIA_LABEL_COLLAPSE = COLLAPSE
+
   public ID_MESH_LOADING_STATUS = MESH_LOADING_STATUS
 
   @ViewChild(NehubaViewerContainerDirective,{static: true})

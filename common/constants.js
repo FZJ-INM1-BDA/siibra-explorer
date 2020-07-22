@@ -1,6 +1,12 @@
 (function(exports){
 
   exports.ARIA_LABELS = {
+    // generic
+    CLOSE: 'Close',
+    OPEN: 'Open',
+    EXPAND: 'Expand',
+    COLLAPSE: 'Collapse',
+
     // dataset specific
     SHOW_DATASET_PREVIEW: 'Show dataset preview',
     TOGGLE_EXPLORE_PANEL: `Toggle explore panel`,
@@ -21,6 +27,7 @@
     STATUS_PANEL: 'Viewre status panel',
     SHOW_FULL_STATUS_PANEL: 'Show full status panel',
     HIDE_FULL_STATUS_PANEL: 'Hide full status panel',
+    TOGGLE_SIDE_PANEL: 'Toggle side panel',
 
     // sharing module
     SHARE_BTN: `Share this view`,
