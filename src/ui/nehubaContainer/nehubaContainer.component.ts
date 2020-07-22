@@ -14,15 +14,11 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
-import { retry } from 'common/util'
 import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
 import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import {
   viewerStateSetConnectivityRegion,
-  viewerStateGetOverlayingAdditionalParcellations,
-  viewerStateSetSelectedRegions,
-  viewerStateRemoveAdditionalLayer,
   viewerStateDblClickOnViewer,
 } from "src/services/state/viewerState.store.helper";
 
@@ -141,10 +137,14 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public nehubaContainerDirective: NehubaViewerContainerDirective
 
   @ViewChild('sideNavMasterSwitch', { static: true })
-  private navSideDrawerMainSwitch: SwitchDirective
+  public navSideDrawerMainSwitch: SwitchDirective
+  @ViewChild('sideNavSwitch', { static: true })
+  public navSideDrawerMinorSwitch: SwitchDirective
 
+  @ViewChild('matDrawerMaster', {static: true})
+  public matDrawerMain: MatDrawer
   @ViewChild('matDrawerMinor', { static: true })
-  private matDrawerMinor: MatDrawer
+  public matDrawerMinor: MatDrawer
 
   @Output()
   public nehubaViewerLoaded: EventEmitter<boolean> = new EventEmitter()
@@ -225,10 +225,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private redrawLayout$: Observable<[string, string]>
 
   public hoveredPanelIndices$: Observable<number>
-
-  public selectedAdditionalLayers$ = this.store.pipe(
-    select(viewerStateGetOverlayingAdditionalParcellations),
-  )
 
   constructor(
     private pureConstantService: PureContantService,
@@ -394,22 +390,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   public useMobileUI$: Observable<boolean>
-
-  public clearSelectedRegions(){
-    this.store.dispatch(
-      viewerStateSetSelectedRegions({
-        selectRegions: []
-      })
-    )
-  }
-
-  public clearAdditionalLayer(layer: { ['@id']: string }){
-    this.store.dispatch(
-      viewerStateRemoveAdditionalLayer({
-        payload: layer
-      })
-    )
-  }
 
   private removeExistingPanels() {
     const element = this.nehubaViewer.nehubaViewer.ngviewer.layout.container.componentValue.element as HTMLElement

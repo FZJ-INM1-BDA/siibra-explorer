@@ -43,7 +43,9 @@ export class AtlasLayerSelector implements OnInit {
       )
 
       this.availableTemplates$ = combineLatest(
-        this.selectedAtlas$,
+        this.selectedAtlas$.pipe(
+          filter(v => !!v)
+        ),
         this.store$.pipe(
           select('viewerState'),
           select('fetchedTemplates')

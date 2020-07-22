@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import {Injectable, NgZone, Optional, Inject, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { Observable, Subject, Subscription, from, race, of, interval } from "rxjs";
-import { distinctUntilChanged, map, filter, startWith, take, switchMap, catchError, mapTo, tap } from "rxjs/operators";
+import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
+import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo } from "rxjs/operators";
 import { DialogService } from "src/services/dialogService.service";
 import {
   getLabelIndexMap,
