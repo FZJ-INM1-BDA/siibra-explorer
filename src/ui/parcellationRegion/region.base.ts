@@ -40,7 +40,7 @@ export class RegionBase {
 
   public sameRegionTemplate: any[] = []
   public regionInOtherTemplates$: Observable<any[]>
-  public regionOriginDatasetLabels$: Observable<string[]>
+  public regionOriginDatasetLabels$: Observable<{ name: string }[]>
 
   constructor(
     private store$: Store<any>,
