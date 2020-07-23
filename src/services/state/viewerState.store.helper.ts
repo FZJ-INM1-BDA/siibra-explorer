@@ -44,11 +44,19 @@ export {
   viewreStateRemoveUserLandmarks
 }
 
-export {
+import {
   viewerStateAllParcellationsSelector,
-  viewerStateSelectedRegionsSelector
+  viewerStateSelectedRegionsSelector,
+  viewerStateSelectedTemplateSelector,
+  viewerStateSelectedParcellationSelector
 } from './viewerState/selectors'
 
+export {
+  viewerStateAllParcellationsSelector,
+  viewerStateSelectedRegionsSelector,
+  viewerStateSelectedTemplateSelector,
+  viewerStateSelectedParcellationSelector
+}
 
 interface IViewerStateHelperStore{
   fetchedAtlases: any[]
@@ -88,22 +96,22 @@ export const viewerStateMetaReducers = [
 
 export class ViewerStateHelperEffect{
   @Effect()
-  selectParcellationWithId$: Observable<any>
+  selectParcellationWithId$: Observable<any> = this.actions$.pipe(
+    ofType(viewerStateRemoveAdditionalLayer.type),
+    withLatestFrom(this.store$.pipe(
+      select(viewerStateGetSelectedAtlas)
+    )),
+    map(([ { payload }, selectedAtlas ]) => {
+      const baseLayer = selectedAtlas['parcellations'].find(p => p['baseLayer'])
+      return viewerStateHelperSelectParcellationWithId({ payload: baseLayer })
+    })
+  )
 
   constructor(
     private store$: Store<any>,
     private actions$: Actions
   ){
-    this.selectParcellationWithId$ = this.actions$.pipe(
-      ofType(viewerStateRemoveAdditionalLayer.type),
-      withLatestFrom(this.store$.pipe(
-        select(viewerStateGetSelectedAtlas)
-      )),
-      map(([ { payload }, selectedAtlas ]) => {
-        const baseLayer = selectedAtlas['parcellations'].find(p => p['baseLayer'])
-        return viewerStateHelperSelectParcellationWithId({ payload: baseLayer })
-      })
-    )
+    
   }
 }
 

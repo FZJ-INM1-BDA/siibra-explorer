@@ -1,6 +1,5 @@
 import { InjectionToken } from "@angular/core";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
-export { DatasetPreview } from "./databrowser.module";
 
 export const OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN = new InjectionToken<(file: any, dataset: any) => void>('OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN')
 export const DATASTORE_DEFAULT_STATE = {
@@ -88,4 +87,9 @@ export interface IKgDataEntry {
 
   id: string
   fullId: string
+}
+
+export interface DatasetPreview {
+  datasetId: string
+  filename: string
 }

@@ -54,7 +54,7 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue } from './glue';
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -96,7 +96,8 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       AtlasViewerHistoryUseEffect,
       UiStateUseEffect,
       NewTemplateUseEffect,
-      ViewerStateHelperEffect
+      ViewerStateHelperEffect,
+      GlueEffects
     ]),
     StoreModule.forRoot({
       pluginState,

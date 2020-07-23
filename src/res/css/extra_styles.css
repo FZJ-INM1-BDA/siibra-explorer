@@ -711,6 +711,14 @@ kg-dataset-previewer > img
   margin-right: -1rem!important;
 }
 
+.ml-5-n
+{
+  margin-left: -1.25rem!important;
+}
+.mr-5-n
+{
+  margin-right: -1.25rem!important;
+}
 .mt-4-n
 {
   margin-top: -1rem!important;

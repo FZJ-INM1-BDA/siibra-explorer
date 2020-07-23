@@ -21,3 +21,13 @@ export const viewerStateAllParcellationsSelector = createSelector(
       }, [])
   }
 )
+
+export const viewerStateSelectedTemplateSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['templateSelected']
+)
+
+export const viewerStateSelectedParcellationSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['parcellationSelected']
+)
