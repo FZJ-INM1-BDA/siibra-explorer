@@ -183,9 +183,9 @@ export const getRegionParentParcRefSpace = createSelector(
 export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
   public transform(originDatasetlabels: { name: string }[], index: string|number){
     if (!!originDatasetlabels && !!originDatasetlabels[index] && !!originDatasetlabels[index].name) {
-      return `View ${originDatasetlabels[index]['name']}`
+      return `${originDatasetlabels[index]['name']}`
     }
-    return `View origin dataset`
+    return `origin dataset`
   }
 }
 

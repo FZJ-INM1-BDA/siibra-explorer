@@ -11,11 +11,36 @@
         <small *ngIf="region.status"> ({{region.status}})</small>
       </div>
     </mat-card-title>
-    <mat-card-subtitle class="mb-0">
-      <i class="fas fa-brain"></i>
-      <span class="text">
-        Brain region
-      </span>
+
+    <!-- other info about brain region -->
+    <mat-card-subtitle class="mb-0 ml-5-n mr-5-n">
+
+      <!-- origin datas -->
+      <button mat-button 
+        [color]="previewDirective.active ? 'primary' : 'basic'"
+        *ngFor="let originDataset of (region.originDatasets || []); let index = index"
+        iav-dataset-preview-dataset-file
+        [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+        [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+        #previewDirective="iavDatasetPreviewDatasetFile"
+        iv-custom-comp
+        [attr.primary]="previewDirective.active || null"
+        role="switch"
+        [attr.aria-checked]="previewDirective.active"
+        [attr.aria-label]="SHOW_ORIGIN_DATASET">
+        <mat-icon fontSet="fas" fontIcon="fa-eye"></mat-icon>
+        <span>
+          View {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+        </span>
+      </button>
+
+      <!-- position -->
+      <button mat-icon-button *ngIf="region?.position"
+        (click)="navigateToRegion()"
+        [matTooltip]="region.position | nmToMm | addUnitAndJoin : 'mm'">
+        <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
+        </mat-icon>
+      </button>
     </mat-card-subtitle>
   </div>
 
@@ -33,32 +58,6 @@
     <mat-divider></mat-divider>
 
     <mat-list class="action-list sm">
-
-      <!-- position -->
-      <mat-list-item *ngIf="region?.position" (click)="navigateToRegion()" mat-ripple>
-        <mat-icon scaled-down fontSet="fas" fontIcon="fa-map-marked-alt" mat-list-icon></mat-icon>
-        <div mat-line>
-          {{ region.position | nmToMm | addUnitAndJoin : 'mm' }}
-        </div>
-      </mat-list-item>
-
-      <!-- originData -->
-      <mat-list-item *ngFor="let originDataset of (region.originDatasets || []); let index = index"
-        iav-dataset-preview-dataset-file
-        [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-        [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-        #previewDirective="iavDatasetPreviewDatasetFile"
-        iv-custom-comp
-        [attr.primary]="previewDirective.active || null"
-        role="switch"
-        [attr.aria-checked]="previewDirective.active"
-        [attr.aria-label]="SHOW_ORIGIN_DATASET"
-        mat-ripple>
-        <mat-icon fontSet="fas" fontIcon="fa-eye" mat-list-icon></mat-icon>
-        <div mat-line>
-          {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-        </div>
-      </mat-list-item>
 
       <!-- connectivity -->
       <div *ngIf="hasConnectivity" iav-switch #connectivitySwitch="iavSwitch">

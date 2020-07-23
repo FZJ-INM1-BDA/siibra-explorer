@@ -1,9 +1,9 @@
-import { uiActionSetPreviewingDatasetFiles, TypeOpenedWidget, EnumWidgetTypes, IDatasetPreviewData, uiStateShowBottomSheet } from "./services/state/uiState.store.helper"
+import { uiActionSetPreviewingDatasetFiles, TypeOpenedWidget, EnumWidgetTypes, IDatasetPreviewData, uiStateShowBottomSheet, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
 import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule"
-import { Subscription, Observable, forkJoin, of } from "rxjs"
+import { Subscription, Observable, forkJoin, of, merge } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
-import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom } from "rxjs/operators"
+import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip } from "rxjs/operators"
 import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
 import { getIdObj } from 'common/util'
 import { MatDialogRef } from "@angular/material/dialog"
@@ -13,6 +13,8 @@ import { ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, INgLayerInterfac
 import { ARIA_LABELS } from 'common/constants'
 import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
 import { EnumColorMapName } from "./util/colorMaps"
+import { Effect } from "@ngrx/effects"
+import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -20,11 +22,6 @@ const PREVIEW_FILE_TYPES_NO_UI = [
 ]
 
 const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
-
-export const glueActionPreviewDataset = createAction(
-  '[glue] previewDataset',
-  props<IDatasetPreviewData>()
-)
 
 export const glueActionToggleDatasetPreview = createAction(
   '[glue] toggleDatasetPreview',
@@ -49,6 +46,55 @@ export const glueSelectorGetUiStatePreviewingFiles = createSelector(
 export interface IDatasetPreviewGlue{
   datasetPreviewDisplayed(file: DatasetPreview, dataset: IKgDataEntry): Observable<boolean>
   displayDatasetPreview(previewFile: DatasetPreview, dataset: IKgDataEntry): void
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+
+export class GlueEffects {
+  
+  @Effect()
+  resetDatasetPreview$: Observable<any> = this.store$.pipe(
+    select(uiStatePreviewingDatasetFilesSelector),
+    distinctUntilChanged(),
+    filter(previews => previews?.length > 0),
+    switchMapTo(merge(
+      this.store$.pipe(
+        select(viewerStateSelectedRegionsSelector),
+        map(rs => (rs || []).map(r => r['name']).sort().join(',')),
+        distinctUntilChanged(),
+        skip(1)
+      ),
+      this.store$.pipe(
+        select(viewerStateSelectedTemplateSelector),
+        map(tmpl => tmpl
+          ? tmpl['@id'] || tmpl['name']
+          : null),
+        distinctUntilChanged(),
+        skip(1)
+      ),
+      this.store$.pipe(
+        select(viewerStateSelectedParcellationSelector),
+        map(parc => parc
+          ? parc['@id'] || parc['name']
+          : null),
+        distinctUntilChanged(),
+        skip(1)
+      )
+    ))
+  ).pipe(
+    tap(console.log),
+    mapTo(uiActionSetPreviewingDatasetFiles({
+      previewingDatasetFiles: []
+    }))
+  )
+
+  constructor(
+    private store$: Store<any>
+  ){
+
+  }
 }
 
 @Injectable({

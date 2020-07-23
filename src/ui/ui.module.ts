@@ -234,6 +234,7 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     LandmarkUIComponent,
     NehubaViewerTouchDirective,
     AtlasDropdownSelector,
+    RenderViewOriginDatasetLabelPipe,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
