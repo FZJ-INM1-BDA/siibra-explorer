@@ -1,6 +1,6 @@
-import { uiActionSetPreviewingDatasetFiles, TypeOpenedWidget, EnumWidgetTypes, IDatasetPreviewData, uiStateShowBottomSheet, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
+import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStateShowBottomSheet, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
-import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule"
+import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule/pure"
 import { Subscription, Observable, forkJoin, of, merge } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
 import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip } from "rxjs/operators"
@@ -54,37 +54,40 @@ export interface IDatasetPreviewGlue{
 
 export class GlueEffects {
   
+  public regionTemplateParcChange$ = merge(
+    this.store$.pipe(
+      select(viewerStateSelectedRegionsSelector),
+      map(rs => (rs || []).map(r => r['name']).sort().join(',')),
+      distinctUntilChanged(),
+      skip(1),
+    ),
+    this.store$.pipe(
+      select(viewerStateSelectedTemplateSelector),
+      map(tmpl => tmpl
+        ? tmpl['@id'] || tmpl['name']
+        : null),
+      distinctUntilChanged(),
+      skip(1)
+    ),
+    this.store$.pipe(
+      select(viewerStateSelectedParcellationSelector),
+      map(parc => parc
+        ? parc['@id'] || parc['name']
+        : null),
+      distinctUntilChanged(),
+      skip(1)
+    )
+  ).pipe(
+    mapTo(true)
+  )
+
   @Effect()
   resetDatasetPreview$: Observable<any> = this.store$.pipe(
     select(uiStatePreviewingDatasetFilesSelector),
     distinctUntilChanged(),
     filter(previews => previews?.length > 0),
-    switchMapTo(merge(
-      this.store$.pipe(
-        select(viewerStateSelectedRegionsSelector),
-        map(rs => (rs || []).map(r => r['name']).sort().join(',')),
-        distinctUntilChanged(),
-        skip(1)
-      ),
-      this.store$.pipe(
-        select(viewerStateSelectedTemplateSelector),
-        map(tmpl => tmpl
-          ? tmpl['@id'] || tmpl['name']
-          : null),
-        distinctUntilChanged(),
-        skip(1)
-      ),
-      this.store$.pipe(
-        select(viewerStateSelectedParcellationSelector),
-        map(parc => parc
-          ? parc['@id'] || parc['name']
-          : null),
-        distinctUntilChanged(),
-        skip(1)
-      )
-    ))
+    switchMapTo(this.regionTemplateParcChange$)
   ).pipe(
-    tap(console.log),
     mapTo(uiActionSetPreviewingDatasetFiles({
       previewingDatasetFiles: []
     }))
