@@ -98,6 +98,12 @@
               <ng-container *ngTemplateOutlet="selectedRegionTmpl">
               </ng-container>
             </ng-container>
+
+            <!-- controls for iav volumes -->
+            <div class="hidden" iav-shown-previews #previews="iavShownPreviews"></div>
+            <ng-container *ngTemplateOutlet="selectedDatasetPreview; context: { layers: previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] }">
+            </ng-container>
+
           </mat-chip-list>
           
           <!-- current layer tmpl -->
@@ -199,24 +205,26 @@
                 </mat-icon>
               </mat-chip>
 
-              <!-- chips for previewing origin datasets -->
-              <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
-                <div class="hidden"
-                  iav-dataset-preview-dataset-file
-                  [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-                  [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-                  #previewDirective="iavDatasetPreviewDatasetFile">
-                </div>
-                <mat-chip *ngIf="previewDirective.active"
-                  (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
-                  class="pe-all">
-                  {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-                  <mat-icon (click)="previewDirective.onClick()"
-                    fontSet="fas"
-                    fontIcon="fa-times">
-                  </mat-icon>
-                </mat-chip>
-              </ng-container>
+            </ng-container>
+          </ng-template>
+
+          <ng-template #selectedDatasetPreview let-layers="layers">
+
+            <ng-container *ngFor="let layer of layers">
+              <div class="hidden"
+                iav-dataset-preview-dataset-file
+                [iav-dataset-preview-dataset-file-kgid]="layer.datasetId"
+                [iav-dataset-preview-dataset-file-filename]="layer.filename"
+                #preview="iavDatasetPreviewDatasetFile">
+                
+              </div>
+              <mat-chip class="pe-all"
+                (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()">
+                {{ layer.file?.name || layer.filename || 'Unknown data preview' }}
+                <mat-icon fontSet="fas" fontIcon="fa-times"
+                  (click)="preview.onClick()">
+                </mat-icon>
+              </mat-chip>
             </ng-container>
           </ng-template>
 

@@ -3,7 +3,7 @@ import { RegionMenuComponent } from "./regionMenu.component"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
-import { PreviewDatasetFile } from "src/ui/databrowserModule/singleDataset/datasetPreviews/previewDatasetFile.directive"
+import { PreviewDatasetFile } from "src/ui/databrowserModule/pure"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { regionInOtherTemplateSelector, RenderViewOriginDatasetLabelPipe } from '../region.base'
 import { ARIA_LABELS } from 'common/constants'

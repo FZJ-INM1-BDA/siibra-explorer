@@ -1,8 +1,8 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, from } from "rxjs";
+import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, Subject } from "rxjs";
 import { pipe } from "rxjs/internal/util/pipe";
-import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime, delay, bufferWhen, concatMap } from "rxjs/operators";
+import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime } from "rxjs/operators";
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
 
@@ -173,7 +173,12 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private newViewer$: Observable<any>
   private selectedParcellation$: Observable<any>
   public selectedRegions: any[] = []
-  public selectedRegions$: Observable<any[]>
+  public selectedRegions$: Observable<any[]> = this.store.pipe(
+    select('viewerState'),
+    select('regionsSelected'),
+    filter(rs => !!rs),
+  )
+
   public selectedLandmarks$: Observable<any[]>
   public selectedPtLandmarks$: Observable<any[]>
   private hideSegmentations$: Observable<boolean>
@@ -188,6 +193,17 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   @Input()
   private currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
+
+  public iavAdditionalLayers$ = new Subject<any[]>()
+
+  public alwaysHideMinorPanel$: Observable<boolean> = combineLatest(
+    this.selectedRegions$,
+    this.iavAdditionalLayers$.pipe(
+      startWith([])
+    )
+  ).pipe(
+    map(([ regions, layers ]) => regions.length === 0 && layers.length === 0)
+  )
 
   public onHoverSegments$: BehaviorSubject<any[]> = new BehaviorSubject([])
   public onHoverSegment$: Observable<any> = this.onHoverSegments$.pipe(
@@ -290,12 +306,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       select('parcellationSelected'),
       distinctUntilChanged(),
       filter(v => !!v)
-    )
-
-    this.selectedRegions$ = this.store.pipe(
-      select('viewerState'),
-      select('regionsSelected'),
-      filter(rs => !!rs),
     )
 
     this.selectedLandmarks$ = this.store.pipe(
@@ -731,12 +741,17 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     /** switch side nav */
     this.subscriptions.push(
-      this.selectedRegions$.subscribe(regions => {
-        this.selectedRegions = regions
-        if (regions?.length > 0) {
+      this.alwaysHideMinorPanel$.subscribe(flag => {
+        if (!flag) {
           this.matDrawerMinor && this.matDrawerMinor.open()
           this.navSideDrawerMainSwitch && this.navSideDrawerMainSwitch.open()
         }
+      })
+    )
+
+    this.subscriptions.push(
+      this.selectedRegions$.subscribe(regions => {
+        this.selectedRegions = regions
       })
     )
 

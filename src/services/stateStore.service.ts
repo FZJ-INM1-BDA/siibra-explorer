@@ -1,5 +1,7 @@
 import { filter } from 'rxjs/operators';
 
+export { getNgIds } from 'src/util/fn'
+
 import {
   ActionInterface as NgViewerActionInterface,
   defaultState as ngViewerDefaultState,
@@ -139,15 +141,6 @@ export function getLabelIndexMap(regions: any[]): Map<number, any> {
  * @param regions regions to deep iterate to find all ngId 's, filtering out falsy values
  * n.b. returns non unique list
  */
-export function getNgIds(regions: any[]): string[] {
-  return regions && regions.map
-    ? regions
-      .map(r => [r.ngId, ...getNgIds(r.children)])
-      .reduce((acc, item) => acc.concat(item), [])
-      .filter(ngId => !!ngId)
-    : []
-}
-
 export interface DedicatedViewState {
   dedicatedView: string | null
 }

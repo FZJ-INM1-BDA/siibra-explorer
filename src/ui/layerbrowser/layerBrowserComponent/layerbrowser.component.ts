@@ -1,22 +1,23 @@
 import { Component,  EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, Observable, Subscription } from "rxjs";
-import { debounceTime, distinctUntilChanged, filter, map, shareReplay } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { LoggingService } from "src/logging";
-import { NG_VIEWER_ACTION_TYPES } from "src/services/state/ngViewerState.store";
-import { getViewer } from "src/util/fn";
-import { INgLayerInterface } from "../../atlasViewer/atlasViewer.component";
-import { FORCE_SHOW_SEGMENT, getNgIds, isDefined, REMOVE_NG_LAYER, safeFilter, ViewerStateInterface, IavRootStoreInterface } from "../../services/stateStore.service";
+import { debounceTime, distinctUntilChanged, map, shareReplay, startWith } from "rxjs/operators";
 import { MatSliderChange } from "@angular/material/slider";
+
+import { getViewer } from "src/util/fn";
+import { PureContantService } from "src/util";
+import { ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState/actions";
+import { getNgIds } from 'src/util/fn'
+import { LoggingService } from "src/logging";
 import { ARIA_LABELS } from 'common/constants'
+
+import { INgLayerInterface } from "../index";
 
 @Component({
   selector : 'layer-browser',
   templateUrl : './layerbrowser.template.html',
   styleUrls : [
     './layerbrowser.style.css',
-    '../btnShadow.style.css',
   ],
 })
 
@@ -43,9 +44,6 @@ export class LayerBrowser implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = []
   private disposeHandler: any
 
-  /* TODO temporary measure. when datasetID can be used, will use  */
-  public fetchedDataEntries$: Observable<any>
-
   @Input()
   public showPlaceholder: boolean = true
 
@@ -54,11 +52,11 @@ export class LayerBrowser implements OnInit, OnDestroy {
   private customNgLayers: string[] = ['spatial landmark layer']
 
   constructor(
-    private store: Store<IavRootStoreInterface>,
-    private constantsService: AtlasViewerConstantsServices,
+    private store: Store<any>,
+    private constantsService: PureContantService,
     private log: LoggingService,
   ) {
-
+    console.log('init')
     this.ngLayers$ = store.pipe(
       select('viewerState'),
       select('templateSelected'),
@@ -106,20 +104,10 @@ export class LayerBrowser implements OnInit, OnDestroy {
       distinctUntilChanged()
     )
 
-    /**
-     * TODO
-     * this is no longer populated
-     */
-    this.fetchedDataEntries$ = this.store.pipe(
-      select('dataStore'),
-      safeFilter('fetchedDataEntries'),
-      map(v => v.fetchedDataEntries),
-    )
-
     this.forceShowSegment$ = this.store.pipe(
       select('ngViewerState'),
-      filter(state => isDefined(state) && typeof state.forceShowSegment !== 'undefined'),
-      map(state => state.forceShowSegment),
+      select('forceShowSegment'),
+      startWith(false)
     )
 
     this.darktheme$ = this.constantsService.darktheme$.pipe(
@@ -187,7 +175,7 @@ export class LayerBrowser implements OnInit, OnDestroy {
      * TODO perhaps useEffects ?
      */
     this.store.dispatch({
-      type : FORCE_SHOW_SEGMENT,
+      type : 'FORCE_SHOW_SEGMENT',
       forceShowSegment : this.forceShowSegmentCurrentState === null
         ? true
         : this.forceShowSegmentCurrentState === true
@@ -196,21 +184,17 @@ export class LayerBrowser implements OnInit, OnDestroy {
     })
   }
 
-  public removeAllNonBasicLayer() {
-    this.store.dispatch({
-      type: NG_VIEWER_ACTION_TYPES.REMOVE_ALL_NONBASE_LAYERS,
-    })
-  }
-
   public removeLayer(layer: any) {
     if (this.checkLocked(layer)) {
       this.log.warn('this layer is locked and cannot be removed')
       return
     }
-    this.store.dispatch({
-      type: REMOVE_NG_LAYER,
-      layer
-    })
+
+    this.store.dispatch(
+      ngViewerActionRemoveNgLayer({
+        layer
+      })
+    )
   }
 
   public changeOpacity(layerName: string, event: MatSliderChange){

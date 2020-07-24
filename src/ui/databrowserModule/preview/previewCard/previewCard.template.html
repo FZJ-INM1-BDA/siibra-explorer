@@ -1,0 +1,18 @@
+<mat-card class="mat-elevation-z4">
+  <div class="header-container">
+    <mat-card-title>
+      {{ file.name || filename }}
+    </mat-card-title>
+
+    <mat-card-subtitle>
+      <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
+      <span>
+        Previewing data
+      </span>
+    </mat-card-subtitle>
+  </div>
+</mat-card>
+
+<div class="mt-4">
+  <layer-browser></layer-browser>
+</div>

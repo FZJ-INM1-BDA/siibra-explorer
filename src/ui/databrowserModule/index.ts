@@ -18,5 +18,6 @@ export {
   IKgReferenceSpace,
   DatasetPreview,
   PreviewComponentWrapper,
-  getKgSchemaIdFromFullId
+  getKgSchemaIdFromFullId,
+  PreviewDatasetFile,
 } from './pure'

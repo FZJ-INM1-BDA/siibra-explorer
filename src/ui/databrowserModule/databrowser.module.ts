@@ -25,11 +25,11 @@ import { AppendFilerModalityPipe } from "./util/appendFilterModality.pipe";
 import { GetKgSchemaIdFromFullIdPipe, getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
 import { ResetCounterModalityPipe } from "./util/resetCounterModality.pipe";
 import { PreviewFileVisibleInSelectedReferenceTemplatePipe } from "./util/previewFileDisabledByReferenceSpace.pipe";
-import { DatasetPreviewList, UnavailableTooltip } from "./singleDataset/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
+import { DatasetPreviewList, UnavailableTooltip } from "./preview/datasetPreviews/datasetPreviewsList/datasetPreviewList.component";
 import { PreviewComponentWrapper } from "./preview/previewComponentWrapper/previewCW.component";
 import { BulkDownloadBtn, TransformDatasetToIdPipe } from "./bulkDownload/bulkDownloadBtn.component";
 import { ShowDatasetDialogDirective, IAV_DATASET_SHOW_DATASET_DIALOG_CMP } from "./showDatasetDialog.directive";
-import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./singleDataset/datasetPreviews/previewDatasetFile.directive";
+import { PreviewDatasetFile, IAV_DATASET_PREVIEW_DATASET_FN, IAV_DATASET_PREVIEW_ACTIVE, TypePreviewDispalyed } from "./preview/previewDatasetFile.directive";
 
 import {
   DatasetPreview
@@ -38,6 +38,10 @@ import {
 import {
   OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN,
 } from './constants'
+import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
+import { FilterPreviewByType } from "./preview/filterPreview.pipe";
+import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
+import { LayerBrowserModule } from "../layerbrowser";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -53,6 +57,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     FormsModule,
     UtilModule,
     AngularMaterialModule,
+    LayerBrowserModule,
   ],
   declarations: [
     DataBrowser,
@@ -62,12 +67,14 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     DatasetPreviewList,
     PreviewComponentWrapper,
     BulkDownloadBtn,
+    PreviewCardComponent,
 
     /**
      * Directives
      */
     ShowDatasetDialogDirective,
     PreviewDatasetFile,
+    ShownPreviewsDirective,
 
     /**
      * pipes
@@ -88,7 +95,9 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     PreviewFileVisibleInSelectedReferenceTemplatePipe,
     UnavailableTooltip,
     TransformDatasetToIdPipe,
-    SortModalityAlphabeticallyPipe
+    SortModalityAlphabeticallyPipe,
+    PreviewFileTypePipe,
+    FilterPreviewByType,
   ],
   exports: [
     DataBrowser,
@@ -101,6 +110,10 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     TransformDatasetToIdPipe,
     ShowDatasetDialogDirective,
     PreviewDatasetFile,
+    PreviewFileTypePipe,
+    ShownPreviewsDirective,
+    FilterPreviewByType,
+    PreviewCardComponent,
   ],
   entryComponents: [
     DataBrowser,
