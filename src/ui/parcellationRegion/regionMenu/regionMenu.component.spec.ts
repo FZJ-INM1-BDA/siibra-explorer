@@ -119,6 +119,23 @@ describe('> regionMenu.component.ts', () => {
         expect(toggleBtn).toBeTruthy()
       })
 
+      it('> if showRegionInOtherTmpl is set to false, toggle btn will not be shown', () => {
+        
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(
+          regionInOtherTemplateSelector,
+          nohemisphereHrms
+        )
+
+        const fixture = TestBed.createComponent(RegionMenuComponent)
+        fixture.componentInstance.region = mr1
+        fixture.componentInstance.showRegionInOtherTmpl = false
+        fixture.detectChanges()
+
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
+        expect(toggleBtn).toBeFalsy()
+      })
+
       it('> even if toggleBtn exists, list should be hidden by default', () => {
 
         const mockStore = TestBed.inject(MockStore)

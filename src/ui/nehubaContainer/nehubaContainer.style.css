@@ -181,6 +181,10 @@ div#scratch-pad
   text-align: right;
 }
 
+.accordion-icon
+{
+  width:1.5rem;
+}
 .tab-toggle-container
 {
   margin-top: 1.5rem;

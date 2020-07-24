@@ -29,7 +29,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     private connectivityRegion$: Observable<any>
     private templateSelected$: Observable<any>
     private selectedParcellation$: Observable<any>
-    public selectedRegions$: Observable<any[]>
 
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
@@ -44,7 +43,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       maxHeight: '500px'
     }
 
-    @ViewChild('connectivityComponent', {read: ElementRef, static: true}) public connectivityComponentElement: ElementRef
+    @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
+
 
     @Output() public closeConnectivity: EventEmitter<boolean> = new EventEmitter()
     @Output() public connectedAreaCount: EventEmitter<number> = new EventEmitter()
@@ -63,15 +63,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       this.connectivityRegion$ = this.store$.pipe(
         select('viewerState'),
         safeFilter('connectivityRegion'),
-        map(state => state.connectivityRegion)
+        map(state => state.connectivityRegion),
+        distinctUntilChanged()
       )
 
-      this.selectedRegions$ = this.store$.pipe(
-        select('viewerState'),
-        filter(state => isDefined(state) && isDefined(state.regionsSelected)),
-        map(state => state.regionsSelected),
-        distinctUntilChanged(),
-      )
       this.templateSelected$ = this.store$.pipe(
         select('viewerState'),
         select('templateSelected'),
@@ -80,7 +75,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     public ngAfterContentChecked(): void {
-      this.componentHeight = this.connectivityComponentElement.nativeElement.clientHeight
+      this.componentHeight = this.connectivityComponentElement?.nativeElement.clientHeight
     }
 
     public ngAfterViewInit(): void {
@@ -100,6 +95,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         }),
         this.connectivityRegion$.subscribe(cr => {
           if (cr && cr.length) {
+            if (this.region !== cr && this.defaultColorMap) {
+              this.setDefaultMap()
+              this.store$.dispatch({
+                type: SET_CONNECTIVITY_VISIBLE,
+                payload: false,
+              })
+            }
             this.region = cr
             this.changeDetectionRef.detectChanges()
           }
@@ -109,7 +111,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         this.closeConnectivityView()
       }))
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived', { capture: true })
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived', { capture: true })
           .subscribe((e: CustomEvent) => {
             this.connectedAreas = e.detail
             this.connectedAreaCount.emit(this.connectedAreas.length)
@@ -118,14 +120,24 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
             } else {
               this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
             }          }),
-        fromEvent(this.connectivityComponentElement.nativeElement, 'collapsedMenuChanged', { capture: true })
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'collapsedMenuChanged', { capture: true })
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
           }),
-        fromEvent(this.connectivityComponentElement.nativeElement, 'datasetDataReceived', { capture: true })
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'datasetDataReceived', { capture: true })
           .subscribe((e: CustomEvent) => {
             this.datasetList = e.detail
             this.selectedDataset = this.datasetList[0]
+          }),
+        fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', { capture: true })
+          .subscribe((e: CustomEvent) => {
+            if (e.detail.name === 'export csv') {
+              // ToDo Fix in future to use component
+              const a = document.querySelector('hbp-connectivity-matrix-row')
+              a.downloadCSV()
+            } else if (e.detail.name === 'Apply colors to viewer') {
+              this.defaultColorMap && this.toggleConnectivityOnViewer( {checked: this.showConnectivityToggle? false : true})
+            }
           }),
       )
     }
@@ -151,6 +163,11 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
+      this.defaultColorMap && this.setDefaultMap()
+      this.store$.dispatch({
+        type: SET_CONNECTIVITY_VISIBLE,
+        payload: false,
+      })
     }
 
     navigateToRegion(region) {

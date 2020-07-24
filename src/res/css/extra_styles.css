@@ -649,11 +649,6 @@ body::after
   flex-grow: 3!important;
 }
 
-.flex-grow-5
-{
-  flex-grow: 5!important;
-}
-
 .layerBrowserContainer
 {
   margin:-1em!important;
@@ -751,3 +746,8 @@ kg-dataset-previewer > img
   width: 100%;
 }
 
+mat-list.sm mat-list-item
+{
+  height:2rem!important;
+  font-size: 0.8rem!important;
+}

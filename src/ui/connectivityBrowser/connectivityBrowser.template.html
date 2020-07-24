@@ -11,10 +11,10 @@
             show-toolbar="false"
             show-description="false"
             show-dataset-name="false"
-            custom-dataset-selector="true">
-        <div slot="header" class="w-100 d-flex justify-content-between mt-3">
-            <mat-slide-toggle (change)="this.defaultColorMap && toggleConnectivityOnViewer($event)">Show connectivity on viewer</mat-slide-toggle>
-        </div>
+            custom-dataset-selector="true"
+            tools_showlog="true"
+            [tools_custom]='[{"name": "Apply colors to viewer", "type": "checkbox", "checked": showConnectivityToggle}, {"name": "export csv", "type": "button"}]'
+            hide-export-view="true">
 
         <div slot="dataset">
             <div *ngIf="datasetList.length && selectedDataset"  class=" flex-grow-0 flex-shrink-0 d-flex flex-row flex-nowrap">
