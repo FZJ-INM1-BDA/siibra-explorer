@@ -353,6 +353,7 @@
     <ng-template #regionalFeaturesTmpl>
       <data-browser [template]="templateSelected$ | async"
         [parcellation]="selectedParcellation"
+        [disableVirtualScroll]="true"
         [regions]="[region]">
       </data-browser>
     </ng-template>

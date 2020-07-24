@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Inject, Optional} from "@angular/core";
+import { ChangeDetectorRef, Component, Inject, Optional, Input} from "@angular/core";
 import {
   DatabrowserService,
   KgSingleDatasetService,
@@ -12,7 +12,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
   templateUrl: './singleDataset.template.html',
   styleUrls: [
     `./singleDataset.style.css`,
-  ]
+  ],
+  exportAs: 'singleDatasetView'
 })
 
 export class SingleDatasetView extends SingleDatasetBase {
@@ -26,5 +27,10 @@ export class SingleDatasetView extends SingleDatasetBase {
   ) {
     super(dbService, singleDatasetService, cdr,snackbar, data)
   }
+  
+  @Input()
+  hideTitle = false
 
+  @Input()
+  hidePreview = false
 }

@@ -53,56 +53,6 @@
       </button>
     </mat-card-subtitle>
   </div>
-
-  <mat-card-content>
-    <mat-divider></mat-divider>
-
-    <!-- region desc -->
-    <ng-container *ngIf="region?.description?.length > 0">
-      <mat-divider></mat-divider>
-      <div>
-        {{ region.description }}
-    </div>
-    </ng-container>
-
-    <mat-divider></mat-divider>
-
-    <mat-list class="action-list sm cursor-default">
-
-      <!-- connectivity -->
-      <div *ngIf="hasConnectivity" iav-switch #connectivitySwitch="iavSwitch">
-
-        <mat-list-item mat-ripple
-          (click)="connectivitySwitch.toggle()"
-          [attr.aria-label]="SHOW_CONNECTIVITY_DATA">
-          <mat-icon fontSet="fab" fontIcon="fa-connectdevelop" mat-list-icon></mat-icon >
-          <div mat-line>
-            <span>
-              Connectivity
-            </span>
-            <span class="muted">
-             ({{ 1 }})
-            </span>
-          </div>
-          <mat-icon fontSet="fas" [fontIcon]="connectivitySwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
-        </mat-list-item>
-
-        <!-- connectivity -->
-        <mat-list-item *ngIf="connectivitySwitch.switchState" mat-ripple (click)="showConnectivity(region.name)">
-          <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-          <div mat-line>1000 Brain Study - DTI connectivity</div>
-        </mat-list-item>
-
-      </div>
-
-      <!-- change template -->
-      <ng-container *ngIf="showRegionInOtherTmpl">
-        <ng-container *ngTemplateOutlet="regionInOtherTemplatesTmpl; context: { regionInOtherTemplates: regionInOtherTemplates$ | async }">
-        </ng-container>
-      </ng-container>
-
-    </mat-list>
-  </mat-card-content>
 </mat-card>
 
 <!-- ToDo make dynamic with AVAILABLE CONNECTIVITY DATASETS data - get info from atlas viewer core -->

@@ -21,6 +21,9 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
   @Input()
+  disableVirtualScroll: boolean = false
+
+  @Input()
   showList: boolean = true
 
   public MODALITY_FILTER_ARIA_LABEL = MODALITY_FILTER
