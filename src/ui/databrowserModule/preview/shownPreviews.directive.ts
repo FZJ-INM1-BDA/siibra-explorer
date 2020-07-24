@@ -22,11 +22,11 @@ export class ShownPreviewsDirective implements OnDestroy{
     select(uiStatePreviewingDatasetFilesSelector),
     switchMap(prevs => prevs.length > 0
       ? forkJoin(...prevs.map(
-          prev => this.getDatasetPreviewFromId
-            ? this.getDatasetPreviewFromId(prev)
-            : of(null)
-          )
-        )
+        prev => this.getDatasetPreviewFromId
+          ? this.getDatasetPreviewFromId(prev)
+          : of(null)
+      )
+      )
       : of([])
     ),
     map(arr => arr.filter(item => !!item)),
