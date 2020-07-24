@@ -1,11 +1,11 @@
-import { EventEmitter, Input, Output } from "@angular/core";
+import { EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { distinctUntilChanged, switchMap, filter } from "rxjs/operators";
-import { Observable, BehaviorSubject } from "rxjs";
+import { distinctUntilChanged, switchMap, filter, map, tap } from "rxjs/operators";
+import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateGetSelectedAtlas } from "src/services/state/viewerState.store.helper";
 
 export class RegionBase {
 
@@ -43,6 +43,7 @@ export class RegionBase {
 
   public sameRegionTemplate: any[] = []
   public regionInOtherTemplates$: Observable<any[]>
+  public regionOriginDatasetLabels$: Observable<{ name: string }[]>
 
   constructor(
     private store$: Store<any>,
@@ -57,6 +58,14 @@ export class RegionBase {
           { region }
         )
       ))
+    )
+
+    this.regionOriginDatasetLabels$ = combineLatest(
+      this.store$,
+      this.region$
+    ).pipe(
+      map(([state, region]) => getRegionParentParcRefSpace(state, { region })),
+      map(({ template }) => (template && template.originalDatasetFormats) || [])
     )
   }
 
@@ -116,6 +125,71 @@ export class RegionBase {
   public SHOW_IN_OTHER_REF_SPACE = ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE
   public SHOW_ORIGIN_DATASET = ARIA_LABELS.SHOW_ORIGIN_DATASET
   public AVAILABILITY_IN_OTHER_REF_SPACE = ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE
+}
+
+export const getRegionParentParcRefSpace = createSelector(
+  (state: any) => state.viewerState,
+  viewerStateGetSelectedAtlas,
+  (viewerState, selectedAtlas, prop) => {
+    const { region: regionOfInterest } = prop
+    /**
+     * if region is undefined, return null
+     */
+    if (!regionOfInterest || !viewerState.parcellationSelected || !viewerState.templateSelected) {
+      return {
+        template: null,
+        parcellation: null
+      }
+    }
+    /**
+     * first check if the region can be found in the currently selected parcellation
+     */
+    const checkRegions = regions => {
+      for (const region of regions) {
+        
+        /**
+         * check ROI to iterating regions
+         */
+        if (region.name === regionOfInterest.name) return true
+        
+        if (region && region.children && Array.isArray(region.children)) {
+          const flag = checkRegions(region.children)
+          if (flag) return true
+        }
+      }
+      return false
+    }
+    const regionInParcSelected = checkRegions(viewerState.parcellationSelected.regions)
+
+    if (regionInParcSelected) {
+      const p = selectedAtlas.parcellations.find(p => p['@id'] === viewerState.parcellationSelected['@id'])
+      if (p) {
+        const refSpace = p.availableIn.find(refSpace => refSpace['@id'] === viewerState.templateSelected['@id'])
+        return {
+          template: refSpace,
+          parcellation: p
+        }
+      }
+    } 
+    
+    return {
+      template: null,
+      parcellation: null
+    }
+  }
+)
+
+@Pipe({
+  name: 'renderViewOriginDatasetlabel'
+})
+
+export class RenderViewOriginDatasetLabelPipe implements PipeTransform{
+  public transform(originDatasetlabels: { name: string }[], index: string|number){
+    if (!!originDatasetlabels && !!originDatasetlabels[index] && !!originDatasetlabels[index].name) {
+      return `${originDatasetlabels[index]['name']}`
+    }
+    return `origin dataset`
+  }
 }
 
 export const regionInOtherTemplateSelector = createSelector(

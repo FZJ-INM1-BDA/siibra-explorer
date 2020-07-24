@@ -1,6 +1,7 @@
 {
   "@id": "juelich/iav/atlas/v1.0.0/1",
   "name": "Multilevel Human Atlas",
+  "order": 1,
   "templateSpaces": [
     {
       "@id": "minds/core/referencespace/v1.0.0/a1655b99-82f1-420f-a3c2-fe80fd4c8588",
@@ -8,7 +9,7 @@
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Cytoarchitechtonic Maps"
+          "name": "Cytoarchitectonic maps"
         },
         {
           "name": "Cortical Layers Segmentation",
@@ -23,10 +24,11 @@
     {
       "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
       "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+      "displayName": "ICBM 152 2009c Nonlinear Asymmetric",
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Cytoarchitechtonic maps"
+          "name": "Cytoarchitectonic maps"
         },
         {
           "name": "Long Bundle",
@@ -65,7 +67,7 @@
       "availableIn": [
         {
           "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-          "name": "Cytoarchitechtonic maps"
+          "name": "Cytoarchitectonic maps"
         }
       ]
     }
@@ -73,7 +75,7 @@
   "parcellations": [
     {
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-      "name": "Cytoarchitechtonic maps",
+      "name": "Cytoarchitectonic maps",
       "baseLayer": true,
       "availableIn": [
         {
@@ -82,11 +84,17 @@
         },
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
         },
         {
           "@id": "minds/core/referencespace/v1.0.0/7f39f7be-445b-47c0-9791-e971c0b6d992",
-          "name": "MNI Colin 27"
+          "name": "MNI Colin 27",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
         }
       ]
     },
@@ -117,7 +125,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
         }
       ]
     },
@@ -129,7 +140,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "probability map"
+          }]
         }
       ]
     },
@@ -140,7 +154,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "continuous map"
+          }]
         }
       ]
     },
@@ -151,7 +168,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "continuous map"
+          }]
         }
       ]
     },
@@ -162,7 +182,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "continuous map"
+          }]
         }
       ]
     },
@@ -173,7 +196,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "continuous map"
+          }]
         }
       ]
     },
@@ -184,7 +210,10 @@
       "availableIn": [
         {
           "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
-          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric"
+          "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+          "originalDatasetFormats": [{
+            "name": "continuous map"
+          }]
         }
       ]
     }

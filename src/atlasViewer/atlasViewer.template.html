@@ -56,20 +56,183 @@
       [iav-captureClickListenerDirective-captureDocument]="true"
       (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
 
-      <div ui-nehuba-container-overlay-top-right
-        class="d-inline-flex flex-row justify-content-end align-items-start z-index-6 position-absolute pe-none w-100 h-100">
-        <!-- atlas selector -->
-        <atlas-dropdown-selector class="pe-all mt-4">
-        </atlas-dropdown-selector>
+      <!-- top right content transclusion -->
+      <div ui-nehuba-container-overlay-top-right class="d-inline-flex flex-row justify-content-end align-items-start z-index-6 position-absolute pe-none w-100 h-100">
 
         <signin-banner
           class="mt-3 mr-2"
           [parcellationIsSelected]="!!selectedParcellation"
           [ismobile]="(media.mediaBreakPoint$ | async) > 3">
         </signin-banner>
+
+        <!-- atlas selector -->
+        <div *ngIf="uiNehubaContainer.viewerLoaded"
+          class="iv-custom-comp bg card m-2 mat-elevation-z2">
+          <atlas-dropdown-selector class="pe-all mt-2">
+          </atlas-dropdown-selector>
+        </div>
+
+      </div>
+
+      <!-- bottom left content transclusion -->
+      <div ui-nehuba-container-overlay-bottom-left class="d-inline-flex pe-none w-100 align-items-end m-2 mb-4">
+
+        <!-- only load atlas layer selector and chips if viewer is loaded -->
+        <ng-template [ngIf]="uiNehubaContainer.viewerLoaded">
+
+          <!-- Viewer Selector Container-->
+          <atlas-layer-selector
+            #alSelector="atlasLayerSelector"
+            class="pe-all"
+            (iav-outsideClick)="alSelector.selectorExpanded = false">
+          </atlas-layer-selector>
+          <mat-chip-list class="mb-2">
+            <!-- additional layer -->
+            <ng-container *ngIf="!alSelector.selectorExpanded">
+              <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
+              </ng-container>
+            </ng-container>
+
+            <!-- any selected region(s) -->
+            <ng-container *ngIf="!uiNehubaContainer.navSideDrawerMainSwitch.switchState || !uiNehubaContainer.navSideDrawerMinorSwitch.switchState">
+              <ng-container *ngTemplateOutlet="selectedRegionTmpl">
+              </ng-container>
+            </ng-container>
+          </mat-chip-list>
+          
+          <!-- current layer tmpl -->
+          <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
+            <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
+              <ng-container *ngFor="let p of addParc">
+                <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                  parcel: p,
+                  selected: true,
+                  dismissable: true
+                }">
+                </ng-container>
+              </ng-container>
+            </ng-template>
+            <ng-template #defaultParcTmpl>
+              <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                parcel: parc,
+                selected: false,
+                dismissable: false
+              }">
+              </ng-container>
+            </ng-template>
+
+            <!-- render parc templ -->
+            <ng-template #chipTmpl
+              let-parcel="parcel"
+              let-selected="selected"
+              let-dismissable="dismissable">
+              <mat-chip class="pe-all"
+                (click)="alSelector.selectorExpanded = true"
+                [selected]="selected">
+                
+                {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
+
+                <!-- info icon -->
+                <ng-template [ngIf]="parcel?.originDatasets?.length > 0"
+                    [ngIfElse]="infoIconBasic">
+
+                  <mat-icon
+                    *ngFor="let ds of parcel.originDatasets"
+                    fontSet="fas"
+                    fontIcon="fa-info-circle"
+                    iav-stop="click"
+                    iav-dataset-show-dataset-dialog
+                    [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
+                    [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
+                    [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
+                    [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
+                  </mat-icon>
+
+                </ng-template>
+
+                <ng-template #infoIconBasic>
+                  <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
+                    fontSet="fas"
+                    fontIcon="fa-info-circle"
+                    iav-stop="click"
+                    iav-dataset-show-dataset-dialog
+                    [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
+                    [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
+
+                  </mat-icon>
+                </ng-template>
+
+                <!-- dismiss icon -->
+                <mat-icon
+                  *ngIf="dismissable"
+                  (click)="clearAdditionalLayer(parcel)"
+                  fontSet="fas"
+                  fontIcon="fa-times">
+                </mat-icon>
+              </mat-chip>
+            </ng-template>
+          </ng-template>
+
+          <ng-template #selectedRegionTmpl>
+            <ng-container *ngFor="let r of (selectedRegions$ | async)">
+
+              <!-- region chip for discrete map -->
+              <mat-chip
+                iav-region
+                (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                [region]="r"
+                class="pe-all"
+                [ngClass]="{
+                  'darktheme':regionDirective.rgbDarkmode === true,
+                  'lighttheme': regionDirective.rgbDarkmode === false
+                }"
+                [style.backgroundColor]="regionDirective.rgbString"
+                #regionDirective="iavRegion">
+                <span class="iv-custom-comp text text-truncate d-inline">
+                  {{ r.name }}
+                </span>
+                <mat-icon
+                  class="iv-custom-comp text"
+                  (click)="clearSelectedRegions()"
+                  fontSet="fas"
+                  fontIcon="fa-times">
+                </mat-icon>
+              </mat-chip>
+
+              <!-- chips for previewing origin datasets -->
+              <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
+                <div class="hidden"
+                  iav-dataset-preview-dataset-file
+                  [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+                  [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+                  #previewDirective="iavDatasetPreviewDatasetFile">
+                </div>
+                <mat-chip *ngIf="previewDirective.active"
+                  (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                  class="pe-all">
+                  {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+                  <mat-icon (click)="previewDirective.onClick()"
+                    fontSet="fas"
+                    fontIcon="fa-times">
+                  </mat-icon>
+                </mat-chip>
+              </ng-container>
+            </ng-container>
+          </ng-template>
+
+        </ng-template>
+      </div>
+
+      <!-- top left content transclusion -->
+      <div ui-nehuba-container-overlay-top-left class="d-inline-flex pe-none w-100 align-items-start m-2">
+        <ui-status-card
+          *ngIf="uiNehubaContainer.viewerLoaded"
+          class="pe-all muted-7"
+          [selectedTemplateName]="uiNehubaContainer?.selectedTemplate?.name"
+          [nehubaViewer]="uiNehubaContainer?.nehubaViewer">
+        </ui-status-card>
       </div>
     </ui-nehuba-container>
-
 
     <layout-floating-container
       zIndex="13"

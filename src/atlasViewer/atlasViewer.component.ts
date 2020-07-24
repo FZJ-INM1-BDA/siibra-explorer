@@ -40,7 +40,7 @@ export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> =
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
-import { viewerStateSetSelectedRegions } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetSelectedRegions, viewerStateGetOverlayingAdditionalParcellations, viewerStateRemoveAdditionalLayer } from "src/services/state/viewerState.store.helper";
 
 /**
  * TODO
@@ -101,6 +101,11 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   public unsupportedPreviews: any[] = UNSUPPORTED_PREVIEW
 
   public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
+
+
+  public selectedAdditionalLayers$ = this.store.pipe(
+    select(viewerStateGetOverlayingAdditionalParcellations),
+  )
 
   constructor(
     private store: Store<IavRootStoreInterface>,
@@ -347,7 +352,23 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
-  public mouseClickDocument(event: MouseEvent) {
+  public clearAdditionalLayer(layer: { ['@id']: string }){
+    this.store.dispatch(
+      viewerStateRemoveAdditionalLayer({
+        payload: layer
+      })
+    )
+  }
+
+  public clearSelectedRegions(){
+    this.store.dispatch(
+      viewerStateSetSelectedRegions({
+        selectRegions: []
+      })
+    )
+  }
+
+  public mouseClickDocument(_event: MouseEvent) {
 
     const next = () => {
       if (!this.onhoverSegments) return

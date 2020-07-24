@@ -1,5 +1,6 @@
 {
   "name": "MNI 152 ICBM 2009c Nonlinear Asymmetric",
+  "displayName": "ICBM 152 2009c Nonlinear Asymmetric",
   "@id": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
   "fullId": "minds/core/referencespace/v1.0.0/dafcffc5-4826-4bf1-8ff6-46b8a31ff8e2",
   "type": "template",
@@ -11,7 +12,7 @@
     {
       "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
       "fullId": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-      "name": "Cytoarchitechtonic maps",
+      "name": "Cytoarchitectonic maps",
       "ngId": "jubrain mni152 v18 left",
       "auxillaryMeshIndices": [
         65535

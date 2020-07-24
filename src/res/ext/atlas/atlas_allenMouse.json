@@ -1,6 +1,7 @@
 {
   "@id": "juelich/iav/atlas/v1.0.0/2",
   "name": "Allen Mouse Common Coordinate Framework v3",
+  "order": 3,
   "templateSpaces": [{
     "@id": "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9",
     "name": "Allen Mouse Common Coordinate Framework v3",

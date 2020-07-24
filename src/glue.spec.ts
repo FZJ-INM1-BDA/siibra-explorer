@@ -1,5 +1,5 @@
 import { TestBed, tick, fakeAsync } from "@angular/core/testing"
-import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview } from "./glue"
+import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
@@ -529,6 +529,87 @@ describe('> glue.ts', () => {
         expect(args[0]).toEqual(stateObj1)
         expect(args[1].type).toEqual(uiActionSetPreviewingDatasetFiles.type)
         expect(args[1].previewingDatasetFiles).toEqual([ ])
+      })
+    })
+  })
+
+  describe('> GlueEffects', () => {
+
+    const defaultState = {
+      viewerState: {
+        templateSelected: null,
+        parcellationSelected: null,
+        regionsSelected: []
+      },
+      uiState: {
+        previewingDatasetFiles: []
+      }
+    }
+    beforeEach(() => {
+
+      TestBed.configureTestingModule({
+        providers: [
+          GlueEffects,
+          provideMockStore({
+            initialState: defaultState
+          })
+        ]
+      })
+    })
+
+    describe('> regionTemplateParcChange$', () => {
+
+      const copiedState0 = JSON.parse(JSON.stringify(defaultState))
+      copiedState0.viewerState.regionsSelected = [{ name: 'coffee' }]
+      copiedState0.viewerState.parcellationSelected = { name: 'chicken' }
+      copiedState0.viewerState.templateSelected = { name: 'spinach' }
+
+      const generateTest = (m1, m2) => {
+
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.setState(copiedState0)
+        const glueEffects = TestBed.inject(GlueEffects)
+        /**
+         * couldn't get jasmine-marble to coopoerate
+         * TODO test proper with jasmine marble (?)
+         */
+        let numOfEmit = 0
+        const sub = glueEffects.regionTemplateParcChange$.subscribe(() => {
+          numOfEmit += 1
+        })
+
+        const copiedState1 = JSON.parse(JSON.stringify(copiedState0))
+        m1(copiedState1)
+        mockStore.setState(copiedState1)
+        expect(numOfEmit).toEqual(1)
+
+        const copiedState2 = JSON.parse(JSON.stringify(copiedState0))
+        m2(copiedState2)
+        mockStore.setState(copiedState2)
+        expect(numOfEmit).toEqual(2)
+
+        sub.unsubscribe()
+      }
+      
+      it('> on change of region, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.regionsSelected = [{ name: 'cake' }],
+          copiedState2 => copiedState2.viewerState.regionsSelected = [{ name: 't bone' }]
+        )
+      })
+
+      it('> on change of parcellation, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.parcellationSelected = { name: 'pizza' },
+          copiedState2 => copiedState2.viewerState.parcellationSelected = { name: 'pizza on pineapple' }
+        )
+      })
+
+      it('> on change of template, should emit', () => {
+        generateTest(
+          copiedState1 => copiedState1.viewerState.templateSelected = { name: 'calzone' },
+          copiedState2 => copiedState2.viewerState.templateSelected = { name: 'calzone on pineapple' }
+        )
       })
     })
   })

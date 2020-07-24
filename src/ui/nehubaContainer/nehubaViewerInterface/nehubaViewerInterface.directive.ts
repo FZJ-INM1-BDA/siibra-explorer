@@ -2,14 +2,15 @@ import { Directive, ViewContainerRef, ComponentFactoryResolver, ComponentFactory
 import { NehubaViewerUnit, INehubaLifecycleHook } from "../nehubaViewer/nehubaViewer.component";
 import { Store, select } from "@ngrx/store";
 import { IavRootStoreInterface } from "src/services/stateStore.service";
-import { Subscription, Observable } from "rxjs";
-import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime } from "rxjs/operators";
+import { Subscription, Observable, fromEvent } from "rxjs";
+import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, throttleTime, switchMapTo } from "rxjs/operators";
 import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { getNavigationStateFromConfig } from "../util";
 import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
 import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { timedValues } from "src/util/generator";
 import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiState.store";
+import { takeOnePipe } from "../nehubaContainer.component";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -258,6 +259,8 @@ const accumulatorFn: (
 
 export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
+  public viewportToDatas: [any, any, any] = [null, null, null]
+
   @Output()
   public iavNehubaViewerContainerViewerLoading: EventEmitter<boolean> = new EventEmitter()
   
@@ -463,6 +466,13 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
             label,
           },
         })
+      }),
+
+      this.nehubaViewerInstance.nehubaReady.pipe(
+        switchMapTo(fromEvent(this.nehubaViewerInstance.elementRef.nativeElement, 'viewportToData')),
+        takeOnePipe()
+      ).subscribe((events: CustomEvent[]) => {
+        [0, 1, 2].forEach(idx => this.viewportToDatas[idx] = events[idx].detail.viewportToData)
       }),
     )
   }

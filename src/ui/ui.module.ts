@@ -62,16 +62,14 @@ import { ReorderPanelIndexPipe } from "./nehubaContainer/reorderPanelIndex.pipe"
 import { TouchSideClass } from "./nehubaContainer/touchSideClass.directive";
 import { BinSavedRegionsSelectionPipe, SavedRegionsSelectionBtnDisabledPipe } from "./viewerStateController/viewerState.pipes";
 
-import {FilterWithStringPipe} from "src/util/pipes/filterWithString.pipe";
-
-import {TakeScreenshotComponent} from "src/ui/takeScreenshot/takeScreenshot.component";
-import {FixedMouseContextualContainerDirective} from "src/util/directives/FixedMouseContextualContainerDirective.directive";
+import { TakeScreenshotComponent } from "src/ui/takeScreenshot/takeScreenshot.component";
+import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHierarchy.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
 import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
 import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 
-import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import { ConnectivityBrowserComponent } from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
 import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSimpleView/regionListSimpleView.component";
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
@@ -88,9 +86,10 @@ import { importNehubaFactory } from "./nehubaContainer/util";
 import { APPEND_SCRIPT_TOKEN, appendScriptFactory } from "src/util/constants";
 import { DOCUMENT } from "@angular/common";
 import { AtlasDropdownSelector } from './atlasDropdown/atlasDropdown.component'
-import {AtlasLayerSelector} from "src/ui/atlasLayerSelector/atlasLayerSelector.component";
+import { AtlasLayerSelector } from "src/ui/atlasLayerSelector/atlasLayerSelector.component";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionDirective } from "./parcellationRegion/region.directive";
+import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.base";
 
 @NgModule({
   imports : [
@@ -175,11 +174,12 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
     GetFileExtension,
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
-    FilterWithStringPipe,
+
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
     GetInitialLayerOpacityPipe,
+    RenderViewOriginDatasetLabelPipe,
 
     /* directive */
     DownloadDirective,
@@ -222,6 +222,8 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
     HelpComponent,
     ConfigComponent,
     SigninBanner,
+    AtlasLayerSelector,
+    RegionDirective,
     
     CookieAgreement,
     KGToS,
@@ -232,6 +234,7 @@ import { RegionDirective } from "./parcellationRegion/region.directive";
     LandmarkUIComponent,
     NehubaViewerTouchDirective,
     AtlasDropdownSelector,
+    RenderViewOriginDatasetLabelPipe,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

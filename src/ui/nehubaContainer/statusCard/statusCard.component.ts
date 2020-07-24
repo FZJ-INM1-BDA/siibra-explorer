@@ -99,7 +99,7 @@ export class StatusCardComponent implements OnInit, OnChanges{
     ).pipe(
       map(([realFlag, real, voxel]) => realFlag
         ? real.map(v => `${ (v/1e6).toFixed(3) }mm`).join(', ')
-        : voxel.map(v => v.toFixed(3)).join(', s')),
+        : voxel.map(v => v.toFixed(3)).join(', ')),
       startWith(``)
     )
   }

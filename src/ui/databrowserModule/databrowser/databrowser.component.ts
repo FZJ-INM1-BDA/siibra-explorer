@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
 import { merge, Observable, Subscription } from "rxjs";
 import { LoggingService } from "src/logging";
-import { IDataEntry } from "src/services/stateStore.service";
+import { IDataEntry } from "src/services/state/dataStore.store";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 import { ARIA_LABELS } from 'common/constants.js'
@@ -76,7 +76,7 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
        * TODO to be replaced with properly region UUIDs from KG
        */
       return {
-        id: `${this.parcellation.name}/${r.name}`,
+        id: `${this.parcellation?.name || 'untitled_parcellation'}/${r.name}`,
         ...r,
       }
     })

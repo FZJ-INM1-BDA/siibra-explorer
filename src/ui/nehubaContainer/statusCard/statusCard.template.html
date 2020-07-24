@@ -1,4 +1,4 @@
-<mat-card class="expandedContainer" *ngIf="showFull; else showMin">
+<mat-card class="expandedContainer p-2 pt-1" *ngIf="showFull; else showMin">
   <mat-card-content>
 
     <!-- reset -->
@@ -100,7 +100,7 @@
 
 <!-- minimised status bar -->
 <ng-template #showMin>
-  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center pb-2"
+  <div class="iv-custom-comp text overflow-visible text-nowrap d-inline-flex align-items-center m-1 mt-3"
     iav-media-query
     #media="iavMediaQuery">
     
