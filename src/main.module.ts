@@ -54,7 +54,7 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -217,6 +217,11 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     {
       provide: IAV_DATASET_PREVIEW_ACTIVE,
       useFactory: (glue: DatasetPreviewGlue) => glue.datasetPreviewDisplayed.bind(glue),
+      deps: [ DatasetPreviewGlue ]
+    },
+    {
+      provide: GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
+      useFactory: (glue: DatasetPreviewGlue) => glue.getDatasetPreviewFromId.bind(glue),
       deps: [ DatasetPreviewGlue ]
     },
     DatasetPreviewGlue,

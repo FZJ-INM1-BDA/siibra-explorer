@@ -23,6 +23,8 @@ const PREVIEW_FILE_TYPES_NO_UI = [
 
 const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
 
+export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME: InjectionToken<({ datasetId, filename })=>Observable<any>> = new InjectionToken('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')
+
 export const glueActionToggleDatasetPreview = createAction(
   '[glue] toggleDatasetPreview',
   props<{ datasetPreviewFile: IDatasetPreviewData }>()
@@ -196,7 +198,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
 
   private fetchedDatasetPreviewCache: Map<string, any> = new Map()
-  private getDatasetPreviewFromId({ datasetId, filename }: IDatasetPreviewData){
+  public getDatasetPreviewFromId({ datasetId, filename }: IDatasetPreviewData){
     const dsPrvId = DatasetPreviewGlue.GetDatasetPreviewId({ datasetId, filename })
     const cachedPrv = this.fetchedDatasetPreviewCache.get(dsPrvId)
     const filteredDsId = /[a-f0-9-]+$/.exec(datasetId)

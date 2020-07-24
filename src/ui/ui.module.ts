@@ -1,10 +1,10 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule, Renderer2} from "@angular/core";
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { LayoutModule } from "src/layouts/layout.module";
 import { NehubaContainer } from "./nehubaContainer/nehubaContainer.component";
-import {  IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
+import { IMPORT_NEHUBA_INJECT_TOKEN } from "./nehubaContainer/nehubaViewer/nehubaViewer.component";
 import { GetTemplateImageSrcPipe, ImgSrcSetPipe, SplashScreen } from "./nehubaContainer/splashScreen/splashScreen.component";
 
 import { FilterRegionDataEntries } from "src/util/pipes/filterRegionDataEntries.pipe";
@@ -18,7 +18,6 @@ import { SortDataEntriesToRegion } from "../util/pipes/sortDataEntriesIntoRegion
 import { CitationsContainer } from "./citation/citations.component";
 import { KgEntryViewer } from "./kgEntryViewer/kgentry.component";
 import { SubjectViewer } from "./kgEntryViewer/subjectViewer/subjectViewer.component";
-import { LayerBrowser, LockedLayerBtnClsPipe, GetInitialLayerOpacityPipe } from "./layerbrowser/layerbrowser.component";
 import { LandmarkUnit } from "./nehubaContainer/landmarkUnit/landmarkUnit.component";
 import { PluginBannerUI } from "./pluginBanner/pluginBanner.component";
 
@@ -28,7 +27,6 @@ import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.modu
 import { AppendtooltipTextPipe } from "src/util/pipes/appendTooltipText.pipe";
 import { FlatmapArrayPipe } from "src/util/pipes/flatMapArray.pipe";
 import { GetFileExtension } from "src/util/pipes/getFileExt.pipe";
-import { GetFilenamePipe } from "src/util/pipes/getFilename.pipe";
 import { UtilModule } from "src/util";
 import { DownloadDirective } from "../util/directives/download.directive";
 import { SpatialLandmarksToDataBrowserItemPipe } from "../util/pipes/spatialLandmarksToDatabrowserItem.pipe";
@@ -75,7 +73,6 @@ import { RegionListSimpleViewComponent } from "./parcellationRegion/regionListSi
 import { SimpleRegionComponent } from "./parcellationRegion/regionSimple/regionSimple.component";
 import { LandmarkUIComponent } from "./landmarkUI/landmarkUI.component";
 import { NehubaModule } from "./nehubaContainer/nehuba.module";
-import { LayerDetailComponent } from "./layerbrowser/layerDetail/layerDetail.component";
 import { ShareModule } from "src/share";
 import { StateModule } from "src/state";
 import { AuthModule } from "src/auth";
@@ -116,8 +113,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     LandmarkUnit,
     PluginBannerUI,
     CitationsContainer,
-    LayerBrowser,
-    LayerDetailComponent,
     KgEntryViewer,
     SubjectViewer,
     LogoContainer,
@@ -169,8 +164,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     ImgSrcSetPipe,
     PluginBtnFabColorPipe,
     KgSearchBtnColorPipe,
-    LockedLayerBtnClsPipe,
-    GetFilenamePipe,
     GetFileExtension,
     BinSavedRegionsSelectionPipe,
     SavedRegionsSelectionBtnDisabledPipe,
@@ -178,7 +171,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     TemplateParcellationHasMoreInfo,
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
-    GetInitialLayerOpacityPipe,
     RenderViewOriginDatasetLabelPipe,
 
     /* directive */
@@ -204,7 +196,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
 
     /* dynamically created components needs to be declared here */
     
-    LayerBrowser,
     PluginBannerUI,
     ActionDialog,
   ],
@@ -215,7 +206,6 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     PluginBannerUI,
     NehubaContainer,
     
-    LayerBrowser,
     LogoContainer,
     TemplateParcellationCitationsContainer,
     MobileOverlay,

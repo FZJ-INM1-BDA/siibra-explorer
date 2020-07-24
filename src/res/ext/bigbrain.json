@@ -749,7 +749,8 @@
     },
     {
       "@id": "juelich/iav/atlas/v1.0.0/4",
-      "name": "Isocortical/Non-isocortical structures",
+      "name": "Grey/White matter",
+      "displayName": "Isocortical/Non-isocortical structures",
       "type": "parcellation",
       "ngData": null,
       "ngId": " tissue type: ",

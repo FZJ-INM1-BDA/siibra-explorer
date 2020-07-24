@@ -3,6 +3,8 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ViewerPreviewFile, IDataEntry } from 'src/services/state/dataStore.store'
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
+import { PreviewBase } from "./preview.base";
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/glue";
 
 export const IAV_DATASET_PREVIEW_DATASET_FN = 'IAV_DATASET_PREVIEW_DATASET_FN'
 
@@ -15,7 +17,8 @@ export const IAV_DATASET_PREVIEW_ACTIVE = new InjectionToken<TypePreviewDispalye
   exportAs: 'iavDatasetPreviewDatasetFile'
 })
 
-export class PreviewDatasetFile implements OnChanges{
+export class PreviewDatasetFile extends PreviewBase implements OnChanges{
+
   @Input('iav-dataset-preview-dataset-file')
   file: ViewerPreviewFile
 
@@ -26,7 +29,13 @@ export class PreviewDatasetFile implements OnChanges{
   dataset: IDataEntry
 
   @Input('iav-dataset-preview-dataset-file-kgid')
-  kgId: string
+  set kgId(val) {
+    this.datasetId = val
+  }
+
+  get kgId(){
+    return this.datasetId
+  }
 
   @Input('iav-dataset-preview-dataset-file-kgschema')
   kgSchema: string = `minds/core/dataset/v1.0.0`
@@ -46,12 +55,14 @@ export class PreviewDatasetFile implements OnChanges{
   constructor(
     private snackbar: MatSnackBar,
     @Optional() @Inject(IAV_DATASET_PREVIEW_DATASET_FN) private emitFn: any,
-    @Optional() @Inject(IAV_DATASET_PREVIEW_ACTIVE) private getDatasetActiveObs: (file, dataset) => Observable<boolean>
+    @Optional() @Inject(IAV_DATASET_PREVIEW_ACTIVE) private getDatasetActiveObs: (file, dataset) => Observable<boolean>,
+    @Optional() @Inject(GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME) getDatasetPreviewFromId,
   ){
-    
+    super(getDatasetPreviewFromId || null)
   }
 
   ngOnChanges(){
+    super.ngOnChanges()
     if (this.dataActiveObs) this.dataActiveObs.unsubscribe()
     
     if (this.getDatasetActiveObs) this.dataActiveObs = this.getDatasetActiveObs(this.getFile(), this.getDataset()).pipe(

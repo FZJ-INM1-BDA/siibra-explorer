@@ -62,12 +62,12 @@
       </div>
 
       <button mat-raised-button
-        *ngIf="selectedRegions.length > 0"
+        *ngIf="!(alwaysHideMinorPanel$ | async)"
         [attr.aria-label]="ARIA_LABEL_EXPAND"
         (click)="matDrawerMinor.open()"
         class="explore-btn pe-all"
         color="accent">
-        Explore regional features & connectivity
+        Explore
       </button>
     </mat-drawer>
     <mat-drawer-content class="visible position-relative">
@@ -89,7 +89,7 @@
           [attr.aria-label]="ARIA_LABEL_TOGGLE_SIDE_PANEL"
           class="pe-all tab-toggle"
           (click)="sideNavMasterSwitch.toggle()"
-          [color]="!sideNavMasterSwitch.switchState && selectedRegions.length > 0 ? 'accent' : 'basic'">
+          [color]="!sideNavMasterSwitch.switchState && !(alwaysHideMinorPanel$ | async) ? 'accent' : 'basic'">
           <i class="fas" [ngClass]="sideNavMasterSwitch.switchState ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
         </button>
       </div>
@@ -99,7 +99,7 @@
 
   <!-- drawer #2 -->
   <mat-drawer-container
-    [iav-switch-initstate]="selectedRegions.length > 0"
+    [iav-switch-initstate]="!(alwaysHideMinorPanel$ | async)"
     iav-switch
     #sideNavSwitch="iavSwitch"
     class="mat-drawer-content-overflow-visible w-100 h-100 position-absolute invisible"
@@ -127,8 +127,22 @@
           </ng-container>
         </div>
 
-        <ng-container *ngTemplateOutlet="sidenavTmpl">
-        </ng-container>  
+        <div class="hidden"
+          iav-shown-previews
+          (emitter)="iavAdditionalLayers$.next($event)"
+          #previews="iavShownPreviews">
+        </div>
+
+        <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
+          <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavTmpl">
+            <ng-container *ngFor="let vPreview of volumePreviews">
+              <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
+
+              </ng-container>
+            </ng-container>
+          </ng-template>
+        </ng-container>
+
       </div>
     </mat-drawer>
 
@@ -146,7 +160,23 @@
 
 </layout-floating-container>
 
-<!-- sidenav tmpl -->
+<!-- collapse btn -->
+<ng-template #collapseBtn>
+
+  <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
+    <button mat-raised-button class="mat-elevation-z8"
+      [attr.aria-label]="ARIA_LABEL_COLLAPSE"
+      (click)="sideNavSwitch.close()"
+      color="accent">
+      <i class="fas fa-chevron-up"></i>
+      <span>
+        collapse
+      </span>
+    </button>
+  </div>
+</ng-template>
+
+<!-- region sidenav tmpl -->
 <ng-template #sidenavTmpl>
 
   <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
@@ -171,18 +201,22 @@
   </div>
 
   <!-- collapse btn -->
-  <div class="h-0 w-100 collapse-position d-flex flex-column justify-content-end align-items-center">
-    <button mat-raised-button class="mat-elevation-z8"
-      [attr.aria-label]="ARIA_LABEL_COLLAPSE"
-      (click)="sideNavSwitch.close()"
-      [color]="selectedRegions.length > 0 ? 'accent' : 'basic'">
-      <i class="fas fa-chevron-up"></i>
-      <span>
-        collapse
-      </span>
-    </button>
-  </div>
+  <ng-container *ngTemplateOutlet="collapseBtn">
+  </ng-container>
+</ng-template>
 
+<ng-template #sidenavDsPreviewTmpl let-file="file" let-filename="filename" let-datasetId="datasetId">
+  <div class="w-100 flex-grow-1 d-flex flex-column">
+
+    <preview-card class="d-block side-nav-cover flex-grow-1"
+      [datasetId]="datasetId"
+      [filename]="filename">
+    </preview-card>
+
+    <!-- collapse btn -->
+    <ng-container *ngTemplateOutlet="collapseBtn">
+    </ng-container>
+  </div>
 </ng-template>
 
 <ng-template #empty>
