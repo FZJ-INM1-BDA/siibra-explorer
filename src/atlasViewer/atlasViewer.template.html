@@ -205,6 +205,24 @@
                 </mat-icon>
               </mat-chip>
 
+              <!-- chips for previewing origin datasets -->
+              <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
+                <div class="hidden"
+                  iav-dataset-preview-dataset-file
+                  [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+                  [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+                  #previewDirective="iavDatasetPreviewDatasetFile">
+                </div>
+                <mat-chip *ngIf="previewDirective.active"
+                  (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                  class="pe-all">
+                  {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+                  <mat-icon (click)="previewDirective.onClick()"
+                    fontSet="fas"
+                    fontIcon="fa-times">
+                  </mat-icon>
+                </mat-chip>
+              </ng-container>
             </ng-container>
           </ng-template>
 

@@ -1,6 +1,6 @@
 
 <!-- title -->
-<mat-card-subtitle>
+<mat-card-subtitle *ngIf="!hideTitle">
   <span *ngIf="name; else nameLoading">
     {{ name }}
   </span>
@@ -130,26 +130,30 @@
 
 
   <!-- check if has preview -->
-  <kg-dataset-list
-    class="d-none"
-    [backendUrl]="DS_PREVIEW_URL"
-    *ngIf="kgId"
-    (kgDsPrvUpdated)="handleKgDsPrvUpdate($event)"
-    [kgId]="kgId">
 
-  </kg-dataset-list>
+  <ng-template [ngIf]="!hidePreview">
 
-  <iav-dynamic-mat-button
-    *ngIf="hasPreview"
-    mat-dialog-close
-    [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
-    [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
-    (click)="showPreviewList(previewFilesListTemplate)">
+    <kg-dataset-list
+      class="d-none"
+      [backendUrl]="DS_PREVIEW_URL"
+      *ngIf="kgId"
+      (kgDsPrvUpdated)="handleKgDsPrvUpdate($event)"
+      [kgId]="kgId">
 
-    <span *ngIf="mediaBreakPoint < 2">
-      Preview
-    </span>
-    <i class="ml-1 far fa-eye"></i>
-  </iav-dynamic-mat-button>
+    </kg-dataset-list>
+
+    <iav-dynamic-mat-button
+      *ngIf="hasPreview"
+      mat-dialog-close
+      [iav-dynamic-mat-button-style]="mediaBreakPoint < 2 ? 'mat-button' : 'mat-icon-button'"
+      [iav-dynamic-mat-button-aria-label]="SHOW_DATASET_PREVIEW_ARIA_LABEL"
+      (click)="showPreviewList(previewFilesListTemplate)">
+
+      <span *ngIf="mediaBreakPoint < 2">
+        Preview
+      </span>
+      <i class="ml-1 far fa-eye"></i>
+    </iav-dynamic-mat-button>
+  </ng-template>
 
 </ng-template>

@@ -1,16 +1,25 @@
 <mat-card class="mat-elevation-z4">
   <div class="header-container">
     <mat-card-title>
-      {{ file.name || filename }}
+      {{ singleDsView?.name || file.name || filename }}
     </mat-card-title>
 
     <mat-card-subtitle>
       <mat-icon fontSet="fas" fontIcon="fa-database"></mat-icon>
       <span>
-        Previewing data
+        Dataset preview
       </span>
     </mat-card-subtitle>
   </div>
+</mat-card>
+
+<mat-card class="mt-4">
+  <single-dataset-view [fullId]="datasetId"
+    [hideTitle]="true"
+    [hidePreview]="true"
+    #singleDsView="singleDatasetView">
+
+  </single-dataset-view>
 </mat-card>
 
 <div class="mt-4">
