@@ -5,6 +5,8 @@ import { IDataEntry } from "src/services/state/dataStore.store";
 import { CountedDataModality, DatabrowserService } from "../databrowser.service";
 import { ModalityPicker } from "../modalityPicker/modalityPicker.component";
 import { ARIA_LABELS } from 'common/constants.js'
+import { DatabrowserBase } from "./databrowser.base";
+import { debounceTime } from "rxjs/operators";
 
 const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
 
@@ -18,7 +20,7 @@ const { MODALITY_FILTER, LIST_OF_DATASETS } = ARIA_LABELS
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class DataBrowser implements OnChanges, OnDestroy, OnInit {
+export class DataBrowser extends DatabrowserBase implements OnChanges, OnDestroy, OnInit {
 
   @Input()
   disableVirtualScroll: boolean = false
@@ -28,22 +30,8 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
 
   public MODALITY_FILTER_ARIA_LABEL = MODALITY_FILTER
   public LIST_OF_DATASETS_ARIA_LABEL = LIST_OF_DATASETS
-  @Input()
-  public regions: any[] = []
 
-  @Input()
-  public template: any
 
-  @Input()
-  public parcellation: any
-
-  @Output()
-  public dataentriesUpdated: EventEmitter<IDataEntry[]> = new EventEmitter()
-
-  public dataentries: IDataEntry[] = []
-
-  public fetchingFlag: boolean = false
-  public fetchError: boolean = false
   /**
    * TODO filter types
    */
@@ -54,7 +42,6 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   @ViewChild(ModalityPicker)
   public modalityPicker: ModalityPicker
 
-  public favDataentries$: Observable<Partial<IDataEntry>[]>
 
   /**
    * TODO
@@ -65,67 +52,36 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
   public gemoetryFilter: any
 
   constructor(
-    private dbService: DatabrowserService,
+    private dataService: DatabrowserService,
     private cdr: ChangeDetectorRef,
-    private log: LoggingService,
+    log: LoggingService,
   ) {
-    this.favDataentries$ = this.dbService.favedDataentries$
+    super(dataService, log)
   }
 
   public ngOnChanges() {
-
-    this.regions = this.regions.map(r => {
-      /**
-       * TODO to be replaced with properly region UUIDs from KG
-       */
-      return {
-        id: `${this.parcellation?.name || 'untitled_parcellation'}/${r.name}`,
-        ...r,
-      }
-    })
-    const { regions, parcellation, template } = this
-    this.fetchingFlag = true
-
-    // input may be undefined/null
-    if (!parcellation) { return }
-
-    /**
-     * reconstructing parcellation region is async (done on worker thread)
-     * if parcellation region is not yet defined, return.
-     * parccellation will eventually be updated with the correct region
-     */
-    if (!parcellation.regions) { return }
-
-    this.dbService.getDataByRegion({ regions, parcellation, template })
-      .then(de => {
-        this.dataentries = de
-        return de
-      })
-      .then(this.dbService.getModalityFromDE)
-      .then(modalities => {
-        this.countedDataM = modalities
-      })
-      .catch(e => {
-        this.log.error(e)
-        this.fetchError = true
-      })
-      .finally(() => {
-        this.fetchingFlag = false
-        this.dataentriesUpdated.emit(this.dataentries)
-        this.cdr.markForCheck()
-      })
-
+    super.ngOnChanges()
   }
 
   public ngOnInit() {
+
+    this.subscriptions.push(
+      this.dataentriesUpdated.pipe(
+        debounceTime(60)
+      ).subscribe(() => {
+        this.countedDataM = this.dataService.getModalityFromDE(this.dataentries)
+        this.cdr.markForCheck()
+      })
+    )
+    
     /**
      * TODO gets init'ed everytime when appends to ngtemplateoutlet
      */
-    this.dbService.dbComponentInit(this)
+    this.dataService.dbComponentInit(this)
     this.subscriptions.push(
       merge(
-        // this.dbService.selectedRegions$,
-        this.dbService.fetchDataObservable$,
+        // this.dataService.selectedRegions$,
+        this.dataService.fetchDataObservable$,
       ).subscribe(() => {
         /**
          * Only reset modality picker
@@ -161,23 +117,6 @@ export class DataBrowser implements OnChanges, OnDestroy, OnInit {
     this.countedDataM = modalityFilter
     this.visibleCountedDataM = modalityFilter.filter(dm => dm.visible)
     this.cdr.markForCheck()
-  }
-
-  public retryFetchData(event: MouseEvent) {
-    event.preventDefault()
-    this.dbService.manualFetchDataset$.next(null)
-  }
-
-  public toggleFavourite(dataset: IDataEntry) {
-    this.dbService.toggleFav(dataset)
-  }
-
-  public saveToFavourite(dataset: IDataEntry) {
-    this.dbService.saveToFav(dataset)
-  }
-
-  public removeFromFavourite(dataset: IDataEntry) {
-    this.dbService.removeFromFav(dataset)
   }
 
   public showParcellationList: boolean = false

@@ -1,5 +1,5 @@
 import { NgModule } from "@angular/core";
-import { stateStore } from "src/services/state/uiState.store";
+import { stateStore } from "src/services/state/dataStore.store";
 import { DataBrowserUseEffect } from "./databrowser.useEffect";
 import { StoreModule } from "@ngrx/store";
 import { EffectsModule } from "@ngrx/effects";

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
-import { filter, map, withLatestFrom } from "rxjs/operators";
+import { filter, map, withLatestFrom, tap } from "rxjs/operators";
 import { DATASETS_ACTIONS_TYPES, IDataEntry } from "src/services/state/dataStore.store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 import { getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";

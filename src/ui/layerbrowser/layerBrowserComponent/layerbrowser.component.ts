@@ -56,7 +56,6 @@ export class LayerBrowser implements OnInit, OnDestroy {
     private constantsService: PureContantService,
     private log: LoggingService,
   ) {
-    console.log('init')
     this.ngLayers$ = store.pipe(
       select('viewerState'),
       select('templateSelected'),

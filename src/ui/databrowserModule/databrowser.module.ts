@@ -42,6 +42,7 @@ import { ShownPreviewsDirective } from "./preview/shownPreviews.directive";
 import { FilterPreviewByType } from "./preview/filterPreview.pipe";
 import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
 import { LayerBrowserModule } from "../layerbrowser";
+import { DatabrowserDirective } from "./databrowser/databrowser.directive";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -75,6 +76,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     ShowDatasetDialogDirective,
     PreviewDatasetFile,
     ShownPreviewsDirective,
+    DatabrowserDirective,
 
     /**
      * pipes
@@ -114,6 +116,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     ShownPreviewsDirective,
     FilterPreviewByType,
     PreviewCardComponent,
+    DatabrowserDirective,
   ],
   entryComponents: [
     DataBrowser,

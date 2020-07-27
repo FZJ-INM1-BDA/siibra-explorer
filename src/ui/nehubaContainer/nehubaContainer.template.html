@@ -114,7 +114,6 @@
       (openedChange)="$event && sideNavSwitch.open()"
       [disableClose]="true"
       [@openClose]="sideNavMasterSwitch.switchState && sideNavSwitch.switchState ? 'open' : 'closed'"
-      (@openClose.start)="_tmp=1"
       (@openClose.done)="$event.toState === 'closed' && matDrawerMinor.close()">
 
       <div class="position-relative d-flex flex-column h-100">
@@ -134,7 +133,7 @@
         </div>
 
         <ng-container *ngIf="previews.iavAdditionalLayers$ | async | filterPreviewByType : [previews.FILETYPES.VOLUMES] as volumePreviews">
-          <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavTmpl">
+          <ng-template [ngIf]="volumePreviews.length > 0" [ngIfElse]="sidenavRegionTmpl">
             <ng-container *ngFor="let vPreview of volumePreviews">
               <ng-container *ngTemplateOutlet="sidenavDsPreviewTmpl; context: vPreview">
 
@@ -167,7 +166,7 @@
     <button mat-raised-button class="mat-elevation-z8"
       [attr.aria-label]="ARIA_LABEL_COLLAPSE"
       (click)="sideNavSwitch.close()"
-      color="accent">
+      color="basic">
       <i class="fas fa-chevron-up"></i>
       <span>
         collapse
@@ -177,7 +176,7 @@
 </ng-template>
 
 <!-- region sidenav tmpl -->
-<ng-template #sidenavTmpl>
+<ng-template #sidenavRegionTmpl>
 
   <div class="flex-shrink-1 flex-grow-1 d-flex flex-column"
     [ngClass]="{'region-populated': (selectedRegions$ | async).length > 0 }">
@@ -358,9 +357,16 @@
       </data-browser>
     </ng-template>
 
+    <div class="hidden" iav-databrowser-directive
+      [template]="templateSelected$ | async"
+      [parcellation]="selectedParcellation"
+      [regions]="[region]"
+      #iavDbDirective="iavDatabrowserDirective">
+    </div>
+
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: 'Regional features',
-      desc: 123,
+      desc: iavDbDirective?.dataentries?.length,
       iconClass: 'fas fa-database',
       iavNgIf: true,
       content: regionalFeaturesTmpl

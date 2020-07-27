@@ -132,7 +132,6 @@ const {
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
-  public _tmp: number = 0
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
   public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL

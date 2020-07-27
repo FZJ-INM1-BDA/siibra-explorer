@@ -22,6 +22,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
 
   public SHOW_DATASET_PREVIEW_ARIA_LABEL = ARIA_LABELS.SHOW_DATASET_PREVIEW
   public PIN_DATASET_ARIA_LABEL = ARIA_LABELS.PIN_DATASET
+  public EXPLORE_DATASET_IN_KG_ARIA_LABEL = ARIA_LABELS.EXPLORE_DATASET_IN_KG
 
   @Input() public ripple: boolean = false
 

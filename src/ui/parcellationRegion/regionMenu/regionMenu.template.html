@@ -13,20 +13,16 @@
     </mat-card-title>
 
     <!-- subtitle on what it is -->
-    <mat-card-subtitle>
+    <mat-card-subtitle class="d-inline-flex align-items-center">
       <mat-icon fontSet="fas" fontIcon="fa-brain"></mat-icon>
       <span>
         Brain region
       </span>
-    </mat-card-subtitle>
 
-    <mat-divider></mat-divider>
-
-    <!-- other info about brain region -->
-    <mat-card-subtitle class="mt-4 mb-0 ml-5-n mr-5-n">
+      <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
       <!-- origin datas -->
-      <button mat-button 
+      <button mat-icon-button 
         [color]="previewDirective.active ? 'primary' : 'basic'"
         *ngFor="let originDataset of (region.originDatasets || []); let index = index"
         iav-dataset-preview-dataset-file
@@ -37,21 +33,25 @@
         [attr.primary]="previewDirective.active || null"
         role="switch"
         [attr.aria-checked]="previewDirective.active"
+        [matTooltip]="SHOW_ORIGIN_DATASET"
         [attr.aria-label]="SHOW_ORIGIN_DATASET">
         <mat-icon fontSet="fas" fontIcon="fa-eye"></mat-icon>
-        <span>
+        <!-- <span>
           View {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-        </span>
+        </span> -->
       </button>
+
 
       <!-- position -->
       <button mat-icon-button *ngIf="region?.position"
         (click)="navigateToRegion()"
-        [matTooltip]="region.position | nmToMm | addUnitAndJoin : 'mm'">
+        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (region.position | nmToMm | addUnitAndJoin : 'mm')">
         <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
         </mat-icon>
       </button>
+
     </mat-card-subtitle>
+
   </div>
 </mat-card>
 
