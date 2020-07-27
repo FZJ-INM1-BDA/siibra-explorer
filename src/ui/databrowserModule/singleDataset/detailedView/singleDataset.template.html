@@ -70,7 +70,7 @@
 <ng-template #actionBtns let-mediaBreakPoint>
 
   <!-- explore -->
-  <ng-container *ngIf="!strictLocal">
+  <ng-container *ngIf="!strictLocal && !hideExplore">
 
     <a *ngFor="let kgRef of kgReference"
       [href]="kgRef | doiParserPipe"
@@ -95,6 +95,7 @@
 
     <ng-template #favDatasetBtn let-isFav>
       <iav-dynamic-mat-button
+        *ngIf="!hidePinBtn"
         (click)="isFav ? undoableRemoveFav() : undoableAddFav()"
         iav-stop="click mousedown"
         [iav-dynamic-mat-button-aria-label]="PIN_DATASET_ARIA_LABEL"
@@ -110,7 +111,7 @@
   </ng-container>
 
   <!-- download -->
-  <ng-container *ngIf="!strictLocal">
+  <ng-container *ngIf="!strictLocal && !hideDownloadBtn">
 
     <a *ngIf="files && files.length > 0"
       [href]="dlFromKgHref"

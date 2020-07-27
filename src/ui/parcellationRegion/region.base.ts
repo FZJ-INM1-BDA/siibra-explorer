@@ -12,9 +12,6 @@ export class RegionBase {
   public rgbString: string
   public rgbDarkmode: boolean
 
-  @Input()
-  showRegionInOtherTmpl: boolean = true
-
   private _region: any
 
   @Input()
@@ -121,6 +118,7 @@ export class RegionBase {
     })
   }
 
+  public GO_TO_REGION_CENTROID = ARIA_LABELS.GO_TO_REGION_CENTROID
   public SHOW_CONNECTIVITY_DATA = ARIA_LABELS.SHOW_CONNECTIVITY_DATA
   public SHOW_IN_OTHER_REF_SPACE = ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE
   public SHOW_ORIGIN_DATASET = ARIA_LABELS.SHOW_ORIGIN_DATASET

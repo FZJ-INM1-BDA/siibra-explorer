@@ -33,4 +33,13 @@ export class SingleDatasetView extends SingleDatasetBase {
 
   @Input()
   hidePreview = false
+
+  @Input()
+  hideExplore = false
+
+  @Input()
+  hidePinBtn = false
+
+  @Input()
+  hideDownloadBtn = false
 }

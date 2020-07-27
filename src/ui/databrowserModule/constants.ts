@@ -1,5 +1,6 @@
 import { InjectionToken } from "@angular/core";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
+import { Observable } from "rxjs";
 
 export const OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN = new InjectionToken<(file: any, dataset: any) => void>('OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN')
 export const DATASTORE_DEFAULT_STATE = {
@@ -93,3 +94,5 @@ export interface DatasetPreview {
   datasetId: string
   filename: string
 }
+
+export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME: InjectionToken<({ datasetId, filename }) => Observable<any>> = new InjectionToken('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')

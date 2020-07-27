@@ -20,4 +20,5 @@ export {
   PreviewComponentWrapper,
   getKgSchemaIdFromFullId,
   PreviewDatasetFile,
+  GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
 } from './pure'

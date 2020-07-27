@@ -10,7 +10,8 @@ export {
   IKgParcellationRegion,
   IKgPublication,
   IKgReferenceSpace,
-  DatasetPreview
+  DatasetPreview,
+  GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
 } from './constants'
 
 export { PreviewFileTypePipe } from './preview/previewFileType.pipe'

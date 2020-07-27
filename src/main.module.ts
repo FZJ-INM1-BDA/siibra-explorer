@@ -26,7 +26,7 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore } from "src/ui/databrowserModule";
+import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/ui/databrowserModule";
 import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
@@ -54,7 +54,7 @@ import 'hammerjs'
 import 'src/res/css/extra_styles.css'
 import 'src/res/css/version.css'
 import 'src/theme.scss'
-import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from './glue';
+import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {

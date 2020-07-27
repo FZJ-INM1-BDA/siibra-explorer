@@ -99,7 +99,7 @@
     <mat-card-content class="w-100">
       <!-- TODO export aria labels to common/constants -->
       <div *ngIf="showList">
-        <div *ngFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 20; let index = index"
+        <div *ngFor="let dataset of filteredDataEntry; trackBy: trackByFn; let index = index"
           class="scroll-element overflow-hidden">
 
           <mat-divider *ngIf="index !== 0"></mat-divider>

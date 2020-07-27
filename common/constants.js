@@ -8,6 +8,7 @@
     COLLAPSE: 'Collapse',
 
     // dataset specific
+    EXPLORE_DATASET_IN_KG: `Explore dataset in Knowledge`,
     SHOW_DATASET_PREVIEW: 'Show dataset preview',
     TOGGLE_EXPLORE_PANEL: `Toggle explore panel`,
     MODALITY_FILTER: `Toggle dataset modality filter`,
@@ -36,6 +37,7 @@
     SHARE_CUSTOM_URL_DIALOG: 'Dialog for creating a custom URL',
 
     // parcellation region specific
+    GO_TO_REGION_CENTROID: 'Navigate to region centroid',
     SHOW_ORIGIN_DATASET: `Show probabilistic map`,
     SHOW_CONNECTIVITY_DATA: `Show connectivity data`,
     SHOW_IN_OTHER_REF_SPACE: `Show in other reference space`,

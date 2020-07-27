@@ -1,6 +1,6 @@
 import { Component, Optional, Inject } from "@angular/core";
 import { PreviewBase } from "../preview.base";
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/glue";
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../../pure";
 
 @Component({
   selector: 'preview-card',

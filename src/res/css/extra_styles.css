@@ -372,6 +372,11 @@ markdown-dom pre code
   pointer-events: none;
 }
 
+.h-2rem
+{
+  height: 2rem!important;
+}
+
 .h-5em
 {
   height: 5em!important;
@@ -750,4 +755,9 @@ mat-list.sm mat-list-item
 {
   height:2rem!important;
   font-size: 0.8rem!important;
+}
+
+.color-inherit
+{
+  color: inherit!important;
 }

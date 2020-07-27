@@ -3,9 +3,9 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { filter, map, withLatestFrom } from "rxjs/operators";
-import { DATASETS_ACTIONS_TYPES, IDataEntry } from "src/services/state/dataStore.store";
 import { LOCAL_STORAGE_CONST } from "src/util/constants";
 import { getKgSchemaIdFromFullId } from "./util/getKgSchemaIdFromFullId.pipe";
+import { datastateActionToggleFav, datastateActionUpdateFavDataset, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,7 @@ export class DataBrowserUseEffect {
     )
 
     this.toggleDataset$ = this.actions$.pipe(
-      ofType(DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET),
+      ofType(datastateActionToggleFav.type),
       withLatestFrom(this.favDataEntries$),
       map(([action, prevFavDataEntries]) => {
         const { payload = {} } = action as any
@@ -35,27 +35,25 @@ export class DataBrowserUseEffect {
         const re1 = getKgSchemaIdFromFullId(fullId)
 
         if (!re1) {
-          return {
-            type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-            favDataEntries: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-          }
+          return datastateActionUpdateFavDataset({
+            favDataEntries: prevFavDataEntries
+          })
         }
         const favIdx = prevFavDataEntries.findIndex(ds => {
           const re2 = getKgSchemaIdFromFullId(ds.fullId)
           if (!re2) return false
           return re2[1] === re1[1]
         })
-        return {
-          type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+        return datastateActionUpdateFavDataset({
           favDataEntries: favIdx >= 0
             ? prevFavDataEntries.filter((_, idx) => idx !== favIdx)
             : prevFavDataEntries.concat(payload),
-        }
+        })
       }),
     )
 
     this.unfavDataset$ = this.actions$.pipe(
-      ofType(DATASETS_ACTIONS_TYPES.UNFAV_DATASET),
+      ofType(datastateActionUnfavDataset.type),
       withLatestFrom(this.favDataEntries$),
       map(([action, prevFavDataEntries]) => {
 
@@ -64,20 +62,19 @@ export class DataBrowserUseEffect {
 
         const re1 = getKgSchemaIdFromFullId(fullId)
 
-        return {
-          type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
+        return datastateActionUpdateFavDataset({
           favDataEntries: prevFavDataEntries.filter(ds => {
             const re2 = getKgSchemaIdFromFullId(ds.fullId)
             if (!re2) return false
             if (!re1) return true
             return re2[1] !== re1[1]
-          }),
-        }
+          })
+        })
       }),
     )
 
     this.favDataset$ = this.actions$.pipe(
-      ofType(DATASETS_ACTIONS_TYPES.FAV_DATASET),
+      ofType(datastateActionFavDataset.type),
       withLatestFrom(this.favDataEntries$),
       map(([ action, prevFavDataEntries ]) => {
         const { payload } = action as any
@@ -88,10 +85,9 @@ export class DataBrowserUseEffect {
         const { fullId } = payload
         const re1 = getKgSchemaIdFromFullId(fullId)
         if (!re1) {
-          return {
-            type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-            favDataEntries: prevFavDataEntries,
-          }
+          return datastateActionUpdateFavDataset({
+            favDataEntries: prevFavDataEntries
+          })
         }
 
         const isDuplicate = prevFavDataEntries.some(favDe => {
@@ -103,10 +99,9 @@ export class DataBrowserUseEffect {
           ? prevFavDataEntries
           : prevFavDataEntries.concat(payload)
 
-        return {
-          type: DATASETS_ACTIONS_TYPES.UPDATE_FAV_DATASETS,
-          favDataEntries,
-        }
+        return datastateActionUpdateFavDataset({
+          favDataEntries
+        })
       }),
     )
 
@@ -136,7 +131,7 @@ export class DataBrowserUseEffect {
 
   private savedFav$: Observable<Array<{id: string, name: string}> | null>
 
-  private favDataEntries$: Observable<Partial<IDataEntry>[]>
+  public favDataEntries$: Observable<Partial<any>[]>
 
   @Effect()
   public favDataset$: Observable<any>
