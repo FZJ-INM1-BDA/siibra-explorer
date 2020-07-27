@@ -4,7 +4,7 @@ import { ViewerPreviewFile, IDataEntry } from 'src/services/state/dataStore.stor
 import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { PreviewBase } from "./preview.base";
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/glue";
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../pure";
 
 export const IAV_DATASET_PREVIEW_DATASET_FN = 'IAV_DATASET_PREVIEW_DATASET_FN'
 

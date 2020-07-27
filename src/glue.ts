@@ -23,8 +23,6 @@ const PREVIEW_FILE_TYPES_NO_UI = [
 
 const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
 
-export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME: InjectionToken<({ datasetId, filename }) => Observable<any>> = new InjectionToken('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')
-
 export const glueActionToggleDatasetPreview = createAction(
   '[glue] toggleDatasetPreview',
   props<{ datasetPreviewFile: IDatasetPreviewData }>()

@@ -3,11 +3,12 @@ import { RegionMenuComponent } from "./regionMenu.component"
 import { AngularMaterialModule } from "src/ui/sharedModules/angularMaterial.module"
 import { UtilModule } from "src/util/util.module"
 import { CommonModule } from "@angular/common"
-import { PreviewDatasetFile } from "src/ui/databrowserModule/pure"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { regionInOtherTemplateSelector, RenderViewOriginDatasetLabelPipe } from '../region.base'
 import { ARIA_LABELS } from 'common/constants'
 import { By } from "@angular/platform-browser"
+import { Directive, Input } from "@angular/core"
+import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 
 const mt0 = {
   name: 'mt0'
@@ -55,6 +56,31 @@ const hemisphereMrms = [ {
 
 const nohemisphereHrms = [mrm0, mrm1]
 
+@Directive({
+  selector: '[iav-dataset-preview-dataset-file]',
+  exportAs: 'iavDatasetPreviewDatasetFile'
+})
+class MockPrvDsFileDirective {
+  @Input('iav-dataset-preview-dataset-file') 
+  file
+
+  @Input('iav-dataset-preview-dataset-file-filename') 
+  filefilename
+
+  @Input('iav-dataset-preview-dataset-file-dataset') 
+  filedataset
+
+  @Input('iav-dataset-preview-dataset-file-kgid') 
+  filekgid
+
+  @Input('iav-dataset-preview-dataset-file-kgschema') 
+  filekgschema
+
+  @Input('iav-dataset-preview-dataset-file-fullid') 
+  filefullid
+
+}
+
 describe('> regionMenu.component.ts', () => {
   describe('> RegionMenuComponent', () => {
     beforeEach(async(() => {
@@ -64,6 +90,7 @@ describe('> regionMenu.component.ts', () => {
           UtilModule,
           AngularMaterialModule,
           CommonModule,
+          NoopAnimationsModule,
         ],
         declarations: [
           RegionMenuComponent,
@@ -71,7 +98,7 @@ describe('> regionMenu.component.ts', () => {
           /**
            * Used by regionMenu.template.html to show region preview
            */
-          PreviewDatasetFile,
+          MockPrvDsFileDirective,
         ],
         providers: [
           provideMockStore({ initialState: {} })
@@ -87,7 +114,7 @@ describe('> regionMenu.component.ts', () => {
     
     describe('> regionInOtherTemplatesTmpl', () => {
 
-      it('> toggleBtn does not exists if selector returns empty array', () => {
+      it('> if selector returns empty array, data-available-in-tmpl-count == 0', () => {
 
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(
@@ -99,11 +126,11 @@ describe('> regionMenu.component.ts', () => {
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
 
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        expect(toggleBtn).toBeFalsy()
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        expect(toggleBtn.attributes['data-available-in-tmpl-count']).toEqual('0')
       })
 
-      it('> toggleBtn exists if selector returns non empty array', () => {
+      it('> if selector returns non empty array, data-available-in-tmpl-count == array.length', () => {
 
         const mockStore = TestBed.inject(MockStore)
         mockStore.overrideSelector(
@@ -115,8 +142,8 @@ describe('> regionMenu.component.ts', () => {
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
 
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
-        expect(toggleBtn).toBeTruthy()
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        expect(toggleBtn.attributes['data-available-in-tmpl-count']).toEqual('2')
       })
 
       it('> if showRegionInOtherTmpl is set to false, toggle btn will not be shown', () => {
@@ -148,7 +175,7 @@ describe('> regionMenu.component.ts', () => {
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
 
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
         expect(listContainer).toBeFalsy()
       })
 
@@ -163,10 +190,10 @@ describe('> regionMenu.component.ts', () => {
         const fixture = TestBed.createComponent(RegionMenuComponent)
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
         toggleBtn.triggerEventHandler('click', null)
         fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
         expect(listContainer).toBeTruthy()
       })
 
@@ -181,11 +208,11 @@ describe('> regionMenu.component.ts', () => {
         const fixture = TestBed.createComponent(RegionMenuComponent)
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
         toggleBtn.triggerEventHandler('click', null)
         fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
-        expect(listContainer.nativeElement.children.length).toEqual(2)
+        const listContainer = fixture.debugElement.queryAll( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"] [role="button"]`) )
+        expect(listContainer.length).toEqual(2)
       })
 
       it('> the text (no hemisphere metadata) on the list is as expected', () => {
@@ -199,13 +226,14 @@ describe('> regionMenu.component.ts', () => {
         const fixture = TestBed.createComponent(RegionMenuComponent)
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
         toggleBtn.triggerEventHandler('click', null)
         fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        const listContainer = fixture.debugElement.queryAll( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"] [role="button"]`) )
 
         // trim white spaces before and after
-        const texts = Array.from(listContainer.nativeElement.children).map((c: HTMLElement) => c.textContent.replace(/^\s+/, '').replace(/\s+$/, ''))
+        
+        const texts = listContainer.map(c => c.nativeElement.textContent.replace(/^\s+/, '').replace(/\s+$/, ''))
         expect(texts).toContain(mt0.name)
         expect(texts).toContain(mt1.name)
       })
@@ -221,13 +249,13 @@ describe('> regionMenu.component.ts', () => {
         const fixture = TestBed.createComponent(RegionMenuComponent)
         fixture.componentInstance.region = mr1
         fixture.detectChanges()
-        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"]`) )
+        const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
         toggleBtn.triggerEventHandler('click', null)
         fixture.detectChanges()
-        const listContainer = fixture.debugElement.query( By.css(`[aria-label="${ARIA_LABELS.AVAILABILITY_IN_OTHER_REF_SPACE}"]`) )
+        const listContainer = fixture.debugElement.queryAll( By.css(`[aria-label="${ARIA_LABELS.SHOW_IN_OTHER_REF_SPACE}"] [role="button"]`) )
 
         // trim white spaces before and after, and middle white spaces into a single white space
-        const texts = Array.from(listContainer.nativeElement.children).map((c: HTMLElement) => c.textContent.replace(/^\s+/, '').replace(/\s+$/, '').replace(/\s+/g, ' '))
+        const texts = listContainer.map(c => c.nativeElement.textContent.replace(/^\s+/, '').replace(/\s+$/, '').replace(/\s+/g, ' '))
         expect(texts).toContain(`${mt0.name} (left hemisphere)`)
         expect(texts).toContain(`${mt1.name} (left hemisphere)`)
       })

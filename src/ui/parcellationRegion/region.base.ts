@@ -12,9 +12,6 @@ export class RegionBase {
   public rgbString: string
   public rgbDarkmode: boolean
 
-  @Input()
-  showRegionInOtherTmpl: boolean = true
-
   private _region: any
 
   @Input()

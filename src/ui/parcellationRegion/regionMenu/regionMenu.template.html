@@ -50,6 +50,16 @@
         </mat-icon>
       </button>
 
+      <!-- region in other templates -->
+      <button mat-icon-button
+        *ngIf="showRegionInOtherTmpl"
+        [attr.data-available-in-tmpl-count]="(regionInOtherTemplates$ | async).length"
+        [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE"
+        [matMenuTriggerFor]="regionInOtherTemplatesMenu"
+        [matMenuTriggerData]="{ regionInOtherTemplates: regionInOtherTemplates$ | async }">
+        <i class="fas fa-globe"></i>
+      </button>
+
     </mat-card-subtitle>
 
   </div>
@@ -68,43 +78,24 @@
 </mat-menu>
 
 <!-- template for switching template -->
-<ng-template #regionInOtherTemplatesTmpl let-regionInOtherTemplates="regionInOtherTemplates">
+<mat-menu #regionInOtherTemplatesMenu="matMenu"
+  [aria-label]="SHOW_IN_OTHER_REF_SPACE">
+  hello world
+  <ng-template matMenuContent let-regionInOtherTemplates="regionInOtherTemplates">
 
-  <div iav-switch #changeTmplSwitch="iavSwitch">
-
-    <mat-list-item *ngIf="regionInOtherTemplates.length"
+    <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
+      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
+      (click)="changeView(sameRegion)"
       mat-ripple
-      [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE"
-      (click)="changeTmplSwitch && changeTmplSwitch.toggle()">
-      <mat-icon fontSet="fas" fontIcon="fa-brain" mat-list-icon></mat-icon>
+      [attr.role]="'button'">
+      <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
       <div mat-line>
-        <span>
-          Explore in other templates
-        </span>
-        <span class="muted">
-          ({{ regionInOtherTemplates.length }})
-        </span>
+        <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
+        </ng-container>
       </div>
-      <mat-icon fontSet="fas" [fontIcon]="changeTmplSwitch.switchState ? 'fa-chevron-up' : 'fa-chevron-down'"></mat-icon>
     </mat-list-item>
-
-    <!-- change template items -->
-    <div *ngIf="changeTmplSwitch.switchState"
-      [attr.aria-label]="AVAILABILITY_IN_OTHER_REF_SPACE">
-      <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates; let i = index"
-        [attr.aria-label]="SHOW_IN_OTHER_REF_SPACE + ': ' + sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') "
-        (click)="changeView(sameRegion)"
-        mat-ripple
-        [attr.role]="'button'">
-        <mat-icon fontSet="fas" fontIcon="fa-none" mat-list-icon></mat-icon>
-        <div mat-line>
-          <ng-container *ngTemplateOutlet="regionInOtherTemplate; context: sameRegion">
-          </ng-container>
-        </div>
-      </mat-list-item>
-    </div>
-  </div>
-</ng-template>
+  </ng-template>
+</mat-menu>
 
 <!-- template for rendering template name and template hemisphere -->
 <ng-template #regionInOtherTemplate let-template="template" let-hemisphere="hemisphere">

@@ -4,7 +4,7 @@ import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiStat
 import { EnumPreviewFileTypes } from "../pure";
 import { switchMap, map, startWith } from "rxjs/operators";
 import { forkJoin, of, Subscription } from "rxjs";
-import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/glue";
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../pure";
 
 @Directive({
   selector: '[iav-shown-previews]',
