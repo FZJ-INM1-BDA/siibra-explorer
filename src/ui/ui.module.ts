@@ -1,4 +1,4 @@
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { ComponentsModule } from "src/components/components.module";
 
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -87,6 +87,7 @@ import { AtlasLayerSelector } from "src/ui/atlasLayerSelector/atlasLayerSelector
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionDirective } from "./parcellationRegion/region.directive";
 import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.base";
+import { RegionAccordionTooltipTextPipe } from './util'
 
 @NgModule({
   imports : [
@@ -172,6 +173,7 @@ import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.ba
     HumanReadableFileSizePipe,
     ReorderPanelIndexPipe,
     RenderViewOriginDatasetLabelPipe,
+    RegionAccordionTooltipTextPipe,
 
     /* directive */
     DownloadDirective,

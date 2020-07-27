@@ -85,13 +85,13 @@
       </div>
 
       <div *ngIf="viewerLoaded" class="position-absolute z-index-6 top-0 left-0 pe-none tab-toggle-container">
-        <button mat-raised-button
-          [attr.aria-label]="ARIA_LABEL_TOGGLE_SIDE_PANEL"
-          class="pe-all tab-toggle"
-          (click)="sideNavMasterSwitch.toggle()"
-          [color]="!sideNavMasterSwitch.switchState && !(alwaysHideMinorPanel$ | async) ? 'accent' : 'basic'">
-          <i class="fas" [ngClass]="sideNavMasterSwitch.switchState ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
-        </button>
+        <ng-container *ngTemplateOutlet="tabTmpl; context: {
+          isOpen: sideNavMasterSwitch.switchState,
+          regionSelected: selectedRegions$ | async,
+          iavAdditionallayers: iavAdditionalLayers$ | async
+        }">
+
+        </ng-container>
       </div>
 
     </mat-drawer-content>
@@ -291,6 +291,7 @@
       let-title="title"
       let-desc="desc"
       let-iconClass="iconClass"
+      let-iconTooltip="iconTooltip"
       let-iavNgIf="iavNgIf"
       let-content="content">
       <mat-expansion-panel class="mt-1 mb-1"
@@ -305,7 +306,8 @@
           </mat-panel-title>
 
           <!-- desc + icon -->
-          <mat-panel-description class="d-flex align-items-center justify-content-end">
+          <mat-panel-description class="d-flex align-items-center justify-content-end"
+            [matTooltip]="iconTooltip">
             <span class="mr-3">{{ desc }}</span>
             <span class="accordion-icon d-inline-flex justify-content-center">
               <i [class]="iconClass"></i>
@@ -340,6 +342,7 @@
         title: 'Explore in other templates',
         desc: regionInOtherTemplates.length,
         iconClass: 'fas fa-brain',
+        iconTooltip: regionInOtherTemplates.length | regionAccordionTooltipTextPipe : 'regionInOtherTmpl',
         iavNgIf: regionInOtherTemplates.length,
         content: exploreInOtherTmpl
       }">
@@ -368,7 +371,8 @@
       title: 'Regional features',
       desc: iavDbDirective?.dataentries?.length,
       iconClass: 'fas fa-database',
-      iavNgIf: true,
+      iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
+      iavNgIf: iavDbDirective?.dataentries?.length,
       content: regionalFeaturesTmpl
     }">
     </ng-container>
@@ -385,6 +389,7 @@
       title: 'Connectivity',
       desc: connectedCounterDir.value,
       iconClass: 'fas fa-braille',
+      iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
       iavNgIf: selectedParcellation
         && selectedParcellation.hasAdditionalViewMode
         && selectedParcellation.hasAdditionalViewMode.includes('connectivity'),
@@ -527,4 +532,92 @@
       <i class="fas fa-eye"></i>
     </ng-template>
   </button>
+</ng-template>
+
+
+<!-- template for rendering tab -->
+<ng-template #tabTmpl
+  let-isOpen="isOpen"
+  let-regionSelected="regionSelected"
+  let-iavAdditionallayers="iavAdditionallayers">
+
+  <!-- if mat drawer is open -->
+  <ng-template [ngIf]="isOpen" [ngIfElse]="tabTmpl_closedTmpl">
+    <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+      matColor: 'basic',
+      fontIcon: 'fa-chevron-left'
+    }">
+    </ng-container>
+  </ng-template>
+
+  <!-- if matdrawer is closed -->
+  <ng-template #tabTmpl_closedTmpl>
+
+    <!-- if additional layers are being shown -->
+    <ng-template [ngIf]="iavAdditionallayers?.length > 0" [ngIfElse]="tabTmpl_noAdditionalLayers">
+      <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+        matColor: 'accent',
+        fontIcon: 'fa-database',
+        tooltip: 'Explore dataset preview'
+      }">
+      </ng-container>
+    </ng-template>
+
+    <!-- if additional layers not not being shown -->
+    <ng-template #tabTmpl_noAdditionalLayers>
+      
+      <!-- if region selected > 0 -->
+      <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
+        <div class="hidden"
+          iav-region
+          [region]="regionSelected[0]"
+          #tabTmpl_iavRegion="iavRegion">
+        </div>
+
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'accent',
+          customColor: tabTmpl_iavRegion.rgbString,
+          customColorDarkmode: tabTmpl_iavRegion.rgbDarkmode,
+          fontIcon: 'fa-brain',
+          tooltip: 'Explore ' + tabTmpl_iavRegion.region.name
+        }">
+
+        </ng-container>
+      </ng-template>
+
+      <!-- nothing is selected -->
+      <ng-template #tabTmpl_nothingSelected>
+        <ng-container *ngTemplateOutlet="tabTmpl_defaultTmpl; context: {
+          matColor: 'primary',
+          fontIcon: 'fa-sitemap',
+          tooltip: 'Explore regions'
+        }">
+        </ng-container>
+      </ng-template>
+    </ng-template>
+  </ng-template>
+
+  <ng-template #tabTmpl_defaultTmpl
+    let-matColor="matColor"
+    let-fontIcon="fontIcon"
+    let-customColor="customColor"
+    let-customColorDarkmode="customColorDarkmode"
+    let-tooltip="tooltip">
+    <button mat-raised-button
+      [attr.aria-label]="ARIA_LABEL_TOGGLE_SIDE_PANEL"
+      [matTooltip]="tooltip"
+      class="pe-all tab-toggle"
+      [ngClass]="{
+        'darktheme': customColorDarkmode === true,
+        'lighttheme': customColorDarkmode === false
+      }"
+      [style.backgroundColor]="customColor"
+      (click)="sideNavMasterSwitch.toggle()"
+      [color]="(!customColor && matColor) ? matColor : null">
+      
+      <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
+        <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
+      </span>
+    </button>
+  </ng-template>
 </ng-template>

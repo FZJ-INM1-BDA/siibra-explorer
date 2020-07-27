@@ -173,6 +173,7 @@
                   *ngIf="dismissable"
                   (click)="clearAdditionalLayer(parcel)"
                   fontSet="fas"
+                  iav-stop="click"
                   fontIcon="fa-times">
                 </mat-icon>
               </mat-chip>
@@ -201,6 +202,7 @@
                   class="iv-custom-comp text"
                   (click)="clearSelectedRegions()"
                   fontSet="fas"
+                  iav-stop="click"
                   fontIcon="fa-times">
                 </mat-icon>
               </mat-chip>
@@ -221,6 +223,7 @@
                   </span>
                   <mat-icon (click)="previewDirective.onClick()"
                     fontSet="fas"
+                    iav-stop="click"
                     fontIcon="fa-times">
                   </mat-icon>
                 </mat-chip>
@@ -242,7 +245,8 @@
                 (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()">
                 {{ layer.file?.name || layer.filename || 'Unknown data preview' }}
                 <mat-icon fontSet="fas" fontIcon="fa-times"
-                  (click)="preview.onClick()">
+                  (click)="preview.onClick()"
+                  iav-stop="click">
                 </mat-icon>
               </mat-chip>
             </ng-container>
