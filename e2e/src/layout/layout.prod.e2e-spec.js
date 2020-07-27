@@ -98,3 +98,11 @@ describe('> status panel', () => {
     expect(expectVisible).toEqual(true)
   })
 })
+
+describe('> double mat drawer', () => {
+  describe('> on user interaction', () => {
+    describe('> when user closes region chip', () => {
+      it('> mat drawers should remain closed')
+    })
+  })
+})

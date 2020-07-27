@@ -37,6 +37,7 @@ import { RenderViewOriginDatasetLabelPipe } from '../parcellationRegion/region.b
 import { By } from '@angular/platform-browser'
 import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
+import { RegionAccordionTooltipTextPipe } from '../util'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -96,7 +97,8 @@ describe('> nehubaContainer.component.ts', () => {
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
           SafeStylePipe,
-          RenderViewOriginDatasetLabelPipe
+          RenderViewOriginDatasetLabelPipe,
+          RegionAccordionTooltipTextPipe,
         ],
         providers: [
           provideMockStore({ initialState: defaultRootState }),

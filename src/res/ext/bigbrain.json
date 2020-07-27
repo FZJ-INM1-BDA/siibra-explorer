@@ -658,6 +658,7 @@
     {
       "@id": "juelich/iav/atlas/v1.0.0/3",
       "name": "Cortical Layers Segmentation",
+      "displayName": "Cortical layers",
       "ngId": "cortical layers",
       "originDatasets": [
         {
@@ -756,7 +757,7 @@
     {
       "@id": "juelich/iav/atlas/v1.0.0/4",
       "name": "Grey/White matter",
-      "displayName": "Isocortical/Non-isocortical structures",
+      "displayName": "Isocortex",
       "type": "parcellation",
       "ngData": null,
       "ngId": " tissue type: ",

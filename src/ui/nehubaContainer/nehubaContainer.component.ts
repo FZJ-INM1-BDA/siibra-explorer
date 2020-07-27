@@ -740,7 +740,9 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     /** switch side nav */
     this.subscriptions.push(
-      this.alwaysHideMinorPanel$.subscribe(flag => {
+      this.alwaysHideMinorPanel$.pipe(
+        distinctUntilChanged()
+      ).subscribe(flag => {
         if (!flag) {
           this.matDrawerMinor && this.matDrawerMinor.open()
           this.navSideDrawerMainSwitch && this.navSideDrawerMainSwitch.open()
