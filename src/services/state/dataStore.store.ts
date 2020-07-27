@@ -5,6 +5,7 @@
 import { Action } from '@ngrx/store'
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { LOCAL_STORAGE_CONST } from 'src/util/constants'
+import { datastateActionUpdateFavDataset } from './dataState/actions'
 
 /**
  * TODO merge with databrowser.usereffect.ts
@@ -48,13 +49,13 @@ export const getStateStore = ({ state: state = defaultState } = {}) => (prevStat
       fetchedDataEntries : action.fetchedDataEntries,
     }
   }
-  case FETCHED_SPATIAL_DATA : {
+  case FETCHED_SPATIAL_DATA: {
     return {
       ...prevState,
       fetchedSpatialData : action.fetchedDataEntries,
     }
   }
-  case ACTION_TYPES.UPDATE_FAV_DATASETS: {
+  case datastateActionUpdateFavDataset.type: {
     const { favDataEntries = [] } = action
     return {
       ...prevState,
@@ -211,10 +212,6 @@ export interface IFileSupplementData {
 }
 
 const ACTION_TYPES = {
-  FAV_DATASET: `FAV_DATASET`,
-  UPDATE_FAV_DATASETS: `UPDATE_FAV_DATASETS`,
-  UNFAV_DATASET: 'UNFAV_DATASET',
-  TOGGLE_FAV_DATASET: 'TOGGLE_FAV_DATASET',
   PREVIEW_DATASET: 'PREVIEW_DATASET',
   CLEAR_PREVIEW_DATASET: 'CLEAR_PREVIEW_DATASET',
   CLEAR_PREVIEW_DATASETS: 'CLEAR_PREVIEW_DATASETS'

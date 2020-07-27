@@ -10,13 +10,13 @@ import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.se
 import { WidgetUnit } from "src/widget";
 
 import { LoggingService } from "src/logging";
-import { DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
 import { regionFlattener } from "src/util/regionFlattener";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
+import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -206,24 +206,33 @@ export class DatabrowserService implements OnDestroy {
   }
 
   public toggleFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.TOGGLE_FAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionToggleFav({
+        payload: {
+          fullId: dataentry.fullId || null
+        }
+      })
+    )
   }
 
   public saveToFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.FAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionFavDataset({
+        payload: {
+          fullId: dataentry?.fullId || null
+        }
+      })
+    )
   }
 
   public removeFromFav(dataentry: Partial<IDataEntry>) {
-    this.store.dispatch({
-      type: DATASETS_ACTIONS_TYPES.UNFAV_DATASET,
-      payload: dataentry,
-    })
+    this.store.dispatch(
+      datastateActionUnfavDataset({
+        payload: {
+          fullId: dataentry.fullId || null
+        }
+      })
+    )
   }
 
   // TODO deprecate
