@@ -489,6 +489,10 @@ markdown-dom pre code
     cursor: pointer!important;
 }
 
+.z-index-1
+{
+  z-index: 1!important;
+}
 .z-index-6
 {
   z-index: 6!important;
@@ -715,6 +719,12 @@ kg-dataset-previewer > img
 {
   margin-left: -1.25rem!important;
 }
+
+.ml-8-n
+{
+  margin-left: -2rem!important;
+}
+
 .mr-5-n
 {
   margin-right: -1.25rem!important;
