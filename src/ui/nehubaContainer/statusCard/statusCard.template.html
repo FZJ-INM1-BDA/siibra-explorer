@@ -38,8 +38,7 @@
       </span>
 
       <mat-slide-toggle
-        [checked]="statusPanelRealSpace$ | async"
-        (change)="statusPanelRealSpace$.next($event.checked)"
+        [formControl]="statusPanelFormCtrl"
         class="pl-2 pr-2">
       </mat-slide-toggle>
       
