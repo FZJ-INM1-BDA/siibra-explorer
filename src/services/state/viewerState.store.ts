@@ -226,7 +226,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
   case SET_CONNECTIVITY_VISIBLE:
     return {
       ...prevState,
-      overwrittenColorMap: action.payload,
+      overwrittenColorMap: action.payload || '',
     }  
   default :
     return prevState

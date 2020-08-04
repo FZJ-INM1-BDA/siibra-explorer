@@ -29,6 +29,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     private connectivityRegion$: Observable<any>
     private templateSelected$: Observable<any>
     private selectedParcellation$: Observable<any>
+    public overwrittenColorMap$: Observable<any>
 
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
@@ -72,6 +73,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         select('templateSelected'),
         shareReplay(1)
       )
+
+      this.overwrittenColorMap$ = this.store$.pipe(
+        select('viewerState'),
+        safeFilter('overwrittenColorMap'),
+        map(state => state.overwrittenColorMap),
+        distinctUntilChanged()
+      )
     }
 
     public ngAfterContentChecked(): void {
@@ -99,7 +107,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
               this.setDefaultMap()
               this.store$.dispatch({
                 type: SET_CONNECTIVITY_VISIBLE,
-                payload: false,
+                payload: null,
               })
             }
             this.region = cr
@@ -109,6 +117,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       )
       this.subscriptions.push(this.templateSelected$.subscribe(t => {
         this.closeConnectivityView()
+      }))
+      this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
+        this.showConnectivityToggle = ocm === 'connectivity'? true : false
       }))
       this.subscriptions.push(
         fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived', { capture: true })
@@ -151,7 +162,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         if (this.defaultColorMap) this.setDefaultMap()
         this.store$.dispatch({
           type: SET_CONNECTIVITY_VISIBLE,
-          payload: false,
+          payload: null,
         })
       }
     }
@@ -164,10 +175,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
       this.defaultColorMap && this.setDefaultMap()
-      this.store$.dispatch({
-        type: SET_CONNECTIVITY_VISIBLE,
-        payload: false,
-      })
+      // this.store$.dispatch({
+      //   type: SET_CONNECTIVITY_VISIBLE,
+      //   payload: false,
+      // })
     }
 
     navigateToRegion(region) {
@@ -197,7 +208,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       })
       this.store$.dispatch({
         type: SET_CONNECTIVITY_VISIBLE,
-        payload: false,
+        payload: null,
       })
     }
 
@@ -213,7 +224,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public addNewColorMap() {
       this.store$.dispatch({
         type: SET_CONNECTIVITY_VISIBLE,
-        payload: true,
+        payload: 'connectivity',
       })
       this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
 

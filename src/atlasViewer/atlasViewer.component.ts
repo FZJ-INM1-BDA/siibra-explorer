@@ -95,6 +95,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public onhoverLandmark$: Observable<{landmarkName: string, datasets: any} | null>
 
+  public overwrittenColorMap$: Observable<any>
+
   private subscriptions: Subscription[] = []
 
   public unsupportedPreviewIdx: number = 0
@@ -200,6 +202,13 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
         this.selectedParcellation = parcellation
       }),
 
+    )
+
+    this.overwrittenColorMap$ = this.store.pipe(
+      select('viewerState'),
+      safeFilter('overwrittenColorMap'),
+      map(state => state.overwrittenColorMap),
+      distinctUntilChanged()
     )
 
     const error = this.el.nativeElement.getAttribute('data-error')
