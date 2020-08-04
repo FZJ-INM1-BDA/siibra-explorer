@@ -1,5 +1,6 @@
-<div class="w-100 h-100 d-block d-flex flex-column pb-2" #connectivityComponent>
+<div class="w-100 h-100 d-block d-flex flex-column pb-2">
     <hbp-connectivity-matrix-row
+            #connectivityComponent
             *ngIf="region"
             [region]="region"
             theme="dark"
@@ -41,6 +42,12 @@
                             [iav-dataset-show-dataset-dialog-description]="selectedDataset.description">
                         <i class="fas fa-info"></i>
                     </button>
+                    <button class="flex-grow-0 flex-shrink-0"
+                            mat-icon-button
+                            (click)="exportFullConnectivity()"
+                            matTooltip="Export full connectivity profile">
+                        <i class="fas fa-download"></i>
+                    </button>
                 </ng-container>
 
                 </div>
@@ -67,4 +74,8 @@
             </div>
         </div>
     </hbp-connectivity-matrix-row>
+    <full-connectivity-grid #fullConnectivityGrid
+                            dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies"
+                            onlyExport="true">
+    </full-connectivity-grid>
 </div>
