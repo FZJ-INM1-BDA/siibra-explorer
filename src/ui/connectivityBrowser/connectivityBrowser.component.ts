@@ -44,7 +44,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
-
+    @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
 
     @Output() public closeConnectivity: EventEmitter<boolean> = new EventEmitter()
     @Output() public connectedAreaCount: EventEmitter<number> = new EventEmitter()
@@ -246,6 +246,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
           this.allRegions.push(region)
         }
       }
+    }
+
+    public exportFullConnectivity() {
+      this.fullConnectivityGridElement.nativeElement['downloadCSV']()
     }
 
 }
