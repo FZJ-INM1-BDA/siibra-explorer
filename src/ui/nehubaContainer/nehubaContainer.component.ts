@@ -25,6 +25,7 @@ import {
 import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, isFirstRow, isFirstCell } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
+import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -248,6 +249,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private redrawLayout$: Observable<[string, string]>
 
   public hoveredPanelIndices$: Observable<number>
+
+  @ViewChild('connectivityComponent') public connectivityComponent: ConnectivityBrowserComponent
 
   constructor(
     private pureConstantService: PureContantService,

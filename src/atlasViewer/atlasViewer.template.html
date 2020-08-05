@@ -227,7 +227,22 @@
                     fontIcon="fa-times">
                   </mat-icon>
                 </mat-chip>
+
+                <mat-chip *ngIf="(overwrittenColorMap$ | async) === 'connectivity' && !previewDirective.active"
+                          (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                          class="pe-all position-relative ml-8-n">
+                  <span class="pl-4">
+                    Connectivity
+                  </span>
+                  <mat-icon
+                          (click)="uiNehubaContainer.connectivityComponent.closeConnectivityView()"
+                          fontSet="fas"
+                          iav-stop="click"
+                          fontIcon="fa-times">
+                  </mat-icon>
+                </mat-chip>
               </ng-container>
+
             </ng-container>
           </ng-template>
 
