@@ -23,7 +23,7 @@
       "mesh": {
         "removeBasedOnNavigation": true,
         "flipRemovedOctant": true,
-        "surfaceParcellation": false
+        "surfaceParcellation": true
       },
       "removePerspectiveSlicesBackground": {
         "mode": "=="
@@ -87,10 +87,10 @@
             ]
           ]
         },
-        "jubrain colin v18 left": {
+        "julich brain colin v22 left": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/left",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/data-repo/20200804-julich-brain-v2-colin-lefth/precomputed",
           "transform": [
             [
               1,
@@ -118,10 +118,10 @@
             ]
           ]
         },
-        "jubrain colin v18 right": {
+        "julich brain colin v22 right": {
           "type": "segmentation",
           "visible": true,
-          "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/colin27/right",
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/data-repo/20200804-julich-brain-v2.colin-righth/precomputed",
           "transform": [
             [
               1,
