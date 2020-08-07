@@ -95,7 +95,7 @@
         },
         "jubrain mni152 v18 left": {
           "type": "segmentation",
-          "visible": true,
+          "visible": false,
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/icbm152casym/left",
           "transform": [
             [
@@ -126,8 +126,70 @@
         },
         "jubrain mni152 v18 right": {
           "type": "segmentation",
-          "visible": true,
+          "visible": false,
           "source": "precomputed://https://neuroglancer.humanbrainproject.org/precomputed/JuBrain/18/icbm152casym/right",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -132500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -78500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "julich brain mni152 v22 left": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/data-repo/20200807_julich_brain_v2_mni152_left/precomputed",
+          "transform": [
+            [
+              1,
+              0,
+              0,
+              -96500000
+            ],
+            [
+              0,
+              1,
+              0,
+              -132500000
+            ],
+            [
+              0,
+              0,
+              1,
+              -78500000
+            ],
+            [
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        },
+        "julich brain mni152 v22 right": {
+          "type": "segmentation",
+          "visible": true,
+          "source": "precomputed://https://neuroglancer-dev.humanbrainproject.org/precomputed/data-repo/20200807_julich_brain_v2_mni152_right/precomputed",
           "transform": [
             [
               1,
