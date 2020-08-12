@@ -10,32 +10,6 @@ import { defaultRootState } from '../stateStore.service'
 
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
-
-const hoc1 = {
-  name: "Area hOc1 (V1, 17, CalcS) - left hemisphere",
-  rgb: [
-    190,
-    132,
-    147,
-  ],
-  labelIndex: 8,
-  ngId: "jubrain colin v18 left",
-  children: [],
-  status: "publicP",
-  position: [
-    -8533787,
-    -84646549,
-    1855106,
-  ],
-  originDatasets: [
-    {
-      kgSchema: "minds/core/dataset/v1.0.0",
-      kgId: "5c669b77-c981-424a-858d-fe9f527dbc07",
-      filename: "Area hOc1 (V1, 17, CalcS) [v2.4, Colin 27, left hemisphere]"
-    }
-  ],
-}
-
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {
     it('translateds hoc1 from labelIndex to region', () => {
@@ -46,8 +20,10 @@ describe('effect.ts', () => {
           updated: true,
         },
       })
-      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: 'jubrain colin v18 left#8' })
-      expect(fetchedRegion).toEqual(hoc1)
+      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: 'julich brain colin v22 left#116' })
+      expect(fetchedRegion).toBeTruthy()
+      expect(fetchedRegion.fullId.kg.kgId).toEqual('5151ab8f-d8cb-4e67-a449-afe2a41fb007')
+      
     })
   })
 

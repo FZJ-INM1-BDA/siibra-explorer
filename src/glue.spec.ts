@@ -5,7 +5,6 @@ import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
 import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
-import * as DATABROWSER_MODULE_EXPORTS from 'src/ui/databrowserModule'
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
 import { getIdObj } from 'common/util'
@@ -244,7 +243,7 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
 
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
       }))
     })
