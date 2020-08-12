@@ -47,7 +47,7 @@
       "_meta": {
         "regions": {
           "repo": "https://gin.g-node.org/xgui3783/20200811-julich-brain-v2-ontology.git",
-          "commit": "8566eade5f8858ca739e7f471b40a862990c584c"
+          "commit": "e10aaa86a002cdefe2e99172e73c416570c0c9d3"
         }
       },
       "regions": [
@@ -97,6 +97,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -116,6 +122,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -126,7 +138,13 @@
                               ],
                               "ontologyLabelIndex": 286
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                            }
+                          }
                         }
                       ]
                     },
@@ -155,6 +173,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -174,6 +198,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -184,7 +214,13 @@
                               ],
                               "ontologyLabelIndex": 264
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a5c9d95f-8e7c-4454-91b6-a790387370fc"
+                            }
+                          }
                         }
                       ]
                     },
@@ -213,6 +249,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -231,6 +273,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -240,7 +288,13 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "bb111a95-e04c-4987-8254-4af4ed8b0022"
+                            }
+                          }
                         }
                       ]
                     }
@@ -278,6 +332,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -297,6 +357,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -307,7 +373,13 @@
                               ],
                               "ontologyLabelIndex": 187
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "708df0fa-e9a4-4c23-bd85-8957f6d30faf"
+                            }
+                          }
                         }
                       ]
                     },
@@ -336,6 +408,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -355,6 +433,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -365,7 +449,13 @@
                               ],
                               "ontologyLabelIndex": 290
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                            }
+                          }
                         },
                         {
                           "name": "SF (Amygdala)",
@@ -385,6 +475,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -404,6 +500,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -414,7 +516,13 @@
                               ],
                               "ontologyLabelIndex": 185
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "48929163-bf7b-4471-9f14-991c5225eced"
+                            }
+                          }
                         }
                       ]
                     },
@@ -443,6 +551,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -462,6 +576,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -472,7 +592,13 @@
                               ],
                               "ontologyLabelIndex": 228
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a964e6e6-8014-41a2-b975-754d75cbb6f2"
+                            }
+                          }
                         },
                         {
                           "name": "IF (Amygdala)",
@@ -492,6 +618,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -510,6 +642,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -519,7 +657,13 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5a1391c8-6056-40e4-a19b-3774df42bd07"
+                            }
+                          }
                         },
                         {
                           "name": "MF (Amygdala)",
@@ -539,6 +683,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -558,6 +708,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -568,7 +724,13 @@
                               ],
                               "ontologyLabelIndex": 235
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3741c788-9412-4b8e-9ab4-9ca2d3a715ca"
+                            }
+                          }
                         }
                       ]
                     },
@@ -597,6 +759,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -615,6 +783,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -624,7 +798,13 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7aba8aef-6430-4fa7-ab54-8ecac558faed"
+                            }
+                          }
                         }
                       ]
                     }
@@ -675,6 +855,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -698,6 +884,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -708,7 +900,13 @@
                               ],
                               "ontologyLabelIndex": 130
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "64555f7f-1b33-4ffe-9853-be41e7a21096"
+                            }
+                          }
                         },
                         {
                           "name": "Area 7PC (SPL)",
@@ -732,6 +930,12 @@
                                 28
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -755,6 +959,12 @@
                                 28
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -765,7 +975,13 @@
                               ],
                               "ontologyLabelIndex": 132
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "763140d3-7ba0-4f28-b0ac-c6cbda2d14e1"
+                            }
+                          }
                         },
                         {
                           "name": "Area 5M (SPL)",
@@ -789,6 +1005,12 @@
                                 76
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -812,6 +1034,12 @@
                                 76
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -822,7 +1050,13 @@
                               ],
                               "ontologyLabelIndex": 131
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "abe105cf-2c29-46af-af75-6b46fdb75137"
+                            }
+                          }
                         },
                         {
                           "name": "Area 7P (SPL)",
@@ -846,6 +1080,12 @@
                                 106
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -869,6 +1109,12 @@
                                 106
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -879,7 +1125,13 @@
                               ],
                               "ontologyLabelIndex": 208
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "af9c4f39-63a4-409f-b306-e5965d639f37"
+                            }
+                          }
                         },
                         {
                           "name": "Area 5Ci (SPL)",
@@ -903,6 +1155,12 @@
                                 146
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -926,6 +1184,12 @@
                                 146
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -936,7 +1200,13 @@
                               ],
                               "ontologyLabelIndex": 136
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "07d08f74-af3d-4cbe-bc3c-f32b7f5c989f"
+                            }
+                          }
                         },
                         {
                           "name": "Area 7A (SPL)",
@@ -960,6 +1230,12 @@
                                 19
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -983,6 +1259,12 @@
                                 19
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -993,7 +1275,13 @@
                               ],
                               "ontologyLabelIndex": 134
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1026,6 +1314,12 @@
                                 80
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1049,6 +1343,12 @@
                                 80
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1059,7 +1359,13 @@
                               ],
                               "ontologyLabelIndex": 75
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f6f10b01-6c10-42cf-8129-f5aaf307a36b"
+                            }
+                          }
                         },
                         {
                           "name": "Area OP4 (POperc)",
@@ -1083,6 +1389,12 @@
                                 132
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1106,6 +1418,12 @@
                                 132
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1116,7 +1434,13 @@
                               ],
                               "ontologyLabelIndex": 72
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b1e7f0d2-6d37-4047-9c2e-a08c3f1e2a16"
+                            }
+                          }
                         },
                         {
                           "name": "Area OP2 (POperc)",
@@ -1140,6 +1464,12 @@
                                 221
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1163,6 +1493,12 @@
                                 221
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1173,7 +1509,13 @@
                               ],
                               "ontologyLabelIndex": 74
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "ab26cefd-f7d6-4442-8020-a6e418e673ff"
+                            }
+                          }
                         },
                         {
                           "name": "Area OP1 (POperc)",
@@ -1197,6 +1539,12 @@
                                 34
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1220,6 +1568,12 @@
                                 34
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1230,7 +1584,13 @@
                               ],
                               "ontologyLabelIndex": 73
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "402ec28d-0809-4226-91a4-900d9303291b"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1263,6 +1623,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1286,6 +1652,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1296,7 +1668,13 @@
                               ],
                               "ontologyLabelIndex": 127
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b84f67bb-5d9f-4daf-a8d6-15f63f901bd4"
+                            }
+                          }
                         },
                         {
                           "name": "Area 1 (PostCG)",
@@ -1320,6 +1698,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1343,6 +1727,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1353,7 +1743,13 @@
                               ],
                               "ontologyLabelIndex": 125
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "c9753e82-80ca-4074-a704-9dd2c4c0d58b"
+                            }
+                          }
                         },
                         {
                           "name": "Area 2 (PostCS)",
@@ -1377,6 +1773,12 @@
                                 35
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1400,6 +1802,12 @@
                                 35
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1410,7 +1818,13 @@
                               ],
                               "ontologyLabelIndex": 252
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f9147ae9-5cf0-41b2-89a3-e6e6df07bef1"
+                            }
+                          }
                         },
                         {
                           "name": "Area 3a (PostCG)",
@@ -1434,6 +1848,12 @@
                                 50
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1457,6 +1877,12 @@
                                 50
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1467,7 +1893,13 @@
                               ],
                               "ontologyLabelIndex": 126
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "2657ecc1-da69-4a37-9b37-66ae95f9623c"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1500,6 +1932,12 @@
                                 61
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1523,6 +1961,12 @@
                                 61
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1533,7 +1977,13 @@
                               ],
                               "ontologyLabelIndex": 206
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "18e5e1b0-6c25-4f55-a967-0834d2bd3ee4"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFcm (IPL)",
@@ -1557,6 +2007,12 @@
                                 120
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1580,6 +2036,12 @@
                                 120
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1590,7 +2052,13 @@
                               ],
                               "ontologyLabelIndex": 113
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "10502c3a-f20e-44fa-b985-786d6888d4bb"
+                            }
+                          }
                         },
                         {
                           "name": "Area PGa (IPL)",
@@ -1614,6 +2082,12 @@
                                 131
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1637,6 +2111,12 @@
                                 131
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1647,7 +2127,13 @@
                               ],
                               "ontologyLabelIndex": 110
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d7f6c5be-93c6-4a16-8939-4420329d4147"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFt (IPL)",
@@ -1671,6 +2157,12 @@
                                 232
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1694,6 +2186,12 @@
                                 232
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1704,7 +2202,13 @@
                               ],
                               "ontologyLabelIndex": 109
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "847cef50-7340-470d-8580-327b4ce9db19"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFm (IPL)",
@@ -1728,6 +2232,12 @@
                                 145
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1751,6 +2261,12 @@
                                 145
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1761,7 +2277,13 @@
                               ],
                               "ontologyLabelIndex": 112
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "411edde9-685f-464b-970c-a929f9a4067c"
+                            }
+                          }
                         },
                         {
                           "name": "Area PGp (IPL)",
@@ -1785,6 +2307,12 @@
                                 83
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1808,6 +2336,12 @@
                                 83
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1818,7 +2352,13 @@
                               ],
                               "ontologyLabelIndex": 108
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b3ef6947-76c9-4935-bbc6-8b2329c0967b"
+                            }
+                          }
                         },
                         {
                           "name": "Area PFop (IPL)",
@@ -1842,6 +2382,12 @@
                                 177
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1865,6 +2411,12 @@
                                 177
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1875,7 +2427,13 @@
                               ],
                               "ontologyLabelIndex": 111
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e8262e56-88fe-4006-b078-def4d78416b8"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1908,6 +2466,12 @@
                                 235
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1931,6 +2495,12 @@
                                 235
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -1941,7 +2511,13 @@
                               ],
                               "ontologyLabelIndex": 297
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a78998c2-99d4-4738-bbda-82a317f713f1"
+                            }
+                          }
                         }
                       ]
                     },
@@ -1974,6 +2550,12 @@
                                 82
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -1997,6 +2579,12 @@
                                 82
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2007,7 +2595,13 @@
                               ],
                               "ontologyLabelIndex": 128
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7722c71f-fe84-4deb-8f6b-98e2aecf2e31"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP7 (IPS)",
@@ -2031,6 +2625,12 @@
                                 218
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2054,6 +2654,12 @@
                                 218
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2064,7 +2670,13 @@
                               ],
                               "ontologyLabelIndex": 296
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9c6c3c96-8129-4e0e-aa22-a0fb435aab45"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP3 (IPS)",
@@ -2088,6 +2700,12 @@
                                 229
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2111,6 +2729,12 @@
                                 229
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2121,7 +2745,13 @@
                               ],
                               "ontologyLabelIndex": 133
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "700ac6db-870d-44f1-8786-0c01207f992b"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP2 (IPS)",
@@ -2145,6 +2775,12 @@
                                 203
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2168,6 +2804,12 @@
                                 203
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2178,7 +2820,13 @@
                               ],
                               "ontologyLabelIndex": 129
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "4490ef3e-ce60-4453-9e9f-85388d0603cb"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP4 (IPS)",
@@ -2202,6 +2850,12 @@
                                 184
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2225,6 +2879,12 @@
                                 184
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2235,7 +2895,13 @@
                               ],
                               "ontologyLabelIndex": 294
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5875bfe2-99ca-4e50-bce2-61c201c3dd54"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP5 (IPS)",
@@ -2259,6 +2925,12 @@
                                 210
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2282,6 +2954,12 @@
                                 210
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2292,7 +2970,13 @@
                               ],
                               "ontologyLabelIndex": 295
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f9717dec-0310-4078-a4ae-294170b4fb37"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP6 (IPS)",
@@ -2316,6 +3000,12 @@
                                 37
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2339,6 +3029,12 @@
                                 37
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2349,7 +3045,13 @@
                               ],
                               "ontologyLabelIndex": 292
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b9975f8e-f484-4e82-883a-5fd765855ae0"
+                            }
+                          }
                         },
                         {
                           "name": "Area hIP8 (IPS)",
@@ -2373,6 +3075,12 @@
                                 3
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2396,6 +3104,12 @@
                                 3
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2406,7 +3120,13 @@
                               ],
                               "ontologyLabelIndex": 293
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a2c1acc7-7fdc-4fbd-90ee-729eda7fdff3"
+                            }
+                          }
                         }
                       ]
                     }
@@ -2448,6 +3168,12 @@
                                 26
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2471,6 +3197,12 @@
                                 26
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2481,7 +3213,13 @@
                               ],
                               "ontologyLabelIndex": 291
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d72e0210-a910-4b15-bcaf-80c3433cd3e0"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc4d (Cuneus)",
@@ -2505,6 +3243,12 @@
                                 10
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2528,6 +3272,12 @@
                                 10
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2538,7 +3288,13 @@
                               ],
                               "ontologyLabelIndex": 119
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8120426c-f65b-4426-8a58-3060e2334921"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc3d (Cuneus)",
@@ -2562,6 +3318,12 @@
                                 48
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2585,6 +3347,12 @@
                                 48
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2595,7 +3363,13 @@
                               ],
                               "ontologyLabelIndex": 120
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d7ec4342-ae58-41e3-a68c-28e90a719d41"
+                            }
+                          }
                         }
                       ]
                     },
@@ -2628,6 +3402,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2651,6 +3431,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2661,7 +3447,13 @@
                               ],
                               "ontologyLabelIndex": 10
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc4v (LingG)",
@@ -2685,6 +3477,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2708,6 +3506,12 @@
                                 155
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2718,7 +3522,13 @@
                               ],
                               "ontologyLabelIndex": 9
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "27d91cbb-5611-4d38-bd17-c0f1ac22b4cc"
+                            }
+                          }
                         }
                       ]
                     },
@@ -2751,6 +3561,12 @@
                                 22
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2774,6 +3590,12 @@
                                 22
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2784,7 +3606,13 @@
                               ],
                               "ontologyLabelIndex": 7
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc1 (V1, 17, CalcS)",
@@ -2808,6 +3636,12 @@
                                 147
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2831,6 +3665,12 @@
                                 147
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2841,7 +3681,13 @@
                               ],
                               "ontologyLabelIndex": 8
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5151ab8f-d8cb-4e67-a449-afe2a41fb007"
+                            }
+                          }
                         }
                       ]
                     },
@@ -2874,6 +3720,12 @@
                                 253
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2897,6 +3749,12 @@
                                 253
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2907,7 +3765,13 @@
                               ],
                               "ontologyLabelIndex": 117
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9006ee6a-6dc1-4604-9f20-7e08b42d574d"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc5 (LOC)",
@@ -2931,6 +3795,12 @@
                                 0
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -2954,6 +3824,12 @@
                                 0
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -2964,7 +3840,13 @@
                               ],
                               "ontologyLabelIndex": 6
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                            }
+                          }
                         },
                         {
                           "name": "Area hOc4la (LOC)",
@@ -2988,6 +3870,12 @@
                                 189
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "94365b82-6204-4937-8b86-fe0433287938"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3011,6 +3899,12 @@
                                 189
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "94365b82-6204-4937-8b86-fe0433287938"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3021,7 +3915,13 @@
                               ],
                               "ontologyLabelIndex": 118
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "94365b82-6204-4937-8b86-fe0433287938"
+                            }
+                          }
                         }
                       ]
                     }
@@ -3063,6 +3963,12 @@
                                 75
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3086,6 +3992,12 @@
                                 75
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3096,7 +4008,13 @@
                               ],
                               "ontologyLabelIndex": 2
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "8a6be82c-5947-4fff-8348-cf9bf73e4f40"
+                            }
+                          }
                         },
                         {
                           "name": "Area 45 (IFG)",
@@ -3120,6 +4038,12 @@
                                 146
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3143,6 +4067,12 @@
                                 146
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3153,7 +4083,13 @@
                               ],
                               "ontologyLabelIndex": 1
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "cb32e688-43f0-4ae3-9554-085973137663"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3186,6 +4122,12 @@
                                 180
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3209,6 +4151,12 @@
                                 180
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3219,7 +4167,13 @@
                               ],
                               "ontologyLabelIndex": 288
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "963c5281-67df-4d41-9b91-60b31cf150c0"
+                            }
+                          }
                         },
                         {
                           "name": "Area 6d1 (PreCG)",
@@ -3243,6 +4197,12 @@
                                 27
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3266,6 +4226,12 @@
                                 27
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3276,7 +4242,13 @@
                               ],
                               "ontologyLabelIndex": 287
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "a802f3dc-b7e5-48b7-9845-832a6e6f9b1c"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3309,6 +4281,12 @@
                                 222
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3332,6 +4310,12 @@
                                 222
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3342,7 +4326,13 @@
                               ],
                               "ontologyLabelIndex": 299
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "07b4c6a1-8a24-4f88-8f73-b2ea06e1c2f3"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3375,6 +4365,12 @@
                                 21
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3398,6 +4394,12 @@
                                 21
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3408,7 +4410,13 @@
                               ],
                               "ontologyLabelIndex": 289
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "266c1ada-1840-462f-8223-7ff2df457552"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3441,6 +4449,12 @@
                                 200
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3464,6 +4478,12 @@
                                 200
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3474,7 +4494,13 @@
                               ],
                               "ontologyLabelIndex": 212
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "10dc5343-941b-4e3e-80ed-df031c33bbc6"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fp2 (FPole)",
@@ -3498,6 +4524,12 @@
                                 211
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3521,6 +4553,12 @@
                                 211
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3531,7 +4569,13 @@
                               ],
                               "ontologyLabelIndex": 211
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3bf7bde1-cc06-4657-b296-380275f9d4b8"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3564,6 +4608,12 @@
                                 124
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3587,6 +4637,12 @@
                                 124
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3597,7 +4653,13 @@
                               ],
                               "ontologyLabelIndex": 123
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "82e6e826-a439-41db-84ff-4674ca3d643a"
+                            }
+                          }
                         },
                         {
                           "name": "Area 4a (PreCG)",
@@ -3621,6 +4683,12 @@
                                 183
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3644,6 +4712,12 @@
                                 183
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3654,7 +4728,13 @@
                               ],
                               "ontologyLabelIndex": 124
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "175848ff-4c55-47e3-a0ae-f905a14e03cd"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3687,6 +4767,12 @@
                                 87
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3710,6 +4796,12 @@
                                 87
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3720,7 +4812,13 @@
                               ],
                               "ontologyLabelIndex": 298
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "def99e8e-ce8f-4a62-bd5d-739948c4b010"
+                            }
+                          }
                         }
                       ]
                     },
@@ -3753,6 +4851,12 @@
                                 179
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3776,6 +4880,12 @@
                                 179
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3786,7 +4896,13 @@
                               ],
                               "ontologyLabelIndex": 3
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3864cb8c-f277-4de6-9f8d-c76d71d7e9a9"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fo3 (OFC)",
@@ -3810,6 +4926,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3833,6 +4955,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3843,7 +4971,13 @@
                               ],
                               "ontologyLabelIndex": 5
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "741f6a9e-cfd7-4173-ac7d-ee616c29555e"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fo2 (OFC)",
@@ -3867,6 +5001,12 @@
                                 0
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -3890,6 +5030,12 @@
                                 0
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -3900,7 +5046,13 @@
                               ],
                               "ontologyLabelIndex": 4
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "30a04d2b-58e1-43d7-8b8f-1f0b598382d0"
+                            }
+                          }
                         }
                       ]
                     },
@@ -4185,6 +5337,12 @@
                                 91
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4208,6 +5366,12 @@
                                 91
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4218,7 +5382,13 @@
                               ],
                               "ontologyLabelIndex": 325
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3fd2e113-ec08-407b-bc88-172c9285694a"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fo4 (OFC)",
@@ -4242,6 +5412,12 @@
                                 53
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4265,6 +5441,12 @@
                                 53
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4275,7 +5457,13 @@
                               ],
                               "ontologyLabelIndex": 324
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "2cdee956-207a-4d4d-b051-bef80045210b"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fo6 (OFC)",
@@ -4299,6 +5487,12 @@
                                 187
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4322,6 +5516,12 @@
                                 187
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4332,7 +5532,13 @@
                               ],
                               "ontologyLabelIndex": 326
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "330ae178-557c-4bd0-a932-f138c0a05345"
+                            }
+                          }
                         },
                         {
                           "name": "Area Fo7 (OFC)",
@@ -4356,6 +5562,12 @@
                                 186
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4379,6 +5591,12 @@
                                 186
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4389,7 +5607,13 @@
                               ],
                               "ontologyLabelIndex": 327
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "1b882148-fcdd-4dbe-b33d-659957840e9e"
+                            }
+                          }
                         }
                       ]
                     }
@@ -4431,6 +5655,12 @@
                                 197
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10dba769-4f6c-40f9-8ffd-e0cce71c5adb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4454,6 +5684,12 @@
                                 197
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "10dba769-4f6c-40f9-8ffd-e0cce71c5adb"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4464,7 +5700,13 @@
                               ],
                               "ontologyLabelIndex": 336
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "10dba769-4f6c-40f9-8ffd-e0cce71c5adb"
+                            }
+                          }
                         },
                         {
                           "name": "Area Ig1 (Insula)",
@@ -4488,6 +5730,12 @@
                                 40
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4511,6 +5759,12 @@
                                 40
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4521,7 +5775,13 @@
                               ],
                               "ontologyLabelIndex": 115
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "46cf08af-8086-4e8a-9e9f-182ca583bdf0"
+                            }
+                          }
                         },
                         {
                           "name": "Area Ig2 (Insula)",
@@ -4545,6 +5805,12 @@
                                 82
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4568,6 +5834,12 @@
                                 82
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4578,7 +5850,13 @@
                               ],
                               "ontologyLabelIndex": 114
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "49092952-1eef-4b89-b8bf-1bf1f25f149a"
+                            }
+                          }
                         }
                       ]
                     },
@@ -4611,6 +5889,12 @@
                                 62
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4634,6 +5918,12 @@
                                 62
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4644,7 +5934,13 @@
                               ],
                               "ontologyLabelIndex": 339
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "110d0d7b-cb88-48ea-9caf-863f548dbe38"
+                            }
+                          }
                         }
                       ]
                     },
@@ -4677,6 +5973,12 @@
                                 216
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4700,6 +6002,12 @@
                                 216
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4710,7 +6018,13 @@
                               ],
                               "ontologyLabelIndex": 159
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3d5729f5-55c6-412a-8fc1-41a95c71b13a"
+                            }
+                          }
                         }
                       ]
                     },
@@ -4743,6 +6057,12 @@
                                 73
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "cf9dea67-649d-4034-ae57-ec389f339277"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4766,6 +6086,12 @@
                                 73
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "cf9dea67-649d-4034-ae57-ec389f339277"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4776,7 +6102,13 @@
                               ],
                               "ontologyLabelIndex": 56
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "cf9dea67-649d-4034-ae57-ec389f339277"
+                            }
+                          }
                         },
                         {
                           "name": "Area Id1 (Insula)",
@@ -4800,6 +6132,12 @@
                                 216
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "c22055c1-514f-4096-906b-abf57286053b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4823,6 +6161,12 @@
                                 216
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "c22055c1-514f-4096-906b-abf57286053b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4833,7 +6177,13 @@
                               ],
                               "ontologyLabelIndex": 116
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "c22055c1-514f-4096-906b-abf57286053b"
+                            }
+                          }
                         },
                         {
                           "name": "Area Id5 (Insula)",
@@ -4857,6 +6207,12 @@
                                 50
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4880,6 +6236,12 @@
                                 50
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4890,7 +6252,13 @@
                               ],
                               "ontologyLabelIndex": 338
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e03cd3c6-d0be-481c-b906-9b39c1d0b641"
+                            }
+                          }
                         },
                         {
                           "name": "Area Id6 (Insula)",
@@ -4914,6 +6282,12 @@
                                 119
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4937,6 +6311,12 @@
                                 119
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -4947,7 +6327,13 @@
                               ],
                               "ontologyLabelIndex": 340
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "31bbe92d-e5e8-4cf4-be5d-e6b12c71a107"
+                            }
+                          }
                         },
                         {
                           "name": "Area Id4 (Insula)",
@@ -4971,6 +6357,12 @@
                                 113
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -4994,6 +6386,12 @@
                                 113
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5004,7 +6402,13 @@
                               ],
                               "ontologyLabelIndex": 337
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "f480ed72-5ca5-4d1f-8905-cbe9bedcfaee"
+                            }
+                          }
                         },
                         {
                           "name": "Area Id3 (Insula)",
@@ -5028,6 +6432,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3dcfcfc2-035c-4785-a820-a671f2104ac3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5051,6 +6461,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "3dcfcfc2-035c-4785-a820-a671f2104ac3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5061,7 +6477,13 @@
                               ],
                               "ontologyLabelIndex": 57
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "3dcfcfc2-035c-4785-a820-a671f2104ac3"
+                            }
+                          }
                         }
                       ]
                     }
@@ -5103,6 +6525,12 @@
                                 123
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5126,6 +6554,12 @@
                                 123
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5136,7 +6570,13 @@
                               ],
                               "ontologyLabelIndex": 272
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "278fc30f-2e24-4046-856b-95dfaf561635"
+                            }
+                          }
                         },
                         {
                           "name": "Area STS1 (STS)",
@@ -5160,6 +6600,12 @@
                                 4
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5183,6 +6629,12 @@
                                 4
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5193,7 +6645,13 @@
                               ],
                               "ontologyLabelIndex": 271
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "68784b66-ff15-4b09-b28a-a2146c0f8907"
+                            }
+                          }
                         }
                       ]
                     },
@@ -5226,6 +6684,12 @@
                                 108
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5249,6 +6713,12 @@
                                 108
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5259,7 +6729,13 @@
                               ],
                               "ontologyLabelIndex": 31
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7e1a3291-efdc-4ca6-a3d0-6c496c34639f"
+                            }
+                          }
                         },
                         {
                           "name": "Area TE 2.2 (STG)",
@@ -5529,6 +7005,12 @@
                                 192
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5552,6 +7034,12 @@
                                 192
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5562,7 +7050,13 @@
                               ],
                               "ontologyLabelIndex": 30
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "677cd48c-70fa-4bbd-9f0a-ffdc7744bc0f"
+                            }
+                          }
                         },
                         {
                           "name": "Area TE 1.1 (HESCHL)",
@@ -5586,6 +7080,12 @@
                                 68
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5609,6 +7109,12 @@
                                 68
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5619,7 +7125,13 @@
                               ],
                               "ontologyLabelIndex": 33
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e2969911-77eb-4b21-af70-216cab5285b1"
+                            }
+                          }
                         },
                         {
                           "name": "Area TE 1.0 (HESCHL)",
@@ -5643,6 +7155,12 @@
                                 222
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5666,6 +7184,12 @@
                                 222
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5676,7 +7200,13 @@
                               ],
                               "ontologyLabelIndex": 27
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "13e21153-2ba8-4212-b172-8894f1012225"
+                            }
+                          }
                         }
                       ]
                     },
@@ -5709,6 +7239,12 @@
                                 149
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5732,6 +7268,12 @@
                                 149
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5742,7 +7284,13 @@
                               ],
                               "ontologyLabelIndex": 106
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "6e7a0441-4baa-4355-921b-50d23d07d50f"
+                            }
+                          }
                         },
                         {
                           "name": "Area FG3 (FusG)",
@@ -5766,6 +7314,12 @@
                                 37
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5789,6 +7343,12 @@
                                 37
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5799,7 +7359,13 @@
                               ],
                               "ontologyLabelIndex": 239
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "023f8ef7-c266-4c45-8bf2-4a17dc52985b"
+                            }
+                          }
                         },
                         {
                           "name": "Area FG1 (FusG)",
@@ -5823,6 +7389,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5846,6 +7418,12 @@
                                 58
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5856,7 +7434,13 @@
                               ],
                               "ontologyLabelIndex": 107
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "39fb34a8-fd6d-4fba-898c-2f6167e40459"
+                            }
+                          }
                         },
                         {
                           "name": "Area FG4 (FusG)",
@@ -5880,6 +7464,12 @@
                                 175
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5903,6 +7493,12 @@
                                 175
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5913,7 +7509,13 @@
                               ],
                               "ontologyLabelIndex": 238
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "fa602743-5f6e-49d1-9734-29dffaa95ff5"
+                            }
+                          }
                         }
                       ]
                     }
@@ -5955,6 +7557,12 @@
                                 195
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -5978,6 +7586,12 @@
                                 195
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -5988,7 +7602,13 @@
                               ],
                               "ontologyLabelIndex": 232
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e6507a3d-f2f8-4c17-84ff-0e7297e836a0"
+                            }
+                          }
                         },
                         {
                           "name": "Area 25 (sACC)",
@@ -6012,6 +7632,12 @@
                                 220
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6035,6 +7661,12 @@
                                 220
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6045,7 +7677,13 @@
                               ],
                               "ontologyLabelIndex": 184
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9010ef76-accd-4308-9951-f37b6a10f42b"
+                            }
+                          }
                         },
                         {
                           "name": "Area p24ab (pACC)",
@@ -6069,6 +7707,12 @@
                                 229
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6092,6 +7736,12 @@
                                 229
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6102,7 +7752,13 @@
                               ],
                               "ontologyLabelIndex": 231
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "5dbb1035-487c-4f43-b551-ccadcf058340"
+                            }
+                          }
                         },
                         {
                           "name": "Area s32 (sACC)",
@@ -6126,6 +7782,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6149,6 +7811,12 @@
                                 250
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6159,7 +7827,13 @@
                               ],
                               "ontologyLabelIndex": 46
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "61b44255-ae3a-4a23-b1bc-7d303a48dbd3"
+                            }
+                          }
                         },
                         {
                           "name": "Area 33 (ACC)",
@@ -6183,6 +7857,12 @@
                                 245
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6206,6 +7886,12 @@
                                 245
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6216,7 +7902,13 @@
                               ],
                               "ontologyLabelIndex": 39
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b83a3330-b80e-42a0-b8d2-82f38784aa1d"
+                            }
+                          }
                         },
                         {
                           "name": "Area p32 (pACC)",
@@ -6240,6 +7932,12 @@
                                 14
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6263,6 +7961,12 @@
                                 14
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6273,7 +7977,13 @@
                               ],
                               "ontologyLabelIndex": 47
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "b09aaa77-f41b-4008-b8b9-f984b0417cf3"
+                            }
+                          }
                         },
                         {
                           "name": "Area s24 (sACC)",
@@ -6297,6 +8007,12 @@
                                 201
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6320,6 +8036,12 @@
                                 201
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6330,7 +8052,13 @@
                               ],
                               "ontologyLabelIndex": 183
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "d4ea6cc5-1e1d-4212-966f-81fed01eb648"
+                            }
+                          }
                         }
                       ]
                     },
@@ -6363,6 +8091,12 @@
                                 73
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6386,6 +8120,12 @@
                                 73
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6396,7 +8136,13 @@
                               ],
                               "ontologyLabelIndex": 68
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "9ec4a423-70fa-43cd-90b3-fbc26a3cbc6c"
+                            }
+                          }
                         },
                         {
                           "name": "Entorhinal Cortex",
@@ -6420,6 +8166,12 @@
                                 14
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6443,6 +8195,12 @@
                                 14
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6453,7 +8211,13 @@
                               ],
                               "ontologyLabelIndex": 60
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "030827d4-e0d1-4406-b71f-3f58dc2f9cca"
+                            }
+                          }
                         },
                         {
                           "name": "CA1 (Hippocampus)",
@@ -6534,6 +8298,12 @@
                                 8
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6557,6 +8327,12 @@
                                 8
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6567,7 +8343,13 @@
                               ],
                               "ontologyLabelIndex": 61
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0bea7e03-bfb2-4907-9d45-db9071ce627d"
+                            }
+                          }
                         },
                         {
                           "name": "Subiculum (Hippocampus)",
@@ -6591,6 +8373,12 @@
                                 10
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7e2dab4c-a140-440d-a322-c1679adef2d4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -6614,6 +8402,12 @@
                                 10
                               ],
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "7e2dab4c-a140-440d-a322-c1679adef2d4"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -6624,7 +8418,13 @@
                               ],
                               "ontologyLabelIndex": 192
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "7e2dab4c-a140-440d-a322-c1679adef2d4"
+                            }
+                          }
                         },
                         {
                           "name": "CA3 (Hippocampus)",
@@ -7061,6 +8861,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -7080,6 +8886,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -7090,7 +8902,13 @@
                               ],
                               "ontologyLabelIndex": 251
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                            }
+                          }
                         }
                       ]
                     },
@@ -7119,6 +8937,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "58095aef-da69-43d4-887c-009c095cecce"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -7138,6 +8962,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "58095aef-da69-43d4-887c-009c095cecce"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -7148,7 +8978,13 @@
                               ],
                               "ontologyLabelIndex": 240
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "58095aef-da69-43d4-887c-009c095cecce"
+                            }
+                          }
                         },
                         {
                           "name": "Ventral Dentate Nucleus (Cerebellum)",
@@ -7168,6 +9004,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -7187,6 +9029,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -7197,7 +9045,13 @@
                               ],
                               "ontologyLabelIndex": 241
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "57282342-5a75-4e07-bcdc-2d368c517b71"
+                            }
+                          }
                         }
                       ]
                     },
@@ -7226,6 +9080,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -7245,6 +9105,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -7255,7 +9121,13 @@
                               ],
                               "ontologyLabelIndex": 219
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "e8abfe3d-8b64-45c2-8853-314d82873273"
+                            }
+                          }
                         }
                       ]
                     },
@@ -7284,6 +9156,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 left",
                               "originDatasets": [
                                 {
@@ -7302,6 +9180,12 @@
                               "synonyms": [],
                               "rgb": null,
                               "children": [],
+                              "fullId": {
+                                "kg": {
+                                  "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                  "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                                }
+                              },
                               "ngId": "julich brain mni152 v22 right",
                               "originDatasets": [
                                 {
@@ -7311,7 +9195,13 @@
                                 }
                               ]
                             }
-                          ]
+                          ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "85e7bb13-4b73-4f6f-8222-3adb7b800788"
+                            }
+                          }
                         }
                       ]
                     }
