@@ -41,6 +41,7 @@ export enum EnumWidgetTypes{
 export interface IDatasetPreviewData{
   datasetId: string
   filename: string
+  datasetSchema?: string
 }
 
 export type TypeOpenedWidget = {
