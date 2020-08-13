@@ -120,8 +120,8 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
 
   static GetDatasetPreviewId(data: IDatasetPreviewData ){
-    const { datasetId, filename } = data
-    return `${datasetId}:${filename}`
+    const { datasetSchema = 'untitled', datasetId, filename } = data
+    return `${datasetSchema}/${datasetId}:${filename}`
   }
 
   static GetDatasetPreviewFromId(id: string): IDatasetPreviewData{
@@ -196,12 +196,12 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
 
   private fetchedDatasetPreviewCache: Map<string, any> = new Map()
-  public getDatasetPreviewFromId({ datasetId, filename }: IDatasetPreviewData){
-    const dsPrvId = DatasetPreviewGlue.GetDatasetPreviewId({ datasetId, filename })
+  public getDatasetPreviewFromId({ datasetSchema = 'minds/core/dataset/v1.0.0', datasetId, filename }: IDatasetPreviewData){
+    const dsPrvId = DatasetPreviewGlue.GetDatasetPreviewId({ datasetSchema, datasetId, filename })
     const cachedPrv = this.fetchedDatasetPreviewCache.get(dsPrvId)
     const filteredDsId = /[a-f0-9-]+$/.exec(datasetId)
     if (cachedPrv) return of(cachedPrv)
-    return this.http.get(`${DS_PREVIEW_URL}/${filteredDsId}/${encodeURIComponent(filename)}`, { responseType: 'json' }).pipe(
+    return this.http.get(`${DS_PREVIEW_URL}/${encodeURIComponent(datasetSchema)}/${filteredDsId}/${encodeURIComponent(filename)}`, { responseType: 'json' }).pipe(
       map(json => {
         return {
           ...json,

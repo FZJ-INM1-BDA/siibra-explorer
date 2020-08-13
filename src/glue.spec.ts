@@ -253,7 +253,7 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
 
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
       }))
 
@@ -270,8 +270,6 @@ describe('> glue.ts', () => {
 
         const glue = TestBed.inject(DatasetPreviewGlue)
 
-        
-
         store.setState({
           uiState: {
             previewingDatasetFiles: [ file1 ]
@@ -282,7 +280,7 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
 
-        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${datasetId}/${encodeURIComponent(filename)}`)
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
 
         const { name, volumeMetadata } = nifti

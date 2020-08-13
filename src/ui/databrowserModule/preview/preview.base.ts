@@ -16,6 +16,9 @@ export class PreviewBase implements OnChanges{
   @Input()
   datasetId: string
 
+  @Input()
+  datasetSchema: string = 'minds/core/dataste/v1.0.0'
+
   previewtype: EnumPreviewFileTypes
 
   fetchingFlag: boolean = false
@@ -28,10 +31,10 @@ export class PreviewBase implements OnChanges{
      * if already complete, do not attempt to fetch
      */
 
-    const { datasetId, filename } = this
+    const { datasetId, filename, datasetSchema } = this
     if (!filename || !datasetId) return
     this.fetchingFlag = true
-    this.getDatasetPreviewFromId({ datasetId, filename })
+    this.getDatasetPreviewFromId({ datasetSchema, datasetId, filename })
       .subscribe(
         file => {
           this.fetchingFlag = false
@@ -42,7 +45,7 @@ export class PreviewBase implements OnChanges{
   }
 
   constructor(
-    private getDatasetPreviewFromId: ({ datasetId, filename }) => Observable<any>
+    private getDatasetPreviewFromId: ({ datasetSchema, datasetId, filename }) => Observable<any>
   ){
     
   }
