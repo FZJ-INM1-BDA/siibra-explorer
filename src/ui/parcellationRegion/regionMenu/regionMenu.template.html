@@ -26,6 +26,7 @@
         [color]="previewDirective.active ? 'primary' : 'basic'"
         *ngFor="let originDataset of (region.originDatasets || []); let index = index"
         iav-dataset-preview-dataset-file
+        [iav-dataset-preview-dataset-file-kgschema]="originDataset.kgSchema"
         [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
         [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
         #previewDirective="iavDatasetPreviewDatasetFile"

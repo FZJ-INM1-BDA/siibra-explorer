@@ -38,7 +38,14 @@ export class PreviewDatasetFile extends PreviewBase implements OnChanges{
   }
 
   @Input('iav-dataset-preview-dataset-file-kgschema')
-  kgSchema: string = `minds/core/dataset/v1.0.0`
+  set kgSchema(val){
+    if (!val) return
+    this.datasetSchema = val
+  }
+
+  get kgSchema(){
+    return this.datasetSchema
+  }
 
   @Input('iav-dataset-preview-dataset-file-fullid')
   fullId: string
