@@ -68,12 +68,15 @@ jobs:
         (type = pull_request AND branch = staging) OR \
         (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
+      - which test
       - VERSION_NUM=$(jq '.version' < package.json)
       - VERSION_NUM=${VERSION_NUM#\"} 
       - VERSION_NUM=${VERSION_NUM%\"} 
       - 'echo "VERSION_NUM: $VERSION_NUM"'
-      - 'cat mkdocs.yml'
-      - 'test -z "$(cat mkdocs.yml | grep $VERSION_NUM)" && exit 1'
+      - cat mkdocs.yml
+      - GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
+      - 'echo GREP_VERSION_NUM: $GREP_VERSION_NUM'
+      - test -z "$GREP_VERSION_NUM" && exit 1
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
