@@ -87,12 +87,10 @@ module.exports = (app) => {
         'unpkg.com',
         '*.unpkg.com',
         '*.jsdelivr.net',
-
-        // Catching Safari 10 bug unsafe-eval
-        "'sha256-yEVCaeeaeg6koloXfx+6DuFnP7SnjOwYZiWBTRFurJw='",
         (req, res) => res.locals.nonce ? `'nonce-${res.locals.nonce}'` : null,
         ...SCRIPT_SRC,
-        ...WHITE_LIST_SRC
+        ...WHITE_LIST_SRC,
+        ...defaultAllowedSites
       ],
       reportUri: CSP_REPORT_URI || '/report-violation'
     },

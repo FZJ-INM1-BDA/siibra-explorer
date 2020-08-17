@@ -42,6 +42,29 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
+    - name: Check version number advanced (package.json)
+      if: |
+        (type = pull_request AND head_branch = staging) OR \
+        (type = pull_request AND head_branch = master AND NOT branch = staging)
+      script:
+      - PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json)
+      - test -z "$PACKAGE_JSON_DIFF" && exit 1
+
+    - name: Check release notes authored (docs/releases/v?.?.?.md)
+      if: |
+        type = pull_request AND \
+        head_branch = staging
+      script:
+      - VERSION_NUM=$(jq '.version' < package.json)
+      - test -f docs/releases/v$VERSION_NUM.md || exit 1
+
+    - name: Release notes linked in mkdocs.yml
+      if: |
+        type = pull_request AND \
+        head_branch = staging
+      script:
+      - VERSION_NUM=$(jq '.version' < package.json)
+      - test -z $(grep $VERSION_NUM < mkdocs.yml) && exit 1
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
