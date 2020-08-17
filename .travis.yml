@@ -45,24 +45,24 @@ jobs:
     - stage: Check version numbers and release notes
       name: Check version number advanced (package.json)
       if: |
-        (type = pull_request AND head_branch = test_travis) OR \
-        (type = pull_request AND head_branch = master AND NOT branch = staging)
+        (type = pull_request AND branch = test_travis) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
       - PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json)
       - test -z "$PACKAGE_JSON_DIFF" && exit 1
 
     - name: Check release notes authored (docs/releases/v?.?.?.md)
       if: |
-        (type = pull_request AND head_branch = test_travis) OR \
-        (type = pull_request AND head_branch = master AND NOT branch = staging)
+        (type = pull_request AND branch = test_travis) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
       - VERSION_NUM=$(jq '.version' < package.json)
       - test -f docs/releases/v$VERSION_NUM.md || exit 1
 
     - name: Release notes linked in mkdocs.yml
       if: |
-        (type = pull_request AND head_branch = test_travis) OR \
-        (type = pull_request AND head_branch = master AND NOT branch = staging)
+        (type = pull_request AND branch = test_travis) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
       - VERSION_NUM=$(jq '.version' < package.json)
       - test -z $(grep $VERSION_NUM < mkdocs.yml) && exit 1
