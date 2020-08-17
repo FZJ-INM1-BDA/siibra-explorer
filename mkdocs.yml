@@ -40,6 +40,8 @@ pages:
     - Fetching datasets: 'advanced/datasets.md'
     - Display non-atlas volumes: 'advanced/otherVolumes.md'
   - Release notes:
+    - v2.2.5: 'releases/v2.2.5.md'
+    - v2.2.4: 'releases/v2.2.4.md'
     - v2.2.3: 'releases/v2.2.3.md'
     - v2.2.2: 'releases/v2.2.2.md'
     - v2.2.1: 'releases/v2.2.1.md'
