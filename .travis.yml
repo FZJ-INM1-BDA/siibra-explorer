@@ -76,7 +76,7 @@ jobs:
       - cat mkdocs.yml
       - GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
       - 'echo GREP_VERSION_NUM: $GREP_VERSION_NUM'
-      - test -z "$GREP_VERSION_NUM" && exit 1
+      - test -z "$GREP_VERSION_NUM" && echo "EMPTY" || echo "NON EMPTY"
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
