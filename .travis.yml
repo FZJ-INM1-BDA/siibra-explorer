@@ -48,8 +48,9 @@ jobs:
         (type = pull_request AND branch = staging) OR \
         (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
-      - PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json)
-      - test -z "$PACKAGE_JSON_DIFF" && exit 1
+      - |
+        PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json) && \
+        test -z "$PACKAGE_JSON_DIFF" && exit 1
 
     - name: Check release notes authored (docs/releases/v?.?.?.md)
       if: |
@@ -71,7 +72,7 @@ jobs:
         VERSION_NUM=$(jq '.version' < package.json) && \
         VERSION_NUM=${VERSION_NUM#\"} && \
         VERSION_NUM=${VERSION_NUM%\"} && \
-        test -z $(grep $VERSION_NUM < mkdocs.yml) && exit 1
+        test -z "$(grep $VERSION_NUM < mkdocs.yml)" && exit 1
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
