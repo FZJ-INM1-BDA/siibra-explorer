@@ -72,6 +72,7 @@ jobs:
         VERSION_NUM=$(jq '.version' < package.json) && \
         VERSION_NUM=${VERSION_NUM#\"} && \
         VERSION_NUM=${VERSION_NUM%\"} && \
+        echo VERSION_NUM: $VERSION_NUM && \
         test -z "$(grep $VERSION_NUM < mkdocs.yml)" && exit 1
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
