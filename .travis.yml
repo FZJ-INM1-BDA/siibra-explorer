@@ -42,29 +42,40 @@ jobs:
       - NODE_ENV=test
       - PORT=12234
 
-    - name: Check version number advanced (package.json)
+    - stage: Check version numbers and release notes
+      name: Check version number advanced (package.json)
       if: |
-        (type = pull_request AND head_branch = staging) OR \
-        (type = pull_request AND head_branch = master AND NOT branch = staging)
+        (type = pull_request AND branch = staging) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
-      - PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json)
-      - test -z "$PACKAGE_JSON_DIFF" && exit 1
+      - |
+        PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json) && \
+        test -z "$PACKAGE_JSON_DIFF" && exit 1 || exit 0
 
     - name: Check release notes authored (docs/releases/v?.?.?.md)
       if: |
-        type = pull_request AND \
-        head_branch = staging
+        (type = pull_request AND branch = staging) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
-      - VERSION_NUM=$(jq '.version' < package.json)
-      - test -f docs/releases/v$VERSION_NUM.md || exit 1
+      - |
+        VERSION_NUM=$(jq '.version' < package.json) && \
+        VERSION_NUM=${VERSION_NUM#\"} && \
+        VERSION_NUM=${VERSION_NUM%\"} && \
+        test -f docs/releases/v$VERSION_NUM.md && exit 0 || exit 1
 
     - name: Release notes linked in mkdocs.yml
       if: |
-        type = pull_request AND \
-        head_branch = staging
+        (type = pull_request AND branch = staging) OR \
+        (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
       - VERSION_NUM=$(jq '.version' < package.json)
-      - test -z $(grep $VERSION_NUM < mkdocs.yml) && exit 1
+      - VERSION_NUM=${VERSION_NUM#\"} 
+      - VERSION_NUM=${VERSION_NUM%\"} 
+      - 'echo "VERSION_NUM: $VERSION_NUM"'
+      - cat mkdocs.yml
+      - GREP_VERSION_NUM=$(cat mkdocs.yml | grep $VERSION_NUM)
+      - 'echo GREP_VERSION_NUM: $GREP_VERSION_NUM'
+      - test -z "$GREP_VERSION_NUM" && exit 1 || exit 0
 
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
