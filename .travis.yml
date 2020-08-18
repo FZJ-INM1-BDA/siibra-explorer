@@ -48,9 +48,9 @@ jobs:
         (type = pull_request AND branch = staging) OR \
         (type = pull_request AND branch = master AND NOT head_branch = staging)
       script:
-      - |
-        PACKAGE_JSON_DIFF=$(git diff --name-only $TRAVIS_COMMIT_RANGE package.json) && \
-        test -z "$PACKAGE_JSON_DIFF" && exit 1 || exit 0
+      - MASTER_VERSION=$(git show origin/master:package.json | jq '.version')
+      - THIS_VERSION=$(jq '.version' < package.json)
+      - test "$MASTER_VERSION" == "$THIS_VERSION" && exit 1 || exit 0
 
     - name: Check release notes authored (docs/releases/v?.?.?.md)
       if: |
@@ -91,12 +91,6 @@ jobs:
     #   - ATLAS_URL=https://interactive-viewer-next.apps-dev.hbp.eu/
     #   - BROWSERSTACK_USERNAME=xiao33
     #   - secure: "YD2hDBnWzcMs9mTJCsKkJimd+mYKP8V1lTaCnxNvspJUxTuBWFmr8cvryIs9G9DhwgxkC3YL7hugsGkwMg6OIq27vLlo8mgoKS7/qrkWAJApGvDW4jc4CHpI2iE/ryrwG1bI3u9TuG0kSw+2sN/786LBgArlf5NbmwB9zmW4zyzjXXzSME34cwYdfEP96L2cob/uGiIj9YdaA1k3zfBhQQlp328i/xzYbIAcwfIia1AKYh/wgCzj+yfWDQ0Rtg9VcI2JiNfcbzMCgvDEBzshgeXuubFd9GPqPsc8zJhYqAi/15ge+WiB8R50MnZsYHO39JJihQzKz6WxIZQDeOQ2xd600NhFFLg6WPdE3jxAyENouTAd+0zJgXEeUU71YBDBl6RViagf8k7eOe9oMPW5ZlevdD3vcI8BC/qUL6Evye8QDDNi0s8gbIvcnJl5QMRBpeYcm/QaRUow1YeJobpccj/3tb7qTbc7T4Rha/NRBNhbhp/WzDSO/BUSEtpgJ3YwSEPTiEeSocTRT8ylnhEtBB70h4vQSClV73lW4vn7WjdZUTRACdxFNJ1MteQJ+3bgzyWMhDtdQo6BSz2UxF0mQFayAu2p9j0+MbB7x2zW9tksSw+6B6EjzPhQw6eOs2K0+syxWg09MTW1Fy6n0Zgchn0RWSnEPqPvss6kB2pkAR4="
-
-env:
-  global:
-    - CHROMIUM_VERSION=80.0.3987.106
-    - PPTR_VERSION=2.1.0
-    - PROTRACTOR_SPECS=./src/navigating/*.e2e-spec.js
 
 # addons:
 #   browserstack:
