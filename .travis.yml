@@ -77,6 +77,16 @@ jobs:
       - 'echo GREP_VERSION_NUM: $GREP_VERSION_NUM'
       - test -z "$GREP_VERSION_NUM" && exit 1 || exit 0
 
+    - stage: Create github release
+      if: |
+        type = push AND \
+        branch = master
+      before_script:
+      - chmod ugo+x ./release.sh
+      script: ./release.sh
+      env:
+      - secure: "mERkfztriSCECF/liheC4zFmq4h+MxausY8N0soTytOWUuTmz+NfxObsQ8w8Zl0h3XVe0BZdueJ15zeoipNBDisHZ2kbfLYnCJ8nsym+0O7mpYUSEiT5nDVE0Yj/9a+ZOAW0h0mvWNOwQZId0uTPr8rEst4IvCr+HkLZEUOM06lnftz1edYN3EsVih6MuTymXNLUaYkMBCErq2AFGvgOy6oP6Mq/D2QkBvM+RUNIxcJ2SrM9lMw4i5L/PeOnxbm0MBUndFhR/P0rJ7qz0j4kRP3DvgXfeW+hQsYcECGsnxMgC+Q59ULTBrRGuD03PnHI+7H8CrX+8maHYy+yf7S/iblaCcr0E5gZq/U0mUJbicymBhw4Ygu76X2Rj6E4jUeoC60MqDZovSisV6xuRXXFDqbfYxlBgFSsSS4Ozbl/RUA5MtLx/N4LwAKv5kafktFwZih/ZfQMAOZQfUDB60y4Mvh1Eg6XK4HhnRxdBE8GWP1tQLq/3n8NLr9KBIR4ceHUNEFXjWw3nPIAujnCqUoxSJotfDEnFUpV6KMgZxiC9vv/vq7IgnzzTXRGdvFfjzBbFmYv4+nqYzZhqKb7BI9y++0v+4Jdu9eHGdYVIpiYzzEKhqImK6I4CsUdcakXiPecdxlwA1zc/yET8qyBNGPGnXvYAw1hBt1VbtP8Rf3PKfo="
+
     # Temporarily disabling browserstack e2e tests. They seem to fail without any reason
 
     # - stage: browserstack e2e
