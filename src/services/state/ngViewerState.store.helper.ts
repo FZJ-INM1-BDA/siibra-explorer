@@ -8,6 +8,7 @@ import {
   ngViewerActionRemoveNgLayer,
   ngViewerActionSetPerspOctantRemoval,
   ngViewerActionToggleMax,
+  ngViewerActionClearView,
 } from './ngViewerState/actions'
 
 export {
@@ -15,4 +16,5 @@ export {
   ngViewerActionRemoveNgLayer,
   ngViewerActionSetPerspOctantRemoval,
   ngViewerActionToggleMax,
+  ngViewerActionClearView,
 }

@@ -20,3 +20,29 @@ export const ngViewerActionToggleMax = createAction(
   `[ngViewerAction] toggleMax`,
   props<{ payload: { index: number } }>()
 )
+
+/**
+ * Clear viewer view from additional layers such as PMap or connectivity
+ * To request view to be cleared, call 
+ * this.store$.dispatch(
+ *  ngViewerActionClearView({ 
+ *    payload: {
+ *      ['my-unique-id']: true
+ *    }
+ *  })
+ * )
+ * 
+ * When finished, call
+ * 
+ * this.store$.dispatch(
+ *   ngViewerActionClearView({
+ *    payload: {
+ *      ['my-unique-id']: false
+ *    }
+ *   })
+ * )
+ */
+export const ngViewerActionClearView = createAction(
+  `[ngViewerAction] clearView`,
+  props<{ payload: { [key:string]: boolean }}>()
+)
