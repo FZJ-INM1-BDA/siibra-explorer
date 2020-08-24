@@ -7,10 +7,10 @@ import { distinctUntilChanged, filter, debounceTime, shareReplay, scan, map, thr
 import { StateInterface as ViewerConfigStateInterface } from "src/services/state/viewerConfig.store";
 import { getNavigationStateFromConfig } from "../util";
 import { NEHUBA_LAYER_CHANGED, CHANGE_NAVIGATION, VIEWERSTATE_ACTION_TYPES } from "src/services/state/viewerState.store";
-import { NEHUBA_READY } from "src/services/state/ngViewerState.store";
 import { timedValues } from "src/util/generator";
 import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiState.store";
 import { takeOnePipe } from "../nehubaContainer.component";
+import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -425,10 +425,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
         /**
          * TODO when user selects new template, window.viewer
          */
-        this.store$.dispatch({
-          type: NEHUBA_READY,
-          nehubaReady: true,
-        })
+        this.store$.dispatch(
+          ngViewerActionNehubaReady({
+            nehubaReady: true,
+          })
+        )
       }),
 
       this.nehubaViewerInstance.mouseoverSegmentEmitter.pipe(

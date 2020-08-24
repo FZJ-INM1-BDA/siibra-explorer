@@ -19,29 +19,16 @@
         Brain region
       </span>
 
+      <!-- origin datas format -->
+      <div *ngFor="let originDataset of (region.originDatasets || []); let index = index"
+        class="ml-2">
+        <i>&#183;</i>
+        <span>
+          {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+        </span>
+      </div>
+
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
-
-      <!-- origin datas -->
-      <button mat-icon-button 
-        [color]="previewDirective.active ? 'primary' : 'basic'"
-        *ngFor="let originDataset of (region.originDatasets || []); let index = index"
-        iav-dataset-preview-dataset-file
-        [iav-dataset-preview-dataset-file-kgschema]="originDataset.kgSchema"
-        [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-        [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-        #previewDirective="iavDatasetPreviewDatasetFile"
-        iv-custom-comp
-        [attr.primary]="previewDirective.active || null"
-        role="switch"
-        [attr.aria-checked]="previewDirective.active"
-        [matTooltip]="SHOW_ORIGIN_DATASET"
-        [attr.aria-label]="SHOW_ORIGIN_DATASET">
-        <mat-icon fontSet="fas" fontIcon="fa-eye"></mat-icon>
-        <!-- <span>
-          View {{ regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
-        </span> -->
-      </button>
-
 
       <!-- position -->
       <button mat-icon-button *ngIf="region?.position"

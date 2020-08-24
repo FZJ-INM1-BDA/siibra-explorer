@@ -6,7 +6,7 @@ import { MatSliderChange } from "@angular/material/slider";
 
 import { getViewer } from "src/util/fn";
 import { PureContantService } from "src/util";
-import { ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState/actions";
+import { ngViewerActionRemoveNgLayer, ngViewerActionForceShowSegment } from "src/services/state/ngViewerState/actions";
 import { getNgIds } from 'src/util/fn'
 import { LoggingService } from "src/logging";
 import { ARIA_LABELS } from 'common/constants'
@@ -173,14 +173,15 @@ export class LayerBrowser implements OnInit, OnDestroy {
     /**
      * TODO perhaps useEffects ?
      */
-    this.store.dispatch({
-      type : 'FORCE_SHOW_SEGMENT',
-      forceShowSegment : this.forceShowSegmentCurrentState === null
-        ? true
-        : this.forceShowSegmentCurrentState === true
-          ? false
-          : null,
-    })
+    this.store.dispatch(
+      ngViewerActionForceShowSegment({
+        forceShowSegment : this.forceShowSegmentCurrentState === null
+          ? true
+          : this.forceShowSegmentCurrentState === true
+            ? false
+            : null,
+      })
+    )
   }
 
   public removeLayer(layer: any) {

@@ -14,7 +14,7 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
-import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
+import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
 import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import {
@@ -132,6 +132,14 @@ const {
 })
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
+
+  public test(flag: boolean) {
+    this.store.dispatch(
+      ngViewerActionClearView({ payload: {
+        ['id-me']: flag
+      } })
+    )
+  }
 
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT

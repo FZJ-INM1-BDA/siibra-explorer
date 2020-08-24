@@ -1,4 +1,4 @@
-import { createAction, props } from "@ngrx/store"
+import { createAction, props, createReducer } from "@ngrx/store"
 import { INgLayerInterface } from './constants'
 
 export const ngViewerActionAddNgLayer = createAction(
@@ -19,6 +19,26 @@ export const ngViewerActionSetPerspOctantRemoval = createAction(
 export const ngViewerActionToggleMax = createAction(
   `[ngViewerAction] toggleMax`,
   props<{ payload: { index: number } }>()
+)
+
+export const ngViewerActionSetPanelOrder = createAction(
+  `[ngViewerAction] setPanelOrder`,
+  props<{ payload: { panelOrder: string } }>()
+)
+
+export const ngViewerActionSwitchPanelMode = createAction(
+  `[ngViewerAction] switchPanelMode`,
+  props<{ payload: { panelMode: string } }>()
+)
+
+export const ngViewerActionForceShowSegment = createAction(
+  `[ngViewerAction] forceShowSegment`,
+  props<{ forceShowSegment: boolean }>()
+)
+
+export const ngViewerActionNehubaReady = createAction(
+  `[ngViewerAction] nehubaReady`,
+  props<{ nehubaReady: boolean }>()
 )
 
 /**
@@ -44,5 +64,5 @@ export const ngViewerActionToggleMax = createAction(
  */
 export const ngViewerActionClearView = createAction(
   `[ngViewerAction] clearView`,
-  props<{ payload: { [key:string]: boolean }}>()
+  props<{ payload: { [key: string]: boolean }}>()
 )

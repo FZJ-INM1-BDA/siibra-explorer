@@ -296,6 +296,8 @@
       let-content="content">
       <mat-expansion-panel class="mt-1 mb-1"
         hideToggle
+        (afterExpand)="test(true)"
+        (afterCollapse)="test(false)"
         *ngIf="iavNgIf">
 
         <mat-expansion-panel-header>

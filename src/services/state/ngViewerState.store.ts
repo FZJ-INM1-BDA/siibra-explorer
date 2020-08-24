@@ -4,13 +4,14 @@ import { Effect, Actions, ofType } from '@ngrx/effects';
 import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
 import { SNACKBAR_MESSAGE } from './uiState.store';
 import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
-import { Action, select, Store } from '@ngrx/store'
+import { Action, select, Store, createReducer, on } from '@ngrx/store'
 import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
 import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
-import { ngViewerActionToggleMax } from './ngViewerState/actions';
+import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady } from './ngViewerState/actions';
+import { generalApplyState } from '../stateStore.helper';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -18,9 +19,6 @@ export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerI
   } else {
     return oldLayers.concat({
       ...newLayers,
-      ...( newLayers.mixability === 'nonmixable' && oldLayers.findIndex(l => l.mixability === 'nonmixable') >= 0
-        ? {visible: false}
-        : {}),
     })
   }
 }
@@ -35,6 +33,10 @@ export interface StateInterface {
   octantRemoval: boolean
   showSubstrate: boolean
   showZoomlevel: boolean
+
+  clearViewQueue: {
+    [key: string]: boolean
+  }
 }
 
 export interface ActionInterface extends Action {
@@ -55,91 +57,82 @@ export const defaultState: StateInterface = {
   octantRemoval: true,
   showSubstrate: null,
   showZoomlevel: null,
+
+  clearViewQueue: {}
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface): StateInterface => {
-  switch (action.type) {
-  case ngViewerActionSetPerspOctantRemoval.type:{
-    const { octantRemovalFlag } = action as any
+export const ngViewerStateReducer = createReducer(
+  defaultState,
+  on(ngViewerActionClearView, (state, { payload }) => {
+    const { clearViewQueue } = state
+    for (const key in payload) {
+      clearViewQueue[key] = payload[key]
+    }
     return {
-      ...prevState,
+      ...state,
+      clearViewQueue: {
+        ...clearViewQueue
+      }
+    }
+  }),
+  on(ngViewerActionSetPerspOctantRemoval, (state, { octantRemovalFlag }) => {
+    return {
+      ...state,
       octantRemoval: octantRemovalFlag
     }
-  }
-  case ACTION_TYPES.SET_PANEL_ORDER: {
-    const { payload } = action
+  }),
+  on(ngViewerActionAddNgLayer, (state, { layer }) => {
+    return {
+      ...state,
+      layers: mixNgLayers(state.layers, layer)
+    }
+  }),
+  on(ngViewerActionSetPanelOrder, (state, { payload }) => {
     const { panelOrder } = payload
-
     return {
-      ...prevState,
-      panelOrder,
+      ...state,
+      panelOrder
     }
-  }
-  case ACTION_TYPES.SWITCH_PANEL_MODE: {
-    const { payload } = action
+  }),
+  on(ngViewerActionSwitchPanelMode, (state, { payload }) => {
     const { panelMode } = payload
-    if (SUPPORTED_PANEL_MODES.indexOf(panelMode) < 0) { return prevState }
+    if (SUPPORTED_PANEL_MODES.indexOf(panelMode as any) < 0) { return state }
     return {
-      ...prevState,
-      panelMode,
+      ...state,
+      panelMode
     }
-  }
-  case ngViewerActionAddNgLayer.type:
-  case ADD_NG_LAYER:
+  }),
+  on(ngViewerActionRemoveNgLayer, (state, { layer }) => {
+    
+    const newLayers = Array.isArray(layer)
+      ? (() => {
+        const layerNameSet = new Set(layer.map(l => l.name))
+        return state.layers.filter(l => !layerNameSet.has(l.name))
+      })()
+      : state.layers.filter(l => l.name !== layer.name)
     return {
-      ...prevState,
-      layers : mixNgLayers(prevState.layers, action.layer),
+      ...state,
+      layers: newLayers
     }
-  case ngViewerActionRemoveNgLayer.type:
-  case REMOVE_NG_LAYER: {
-    if (Array.isArray(action.layer)) {
-      const { layer } = action
-      const layerNameSet = new Set(layer.map(l => l.name))
-      return {
-        ...prevState,
-        layers: prevState.layers.filter(l => !layerNameSet.has(l.name)),
-      }
-    } else {
-      return {
-        ...prevState,
-        layers : prevState.layers.filter(l => l.name !== action.layer.name),
-      }
-    }
-  }
-  case SHOW_NG_LAYER: 
+  }),
+  on(ngViewerActionForceShowSegment, (state, { forceShowSegment }) => {
     return {
-      ...prevState,
-      layers : prevState.layers.map(l => l.name === action.layer.name
-        ? { ...l, visible: true }
-        : l),
+      ...state,
+      forceShowSegment
     }
-  case HIDE_NG_LAYER:
+  }),
+  on(ngViewerActionNehubaReady, (state, { nehubaReady }) => {
     return {
-      ...prevState,
-
-      layers : prevState.layers.map(l => l.name === action.layer.name
-        ? { ...l, visible: false }
-        : l),
-    }
-  case FORCE_SHOW_SEGMENT:
-    return {
-      ...prevState,
-      forceShowSegment : action.forceShowSegment,
-    }
-  case NEHUBA_READY: {
-    const { nehubaReady } = action
-    return {
-      ...prevState,
+      ...state,
       nehubaReady
     }
-  }
-  case GENERAL_ACTION_TYPES.APPLY_STATE: {
-    const { ngViewerState } = (action as any).state
+  }),
+  on(generalApplyState, (_, { state }) => {
+    const { ngViewerState } = state
     return ngViewerState
-  }
-  default: return prevState
-  }
-}
+  })
+)
+
 
 // must export a named function for aot compilation
 // see https://github.com/angular/angular/issues/15587
@@ -148,10 +141,8 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
 //
 // angular function expressions are not supported in decorators
 
-const defaultStateStore = getStateStore()
-
 export function stateStore(state, action) {
-  return defaultStateStore(state, action)
+  return ngViewerStateReducer(state, action)
 }
 
 @Injectable({
@@ -258,12 +249,11 @@ export class NgViewerUseEffect implements OnDestroy {
       ofType(ACTION_TYPES.CYCLE_VIEWS),
       withLatestFrom(this.panelOrder$),
       map(([_, panelOrder]) => {
-        return {
-          type: ACTION_TYPES.SET_PANEL_ORDER,
+        return ngViewerActionSetPanelOrder({
           payload: {
             panelOrder: [...panelOrder.slice(1), ...panelOrder.slice(0, 1)].join(''),
-          },
-        }
+          }
+        })
       }),
     )
 
@@ -280,12 +270,9 @@ export class NgViewerUseEffect implements OnDestroy {
         const { index = 0 } = payload
 
         const panelOrder = [...oldPanelOrder.slice(index), ...oldPanelOrder.slice(0, index)].join('')
-        return {
-          type: ACTION_TYPES.SET_PANEL_ORDER,
-          payload: {
-            panelOrder,
-          },
-        }
+        return ngViewerActionSetPanelOrder({
+          payload: { panelOrder },
+        })
       }),
     )
 
@@ -320,12 +307,9 @@ export class NgViewerUseEffect implements OnDestroy {
 
         const panelOrder = panelOrdersPrev || [...panelOrders.slice(index), ...panelOrders.slice(0, index)].join('')
 
-        return {
-          type: ACTION_TYPES.SET_PANEL_ORDER,
-          payload: {
-            panelOrder,
-          },
-        }
+        return ngViewerActionSetPanelOrder({
+          payload: { panelOrder }
+        })
       }),
     )
 
@@ -336,14 +320,13 @@ export class NgViewerUseEffect implements OnDestroy {
         scan(scanFn, []),
       )),
       map(([ _, panelModes ]) => {
-        return {
-          type: ACTION_TYPES.SWITCH_PANEL_MODE,
+        return ngViewerActionSwitchPanelMode({
           payload: {
             panelMode: panelModes[0] === PANELS.SINGLE_PANEL
               ? (panelModes[1] || PANELS.FOUR_PANEL)
               : PANELS.SINGLE_PANEL,
           },
-        }
+        })
       }),
     )
 
@@ -419,10 +402,9 @@ export class NgViewerUseEffect implements OnDestroy {
         return loadedNgLayers.filter(l => !baseNameSet.has(l.name))
       }),
       map(layer => {
-        return {
-          type: REMOVE_NG_LAYER,
-          layer,
-        }
+        return ngViewerActionRemoveNgLayer({
+          layer
+        })
       }),
     )
   }
@@ -434,19 +416,9 @@ export class NgViewerUseEffect implements OnDestroy {
   }
 }
 
-export const ADD_NG_LAYER = 'ADD_NG_LAYER'
-export const REMOVE_NG_LAYER = 'REMOVE_NG_LAYER'
-export const SHOW_NG_LAYER = 'SHOW_NG_LAYER'
-export const HIDE_NG_LAYER = 'HIDE_NG_LAYER'
-export const FORCE_SHOW_SEGMENT = `FORCE_SHOW_SEGMENT`
-export const NEHUBA_READY = `NEHUBA_READY`
-
 export { INgLayerInterface } 
 
 const ACTION_TYPES = {
-  SWITCH_PANEL_MODE: 'SWITCH_PANEL_MODE',
-  SET_PANEL_ORDER: 'SET_PANEL_ORDER',
-
   CYCLE_VIEWS: 'CYCLE_VIEWS',
 
   REMOVE_ALL_NONBASE_LAYERS: `REMOVE_ALL_NONBASE_LAYERS`,

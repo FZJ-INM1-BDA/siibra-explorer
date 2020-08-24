@@ -9,6 +9,8 @@ import {
   ngViewerActionSetPerspOctantRemoval,
   ngViewerActionToggleMax,
   ngViewerActionClearView,
+  ngViewerActionSetPanelOrder,
+  ngViewerActionForceShowSegment,
 } from './ngViewerState/actions'
 
 export {
@@ -17,4 +19,6 @@ export {
   ngViewerActionSetPerspOctantRemoval,
   ngViewerActionToggleMax,
   ngViewerActionClearView,
+  ngViewerActionSetPanelOrder,
+  ngViewerActionForceShowSegment,
 }
