@@ -17,7 +17,7 @@ export class PreviewBase implements OnChanges{
   datasetId: string
 
   @Input()
-  datasetSchema: string = 'minds/core/dataste/v1.0.0'
+  datasetSchema: string = 'minds/core/dataset/v1.0.0'
 
   previewtype: EnumPreviewFileTypes
 
