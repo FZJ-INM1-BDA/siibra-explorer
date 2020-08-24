@@ -15,6 +15,7 @@ import { NgLayersService } from "src/ui/layerbrowser/ngLayerService.service"
 import { EnumColorMapName } from "./util/colorMaps"
 import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
+import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -120,12 +121,12 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
 
   static GetDatasetPreviewId(data: IDatasetPreviewData ){
-    const { datasetSchema = 'untitled', datasetId, filename } = data
+    const { datasetSchema = 'minds/core/dataset/v1.0.0', datasetId, filename } = data
     return `${datasetSchema}/${datasetId}:${filename}`
   }
 
   static GetDatasetPreviewFromId(id: string): IDatasetPreviewData{
-    const re = /^([a-f0-9-]+):(.+)$/.exec(id)
+    const re = /([a-f0-9-]+):(.+)$/.exec(id)
     if (!re) throw new Error(`id cannot be decoded: ${id}`)
     return { datasetId: re[1], filename: re[2] }
   }
@@ -195,13 +196,62 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     )
   }
 
-  private fetchedDatasetPreviewCache: Map<string, any> = new Map()
+  public selectedRegionPreview$ = this.store$.pipe(
+    select(state => state?.viewerState?.regionsSelected),
+    filter(regions => !!regions),
+    map(regions => /** effectively flatMap */ regions.reduce((acc, curr) => acc.concat(
+      curr.originDatasets && Array.isArray(curr.originDatasets) && curr.originDatasets.length > 0
+        ? curr.originDatasets
+        : []
+    ), [])),
+  )
+
+  public onRegionSelectChangeShowPreview$ = this.selectedRegionPreview$.pipe(
+    switchMap(arr => arr.length > 0
+      ? forkJoin(...arr.map(({ kgId, kgSchema, filename }) => this.getDatasetPreviewFromId({ datasetId: kgId, datasetSchema: kgSchema, filename })))
+      : of([])
+    ),
+    shareReplay(1),
+  )
+
+  public onRegionDeselectRemovePreview$ = this.onRegionSelectChangeShowPreview$.pipe(
+    pairwise(),
+    map(([oArr, nArr]) => oArr.filter(item => {
+      return !nArr
+        .map(DatasetPreviewGlue.GetDatasetPreviewId)
+        .includes(
+          DatasetPreviewGlue.GetDatasetPreviewId(item)
+        )
+    })),
+  )
+
+  public onClearviewRemovePreview$ = this.onRegionSelectChangeShowPreview$.pipe(
+    filter(arr => arr.length > 0),
+    switchMap(arr => this.store$.pipe(
+      select(ngViewerSelectorClearView),
+      distinctUntilChanged(),
+      filter(val => val),
+      mapTo(arr)
+    )),
+  )
+
+  public onClearviewAddPreview$ = this.onRegionSelectChangeShowPreview$.pipe(
+    filter(arr => arr.length > 0),
+    switchMap(arr => this.store$.pipe(
+      select(ngViewerSelectorClearView),
+      distinctUntilChanged(),
+      filter(val => !val),
+      mapTo(arr)
+    ))
+  )
+
+  private fetchedDatasetPreviewCache: Map<string, Observable<any>> = new Map()
   public getDatasetPreviewFromId({ datasetSchema = 'minds/core/dataset/v1.0.0', datasetId, filename }: IDatasetPreviewData){
     const dsPrvId = DatasetPreviewGlue.GetDatasetPreviewId({ datasetSchema, datasetId, filename })
-    const cachedPrv = this.fetchedDatasetPreviewCache.get(dsPrvId)
+    const cachedPrv$ = this.fetchedDatasetPreviewCache.get(dsPrvId)
     const filteredDsId = /[a-f0-9-]+$/.exec(datasetId)
-    if (cachedPrv) return of(cachedPrv)
-    return this.http.get(`${DS_PREVIEW_URL}/${encodeURIComponent(datasetSchema)}/${filteredDsId}/${encodeURIComponent(filename)}`, { responseType: 'json' }).pipe(
+    if (cachedPrv$) return cachedPrv$
+    const filedetail$ = this.http.get(`${DS_PREVIEW_URL}/${encodeURIComponent(datasetSchema)}/${filteredDsId}/${encodeURIComponent(filename)}`, { responseType: 'json' }).pipe(
       map(json => {
         return {
           ...json,
@@ -209,7 +259,10 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           datasetId
         }
       }),
-      tap(val => this.fetchedDatasetPreviewCache.set(dsPrvId, val))
+    )
+    this.fetchedDatasetPreviewCache.set(dsPrvId, filedetail$)
+    return filedetail$.pipe(
+      tap(val => this.fetchedDatasetPreviewCache.set(dsPrvId, of(val)))
     )
   }
 
@@ -268,9 +321,24 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
 
     // managing niftiVolumes
     // monitors previewDatasetFile obs to add/remove ng layer
+
     this.subscriptions.push(
-      this.getDiffDatasetFilesPreviews(
-        dsPrv => determinePreviewFileType(dsPrv) === EnumPreviewFileTypes.NIFTI
+      merge(
+        this.getDiffDatasetFilesPreviews(
+          dsPrv => determinePreviewFileType(dsPrv) === EnumPreviewFileTypes.NIFTI
+        ),
+        this.onRegionSelectChangeShowPreview$.pipe(
+          map(prvToShow => ({ prvToShow, prvToDismiss: [] }))
+        ),
+        this.onRegionDeselectRemovePreview$.pipe(
+          map(prvToDismiss => ({ prvToShow: [], prvToDismiss }))
+        ),
+        this.onClearviewRemovePreview$.pipe(
+          map(prvToDismiss => ({ prvToDismiss, prvToShow: [] }))
+        ),
+        this.onClearviewAddPreview$.pipe(
+          map(prvToShow => ({ prvToDismiss: [], prvToShow }))
+        )
       ).pipe(
         withLatestFrom(this.store$.pipe(
           select(state => state?.viewerState?.templateSelected || null),
@@ -365,7 +433,6 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
         }
       })
     )
-
   }
 
   private closeDatasetPreviewWidget(data: IDatasetPreviewData){

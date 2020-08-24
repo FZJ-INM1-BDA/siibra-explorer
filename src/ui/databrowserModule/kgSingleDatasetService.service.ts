@@ -4,10 +4,10 @@ import { select, Store } from "@ngrx/store";
 import { Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
 import { IDataEntry, ViewerPreviewFile, DATASETS_ACTIONS_TYPES } from "src/services/state/dataStore.store";
-import { SHOW_BOTTOM_SHEET } from "src/services/state/uiState.store";
-import { IavRootStoreInterface, REMOVE_NG_LAYER } from "src/services/stateStore.service";
+import { IavRootStoreInterface } from "src/services/stateStore.service";
 import { BACKENDURL } from "src/util/constants";
 import { uiStateShowBottomSheet } from "src/services/state/uiState.store.helper";
+import { ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState/actions";
 
 @Injectable({ providedIn: 'root' })
 export class KgSingleDatasetService implements OnDestroy {
@@ -74,12 +74,11 @@ export class KgSingleDatasetService implements OnDestroy {
   }
 
   public removeNgLayer({ url }) {
-    this.store$.dispatch({
-      type : REMOVE_NG_LAYER,
-      layer : {
-        name : url,
-      },
-    })
+    this.store$.dispatch(
+      ngViewerActionRemoveNgLayer({
+        layer: { name: url }
+      })
+    )
   }
 }
 
