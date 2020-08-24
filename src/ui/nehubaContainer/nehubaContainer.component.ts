@@ -26,6 +26,8 @@ import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThre
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
+import {MatAccordion, MatExpansionPanel} from "@angular/material/expansion";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -737,7 +739,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
-      if (sr?.length === 1) this.setConnectivityRegion(sr[0].name)
+      if (sr?.length >= 1) this.setConnectivityRegion(sr[0].name)
+      else this.store.dispatch({type: CLEAR_CONNECTIVITY_REGION})
       this.selectedRegions = sr
     }))
 
@@ -807,6 +810,25 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   setConnectivityRegion(regionName) {
     this.store.dispatch(viewerStateSetConnectivityRegion({ connectivityRegion: regionName }))
+  }
+
+  public accordionOpened: string = ''
+
+  sidebarAccordionOpened(title) {
+    switch (title) {
+    case 'Connectivity': {
+      this.connectivityComponent?.toggleConnectivityOnViewer( {checked: true})
+      break
+    }
+    }
+  }
+  sidebarAccordionClosed(title) {
+    switch (title) {
+    case 'Connectivity': {
+      this.connectivityComponent?.toggleConnectivityOnViewer( {checked: false})
+      break
+    }
+    }
   }
 
   public ngOnDestroy() {

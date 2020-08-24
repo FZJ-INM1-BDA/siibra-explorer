@@ -29,6 +29,7 @@
         [iav-dataset-preview-dataset-file-kgschema]="originDataset.kgSchema"
         [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
         [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+        (iav-dataset-preview-dataset-file-emit)="pmapDiplayed.emit()"
         #previewDirective="iavDatasetPreviewDatasetFile"
         iv-custom-comp
         [attr.primary]="previewDirective.active || null"

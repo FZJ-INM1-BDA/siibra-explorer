@@ -1,16 +1,36 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { Observable, combineLatest, fromEvent, Subscription, from, of } from 'rxjs';
+import {Observable, combineLatest, fromEvent, Subscription, from, of, EMPTY} from 'rxjs';
 import { Effect, Actions, ofType } from '@ngrx/effects';
-import { withLatestFrom, map, distinctUntilChanged, scan, shareReplay, filter, mapTo, debounceTime, catchError, skip, throttleTime } from 'rxjs/operators';
+import {
+  withLatestFrom,
+  map,
+  distinctUntilChanged,
+  scan,
+  shareReplay,
+  filter,
+  mapTo,
+  debounceTime,
+  catchError,
+  skip,
+  throttleTime,
+  mergeMap
+} from 'rxjs/operators';
 import { SNACKBAR_MESSAGE } from './uiState.store';
 import { getNgIds, IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service';
 import { Action, select, Store } from '@ngrx/store'
 import { BACKENDURL, CYCLE_PANEL_MESSAGE } from 'src/util/constants';
 import { HttpClient } from '@angular/common/http';
-import { INgLayerInterface, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionSetPerspOctantRemoval } from './ngViewerState.store.helper'
+import {
+  INgLayerInterface,
+  ngViewerActionAddNgLayer,
+  ngViewerActionClearView,
+  ngViewerActionRemoveNgLayer,
+  ngViewerActionSetPerspOctantRemoval
+} from './ngViewerState.store.helper'
 import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
 import { ngViewerActionToggleMax } from './ngViewerState/actions';
+import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -187,6 +207,9 @@ export class NgViewerUseEffect implements OnDestroy {
 
   @Effect()
   public applySavedUserConfig$: Observable<any>
+
+  @Effect()
+  public cleanView$: Observable<any>
 
   constructor(
     private actions: Actions,
@@ -424,6 +447,17 @@ export class NgViewerUseEffect implements OnDestroy {
           layer,
         }
       }),
+    )
+
+    this.cleanView$ = this.actions.pipe(
+      ofType(ngViewerActionClearView.type),
+      mergeMap((a) => {
+        if (a['payload']['connectivity']) {
+          return [{type: CLEAR_CONNECTIVITY_REGION},
+            {type: SET_CONNECTIVITY_VISIBLE, payload: null}]
+        }
+        return EMPTY
+      })
     )
   }
 

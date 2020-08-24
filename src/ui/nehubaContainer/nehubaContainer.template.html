@@ -275,6 +275,7 @@
     <region-menu
       [showRegionInOtherTmpl]="false"
       [region]="region"
+      (pmapDiplayed)="accordionOpened = ''"
       class="side-nav-cover mat-elevation-z4">
     </region-menu>
   </ng-container>
@@ -295,6 +296,9 @@
       let-iavNgIf="iavNgIf"
       let-content="content">
       <mat-expansion-panel class="mt-1 mb-1"
+        [expanded]="accordionOpened === title"
+        (opened)="sidebarAccordionOpened(title); accordionOpened = title"
+        (closed)="sidebarAccordionClosed(title); accordionOpened === title? accordionOpened = '' : null"
         hideToggle
         *ngIf="iavNgIf">
 

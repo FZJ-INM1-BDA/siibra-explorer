@@ -25,6 +25,8 @@ export class RegionBase {
     this.rgbDarkmode = l < 0.4
   }
 
+  @Output() public pmapDiplayed: EventEmitter<any> = new EventEmitter()
+
   get region(){
     return this._region
   }

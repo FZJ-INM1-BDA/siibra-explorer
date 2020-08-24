@@ -12,6 +12,7 @@ import {distinctUntilChanged, filter, map, shareReplay} from "rxjs/operators";
 import {CLEAR_CONNECTIVITY_REGION, SELECT_REGIONS, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 import {isDefined, safeFilter} from "src/services/stateStore.service";
 import { viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
+import {ngViewerActionClearView} from "src/services/state/ngViewerState/actions";
 
 @Component({
   selector: 'connectivity-browser',
@@ -38,10 +39,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public math = Math
 
     public connectivityComponentStyle: any = {
-      // ToDo - new popup panels from layer container hardcoded height and when I'm trying to grow connectivity popup, it overflows below.
-      //  For that I will just set hardcoded height, If we will able to grow new popups dynamically, below commented maxHeight should be apply.
-      // maxHeight: +(+getWindow().innerHeight - 200) + 'px',
-      maxHeight: '500px'
+      maxHeight: +(+getWindow().innerHeight - 200) + 'px',
     }
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
@@ -89,35 +87,33 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(parcellation => {
+          this.closeConnectivityView(false)
           if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
             if (parcellation.regions && parcellation.regions.length) {
               this.allRegions = []
               this.getAllRegionsFromParcellation(parcellation.regions)
-              if (this.defaultColorMap) {
-                this.addNewColorMap()
-              }
             }
-          } else {
-            this.closeConnectivityView()
           }
         }),
         this.connectivityRegion$.subscribe(cr => {
           if (cr && cr.length) {
             if (this.region !== cr && this.defaultColorMap) {
-              this.setDefaultMap()
-              this.store$.dispatch({
-                type: SET_CONNECTIVITY_VISIBLE,
-                payload: null,
-              })
+              this.closeConnectivityView()
             }
             this.region = cr
             this.changeDetectionRef.detectChanges()
+          } else {
+            // this.defaultColorMap && this.setDefaultMap()
+            this.store$.dispatch({
+              type: SET_CONNECTIVITY_VISIBLE,
+              payload: false,
+            })
           }
         }),
       )
-      this.subscriptions.push(this.templateSelected$.subscribe(t => {
-        this.closeConnectivityView()
-      }))
+      // this.subscriptions.push(this.templateSelected$.subscribe(t => {
+      //   this.closeConnectivityView(false)
+      // }))
       this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
         this.showConnectivityToggle = ocm === 'connectivity'? true : false
       }))
@@ -146,11 +142,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
               // ToDo Fix in future to use component
               const a = document.querySelector('hbp-connectivity-matrix-row')
               a.downloadCSV()
-            } else if (e.detail.name === 'Apply colors to viewer') {
-              this.defaultColorMap && this.toggleConnectivityOnViewer( {checked: this.showConnectivityToggle? false : true})
             }
+            // else if (e.detail.name === 'Apply colors to viewer') {
+            //   this.defaultColorMap && this.toggleConnectivityOnViewer( {checked: !this.showConnectivityToggle})
+            // }
           }),
       )
+
+      this.showConnectivityToggle = true
     }
 
     toggleConnectivityOnViewer(event) {
@@ -174,7 +173,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
-      this.defaultColorMap && this.setDefaultMap()
+      // this.defaultColorMap && this.setDefaultMap()
       // this.store$.dispatch({
       //   type: SET_CONNECTIVITY_VISIBLE,
       //   payload: false,
@@ -200,19 +199,19 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       return this.allRegions.find(ar => ar.name === region)
     }
 
-    public closeConnectivityView() {
-      if (this.defaultColorMap) this.setDefaultMap()
+    public closeConnectivityView(setDefault = true) {
+      if (this.defaultColorMap && setDefault) this.setDefaultMap()
       this.closeConnectivity.emit()
-      this.store$.dispatch({
-        type: CLEAR_CONNECTIVITY_REGION,
-      })
+      // this.store$.dispatch({
+      //   type: CLEAR_CONNECTIVITY_REGION,
+      // })
       this.store$.dispatch({
         type: SET_CONNECTIVITY_VISIBLE,
         payload: null,
       })
     }
 
-    public setDefaultMap() {
+    private setDefaultMap() {
       this.allRegions.forEach(r => {
         if (r && r.ngId && r.rgb && this.defaultColorMap) {
           this.defaultColorMap.get(r.ngId).set(r.labelIndex, {red: r.rgb[0], green: r.rgb[1], blue: r.rgb[2]})
@@ -222,6 +221,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     }
 
     public addNewColorMap() {
+      this.store$.dispatch(ngViewerActionClearView({
+        payload: {pmap: true}
+      }))
       this.store$.dispatch({
         type: SET_CONNECTIVITY_VISIBLE,
         payload: 'connectivity',
@@ -259,6 +261,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       }
     }
 
+    exportConnectivityProfile() {
+      const a = document.querySelector('hbp-connectivity-matrix-row')
+      a.downloadCSV()
+    }
     public exportFullConnectivity() {
       this.fullConnectivityGridElement.nativeElement['downloadCSV']()
     }

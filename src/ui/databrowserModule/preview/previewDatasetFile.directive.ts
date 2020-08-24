@@ -5,6 +5,9 @@ import { Observable, Subscription } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { PreviewBase } from "./preview.base";
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../pure";
+import {Store} from "@ngrx/store";
+import {IavRootStoreInterface} from "src/services/stateStore.service";
+import {ngViewerActionClearView} from "src/services/state/ngViewerState/actions";
 
 export const IAV_DATASET_PREVIEW_DATASET_FN = 'IAV_DATASET_PREVIEW_DATASET_FN'
 
@@ -37,6 +40,8 @@ export class PreviewDatasetFile extends PreviewBase implements OnChanges{
     return this.datasetId
   }
 
+  @Output('show-pmap') public displayMap: EventEmitter<any> = new EventEmitter()
+
   @Input('iav-dataset-preview-dataset-file-kgschema')
   set kgSchema(val){
     if (!val) return
@@ -61,6 +66,7 @@ export class PreviewDatasetFile extends PreviewBase implements OnChanges{
   private dataActiveObs: Subscription
   constructor(
     private snackbar: MatSnackBar,
+    private store$: Store<IavRootStoreInterface>,
     @Optional() @Inject(IAV_DATASET_PREVIEW_DATASET_FN) private emitFn: any,
     @Optional() @Inject(IAV_DATASET_PREVIEW_ACTIVE) private getDatasetActiveObs: (file, dataset) => Observable<boolean>,
     @Optional() @Inject(GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME) getDatasetPreviewFromId,
@@ -103,7 +109,11 @@ export class PreviewDatasetFile extends PreviewBase implements OnChanges{
       this.snackbar.open(`Cannot preview dataset file. Neither file nor filename are defined.`)
       return
     }
+    this.store$.dispatch(ngViewerActionClearView({
+      payload: {connectivity: true}
+    }))
     if (this.emitFn) this.emitFn(file, dataset)
     this.emitter.emit({ file, dataset })
+    // this.displayMap.emit()
   }
 }
