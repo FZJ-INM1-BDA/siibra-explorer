@@ -5,6 +5,7 @@ import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeM
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateGetSelectedAtlas, viewerStateSelectTemplateWithId, viewerStateAllParcellationsSelector, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
+import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 
 @Component({
   selector: 'atlas-layer-selector',
@@ -160,6 +161,8 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     selectTemplateWithName(template) {
+      this.store$.dispatch({type: CLEAR_CONNECTIVITY_REGION})
+      this.store$.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
       this.store$.dispatch(
         viewerStateSelectTemplateWithId({ payload: template })
       )

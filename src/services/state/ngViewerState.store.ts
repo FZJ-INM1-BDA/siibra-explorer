@@ -65,14 +65,13 @@ export const ngViewerStateReducer = createReducer(
   defaultState,
   on(ngViewerActionClearView, (state, { payload }) => {
     const { clearViewQueue } = state
+    const clearViewQueueUpdated = {...clearViewQueue}
     for (const key in payload) {
-      clearViewQueue[key] = payload[key]
+      clearViewQueueUpdated[key] = payload[key]
     }
     return {
       ...state,
-      clearViewQueue: {
-        ...clearViewQueue
-      }
+      clearViewQueue: clearViewQueueUpdated
     }
   }),
   on(ngViewerActionSetPerspOctantRemoval, (state, { octantRemovalFlag }) => {
