@@ -14,7 +14,7 @@
             show-dataset-name="false"
             custom-dataset-selector="true"
             tools_showlog="true"
-            [tools_custom]='[{"name": "Apply colors to viewer", "type": "checkbox", "checked": showConnectivityToggle}, {"name": "export csv", "type": "button"}]'
+            [tools_custom]='[{"name": "exportslot", "type": "slot"}]'
             hide-export-view="true">
 
         <div slot="dataset">
@@ -49,8 +49,10 @@
                         <i class="fas fa-download"></i>
                     </button>
                 </ng-container>
-
                 </div>
+            <div>
+                Connectivity Profile
+            </div>
         </div>
 
         <div slot="connectedRegionMenu">
@@ -72,6 +74,13 @@
                 </mat-card-subtitle>
                 <mat-divider></mat-divider>
             </div>
+        </div>
+        <div slot="exportslot">
+            <button mat-icon-button
+                    (click)="exportConnectivityProfile()"
+                    matTooltip="Export connectivity profile">
+                <i class="fas fa-download mb-2"></i>
+            </button>
         </div>
     </hbp-connectivity-matrix-row>
     <full-connectivity-grid #fullConnectivityGrid

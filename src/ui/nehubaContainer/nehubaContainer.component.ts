@@ -26,6 +26,7 @@ import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThre
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -132,14 +133,6 @@ const {
 })
 
 export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
-
-  public test(flag: boolean) {
-    this.store.dispatch(
-      ngViewerActionClearView({ payload: {
-        ['id-me']: flag
-      } })
-    )
-  }
 
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
@@ -259,6 +252,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public hoveredPanelIndices$: Observable<number>
 
   @ViewChild('connectivityComponent') public connectivityComponent: ConnectivityBrowserComponent
+  public accordionOpened: string = ''
 
   constructor(
     private pureConstantService: PureContantService,
@@ -745,7 +739,12 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
-      if (sr?.length === 1) this.setConnectivityRegion(sr[0].name)
+      if (sr?.length >= 1) this.setConnectivityRegion(sr[0].name)
+      else {
+        this.store.dispatch({type: CLEAR_CONNECTIVITY_REGION})
+        this.store.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
+        if (this.accordionOpened === 'Connectivity') this.connectivityComponent.toggleConnectivityOnViewer(false)
+      }
       this.selectedRegions = sr
     }))
 
@@ -817,6 +816,31 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.store.dispatch(viewerStateSetConnectivityRegion({ connectivityRegion: regionName }))
   }
 
+  sidebarAccordionOpened(title) {
+    switch (title) {
+    case 'Connectivity': {
+        this.connectivityComponent?.toggleConnectivityOnViewer( {checked: true})
+        break
+    }}
+    this.store.dispatch(
+      ngViewerActionClearView({ payload: {
+        ['connectivity-shown']: true
+      } })
+    )
+  }
+  sidebarAccordionClosed(title) {
+    switch (title) {
+    case 'Connectivity': {
+        this.connectivityComponent?.toggleConnectivityOnViewer( {checked: false})
+        break
+    }}
+    this.store.dispatch(
+      ngViewerActionClearView({ payload: {
+        ['connectivity-shown']: false
+      } })
+    )
+  }
+  
   public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
