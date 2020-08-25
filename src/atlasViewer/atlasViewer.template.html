@@ -111,7 +111,9 @@
 
           <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
 
-            <div [matMenuTriggerFor]="layerVersionMenu" #layerVersionMenuTrigger="matMenuTrigger">
+            <div [matMenuTriggerFor]="layerVersionMenu"
+              [matMenuTriggerData]="{ layerVersionMenuTrigger: layerVersionMenuTrigger }"
+              #layerVersionMenuTrigger="matMenuTrigger">
 
               <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
                 <ng-container *ngFor="let p of addParc">
@@ -142,7 +144,7 @@
             let-selected="selected"
             let-dismissable="dismissable"
             let-onclick="onclick">
-            <mat-chip class="pe-all" (click)="onclick && onclick()" [selected]="selected">
+            <mat-chip class="pe-all position-relative z-index-2" (click)="onclick && onclick()" [selected]="selected">
               
               {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
 
@@ -187,17 +189,23 @@
           </ng-template>
 
           <!-- layer version selector -->
-          <mat-menu #layerVersionMenu>
-            <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
-              <ng-container *ngTemplateOutlet="chipTmpl; context: {
-                parcel: parcVer,
-                selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
-                dismissable: false,
-                onclick: bindFn(selectParcellation.bind(this), parcVer)
-              }">
+          <mat-menu #layerVersionMenu class="bg-none">
+            <ng-template matMenuContent let-layerVersionMenuTrigger="layerVersionMenuTrigger">
+
+              <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
+                <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                  parcel: parcVer,
+                  selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
+                  dismissable: false,
+                  onclick: bindFns([
+                    [ selectParcellation.bind(this), parcVer ],
+                    [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
+                  ])
+                }">
+                </ng-container>
+                <div class="mt-1"></div>
               </ng-container>
-              <div class="mt-1"></div>
-            </ng-container>
+            </ng-template>
           </mat-menu>
 
           <ng-template #selectedRegionTmpl>
@@ -208,14 +216,14 @@
                 iav-region
                 (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
                 [region]="r"
-                class="pe-all position-relative z-index-1"
+                class="pe-all position-relative z-index-1 ml-8-n"
                 [ngClass]="{
                   'darktheme':regionDirective.rgbDarkmode === true,
                   'lighttheme': regionDirective.rgbDarkmode === false
                 }"
                 [style.backgroundColor]="regionDirective.rgbString"
                 #regionDirective="iavRegion">
-                <span class="iv-custom-comp text text-truncate d-inline">
+                <span class="iv-custom-comp text text-truncate d-inline pl-4">
                   {{ r.name }}
                 </span>
                 <mat-icon

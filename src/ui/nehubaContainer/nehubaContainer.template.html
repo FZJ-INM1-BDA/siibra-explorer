@@ -66,8 +66,21 @@
         [attr.aria-label]="ARIA_LABEL_EXPAND"
         (click)="matDrawerMinor.open()"
         class="explore-btn pe-all"
-        color="accent">
-        Explore
+        [ngClass]="{
+          'darktheme': iavRegion.rgbDarkmode === true,
+          'lighttheme': iavRegion.rgbDarkmode === false
+        }"
+        [style.backgroundColor]="iavRegion?.rgbString || 'accent'">
+        <span>
+          Explore
+        </span>
+
+        <div class="hidden"
+          iav-region
+          [region]="(selectedRegions$ | async) && (selectedRegions$ | async)[0]"
+          #iavRegion="iavRegion">
+        </div>
+
       </button>
     </mat-drawer>
     <mat-drawer-content class="visible position-relative">
