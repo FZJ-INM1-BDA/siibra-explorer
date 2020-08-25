@@ -1,11 +1,4 @@
-<div class="position-relative">
-
-    <!-- place holder when not expanded -->
-    <div [ngClass]="{ 'scale-up-bl muted-7 pe-all': !selectorExpanded, 'scale-down-bl pe-none': selectorExpanded }"
-         class="position-relative m-2 selectedLayerBorder cursor-pointer selectedTemplateDefaultContainer"
-         (click)="selectorExpanded = true">
-        <img [src]="selectedTemplatePreviewUrl" draggable="false"/>
-    </div>
+<div class="position-relative d-flex flex-column justify-content-start">
 
     <!-- selector panel when expanded -->
 
@@ -65,6 +58,18 @@
             </mat-grid-list>
         </mat-card-content>
     </mat-card>
+
+    <!-- place holder when not expanded -->
+    <div class="position-relative m-2 cursor-pointer scale-up-bl pe-all">
+        <button color="primary"
+                matTooltip="Select layer"
+                mat-mini-fab
+                aria-label="Layer selector expand button"
+                (click)="selectorExpanded = !selectorExpanded">
+            <i class="fas fa-layer-group"></i>
+        </button>
+    </div>
+
 </div>
 
 <!-- image tile tmpl -->
