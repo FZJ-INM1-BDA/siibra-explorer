@@ -3,8 +3,9 @@ import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap, filter } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
-import { viewerStateGetSelectedAtlas, viewerStateSelectTemplateWithId, viewerStateAllParcellationsSelector, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
+import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
+import { viewerStateGetSelectedAtlas, viewerStateAtlasParcellationSelector, viewerStateAtlasLatestParcellationSelector } from "src/services/state/viewerState/selectors";
 
 @Component({
   selector: 'atlas-layer-selector',
@@ -97,28 +98,24 @@ export class AtlasLayerSelector implements OnInit {
         ))
       )
 
-      this.nonGroupedLayers$ = combineLatest(
-        this.store$.pipe(
-          select(viewerStateAllParcellationsSelector)
+      const atlasLayersLatest$ = this.store$.pipe(
+        select(viewerStateAtlasLatestParcellationSelector),
+        shareReplay(1),
+      )
+
+      this.nonGroupedLayers$ = atlasLayersLatest$.pipe(
+        map(allParcellations => 
+          allParcellations
+            .filter(p => !p['groupName'])
+            .filter(p => !p['baseLayer'])
         ),
-        layersGroupBy$
-      ).pipe(
-        map(([ allParcellations, arr]) => {
-          const nonGrouped = arr.find(([ _key ]) => !_key)
-          return ((nonGrouped && nonGrouped[1]) || []).map(layer => {
-            const fullLayerInfo = allParcellations.find(p => p['@id'] === layer['@id']) || {}
-            return {
-              ...fullLayerInfo,
-              ...layer,
-              darktheme: (fullLayerInfo || {}).useTheme === 'dark'
-            }
-          })
-        }),
       )
 
       this.groupedLayers$ = combineLatest(
-        this.store$.pipe(
-          select(viewerStateAllParcellationsSelector)
+        atlasLayersLatest$.pipe(
+          map(allParcellations => 
+            allParcellations.filter(p => !p['baseLayer'])
+          ),
         ),
         layersGroupBy$
       ).pipe(

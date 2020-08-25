@@ -5,7 +5,8 @@ import { distinctUntilChanged, switchMap, filter, map, tap } from "rxjs/operator
 import { Observable, BehaviorSubject, combineLatest } from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
-import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect, viewerStateGetSelectedAtlas } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
+import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 
 export class RegionBase {
 

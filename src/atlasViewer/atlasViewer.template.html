@@ -88,13 +88,14 @@
           </atlas-layer-selector>
           <mat-chip-list class="mb-2">
             <!-- additional layer -->
-            <ng-container *ngIf="!alSelector.selectorExpanded">
+
+            <ng-container>
               <ng-container *ngTemplateOutlet="currParcellationTmpl; context: { addParc: (selectedAdditionalLayers$ | async), parc: selectedParcellation }">
               </ng-container>
             </ng-container>
 
             <!-- any selected region(s) -->
-            <ng-container *ngIf="!uiNehubaContainer.navSideDrawerMainSwitch.switchState || !uiNehubaContainer.navSideDrawerMinorSwitch.switchState">
+            <ng-container>
               <ng-container *ngTemplateOutlet="selectedRegionTmpl">
               </ng-container>
             </ng-container>
@@ -107,78 +108,97 @@
           </mat-chip-list>
           
           <!-- current layer tmpl -->
+
           <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
-            <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
-              <ng-container *ngFor="let p of addParc">
+
+            <div [matMenuTriggerFor]="layerVersionMenu" #layerVersionMenuTrigger="matMenuTrigger">
+
+              <ng-template [ngIf]="addParc.length > 0" [ngIfElse]="defaultParcTmpl">
+                <ng-container *ngFor="let p of addParc">
+                  <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                    parcel: p,
+                    selected: true,
+                    dismissable: true,
+                    onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
+                  }">
+                  </ng-container>
+                </ng-container>
+              </ng-template>
+              <ng-template #defaultParcTmpl>
                 <ng-container *ngTemplateOutlet="chipTmpl; context: {
-                  parcel: p,
-                  selected: true,
-                  dismissable: true
+                  parcel: parc,
+                  selected: false,
+                  dismissable: false,
+                  onclick: layerVersionMenuTrigger.toggleMenu.bind(layerVersionMenuTrigger)
                 }">
                 </ng-container>
-              </ng-container>
-            </ng-template>
-            <ng-template #defaultParcTmpl>
+              </ng-template>
+            </div>
+          </ng-template>
+
+          <!-- render parc templ -->
+          <ng-template #chipTmpl
+            let-parcel="parcel"
+            let-selected="selected"
+            let-dismissable="dismissable"
+            let-onclick="onclick">
+            <mat-chip class="pe-all" (click)="onclick && onclick()" [selected]="selected">
+              
+              {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
+
+              <!-- info icon -->
+              <ng-template [ngIf]="parcel?.originDatasets?.length > 0" [ngIfElse]="infoIconBasic">
+
+                <mat-icon
+                  *ngFor="let ds of parcel.originDatasets"
+                  fontSet="fas"
+                  fontIcon="fa-info-circle"
+                  iav-stop="click"
+                  iav-dataset-show-dataset-dialog
+                  [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
+                  [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
+                  [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
+                </mat-icon>
+
+              </ng-template>
+
+              <ng-template #infoIconBasic>
+                <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
+                  fontSet="fas"
+                  fontIcon="fa-info-circle"
+                  iav-stop="click"
+                  iav-dataset-show-dataset-dialog
+                  [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
+                  [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
+
+                </mat-icon>
+              </ng-template>
+
+              <!-- dismiss icon -->
+              <mat-icon
+                *ngIf="dismissable"
+                (click)="clearAdditionalLayer(parcel)"
+                fontSet="fas"
+                iav-stop="click"
+                fontIcon="fa-times">
+              </mat-icon>
+            </mat-chip>
+          </ng-template>
+
+          <!-- layer version selector -->
+          <mat-menu #layerVersionMenu>
+            <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
               <ng-container *ngTemplateOutlet="chipTmpl; context: {
-                parcel: parc,
-                selected: false,
-                dismissable: false
+                parcel: parcVer,
+                selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
+                dismissable: false,
+                onclick: bindFn(selectParcellation.bind(this), parcVer)
               }">
               </ng-container>
-            </ng-template>
-
-            <!-- render parc templ -->
-            <ng-template #chipTmpl
-              let-parcel="parcel"
-              let-selected="selected"
-              let-dismissable="dismissable">
-              <mat-chip class="pe-all"
-                (click)="alSelector.selectorExpanded = true"
-                [selected]="selected">
-                
-                {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
-
-                <!-- info icon -->
-                <ng-template [ngIf]="parcel?.originDatasets?.length > 0"
-                    [ngIfElse]="infoIconBasic">
-
-                  <mat-icon
-                    *ngFor="let ds of parcel.originDatasets"
-                    fontSet="fas"
-                    fontIcon="fa-info-circle"
-                    iav-stop="click"
-                    iav-dataset-show-dataset-dialog
-                    [iav-dataset-show-dataset-dialog-kgid]="ds['kgId']"
-                    [iav-dataset-show-dataset-dialog-kgschema]="ds['kgSchema']"
-                    [iav-dataset-show-dataset-dialog-name]="parcel?.properties?.name"
-                    [iav-dataset-show-dataset-dialog-description]="parcel?.properties?.description">
-                  </mat-icon>
-
-                </ng-template>
-
-                <ng-template #infoIconBasic>
-                  <mat-icon *ngIf="parcel?.properties?.name && parcel?.properties?.description"
-                    fontSet="fas"
-                    fontIcon="fa-info-circle"
-                    iav-stop="click"
-                    iav-dataset-show-dataset-dialog
-                    [iav-dataset-show-dataset-dialog-name]="parcel.properties.name"
-                    [iav-dataset-show-dataset-dialog-description]="parcel.properties.description">
-
-                  </mat-icon>
-                </ng-template>
-
-                <!-- dismiss icon -->
-                <mat-icon
-                  *ngIf="dismissable"
-                  (click)="clearAdditionalLayer(parcel)"
-                  fontSet="fas"
-                  iav-stop="click"
-                  fontIcon="fa-times">
-                </mat-icon>
-              </mat-chip>
-            </ng-template>
-          </ng-template>
+              <div class="mt-1"></div>
+            </ng-container>
+          </mat-menu>
 
           <ng-template #selectedRegionTmpl>
             <ng-container *ngFor="let r of (selectedRegions$ | async)">
