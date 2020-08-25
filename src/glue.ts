@@ -3,7 +3,7 @@ import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angula
 import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule/pure"
 import { Subscription, Observable, forkJoin, of, merge } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
-import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip } from "rxjs/operators"
+import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError } from "rxjs/operators"
 import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
 import { getIdObj } from 'common/util'
 import { MatDialogRef } from "@angular/material/dialog"
@@ -23,6 +23,11 @@ const PREVIEW_FILE_TYPES_NO_UI = [
 ]
 
 const DATASET_PREVIEW_ANNOTATION = `DATASET_PREVIEW_ANNOTATION`
+
+const prvFilterNull = ({ prvToDismiss, prvToShow }) => ({
+  prvToDismiss: prvToDismiss.filter(v => !!v),
+  prvToShow: prvToShow.filter(v => !!v),
+})
 
 export const glueActionToggleDatasetPreview = createAction(
   '[glue] toggleDatasetPreview',
@@ -182,6 +187,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           : of([])
       })
     }),
+    map(prvFilterNull),
     shareReplay(1)
   )
 
@@ -211,6 +217,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
       ? forkJoin(...arr.map(({ kgId, kgSchema, filename }) => this.getDatasetPreviewFromId({ datasetId: kgId, datasetSchema: kgSchema, filename })))
       : of([])
     ),
+    map(arr => arr.filter(item => !!item)),
     shareReplay(1),
   )
 
@@ -251,7 +258,8 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     const cachedPrv$ = this.fetchedDatasetPreviewCache.get(dsPrvId)
     const filteredDsId = /[a-f0-9-]+$/.exec(datasetId)
     if (cachedPrv$) return cachedPrv$
-    const filedetail$ = this.http.get(`${DS_PREVIEW_URL}/${encodeURIComponent(datasetSchema)}/${filteredDsId}/${encodeURIComponent(filename)}`, { responseType: 'json' }).pipe(
+    const url = `${DS_PREVIEW_URL}/${encodeURIComponent(datasetSchema)}/${filteredDsId}/${encodeURIComponent(filename)}`
+    const filedetail$ = this.http.get(url, { responseType: 'json' }).pipe(
       map(json => {
         return {
           ...json,
@@ -259,6 +267,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           datasetId
         }
       }),
+      catchError((_err, _obs) => of(null))
     )
     this.fetchedDatasetPreviewCache.set(dsPrvId, filedetail$)
     return filedetail$.pipe(
@@ -340,6 +349,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
           map(prvToShow => ({ prvToDismiss: [], prvToShow }))
         )
       ).pipe(
+        map(prvFilterNull),
         withLatestFrom(this.store$.pipe(
           select(state => state?.viewerState?.templateSelected || null),
           distinctUntilChanged(),
