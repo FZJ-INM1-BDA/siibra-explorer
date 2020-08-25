@@ -37,13 +37,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
     public math = Math
 
-    public connectivityComponentStyle: any = {
-      // ToDo - new popup panels from layer container hardcoded height and when I'm trying to grow connectivity popup, it overflows below.
-      //  For that I will just set hardcoded height, If we will able to grow new popups dynamically, below commented maxHeight should be apply.
-      // maxHeight: +(+getWindow().innerHeight - 200) + 'px',
-      maxHeight: '500px'
-    }
-
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
 
@@ -89,35 +82,29 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
     public ngAfterViewInit(): void {
       this.subscriptions.push(
         this.selectedParcellation$.subscribe(parcellation => {
+          this.closeConnectivityView(false)
           if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
             if (parcellation.regions && parcellation.regions.length) {
               this.allRegions = []
               this.getAllRegionsFromParcellation(parcellation.regions)
-              if (this.defaultColorMap) {
-                this.addNewColorMap()
-              }
             }
-          } else {
-            this.closeConnectivityView()
           }
         }),
         this.connectivityRegion$.subscribe(cr => {
           if (cr && cr.length) {
             if (this.region !== cr && this.defaultColorMap) {
-              this.setDefaultMap()
-              this.store$.dispatch({
-                type: SET_CONNECTIVITY_VISIBLE,
-                payload: null,
-              })
+              this.closeConnectivityView()
             }
             this.region = cr
             this.changeDetectionRef.detectChanges()
+          } else {
+            this.store$.dispatch({
+              type: SET_CONNECTIVITY_VISIBLE,
+              payload: false,
+            })
           }
         }),
       )
-      this.subscriptions.push(this.templateSelected$.subscribe(t => {
-        this.closeConnectivityView()
-      }))
       this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
         this.showConnectivityToggle = ocm === 'connectivity'? true : false
       }))
@@ -151,6 +138,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
             }
           }),
       )
+      this.showConnectivityToggle = true
     }
 
     toggleConnectivityOnViewer(event) {
@@ -174,11 +162,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
-      this.defaultColorMap && this.setDefaultMap()
-      // this.store$.dispatch({
-      //   type: SET_CONNECTIVITY_VISIBLE,
-      //   payload: false,
-      // })
     }
 
     navigateToRegion(region) {
@@ -200,12 +183,9 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       return this.allRegions.find(ar => ar.name === region)
     }
 
-    public closeConnectivityView() {
-      if (this.defaultColorMap) this.setDefaultMap()
+    public closeConnectivityView(setDefault = true) {
+      if (this.defaultColorMap && setDefault) this.setDefaultMap()
       this.closeConnectivity.emit()
-      this.store$.dispatch({
-        type: CLEAR_CONNECTIVITY_REGION,
-      })
       this.store$.dispatch({
         type: SET_CONNECTIVITY_VISIBLE,
         payload: null,
@@ -258,7 +238,10 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
         }
       }
     }
-
+    exportConnectivityProfile() {
+      const a = document.querySelector('hbp-connectivity-matrix-row')
+      a.downloadCSV()
+    }
     public exportFullConnectivity() {
       this.fullConnectivityGridElement.nativeElement['downloadCSV']()
     }
