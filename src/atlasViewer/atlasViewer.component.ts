@@ -40,7 +40,8 @@ export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> =
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
-import { viewerStateSetSelectedRegions, viewerStateGetOverlayingAdditionalParcellations, viewerStateRemoveAdditionalLayer } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateSelectParcellation } from "src/services/state/viewerState.store.helper";
+import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector } from "src/services/state/viewerState/selectors";
 
 /**
  * TODO
@@ -107,6 +108,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectedAdditionalLayers$ = this.store.pipe(
     select(viewerStateGetOverlayingAdditionalParcellations),
+  )
+
+  public selectedLayerVersions$ = this.store.pipe(
+    select(viewerStateParcVersionSelector),
   )
 
   constructor(
@@ -359,6 +364,18 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     ).subscribe(() => {
       this.kgTosDialogRef = this.matDialog.open(this.kgTosComponent)
     })
+  }
+
+  public selectParcellation(parc: any) {
+    this.store.dispatch(
+      viewerStateSelectParcellation({
+        selectParcellation: parc
+      })
+    )
+  }
+
+  public bindFn(fn, arg){
+    return () => fn(arg)
   }
 
   public clearAdditionalLayer(layer: { ['@id']: string }){

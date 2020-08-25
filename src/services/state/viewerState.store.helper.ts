@@ -45,17 +45,16 @@ export {
 }
 
 import {
-  viewerStateAllParcellationsSelector,
   viewerStateSelectedRegionsSelector,
   viewerStateSelectedTemplateSelector,
-  viewerStateSelectedParcellationSelector
+  viewerStateSelectedParcellationSelector,
+  viewerStateGetSelectedAtlas,
 } from './viewerState/selectors'
 
 export {
-  viewerStateAllParcellationsSelector,
   viewerStateSelectedRegionsSelector,
   viewerStateSelectedTemplateSelector,
-  viewerStateSelectedParcellationSelector
+  viewerStateSelectedParcellationSelector,
 }
 
 interface IViewerStateHelperStore{
@@ -123,32 +122,6 @@ export const viewerStateHelperReducer = createReducer(
 )
 
 export const viewerStateHelperStoreName = 'viewerStateHelper'
-
-export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
-  state => state[viewerStateHelperStoreName],
-  state => state['viewerState'],
-  (viewerHelperState, viewerState ) => {
-    const { selectedAtlasId, fetchedAtlases } = viewerHelperState
-    const { parcellationSelected } = viewerState
-
-    const selectedAtlas = selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
-    const atlasLayer =  selectedAtlas?.parcellations.find(p => p['@id'] === (parcellationSelected && parcellationSelected['@id']))
-    const isBaseLayer = atlasLayer && atlasLayer.baseLayer
-    return (!!atlasLayer && !isBaseLayer) ? [{
-      ...(parcellationSelected || {} ),
-      ...atlasLayer
-    }] : []
-  }
-)
-
-export const viewerStateGetSelectedAtlas = createSelector(
-  state => state[viewerStateHelperStoreName],
-  helperState => {
-    if (!helperState) return null
-    const { selectedAtlasId, fetchedAtlases } = helperState
-    return selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
-  }
-)
 
 export function viewerStateFleshOutDetail(reducer: ActionReducer<any>): ActionReducer<any> {
   return (state, action) => {

@@ -19,13 +19,25 @@
     "availableIn": [{
       "@id": "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9",
       "name": "Allen Mouse Common Coordinate Framework v3"
-    }]
+    }],
+    "@version": {
+      "@next": null,
+      "@this": "minds/core/parcellationatlas/v1.0.0/05655b58-3b6f-49db-b285-64b5a0276f83",
+      "name": "v3 2017",
+      "@previous": "minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f"
+    }
   },{
     "name": "Allen Mouse Common Coordinate Framework v3 2015",
     "@id": "minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f",
     "availableIn": [{
       "@id": "minds/core/referencespace/v1.0.0/265d32a0-3d84-40a5-926f-bf89f68212b9",
       "name": "Allen Mouse Common Coordinate Framework v3"
-    }]
+    }],
+    "@version": {
+      "@next": "minds/core/parcellationatlas/v1.0.0/05655b58-3b6f-49db-b285-64b5a0276f83",
+      "@this": "minds/core/parcellationatlas/v1.0.0/39a1384b-8413-4d27-af8d-22432225401f",
+      "name": "v3 2015",
+      "@previous": null
+    }
   }]
 }

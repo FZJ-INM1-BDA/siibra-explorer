@@ -32,7 +32,7 @@ module.exports = merge(staticAssets, {
       {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         loader: '@ngtools/webpack',
-        exclude : /third_party|plugin_example/
+        exclude : /third_party|plugin_example|spec\.ts$/
       },
       {
         test : /\.(html|css)$/,
