@@ -84,7 +84,8 @@
           <atlas-layer-selector
             #alSelector="atlasLayerSelector"
             class="pe-all"
-            (iav-outsideClick)="alSelector.selectorExpanded = false">
+            (iav-outsideClick)="alSelector.selectorExpanded = false"
+            (closeAccordion)="uiNehubaContainer.accordionOpened = ''">
           </atlas-layer-selector>
           <mat-chip-list class="mb-2">
             <!-- additional layer -->

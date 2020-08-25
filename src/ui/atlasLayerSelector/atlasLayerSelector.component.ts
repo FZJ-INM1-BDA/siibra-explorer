@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChildren, QueryList } from "@angular/core";
+import {Component, OnInit, ViewChildren, QueryList, Output, EventEmitter} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
 import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap, filter } from "rxjs/operators";
@@ -36,6 +36,8 @@ export class AtlasLayerSelector implements OnInit {
     public availableTemplates$: Observable<any[]>
 
     public containerMaxWidth: number
+
+    @Output() public closeAccordion: EventEmitter<boolean> = new EventEmitter()
 
     constructor(private store$: Store<any>) {
       this.selectedAtlas$ = this.store$.pipe(
@@ -158,6 +160,7 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     selectTemplateWithName(template) {
+      this.closeAccordion.emit()
       this.store$.dispatch({type: CLEAR_CONNECTIVITY_REGION})
       this.store$.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
       this.store$.dispatch(
