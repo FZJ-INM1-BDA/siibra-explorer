@@ -111,7 +111,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
   )
 
   public selectedLayerVersions$ = this.store.pipe(
-    select(viewerStateParcVersionSelector, { showOnlyLatest: false }),
+    select(viewerStateParcVersionSelector),
   )
 
   constructor(
