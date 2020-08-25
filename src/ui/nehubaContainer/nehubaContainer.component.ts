@@ -741,9 +741,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
       if (sr?.length >= 1) this.setConnectivityRegion(sr[0].name)
       else {
-        this.store.dispatch({type: CLEAR_CONNECTIVITY_REGION})
-        this.store.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
-        if (this.accordionOpened === 'Connectivity') this.connectivityComponent.toggleConnectivityOnViewer(false)
+        this.disableConnectivity()
       }
       this.selectedRegions = sr
     }))
@@ -814,6 +812,12 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   setConnectivityRegion(regionName) {
     this.store.dispatch(viewerStateSetConnectivityRegion({ connectivityRegion: regionName }))
+  }
+
+  public disableConnectivity() {
+    this.store.dispatch({type: CLEAR_CONNECTIVITY_REGION})
+    this.store.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
+    if (this.accordionOpened === 'Connectivity') this.connectivityComponent.toggleConnectivityOnViewer(false)
   }
 
   sidebarAccordionOpened(title) {
