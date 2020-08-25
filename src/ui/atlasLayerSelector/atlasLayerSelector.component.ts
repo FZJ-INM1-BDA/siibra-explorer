@@ -5,7 +5,7 @@ import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeM
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { viewerStateGetSelectedAtlas, viewerStateAtlasParcellationSelector, viewerStateAtlasLatestParcellationSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector } from "src/services/state/viewerState/selectors";
 import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 
 @Component({
