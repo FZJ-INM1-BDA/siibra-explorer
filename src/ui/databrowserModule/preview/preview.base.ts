@@ -37,6 +37,7 @@ export class PreviewBase implements OnChanges{
     this.getDatasetPreviewFromId({ datasetSchema, datasetId, filename })
       .subscribe(
         file => {
+          if (!file) return
           this.fetchingFlag = false
           this.file = file
           this.previewtype = determinePreviewFileType(file)

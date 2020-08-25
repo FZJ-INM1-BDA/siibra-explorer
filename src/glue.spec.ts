@@ -316,6 +316,24 @@ describe('> glue.ts', () => {
         expect(colorMapMapSpy).toHaveBeenCalledWith(name, EnumColorMapName.VIRIDIS)
         expect(bgFlagSpy).toHaveBeenCalledWith(name, true)
       }))
+
+      it('> if returns 404, should be handled gracefully', fakeAsync(() => {
+
+        const ctrl = TestBed.inject(HttpTestingController)
+        const glue = TestBed.inject(DatasetPreviewGlue)
+
+        const { datasetId, filename } = file3
+
+        const obs$ = glue.getDatasetPreviewFromId({ datasetId, filename })
+        let expectedVal = 'defined'
+        obs$.subscribe(val => expectedVal = val)
+        tick(200)
+
+        const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${encodeURIComponent(datasetId)}/${encodeURIComponent(filename)}`)
+        req.flush(null, { status: 404, statusText: 'Not found' })
+
+        expect(expectedVal).toBeNull()
+      }))
     })
 
     describe('> #actionOnWidget', () => {
