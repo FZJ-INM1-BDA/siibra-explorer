@@ -162,7 +162,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
 
     public ngOnDestroy(): void {
       this.subscriptions.forEach(s => s.unsubscribe())
-      // this.defaultColorMap && this.setDefaultMap()
     }
 
     navigateToRegion(region) {
