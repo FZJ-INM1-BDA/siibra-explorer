@@ -493,6 +493,10 @@ markdown-dom pre code
 {
   z-index: 1!important;
 }
+.z-index-2
+{
+  z-index: 2!important;
+}
 .z-index-6
 {
   z-index: 6!important;

@@ -374,8 +374,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     )
   }
 
-  public bindFn(fn, arg){
-    return () => fn(arg)
+  public bindFns(fns){
+    return () => {
+      for (const [ fn, ...arg] of fns) {
+        fn(...arg)
+      }
+    }
   }
 
   public clearAdditionalLayer(layer: { ['@id']: string }){
