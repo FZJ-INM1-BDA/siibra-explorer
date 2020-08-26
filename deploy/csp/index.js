@@ -70,6 +70,7 @@ module.exports = (app) => {
         ...WHITE_LIST_SRC
       ],
       fontSrc: [
+        "'self'",
         '*.fontawesome.com',
         ...WHITE_LIST_SRC
       ],

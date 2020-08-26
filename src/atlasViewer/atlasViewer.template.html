@@ -181,31 +181,33 @@
               <!-- dismiss icon -->
               <mat-icon
                 *ngIf="dismissable"
-                (click)="clearAdditionalLayer(parcel)"
+                (click)="clearAdditionalLayer(parcel); $event.stopPropagation()"
                 fontSet="fas"
-                iav-stop="click"
                 fontIcon="fa-times">
               </mat-icon>
             </mat-chip>
           </ng-template>
 
           <!-- layer version selector -->
-          <mat-menu #layerVersionMenu class="bg-none">
+          <mat-menu #layerVersionMenu
+            class="bg-none box-shadow-none"
+            [hasBackdrop]="false">
             <ng-template matMenuContent let-layerVersionMenuTrigger="layerVersionMenuTrigger">
-
-              <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
-                <ng-container *ngTemplateOutlet="chipTmpl; context: {
-                  parcel: parcVer,
-                  selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
-                  dismissable: false,
-                  onclick: bindFns([
-                    [ selectParcellation.bind(this), parcVer ],
-                    [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
-                  ])
-                }">
+              <div (iav-outsideClick)="layerVersionMenuTrigger.closeMenu()">
+                <ng-container *ngFor="let parcVer of selectedLayerVersions$ | async">
+                  <ng-container *ngTemplateOutlet="chipTmpl; context: {
+                    parcel: parcVer,
+                    selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
+                    dismissable: false,
+                    onclick: bindFns([
+                      [ selectParcellation.bind(this), parcVer ],
+                      [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]
+                    ])
+                  }">
+                  </ng-container>
+                  <div class="mt-1"></div>
                 </ng-container>
-                <div class="mt-1"></div>
-              </ng-container>
+              </div>
             </ng-template>
           </mat-menu>
 
