@@ -369,7 +369,7 @@ markdown-dom pre code
 
 .pe-none
 {
-  pointer-events: none;
+  pointer-events: none!important;
 }
 
 .h-2rem
