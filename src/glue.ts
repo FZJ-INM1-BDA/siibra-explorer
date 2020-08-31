@@ -3,7 +3,7 @@ import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angula
 import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule/pure"
 import { Subscription, Observable, forkJoin, of, merge } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
-import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError } from "rxjs/operators"
+import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError, bufferTime } from "rxjs/operators"
 import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
 import { getIdObj } from 'common/util'
 import { MatDialogRef } from "@angular/material/dialog"
@@ -16,6 +16,7 @@ import { EnumColorMapName } from "./util/colorMaps"
 import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
+import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -97,6 +98,20 @@ export class GlueEffects {
     mapTo(uiActionSetPreviewingDatasetFiles({
       previewingDatasetFiles: []
     }))
+  )
+
+  @Effect()
+  resetConnectivityMode: Observable<any> = this.store$.pipe(
+    select(viewerStateSelectedRegionsSelector),
+    pairwise(),
+    filter(([o, n]) => o.length > 0 && n.length === 0),
+    mapTo(
+      ngViewerActionClearView({
+        payload: {
+          'Connectivity': false
+        }
+      })
+    )
   )
 
   constructor(
@@ -248,6 +263,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
       select(ngViewerSelectorClearView),
       distinctUntilChanged(),
       filter(val => !val),
+      skip(1),
       mapTo(arr)
     ))
   )
@@ -350,6 +366,38 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
         )
       ).pipe(
         map(prvFilterNull),
+        bufferTime(15),
+        map(arr => {
+          const prvToDismiss = []
+          const prvToShow = []
+
+          const showPrvIds = new Set()
+          const dismissPrvIds = new Set()
+
+          for (const { prvToDismiss: dismisses, prvToShow: shows } of arr) {
+            for (const dismiss of dismisses) {
+
+              const id = DatasetPreviewGlue.GetDatasetPreviewId(dismiss)
+              if (!dismissPrvIds.has(id)) {
+                dismissPrvIds.add(id)
+                prvToDismiss.push(dismiss)
+              }
+            }
+
+            for (const show of shows) {
+              const id = DatasetPreviewGlue.GetDatasetPreviewId(show)
+              if (!dismissPrvIds.has(id) && !showPrvIds.has(id)) {
+                showPrvIds.add(id)
+                prvToShow.push(show)
+              }
+            }
+          }
+
+          return {
+            prvToDismiss,
+            prvToShow
+          }
+        }),
         withLatestFrom(this.store$.pipe(
           select(state => state?.viewerState?.templateSelected || null),
           distinctUntilChanged(),

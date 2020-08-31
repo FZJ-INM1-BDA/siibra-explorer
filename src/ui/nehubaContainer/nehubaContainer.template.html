@@ -308,11 +308,9 @@
       let-iavNgIf="iavNgIf"
       let-content="content">
       <mat-expansion-panel class="mt-1 mb-1"
-        [expanded]="accordionOpened === title"
-        (opened)="sidebarAccordionOpened(title); accordionOpened = title"
-        (closed)="sidebarAccordionClosed(title); accordionOpened === title? accordionOpened = '' : null"
         hideToggle
-        *ngIf="iavNgIf">
+        *ngIf="iavNgIf"
+        #expansionPanel="matExpansionPanel">
 
         <mat-expansion-panel-header>
 
@@ -333,10 +331,8 @@
         </mat-expansion-panel-header>
 
         <!-- content -->
-        <ng-template matExpansionPanelContent>
-          <ng-container *ngTemplateOutlet="content">
-          </ng-container>
-        </ng-template>
+        <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
+        </ng-container>
       </mat-expansion-panel>
     </ng-template>
 
@@ -394,10 +390,16 @@
     </ng-container>
 
     <!-- Connectivity -->
-    <ng-template #connectivityContentTmpl>
+    <ng-template #connectivityContentTmpl let-expansionPanel="expansionPanel">
       <mat-card-content class="flex-grow-1 flex-shrink-1 w-100">
-        <connectivity-browser class="pe-all flex-shrink-1" #connectivityComponent>
-        </connectivity-browser>
+        <ng-container *ngFor="let region of selectedRegions$ | async">
+          <connectivity-browser class="pe-all flex-shrink-1"
+            [region]="region"
+            (setOpenState)="expansionPanel.expanded = $event"
+            [accordionExpanded]="expansionPanel.expanded"
+            #connectivityComponent>
+          </connectivity-browser>
+        </ng-container>
       </mat-card-content>
     </ng-template>
 

@@ -27,6 +27,22 @@ export const viewerStateSelectedParcellationSelector = createSelector(
   viewerState => viewerState['parcellationSelected']
 )
 
+export const viewerStateAllRegionsFlattenedRegionSelector = createSelector(
+  viewerStateSelectedParcellationSelector,
+  parc => {
+    const returnArr = []
+    const processRegion = region => {
+      const { children, ...rest } = region
+      returnArr.push({ ...rest })
+      region.children && Array.isArray(region.children) && region.children.forEach(processRegion)
+    }
+    if (parc && parc.regions && Array.isArray(parc.regions)) {
+      parc.regions.forEach(processRegion)
+    }
+    return returnArr
+  }
+)
+
 export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
   state => state[viewerStateHelperStoreName],
   state => state['viewerState'],

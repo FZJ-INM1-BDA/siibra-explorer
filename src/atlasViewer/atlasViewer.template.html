@@ -84,8 +84,7 @@
           <atlas-layer-selector
             #alSelector="atlasLayerSelector"
             class="pe-all"
-            (iav-outsideClick)="alSelector.selectorExpanded = false"
-            (closeAccordion)="uiNehubaContainer.accordionOpened = ''">
+            (iav-outsideClick)="alSelector.selectorExpanded = false">
           </atlas-layer-selector>
           <mat-chip-list class="mb-2">
             <!-- additional layer -->
@@ -259,17 +258,17 @@
                   </mat-icon>
                 </mat-chip>
 
-                <mat-chip *ngIf="(overwrittenColorMap$ | async) === 'connectivity' && !previewDirective.active"
-                          (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
-                          class="pe-all position-relative ml-8-n">
+                <mat-chip *ngFor="let key of clearViewKeys$ | async"
+                  (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                  class="pe-all position-relative ml-8-n">
                   <span class="pl-4">
-                    Connectivity
+                    {{ key }}
                   </span>
-                  <mat-icon
-                          (click)="uiNehubaContainer.accordionOpened = ''"
-                          fontSet="fas"
-                          iav-stop="click"
-                          fontIcon="fa-times">
+                  <mat-icon (click)="unsetClearViewByKey(key)"
+                    fontSet="fas"
+                    iav-stop="click"
+                    fontIcon="fa-times">
+
                   </mat-icon>
                 </mat-chip>
               </ng-container>
