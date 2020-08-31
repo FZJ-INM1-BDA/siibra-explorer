@@ -97,6 +97,7 @@ export class RegionBase {
   }
 
   changeView(sameRegion) {
+    console.log('Changing view')
     const {
       template,
       parcellation,

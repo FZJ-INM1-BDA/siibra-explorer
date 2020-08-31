@@ -26,6 +26,8 @@ export const cvtStateToSearchParam = (state: any): URLSearchParams => {
   const { viewerState, pluginState, uiState } = state
   const { templateSelected, parcellationSelected, navigation, regionsSelected, standaloneVolumes } = viewerState
 
+  // console.log(viewerState)
+
   if (standaloneVolumes && Array.isArray(standaloneVolumes) && standaloneVolumes.length > 0) {
     searchParam.set('standaloneVolumes', JSON.stringify(standaloneVolumes))
   } else {
