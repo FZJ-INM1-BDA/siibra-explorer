@@ -37,8 +37,6 @@ export class AtlasLayerSelector implements OnInit {
 
     public containerMaxWidth: number
 
-    @Output() public closeAccordion: EventEmitter<boolean> = new EventEmitter()
-
     constructor(private store$: Store<any>) {
       this.selectedAtlas$ = this.store$.pipe(
         select(viewerStateGetSelectedAtlas),
@@ -160,9 +158,6 @@ export class AtlasLayerSelector implements OnInit {
     }
 
     selectTemplateWithName(template) {
-      this.closeAccordion.emit()
-      this.store$.dispatch({type: CLEAR_CONNECTIVITY_REGION})
-      this.store$.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
       this.store$.dispatch(
         viewerStateSelectTemplateWithId({ payload: template })
       )

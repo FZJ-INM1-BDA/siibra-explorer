@@ -14,19 +14,17 @@ import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
-import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer, ngViewerActionClearView } from "src/services/state/ngViewerState.store.helper";
+import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
 import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import {
-  viewerStateSetConnectivityRegion,
   viewerStateDblClickOnViewer,
 } from "src/services/state/viewerState.store.helper";
 
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, isFirstRow, isFirstCell } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
-import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -252,7 +250,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public hoveredPanelIndices$: Observable<number>
 
   @ViewChild('connectivityComponent') public connectivityComponent: ConnectivityBrowserComponent
-  public accordionOpened: string = ''
 
   constructor(
     private pureConstantService: PureContantService,
@@ -739,10 +736,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.subscriptions.push(this.selectedRegions$.subscribe(sr => {
-      if (sr?.length >= 1) this.setConnectivityRegion(sr[0].name)
-      else {
-        this.disableConnectivity()
-      }
       this.selectedRegions = sr
     }))
 
@@ -808,41 +801,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     if (this.currentOnHoverObs$) {
       this.currOnHoverObsSub = this.currentOnHoverObs$.subscribe(({ segments }) => this.onHoverSegments$.next(segments))
     }
-  }
-
-  setConnectivityRegion(regionName) {
-    this.store.dispatch(viewerStateSetConnectivityRegion({ connectivityRegion: regionName }))
-  }
-
-  public disableConnectivity() {
-    this.store.dispatch({type: CLEAR_CONNECTIVITY_REGION})
-    this.store.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
-    if (this.accordionOpened === 'Connectivity') this.connectivityComponent.toggleConnectivityOnViewer(false)
-  }
-
-  sidebarAccordionOpened(title) {
-    switch (title) {
-    case 'Connectivity': {
-        this.connectivityComponent?.toggleConnectivityOnViewer( {checked: true})
-        break
-    }}
-    this.store.dispatch(
-      ngViewerActionClearView({ payload: {
-        ['connectivity-shown']: true
-      } })
-    )
-  }
-  sidebarAccordionClosed(title) {
-    switch (title) {
-    case 'Connectivity': {
-        this.connectivityComponent?.toggleConnectivityOnViewer( {checked: false})
-        break
-    }}
-    this.store.dispatch(
-      ngViewerActionClearView({ payload: {
-        ['connectivity-shown']: false
-      } })
-    )
   }
   
   public ngOnDestroy() {

@@ -42,6 +42,8 @@ import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
 import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateSelectParcellation } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector } from "src/services/state/viewerState/selectors";
+import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
+import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 
 /**
  * TODO
@@ -112,6 +114,16 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectedLayerVersions$ = this.store.pipe(
     select(viewerStateParcVersionSelector),
+  )
+
+  private selectedParcellation$: Observable<any>
+  public selectedParcellation: any
+
+  private cookieDialogRef: MatDialogRef<any>
+  private kgTosDialogRef: MatDialogRef<any>
+
+  public clearViewKeys$ = this.store.pipe(
+    select(ngViewerSelectorClearViewEntries)
   )
 
   constructor(
@@ -223,12 +235,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       this.el.nativeElement.removeAttribute('data-error')
     }
   }
-
-  private selectedParcellation$: Observable<any>
-  public selectedParcellation: any
-
-  private cookieDialogRef: MatDialogRef<any>
-  private kgTosDialogRef: MatDialogRef<any>
 
   public ngOnInit() {
     this.meetsRequirement = this.meetsRequirements()
@@ -366,6 +372,21 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     })
   }
 
+  /**
+   * For completeness sake. Root element should never be destroyed.
+   */
+  public ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe())
+  }
+
+  public unsetClearViewByKey(key:string){
+    this.store.dispatch(
+      ngViewerActionClearView({ payload: {
+        [key]: false
+      }})
+    )
+  }
+
   public selectParcellation(parc: any) {
     this.store.dispatch(
       viewerStateSelectParcellation({
@@ -411,13 +432,6 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     this.nehubaClickOverride(next)
 
-  }
-
-  /**
-   * For completeness sake. Root element should never be destroyed.
-   */
-  public ngOnDestroy() {
-    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   /**

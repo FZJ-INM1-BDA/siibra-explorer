@@ -1,16 +1,17 @@
 import { createSelector } from "@ngrx/store";
 
-export const ngViewerSelectorClearView = createSelector(
+export const ngViewerSelectorClearViewEntries = createSelector(
   (state: any) => state?.ngViewerState?.clearViewQueue,
-  (clearViewQueue, props) => {
-    
-    if (!!props && !!props.id) {
-      for (const key in clearViewQueue) {
-        if (key === props.id) return !!clearViewQueue[key]
-      }
-      return false
-    } else {
-      return Object.keys(clearViewQueue).some(key => !!clearViewQueue[key])
+  (clearViewQueue = {}) => {
+    const returnKeys = []
+    for (const key in clearViewQueue) {
+      if (!!clearViewQueue[key]) returnKeys.push(key)
     }
+    return returnKeys
   }
+)
+
+export const ngViewerSelectorClearView = createSelector(
+  ngViewerSelectorClearViewEntries,
+  keys => keys.length > 0
 )

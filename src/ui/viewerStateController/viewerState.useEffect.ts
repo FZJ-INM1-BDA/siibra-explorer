@@ -4,11 +4,13 @@ import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
 import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS } from "src/services/stateStore.service";
+import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, viewerState } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateHelperStoreName } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateHelperStoreName, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState.store.helper";
+import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
+import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 
 @Injectable({
   providedIn: 'root',
@@ -42,9 +44,25 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   @Effect()
   public navigateToRegion$: Observable<any>
 
-
   @Effect()
   public onTemplateSelectClearStandAloneVolumes$: Observable<any>
+
+  @Effect()
+  public onTemplateSelectUnsetAllClearQueues$: Observable<any> = this.store$.pipe(
+    select(viewerStateSelectedTemplateSelector),
+    withLatestFrom(this.store$.pipe(
+      select(ngViewerSelectorClearViewEntries)
+    )),
+    map(([_, clearViewQueue]) => {
+      const newVal = {}
+      for (const key of clearViewQueue) {
+        newVal[key] = false
+      }
+      return ngViewerActionClearView({
+        payload: newVal
+      })
+    })
+  )
 
   constructor(
     private actions$: Actions,
@@ -62,8 +80,8 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       distinctUntilChanged(),
     )
 
-    this.onTemplateSelectClearStandAloneVolumes$ = viewerState$.pipe(
-      select('templateSelected'),
+    this.onTemplateSelectClearStandAloneVolumes$ = this.store$.pipe(
+      select(viewerStateSelectedTemplateSelector),
       distinctUntilChanged(),
       mapTo({ type: CLEAR_STANDALONE_VOLUMES })
     )

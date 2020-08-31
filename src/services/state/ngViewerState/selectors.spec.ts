@@ -24,14 +24,5 @@ describe('> ngViewerState/selectors.ts', () => {
         expect(result).toEqual(true)
       })
     })
-    describe('> when prop is provided', () => {
-      it('> only provides clear view status of the required', () => {
-        clearViewQueue['hello - world'] = 1
-        const result0 = ngViewerSelectorClearView.projector(clearViewQueue, { id: 'hello - world' })
-        const result1 = ngViewerSelectorClearView.projector(clearViewQueue, { id: 'foo bar' })
-        expect(result0).toEqual(true)
-        expect(result1).toEqual(false)
-      })
-    })
   })
 })

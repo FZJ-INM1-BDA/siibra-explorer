@@ -1,71 +1,102 @@
 import {
-  AfterContentChecked,
   AfterViewInit, ChangeDetectorRef,
   Component,
-  ElementRef, EventEmitter, Input,
-  OnDestroy, Output,
+  ElementRef,
+  EventEmitter, 
+  OnDestroy,
+  Output,
   ViewChild,
+  Input,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
-import {fromEvent, Observable, Subscription} from "rxjs";
-import {distinctUntilChanged, filter, map, shareReplay} from "rxjs/operators";
+import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
+import {distinctUntilChanged, map } from "rxjs/operators";
 import {CLEAR_CONNECTIVITY_REGION, SELECT_REGIONS, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
-import {isDefined, safeFilter} from "src/services/stateStore.service";
+import { safeFilter} from "src/services/stateStore.service";
 import { viewerStateNavigateToRegion } from "src/services/state/viewerState.store.helper";
+import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
+import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
+import { viewerStateAllRegionsFlattenedRegionSelector } from "src/services/state/viewerState/selectors";
+
+const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
 @Component({
-  selector: 'connectivity-browser',
-  templateUrl: './connectivityBrowser.template.html',
+    selector: 'connectivity-browser',
+    templateUrl: './connectivityBrowser.template.html',
 })
-export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, AfterContentChecked {
+export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
 
-    public region: string
+    private setColorMap$: Subject<boolean> = new Subject()
+
+    /**
+     * accordion expansion should only toggle the clearviewqueue state
+     * which should be the single source of truth
+     * setcolormaps$ is set by the presence/absence of clearviewqueue[CONNECTIVITY_NAME_PLATE]
+     */
+    private _isFirstUpdate = true
+
+    @Input()
+    set accordionExpanded(flag: boolean){
+      /**
+       * ignore first update
+       */
+      if (this._isFirstUpdate) {
+        this._isFirstUpdate = false
+        return
+      }
+      this.store$.dispatch(
+        ngViewerActionClearView({ payload: {
+          [CONNECTIVITY_NAME_PLATE]: flag
+        }})
+      )
+    }
+
+    @Output()
+    setOpenState: EventEmitter<boolean> = new EventEmitter()
+
+    @Input()
+    set region(val){
+      const newRegionName = val && val.name
+
+      if (!val) {
+        this.store$.dispatch({
+            type: SET_CONNECTIVITY_VISIBLE,
+            payload: false,
+        })
+        return
+      }
+
+      if (newRegionName !== this.regionName && this.defaultColorMap) {
+          this.restoreDefaultColormap()
+      } 
+      this.regionName = newRegionName
+
+      // TODO may not be necessary
+      this.changeDetectionRef.detectChanges()
+    }
+    
+    public regionName: string
     public datasetList: any[] = []
     public selectedDataset: any
     public connectedAreas = []
-    public componentHeight: any
-    public showConnectivityToggle: boolean = false
-
-    private connectivityRegion$: Observable<any>
-    private templateSelected$: Observable<any>
-    private selectedParcellation$: Observable<any>
+    
+    private selectedParcellationFlatRegions$ = this.store$.pipe(
+      select(viewerStateAllRegionsFlattenedRegionSelector)
+    )
     public overwrittenColorMap$: Observable<any>
 
     private subscriptions: Subscription[] = []
     public expandMenuIndex = -1
     public allRegions = []
     public defaultColorMap: Map<string, Map<number, {red: number, green: number, blue: number}>>
-    public math = Math
 
     @ViewChild('connectivityComponent', {read: ElementRef}) public connectivityComponentElement: ElementRef<HTMLHbpConnectivityMatrixRowElement>
     @ViewChild('fullConnectivityGrid') public fullConnectivityGridElement: ElementRef<HTMLFullConnectivityGridElement>
-
-    @Output() public closeConnectivity: EventEmitter<boolean> = new EventEmitter()
-    @Output() public connectedAreaCount: EventEmitter<number> = new EventEmitter()
 
     constructor(
         private store$: Store<any>,
         private changeDetectionRef: ChangeDetectorRef,
     ) {
-      this.selectedParcellation$ = this.store$.pipe(
-        select('viewerState'),
-        filter(state => isDefined(state) && isDefined(state.parcellationSelected)),
-        map(state => state.parcellationSelected),
-        distinctUntilChanged(),
-      )
-
-      this.connectivityRegion$ = this.store$.pipe(
-        select('viewerState'),
-        safeFilter('connectivityRegion'),
-        map(state => state.connectivityRegion),
-        distinctUntilChanged()
-      )
-
-      this.templateSelected$ = this.store$.pipe(
-        select('viewerState'),
-        select('templateSelected'),
-        shareReplay(1)
-      )
 
       this.overwrittenColorMap$ = this.store$.pipe(
         select('viewerState'),
@@ -75,49 +106,66 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       )
     }
 
-    public ngAfterContentChecked(): void {
-      this.componentHeight = this.connectivityComponentElement?.nativeElement.clientHeight
-    }
-
     public ngAfterViewInit(): void {
+
       this.subscriptions.push(
-        this.selectedParcellation$.subscribe(parcellation => {
-          this.closeConnectivityView(false)
-          if (parcellation && parcellation.hasAdditionalViewMode && parcellation.hasAdditionalViewMode.includes('connectivity')) {
-            if (parcellation.regions && parcellation.regions.length) {
-              this.allRegions = []
-              this.getAllRegionsFromParcellation(parcellation.regions)
-            }
-          }
-        }),
-        this.connectivityRegion$.subscribe(cr => {
-          if (cr && cr.length) {
-            if (this.region !== cr && this.defaultColorMap) {
-              this.closeConnectivityView()
-            }
-            this.region = cr
-            this.changeDetectionRef.detectChanges()
-          } else {
-            this.store$.dispatch({
-              type: SET_CONNECTIVITY_VISIBLE,
-              payload: false,
-            })
-          }
+        this.store$.pipe(
+          select(ngViewerSelectorClearViewEntries),
+        ).subscribe(keys => {
+          this.setColorMap$.next(keys.includes(CONNECTIVITY_NAME_PLATE))
+        })
+      )
+
+      this.subscriptions.push(
+        this.store$.pipe(
+          select(ngViewerSelectorClearViewEntries),
+        ).subscribe(keys => {
+          this.setOpenState.emit(keys.includes(CONNECTIVITY_NAME_PLATE))
+        })
+      )
+
+      this.subscriptions.push(
+        this.selectedParcellationFlatRegions$.subscribe(flattenedRegions => {
+          this.defaultColorMap = null
+          this.allRegions = flattenedRegions
         }),
       )
-      this.subscriptions.push(this.overwrittenColorMap$.subscribe(ocm => {
-        this.showConnectivityToggle = ocm === 'connectivity'? true : false
-      }))
+
+      /**
+       * setting/restoring colormap
+       */
       this.subscriptions.push(
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'connectivityDataReceived', { capture: true })
-          .subscribe((e: CustomEvent) => {
-            this.connectedAreas = e.detail
-            this.connectedAreaCount.emit(this.connectedAreas.length)
-            if (this.connectedAreas.length > 0 && this.showConnectivityToggle) {
-              this.addNewColorMap()
-            } else {
-              this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
-            }          }),
+        combineLatest(
+          this.setColorMap$.pipe(
+            distinctUntilChanged()
+          ),
+          fromEvent(this.connectivityComponentElement.nativeElement, 'connectivityDataReceived').pipe(
+            map((e: CustomEvent) => e.detail)
+          )
+        ).subscribe(([flag, connectedAreas]) => {
+
+          this.connectedAreas = connectedAreas
+          
+          if (flag) {
+            this.addNewColorMap()
+            this.store$.dispatch({
+              type: SET_CONNECTIVITY_VISIBLE,
+              payload: 'connectivity',
+            })
+          } else {
+            this.restoreDefaultColormap()
+
+            /**
+             * TODO
+             * may no longer be necessary
+             */
+            this.store$.dispatch({type: CLEAR_CONNECTIVITY_REGION})
+            this.store$.dispatch({type: SET_CONNECTIVITY_VISIBLE, payload: null})
+          }
+        })
+      )
+
+      this.subscriptions.push(
         fromEvent(this.connectivityComponentElement?.nativeElement, 'collapsedMenuChanged', { capture: true })
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
@@ -133,35 +181,18 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
               // ToDo Fix in future to use component
               const a = document.querySelector('hbp-connectivity-matrix-row')
               a.downloadCSV()
-            } else if (e.detail.name === 'Apply colors to viewer') {
-              this.defaultColorMap && this.toggleConnectivityOnViewer( {checked: this.showConnectivityToggle? false : true})
             }
           }),
       )
-      this.showConnectivityToggle = true
     }
 
-    toggleConnectivityOnViewer(event) {
-      if (event.checked) {
-        this.showConnectivityToggle = true
-        this.addNewColorMap()
-      } else {
-        this.showConnectivityToggle = false
-        if (this.defaultColorMap) this.setDefaultMap()
-        this.store$.dispatch({
-          type: SET_CONNECTIVITY_VISIBLE,
-          payload: null,
-        })
-      }
+    public ngOnDestroy(): void {
+      this.subscriptions.forEach(s => s.unsubscribe())
     }
     
     // ToDo Affect on component
     changeDataset(event) {
       this.selectedDataset = event.value
-    }
-
-    public ngOnDestroy(): void {
-      this.subscriptions.forEach(s => s.unsubscribe())
     }
 
     navigateToRegion(region) {
@@ -183,29 +214,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       return this.allRegions.find(ar => ar.name === region)
     }
 
-    public closeConnectivityView(setDefault = true) {
-      if (this.defaultColorMap && setDefault) this.setDefaultMap()
-      this.closeConnectivity.emit()
-      this.store$.dispatch({
-        type: SET_CONNECTIVITY_VISIBLE,
-        payload: null,
-      })
-    }
-
-    public setDefaultMap() {
-      this.allRegions.forEach(r => {
-        if (r && r.ngId && r.rgb && this.defaultColorMap) {
-          this.defaultColorMap.get(r.ngId).set(r.labelIndex, {red: r.rgb[0], green: r.rgb[1], blue: r.rgb[2]})
-        }
-      })
+    public restoreDefaultColormap() {
+      console.log('restore')
+      debugger
+      if (!this.defaultColorMap) return
       getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(this.defaultColorMap)
     }
 
     public addNewColorMap() {
-      this.store$.dispatch({
-        type: SET_CONNECTIVITY_VISIBLE,
-        payload: 'connectivity',
-      })
       this.defaultColorMap = new Map(getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
 
       const existingMap: Map<string, Map<number, {red: number, green: number, blue: number}>> = (getWindow().interactiveViewer.viewerHandle.getLayersSegmentColourMap())
@@ -229,15 +245,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy, A
       getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(colorMap)
     }
 
-    public getAllRegionsFromParcellation = (regions) => {
-      for (const region of regions) {
-        if (region.children && region.children.length) {
-          this.getAllRegionsFromParcellation(region.children)
-        } else {
-          this.allRegions.push(region)
-        }
-      }
-    }
     exportConnectivityProfile() {
       const a = document.querySelector('hbp-connectivity-matrix-row')
       a.downloadCSV()
