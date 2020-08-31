@@ -187,6 +187,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
     }
 
     public ngOnDestroy(): void {
+      this.restoreDefaultColormap()
       this.subscriptions.forEach(s => s.unsubscribe())
     }
     

@@ -1,4 +1,4 @@
-import { TestBed, tick, fakeAsync } from "@angular/core/testing"
+import { TestBed, tick, fakeAsync, discardPeriodicTasks, flush } from "@angular/core/testing"
 import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
@@ -262,6 +262,8 @@ describe('> glue.ts', () => {
         // debounce at 100ms
         tick(200)
         ctrl.expectNone({})
+
+        discardPeriodicTasks()
       }))
       it('> on set state, calls end point to fetch full data', fakeAsync(() => {
 
@@ -281,6 +283,7 @@ describe('> glue.ts', () => {
 
         const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
+        discardPeriodicTasks()
       }))
 
       it('> on previewing nifti, thresholds, colormap and remove bg flag set properly', fakeAsync(() => {
@@ -309,12 +312,14 @@ describe('> glue.ts', () => {
         const req = ctrl.expectOne(`${DS_PREVIEW_URL}/${encodeURIComponent('minds/core/dataset/v1.0.0')}/${datasetId}/${encodeURIComponent(filename)}`)
         req.flush(nifti)
 
+        tick(200)
         const { name, volumeMetadata } = nifti
         const { min, max } = volumeMetadata
         expect(highThresholdMapSpy).toHaveBeenCalledWith(name, max)
         expect(lowThresholdMapSpy).toHaveBeenCalledWith(name, min)
         expect(colorMapMapSpy).toHaveBeenCalledWith(name, EnumColorMapName.VIRIDIS)
         expect(bgFlagSpy).toHaveBeenCalledWith(name, true)
+        discardPeriodicTasks()
       }))
 
       it('> if returns 404, should be handled gracefully', fakeAsync(() => {
@@ -333,6 +338,7 @@ describe('> glue.ts', () => {
         req.flush(null, { status: 404, statusText: 'Not found' })
 
         expect(expectedVal).toBeNull()
+        discardPeriodicTasks()
       }))
     })
 
@@ -351,6 +357,7 @@ describe('> glue.ts', () => {
         })
         tick(200)
         expect(actionOnWidgetSpy).not.toHaveBeenCalled()
+        discardPeriodicTasks()
       }))
 
       it('> correctly calls actionOnWidgetSpy on create', fakeAsync(() => {
@@ -377,7 +384,7 @@ describe('> glue.ts', () => {
 
         const [ type, cmp, option, ...rest ] = args[0]
         expect(type).toEqual(EnumActionToWidget.OPEN)
-
+        discardPeriodicTasks()
       }))
   
       it('> correctly calls actionOnWidgetSpy twice when needed', fakeAsync(() => {
@@ -423,6 +430,7 @@ describe('> glue.ts', () => {
 
         expect(cmp0).toBeTruthy()
         expect(cmp0).toBe(cmp1)
+        discardPeriodicTasks()
       }))
 
       it('> correctly calls actionOnWidgetSpy on change of state', fakeAsync(() => {
@@ -472,6 +480,7 @@ describe('> glue.ts', () => {
         expect(type1).toEqual(EnumActionToWidget.CLOSE)
         expect(cmp1).toBe(null)
         expect(option1.id).toEqual(mockActionOnSpyReturnVal1.id)
+        discardPeriodicTasks()
       }))
 
 
@@ -493,6 +502,7 @@ describe('> glue.ts', () => {
         req.flush(nifti)
 
         expect(actionOnWidgetSpy).not.toHaveBeenCalled()
+        discardPeriodicTasks()
       }))
       
     })
@@ -520,6 +530,8 @@ describe('> glue.ts', () => {
             a: region1.originDatasets
           })
         )
+
+        discardPeriodicTasks()
       }))
 
       it('> when regions are selected without originDatasets, emits empty array', () => {
@@ -575,6 +587,8 @@ describe('> glue.ts', () => {
             a: expectedOriginDatasets
           })
         )
+
+        discardPeriodicTasks()
       }))
 
       it('> if regions with multiple originDatasets are selected, emit array containing all origindatasets', fakeAsync(() => {
@@ -627,6 +641,7 @@ describe('> glue.ts', () => {
             a: expectedOriginDatasets
           })
         )
+        discardPeriodicTasks()
       }))
     })
 
@@ -672,6 +687,8 @@ describe('> glue.ts', () => {
             } ]
           })
         )
+
+        discardPeriodicTasks()
       }))
     })
 
@@ -721,6 +738,7 @@ describe('> glue.ts', () => {
         )
 
         tick(200)
+        discardPeriodicTasks()
       }))
     })
 
@@ -757,6 +775,7 @@ describe('> glue.ts', () => {
         )
 
         tick(200)
+        discardPeriodicTasks()
       }))
     })
 
@@ -765,7 +784,10 @@ describe('> glue.ts', () => {
         const store = TestBed.inject(MockStore)
         const overridenSelector = store.overrideSelector(ngViewerSelectorClearView, true)
 
-        const overridenSelector$ = hot('ab', {
+        /**
+         * skips first false
+         */
+        const overridenSelector$ = hot('bab', {
           a: true,
           b: false
         })
@@ -792,7 +814,7 @@ describe('> glue.ts', () => {
         })
 
         expect(glue.onClearviewAddPreview$).toBeObservable(
-          hot('-a', {
+          hot('--a', {
             a: [{
               ...nifti,
               filename: region1.originDatasets[0].filename,
@@ -803,6 +825,7 @@ describe('> glue.ts', () => {
         )
 
         tick(200)
+        discardPeriodicTasks()
       }))
     })
   })

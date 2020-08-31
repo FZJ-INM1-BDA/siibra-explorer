@@ -985,7 +985,18 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         }))
       },
       segmentColourMap : new Map(),
-      getLayersSegmentColourMap: () => this.nehubaViewer.multiNgIdColorMap,
+      getLayersSegmentColourMap: () => {
+        const newMainMap = new Map()
+        for (const [key, colormap] of this.nehubaViewer.multiNgIdColorMap.entries()) {
+          const newColormap = new Map()
+          newMainMap.set(key, newColormap)
+          
+          for (const [lableIndex, entry] of colormap.entries()) {
+            newColormap.set(lableIndex, JSON.parse(JSON.stringify(entry)))
+          }
+        }
+        return newMainMap
+      },
       applyColourMap : (_map) => {
         throw new Error(`apply color map has been deprecated. use applyLayersColourMap instead`)
       },
