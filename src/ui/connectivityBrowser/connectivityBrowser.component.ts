@@ -21,8 +21,8 @@ import { viewerStateAllRegionsFlattenedRegionSelector } from "src/services/state
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
 @Component({
-    selector: 'connectivity-browser',
-    templateUrl: './connectivityBrowser.template.html',
+  selector: 'connectivity-browser',
+  templateUrl: './connectivityBrowser.template.html',
 })
 export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
 
@@ -60,14 +60,14 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
 
       if (!val) {
         this.store$.dispatch({
-            type: SET_CONNECTIVITY_VISIBLE,
-            payload: false,
+          type: SET_CONNECTIVITY_VISIBLE,
+          payload: false,
         })
         return
       }
 
       if (newRegionName !== this.regionName && this.defaultColorMap) {
-          this.restoreDefaultColormap()
+        this.restoreDefaultColormap()
       } 
       this.regionName = newRegionName
 
@@ -215,8 +215,6 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
     }
 
     public restoreDefaultColormap() {
-      console.log('restore')
-      debugger
       if (!this.defaultColorMap) return
       getWindow().interactiveViewer.viewerHandle.applyLayersColourMap(this.defaultColorMap)
     }

@@ -379,7 +379,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
 
-  public unsetClearViewByKey(key:string){
+  public unsetClearViewByKey(key: string){
     this.store.dispatch(
       ngViewerActionClearView({ payload: {
         [key]: false
