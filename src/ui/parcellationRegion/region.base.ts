@@ -7,6 +7,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
+import { intToRgb } from 'common/util'
 
 export class RegionBase {
 
@@ -20,10 +21,11 @@ export class RegionBase {
     this._region = val
     this.region$.next(this._region)
     if (!this._region) return
-    if (!this._region.rgb) return
-    this.rgbString = `rgb(${this._region.rgb.join(',')})`
-    const [h, s, l] = rgbToHsl(...this._region.rgb)
-    this.rgbDarkmode = l < 0.4
+
+    const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
+    this.rgbString = `rgb(${rgb.join(',')})`
+    const [_h, _s, l] = rgbToHsl(...rgb)
+    this.rgbDarkmode = l < 0.65
   }
 
   get region(){

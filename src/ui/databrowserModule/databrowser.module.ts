@@ -43,6 +43,7 @@ import { FilterPreviewByType } from "./preview/filterPreview.pipe";
 import { PreviewCardComponent } from "./preview/previewCard/previewCard.component";
 import { LayerBrowserModule } from "../layerbrowser";
 import { DatabrowserDirective } from "./databrowser/databrowser.directive";
+import { ContributorModule } from "./contributor";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -59,6 +60,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
     UtilModule,
     AngularMaterialModule,
     LayerBrowserModule,
+    ContributorModule,
   ],
   declarations: [
     DataBrowser,

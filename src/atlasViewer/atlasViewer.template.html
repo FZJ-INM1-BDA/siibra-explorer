@@ -143,10 +143,16 @@
             let-parcel="parcel"
             let-selected="selected"
             let-dismissable="dismissable"
+            let-chipClass="class"
             let-onclick="onclick">
-            <mat-chip class="pe-all position-relative z-index-2" (click)="onclick && onclick()" [selected]="selected">
+            <mat-chip class="pe-all position-relative z-index-2 d-inline-flex justify-content-between"
+              [ngClass]="chipClass"
+              (click)="onclick && onclick()"
+              [selected]="selected">
               
-              {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
+              <span>
+                {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
+              </span>
 
               <!-- info icon -->
               <ng-template [ngIf]="parcel?.originDatasets?.length > 0" [ngIfElse]="infoIconBasic">
@@ -198,6 +204,7 @@
                     parcel: parcVer,
                     selected: selectedParcellation && selectedParcellation['@id'] === parcVer['@id'],
                     dismissable: false,
+                    class: 'w-100',
                     onclick: bindFns([
                       [ selectParcellation.bind(this), parcVer ],
                       [ layerVersionMenuTrigger.closeMenu.bind(layerVersionMenuTrigger) ]

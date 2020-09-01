@@ -44,9 +44,12 @@
 
   <!-- contributors, if publications not available -->
   <ng-container *ngIf="publications && publications.length == 0 && contributors && contributors.length > 0">
-    <i class="small" *ngFor="let contributor of contributors; let lastFlag = last;">
-      {{ contributor }}{{ lastFlag ? '' : ',' }}
-    </i>
+    <ng-container *ngFor="let contributor of contributors; let lastFlag = last;">
+      <a [href]="contributor | getContributorKgLink" class="iv-custom-comp" target="_blank">
+        {{ contributor['schema.org/shortName'] || contributor['shortName'] || contributor['name'] }}
+      </a>
+      <span *ngIf="!lastFlag">,</span>
+    </ng-container>
   </ng-container>
 </mat-card-content>
 

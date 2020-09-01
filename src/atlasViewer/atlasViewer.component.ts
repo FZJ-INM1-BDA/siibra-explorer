@@ -40,7 +40,7 @@ export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> =
 import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
-import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateSelectParcellation } from "src/services/state/viewerState.store.helper";
+import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateHelperSelectParcellationWithId } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
@@ -114,6 +114,12 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectedLayerVersions$ = this.store.pipe(
     select(viewerStateParcVersionSelector),
+    map(arr => arr.map(item => {
+      const overwrittenName = item['@version'] && item['@version']['name']
+      return overwrittenName
+        ? { ...item, name: overwrittenName }
+        : item
+    }))
   )
 
   private selectedParcellation$: Observable<any>
@@ -389,8 +395,8 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public selectParcellation(parc: any) {
     this.store.dispatch(
-      viewerStateSelectParcellation({
-        selectParcellation: parc
+      viewerStateHelperSelectParcellationWithId({
+        payload: parc
       })
     )
   }
