@@ -172,22 +172,11 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
 
         return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(
           map(({ status, statusText, result }) => {
-            if (status === 'error') {
-              return {
-                newTemplateId,
-                templateSelected: templateSelected,
-                fetchedTemplates,
-                translatedCoordinate: null,
-                navigation,
-                newParcellationId,
-                parcellationSelected
-              }
-            }
             return {
               newTemplateId,
               templateSelected: templateSelected,
               fetchedTemplates,
-              translatedCoordinate: result,
+              translatedCoordinate: status === 'error'? null : result,
               navigation,
               newParcellationId,
               parcellationSelected

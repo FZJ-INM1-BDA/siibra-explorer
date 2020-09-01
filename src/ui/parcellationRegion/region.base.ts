@@ -1,14 +1,14 @@
-import { EventEmitter, Input, Output, Pipe, PipeTransform } from "@angular/core";
+import {EventEmitter, Input, OnDestroy, OnInit, Output, Pipe, PipeTransform} from "@angular/core";
 import { select, Store, createSelector } from "@ngrx/store";
 import { uiStateOpenSidePanel, uiStateExpandSidePanel, uiActionShowSidePanelConnectivity } from 'src/services/state/uiState.store.helper'
-import { distinctUntilChanged, switchMap, filter, map, tap } from "rxjs/operators";
-import { Observable, BehaviorSubject, combineLatest } from "rxjs";
+import { distinctUntilChanged, switchMap, filter, map } from "rxjs/operators";
+import {Observable, BehaviorSubject, combineLatest, Subscription} from "rxjs";
 import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 
-export class RegionBase {
+export class RegionBase implements OnInit, OnDestroy {
 
   public rgbString: string
   public rgbDarkmode: boolean
@@ -42,6 +42,10 @@ export class RegionBase {
   public sameRegionTemplate: any[] = []
   public regionInOtherTemplates$: Observable<any[]>
   public regionOriginDatasetLabels$: Observable<{ name: string }[]>
+  public navigation$: Observable<any>
+  public currentNavigation: any
+
+  private subscriptions: Subscription[] = []
 
   constructor(
     private store$: Store<any>,
@@ -57,6 +61,12 @@ export class RegionBase {
         )
       ))
     )
+    
+    this.navigation$ = this.store$.pipe(
+      select('viewerState'),
+      select('navigation'),
+      distinctUntilChanged(),
+    )
 
     this.regionOriginDatasetLabels$ = combineLatest(
       this.store$,
@@ -67,6 +77,12 @@ export class RegionBase {
     )
   }
 
+
+  ngOnInit(): void {
+    this.subscriptions.push(this.navigation$.subscribe(n => {
+      this.currentNavigation = n
+    }))
+  }
 
   public navigateToRegion() {
     this.closeRegionMenu.emit()
@@ -97,13 +113,13 @@ export class RegionBase {
   }
 
   changeView(sameRegion) {
-    console.log('Changing view')
     const {
       template,
       parcellation,
       region
     } = sameRegion
     const { position } = region
+    const { zoom } = this.currentNavigation
     this.closeRegionMenu.emit()
 
     /**
@@ -115,9 +131,14 @@ export class RegionBase {
       selectTemplate: template,
       selectParcellation: parcellation,
       navigation: {
-        position
+        position,
+        zoom,
       },
     })
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   public GO_TO_REGION_CENTROID = ARIA_LABELS.GO_TO_REGION_CENTROID

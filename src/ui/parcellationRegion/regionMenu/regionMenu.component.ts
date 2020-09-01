@@ -9,18 +9,12 @@ import { ARIA_LABELS } from 'common/constants'
   templateUrl: './regionMenu.template.html',
   styleUrls: ['./regionMenu.style.css'],
 })
-export class RegionMenuComponent extends RegionBase implements OnDestroy {
-
-  private subscriptions: Subscription[] = []
+export class RegionMenuComponent extends RegionBase {
 
   constructor(
     store$: Store<any>,
   ) {
     super(store$)
-  }
-
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(s => s.unsubscribe())
   }
 
   @Input()
