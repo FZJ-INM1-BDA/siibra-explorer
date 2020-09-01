@@ -11,6 +11,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { ARIA_LABELS } from 'common/constants'
 import { switchMap, catchError, distinctUntilChanged, filter } from "rxjs/operators";
+import { IContributor } from "../contributor";
 
 export {
   DatabrowserService,
@@ -34,7 +35,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
   @Input() public description?: string
   @Input() public publications?: IPublication[]
 
-  @Input() public contributors: any[] = []
+  @Input() public contributors: IContributor[] = []
 
   public fetchFlag = false
   private _fullId: string

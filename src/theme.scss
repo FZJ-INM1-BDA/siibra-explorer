@@ -15,6 +15,20 @@
   [iv-custom-comp],
   .iv-custom-comp
   {
+
+    &[target="_blank"]
+    {
+      // TODO it seems unicode does not have an external link character.
+      // will have to use SVG as background image or something
+
+      // &::after
+      // {
+      //   content: "";
+      //   display: inline-block;
+        
+      // }
+    }
+
     &[card],
     &.card
     {
