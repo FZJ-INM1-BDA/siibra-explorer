@@ -13,6 +13,27 @@
     }
   }
 
+  /**
+   *
+   * https://stackoverflow.com/a/16348977/6059235
+   */
+  exports.intToRgb = int => {
+    if (int >= 65500) {
+      return [255, 255, 255]
+    }
+    const str = String(int * 65535)
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const returnV = []
+    for (let i = 0; i < 3; i++) {
+      const value = (hash >> (i * 8)) & 0xFF;
+      returnV.push(value)
+    }
+    return returnV
+  }
+
   exports.getIdObj = getIdObj
 
   exports.getIdFromFullId = fullId => {

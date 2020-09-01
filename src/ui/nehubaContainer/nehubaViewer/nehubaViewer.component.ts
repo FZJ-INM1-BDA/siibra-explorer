@@ -11,6 +11,7 @@ import { getExportNehuba, getViewer, setNehubaViewer } from "src/util/fn";
 import '!!file-loader?context=third_party&name=main.bundle.js!export-nehuba/dist/min/main.bundle.js'
 import '!!file-loader?context=third_party&name=chunk_worker.bundle.js!export-nehuba/dist/min/chunk_worker.bundle.js'
 import { scanSliceViewRenderFn } from "../util";
+import { intToRgb as intToColour } from 'common/util'
 
 const NG_LANDMARK_LAYER_NAME = 'spatial landmark layer'
 const NG_USER_LANDMARK_LAYER_NAME = 'user landmark layer'
@@ -955,27 +956,6 @@ const patchSliceViewPanel = (sliceViewPanel: any) => {
 
     originalDraw.call(this)
   }
-}
-
-/**
- *
- * https://stackoverflow.com/a/16348977/6059235
- */
-const intToColour = function(int) {
-  if (int >= 65500) {
-    return [255, 255, 255]
-  }
-  const str = String(int * 65535)
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const returnV = []
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xFF;
-    returnV.push(value)
-  }
-  return returnV
 }
 
 export interface ViewerState {
