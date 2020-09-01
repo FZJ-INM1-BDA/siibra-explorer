@@ -151,7 +151,7 @@
               [selected]="selected">
               
               <span>
-                {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel?.name }}
+                {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel && (parcel.displayName || parcel.name) }}
               </span>
 
               <!-- info icon -->
