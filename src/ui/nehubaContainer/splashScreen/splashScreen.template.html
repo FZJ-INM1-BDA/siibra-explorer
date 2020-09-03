@@ -34,7 +34,7 @@
           *ngFor="let parcellation of template.parcellations"
           mat-button
           color="primary">
-          {{ parcellation.name }}
+          {{ parcellation.displayName || parcellation.name }}
         </button>
       </mat-card-content>
 

@@ -10,6 +10,7 @@
     {
       "name": "JuBrain Cytoarchitectonic Atlas",
       "ngId": "julich brain colin v22 left",
+      "displayName":"Julich-Brain Cytoarchitectonic Atlas",
       "auxillaryMeshIndices": [
         65535
       ],
@@ -19,7 +20,7 @@
       "originDatasets": [
         {
           "kgSchema": "minds/core/dataset/v1.0.0",
-          "kgId": "4ac9f0bc-560d-47e0-8916-7b24da9bb0ce"
+          "kgId": "fd303d56-e1aa-46a2-9d0c-7e5215aeb7ca"
         }
       ],
       "properties": {
