@@ -3,7 +3,7 @@
   {{ templateSelected.name }}
 </div>
 <div *ngIf="parcellationSelected$ | async as parcellationSelected">
-  {{ parcellationSelected.name }}
+  {{ parcellationSelected.displayName || parcellationSelected.name }}
 </div>
 
 <!-- selected parcellation regions -->
