@@ -76,6 +76,44 @@ describe('atlasViewer.apiService.service.ts', () => {
         })
       })
 
+      describe('> getUserToSelectRoi', () => {
+        it('> calling getUserToSelectRoi without spec throws error', () => {
+          const service = TestBed.inject(AtlasViewerAPIServices)
+          expect(() => {
+            service.interactiveViewer.uiHandle.getUserToSelectRoi('hello world')
+          }).toThrow()
+        })
+
+        it('> calling getUserToSelectRoi without spec.type throws', () => {
+          const service = TestBed.inject(AtlasViewerAPIServices)
+          expect(() => {
+            service.interactiveViewer.uiHandle.getUserToSelectRoi('hello world', { foo: 'bar' } as any)
+          }).toThrow()
+        })
+
+        it('> calling getUserToSelectRoi populates getUserToSelectRegion with malformed spec.type is fine', () => {
+          const service = TestBed.inject(AtlasViewerAPIServices)
+          expect(() => {
+            service.interactiveViewer.uiHandle.getUserToSelectRoi('hello world', { type: 'foobar' })
+          }).not.toThrow()
+        })
+        it('> calling getUserToSelectRoi populates getUserToSelectRegion', () => {
+
+          const service = TestBed.inject(AtlasViewerAPIServices)
+
+          const pr = service.interactiveViewer.uiHandle.getUserToSelectRoi('hello world', { type: 'POINT' })
+          
+          expect(service.getUserToSelectRegion.length).toEqual(1)
+          const { promise, message, spec, rs, rj } = service.getUserToSelectRegion[0]
+          expect(promise).toEqual(pr)
+          expect(message).toEqual('hello world')
+          expect(spec).toEqual({ type: 'POINT' })
+          
+          expect(rs).not.toBeFalsy()
+          expect(rj).not.toBeFalsy()
+        })
+      })
+
       describe('cancelPromise', () => {
         it('calling cancelPromise removes pr from getUsertoSelectRegion', done => {
 
@@ -243,9 +281,10 @@ describe('atlasViewer.apiService.service.ts', () => {
   describe('overrideNehubaClickFactory', () => {
 
     const OVERRIDE_NEHUBA_TOKEN = 'OVERRIDE_NEHUBA_TOKEN'
-    const MOCK_GET_MOUSEOVER_SEGMENTS_TOKEN = 'MOCK_GET_MOUSEOVER_SEGMENTS_TOKEN'
+    const MOCK_GET_STATE_SNAPSHOT_TOKEN = 'MOCK_GET_STATE_SNAPSHOT_TOKEN'
 
     let mockGetMouseOverSegments = []
+    let mousePositionReal = [1,2,3]
     
     afterEach(() => {
       mockGetMouseOverSegments = []
@@ -264,13 +303,22 @@ describe('atlasViewer.apiService.service.ts', () => {
             useFactory: overrideNehubaClickFactory,
             deps: [
               AtlasViewerAPIServices,
-              MOCK_GET_MOUSEOVER_SEGMENTS_TOKEN,
+              MOCK_GET_STATE_SNAPSHOT_TOKEN,
             ]
           },
           {
-            provide: MOCK_GET_MOUSEOVER_SEGMENTS_TOKEN,
+            provide: MOCK_GET_STATE_SNAPSHOT_TOKEN,
             useValue: () => {
-              return mockGetMouseOverSegments
+              return {
+                state: {
+                  uiState: {
+                    mouseOverSegments: mockGetMouseOverSegments
+                  }
+                },
+                other: {
+                  mousePositionReal
+                }
+              }
             }
           },
           {
@@ -288,142 +336,316 @@ describe('atlasViewer.apiService.service.ts', () => {
       expect(fn).not.toBeNull()
     })
 
-    it('by default, next fn will be called', () => {
-      const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
-      const nextSpy = jasmine.createSpy('next')
-      fn(nextSpy)
-      expect(nextSpy).toHaveBeenCalled()
-    })
+    describe('> if getUserToSelectRegion.length === 0', () => {
 
-    it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
-      const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
-      const apiService = TestBed.inject(AtlasViewerAPIServices)
-
-      const rsSpy = jasmine.createSpy('rs') 
-      const rjSpy = jasmine.createSpy('rj')
-      apiService.getUserToSelectRegion = [
-        {
-          message: 'test',
-          promise: null,
-          rs: rsSpy,
-          rj: rjSpy,
-        }
-      ]
-
-      const mockSegment = {
-        layer: {
-          name: 'apple'
-        },
-        segment: {
-          name: 'bananas'
-        }
-      }
-      mockGetMouseOverSegments = [ mockSegment ]
-      
-      const nextSpy = jasmine.createSpy('next')
-      fn(nextSpy)
-
-      expect(nextSpy).not.toHaveBeenCalled()
-      expect(rsSpy).toHaveBeenCalledWith(mockSegment)
-    })
+      it('by default, next fn will be called', () => {
+        const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+        const nextSpy = jasmine.createSpy('next')
+        fn(nextSpy)
+        expect(nextSpy).toHaveBeenCalled()
+      })
   
-    it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
-      const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
-
-      const mockSegment = {
-        layer: {
-          name: 'apple'
-        },
-        segment: {
-          name: 'bananas'
+      it('if apiService.getUserToSelectRegion.length === 0, and mouseoversegment.length > 0 calls next', () => {
+        const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+  
+        const mockSegment = {
+          layer: {
+            name: 'apple'
+          },
+          segment: {
+            name: 'bananas'
+          }
         }
-      }
-      mockGetMouseOverSegments = [ mockSegment ]
-      
-      const nextSpy = jasmine.createSpy('next')
-      fn(nextSpy)
-
-      expect(nextSpy).toHaveBeenCalled()
+        mockGetMouseOverSegments = [ mockSegment ]
+        
+        const nextSpy = jasmine.createSpy('next')
+        fn(nextSpy)
+  
+        expect(nextSpy).toHaveBeenCalled()
+      })
     })
-
-    it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
-      const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
-      const apiService = TestBed.inject(AtlasViewerAPIServices)
-
-      const rsSpy = jasmine.createSpy('rs') 
-      const rjSpy = jasmine.createSpy('rj')
-      apiService.getUserToSelectRegion = [
-        {
-          message: 'test',
-          promise: null,
-          rs: rsSpy,
-          rj: rjSpy,
+    describe('> if getUserToSelectRegion.length > 0', () => {
+      it('if both apiService.getUserToSelectRegion.length > 0 and mouseoverSegment.length >0, then next will not be called, but rs will be', () => {
+        const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+        const apiService = TestBed.inject(AtlasViewerAPIServices)
+  
+        const rsSpy = jasmine.createSpy('rs') 
+        const rjSpy = jasmine.createSpy('rj')
+        apiService.getUserToSelectRegion = [
+          {
+            message: 'test',
+            promise: null,
+            rs: rsSpy,
+            rj: rjSpy,
+          }
+        ]
+  
+        const mockSegment = {
+          layer: {
+            name: 'apple'
+          },
+          segment: {
+            name: 'bananas'
+          }
         }
-      ]
+        mockGetMouseOverSegments = [ mockSegment ]
+        
+        const nextSpy = jasmine.createSpy('next')
+        fn(nextSpy)
+  
+        expect(nextSpy).not.toHaveBeenCalled()
+        expect(rsSpy).toHaveBeenCalledWith(mockSegment)
+      })
+      it('if multiple getUserToSelectRegion handler exists, it resolves in a LIFO manner', () => {
+        const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+        const apiService = TestBed.inject(AtlasViewerAPIServices)
+  
+        const rsSpy1 = jasmine.createSpy('rs1') 
+        const rjSpy1 = jasmine.createSpy('rj1')
+  
+        const rsSpy2 = jasmine.createSpy('rs2') 
+        const rjSpy2 = jasmine.createSpy('rj2')
+        apiService.getUserToSelectRegion = [
+          {
+            message: 'test1',
+            promise: null,
+            rs: rsSpy1,
+            rj: rjSpy1,
+          },
+          {
+            message: 'test2',
+            promise: null,
+            rs: rsSpy2,
+            rj: rjSpy2,
+          }
+        ]
+        
+        const mockSegment = {
+          layer: {
+            name: 'apple'
+          },
+          segment: {
+            name: 'bananas'
+          }
+        }
+  
+        mockGetMouseOverSegments = [ mockSegment ]
+  
+        const nextSpy1 = jasmine.createSpy('next1')
+        fn(nextSpy1)
+  
+        expect(rsSpy2).toHaveBeenCalledWith(mockSegment)
+        expect(rjSpy2).not.toHaveBeenCalled()
+  
+        expect(nextSpy1).not.toHaveBeenCalled()
+        expect(rsSpy1).not.toHaveBeenCalled()
+        expect(rjSpy1).not.toHaveBeenCalled()
+  
+        const nextSpy2 = jasmine.createSpy('next2')
+        fn(nextSpy2)
+  
+        expect(nextSpy2).not.toHaveBeenCalled()
+        expect(rsSpy1).toHaveBeenCalledWith(mockSegment)
+        expect(rjSpy1).not.toHaveBeenCalled()
+  
+        const nextSpy3 = jasmine.createSpy('next3')
+        fn(nextSpy3)
+  
+        expect(nextSpy3).toHaveBeenCalled()
+      })
+
+      describe('> if spec is not set (defaults to parcellation region mode)', () => {
+
+        it('if apiService.getUserToSelectRegion.length > 0, but mouseoversegment.length ===0, will not call next, will not rs, will not call rj', () => {
+          const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+          const apiService = TestBed.inject(AtlasViewerAPIServices)
+    
+          const rsSpy = jasmine.createSpy('rs') 
+          const rjSpy = jasmine.createSpy('rj')
+          apiService.getUserToSelectRegion = [
+            {
+              message: 'test',
+              promise: null,
+              rs: rsSpy,
+              rj: rjSpy,
+            }
+          ]
+          
+          const nextSpy = jasmine.createSpy('next')
+          fn(nextSpy)
+    
+          expect(rsSpy).not.toHaveBeenCalled()
+          expect(nextSpy).toHaveBeenCalled()
+          expect(rjSpy).not.toHaveBeenCalled()
+        })
+      })
+
+      describe('> if spec is set', () => {
+        describe('> if spec is set to PARCELLATION_REGION', () => {
+
+          it('> mouseoversegment.length === 0, will not call next, will not rs, will not call rj', () => {
+            const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+            const apiService = TestBed.inject(AtlasViewerAPIServices)
       
-      const nextSpy = jasmine.createSpy('next')
-      fn(nextSpy)
-
-      expect(rsSpy).not.toHaveBeenCalled()
-      expect(nextSpy).toHaveBeenCalled()
-      expect(rjSpy).not.toHaveBeenCalled()
-    })
-    it('if muliple getUserToSelectRegion handler exists, it resolves in a FIFO manner', () => {
-      const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
-      const apiService = TestBed.inject(AtlasViewerAPIServices)
-
-      const rsSpy1 = jasmine.createSpy('rs1') 
-      const rjSpy1 = jasmine.createSpy('rj1')
-
-      const rsSpy2 = jasmine.createSpy('rs2') 
-      const rjSpy2 = jasmine.createSpy('rj2')
-      apiService.getUserToSelectRegion = [
-        {
-          message: 'test1',
-          promise: null,
-          rs: rsSpy1,
-          rj: rjSpy1,
-        },
-        {
-          message: 'test2',
-          promise: null,
-          rs: rsSpy2,
-          rj: rjSpy2,
-        }
-      ]
+            const rsSpy = jasmine.createSpy('rs') 
+            const rjSpy = jasmine.createSpy('rj')
+            apiService.getUserToSelectRegion = [
+              {
+                message: 'test',
+                promise: null,
+                spec: {
+                  type: 'PARCELLATION_REGION'
+                },
+                rs: rsSpy,
+                rj: rjSpy,
+              }
+            ]
+            
+            const nextSpy = jasmine.createSpy('next')
+            fn(nextSpy)
       
-      const mockSegment = {
-        layer: {
-          name: 'apple'
-        },
-        segment: {
-          name: 'bananas'
-        }
-      }
+            expect(rsSpy).not.toHaveBeenCalled()
+            expect(nextSpy).toHaveBeenCalled()
+            expect(rjSpy).not.toHaveBeenCalled()
+          })
+          
+          it('> mouseoversegment.length > 0, will not call next, will call rs', () => {
+            const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+            const apiService = TestBed.inject(AtlasViewerAPIServices)
+      
+            const mockSegment = {
+              layer: {
+                name: 'apple'
+              },
+              segment: {
+                name: 'bananas'
+              }
+            }
+            mockGetMouseOverSegments = [ mockSegment ]
 
-      mockGetMouseOverSegments = [ mockSegment ]
+            const rsSpy = jasmine.createSpy('rs') 
+            const rjSpy = jasmine.createSpy('rj')
+            apiService.getUserToSelectRegion = [
+              {
+                message: 'test',
+                promise: null,
+                spec: {
+                  type: 'PARCELLATION_REGION'
+                },
+                rs: rsSpy,
+                rj: rjSpy,
+              }
+            ]
+            
+            const nextSpy = jasmine.createSpy('next')
+            fn(nextSpy)
+      
+            expect(rsSpy).toHaveBeenCalled()
+            expect(nextSpy).not.toHaveBeenCalled()
+            expect(rjSpy).not.toHaveBeenCalled()
+          })
+        })
 
-      const nextSpy1 = jasmine.createSpy('next1')
-      fn(nextSpy1)
+        describe('> if spec is set to POINT', () => {
+          it('> rs is called if mouseoversegment.length === 0', () => {
+            const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+            const apiService = TestBed.inject(AtlasViewerAPIServices)
+      
+            const rsSpy = jasmine.createSpy('rs') 
+            const rjSpy = jasmine.createSpy('rj')
+            apiService.getUserToSelectRegion = [
+              {
+                message: 'test',
+                promise: null,
+                spec: {
+                  type: 'POINT'
+                },
+                rs: rsSpy,
+                rj: rjSpy,
+              }
+            ]
+            
+            const nextSpy = jasmine.createSpy('next')
+            fn(nextSpy)
+      
+            expect(rsSpy).toHaveBeenCalled()
+            expect(nextSpy).not.toHaveBeenCalled()
+            expect(rjSpy).not.toHaveBeenCalled()
+          })
+          it('> rs is called with correct arg if mouseoversegment.length > 0', () => {
+            const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+            const apiService = TestBed.inject(AtlasViewerAPIServices)
+      
+            const rsSpy = jasmine.createSpy('rs') 
+            const rjSpy = jasmine.createSpy('rj')
+            apiService.getUserToSelectRegion = [
+              {
+                message: 'test',
+                promise: null,
+                spec: {
+                  type: 'POINT'
+                },
+                rs: rsSpy,
+                rj: rjSpy,
+              }
+            ]
+            
+            const nextSpy = jasmine.createSpy('next')
+            fn(nextSpy)
+      
+            expect(rsSpy).toHaveBeenCalledWith({
+              type: 'POINT',
+              payload: mousePositionReal
+            })
+            expect(nextSpy).not.toHaveBeenCalled()
+            expect(rjSpy).not.toHaveBeenCalled()
+          })
+        })
 
-      expect(rsSpy2).toHaveBeenCalledWith(mockSegment)
-      expect(rjSpy2).not.toHaveBeenCalled()
-
-      expect(nextSpy1).not.toHaveBeenCalled()
-      expect(rsSpy1).not.toHaveBeenCalled()
-      expect(rjSpy1).not.toHaveBeenCalled()
-
-      const nextSpy2 = jasmine.createSpy('next2')
-      fn(nextSpy2)
-
-      expect(nextSpy2).not.toHaveBeenCalled()
-      expect(rsSpy1).toHaveBeenCalledWith(mockSegment)
-      expect(rjSpy1).not.toHaveBeenCalled()
-
-      const nextSpy3 = jasmine.createSpy('next3')
-      fn(nextSpy3)
-
-      expect(nextSpy3).toHaveBeenCalled()
+        describe('> if multiple getUserToSelectRegion exist', () => {
+          it('> only the last Promise will be evaluated', () => {
+            const fn = TestBed.inject(OVERRIDE_NEHUBA_TOKEN as any) as (next: () => void) => void
+            const apiService = TestBed.inject(AtlasViewerAPIServices)
+      
+            const rsSpy1 = jasmine.createSpy('rs1') 
+            const rjSpy1 = jasmine.createSpy('rj1')
+      
+            const rsSpy2 = jasmine.createSpy('rs2') 
+            const rjSpy2 = jasmine.createSpy('rj2')
+            apiService.getUserToSelectRegion = [
+              {
+                message: 'test1',
+                promise: null,
+                spec: {
+                  type: 'POINT'
+                },
+                rs: rsSpy1,
+                rj: rjSpy1,
+              },
+              {
+                message: 'test2',
+                promise: null,
+                spec: {
+                  type: 'PARCELLATION_REGION'
+                },
+                rs: rsSpy2,
+                rj: rjSpy2,
+              }
+            ]
+      
+            const nextSpy1 = jasmine.createSpy('next1')
+            fn(nextSpy1)
+      
+            expect(rsSpy2).not.toHaveBeenCalled()
+            expect(rjSpy2).not.toHaveBeenCalled()
+      
+            expect(nextSpy1).toHaveBeenCalled()
+            expect(rsSpy1).not.toHaveBeenCalled()
+            expect(rjSpy1).not.toHaveBeenCalled()
+      
+          })
+        })
+      })
     })
   })
 })
