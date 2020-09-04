@@ -166,18 +166,45 @@ window.interactiveViewer
   }
   ```
   - *getUserToSelectARegion(message)* returns a `Promise`
+  
+    **To be deprecated**
 
     _input_
     
     | input | type | desc |
     | --- | --- | --- |
     | message | `string` | human readable message displayed to the user | 
+    | spec.type | `'POINT'` `'PARCELLATION_REGION'` **default** | type of region to be returned. |
 
     _returns_
 
-    `Promise`, resolves to return `RegionSelectedByUser`, rejects with error object `{ userInitiated: boolean }`
+    `Promise`, resolves to return array of region clicked, rejects with error object `{ userInitiated: boolean }`
     
-    Requests user to select a parcellation region, displaying the message. Resolving to the region selected by the user. Rejects if either user cancels by pressing `Esc` or `Cancel`, or by developer calling `cancelPromise`
+    Requests user to select a region of interest. Resolving to the region selected by the user. Rejects if either user cancels by pressing `Esc` or `Cancel`, or by developer calling `cancelPromise`
+
+  - *getUserToSelectRoi(message, spec)* returns a `Promise`
+
+    _input_
+    
+    | input | type | desc |
+    | --- | --- | --- |
+    | message | `string` | human readable message displayed to the user | 
+    | spec.type | `POINT` `PARCELLATION_REGION` | type of ROI to be returned. |
+
+    _returns_
+
+    `Promise`
+    
+    **resolves**: return `{ type, payload }`. `type` is the same as `spec.type`, and `payload` differs depend on the type requested:
+    
+    | type | payload | example |
+    | --- | --- | --- |
+    | `POINT` | array of number in mm | `[12.2, 10.1, -0.3]` |
+    | `PARCELLATION_REGOIN` | non empty array of region selected | `[{ "layer": { "name" : " viewer specific layer name " }, "segment": {} }]` |
+    
+    **rejects**: with error object `{ userInitiated: boolean }`
+    
+    Requests user to select a region of interest. If the `spec.type` input is missing, it is assumed to be `'PARCELLATION_REGION'`. Resolving to the region selected by the user. Rejects if either user cancels by pressing `Esc` or `Cancel`, or by developer calling `cancelPromise`
   
   - *cancelPromise(promise)* returns `void`
   

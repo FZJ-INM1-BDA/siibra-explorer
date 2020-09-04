@@ -24,6 +24,7 @@ interface IRejectUserInput{
 interface IGetUserSelectRegionPr{
   message: string
   promise: Promise<any>
+  spec?: ICustomRegionSpec
   rs: (region: any) => void
   rj: (reject: IRejectUserInput) => void
 }
@@ -60,13 +61,18 @@ export class AtlasViewerAPIServices implements OnDestroy{
   public getUserToSelectRegion: IGetUserSelectRegionPr[] = []
   public getUserToSelectRegionUI$: Subject<IGetUserSelectRegionPr[]> = new Subject()
 
-  public getUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
+  public getNextUserRegionSelectHandler: () => IGetUserSelectRegionPr = () => {
     if (this.getUserToSelectRegion.length > 0) {
-      const handler =  this.getUserToSelectRegion.pop()
-      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
-      return handler
+      return this.getUserToSelectRegion[this.getUserToSelectRegion.length - 1]
     } 
     else return null
+  }
+
+  public popUserRegionSelectHandler = () => {
+    if (this.getUserToSelectRegion.length > 0) {
+      this.getUserToSelectRegion.pop()
+      this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+    } 
   }
 
   private s: Subscription[] = []
@@ -217,8 +223,32 @@ export class AtlasViewerAPIServices implements OnDestroy{
         getUserConfirmation: config => this.dialogService.getUserConfirm(config),
 
         getUserToSelectARegion: message => {
+          console.warn(`interactiveViewer.uiHandle.getUserToSelectARegion is becoming deprecated. Use getUserToSelectRoi instead`)
           const obj = {
             message,
+            promise: null,
+            rs: null,
+            rj: null
+          }
+          const pr = new Promise((rs, rj) => {
+            obj.rs = rs
+            obj.rj = rj
+          })
+
+          obj.promise = pr
+
+          this.getUserToSelectRegion.push(obj)
+          this.getUserToSelectRegionUI$.next([...this.getUserToSelectRegion])
+          this.zone.run(() => {
+
+          })
+          return pr
+        },
+        getUserToSelectRoi: (message: string, spec: ICustomRegionSpec) => {
+          if (!spec || !spec.type) throw new Error(`spec.type must be defined for getUserToSelectRoi`)
+          const obj = {
+            message,
+            spec,
             promise: null,
             rs: null,
             rj: null
@@ -331,7 +361,8 @@ export interface IInteractiveViewerInterface {
     getUserInput: (config: IGetUserInputConfig) => Promise<string>
     getUserConfirmation: (config: IGetUserConfirmation) => Promise<any>
     getUserToSelectARegion: (selectingMessage: any) => Promise<any>
-    cancelPromise: (pr) => void
+    getUserToSelectRoi: (selectingMessage: string, spec?: ICustomRegionSpec) => Promise<any>
+    cancelPromise: (pr: Promise<any>) => void
   }
 
   pluginControl: {
@@ -355,16 +386,63 @@ export interface IUserLandmark {
   name: string
   position: [number, number, number]
   id: string /* probably use the it to track and remove user landmarks */
-  highlight: boolean
+  color: [ number, number, number ]
 }
 
-export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, getMouseoverSegments: () => any [] ) => {
+export enum EnumCustomRegion{
+  POINT = 'POINT',
+  PARCELLATION_REGION = 'PARCELLATION_REGION',
+}
+
+export interface ICustomRegionSpec{
+  type: string // type of EnumCustomRegion
+}
+
+export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, getState: () => any ) => {
   return (next: () => void) => {
-    const moSegments = getMouseoverSegments()
-    if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
-      const { rs } = apiService.getUserRegionSelectHandler() || {}
-      if (!!rs) {
-        return rs(moSegments[0])
+    const { state, other } = getState()
+    const moSegments = state?.uiState?.mouseOverSegments
+    const { mousePositionReal } = other || {}
+    const { rs, spec } = apiService.getNextUserRegionSelectHandler() || {}
+    if (!!rs) {
+
+      /**
+       * getROI api
+       */
+      if (spec) {
+
+        /**
+         * if spec of overwrite click is for a point
+         */
+        if (spec.type === EnumCustomRegion.POINT) {
+          apiService.popUserRegionSelectHandler()
+          return rs({
+            type: spec.type,
+            payload: mousePositionReal
+          })
+        }
+
+        /**
+         * if spec of overwrite click is for a point
+         */
+        if (spec.type === EnumCustomRegion.PARCELLATION_REGION) {
+          if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
+            apiService.popUserRegionSelectHandler()
+            return rs({
+              type: spec.type,
+              payload: moSegments
+            })
+          }
+        }
+      } else {
+        /**
+         * selectARegion API
+         * TODO deprecate
+         */
+        if (!!moSegments && Array.isArray(moSegments) && moSegments.length > 0) {
+          apiService.popUserRegionSelectHandler()
+          return rs(moSegments[0])
+        }
       }
     }
     next()

@@ -192,20 +192,6 @@ export interface ActionInterface extends Action {
   payload: any
 }
 
-export const GET_MOUSEOVER_SEGMENTS_TOKEN = `GET_MOUSEOVER_SEGMENTS_TOKEN`
-
-export const getMouseoverSegmentsFactory = (store: Store<IavRootStoreInterface>) => {
-  return () => {
-    let moSegments
-    store.pipe(
-      select('uiState'),
-      select('mouseOverSegments'),
-      take(1)
-    ).subscribe(v => moSegments = v)
-    return moSegments
-  }
-}
-
 @Injectable({
   providedIn: 'root',
 })

@@ -1,6 +1,6 @@
 import { DragDropModule } from '@angular/cdk/drag-drop'
 import { CommonModule } from "@angular/common";
-import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule, InjectionToken } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { StoreModule, Store, ActionReducer } from "@ngrx/store";
 import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
@@ -38,7 +38,7 @@ import { UtilModule } from "src/util";
 import { SpotLightModule } from 'src/spotlight/spot-light.module'
 import { TryMeComponent } from "./ui/tryme/tryme.component";
 import { MouseHoverDirective, MouseOverIconPipe, MouseOverTextPipe } from "./atlasViewer/mouseOver.directive";
-import { UiStateUseEffect, getMouseoverSegmentsFactory, GET_MOUSEOVER_SEGMENTS_TOKEN } from "src/services/state/uiState.store";
+import { UiStateUseEffect } from "src/services/state/uiState.store";
 import { AtlasViewerHistoryUseEffect } from "./atlasViewer/atlasViewer.history.service";
 import { PluginServiceUseEffect } from './services/effect/pluginUseEffect';
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
@@ -56,6 +56,7 @@ import 'src/res/css/version.css'
 import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
+import { take } from 'rxjs/operators';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -65,7 +66,8 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
     return reducer(state, action);
   };
 }
- 
+
+export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_TOKEN')
 
 @NgModule({
   imports : [
@@ -155,12 +157,30 @@ export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
       useFactory: overrideNehubaClickFactory,
       deps: [
         AtlasViewerAPIServices,
-        GET_MOUSEOVER_SEGMENTS_TOKEN
+        GET_STATE_SNAPSHOT_TOKEN
       ]
     },
     {
-      provide: GET_MOUSEOVER_SEGMENTS_TOKEN,
-      useFactory: getMouseoverSegmentsFactory,
+      provide: GET_STATE_SNAPSHOT_TOKEN,
+      useFactory: (store: Store<any>) => {
+        return () => {
+          const other: any = {}
+          let state
+          // rather than commiting mousePositionReal in state via action, do a single subscription instead.
+          // otherwise, the state gets updated way too often
+          if (window && (window as any).nehubaViewer) {
+            (window as any).nehubaViewer.mousePosition.inRealSpace
+              .take(1)
+              .subscribe(floatArr => {
+                other.mousePositionReal = floatArr && Array.from(floatArr).map((val: number) => val / 1e6)
+              })
+          }
+          store.pipe(
+            take(1)
+          ).subscribe(v => state = v)
+          return { state, other }
+        }
+      },
       deps: [ Store ]
     },
     {
