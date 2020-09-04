@@ -1,5 +1,5 @@
 import { Injectable, TemplateRef, OnDestroy } from '@angular/core';
-import { Action, select, Store, createAction, props } from '@ngrx/store'
+import { Action, select, Store } from '@ngrx/store'
 
 import { Effect, Actions, ofType } from "@ngrx/effects";
 import { Observable, Subscription } from "rxjs";
@@ -8,6 +8,7 @@ import { COOKIE_VERSION, KG_TOS_VERSION, LOCAL_STORAGE_CONST } from 'src/util/co
 import { IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.service'
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
+import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
 
 export const defaultState: StateInterface = {
   previewingDatasetFiles: [],
@@ -20,7 +21,6 @@ export const defaultState: StateInterface = {
 
   focusedSidePanel: null,
   sidePanelIsOpen: false,
-  sidePanelCurrentViewContent: 'Dataset',
   sidePanelExploreCurrentViewIsOpen: false,
 
   snackbarMessage: null,
@@ -54,7 +54,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
       ...prevState,
       mouseOverSegment : action.segment,
     }
-  case MOUSEOVER_USER_LANDMARK: {
+  case viewerStateMouseOverCustomLandmark.type: {
     const { payload = {} } = action
     const { userLandmark: mouseOverUserLandmark = null } = payload
     return {
@@ -100,12 +100,6 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Stat
     return {
       ...prevState,
       sidePanelExploreCurrentViewIsOpen: false,
-    }
-
-  case SHOW_SIDE_PANEL_DATASET_LIST:
-    return {
-      ...prevState,
-      sidePanelCurrentViewContent: 'Dataset',
     }
 
   case uiActionShowSidePanelConnectivity.type:
@@ -160,7 +154,6 @@ export interface StateInterface {
     segment: any | null
   }>
   sidePanelIsOpen: boolean
-  sidePanelCurrentViewContent: 'Connectivity' | 'Dataset' | null
   sidePanelExploreCurrentViewIsOpen: boolean
   mouseOverSegment: any | number
 
@@ -266,11 +259,9 @@ export class UiStateUseEffect implements OnDestroy{
 export const MOUSE_OVER_SEGMENT = `MOUSE_OVER_SEGMENT`
 export const MOUSE_OVER_SEGMENTS = `MOUSE_OVER_SEGMENTS`
 export const MOUSE_OVER_LANDMARK = `MOUSE_OVER_LANDMARK`
-export const MOUSEOVER_USER_LANDMARK = `MOUSEOVER_USER_LANDMARK`
 
 export const CLOSE_SIDE_PANEL = `CLOSE_SIDE_PANEL`
 export const OPEN_SIDE_PANEL = `OPEN_SIDE_PANEL`
-export const SHOW_SIDE_PANEL_DATASET_LIST = `SHOW_SIDE_PANEL_DATASET_LIST`
 export const COLLAPSE_SIDE_PANEL_CURRENT_VIEW = `COLLAPSE_SIDE_PANEL_CURRENT_VIEW`
 export const EXPAND_SIDE_PANEL_CURRENT_VIEW = `EXPAND_SIDE_PANEL_CURRENT_VIEW`
 

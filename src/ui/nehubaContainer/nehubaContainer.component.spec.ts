@@ -38,6 +38,7 @@ import { By } from '@angular/platform-browser'
 import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RegionAccordionTooltipTextPipe } from '../util'
+import { hot } from 'jasmine-marbles'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -116,6 +117,7 @@ describe('> nehubaContainer.component.ts', () => {
 
     it('> component can be created', () => {
       const fixture = TestBed.createComponent(NehubaContainer)
+      fixture.componentInstance.currentOnHoverObs$ = hot('')
       const el = fixture.debugElement.componentInstance
       expect(el).toBeTruthy()
     })
@@ -124,6 +126,7 @@ describe('> nehubaContainer.component.ts', () => {
       
       it('> calls importNehubaPr', async () => {
         const fixture = TestBed.createComponent(NehubaContainer)
+        fixture.componentInstance.currentOnHoverObs$ = hot('')
 
         const mockStore = TestBed.inject(MockStore)
         const newState = {
@@ -155,6 +158,7 @@ describe('> nehubaContainer.component.ts', () => {
       it('> should set ngId of nehubaViewer', () => {
         
         const fixture = TestBed.createComponent(NehubaContainer)
+        fixture.componentInstance.currentOnHoverObs$ = hot('')
         const el = fixture.debugElement.componentInstance as NehubaContainer
         const mockStore = TestBed.inject(MockStore)
         const newState = {
@@ -221,6 +225,7 @@ describe('> nehubaContainer.component.ts', () => {
 
         it('> both should be shut', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           expect(
             fixture.componentInstance.matDrawerMain.opened
@@ -233,6 +238,7 @@ describe('> nehubaContainer.component.ts', () => {
         it('> opening via tab should result in only top drawer open', () => {
 
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
@@ -249,6 +255,7 @@ describe('> nehubaContainer.component.ts', () => {
         it('> on opening top drawer, explore features should not be present', () => {
 
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
@@ -259,6 +266,7 @@ describe('> nehubaContainer.component.ts', () => {
         it('> collapse btn should not be visible', () => {
 
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
@@ -292,6 +300,7 @@ describe('> nehubaContainer.component.ts', () => {
         })
         it('> both should be open', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           expect(
             fixture.componentInstance.matDrawerMain.opened
@@ -310,6 +319,7 @@ describe('> nehubaContainer.component.ts', () => {
 
         it('> closing main drawer via tag should close both', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
@@ -335,6 +345,7 @@ describe('> nehubaContainer.component.ts', () => {
         it('> collapse btn should be visible', () => {
 
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
           expect(collapseRegionFeatureBtn).not.toBeNull()
@@ -342,6 +353,7 @@ describe('> nehubaContainer.component.ts', () => {
         it('> clicking on collapse btn should minimize 1 drawer', () => {
 
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
           collapseRegionFeatureBtn.triggerEventHandler('click', null)
@@ -367,6 +379,7 @@ describe('> nehubaContainer.component.ts', () => {
 
         it('> on minimize drawer, clicking expand btn should expand everything', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
+          fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
           const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
           collapseRegionFeatureBtn.triggerEventHandler('click', null)
