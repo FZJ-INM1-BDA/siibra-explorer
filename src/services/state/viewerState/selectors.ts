@@ -6,6 +6,11 @@ export const viewerStateSelectedRegionsSelector = createSelector(
   viewerState => viewerState['regionsSelected']
 )
 
+export const viewerStateCustomLandmarkSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['userLandmarks']
+)
+
 const flattenFetchedTemplatesIntoParcellationsReducer = (acc, curr) => {
   const parcelations = (curr['parcellations'] || []).map(p => {
     return {

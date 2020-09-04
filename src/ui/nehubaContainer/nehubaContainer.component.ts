@@ -15,7 +15,7 @@ import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
 import { ARIA_LABELS, IDS } from 'common/constants'
 import { ngViewerActionSetPerspOctantRemoval, PANELS, ngViewerActionToggleMax, ngViewerActionAddNgLayer, ngViewerActionRemoveNgLayer } from "src/services/state/ngViewerState.store.helper";
-import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from 'src/services/state/viewerState.store.helper'
+import { viewerStateSelectRegionWithIdDeprecated, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateCustomLandmarkSelector, viewerStateSelectedParcellationSelector, viewerStateSelectedTemplateSelector } from 'src/services/state/viewerState.store.helper'
 import { SwitchDirective } from "src/util/directives/switch.directive";
 import {
   viewerStateDblClickOnViewer,
@@ -25,6 +25,7 @@ import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThre
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
+import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -168,9 +169,20 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public perspectiveViewLoading$: Observable<string|null>
   public showPerpsectiveScreen$: Observable<string>
 
-  public templateSelected$: Observable<any>
-  private newViewer$: Observable<any>
-  private selectedParcellation$: Observable<any>
+  public templateSelected$: Observable<any> = this.store.pipe(
+    select(viewerStateSelectedTemplateSelector),
+    distinctUntilChanged(isSame),
+  )
+
+  private newViewer$: Observable<any> = this.templateSelected$.pipe(
+    filter(v => !!v),
+  )
+
+  private selectedParcellation$: Observable<any> = this.store.pipe(
+    select(viewerStateSelectedParcellationSelector),
+    distinctUntilChanged(),
+    filter(v => !!v)
+  )
   public selectedRegions: any[] = []
   public selectedRegions$: Observable<any[]> = this.store.pipe(
     select('viewerState'),
@@ -180,6 +192,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public selectedLandmarks$: Observable<any[]>
   public selectedPtLandmarks$: Observable<any[]>
+  public customLandmarks$: Observable<any> = this.store.pipe(
+    select(viewerStateCustomLandmarkSelector),
+    map(lms => lms.map(lm => ({
+      ...lm,
+      geometry: { 
+        position: lm.position
+      }
+    })))
+  )
   private hideSegmentations$: Observable<boolean>
 
   private fetchedSpatialDatasets$: Observable<ILandmark[]>
@@ -191,7 +212,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   private currentOnHover: {segments: any, landmark: any, userLandmark: any}
 
   @Input()
-  private currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
+  currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
 
   public iavAdditionalLayers$ = new Subject<any[]>()
 
@@ -292,23 +313,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       )),
     )
 
-    this.templateSelected$ = this.store.pipe(
-      select('viewerState'),
-      select('templateSelected'),
-      distinctUntilChanged(isSame),
-    )
-
-    this.newViewer$ = this.templateSelected$.pipe(
-      filter(v => !!v),
-    )
-
-    this.selectedParcellation$ = this.store.pipe(
-      select('viewerState'),
-      select('parcellationSelected'),
-      distinctUntilChanged(),
-      filter(v => !!v)
-    )
-
     this.selectedLandmarks$ = this.store.pipe(
       select('viewerState'),
       select('landmarksSelected'),
@@ -328,8 +332,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.userLandmarks$ = this.store.pipe(
-      select('viewerState'),
-      select('userLandmarks'),
+      select(viewerStateCustomLandmarkSelector),
       distinctUntilChanged(),
     )
 
@@ -429,7 +432,6 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   public ngOnInit() {
-
     this.hoveredPanelIndices$ = fromEvent(this.elementRef.nativeElement, 'mouseover').pipe(
       switchMap((ev: MouseEvent) => merge(
         of(this.findPanelIndex(ev.target as HTMLElement)),
@@ -819,11 +821,11 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public selectedProp = null
 
   public returnTruePos(quadrant: number, data: any) {
-    const pos = quadrant > 2 ?
-      [0, 0, 0] :
-      this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant] ?
-        this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n => n * 1e6)) :
-        [0, 0, 0]
+    const pos = quadrant > 2
+      ? [0, 0, 0]
+      : this.nanometersToOffsetPixelsFn && this.nanometersToOffsetPixelsFn[quadrant]
+        ? this.nanometersToOffsetPixelsFn[quadrant](data.geometry.position.map(n => n * 1e6))
+        : [0, 0, 0]
     return pos
   }
 
@@ -835,6 +837,22 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
   public getPositionZ(quadrant: number, data: any) {
     return this.returnTruePos(quadrant, data)[2]
+  }
+
+  public handleMouseEnterCustomLandmark(lm) {
+    this.store.dispatch(
+      viewerStateMouseOverCustomLandmark({
+        payload: { userLandmark: lm }
+      })
+    )
+  }
+
+  public handleMouseLeaveCustomLandmark(lm) {
+    this.store.dispatch(
+      viewerStateMouseOverCustomLandmark({
+        payload: { userLandmark: null }
+      })
+    )
   }
 
   // handles mouse enter/leave landmarks in 2D
@@ -1024,9 +1042,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         ),
       ) ,
       mouseOverNehuba : this.onHoverSegment$.pipe(
-        tap(() => this.log.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.')),
+        tap(() => console.warn('mouseOverNehuba observable is becoming deprecated. use mouseOverNehubaLayers instead.')),
       ),
       mouseOverNehubaLayers: this.onHoverSegments$,
+      mouseOverNehubaUI: this.currentOnHoverObs$.pipe(
+        map(({ landmark, segments, userLandmark: customLandmark }) => ({ segments, landmark, customLandmark })),
+        shareReplay(1),
+      ),
       getNgHash : this.nehubaViewer.getNgHash,
     }
   }

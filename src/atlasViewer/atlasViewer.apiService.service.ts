@@ -346,11 +346,8 @@ export interface IInteractiveViewerInterface {
 
     mouseEvent: Observable<{eventName: string, event: MouseEvent}>
     mouseOverNehuba: Observable<{labelIndex: number, foundRegion: any | null}>
-    /**
-     * TODO add to documentation
-     */
     mouseOverNehubaLayers: Observable<Array<{layer: {name: string}, segment: any | number }>>
-
+    mouseOverNehubaUI: Observable<{ segments: any, landmark: any, customLandmark: any }>
     getNgHash: () => string
   }
 
@@ -386,7 +383,8 @@ export interface IUserLandmark {
   name: string
   position: [number, number, number]
   id: string /* probably use the it to track and remove user landmarks */
-  color: [ number, number, number ]
+  highlight: boolean
+  color?: [number, number, number]
 }
 
 export enum EnumCustomRegion{

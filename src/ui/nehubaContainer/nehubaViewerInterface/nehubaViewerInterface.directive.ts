@@ -11,6 +11,7 @@ import { timedValues } from "src/util/generator";
 import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiState.store";
 import { takeOnePipe } from "../nehubaContainer.component";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
+import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -461,12 +462,11 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
       this.nehubaViewerInstance.mouseoverUserlandmarkEmitter.pipe(
         throttleTime(160),
       ).subscribe(label => {
-        this.store$.dispatch({
-          type: VIEWERSTATE_ACTION_TYPES.MOUSEOVER_USER_LANDMARK_LABEL,
-          payload: {
-            label,
-          },
-        })
+        this.store$.dispatch(
+          viewerStateMouseOverCustomLandmarkInPerspectiveView({
+            payload: { label }
+          })
+        )
       }),
 
       this.nehubaViewerInstance.nehubaReady.pipe(

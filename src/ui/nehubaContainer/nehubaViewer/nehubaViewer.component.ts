@@ -99,7 +99,7 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       }
     }> = new EventEmitter()
   @Output() public mouseoverLandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
-  @Output() public mouseoverUserlandmarkEmitter: EventEmitter<number | null> = new EventEmitter()
+  @Output() public mouseoverUserlandmarkEmitter: EventEmitter<string> = new EventEmitter()
   @Output() public regionSelectionEmitter: EventEmitter<{segment: number, layer: {name?: string, url?: string}}> = new EventEmitter()
   @Output() public errorEmitter: EventEmitter<any> = new EventEmitter()
 
@@ -253,9 +253,9 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
         if (!url) { return }
         const _ = {}
         _[NG_USER_LANDMARK_LAYER_NAME] = {
-          type : 'mesh',
-          source : `vtk://${url}`,
-          shader : FRAGMENT_MAIN_WHITE,
+          type: 'mesh',
+          source: `vtk://${url}`,
+          shader: this.userLandmarkShader,
         }
         this.loadLayer(_)
       }),
@@ -500,16 +500,37 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
     )
   }
 
+  private userLandmarkShader: string = FRAGMENT_MAIN_WHITE
+  
   // TODO single landmark for user landmark
   public updateUserLandmarks(landmarks: any[]) {
     if (!this.nehubaViewer) {
       return
     }
+    
     this.workerService.worker.postMessage({
       type : 'GET_USERLANDMARKS_VTK',
       scale: Math.min(...this.dim.map(v => v * NG_LANDMARK_CONSTANT)),
       landmarks : landmarks.map(lm => lm.position.map(coord => coord * 1e6)),
     })
+
+    const parseLmColor = lm => {
+      if (!lm) return null
+      const { color } = lm
+      if (!color) return null
+      if (!Array.isArray(color)) return null
+      if (color.length !== 3) return null
+      const parseNum = num => (num >= 0 && num <= 255 ? num / 255 : 1).toFixed(3)
+      return `emitRGB(vec3(${color.map(parseNum).join(',')}));`
+    }
+  
+    const appendConditional = (frag, idx) => frag && `if (label > ${idx - 0.01} && label < ${idx + 0.01}) { ${frag} }`
+
+    if (landmarks.some(parseLmColor)) {
+      this.userLandmarkShader = `void main(){ ${landmarks.map(parseLmColor).map(appendConditional).filter(v => !!v).join('else ')} else {${FRAGMENT_EMIT_RED}} }`
+    } else {
+      this.userLandmarkShader = FRAGMENT_MAIN_WHITE  
+    }
   }
 
   public removeSpatialSearch3DLandmarks() {

@@ -80,3 +80,13 @@ export const viewreStateRemoveUserLandmarks = createAction(
   `[viewerState] removeUserLandmarks`,
   props<{ payload: { landmarkIds: string[] } }>()
 )
+
+export const viewerStateMouseOverCustomLandmark = createAction(
+  '[viewerState] mouseOverCustomLandmark',
+  props<{ payload: { userLandmark: any } }>()
+)
+
+export const viewerStateMouseOverCustomLandmarkInPerspectiveView = createAction(
+  `[viewerState] mouseOverCustomLandmarkInPerspectiveView`,
+  props<{ payload: { label: string } }>()
+)

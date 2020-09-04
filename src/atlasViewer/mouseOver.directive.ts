@@ -5,7 +5,7 @@ import { combineLatest, merge, Observable } from "rxjs";
 import { distinctUntilChanged, filter, map, scan, shareReplay, startWith, withLatestFrom } from "rxjs/operators";
 import { TransformOnhoverSegmentPipe } from "src/atlasViewer/onhoverSegment.pipe";
 import { LoggingService } from "src/logging";
-import { getNgIdLabelIndexFromId, IavRootStoreInterface } from "src/services/stateStore.service";
+import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";
 
 /**
  * Scan function which prepends newest positive (i.e. defined) value
@@ -44,7 +44,7 @@ export class MouseHoverDirective {
   public currentOnHoverObs$: Observable<{segments: any, landmark: any, userLandmark: any}>
 
   constructor(
-    private store$: Store<IavRootStoreInterface>,
+    private store$: Store<any>,
     private log: LoggingService,
   ) {
 
@@ -144,14 +144,22 @@ export class MouseHoverDirective {
 
     this.currentOnHoverObs$ = mergeObs.pipe(
       scan(temporalPositveScanFn, []),
-      map(arr => arr[0]),
-      map(val => {
-        return {
+      map(arr => {
+
+        let returnObj = {
           segments: null,
           landmark: null,
           userLandmark: null,
-          ...val,
         }
+
+        for (const val of arr) {
+          returnObj = {
+            ...returnObj,
+            ...val
+          }
+        }
+
+        return returnObj
       }),
       shareReplay(1),
     )

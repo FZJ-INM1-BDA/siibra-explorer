@@ -49,12 +49,14 @@ import {
   viewerStateSelectedTemplateSelector,
   viewerStateSelectedParcellationSelector,
   viewerStateGetSelectedAtlas,
+  viewerStateCustomLandmarkSelector,
 } from './viewerState/selectors'
 
 export {
   viewerStateSelectedRegionsSelector,
   viewerStateSelectedTemplateSelector,
   viewerStateSelectedParcellationSelector,
+  viewerStateCustomLandmarkSelector,
 }
 
 interface IViewerStateHelperStore{

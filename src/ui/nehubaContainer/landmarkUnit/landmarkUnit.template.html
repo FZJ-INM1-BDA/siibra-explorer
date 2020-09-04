@@ -1,41 +1,40 @@
 <div 
-  [ngStyle] = "{opacity:calcOpacity()}"
+  [ngStyle]="{ opacity: opacity }"
   landmarkContainer>
   
   <div 
     [style.transform] = "markerTransform | safeStyle"
-    [ngStyle] = "styleNode()"
+    [ngStyle]="nodeStyle"
     nodeView 
     #nodeView>
-    <span 
-      [class] = "className">
+    <span [class]="className">
     </span>
   </div>
 
   <div
-    [style.transform] = "beamTransform | safeStyle" 
-    class = "pos-beam">
+    [style.transform]="beamTransform | safeStyle" 
+    class="pos-beam">
     
     <div 
-      *ngIf = "positionZ >= 0"
-      [ngStyle] = "styleBeamColor(false)"
-      class = "pos-beam-outer">
+      *ngIf="positionZ >= 0"
+      [ngStyle]="beamColorOuter"
+      class="pos-beam-outer">
     </div>
     <div 
-      *ngIf = "positionZ >= 0"
-      [ngStyle] = "styleBeamColor(true)"
-      class = "pos-beam-inner">
+      *ngIf="positionZ >= 0"
+      [ngStyle]="beamColorInner"
+      class="pos-beam-inner">
     </div>
 
     <div 
-      *ngIf = "positionZ < 0"
-      [ngStyle] = "styleBeamDashedColor()"
-      class = "pos-beam-dashed">
+      *ngIf="positionZ < 0"
+      [ngStyle]="beamDashedColor"
+      class="pos-beam-dashed">
     </div>
   </div>
   <div 
-    [ngStyle]="styleShadow()"
-    class = "pos-shadow">
+    [ngStyle]="shadowStyle"
+    class="pos-shadow">
     
   </div>
 </div>

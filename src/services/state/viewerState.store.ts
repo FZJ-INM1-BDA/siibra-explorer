@@ -9,8 +9,17 @@ import { getViewer } from 'src/util/fn';
 import { LoggingService } from 'src/logging';
 import { generateLabelIndexId, IavRootStoreInterface } from '../stateStore.service';
 import { GENERAL_ACTION_TYPES } from '../stateStore.service'
-import { MOUSEOVER_USER_LANDMARK, CLOSE_SIDE_PANEL } from './uiState.store';
-import { viewerStateSetSelectedRegions, viewerStateSetConnectivityRegion, viewerStateSelectAtlas, viewerStateSelectParcellation } from './viewerState.store.helper';
+import { CLOSE_SIDE_PANEL } from './uiState.store';
+import { 
+  viewerStateSetSelectedRegions,
+  viewerStateSetConnectivityRegion,
+  viewerStateSelectAtlas,
+  viewerStateSelectParcellation,
+  viewerStateSelectRegionWithIdDeprecated,
+  viewerStateCustomLandmarkSelector,
+} from './viewerState.store.helper';
+
+import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateMouseOverCustomLandmark, viewerStateMouseOverCustomLandmarkInPerspectiveView } from './viewerState/actions';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -246,11 +255,6 @@ export function stateStore(state, action) {
   return defaultStateStore(state, action)
 }
 
-import {
-  viewerStateSelectRegionWithIdDeprecated
-} from './viewerState.store.helper'
-import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks } from './viewerState/actions';
-
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
@@ -291,8 +295,8 @@ export class ViewerStateUseEffect {
       select('viewerState'),
       shareReplay(1)
     )
-    this.currentLandmarks$ = viewerState$.pipe(
-      select('userLandmarks'),
+    this.currentLandmarks$ = this.store$.pipe(
+      select(viewerStateCustomLandmarkSelector),
       shareReplay(1),
     )
 
@@ -314,7 +318,7 @@ export class ViewerStateUseEffect {
     )
 
     this.addUserLandmarks$ = this.actions$.pipe(
-      ofType(ACTION_TYPES.ADD_USERLANDMARKS),
+      ofType(viewerStateAddUserLandmarks.type),
       withLatestFrom(this.currentLandmarks$),
       map(([action, currentLandmarks]) => {
         const { landmarks } = action as ActionInterface
@@ -340,36 +344,31 @@ export class ViewerStateUseEffect {
     )
 
     this.mouseoverUserLandmarks = this.actions$.pipe(
-      ofType(ACTION_TYPES.MOUSEOVER_USER_LANDMARK_LABEL),
+      ofType(viewerStateMouseOverCustomLandmarkInPerspectiveView.type),
       withLatestFrom(this.currentLandmarks$),
       map(([ action, currentLandmarks ]) => {
         const { payload } = action as any
         const { label } = payload
-        if (!label) { return {
-          type: MOUSEOVER_USER_LANDMARK,
-          payload: {
-            userLandmark: null,
-          },
-        }
+        if (!label) {
+          return viewerStateMouseOverCustomLandmark({
+            payload: {
+              userLandmark: null
+            }
+          })
         }
 
         const idx = Number(label.replace('label=', ''))
         if (isNaN(idx)) {
           this.log.warn(`Landmark index could not be parsed as a number: ${idx}`)
-          return {
-            type: MOUSEOVER_USER_LANDMARK,
-            payload: {
-              userLandmark: null,
-            },
-          }
+          return viewerStateMouseOverCustomLandmark({
+            payload: { userLandmark: null }
+          })
         }
-
-        return {
-          type: MOUSEOVER_USER_LANDMARK,
+        return viewerStateMouseOverCustomLandmark({
           payload: {
-            userLandmark: currentLandmarks[idx],
-          },
-        }
+            userLandmark: currentLandmarks[idx]
+          }
+        })
       }),
 
     )
@@ -467,9 +466,7 @@ export class ViewerStateUseEffect {
 }
 
 const ACTION_TYPES = {
-  ADD_USERLANDMARKS: viewerStateAddUserLandmarks.type,
   REMOVE_USER_LANDMARKS: viewreStateRemoveUserLandmarks.type,
-  MOUSEOVER_USER_LANDMARK_LABEL: 'MOUSEOVER_USER_LANDMARK_LABEL',
 
   SINGLE_CLICK_ON_VIEWER: 'SINGLE_CLICK_ON_VIEWER',
   DOUBLE_CLICK_ON_VIEWER: viewerStateDblClickOnViewer.type

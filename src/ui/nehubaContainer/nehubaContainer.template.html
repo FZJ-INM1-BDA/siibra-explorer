@@ -471,6 +471,18 @@
   <!-- nb this slice view is not suitable for perspective view! -->
   <layout-floating-container *ngIf="panelIndex < 3" landmarkContainer>
 
+    <!-- customLandmarks -->
+    <nehuba-2dlandmark-unit *ngFor="let lm of (customLandmarks$ | async)"
+    (mouseenter)="handleMouseEnterCustomLandmark(lm)"
+      (mouseleave)="handleMouseLeaveCustomLandmark(lm)"
+      fasClass="fa-chevron-down"
+      [color]="lm.color || [255, 255, 255]"
+      [positionX]="getPositionX(panelIndex, lm)"
+      [positionY]="getPositionY(panelIndex, lm)"
+      [positionZ]="getPositionZ(panelIndex, lm)">
+
+    </nehuba-2dlandmark-unit>
+
     <!-- only show landmarks in slice views -->
 
     <nehuba-2dlandmark-unit *ngFor="let spatialData of (selectedPtLandmarks$ | async)"
