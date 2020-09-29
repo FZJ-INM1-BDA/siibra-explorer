@@ -622,6 +622,27 @@
                           "relatedAreas": []
                         },
                         {
+                          "name": "Area hOc3v (LingG)",
+                          "ngId": "v3v",
+                          "status": "fully mapped",
+                          "labelIndex": 1,
+                          "position": [
+                          ],
+                          "rgb": [
+                            83,
+                            179,
+                            155
+                          ],
+                          "children": [],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+                            }
+                          },
+                          "relatedAreas": []
+                        },
+                        {
                           "name": "dorsal occipital cortex",
                           "children": [
                             {
@@ -644,12 +665,38 @@
                               "relatedAreas": []
                             }
                           ]
-                        }
-                      ]
-                    }
-                  ]
-                }
-              ]
+			},
+			{
+				"name": "lateral occipital cortex",
+				"children": [
+					{
+						"name": "Area hOc5 (LOC)",
+						"ngId": "v5",
+						"status": "fully mapped",
+						"labelIndex": 1,
+						"position": [
+						],
+						"rgb": [
+							255,
+							0,
+							0
+						],
+						"children": [],
+						"fullId": {
+							"kg": {
+								"kgSchema": "minds/core/parcellationregion/v1.0.0",
+								"kgId": "04674a3c-bb3a-495e-a466-206355e630bd"
+							}
+						},
+						"relatedAreas": []
+					}
+				]
+			}
+		      ]
+		    }
+		  ]
+		}
+	      ]
             }
           ]
         }
