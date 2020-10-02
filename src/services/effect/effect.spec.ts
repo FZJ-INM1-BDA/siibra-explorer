@@ -10,6 +10,8 @@ import { defaultRootState } from '../stateStore.service'
 
 const colinsJson = require('!json-loader!../../res/ext/colin.json')
 
+const COLIN_JULICHBRAIN_LAYER_NAME = `COLIN_V24_LEFT_NG`
+
 describe('effect.ts', () => {
   describe('getGetRegionFromLabelIndexId', () => {
     it('translateds hoc1 from labelIndex to region', () => {
@@ -20,9 +22,9 @@ describe('effect.ts', () => {
           updated: true,
         },
       })
-      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: 'julich brain colin v22 left#116' })
+      const fetchedRegion = getRegionFromlabelIndexId({ labelIndexId: `${COLIN_JULICHBRAIN_LAYER_NAME}#116` })
       expect(fetchedRegion).toBeTruthy()
-      expect(fetchedRegion.fullId.kg.kgId).toEqual('5151ab8f-d8cb-4e67-a449-afe2a41fb007')
+      expect(fetchedRegion.fullId.kg.kgId).toEqual('b09aaa77-f41b-4008-b8b9-f984b0417cf3')
       
     })
   })
