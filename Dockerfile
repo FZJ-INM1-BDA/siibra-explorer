@@ -7,7 +7,7 @@ ARG USE_LOGO
 ENV USE_LOGO=${USE_LOGO:-hbp}
 
 ARG DATASET_PREVIEW_URL
-ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/datasetPreview}
+ENV DATASET_PREVIEW_URL=${DATASET_PREVIEW_URL:-https://hbp-kg-dataset-previewer.apps.hbp.eu/v2}
 
 ARG USE_LOGO
 ENV USE_LOGO=${USE_LOGO:-hbp}
