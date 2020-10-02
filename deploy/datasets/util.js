@@ -97,7 +97,7 @@ initPrArray.push(
     .then(json => {
       const longBundle = flattenRegions(json.parcellations.find(({ name }) => name === 'Fibre Bundle Atlas - Long Bundle').regions)
       const shortBundle = flattenRegions(json.parcellations.find(({ name }) =>  name === 'Fibre Bundle Atlas - Short Bundle').regions)
-      const jubrain = flattenRegions(json.parcellations.find(({ name }) => 'JuBrain Cytoarchitectonic Atlas' === name).regions)
+      const jubrain = flattenRegions(json.parcellations.find(({ name }) => 'Cytoarchitectonic Maps' === name).regions)
       longBundleSet = populateSet(longBundle)
       shortBundleSet = populateSet(shortBundle)
       juBrainSet = populateSet(jubrain)
