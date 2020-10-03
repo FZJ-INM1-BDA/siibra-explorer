@@ -12304,11 +12304,16 @@
               "status": "left hemisphere",
               "labelIndex": 13,
               "ngId": "ICBM152_V24_LEFT_NG",
+              "rgb": [
+                186,
+                255,
+                25
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-I (GapMap) [v9.2, ICBM 2009c Asymmetric, left hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "d7f53ed36c5c546be47deb6891edc20d"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "6b1ebd25-d1bf-477a-9f6f-d458b24bc6b7"
                 }
               ],
               "_": {
@@ -12328,11 +12333,16 @@
               "status": "left hemisphere",
               "labelIndex": 32,
               "ngId": "ICBM152_V24_LEFT_NG",
+              "rgb": [
+                104,
+                161,
+                93
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-to-Occipital (GapMap) [v9.2, ICBM 2009c Asymmetric, left hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "b7d5d816297321efec0fd9364de8809a"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "f3ae17b7-f994-4161-ba60-46a971610167"
                 }
               ],
               "_": {
@@ -12352,11 +12362,16 @@
               "status": "left hemisphere",
               "labelIndex": 60,
               "ngId": "ICBM152_V24_LEFT_NG",
+              "rgb": [
+                76,
+                90,
+                161
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Temporal-to-Parietal (GapMap) [v9.2, ICBM 2009c Asymmetric, left hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "90596a422d2c94b8f7acf1d79f0d463e"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "19838359-3e95-4334-aaa0-3c64e3a65c18"
                 }
               ],
               "_": {
@@ -12376,11 +12391,16 @@
               "status": "left hemisphere",
               "labelIndex": 90,
               "ngId": "ICBM152_V24_LEFT_NG",
+              "rgb": [
+                255,
+                135,
+                15
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-II (GapMap) [v9.2, ICBM 2009c Asymmetric, left hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "35d1a2a10e3c524ac9ef09e859a7952d"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "1db74846-624c-4be3-b4cc-71c18e94b119"
                 }
               ],
               "_": {
@@ -12400,11 +12420,16 @@
               "status": "left hemisphere",
               "labelIndex": 97,
               "ngId": "ICBM152_V24_LEFT_NG",
+              "rgb": [
+                161,
+                24,
+                74
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-to-Temporal (GapMap) [v9.2, ICBM 2009c Asymmetric, left hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "18ed63d8f6accb3042cbd0e63e5c6565"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "6e0c6897-7ecf-451e-a9ad-d3e96bcc7b45"
                 }
               ],
               "_": {
@@ -12424,11 +12449,16 @@
               "status": "right hemisphere",
               "labelIndex": 13,
               "ngId": "ICBM152_V24_RIGHT_NG",
+              "rgb": [
+                186,
+                255,
+                25
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-I (GapMap) [v9.2, ICBM 2009c Asymmetric, right hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "d7f53ed36c5c546be47deb6891edc20d"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "6b1ebd25-d1bf-477a-9f6f-d458b24bc6b7"
                 }
               ],
               "_": {
@@ -12448,11 +12478,16 @@
               "status": "right hemisphere",
               "labelIndex": 32,
               "ngId": "ICBM152_V24_RIGHT_NG",
+              "rgb": [
+                104,
+                161,
+                93
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-to-Occipital (GapMap) [v9.2, ICBM 2009c Asymmetric, right hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "b7d5d816297321efec0fd9364de8809a"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "f3ae17b7-f994-4161-ba60-46a971610167"
                 }
               ],
               "_": {
@@ -12472,11 +12507,16 @@
               "status": "right hemisphere",
               "labelIndex": 60,
               "ngId": "ICBM152_V24_RIGHT_NG",
+              "rgb": [
+                76,
+                90,
+                161
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Temporal-to-Parietal (GapMap) [v9.2, ICBM 2009c Asymmetric, right hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "90596a422d2c94b8f7acf1d79f0d463e"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "19838359-3e95-4334-aaa0-3c64e3a65c18"
                 }
               ],
               "_": {
@@ -12496,11 +12536,16 @@
               "status": "right hemisphere",
               "labelIndex": 90,
               "ngId": "ICBM152_V24_RIGHT_NG",
+              "rgb": [
+                255,
+                135,
+                15
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-II (GapMap) [v9.2, ICBM 2009c Asymmetric, right hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "35d1a2a10e3c524ac9ef09e859a7952d"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "1db74846-624c-4be3-b4cc-71c18e94b119"
                 }
               ],
               "_": {
@@ -12520,11 +12565,16 @@
               "status": "right hemisphere",
               "labelIndex": 96,
               "ngId": "ICBM152_V24_RIGHT_NG",
+              "rgb": [
+                161,
+                24,
+                74
+              ],
               "originDatasets": [
                 {
                   "filename": "GapMap Frontal-to-Temporal (GapMap) [v9.2, ICBM 2009c Asymmetric, right hemisphere]",
-                  "kgSchema": "julich/tmp/dataset/v1.0.0",
-                  "kgId": "18ed63d8f6accb3042cbd0e63e5c6565"
+                  "kgSchema": "minds/core/dataset/v1.0.0",
+                  "kgId": "6e0c6897-7ecf-451e-a9ad-d3e96bcc7b45"
                 }
               ],
               "_": {
@@ -12543,7 +12593,7 @@
         }
       ],
       "_": {
-        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_ontology/src/1cccaf9ed445a88e6c9309dd7a99b041225309bf/output/nehuba-ui/julich-brain-v2_4-icbm152.json"
+        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201002_JulichBrain-V2_4-ICBM152_ontology/src/5206d759e7ed4adc4a35336519030de5605ca304/output/nehuba-ui/julich-brain-v2_4-icbm152.json"
       }
     },
     {

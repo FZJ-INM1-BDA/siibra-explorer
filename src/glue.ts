@@ -371,9 +371,10 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   public displayDatasetPreview(previewFile: DatasetPreview, dataset: IKgDataEntry){
     const { filename, datasetId } = previewFile
     const { fullId } = dataset
-    const { kgId } = getIdObj(fullId)
+    const { kgId, kgSchema } = getIdObj(fullId)
 
     const datasetPreviewFile = {
+      datasetSchema: kgSchema,
       datasetId: datasetId || kgId,
       filename
     }
