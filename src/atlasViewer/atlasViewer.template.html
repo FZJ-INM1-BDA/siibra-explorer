@@ -41,7 +41,6 @@
 <!-- atlas template -->
 <ng-template #viewerBody>
   <div class="atlas-container"
-    (drag-drop)="localFileService.handleFileDrop($event)"
     iav-media-query
     #media="iavMediaQuery">
     <!-- prevent default is required so that user do not zoom in on UI or scroll on mobile UI -->
@@ -54,7 +53,8 @@
       [currentOnHover]="iavMouseHoverEl.currentOnHoverObs$ | async"
       iav-captureClickListenerDirective
       [iav-captureClickListenerDirective-captureDocument]="true"
-      (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)">
+      (iav-captureClickListenerDirective-onUnmovedClick)="mouseClickDocument($event)"
+      (drag-drop)="localFileService.handleFileDrop($event)">
 
       <!-- top right content transclusion -->
       <div ui-nehuba-container-overlay-top-right class="d-inline-flex flex-row justify-content-end align-items-start z-index-6 position-absolute pe-none w-100 h-100">
@@ -106,7 +106,7 @@
             </ng-container>
 
           </mat-chip-list>
-          
+
           <!-- current layer tmpl -->
 
           <ng-template #currParcellationTmpl let-parc="parc" let-addParc="addParc">
@@ -149,7 +149,7 @@
               [ngClass]="chipClass"
               (click)="onclick && onclick()"
               [selected]="selected">
-              
+
               <span>
                 {{ parcel?.groupName ? (parcel?.groupName + ' - ') : '' }}{{ parcel && (parcel.displayName || parcel.name) }}
               </span>
@@ -291,7 +291,7 @@
                 [iav-dataset-preview-dataset-file-kgid]="layer.datasetId"
                 [iav-dataset-preview-dataset-file-filename]="layer.filename"
                 #preview="iavDatasetPreviewDatasetFile">
-                
+
               </div>
               <mat-chip class="pe-all"
                 (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()">
