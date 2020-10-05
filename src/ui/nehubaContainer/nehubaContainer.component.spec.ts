@@ -406,6 +406,19 @@ describe('> nehubaContainer.component.ts', () => {
           // ).toEqual(true)
         })
       })
+
+      describe('> side bar content', () => {
+
+        /**
+         * TODO
+         */
+        it('> if nothing is shown, it should show place holder text')
+
+        /**
+         * TODO
+         */
+        it('> if something (region features/connectivity) exists, placeh holder text should be hdiden')
+      })
     })
   })
 })
