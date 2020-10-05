@@ -379,6 +379,14 @@
       #iavDbDirective="iavDatabrowserDirective">
     </div>
 
+    <!-- place holder content, if no regional features or connectivity or change ref space options are available -->
+    <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0
+      && !(selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'))">
+      <div class="p-4">
+        No additional information on the selected region.
+      </div>
+    </ng-template>
+
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: 'Regional features',
       desc: iavDbDirective?.dataentries?.length,
@@ -408,9 +416,7 @@
       desc: connectedCounterDir.value,
       iconClass: 'fas fa-braille',
       iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
-      iavNgIf: selectedParcellation
-        && selectedParcellation.hasAdditionalViewMode
-        && selectedParcellation.hasAdditionalViewMode.includes('connectivity'),
+      iavNgIf: selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'),
       content: connectivityContentTmpl
     }">
     </ng-container>
