@@ -3796,6 +3796,12 @@
                             193,
                             45
                           ],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0db35172-495f-494d-9c14-01a2d6c7e398"
+                            }
+                          },
                           "children": []
                         },
                         {
@@ -3932,19 +3938,7 @@
                           "kgSchema": "minds/core/parcellationregion/v1.0.0",
                           "kgId": "b4ab5ba5-0753-4ffb-80f9-ccd5d85cb6ac"
                         }
-                      },
-                      "relatedAreas": [
-                        {
-                          "name": "Rat Neocortex (v3)",
-                          "fullId": {
-                            "kg": {
-                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
-                              "kgId": "0db35172-495f-494d-9c14-01a2d6c7e398",
-                              "alternateOf": []
-                            }
-                          }
-                        }
-                      ]
+                      }
                     },
                     {
                       "ngId": "v3",
