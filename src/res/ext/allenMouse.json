@@ -33,6 +33,7 @@
           ],
           "name": "root",
           "labelIndex": 997,
+          "unselectable": true,
           "relatedAreas": [
             {
               "name": "Whole brain",
