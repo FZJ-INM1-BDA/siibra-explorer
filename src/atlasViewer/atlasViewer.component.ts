@@ -44,6 +44,7 @@ import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewer
 import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
+import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
 
 /**
  * TODO
@@ -193,8 +194,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
     // TODO temporary hack. even though the front octant is hidden, it seems if a mesh is present, hover will select the said mesh
     this.onhoverSegments$ = this.store.pipe(
-      select('uiState'),
-      select('mouseOverSegments'),
+      select(uiStateMouseOverSegmentsSelector),
       filter(v => !!v),
       distinctUntilChanged((o, n) => o.length === n.length && n.every(segment => o.find(oSegment => oSegment.layer.name === segment.layer.name && oSegment.segment === segment.segment) ) ),
       /* cannot filter by state, as the template expects a default value, or it will throw ExpressionChangedAfterItHasBeenCheckedError */
