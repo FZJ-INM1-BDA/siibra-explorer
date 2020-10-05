@@ -58,7 +58,7 @@ export class LandmarkUnit implements OnChanges {
   public opacity: number = 1
 
   public ngOnChanges(simpleChanges: SimpleChanges) {
-    const { 
+    const {
       positionX,
       positionY,
       positionZ,
@@ -75,15 +75,15 @@ export class LandmarkUnit implements OnChanges {
     if (positionX || positionY) {
       this.transform = `translate(${positionX?.currentValue || this.positionX}px, ${positionY?.currentValue || this.positionY}px)`
     }
-    
+
     if (color || positionZ || highlight) {
       const zIndex = (positionZ.currentValue || this.positionZ) >= 0 ? 0 : -2
       const nColor = color?.currentValue
         || this.color
         || (highlight?.currentValue || this.highlight)
         ? HOVER_COLOR
-        : NORMAL_COLOR
-      
+        : this.color? this.color : NORMAL_COLOR
+
       this.nodeStyle = {
         color: `rgb(${nColor.join(',')})`,
         'z-index': zIndex
@@ -100,6 +100,10 @@ export class LandmarkUnit implements OnChanges {
         ...this.shadowStyle,
         background: shadowStyleBackground,
       }
+
+      this.beamColorInner = {
+        ...this.beamColorInner,
+        'border-top-color' : `rgba(${nColor.join(',')},0.8)`, }
     }
 
     if (flatProjection || highlight || positionZ) {
@@ -111,7 +115,7 @@ export class LandmarkUnit implements OnChanges {
       const highlightVal = typeof highlight === 'undefined'
         ? this.highlight
         : flatProjection.currentValue
-      
+
       const positionZVal = typeof positionZ === 'undefined'
         ? this.positionZ
         : positionZ.currentValue
