@@ -138,10 +138,7 @@ app.use(require('./devBanner'))
 /**
  * populate nonce token
  */
-const indexTemplate = fs.readFileSync(
-  path.join(PUBLIC_PATH, 'index.html'),
-  'utf-8'
-)
+const { indexTemplate } = require('./constants')
 app.get('/', cookieParser(), (req, res) => {
   const iavError = req.cookies && req.cookies['iav-error']
   

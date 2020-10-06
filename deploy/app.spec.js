@@ -26,9 +26,6 @@ describe('authentication', () => {
     const auth = require('./auth')
     const authConfigureAuthStub = sinon.stub(auth, 'configureAuth')
     const authIsReadyStub = sinon.stub(auth, 'ready')
-    const fsReadyFileSyncStub = sinon.stub(fs, 'readFileSync')
-
-    fsReadyFileSyncStub.returns(``)
   
     require.cache[require.resolve('./datasets')] = {
       exports: (req, res, next) => next()
@@ -40,6 +37,12 @@ describe('authentication', () => {
 
     require.cache[require.resolve('./user')] = {
       exports: fakeFunctionObj.fakeUserRouterFn
+    }
+
+    require.cache[require.resolve('./constants')] = {
+      exports: {
+        indexTemplate: ``
+      }
     }
   
     authConfigureAuthStub.callsFake(app => {
