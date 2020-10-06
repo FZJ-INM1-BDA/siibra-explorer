@@ -42,9 +42,18 @@ app.use((req, _, next) => {
 
 const { configureAuth, ready: authReady } = require('./auth')
 
-const store = new MemoryStore({
-  checkPeriod: 86400000
-})
+/**
+ * memorystore (or perhaps lru-cache itself) does not properly close when server shuts
+ * this causes problems during tests
+ * So when testing app.js, set USE_DEFAULT_MEMORY_STORE to true
+ * see app.spec.js
+ */
+const { USE_DEFAULT_MEMORY_STORE } = process.env
+const store = USE_DEFAULT_MEMORY_STORE
+  ? (console.warn(`USE_DEFAULT_MEMORY_STORE is set to true, memleak expected. Do NOT use in prod.`), null)
+  : new MemoryStore({
+      checkPeriod: 86400000
+    })
 
 const SESSIONSECRET = process.env.SESSIONSECRET || 'this is not really a random session secret'
 
@@ -67,14 +76,15 @@ if (process.env.DISABLE_CSP && process.env.DISABLE_CSP === 'true') {
   require('./csp')(app)
 }
 
-
 /**
  * configure Auth
  * async function, but can start server without
  */
-configureAuth(app)
-  .then(() => console.log('configure auth properly'))
-  .catch(e => console.error('configure auth failed', e))
+
+(async () => {
+  await configureAuth(app)
+  app.use('/user', require('./user'))
+})()
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
@@ -153,11 +163,6 @@ app.get('/', cookieParser(), (req, res) => {
 
 
 app.use('/logo', require('./logo'))
-
-/**
- * User route, for user profile/management
- */
-app.use('/user', require('./user'))
 
 app.get('/ready', async (req, res) => {
   const authIsReady = await authReady()

@@ -1,4 +1,5 @@
 const { configureAuth, jwtDecode } = require('./oidc')
+const objStoreDb = new Map()
 
 const HOSTNAME = process.env.HOSTNAME || 'http://localhost:3000'
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
@@ -50,6 +51,7 @@ const getPublicAccessToken = async () => {
 }
 
 const initPassportJs = app => {
+  console.log('init passport js')
   const passport = require('passport')
   
   app.use(passport.initialize())
@@ -70,6 +72,13 @@ const initPassportJs = app => {
 
 module.exports = async () => {
 
+  /**
+   * this configuration is required to acquire valid
+   * access tokens using refresh token
+   * 
+   * This is so that datasets can be retrieved when user
+   * is not authenticated
+   */
   const { client } = await configureAuth({
     clientId,
     clientSecret,
@@ -85,6 +94,7 @@ module.exports = async () => {
 
   return {
     initPassportJs,
+    objStoreDb,
     getPublicAccessToken: async () => await getPublicAccessToken()
   }
 }
