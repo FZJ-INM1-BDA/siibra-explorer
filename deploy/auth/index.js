@@ -1,4 +1,3 @@
-const objStoreDb = new Map()
 const HOST_PATHNAME = process.env.HOST_PATHNAME || ''
 const { retry } = require('../../common/util')
 
@@ -14,7 +13,7 @@ const configureAuth = async (app) => {
   const hbpOidc2 = require('./hbp-oidc-v2')
   
   const obj = await require('./util')()
-  const { initPassportJs } = obj
+  const { initPassportJs, objStoreDb } = obj
   initPassportJs(app)
 
   await retry(() => hbpOidc(app), { timeout: 1000, retries: 3 })
