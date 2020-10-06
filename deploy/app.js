@@ -138,7 +138,7 @@ app.use(require('./devBanner'))
 /**
  * populate nonce token
  */
-const indexTemplate = require('fs').readFileSync(
+const indexTemplate = fs.readFileSync(
   path.join(PUBLIC_PATH, 'index.html'),
   'utf-8'
 )

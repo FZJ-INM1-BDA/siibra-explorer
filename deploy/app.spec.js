@@ -1,4 +1,5 @@
 const { expect } = require('chai')
+const fs = require('fs')
 const { assert } = require('console')
 const express = require('express')
 const got = require('got')
@@ -25,6 +26,9 @@ describe('authentication', () => {
     const auth = require('./auth')
     const authConfigureAuthStub = sinon.stub(auth, 'configureAuth')
     const authIsReadyStub = sinon.stub(auth, 'ready')
+    const fsReadyFileSyncStub = sinon.stub(fs, 'readFileSync')
+
+    fsReadyFileSyncStub.returns(``)
   
     require.cache[require.resolve('./datasets')] = {
       exports: (req, res, next) => next()
@@ -50,10 +54,6 @@ describe('authentication', () => {
   })
 
   after(() => {
-    delete require.cache[require.resolve('./datasets')]
-    delete require.cache[require.resolve('./saneUrl')]
-    delete require.cache[require.resolve('./user')]
-  
     server.close()
   })
   
