@@ -1,4 +1,5 @@
 const fs = require('fs')
+const path = require('path')
 
 const PUBLIC_PATH = process.env.NODE_ENV === 'production'
   ? path.join(__dirname, 'public')
