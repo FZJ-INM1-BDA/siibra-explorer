@@ -81,8 +81,7 @@ export class LandmarkUnit implements OnChanges {
       const nColor = color?.currentValue
         || this.color
         || (highlight?.currentValue || this.highlight)
-        ? HOVER_COLOR
-        : this.color? this.color : NORMAL_COLOR
+        ? this.color? this.color : HOVER_COLOR : NORMAL_COLOR
 
       this.nodeStyle = {
         color: `rgb(${nColor.join(',')})`,
