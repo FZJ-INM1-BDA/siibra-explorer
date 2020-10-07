@@ -193,7 +193,7 @@ export class MouseOverTextPipe implements PipeTransform {
     case 'segments':
       return obj.map(({ segment }) => this.transformOnHoverSegmentPipe.transform(segment))
     case 'userLandmark':
-      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.id)]
+      return [this.sanitizer.sanitize(SecurityContext.HTML, obj.name)]
     default:
       // ts-lint:disable-next-line
       console.warn(`mouseOver.directive.ts#mouseOverTextPipe: Cannot be displayed: label: ${label}`)
