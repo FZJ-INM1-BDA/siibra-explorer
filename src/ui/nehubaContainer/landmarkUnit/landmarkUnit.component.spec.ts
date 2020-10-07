@@ -1,6 +1,5 @@
 import { Component, ViewChild } from "@angular/core"
 import { async, TestBed } from "@angular/core/testing"
-import { By } from "@angular/platform-browser"
 import { SafeStylePipe } from "src/util/pipes/safeStyle.pipe"
 import { HOVER_COLOR, LandmarkUnit, NORMAL_COLOR } from "./landmarkUnit.component"
 
@@ -10,18 +9,7 @@ import { HOVER_COLOR, LandmarkUnit, NORMAL_COLOR } from "./landmarkUnit.componen
  * see https://github.com/angular/angular/issues/35614
  */
 @Component({
-  template: `
-  <nehuba-2dlandmark-unit
-    [positionX]="positionX"
-    [positionY]="positionY"
-    [positionZ]="positionZ"
-    [color]="color"
-    [highlight]="highlight"
-    [flatProjection]="flatProjection"
-    [fasClass]="fasClass" 
-    >
-  </nehuba-2dlandmark-unit>
-  `
+  template: ``
 })
 class DummyCmp{
   @ViewChild(LandmarkUnit) public landmarkUnit: LandmarkUnit
@@ -44,6 +32,21 @@ describe('> landmarkUnit.component.ts', () => {
           LandmarkUnit,
           SafeStylePipe
         ]
+      }).overrideComponent(DummyCmp, {
+        set: {
+          template: `
+          <nehuba-2dlandmark-unit
+            [positionX]="positionX"
+            [positionY]="positionY"
+            [positionZ]="positionZ"
+            [color]="color"
+            [highlight]="highlight"
+            [flatProjection]="flatProjection"
+            [fasClass]="fasClass" 
+            >
+          </nehuba-2dlandmark-unit>
+          `
+        }
       }).compileComponents()
     }))
 
