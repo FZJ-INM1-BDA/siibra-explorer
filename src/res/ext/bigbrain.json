@@ -618,6 +618,27 @@
                           "relatedAreas": []
                         },
                         {
+                          "name": "Area hOc3v (LingG)",
+                          "ngId": "v3v",
+                          "status": "fully mapped",
+                          "labelIndex": 1,
+                          "position": [
+                          ],
+                          "rgb": [
+                            83,
+                            179,
+                            155
+                          ],
+                          "children": [],
+                          "fullId": {
+                            "kg": {
+                              "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                              "kgId": "0d6392fd-b905-4bc3-bac9-fc44d8990a30"
+                            }
+                          },
+                          "relatedAreas": []
+                        },
+                        {
                           "name": "dorsal occipital cortex",
                           "children": [
                             {
@@ -640,8 +661,33 @@
                               "relatedAreas": []
                             }
                           ]
-                        }
-                      ]
+                      },
+                      {
+                        "name": "lateral occipital cortex",
+                        "children": [
+                          {
+                            "name": "Area hOc5 (LOC)",
+                            "ngId": "v5",
+                            "status": "fully mapped",
+                            "labelIndex": 1,
+                            "position": [
+                            ],
+                            "rgb": [
+                              255,
+                              0,
+                              0
+                            ],
+                            "children": [],
+                            "fullId": {
+                              "kg": {
+                                "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                "kgId": "b40afb5a-e6a1-47b6-8a3e-1f8a20fbf99a"
+                              }
+                            },
+                            "relatedAreas": []
+                          }
+                        ]
+                      }]
                     }
                   ]
                 }
