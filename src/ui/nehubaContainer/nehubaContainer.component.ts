@@ -7,7 +7,19 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
 
 import { LoggingService } from "src/logging";
-import { generateLabelIndexId, getMultiNgIdsRegionsLabelIndexMap, getNgIds, ILandmark, IOtherLandmarkGeometry, IPlaneLandmarkGeometry, IPointLandmarkGeometry, isDefined, MOUSE_OVER_LANDMARK, NgViewerStateInterface } from "src/services/stateStore.service";
+import {
+  CHANGE_NAVIGATION,
+  generateLabelIndexId,
+  getMultiNgIdsRegionsLabelIndexMap,
+  getNgIds,
+  ILandmark,
+  IOtherLandmarkGeometry,
+  IPlaneLandmarkGeometry,
+  IPointLandmarkGeometry,
+  isDefined,
+  MOUSE_OVER_LANDMARK,
+  NgViewerStateInterface
+} from "src/services/stateStore.service";
 import { getExportNehuba, isSame, getViewer } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
@@ -82,7 +94,7 @@ const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
   return [...newEntries, ...changed, ...unchanged]
 }
 
-const { 
+const {
   ZOOM_IN,
   ZOOM_OUT,
   TOGGLE_SIDE_PANEL,
@@ -164,7 +176,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public viewerLoaded: boolean = false
 
-  private sliceRenderEvent$: Observable<CustomEvent> 
+  private sliceRenderEvent$: Observable<CustomEvent>
   public sliceViewLoadingMain$: Observable<[boolean, boolean, boolean]>
   public perspectiveViewLoading$: Observable<string|null>
   public showPerpsectiveScreen$: Observable<string>
@@ -196,7 +208,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     select(viewerStateCustomLandmarkSelector),
     map(lms => lms.map(lm => ({
       ...lm,
-      geometry: { 
+      geometry: {
         position: lm.position
       }
     })))
@@ -381,7 +393,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         startWith('Loading ...'),
         throttleTime(100, asyncScheduler, { leading: true, trailing: true })
       ))
-    ) 
+    )
 
     /* missing chunk perspective view */
     this.perspectiveViewLoading$ = fromEvent(this.elementRef.nativeElement, 'perpspectiveRenderEvent')
@@ -722,13 +734,13 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         }
       }),
     )
-    
+
     this.subscriptions.push(
       this.selectedParcellation$.subscribe(this.handleParcellation.bind(this))
     )
 
     /* setup init view state */
-    
+
     this.subscriptions.push(
       this.selectedRegions$.pipe(
         filter(() => !!this.nehubaViewer),
@@ -804,7 +816,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       this.currOnHoverObsSub = this.currentOnHoverObs$.subscribe(({ segments }) => this.onHoverSegments$.next(segments))
     }
   }
-  
+
   public ngOnDestroy() {
     this.subscriptions.forEach(s => s.unsubscribe())
   }
@@ -817,7 +829,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   public tunableMobileProperties: ITunableProp[] = []
 
-  
+
   public selectedProp = null
 
   public returnTruePos(quadrant: number, data: any) {
@@ -929,10 +941,15 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
       }),
       /* TODO introduce animation */
-      moveToNavigationLoc : (coord, realSpace?) => this.nehubaViewer.setNavigationState({
-        position : coord,
-        positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
-      }),
+      moveToNavigationLoc : (coord, realSpace?) => {
+        this.store.dispatch({
+          type: CHANGE_NAVIGATION,
+          navigation: {
+            position: coord,
+            animation: {},
+          },
+        })
+      },
       setNavigationOri : (quat) => this.nehubaViewer.setNavigationState({
         orientation : quat,
       }),
@@ -1008,7 +1025,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
         for (const [key, colormap] of this.nehubaViewer.multiNgIdColorMap.entries()) {
           const newColormap = new Map()
           newMainMap.set(key, newColormap)
-          
+
           for (const [lableIndex, entry] of colormap.entries()) {
             newColormap.set(lableIndex, JSON.parse(JSON.stringify(entry)))
           }
@@ -1097,7 +1114,7 @@ export const takeOnePipe = () => {
         const idx = panelEls.indexOf(element)
         return idx
       }
-  
+
       const key = identifySrcElement(target)
       const _ = {}
       _[key] = event

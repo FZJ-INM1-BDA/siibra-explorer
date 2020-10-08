@@ -75,20 +75,16 @@ export class LandmarkUnit implements OnChanges {
     if (positionX || positionY) {
       this.transform = `translate(${positionX?.currentValue || this.positionX}px, ${positionY?.currentValue || this.positionY}px)`
     }
-
     if (color || positionZ || highlight) {
-      const zIndex = (positionZ.currentValue || this.positionZ) >= 0 ? 0 : -2
-      const nColor = color?.currentValue
-        || this.color
-        || (highlight?.currentValue || this.highlight)
+      const zIndex = (positionZ?.currentValue || this.positionZ) >= 0 ? 0 : -2
+      const nColor = (highlight?.currentValue || this.highlight) === true
         ? HOVER_COLOR
-        : this.color? this.color : NORMAL_COLOR
+        : color?.currentValue || this.color || NORMAL_COLOR
 
       this.nodeStyle = {
         color: `rgb(${nColor.join(',')})`,
         'z-index': zIndex
       }
-
 
       const shadowStyleBackground = `radial-gradient(
         circle at center,
@@ -108,17 +104,17 @@ export class LandmarkUnit implements OnChanges {
 
     if (flatProjection || highlight || positionZ) {
 
-      const flatProjectionVal = typeof flatProjection === 'undefined'
-        ? this.flatProjection
-        : flatProjection.currentValue
+      const flatProjectionVal = flatProjection
+        ? flatProjection.currentValue
+        : this.flatProjection
 
-      const highlightVal = typeof highlight === 'undefined'
-        ? this.highlight
-        : flatProjection.currentValue
+      const highlightVal = highlight
+        ? highlight.currentValue
+        : this.highlight
 
-      const positionZVal = typeof positionZ === 'undefined'
-        ? this.positionZ
-        : positionZ.currentValue
+      const positionZVal = positionZ
+        ? positionZ.currentValue
+        : this.positionZ
 
       this.opacity = flatProjectionVal
         ? highlightVal
@@ -135,7 +131,6 @@ export class LandmarkUnit implements OnChanges {
     }
 
     if (highlight) {
-      console.log('highlight change')
       this.beamDashedColor = {
         'border-left-color' : `rgba(${highlight.currentValue ? HOVER_COLOR.join(',') : NORMAL_COLOR.join(',')}, 0.8)`,
       }
@@ -143,5 +138,5 @@ export class LandmarkUnit implements OnChanges {
   }
 }
 
-const NORMAL_COLOR: number[] = [201,54,38]
-const HOVER_COLOR: number[] = [250,150,80]
+export const NORMAL_COLOR: number[] = [201,54,38]
+export const HOVER_COLOR: number[] = [250,150,80]
