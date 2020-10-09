@@ -5,7 +5,7 @@
   [iav-viewer-touch-interface-vp-to-data]="iavContainer?.viewportToDatas"
   [iav-viewer-touch-interface-ngviewer]="nehubaViewer?.nehubaViewer?.ngviewer"
   [iav-viewer-touch-interface-nehuba-config]="selectedTemplate?.nehubaConfig">
-  <div 
+  <div
     iav-nehuba-viewer-container
     (iavNehubaViewerContainerViewerLoading)="handleViewerLoadedEvent($event)"
     #iavContainer="iavNehubaViewerContainer">
@@ -132,7 +132,7 @@
       <div class="position-relative d-flex flex-column h-100">
 
         <!-- region search autocomplete  -->
-        
+
         <div class="h-0 w-100 region-text-search-autocomplete-position"
           [@openCloseAnchor]="sideNavSwitch.switchState ? 'open' : 'closed'">
           <ng-container *ngTemplateOutlet="autocompleteTmpl">
@@ -160,7 +160,7 @@
 
     <!-- main-content -->
     <mat-drawer-content class="visible position-relative">
-  
+
       <!-- bottom left overlay -->
       <div class="position-absolute bottom-0 left-0 w-100 d-inline-block pe-none">
         <ng-content select="[ui-nehuba-container-overlay-bottom-left]">
@@ -341,7 +341,7 @@
 
       <ng-template #exploreInOtherTmpl>
         <mat-list class="action-list sm cursor-default">
-          <mat-list-item *ngFor="let sameRegion of regionInOtherTemplates"
+          <mat-list-item class="explore-other-template-item" *ngFor="let sameRegion of regionInOtherTemplates"
             (click)="iavRegion.changeView(sameRegion)"
             [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
             mat-ripple>
@@ -359,7 +359,7 @@
         content: exploreInOtherTmpl
       }">
 
-  
+
       </ng-container>
     </ng-container>
 
@@ -458,7 +458,7 @@
     <!-- maximise/minimise button -->
     <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: 3, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }">
     </ng-container>
-    
+
     <!-- mesh loading is still weird -->
     <!-- if the precomputed server does not have the necessary fragment file, then the numberws will not collate -->
     <div *ngIf="false && (perspectiveViewLoading$ | async)" class="loadingIndicator">
@@ -557,7 +557,7 @@
     (click)="setOctantRemoval(!state)"
     mat-icon-button
     color="primary">
-  
+
     <!-- octant removal is true -->
     <ng-template [ngIf]="nehubaViewerPerspectiveOctantRemoval$ | async" [ngIfElse]="octantRemovalOffTmpl">
       <i class="fas fa-eye-slash"></i>
@@ -601,7 +601,7 @@
 
     <!-- if additional layers not not being shown -->
     <ng-template #tabTmpl_noAdditionalLayers>
-      
+
       <!-- if region selected > 0 -->
       <ng-template [ngIf]="regionSelected?.length > 0" [ngIfElse]="tabTmpl_nothingSelected">
         <div class="hidden"
@@ -650,7 +650,7 @@
       [style.backgroundColor]="customColor"
       (click)="sideNavMasterSwitch.toggle()"
       [color]="(!customColor && matColor) ? matColor : null">
-      
+
       <span [ngClass]="{'iv-custom-comp  text': !!customColor}">
         <i class="fas" [ngClass]="fontIcon || 'fa-question'"></i>
       </span>

@@ -38,7 +38,7 @@
                         onClick: getTileTmplClickFnAsCtx(selectParcellationWithName, layer),
                         disabled: !currentTemplateIncludesLayer(layer)
                     }">
-    
+
                     </ng-container>
                 </mat-grid-tile>
 
@@ -52,7 +52,7 @@
                         menuTriggerData: { layerGroupItems: group.parcellations },
                         isDirectory: true
                     }">
-    
+
                     </ng-container>
                 </mat-grid-tile>
             </mat-grid-list>
@@ -107,6 +107,7 @@
             [ngStyle]="{opacity: disabled ? '0.2': '1' }">
 
             <div class="position-relative d-flex flex-column align-items-center">
+                <div class="position-relative">
                 <!-- info icon btn -->
                 <div class="position-absolute top-0 right-0 info-container"
                     [ngClass]="{ 'darktheme': tileSrc.darktheme, 'lighttheme': !tileSrc.darktheme }">
@@ -126,8 +127,9 @@
                 <div *ngIf="isDirectory" class="position-absolute bottom-0 right-0">
                     <i class="fas fa-folder folder-container fa-2x"></i>
                 </div>
+                </div>
             </div>
-            
+
             <!-- text container -->
             <div class="d-flex justify-content-center">
                 <small class="iv-custom-comp text ml-1 mr-1 mt-2 text-break text-center">{{ tileSrc.displayName || tileSrc.name }}</small>
@@ -182,7 +184,7 @@
                     selected: selectedLayersIncludes(layer['@id']),
                     disabled: !currentTemplateIncludesLayer(layer)
                 } ">
-    
+
                 </ng-container>
             </div>
         </div>
