@@ -8114,8 +8114,7 @@
           ]
         }
       ]
-    },
-    {
+    },{
       "@id": "juelich/iav/atlas/v1.0.0/5",
       "ngId": "fibre bundle long",
       "auxillaryMeshIndices": [
@@ -8134,352 +8133,3246 @@
       "properties": {},
       "regions": [
         {
-          "name": "Arcuate - Left",
+          "name": "Direct segment of the left arcuate fasciculus",
           "children": [],
-          "labelIndex": "1",
+          "labelIndex": 1,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "7de080e0-fa5e-492f-9cbc-a4d7e498b1d5"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "7de080e0-fa5e-492f-9cbc-a4d7e498b1d5": {
+                "name": "Direct segment of the left arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "330ed9f5-ea87-4e90-a325-a11adeab1e66",
+              "filename": "Arcuate_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Arcuate - Right",
+          "name": "Direct segment of the right arcuate fasciculus",
           "children": [],
-          "labelIndex": "31",
+          "labelIndex": 31,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "17cbf31c-f68b-4753-9014-44aa38e1cdcf"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "17cbf31c-f68b-4753-9014-44aa38e1cdcf": {
+                "name": "Direct segment of the right arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "f8b607e1-3264-47ed-9e7e-b416891efcbe",
+              "filename": "Arcuate_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Arcuate_Anterior - Left",
+          "name": "Anterior segment of the left arcuate fasciculus",
           "children": [],
-          "labelIndex": "2",
+          "labelIndex": 2,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "1ed86a08-d720-427c-9796-ade24e34a36b"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "1ed86a08-d720-427c-9796-ade24e34a36b": {
+                "name": "Anterior segment of the left arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "7e227fef-dc93-4593-a0ea-707996992dd8",
+              "filename": "Arcuate_Anterior_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Arcuate_Anterior - Right",
+          "name": "Anterior segment of the right arcuate fasciculus",
           "children": [],
-          "labelIndex": "32",
+          "labelIndex": 32,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "9f625fad-9329-4824-8751-8b27dc197d3e"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "9f625fad-9329-4824-8751-8b27dc197d3e": {
+                "name": "Anterior segment of the right arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "93344d55-e70a-4545-92b7-45c65f7350a9",
+              "filename": "Arcuate_Anterior_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Arcuate_Posterior - Left",
+          "name": "Posterior segment of the left arcuate fasciculus",
           "children": [],
-          "labelIndex": "3",
+          "labelIndex": 3,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "f13ba46b-09ad-48bd-9301-282b0ee74d8d"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "f13ba46b-09ad-48bd-9301-282b0ee74d8d": {
+                "name": "Posterior segment of the left arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "68a390f0-13ab-47f3-8ba7-53b317734f17",
+              "filename": "Arcuate_Posterior_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Arcuate_Posterior - Right",
+          "name": "Posterior segment of the right arcuate fasciculus",
           "children": [],
-          "labelIndex": "33",
+          "labelIndex": 33,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "2a6ea612-46c1-4a0f-a6f4-5ffc7ff09548"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "2a6ea612-46c1-4a0f-a6f4-5ffc7ff09548": {
+                "name": "Posterior segment of the right arcuate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "d451038f-da94-4d51-8141-54a1a4a7a9f6",
+              "filename": "Arcuate_Posterior_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Long - Left",
+          "name": "Left long cingulate fibres",
           "children": [],
-          "labelIndex": "4",
+          "labelIndex": 4,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "6fa27cc1-2efe-4fd3-83d7-973667a0b925"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "6fa27cc1-2efe-4fd3-83d7-973667a0b925": {
+                "name": "Left long cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "3637f1c6-d0f5-4a86-ba07-d88098c59f81",
+              "filename": "Cingulum_Long_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Long - Right",
+          "name": "Right long cingulate fibres",
           "children": [],
-          "labelIndex": "34",
+          "labelIndex": 34,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "f5ae1188-8a10-4e17-9fa9-47b1dc4e50cd"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "f5ae1188-8a10-4e17-9fa9-47b1dc4e50cd": {
+                "name": "Right long cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "70d976ca-ebdb-4e70-8c58-2aa3333f8bff",
+              "filename": "Cingulum_Long_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Short - Left",
+          "name": "Left short cingulate fibres",
           "children": [],
-          "labelIndex": "5",
+          "labelIndex": 5,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "882d13c0-ffe4-4fd8-95a1-ba714cd25fbb"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "882d13c0-ffe4-4fd8-95a1-ba714cd25fbb": {
+                "name": "Left short cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "651038f7-1792-429a-8f26-6a9fbe998952",
+              "filename": "Cingulum_Short_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Short - Right",
+          "name": "Right short cingulate fibres",
           "children": [],
-          "labelIndex": "35",
+          "labelIndex": 35,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "4c5ecae5-17b4-4a65-8b66-c4d0882a2bca"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "4c5ecae5-17b4-4a65-8b66-c4d0882a2bca": {
+                "name": "Right short cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "405fec3d-e95a-411f-a990-726ae11d2657",
+              "filename": "Cingulum_Short_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Temporal - Left",
+          "name": "Left temporal cingulate fibres",
           "children": [],
-          "labelIndex": "6",
+          "labelIndex": 6,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "2c71b329-5a32-4ba0-aacb-0fac99c46aca"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "2c71b329-5a32-4ba0-aacb-0fac99c46aca": {
+                "name": "Left temporal cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "c6cf614d-abf1-495c-986b-7f551f8fa65e",
+              "filename": "Cingulum_Temporal_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Cingulum_Temporal - Right",
+          "name": "Right temporal cingulate fibres",
           "children": [],
-          "labelIndex": "36",
+          "labelIndex": 36,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "7e965e21-1d9b-4b8d-b77d-4a7ca17603e6"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "7e965e21-1d9b-4b8d-b77d-4a7ca17603e6": {
+                "name": "Right temporal cingulate fibres"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "518b0d17-ed31-4a20-91c2-efbe2eb6545a",
+              "filename": "Cingulum_Temporal_Right.nii.gz"
+            }
+          ]
         },
         {
           "name": "CorpusCallosum_Body",
           "children": [],
-          "labelIndex": "7"
+          "labelIndex": 7
         },
         {
           "name": "CorpusCallosum_Genu",
           "children": [],
-          "labelIndex": "8"
+          "labelIndex": 8
         },
         {
           "name": "CorpusCallosum_Rostrum",
           "children": [],
-          "labelIndex": "9"
+          "labelIndex": 9
         },
         {
           "name": "CorpusCallosum_Splenium",
           "children": [],
-          "labelIndex": "10"
+          "labelIndex": 10
         },
         {
-          "name": "CorticoSpinalTract - Left",
+          "name": "Left corticospinal tract",
           "children": [],
-          "labelIndex": "11",
+          "labelIndex": 11,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "afbb2642-5e90-412f-9847-3d7a831f8f07"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "afbb2642-5e90-412f-9847-3d7a831f8f07": {
+                "name": "Left corticospinal tract"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "41495f74-0278-4ce1-8190-02ae57b316d8",
+              "filename": "CorticoSpinalTract_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "CorticoSpinalTract - Right",
+          "name": "Right corticospinal tract",
           "children": [],
-          "labelIndex": "41",
+          "labelIndex": 41,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "2f398c6e-6264-4615-8a28-18b3573d0732"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "2f398c6e-6264-4615-8a28-18b3573d0732": {
+                "name": "Right corticospinal tract"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "b1b77339-de1c-424c-a2a1-1489de4882f9",
+              "filename": "CorticoSpinalTract_Right.nii.gz"
+            }
+          ]
         },
         {
           "name": "ExternalCapsule - Left",
           "children": [],
-          "labelIndex": "12"
+          "labelIndex": 12
         },
         {
           "name": "ExternalCapsule - Right",
           "children": [],
-          "labelIndex": "42"
+          "labelIndex": 42
         },
         {
-          "name": "Fornix - Left",
+          "name": "Left fornix",
           "children": [],
-          "labelIndex": "13",
+          "labelIndex": 13,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "c8d1e4a0-d0c2-4101-a971-3ffb1ba65ef8"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "c8d1e4a0-d0c2-4101-a971-3ffb1ba65ef8": {
+                "name": "Left fornix"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "6820edd5-9f90-487e-8736-0d2e54e5f958",
+              "filename": "Fornix_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Fornix - Right",
+          "name": "Right fornix",
           "children": [],
-          "labelIndex": "43",
+          "labelIndex": 43,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "e7e8fd6d-aa43-452e-9fc3-635aa0333910"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "e7e8fd6d-aa43-452e-9fc3-635aa0333910": {
+                "name": "Right fornix"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "82c00b60-f207-4473-8662-39be36ec5642",
+              "filename": "Fornix_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "InferiorFrontoOccipital - Left",
+          "name": "Left inferior fronto-occipital fasciculus",
           "children": [],
-          "labelIndex": "14",
+          "labelIndex": 14,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "524cd5a0-7066-4149-83b8-c0c4aaa12820"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "524cd5a0-7066-4149-83b8-c0c4aaa12820": {
+                "name": "Left inferior fronto-occipital fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "58924d48-9606-4577-8d10-a729a8fda4f6",
+              "filename": "InferiorFrontoOccipital_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "InferiorFrontoOccipital - Right",
+          "name": "Right inferior fronto-occipital fasciculus",
           "children": [],
-          "labelIndex": "44",
+          "labelIndex": 44,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "34e8f68d-0b00-4e9e-bd43-ccaf10deef6d"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "34e8f68d-0b00-4e9e-bd43-ccaf10deef6d": {
+                "name": "Right inferior fronto-occipital fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "4e8b0736-efb2-497a-a81c-40b6142ba278",
+              "filename": "InferiorFrontoOccipital_Right.nii.gz"
+            }
+          ]
         },
         {
-          "name": "InferiorLongitudinal - Left",
+          "name": "Left inferior longitudinal fasciculus",
           "children": [],
-          "labelIndex": "15",
+          "labelIndex": 15,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "d3a458e1-6dbf-418d-bb52-c0b0c6acb920"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "d3a458e1-6dbf-418d-bb52-c0b0c6acb920": {
+                "name": "Left inferior longitudinal fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "ddc35deb-bbb0-41b6-a4be-464d7e5f04f9",
+              "filename": "InferiorLongitudinal_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "InferiorLongitudinal - Right",
+          "name": "Right inferior longitudinal fasciculus",
           "children": [],
-          "labelIndex": "45",
+          "labelIndex": 45,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "25326bc6-2b87-4483-9738-89ca249faccd"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "25326bc6-2b87-4483-9738-89ca249faccd": {
+                "name": "Right inferior longitudinal fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "aaff510c-85e7-4749-ac18-af374ded64dd",
+              "filename": "InferiorLongitudinal_Right.nii.gz"
+            }
+          ]
         },
         {
           "name": "InferiorLongitudinal_Lateral - Left",
           "children": [],
-          "labelIndex": "16"
+          "labelIndex": 16
         },
         {
           "name": "InferiorLongitudinal_Lateral - Right",
           "children": [],
-          "labelIndex": "46"
+          "labelIndex": 46
         },
         {
           "name": "MediumLongitudinal - Left",
           "children": [],
-          "labelIndex": "17"
+          "labelIndex": 17
         },
         {
           "name": "MediumLongitudinal - Right",
           "children": [],
-          "labelIndex": "47"
+          "labelIndex": 47
         },
         {
           "name": "SpinoThalamicTract - Left",
           "children": [],
-          "labelIndex": "18"
+          "labelIndex": 18
         },
         {
           "name": "SpinoThalamicTract - Right",
           "children": [],
-          "labelIndex": "48"
+          "labelIndex": 48
         },
         {
           "name": "ThalamicRadiations_Anterior - Left",
           "children": [],
-          "labelIndex": "19"
+          "labelIndex": 19
         },
         {
           "name": "ThalamicRadiations_Anterior - Right",
           "children": [],
-          "labelIndex": "49"
+          "labelIndex": 49
         },
         {
           "name": "ThalamicRadiations_Posterior - Left",
           "children": [],
-          "labelIndex": "20"
+          "labelIndex": 20
         },
         {
           "name": "ThalamicRadiations_Posterior - Right",
           "children": [],
-          "labelIndex": "50"
+          "labelIndex": 50
         },
         {
-          "name": "Uncinate - Left",
+          "name": "Left uncinate fasciculus",
           "children": [],
-          "labelIndex": "21",
+          "labelIndex": 21,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "f36707b5-d4f3-480b-a1c9-651bf8cc49d5"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "f36707b5-d4f3-480b-a1c9-651bf8cc49d5": {
+                "name": "Left uncinate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "ed7f25ea-5a32-4a7d-9d38-39317bab84bc",
+              "filename": "Uncinate_Left.nii.gz"
+            }
+          ]
         },
         {
-          "name": "Uncinate - Right",
+          "name": "Right uncinate fasciculus",
           "children": [],
-          "labelIndex": "51",
+          "labelIndex": 51,
           "relatedAreas": [],
           "fullId": {
             "kg": {
               "kgSchema": "minds/core/parcellationregion/v1.0.0",
               "kgId": "84ea1a64-03a6-4a7e-9f64-a3d2127ebf3f"
+            },
+            "minds/core/parcellationregion/v1.0.0": {
+              "84ea1a64-03a6-4a7e-9f64-a3d2127ebf3f": {
+                "name": "Right uncinate fasciculus"
+              }
             }
-          }
+          },
+          "originDatasets": [
+            {
+              "kgSchema": "minds/core/dataset/v1.0.0",
+              "kgId": "cd10f6c0-4828-4483-8ea4-0935a4313927",
+              "filename": "Uncinate_Right.nii.gz"
+            }
+          ]
         }
-      ]
+      ],
+      "_": {
+        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201009-fix-longbundle-IAV-hierarchy/raw/455fa9131fb0235554fa8eaf118621bc89943f07/output/nehubaUI/long-bundle.json"
+      }
     },
     {
+      "regions": [
+        {
+          "name": "Left Hemisphere",
+          "children": [
+            {
+              "name": "Caudal Middle Frontal - Precuneus",
+              "children": [
+                {
+                  "name": "lh_CAC-PrCu_0",
+                  "children": [],
+                  "labelIndex": 38,
+                  "originDatasets": [
+                    {
+                      "kgId": "8968a37e-552d-43de-a361-666033723fc1",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CAC-PrCu_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "90ac80d5-bec6-4655-84f5-41086370808d": {
+                        "name": "left hemisphere Precuneus (lh_PrCu)"
+                      },
+                      "4377b03e-cdb3-42ea-9f52-16abf8d799bd": {
+                        "name": "left hemisphere Caudal Anterior Cingulate (lh_CAC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Pars Opercularis",
+              "children": [
+                {
+                  "name": "lh_CMF-Op_0",
+                  "children": [],
+                  "labelIndex": 37,
+                  "originDatasets": [
+                    {
+                      "kgId": "a9a96fbd-ccdb-49d3-b60c-ae5a7a5471fa",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-Op_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "1b20be7e-dcc6-44f2-b186-7605b10d7689": {
+                        "name": "left hemisphere Pars Opercularis (lh_Op)"
+                      },
+                      "dc749ec9-4957-4307-9e6f-46ca4d1cdbeb": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal - Poscentral",
+              "children": [
+                {
+                  "name": "lh_CMF-PoC_0",
+                  "children": [],
+                  "labelIndex": 62,
+                  "originDatasets": [
+                    {
+                      "kgId": "71f2efd7-db05-4006-88b5-2b34b36bee91",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-PoC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "5c571448-e864-4535-abe6-e1e0ae38c27a": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      },
+                      "a3866dc4-b97b-4329-b677-bacc6ef53293": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal - Precentral",
+              "children": [
+                {
+                  "name": "lh_CMF-PrC_0",
+                  "children": [],
+                  "labelIndex": 97,
+                  "originDatasets": [
+                    {
+                      "kgId": "57f169f3-fe5f-42de-8074-50da96adc53a",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "c23e6ef7-a980-4ca6-b4c9-f756e0118902": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "7ddbf594-9710-4fb9-8660-cbb5dbc466cf": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_CMF-PrC_1",
+                  "children": [],
+                  "labelIndex": 99,
+                  "originDatasets": [
+                    {
+                      "kgId": "4b1a0e0e-0c51-4a67-a7ed-1821ee23c702",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-PrC_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "c5dfa7a0-b626-4155-890e-1359ff3f4d8e": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "a0bec6d3-fbc9-4768-b98e-ba8250dfc32a": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Rostral Middle Frontal",
+              "children": [
+                {
+                  "name": "lh_CMF-RMF_0",
+                  "children": [],
+                  "labelIndex": 49,
+                  "originDatasets": [
+                    {
+                      "kgId": "314d6705-3859-4d5a-b945-9170fb5a7f0c",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-RMF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "6641ab28-cf9a-4e10-ad6f-e9ebb476ba3e": {
+                        "name": "left hemisphere Rostral Middle Frontal (lh_RMF)"
+                      },
+                      "26a6b439-00cc-43b2-a333-552acf372ddb": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_CMF-SF_0",
+                  "children": [],
+                  "labelIndex": 68,
+                  "originDatasets": [
+                    {
+                      "kgId": "fe019895-7be8-4dfa-a5b0-b70507a0604f",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_CMF-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "1bdeb53d-e753-4a0d-8f80-2df3e539ee84": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "4b922c66-c3fe-4a99-8543-43cfd90fa50e": {
+                        "name": "left hemisphere Caudal Middle Frontal (lh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Fusiform – Lateral Occipital",
+              "children": [
+                {
+                  "name": "lh_Fu-LO_0",
+                  "children": [],
+                  "labelIndex": 51,
+                  "originDatasets": [
+                    {
+                      "kgId": "71ee6b85-1ec7-40c3-b1a3-a80503af7fcb",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Fu-LO_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "7838b80a-7294-4b36-9416-66183a705a1a": {
+                        "name": "left hemisphere Lateral Occipital (lh_LO)"
+                      },
+                      "bdb4477b-f1d7-4a04-9188-ace83e3f47e9": {
+                        "name": "left hemisphere Fusiform (lh_Fu)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Isthmus Cingulate - Precuneus",
+              "children": [
+                {
+                  "name": "lh_IC-PrCu_0",
+                  "children": [],
+                  "labelIndex": 40,
+                  "originDatasets": [
+                    {
+                      "kgId": "4b293404-b8d3-4eba-95cd-5a66387ea428",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IC-PrCu_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "8dd1267b-f01a-4fbd-84b6-89a8d4fdabed": {
+                        "name": "left hemisphere Precuneus (lh_PrCu)"
+                      },
+                      "01f6de2d-7fc8-454c-b69b-b0a9b530bb2d": {
+                        "name": "left hemisphere Isthmus Cingulate (lh_IC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Inferior Temporal",
+              "children": [
+                {
+                  "name": "lh_IP-IT_0",
+                  "children": [],
+                  "labelIndex": 59,
+                  "originDatasets": [
+                    {
+                      "kgId": "a942d3e5-d720-4f41-af2d-9a292b6f58f2",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-IT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "6799f308-b444-4f69-a1a9-0f8fcc9d5b7e": {
+                        "name": "left hemisphere Inferior Temporal (lh_IT)"
+                      },
+                      "d1742604-ca99-447d-8f93-ef02ff5ffcd8": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Lateral Occipital",
+              "children": [
+                {
+                  "name": "lh_IP-LO_1",
+                  "children": [],
+                  "labelIndex": 86,
+                  "originDatasets": [
+                    {
+                      "kgId": "44d986b4-88f7-4a1a-8469-1518b5e55eab",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-LO_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "6cb4a831-7323-489e-b379-3486c54f42f4": {
+                        "name": "left hemisphere Lateral Occipital (lh_LO)"
+                      },
+                      "8c151d91-f2f4-496c-94bd-d1fdf816b584": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Middle Temporal\t",
+              "children": [
+                {
+                  "name": "lh_IP-MT_0",
+                  "children": [],
+                  "labelIndex": 33,
+                  "originDatasets": [
+                    {
+                      "kgId": "b7a8e4c1-461d-49b9-9759-ae4c747adee8",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-MT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "d3f76f95-f344-4d07-9380-0c79084fdffe": {
+                        "name": "left hemisphere Middle Temporal (lh_MT)"
+                      },
+                      "2f889f68-337b-4467-b703-8462c9f69630": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal - Supramarginal",
+              "children": [
+                {
+                  "name": "lh_IP-SM_0",
+                  "children": [],
+                  "labelIndex": 80,
+                  "originDatasets": [
+                    {
+                      "kgId": "7c0ade5c-590d-4134-bb42-f36e8188b685",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "d909a5a5-8606-410d-82ad-53696f690ae1": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "9d2087ea-344f-4529-98ef-01f93b433f12": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Pariertal – Superior Parietal",
+              "children": [
+                {
+                  "name": "lh_IP-SP_0",
+                  "children": [],
+                  "labelIndex": 82,
+                  "originDatasets": [
+                    {
+                      "kgId": "47a759c6-47ef-4628-9e6a-a4f3f6e4f258",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-SP_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "d3435305-40c4-452d-a0d1-6a791c96495c": {
+                        "name": "left hemisphere Superior Parietal (lh_SP)"
+                      },
+                      "108cda8b-520a-45af-9422-0d4523b54f1c": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_IP-SP_1",
+                  "children": [],
+                  "labelIndex": 84,
+                  "originDatasets": [
+                    {
+                      "kgId": "32789750-28a1-4400-b91c-6e33b930bb7e",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IP-SP_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "71360f45-52f6-447b-908c-60c1743816ba": {
+                        "name": "left hemisphere Superior Parietal  (lh_SP)"
+                      },
+                      "f48c88f7-ab97-49f7-ba74-7b3e97541830": {
+                        "name": "left hemisphere Inferior Parietal (lh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Temporal – Middle Temporal",
+              "children": [
+                {
+                  "name": "lh_IT-MT_0",
+                  "children": [],
+                  "labelIndex": 89,
+                  "originDatasets": [
+                    {
+                      "kgId": "533d3ca2-ed60-43e3-b03b-4b7a1498f8e4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_IT-MT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "8ce8598e-787a-4db3-923e-4f356e7bcab6": {
+                        "name": "left hemisphere Middle Temporal (lh_MT)"
+                      },
+                      "2094a29a-96dd-486a-aa7a-c5aa5f02f2fd": {
+                        "name": "left hemisphere Inferior Temporal (lh_IT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Pars Orbitalis",
+              "children": [
+                {
+                  "name": "lh_LOF-Or_0",
+                  "children": [],
+                  "labelIndex": 48,
+                  "originDatasets": [
+                    {
+                      "kgId": "45bdb586-987f-415c-b17c-27277d3e890e",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_LOF-Or_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "12d597fb-e04f-448a-9c91-993b2c8421d3": {
+                        "name": "left hemisphere Pars Orbitalis (lh_Or)"
+                      },
+                      "513b5cda-32b3-4928-b3ae-a62f59dba28b": {
+                        "name": "left hemisphere Lateral Orbitofrontal (lh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Rostral Middle Frontal",
+              "children": [
+                {
+                  "name": "lh_LOF-RMF_0",
+                  "children": [],
+                  "labelIndex": 29,
+                  "originDatasets": [
+                    {
+                      "kgId": "a0e9a19f-0086-4a70-9d42-d5fef5cbf913",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_LOF-RMF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "ebe4f447-d28f-4ef6-87d7-850ee41794c7": {
+                        "name": "left hemisphere Rostral Middle Frontal (lh_RMF)"
+                      },
+                      "d41d9d83-9220-4440-8adb-5ed9692a9d31": {
+                        "name": "left hemisphere Lateral Orbitofrontal (lh_LOF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_LOF-RMF_1",
+                  "children": [],
+                  "labelIndex": 31,
+                  "originDatasets": [
+                    {
+                      "kgId": "1b73bb19-9daa-4f51-b0b7-ae1c10f44992",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_LOF-RMF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "e894dfb7-e503-4a86-b5c2-f305d3347967": {
+                        "name": "left hemisphere Rostral Middle Frontal (lh_RMF)"
+                      },
+                      "4e7b3450-7913-46b8-a210-f7322192376f": {
+                        "name": "left hemisphere Lateral Orbitofrontal (lh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Superior Temporal",
+              "children": [
+                {
+                  "name": "lh_LOF-ST_0",
+                  "children": [],
+                  "labelIndex": 25,
+                  "originDatasets": [
+                    {
+                      "kgId": "c9af7a82-a47d-4b26-b8af-db20b2e332bd",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_LOF-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "7109d265-3029-4063-936c-9baf1e58b93b": {
+                        "name": "left hemisphere Superior Temporal (lh_ST)"
+                      },
+                      "85595e2c-8b80-44de-ba31-dab50a6357bd": {
+                        "name": "left hemisphere Lateral Orbitofrontal (lh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Orbitofrontal – Superior Temporal",
+              "children": [
+                {
+                  "name": "lh_MOF-ST_0",
+                  "children": [],
+                  "labelIndex": 12,
+                  "originDatasets": [
+                    {
+                      "kgId": "472bf4b3-14a5-4576-8c90-57871597b0ef",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_MOF-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "54a5fe0b-374b-4738-a4ba-b737aa4f8bb2": {
+                        "name": "left hemisphere Superior Temporal (lh_ST)"
+                      },
+                      "2a250bd3-2d8e-4caa-8e51-181af09057ba": {
+                        "name": "left hemisphere Middle Orbitofrontal (lh_MOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Temporal - Supramarginal",
+              "children": [
+                {
+                  "name": "lh_MT-SM_0",
+                  "children": [],
+                  "labelIndex": 72,
+                  "originDatasets": [
+                    {
+                      "kgId": "74eeddf7-6ffa-4c73-aa46-e6e357db4e76",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_MT-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "3af88a08-02cf-4b5e-b7af-c2a5d111600d": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "eb30d641-81a8-42b3-bf4c-2696d6e3e6e2": {
+                        "name": "left hemisphere Middle Temporal (lh_MT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Temporal – Superior Temporal",
+              "children": [
+                {
+                  "name": "lh_MT-ST_0",
+                  "children": [],
+                  "labelIndex": 95,
+                  "originDatasets": [
+                    {
+                      "kgId": "dbf4f62b-86ba-40ac-9f60-5a17b1e24c06",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_MT-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "749c0138-acf5-4047-a2ed-553ea8a8cc8d": {
+                        "name": "left hemisphere Superior Temporal (lh_ST)"
+                      },
+                      "937cc55b-b119-4bae-adea-71fcded4156e": {
+                        "name": "left hemisphere Middle Temporal (lh_MT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis - Insula",
+              "children": [
+                {
+                  "name": "lh_Op-Ins_0",
+                  "children": [],
+                  "labelIndex": 27,
+                  "originDatasets": [
+                    {
+                      "kgId": "0e864ddc-067c-42f9-b4d3-6a7fe27939ca",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Op-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "9da7d862-d1b1-4eb0-b6d9-af80ad2583b0": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "7ad58c7d-d444-4806-a84f-a39ed7660432": {
+                        "name": "left hemisphere Pars Opercularis (lh_Op)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis - Precentral`",
+              "children": [
+                {
+                  "name": "lh_Op-PrC_0",
+                  "children": [],
+                  "labelIndex": 18,
+                  "originDatasets": [
+                    {
+                      "kgId": "717392c1-73a0-4485-9509-f7cbc02156d1",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Op-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "736ed565-80e3-4263-b3f2-712eeeeeceac": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "64cf4e5d-490e-4f9b-a303-0d6c19467b90": {
+                        "name": "left hemisphere Pars Opercularis (lh_Op)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_Op-SF_0",
+                  "children": [],
+                  "labelIndex": 42,
+                  "originDatasets": [
+                    {
+                      "kgId": "cec92860-cafe-4219-a4b2-382765fb3390",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Op-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "3e4719b5-273b-4ebd-b3d0-1b904780a8aa": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "1f785d52-cd69-49f8-930e-90cb15342df5": {
+                        "name": "left hemisphere Pars Opercularis (lh_Op)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Orbitalis - Insula",
+              "children": [
+                {
+                  "name": "lh_Or-Ins_0",
+                  "children": [],
+                  "labelIndex": 16,
+                  "originDatasets": [
+                    {
+                      "kgId": "fb9818d7-139a-474f-aba8-b9e5a5189d39",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Or-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "73bbcdc9-f0bc-4f94-b257-09077b29909e": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "8adf804e-d126-4e59-a14e-0b60d29638e0": {
+                        "name": "left hemisphere Pars Orbitalis (lh_Or)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Postcentral - Insula",
+              "children": [
+                {
+                  "name": "lh_PoC-Ins_0",
+                  "children": [],
+                  "labelIndex": 53,
+                  "originDatasets": [
+                    {
+                      "kgId": "8a9bf166-de0a-4f7b-943d-2e49cd6e0b28",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "57af0af4-cb24-4430-90b4-d2ab2e097ade": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "2807614f-14e7-487b-9828-761a156541a0": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Poscentral - Precuneus",
+              "children": [
+                {
+                  "name": "lh_PoCi-PrCu_0",
+                  "children": [],
+                  "labelIndex": 44,
+                  "originDatasets": [
+                    {
+                      "kgId": "b3a25d84-b3bc-41ee-b76b-7bc45d84daf4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoCi-PrCu_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "3ebff112-c698-4ace-8f31-fb0d9b84de0b": {
+                        "name": "left hemisphere Precuneus (lh_PrCu)"
+                      },
+                      "45d9b611-1ee2-4568-aeea-1af538ac82fb": {
+                        "name": "left hemisphere Posterior Cingulate (lh_PoCi)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_PoCi-PrCu_1",
+                  "children": [],
+                  "labelIndex": 45,
+                  "originDatasets": [
+                    {
+                      "kgId": "e9b10734-a628-4c5f-8029-228453f09e7d",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoCi-PrCu_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "9e3c8757-b12c-4f74-a52e-34b2df5cf4a6": {
+                        "name": "left hemisphere Precuneus (lh_PrCu)"
+                      },
+                      "ffdcb6fe-738c-4e59-83fd-0ac8e9d85345": {
+                        "name": "left hemisphere Posterior Cingulate (lh_PoCi)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Posterior Cingulate – Rostral Anterior Cingulate",
+              "children": [
+                {
+                  "name": "lh_PoCi-RAC_0",
+                  "children": [],
+                  "labelIndex": 10,
+                  "originDatasets": [
+                    {
+                      "kgId": "f659ed0f-56c8-4edb-85d7-b213ffef5f40",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoCi-RAC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "ea149b60-886d-4ab1-81b8-7754c787923c": {
+                        "name": "left hemisphere Rostral Anterior Cingulate (lh_RAC)"
+                      },
+                      "99ea7643-3816-4b86-9b66-a1a3123ed87a": {
+                        "name": "left hemisphere Posterior Cingulate (lh_PoCi)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Posterior Cingulate – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_PoCi-SF_0",
+                  "children": [],
+                  "labelIndex": 79,
+                  "originDatasets": [
+                    {
+                      "kgId": "35cbf322-e3f3-4a14-b8eb-b25232d1384e",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoCi-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "c15b5480-3826-49f6-b601-46435a5b94b6": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "fa6c2513-f84d-44d9-961b-a84cf85310c3": {
+                        "name": "left hemisphere Posterior Cingulate (lh_PoCi)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Poscentral - Precentral",
+              "children": [
+                {
+                  "name": "lh_PoC-PrC_0",
+                  "children": [],
+                  "labelIndex": 1,
+                  "originDatasets": [
+                    {
+                      "kgId": "213c23a1-7f5a-4331-a5e6-6d730325c0c4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "47d7edca-d4b2-4959-8a6a-3bd3bd5bb1d4": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "8c6e0375-de66-4f20-8fe0-6a16cacb09a2": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_PoC-PrC_1",
+                  "children": [],
+                  "labelIndex": 3,
+                  "originDatasets": [
+                    {
+                      "kgId": "2d384dab-705b-4a4e-ae1e-2ff802110426",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-PrC_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "83e0a746-67a4-4958-bbfd-75339feca98b": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "6459dc32-90e2-445b-b246-c9e54a5ed62f": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_PoC-PrC_2",
+                  "children": [],
+                  "labelIndex": 5,
+                  "originDatasets": [
+                    {
+                      "kgId": "b4aa464a-af35-42b1-a7f6-3b67a801f115",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-PrC_2.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "559bf692-7e47-416a-8c53-aca14a4dd422": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "c4b1f1c2-b202-4212-8e3c-a5e7b7299f98": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_PoC-PrC_3",
+                  "children": [],
+                  "labelIndex": 7,
+                  "originDatasets": [
+                    {
+                      "kgId": "b3706a0c-26d1-4b98-90c9-0542746c7b22",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-PrC_3.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "00f2f96b-b24a-43ce-b284-fa269f775e6d": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      },
+                      "0962f7b5-d922-49c8-9b26-5dcfb1d04f74": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Poscentral - Supramarginal",
+              "children": [
+                {
+                  "name": "lh_PoC-SM_0",
+                  "children": [],
+                  "labelIndex": 74,
+                  "originDatasets": [
+                    {
+                      "kgId": "d427a67d-e144-4ed2-93b1-371e497813b4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "f0a14810-8100-4234-b386-3259c5a82e4d": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "4864f021-235a-4723-ab9d-7ca8ffe97992": {
+                        "name": "left hemisphere Postcentral (lh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_PoC-SM_1",
+                  "children": [],
+                  "labelIndex": 76,
+                  "originDatasets": [
+                    {
+                      "kgId": "f94c650d-b1b2-4dc7-84c0-b551cf8dcc35",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PoC-SM_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "3af7ba92-4468-4f3a-a4d2-84d40c7d8c88": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "f3c7cf97-cd8d-41b1-b936-8af3a2ab94fb": {
+                        "name": "left hemisphere Postcetnral (lh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral - Insula",
+              "children": [
+                {
+                  "name": "lh_PrC-Ins_0",
+                  "children": [],
+                  "labelIndex": 66,
+                  "originDatasets": [
+                    {
+                      "kgId": "ba651bf6-7dc7-47f3-900b-5f00e29534bb",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PrC-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "4d9c09a7-1b51-4285-91d1-7f49a18bfc81": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "f4e308b1-9355-4548-835a-1b0dc5cbb401": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_PrC-SF_0",
+                  "children": [],
+                  "labelIndex": 20,
+                  "originDatasets": [
+                    {
+                      "kgId": "670483c3-4c9a-4362-983f-7277728fd739",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PrC-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "eccb5dd4-a360-4120-a21d-7ffdf4b12978": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "745b8125-e3c5-4346-b150-6110074fd69b": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral - Supramarginal",
+              "children": [
+                {
+                  "name": "lh_PrC-SM_0",
+                  "children": [],
+                  "labelIndex": 15,
+                  "originDatasets": [
+                    {
+                      "kgId": "d77f8c3f-1ff9-4c18-886e-12500fd650a8",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_PrC-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "aa6798a4-a510-45af-aa50-008ac8dcbe73": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "e0d06fec-d6f9-4a24-a255-aee751b6bdf0": {
+                        "name": "left hemisphere Precentral (lh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Rostral Anterior Cingulate – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_RAC-SF_1",
+                  "children": [],
+                  "labelIndex": 78,
+                  "originDatasets": [
+                    {
+                      "kgId": "c0811fcf-0d37-4d64-ac9f-d6201e4525e7",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_RAC-SF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "1afa4e40-4f1a-4883-882b-5d1ba063c908": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "0532c80f-d28b-4fd9-883e-20aa28896a6e": {
+                        "name": "left hemisphere Rostral Anterior Cingulate (lh_RAC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Rostral Middle Frontal – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_RMF-SF_0",
+                  "children": [],
+                  "labelIndex": 21,
+                  "originDatasets": [
+                    {
+                      "kgId": "45f076a2-f874-4e1b-85b7-d54b653c3ecb",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_RMF-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "e8747bcc-53a3-42e8-8fa1-e584bb8d5c04": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "0d24dc16-c4c8-4cfb-ba8b-8caa603d0de7": {
+                        "name": "left hemisphere Rostral Middle Frontal (lh_RMF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "lh_RMF-SF_1",
+                  "children": [],
+                  "labelIndex": 23,
+                  "originDatasets": [
+                    {
+                      "kgId": "ce3b410c-82ec-4f3e-aaf0-91eeb7d7a650",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_RMF-SF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "607c928c-e1e0-4706-a1f7-50937ed27ccf": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "35525384-a2cf-4feb-961c-aa220f5c8990": {
+                        "name": "left hemisphere Rostral Middle Frontal (lh_RMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Supramarginal - Insula",
+              "children": [
+                {
+                  "name": "lh_SM-Ins_0",
+                  "children": [],
+                  "labelIndex": 57,
+                  "originDatasets": [
+                    {
+                      "kgId": "ec747061-54ed-4fe5-8981-ca72baff1cbd",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_SM-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "5b3b1c89-3325-476a-be1d-a53865b553af": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "ae4eccd0-21a7-4b72-a54f-54de41f5f992": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Superior Parietal - Supramarginal",
+              "children": [
+                {
+                  "name": "lh_SP-SM_0",
+                  "children": [],
+                  "labelIndex": 93,
+                  "originDatasets": [
+                    {
+                      "kgId": "431071e0-ba94-454e-a87d-e68230449bdf",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_SP-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "124334b1-40af-481e-837b-50c492d0110a": {
+                        "name": "left hemisphere Supramarginal (lh_SM)"
+                      },
+                      "bbebbcf6-5172-4c52-975a-b415ce253ee5": {
+                        "name": "left hemisphere Superior Parietal (lh_SP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Superior Temporal - Insula",
+              "children": [
+                {
+                  "name": "lh_ST-Ins_0",
+                  "children": [],
+                  "labelIndex": 92,
+                  "originDatasets": [
+                    {
+                      "kgId": "f9358de9-9803-40df-935b-f6401cabd498",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_ST-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "641b286a-ecde-4e3b-bd35-3c2f539ec910": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "a8795a52-0d43-4e12-9824-bd9b0fa3aefe": {
+                        "name": "left hemisphere Superior Temporal (lh_ST)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Superior Temporal – Transverse Temporal",
+              "children": [
+                {
+                  "name": "lh_ST-TT_0",
+                  "children": [],
+                  "labelIndex": 35,
+                  "originDatasets": [
+                    {
+                      "kgId": "70686739-574a-4b9f-bfc1-27e532df1b55",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_ST-TT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "7ee096fe-ace7-4cac-8282-4edffa5a9066": {
+                        "name": "left hemisphere Transverse Temporal (lh_TT)"
+                      },
+                      "17924915-d774-463e-a767-c6b117e346b7": {
+                        "name": "left hemisphere Superior Temporal (lh_ST)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Triangularis - Insula",
+              "children": [
+                {
+                  "name": "lh_Tr-Ins_0",
+                  "children": [],
+                  "labelIndex": 64,
+                  "originDatasets": [
+                    {
+                      "kgId": "33b483d3-6387-49f4-91b7-053a10c5172f",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Tr-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "fd7267db-6786-48f0-ac1c-29791c7db1c6": {
+                        "name": "left hemisphere Insula (lh_Ins)"
+                      },
+                      "f05ca0a9-445b-42ab-8aba-c14762b9f2f5": {
+                        "name": "left hemisphere Pars Triangularis (lh_Tr)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Triangularis – Superior Frontal",
+              "children": [
+                {
+                  "name": "lh_Tr-SF_0",
+                  "children": [],
+                  "labelIndex": 55,
+                  "originDatasets": [
+                    {
+                      "kgId": "a6dbb194-777a-43ca-b8c8-b43f992faf89",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "lh_Tr-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "8725059e-0ecb-452a-9c1d-f1088619a265": {
+                        "name": "left hemisphere Superior Frontal (lh_SF)"
+                      },
+                      "3714e138-febe-4f8c-b96e-589cda8186f5": {
+                        "name": "left hemisphere Pars Triangularis (lh_Tr)"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Right Hemisphere",
+          "children": [
+            {
+              "name": "Caudal Middle Frontal – Posterior Cingulate",
+              "children": [
+                {
+                  "name": "rh_CAC-PoCi_0",
+                  "children": [],
+                  "labelIndex": 8,
+                  "originDatasets": [
+                    {
+                      "kgId": "3b0b9de1-1fc6-42e9-b786-2efa87c2d67a",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CAC-PoCi_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a8f8439a-6bd1-4e10-9288-f315aab594c6": {
+                        "name": "right hemisphere Posterior Cingulate (rh_PoCi)"
+                      },
+                      "c4a8e98b-d93c-439b-a112-c3574689bddc": {
+                        "name": "right hemisphere Caudal Anterior Cingulate (rh_CAC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal - Precuneus",
+              "children": [
+                {
+                  "name": "rh_CAC-PrCu_0",
+                  "children": [],
+                  "labelIndex": 39,
+                  "originDatasets": [
+                    {
+                      "kgId": "f740f09e-9cfe-474b-9132-620dd732765f",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CAC-PrCu_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "79b4fdaa-2b89-488a-b6a8-caec0fad10ff": {
+                        "name": "right hemisphere Precuneus (rh_PrCu)"
+                      },
+                      "92ddc32d-1c31-4f3f-b647-9a4d0268a406": {
+                        "name": "right hemisphere Caudal Anterior Cingulate (rh_CAC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal - Precentral",
+              "children": [
+                {
+                  "name": "rh_CMF-PrC_0",
+                  "children": [],
+                  "labelIndex": 98,
+                  "originDatasets": [
+                    {
+                      "kgId": "f3ab5291-a58e-47f3-af03-78133db938ab",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CMF-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "0631318f-9bb4-459e-9a1a-dcba16030ddf": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      },
+                      "64cc1003-572e-49fc-a633-7d275c451105": {
+                        "name": "right hemisphere Caudal Middle Frontal (rh_CMF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_CMF-PrC_1",
+                  "children": [],
+                  "labelIndex": 100,
+                  "originDatasets": [
+                    {
+                      "kgId": "c1d905b0-7aa7-4c8b-8eaf-ebb25ad509f0",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CMF-PrC_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "faac5eef-bff1-49f8-b24c-401a713fcfde": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      },
+                      "03ddf35a-a143-46a8-83a9-acf0aa02be36": {
+                        "name": "right hemisphere Caudal Middle Frontal (rh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Rostral Middle Frontal",
+              "children": [
+                {
+                  "name": "rh_CMF-RMF_0",
+                  "children": [],
+                  "labelIndex": 50,
+                  "originDatasets": [
+                    {
+                      "kgId": "27557ac3-5c8b-4baa-9072-6f3f7c34f6ab",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CMF-RMF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "8730eb77-7a22-4e14-afbe-7aef259a1e2b": {
+                        "name": "right hemisphere Rostral Middle Frontal (rh_RMF)"
+                      },
+                      "b2de605f-45ef-4c8e-9015-083e5735dfcf": {
+                        "name": "right hemisphere Caudal Middle Frontal (rh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Superior Frontal",
+              "children": [
+                {
+                  "name": "rh_CMF-SF_0",
+                  "children": [],
+                  "labelIndex": 69,
+                  "originDatasets": [
+                    {
+                      "kgId": "865fe1ce-1363-4372-b1a3-fbf211a0c268",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CMF-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "e09d0f73-1dce-47f7-9957-35b9b589e02b": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "ac602465-e38d-4072-b332-21c889e51939": {
+                        "name": "right hemisphere Caudal Middle Frontal (rh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Caudal Middle Frontal – Superior Frontal\t\t",
+              "children": [
+                {
+                  "name": "rh_CMF-SF_1",
+                  "children": [],
+                  "labelIndex": 70,
+                  "originDatasets": [
+                    {
+                      "kgId": "b5d42fc2-68e7-47de-af9e-f4f0b49b7368",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_CMF-SF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "b9214225-aa82-4322-af7c-b097933a1913": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "6f939591-33b8-4694-b012-e2336db4aa2c": {
+                        "name": "right hemisphere Caudal Middle Frontal (rh_CMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Cuneus - Lingual",
+              "children": [
+                {
+                  "name": "rh_Cu-Li_0",
+                  "children": [],
+                  "labelIndex": 61,
+                  "originDatasets": [
+                    {
+                      "kgId": "05eb7f3c-8a87-49c0-af81-0bd29098f986",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Cu-Li_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "99add9b2-e21e-4bc9-8cbb-1ace4eb478fe": {
+                        "name": "right hemisphere Lingual (rh_Li)"
+                      },
+                      "1cfc143b-6432-4334-b8ff-690c5920d0bd": {
+                        "name": "right hemisphere Cuneus (rh_Cu)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Fusiform – Lateral Occipital",
+              "children": [
+                {
+                  "name": "rh_Fu-LO_1",
+                  "children": [],
+                  "labelIndex": 52,
+                  "originDatasets": [
+                    {
+                      "kgId": "0f108248-9cea-4a5d-bc9c-637d4c290f49",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Fu-LO_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "0f81ef07-2137-4244-9ebd-cdf206b66417": {
+                        "name": "right hemisphere Lateral Occipital (rh_LO)"
+                      },
+                      "9659f9e5-9f24-4bfb-8bbb-af9bd650fb69": {
+                        "name": "right hemisphere Fusiform (rh_Fu)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Isthmus Cingulate - Precuneus",
+              "children": [
+                {
+                  "name": "rh_IC-PrCu_0",
+                  "children": [],
+                  "labelIndex": 41,
+                  "originDatasets": [
+                    {
+                      "kgId": "adfbdcbc-510f-457f-9c63-fe6b7cecf789",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IC-PrCu_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a753d2de-342f-47c5-9ec7-9c12c9ec35b3": {
+                        "name": "right hemisphere Precuneus (rh_PrCu)"
+                      },
+                      "847c08f1-9886-4a26-9e18-536b7e06f08d": {
+                        "name": "right hemisphere Isthmus Cingulate (rh_IC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Inferior Temporal ",
+              "children": [
+                {
+                  "name": "rh_IP-IT_0",
+                  "children": [],
+                  "labelIndex": 60,
+                  "originDatasets": [
+                    {
+                      "kgId": "06246ac0-af1c-4277-a885-8865c4ff4bf3",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IP-IT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "d842d83d-863f-43cb-8573-8c2254aa987f": {
+                        "name": "right hemisphere Inferior Temporal (rh_IT)"
+                      },
+                      "99b94a5e-adc0-41b5-b3c6-5d261827d65d": {
+                        "name": "right hemisphere Inferior Parietal (rh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Lateral Occipital",
+              "children": [
+                {
+                  "name": "rh_IP-LO_0",
+                  "children": [],
+                  "labelIndex": 85,
+                  "originDatasets": [
+                    {
+                      "kgId": "6f9f342e-f314-43d9-8166-46ce8deb2d0c",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IP-LO_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "649fce83-2c8b-421d-b41a-32fe86a83ebc": {
+                        "name": "right hemisphere Lateral Occipital (rh_LO)"
+                      },
+                      "25c3d3c2-a4ac-4790-b4e1-492019345607": {
+                        "name": "right hemisphere Inferior Parietal (rh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Middle Temporal",
+              "children": [
+                {
+                  "name": "rh_IP-MT_0",
+                  "children": [],
+                  "labelIndex": 34,
+                  "originDatasets": [
+                    {
+                      "kgId": "faafacaa-2657-4d2c-88b6-044b0f8a2e40",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IP-MT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "51e7e92d-dc30-4ae7-8c21-fcd4b961c826": {
+                        "name": "right hemisphere Middle Temporal (rh_MT)"
+                      },
+                      "dc772c35-fad0-4fa0-bb58-045cd9aa3a61": {
+                        "name": "right hemisphere Inferior Parietal (rh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal - Supramarginal",
+              "children": [
+                {
+                  "name": "rh_IP-SM_0",
+                  "children": [],
+                  "labelIndex": 81,
+                  "originDatasets": [
+                    {
+                      "kgId": "cb96a9b7-c659-4d9a-aa19-bb1c9601ab34",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IP-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "32f71fba-9bea-467e-aced-9ef4b78b8517": {
+                        "name": "right hemisphere Supramarginal (rh_SM)"
+                      },
+                      "bea456a8-3c88-43e1-9f02-3ab25d707412": {
+                        "name": "right hemisphere Inferior Parietal (rh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Parietal – Superior Parietal",
+              "children": [
+                {
+                  "name": "rh_IP-SP_0",
+                  "children": [],
+                  "labelIndex": 83,
+                  "originDatasets": [
+                    {
+                      "kgId": "2078a9f3-7776-47d8-a4dc-eb4b5c1c7f16",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IP-SP_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "e2149ed9-14a2-4760-b212-38b75be13d38": {
+                        "name": "right hemisphere Superior Parietal (rh_SP)"
+                      },
+                      "2c92d6a5-062a-423f-b6d7-12458ee56d00": {
+                        "name": "right hemisphere Inferior Parietal (rh_IP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Inferior Temporal – Middle Temporal",
+              "children": [
+                {
+                  "name": "rh_IT-MT_1",
+                  "children": [],
+                  "labelIndex": 90,
+                  "originDatasets": [
+                    {
+                      "kgId": "32896a92-d755-48f6-bf91-ab6d1f7e5b0e",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IT-MT_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "ef98957c-b180-45c3-a3c1-b903d4ea6ce1": {
+                        "name": "right hemisphere Middle Temporal (rh_MT)"
+                      },
+                      "c7cd970f-51e3-471d-aa80-42f1ad3f13a9": {
+                        "name": "right hemisphere Inferior Temporal (rh_IT)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_IT-MT_2",
+                  "children": [],
+                  "labelIndex": 91,
+                  "originDatasets": [
+                    {
+                      "kgId": "f9cebe67-739d-4baf-9008-685604507599",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_IT-MT_2.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "69662b9b-fee5-43f6-ab45-98c9b6819313": {
+                        "name": "right hemisphere Inferior Temporal (rh_IT)"
+                      },
+                      "4a48a06f-1295-4127-b153-28eb0ace75eb": {
+                        "name": "right hemisphere Middle Temporal (rh_MT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Middle Orbitofrontal",
+              "children": [
+                {
+                  "name": "rh_LOF-MOF_0",
+                  "children": [],
+                  "labelIndex": 71,
+                  "originDatasets": [
+                    {
+                      "kgId": "2994d72e-c399-423c-9821-b8d1219f6b73",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_LOF-MOF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "b30d038a-7d82-45b4-8c81-16aa3a2ee857": {
+                        "name": "right hemisphere Middle Orbitofrontal (rh_MOF)"
+                      },
+                      "bea1d3a5-c8ff-4935-a434-90f11e01fd01": {
+                        "name": "right hemisphere Lateral Orbitofrontal (rh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Rostral Middle Frontal",
+              "children": [
+                {
+                  "name": "rh_LOF-RMF_0",
+                  "children": [],
+                  "labelIndex": 30,
+                  "originDatasets": [
+                    {
+                      "kgId": "a0266f84-b105-433e-88f1-cc84a6b526cd",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_LOF-RMF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "50496f13-c270-42e6-85b1-3fa7fe3fb45f": {
+                        "name": "right hemisphere Rostral Middle Frontal (rh_RMF)"
+                      },
+                      "fb5eb066-5de1-48d3-8f0c-75203c568e2b": {
+                        "name": "right hemisphere Lateral Orbitofrontal (rh_LOF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_LOF-RMF_1",
+                  "children": [],
+                  "labelIndex": 32,
+                  "originDatasets": [
+                    {
+                      "kgId": "781b0351-f768-44a9-a7db-c45a5424aa6d",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_LOF-RMF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "d7868239-da4f-43c1-8841-344aa69bd127": {
+                        "name": "right hemisphere Rostral Middle Frontal (rh_RMF)"
+                      },
+                      "4818f766-3b5a-4623-b272-37226523a0a7": {
+                        "name": "right hemisphere Lateral Orbitofrontal (rh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Superior Temporal",
+              "children": [
+                {
+                  "name": "rh_LOF-ST_0",
+                  "children": [],
+                  "labelIndex": 26,
+                  "originDatasets": [
+                    {
+                      "kgId": "ee642a5b-54c3-4385-bc80-5badf00ccc55",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_LOF-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "675a6ce9-ef26-4e68-9852-54afeb24923c": {
+                        "name": "right hemisphere Superior Temporal (rh_ST)"
+                      },
+                      "097c5fce-f0f5-4e3c-bf0f-68fd96086cde": {
+                        "name": "right hemisphere Lateral Orbitofrontal (rh_LOF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Lateral Orbitofrontal – Superior Parietal",
+              "children": [
+                {
+                  "name": "rh_LO-SP_0",
+                  "children": [],
+                  "labelIndex": 54,
+                  "originDatasets": [
+                    {
+                      "kgId": "0860234b-990f-4081-9319-e5f6a8fe36bb",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_LO-SP_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "b1da4dcf-4991-4f8e-bfd0-11febf7af3a4": {
+                        "name": "right hemisphere Superior Parietal (rh_SP)"
+                      },
+                      "141117c9-4dc4-4dd1-8093-3ffa7a18ed32": {
+                        "name": "right hemisphere Lateral Occipital (rh_LO)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Orbitofrontal – Superior Temporal",
+              "children": [
+                {
+                  "name": "rh_MOF-ST_0",
+                  "children": [],
+                  "labelIndex": 13,
+                  "originDatasets": [
+                    {
+                      "kgId": "7c67daac-62c6-47d9-9dd9-5d7f61c17464",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_MOF-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "4bbbf808-ac2d-4062-b9fc-a8480c83397b": {
+                        "name": "right hemisphere Superior Temporal (rh_ST)"
+                      },
+                      "ae420565-56bb-47c0-b50e-49019c27a988": {
+                        "name": "right hemisphere Middle Orbitofrontal (rh_MOF)  "
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Temporal - Supramarginal",
+              "children": [
+                {
+                  "name": "rh_MT-SM_0",
+                  "children": [],
+                  "labelIndex": 73,
+                  "originDatasets": [
+                    {
+                      "kgId": "f8c07769-d0b1-4234-a83f-21561d998c21",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_MT-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "3393eb4a-02a6-4c77-9fe6-39d06fceea93": {
+                        "name": "right hemisphere Supramarginal (rh_SM)"
+                      },
+                      "5d6ca992-335e-459c-9809-cc3c36ddd1ff": {
+                        "name": "right hemisphere Middle Temporal (rh_MT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Middle Temporal – Superior Temporal",
+              "children": [
+                {
+                  "name": "rh_MT-ST_0",
+                  "children": [],
+                  "labelIndex": 96,
+                  "originDatasets": [
+                    {
+                      "kgId": "b4ea38d2-09f5-45fe-abdb-4dcb4c05d495",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_MT-ST_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "bde48d05-f9ef-4d0b-a247-4c23a18d8d60": {
+                        "name": "right hemisphere Superior Temporal (rh_ST)"
+                      },
+                      "4586bd71-8956-40a9-aba3-a4cb2e70ab55": {
+                        "name": "right hemisphere Middle Temporal (rh_MT)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis - Insula",
+              "children": [
+                {
+                  "name": "rh_Op-Ins_0",
+                  "children": [],
+                  "labelIndex": 28,
+                  "originDatasets": [
+                    {
+                      "kgId": "f144a431-46f5-46b1-af9e-71806a31bb92",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Op-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "68a02c5a-48ea-402c-b335-68f95fe0c200": {
+                        "name": "right hemisphere Insula (rh_Ins)"
+                      },
+                      "a8e62223-0074-40ec-bc09-d8104bb0cf8d": {
+                        "name": "right hemisphere Pars Opercularis (rh_Op)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis - Precentral",
+              "children": [
+                {
+                  "name": "rh_Op-PrC_0",
+                  "children": [],
+                  "labelIndex": 19,
+                  "originDatasets": [
+                    {
+                      "kgId": "0c4eca5d-7c46-41b6-914f-7642ccdda8a8",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Op-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a8e62223-0074-40ec-bc09-d8104bb0cf8d": {
+                        "name": "right hemisphere Pars Opercularis (rh_Op)"
+                      },
+                      "14b34651-7810-4b98-9cfa-7fb3c370c945": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis – Superior Frontal",
+              "children": [
+                {
+                  "name": "rh_Op-SF_0",
+                  "children": [],
+                  "labelIndex": 43,
+                  "originDatasets": [
+                    {
+                      "kgId": "784e25fa-501d-4ba3-878a-f32412f6dd28",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Op-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a8e62223-0074-40ec-bc09-d8104bb0cf8d": {
+                        "name": "right hemisphere Pars Opercularis (rh_Op)"
+                      },
+                      "f184300a-6660-4885-aaf4-a81b27d22bf3": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Opercularis – Pars Triangularis",
+              "children": [
+                {
+                  "name": "rh_Op-Tr_0",
+                  "children": [],
+                  "labelIndex": 63,
+                  "originDatasets": [
+                    {
+                      "kgId": "94d50656-1407-4e99-88c1-b7c3520598a6",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Op-Tr_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a8e62223-0074-40ec-bc09-d8104bb0cf8d": {
+                        "name": "right hemisphere Pars Opercularis (rh_Op)"
+                      },
+                      "01236433-c8bb-41bd-bc38-31ae6d588533": {
+                        "name": "right hemisphere Pars Triangularis (rh_Tr)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Orbitalis - Insula",
+              "children": [
+                {
+                  "name": "rh_Or-Ins_0",
+                  "children": [],
+                  "labelIndex": 17,
+                  "originDatasets": [
+                    {
+                      "kgId": "de7674b7-0599-4a6a-9a1c-eb4aaaca04f4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Or-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "a2e596ad-deca-4a1d-a41c-752bfcd268df": {
+                        "name": "right hemisphere Insula (rh_Ins)"
+                      },
+                      "8487772f-dd3a-4cce-9bc8-32d392ba4060": {
+                        "name": "right hemisphere Pars Orbitalis (rh_Or)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Posterior Cingulate - Precuneus",
+              "children": [
+                {
+                  "name": "rh_PoCi-PrCu_1",
+                  "children": [],
+                  "labelIndex": 46,
+                  "originDatasets": [
+                    {
+                      "kgId": "16ecb569-bf31-4763-b68f-507c59471f3a",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoCi-PrCu_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "38a01a25-ca78-4130-8c45-539d6c76e6f4": {
+                        "name": "right hemisphere Posterior Cingulate (rh_PoCi)"
+                      },
+                      "60f094f9-343c-492d-91bb-315d8b28b45f": {
+                        "name": "right hemisphere Precuneus (rh_PrCu)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_PoCi-PrCu_2",
+                  "children": [],
+                  "labelIndex": 47,
+                  "originDatasets": [
+                    {
+                      "kgId": "d20c41e0-7b21-45e7-869f-e66df6480563",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoCi-PrCu_2.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "b140275d-bdfa-42f0-84cb-5cb935823d9a": {
+                        "name": "right hemisphere Precuneus (rh_PrCu)"
+                      },
+                      "c8641beb-0885-4752-8cae-915bedd2e29f": {
+                        "name": "right hemisphere Posterior Cingulate (rh_PoCi)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Posterior Cingulate – Rostral Anterior Cingulate",
+              "children": [
+                {
+                  "name": "rh_PoCi-RAC_0",
+                  "children": [],
+                  "labelIndex": 11,
+                  "originDatasets": [
+                    {
+                      "kgId": "71f844b8-b7de-468c-9177-157ac9e830be",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoCi-RAC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "7cce70c5-92c6-4819-b0ff-cba354559f8e": {
+                        "name": "right hemisphere Rostral Anterior Cingulate (rh_RAC) "
+                      },
+                      "aef00659-4815-4a2c-800e-8eae2f971818": {
+                        "name": "right hemisphere Posterior Cingulate (rh_PoCi)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Poscentral - Precentral",
+              "children": [
+                {
+                  "name": "rh_PoC-PrC_0",
+                  "children": [],
+                  "labelIndex": 2,
+                  "originDatasets": [
+                    {
+                      "kgId": "499b78bc-2bbc-43f8-bfca-1f8846ca2697",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-PrC_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "c10b71c8-0ab2-4e47-aee3-74aedee8a988": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      },
+                      "f6598864-434f-4659-a581-23e2371ff3ab": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_PoC-PrC_1",
+                  "children": [],
+                  "labelIndex": 4,
+                  "originDatasets": [
+                    {
+                      "kgId": "42c1df7e-ddd2-4229-a4b0-2a7f61f431e4",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-PrC_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "b84a00f8-c090-4f1f-99e8-e1e41ca24905": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      },
+                      "52b05cff-1f0f-48f2-bcf2-dc1f3d9831cf": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_PoC-PrC_2",
+                  "children": [],
+                  "labelIndex": 6,
+                  "originDatasets": [
+                    {
+                      "kgId": "358e97f5-7fa6-45b4-9555-2d15fe1db89e",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-PrC_2.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "5e446c5a-2595-46aa-b6db-300a97558e17": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      },
+                      "741ef69b-71e6-44ff-aca7-9fb3879d87a1": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Postcentral - Supramarginal",
+              "children": [
+                {
+                  "name": "rh_PoC-SM_0",
+                  "children": [],
+                  "labelIndex": 75,
+                  "originDatasets": [
+                    {
+                      "kgId": "77d202cb-90ec-4c66-9905-bd4df03a12b9",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "5a659d4c-509c-4247-a347-64c4551fdedb": {
+                        "name": "right hemisphere Supramarginal (rh_SM)"
+                      },
+                      "e5da98e6-0885-4f61-a7e8-e4b36f6a1883": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Postcentral – Superior Parietal",
+              "children": [
+                {
+                  "name": "rh_PoC-SP_0",
+                  "children": [],
+                  "labelIndex": 87,
+                  "originDatasets": [
+                    {
+                      "kgId": "80aa2397-8655-4279-bd52-96cf18ab4ae6",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-SP_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "072cf5a2-9fbb-48f5-9612-79170f5f2e71": {
+                        "name": "right hemisphere Supramarginal (rh_SP)"
+                      },
+                      "95bef109-5d20-42a3-a6b0-309ae21e7ffa": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_PoC-SP_1",
+                  "children": [],
+                  "labelIndex": 88,
+                  "originDatasets": [
+                    {
+                      "kgId": "24bfa523-5f93-42d0-a249-2f3813f3b7d8",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PoC-SP_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "0c9cd77f-4784-4629-8deb-607921c74083": {
+                        "name": "right hemisphere Supramarginal (rh_SP)"
+                      },
+                      "a742ce43-fcab-4df1-9e08-66ca161e56c9": {
+                        "name": "right hemisphere Postcentral (rh_PoC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral - Insula",
+              "children": [
+                {
+                  "name": "rh_PrC-Ins_0",
+                  "children": [],
+                  "labelIndex": 67,
+                  "originDatasets": [
+                    {
+                      "kgId": "482e73fa-aeae-46d3-a88c-59262b40542b",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PrC-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "0bcd031c-a3b6-4016-970d-e9f620da125d": {
+                        "name": "right hemisphere Insula (rh_Ins)"
+                      },
+                      "d7cfdae6-979d-4cc0-b2ad-2f7496a72f34": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral - Supramarginal\t",
+              "children": [
+                {
+                  "name": "rh_PrC-SM_0",
+                  "children": [],
+                  "labelIndex": 14,
+                  "originDatasets": [
+                    {
+                      "kgId": "9d499f79-0c6c-4b25-bcb0-127a195e70af",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PrC-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "1ff6b2e3-13ac-4eb0-9dda-114c23da3bbe": {
+                        "name": "right hemisphere Supramarginal (rh_SM)"
+                      },
+                      "f56e01db-058d-4619-957c-e25bf7cf26b8": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Precentral – Superior Parietal",
+              "children": [
+                {
+                  "name": "rh_PrC-SP_0",
+                  "children": [],
+                  "labelIndex": 9,
+                  "originDatasets": [
+                    {
+                      "kgId": "599f4b18-6b9b-453a-a81f-ba1081c1635a",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_PrC-SP_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "60ca5664-f486-4d9b-966a-2a9118b34df1": {
+                        "name": "right hemisphere Superior Parietal (rh_SP)"
+                      },
+                      "0f59b7e4-58c2-47ff-9d98-870e94c07a42": {
+                        "name": "right hemisphere Precentral (rh_PrC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Rostral Anterior Cingulate",
+              "children": [
+                {
+                  "name": "rh_RAC-SF_0",
+                  "children": [],
+                  "labelIndex": 77,
+                  "originDatasets": [
+                    {
+                      "kgId": "378fbed1-1945-4e76-95d5-f02dc8676fe6",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_RAC-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "dd250f86-4da4-45ee-876e-79824f8b7672": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "915c80da-26f9-4e62-af63-9822d38bee99": {
+                        "name": "right hemisphere Rostral Anterior Cingulate (rh_RAC)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Rostral Middle Frontal – Superior Frontal",
+              "children": [
+                {
+                  "name": "rh_RMF-SF_0",
+                  "children": [],
+                  "labelIndex": 22,
+                  "originDatasets": [
+                    {
+                      "kgId": "fdaff7eb-2a35-44a6-966f-ee5307ac1b7c",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_RMF-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "05705709-a25a-4587-964d-a2c4a0aff783": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "87a9911d-98db-4eae-a3da-522b9989089c": {
+                        "name": "right hemisphere Rostral Middle Frontal (rh_RMF)"
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "rh_RMF-SF_1",
+                  "children": [],
+                  "labelIndex": 24,
+                  "originDatasets": [
+                    {
+                      "kgId": "6294f3e9-0279-46fc-b535-adc7f0b5f78c",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_RMF-SF_1.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "62e8a7d4-1886-4f9c-9f80-4aae2c9bd44b": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "031edd52-04c5-4368-bad8-2515e20d860d": {
+                        "name": "right hemisphere Rostral Middle Frontal (rh_RMF)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Supramarginal - Insula",
+              "children": [
+                {
+                  "name": "rh_SM-Ins_0",
+                  "children": [],
+                  "labelIndex": 58,
+                  "originDatasets": [
+                    {
+                      "kgId": "937b06ad-85e1-40d9-8523-2208e493f65c",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_SM-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "f07556fc-baf5-42ee-9787-99caf88a34bc": {
+                        "name": "right hemisphere Insula (rh_Ins)"
+                      },
+                      "0c298145-f661-44d0-9fa9-f8162548072f": {
+                        "name": "right hemisphere Supramarginal (rh_SM) "
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Superior Parietal - Supramarginal",
+              "children": [
+                {
+                  "name": "rh_SP-SM_0",
+                  "children": [],
+                  "labelIndex": 94,
+                  "originDatasets": [
+                    {
+                      "kgId": "0a7d2e7d-9932-4bc7-bf88-18454b387d63",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_SP-SM_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "cebbf914-7c0e-4662-8357-980be1ab6159": {
+                        "name": "right hemisphere Supramarginal (rh_SM)"
+                      },
+                      "42034a13-1656-4f99-b157-863f608757cc": {
+                        "name": "right hemisphere Superior Parietal (rh_SP)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Superior Temporal – Transverse Temporal",
+              "children": [
+                {
+                  "name": "rh_ST-TT_0",
+                  "children": [],
+                  "labelIndex": 36,
+                  "originDatasets": [
+                    {
+                      "kgId": "c91efb77-dfe8-48d9-a110-bb75e9beff99",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_ST-TT_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "93828419-ff60-4223-ba14-df8b09edf490": {
+                        "name": "right hemisphere Transverse Temporal (rh_TT)"
+                      },
+                      "82705c3c-c6d8-4d38-ae5a-bc52e69fedba": {
+                        "name": "right hemisphere Superior Temporal (rh_ST)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Triangularis - Insula",
+              "children": [
+                {
+                  "name": "rh_Tr-Ins_0",
+                  "children": [],
+                  "labelIndex": 65,
+                  "originDatasets": [
+                    {
+                      "kgId": "545f318a-4648-4880-ab3f-bc7e05ca4687",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Tr-Ins_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "0a8cc427-061c-4cc9-b3c0-011972eb967b": {
+                        "name": "right hemisphere Insula (rh_Ins)"
+                      },
+                      "39679b45-3ccd-4402-b272-ead113e5c426": {
+                        "name": "right hemisphere Pars Triangularis (rh_Tr)"
+                      }
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Pars Triangularis – Superior Frontal",
+              "children": [
+                {
+                  "name": "rh_Tr-SF_0",
+                  "children": [],
+                  "labelIndex": 56,
+                  "originDatasets": [
+                    {
+                      "kgId": "5d35bdda-303b-4fc9-ab76-e3076c1e5ebc",
+                      "kgSchema": "minds/core/dataset/v1.0.0",
+                      "filename": "rh_Tr-SF_0.nii"
+                    }
+                  ],
+                  "fullId": {
+                    "minds/core/dataset/v1.0.0/parcellationregion": {
+                      "61384778-971e-47f5-8f9b-dc0ca89a5afc": {
+                        "name": "right hemisphere Superior Frontal (rh_SF)"
+                      },
+                      "0e4e9a66-98e1-4b65-8bbe-5fc58350b9da": {
+                        "name": "right hemisphere Pars Triangularis (rh_Tr) "
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "@id": "juelich/iav/atlas/v1.0.0/6",
       "ngId": "fibre bundle short",
       "auxillaryMeshIndices": [
@@ -8495,1033 +11388,9 @@
           "kgId": "f58e4425-6614-4ad9-ac26-5e946b1296cb"
         }
       ],
-      "regions": [
-        {
-          "name": "Left Hemisphere",
-          "children": [
-            {
-              "name": "Caudal Middle Frontal - Precuneus",
-              "children": [
-                {
-                  "name": "lh_CAC-PrCu_0",
-                  "children": [],
-                  "labelIndex": "38",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CAC-PrCu_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Pars Opercularis",
-              "children": [
-                {
-                  "name": "lh_CMF-Op_0",
-                  "children": [],
-                  "labelIndex": "37",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-Op_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal - Poscentral",
-              "children": [
-                {
-                  "name": "lh_CMF-PoC_0",
-                  "children": [],
-                  "labelIndex": "62",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-PoC_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal - Precentral",
-              "children": [
-                {
-                  "name": "lh_CMF-PrC_0",
-                  "children": [],
-                  "labelIndex": "97",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-PrC_0.nii"
-                },
-                {
-                  "name": "lh_CMF-PrC_1",
-                  "children": [],
-                  "labelIndex": "99",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-PrC_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Rostral Middle Frontal",
-              "children": [
-                {
-                  "name": "lh_CMF-RMF_0",
-                  "children": [],
-                  "labelIndex": "49",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-RMF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_CMF-SF_0",
-                  "children": [],
-                  "labelIndex": "68",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_CMF-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Fusiform – Lateral Occipital",
-              "children": [
-                {
-                  "name": "lh_Fu-LO_0",
-                  "children": [],
-                  "labelIndex": "51",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Fu-LO_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Isthmus Cingulate - Precuneus",
-              "children": [
-                {
-                  "name": "lh_IC-PrCu_0",
-                  "children": [],
-                  "labelIndex": "40",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IC-PrCu_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Inferior Temporal",
-              "children": [
-                {
-                  "name": "lh_IP-IT_0",
-                  "children": [],
-                  "labelIndex": "59",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-IT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Lateral Occipital",
-              "children": [
-                {
-                  "name": "lh_IP-LO_1",
-                  "children": [],
-                  "labelIndex": "86",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-LO_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Middle Temporal\t",
-              "children": [
-                {
-                  "name": "lh_IP-MT_0",
-                  "children": [],
-                  "labelIndex": "33",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-MT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal - Supramarginal",
-              "children": [
-                {
-                  "name": "lh_IP-SM_0",
-                  "children": [],
-                  "labelIndex": "80",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Pariertal – Superior Parietal",
-              "children": [
-                {
-                  "name": "lh_IP-SP_0",
-                  "children": [],
-                  "labelIndex": "82",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-SP_0.nii"
-                },
-                {
-                  "name": "lh_IP-SP_1",
-                  "children": [],
-                  "labelIndex": "84",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IP-SP_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Temporal – Middle Temporal",
-              "children": [
-                {
-                  "name": "lh_IT-MT_0",
-                  "children": [],
-                  "labelIndex": "89",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_IT-MT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Pars Orbitalis",
-              "children": [
-                {
-                  "name": "lh_LOF-Or_0",
-                  "children": [],
-                  "labelIndex": "48",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_LOF-Or_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Rostral Middle Frontal",
-              "children": [
-                {
-                  "name": "lh_LOF-RMF_0",
-                  "children": [],
-                  "labelIndex": "29",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_LOF-RMF_0.nii"
-                },
-                {
-                  "name": "lh_LOF-RMF_1",
-                  "children": [],
-                  "labelIndex": "31",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_LOF-RMF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Superior Temporal",
-              "children": [
-                {
-                  "name": "lh_LOF-ST_0",
-                  "children": [],
-                  "labelIndex": "25",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_LOF-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Orbitofrontal – Superior Temporal",
-              "children": [
-                {
-                  "name": "lh_MOF-ST_0",
-                  "children": [],
-                  "labelIndex": "12",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_MOF-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Temporal - Supramarginal",
-              "children": [
-                {
-                  "name": "lh_MT-SM_0",
-                  "children": [],
-                  "labelIndex": "72",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_MT-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Temporal – Superior Temporal",
-              "children": [
-                {
-                  "name": "lh_MT-ST_0",
-                  "children": [],
-                  "labelIndex": "95",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_MT-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis - Insula",
-              "children": [
-                {
-                  "name": "lh_Op-Ins_0",
-                  "children": [],
-                  "labelIndex": "27",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Op-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis - Precentral`",
-              "children": [
-                {
-                  "name": "lh_Op-PrC_0",
-                  "children": [],
-                  "labelIndex": "18",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Op-PrC_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_Op-SF_0",
-                  "children": [],
-                  "labelIndex": "42",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Op-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Orbitalis - Insula",
-              "children": [
-                {
-                  "name": "lh_Or-Ins_0",
-                  "children": [],
-                  "labelIndex": "16",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Or-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Postcentral - Insula",
-              "children": [
-                {
-                  "name": "lh_PoC-Ins_0",
-                  "children": [],
-                  "labelIndex": "53",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Poscentral - Precuneus",
-              "children": [
-                {
-                  "name": "lh_PoCi-PrCu_0",
-                  "children": [],
-                  "labelIndex": "44",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoCi-PrCu_0.nii"
-                },
-                {
-                  "name": "lh_PoCi-PrCu_1",
-                  "children": [],
-                  "labelIndex": "45",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoCi-PrCu_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Posterior Cingulate – Rostral Anterior Cingulate",
-              "children": [
-                {
-                  "name": "lh_PoCi-RAC_0",
-                  "children": [],
-                  "labelIndex": "10",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoCi-RAC_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Posterior Cingulate – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_PoCi-SF_0",
-                  "children": [],
-                  "labelIndex": "79",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoCi-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Poscentral - Precentral",
-              "children": [
-                {
-                  "name": "lh_PoC-PrC_0",
-                  "children": [],
-                  "labelIndex": "1",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-PrC_0.nii"
-                },
-                {
-                  "name": "lh_PoC-PrC_1",
-                  "children": [],
-                  "labelIndex": "3",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-PrC_1.nii"
-                },
-                {
-                  "name": "lh_PoC-PrC_2",
-                  "children": [],
-                  "labelIndex": "5",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-PrC_2.nii"
-                },
-                {
-                  "name": "lh_PoC-PrC_3",
-                  "children": [],
-                  "labelIndex": "7",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-PrC_3.nii"
-                }
-              ]
-            },
-            {
-              "name": "Poscentral - Supramarginal",
-              "children": [
-                {
-                  "name": "lh_PoC-SM_0",
-                  "children": [],
-                  "labelIndex": "74",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-SM_0.nii"
-                },
-                {
-                  "name": "lh_PoC-SM_1",
-                  "children": [],
-                  "labelIndex": "76",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PoC-SM_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral - Insula",
-              "children": [
-                {
-                  "name": "lh_PrC-Ins_0",
-                  "children": [],
-                  "labelIndex": "66",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PrC-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_PrC-SF_0",
-                  "children": [],
-                  "labelIndex": "20",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PrC-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral - Supramarginal",
-              "children": [
-                {
-                  "name": "lh_PrC-SM_0",
-                  "children": [],
-                  "labelIndex": "15",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_PrC-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Rostral Anterior Cingulate – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_RAC-SF_1",
-                  "children": [],
-                  "labelIndex": "78",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_RAC-SF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Rostral Middle Frontal – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_RMF-SF_0",
-                  "children": [],
-                  "labelIndex": "21",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_RMF-SF_0.nii"
-                },
-                {
-                  "name": "lh_RMF-SF_1",
-                  "children": [],
-                  "labelIndex": "23",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_RMF-SF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Supramarginal - Insula",
-              "children": [
-                {
-                  "name": "lh_SM-Ins_0",
-                  "children": [],
-                  "labelIndex": "57",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_SM-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Superior Parietal - Supramarginal",
-              "children": [
-                {
-                  "name": "lh_SP-SM_0",
-                  "children": [],
-                  "labelIndex": "93",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_SP-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Superior Temporal - Insula",
-              "children": [
-                {
-                  "name": "lh_ST-Ins_0",
-                  "children": [],
-                  "labelIndex": "92",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_ST-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Superior Temporal – Transverse Temporal",
-              "children": [
-                {
-                  "name": "lh_ST-TT_0",
-                  "children": [],
-                  "labelIndex": "35",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_ST-TT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Triangularis - Insula",
-              "children": [
-                {
-                  "name": "lh_Tr-Ins_0",
-                  "children": [],
-                  "labelIndex": "64",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Tr-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Triangularis – Superior Frontal",
-              "children": [
-                {
-                  "name": "lh_Tr-SF_0",
-                  "children": [],
-                  "labelIndex": "55",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/lh_Tr-SF_0.nii"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "name": "Right Hemisphere",
-          "children": [
-            {
-              "name": "Caudal Middle Frontal – Posterior Cingulate",
-              "children": [
-                {
-                  "name": "rh_CAC-PoCi_0",
-                  "children": [],
-                  "labelIndex": "8",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CAC-PoCi_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal - Precuneus",
-              "children": [
-                {
-                  "name": "rh_CAC-PrCu_0",
-                  "children": [],
-                  "labelIndex": "39",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CAC-PrCu_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal - Precentral",
-              "children": [
-                {
-                  "name": "rh_CMF-PrC_0",
-                  "children": [],
-                  "labelIndex": "98",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CMF-PrC_0.nii"
-                },
-                {
-                  "name": "rh_CMF-PrC_1",
-                  "children": [],
-                  "labelIndex": "100",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CMF-PrC_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Rostral Middle Frontal",
-              "children": [
-                {
-                  "name": "rh_CMF-RMF_0",
-                  "children": [],
-                  "labelIndex": "50",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CMF-RMF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Superior Frontal",
-              "children": [
-                {
-                  "name": "rh_CMF-SF_0",
-                  "children": [],
-                  "labelIndex": "69",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CMF-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Caudal Middle Frontal – Superior Frontal\t\t",
-              "children": [
-                {
-                  "name": "rh_CMF-SF_1",
-                  "children": [],
-                  "labelIndex": "70",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_CMF-SF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Cuneus - Lingual",
-              "children": [
-                {
-                  "name": "rh_Cu-Li_0",
-                  "children": [],
-                  "labelIndex": "61",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Cu-Li_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Fusiform – Lateral Occipital",
-              "children": [
-                {
-                  "name": "rh_Fu-LO_1",
-                  "children": [],
-                  "labelIndex": "52",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Fu-LO_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Isthmus Cingulate - Precuneus",
-              "children": [
-                {
-                  "name": "rh_IC-PrCu_0",
-                  "children": [],
-                  "labelIndex": "41",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IC-PrCu_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Inferior Temporal ",
-              "children": [
-                {
-                  "name": "rh_IP-IT_0",
-                  "children": [],
-                  "labelIndex": "60",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IP-IT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Lateral Occipital",
-              "children": [
-                {
-                  "name": "rh_IP-LO_0",
-                  "children": [],
-                  "labelIndex": "85",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IP-LO_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Middle Temporal",
-              "children": [
-                {
-                  "name": "rh_IP-MT_0",
-                  "children": [],
-                  "labelIndex": "34",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IP-MT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal - Supramarginal",
-              "children": [
-                {
-                  "name": "rh_IP-SM_0",
-                  "children": [],
-                  "labelIndex": "81",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IP-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Parietal – Superior Parietal",
-              "children": [
-                {
-                  "name": "rh_IP-SP_0",
-                  "children": [],
-                  "labelIndex": "83",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IP-SP_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Inferior Temporal – Middle Temporal",
-              "children": [
-                {
-                  "name": "rh_IT-MT_1",
-                  "children": [],
-                  "labelIndex": "90",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IT-MT_1.nii"
-                },
-                {
-                  "name": "rh_IT-MT_2",
-                  "children": [],
-                  "labelIndex": "91",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_IT-MT_2.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Middle Orbitofrontal",
-              "children": [
-                {
-                  "name": "rh_LOF-MOF_0",
-                  "children": [],
-                  "labelIndex": "71",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_LOF-MOF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Rostral Middle Frontal",
-              "children": [
-                {
-                  "name": "rh_LOF-RMF_0",
-                  "children": [],
-                  "labelIndex": "30",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_LOF-RMF_0.nii"
-                },
-                {
-                  "name": "rh_LOF-RMF_1",
-                  "children": [],
-                  "labelIndex": "32",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_LOF-RMF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Superior Temporal",
-              "children": [
-                {
-                  "name": "rh_LOF-ST_0",
-                  "children": [],
-                  "labelIndex": "26",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_LOF-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Lateral Orbitofrontal – Superior Parietal",
-              "children": [
-                {
-                  "name": "rh_LO-SP_0",
-                  "children": [],
-                  "labelIndex": "54",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_LO-SP_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Orbitofrontal – Superior Temporal",
-              "children": [
-                {
-                  "name": "rh_MOF-ST_0",
-                  "children": [],
-                  "labelIndex": "13",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_MOF-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Temporal - Supramarginal",
-              "children": [
-                {
-                  "name": "rh_MT-SM_0",
-                  "children": [],
-                  "labelIndex": "73",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_MT-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Middle Temporal – Superior Temporal",
-              "children": [
-                {
-                  "name": "rh_MT-ST_0",
-                  "children": [],
-                  "labelIndex": "96",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_MT-ST_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis - Insula",
-              "children": [
-                {
-                  "name": "rh_Op-Ins_0",
-                  "children": [],
-                  "labelIndex": "28",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Op-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis - Precentral",
-              "children": [
-                {
-                  "name": "rh_Op-PrC_0",
-                  "children": [],
-                  "labelIndex": "19",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Op-PrC_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis – Superior Frontal",
-              "children": [
-                {
-                  "name": "rh_Op-SF_0",
-                  "children": [],
-                  "labelIndex": "43",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Op-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Opercularis – Pars Triangularis",
-              "children": [
-                {
-                  "name": "rh_Op-Tr_0",
-                  "children": [],
-                  "labelIndex": "63",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Op-Tr_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Orbitalis - Insula",
-              "children": [
-                {
-                  "name": "rh_Or-Ins_0",
-                  "children": [],
-                  "labelIndex": "17",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Or-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Posterior Cingulate - Precuneus",
-              "children": [
-                {
-                  "name": "rh_PoCi-PrCu_1",
-                  "children": [],
-                  "labelIndex": "46",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoCi-PrCu_1.nii"
-                },
-                {
-                  "name": "rh_PoCi-PrCu_2",
-                  "children": [],
-                  "labelIndex": "47",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoCi-PrCu_2.nii"
-                }
-              ]
-            },
-            {
-              "name": "Posterior Cingulate – Rostral Anterior Cingulate",
-              "children": [
-                {
-                  "name": "rh_PoCi-RAC_0",
-                  "children": [],
-                  "labelIndex": "11",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoCi-RAC_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Poscentral - Precentral",
-              "children": [
-                {
-                  "name": "rh_PoC-PrC_0",
-                  "children": [],
-                  "labelIndex": "2",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-PrC_0.nii"
-                },
-                {
-                  "name": "rh_PoC-PrC_1",
-                  "children": [],
-                  "labelIndex": "4",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-PrC_1.nii"
-                },
-                {
-                  "name": "rh_PoC-PrC_2",
-                  "children": [],
-                  "labelIndex": "6",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-PrC_2.nii"
-                }
-              ]
-            },
-            {
-              "name": "Postcentral - Supramarginal",
-              "children": [
-                {
-                  "name": "rh_PoC-SM_0",
-                  "children": [],
-                  "labelIndex": "75",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Postcentral – Superior Parietal",
-              "children": [
-                {
-                  "name": "rh_PoC-SP_0",
-                  "children": [],
-                  "labelIndex": "87",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-SP_0.nii"
-                },
-                {
-                  "name": "rh_PoC-SP_1",
-                  "children": [],
-                  "labelIndex": "88",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PoC-SP_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral - Insula",
-              "children": [
-                {
-                  "name": "rh_PrC-Ins_0",
-                  "children": [],
-                  "labelIndex": "67",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PrC-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral - Supramarginal\t",
-              "children": [
-                {
-                  "name": "rh_PrC-SM_0",
-                  "children": [],
-                  "labelIndex": "14",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PrC-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Precentral – Superior Parietal",
-              "children": [
-                {
-                  "name": "rh_PrC-SP_0",
-                  "children": [],
-                  "labelIndex": "9",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_PrC-SP_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Rostral Anterior Cingulate",
-              "children": [
-                {
-                  "name": "rh_RAC-SF_0",
-                  "children": [],
-                  "labelIndex": "77",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_RAC-SF_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Rostral Middle Frontal – Superior Frontal",
-              "children": [
-                {
-                  "name": "rh_RMF-SF_0",
-                  "children": [],
-                  "labelIndex": "22",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_RMF-SF_0.nii"
-                },
-                {
-                  "name": "rh_RMF-SF_1",
-                  "children": [],
-                  "labelIndex": "24",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_RMF-SF_1.nii"
-                }
-              ]
-            },
-            {
-              "name": "Supramarginal - Insula",
-              "children": [
-                {
-                  "name": "rh_SM-Ins_0",
-                  "children": [],
-                  "labelIndex": "58",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_SM-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Superior Parietal - Supramarginal",
-              "children": [
-                {
-                  "name": "rh_SP-SM_0",
-                  "children": [],
-                  "labelIndex": "94",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_SP-SM_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Superior Temporal – Transverse Temporal",
-              "children": [
-                {
-                  "name": "rh_ST-TT_0",
-                  "children": [],
-                  "labelIndex": "36",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_ST-TT_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Triangularis - Insula",
-              "children": [
-                {
-                  "name": "rh_Tr-Ins_0",
-                  "children": [],
-                  "labelIndex": "65",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Tr-Ins_0.nii"
-                }
-              ]
-            },
-            {
-              "name": "Pars Triangularis – Superior Frontal",
-              "children": [
-                {
-                  "name": "rh_Tr-SF_0",
-                  "children": [],
-                  "labelIndex": "56",
-                  "PMapURL": "https://neuroglancer.humanbrainproject.org/precomputed/Fiber_Bundle/ProbabilityMaps/rh_Tr-SF_0.nii"
-                }
-              ]
-            }
-          ]
-        }
-      ]
+      "_": {
+        "@src": "https://gin.g-node.org/FZJ-INM1-BDA/20201009-fix-shortbundle-IAV-hiearchy/raw/e7e1839f925c91339d3c0306d3b9ec44cbf0358e/output/nehubaUI/short-bundle.json"
+      }
     },
     {
       "name": "DiFuMo Atlas (64 dimensions)",
