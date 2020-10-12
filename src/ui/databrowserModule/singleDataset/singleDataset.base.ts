@@ -1,5 +1,5 @@
-import { ChangeDetectorRef, Input, OnInit, TemplateRef, OnChanges, OnDestroy } from "@angular/core";
-import { Observable, Subject, Subscription, of, combineLatest } from "rxjs";
+import { ChangeDetectorRef, Input, TemplateRef, OnChanges, OnDestroy } from "@angular/core";
+import { Observable, Subject, Subscription, combineLatest } from "rxjs";
 import { IDataEntry, IFile, IPublication } from 'src/services/state/dataStore.store'
 import { HumanReadableFileSizePipe } from "src/util/pipes/humanReadableFileSize.pipe";
 import { DatabrowserService } from "../databrowser.service";
@@ -10,7 +10,7 @@ import { getKgSchemaIdFromFullId } from "../util/getKgSchemaIdFromFullId.pipe";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { ARIA_LABELS } from 'common/constants'
-import { switchMap, catchError, distinctUntilChanged, filter } from "rxjs/operators";
+import { switchMap, distinctUntilChanged, filter } from "rxjs/operators";
 import { IContributor } from "../contributor";
 
 export {
@@ -110,7 +110,7 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
     this.favedDataentries$ = this.dbService.favedDataentries$
 
     this.subscriptions.push(
-      combineLatest(
+      combineLatest([
         this.kgSchema$.pipe(
           distinctUntilChanged(),
           filter(v => !!v)
@@ -119,13 +119,11 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
           distinctUntilChanged(),
           filter(v => !!v)
         )
-      ).pipe(
+      ]).pipe(
         switchMap(([kgSchema, kgId]) => {
           this.fetchFlag = true
           this.cdr.markForCheck()
-          return this.singleDatasetService.getInfoFromKg({ kgSchema, kgId }).pipe(
-            catchError((err, obs) => of(null))
-          )
+          return this.singleDatasetService.getInfoFromKg({ kgSchema, kgId })
         })
       ).subscribe(dataset => {
         if (!dataset) return
@@ -144,6 +142,12 @@ export class SingleDatasetBase implements OnChanges, OnDestroy {
         this.dlFromKgHref = this.singleDatasetService.getDownloadZipFromKgHref({ kgSchema, kgId })
         
         this.fetchFlag = false
+        this.cdr.markForCheck()
+      },
+      err => {
+        this.fetchFlag = false
+        this.name = `[This dataset cannot be fetched right now]`
+        this.description = ` `
         this.cdr.markForCheck()
       })
     )

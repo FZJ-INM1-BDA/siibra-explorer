@@ -1,6 +1,7 @@
-import { Component } from "@angular/core";
+import { Component, Inject, InjectionToken, Optional } from "@angular/core";
 import { Observable } from "rxjs";
-import { DatabrowserService } from "../databrowserModule/databrowser.service";
+
+export const TOS_OBS_INJECTION_TOKEN = new InjectionToken<Observable<string>>('TOS_STRING')
 
 @Component({
   selector: 'kgtos-component',
@@ -15,8 +16,8 @@ export class KGToS {
   public kgTos$: Observable<string>
 
   constructor(
-    private dbService: DatabrowserService,
+    @Optional() @Inject(TOS_OBS_INJECTION_TOKEN) kgTos$
   ) {
-    this.kgTos$ = this.dbService.kgTos$
+    this.kgTos$ = kgTos$
   }
 }
