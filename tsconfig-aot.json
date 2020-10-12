@@ -1,4 +1,9 @@
 {
+  "exclude": [
+    "**/*.spec.ts",
+    "./spec/*",
+    "src/atlasViewerExports/*"
+  ],
   "compilerOptions": {
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
