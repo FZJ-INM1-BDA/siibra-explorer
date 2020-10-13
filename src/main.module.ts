@@ -57,6 +57,7 @@ import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { take } from 'rxjs/operators';
+import { UiEffects } from './services/state/uiState/ui.effects';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
   return function(state, action) {
@@ -99,7 +100,8 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
       UiStateUseEffect,
       NewTemplateUseEffect,
       ViewerStateHelperEffect,
-      GlueEffects
+      GlueEffects,
+      UiEffects,
     ]),
     StoreModule.forRoot({
       pluginState,

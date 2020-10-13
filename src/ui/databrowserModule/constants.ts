@@ -95,4 +95,4 @@ export interface DatasetPreview {
   filename: string
 }
 
-export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME: InjectionToken<({ datasetSchema, datasetId, filename }) => Observable<any>> = new InjectionToken('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')
+export const GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME = new InjectionToken<({ datasetSchema, datasetId, filename }) => Observable<any|null>>('GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME')

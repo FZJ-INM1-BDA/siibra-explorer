@@ -119,15 +119,15 @@ export class NehubaViewerUnit implements OnInit, OnDestroy {
       : [1.5e9, 1.5e9, 1.5e9]
   }
 
-  public _s1$: any
-  public _s2$: any
-  public _s3$: any
-  public _s4$: any
-  public _s5$: any
-  public _s6$: any
-  public _s7$: any
-  public _s8$: any
-  public _s9$: any
+  public _s1$: any = null
+  public _s2$: any = null
+  public _s3$: any = null
+  public _s4$: any = null
+  public _s5$: any = null
+  public _s6$: any = null
+  public _s7$: any = null
+  public _s8$: any = null
+  public _s9$: any = null
 
   public _s$: any[] = [
     this._s1$,

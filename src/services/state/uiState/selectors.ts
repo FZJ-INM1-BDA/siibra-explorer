@@ -1,8 +1,9 @@
 import { createSelector } from "@ngrx/store";
+import { IUiState } from './common'
 
 export const uiStatePreviewingDatasetFilesSelector = createSelector(
   state => state['uiState'],
-  uiState => uiState['previewingDatasetFiles']
+  (uiState: IUiState) => uiState['previewingDatasetFiles']
 )
 
 export const uiStateMouseOverSegmentsSelector = createSelector(

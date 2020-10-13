@@ -1,7 +1,7 @@
 import { uiActionSetPreviewingDatasetFiles, IDatasetPreviewData, uiStateShowBottomSheet, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { OnDestroy, Injectable, Optional, Inject, InjectionToken } from "@angular/core"
-import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId } from "./ui/databrowserModule/pure"
-import { Subscription, Observable, forkJoin, of, merge } from "rxjs"
+import { PreviewComponentWrapper, DatasetPreview, determinePreviewFileType, EnumPreviewFileTypes, IKgDataEntry, getKgSchemaIdFromFullId, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./ui/databrowserModule/pure"
+import { Subscription, Observable, forkJoin, of, merge, combineLatest } from "rxjs"
 import { select, Store, ActionReducer, createAction, props, createSelector, Action } from "@ngrx/store"
 import { startWith, map, shareReplay, pairwise, debounceTime, distinctUntilChanged, tap, switchMap, withLatestFrom, mapTo, switchMapTo, filter, skip, catchError, bufferTime } from "rxjs/operators"
 import { TypeActionToWidget, EnumActionToWidget, ACTION_TO_WIDGET_TOKEN } from "./widget"
@@ -17,6 +17,7 @@ import { Effect } from "@ngrx/effects"
 import { viewerStateSelectedRegionsSelector, viewerStateSelectedTemplateSelector, viewerStateSelectedParcellationSelector } from "./services/state/viewerState/selectors"
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { ngViewerActionClearView } from './services/state/ngViewerState/actions'
+import { generalActionError } from "./services/stateStore.helper"
 
 const PREVIEW_FILE_TYPES_NO_UI = [
   EnumPreviewFileTypes.NIFTI,
@@ -100,6 +101,83 @@ export class GlueEffects {
     }))
   )
 
+  unsuitablePreviews$: Observable<any> = merge(
+    /**
+     * filter out the dataset previews, whose details cannot be fetchd from getdatasetPreviewFromId method
+     */
+
+    this.store$.pipe(
+      select(uiStatePreviewingDatasetFilesSelector),
+      switchMap(previews => 
+        forkJoin(
+          previews.map(prev => this.getDatasetPreviewFromId(prev).pipe(
+            // filter out the null's 
+            filter(val => !val),
+            mapTo(prev)
+          ))
+        ).pipe(
+          filter(previewFiles => previewFiles.length > 0)
+        )
+      )
+    ),
+    /**
+     * filter out the dataset previews, whose details can be fetched from getDatasetPreviewFromId method
+     */
+    combineLatest([
+      this.store$.pipe(
+        select(viewerStateSelectedTemplateSelector)
+      ),
+      this.store$.pipe(
+        select(uiStatePreviewingDatasetFilesSelector),
+        switchMap(previews => 
+          forkJoin(
+            previews.map(prev => this.getDatasetPreviewFromId(prev).pipe(
+              filter(val => !!val)
+            ))
+          ).pipe(
+            // filter out the null's 
+            filter(previewFiles => previewFiles.length > 0)
+          )
+        ),
+      )
+    ]).pipe(
+      map(([ templateSelected, previewFiles ]) => 
+        previewFiles.filter(({ referenceSpaces }) => 
+          // if referenceSpaces of the dataset preview is undefined, assume it is suitable for all reference spaces
+          (!referenceSpaces)
+            ? false
+            : !referenceSpaces.some(({ fullId }) => fullId === '*' || fullId === templateSelected.fullId)
+        )
+      ),
+    ) 
+  ).pipe(
+    filter(arr => arr.length > 0),
+    shareReplay(1),
+  )
+
+  @Effect()
+  uiRemoveUnsuitablePreviews$: Observable<any> = this.unsuitablePreviews$.pipe(
+    map(previews => generalActionError({
+      message: `Dataset previews ${previews.map(v => v.name)} cannot be displayed.`
+    }))
+  )
+
+  @Effect()
+  filterDatasetPreviewByTemplateSelected$: Observable<any> = this.unsuitablePreviews$.pipe(
+    withLatestFrom(
+      this.store$.pipe(
+        select(uiStatePreviewingDatasetFilesSelector),
+      )
+    ),
+    map(([ unsuitablePreviews, previewFiles ]) => uiActionSetPreviewingDatasetFiles({
+      previewingDatasetFiles: previewFiles.filter(
+        ({ datasetId: dsId, filename: fName }) => !unsuitablePreviews.some(
+          ({ datasetId, filename }) => datasetId === dsId && fName === filename
+        )
+      )
+    }))
+  )
+
   @Effect()
   resetConnectivityMode: Observable<any> = this.store$.pipe(
     select(viewerStateSelectedRegionsSelector),
@@ -115,9 +193,9 @@ export class GlueEffects {
   )
 
   constructor(
-    private store$: Store<any>
+    private store$: Store<any>,
+    @Inject(GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME) private getDatasetPreviewFromId: (arg) => Observable<any|null>
   ){
-
   }
 }
 
@@ -195,10 +273,10 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
     switchMap(({ prvToShow, prvToDismiss }) => {
       return forkJoin({
         prvToShow: prvToShow.length > 0 
-          ? forkJoin(...prvToShow.map(val => this.getDatasetPreviewFromId(val)))
+          ? forkJoin(prvToShow.map(val => this.getDatasetPreviewFromId(val)))
           : of([]),
         prvToDismiss: prvToDismiss.length > 0 
-          ? forkJoin(...prvToDismiss.map(val => this.getDatasetPreviewFromId(val)))
+          ? forkJoin(prvToDismiss.map(val => this.getDatasetPreviewFromId(val)))
           : of([])
       })
     }),
@@ -229,7 +307,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
 
   public onRegionSelectChangeShowPreview$ = this.selectedRegionPreview$.pipe(
     switchMap(arr => arr.length > 0
-      ? forkJoin(...arr.map(({ kgId, kgSchema, filename }) => this.getDatasetPreviewFromId({ datasetId: kgId, datasetSchema: kgSchema, filename })))
+      ? forkJoin(arr.map(({ kgId, kgSchema, filename }) => this.getDatasetPreviewFromId({ datasetId: kgId, datasetSchema: kgSchema, filename })))
       : of([])
     ),
     map(arr => arr.filter(item => !!item)),
@@ -238,7 +316,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
 
   public onRegionDeselectRemovePreview$ = this.onRegionSelectChangeShowPreview$.pipe(
     pairwise(),
-    map(([oArr, nArr]) => oArr.filter(item => {
+    map(([oArr, nArr]) => oArr.filter((item: any) => {
       return !nArr
         .map(DatasetPreviewGlue.GetDatasetPreviewId)
         .includes(
