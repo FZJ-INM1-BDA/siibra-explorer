@@ -645,7 +645,7 @@ class WdLayoutPage extends WdBase{
 
   _getAdditionalLayerControl(){
     return this._browser.findElement(
-      By.css('[aria-label="Additional volumes control"]')
+      By.css(`[aria-label="${ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL}"]`)
     )
   }
 
@@ -661,18 +661,9 @@ class WdLayoutPage extends WdBase{
   additionalLayerControlIsExpanded() {
     return this._getAdditionalLayerControl()
       .findElement(
-        By.tagName('layer-browser')
+        By.css('layer-browser')
       )
       .isDisplayed()
-  }
-
-  // will throw if additional layer control is not visible
-  async toggleLayerControl(){
-    return this._getAdditionalLayerControl()
-      .findElement(
-        By.css('[aria-label="Toggle expansion state of additional layer browser"]')
-      )
-      .click()
   }
 
   async toggleNthLayerControl(idx) {

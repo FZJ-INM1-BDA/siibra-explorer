@@ -197,7 +197,7 @@ describe('> pmap dataset preview', () => {
 
   it('> on update of layer control, pmap retains', async () => {
     // by default, additional layer control is collapsed
-    await iavPage.toggleLayerControl()
+    // await iavPage.toggleLayerControl() // deprecated
     await iavPage.wait(500)
     await iavPage.toggleNthLayerControl(0)
     await iavPage.wait(5500)

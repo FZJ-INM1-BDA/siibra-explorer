@@ -9,8 +9,8 @@ import { IavRootStoreInterface, GENERAL_ACTION_TYPES } from '../stateStore.servi
 import { MatBottomSheetRef, MatBottomSheet } from '@angular/material/bottom-sheet';
 import { uiStateCloseSidePanel, uiStateOpenSidePanel, uiStateCollapseSidePanel, uiStateExpandSidePanel, uiActionSetPreviewingDatasetFiles, uiStateShowBottomSheet, uiActionShowSidePanelConnectivity } from './uiState.store.helper';
 import { viewerStateMouseOverCustomLandmark } from './viewerState/actions';
-
-export const defaultState: StateInterface = {
+import { IUiState } from './uiState/common'
+export const defaultState: IUiState = {
   previewingDatasetFiles: [],
 
   mouseOverSegments: [],
@@ -32,7 +32,9 @@ export const defaultState: StateInterface = {
   agreedKgTos: localStorage.getItem(LOCAL_STORAGE_CONST.AGREE_KG_TOS) === KG_TOS_VERSION,
 }
 
-export const getStateStore = ({ state = defaultState } = {}) => (prevState: StateInterface = state, action: ActionInterface) => {
+export { IUiState }
+
+export const getStateStore = ({ state = defaultState } = {}) => (prevState: IUiState = state, action: ActionInterface) => {
   switch (action.type) {
   
   case uiActionSetPreviewingDatasetFiles.type: {
@@ -142,30 +144,6 @@ const defaultStateStore = getStateStore()
 
 export function stateStore(state, action) {
   return defaultStateStore(state, action)
-}
-
-export interface StateInterface {
-  previewingDatasetFiles: {datasetId: string, filename: string}[]
-
-  mouseOverSegments: Array<{
-    layer: {
-      name: string
-    }
-    segment: any | null
-  }>
-  sidePanelIsOpen: boolean
-  sidePanelExploreCurrentViewIsOpen: boolean
-  mouseOverSegment: any | number
-
-  mouseOverLandmark: any
-  mouseOverUserLandmark: any
-
-  focusedSidePanel: string | null
-
-  snackbarMessage: string
-
-  agreedCookies: boolean
-  agreedKgTos: boolean
 }
 
 export interface ActionInterface extends Action {

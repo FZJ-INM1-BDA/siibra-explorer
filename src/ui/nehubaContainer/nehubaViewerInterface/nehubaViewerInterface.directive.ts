@@ -12,6 +12,7 @@ import { MOUSE_OVER_SEGMENTS, MOUSE_OVER_LANDMARK } from "src/services/state/uiS
 import { takeOnePipe } from "../nehubaContainer.component";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
 import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
+import { viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -324,8 +325,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
 
     this.subscriptions.push(
       this.store$.pipe(
-        select('viewerState'),
-        select('standaloneVolumes'),
+        select(viewerStateStandAloneVolumes),
         filter(v => v && Array.isArray(v) && v.length > 0),
         distinctUntilChanged()
       ).subscribe(async volumes => {

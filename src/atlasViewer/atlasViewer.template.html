@@ -78,7 +78,7 @@
       <div ui-nehuba-container-overlay-bottom-left class="d-inline-flex pe-none w-100 align-items-end m-2 mb-4">
 
         <!-- only load atlas layer selector and chips if viewer is loaded -->
-        <ng-template [ngIf]="uiNehubaContainer.viewerLoaded">
+        <ng-template [ngIf]="uiNehubaContainer.viewerLoaded  && !(isStandaloneVolumes$ | async)">
 
           <!-- Viewer Selector Container-->
           <atlas-layer-selector

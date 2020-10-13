@@ -45,6 +45,7 @@
 
     // additional volumes
     TOGGLE_SHOW_LAYER_CONTROL: `Show layer control`,
+    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control'
   }
 
   exports.IDS = {

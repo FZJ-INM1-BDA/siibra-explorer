@@ -2,13 +2,13 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
-import {distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
+import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
-import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, GENERAL_ACTION_TYPES, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, viewerState } from "src/services/stateStore.service";
+import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
-import {TemplateCoordinatesTransformation} from "src/services/templateCoordinatesTransformation.service";
+import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateHelperStoreName, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState.store.helper";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 
@@ -124,12 +124,9 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         const { parcellations: availableParcellations } = templateSelected
         const newParcellation = availableParcellations.find(t => t['@id'] === id)
         if (!newParcellation) {
-          return {
-            type: GENERAL_ACTION_TYPES.ERROR,
-            payload: {
-              message: 'Selected parcellation not found.',
-            },
-          }
+          return generalActionError({
+            message: 'Selected parcellation not found.'
+          })
         }
         return {
           type: SELECT_PARCELLATION,
@@ -217,12 +214,9 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
       map(({ newTemplateId, templateSelected, newParcellationId, fetchedTemplates, translatedCoordinate, navigation, parcellationSelected }) => {
         const newTemplateTobeSelected = fetchedTemplates.find(t => t['@id'] === newTemplateId)
         if (!newTemplateTobeSelected) {
-          return {
-            type: GENERAL_ACTION_TYPES.ERROR,
-            payload: {
-              message: 'Selected template not found.',
-            },
-          }
+          return generalActionError({
+            message: 'Selected template not found.'
+          })
         }
 
         const selectParcellationWithTemplate = (newParcellationId && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === newParcellationId))
@@ -262,22 +256,16 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         const { payload = {} } = action as ViewerStateAction
         const { region } = payload
         if (!region) {
-          return {
-            type: GENERAL_ACTION_TYPES.ERROR,
-            payload: {
-              message: `Go to region: region not defined`,
-            },
-          }
+          return generalActionError({
+            message: `Go to region: region not defined`
+          })
         }
 
         const { position } = region
         if (!position) {
-          return {
-            type: GENERAL_ACTION_TYPES.ERROR,
-            payload: {
-              message: `${region.name} - does not have a position defined`,
-            },
-          }
+          return generalActionError({
+            message: `${region.name} - does not have a position defined`
+          })
         }
 
         return {
@@ -302,12 +290,9 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
          * if region does not have labelIndex (not tree leaf), for now, return error
          */
         if (!region.labelIndex) {
-          return {
-            type: GENERAL_ACTION_TYPES.ERROR,
-            payload: {
-              message: 'Currently, only regions at the lowest hierarchy can be selected.',
-            },
-          }
+          return generalActionError({
+            message: 'Currently, only regions at the lowest hierarchy can be selected.'
+          })
         }
 
         /**

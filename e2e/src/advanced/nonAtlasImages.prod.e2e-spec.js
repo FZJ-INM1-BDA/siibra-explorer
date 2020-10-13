@@ -35,7 +35,7 @@ describe('> non-atlas images', () => {
       searchParam.set('standaloneVolumes', '["precomputed://https://object.cscs.ch/v1/AUTH_08c08f9f119744cbbf77e216988da3eb/imgsvc-46d9d64f-bdac-418e-a41b-b7f805068c64"]')
 
       await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
-      await iavPage.wait(10000)
+      await iavPage.wait(30000)
       const interceptedCalls = await iavPage.getInterceptedHttpCalls()
 
       expect(
@@ -78,30 +78,18 @@ describe('> non-atlas images', () => {
       searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
       
       await iavPage.goto(`/?${searchParam.toString()}`, { interceptHttp: true, doNotAutomate: true })
-      await iavPage.wait(10000)
+      await iavPage.wait(30000)
       const interceptedCalls = await iavPage.getInterceptedHttpCalls()
 
       const array = [
-        'BI-FOM-HSV_R',
-        'BI-FOM-HSV_G',
-        'BI-FOM-HSV_B',
-        'BI',
-        'BI-TIM',
-        'BI-MRI',
-        'BI-MRS',
+        "PLI Fiber Orientation Red Channel",
+        "PLI Fiber Orientation Green Channel",
+        "PLI Fiber Orientation Blue Channel",
+        "Blockface Image",
+        "PLI Transmittance",
+        "T2w MRI",
+        "MRI Labels"
       ]
-
-      for (const item of array) {
-        expect(
-          interceptedCalls.find(({
-            method,
-            url
-          }) => {
-            const regex = new RegExp(item)
-            return method === 'GET' && regex.test(url)
-          })
-        ).toBeTruthy()
-      }
 
       expect(
         interceptedCalls
@@ -188,6 +176,7 @@ describe('> non-atlas images', () => {
         )
       )
     })
+  
   })
 
   describe('> controls for non atlas volumes', () => {
@@ -231,40 +220,10 @@ describe('> non-atlas images', () => {
       await iavPage.wait(2000)
       
       const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded2).toEqual(false)
-
-    })
-
-    it('if additional volumes are being shown, it can be toggled', async () => {
-
-      const searchParam = new URLSearchParams()
-      searchParam.set('templateSelected', 'Big Brain (Histology)')
-      searchParam.set('parcellationSelected', 'Grey/White matter')
-  
-      const previewingDatasetFiles = [
-        {
-          "datasetId":"minds/core/dataset/v1.0.0/b08a7dbc-7c75-4ce7-905b-690b2b1e8957",
-          "filename":"Overlay of data modalities"
-        }
-      ]
-      searchParam.set('previewingDatasetFiles', JSON.stringify(previewingDatasetFiles))
-      
-      await iavPage.goto(`/?${searchParam.toString()}`, { forceTimeout: 20000 })
-      await iavPage.wait(2000)
-      
-      const additionalLayerCtrlIsExpanded = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded).toEqual(false)
-
-      await iavPage.toggleLayerControl()
-
-      const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
       expect(additionalLayerCtrlIsExpanded2).toEqual(true)
 
-      await iavPage.toggleLayerControl()
-
-      const additionalLayerCtrlIsExpanded3 = await iavPage.additionalLayerControlIsExpanded()
-      expect(additionalLayerCtrlIsExpanded3).toEqual(false)
-
     })
+
   })
+
 })

@@ -48,6 +48,11 @@ export const viewerStateAllRegionsFlattenedRegionSelector = createSelector(
   }
 )
 
+export const viewerStateStandAloneVolumes = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['standaloneVolumes']
+)
+
 export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
   state => state[viewerStateHelperStoreName],
   state => state['viewerState'],

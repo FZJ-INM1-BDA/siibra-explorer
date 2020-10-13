@@ -99,7 +99,8 @@ const {
   ZOOM_OUT,
   TOGGLE_SIDE_PANEL,
   EXPAND,
-  COLLAPSE
+  COLLAPSE,
+  ADDITIONAL_VOLUME_CONTROL
 } = ARIA_LABELS
 
 @Component({
@@ -150,7 +151,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL
   public ARIA_LABEL_EXPAND = EXPAND
   public ARIA_LABEL_COLLAPSE = COLLAPSE
-
+  public ARIA_LABEL_ADDITIONAL_VOLUME_CONTROL = ADDITIONAL_VOLUME_CONTROL
+  
   public ID_MESH_LOADING_STATUS = MESH_LOADING_STATUS
 
   @ViewChild(NehubaViewerContainerDirective,{static: true})
