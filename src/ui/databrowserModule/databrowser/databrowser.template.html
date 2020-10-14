@@ -72,7 +72,8 @@
         minBufferPx="200"
         maxBufferPx="400"
         itemSize="50">
-        <div class="virtual-scroll-element overflow-hidden" *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 20; let index = index">
+        <div *cdkVirtualFor="let dataset of filteredDataEntry; trackBy: trackByFn; templateCacheSize: 20; let index = index"
+          class="virtual-scroll-element overflow-hidden">
 
           <!-- divider, show if not first -->
           <mat-divider *ngIf="index !== 0"></mat-divider>

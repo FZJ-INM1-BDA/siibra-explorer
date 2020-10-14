@@ -17,6 +17,7 @@
       <!-- close region selection -->
       <button *ngIf="(regionsSelected$ | async)?.length > 0"
         mat-icon-button
+        [attr.aria-label]="CLEAR_SELECTED_REGION"
         (click)="optionSelected()"  
         matSuffix>
         <i class="fas fa-times"></i>

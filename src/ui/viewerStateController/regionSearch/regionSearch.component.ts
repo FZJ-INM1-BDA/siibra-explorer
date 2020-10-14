@@ -11,6 +11,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PureContantService } from "src/util";
 import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
+import { ARIA_LABELS } from 'common/constants'
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -36,7 +37,9 @@ export class RegionTextSearchAutocomplete {
 
   public compareFn = compareFn
 
-  @Input() public ariaLabel: string = `Search for any region of interest in the atlas selected`
+  public CLEAR_SELECTED_REGION = ARIA_LABELS.CLEAR_SELECTED_REGION
+
+  @Input() public ariaLabel: string = ARIA_LABELS.TEXT_INPUT_SEARCH_REGION
   @Input() public showBadge: boolean = false
   @Input() public showAutoComplete: boolean = true
 

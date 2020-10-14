@@ -3,7 +3,7 @@ const { getCommonSenseDsFilter } = require('./supplements/commonSense')
 const { hasPreview } = require('./supplements/previewFile')
 const path = require('path')
 const fs = require('fs')
-const { getIdFromFullId, retry, flattenRegions } = require('../../common/util')
+const { getIdFromFullId, retry, flattenRegions, getUniqueRegionId } = require('../../common/util')
 
 let getPublicAccessToken
 
@@ -79,6 +79,57 @@ const populateSet = (flattenedRegions, set = new Set()) => {
 
 const initPrArray = []
 
+/**
+ * regionMap maps schema/id to { parent, children }
+ */
+const regionMap = new Map()
+
+const getParseRegion = (template, parcellation) => {
+
+  const getRegionIdFromRegion = region => {
+    return region.fullId
+      ? getIdFromFullId(region.fullId)
+      : getUniqueRegionId(template, parcellation, region)
+  }
+  
+  const parseRegion = (region, parent) => {
+    const regionId = getRegionIdFromRegion(region)
+    const { children, relatedAreas } = region
+    const childrenIds = [
+      ...(children || []).map(getRegionIdFromRegion)
+    ]
+
+    const alternateIds = [
+      ...(relatedAreas || []).map(getRegionIdFromRegion)
+    ]
+
+    regionMap.set(regionId, {
+      parent,
+      self: [ regionId, ...alternateIds ],
+      children: childrenIds
+    })
+    for (const altId of alternateIds) {
+      regionMap.set(altId, {
+        parent,
+        self: [ regionId, ...alternateIds ],
+        children: childrenIds
+      })
+    }
+    for (const c of (children || [])) {
+      parseRegion(c, regionId)
+    }
+  }
+  return parseRegion  
+}
+
+const processParc = (t, p) => {
+  const parseRegion = getParseRegion(t, p)
+  const { regions } = p
+  for (const r of regions) {
+    parseRegion(r)
+  }
+}
+
 let juBrainSet = new Set(),
   bigbrainCytoSet = new Set()
   shortBundleSet = new Set(),
@@ -93,6 +144,9 @@ initPrArray.push(
   readConfigFile('bigbrain.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const bigbrainCyto = flattenRegions(json.parcellations.find(({ name }) => name === 'Cytoarchitectonic Maps').regions)
       bigbrainCytoSet = populateSet(bigbrainCyto)
     })
@@ -103,6 +157,9 @@ initPrArray.push(
   readConfigFile('MNI152.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const longBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.LONG_BUNDLE).regions)
       const shortBundle = flattenRegions(json.parcellations.find(({ ['@id']: id }) =>  id === KG_IDS.PARCELLATIONS.SHORT_BUNDLE).regions)
       const jubrain = flattenRegions(json.parcellations.find(({ ['@id']: id }) => id === KG_IDS.PARCELLATIONS.JULICH_BRAIN).regions)
@@ -117,6 +174,9 @@ initPrArray.push(
   readConfigFile('waxholmRatV2_0.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const waxholm3 = flattenRegions(json.parcellations[0].regions)
       const waxholm2 = flattenRegions(json.parcellations[1].regions)
       const waxholm1 = flattenRegions(json.parcellations[2].regions)
@@ -132,6 +192,9 @@ initPrArray.push(
   readConfigFile('allenMouse.json')
     .then(data => JSON.parse(data))
     .then(json => {
+      for (const p of json.parcellations) {
+        processParc(json, p)
+      }
       const flattenedAllen2017 = flattenRegions(json.parcellations[0].regions)
       allen2017Set = populateSet(flattenedAllen2017)
 
@@ -196,6 +259,33 @@ const datasetBelongsInTemplate = ({ templateName }) => ({ referenceSpaces }) => 
 const datasetBelongToParcellation = ({ parcellationName = null, dataset = {parcellationAtlas: []} } = {}) => parcellationName === null || dataset.parcellationAtlas.length === 0
   ? true
   : (dataset.parcellationAtlas || []).some(({ name }) => name === parcellationName)
+
+const relatedRegionsCache = new Map()
+const traverseRegionMap = regionSchemaId => {
+  if (relatedRegionsCache.has(regionSchemaId)) return relatedRegionsCache.get(regionSchemaId)
+  const out = regionMap.get(regionSchemaId)
+  if (!out) {
+    return []
+  }
+  const { parent, self, children } = out
+
+  /**
+   * how to determine how to traverse the tree to determine related regions?
+   * for now, will traverse towards the parents
+   * ie, when selecting a leaf node, all nodes up to the root will be considered important
+   */
+
+  const relatedSchemaIds = self.concat(
+    parent ? traverseRegionMap(parent) : []
+  )
+  relatedRegionsCache.set(regionSchemaId, relatedSchemaIds)
+  return relatedSchemaIds
+}
+
+const filterDatasetsByRegion = async (datasets = [], regionSchemaId) => {
+  const allRelevantSchemaSet = new Set(traverseRegionMap(regionSchemaId))
+  return datasets.filter(ds => ds['parcellationRegion'].some(pr => allRelevantSchemaSet.has(getIdFromFullId(pr.fullId))))
+}
 
 /**
  * NB: if changed, also change ~/docs/advanced/dataset.md
@@ -309,6 +399,7 @@ module.exports = {
   datasetBelongToParcellation,
   datasetRegionExistsInParcellationRegion,
   datasetBelongsInTemplate,
+  filterDatasetsByRegion,
   _getParcellations: async () => {
     await Promise.all(initPrArray)
     return {

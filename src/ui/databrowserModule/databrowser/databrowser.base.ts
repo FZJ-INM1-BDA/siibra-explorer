@@ -3,6 +3,7 @@ import { LoggingService } from "src/logging"
 import { DatabrowserService } from "../singleDataset/singleDataset.base"
 import { Observable } from "rxjs"
 import { IDataEntry } from "src/services/stateStore.service"
+import { getUniqueRegionId } from 'common/util'
 
 export class DatabrowserBase{
 
@@ -35,17 +36,18 @@ export class DatabrowserBase{
 
   ngOnChanges(){
 
-
+    const { regions, parcellation, template } = this
     this.regions = this.regions.map(r => {
       /**
        * TODO to be replaced with properly region UUIDs from KG
        */
+      const uniqueRegionId = getUniqueRegionId(template, parcellation, r)
       return {
-        id: `${this.parcellation?.name || 'untitled_parcellation'}/${r.name}`,
+        fullId: uniqueRegionId,
+        id: uniqueRegionId,
         ...r,
       }
     })
-    const { regions, parcellation, template } = this
     this.fetchingFlag = true
 
     // input may be undefined/null
