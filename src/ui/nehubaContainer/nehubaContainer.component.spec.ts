@@ -260,7 +260,7 @@ describe('> nehubaContainer.component.ts', () => {
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
           fixture.detectChanges()
-          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${EXPAND}"]`) )
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-secondary-open="true"] [aria-label="${EXPAND}"]`) )
           expect(expandRegionFeatureBtn).toBeNull()
         })
         it('> collapse btn should not be visible', () => {
@@ -271,7 +271,7 @@ describe('> nehubaContainer.component.ts', () => {
           const toggleBtn = fixture.debugElement.query( By.css(`[aria-label="${TOGGLE_SIDE_PANEL}"]`) )
           toggleBtn.triggerEventHandler('click', null)
           fixture.detectChanges()
-          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-secondary-open="true"] [aria-label="${COLLAPSE}"]`) )
           expect(expandRegionFeatureBtn).toBeNull()
         })
       })
@@ -347,7 +347,7 @@ describe('> nehubaContainer.component.ts', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
           fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
-          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-secondary-open="true"] [aria-label="${COLLAPSE}"]`) )
           expect(collapseRegionFeatureBtn).not.toBeNull()
         })
         it('> clicking on collapse btn should minimize 1 drawer', () => {
@@ -355,7 +355,7 @@ describe('> nehubaContainer.component.ts', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
           fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
-          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-secondary-open="true"] [aria-label="${COLLAPSE}"]`) )
           collapseRegionFeatureBtn.triggerEventHandler('click', null)
           fixture.detectChanges()
           expect(
@@ -381,10 +381,10 @@ describe('> nehubaContainer.component.ts', () => {
           const fixture = TestBed.createComponent(NehubaContainer)
           fixture.componentInstance.currentOnHoverObs$ = hot('')
           fixture.detectChanges()
-          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${COLLAPSE}"]`) )
+          const collapseRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-secondary-open="true"] [aria-label="${COLLAPSE}"]`) )
           collapseRegionFeatureBtn.triggerEventHandler('click', null)
           fixture.detectChanges()
-          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-open="true"] [aria-label="${EXPAND}"]`) )
+          const expandRegionFeatureBtn = fixture.debugElement.query( By.css(`mat-drawer[data-mat-drawer-primary-open="true"] [aria-label="${EXPAND}"]`) )
           expandRegionFeatureBtn.triggerEventHandler('click', null)
           fixture.detectChanges()
 
