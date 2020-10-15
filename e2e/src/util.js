@@ -885,7 +885,10 @@ class WdIavPage extends WdLayoutPage{
       const els = await this._browser.findElements(
         By.css('div.loadingIndicator')
       )
-      return els.length === 0
+      const els2 = await this._browser.findElements(
+        By.css('.spinnerAnimationCircle')
+      )
+      return [...els, ...els2].length === 0
     }, 1e3 * 60 * 10)
   }
 

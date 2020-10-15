@@ -449,7 +449,7 @@
       [attr.id]="ID_MESH_LOADING_STATUS"
       role="status">
 
-      <div class="spinnerAnimationCircle">
+      <div [ngClass]="{spinnerAnimationCircle: !!(showPerpsectiveScreen$ | async)}">
       </div>
       <mat-list>
         <mat-list-item>
