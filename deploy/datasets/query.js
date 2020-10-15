@@ -4,7 +4,7 @@ const URL = require('url')
 const path = require('path')
 const archiver = require('archiver')
 const { getPreviewFile, hasPreview } = require('./supplements/previewFile')
-const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets } = require('./util')
+const { constants, init: kgQueryUtilInit, getUserKGRequestParam, filterDatasets, filterDatasetsByRegion } = require('./util')
 const ibc = require('./importIBS')
 
 let cachedData = null
@@ -126,6 +126,14 @@ const init = async () => {
   return await getPublicDs()
 }
 
+const getDatasetsByRegion = async ({ regionId, user }) => {
+  /**
+   * potentially add other sources of datasets
+   */
+  const kgDatasets = await getDs({ user })
+  return filterDatasetsByRegion(kgDatasets, regionId)
+}
+
 const getDatasets = ({ templateName, parcellationName, user }) => {
   // Get Local datasets
   const localDatasets = [
@@ -136,7 +144,6 @@ const getDatasets = ({ templateName, parcellationName, user }) => {
   // Get all datasets and merge local ones
   return getDs({ user })
     .then(json => {
-      // console.log(json.map(j=> j.parcellationRegion))
       json = [...json, ...localDatasets]
       return filterDatasets(json, { templateName, parcellationName })
     })
@@ -233,6 +240,7 @@ module.exports = {
   getPreview,
   hasPreview,
   getTos,
-  getExternalSchemaDatasets
+  getExternalSchemaDatasets,
+  getDatasetsByRegion,
 }
 

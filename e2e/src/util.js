@@ -8,7 +8,7 @@ const { By, Key, until } = require('selenium-webdriver')
 const CITRUS_LIGHT_URL = `https://unpkg.com/citruslight@0.1.0/citruslight.js`
 const { polyFillClick } = require('./material-util')
 
-const { ARIA_LABELS } = require('../../common/constants')
+const { ARIA_LABELS, CONST } = require('../../common/constants')
 const { retry } = require('../../common/util')
 
 function getActualUrl(url) {
@@ -25,8 +25,6 @@ async function _getIndexFromArrayOfWebElements(search, webElements) {
   )
   return texts.findIndex(text => text.indexOf(search) >= 0)
 }
-
-const regionSearchAriaLabelText = 'Search for any region of interest in the atlas selected'
 
 const verifyPosition = position => {
 
@@ -550,8 +548,8 @@ class WdLayoutPage extends WdBase{
 
   async _findTitleCard(title) {
     const titleCards = await this._browser
-      .findElement( By.tagName('ui-splashscreen') )
-      .findElements( By.tagName('mat-card') )
+      .findElement( By.css('ui-splashscreen') )
+      .findElements( By.css('mat-card') )
     const idx = await _getIndexFromArrayOfWebElements(title, titleCards)
     if (idx >= 0) return titleCards[idx]
     else throw new Error(`${title} does not fit any titleCards`)
@@ -563,17 +561,106 @@ class WdLayoutPage extends WdBase{
   }
 
   async selectTitleTemplateParcellation(templateName, parcellationName){
-    const titleCard = await this._findTitleCard(templateName)
-    const parcellations = await titleCard
-      .findElement( By.css('mat-card-content.available-parcellations-container') )
-      .findElements( By.tagName('button') )
-    const idx = await _getIndexFromArrayOfWebElements( parcellationName, parcellations )
-    if (idx >= 0) await parcellations[idx].click()
-    else throw new Error(`parcellationName ${parcellationName} does not exist`)
+    throw new Error(`selectTitleTemplateParcellation has been deprecated. use selectAtlasTemplateParcellation`)
   }
 
+  /**
+   * _setAtlasSelectorExpanded
+   * toggle/set the open state of the atlas-layer-selector element
+   * If the only argument (flag) is not provided, it will toggle the atlas-layer-selector
+   * 
+   * Will throw if atlas-layer-selector is not in the DOM
+   * 
+   * @param {boolean} flag 
+   * 
+   */
+  async _setAtlasSelectorExpanded(flag) {
+    const atlasLayerSelectorEl = this._browser.findElement(
+      By.css('atlas-layer-selector')
+    )
+    const openedFlag = (await atlasLayerSelectorEl.getAttribute('data-opened')) === 'true'
+    if (typeof flag === 'undefined' || flag !== openedFlag) {
+      await atlasLayerSelectorEl.findElement(By.css(`button[aria-label="${ARIA_LABELS.TOGGLE_ATLAS_LAYER_SELECTOR}"]`)).click()
+    }
+  }
+
+  async changeTemplate(templateName){
+    if (!templateName) throw new Error(`templateName needs to be provided`)
+    await this._setAtlasSelectorExpanded(true)
+    await this.wait(1000)
+    const allTiles = await this._browser
+      .findElement( By.css('atlas-layer-selector') )
+      .findElements( By.css(`mat-grid-tile`) )
+
+    const idx = await _getIndexFromArrayOfWebElements(templateName, allTiles)
+    if (idx >= 0) await allTiles[idx].click()
+    else throw new Error(`#changeTemplate: templateName ${templateName} cannot be found.`)
+  }
+
+  async changeParc(parcName) {
+    throw new Error(`changeParc NYI`)
+  }
+
+  async selectAtlasTemplateParcellation(atlasName, templateName, parcellationName, parcVersion) {
+    if (!atlasName) throw new Error(`atlasName needs to be provided`)
+    try {
+      /**
+       * if at title screen
+       */
+      await (await this._findTitleCard(atlasName)).click()
+    } catch (e) {
+      /**
+       * if not at title screen
+       * select from dropdown
+       */
+    }
+
+    if (templateName) {
+      await this.wait(1000)
+      await this.waitUntilAllChunksLoaded()
+      await this.changeTemplate(templateName)
+    }
+    
+    if (parcellationName) {
+      await this.wait(1000)
+      await this.waitUntilAllChunksLoaded()
+      await this.changeParc(parcellationName)
+    }
+
+    await this._setAtlasSelectorExpanded(false)
+  }
 
   // SideNav
+  _getSideNavPrimary(){
+    return this._browser.findElement(
+      By.css('mat-drawer[data-mat-drawer-primary-open]')
+    )
+  }
+
+  async _getSideNavPrimaryExpanded(){
+    return (await this._getSideNavPrimary()
+      .getAttribute('data-mat-drawer-primary-open')) === 'true'
+  }
+
+  _getSideNavSecondary(){
+    return this._browser.findElement(
+      By.css('mat-drawer[data-mat-drawer-secondary-open]')
+    )
+  }
+
+  async _getSideNavSecondaryExpanded(){
+    return (await this._getSideNavSecondary()
+      .getAttribute('data-mat-drawer-secondary-open')) === 'true'
+  }
+
+  async _setSideNavPrimaryExpanded(flag) {
+    const matDrawerPrimaryEl = this._getSideNavPrimary()
+    const openedFlag = await this._getSideNavPrimaryExpanded()
+    if (typeof flag === 'undefined' || flag !== openedFlag) {
+      await this._browser.findElement(By.css(`button[aria-label="${ARIA_LABELS.TOGGLE_SIDE_PANEL}"]`)).click()
+    }
+  }
+
   _getSideNav() {
     throw new Error(`side bar no longer exist`)
   }
@@ -787,7 +874,7 @@ class WdIavPage extends WdLayoutPage{
 
   async clearAllSelectedRegions() {
     const clearAllRegionBtn = await this._browser.findElement(
-      By.css('[aria-label="Clear all regions"]')
+      By.css(`[aria-label="${ARIA_LABELS.CLEAR_SELECTED_REGION}"]`)
     )
     await clearAllRegionBtn.click()
     await this.wait(500)
@@ -834,9 +921,15 @@ class WdIavPage extends WdLayoutPage{
     else throw new Error(`${title} is not found as one of the dropdown templates`)
   }
 
-  _getSearchRegionInput(){
-    return this._getSideNav()
-      .findElement( By.css(`[aria-label="${regionSearchAriaLabelText}"]`) )
+  async _getSearchRegionInput(){
+    await this._setSideNavPrimaryExpanded(true)
+    await this.wait(500)
+    const secondaryOpen = await this._getSideNavSecondaryExpanded()
+    if (secondaryOpen) {
+      return this._getSideNavSecondary().findElement( By.css(`[aria-label="${ARIA_LABELS.TEXT_INPUT_SEARCH_REGION}"]`) )
+    } else {
+      return this._getSideNavPrimary().findElement( By.css(`[aria-label="${ARIA_LABELS.TEXT_INPUT_SEARCH_REGION}"]`) )
+    }
   }
 
   async searchRegionWithText(text=''){
@@ -888,8 +981,8 @@ class WdIavPage extends WdLayoutPage{
 
   _getModalityListView(){
     return this._browser
-      .findElement( By.tagName('modality-picker') )
-      .findElements( By.tagName('mat-checkbox') )
+      .findElement( By.css('modality-picker') )
+      .findElements( By.css('mat-checkbox') )
   }
 
   async getModalities(){
@@ -905,9 +998,22 @@ class WdIavPage extends WdLayoutPage{
 
   _getSingleDatasetListView(){
     return this._browser
-      .findElement( By.tagName('data-browser') )
-      .findElement( By.css('div.cdk-virtual-scroll-content-wrapper') )
-      .findElements( By.tagName('single-dataset-list-view') )
+      .findElement( By.css('data-browser') )
+      .findElements( By.css('single-dataset-list-view') )
+  }
+
+  _getRegionalFeatureEl(){
+    return this._getSideNavSecondary().findElement(
+      By.css(`mat-expansion-panel[data-mat-expansion-title="${CONST.REGIONAL_FEATURES}"]`)
+    )
+  }
+
+  async _setRegionalFeaturesExpanded(flag){
+    const regionFeatureExpEl = this._getRegionalFeatureEl()
+    const openedFlag = (await regionFeatureExpEl.getAttribute('data-opened')) === 'true'
+    if (typeof flag === 'undefined' || flag !== openedFlag) {
+      await regionFeatureExpEl.findElement(By.css(`mat-expansion-panel-header`)).click()
+    }
   }
 
   async getVisibleDatasets() {

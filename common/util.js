@@ -34,6 +34,13 @@
     return returnV
   }
 
+  exports.getUniqueRegionId = (template, parcellation, region) => {
+    const templateId = template ? (template['@id'] || template['name']) : `untitled-template`
+    const parcId = parcellation ? (parcellation['@id'] || parcellation['name']) : `untitled-parcellation`
+    const regionId = region ? region['name'] : `untitled-region`
+    return `${templateId}/${parcId}/${regionId}`
+  }
+
   exports.getIdObj = getIdObj
 
   exports.getIdFromFullId = fullId => {
