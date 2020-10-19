@@ -1,15 +1,14 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { TestBed, async } from "@angular/core/testing"
+import { async, TestBed } from "@angular/core/testing"
 import { NehubaContainer } from "./nehubaContainer.component"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { defaultRootState } from 'src/services/stateStore.service'
-import { ComponentsModule } from "src/components"
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module"
 import { TouchSideClass } from "./touchSideClass.directive"
 import { MaximmisePanelButton } from "./maximisePanelButton/maximisePanelButton.component"
 import { LandmarkUnit } from './landmarkUnit/landmarkUnit.component'
 import { LayoutModule } from 'src/layouts/layout.module'
-import { UtilModule } from "src/util"
+import { PureContantService, UtilModule } from "src/util"
 import { AtlasLayerSelector } from "../atlasLayerSelector/atlasLayerSelector.component"
 import { StatusCardComponent } from './statusCard/statusCard.component'
 import { NehubaViewerTouchDirective } from './nehubaViewerInterface/nehubaViewerTouch.directive'
@@ -38,6 +37,8 @@ import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RegionAccordionTooltipTextPipe } from '../util'
 import { hot } from 'jasmine-marbles'
+import { of } from 'rxjs'
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 
 const { 
   TOGGLE_SIDE_PANEL,
@@ -58,7 +59,7 @@ describe('> nehubaContainer.component.ts', () => {
 
   describe('> NehubaContainer', () => {
 
-    beforeEach(done => {
+    beforeEach(async(() => {
 
       TestBed.configureTestingModule({
         imports: [
@@ -74,7 +75,13 @@ describe('> nehubaContainer.component.ts', () => {
           FormsModule,
           ReactiveFormsModule,
           HttpClientModule,
-          CommonModule
+          CommonModule,
+
+          /**
+           * because the change done to pureconstant service, need to intercept http call to avoid crypto error message
+           * so and so components needs to be compiled first. make sure you call compileComponents
+           */
+          HttpClientTestingModule,
         ],
         declarations: [
           NehubaContainer,
@@ -103,15 +110,16 @@ describe('> nehubaContainer.component.ts', () => {
           {
             provide: IMPORT_NEHUBA_INJECT_TOKEN,
             useValue: importNehubaSpy
-          }
+          },
+          PureContantService,
+
         ],
         schemas: [
           CUSTOM_ELEMENTS_SCHEMA
         ],
       }).compileComponents()
-        .then(() => done())
-        .catch(done)
-    })  
+      
+    }))
 
     it('> component can be created', () => {
       const fixture = TestBed.createComponent(NehubaContainer)
