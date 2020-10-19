@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter } from "@angular/core";
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, Subject } from "rxjs";
 import { pipe } from "rxjs/internal/util/pipe";
@@ -21,7 +21,7 @@ import {
   NgViewerStateInterface
 } from "src/services/stateStore.service";
 import { getExportNehuba, isSame, getViewer } from "src/util/fn";
-import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
+import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
 import { PureContantService } from "src/util";
@@ -289,7 +289,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
   constructor(
     private pureConstantService: PureContantService,
-    private apiService: AtlasViewerAPIServices,
+    @Optional() @Inject(API_SERVICE_SET_VIEWER_HANDLE_TOKEN) private setViewerHandle: (arg) => void,
     private store: Store<any>,
     private elementRef: ElementRef,
     private log: LoggingService,
@@ -921,7 +921,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
      * TODO if plugin subscribes to viewerHandle, and then new template is selected, changes willl not be be sent
      * could be considered as a bug.
      */
-    this.apiService.interactiveViewer.viewerHandle = null
+    this.setViewerHandle && this.setViewerHandle(null)
     this.nehubaContainerDirective.clear()
 
     this.nehubaViewer = null
@@ -938,7 +938,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   }
 
   private setupViewerHandleApi() {
-    this.apiService.interactiveViewer.viewerHandle = {
+    const viewerHandle = {
       setNavigationLoc : (coord, realSpace?) => this.nehubaViewer.setNavigationState({
         position : coord,
         positionReal : typeof realSpace !== 'undefined' ? realSpace : true,
@@ -1071,6 +1071,8 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       ),
       getNgHash : this.nehubaViewer.getNgHash,
     }
+
+    this.setViewerHandle && this.setViewerHandle(viewerHandle)
   }
 
   public setOctantRemoval(octantRemovalFlag: boolean) {

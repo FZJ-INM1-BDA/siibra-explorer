@@ -28,7 +28,6 @@ import { StateModule } from 'src/state'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { HttpClientModule } from '@angular/common/http'
 import { WidgetModule } from 'src/widget'
-import { PluginModule } from 'src/atlasViewer/pluginUnit/plugin.module'
 import { NehubaModule } from './nehuba.module'
 import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
@@ -59,14 +58,12 @@ describe('> nehubaContainer.component.ts', () => {
 
   describe('> NehubaContainer', () => {
 
-    beforeEach(async(() => {
+    beforeEach(done => {
 
       TestBed.configureTestingModule({
         imports: [
           NoopAnimationsModule,
-          PluginModule,
           WidgetModule,
-          ComponentsModule,
           AngularMaterialModule,
           LayoutModule,
           UtilModule,
@@ -93,7 +90,7 @@ describe('> nehubaContainer.component.ts', () => {
           CurrentLayout,
           RegionDirective,
           RegionTextSearchAutocomplete,
-
+  
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
@@ -112,8 +109,9 @@ describe('> nehubaContainer.component.ts', () => {
           CUSTOM_ELEMENTS_SCHEMA
         ],
       }).compileComponents()
-
-    }))
+        .then(() => done())
+        .catch(done)
+    })  
 
     it('> component can be created', () => {
       const fixture = TestBed.createComponent(NehubaContainer)
@@ -123,7 +121,6 @@ describe('> nehubaContainer.component.ts', () => {
     })
 
     describe('> on selectedTemplatechange', () => {
-      
       it('> calls importNehubaPr', async () => {
         const fixture = TestBed.createComponent(NehubaContainer)
         fixture.componentInstance.currentOnHoverObs$ = hot('')

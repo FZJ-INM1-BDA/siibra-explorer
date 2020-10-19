@@ -14,7 +14,7 @@ import { GetNamesPipe } from "./util/pipes/getNames.pipe";
 
 import { HttpClientModule } from "@angular/common/http";
 import { EffectsModule } from "@ngrx/effects";
-import { AtlasViewerAPIServices, overrideNehubaClickFactory, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN } from "./atlasViewer/atlasViewer.apiService.service";
+import { AtlasViewerAPIServices, overrideNehubaClickFactory, CANCELLABLE_DIALOG, GET_TOAST_HANDLER_TOKEN, API_SERVICE_SET_VIEWER_HANDLE_TOKEN, setViewerHandleFactory } from "./atlasViewer/atlasViewer.apiService.service";
 import { AtlasWorkerService } from "./atlasViewer/atlasViewer.workerService.service";
 import { ModalUnit } from "./atlasViewer/modalUnit/modalUnit.component";
 import { TransformOnhoverSegmentPipe } from "./atlasViewer/onhoverSegment.pipe";
@@ -253,6 +253,11 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
      */
     DatabrowserService,
+    {
+      provide: API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
+      useFactory: setViewerHandleFactory,
+      deps: [ AtlasViewerAPIServices ]
+    }
   ],
   bootstrap : [
     AtlasViewer,

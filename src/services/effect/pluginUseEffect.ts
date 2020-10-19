@@ -6,7 +6,6 @@ import { filter, map, startWith, switchMap } from "rxjs/operators"
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service"
 import { PluginServices } from "src/atlasViewer/pluginUnit"
 import { PLUGINSTORE_ACTION_TYPES, PLUGINSTORE_CONSTANTS } from 'src/services/state/pluginState.store'
-import { LoggingService } from "src/logging"
 import { IavRootStoreInterface } from "../stateStore.service"
 import { HttpClient } from "@angular/common/http"
 
@@ -23,7 +22,6 @@ export class PluginServiceUseEffect {
     store$: Store<IavRootStoreInterface>,
     constantService: AtlasViewerConstantsServices,
     pluginService: PluginServices,
-    private log: LoggingService,
     http: HttpClient
   ) {
     this.initManifests$ = store$.pipe(

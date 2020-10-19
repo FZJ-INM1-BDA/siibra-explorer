@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import {Injectable, NgZone, Optional, Inject, OnDestroy} from "@angular/core";
+import {Injectable, NgZone, Optional, Inject, OnDestroy, InjectionToken} from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { Observable, Subject, Subscription, from, race, of, } from "rxjs";
 import { distinctUntilChanged, map, filter, startWith, switchMap, catchError, mapTo } from "rxjs/operators";
@@ -445,4 +445,10 @@ export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, g
     }
     next()
   }
+}
+
+export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle)=>void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
+
+export const setViewerHandleFactory = (apiService: AtlasViewerAPIServices) => {
+  return viewerHandle => apiService.interactiveViewer.viewerHandle = viewerHandle
 }

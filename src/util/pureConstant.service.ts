@@ -2,7 +2,7 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Store, createSelector, select } from "@ngrx/store";
 import { Observable, merge, Subscription, of, throwError, forkJoin, fromEvent } from "rxjs";
 import { VIEWER_CONFIG_FEATURE_KEY, IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
-import { shareReplay, tap, scan, catchError, filter, mergeMap, switchMapTo, switchMap, map, take } from "rxjs/operators";
+import { shareReplay, tap, scan, catchError, filter, switchMap, map, take } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { BACKENDURL } from './constants'
 import { viewerStateSetFetchedAtlases } from "src/services/state/viewerState.store.helper";

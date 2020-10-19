@@ -188,11 +188,11 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
     withLatestFrom(
       this.store$.pipe(
         select(viewerStateSelectedTemplateSelector),
-        startWith(<any>null),
+        startWith(null as any),
       ),
       this.store$.pipe(
         select(viewerStateNavigationStateSelector),
-        startWith(<any>null),
+        startWith(null as any),
       )
     ),
     switchMap(([{ selectTemplate, selectParcellation, errorMessage }, lastSelectedTemplate, navigation]) => {
