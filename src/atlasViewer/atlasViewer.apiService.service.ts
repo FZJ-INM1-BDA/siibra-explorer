@@ -447,7 +447,7 @@ export const overrideNehubaClickFactory = (apiService: AtlasViewerAPIServices, g
   }
 }
 
-export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle)=>void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
+export const API_SERVICE_SET_VIEWER_HANDLE_TOKEN = new InjectionToken<(viewerHandle) => void>('API_SERVICE_SET_VIEWER_HANDLE_TOKEN')
 
 export const setViewerHandleFactory = (apiService: AtlasViewerAPIServices) => {
   return viewerHandle => apiService.interactiveViewer.viewerHandle = viewerHandle
