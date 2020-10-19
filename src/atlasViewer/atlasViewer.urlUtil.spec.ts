@@ -2,7 +2,7 @@
 
 import {} from 'jasmine'
 import { defaultRootState } from 'src/services/stateStore.service'
-import { cvtSearchParamToState, PARSING_SEARCHPARAM_ERROR, cvtStateToSearchParam } from './atlasViewer.urlUtil'
+import { cvtSearchParamToState, cvtStateToSearchParam } from './atlasViewer.urlUtil'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 const colin = require('!json-loader!src/res/ext/colin.json')

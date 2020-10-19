@@ -1,12 +1,12 @@
-import {Component, OnInit, ViewChildren, QueryList, Output, EventEmitter} from "@angular/core";
+import { Component, OnInit, ViewChildren, QueryList, HostBinding } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { safeFilter } from "src/services/stateStore.service";
-import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, tap, filter } from "rxjs/operators";
+import { distinctUntilChanged, map, withLatestFrom, shareReplay, groupBy, mergeMap, toArray, switchMap, scan, filter } from "rxjs/operators";
 import { Observable, Subscription, from, zip, of, combineLatest } from "rxjs";
 import { viewerStateSelectTemplateWithId, viewerStateToggleLayer } from "src/services/state/viewerState.store.helper";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { viewerStateGetSelectedAtlas, viewerStateAtlasLatestParcellationSelector } from "src/services/state/viewerState/selectors";
-import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/state/viewerState.store";
+import { ARIA_LABELS } from 'common/constants'
 
 @Component({
   selector: 'atlas-layer-selector',
@@ -15,6 +15,8 @@ import {CLEAR_CONNECTIVITY_REGION, SET_CONNECTIVITY_VISIBLE} from "src/services/
   exportAs: 'atlasLayerSelector'
 })
 export class AtlasLayerSelector implements OnInit {
+
+    public TOGGLE_ATLAS_LAYER_SELECTOR = ARIA_LABELS.TOGGLE_ATLAS_LAYER_SELECTOR
 
     @ViewChildren(MatMenuTrigger) matMenuTriggers: QueryList<MatMenuTrigger>
     public atlas: any
@@ -30,6 +32,7 @@ export class AtlasLayerSelector implements OnInit {
     public selectedAtlas$: Observable<any>
     private subscriptions: Subscription[] = []
 
+    @HostBinding('attr.data-opened')
     public selectorExpanded: boolean = false
     public selectedTemplatePreviewUrl: string = ''
 

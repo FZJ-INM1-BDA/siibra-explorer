@@ -17,6 +17,8 @@
     DOWNLOAD_PREVIEW_CSV: `Download CSV`,
     DATASET_FILE_PREVIEW: `Preview of dataset`,
     PIN_DATASET: 'Toggle pinning dataset',
+    TEXT_INPUT_SEARCH_REGION: 'Search for any region of interest in the atlas selected',
+    CLEAR_SELECTED_REGION: 'Clear selected region',
 
     // overlay/layout specific
     SELECT_ATLAS: 'Select a different atlas',
@@ -29,6 +31,7 @@
     SHOW_FULL_STATUS_PANEL: 'Show full status panel',
     HIDE_FULL_STATUS_PANEL: 'Hide full status panel',
     TOGGLE_SIDE_PANEL: 'Toggle side panel',
+    TOGGLE_ATLAS_LAYER_SELECTOR: 'Toggle atlas layer selector',
 
     // sharing module
     SHARE_BTN: `Share this view`,
@@ -45,10 +48,15 @@
 
     // additional volumes
     TOGGLE_SHOW_LAYER_CONTROL: `Show layer control`,
+    ADDITIONAL_VOLUME_CONTROL: 'Additional volumes control'
   }
 
   exports.IDS = {
     // mesh loading status
     MESH_LOADING_STATUS: 'mesh-loading-status'
+  }
+
+  exports.CONST = {
+    REGIONAL_FEATURES: 'Regional features'
   }
 })(typeof exports === 'undefined' ? module.exports : exports)

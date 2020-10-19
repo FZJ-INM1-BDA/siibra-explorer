@@ -12,13 +12,17 @@ export const regionsEqual = (r1, r2) => {
 }
 
 const isSubRegion = (high, low) => regionsEqual(high, low)
-  ? true
-  : high.children && Array.isArray(high.children)
-    ? high.children.some(r => isSubRegion(r, low))
-    : false
+  || (
+    high.children
+    && Array.isArray(high.children)
+    && high.children.some(r => isSubRegion(r, low))
+  )
+    
 
-const filterSubSelect = (dataEntry, selectedRegions) =>
-  dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr, sr)))
+const filterSubSelect = (dataEntry, selectedRegions) => {
+  if (dataEntry.name === 'Density measurements of different receptors for Area 7A (SPL) [human, v1.0]') console.log(dataEntry)
+  return dataEntry.parcellationRegion.some(pr => selectedRegions.some(sr => isSubRegion(pr, sr)))
+}
 
 @Pipe({
   name: 'filterDataEntriesByRegion',
@@ -27,8 +31,7 @@ const filterSubSelect = (dataEntry, selectedRegions) =>
 export class FilterDataEntriesByRegion implements PipeTransform {
   public transform(dataentries: IDataEntry[], selectedRegions: any[], flattenedAllRegions: any[]) {
     return dataentries && selectedRegions && selectedRegions.length > 0
-      ? dataentries
-        .filter(de => filterSubSelect(de, selectedRegions))
+      ? dataentries.filter(de => filterSubSelect(de, selectedRegions))
       : dataentries
   }
 }

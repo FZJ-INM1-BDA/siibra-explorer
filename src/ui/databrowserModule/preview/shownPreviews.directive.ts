@@ -2,9 +2,10 @@ import { Directive, Optional, Inject, Output, EventEmitter, OnDestroy } from "@a
 import { Store, select } from "@ngrx/store";
 import { uiStatePreviewingDatasetFilesSelector } from "src/services/state/uiState/selectors";
 import { EnumPreviewFileTypes } from "../pure";
-import { switchMap, map, startWith } from "rxjs/operators";
+import { switchMap, map, startWith, withLatestFrom } from "rxjs/operators";
 import { forkJoin, of, Subscription } from "rxjs";
 import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "../pure";
+import { viewerStateSelectedTemplateSelector } from "src/services/state/viewerState/selectors";
 
 @Directive({
   selector: '[iav-shown-previews]',
@@ -18,14 +19,18 @@ export class ShownPreviewsDirective implements OnDestroy{
   @Output()
   emitter: EventEmitter<any[]> = new EventEmitter()
 
+  private templateSelected$ = this.store$.pipe(
+    select(viewerStateSelectedTemplateSelector)
+  )
+
   public iavAdditionalLayers$ = this.store$.pipe(
     select(uiStatePreviewingDatasetFilesSelector),
     switchMap(prevs => prevs.length > 0
-      ? forkJoin(...prevs.map(
-        prev => this.getDatasetPreviewFromId
+      ? forkJoin(
+        prevs.map(prev => this.getDatasetPreviewFromId
           ? this.getDatasetPreviewFromId(prev)
           : of(null)
-      )
+        )
       )
       : of([])
     ),

@@ -41,7 +41,7 @@ import { MIN_REQ_EXPLAINER } from 'src/util/constants'
 import { SlServiceService } from "src/spotlight/sl-service.service";
 import { PureContantService } from "src/util";
 import { viewerStateSetSelectedRegions, viewerStateRemoveAdditionalLayer, viewerStateHelperSelectParcellationWithId } from "src/services/state/viewerState.store.helper";
-import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector } from "src/services/state/viewerState/selectors";
+import { viewerStateGetOverlayingAdditionalParcellations, viewerStateParcVersionSelector, viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { uiStateMouseOverSegmentsSelector } from "src/services/state/uiState/selectors";
@@ -108,6 +108,10 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
   public MIN_REQ_EXPLAINER = MIN_REQ_EXPLAINER
 
+  public isStandaloneVolumes$ = this.store.pipe(
+    select(viewerStateStandAloneVolumes),
+    map(v => v.length > 0)
+  )
 
   public selectedAdditionalLayers$ = this.store.pipe(
     select(viewerStateGetOverlayingAdditionalParcellations),

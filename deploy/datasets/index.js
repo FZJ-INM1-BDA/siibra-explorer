@@ -2,7 +2,7 @@ const express = require('express')
 const path = require('path')
 const fs = require('fs')
 const datasetsRouter = express.Router()
-const { init, getDatasets, getPreview, getDatasetFromId, getExternalSchemaDatasets, getDatasetFileAsZip, getTos, hasPreview } = require('./query')
+const { init, getDatasets, getPreview, getDatasetFromId, getExternalSchemaDatasets, getDatasetFileAsZip, getTos, hasPreview, getDatasetsByRegion } = require('./query')
 const { retry } = require('./util')
 const url = require('url')
 const qs = require('querystring')
@@ -70,6 +70,13 @@ datasetsRouter.get('/templateNameParcellationName/:templateName/:parcellationNam
         trace: 'templateName'
       })
     })
+})
+
+datasetsRouter.get('/byRegion/:regionId', noCacheMiddleWare, async (req, res) => {
+  const { regionId } = req.params
+  const { user } = req
+  const ds = await getDatasetsByRegion({ regionId, user })
+  res.status(200).json(ds)
 })
 
 const deprecatedNotice = (_req, res) => {

@@ -48,7 +48,7 @@
     <!-- sidenav-content -->
     <mat-drawer class="box-shadow-none border-0 pe-none bg-none col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2"
       mode="side"
-      [attr.data-mat-drawer-open]="matDrawerMaster.opened"
+      [attr.data-mat-drawer-primary-open]="matDrawerMaster.opened"
       [opened]="sideNavMasterSwitch.switchState"
       [autoFocus]="false"
       (closedStart)="sideNavSwitch.switchState && matDrawerMinor.close()"
@@ -121,7 +121,7 @@
     <!-- sidenav-content -->
     <mat-drawer class="darker-bg iv-custom-comp visible col-10 col-sm-10 col-md-5 col-lg-4 col-xl-3 col-xxl-2 d-flex flex-column pe-all"
       mode="push"
-      [attr.data-mat-drawer-open]="matDrawerMinor.opened"
+      [attr.data-mat-drawer-secondary-open]="matDrawerMinor.opened"
       [autoFocus]="false"
       #matDrawerMinor="matDrawer"
       (openedChange)="$event && sideNavSwitch.open()"
@@ -221,6 +221,7 @@
   <div class="w-100 flex-grow-1 d-flex flex-column">
 
     <preview-card class="d-block side-nav-cover flex-grow-1"
+      [attr.aria-label]="ARIA_LABEL_ADDITIONAL_VOLUME_CONTROL"
       [datasetId]="datasetId"
       [filename]="filename">
     </preview-card>
@@ -308,6 +309,8 @@
       let-iavNgIf="iavNgIf"
       let-content="content">
       <mat-expansion-panel class="mt-1 mb-1"
+        [attr.data-opened]="expansionPanel.expanded"
+        [attr.data-mat-expansion-title]="title"
         hideToggle
         *ngIf="iavNgIf"
         #expansionPanel="matExpansionPanel">
@@ -388,7 +391,7 @@
     </ng-template>
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
-      title: 'Regional features',
+      title: CONST.REGIONAL_FEATURES,
       desc: iavDbDirective?.dataentries?.length,
       iconClass: 'fas fa-database',
       iconTooltip: iavDbDirective?.dataentries?.length | regionAccordionTooltipTextPipe : 'regionalFeatures',
@@ -446,7 +449,7 @@
       [attr.id]="ID_MESH_LOADING_STATUS"
       role="status">
 
-      <div class="spinnerAnimationCircle">
+      <div [ngClass]="{spinnerAnimationCircle: !!(showPerpsectiveScreen$ | async)}">
       </div>
       <mat-list>
         <mat-list-item>

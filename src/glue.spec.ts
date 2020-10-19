@@ -1,9 +1,9 @@
-import { TestBed, tick, fakeAsync, discardPeriodicTasks, flush } from "@angular/core/testing"
+import { TestBed, tick, fakeAsync, discardPeriodicTasks } from "@angular/core/testing"
 import { DatasetPreviewGlue, glueSelectorGetUiStatePreviewingFiles, glueActionRemoveDatasetPreview, datasetPreviewMetaReducer, glueActionAddDatasetPreview, GlueEffects } from "./glue"
 import { ACTION_TO_WIDGET_TOKEN, EnumActionToWidget } from "./widget"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { getRandomHex } from 'common/util'
-import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles } from "./services/state/uiState.store.helper"
+import { EnumWidgetTypes, TypeOpenedWidget, uiActionSetPreviewingDatasetFiles, uiStatePreviewingDatasetFilesSelector } from "./services/state/uiState.store.helper"
 import { hot } from "jasmine-marbles"
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing"
 import { glueActionToggleDatasetPreview } from './glue'
@@ -14,6 +14,9 @@ import { EnumColorMapName } from "./util/colorMaps"
 import { ngViewerSelectorClearView } from "./services/state/ngViewerState/selectors"
 import { tap, ignoreElements } from "rxjs/operators"
 import { merge, of } from "rxjs"
+import { GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "./ui/databrowserModule/pure"
+import { viewerStateSelectedTemplateSelector } from "./services/state/viewerState/selectors"
+import { generalActionError } from "./services/stateStore.helper"
 
 const mockActionOnSpyReturnVal0 = { 
   id: getRandomHex(),
@@ -909,6 +912,50 @@ describe('> glue.ts', () => {
 
   describe('> GlueEffects', () => {
 
+    /**
+     * related to previews
+     */
+    const mockTemplate = {
+      fullId: 'bar'
+    }
+    const mockPreviewFileIds = {
+      datasetId: 'foo',
+      filename: 'bar'
+    }
+    const mockPreviewFileIds2 = {
+      datasetId: 'foo2',
+      filename: 'bar2'
+    }
+    const mockPreviewFileIds3 = {
+      datasetId: 'foo3',
+      filename: 'bar3'
+    }
+    const mockPreviewFileIds4 = {
+      datasetId: 'foo4',
+      filename: 'bar4'
+    }
+    const previewFileNoRefSpace = {
+      name: 'bla bla 4',
+      datasetId: 'foo4',
+      filename: 'bar4'
+    }
+    const fittingMockPreviewFile = {
+      name: 'bla bla2',
+      datasetId: 'foo2',
+      filename: 'bar2',
+      referenceSpaces: [{
+        fullId: 'bar'
+      }]
+    }
+    const mockPreviewFile = {
+      name: 'bla bla',
+      datasetId: 'foo',
+      filename: 'bar',
+      referenceSpaces: [{
+        fullId: 'hello world'
+      }]
+    }
+
     const defaultState = {
       viewerState: {
         templateSelected: null,
@@ -919,16 +966,46 @@ describe('> glue.ts', () => {
         previewingDatasetFiles: []
       }
     }
-    beforeEach(() => {
 
+    const mockGetDatasetPreviewFromId = jasmine.createSpy('getDatasetPreviewFromId')
+
+    beforeEach(() => {
       TestBed.configureTestingModule({
         providers: [
           GlueEffects,
           provideMockStore({
             initialState: defaultState
-          })
+          }),
+          {
+            provide: GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME,
+            useValue: mockGetDatasetPreviewFromId
+          }
         ]
       })
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds2).and.returnValue(
+        hot('(a|)', {
+          a: fittingMockPreviewFile
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs({ datasetId: 'foo', filename: 'bar' }).and.returnValue(
+        hot('(a|)', {
+          a: mockPreviewFile
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds3).and.returnValue(
+        hot('(a|)', {
+          a: null
+        })
+      )
+      mockGetDatasetPreviewFromId.withArgs(mockPreviewFileIds4).and.returnValue(
+        hot('(a|)', {
+          a: previewFileNoRefSpace
+        })
+      )
+    })
+
+    afterEach(() => {
+      mockGetDatasetPreviewFromId.calls.reset()
     })
 
     describe('> regionTemplateParcChange$', () => {
@@ -986,5 +1063,146 @@ describe('> glue.ts', () => {
         )
       })
     })
+    
+  
+    describe('> unsuitablePreviews$', () => {
+
+      it('> calls injected getDatasetPreviewFromId', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds2])
+
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.unsuitablePreviews$).toBeObservable(
+          hot('')
+        )
+        /**
+         * calling twice, once to check if the dataset preview can be retrieved, the other to check the referenceSpace
+         */
+        expect(mockGetDatasetPreviewFromId).toHaveBeenCalledTimes(2)
+        expect(mockGetDatasetPreviewFromId).toHaveBeenCalledWith(mockPreviewFileIds2)
+      })
+
+      it('> if getDatasetPreviewFromId throws in event stream, handles gracefully', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds3])
+
+        const glueEffects = TestBed.inject(GlueEffects)
+        
+        expect(glueEffects.unsuitablePreviews$).toBeObservable(
+          hot('a', {
+            a: [ mockPreviewFileIds3 ]
+          })
+        )
+      })
+
+      describe('> filtering out dataset previews that do not satisfy reference space requirements', () => {
+        it('> if reference spaces does not match the selected reference template, will emit', () => {
+          const mockStore = TestBed.inject(MockStore)
+
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('a', {
+              a: [ mockPreviewFile ]
+            })
+          )
+        })
+      })
+
+      describe('> keeping dataset previews that satisfy reference space criteria', () => {
+        it('> if ref space is undefined, keep preview', () => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds4])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('')
+          )
+        })
+
+        it('> if ref space is defined, and matches, keep preview', () => {
+
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+          mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds2])
+          const glueEffects = TestBed.inject(GlueEffects)
+          expect(glueEffects.unsuitablePreviews$).toBeObservable(
+            hot('')
+          )
+        })
+      })  
+    
+    })
+
+    describe('> uiRemoveUnsuitablePreviews$', () => {
+      it('> emits whenever unsuitablePreviews$ emits', () => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.uiRemoveUnsuitablePreviews$).toBeObservable(
+          hot('a', {
+            a: generalActionError({
+              message: `Dataset previews ${mockPreviewFile.name} cannot be displayed.`
+            })
+          })
+        )
+      })
+    })
+    
+    describe('> filterDatasetPreviewByTemplateSelected$', () => {
+
+      it('> remove 1 preview datasetfile depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [  ]
+            })
+          })
+        )
+
+      })
+      it('> remove 1 preview datasetfile (get preview info fail) depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds3])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [  ]
+            })
+          })
+        )
+
+      })
+      it('> remove 2 preview datasetfile depending on unsuitablepreview$', () => {
+        const mockStore = TestBed.inject(MockStore)
+
+        mockStore.overrideSelector(viewerStateSelectedTemplateSelector, mockTemplate)
+        mockStore.overrideSelector(uiStatePreviewingDatasetFilesSelector, [mockPreviewFileIds, mockPreviewFileIds2, mockPreviewFileIds4])
+        const glueEffects = TestBed.inject(GlueEffects)
+        expect(glueEffects.filterDatasetPreviewByTemplateSelected$).toBeObservable(
+          hot('a', {
+            a: uiActionSetPreviewingDatasetFiles({
+              previewingDatasetFiles: [ mockPreviewFileIds2, mockPreviewFileIds4 ]
+            })
+          })
+        )
+
+      })
+      
+    })
+
   })
 })

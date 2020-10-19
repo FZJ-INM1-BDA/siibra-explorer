@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import {ComponentRef, Injectable, OnDestroy} from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { BehaviorSubject, combineLatest, from, fromEvent, Observable, of, Subscription } from "rxjs";
+import { BehaviorSubject, combineLatest, forkJoin, from, fromEvent, Observable, of, Subscription } from "rxjs";
 import { catchError, debounceTime, distinctUntilChanged, filter, map, shareReplay, switchMap, tap, withLatestFrom } from "rxjs/operators";
 import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
@@ -12,11 +12,12 @@ import { WidgetUnit } from "src/widget";
 import { LoggingService } from "src/logging";
 import { SHOW_KG_TOS } from "src/services/state/uiState.store";
 import { FETCHED_DATAENTRIES, FETCHED_SPATIAL_DATA, IavRootStoreInterface, IDataEntry, safeFilter } from "src/services/stateStore.service";
-import { regionFlattener } from "src/util/regionFlattener";
 import { DataBrowser } from "./databrowser/databrowser.component";
 import { NO_METHODS } from "./util/filterDataEntriesByMethods.pipe";
 import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe";
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
+
+import { getIdFromFullId } from 'common/util'
 
 const noMethodDisplayName = 'No methods described'
 
@@ -62,12 +63,10 @@ export class DatabrowserService implements OnDestroy {
     })
   }
   public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
-  public getDataByRegion: ({regions, parcellation, template}: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => new Promise((resolve, reject) => {
-    this.lowLevelQuery(template.name, parcellation.name)
-      .then(de => this.filterDEByRegion.transform(de, regions, parcellation.regions.map(regionFlattener).reduce((acc, item) => acc.concat(item), [])))
-      .then(resolve)
-      .catch(reject)
-  })
+  public getDataByRegion: ({ regions, parcellation, template }: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => 
+    forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
+      map((arrOfArr: IDataEntry[][]) => arrOfArr.reduce((acc, curr) => acc.concat(curr), []))
+    ).toPromise()
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
   private dataentries: IDataEntry[] = []
@@ -257,6 +256,16 @@ export class DatabrowserService implements OnDestroy {
   public fetchError: string
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
+
+  private getDatasetsByRegion(region: { fullId: string }){
+    return this.http.get<IDataEntry>(
+      `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(getIdFromFullId(region.fullId))}`,
+      {
+        headers: this.constantService.getHttpHeader(),
+        responseType: 'json'
+      }
+    )
+  }
 
   private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {
     const encodedTemplateName = encodeURIComponent(templateName)
