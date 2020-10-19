@@ -1,15 +1,11 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable, OnDestroy } from "@angular/core";
 import { select, Store } from "@ngrx/store";
-import { merge, Observable, of, Subscription, throwError, fromEvent, forkJoin } from "rxjs";
-import { catchError, map, shareReplay, switchMap, tap, filter, take } from "rxjs/operators";
-import { LoggingService } from "src/logging";
+import { Observable, Subscription } from "rxjs";
+import { map, shareReplay } from "rxjs/operators";
 import { SNACKBAR_MESSAGE } from "src/services/state/uiState.store";
 import { IavRootStoreInterface } from "../services/stateStore.service";
-import { AtlasWorkerService } from "./atlasViewer.workerService.service";
 import { PureContantService } from "src/util";
-
-const getUniqueId = () => Math.round(Math.random() * 1e16).toString(16)
 
 @Injectable({
   providedIn : 'root',
@@ -30,75 +26,10 @@ export class AtlasViewerConstantsServices implements OnDestroy {
   // instead of using window.location.href, which includes query param etc
   public backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
 
-  private fetchTemplate = (templateUrl) => this.http.get(`${this.backendUrl}${templateUrl}`, { responseType: 'json' }).pipe(
-    switchMap((template: any) => {
-      if (template.nehubaConfig) { return of(template) }
-      if (template.nehubaConfigURL) { return this.http.get(`${this.backendUrl}${template.nehubaConfigURL}`, { responseType: 'json' }).pipe(
-        map(nehubaConfig => {
-          return {
-            ...template,
-            nehubaConfig,
-          }
-        }),
-      )
-      }
-      throwError('neither nehubaConfig nor nehubaConfigURL defined')
-    }),
-  )
-
   public totalTemplates = null
-
-  private workerUpdateParcellation$ = fromEvent(this.workerService.worker, 'message').pipe(
-    filter((message: MessageEvent) => message && message.data && message.data.type === 'UPDATE_PARCELLATION_REGIONS'),
-    map(({ data }) => data)
-  )
-
-  private processTemplate = template => forkJoin(
-    ...template.parcellations.map(parcellation => {
-
-      const id = getUniqueId()
-
-      this.workerService.worker.postMessage({
-        type: 'PROPAGATE_PARC_REGION_ATTR',
-        parcellation,
-        inheritAttrsOpts: {
-          ngId: (parcellation as any ).ngId,
-          relatedAreas: [],
-          fullId: null
-        },
-        id
-      })
-
-      return this.workerUpdateParcellation$.pipe(
-        filter(({ id: returnedId }) => id === returnedId),
-        take(1),
-        map(({ parcellation }) => parcellation)
-      )
-    })
-  )
 
   public getTemplateEndpoint$ = this.http.get(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
     shareReplay(1)
-  )
-
-  public initFetchTemplate$ = this.getTemplateEndpoint$.pipe(
-    tap((arr: any[]) => this.totalTemplates = arr.length),
-    switchMap((templates: string[]) => merge(
-      ...templates.map(templateName => this.fetchTemplate(templateName).pipe(
-        switchMap(template => this.processTemplate(template).pipe(
-          map(parcellations => {
-            return {
-              ...template,
-              parcellations
-            }
-          })
-        ))
-      )),
-    )),
-    catchError((err) => {
-      this.log.warn(`fetching templates error`, err)
-      return of(null)
-    }),
   )
 
   public templateUrls = Array(100)
@@ -258,8 +189,6 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
   constructor(
     private store$: Store<IavRootStoreInterface>,
     private http: HttpClient,
-    private log: LoggingService,
-    private workerService: AtlasWorkerService,
     private pureConstantService: PureContantService
   ) {
 
@@ -291,7 +220,10 @@ Raise/track issues at github repo: <a target = "_blank" href = "${this.repoUrl}"
           this.dissmissUserLayerSnackbarMessage = this.dissmissUserLayerSnackbarMessageDesktop
         }
       }),
-    )
+    ),
+    this.pureConstantService.getTemplateEndpoint$.subscribe(arr => {
+      this.totalTemplates = arr.length
+    })
   }
 
   private subscriptions: Subscription[] = []

@@ -22,6 +22,11 @@ const flattenFetchedTemplatesIntoParcellationsReducer = (acc, curr) => {
   return acc.concat( parcelations )
 }
 
+export const viewerStateFetchedTemplatesSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['fetchedTemplates']
+)
+
 export const viewerStateSelectedTemplateSelector = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['templateSelected']
@@ -30,6 +35,11 @@ export const viewerStateSelectedTemplateSelector = createSelector(
 export const viewerStateSelectedParcellationSelector = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['parcellationSelected']
+)
+
+export const viewerStateNavigationStateSelector = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['navigation']
 )
 
 export const viewerStateAllRegionsFlattenedRegionSelector = createSelector(

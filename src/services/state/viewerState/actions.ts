@@ -1,6 +1,15 @@
 import { createAction, props } from "@ngrx/store"
 import { IRegion } from './constants'
 
+export const viewerStateNewViewer = createAction(
+  `[viewerState] newViewer`,
+  props<{ 
+    selectTemplate: any
+    selectParcellation: any
+    navigation: any
+  }>()
+)
+
 export const viewerStateSetSelectedRegionsWithIds = createAction(
   `[viewerState] setSelectedRegionsWithIds`,
   props<{ selectRegionIds: string[] }>()
@@ -44,6 +53,11 @@ export const viewerStateHelperSelectParcellationWithId = createAction(
 export const viewerStateSelectParcellation = createAction(
   `[viewerState] selectParcellation`,
   props<{ selectParcellation: any }>()
+)
+
+export const viewerStateSelectTemplateWithName = createAction(
+  `[viewerState] selectTemplateWithName`, 
+  props<{ payload: { name: string } }>()
 )
 
 export const viewerStateSelectTemplateWithId = createAction(
@@ -90,3 +104,4 @@ export const viewerStateMouseOverCustomLandmarkInPerspectiveView = createAction(
   `[viewerState] mouseOverCustomLandmarkInPerspectiveView`,
   props<{ payload: { label: string } }>()
 )
+

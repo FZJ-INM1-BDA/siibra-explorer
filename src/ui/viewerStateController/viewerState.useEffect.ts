@@ -2,15 +2,96 @@ import { Injectable, OnDestroy } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 import { Action, select, Store } from "@ngrx/store";
 import { Observable, Subscription, of, merge } from "rxjs";
-import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo } from "rxjs/operators";
-import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.constantService.service";
+import { distinctUntilChanged, filter, map, shareReplay, withLatestFrom, switchMap, mapTo, startWith } from "rxjs/operators";
 import { CHANGE_NAVIGATION, FETCHED_TEMPLATE, IavRootStoreInterface, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, generalActionError } from "src/services/stateStore.service";
 import { VIEWERSTATE_CONTROLLER_ACTION_TYPES } from "./viewerState.base";
 import { TemplateCoordinatesTransformation } from "src/services/templateCoordinatesTransformation.service";
 import { CLEAR_STANDALONE_VOLUMES } from "src/services/state/viewerState.store";
-import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector } from "src/services/state/viewerState.store.helper";
+import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithId, viewerStateSelectTemplateWithId, viewerStateNavigateToRegion, viewerStateSelectedTemplateSelector, viewerStateFetchedTemplatesSelector, viewerStateNewViewer, viewerStateSelectedParcellationSelector, viewerStateNavigationStateSelector, viewerStateSelectTemplateWithName } from "src/services/state/viewerState.store.helper";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
+import { PureContantService } from "src/util";
+
+const defaultPerspectiveZoom = 1e6
+const defaultZoom = 1e6
+
+export const defaultNavigationObject = {
+  orientation: [0, 0, 0, 1],
+  perspectiveOrientation: [0 , 0, 0, 1],
+  perspectiveZoom: defaultPerspectiveZoom,
+  zoom: defaultZoom,
+  position: [0, 0, 0],
+  positionReal: true
+}
+
+export const defaultNehubaConfigObject = {
+  perspectiveOrientation: [0, 0, 0, 1],
+  perspectiveZoom: 1e6,
+  navigation: {
+    pose: {
+      position: {
+        voxelCoordinates: [0, 0, 0],
+        voxelSize: [1,1,1]
+      },
+      orientation: [0, 0, 0, 1],
+    },
+    zoomFactor: defaultZoom
+  }
+}
+
+export function cvtNehubaConfigToNavigationObj(nehubaConfig?){
+  const { navigation, perspectiveOrientation = [0, 0, 0, 1], perspectiveZoom = 1e6 } = nehubaConfig || {}
+  const { pose, zoomFactor = 1e6 } = navigation || {}
+  const { position, orientation = [0, 0, 0, 1] } = pose || {}
+  const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position || {}
+
+  return {
+    orientation,
+    perspectiveOrientation: perspectiveOrientation,
+    perspectiveZoom: perspectiveZoom,
+    zoom: zoomFactor,
+    position: [0, 1, 2].map(idx => voxelSize[idx] * voxelCoordinates[idx]),
+    positionReal: true
+  }
+}
+
+export function cvtNavigationObjToNehubaConfig(navigationObj, nehubaConfigObj){
+  const {
+    orientation = [0, 0, 0, 1],
+    perspectiveOrientation = [0, 0, 0, 1],
+    perspectiveZoom = 1e6,
+    zoom = 1e6,
+    position = [0, 0, 0],
+    positionReal = true,
+  } = navigationObj || {}
+
+  const voxelSize = (() => {
+    const {
+      navigation = {}
+    } = nehubaConfigObj || {}
+    const { pose = {}, zoomFactor = 1e6 } = navigation
+    const { position = {}, orientation = [0, 0, 0, 1] } = pose
+    const { voxelSize = [1, 1, 1], voxelCoordinates = [0, 0, 0] } = position
+    return voxelSize
+  })()
+
+  return {
+    perspectiveOrientation,
+    perspectiveZoom,
+    navigation: {
+      pose: {
+        position: {
+          voxelCoordinates: positionReal
+            ? [0, 1, 2].map(idx => position[idx] / voxelSize[idx])
+            : position,
+          voxelSize
+        },
+        orientation,
+      },
+      zoomFactor: zoom
+    }
+  }
+}
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +104,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   private selectedRegions$: Observable<any[]>
 
   @Effect()
-  public init$ = this.constantSerivce.initFetchTemplate$.pipe(
+  public init$ = this.pureService.initFetchTemplate$.pipe(
     map(fetchedTemplate => {
       return {
         type: FETCHED_TEMPLATE,
@@ -35,8 +116,154 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   @Effect()
   public selectParcellation$: Observable<any>
 
+  private selectTemplateIntent$: Observable<any> = merge(
+    this.actions$.pipe(
+      ofType(viewerStateSelectTemplateWithId.type),
+      map(({ payload, config }) => {
+        return {
+          templateId: payload['@id'],
+          parcellationId: config && config['selectParcellation'] && config['selectParcellation']['@id']
+        }
+      })
+    ),
+    this.actions$.pipe(
+      ofType(viewerStateSelectTemplateWithName),
+      withLatestFrom(this.store$.pipe(
+        select(viewerStateFetchedTemplatesSelector)
+      )),
+      map(([ action, fetchedTemplates ]) => {
+        const templateName = (action as any).payload.name
+        const foundTemplate = fetchedTemplates.find(t => t.name === templateName)
+        return foundTemplate && foundTemplate['@id']
+      }),
+      filter(v => !!v),
+      map(templateId => {
+        return { templateId, parcellationId: null }
+      })
+    )
+  )
+
   @Effect()
-  public selectTemplate$: Observable<any>
+  public selectTemplate$: Observable<any> = this.selectTemplateIntent$.pipe(
+    withLatestFrom(
+      this.store$.pipe(
+        select(viewerStateFetchedTemplatesSelector)
+      ),
+      this.store$.pipe(
+        select(viewerStateSelectedParcellationSelector)
+      )
+    ),
+    map(([ { templateId, parcellationId }, fetchedTemplates, parcellationSelected ]) => {
+      /**
+       * find the correct template & parcellation from their IDs
+       */
+
+      /**
+       * for template, just look for the new id in fetched templates
+       */
+      const newTemplateTobeSelected = fetchedTemplates.find(t => t['@id'] === templateId)
+      if (!newTemplateTobeSelected) {
+        return {
+          selectTemplate: null,
+          selectParcellation: null,
+          errorMessage: `Selected templateId ${templateId} not found.`
+        }
+      }
+
+      /**
+       * for parcellation,
+       * if new parc id is defined, try to find the corresponding parcellation in the new template
+       * if above fails, try to find the corresponding parcellation of the currently selected parcellation
+       * if the above fails, select the first parcellation in the new template
+       */
+      const selectParcellationWithTemplate = (parcellationId && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === parcellationId))
+        || (parcellationSelected && parcellationSelected['@id'] && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === parcellationSelected['@id']))
+        || newTemplateTobeSelected.parcellations[0]
+
+      return {
+        selectTemplate: newTemplateTobeSelected,
+        selectParcellation: selectParcellationWithTemplate
+      }
+    }),
+    withLatestFrom(
+      this.store$.pipe(
+        select(viewerStateSelectedTemplateSelector),
+        startWith(<any>null),
+      ),
+      this.store$.pipe(
+        select(viewerStateNavigationStateSelector),
+        startWith(<any>null),
+      )
+    ),
+    switchMap(([{ selectTemplate, selectParcellation, errorMessage }, lastSelectedTemplate, navigation]) => {
+      /**
+       * if selectTemplate is undefined (cannot find template with id)
+       */
+      if (errorMessage) {
+        return of(generalActionError({
+          message: errorMessage || 'Switching template error.',
+        }))
+      }
+      /**
+       * if there were no template selected last
+       * simply return selectTemplate object
+       */
+      if (!lastSelectedTemplate) {
+        return of(viewerStateNewViewer({
+          navigation: {},
+          selectParcellation,
+          selectTemplate
+        }))
+      }
+
+      /**
+       * if there were template selected last, extract navigation info
+       */
+      const previousNavigation = (navigation && Object.keys(navigation).length > 0 && navigation) || cvtNehubaConfigToNavigationObj(lastSelectedTemplate.nehubaConfig?.dataset?.initialNgState)
+      return this.coordinatesTransformation.getPointCoordinatesForTemplate(lastSelectedTemplate.name, selectTemplate.name, previousNavigation.position).pipe(
+        map(({ status, result }) => {
+
+          /**
+           * if getPointCoordinatesForTemplate returns error, simply load the temp/parc
+           */
+          if (status === 'error') {
+            return viewerStateNewViewer({
+              navigation: {},
+              selectParcellation,
+              selectTemplate
+            })
+          }
+
+          /**
+           * otherwise, copy the nav state to templateSelected
+           * deepclone of json object is required, or it will mutate the fetchedTemplate
+           * setting navigation sometimes creates a race con, as creating nehubaViewer is not sync
+           */
+          const deepCopiedState = JSON.parse(JSON.stringify(selectTemplate))
+          const initialNgState = deepCopiedState.nehubaConfig.dataset.initialNgState
+
+          const newInitialNgState = cvtNavigationObjToNehubaConfig({
+            ...previousNavigation,
+            position: result
+          }, initialNgState)
+
+          /**
+           * mutation of initialNgState is expected here
+           */
+          deepCopiedState.nehubaConfig.dataset.initialNgState = {
+            ...initialNgState,
+            ...newInitialNgState
+          }
+
+          return viewerStateNewViewer({
+            selectTemplate: deepCopiedState,
+            selectParcellation,
+            navigation: {}
+          })
+        })
+      )
+    })
+  )
 
   @Effect()
   public toggleRegionSelection$: Observable<any>
@@ -67,7 +294,7 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
   constructor(
     private actions$: Actions,
     private store$: Store<IavRootStoreInterface>,
-    private constantSerivce: AtlasViewerConstantsServices,
+    private pureService: PureContantService,
     private coordinatesTransformation: TemplateCoordinatesTransformation
   ) {
     const viewerState$ = this.store$.pipe(
@@ -134,121 +361,6 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         }
       })
     )
-
-    /**
-     * merge all sources into single stream consisting of template id's
-     */
-    this.selectTemplate$ = merge(
-      this.actions$.pipe(
-        ofType(viewerStateSelectTemplateWithId.type),
-        map(({ payload, config }) => {
-          return {
-            templateId: payload['@id'],
-            parcellationId: config && config['selectParcellation'] && config['selectParcellation']['@id']
-          }
-        })
-      ),
-      this.actions$.pipe(
-        ofType(VIEWERSTATE_CONTROLLER_ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME),
-        withLatestFrom(viewerState$.pipe(
-          select('fetchedTemplates')
-        )),
-        map(([ action, fetchedTemplates ]) => {
-          const templateName = (action as any).payload.name
-          const foundTemplate = fetchedTemplates.find(t => t.name === templateName)
-          return foundTemplate && foundTemplate['@id']
-        }),
-        filter(v => !!v),
-        map(templateId => {
-          return { templateId, parcellationId: null }
-        })
-      )
-    ).pipe(
-
-      withLatestFrom(
-        viewerState$
-      ),
-      switchMap(([{ templateId: newTemplateId, parcellationId: newParcellationId }, { templateSelected, fetchedTemplates, navigation, parcellationSelected }]) => {
-        if (!templateSelected) {
-          return of({
-            newTemplateId,
-            templateSelected: templateSelected,
-            fetchedTemplates,
-            translatedCoordinate: null,
-            navigation,
-            newParcellationId,
-            parcellationSelected
-          })
-        }
-        const position = (navigation && navigation.position) || [0, 0, 0]
-        if (newTemplateId === templateSelected['@id']) return of(null)
-
-        const newTemplateName = fetchedTemplates.find(t => t['@id'] === newTemplateId).name
-
-        return this.coordinatesTransformation.getPointCoordinatesForTemplate(templateSelected.name, newTemplateName, position).pipe(
-          map(({ status, statusText, result }) => {
-            if (status === 'error') {
-              return {
-                newTemplateId,
-                templateSelected: templateSelected,
-                fetchedTemplates,
-                translatedCoordinate: null,
-                navigation,
-                newParcellationId,
-                parcellationSelected
-              }
-            }
-            return {
-              newTemplateId,
-              templateSelected: templateSelected,
-              fetchedTemplates,
-              translatedCoordinate: result,
-              navigation,
-              newParcellationId,
-              parcellationSelected
-            }
-          })
-        )
-      }),
-      filter(v => !!v),
-      map(({ newTemplateId, templateSelected, newParcellationId, fetchedTemplates, translatedCoordinate, navigation, parcellationSelected }) => {
-        const newTemplateTobeSelected = fetchedTemplates.find(t => t['@id'] === newTemplateId)
-        if (!newTemplateTobeSelected) {
-          return generalActionError({
-            message: 'Selected template not found.'
-          })
-        }
-
-        const selectParcellationWithTemplate = (newParcellationId && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === newParcellationId))
-          || (parcellationSelected && parcellationSelected['@id'] && newTemplateTobeSelected['parcellations'].find(p => p['@id'] === parcellationSelected['@id']))
-          || newTemplateTobeSelected.parcellations[0]
-
-        if (!translatedCoordinate) {
-          return {
-            type: NEWVIEWER,
-            selectTemplate: newTemplateTobeSelected,
-            selectParcellation: selectParcellationWithTemplate,
-          }
-        }
-        const deepCopiedState = JSON.parse(JSON.stringify(newTemplateTobeSelected))
-        const initNavigation = deepCopiedState.nehubaConfig.dataset.initialNgState.navigation
-
-        const { zoom = null, orientation = null } = navigation || {}
-        if (zoom) initNavigation.zoomFactor = zoom
-        if (orientation) initNavigation.pose.orientation = orientation
-
-        for (const idx of [0, 1, 2]) {
-          initNavigation.pose.position.voxelCoordinates[idx] = translatedCoordinate[idx] / initNavigation.pose.position.voxelSize[idx]
-        }
-
-        return {
-          type: NEWVIEWER,
-          selectTemplate: deepCopiedState,
-          selectParcellation: selectParcellationWithTemplate,
-        }
-      }),
-    )
-
 
     this.navigateToRegion$ = this.actions$.pipe(
       ofType(viewerStateNavigateToRegion),

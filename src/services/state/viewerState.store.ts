@@ -17,9 +17,13 @@ import {
   viewerStateSelectParcellation,
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateCustomLandmarkSelector,
+  viewerStateDblClickOnViewer,
+  viewerStateAddUserLandmarks,
+  viewreStateRemoveUserLandmarks,
+  viewerStateMouseOverCustomLandmark,
+  viewerStateMouseOverCustomLandmarkInPerspectiveView,
+  viewerStateNewViewer
 } from './viewerState.store.helper';
-
-import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateMouseOverCustomLandmark, viewerStateMouseOverCustomLandmarkInPerspectiveView } from './viewerState/actions';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -258,7 +262,7 @@ export function stateStore(state, action) {
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
-export const NEWVIEWER = 'NEWVIEWER'
+export const NEWVIEWER = viewerStateNewViewer.type
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
