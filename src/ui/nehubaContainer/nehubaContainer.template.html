@@ -345,6 +345,7 @@
             (click)="iavRegion.changeView(sameRegion)"
             [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
             mat-ripple>
+            <small>
               {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
             </small>  
           </mat-card>
