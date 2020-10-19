@@ -5,6 +5,7 @@ export {
 } from './databrowser.module'
 
 export { DataBrowserFeatureStore, DATESTORE_FEATURE_KEY } from './store.module'
+export { DatabrowserService } from './databrowser.service'
 
 export {
   DATASTORE_DEFAULT_STATE,
