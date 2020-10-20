@@ -76,7 +76,11 @@ export class PureContantService implements OnDestroy{
   )
 
   public getTemplateEndpoint$ = this.http.get<any[]>(`${this.backendUrl}templates`, { responseType: 'json' }).pipe(
-    shareReplay(1)
+    catchError(() => {
+      this.log.warn(`fetching root /tempaltes error`)
+      return of([])
+    }),
+    shareReplay(),
   )
 
   public initFetchTemplate$ = this.getTemplateEndpoint$.pipe(
