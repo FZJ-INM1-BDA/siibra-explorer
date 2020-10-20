@@ -340,16 +340,15 @@
     <ng-container *ngIf="iavRegion.regionInOtherTemplates$ | async as regionInOtherTemplates">
 
       <ng-template #exploreInOtherTmpl>
-        <mat-list class="action-list sm cursor-default">
-          <mat-card class="p-0 border-0 box-shadow-none mt-1 tb-1" *ngFor="let sameRegion of regionInOtherTemplates"
-            (click)="iavRegion.changeView(sameRegion)"
-            [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
-            mat-ripple>
-            <small>
-              {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
-            </small>  
-          </mat-card>
-        </mat-list>
+        <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
+          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-default" 
+          (click)="iavRegion.changeView(sameRegion)"
+          [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
+          mat-ripple>
+          <small>
+            {{ sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '') }}
+          </small>
+        </mat-card>
       </ng-template>
 
       <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
