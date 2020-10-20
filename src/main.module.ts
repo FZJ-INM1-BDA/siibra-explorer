@@ -26,8 +26,7 @@ import { LocalFileService } from "./services/localFile.service";
 import { NgViewerUseEffect } from "./services/state/ngViewerState.store";
 import { ViewerStateUseEffect } from "./services/state/viewerState.store";
 import { UIService } from "./services/uiService.service";
-import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME } from "src/ui/databrowserModule";
-import { DatabrowserService } from "./ui/databrowserModule/databrowser.service";
+import { DatabrowserModule, OVERRIDE_IAV_DATASET_PREVIEW_DATASET_FN, DataBrowserFeatureStore, GET_KGDS_PREVIEW_INFO_FROM_ID_FILENAME, DatabrowserService } from "src/ui/databrowserModule";
 import { ViewerStateControllerUseEffect } from "./ui/viewerStateController/viewerState.useEffect";
 import { DockedContainerDirective } from "./util/directives/dockedContainer.directive";
 import { DragDropDirective } from "./util/directives/dragDrop.directive";
@@ -57,6 +56,7 @@ import 'src/theme.scss'
 import { DatasetPreviewGlue, datasetPreviewMetaReducer, IDatasetPreviewGlue, GlueEffects } from './glue';
 import { viewerStateHelperReducer, viewerStateFleshOutDetail, viewerStateMetaReducers, ViewerStateHelperEffect } from './services/state/viewerState.store.helper';
 import { take } from 'rxjs/operators';
+import { TOS_OBS_INJECTION_TOKEN } from './ui/kgtos/kgtos.component';
 import { UiEffects } from './services/state/uiState/ui.effects';
 
 export function debug(reducer: ActionReducer<any>): ActionReducer<any> {
@@ -247,6 +247,12 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
       deps: [ DatasetPreviewGlue ]
     },
     DatasetPreviewGlue,
+    
+    {
+      provide: TOS_OBS_INJECTION_TOKEN,
+      useFactory: (dbService: DatabrowserService) => dbService.kgTos$,
+      deps: [ DatabrowserService ]
+    },
 
     /**
      * TODO
@@ -257,7 +263,7 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
       provide: API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
       useFactory: setViewerHandleFactory,
       deps: [ AtlasViewerAPIServices ]
-    }
+    },
   ],
   bootstrap : [
     AtlasViewer,

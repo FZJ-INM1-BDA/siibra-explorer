@@ -44,6 +44,7 @@ import { PreviewCardComponent } from "./preview/previewCard/previewCard.componen
 import { LayerBrowserModule } from "../layerbrowser";
 import { DatabrowserDirective } from "./databrowser/databrowser.directive";
 import { ContributorModule } from "./contributor";
+import { DatabrowserService } from "./databrowser.service";
 
 
 const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
@@ -127,6 +128,7 @@ const previewEmitFactory = ( overrideFn: (file: any, dataset: any) => void) => {
   ],
   providers: [
     KgSingleDatasetService,
+    DatabrowserService,
     {
       provide: IAV_DATASET_SHOW_DATASET_DIALOG_CMP,
       useValue: SingleDatasetView
