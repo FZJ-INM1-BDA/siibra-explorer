@@ -24,6 +24,7 @@ import {
   viewerStateMouseOverCustomLandmarkInPerspectiveView,
   viewerStateNewViewer
 } from './viewerState.store.helper';
+import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -136,17 +137,22 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     }
   case NEWVIEWER: {
 
-    const { selectParcellation: parcellation } = action
+    const {
+      selectParcellation: parcellation,
+      navigation,
+      selectTemplate,
+    } = action
+    const navigationFromTemplateSelected = cvtNehubaConfigToNavigationObj(selectTemplate?.nehubaConfig?.dataset?.initialNgState)
     return {
       ...prevState,
-      templateSelected : action.selectTemplate,
+      templateSelected : selectTemplate,
       parcellationSelected : parcellation,
       // taken care of by effect.ts
       // regionsSelected : [],
 
       // taken care of by effect.ts
       // landmarksSelected : [],
-      navigation : action.navigation,
+      navigation : navigation || navigationFromTemplateSelected,
       dedicatedView : null,
     }
   }

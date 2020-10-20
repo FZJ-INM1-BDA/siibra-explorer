@@ -6,7 +6,7 @@ export const viewerStateNewViewer = createAction(
   props<{ 
     selectTemplate: any
     selectParcellation: any
-    navigation: any
+    navigation?: any
   }>()
 )
 

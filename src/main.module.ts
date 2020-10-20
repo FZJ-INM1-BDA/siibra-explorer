@@ -258,7 +258,6 @@ export const GET_STATE_SNAPSHOT_TOKEN = new InjectionToken('GET_STATE_SNAPSHOT_T
      * TODO
      * once nehubacontainer is separated into viewer + overlay, migrate to nehubaContainer module
      */
-    DatabrowserService,
     {
       provide: API_SERVICE_SET_VIEWER_HANDLE_TOKEN,
       useFactory: setViewerHandleFactory,

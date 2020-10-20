@@ -210,9 +210,8 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
        */
       if (!lastSelectedTemplate) {
         return of(viewerStateNewViewer({
-          navigation: {},
           selectParcellation,
-          selectTemplate
+          selectTemplate,
         }))
       }
 
@@ -228,9 +227,8 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
            */
           if (status === 'error') {
             return viewerStateNewViewer({
-              navigation: {},
               selectParcellation,
-              selectTemplate
+              selectTemplate,
             })
           }
 
@@ -258,7 +256,6 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
           return viewerStateNewViewer({
             selectTemplate: deepCopiedState,
             selectParcellation,
-            navigation: {}
           })
         })
       )

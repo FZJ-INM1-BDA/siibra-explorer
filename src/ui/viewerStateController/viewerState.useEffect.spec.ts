@@ -104,7 +104,6 @@ describe('> viewerState.useEffect.ts', () => {
                   a: viewerStateNewViewer({
                       selectTemplate: reconstitutedColin,
                       selectParcellation: reconstitutedColin.parcellations[0],
-                      navigation: {}
                     })
                 }
               )
@@ -133,7 +132,6 @@ describe('> viewerState.useEffect.ts', () => {
                   a: viewerStateNewViewer({
                       selectTemplate: reconstitutedColin,
                       selectParcellation: reconstitutedColin.parcellations[0],
-                      navigation: {}
                     })
                 }
               )
@@ -162,7 +160,6 @@ describe('> viewerState.useEffect.ts', () => {
                   a: viewerStateNewViewer({
                       selectTemplate: reconstitutedColin,
                       selectParcellation: reconstitutedColin.parcellations[0],
-                      navigation: {}
                     })
                 }
               )
@@ -190,7 +187,6 @@ describe('> viewerState.useEffect.ts', () => {
               a: viewerStateNewViewer({
                   selectTemplate: reconstitutedColin,
                   selectParcellation: reconstitutedColin.parcellations[0],
-                  navigation: {}
                 })
             }
           )
@@ -224,7 +220,6 @@ describe('> viewerState.useEffect.ts', () => {
               a: viewerStateNewViewer({
                   selectTemplate: updatedColin,
                   selectParcellation: updatedColin.parcellations[0],
-                  navigation: {}
                 })
             }
           )
