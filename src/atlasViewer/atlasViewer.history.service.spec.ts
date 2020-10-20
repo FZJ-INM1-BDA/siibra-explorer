@@ -7,6 +7,7 @@ import { Action, Store } from '@ngrx/store'
 import { defaultRootState } from '../services/stateStore.service'
 import { cold } from 'jasmine-marbles'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { AngularMaterialModule } from 'src/ui/sharedModules/angularMaterial.module'
 
 const bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
 
@@ -16,7 +17,8 @@ describe('atlasviewer.history.service.ts', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        AngularMaterialModule,
       ],
       providers: [
         AtlasViewerHistoryUseEffect,
