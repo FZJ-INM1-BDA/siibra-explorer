@@ -8,6 +8,7 @@ import { AtlasViewerConstantsServices } from "src/atlasViewer/atlasViewer.consta
 import { cvtSearchParamToState, cvtStateToSearchParam } from "./atlasViewer.urlUtil";
 import { viewerStateHelperStoreName } from '../services/state/viewerState.store.helper'
 import { PureContantService } from "src/util";
+import { MatSnackBar } from "@angular/material/snack-bar";
 const getSearchParamStringFromState = state => {
   try {
     return cvtStateToSearchParam(state).toString()
@@ -58,7 +59,9 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
           }
         } else {
           // if non empty search param
-          const newState = cvtSearchParamToState(search, storeState)
+          const newState = cvtSearchParamToState(search, storeState, error => {
+            this.snackbar.open(`${error.message}`, 'Dismiss')
+          })
           return {
             type: GENERAL_ACTION_TYPES.APPLY_STATE,
             state: newState,
@@ -127,7 +130,8 @@ export class AtlasViewerHistoryUseEffect implements OnDestroy {
     private store$: Store<IavRootStoreInterface>,
     private actions$: Actions,
     private constantService: AtlasViewerConstantsServices,
-    private pureConstantSErvice: PureContantService
+    private pureConstantSErvice: PureContantService,
+    private snackbar: MatSnackBar
   ) {
 
     this.setNewSearchString$.subscribe(newSearchString => {
