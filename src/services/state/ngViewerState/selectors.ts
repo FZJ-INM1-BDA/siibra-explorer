@@ -30,3 +30,8 @@ export const ngViewerSelectorOctantRemoval = createSelector(
   state => state['ngViewerState'],
   ngViewerState => ngViewerState.octantRemoval
 )
+
+export const ngViewerSelectorNehubaReady = createSelector(
+  state => state['ngViewerState'],
+  ngViewerState => ngViewerState.nehubaReady
+)
