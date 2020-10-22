@@ -38,6 +38,7 @@ import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaVi
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
+import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -97,10 +98,11 @@ const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
 const {
   ZOOM_IN,
   ZOOM_OUT,
+  TOGGLE_FRONTAL_OCTANT,
   TOGGLE_SIDE_PANEL,
   EXPAND,
   COLLAPSE,
-  ADDITIONAL_VOLUME_CONTROL
+  ADDITIONAL_VOLUME_CONTROL,
 } = ARIA_LABELS
 
 @Component({
@@ -149,6 +151,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public CONST = CONST
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+  public ARIA_LABEL_TOGGLE_FRONTAL_OCTANT = TOGGLE_FRONTAL_OCTANT
   public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL
   public ARIA_LABEL_EXPAND = EXPAND
   public ARIA_LABEL_COLLAPSE = COLLAPSE
@@ -299,20 +302,17 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     this.nehubaViewerPerspectiveOctantRemoval$ = this.store.pipe(
-      select('ngViewerState'),
-      select('octantRemoval')
+      select(ngViewerSelectorOctantRemoval),
     )
 
     this.panelMode$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
       shareReplay(1),
     )
 
     this.panelOrder$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
       shareReplay(1),
     )
@@ -322,10 +322,10 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       select('nehubaReady'),
       distinctUntilChanged(),
       filter(v => !!v),
-      switchMapTo(combineLatest(
+      switchMapTo(combineLatest([
         this.panelMode$,
         this.panelOrder$,
-      )),
+      ])),
     )
 
     this.selectedLandmarks$ = this.store.pipe(
@@ -661,7 +661,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.subscriptions.push(
 
-      combineLatest(
+      combineLatest([
         this.selectedRegions$.pipe(
           distinctUntilChanged(),
         ),
@@ -678,7 +678,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           select('overwrittenColorMap'),
           distinctUntilChanged()
         )
-      ).pipe(
+      ]).pipe(
         delayWhen(() => timer())
       ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, overwrittenColorMap]) => {
         if (!this.nehubaViewer) { return }

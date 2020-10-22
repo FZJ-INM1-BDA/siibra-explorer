@@ -16,6 +16,8 @@ import { LayoutModule } from "@angular/cdk/layout";
 import { MapToPropertyPipe } from "./pipes/mapToProperty.pipe";
 import {ClickOutsideDirective} from "src/util/directives/clickOutside.directive";
 import { CounterDirective } from "./directives/counter.directive";
+import { GetNthElementPipe } from "./pipes/getNthElement.pipe";
+import { ParseAsNumberPipe } from "./pipes/parseAsNumber.pipe";
 
 @NgModule({
   imports:[
@@ -36,7 +38,9 @@ import { CounterDirective } from "./directives/counter.directive";
     MediaQueryDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
-    CounterDirective
+    CounterDirective,
+    GetNthElementPipe,
+    ParseAsNumberPipe,
   ],
   exports: [
     FilterNullPipe,
@@ -53,7 +57,9 @@ import { CounterDirective } from "./directives/counter.directive";
     MediaQueryDirective,
     MapToPropertyPipe,
     ClickOutsideDirective,
-    CounterDirective
+    CounterDirective,
+    GetNthElementPipe,
+    ParseAsNumberPipe,
   ]
 })
 

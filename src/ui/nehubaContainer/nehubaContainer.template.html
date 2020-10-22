@@ -459,7 +459,10 @@
     </div>
 
     <!-- maximise/minimise button -->
-    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: 3, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === 3 }">
+    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+      panelIndex: panelOrder$ | async | getNthElement : 3 | parseAsNumber,
+      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === 3
+    }">
     </ng-container>
     
     <!-- mesh loading is still weird -->
@@ -505,7 +508,10 @@
     </nehuba-2dlandmark-unit>
 
     <!-- maximise/minimise button -->
-    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: { panelIndex: panelIndex, visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async  )) === panelIndex }">
+    <ng-container *ngTemplateOutlet="panelCtrlTmpl; context: {
+      panelIndex: panelOrder$ | async | getNthElement : panelIndex | parseAsNumber,
+      visible: (panelOrder$ | async | reorderPanelIndexPipe : ( hoveredPanelIndices$ | async )) === panelIndex
+    }">
     </ng-container>
 
     <div *ngIf="(sliceViewLoadingMain$ | async)[panelIndex]" class="loadingIndicator">
@@ -523,7 +529,9 @@
   let-visible="visible">
 
   <div class="opacity-crossfade always-show-touchdevice pe-all overlay-btn-container"
-    [ngClass]="{ onHover: visible }">
+    [ngClass]="{ onHover: visible }"
+    [attr.data-viewer-controller-visible]="visible"
+    [attr.data-viewer-controller-index]="panelIndex">
 
     <!-- perspective specific control -->
     <ng-container *ngIf="panelIndex === 3">
@@ -559,6 +567,7 @@
   <button
     (click)="setOctantRemoval(!state)"
     mat-icon-button
+    [attr.aria-label]="ARIA_LABEL_TOGGLE_FRONTAL_OCTANT"
     color="primary">
   
     <!-- octant removal is true -->
