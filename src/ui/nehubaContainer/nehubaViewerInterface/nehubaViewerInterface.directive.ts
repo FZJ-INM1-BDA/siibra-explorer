@@ -13,6 +13,7 @@ import { takeOnePipe } from "../nehubaContainer.component";
 import { ngViewerActionNehubaReady } from "src/services/state/ngViewerState/actions";
 import { viewerStateMouseOverCustomLandmarkInPerspectiveView } from "src/services/state/viewerState/actions";
 import { viewerStateStandAloneVolumes } from "src/services/state/viewerState/selectors";
+import { ngViewerSelectorOctantRemoval } from "src/services/state/ngViewerState/selectors";
 
 const defaultNehubaConfig = {
   "configName": "",
@@ -295,8 +296,7 @@ export class NehubaViewerContainerDirective implements OnInit, OnDestroy{
     )
 
     this.nehubaViewerPerspectiveOctantRemoval$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('octantRemoval')
+      select(ngViewerSelectorOctantRemoval),
     )
   }
 
