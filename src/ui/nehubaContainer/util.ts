@@ -1,4 +1,7 @@
+import { pipe } from 'rxjs'
+import { filter, scan, take } from 'rxjs/operators'
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
+import { getViewer } from 'src/util/fn'
 
 const flexContCmnCls = ['w-100', 'h-100', 'd-flex', 'justify-content-center', 'align-items-stretch']
 
@@ -249,4 +252,36 @@ export const scanSliceViewRenderFn: (acc: [boolean, boolean, boolean], curr: Cus
     returnAcc[idx] = Math.max(num1, num2) > 0
   }
   return returnAcc as [boolean, boolean, boolean]
+}
+
+export const takeOnePipe = () => {
+
+  return pipe(
+    scan((acc: Event[], event: Event) => {
+      const target = (event as Event).target as HTMLElement
+      /**
+       * 0 | 1
+       * 2 | 3
+       *
+       * 4 ???
+       */
+      const panels = getViewer()['display']['panels']
+      const panelEls = Array.from(panels).map(({ element }) => element)
+
+      const identifySrcElement = (element: HTMLElement) => {
+        const idx = panelEls.indexOf(element)
+        return idx
+      }
+
+      const key = identifySrcElement(target)
+      const _ = {}
+      _[key] = event
+      return Object.assign({}, acc, _)
+    }, []),
+    filter(v => {
+      const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
+      return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
+    }),
+    take(1),
+  )
 }

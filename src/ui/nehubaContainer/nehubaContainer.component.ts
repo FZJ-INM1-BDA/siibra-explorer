@@ -20,7 +20,7 @@ import {
   MOUSE_OVER_LANDMARK,
   NgViewerStateInterface
 } from "src/services/stateStore.service";
-import { getExportNehuba, isSame, getViewer } from "src/util/fn";
+import { getExportNehuba, isSame } from "src/util/fn";
 import { AtlasViewerAPIServices, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
 import { compareLandmarksChanged } from "src/util/constants";
@@ -33,12 +33,12 @@ import {
   viewerStateDblClickOnViewer,
 } from "src/services/state/viewerState.store.helper";
 
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, takeOnePipe } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
-import { ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
+import { ngViewerSelectorNehubaReady, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -318,8 +318,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     )
 
     this.redrawLayout$ = this.store.pipe(
-      select('ngViewerState'),
-      select('nehubaReady'),
+      select(ngViewerSelectorNehubaReady),
       distinctUntilChanged(),
       filter(v => !!v),
       switchMapTo(combineLatest([
@@ -1097,36 +1096,4 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       ngviewer.perspectiveNavigationState.zoomBy(factor)
     }
   }
-}
-
-export const takeOnePipe = () => {
-
-  return pipe(
-    scan((acc: Event[], event: Event) => {
-      const target = (event as Event).target as HTMLElement
-      /**
-       * 0 | 1
-       * 2 | 3
-       *
-       * 4 ???
-       */
-      const panels = getViewer()['display']['panels']
-      const panelEls = Array.from(panels).map(({ element }) => element)
-
-      const identifySrcElement = (element: HTMLElement) => {
-        const idx = panelEls.indexOf(element)
-        return idx
-      }
-
-      const key = identifySrcElement(target)
-      const _ = {}
-      _[key] = event
-      return Object.assign({}, acc, _)
-    }, []),
-    filter(v => {
-      const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-      return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
-    }),
-    take(1),
-  )
 }

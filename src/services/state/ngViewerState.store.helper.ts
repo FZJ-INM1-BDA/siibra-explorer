@@ -22,3 +22,21 @@ export {
   ngViewerActionSetPanelOrder,
   ngViewerActionForceShowSegment,
 }
+
+import {
+  ngViewerSelectorClearView,
+  ngViewerSelectorClearViewEntries,
+  ngViewerSelectorNehubaReady,
+  ngViewerSelectorOctantRemoval,
+  ngViewerSelectorPanelMode,
+  ngViewerSelectorPanelOrder,
+} from './ngViewerState/selectors'
+
+export {
+  ngViewerSelectorClearView,
+  ngViewerSelectorClearViewEntries,
+  ngViewerSelectorNehubaReady,
+  ngViewerSelectorOctantRemoval,
+  ngViewerSelectorPanelMode,
+  ngViewerSelectorPanelOrder,
+}

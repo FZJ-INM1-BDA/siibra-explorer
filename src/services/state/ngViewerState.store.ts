@@ -276,10 +276,10 @@ export class NgViewerUseEffect implements OnDestroy {
 
     this.unmaximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
-        combineLatest(
+        combineLatest([
           this.panelOrder$,
           this.panelMode$,
-        ),
+        ]),
       ),
       scan((acc, curr) => {
         const [action, [panelOrders, panelMode]] = curr
@@ -328,10 +328,10 @@ export class NgViewerUseEffect implements OnDestroy {
       }),
     )
 
-    this.toggleMaximiseCycleMessage$ = combineLatest(
+    this.toggleMaximiseCycleMessage$ = combineLatest([
       this.toggleMaximiseMode$,
       this.pureConstantService.useTouchUI$,
-    ).pipe(
+    ]).pipe(
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === PANELS.SINGLE_PANEL),
