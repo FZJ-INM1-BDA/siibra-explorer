@@ -12,6 +12,7 @@ import { PureContantService } from 'src/util';
 import { PANELS } from './ngViewerState.store.helper'
 import { ngViewerActionToggleMax, ngViewerActionClearView, ngViewerActionSetPanelOrder, ngViewerActionSwitchPanelMode, ngViewerActionForceShowSegment, ngViewerActionNehubaReady } from './ngViewerState/actions';
 import { generalApplyState } from '../stateStore.helper';
+import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from './ngViewerState/selectors';
 
 export function mixNgLayers(oldLayers: INgLayerInterface[], newLayers: INgLayerInterface|INgLayerInterface[]): INgLayerInterface[] {
   if (newLayers instanceof Array) {
@@ -233,14 +234,12 @@ export class NgViewerUseEffect implements OnDestroy {
     )
 
     this.panelOrder$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
     )
 
     this.panelMode$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
     )
 
@@ -258,10 +257,10 @@ export class NgViewerUseEffect implements OnDestroy {
 
     this.maximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
-        combineLatest(
+        combineLatest([
           this.panelOrder$,
           this.panelMode$,
-        ),
+        ]),
       ),
       filter(([_action, [_panelOrder, panelMode]]) => panelMode !== PANELS.SINGLE_PANEL),
       map(([ action, [ oldPanelOrder ] ]) => {
@@ -277,10 +276,10 @@ export class NgViewerUseEffect implements OnDestroy {
 
     this.unmaximiseOrder$ = toggleMaxmimise$.pipe(
       withLatestFrom(
-        combineLatest(
+        combineLatest([
           this.panelOrder$,
           this.panelMode$,
-        ),
+        ]),
       ),
       scan((acc, curr) => {
         const [action, [panelOrders, panelMode]] = curr
@@ -329,10 +328,10 @@ export class NgViewerUseEffect implements OnDestroy {
       }),
     )
 
-    this.toggleMaximiseCycleMessage$ = combineLatest(
+    this.toggleMaximiseCycleMessage$ = combineLatest([
       this.toggleMaximiseMode$,
       this.pureConstantService.useTouchUI$,
-    ).pipe(
+    ]).pipe(
       filter(([_, useMobileUI]) => !useMobileUI),
       map(([toggleMaximiseMode, _]) => toggleMaximiseMode),
       filter(({ payload }) => payload.panelMode && payload.panelMode === PANELS.SINGLE_PANEL),

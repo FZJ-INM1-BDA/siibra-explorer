@@ -63,6 +63,11 @@ export const viewerStateStandAloneVolumes = createSelector(
   viewerState => viewerState['standaloneVolumes']
 )
 
+export const viewerStateSelectorNavigation = createSelector(
+  state => state['viewerState'],
+  viewerState => viewerState['navigation']
+)
+
 export const viewerStateGetOverlayingAdditionalParcellations = createSelector(
   state => state[viewerStateHelperStoreName],
   state => state['viewerState'],

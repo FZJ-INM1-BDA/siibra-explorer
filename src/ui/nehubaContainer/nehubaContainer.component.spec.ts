@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
-import { async, TestBed } from "@angular/core/testing"
+import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core'
+import { TestBed, async, ComponentFixture, fakeAsync, tick, flush, discardPeriodicTasks } from "@angular/core/testing"
 import { NehubaContainer } from "./nehubaContainer.component"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { defaultRootState } from 'src/services/stateStore.service'
@@ -39,11 +39,16 @@ import { RegionAccordionTooltipTextPipe } from '../util'
 import { hot } from 'jasmine-marbles'
 import { of } from 'rxjs'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
+import { PANELS } from 'src/services/state/ngViewerState/constants'
 
 const { 
   TOGGLE_SIDE_PANEL,
   EXPAND,
-  COLLAPSE
+  COLLAPSE,
+  ZOOM_IN,
+  ZOOM_OUT,
+  TOGGLE_FRONTAL_OCTANT
 } = ARIA_LABELS
 
 const _bigbrainJson = require('!json-loader!src/res/ext/bigbrain.json')
@@ -423,6 +428,212 @@ describe('> nehubaContainer.component.ts', () => {
          * TODO
          */
         it('> if something (region features/connectivity) exists, placeh holder text should be hdiden')
+      })
+    })
+  
+    describe('> panelCtrl', () => {
+      let fixture: ComponentFixture<NehubaContainer>
+      const setViewerLoaded = () => {
+        fixture.componentInstance.viewerLoaded = true
+      }
+      const ctrlElementIsVisible = (el: DebugElement) => {
+        const visible = (el.nativeElement as HTMLElement).getAttribute('data-viewer-controller-visible')
+        return visible === 'true'
+      }
+      beforeEach(() => {
+        fixture = TestBed.createComponent(NehubaContainer)
+      })
+      it('> on start, all four ctrl panels exists', () => {
+        fixture.detectChanges()
+        setViewerLoaded()
+        fixture.detectChanges()
+        for (const idx of [0, 1, 2, 3]) {
+          const el = fixture.debugElement.query(
+            By.css(`[data-viewer-controller-index="${idx}"]`)
+          )
+          expect(el).toBeTruthy()
+        }
+      })
+
+      it('> on start all four ctrl panels are invisible', () => {
+        
+        fixture.detectChanges()
+        setViewerLoaded()
+        fixture.detectChanges()
+        for (const idx of [0, 1, 2, 3]) {
+          const el = fixture.debugElement.query(
+            By.css(`[data-viewer-controller-index="${idx}"]`)
+          )
+          expect(ctrlElementIsVisible(el)).toBeFalsy()
+        }
+      })
+
+      describe('> on hover, only the hovered panel have ctrl shown', () => {
+
+        for (const idx of [0, 1, 2, 3]) {
+          
+          it(`> on hoveredPanelIndices$ emit ${idx}, the panel index ${idx} ctrl becomes visible`, fakeAsync(() => {
+            fixture.detectChanges()
+            const findPanelIndexSpy = spyOn<any>(fixture.componentInstance, 'findPanelIndex').and.callFake(() => {
+              return idx
+            })
+            setViewerLoaded()
+            fixture.detectChanges()
+            const nativeElement = fixture.componentInstance['elementRef'].nativeElement
+            nativeElement.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }))
+  
+            /**
+             * assert findPanelIndex called with event.target, i.e. native element in thsi case
+             */
+            expect(findPanelIndexSpy).toHaveBeenCalledWith(nativeElement)
+            tick(200)
+            fixture.detectChanges()
+            
+            /**
+             * every panel index should be non visible
+             * only when idx matches, it can be visible
+             * n.b. this does not test visual visibility (which is controlled by extra-style.css)
+             * (which is also affected by global [ismobile] configuration)
+             * 
+             * this merely test the unit logic, and sets the flag appropriately
+             */
+            for (const iterativeIdx of [0, 1, 2, 3]) {
+              const el = fixture.debugElement.query(
+                By.css(`[data-viewer-controller-index="${iterativeIdx}"]`)
+              )
+              if (iterativeIdx === idx) {
+                expect(ctrlElementIsVisible(el)).toBeTruthy()
+              } else {
+                expect(ctrlElementIsVisible(el)).toBeFalsy()
+              }
+            }
+            discardPeriodicTasks()
+          }))
+        }
+  
+      })
+
+      describe('> on maximise top right slice panel (idx 1)', () => {
+        beforeEach(() => {
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(ngViewerSelectorPanelMode, PANELS.SINGLE_PANEL)
+          mockStore.overrideSelector(ngViewerSelectorPanelOrder, '1230')
+
+          fixture.detectChanges()
+          setViewerLoaded()
+          fixture.detectChanges()
+        })
+        it('> toggle front octant btn not visible', () => {
+
+          const toggleBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${TOGGLE_FRONTAL_OCTANT}"]`)
+          )
+          expect(toggleBtn).toBeFalsy()
+        })
+
+        it('> zoom in and out btns are visible', () => {
+
+          const zoomInBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_IN}"]`)
+          )
+
+          const zoomOutBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_OUT}"]`)
+          )
+
+          expect(zoomInBtn).toBeTruthy()
+          expect(zoomOutBtn).toBeTruthy()
+        })
+
+        it('> zoom in btn calls fn with right param', () => {
+          const zoomViewSpy = spyOn(fixture.componentInstance, 'zoomNgView')
+
+          const zoomInBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_IN}"]`)
+          )
+          zoomInBtn.triggerEventHandler('click', null)
+          expect(zoomViewSpy).toHaveBeenCalled()
+          const { args } = zoomViewSpy.calls.first()
+          expect(args[0]).toEqual(1)
+          /**
+           * zoom in < 1
+           */
+          expect(args[1]).toBeLessThan(1)
+        })
+        it('> zoom out btn calls fn with right param', () => {
+          const zoomViewSpy = spyOn(fixture.componentInstance, 'zoomNgView')
+
+          const zoomOutBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_OUT}"]`)
+          )
+          zoomOutBtn.triggerEventHandler('click', null)
+          expect(zoomViewSpy).toHaveBeenCalled()
+          const { args } = zoomViewSpy.calls.first()
+          expect(args[0]).toEqual(1)
+          /**
+           * zoom out > 1
+           */
+          expect(args[1]).toBeGreaterThan(1)
+        })
+      })
+      describe('> on maximise perspective panel', () => {
+        beforeEach(() => {
+          const mockStore = TestBed.inject(MockStore)
+          mockStore.overrideSelector(ngViewerSelectorPanelMode, PANELS.SINGLE_PANEL)
+          mockStore.overrideSelector(ngViewerSelectorPanelOrder, '3012')
+
+          fixture.detectChanges()
+          setViewerLoaded()
+          fixture.detectChanges()
+        })
+        it('> toggle octant btn visible and functional', () => {
+          const setOctantRemovalSpy = spyOn(fixture.componentInstance, 'setOctantRemoval')
+
+          const toggleBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${TOGGLE_FRONTAL_OCTANT}"]`)
+          )
+          expect(toggleBtn).toBeTruthy()
+          toggleBtn.nativeElement.dispatchEvent(
+            new MouseEvent('click', { bubbles: true })
+          )
+          expect(setOctantRemovalSpy).toHaveBeenCalled()
+        })
+
+        it('> zoom in btn visible and functional', () => {
+          const zoomViewSpy = spyOn(fixture.componentInstance, 'zoomNgView')
+
+          const zoomInBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_IN}"]`)
+          )
+          expect(zoomInBtn).toBeTruthy()
+
+          zoomInBtn.triggerEventHandler('click', null)
+          expect(zoomViewSpy).toHaveBeenCalled()
+          const { args } = zoomViewSpy.calls.first()
+          expect(args[0]).toEqual(3)
+          /**
+           * zoom in < 1
+           */
+          expect(args[1]).toBeLessThan(1)
+        })
+        it('> zoom out btn visible and functional', () => {
+          const zoomViewSpy = spyOn(fixture.componentInstance, 'zoomNgView')
+
+          const zoomOutBtn = fixture.debugElement.query(
+            By.css(`[cell-i] [aria-label="${ZOOM_OUT}"]`)
+          )
+          expect(zoomOutBtn).toBeTruthy()
+
+          zoomOutBtn.triggerEventHandler('click', null)
+          expect(zoomViewSpy).toHaveBeenCalled()
+          const { args } = zoomViewSpy.calls.first()
+          expect(args[0]).toEqual(3)
+          /**
+           * zoom in < 1
+           */
+          expect(args[1]).toBeGreaterThan(1)
+        })
+      
       })
     })
   })

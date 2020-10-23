@@ -23,6 +23,7 @@
     // overlay/layout specific
     SELECT_ATLAS: 'Select a different atlas',
     CONTEXT_MENU: `Viewer context menu`,
+    TOGGLE_FRONTAL_OCTANT: `Toggle perspective view frontal octant`,
     ZOOM_IN: 'Zoom in',
     ZOOM_OUT: 'Zoom out',
     MAXIMISE_VIEW: 'Maximise this view',

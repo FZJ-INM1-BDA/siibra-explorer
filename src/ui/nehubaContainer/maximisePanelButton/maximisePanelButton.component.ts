@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged, map } from "rxjs/operators";
 import { PANELS } from 'src/services/state/ngViewerState.store.helper'
 import { ARIA_LABELS } from 'common/constants'
+import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
 
 const {
   MAXIMISE_VIEW,
@@ -34,14 +35,12 @@ export class MaximmisePanelButton {
     private store$: Store<any>,
   ) {
     this.panelMode$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
     )
 
     this.panelOrder$ = this.store$.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
     )
 

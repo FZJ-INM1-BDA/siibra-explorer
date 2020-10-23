@@ -20,6 +20,7 @@ import {
   MOUSE_OVER_LANDMARK,
   NgViewerStateInterface
 } from "src/services/stateStore.service";
+
 import { getExportNehuba, isSame, getViewer } from "src/util/fn";
 import { API_SERVICE_SET_VIEWER_HANDLE_TOKEN, IUserLandmark } from "src/atlasViewer/atlasViewer.apiService.service";
 import { NehubaViewerUnit } from "./nehubaViewer/nehubaViewer.component";
@@ -33,11 +34,12 @@ import {
   viewerStateDblClickOnViewer,
 } from "src/services/state/viewerState.store.helper";
 
-import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn } from "./util";
+import { getFourPanel, getHorizontalOneThree, getSinglePanel, getVerticalOneThree, calculateSliceZoomFactor, scanSliceViewRenderFn as scanFn, takeOnePipe } from "./util";
 import { NehubaViewerContainerDirective } from "./nehubaViewerInterface/nehubaViewerInterface.directive";
 import { ITunableProp } from "./mobileOverlay/mobileOverlay.component";
 import {ConnectivityBrowserComponent} from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { viewerStateMouseOverCustomLandmark } from "src/services/state/viewerState/actions";
+import { ngViewerSelectorNehubaReady, ngViewerSelectorOctantRemoval, ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from "src/services/state/ngViewerState/selectors";
 
 const { MESH_LOADING_STATUS } = IDS
 
@@ -97,10 +99,11 @@ const sortByFreshness: (acc: any[], curr: any[]) => any[] = (acc, curr) => {
 const {
   ZOOM_IN,
   ZOOM_OUT,
+  TOGGLE_FRONTAL_OCTANT,
   TOGGLE_SIDE_PANEL,
   EXPAND,
   COLLAPSE,
-  ADDITIONAL_VOLUME_CONTROL
+  ADDITIONAL_VOLUME_CONTROL,
 } = ARIA_LABELS
 
 @Component({
@@ -149,6 +152,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public CONST = CONST
   public ARIA_LABEL_ZOOM_IN = ZOOM_IN
   public ARIA_LABEL_ZOOM_OUT = ZOOM_OUT
+  public ARIA_LABEL_TOGGLE_FRONTAL_OCTANT = TOGGLE_FRONTAL_OCTANT
   public ARIA_LABEL_TOGGLE_SIDE_PANEL = TOGGLE_SIDE_PANEL
   public ARIA_LABEL_EXPAND = EXPAND
   public ARIA_LABEL_COLLAPSE = COLLAPSE
@@ -299,33 +303,29 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
     this.useMobileUI$ = this.pureConstantService.useTouchUI$
 
     this.nehubaViewerPerspectiveOctantRemoval$ = this.store.pipe(
-      select('ngViewerState'),
-      select('octantRemoval')
+      select(ngViewerSelectorOctantRemoval),
     )
 
     this.panelMode$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelMode'),
+      select(ngViewerSelectorPanelMode),
       distinctUntilChanged(),
       shareReplay(1),
     )
 
     this.panelOrder$ = this.store.pipe(
-      select('ngViewerState'),
-      select('panelOrder'),
+      select(ngViewerSelectorPanelOrder),
       distinctUntilChanged(),
       shareReplay(1),
     )
 
     this.redrawLayout$ = this.store.pipe(
-      select('ngViewerState'),
-      select('nehubaReady'),
+      select(ngViewerSelectorNehubaReady),
       distinctUntilChanged(),
       filter(v => !!v),
-      switchMapTo(combineLatest(
+      switchMapTo(combineLatest([
         this.panelMode$,
         this.panelOrder$,
-      )),
+      ])),
     )
 
     this.selectedLandmarks$ = this.store.pipe(
@@ -661,7 +661,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
 
     this.subscriptions.push(
 
-      combineLatest(
+      combineLatest([
         this.selectedRegions$.pipe(
           distinctUntilChanged(),
         ),
@@ -678,7 +678,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
           select('overwrittenColorMap'),
           distinctUntilChanged()
         )
-      ).pipe(
+      ]).pipe(
         delayWhen(() => timer())
       ).subscribe(([regions, hideSegmentFlag, forceShowSegment, selectedParcellation, overwrittenColorMap]) => {
         if (!this.nehubaViewer) { return }
@@ -1099,36 +1099,4 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
       ngviewer.perspectiveNavigationState.zoomBy(factor)
     }
   }
-}
-
-export const takeOnePipe = () => {
-
-  return pipe(
-    scan((acc: Event[], event: Event) => {
-      const target = (event as Event).target as HTMLElement
-      /**
-       * 0 | 1
-       * 2 | 3
-       *
-       * 4 ???
-       */
-      const panels = getViewer()['display']['panels']
-      const panelEls = Array.from(panels).map(({ element }) => element)
-
-      const identifySrcElement = (element: HTMLElement) => {
-        const idx = panelEls.indexOf(element)
-        return idx
-      }
-
-      const key = identifySrcElement(target)
-      const _ = {}
-      _[key] = event
-      return Object.assign({}, acc, _)
-    }, []),
-    filter(v => {
-      const isdefined = (obj) => typeof obj !== 'undefined' && obj !== null
-      return (isdefined(v[0]) && isdefined(v[1]) && isdefined(v[2]))
-    }),
-    take(1),
-  )
 }

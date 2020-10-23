@@ -18,6 +18,7 @@ import { FilterDataEntriesByRegion } from "./util/filterDataEntriesByRegion.pipe
 import { datastateActionToggleFav, datastateActionUnfavDataset, datastateActionFavDataset } from "src/services/state/dataState/actions";
 
 import { getIdFromFullId } from 'common/util'
+import { viewerStateSelectorNavigation } from "src/services/state/viewerState/selectors";
 
 const noMethodDisplayName = 'No methods described'
 
@@ -113,8 +114,7 @@ export class DatabrowserService implements OnDestroy {
     )
 
     this.viewportBoundingBox$ = this.store.pipe(
-      select('viewerState'),
-      select('navigation'),
+      select(viewerStateSelectorNavigation),
       distinctUntilChanged(),
       debounceTime(SPATIAL_SEARCH_DEBOUNCE),
       filter(v => !!v && !!v.position && !!v.zoom),
