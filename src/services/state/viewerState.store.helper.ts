@@ -7,6 +7,7 @@ import { withLatestFrom, map } from "rxjs/operators";
 import { Injectable } from "@angular/core";
 
 import {
+  viewerStateNewViewer,
   viewerStateHelperSelectParcellationWithId,
   viewerStateNavigateToRegion,
   viewerStateRemoveAdditionalLayer,
@@ -22,10 +23,14 @@ import {
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
-  viewreStateRemoveUserLandmarks
+  viewreStateRemoveUserLandmarks,
+  viewerStateMouseOverCustomLandmark,
+  viewerStateMouseOverCustomLandmarkInPerspectiveView,
+  viewerStateSelectTemplateWithName,
 } from './viewerState/actions'
 
 export {
+  viewerStateNewViewer,
   viewerStateHelperSelectParcellationWithId,
   viewerStateNavigateToRegion,
   viewerStateRemoveAdditionalLayer,
@@ -41,7 +46,10 @@ export {
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateDblClickOnViewer,
   viewerStateAddUserLandmarks,
-  viewreStateRemoveUserLandmarks
+  viewreStateRemoveUserLandmarks,
+  viewerStateMouseOverCustomLandmark,
+  viewerStateMouseOverCustomLandmarkInPerspectiveView,
+  viewerStateSelectTemplateWithName,
 }
 
 import {
@@ -50,6 +58,8 @@ import {
   viewerStateSelectedParcellationSelector,
   viewerStateGetSelectedAtlas,
   viewerStateCustomLandmarkSelector,
+  viewerStateFetchedTemplatesSelector,
+  viewerStateNavigationStateSelector,
 } from './viewerState/selectors'
 
 export {
@@ -57,6 +67,8 @@ export {
   viewerStateSelectedTemplateSelector,
   viewerStateSelectedParcellationSelector,
   viewerStateCustomLandmarkSelector,
+  viewerStateFetchedTemplatesSelector,
+  viewerStateNavigationStateSelector,
 }
 
 interface IViewerStateHelperStore{

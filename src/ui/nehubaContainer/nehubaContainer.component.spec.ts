@@ -3,13 +3,12 @@ import { TestBed, async, ComponentFixture, fakeAsync, tick, flush, discardPeriod
 import { NehubaContainer } from "./nehubaContainer.component"
 import { provideMockStore, MockStore } from "@ngrx/store/testing"
 import { defaultRootState } from 'src/services/stateStore.service'
-import { ComponentsModule } from "src/components"
 import { AngularMaterialModule } from "../sharedModules/angularMaterial.module"
 import { TouchSideClass } from "./touchSideClass.directive"
 import { MaximmisePanelButton } from "./maximisePanelButton/maximisePanelButton.component"
 import { LandmarkUnit } from './landmarkUnit/landmarkUnit.component'
 import { LayoutModule } from 'src/layouts/layout.module'
-import { UtilModule } from "src/util"
+import { PureContantService, UtilModule } from "src/util"
 import { AtlasLayerSelector } from "../atlasLayerSelector/atlasLayerSelector.component"
 import { StatusCardComponent } from './statusCard/statusCard.component'
 import { NehubaViewerTouchDirective } from './nehubaViewerInterface/nehubaViewerTouch.directive'
@@ -28,7 +27,6 @@ import { StateModule } from 'src/state'
 import { ReactiveFormsModule, FormsModule } from '@angular/forms'
 import { HttpClientModule } from '@angular/common/http'
 import { WidgetModule } from 'src/widget'
-import { PluginModule } from 'src/atlasViewer/pluginUnit/plugin.module'
 import { NehubaModule } from './nehuba.module'
 import { CommonModule } from '@angular/common'
 import { IMPORT_NEHUBA_INJECT_TOKEN } from './nehubaViewer/nehubaViewer.component'
@@ -39,6 +37,8 @@ import { ARIA_LABELS } from 'common/constants'
 import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 import { RegionAccordionTooltipTextPipe } from '../util'
 import { hot } from 'jasmine-marbles'
+import { of } from 'rxjs'
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { ngViewerSelectorPanelMode, ngViewerSelectorPanelOrder } from 'src/services/state/ngViewerState/selectors'
 import { PANELS } from 'src/services/state/ngViewerState/constants'
 
@@ -69,9 +69,7 @@ describe('> nehubaContainer.component.ts', () => {
       TestBed.configureTestingModule({
         imports: [
           NoopAnimationsModule,
-          PluginModule,
           WidgetModule,
-          ComponentsModule,
           AngularMaterialModule,
           LayoutModule,
           UtilModule,
@@ -82,7 +80,13 @@ describe('> nehubaContainer.component.ts', () => {
           FormsModule,
           ReactiveFormsModule,
           HttpClientModule,
-          CommonModule
+          CommonModule,
+
+          /**
+           * because the change done to pureconstant service, need to intercept http call to avoid crypto error message
+           * so and so components needs to be compiled first. make sure you call compileComponents
+           */
+          HttpClientTestingModule,
         ],
         declarations: [
           NehubaContainer,
@@ -98,7 +102,7 @@ describe('> nehubaContainer.component.ts', () => {
           CurrentLayout,
           RegionDirective,
           RegionTextSearchAutocomplete,
-
+  
           // pipes
           MobileControlNubStylePipe,
           ReorderPanelIndexPipe,
@@ -111,13 +115,15 @@ describe('> nehubaContainer.component.ts', () => {
           {
             provide: IMPORT_NEHUBA_INJECT_TOKEN,
             useValue: importNehubaSpy
-          }
+          },
+          PureContantService,
+
         ],
         schemas: [
           CUSTOM_ELEMENTS_SCHEMA
         ],
       }).compileComponents()
-
+      
     }))
 
     it('> component can be created', () => {
@@ -128,7 +134,6 @@ describe('> nehubaContainer.component.ts', () => {
     })
 
     describe('> on selectedTemplatechange', () => {
-      
       it('> calls importNehubaPr', async () => {
         const fixture = TestBed.createComponent(NehubaContainer)
         fixture.componentInstance.currentOnHoverObs$ = hot('')

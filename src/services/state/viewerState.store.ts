@@ -17,9 +17,14 @@ import {
   viewerStateSelectParcellation,
   viewerStateSelectRegionWithIdDeprecated,
   viewerStateCustomLandmarkSelector,
+  viewerStateDblClickOnViewer,
+  viewerStateAddUserLandmarks,
+  viewreStateRemoveUserLandmarks,
+  viewerStateMouseOverCustomLandmark,
+  viewerStateMouseOverCustomLandmarkInPerspectiveView,
+  viewerStateNewViewer
 } from './viewerState.store.helper';
-
-import { viewerStateDblClickOnViewer, viewerStateAddUserLandmarks, viewreStateRemoveUserLandmarks, viewerStateMouseOverCustomLandmark, viewerStateMouseOverCustomLandmarkInPerspectiveView } from './viewerState/actions';
+import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -132,17 +137,22 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
     }
   case NEWVIEWER: {
 
-    const { selectParcellation: parcellation } = action
+    const {
+      selectParcellation: parcellation,
+      navigation,
+      selectTemplate,
+    } = action
+    const navigationFromTemplateSelected = cvtNehubaConfigToNavigationObj(selectTemplate?.nehubaConfig?.dataset?.initialNgState)
     return {
       ...prevState,
-      templateSelected : action.selectTemplate,
+      templateSelected : selectTemplate,
       parcellationSelected : parcellation,
       // taken care of by effect.ts
       // regionsSelected : [],
 
       // taken care of by effect.ts
       // landmarksSelected : [],
-      navigation : action.navigation,
+      navigation : navigation || navigationFromTemplateSelected,
       dedicatedView : null,
     }
   }
@@ -258,7 +268,7 @@ export function stateStore(state, action) {
 export const LOAD_DEDICATED_LAYER = 'LOAD_DEDICATED_LAYER'
 export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 
-export const NEWVIEWER = 'NEWVIEWER'
+export const NEWVIEWER = viewerStateNewViewer.type
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
 export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'

@@ -7,9 +7,9 @@ import { RegionSelection } from "src/services/state/userConfigState.store";
 import { IavRootStoreInterface, SELECT_REGIONS, USER_CONFIG_ACTION_TYPES } from "src/services/stateStore.service";
 import { MatSelectChange } from "@angular/material/select";
 import { MatBottomSheet, MatBottomSheetRef } from "@angular/material/bottom-sheet";
+import { viewerStateSelectTemplateWithName } from "src/services/state/viewerState/actions";
 
 const ACTION_TYPES = {
-  SELECT_TEMPLATE_WITH_NAME: 'SELECT_TEMPLATE_WITH_NAME',
   SELECT_PARCELLATION_WITH_NAME: 'SELECT_PARCELLATION_WITH_NAME',
 
 }
@@ -94,13 +94,11 @@ export class ViewerStateBase implements OnInit {
   }
 
   public handleTemplateChange(event: MatSelectChange) {
-
-    this.store$.dispatch({
-      type: ACTION_TYPES.SELECT_TEMPLATE_WITH_NAME,
-      payload: {
-        name: event.value,
-      },
-    })
+    this.store$.dispatch(
+      viewerStateSelectTemplateWithName({
+        payload: { name: event.value }
+      })
+    )
   }
 
   public handleParcellationChange(event: MatSelectChange) {
