@@ -341,7 +341,7 @@
 
       <ng-template #exploreInOtherTmpl>
         <mat-card *ngFor="let sameRegion of regionInOtherTemplates"
-          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-default" 
+          class="p-0 border-0 box-shadow-none mt-1 tb-1 cursor-pointer" 
           (click)="iavRegion.changeView(sameRegion)"
           [matTooltip]="sameRegion.template.name + (sameRegion.hemisphere ? (' - ' + sameRegion.hemisphere) : '')"
           mat-ripple>
