@@ -1,7 +1,6 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewChild, ChangeDetectorRef, Output, EventEmitter, Inject, Optional } from "@angular/core";
 import { select, Store } from "@ngrx/store";
 import { combineLatest, fromEvent, merge, Observable, of, Subscription, timer, asyncScheduler, BehaviorSubject, Subject } from "rxjs";
-import { pipe } from "rxjs/internal/util/pipe";
 import { buffer, debounceTime, distinctUntilChanged, filter, map, mapTo, scan, shareReplay, skip, startWith, switchMap, switchMapTo, take, tap, withLatestFrom, delayWhen, throttleTime } from "rxjs/operators";
 import { trigger, state, style, animate, transition } from '@angular/animations'
 import { MatDrawer } from "@angular/material/sidenav";
