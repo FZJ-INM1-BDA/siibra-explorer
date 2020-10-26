@@ -435,7 +435,7 @@ export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
       if (!this.onhoverSegments) return
       this.store.dispatch(
         viewerStateSetSelectedRegions({
-          selectRegions: this.onhoverSegments
+          selectRegions: this.onhoverSegments.slice(0, 1)
         })
       )
     }
