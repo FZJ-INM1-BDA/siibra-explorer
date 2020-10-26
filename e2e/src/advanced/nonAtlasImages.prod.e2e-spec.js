@@ -1,5 +1,6 @@
 const { AtlasPage } = require('../util')
 const { URLSearchParams } = require('url')
+const { ARIA_LABELS } = require('../../../common/constants')
 describe('> non-atlas images', () => {
   let iavPage
 
@@ -196,9 +197,15 @@ describe('> non-atlas images', () => {
       await iavPage.goto(`/?${searchParam.toString()}`)
       await iavPage.wait(2000)
 
-      const additionalLayerControlIsShown = await iavPage.additionalLayerControlIsVisible()
-
-      expect(additionalLayerControlIsShown).toEqual(false)
+      try {
+        const additionalLayerControlIsShown = await iavPage.isVisible(`[aria-label="${ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL}"]`)
+        expect(additionalLayerControlIsShown).toEqual(false)
+      } catch (e) {
+        /**
+         * error when css querying additional volume control
+         * expected behaviour, when it is not visible
+         */
+      }
       
     })
 
@@ -219,7 +226,7 @@ describe('> non-atlas images', () => {
       await iavPage.goto(`/?${searchParam.toString()}`, { forceTimeout: 20000 })
       await iavPage.wait(2000)
       
-      const additionalLayerCtrlIsExpanded2 = await iavPage.additionalLayerControlIsExpanded()
+      const additionalLayerCtrlIsExpanded2 = await iavPage.isVisible(`[aria-label="${ARIA_LABELS.ADDITIONAL_VOLUME_CONTROL}"]`)
       expect(additionalLayerCtrlIsExpanded2).toEqual(true)
 
     })
