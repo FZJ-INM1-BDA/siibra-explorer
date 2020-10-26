@@ -64,8 +64,6 @@ import { TakeScreenshotComponent } from "src/ui/takeScreenshot/takeScreenshot.co
 import { FixedMouseContextualContainerDirective } from "src/util/directives/FixedMouseContextualContainerDirective.directive";
 import { RegionHierarchy } from './viewerStateController/regionHierachy/regionHierarchy.component'
 import { RegionTextSearchAutocomplete } from "./viewerStateController/regionSearch/regionSearch.component";
-import { CurrentlySelectedRegions } from './viewerStateController/regionsListView/currentlySelectedRegions/currentlySelectedRegions.component'
-import { RegionsListView } from "./viewerStateController/regionsListView/simpleRegionsListView/regionListView.component";
 
 import { ConnectivityBrowserComponent } from "src/ui/connectivityBrowser/connectivityBrowser.component";
 import { RegionMenuComponent } from 'src/ui/parcellationRegion/regionMenu/regionMenu.component'
@@ -136,10 +134,8 @@ import { RegionAccordionTooltipTextPipe } from './util'
     CurrentLayout,
     ViewerStateMini,
     RegionHierarchy,
-    CurrentlySelectedRegions,
     MaximmisePanelButton,
     RegionTextSearchAutocomplete,
-    RegionsListView,
     TakeScreenshotComponent,
     RegionMenuComponent,
     ConnectivityBrowserComponent,

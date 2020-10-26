@@ -108,4 +108,15 @@
 
     return [ h, s, l ];
   }
+
+  exports.verifyPositionArg = val => {
+    return (
+      Array.isArray(val) &&
+      val.length === 3 &&
+      val.every(n =>
+        typeof n === 'number' &&
+        !Number.isNaN(n)
+      )
+    )
+  }
 })(typeof exports === 'undefined' ? module.exports : exports)

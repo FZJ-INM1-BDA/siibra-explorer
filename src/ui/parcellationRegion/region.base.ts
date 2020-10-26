@@ -7,7 +7,7 @@ import { ARIA_LABELS } from 'common/constants'
 import { flattenRegions, getIdFromFullId, rgbToHsl } from 'common/util'
 import { viewerStateSetConnectivityRegion, viewerStateNavigateToRegion, viewerStateToggleRegionSelect } from "src/services/state/viewerState.store.helper";
 import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
-import { intToRgb } from 'common/util'
+import { intToRgb, verifyPositionArg } from 'common/util'
 
 export class RegionBase {
 
@@ -16,10 +16,24 @@ export class RegionBase {
 
   private _region: any
 
+  private _position: [number, number, number]
+  set position(val){
+    if (verifyPositionArg(val)) {
+      this._position = val
+    } else {
+      this._position = null
+    }
+  }
+
+  get position(){
+    return this._position
+  }
+
   @Input()
   set region(val) {
     this._region = val
     this.region$.next(this._region)
+    this.position = val.position
     if (!this._region) return
 
     const rgb = this._region.rgb || (this._region.labelIndex && intToRgb(Number(this._region.labelIndex))) || [255, 200, 200]
@@ -60,10 +74,10 @@ export class RegionBase {
       ))
     )
 
-    this.regionOriginDatasetLabels$ = combineLatest(
+    this.regionOriginDatasetLabels$ = combineLatest([
       this.store$,
       this.region$
-    ).pipe(
+    ]).pipe(
       map(([state, region]) => getRegionParentParcRefSpace(state, { region })),
       map(({ template }) => (template && template.originalDatasetFormats) || [])
     )

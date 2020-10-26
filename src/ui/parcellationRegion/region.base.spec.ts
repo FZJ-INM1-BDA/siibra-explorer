@@ -1,4 +1,6 @@
-import { regionInOtherTemplateSelector } from './region.base'
+import { TestBed } from '@angular/core/testing'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { RegionBase, regionInOtherTemplateSelector, getRegionParentParcRefSpace } from './region.base'
 
 const mr1wrong = {
   labelIndex: 1,
@@ -141,9 +143,10 @@ const mtWrong = {
 const mockFetchedTemplates = [ mt0, mt1, mt2, mt3, mtWrong ]
 
 describe('> region.base.ts', () => {
-  describe('> getRegionInOtherTemplatesSelector', () => {
-    describe('> no hemisphere selected, simulates big brain cyto map', () => {
+  describe('> regionInOtherTemplateSelector', () => {
 
+    describe('> no hemisphere selected, simulates big brain cyto map', () => {
+  
       let result: any[]
       beforeAll(() => {
         result = regionInOtherTemplateSelector.projector({ fetchedTemplates: mockFetchedTemplates, templateSelected: mt0 }, { region: mr0 })
@@ -243,6 +246,87 @@ describe('> region.base.ts', () => {
             region: mr0lh
           })
         )
+      })
+    })
+  
+  })
+  
+  describe('> RegionBase', () => {
+    beforeEach(() => {
+      TestBed.configureTestingModule({
+        providers: [
+          provideMockStore()
+        ]
+      })
+    })
+    describe('> position', () => {
+      let regionBase: RegionBase
+      beforeEach(() => {
+        const mockStore = TestBed.inject(MockStore)
+        mockStore.overrideSelector(regionInOtherTemplateSelector, [])
+        mockStore.overrideSelector(getRegionParentParcRefSpace, { template: null, parcellation: null })
+        regionBase = new RegionBase(mockStore)
+      })
+      it('> does not populate if position property is absent', () => {
+        regionBase.region = {
+          ...mr0
+        }
+        expect(regionBase.position).toBeFalsy()
+      })
+
+      describe('> does not populate if position property is malformed', () => {
+
+        it('> if position property is string', () => {
+          regionBase.region = {
+            ...mr0,
+            position: 'hello world'
+          }
+          expect(regionBase.position).toBeFalsy()
+        })
+        it('> if position property is object', () => {
+          regionBase.region = {
+            ...mr0,
+            position: {
+              x: 0,
+              y: 0,
+              z: 0
+            }
+          }
+          expect(regionBase.position).toBeFalsy()
+        })
+
+        it('> if position property is array of incorrect length', () => {
+          regionBase.region = {
+            ...mr0,
+            position: []
+          }
+          expect(regionBase.position).toBeFalsy()
+        })
+
+        it('> if position property is array contain non number elements', () => {
+          regionBase.region = {
+            ...mr0,
+            position: [1, 2, 'hello world']
+          }
+          expect(regionBase.position).toBeFalsy()
+        })
+
+
+        it('> if position property is array contain NaN', () => {
+          regionBase.region = {
+            ...mr0,
+            position: [1, 2, NaN]
+          }
+          expect(regionBase.position).toBeFalsy()
+        })
+      })
+    
+      it('> populates if position property is array with length 3 and non NaN element', () => {
+        regionBase.region = {
+          ...mr0,
+          position: [1, 2, 3]
+        }
+        expect(regionBase.position).toBeTruthy()
       })
     })
   })
