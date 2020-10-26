@@ -11,6 +11,7 @@ import { viewerStateToggleRegionSelect, viewerStateHelperSelectParcellationWithI
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { PureContantService } from "src/util";
+import { verifyPositionArg } from 'common/util'
 
 const defaultPerspectiveZoom = 1e6
 const defaultZoom = 1e6
@@ -374,6 +375,12 @@ export class ViewerStateControllerUseEffect implements OnDestroy {
         if (!position) {
           return generalActionError({
             message: `${region.name} - does not have a position defined`
+          })
+        }
+
+        if (!verifyPositionArg(position)){
+          return generalActionError({
+            message: `${region.name} has malformed position property: ${JSON.stringify(position)}`
           })
         }
 

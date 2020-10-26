@@ -31,9 +31,9 @@
       <mat-divider vertical="true" class="ml-2 h-2rem"></mat-divider>
 
       <!-- position -->
-      <button mat-icon-button *ngIf="region?.position"
+      <button mat-icon-button *ngIf="position"
         (click)="navigateToRegion()"
-        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (region.position | nmToMm | addUnitAndJoin : 'mm')">
+        [matTooltip]="GO_TO_REGION_CENTROID + ': ' + (position | nmToMm | addUnitAndJoin : 'mm')">
         <mat-icon fontSet="fas" fontIcon="fa-map-marked-alt">
         </mat-icon>
       </button>
