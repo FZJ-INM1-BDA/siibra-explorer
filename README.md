@@ -133,6 +133,14 @@ It is recommended to manage your environments with `.env` file.
 | `WAXHOLM_RAT_GOOGLE_SHEET_ID` |
 | `SKIP_RETRY_TEST` | retry tests contains some timeouts, which may slow down tests | 
 
+##### e2e test environments
+
+| name | description | default | example | 
+| --- | --- | --- | --- |
+| PROTRACTOR_SPECS | specs relative to `./e2e/` | `./src/**/*.prod.e2e-spec.js` |  |
+| DISABLE_CHROME_HEADLESS | disable headless chrome, spawns chrome window | `unset` (falsy) | 1 |
+| ENABLE_GPU | uses GPU. nb, in headless mode, will show requirement not met | `unset` (falsy) | 1 |
+
 #### Start dev server
 
 To run a dev server, run:
