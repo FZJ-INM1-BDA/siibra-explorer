@@ -387,7 +387,7 @@
     <ng-template [ngIf]="iavDbDirective?.dataentries?.length === 0
       && !(selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'))">
       <div class="p-4">
-        No additional information on the selected region.
+        {{ CONST.NO_ADDIONTAL_INFO_AVAIL }}
       </div>
     </ng-template>
 

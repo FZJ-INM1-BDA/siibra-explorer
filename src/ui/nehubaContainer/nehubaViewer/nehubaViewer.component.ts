@@ -1,6 +1,6 @@
-import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Renderer2, Optional, Inject } from "@angular/core";
-import { fromEvent, Subscription, ReplaySubject, Subject, BehaviorSubject, Observable } from 'rxjs'
-import { debounceTime, filter, map, scan, startWith, debounce, tap } from "rxjs/operators";
+import { Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, Inject } from "@angular/core";
+import { fromEvent, Subscription, ReplaySubject, BehaviorSubject, Observable } from 'rxjs'
+import { debounceTime, filter, map, scan, startWith, debounce } from "rxjs/operators";
 import { AtlasWorkerService } from "src/atlasViewer/atlasViewer.workerService.service";
 import { StateInterface as ViewerConfiguration } from "src/services/state/viewerConfig.store";
 import { getNgIdLabelIndexFromId } from "src/services/stateStore.service";

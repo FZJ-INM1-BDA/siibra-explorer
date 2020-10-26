@@ -58,6 +58,7 @@
   }
 
   exports.CONST = {
-    REGIONAL_FEATURES: 'Regional features'
+    REGIONAL_FEATURES: 'Regional features',
+    NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`
   }
 })(typeof exports === 'undefined' ? module.exports : exports)
