@@ -190,6 +190,26 @@ class WdLayoutPage extends WdBase{
     }
   }
 
+  /**
+   * Chips
+   */
+  async _getChips(){
+    return await this._browser.findElements(
+      By.css('mat-chip')
+    )
+  }
+
+  async getAllChipsText(){
+    const texts = []
+    const webEls = await this._getChips()
+    for (const el of webEls) {
+      texts.push(
+        await _getTextFromWebElement(el)
+      )
+    }
+    return texts
+  }
+
 
   /**
    * Other

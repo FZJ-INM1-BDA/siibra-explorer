@@ -58,6 +58,7 @@
   }
 
   exports.CONST = {
+    MULTI_REGION_SELECTION: `Multi region selection`,
     REGIONAL_FEATURES: 'Regional features',
     NO_ADDIONTAL_INFO_AVAIL: `Currently, no additional information is linked to this region.`
   }

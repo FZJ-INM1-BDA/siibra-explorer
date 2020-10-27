@@ -218,69 +218,98 @@
           </mat-menu>
 
           <ng-template #selectedRegionTmpl>
-            <ng-container *ngFor="let r of (selectedRegions$ | async)">
 
-              <!-- region chip for discrete map -->
-              <mat-chip
-                iav-region
-                (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
-                [region]="r"
-                class="pe-all position-relative z-index-1 ml-8-n"
-                [ngClass]="{
-                  'darktheme':regionDirective.rgbDarkmode === true,
-                  'lighttheme': regionDirective.rgbDarkmode === false
-                }"
-                [style.backgroundColor]="regionDirective.rgbString"
-                #regionDirective="iavRegion">
-                <span class="iv-custom-comp text text-truncate d-inline pl-4">
-                  {{ r.name }}
-                </span>
-                <mat-icon
-                  class="iv-custom-comp text"
-                  (click)="clearSelectedRegions()"
-                  fontSet="fas"
-                  iav-stop="click"
-                  fontIcon="fa-times">
-                </mat-icon>
-              </mat-chip>
-
-              <!-- chips for previewing origin datasets/continous map -->
-              <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
-                <div class="hidden"
-                  iav-dataset-preview-dataset-file
-                  [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
-                  [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
-                  #previewDirective="iavDatasetPreviewDatasetFile">
-                </div>
-                <mat-chip *ngIf="previewDirective.active"
+            <!-- regions chip -->
+            <ng-template [ngIf]="selectedRegions$ | async" let-selectedRegions="ngIf">
+              <!-- if regions.length > 1 -->
+              <!-- use group chip -->
+              <ng-template [ngIf]="selectedRegions.length > 1" [ngIfElse]="singleRegionTmpl">
+                <mat-chip
+                  color="primary"
+                  selected
                   (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
-                  class="pe-all position-relative ml-8-n">
-                  <span class="pl-4">
-                    {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+                  class="pe-all position-relative z-index-1 ml-8-n">
+                  <span class="iv-custom-comp text text-truncate d-inline pl-4">
+                    {{ CONST.MULTI_REGION_SELECTION }}
                   </span>
-                  <mat-icon (click)="previewDirective.onClick()"
+                  <mat-icon
+                    (click)="clearSelectedRegions()"
                     fontSet="fas"
                     iav-stop="click"
                     fontIcon="fa-times">
                   </mat-icon>
                 </mat-chip>
+              </ng-template>
 
-                <mat-chip *ngFor="let key of clearViewKeys$ | async"
-                  (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
-                  class="pe-all position-relative ml-8-n">
-                  <span class="pl-4">
-                    {{ key }}
-                  </span>
-                  <mat-icon (click)="unsetClearViewByKey(key)"
-                    fontSet="fas"
-                    iav-stop="click"
-                    fontIcon="fa-times">
+              <!-- if reginos.lengt === 1 -->
+              <!-- use single region chip -->
+              <ng-template #singleRegionTmpl>
+                <ng-container *ngFor="let r of selectedRegions">
 
-                  </mat-icon>
-                </mat-chip>
-              </ng-container>
+                  <!-- region chip for discrete map -->
+                  <mat-chip
+                    iav-region
+                    (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                    [region]="r"
+                    class="pe-all position-relative z-index-1 ml-8-n"
+                    [ngClass]="{
+                      'darktheme':regionDirective.rgbDarkmode === true,
+                      'lighttheme': regionDirective.rgbDarkmode === false
+                    }"
+                    [style.backgroundColor]="regionDirective.rgbString"
+                    #regionDirective="iavRegion">
+                    <span class="iv-custom-comp text text-truncate d-inline pl-4">
+                      {{ r.name }}
+                    </span>
+                    <mat-icon
+                      class="iv-custom-comp text"
+                      (click)="clearSelectedRegions()"
+                      fontSet="fas"
+                      iav-stop="click"
+                      fontIcon="fa-times">
+                    </mat-icon>
+                  </mat-chip>
+    
+                  <!-- chips for previewing origin datasets/continous map -->
+                  <ng-container *ngFor="let originDataset of (r.originDatasets || []); let index = index">
+                    <div class="hidden"
+                      iav-dataset-preview-dataset-file
+                      [iav-dataset-preview-dataset-file-kgid]="originDataset.kgId"
+                      [iav-dataset-preview-dataset-file-filename]="originDataset.filename"
+                      #previewDirective="iavDatasetPreviewDatasetFile">
+                    </div>
+                    <mat-chip *ngIf="previewDirective.active"
+                      (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                      class="pe-all position-relative ml-8-n">
+                      <span class="pl-4">
+                        {{ regionDirective.regionOriginDatasetLabels$ | async | renderViewOriginDatasetlabel : index }}
+                      </span>
+                      <mat-icon (click)="previewDirective.onClick()"
+                        fontSet="fas"
+                        iav-stop="click"
+                        fontIcon="fa-times">
+                      </mat-icon>
+                    </mat-chip>
+    
+                    <mat-chip *ngFor="let key of clearViewKeys$ | async"
+                      (click)="uiNehubaContainer.matDrawerMinor.open() && uiNehubaContainer.navSideDrawerMainSwitch.open()"
+                      class="pe-all position-relative ml-8-n">
+                      <span class="pl-4">
+                        {{ key }}
+                      </span>
+                      <mat-icon (click)="unsetClearViewByKey(key)"
+                        fontSet="fas"
+                        iav-stop="click"
+                        fontIcon="fa-times">
+    
+                      </mat-icon>
+                    </mat-chip>
+                  </ng-container>
+    
+                </ng-container>
+              </ng-template>
+            </ng-template>
 
-            </ng-container>
           </ng-template>
 
           <ng-template #selectedDatasetPreview let-layers="layers">

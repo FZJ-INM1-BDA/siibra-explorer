@@ -33,7 +33,7 @@ import { colorAnimation } from "./atlasViewer.animation"
 import { MouseHoverDirective } from "src/atlasViewer/mouseOver.directive";
 import {MatSnackBar, MatSnackBarRef} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, CONST } from 'common/constants'
 
 export const NEHUBA_CLICK_OVERRIDE: InjectionToken<(next: () => void) => void> = new InjectionToken('NEHUBA_CLICK_OVERRIDE')
 
@@ -66,6 +66,7 @@ const compareFn = (it, item) => it.name === item.name
 
 export class AtlasViewer implements OnDestroy, OnInit, AfterViewInit {
 
+  public CONST = CONST
   public CONTEXT_MENU_ARIA_LABEL = ARIA_LABELS.CONTEXT_MENU
   public compareFn = compareFn
 

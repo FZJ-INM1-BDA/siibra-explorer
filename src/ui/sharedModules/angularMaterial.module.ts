@@ -1,6 +1,6 @@
 import {MAT_DIALOG_DEFAULT_OPTIONS, MatDialogConfig, MatDialogModule} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
-import {MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS} from "@angular/material/snack-bar";
+import {MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatCardModule} from "@angular/material/card";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatTabsModule} from "@angular/material/tabs";
@@ -96,11 +96,6 @@ const defaultDialogOption: MatDialogConfig = new MatDialogConfig()
       ...defaultDialogOption,
       panelClass: 'iav-dialog-class',
     },
-  },{
-    provide: MAT_SNACK_BAR_DEFAULT_OPTIONS,
-    useValue: {
-      duration: 2500
-    }
   }],
 })
 export class AngularMaterialModule { }
