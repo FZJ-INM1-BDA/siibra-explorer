@@ -13,9 +13,7 @@ export const PARSING_SEARCHPARAM_ERROR = {
 const PARSING_SEARCHPARAM_WARNING = {
   UNKNOWN_PARCELLATION: 'UNKNOWN_PARCELLATION',
   DECODE_CIPHER_ERROR: 'DECODE_CIPHER_ERROR',
-  ID_ERROR: 'ID_ERROR',
-
-  DEPRECATION_ERROR: `DEPRECATION_ERROR`
+  ID_ERROR: 'ID_ERROR'
 }
 
 export const CVT_STATE_TO_SEARCHPARAM_ERROR = {
@@ -92,7 +90,7 @@ export const cvtStateToSearchParam = (state: any): URLSearchParams => {
 }
 
 const { TEMPLATE_NOT_FOUND, TEMPALTE_NOT_SET, PARCELLATION_NOT_UPDATED } = PARSING_SEARCHPARAM_ERROR
-const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR, ID_ERROR, DEPRECATION_ERROR } = PARSING_SEARCHPARAM_WARNING
+const { UNKNOWN_PARCELLATION, DECODE_CIPHER_ERROR, ID_ERROR } = PARSING_SEARCHPARAM_WARNING
 
 const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchParams, state: IavRootStoreInterface, cb?: (arg: any) => void) => {
 
@@ -195,13 +193,7 @@ const parseSearchParamForTemplateParcellationRegion = (searchparams: URLSearchPa
   return {
     templateSelected,
     parcellationSelected,
-    regionsSelected: (() => {
-      if (regionsSelected.length > 1) {
-        cb({ type: DEPRECATION_ERROR,  message: `Selecting multiple regions has been temporarily disabled in v2.3.0` })
-        return []
-      }
-      return regionsSelected
-    })()
+    regionsSelected
   }
 }
 
