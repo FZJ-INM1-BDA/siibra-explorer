@@ -12,7 +12,7 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { AuthService } from "src/auth";
 import { IavRootStoreInterface, IDataEntry } from "src/services/stateStore.service";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
 import {MatBottomSheet} from "@angular/material/bottom-sheet";
 
 @Component({
@@ -77,13 +77,15 @@ export class SigninBanner {
 
   private dialogRef: MatDialogRef<any>
 
-  public openTmplWithDialog(tmpl: TemplateRef<any>) {
+  public openTmplWithDialog(tmpl: TemplateRef<any>, overwriteConfig?: Partial<MatDialogConfig>) {
     this.dialogRef && this.dialogRef.close()
 
-    if (tmpl) { this.dialogRef = this.dialog.open(tmpl, {
-      autoFocus: false,
-      panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
-    })
+    if (tmpl) {
+      this.dialogRef = this.dialog.open(tmpl, {
+        autoFocus: false,
+        panelClass: ['col-12', 'col-sm-12', 'col-md-8', 'col-lg-6', 'col-xl-4'],
+        ...overwriteConfig
+      })
     }
   }
 

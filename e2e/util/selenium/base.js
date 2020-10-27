@@ -349,7 +349,7 @@ class WdBase{
     // should wait for async operations to end 
     if (!doNotAutomate) {
       await this.wait(200)
-      await this.dismissModal()
+      await this.clearAlerts()
       await this.wait(200)
 
       if (forceTimeout) {

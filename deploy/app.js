@@ -19,6 +19,7 @@ const DOC_PUBLIC_PATH = process.env.NODE_ENV === 'production'
   : path.join(__dirname, '..', 'site')
 
 app.use('/docs', express.static(DOC_PUBLIC_PATH))
+app.use('/quickstart', require('./quickstart'))
 
 const hash = string => crypto.createHash('sha256').update(string).digest('hex')
 

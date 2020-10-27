@@ -14,7 +14,9 @@ export class MarkdownDom implements AfterViewChecked {
 
   @Input() public markdown: string = ``
   public innerHtml: string = ``
-  private converter = new showdown.Converter()
+  private converter = new showdown.Converter({
+    tables: true
+  })
 
   constructor(
     private cdr: ChangeDetectorRef

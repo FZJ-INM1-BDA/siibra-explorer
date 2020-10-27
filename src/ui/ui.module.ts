@@ -86,6 +86,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RegionDirective } from "./parcellationRegion/region.directive";
 import { RenderViewOriginDatasetLabelPipe } from "./parcellationRegion/region.base";
 import { RegionAccordionTooltipTextPipe } from './util'
+import { HelpOnePager } from "./helpOnePager/helpOnePager.component";
 
 @NgModule({
   imports : [
@@ -142,6 +143,7 @@ import { RegionAccordionTooltipTextPipe } from './util'
     SimpleRegionComponent,
     RegionListSimpleViewComponent,
     LandmarkUIComponent,
+    HelpOnePager,
 
     ActionDialog,
 
