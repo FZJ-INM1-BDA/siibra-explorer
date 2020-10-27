@@ -24,14 +24,25 @@
       <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
       </ng-container>
     </div>
+
+    <!-- help one pager -->
+    <div iav-fab-speed-dial-child>
+      <ng-container *ngTemplateOutlet="helpBtnTmpl">
+      </ng-container>
+    </div>
   </div>
+</ng-template>
+
+<!-- help one pager -->
+<ng-template #helperOnePager>
+  <help-one-pager></help-one-pager>
 </ng-template>
 
 <ng-template #fullTmpl>
 
   <div class="d-flex flex-row-reverse"
     [iav-key-listener]="keyListenerConfig"
-    (iav-key-event)="openTmplWithDialog(helpComponent)">
+    (iav-key-event)="openTmplWithDialog(helperOnePager)">
 
     <!-- signin -->
     <ng-container *ngTemplateOutlet="signinBtnTmpl">
@@ -43,6 +54,10 @@
 
     <!-- pinned dataset -->
     <ng-container *ngTemplateOutlet="pinnedDatasetBtnTmpl">
+    </ng-container>
+
+    <!-- help one pager -->
+    <ng-container *ngTemplateOutlet="helpBtnTmpl">
     </ng-container>
   </div>
 </ng-template>
@@ -103,6 +118,21 @@
   </div>
 </ng-template>
 
+<ng-template #helpBtnTmpl>
+
+  <div class="btnWrapper"
+    (click)="openTmplWithDialog(helperOnePager)"
+    matTooltip="Quickstart">
+    <iav-dynamic-mat-button
+      [iav-dynamic-mat-button-style]="matBtnStyle"
+      [iav-dynamic-mat-button-color]="matBtnColor"
+      iav-dynamic-mat-button-aria-label="Show help dialog">
+
+      <i class="far fa-question-circle"></i>
+    </iav-dynamic-mat-button>
+  </div>
+</ng-template>
+
 <!-- plugin dropdownmenu -->
 <mat-menu #pluginDropdownMenu
   [aria-label]="'Tools and plugins menu'">
@@ -135,17 +165,17 @@
   </button>
 
   <button mat-menu-item
-    (click)="openTmplWithDialog(helpComponent)">
+    (click)="openTmplWithDialog(aboutComponent)">
     <mat-icon fontSet="fas" fontIcon="fa-info"></mat-icon>
     About
   </button>
 </mat-menu>
 
-<ng-template #helpComponent>
+<ng-template #aboutComponent>
   <h2 mat-dialog-title>About Interactive Viewer</h2>
   <mat-dialog-content>
     <mat-tab-group>
-      <mat-tab label="Help">
+      <mat-tab label="About">
         <help-component>
         </help-component>
       </mat-tab>

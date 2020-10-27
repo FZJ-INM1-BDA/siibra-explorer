@@ -1,0 +1,19 @@
+<markdown-dom [markdown]="QUICK_STARTER_MD">
+</markdown-dom>
+
+<div mat-dialog-actions align="center">
+
+  <a *ngIf="extQuickStarter"
+    [href]="extQuickStarter"
+    target="_blank">
+    <button mat-raised-button
+      color="primary">
+      <span>
+        Open in new window
+      </span>
+      <i class = "fas fa-external-link-alt"></i>
+    </button>
+  </a>
+
+  <button mat-button mat-dialog-close cdkFocusInitial>close</button>
+</div>

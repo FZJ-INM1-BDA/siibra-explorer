@@ -7,3 +7,4 @@ const {
 
 exports.AtlasPage = AtlasPage
 exports.LayoutPage = LayoutPage
+exports.BasePage = BasePage
