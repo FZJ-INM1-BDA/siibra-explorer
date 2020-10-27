@@ -66,7 +66,21 @@ export class DatabrowserService implements OnDestroy {
   public createDatabrowser: (arg: {regions: any[], template: any, parcellation: any}) => {dataBrowser: ComponentRef<DataBrowser>, widgetUnit: ComponentRef<WidgetUnit>}
   public getDataByRegion: ({ regions, parcellation, template }: {regions: any[], parcellation: any, template: any}) => Promise<IDataEntry[]> = ({regions, parcellation, template}) => 
     forkJoin(regions.map(this.getDatasetsByRegion.bind(this))).pipe(
-      map((arrOfArr: IDataEntry[][]) => arrOfArr.reduce((acc, curr) => acc.concat(curr), []))
+      map(
+        (arrOfArr: IDataEntry[][]) => arrOfArr.reduce(
+          (acc, curr) => {
+            /**
+             * In the event of multi region selection
+             * It is entirely possibly that different regions can fetch the same dataset
+             * If that's the case, filter by fullId attribute
+             */
+            const existSet = new Set(acc.map(v => v['fullId']))
+            const filteredCurr = curr.filter(v => !existSet.has(v['fullId']))
+            return acc.concat(filteredCurr)
+          },
+          []
+        )
+      )
     ).toPromise()
 
   private filterDEByRegion: FilterDataEntriesByRegion = new FilterDataEntriesByRegion()
@@ -257,14 +271,21 @@ export class DatabrowserService implements OnDestroy {
   public fetchingFlag: boolean = false
   private mostRecentFetchToken: any
 
+  private memoizedDatasetByRegion = new Map<string, Observable<IDataEntry>>()
   private getDatasetsByRegion(region: { fullId: string }){
-    return this.http.get<IDataEntry>(
-      `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(getIdFromFullId(region.fullId))}`,
+    const fullId = getIdFromFullId(region.fullId)
+    if (this.memoizedDatasetByRegion.has(fullId)) return this.memoizedDatasetByRegion.get(fullId)
+    const obs$ =  this.http.get<IDataEntry>(
+      `${this.constantService.backendUrl}datasets/byRegion/${encodeURIComponent(fullId)}`,
       {
         headers: this.constantService.getHttpHeader(),
         responseType: 'json'
       }
+    ).pipe(
+      shareReplay(1),
     )
+    this.memoizedDatasetByRegion.set(fullId, obs$)
+    return obs$
   }
 
   private lowLevelQuery(templateName: string, parcellationName: string): Promise<IDataEntry[]> {

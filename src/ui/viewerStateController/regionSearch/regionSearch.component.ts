@@ -11,7 +11,7 @@ import { MatDialog } from "@angular/material/dialog";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PureContantService } from "src/util";
 import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
-import { ARIA_LABELS } from 'common/constants'
+import { ARIA_LABELS, CONST } from 'common/constants'
 
 const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
@@ -30,7 +30,10 @@ const compareFn = (it, item) => it.name === item.name
 export class RegionTextSearchAutocomplete {
 
   public renderInputText(regionsSelected: any[]){
-    return regionsSelected && regionsSelected.length > 0 && regionsSelected[0].name || ''
+    if (!regionsSelected) return ''
+    if (regionsSelected.length === 0) return ''
+    if (regionsSelected.length === 1) return regionsSelected[0].name || ''
+    return CONST.MULTI_REGION_SELECTION
   }
 
   public manualRenderList$: Subject<any> = new Subject()

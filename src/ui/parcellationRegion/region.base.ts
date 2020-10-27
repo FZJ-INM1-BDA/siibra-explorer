@@ -220,6 +220,7 @@ export const regionInOtherTemplateSelector = createSelector(
 
     const regionOfInterestId = getIdFromFullId(regionOfInterest.fullId)
     const { fetchedTemplates, templateSelected } = viewerState
+    if (!templateSelected) return []
     const selectedTemplateId = getIdFromFullId(templateSelected.fullId)
     const otherTemplates = fetchedTemplates.filter(({ fullId }) => getIdFromFullId(fullId) !== selectedTemplateId)
     for (const template of otherTemplates) {
