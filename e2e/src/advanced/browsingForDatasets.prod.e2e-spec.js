@@ -109,7 +109,7 @@ describe('> dataset browser', () => {
           await iavPage.selectSearchRegionAutocompleteWithText()
           await retry(async () => {
             await iavPage.dismissModal()
-            await iavPage.toggleExpansionPanelState(`${CONST.REGIONAL_FEATURES}`)
+            await iavPage.toggleExpansionPanelState(`${CONST.REGIONAL_FEATURES}`, true)
           }, {
             timeout: 2000,
             retries: 10
