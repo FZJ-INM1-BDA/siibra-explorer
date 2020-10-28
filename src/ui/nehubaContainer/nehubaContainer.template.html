@@ -199,7 +199,11 @@
 
       <!-- single-region-wrapper -->
       <ng-template [ngIf]="selectedRegions.length === 1" [ngIfElse]="multiRegionWrapperTmpl">
-        <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: selectedRegions[0] }">
+        <!-- a series of bugs result in requiring this hacky -->
+        <!-- see https://github.com/HumanBrainProject/interactive-viewer/issues/698 -->
+        <ng-container *ngFor="let region of selectedRegions">
+          <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: region }">
+          </ng-container>
         </ng-container>
       </ng-template>
       
@@ -212,7 +216,7 @@
         <!-- This is a wrapper for multiregion consisting of {{ selectedRegions.length }} regions -->
       </ng-template>
 
-      <!-- place holder if length < 0 -->
+      <!-- place holder if length === 0 -->
       <ng-container *ngIf="selectedRegions.length === 0">
         <ng-container *ngTemplateOutlet="singleRegionTmpl; context: { region: false }">
         </ng-container>
@@ -329,10 +333,8 @@
     </mat-expansion-panel-header>
 
     <!-- content -->
-    <ng-template matExpansionPanelContent>
-      <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
-      </ng-container>
-    </ng-template>
+    <ng-container *ngTemplateOutlet="content; context: { expansionPanel: expansionPanel }">
+    </ng-container>
   </mat-expansion-panel>
 </ng-template>
 
