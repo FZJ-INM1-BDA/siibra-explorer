@@ -210,6 +210,17 @@ class WdLayoutPage extends WdBase{
     return texts
   }
 
+  async getAllChipsVisibility(){
+    const visibility = []
+    const webEls = await this._getChips()
+    for (const el of webEls) {
+      visibility.push(
+        await el.isDisplayed()
+      )
+    }
+    return visibility
+  }
+
 
   /**
    * Other
