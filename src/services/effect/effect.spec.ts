@@ -74,7 +74,7 @@ describe('effect.ts', () => {
         }
       )
       expect(
-        useEffectsInstance.onParcellationSelected$
+        useEffectsInstance.onParcChange$
       ).toBeObservable(
         hot(
           'aa',
