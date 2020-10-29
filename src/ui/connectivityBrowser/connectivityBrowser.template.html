@@ -4,8 +4,7 @@
             *ngIf="regionName"
             [region]="regionName"
             theme="dark"
-            loadurl="https://connectivityquery-connectivity.apps-dev.hbp.eu/connectivity"
-            dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies"
+            [loadurl]="loadUrl"
             show-export="true"
             show-source="false"
             show-title="false"
@@ -30,16 +29,16 @@
                                 (selectionChange)="changeDataset($event)">
                             <mat-option
                                     *ngFor="let dataset of datasetList"
-                                    [value]="dataset">
-                                {{ dataset.title }}
+                                    [value]="dataset.name">
+                                {{ dataset.name }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-                <ng-container *ngIf="selectedDataset && selectedDataset.description" >
+                <ng-container *ngIf="selectedDataset && selectedDatasetDescription" >
                     <button class="flex-grow-0 flex-shrink-0" mat-icon-button
                             iav-dataset-show-dataset-dialog
-                            [iav-dataset-show-dataset-dialog-name]="selectedDataset.title"
-                            [iav-dataset-show-dataset-dialog-description]="selectedDataset.description">
+                            [iav-dataset-show-dataset-dialog-name]="selectedDataset"
+                            [iav-dataset-show-dataset-dialog-description]="selectedDatasetDescription">
                         <i class="fas fa-info"></i>
                     </button>
                     <button class="flex-grow-0 flex-shrink-0"
@@ -84,7 +83,9 @@
         </div>
     </hbp-connectivity-matrix-row>
     <full-connectivity-grid #fullConnectivityGrid
-                            dataset-url="https://connectivityquery-connectivity.apps-dev.hbp.eu/studies"
+                            [loadurl]="fullConnectivityLoadUrl"
+                            [name]="selectedDataset"
+                            [description]="selectedDatasetDescription"
                             onlyExport="true">
     </full-connectivity-grid>
 </div>

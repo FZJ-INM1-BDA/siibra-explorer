@@ -499,6 +499,7 @@
           <connectivity-browser class="pe-all flex-shrink-1"
             [region]="region"
             (setOpenState)="expansionPanel.expanded = $event"
+            (connectivityNumberReceived)="connectivityNumber = $event"
             [accordionExpanded]="expansionPanel.expanded"
             #connectivityComponent>
           </connectivity-browser>
@@ -508,7 +509,7 @@
 
     <ng-container *ngTemplateOutlet="ngMatAccordionTmpl; context: {
       title: 'Connectivity',
-      desc: connectedCounterDir.value,
+      desc: connectivityNumber? connectivityNumber : connectedCounterDir.value,
       iconClass: 'fas fa-braille',
       iconTooltip: connectedCounterDir.value | regionAccordionTooltipTextPipe : 'connectivity',
       iavNgIf: selectedParcellation?.hasAdditionalViewMode?.includes('connectivity'),

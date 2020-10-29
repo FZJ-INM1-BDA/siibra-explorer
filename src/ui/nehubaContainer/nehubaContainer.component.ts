@@ -288,6 +288,7 @@ export class NehubaContainer implements OnInit, OnChanges, OnDestroy {
   public hoveredPanelIndices$: Observable<number>
 
   @ViewChild('connectivityComponent') public connectivityComponent: ConnectivityBrowserComponent
+  public connectivityNumber: string
 
   constructor(
     private pureConstantService: PureContantService,
