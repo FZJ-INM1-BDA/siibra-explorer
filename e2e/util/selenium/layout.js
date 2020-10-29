@@ -1,13 +1,50 @@
 const { WdBase } = require('./base')
 const {
   _getIndexFromArrayOfWebElements,
-  _getTextFromWebElement
+  _getTextFromWebElement,
+  _compareText
 } = require('./util')
 const { ARIA_LABELS } = require('../../../common/constants')
 
 class WdLayoutPage extends WdBase{
   constructor(){
     super()
+  }
+
+  /**
+   * Dropdown
+   */
+  /**
+   * 
+   * @param {string} cssSelector for the mat-select DOM element 
+   * @param {string|RegExp} optionStrRegExp substring that option's text node contains, or regexp whose .test method will be called on text node of the option
+   * @returns void
+   * @description finds a mat-select DOM element, then selects a mat-option attached to the mat-select element
+   */
+  async selectDropdownOption(cssSelector, optionStrRegExp){
+    if (!cssSelector) throw new Error(`cssSelector is required for selectDropdownOption method`)
+    const selectEl = await this._browser.findElement(
+      By.css(cssSelector)
+    )
+    if (!selectEl) throw new Error(`element with ${cssSelector} could not be found`)
+    const tagName = await selectEl.getTagName()
+    if (tagName !== 'mat-select') throw new Error(`cssSelector ${cssSelector} did not return a mat-select element, but returned a tagName element`)
+    await selectEl.click()
+    await this.wait(500)
+    const ariaOwnsAttr = await selectEl.getAttribute('aria-owns')
+
+    const opts = []
+    for (const ariaOwnEntry of ariaOwnsAttr.split(' ')) {
+      const matOpt = await this._browser.findElement(
+        By.css(`mat-option#${ariaOwnEntry}`)
+      )
+      const txt = await matOpt.getText()
+      if (_compareText(txt, optionStrRegExp)) {
+        await matOpt.click()
+        return
+      }
+    }
+    throw new Error(`option ${optionStrRegExp} not found.`)
   }
 
   /**
@@ -292,6 +329,7 @@ class WdLayoutPage extends WdBase{
        * if not at title screen
        * select from dropdown
        */
+      await this.selectDropdownOption(`[aria-label="${ARIA_LABELS.SELECT_ATLAS}"]`, atlasName)
     }
 
     if (templateName) {

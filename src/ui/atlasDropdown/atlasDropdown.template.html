@@ -1,9 +1,9 @@
 <mat-form-field>
   <mat-label>
-    Atlas
+    {{ SELECT_ATLAS_ARIA_LABEL }}
   </mat-label>
   <mat-select
-    [attr.aria-label]="SELECT_ATLAS_ARIA_LABEL"
+    [aria-label]="SELECT_ATLAS_ARIA_LABEL"
     [value]="selectedAtlas$ | async | mapToProperty"
     (selectionChange)="handleChangeAtlas($event)">
     <mat-option
