@@ -211,9 +211,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
               // ToDo Fix in future to use component
-              console.log('searching...')
               const a = document.querySelector('hbp-connectivity-matrix-row')
-              console.log(a)
               a.downloadCSV()
             }
           }),
