@@ -9,6 +9,7 @@ import { MatBottomSheet } from "@angular/material/bottom-sheet";
 import { MatDialog } from "@angular/material/dialog";
 import { ARIA_LABELS } from 'common/constants'
 import { PureContantService } from "src/util";
+import { FormControl } from "@angular/forms";
 
 @Component({
   selector : 'ui-status-card',
@@ -65,6 +66,12 @@ export class StatusCardComponent implements OnInit, OnChanges{
         this.selectedTemplateRoot = template.find(t => t.name === this.selectedTemplateName)
       })
     )
+
+    this.subscriptions.push(
+      this.statusPanelFormCtrl.valueChanges.subscribe(val => {
+        this.statusPanelRealSpace = val
+      })
+    )
   }
 
   ngOnChanges() {
@@ -104,8 +111,11 @@ export class StatusCardComponent implements OnInit, OnChanges{
     )
   }
 
-  public statusPanelRealSpace$ = new BehaviorSubject(true)
-  public statusPanelRealSpace: boolean = true
+  statusPanelFormCtrl = new FormControl(true, [])
+  public statusPanelRealSpace = true
+  public statusPanelRealSpace$ = this.statusPanelFormCtrl.valueChanges.pipe(
+    startWith(true)
+  )
 
   public textNavigateTo(string: string) {
     if (string.split(/[\s|,]+/).length >= 3 && string.split(/[\s|,]+/).slice(0, 3).every(entry => !isNaN(Number(entry.replace(/mm/, ''))))) {

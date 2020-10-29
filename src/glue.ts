@@ -358,7 +358,8 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
         return {
           ...json,
           filename,
-          datasetId
+          datasetId,
+          datasetSchema
         }
       }),
       catchError((_err, _obs) => of(null))
@@ -589,6 +590,7 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   }
 
   private openDatasetPreviewWidget(data: IDatasetPreviewData) {
+    console.log({ data })
     const { datasetId: kgId, filename } = data
 
     if (!!this.actionOnWidget) {
@@ -645,9 +647,10 @@ export class DatasetPreviewGlue implements IDatasetPreviewGlue, OnDestroy{
   public displayDatasetPreview(previewFile: DatasetPreview, dataset: IKgDataEntry){
     const { filename, datasetId } = previewFile
     const { fullId } = dataset
-    const { kgId } = getIdObj(fullId)
+    const { kgId, kgSchema } = getIdObj(fullId)
 
     const datasetPreviewFile = {
+      datasetSchema: kgSchema,
       datasetId: datasetId || kgId,
       filename
     }

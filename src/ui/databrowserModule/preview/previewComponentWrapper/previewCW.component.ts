@@ -80,6 +80,8 @@ export class PreviewComponentWrapper{
       this.backendUrl = backendUrl
       this.datasetName = datasetName
     }
+
+    this.backendUrl = this.backendUrl || DS_PREVIEW_URL
   }
 
   public downloadHref: SafeResourceUrl

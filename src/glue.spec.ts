@@ -687,6 +687,7 @@ describe('> glue.ts', () => {
               ...nifti,
               filename: region1.originDatasets[0].filename,
               datasetId: region1.originDatasets[0].kgId,
+              datasetSchema: kgSchema,
             } ]
           })
         )

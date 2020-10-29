@@ -185,9 +185,9 @@ module.exports = [
     "parcellationRegion": [
       {
         "species": [],
-        "name": "Area hOc1",
+        "name": "Area hOc1 (V1, 17, CalcS)",
         "alias": null,
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/b851eb9d-9502-45e9-8dd8-2861f0e6da3f"
+        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/5151ab8f-d8cb-4e67-a449-afe2a41fb007"
       }
     ],
     "species": [
@@ -297,9 +297,9 @@ module.exports = [
     "parcellationRegion": [
       {
         "species": [],
-        "name": "Area 44d",
+        "name": "Area 44 (IFG)",
         "alias": null,
-        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/8aeae833-81c8-4e27-a8d6-deee339d6052"
+        "fullId": "https://nexus.humanbrainproject.org/v0/data/minds/core/parcellationregion/v1.0.0/8a6be82c-5947-4fff-8348-cf9bf73e4f40"
       }
     ],
     "species": [
