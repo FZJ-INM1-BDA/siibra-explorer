@@ -4,7 +4,7 @@
             *ngIf="regionName"
             [region]="regionName"
             theme="dark"
-            [loadurl]="getLoadUrl()"
+            [loadurl]="loadUrl"
             show-export="true"
             show-source="false"
             show-title="false"
@@ -83,7 +83,7 @@
         </div>
     </hbp-connectivity-matrix-row>
     <full-connectivity-grid #fullConnectivityGrid
-                            [loadurl]="getFullConnectivityLoadUrl()"
+                            [loadurl]="fullConnectivityLoadUrl"
                             [name]="selectedDataset"
                             [description]="selectedDatasetDescription"
                             onlyExport="true">

@@ -37,7 +37,7 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
      */
     private _isFirstUpdate = true
 
-    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies'
+    public connectivityUrl = 'http://localhost:5000/v1.1/studies'
 
     @Input()
     set accordionExpanded(flag: boolean){
@@ -117,30 +117,17 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
       )
     }
 
+    public loadUrl: string
+    public fullConnectivityLoadUrl: string
+
     ngOnInit(): void {
       this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
         this.datasetList = res
         this.selectedDataset = this.datasetList[0].name
         this.selectedDatasetDescription = this.datasetList[0].description
+
+        this.changeDataset()
       })
-    }
-
-    getLoadUrl(): string {
-      if (this.datasetList.length && this.selectedDataset) {
-        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
-        const url = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}` : null
-        this.connectivityLoadUrl.emit(url)
-        return url
-      }
-    }
-
-    getFullConnectivityLoadUrl(): string {
-      if (this.datasetList.length && this.selectedDataset) {
-        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
-        const url = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}/full_matrix` : null
-        this.connectivityLoadUrl.emit(url)
-        return url
-      }
     }
 
     public ngAfterViewInit(): void {
@@ -224,9 +211,19 @@ export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDe
     }
     
     // ToDo Affect on component
-    changeDataset(event) {
-      this.selectedDataset = event.value
-      this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
+    changeDataset(event = null) {
+      if (event) {
+        this.selectedDataset = event.value
+        this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
+      }
+      if (this.datasetList.length && this.selectedDataset) {
+        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
+        const url = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}` : null
+        this.connectivityLoadUrl.emit(url)
+        this.loadUrl = url
+
+        this.fullConnectivityLoadUrl = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}/full_matrix` : null
+      }
     }
 
     navigateToRegion(region) {
