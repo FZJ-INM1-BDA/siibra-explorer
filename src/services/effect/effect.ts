@@ -6,7 +6,7 @@ import { filter, map, shareReplay, switchMap, take, withLatestFrom, mapTo, disti
 import { LoggingService } from "src/logging";
 import { ADD_TO_REGIONS_SELECTION_WITH_IDS, DESELECT_REGIONS, NEWVIEWER, SELECT_PARCELLATION, SELECT_REGIONS, SELECT_REGIONS_WITH_ID, SELECT_LANDMARKS } from "../state/viewerState.store";
 import { generateLabelIndexId, getNgIdLabelIndexFromId, IavRootStoreInterface, recursiveFindRegionWithLabelIndexId } from '../stateStore.service';
-import { viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
+import { viewerStateSelectAtlas, viewerStateSetSelectedRegionsWithIds, viewerStateToggleLayer } from "../state/viewerState.store.helper";
 
 @Injectable({
   providedIn: 'root',
@@ -213,13 +213,16 @@ export class UseEffects implements OnDestroy {
    * side effect of selecting a parcellation means deselecting all regions
    */
   @Effect()
-  public onParcellationSelected$ = merge(
+  public onParcChange$ = merge(
     this.actions$.pipe(
       ofType(viewerStateToggleLayer.type)
     ),
     this.parcellationSelected$,
     this.actions$.pipe(
       ofType(NEWVIEWER)
+    ),
+    this.actions$.pipe(
+      ofType(viewerStateSelectAtlas)
     )
   ).pipe(
     mapTo({

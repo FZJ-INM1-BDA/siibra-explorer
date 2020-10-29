@@ -12,7 +12,14 @@ async function _getIndexFromArrayOfWebElements(search, webElements) {
       : text.indexOf(search) >= 0)
 }
 
+function _compareText(textString, testStrRegExp){
+  return testStrRegExp instanceof RegExp
+    ? testStrRegExp.test(textString)
+    : textString.indexOf(testStrRegExp) >= 0
+}
+
 module.exports = {
   _getTextFromWebElement,
-  _getIndexFromArrayOfWebElements
+  _getIndexFromArrayOfWebElements,
+  _compareText
 }

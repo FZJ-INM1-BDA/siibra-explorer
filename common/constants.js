@@ -21,7 +21,7 @@
     CLEAR_SELECTED_REGION: 'Clear selected region',
 
     // overlay/layout specific
-    SELECT_ATLAS: 'Select a different atlas',
+    SELECT_ATLAS: 'Atlas',
     CONTEXT_MENU: `Viewer context menu`,
     TOGGLE_FRONTAL_OCTANT: `Toggle perspective view frontal octant`,
     ZOOM_IN: 'Zoom in',

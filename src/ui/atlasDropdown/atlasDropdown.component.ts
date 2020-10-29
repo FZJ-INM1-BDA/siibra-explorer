@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 import { viewerStateHelperStoreName, viewerStateSelectAtlas } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS } from 'common/constants'
+import { viewerStateGetSelectedAtlas } from "src/services/state/viewerState/selectors";
 
 @Component({
   selector: 'atlas-dropdown-selector',
@@ -27,11 +28,7 @@ export class AtlasDropdownSelector{
       distinctUntilChanged()
     )
     this.selectedAtlas$ = this.store$.pipe(
-      select(viewerStateHelperStoreName),
-      distinctUntilChanged(),
-      select(({ selectedAtlasId, fetchedAtlases }) => {
-        return fetchedAtlases.find(atlas => atlas['@id'] === selectedAtlasId)
-      })
+      select(viewerStateGetSelectedAtlas)
     )
   }
 
