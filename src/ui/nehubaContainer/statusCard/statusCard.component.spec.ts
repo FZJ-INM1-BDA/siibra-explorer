@@ -6,11 +6,13 @@ import { Directive, Component } from "@angular/core"
 import { of } from "rxjs"
 import { ShareModule } from "src/share"
 import { StateModule } from "src/state"
-import { provideMockStore } from "@ngrx/store/testing"
+import { MockStore, provideMockStore } from "@ngrx/store/testing"
 import { By } from "@angular/platform-browser"
 import { MatSlideToggle } from "@angular/material/slide-toggle"
 import { NoopAnimationsModule } from "@angular/platform-browser/animations"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
+import { UtilModule } from "src/util"
+import { viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper"
 
 @Directive({
   selector: '[iav-auth-authState]',
@@ -40,6 +42,7 @@ describe('> statusCard.component.ts', () => {
           FormsModule,
           ReactiveFormsModule,
           NoopAnimationsModule,
+          UtilModule,
         ],
         declarations: [
           StatusCardComponent,
@@ -57,15 +60,26 @@ describe('> statusCard.component.ts', () => {
         ]
       }).compileComponents()
     }))
+
+    beforeEach(() => {
+
+      const mockStore = TestBed.inject(MockStore)
+      mockStore.overrideSelector(viewerConfigSelectorUseMobileUi, false)
+
+    })
+
     it('> can be instantiated', () => {
       const fixture = TestBed.createComponent(StatusCardComponent)
       expect(fixture.debugElement.nativeElement).toBeTruthy()
     })
 
-    it('> toggle can be found', () => {
+    it('> toggle can be found if showFull is set to true', () => {
       
       const fixture = TestBed.createComponent(StatusCardComponent)
       fixture.detectChanges()
+      fixture.componentInstance.showFull = true
+      fixture.detectChanges()
+      
       const slider = fixture.debugElement.query( By.directive(MatSlideToggle) )
       expect(slider).toBeTruthy()
     })
@@ -74,6 +88,9 @@ describe('> statusCard.component.ts', () => {
 
       const fixture = TestBed.createComponent(StatusCardComponent)
       fixture.detectChanges()
+      fixture.componentInstance.showFull = true
+      fixture.detectChanges()
+      
       const prevFlag = fixture.componentInstance.statusPanelRealSpace
       const sliderEl = fixture.debugElement.query( By.directive(MatSlideToggle) )
       const slider = sliderEl.injector.get(MatSlideToggle)

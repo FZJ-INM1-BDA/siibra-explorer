@@ -1511,6 +1511,15 @@
                                   "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
                                 }
                               },
+                              "relatedAreas":[{
+                                "name": "Area 7A",
+                                "fullId": {
+                                  "kg": {
+                                    "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                    "kgId": "811f4adb-4a7c-45c1-8034-4afa9edf586a"
+                                  }
+                                }
+                              }],
                               "_": {
                                 "xml": {
                                   "name": "Area 7A (SPL)",
@@ -1546,6 +1555,15 @@
                                   "kgId": "e26e999f-77ad-4934-9569-8290ed05ebda"
                                 }
                               },
+                              "relatedAreas":[{
+                                "name": "Area 7A",
+                                "fullId": {
+                                  "kg": {
+                                    "kgSchema": "minds/core/parcellationregion/v1.0.0",
+                                    "kgId": "811f4adb-4a7c-45c1-8034-4afa9edf586a"
+                                  }
+                                }
+                              }],
                               "_": {
                                 "xml": {
                                   "name": "Area 7A (SPL)",

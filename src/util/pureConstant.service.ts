@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from "@angular/core";
 import { Store, createSelector, select } from "@ngrx/store";
 import { Observable, merge, Subscription, of, throwError, forkJoin, fromEvent } from "rxjs";
-import { VIEWER_CONFIG_FEATURE_KEY, IViewerConfigState } from "src/services/state/viewerConfig.store.helper";
+import { VIEWER_CONFIG_FEATURE_KEY, IViewerConfigState, viewerConfigSelectorUseMobileUi } from "src/services/state/viewerConfig.store.helper";
 import { shareReplay, tap, scan, catchError, filter, switchMap, map, take } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 import { BACKENDURL } from './constants'
@@ -22,11 +22,6 @@ export class PureContantService implements OnDestroy{
   public darktheme$: Observable<boolean>
 
   public totalAtlasesLength: number
-
-  private useTouchUiSelector = createSelector(
-    state => state[VIEWER_CONFIG_FEATURE_KEY],
-    (state: IViewerConfigState) => state.useMobileUI
-  )
 
   public backendUrl = (BACKEND_URL && `${BACKEND_URL}/`.replace(/\/\/$/, '/')) || `${window.location.origin}${window.location.pathname}`
 
@@ -113,7 +108,7 @@ export class PureContantService implements OnDestroy{
     )
 
     this.useTouchUI$ = this.store.pipe(
-      select(this.useTouchUiSelector),
+      select(viewerConfigSelectorUseMobileUi),
       shareReplay(1)
     )
 
