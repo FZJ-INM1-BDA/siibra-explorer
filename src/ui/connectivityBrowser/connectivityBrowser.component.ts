@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
   Input,
+  OnInit,
 } from "@angular/core";
 import {select, Store} from "@ngrx/store";
 import {fromEvent, Observable, Subscription, Subject, combineLatest} from "rxjs";
@@ -17,6 +18,7 @@ import { viewerStateNavigateToRegion } from "src/services/state/viewerState.stor
 import { ngViewerActionClearView } from "src/services/state/ngViewerState/actions";
 import { ngViewerSelectorClearViewEntries } from "src/services/state/ngViewerState/selectors";
 import { viewerStateAllRegionsFlattenedRegionSelector } from "src/services/state/viewerState/selectors";
+import { HttpClient } from "@angular/common/http";
 
 const CONNECTIVITY_NAME_PLATE = 'Connectivity'
 
@@ -24,7 +26,7 @@ const CONNECTIVITY_NAME_PLATE = 'Connectivity'
   selector: 'connectivity-browser',
   templateUrl: './connectivityBrowser.template.html',
 })
-export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
+export class ConnectivityBrowserComponent implements OnInit, AfterViewInit, OnDestroy{
 
     private setColorMap$: Subject<boolean> = new Subject()
 
@@ -34,6 +36,8 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
      * setcolormaps$ is set by the presence/absence of clearviewqueue[CONNECTIVITY_NAME_PLATE]
      */
     private _isFirstUpdate = true
+
+    public connectivityUrl = 'https://connectivity-query-v1-1-connectivity.apps-dev.hbp.eu/v1.1/studies'
 
     @Input()
     set accordionExpanded(flag: boolean){
@@ -53,6 +57,11 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
 
     @Output()
     setOpenState: EventEmitter<boolean> = new EventEmitter()
+
+    @Output()
+    connectivityLoadUrl: EventEmitter<string> = new EventEmitter()
+    
+    @Output() connectivityNumberReceived: EventEmitter<string> = new EventEmitter()
 
     @Input()
     set region(val){
@@ -78,6 +87,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
     public regionName: string
     public datasetList: any[] = []
     public selectedDataset: any
+    public selectedDatasetDescription: string = ''
     public connectedAreas = []
     
     private selectedParcellationFlatRegions$ = this.store$.pipe(
@@ -96,6 +106,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
     constructor(
         private store$: Store<any>,
         private changeDetectionRef: ChangeDetectorRef,
+        private httpClient: HttpClient
     ) {
 
       this.overwrittenColorMap$ = this.store$.pipe(
@@ -104,6 +115,32 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
         map(state => state.overwrittenColorMap),
         distinctUntilChanged()
       )
+    }
+
+    ngOnInit(): void {
+      this.httpClient.get<[]>(this.connectivityUrl).subscribe(res => {
+        this.datasetList = res
+        this.selectedDataset = this.datasetList[0].name
+        this.selectedDatasetDescription = this.datasetList[0].description
+      })
+    }
+
+    getLoadUrl(): string {
+      if (this.datasetList.length && this.selectedDataset) {
+        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
+        const url = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}` : null
+        this.connectivityLoadUrl.emit(url)
+        return url
+      }
+    }
+
+    getFullConnectivityLoadUrl(): string {
+      if (this.datasetList.length && this.selectedDataset) {
+        const selectedDatasetId = this.datasetList.find(d => d.name === this.selectedDataset).id
+        const url = selectedDatasetId? `${this.connectivityUrl}/${selectedDatasetId}/full_matrix` : null
+        this.connectivityLoadUrl.emit(url)
+        return url
+      }
     }
 
     public ngAfterViewInit(): void {
@@ -143,7 +180,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
             map((e: CustomEvent) => e.detail)
           )
         ).subscribe(([flag, connectedAreas]) => {
-
+          this.connectivityNumberReceived.emit(connectedAreas.length)
           this.connectedAreas = connectedAreas
           
           if (flag) {
@@ -170,16 +207,13 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
           .subscribe((e: CustomEvent) => {
             this.expandMenuIndex = e.detail
           }),
-        fromEvent(this.connectivityComponentElement?.nativeElement, 'datasetDataReceived', { capture: true })
-          .subscribe((e: CustomEvent) => {
-            this.datasetList = e.detail
-            this.selectedDataset = this.datasetList[0]
-          }),
         fromEvent(this.connectivityComponentElement?.nativeElement, 'customToolEvent', { capture: true })
           .subscribe((e: CustomEvent) => {
             if (e.detail.name === 'export csv') {
               // ToDo Fix in future to use component
+              console.log('searching...')
               const a = document.querySelector('hbp-connectivity-matrix-row')
+              console.log(a)
               a.downloadCSV()
             }
           }),
@@ -194,6 +228,7 @@ export class ConnectivityBrowserComponent implements AfterViewInit, OnDestroy{
     // ToDo Affect on component
     changeDataset(event) {
       this.selectedDataset = event.value
+      this.selectedDatasetDescription = this.datasetList.find(d => d.name === this.selectedDataset).description
     }
 
     navigateToRegion(region) {
