@@ -36,6 +36,7 @@ export interface IDatasetPreviewData{
   datasetSchema?: string
   datasetId: string
   filename: string
+  datasetSchema?: string
 }
 
 export type TypeOpenedWidget = {
