@@ -119,7 +119,7 @@ export const viewerStateAtlasParcellationSelector = createSelector(
     const allParcellations = fetchedTemplates.reduce(flattenFetchedTemplatesIntoParcellationsReducer, [])
 
     const selectedAtlas = selectedAtlasId && fetchedAtlases.find(a => a['@id'] === selectedAtlasId)
-    const atlasLayers =  selectedAtlas?.parcellations
+    const atlasLayers = selectedAtlas?.parcellations
       .map(p => {
         const otherHalfOfParc = allParcellations.find(parc => parc['@id'] === p['@id']) || {}
         return {

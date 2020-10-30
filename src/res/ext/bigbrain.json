@@ -15,8 +15,8 @@
   "nehubaConfigURL": "nehubaConfig/bigbrainNehubaConfig",
   "parcellations": [
     {
-      "@id": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
-      "fullId": "minds/core/parcellationatlas/v1.0.0/94c1125b-b87e-45e4-901c-00daee7f2579",
+      "@id": "juelich/iav/atlas/v1.0.0/7",
+      "fullId": "juelich/iav/atlas/v1.0.0/7",
       "name": "Cytoarchitectonic Maps",
       "properties": {
         "name": "Cytoarchitectonic Maps",
