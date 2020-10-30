@@ -292,6 +292,8 @@ describe('datasets/util.js', () => {
 
   describe('filterDatasetsByRegion', () => {
 
+    const idHumanTe1 = `minds/core/parcellationregion/v1.0.0/13e21153-2ba8-4212-b172-8894f1012225`
+    const idHumanTe1Alt = `minds/core/parcellationregion/v1.0.0/f424643e-9baf-4c50-9417-db1ac33dcd3e`
     const idHumanArea7ASPL = 'minds/core/parcellationregion/v1.0.0/e26e999f-77ad-4934-9569-8290ed05ebda'
     const idHumanArea7A = `minds/core/parcellationregion/v1.0.0/811f4adb-4a7c-45c1-8034-4afa9edf586a`
     const idMouseWholeBrain = `minds/core/parcellationregion/v1.0.0/be45bc91-8db5-419f-9471-73a320f44e06`
@@ -302,6 +304,12 @@ describe('datasets/util.js', () => {
       name: 'dataHumanArea7ASPL',
       parcellationRegion: [{
         fullId: idHumanArea7ASPL
+      }]
+    }
+    const dataHumanTe1 = {
+      name: 'dataHumanTe1',
+      parcellationRegion: [{
+        fullId: idHumanTe1
       }]
     }
     const dataMouseWholeBrain = {
@@ -329,8 +337,8 @@ describe('datasets/util.js', () => {
         expect(result).to.deep.equal([])
       })
       it('if query region is relatedAreas, should also leave in dataset', async () => {
-        const result = await filterDatasetsByRegion([dataHumanArea7ASPL], idHumanArea7A)
-        expect(result).to.deep.equal([dataHumanArea7ASPL])
+        const result = await filterDatasetsByRegion([dataHumanTe1], idHumanTe1Alt)
+        expect(result).to.deep.equal([dataHumanTe1])
       })
     })
 
