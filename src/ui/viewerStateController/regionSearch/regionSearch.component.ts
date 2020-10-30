@@ -13,10 +13,10 @@ import { PureContantService } from "src/util";
 import { viewerStateToggleRegionSelect, viewerStateNavigateToRegion, viewerStateSetSelectedRegions, viewerStateSetSelectedRegionsWithIds } from "src/services/state/viewerState.store.helper";
 import { ARIA_LABELS, CONST } from 'common/constants'
 
-const filterRegionBasedOnText = searchTerm => region => region.name.toLowerCase().includes(searchTerm.toLowerCase())
+const filterRegionBasedOnText = searchTerm => region => `${region.name.toLowerCase()}${region.status? ' (' + region.status + ')' : null}`.includes(searchTerm.toLowerCase())
   || (region.relatedAreas && region.relatedAreas.some(relatedArea => relatedArea.name && relatedArea.name.toLowerCase().includes(searchTerm.toLowerCase())))
 
-const compareFn = (it, item) => it.name === item.name
+const compareFn = (it, item) => it.name === item.name && it.status === item.status
 
 @Component({
   selector: 'region-text-search-autocomplete',

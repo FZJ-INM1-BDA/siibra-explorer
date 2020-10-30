@@ -1,7 +1,7 @@
 <div class="d-flex flex-row">
 
   <small class="text-truncate flex-shrink-1 flex-grow-1">
-    {{ region.name }}
+    {{ region.name }}<span *ngIf="region.status" class="text-muted">{{' (' + region.status + ')'}}</span>
   </small>
 
   <div class="flex-grow-0 flex-shrink-0 d-flex flex-row">
