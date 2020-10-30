@@ -105,3 +105,7 @@ export const viewerStateMouseOverCustomLandmarkInPerspectiveView = createAction(
   props<{ payload: { label: string } }>()
 )
 
+export const viewerStateChangeNavigation = createAction(
+  `[viewerState] changeNavigation`,
+  props<{ navigation: any }>()
+)

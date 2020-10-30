@@ -25,6 +25,7 @@ import {
   viewerStateNewViewer
 } from './viewerState.store.helper';
 import { cvtNehubaConfigToNavigationObj } from 'src/ui/viewerStateController/viewerState.useEffect';
+import { viewerStateChangeNavigation } from './viewerState/actions';
 
 export interface StateInterface {
   fetchedTemplates: any[]
@@ -162,6 +163,7 @@ export const getStateStore = ({ state = defaultState } = {}) => (prevState: Part
       fetchedTemplates: prevState.fetchedTemplates.concat(action.fetchedTemplate),
     }
   }
+  case viewerStateChangeNavigation.type:
   case CHANGE_NAVIGATION : {
     return {
       ...prevState,
@@ -271,7 +273,7 @@ export const UNLOAD_DEDICATED_LAYER = 'UNLOAD_DEDICATED_LAYER'
 export const NEWVIEWER = viewerStateNewViewer.type
 
 export const FETCHED_TEMPLATE = 'FETCHED_TEMPLATE'
-export const CHANGE_NAVIGATION = 'CHANGE_NAVIGATION'
+export const CHANGE_NAVIGATION = viewerStateChangeNavigation.type
 
 export const SELECT_PARCELLATION = viewerStateSelectParcellation.type
 

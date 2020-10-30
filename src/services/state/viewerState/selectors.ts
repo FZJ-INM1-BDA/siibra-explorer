@@ -1,4 +1,5 @@
 import { createSelector } from "@ngrx/store"
+import { create } from "domain"
 import { viewerStateHelperStoreName } from "../viewerState.store.helper"
 
 export const viewerStateSelectedRegionsSelector = createSelector(
@@ -30,6 +31,18 @@ export const viewerStateFetchedTemplatesSelector = createSelector(
 export const viewerStateSelectedTemplateSelector = createSelector(
   state => state['viewerState'],
   viewerState => viewerState['templateSelected']
+)
+
+/**
+ * viewerStateSelectedTemplateSelector may have it navigation mutated to allow for initiliasation of viewer at the correct navigation
+ * in some circumstances, it may be required to get the original navigation object
+ */
+export const viewerStateSelectedTemplatePureSelector = createSelector(
+  viewerStateFetchedTemplatesSelector,
+  viewerStateSelectedTemplateSelector,
+  (fetchedTemplates, selectedTemplate) => {
+    return fetchedTemplates.find(t => t['@id'] === selectedTemplate('@id'))
+  }
 )
 
 export const viewerStateSelectedParcellationSelector = createSelector(
