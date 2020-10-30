@@ -41,7 +41,7 @@ export const viewerStateSelectedTemplatePureSelector = createSelector(
   viewerStateFetchedTemplatesSelector,
   viewerStateSelectedTemplateSelector,
   (fetchedTemplates, selectedTemplate) => {
-    return fetchedTemplates.find(t => t['@id'] === selectedTemplate('@id'))
+    return fetchedTemplates.find(t => t['@id'] === selectedTemplate['@id'])
   }
 )
 
